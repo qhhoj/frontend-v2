@@ -171,3 +171,15 @@
     --qh-surface: var(--qh-surface-solid);
   }
 }
+
+/* Container for backend-sanitized user HTML (UserContent.vue): nothing inside may paint, size or stack outside it. */
+@utility user-content {
+  overflow: clip;
+  contain: paint inline-size;
+  isolation: isolate;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  & .katex-display {
+    overflow-x: auto;
+  }
+}

@@ -27,3 +27,19 @@ export async function mountApp(path: string) {
   await flushPromises();
   return { wrapper, router, queryClient };
 }
+
+/** Mounts one component with the app's plugins (router not navigated). */
+export function mountComponent(
+  component: Parameters<typeof mount>[0],
+  options: { props?: Record<string, unknown>; slots?: Record<string, string> } = {},
+) {
+  const pinia = createPinia();
+  setActivePinia(pinia);
+  const router = createAppRouter(createMemoryHistory());
+  const queryClient = createQueryClient();
+  return mount(component, {
+    ...options,
+    attachTo: document.body,
+    global: { plugins: appPlugins({ pinia, router, queryClient }) },
+  });
+}
