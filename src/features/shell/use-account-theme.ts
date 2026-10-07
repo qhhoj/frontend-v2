@@ -1,5 +1,6 @@
+import { useQueryClient } from '@tanstack/vue-query';
 import { watch } from 'vue';
-import { useProfileQuery } from '@/features/account/profile.queries';
+import { PROFILE_KEY, useProfileQuery } from '@/features/account/profile.queries';
 import { useSessionStore } from '@/stores/session.store';
 import { useThemeStore } from '@/theme/theme.store';
 
@@ -10,7 +11,17 @@ import { useThemeStore } from '@/theme/theme.store';
 export function useAccountThemeSync() {
   const theme = useThemeStore();
   const session = useSessionStore();
+  const queryClient = useQueryClient();
   const { data } = useProfileQuery();
+  // Profiles of accounts that are no longer signed in are dropped, not just left unread.
+  watch(
+    () => session.user?.id,
+    (userId) =>
+      queryClient.removeQueries({
+        queryKey: PROFILE_KEY,
+        predicate: (query) => query.queryKey[2] !== userId,
+      }),
+  );
   watch(
     () => [session.status, session.passwordChangeRequired, data.value?.siteTheme] as const,
     ([status, passwordChangeRequired, siteTheme]) => {

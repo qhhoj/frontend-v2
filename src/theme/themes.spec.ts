@@ -113,11 +113,27 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
       'opaque fallback': solid,
       'hover over opaque fallback': over(colour('surface-hover'), solid),
     };
-    for (const blob of BLOBS) {
-      const glass = over(colour('surface'), over(colour(blob), ground));
-      grounds[`glass over ${blob}`] = glass;
-      grounds[`hover row over ${blob}`] = over(colour('surface-hover'), glass);
-      grounds[`inner tile over ${blob}`] = over(colour('surface-strong'), glass);
+    // Blob centres sit at least one radius apart, so where two blobs overlap their falloffs add up to at most
+    // one peak: the compound is checked with each pair at half strength (the single peaks are the other extreme).
+    const halfStrength = (blob: string): Rgba => {
+      const [red, green, blue, alpha] = colour(blob);
+      return [red, green, blue, alpha / 2];
+    };
+    const blobStacks = [
+      ...BLOBS.map((blob) => ({ name: blob, layers: [colour(blob)] })),
+      ...BLOBS.flatMap((first, index) =>
+        BLOBS.slice(index + 1).map((second) => ({
+          name: `${first} + ${second}`,
+          layers: [halfStrength(first), halfStrength(second)],
+        })),
+      ),
+    ];
+    for (const { name, layers } of blobStacks) {
+      const blobGround = layers.reduce((below, layer) => over(layer, below), ground);
+      const glass = over(colour('surface'), blobGround);
+      grounds[`glass over ${name}`] = glass;
+      grounds[`hover row over ${name}`] = over(colour('surface-hover'), glass);
+      grounds[`inner tile over ${name}`] = over(colour('surface-strong'), glass);
     }
     const failures = Object.entries(grounds).flatMap(([groundName, groundColour]) =>
       [

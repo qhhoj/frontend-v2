@@ -46,7 +46,7 @@ export function mountComponent(
   const wrapper = mount(component, {
     ...options,
     attachTo: document.body,
-    global: { plugins: appPlugins({ pinia, router, queryClient }) },
+    global: { plugins: appPlugins({ pinia, router, queryClient }), stubs: { transition: false } },
   });
   mounted.push(wrapper);
   return wrapper;

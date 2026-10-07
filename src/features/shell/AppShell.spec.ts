@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { useSessionStore } from '@/stores/session.store';
 
 const clickMenuItem = async (label: string) => {
   const item = [...document.body.querySelectorAll('[role="menuitem"]')].find((element) =>
@@ -117,6 +118,41 @@ describe('app shell', () => {
     expect(document.documentElement.dataset.theme).toBe('glass-light');
     await wrapper.get('button[aria-label="Tài khoản của user_01"]').trigger('click');
     await clickMenuItem('Đăng xuất');
+    expect(document.documentElement.dataset.theme).toBe('glass-dark');
+  });
+
+  it('keeps the pre-painted account theme while the profile is still loading', async () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    document.documentElement.dataset.theme = 'glass-light';
+    mockApi({
+      'GET /auth/me': signedIn(),
+      'GET /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
+    });
+    await mountApp('/blog');
+    expect(document.documentElement.dataset.theme).toBe('glass-light');
+  });
+
+  it("reads the next account's theme after the previous session expired", async () => {
+    const secondUser = sessionUser({
+      id: '0192a000-0000-7000-8000-000000000002',
+      username: 'user_02',
+    });
+    let profileReads = 0;
+    mockApi({
+      'GET /auth/me': signedIn(),
+      'POST /auth/login': signedIn({ user: secondUser }),
+      'GET /profile': () => {
+        profileReads += 1;
+        return ok(profile({ siteTheme: profileReads === 1 ? 'light' : 'dark' }));
+      },
+    });
+    await mountApp('/blog');
+    expect(document.documentElement.dataset.theme).toBe('glass-light');
+    const session = useSessionStore();
+    session.$patch({ status: 'anonymous', user: null }); // what a 401 on any request does
+    await flushPromises();
+    await session.login({ username: 'user_02', password: 'secret-password' });
+    await flushPromises();
     expect(document.documentElement.dataset.theme).toBe('glass-dark');
   });
 
