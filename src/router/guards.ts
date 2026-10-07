@@ -44,6 +44,11 @@ export async function resolveNavigation(
   }
   if (session.status === 'partial')
     return to.meta.allowPartial ? true : { name: 'login-2fa', query: withRedirect(to) };
+  // The 2FA step exists only for a pending second factor; anyone else is sent on (the redirect is re-guarded).
+  if (to.name === 'login-2fa')
+    return session.status === 'authenticated'
+      ? safeRedirect(to.query.redirect)
+      : { name: 'login', query: { redirect: safeRedirect(to.query.redirect) } };
   if (session.passwordChangeRequired && to.name !== 'account-password')
     return { name: 'account-password' };
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);

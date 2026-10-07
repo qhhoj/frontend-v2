@@ -71,7 +71,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: PlaceholderPage,
+    component: () => import('@/features/auth/LoginPage.vue'),
     meta: { titleKey: 'pages.login', guestOnly: true },
   },
   {
@@ -83,7 +83,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/register',
     name: 'register',
-    component: PlaceholderPage,
+    component: () => import('@/features/auth/RegisterPage.vue'),
     meta: { titleKey: 'pages.register', guestOnly: true },
   },
   {
@@ -95,7 +95,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/activate/:key',
     name: 'activate',
-    component: PlaceholderPage,
+    component: () => import('@/features/auth/ActivatePage.vue'),
     meta: { titleKey: 'pages.activate' },
   },
   {

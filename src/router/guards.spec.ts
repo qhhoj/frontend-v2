@@ -46,6 +46,29 @@ describe('navigation guards', () => {
     expect(route.query.redirect).toBe('/problems');
   });
 
+  it('keeps the 2FA step for a pending second factor', async () => {
+    const { route } = await navigate(
+      '/login/2fa?redirect=/settings',
+      signedIn({ user: null, twoFactorRequired: true }),
+    );
+    expect(route.name).toBe('login-2fa');
+  });
+
+  it.each([
+    ['/login/2fa?redirect=/settings', '/settings'],
+    ['/login/2fa?redirect=//evil.example', '/'],
+    ['/login/2fa', '/'],
+  ])('sends a fully signed-in viewer away from %s', async (path, destination) => {
+    const { route } = await navigate(path, signedIn());
+    expect(route.fullPath).toBe(destination);
+  });
+
+  it('sends a signed-out viewer from 2FA to login, keeping the redirect', async () => {
+    const { route } = await navigate('/login/2fa?redirect=/settings', signedOut);
+    expect(route.name).toBe('login');
+    expect(route.query.redirect).toBe('/settings');
+  });
+
   it('forces a password change when the password is pwned', async () => {
     const { route } = await navigate('/problems', signedIn({ passwordChangeRequired: true }));
     expect(route.name).toBe('account-password');
