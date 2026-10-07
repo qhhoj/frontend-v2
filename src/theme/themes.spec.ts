@@ -3,6 +3,7 @@ import { contrastRatio, over, parseColour } from '@/test/contrast';
 import type { Rgba } from '@/test/contrast';
 import globalTokensCss from './tokens.css?raw';
 import { THEMES } from './registry';
+import stylesCss from './styles.css?raw';
 
 const themeFiles = import.meta.glob<string>('./themes/*.css', {
   query: '?raw',
@@ -159,5 +160,22 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
 describe('theme registry', () => {
   it('has a CSS file for every registered theme and registers every CSS file', () => {
     expect(themes.map((theme) => theme.id).sort()).toEqual(THEMES.map((theme) => theme.id).sort());
+  });
+
+  it('imports every registered theme in styles.css', () => {
+    const missing = THEMES.filter(
+      (theme) => !stylesCss.includes(`@import './themes/${theme.id}.css';`),
+    ).map((theme) => theme.id);
+    expect(missing).toEqual([]);
+  });
+
+  it('declares the colour-scheme its registry entry claims', () => {
+    const mismatched = THEMES.filter(
+      (theme) =>
+        !new RegExp(`color-scheme:\\s*${theme.scheme}\\s*;`).test(
+          themes.find((file) => file.id === theme.id)?.css ?? '',
+        ),
+    ).map((theme) => theme.id);
+    expect(mismatched).toEqual([]);
   });
 });
