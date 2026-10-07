@@ -1,7 +1,7 @@
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 import { flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
 import { installFakeEventSource, latestEventSource } from '@/test/fake-event-source';
 import { mockApi, ok } from '@/test/mock-api';
@@ -105,8 +105,69 @@ describe('useSubmissionStatus', () => {
     const { live } = follow(ref('abc'));
     latestEventSource().fail();
     await flushPromises();
-    expect(live).toMatchObject({ status: 'P', done: false });
+    expect(live).toMatchObject({ status: 'P', done: false, stale: true });
     expect(latestEventSource().closed).toBe(true);
+  });
+
+  it('is stale when the stream is gone and the row cannot be read', async () => {
+    mockApi({
+      'GET /submissions/abc': { status: 404, body: { error: { code: 'not_found', message: 'x' } } },
+    });
+    const { live } = follow(ref('abc'));
+    latestEventSource().fail();
+    await flushPromises();
+    expect(live).toMatchObject({ status: null, done: false, stale: true });
+  });
+
+  it('is not stale when the final row was read', async () => {
+    mockApi({ 'GET /submissions/abc': row('D', 'AC') });
+    const { live } = follow(ref('abc'));
+    latestEventSource().fail();
+    await flushPromises();
+    expect(live.stale).toBe(false);
+  });
+
+  it('ignores frames without a status', async () => {
+    const { live } = follow(ref('abc'));
+    latestEventSource().emit('state', {});
+    latestEventSource().emit('done', {});
+    await flushPromises();
+    expect(live).toMatchObject({ status: null, done: false });
+  });
+
+  it('finishes once when done arrives while a resync read is in flight', async () => {
+    const calls = mockApi({ 'GET /submissions/abc': row('D', 'AC') });
+    const { live, invalidate } = follow(ref('abc'));
+    const stream = latestEventSource();
+    stream.emit('resync', {});
+    stream.emit('done', { submissionId: 'abc', type: 'done', status: 'D' });
+    await flushPromises();
+    expect(live).toMatchObject({ result: 'AC', done: true });
+    expect(invalidate).toHaveBeenCalledTimes(1);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('drops a stale row when the id returns to the same value mid-read', async () => {
+    let answer!: (response: Response) => void;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>((resolve) => (answer = resolve))),
+    );
+    const id = ref<string | null>('abc');
+    const { live } = follow(id);
+    latestEventSource().emit('resync', {});
+    id.value = null;
+    await nextTick();
+    id.value = 'abc';
+    await nextTick();
+    answer(
+      new Response(
+        JSON.stringify({ data: { id: 'abc', status: 'D', result: 'AC', currentTestcase: 0 } }),
+      ),
+    );
+    await flushPromises();
+    expect(live).toMatchObject({ status: null, done: false });
+    expect(latestEventSource().closed).toBe(false);
   });
 
   it('leaves a retrying connection alone', async () => {

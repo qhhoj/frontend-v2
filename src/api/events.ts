@@ -24,7 +24,7 @@ export function openEventStream(
       } catch {
         return;
       }
-      handle(data);
+      if (typeof data === 'object' && data !== null) handle(data);
     });
   source.addEventListener('error', () => {
     if (source.readyState === EventSource.CLOSED) onClosed?.();

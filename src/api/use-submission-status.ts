@@ -17,7 +17,11 @@ export interface SubmissionLiveState {
   result: SubmissionResult | null;
   currentTestcase: number;
   done: boolean;
+  /** The stream closed for good and the final row could not be confirmed: the shown status may be outdated, ask the user to reload. */
+  stale: boolean;
 }
+
+type StoredRow = { status: SubmissionStatus; result: SubmissionResult | null };
 
 const PROGRESS_EVENTS = ['queued', 'processing', 'grading-begin', 'test-case', 'done'] as const;
 
@@ -31,54 +35,65 @@ export function useSubmissionStatus(
     result: null,
     currentTestcase: 0,
     done: false,
+    stale: false,
   });
   let stream: EventStream | null = null;
+  /** Bumped per followed id, so an answer that arrives after the id changed is dropped even when the id is back. */
+  let generation = 0;
   const stop = () => {
     stream?.close();
     stream = null;
   };
 
-  /** Reads the stored row once and ends the stream; `known` is a row already fetched. */
-  async function finish(
-    id: string,
-    known?: { status: SubmissionStatus; result: SubmissionResult | null },
-  ) {
-    stop();
-    const row = known ?? (await fetchSubmission(id).catch(() => null));
-    if (submissionId.value !== id) return;
-    if (row) Object.assign(state, { status: row.status, result: row.result });
-    state.done = true;
-    void queryClient.invalidateQueries({ queryKey: ['submissions'] });
-  }
-
-  /** `stream` is null once finishing started, so a late final event does not finish twice. */
-  function apply(id: string, status: SubmissionStatus, currentTestcase: number | null | undefined) {
-    Object.assign(state, { status, currentTestcase: currentTestcase ?? 0 });
-    if (FINISHED_STATUSES.includes(status) && stream) void finish(id);
-  }
-
-  /** The stored row is the truth when events were lost (`resync`) or the stream is gone (`closed`). */
-  async function rereadRow(id: string, streamIsDead: boolean) {
-    const row = await fetchSubmission(id).catch(() => null);
-    if (submissionId.value !== id || !stream) return;
-    if (!row) {
-      if (streamIsDead) stop();
-      return;
-    }
-    Object.assign(state, { status: row.status, currentTestcase: row.currentTestcase ?? 0 });
-    if (FINISHED_STATUSES.includes(row.status)) void finish(id, row);
-    else if (streamIsDead) stop();
-  }
-
   watch(
     submissionId,
     (id) => {
       stop();
-      Object.assign(state, { status: null, result: null, currentTestcase: 0, done: false });
+      generation += 1;
+      const mine = generation;
+      Object.assign(state, {
+        status: null,
+        result: null,
+        currentTestcase: 0,
+        done: false,
+        stale: false,
+      });
       if (!id) return;
+
+      /** Reads the stored row once and ends the stream; `known` is a row already fetched. */
+      async function finish(known?: StoredRow) {
+        stop();
+        const row = known ?? (await fetchSubmission(id!).catch(() => null));
+        if (generation !== mine) return;
+        if (row) Object.assign(state, { status: row.status, result: row.result });
+        state.done = true;
+        void queryClient.invalidateQueries({ queryKey: ['submissions'] });
+      }
+
+      /** `stream` is null once finishing started, so a late final event does not finish twice. */
+      function apply(status: unknown, currentTestcase: number | null | undefined) {
+        if (typeof status !== 'string') return;
+        Object.assign(state, { status, currentTestcase: currentTestcase ?? 0 });
+        if (FINISHED_STATUSES.includes(status as SubmissionStatus) && stream) void finish();
+      }
+
+      /** The stored row is the truth when events were lost (`resync`) or the stream is gone (`closed`). A gone stream whose final row cannot be confirmed leaves the state `stale`. */
+      async function rereadRow(streamIsDead: boolean) {
+        const row = await fetchSubmission(id!).catch(() => null);
+        if (generation !== mine || !stream) return;
+        if (row) {
+          Object.assign(state, { status: row.status, currentTestcase: row.currentTestcase ?? 0 });
+          if (FINISHED_STATUSES.includes(row.status)) return void finish(row);
+        }
+        if (streamIsDead) {
+          stop();
+          state.stale = true;
+        }
+      }
+
       const progress = (data: unknown) => {
         const event = data as SubmissionProgressEvent;
-        apply(id, event.status, event.currentTestcase);
+        apply(event.status, event.currentTestcase);
       };
       stream = openEventStream(
         `/events/submissions/${encodeURIComponent(id)}`,
@@ -86,11 +101,11 @@ export function useSubmissionStatus(
           ...Object.fromEntries(PROGRESS_EVENTS.map((type) => [type, progress])),
           state: (data) => {
             const event = data as SubmissionStateEvent;
-            apply(id, event.status, event.currentTestcase);
+            apply(event.status, event.currentTestcase);
           },
-          resync: () => void rereadRow(id, false),
+          resync: () => void rereadRow(false),
         },
-        () => void rereadRow(id, true),
+        () => void rereadRow(true),
       );
     },
     { immediate: true },

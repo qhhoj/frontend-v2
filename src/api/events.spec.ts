@@ -22,6 +22,14 @@ describe('openEventStream', () => {
     expect(onState).not.toHaveBeenCalled();
   });
 
+  it('skips a frame whose JSON is not an object', () => {
+    const onState = vi.fn();
+    openEventStream('/events/submissions/abc', { state: onState });
+    latestEventSource().emit('state', 'null', true);
+    latestEventSource().emit('state', '"text"', true);
+    expect(onState).not.toHaveBeenCalled();
+  });
+
   it('closes the connection', () => {
     openEventStream('/events/submissions/abc', {}).close();
     expect(latestEventSource().closed).toBe(true);
