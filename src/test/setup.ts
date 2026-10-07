@@ -1,11 +1,12 @@
 import { enableAutoUnmount } from '@vue/test-utils';
-import { afterEach, beforeEach, expect } from 'vitest';
+import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { DEFAULT_LOCALE, i18n } from '@/i18n';
 import { stubMatchMedia } from './match-media';
 import { takeUnmatchedRequests } from './mock-api';
 
 beforeEach(() => {
   stubMatchMedia();
+  vi.stubGlobal('scrollTo', vi.fn()); // jsdom does not implement it; the router scrolls on every navigation
 });
 
 afterEach(() => {
