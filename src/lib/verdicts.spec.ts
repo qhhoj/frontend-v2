@@ -19,6 +19,10 @@ describe('verdictOf', () => {
     });
   });
 
+  it('keeps showing the status while a result already exists but grading is not done', () => {
+    expect(verdictOf({ status: 'G', result: 'WA' }).code).toBe('G');
+  });
+
   it('shows a final status that carries no result', () => {
     expect(verdictOf({ status: 'CE', result: null })).toMatchObject({ code: 'CE', tone: 'ce' });
   });

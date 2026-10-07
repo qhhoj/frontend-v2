@@ -5,9 +5,9 @@ export const primeVuePreset: PrimeVuePTOptions = {
   select: {
     root: {
       class:
-        'relative inline-flex h-11 min-w-0 cursor-pointer items-center rounded-pill border border-line bg-surface-strong pl-4 text-sm text-content',
+        'relative inline-flex h-11 min-w-0 cursor-pointer items-center rounded-pill border border-line bg-surface-strong pl-4 text-sm text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus',
     },
-    label: { class: 'flex-1 truncate py-2' },
+    label: { class: 'flex-1 truncate py-2 focus-visible:outline-none' },
     dropdown: { class: 'flex w-10 items-center justify-center text-muted' },
     overlay: { class: 'mt-2 rounded-tile border border-line bg-surface-solid p-1 text-content' },
     listContainer: { class: 'max-h-72 overflow-auto' },
@@ -15,7 +15,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
     option: ({ context }) => ({
       class: [
         'flex min-h-11 cursor-pointer items-center rounded-cell px-3 text-sm',
-        context.focused && 'bg-surface-hover',
+        context.focused && 'bg-surface-hover outline-2 -outline-offset-2 outline-focus',
         context.selected && 'font-semibold text-accent-text',
       ],
     }),
@@ -23,7 +23,12 @@ export const primeVuePreset: PrimeVuePTOptions = {
   menu: {
     root: { class: 'min-w-52 rounded-tile border border-line bg-surface-solid p-1 text-content' },
     list: { class: 'm-0 list-none p-0' },
-    item: ({ context }) => ({ class: ['rounded-cell', context.focused && 'bg-surface-hover'] }),
+    item: ({ context }) => ({
+      class: [
+        'rounded-cell',
+        context.focused && 'bg-surface-hover outline-2 -outline-offset-2 outline-focus',
+      ],
+    }),
     itemLink: {
       class:
         'flex min-h-11 cursor-pointer items-center gap-3 px-3 text-sm text-content no-underline',

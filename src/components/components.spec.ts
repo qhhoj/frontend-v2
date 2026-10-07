@@ -103,6 +103,9 @@ describe('UserContent', () => {
       'isolation: isolate',
       'min-width: 0',
       '.katex-display',
+      '& pre',
+      '& table',
+      'width: 100%',
       'overflow-x: auto',
     ]) {
       expect(rule).toContain(declaration);

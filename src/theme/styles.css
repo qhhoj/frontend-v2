@@ -177,9 +177,15 @@
   overflow: clip;
   contain: paint inline-size;
   isolation: isolate;
+  width: 100%;
   min-width: 0;
   overflow-wrap: anywhere;
-  & .katex-display {
+  & .katex-display,
+  & pre {
+    overflow-x: auto;
+  }
+  & table {
+    display: block;
     overflow-x: auto;
   }
 }

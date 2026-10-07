@@ -1,4 +1,6 @@
+import { afterEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { createMemoryHistory } from 'vue-router';
 import App from '@/App.vue';
@@ -28,6 +30,9 @@ export async function mountApp(path: string) {
   return { wrapper, router, queryClient };
 }
 
+const mounted: VueWrapper[] = [];
+afterEach(() => mounted.splice(0).forEach((wrapper) => wrapper.unmount()));
+
 /** Mounts one component with the app's plugins (router not navigated). */
 export function mountComponent(
   component: Parameters<typeof mount>[0],
@@ -37,9 +42,11 @@ export function mountComponent(
   setActivePinia(pinia);
   const router = createAppRouter(createMemoryHistory());
   const queryClient = createQueryClient();
-  return mount(component, {
+  const wrapper = mount(component, {
     ...options,
     attachTo: document.body,
     global: { plugins: appPlugins({ pinia, router, queryClient }) },
   });
+  mounted.push(wrapper);
+  return wrapper;
 }

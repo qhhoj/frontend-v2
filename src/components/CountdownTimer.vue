@@ -9,9 +9,7 @@ const now = useNow();
 const remaining = computed(() =>
   Math.max(0, Math.floor((Date.parse(props.until) - now.value) / 1000)),
 );
-watch(remaining, (seconds, previous) => {
-  if (seconds === 0 && previous > 0) emit('elapsed');
-});
+watch(remaining, (seconds) => seconds === 0 && emit('elapsed'));
 </script>
 
 <template>
