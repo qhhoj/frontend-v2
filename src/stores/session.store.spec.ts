@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { apiRequest, onCsrfFailed } from '@/api/client';
+import { apiRequest, onCsrfFailed, onUnauthorized } from '@/api/client';
 import { sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { useSessionStore } from './session.store';
@@ -9,6 +9,7 @@ describe('useSessionStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     onCsrfFailed(null);
+    onUnauthorized(null);
   });
 
   it('is anonymous when /auth/me answers 401', async () => {

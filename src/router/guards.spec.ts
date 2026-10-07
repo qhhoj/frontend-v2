@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
-import { onCsrfFailed } from '@/api/client';
+import { onCsrfFailed, onUnauthorized } from '@/api/client';
 import { sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
@@ -18,6 +18,7 @@ describe('navigation guards', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     onCsrfFailed(null);
+    onUnauthorized(null);
   });
 
   it('lets anyone open a public page', async () => {
@@ -54,6 +55,12 @@ describe('navigation guards', () => {
     const { route } = await navigate('/admin/judges', signedIn());
     expect(route.name).toBe('not-found');
     expect(route.path).toBe('/admin/judges');
+  });
+
+  it('keeps encoded characters of a hidden admin URL as they were', async () => {
+    const { route } = await navigate('/admin/a%2Fb/c%20d', signedIn());
+    expect(route.name).toBe('not-found');
+    expect(route.path).toBe('/admin/a%2Fb/c%20d');
   });
 
   it('opens admin routes for staff', async () => {

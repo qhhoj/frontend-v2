@@ -15,10 +15,19 @@ const toLogin = (to: RouteLocationNormalized): RouteLocationRaw => ({
   query: withRedirect(to),
 });
 
+/** `to.path` is percent-encoded and the router encodes params again, so decode first. */
+const decodeSegment = (segment: string) => {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+};
+
 /** Renders not-found at the same URL. */
 const notFound = (to: RouteLocationNormalized): RouteLocationRaw => ({
   name: 'not-found',
-  params: { pathMatch: to.path.slice(1).split('/') },
+  params: { pathMatch: to.path.slice(1).split('/').map(decodeSegment) },
   query: to.query,
   hash: to.hash,
 });
