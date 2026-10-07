@@ -24,7 +24,7 @@ Source of truth for values is the code: `src/theme/tokens.css` (global tokens) a
 | Accent as text/link | `--qh-accent-text` | `#FDB8FF` | `#A21CAF` |
 | Text on accent gradient | `--qh-on-accent` | `#140A1F` | `#FFFFFF` |
 
-Measured on the worst ground (blob centre + glass + hover tint): the mockup's muted `#B7A9D6` (4.11) and pink text `#FC72FF` (3.82) fail 4.5:1. Fixes: blob peaks lowered to 24 % (pink) / 28 % (violet), muted `#CFC5EA`, pink never used as text (`--qh-accent-text` `#FDB8FF`), lighter verdict/tier text in dark and darker in light. Every theme is checked by `src/theme/themes.spec.ts`; worst pair is 5.57 (dark) and 4.72 (light).
+Measured on the worst ground (blob centre + glass + hover tint): the mockup's muted `#B7A9D6` (4.11) and pink text `#FC72FF` (3.82) fail 4.5:1. Fixes: blob peaks lowered to 24 % (pink) / 28 % (violet), muted `#CFC5EA`, pink never used as text (`--qh-accent-text` `#FDB8FF`), lighter verdict/tier text in dark and darker in light. Every theme is checked by `src/theme/themes.spec.ts`; worst pair is 5.57 (dark) and 4.61 (light).
 
 Verdicts (text + tint, always with a text label and an icon): AC green, WA red, TLE/MLE amber, RTE/OLE/IR violet, CE/IE slate, pending violet-grey, partial = 3-step green. Rating tiers follow legacy classes (newbie … grandmaster).
 
@@ -43,7 +43,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 ## Components
 
-- **Glass card**: `bg-surface backdrop-blur border border-line rounded-card p-6`.
+- **Glass card**: `glass rounded-card p-6`.
 - **Pill nav**: glass pill container, active item `bg-surface-hover` + `text-content`, others `text-muted`.
 - **Primary button**: accent gradient, `text-on-accent`, 56 px tall in the swap card, 44 px elsewhere.
 - **Token pill**: 40 px pill, 28 px gradient coin + label; selected = accent border + accent tint.

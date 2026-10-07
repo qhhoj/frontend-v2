@@ -15,6 +15,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
     include: ['src/**/*.spec.ts'],
+    // Vitest returns '' for CSS ids by default; themes.spec reads the theme files with `?raw`.
     css: { include: /\.css\?raw$/ },
     restoreMocks: true,
     unstubGlobals: true,

@@ -58,7 +58,7 @@ const TEXT_TOKENS = [
   'tier-grandmaster',
 ];
 /** Text token and the tint it sits on. */
-const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
+const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['verdict-ac', 'verdict-ac-bg'],
   ['verdict-wa', 'verdict-wa-bg'],
   ['verdict-tle', 'verdict-tle-bg'],
@@ -71,7 +71,16 @@ const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['accent-soft-text', 'accent-soft'],
   ['first-solve-text', 'first-solve-bg'],
   ['first-solve-text', 'first-solve-bg-2'],
+  ['positive', 'verdict-ac-bg'],
+  ['negative', 'verdict-wa-bg'],
 ];
+
+/** Verdict and accent tints with their dedicated text colour, plus plain body text on each tint. */
+const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ...TINT_PAIRS,
+  ...[...new Set(TINT_PAIRS.map(([, tint]) => tint))].map((tint) => ['text', tint] as const),
+];
+const allTokenNames = new Set(themes.flatMap(({ tokens }) => [...tokens.keys()]));
 
 describe.each(themes)('theme $id', ({ id, css, tokens }) => {
   const colour = (name: string): Rgba => {
@@ -82,6 +91,10 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
 
   it('is selected by its data-theme attribute', () => {
     expect(css).toContain(`[data-theme='${id}']`);
+  });
+
+  it('defines the same tokens as every other theme', () => {
+    expect([...allTokenNames].filter((name) => !tokens.has(name))).toEqual([]);
   });
 
   it('defines every token the stylesheets and components use', () => {

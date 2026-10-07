@@ -1,9 +1,6 @@
 {
   "name": "qhhoj-frontend-v2",
   "version": "0.0.0",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build",
@@ -16,18 +13,10 @@
     "e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/qhhoj/frontend-v2.git"
-  },
-  "bugs": {
-    "url": "https://github.com/qhhoj/frontend-v2/issues"
-  },
-  "homepage": "https://github.com/qhhoj/frontend-v2#readme",
-  "private": "true",
+  "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.13"
   },
   "dependencies": {
     "@fontsource/inter": "5.3.0",

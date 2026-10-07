@@ -18,6 +18,7 @@
   --font-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
+  --blur-*: initial;
 }
 
 @theme inline {
@@ -77,7 +78,10 @@
   --radius-panel: var(--qh-radius-panel);
   --radius-pill: var(--qh-radius-pill);
   --shadow-glow: var(--qh-glow);
+  --blur-glass: var(--qh-blur);
   --ease-standard: var(--qh-ease);
+  --default-transition-duration: var(--qh-duration-fast);
+  --default-transition-timing-function: var(--qh-ease);
 }
 
 @utility glass {
@@ -141,15 +145,27 @@
       background-color var(--qh-duration-fast) var(--qh-ease),
       border-color var(--qh-duration-fast) var(--qh-ease);
   }
+  /* Catches a stray duration-*, animate-* utility or library transition. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
 }
 
 /* Same specificity as the theme selectors and later in the cascade: these win. */
 @supports not (backdrop-filter: blur(1px)) {
+  :root,
   :root[data-theme] {
     --qh-surface: var(--qh-surface-solid);
   }
 }
 @media (prefers-reduced-transparency: reduce) {
+  :root,
   :root[data-theme] {
     --qh-blur: 0px;
     --qh-surface: var(--qh-surface-solid);
