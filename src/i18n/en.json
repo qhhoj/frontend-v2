@@ -84,9 +84,16 @@
     "not_found": "Not found.",
     "invalid_token": "This link is invalid or has expired.",
     "validation_failed": "Some fields are invalid.",
-    "conflict": "The data just changed. Please try again.",
+    "conflict": "This action conflicts with the current state. Reload and try again.",
     "mail_unavailable": "The email could not be sent. Please try again later.",
     "csrf_failed": "Your session expired. Please reload the page.",
+    "invalid_code": "The code is wrong or has expired.",
+    "totp_not_enabled": "Authenticator app is not enabled for this account.",
+    "webauthn_not_enabled": "No security key is registered for this account.",
+    "webauthn_failed": "Security key verification failed.",
+    "pdf_unavailable": "The PDF is not available.",
+    "file_too_large": "The file is too large.",
+    "not_impersonating": "You are not impersonating another user.",
     "two_factor_required": "Two-factor authentication is required to continue.",
     "password_change_required": "You must change your password before continuing."
   },
@@ -136,7 +143,7 @@
     },
     "ratingDelta": "{delta} at the last contest",
     "ratingTier": "Rating · {tier}",
-    "ratingChart": "Rating over {count} contests, from {first} to {last}",
+    "ratingChart": "Rating over {count} contest, from {first} to {last} | Rating over {count} contests, from {first} to {last}",
     "solved": "Solved",
     "points": "Points",
     "rank": "Rank",
@@ -161,8 +168,8 @@
   },
   "problems": {
     "title": "Pick a problem, start solving",
-    "summary": "{total} problems",
-    "summarySolved": "{total} problems · you solved {solved}",
+    "summary": "{total} problem | {total} problems",
+    "summarySolved": "{total} problem · you solved {solved} | {total} problems · you solved {solved}",
     "search": "Search by code or name",
     "types": "Filter by topic",
     "pointsAny": "Points",
@@ -184,7 +191,7 @@
     "empty": "No matching problems."
   },
   "ranking": {
-    "summary": "{format} · {problems} problems · {participants} contestants",
+    "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",
     "contestNav": "Contest sections",
     "navProblems": "Problems",
     "navSubmissions": "Submissions",
@@ -194,7 +201,7 @@
     "withVirtual": "Include virtual",
     "searchLabel": "Find a contestant",
     "frozenTitle": "The board is frozen",
-    "frozenBody": "In the last {minutes} minutes new results show \"?\" until they are revealed.",
+    "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
     "podium": "Top 3",
     "timeLeft": "Time left",
     "columns": {
@@ -212,10 +219,10 @@
       "pending": "?n: waiting to be revealed"
     },
     "cell": {
-      "firstSolve": "First solve, after {tries} wrong tries, at {time}",
-      "solved": "Solved after {tries} wrong tries, at {time}",
-      "failed": "{tries} wrong tries",
-      "pending": "{tries} submissions waiting to be revealed",
+      "firstSolve": "First solve, after {tries} wrong try, at {time} | First solve, after {tries} wrong tries, at {time}",
+      "solved": "Solved after {tries} wrong try, at {time} | Solved after {tries} wrong tries, at {time}",
+      "failed": "{tries} wrong try | {tries} wrong tries",
+      "pending": "{tries} submission waiting to be revealed | {tries} submissions waiting to be revealed",
       "points": "{points} points",
       "empty": "Not attempted"
     },

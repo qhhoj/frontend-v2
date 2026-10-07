@@ -45,7 +45,6 @@ describe('useLocaleStore', () => {
     store.toggle();
     await nextTick();
     expect(translate('nav.problems')).toBe('Problems');
-    vi.restoreAllMocks();
   });
 
   it('ignores a corrupt stored value', () => {
