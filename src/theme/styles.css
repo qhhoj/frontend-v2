@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/600.css';
+@import './tokens.css';
+@import './themes/glass-dark.css';
+@import './themes/glass-light.css';
+
+/* Only semantic names exist: Tailwind's palette, fonts, radii and shadows are dropped. */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+}
+
+@theme inline {
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-ground: var(--qh-ground);
+  --color-surface: var(--qh-surface);
+  --color-surface-strong: var(--qh-surface-strong);
+  --color-surface-hover: var(--qh-surface-hover);
+  --color-surface-solid: var(--qh-surface-solid);
+  --color-line: var(--qh-line);
+  --color-line-strong: var(--qh-line-strong);
+  --color-content: var(--qh-text);
+  --color-muted: var(--qh-text-muted);
+  --color-accent: var(--qh-accent);
+  --color-accent-2: var(--qh-accent-2);
+  --color-accent-text: var(--qh-accent-text);
+  --color-accent-soft: var(--qh-accent-soft);
+  --color-accent-soft-text: var(--qh-accent-soft-text);
+  --color-on-accent: var(--qh-on-accent);
+  --color-on-coin: var(--qh-on-coin);
+  --color-focus: var(--qh-focus-ring);
+  --color-positive: var(--qh-positive);
+  --color-negative: var(--qh-negative);
+  --color-verdict-ac: var(--qh-verdict-ac);
+  --color-verdict-ac-bg: var(--qh-verdict-ac-bg);
+  --color-verdict-wa: var(--qh-verdict-wa);
+  --color-verdict-wa-bg: var(--qh-verdict-wa-bg);
+  --color-verdict-tle: var(--qh-verdict-tle);
+  --color-verdict-tle-bg: var(--qh-verdict-tle-bg);
+  --color-verdict-rte: var(--qh-verdict-rte);
+  --color-verdict-rte-bg: var(--qh-verdict-rte-bg);
+  --color-verdict-ce: var(--qh-verdict-ce);
+  --color-verdict-ce-bg: var(--qh-verdict-ce-bg);
+  --color-verdict-pending: var(--qh-verdict-pending);
+  --color-verdict-pending-bg: var(--qh-verdict-pending-bg);
+  --color-verdict-partial: var(--qh-verdict-partial);
+  --color-partial-bg-1: var(--qh-partial-bg-1);
+  --color-partial-bg-2: var(--qh-partial-bg-2);
+  --color-partial-bg-3: var(--qh-partial-bg-3);
+  --color-first-solve-text: var(--qh-first-solve-text);
+  --color-tier-none: var(--qh-tier-none);
+  --color-tier-newbie: var(--qh-tier-newbie);
+  --color-tier-pupil: var(--qh-tier-pupil);
+  --color-tier-specialist: var(--qh-tier-specialist);
+  --color-tier-expert: var(--qh-tier-expert);
+  --color-tier-candidate-master: var(--qh-tier-candidate-master);
+  --color-tier-master: var(--qh-tier-master);
+  --color-tier-grandmaster: var(--qh-tier-grandmaster);
+  --font-display: var(--qh-font-display);
+  --font-body: var(--qh-font-body);
+  --font-mono: var(--qh-font-mono);
+  --radius-cell: var(--qh-radius-cell);
+  --radius-row: var(--qh-radius-row);
+  --radius-tile: var(--qh-radius-tile);
+  --radius-card: var(--qh-radius-card);
+  --radius-panel: var(--qh-radius-panel);
+  --radius-pill: var(--qh-radius-pill);
+  --shadow-glow: var(--qh-glow);
+  --ease-standard: var(--qh-ease);
+}
+
+@utility glass {
+  background-color: var(--qh-surface);
+  border: 1px solid var(--qh-line);
+  -webkit-backdrop-filter: blur(var(--qh-blur));
+  backdrop-filter: blur(var(--qh-blur));
+}
+@utility bg-gradient-accent {
+  background-image: var(--qh-gradient-accent);
+}
+@utility bg-first-solve {
+  background-image: linear-gradient(90deg, var(--qh-first-solve-bg), var(--qh-first-solve-bg-2));
+}
+@utility blob-1 {
+  background: radial-gradient(closest-side, var(--qh-blob-1), transparent);
+}
+@utility blob-2 {
+  background: radial-gradient(closest-side, var(--qh-blob-2), transparent);
+}
+@utility blob-3 {
+  background: radial-gradient(closest-side, var(--qh-blob-3), transparent);
+}
+@utility coin-1 {
+  background-image: var(--qh-coin-1);
+}
+@utility coin-2 {
+  background-image: var(--qh-coin-2);
+}
+@utility coin-3 {
+  background-image: var(--qh-coin-3);
+}
+@utility coin-4 {
+  background-image: var(--qh-coin-4);
+}
+@utility coin-5 {
+  background-image: var(--qh-coin-5);
+}
+@utility coin-6 {
+  background-image: var(--qh-coin-6);
+}
+
+@layer base {
+  html {
+    background-color: var(--qh-ground);
+    color: var(--qh-text);
+    font-family: var(--qh-font-body);
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--qh-focus-ring);
+    outline-offset: 2px;
+  }
+  button,
+  a {
+    transition:
+      color var(--qh-duration-fast) var(--qh-ease),
+      background-color var(--qh-duration-fast) var(--qh-ease),
+      border-color var(--qh-duration-fast) var(--qh-ease);
+  }
+}
+
+/* Same specificity as the theme selectors and later in the cascade: these win. */
+@supports not (backdrop-filter: blur(1px)) {
+  :root[data-theme] {
+    --qh-surface: var(--qh-surface-solid);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-theme] {
+    --qh-blur: 0px;
+    --qh-surface: var(--qh-surface-solid);
+  }
+}

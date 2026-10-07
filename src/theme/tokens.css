@@ -1,0 +1,23 @@
+/* Tokens shared by every theme; a theme file may override any of them. Colours live only in themes/. */
+:root {
+  --qh-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --qh-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --qh-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --qh-radius-cell: 12px;
+  --qh-radius-row: 16px;
+  --qh-radius-tile: 20px;
+  --qh-radius-card: 24px;
+  --qh-radius-panel: 28px;
+  --qh-radius-pill: 999px;
+  --qh-blur: 24px;
+  --qh-duration-fast: 150ms;
+  --qh-duration: 200ms;
+  --qh-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --qh-duration-fast: 0ms;
+    --qh-duration: 0ms;
+  }
+}
