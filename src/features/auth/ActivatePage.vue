@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { errorMessageKey } from '@/i18n/error-message';
 import { activate } from '@/api/auth.api';
 
 // Unstyled placeholder: logic only until the auth mock-ups are approved (plan 8b).
 const route = useRoute();
+const router = useRouter();
+const error = ref<unknown>(null);
 const state = ref<'pending' | 'activated' | 'failed'>('pending');
 
 onMounted(async () => {
   try {
     await activate(String(route.params.key));
     state.value = 'activated';
-  } catch {
+  } catch (caught) {
+    error.value = caught;
     state.value = 'failed';
+    return;
   }
+  // The used key does not stay in the address bar or the history (same page instance, no reload).
+  await router.replace({ name: 'activate', params: { key: 'done' } });
 });
 </script>
 
@@ -27,6 +34,6 @@ onMounted(async () => {
         $t('account.login')
       }}</RouterLink>
     </template>
-    <p v-else role="alert" class="mt-6 text-negative">{{ $t('auth.activationFailed') }}</p>
+    <p v-else role="alert" class="mt-6 text-negative">{{ $t(errorMessageKey(error)) }}</p>
   </section>
 </template>

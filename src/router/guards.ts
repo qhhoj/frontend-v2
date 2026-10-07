@@ -15,6 +15,12 @@ const toLogin = (to: RouteLocationNormalized): RouteLocationRaw => ({
   query: withRedirect(to),
 });
 
+/** A `redirect` of `/` is the default, so it is not carried. */
+const loginQuery = (redirect: unknown) => {
+  const safe = safeRedirect(redirect);
+  return safe === '/' ? {} : { redirect: safe };
+};
+
 /** `to.path` is percent-encoded and the router encodes params again, so decode first. */
 const decodeSegment = (segment: string) => {
   try {
@@ -48,7 +54,7 @@ export async function resolveNavigation(
   if (to.name === 'login-2fa')
     return session.status === 'authenticated'
       ? safeRedirect(to.query.redirect)
-      : { name: 'login', query: { redirect: safeRedirect(to.query.redirect) } };
+      : { name: 'login', query: loginQuery(to.query.redirect) };
   if (session.passwordChangeRequired && to.name !== 'account-password')
     return { name: 'account-password' };
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);

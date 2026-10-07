@@ -68,8 +68,7 @@
     "forgot": "Forgot password?",
     "registered": "Account created. Open your email to activate it.",
     "activating": "Activating…",
-    "activated": "Your account is active. You can sign in now.",
-    "activationFailed": "This activation link is invalid or has expired."
+    "activated": "Your account is active. You can sign in now."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

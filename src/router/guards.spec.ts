@@ -63,6 +63,11 @@ describe('navigation guards', () => {
     expect(route.fullPath).toBe(destination);
   });
 
+  it('does not carry a redirect to the home page into login', async () => {
+    const { route } = await navigate('/login/2fa', signedOut);
+    expect(route.fullPath).toBe('/login');
+  });
+
   it('sends a signed-out viewer from 2FA to login, keeping the redirect', async () => {
     const { route } = await navigate('/login/2fa?redirect=/settings', signedOut);
     expect(route.name).toBe('login');

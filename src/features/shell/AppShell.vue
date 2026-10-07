@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import AppHeader from './AppHeader.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
+import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
 
+useAccountCacheSync();
 useAccountThemeSync();
 </script>
 

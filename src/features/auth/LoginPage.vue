@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { ApiError } from '@/api/client';
+import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
@@ -15,14 +17,22 @@ const username = ref('');
 const password = ref('');
 const pending = ref(false);
 const error = ref<unknown>(null);
+/** A ban carries the moderator's reason in the backend message (English); everything else is translated by code. */
+const errorText = computed(() =>
+  error.value instanceof ApiError &&
+  error.value.code === 'banned' &&
+  error.value.message.includes('Reason:')
+    ? error.value.message
+    : translate(errorMessageKey(error.value)),
+);
 
 async function submit() {
   pending.value = true;
   error.value = null;
   try {
     await session.login({ username: username.value, password: password.value });
-    // The shell's account sync adopts the account theme once the profile loads; cached data of the previous viewer is refetched.
-    await queryClient.invalidateQueries();
+    // Drops the previous account's data; active queries (the shell's profile, which adopts the theme) refetch in the background.
+    void queryClient.resetQueries();
     const redirect = safeRedirect(route.query.redirect);
     await router.push(
       session.status === 'partial' ? { name: 'login-2fa', query: { redirect } } : redirect,
@@ -61,7 +71,7 @@ async function submit() {
           class="min-h-11 rounded-row border border-line bg-surface-strong px-3"
         />
       </label>
-      <p v-if="error" role="alert" class="text-negative">{{ $t(errorMessageKey(error)) }}</p>
+      <p v-if="error" role="alert" class="text-negative">{{ errorText }}</p>
       <button
         type="submit"
         :disabled="pending"

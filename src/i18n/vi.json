@@ -68,8 +68,7 @@
     "forgot": "Quên mật khẩu?",
     "registered": "Đã tạo tài khoản. Hãy mở email để kích hoạt.",
     "activating": "Đang kích hoạt…",
-    "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập.",
-    "activationFailed": "Liên kết kích hoạt không hợp lệ hoặc đã hết hạn."
+    "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập."
   },
   "errors": {
     "generic": "Đã có lỗi xảy ra. Hãy thử lại.",

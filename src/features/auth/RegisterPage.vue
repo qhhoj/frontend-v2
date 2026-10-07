@@ -37,18 +37,20 @@ async function submit() {
     <p class="mt-2 text-muted">{{ $t('placeholder.pending') }}</p>
     <p v-if="registered" role="status" class="mt-6">{{ $t('auth.registered') }}</p>
     <form v-else class="mt-6 flex flex-col gap-4" @submit.prevent="submit">
-      <label v-for="field in FIELDS" :key="field.name" class="flex flex-col gap-1">
-        {{ $t(field.labelKey) }}
-        <input
-          v-model="form[field.name]"
-          :name="field.name"
-          :type="field.type"
-          :autocomplete="field.autocomplete"
-          required
-          :aria-invalid="fieldErrors[field.name] ? 'true' : undefined"
-          :aria-describedby="fieldErrors[field.name] ? `register-${field.name}-error` : undefined"
-          class="min-h-11 rounded-row border border-line bg-surface-strong px-3"
-        />
+      <div v-for="field in FIELDS" :key="field.name" class="flex flex-col gap-1">
+        <label class="flex flex-col gap-1">
+          {{ $t(field.labelKey) }}
+          <input
+            v-model="form[field.name]"
+            :name="field.name"
+            :type="field.type"
+            :autocomplete="field.autocomplete"
+            required
+            :aria-invalid="fieldErrors[field.name] ? 'true' : undefined"
+            :aria-describedby="fieldErrors[field.name] ? `register-${field.name}-error` : undefined"
+            class="min-h-11 rounded-row border border-line bg-surface-strong px-3"
+          />
+        </label>
         <span
           v-if="fieldErrors[field.name]"
           :id="`register-${field.name}-error`"
@@ -56,7 +58,7 @@ async function submit() {
         >
           {{ fieldErrors[field.name]!.join(' ') }}
         </span>
-      </label>
+      </div>
       <p v-if="error" role="alert" class="text-negative">{{ $t(errorMessageKey(error)) }}</p>
       <button
         type="submit"
