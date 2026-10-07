@@ -129,4 +129,62 @@ describe('api client', () => {
     });
     expect(handler).toHaveBeenCalledOnce();
   });
+
+  it('passes an aborted request through instead of reporting a network error', async () => {
+    vi.stubGlobal('fetch', () => Promise.reject(new DOMException('aborted', 'AbortError')));
+    const error = await apiRequest('/problems').catch((caught: unknown) => caught);
+    expect(error).not.toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ name: 'AbortError' });
+  });
+
+  it('keeps the HTTP status of a non-JSON error body', async () => {
+    vi.stubGlobal('fetch', () =>
+      Promise.resolve(
+        new Response('<html>Bad Gateway</html>', { status: 502, statusText: 'Bad Gateway' }),
+      ),
+    );
+    await expect(apiRequest('/problems')).rejects.toMatchObject({
+      code: 'http_error',
+      status: 502,
+    });
+  });
+
+  it('refreshes once for parallel csrf_failed answers', async () => {
+    const attempts = new Map<string, number>();
+    mockApi({
+      'POST /a': () =>
+        (attempts.set('a', (attempts.get('a') ?? 0) + 1), attempts.get('a')) === 1
+          ? fail(403, 'csrf_failed')
+          : ok('a'),
+      'POST /b': () =>
+        (attempts.set('b', (attempts.get('b') ?? 0) + 1), attempts.get('b')) === 1
+          ? fail(403, 'csrf_failed')
+          : ok('b'),
+    });
+    const refresh = vi.fn(() => new Promise<void>((resolve) => setTimeout(resolve, 5)));
+    onCsrfFailed(refresh);
+    await expect(
+      Promise.all([apiRequest('/a', { method: 'POST' }), apiRequest('/b', { method: 'POST' })]),
+    ).resolves.toEqual(['a', 'b']);
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('survives a failing refresh: the retry reports its own error and unauthorized is handled', async () => {
+    let attempts = 0;
+    mockApi({
+      'POST /a': () => (++attempts === 1 ? fail(403, 'csrf_failed') : fail(401, 'unauthorized')),
+    });
+    const handler = vi.fn();
+    onUnauthorized(handler);
+    onCsrfFailed(() => Promise.reject(new Error('offline')));
+    await expect(apiRequest('/a', { method: 'POST' })).rejects.toMatchObject({
+      code: 'unauthorized',
+    });
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('rejects a list answer without page metadata', async () => {
+    mockApi({ 'GET /problems/meta': ok({ types: [] }) });
+    await expect(apiPage('/problems/meta')).rejects.toMatchObject({ code: 'invalid_response' });
+  });
 });

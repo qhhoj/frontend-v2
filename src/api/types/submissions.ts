@@ -63,5 +63,6 @@ export interface SubmissionProgressEvent {
   submissionId: string;
   type: 'queued' | 'processing' | 'grading-begin' | 'test-case' | 'done';
   status: SubmissionStatus;
-  currentTestcase?: number;
+  /** 0 except on `test-case`. */
+  currentTestcase: number;
 }

@@ -46,6 +46,15 @@ let refreshCsrf: (() => Promise<void>) | null = null;
 /** The session store installs this: it reloads `/auth/me` so a retried request carries a fresh token. */
 export const onCsrfFailed = (handler: (() => Promise<void>) | null) => void (refreshCsrf = handler);
 
+let refreshing: Promise<void> | null = null;
+/** Parallel `csrf_failed` answers share one refresh; a failing refresh is ignored so the request's own error surfaces. */
+const refreshOnce = (): Promise<void> => {
+  refreshing ??= (refreshCsrf?.() ?? Promise.resolve())
+    .catch(() => undefined)
+    .finally(() => void (refreshing = null));
+  return refreshing;
+};
+
 let handleUnauthorized: (() => void) | null = null;
 /** The session store installs this: a protected request answered `unauthorized` means the session expired. */
 export const onUnauthorized = (handler: (() => void) | null) => void (handleUnauthorized = handler);
@@ -77,7 +86,7 @@ async function send(
       signal,
     });
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') throw error;
+    if ((error as { name?: string }).name === 'AbortError') throw error;
     throw new ApiError('network_error', 0, 'Network error');
   }
 }
@@ -109,7 +118,7 @@ async function request(
   }
   const error = await errorOf(response);
   if (error.code === 'csrf_failed' && refreshCsrf && !retried) {
-    await refreshCsrf();
+    await refreshOnce();
     return request(path, options, true);
   }
   if (error.code === 'unauthorized' && path !== '/auth/me') handleUnauthorized?.();
@@ -128,5 +137,6 @@ export async function apiPage<Item>(
   options: RequestOptions = {},
 ): Promise<Page<Item>> {
   const envelope = await request(path, options);
-  return { items: (envelope?.data ?? []) as Item[], meta: envelope?.meta as PageMeta };
+  if (!envelope?.meta) throw new ApiError('invalid_response', 200, 'Missing page metadata');
+  return { items: (envelope.data ?? []) as Item[], meta: envelope.meta };
 }

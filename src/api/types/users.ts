@@ -22,7 +22,7 @@ export interface RatingHistoryEntry {
   performance: number | null;
 }
 
-/** backend: users/leaderboards/dto/leaderboard.response.ts */
+/** backend: users/leaderboards/dto/leaderboard.response.ts (LeaderboardEntryResponse, fields the SPA reads) */
 export interface LeaderboardEntry {
   rank: number;
   id: string;
