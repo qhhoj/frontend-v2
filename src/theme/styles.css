@@ -33,6 +33,7 @@
   --color-line-strong: var(--qh-line-strong);
   --color-content: var(--qh-text);
   --color-muted: var(--qh-text-muted);
+  --color-line-accent: var(--qh-line-accent);
   --color-accent: var(--qh-accent);
   --color-accent-2: var(--qh-accent-2);
   --color-accent-text: var(--qh-accent-text);

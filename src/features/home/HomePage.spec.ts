@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   contestItem,
   CPP17_ID,
+  PY3_ID,
   leaderboardEntry,
   problemMeta,
   profile,
@@ -170,6 +171,171 @@ describe('home', () => {
     await flushPromises();
     expect(wrapper.get('[data-testid="quick-submit"] [role="alert"]').text()).toBe(
       'Không tìm thấy bài nope.',
+    );
+  });
+
+  const submitQuick = async (
+    wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'],
+    code = 'aplusb',
+    source = 'x',
+  ) => {
+    await wrapper.get('#quick-submit-code').setValue(code);
+    await wrapper.get('#quick-submit-source').setValue(source);
+    await wrapper.get('[data-testid="quick-submit"] form').trigger('submit');
+    await flushPromises();
+  };
+
+  it("submits in the account's preferred language, whichever answer arrives first", async () => {
+    const calls = mockApi(
+      signedInRoutes({
+        'GET /profile': ok(profile({ languageId: PY3_ID })),
+        'POST /problems/aplusb/submit': ok({ id: 'sub-9' }),
+        'GET /submissions/sub-9': ok(submissionItem({ id: 'sub-9' })),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    await submitQuick(wrapper);
+    expect(calls.find((call) => call.method === 'POST')?.body).toMatchObject({ language: PY3_ID });
+  });
+
+  it('does not offer file-only languages', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    await wrapper.get('[data-testid="quick-submit"] [role="combobox"]').trigger('click');
+    await flushPromises();
+    const options = [...document.body.querySelectorAll('[role="option"]')].map((option) =>
+      option.textContent?.trim(),
+    );
+    expect(options).toEqual(['C++17', 'Python 3']);
+  });
+
+  it('keeps a language the viewer picked when the profile arrives later', async () => {
+    const calls = mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': ok({ id: 'sub-9' }),
+        'GET /submissions/sub-9': ok(submissionItem()),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    wrapper.getComponent({ name: 'Select' }).vm.$emit('update:modelValue', PY3_ID);
+    await submitQuick(wrapper);
+    expect(calls.find((call) => call.method === 'POST')?.body).toMatchObject({ language: PY3_ID });
+  });
+
+  it('names a language the problem does not allow', async () => {
+    mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': fail(400, 'validation_failed', {
+          language: ['not allowed'],
+        }),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await submitQuick(wrapper);
+    expect(wrapper.get('[data-testid="quick-submit"] [role="alert"]').text()).toBe(
+      'Ngôn ngữ này không được dùng cho bài aplusb.',
+    );
+  });
+
+  it('names a source the server finds too long', async () => {
+    mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': fail(400, 'validation_failed', { source: ['too long'] }),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await submitQuick(wrapper);
+    expect(wrapper.get('[data-testid="quick-submit"] [role="alert"]').text()).toBe(
+      'Mã nguồn vượt quá 65536 ký tự.',
+    );
+  });
+
+  it('refuses a source over 65536 code points without calling the server', async () => {
+    const calls = mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    await submitQuick(wrapper, 'aplusb', '😀'.repeat(65_537));
+    expect(calls.some((call) => call.method === 'POST')).toBe(false);
+    expect(wrapper.get('[data-testid="quick-submit"] [role="alert"]').text()).toBe(
+      'Mã nguồn vượt quá 65536 ký tự.',
+    );
+  });
+
+  it('allows exactly 65536 code points', async () => {
+    const calls = mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': ok({ id: 'sub-9' }),
+        'GET /submissions/sub-9': ok(submissionItem()),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await submitQuick(wrapper, 'aplusb', '😀'.repeat(65_536));
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
+  });
+
+  it('posts once when the form is submitted twice in a row', async () => {
+    const calls = mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': ok({ id: 'sub-9' }),
+        'GET /submissions/sub-9': ok(submissionItem()),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await wrapper.get('#quick-submit-code').setValue('aplusb');
+    await wrapper.get('#quick-submit-source').setValue('x');
+    const form = wrapper.get('[data-testid="quick-submit"] form');
+    await form.trigger('submit');
+    await form.trigger('submit');
+    await flushPromises();
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
+  });
+
+  it('clears the previous status when a resubmit fails', async () => {
+    let attempt = 0;
+    mockApi(
+      signedInRoutes({
+        'POST /problems/aplusb/submit': () =>
+          attempt++ ? fail(429, 'rate_limited') : ok({ id: 'sub-9' }),
+        'GET /submissions/sub-9': ok(submissionItem({ id: 'sub-9', status: 'D', result: 'AC' })),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await submitQuick(wrapper);
+    latestEventSource().emit('done', { submissionId: 'sub-9', type: 'done', status: 'D' });
+    await flushPromises();
+    expect(wrapper.get('[data-testid="quick-submit"] [role="status"]').text()).toContain(
+      'Chấp nhận',
+    );
+    await submitQuick(wrapper);
+    expect(wrapper.get('[data-testid="quick-submit"] [role="status"]').text()).not.toContain(
+      'Chấp nhận',
+    );
+    expect(wrapper.get('[data-testid="quick-submit"] [role="alert"]').text()).toBe(
+      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
+    );
+  });
+
+  it('offers a retry when the language list fails to load', async () => {
+    mockApi(signedInRoutes({ 'GET /problems/meta': fail(500, 'internal') }));
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    const alert = wrapper.get('[data-testid="quick-submit"] [role="alert"]');
+    expect(alert.find('button').text()).toBe('Thử lại');
+  });
+
+  it('says so when the rating history cannot be loaded', async () => {
+    mockApi(signedInRoutes({ 'GET /users/user_01/ratings': fail(500, 'internal') }));
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="rating-hero"] [role="alert"] button').text()).toBe('Thử lại');
+  });
+
+  it('says so when nobody is rated', async () => {
+    mockApi(signedInRoutes({ 'GET /users': page([]) }));
+    const { wrapper } = await mountApp('/');
+    expect(wrapper.get('[data-testid="top-users"]').text()).toContain(
+      'Chưa có người dùng nào có rating.',
     );
   });
 

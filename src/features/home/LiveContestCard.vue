@@ -8,7 +8,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
 </script>
 
 <template>
-  <GlassCard data-testid="live-contest" class="p-6">
+  <GlassCard data-testid="live-contest" class="border-line-accent! p-6">
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template v-if="contest">
         <p class="flex items-center gap-2 text-[13px] font-semibold text-accent-text">

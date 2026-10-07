@@ -35,16 +35,16 @@ const now = useNow(60_000);
         <li v-for="item in submissions" :key="item.id">
           <RouterLink
             :to="{ name: 'submission', params: { id: item.id } }"
-            class="flex items-center gap-3.5 rounded-row bg-surface px-3.5 py-3 text-content hover:bg-surface-hover"
+            class="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-row bg-surface px-3.5 py-3 text-content hover:bg-surface-hover"
           >
             <VerdictBadge :verdict="verdictOf(item)" />
-            <span class="min-w-0 flex-1">
+            <span class="min-w-32 flex-1">
               <span class="block truncate font-semibold">{{ item.problem?.name ?? '—' }}</span>
               <span class="block text-[13px] text-muted"
                 >{{ $t(verdictOf(item).labelKey) }} · {{ item.language?.name ?? '—' }}</span
               >
             </span>
-            <span class="shrink-0 font-mono text-[13px] text-muted">
+            <span class="ml-auto text-right font-mono text-[13px] text-muted">
               {{ item.time !== null ? `${item.time.toFixed(2)}s · ` : ''
               }}{{ formatRelative(item.date, now, locale.locale) }}
             </span>

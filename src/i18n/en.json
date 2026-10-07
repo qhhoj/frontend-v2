@@ -152,6 +152,8 @@
     "source": "Source code",
     "submit": "Submit",
     "submitting": "Submitting…",
+    "languageNotAllowed": "This language is not allowed for problem {code}.",
+    "sourceTooLong": "The source is longer than {max} characters.",
     "problemNotFound": "Problem {code} not found.",
     "staleReload": "Could not follow the result. Reload the page to see the latest status.",
     "judging": "Judging test {test}",
@@ -162,6 +164,7 @@
     "browseContests": "Browse contests",
     "enterContest": "Enter contest",
     "endsIn": "Ends in",
+    "noUsers": "Nobody has a rating yet.",
     "topRating": "Top rating",
     "welcomeTitle": "Practise algorithms, compete online",
     "welcomeBody": "Sign in to submit, follow your rating and join contests."

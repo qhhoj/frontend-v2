@@ -152,6 +152,8 @@
     "source": "Mã nguồn",
     "submit": "Nộp bài",
     "submitting": "Đang nộp…",
+    "languageNotAllowed": "Ngôn ngữ này không được dùng cho bài {code}.",
+    "sourceTooLong": "Mã nguồn vượt quá {max} ký tự.",
     "problemNotFound": "Không tìm thấy bài {code}.",
     "judging": "Đang chấm test {test}",
     "staleReload": "Không theo dõi được kết quả. Tải lại trang để xem trạng thái mới nhất.",
@@ -162,6 +164,7 @@
     "browseContests": "Xem các kỳ thi",
     "enterContest": "Vào thi",
     "endsIn": "Kết thúc sau",
+    "noUsers": "Chưa có người dùng nào có rating.",
     "topRating": "Top rating",
     "welcomeTitle": "Luyện thuật toán, thi đấu trực tuyến",
     "welcomeBody": "Đăng nhập để nộp bài, theo dõi rating và tham gia kỳ thi."

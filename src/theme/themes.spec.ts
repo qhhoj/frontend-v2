@@ -105,6 +105,14 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
     );
   });
 
+  it('keeps the accent border at 3:1 on the ground and the opaque fallback', () => {
+    const ground = colour('ground');
+    const solid = over(colour('surface-solid'), ground);
+    const border = colour('line-accent');
+    expect(contrastRatio(border, ground)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(border, solid)).toBeGreaterThanOrEqual(3);
+  });
+
   it('keeps text at 4.5:1 on every ground, every blob centre and the opaque fallback included', () => {
     const ground = colour('ground');
     const solid = over(colour('surface-solid'), ground);

@@ -26,7 +26,10 @@ const session = useSessionStore();
         :username="session.user.username"
         class="min-w-0 flex-[999_1_560px]"
       />
-      <div class="flex min-w-0 flex-[1_1_360px] flex-col gap-6">
+      <div
+        class="flex min-w-0 flex-[1_1_360px] flex-col gap-6"
+        :class="{ 'sm:max-w-sm': !session.user }"
+      >
         <LiveContestCard />
         <TopUsersCard />
       </div>

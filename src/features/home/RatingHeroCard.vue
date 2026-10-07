@@ -11,7 +11,11 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 const props = defineProps<{ username: string }>();
 const { data: user, isPending, error, refetch } = useUserPageQuery(() => props.username);
-const { data: history } = useRatingHistoryQuery(() => props.username);
+const {
+  data: history,
+  error: historyError,
+  refetch: refetchHistory,
+} = useRatingHistoryQuery(() => props.username);
 const locale = useLocaleStore();
 const gradientId = useId();
 
@@ -43,7 +47,16 @@ const tiles = computed(() =>
 
 <template>
   <GlassCard data-testid="rating-hero" class="p-6 sm:p-8">
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+    <QueryState
+      :loading="isPending"
+      :error="error || historyError"
+      @retry="
+        () => {
+          refetch();
+          refetchHistory();
+        }
+      "
+    >
       <template v-if="user">
         <p class="text-muted">{{ $t(greeting, { username }) }}</p>
         <div class="mt-2 flex flex-wrap items-end gap-4">
@@ -97,11 +110,11 @@ const tiles = computed(() =>
             stroke-linejoin="round"
           />
         </svg>
-        <dl class="mt-3 grid grid-cols-3 gap-3">
+        <dl class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
           <div
             v-for="tile in tiles"
             :key="tile.labelKey"
-            class="rounded-tile bg-surface-strong p-4"
+            class="min-w-0 rounded-tile bg-surface-strong p-4"
           >
             <dt class="text-[13px] text-muted">{{ $t(tile.labelKey) }}</dt>
             <dd class="m-0 font-mono text-[26px] font-semibold tabular-nums">{{ tile.value }}</dd>
