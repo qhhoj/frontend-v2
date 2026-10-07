@@ -195,7 +195,7 @@ describe('auth screens', () => {
       'GET /profile': ok(profile()),
       'POST /submissions/abc/abort': fail(401, 'unauthorized'),
     });
-    const { queryClient } = await mountApp('/problems');
+    const { queryClient } = await mountApp('/blog');
     queryClient.setQueryData(['submissions', 'list', { user: 'user_01' }], ['mine']);
     await apiRequest('/submissions/abc/abort', { method: 'POST' }).catch(() => undefined);
     await flushPromises();

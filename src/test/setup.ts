@@ -7,6 +7,14 @@ import { takeUnmatchedRequests } from './mock-api';
 beforeEach(() => {
   stubMatchMedia();
   vi.stubGlobal('scrollTo', vi.fn()); // jsdom does not implement it; the router scrolls on every navigation
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  ); // PrimeVue overlays watch their content size
 });
 
 afterEach(() => {

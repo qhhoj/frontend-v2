@@ -1,5 +1,5 @@
 import type { ContestListItem } from '../api/types/contests';
-import type { Language, ProblemMeta } from '../api/types/problems';
+import type { Language, ProblemListItem, ProblemMeta } from '../api/types/problems';
 import type { SubmissionListItem } from '../api/types/submissions';
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
 import type { SessionResponse, SessionUser } from '../api/types/auth';
@@ -176,4 +176,23 @@ export const leaderboardEntry = (
   problemCount: 0,
   rating,
   contributionPoints: 0,
+});
+
+export const problemItem = (overrides: Partial<ProblemListItem> = {}): ProblemListItem => ({
+  id: '0192a000-0000-7000-8000-0000000002a1',
+  code: 'lis',
+  name: 'Dãy con tăng dài nhất',
+  group: null,
+  types: [{ id: TYPE_DP_ID, name: 'dp', fullName: 'Quy hoạch động' }],
+  points: 1400,
+  partial: false,
+  userCount: 2011,
+  acRate: 55.2,
+  date: '2026-01-01T00:00:00Z',
+  isPublic: true,
+  isOrganizationPrivate: false,
+  hasPublicEditorial: false,
+  hasPdfStatement: false,
+  viewerStatus: null,
+  ...overrides,
 });
