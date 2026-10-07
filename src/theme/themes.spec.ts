@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { contrastRatio, over, parseColour } from '@/test/contrast';
 import type { Rgba } from '@/test/contrast';
 import globalTokensCss from './tokens.css?raw';
+import { THEMES } from './registry';
 
 const themeFiles = import.meta.glob<string>('./themes/*.css', {
   query: '?raw',
@@ -152,5 +153,11 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
         .map(([name, ratio]) => `${name}: ${ratio.toFixed(2)}`);
     });
     expect(failures).toEqual([]);
+  });
+});
+
+describe('theme registry', () => {
+  it('has a CSS file for every registered theme and registers every CSS file', () => {
+    expect(themes.map((theme) => theme.id).sort()).toEqual(THEMES.map((theme) => theme.id).sort());
   });
 });

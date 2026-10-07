@@ -4,6 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>QHHOJ</title>
+    <script>
+      // Pre-paint: the theme useThemeStore applied last time (src/theme/theme.store.ts), else the OS scheme.
+      // The fallback ids are the default theme of each scheme; keep them in step with src/theme/registry.ts.
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem('qhhoj.resolvedTheme') ||
+          (matchMedia('(prefers-color-scheme: light)').matches ? 'glass-light' : 'glass-dark');
+      } catch (error) {
+        document.documentElement.dataset.theme = 'glass-dark';
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
