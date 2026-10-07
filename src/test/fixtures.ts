@@ -1,4 +1,5 @@
 import type { SessionResponse, SessionUser } from '../api/types/auth';
+import type { Profile } from '../api/types/profile';
 
 export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   id: '0192a000-0000-7000-8000-000000000001',
@@ -29,3 +30,13 @@ export const signedOut = {
   status: 401,
   body: { error: { code: 'unauthorized', message: 'Unauthorized' } },
 };
+
+export const profile = (overrides: Partial<Profile> = {}): Profile => ({
+  firstName: '',
+  timezone: 'Asia/Ho_Chi_Minh',
+  languageId: '0192a000-0000-7000-8000-00000000c017',
+  aceTheme: 'auto',
+  siteTheme: 'auto',
+  mathEngine: 'auto',
+  ...overrides,
+});

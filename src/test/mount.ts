@@ -24,7 +24,8 @@ export async function mountApp(path: string) {
   await router.push(path);
   const wrapper = mount(App, {
     attachTo: document.body,
-    global: { plugins: appPlugins({ pinia, router, queryClient }) },
+    // Real transitions: PrimeVue overlays emit show/hide from transition hooks.
+    global: { plugins: appPlugins({ pinia, router, queryClient }), stubs: { transition: false } },
   });
   await flushPromises();
   return { wrapper, router, queryClient };

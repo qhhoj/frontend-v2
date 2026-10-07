@@ -1,5 +1,9 @@
+<script setup lang="ts">
+import AppShell from '@/features/shell/AppShell.vue';
+</script>
+
 <template>
-  <main id="main" class="min-h-dvh bg-ground font-body text-content">
+  <AppShell>
     <RouterView />
-  </main>
+  </AppShell>
 </template>
