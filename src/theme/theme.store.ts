@@ -14,13 +14,13 @@ const schemeOf = (prefersLight: boolean): ColorScheme => (prefersLight ? 'light'
 
 export const useThemeStore = defineStore('theme', () => {
   const storedPreference = readStorage(PREFERENCE_KEY);
-  const preference = ref(storedPreference ?? AUTO_THEME);
+  const localPreference = ref(storedPreference ?? AUTO_THEME);
   /** The signed-in account's `siteTheme`; it outranks the browser preference until `adopt(null)`. */
   const accountTheme = ref<string | null>(null);
 
   // Without an explicit local choice the pre-painted theme stays until the account or the OS says otherwise.
   const cachedTheme =
-    storedPreference === null
+    localPreference.value === AUTO_THEME
       ? THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY))
       : undefined;
   const holdingCache = ref(cachedTheme !== undefined);
@@ -34,16 +34,19 @@ export const useThemeStore = defineStore('theme', () => {
   media.addEventListener('change', onSystemChange);
   onScopeDispose(() => media.removeEventListener('change', onSystemChange));
 
+  /** What the theme menu shows as selected: the account's theme while signed in, else the browser's choice. */
+  const preference = computed(() => accountTheme.value ?? localPreference.value);
   const theme = computed(
     () =>
       (holdingCache.value ? cachedTheme : undefined) ??
-      resolveTheme(accountTheme.value ?? preference.value, systemScheme.value),
+      resolveTheme(preference.value, systemScheme.value),
   );
   watch(
     theme,
     (active) => {
       const root = document.documentElement;
-      root.dataset.theme = active.id;
+      // The pre-paint script usually has set it already; an identical write would still notify observers.
+      if (root.dataset.theme !== active.id) root.dataset.theme = active.id;
       root.style.colorScheme = active.scheme;
       document
         .querySelector('meta[name="theme-color"]')
@@ -57,7 +60,7 @@ export const useThemeStore = defineStore('theme', () => {
   function choose(value: string) {
     accountTheme.value = null;
     holdingCache.value = false;
-    preference.value = value;
+    localPreference.value = value;
     writeStorage(PREFERENCE_KEY, value);
   }
 

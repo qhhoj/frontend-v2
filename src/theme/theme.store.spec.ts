@@ -77,16 +77,18 @@ describe('useThemeStore', () => {
     localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
     document.documentElement.dataset.theme = 'glass-light';
     stubMatchMedia({ light: false });
-    const repaints = new MutationObserver(() => {});
-    repaints.observe(document.documentElement, { attributeFilter: ['data-theme'] });
+    const repaints: MutationRecord[] = [];
+    const observer = new MutationObserver((records) => repaints.push(...records));
+    observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
     const store = useThemeStore();
     store.adopt('light');
     await nextTick();
-    expect(repaints.takeRecords()).toHaveLength(0);
+    repaints.push(...observer.takeRecords());
+    expect(repaints).toHaveLength(0);
     expect(appliedTheme()).toBe('glass-light');
     expect(localStorage.getItem('qhhoj.resolvedTheme')).toBe('glass-light');
     expect(localStorage.getItem('qhhoj.theme')).toBeNull();
-    repaints.disconnect();
+    observer.disconnect();
   });
 
   it('keeps the cached theme at init until the account or the OS says otherwise', () => {
@@ -156,16 +158,56 @@ describe('useThemeStore', () => {
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
     document.head.append(meta);
-    const grounds: Record<string, string> = { 'glass-dark': '#111111', 'glass-light': '#eeeeee' };
-    vi.stubGlobal('getComputedStyle', () => ({
-      getPropertyValue: () => ` ${grounds[appliedTheme() ?? '']} `,
-    }));
+    try {
+      const grounds: Record<string, string> = { 'glass-dark': '#111111', 'glass-light': '#eeeeee' };
+      vi.stubGlobal('getComputedStyle', () => ({
+        getPropertyValue: () => ` ${grounds[appliedTheme() ?? '']} `,
+      }));
+      const store = useThemeStore();
+      expect(meta.content).toBe('#111111');
+      store.choose('light');
+      await nextTick();
+      expect(meta.content).toBe('#eeeeee');
+    } finally {
+      meta.remove();
+    }
+  });
+
+  it('applies the account theme over a held cache and rewrites the cache', async () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
     const store = useThemeStore();
-    expect(meta.content).toBe('#111111');
-    store.choose('light');
+    store.adopt('light');
     await nextTick();
-    expect(meta.content).toBe('#eeeeee');
-    meta.remove();
+    expect(appliedTheme()).toBe('glass-light');
+    expect(localStorage.getItem('qhhoj.resolvedTheme')).toBe('glass-light');
+  });
+
+  it('resolves from the OS when sign-out arrives while the cache is held', async () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
+    stubMatchMedia({ light: true });
+    const store = useThemeStore();
+    store.adopt(null);
+    await nextTick();
+    expect(appliedTheme()).toBe('glass-light');
+    expect(localStorage.getItem('qhhoj.resolvedTheme')).toBe('glass-light');
+  });
+
+  it('exposes the account theme as the selected preference while signed in', () => {
+    localStorage.setItem('qhhoj.theme', 'dark');
+    const store = useThemeStore();
+    expect(store.preference).toBe('dark');
+    store.adopt('light');
+    expect(store.preference).toBe('light');
+    store.adopt(null);
+    expect(store.preference).toBe('dark');
+  });
+
+  it('treats a stored auto preference as no explicit choice for the cache hold', () => {
+    localStorage.setItem('qhhoj.theme', 'auto');
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    stubMatchMedia({ light: false });
+    useThemeStore();
+    expect(appliedTheme()).toBe('glass-light');
   });
 
   it('stops listening to the system scheme when disposed', () => {
