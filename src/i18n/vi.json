@@ -154,6 +154,7 @@
     "submitting": "Đang nộp…",
     "problemNotFound": "Không tìm thấy bài {code}.",
     "judging": "Đang chấm test {test}",
+    "staleReload": "Không theo dõi được kết quả. Tải lại trang để xem trạng thái mới nhất.",
     "recentSubmissions": "Bài nộp gần đây",
     "noSubmissions": "Bạn chưa nộp bài nào.",
     "liveContest": "Đang diễn ra",

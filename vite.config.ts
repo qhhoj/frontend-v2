@@ -17,6 +17,8 @@ export default defineConfig({
     include: ['src/**/*.spec.ts'],
     // Vitest returns '' for CSS ids by default; themes.spec reads the theme files with `?raw`.
     css: { include: /\.css\?raw$/ },
+    // Greetings and relative dates depend on the local hour.
+    env: { TZ: 'UTC' },
     restoreMocks: true,
     unstubGlobals: true,
   },

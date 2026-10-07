@@ -1,10 +1,31 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { apiRequest } from '@/api/client';
-import { profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
-import { fail, mockApi, noContent, ok } from '@/test/mock-api';
+import {
+  contestItem,
+  leaderboardEntry,
+  problemMeta,
+  profile,
+  ratingHistory,
+  sessionResponse,
+  signedIn,
+  signedOut,
+  submissionItem,
+  userPage,
+} from '@/test/fixtures';
+import { fail, mockApi, noContent, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
+
+/** What the home page loads for the signed-in viewer a login lands on. */
+const homeRoutes = {
+  'GET /users/user_01': ok(userPage()),
+  'GET /users/user_01/ratings': ok(ratingHistory()),
+  'GET /submissions': page([submissionItem()]),
+  'GET /problems/meta': ok(problemMeta()),
+  'GET /contests': page([contestItem()]),
+  'GET /users': page([leaderboardEntry(1, 'user_07', 2788)]),
+};
 
 describe('auth screens', () => {
   it('returns to a safe redirect after login', async () => {
@@ -12,6 +33,7 @@ describe('auth screens', () => {
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile()),
+      ...homeRoutes,
     });
     const { wrapper, router } = await mountApp('/login?redirect=/settings');
     await wrapper.get('input[name="username"]').setValue('user_01');
@@ -113,6 +135,7 @@ describe('auth screens', () => {
         'GET /auth/me': signedOut,
         'POST /auth/login': ok(sessionResponse()),
         'GET /profile': ok(profile()),
+        ...homeRoutes,
       });
       const { wrapper, router } = await mountApp(`/login?redirect=${encodeURIComponent(hostile)}`);
       await wrapper.get('input[name="username"]').setValue('user_01');
@@ -128,6 +151,7 @@ describe('auth screens', () => {
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile({ siteTheme: 'light' })),
+      ...homeRoutes,
     });
     const { wrapper } = await mountApp('/login');
     await wrapper.get('input[name="username"]').setValue('user_01');
@@ -152,6 +176,7 @@ describe('auth screens', () => {
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile()),
+      ...homeRoutes,
     });
     const { wrapper, queryClient } = await mountApp('/login');
     queryClient.setQueryData(['submissions', 'list', { user: 'previous_user' }], ['old']);

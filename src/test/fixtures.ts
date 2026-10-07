@@ -1,3 +1,7 @@
+import type { ContestListItem } from '../api/types/contests';
+import type { Language, ProblemMeta } from '../api/types/problems';
+import type { SubmissionListItem } from '../api/types/submissions';
+import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
 import type { SessionResponse, SessionUser } from '../api/types/auth';
 import type { Profile } from '../api/types/profile';
 
@@ -39,4 +43,137 @@ export const profile = (overrides: Partial<Profile> = {}): Profile => ({
   siteTheme: 'auto',
   mathEngine: 'auto',
   ...overrides,
+});
+
+export const CPP17_ID = '0192a000-0000-7000-8000-00000000c017';
+export const PY3_ID = '0192a000-0000-7000-8000-0000000000b3';
+export const TYPE_DP_ID = '0192a000-0000-7000-8000-0000000000d1';
+export const TYPE_GRAPH_ID = '0192a000-0000-7000-8000-0000000000d2';
+
+const language = (id: string, key: string, name: string, fileOnly = false): Language => ({
+  id,
+  key,
+  name,
+  shortName: null,
+  commonName: name,
+  ace: 'c_cpp',
+  extension: 'cpp',
+  template: '',
+  fileOnly,
+  fileSizeLimit: 0,
+  includeInProblem: true,
+});
+
+export const problemMeta = (): ProblemMeta => ({
+  types: [
+    { id: TYPE_DP_ID, name: 'dp', fullName: 'Quy hoạch động' },
+    { id: TYPE_GRAPH_ID, name: 'graph', fullName: 'Đồ thị' },
+  ],
+  groups: [],
+  languages: [
+    language(CPP17_ID, 'CPP17', 'C++17'),
+    language(PY3_ID, 'PY3', 'Python 3'),
+    language('0192a000-0000-7000-8000-0000000000f1', 'OUTPUT', 'Output only', true),
+  ],
+});
+
+export const userPage = (overrides: Partial<UserPage> = {}): UserPage => ({
+  id: sessionUser().id,
+  username: 'user_01',
+  displayName: 'user_01',
+  points: 1200,
+  performancePoints: 386.4,
+  problemCount: 412,
+  rating: 2104,
+  rank: 27,
+  ratingRank: 30,
+  ...overrides,
+});
+
+/** Out of order on purpose: the client sorts by end time. */
+export const ratingHistory = (): RatingHistoryEntry[] => [
+  {
+    contestKey: 'r41',
+    contestName: 'Round 41',
+    endTime: '2026-09-20T10:00:00Z',
+    rating: 2018,
+    rank: 12,
+    performance: 2200,
+  },
+  {
+    contestKey: 'r40',
+    contestName: 'Round 40',
+    endTime: '2026-09-01T10:00:00Z',
+    rating: 1950,
+    rank: 20,
+    performance: 2000,
+  },
+  {
+    contestKey: null,
+    contestName: null,
+    endTime: '2026-09-10T10:00:00Z',
+    rating: null,
+    rank: null,
+    performance: null,
+  },
+  {
+    contestKey: 'r42',
+    contestName: 'Round 42',
+    endTime: '2026-10-01T10:00:00Z',
+    rating: 2104,
+    rank: 4,
+    performance: 2300,
+  },
+];
+
+export const submissionItem = (
+  overrides: Partial<SubmissionListItem> = {},
+): SubmissionListItem => ({
+  id: 'sub-1',
+  user: { id: sessionUser().id, username: 'user_01' },
+  problem: { code: 'aplusb', name: 'Tổng hai số' },
+  language: { id: CPP17_ID, key: 'CPP17', name: 'C++17' },
+  date: '2026-10-08T09:58:00Z',
+  status: 'D',
+  result: 'AC',
+  points: 100,
+  casePoints: 10,
+  caseTotal: 10,
+  time: 0.04,
+  memory: 1024,
+  ...overrides,
+});
+
+export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestListItem => ({
+  key: 'r42',
+  name: 'QHH Round #42 (Div. 2)',
+  summary: '',
+  startTime: '2026-10-08T08:00:00Z',
+  endTime: '2026-10-08T11:24:37Z',
+  timeLimit: null,
+  phase: 'running',
+  formatName: 'icpc',
+  isRated: true,
+  tags: [],
+  userCount: 318,
+  virtualCount: 0,
+  isPrivate: false,
+  isOrganizationPrivate: false,
+  ...overrides,
+});
+
+export const leaderboardEntry = (
+  rank: number,
+  username: string,
+  rating: number | null,
+): LeaderboardEntry => ({
+  rank,
+  id: `0192a000-0000-7000-8000-0000000001${String(rank).padStart(2, '0')}`,
+  username,
+  displayName: username,
+  points: 0,
+  performancePoints: 0,
+  problemCount: 0,
+  rating,
+  contributionPoints: 0,
 });

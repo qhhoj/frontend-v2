@@ -4,7 +4,12 @@ import type { RouteRecordRaw } from 'vue-router';
 const PlaceholderPage = () => import('@/components/PlaceholderPage.vue');
 
 export const routes: RouteRecordRaw[] = [
-  { path: '/', name: 'home', component: PlaceholderPage, meta: { titleKey: 'nav.home' } },
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/features/home/HomePage.vue'),
+    meta: { titleKey: 'nav.home' },
+  },
   {
     path: '/problems',
     name: 'problems',
