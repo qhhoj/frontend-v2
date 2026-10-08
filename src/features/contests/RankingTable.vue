@@ -3,7 +3,14 @@ import { computed } from 'vue';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
 import { formatNumber } from '@/lib/format';
-import { formatCumtime, isPenaltyFormat, rankingCell, solvedCount } from '@/lib/ranking-cells';
+import {
+  formatCumtime,
+  isPenaltyFormat,
+  rankingCell,
+  showsCumtime,
+  solvedCount,
+} from '@/lib/ranking-cells';
+import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
 import RankingCell from './RankingCell.vue';
 
@@ -11,14 +18,20 @@ const props = defineProps<{
   ranking: Ranking;
   rows: RankingRow[];
   formatName: string;
+  pointsPrecision: number;
   viewerId: string | null;
 }>();
 const locale = useLocaleStore();
+const context = computed<RankingContext>(() => ({
+  formatName: props.formatName,
+  pointsPrecision: props.pointsPrecision,
+  locale: locale.locale,
+}));
 const penalty = computed(() => isPenaltyFormat(props.formatName));
 const cellsOf = (row: RankingRow) =>
   props.ranking.problems.map((problem) => ({
     problemId: problem.problemId,
-    view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.formatName),
+    view: rankingCell(row.cells[problem.problemId], problem, row.participationId, context.value),
   }));
 const LEGEND = [
   'ranking.legend.firstSolve',
@@ -29,6 +42,9 @@ const LEGEND = [
 </script>
 
 <template>
+  <p aria-hidden="true" class="px-5 pt-3 text-[13px] text-muted md:hidden">
+    {{ $t('ranking.scrollHint') }}
+  </p>
   <div
     tabindex="0"
     role="region"
@@ -52,7 +68,7 @@ const LEGEND = [
           <th scope="col" class="px-2.5 py-4 font-medium">
             {{ $t(penalty ? 'ranking.columns.solved' : 'ranking.columns.score') }}
           </th>
-          <th scope="col" class="px-2.5 py-4 font-medium">
+          <th v-if="showsCumtime(formatName)" scope="col" class="px-2.5 py-4 font-medium">
             {{ $t(penalty ? 'ranking.columns.penalty' : 'ranking.columns.time') }}
           </th>
           <th
@@ -87,9 +103,13 @@ const LEGEND = [
             >
           </th>
           <td class="font-bold">
-            {{ penalty ? solvedCount(row) : formatNumber(row.score, locale.locale, 2) }}
+            {{
+              penalty
+                ? solvedCount(row, ranking.problems, context)
+                : formatNumber(row.score, locale.locale, pointsPrecision)
+            }}
           </td>
-          <td>{{ formatCumtime(formatName, row.cumtime) }}</td>
+          <td v-if="showsCumtime(formatName)">{{ formatCumtime(formatName, row.cumtime) }}</td>
           <RankingCell v-for="cell in cellsOf(row)" :key="cell.problemId" :view="cell.view" />
         </tr>
       </tbody>

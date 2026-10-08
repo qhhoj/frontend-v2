@@ -235,7 +235,9 @@
     "solvedCount": "{count} solved",
     "empty": "No contestants yet.",
     "disqualified": "Disqualified",
-    "scrollRegion": "Scrollable ranking board"
+    "scrollRegion": "Scrollable ranking board",
+    "refreshFailed": "Could not refresh the board, retrying.",
+    "scrollHint": "Swipe sideways to see the problems →"
   },
   "formats": {
     "default": "Default",

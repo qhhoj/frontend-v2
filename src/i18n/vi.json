@@ -235,7 +235,9 @@
     "solvedCount": "{count} bài",
     "empty": "Chưa có thí sinh.",
     "disqualified": "Bị loại",
-    "scrollRegion": "Vùng cuộn bảng xếp hạng"
+    "scrollRegion": "Vùng cuộn bảng xếp hạng",
+    "refreshFailed": "Không cập nhật được bảng, đang thử lại.",
+    "scrollHint": "Vuốt ngang để xem các bài →"
   },
   "formats": {
     "default": "Mặc định",

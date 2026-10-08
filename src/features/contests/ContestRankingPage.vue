@@ -6,6 +6,7 @@ import CountdownTimer from '@/components/CountdownTimer.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
+import { useNow } from '@/lib/use-now';
 import { useSessionStore } from '@/stores/session.store';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
@@ -22,11 +23,19 @@ const {
   error: contestError,
   refetch: refetchContest,
 } = useContestQuery(key);
-const running = computed(() => contest.value?.phase === 'running');
+const now = useNow();
+/** Also true once a contest that was still upcoming when loaded has started, so polling begins without a reload. */
+const running = computed(
+  () =>
+    contest.value?.phase === 'running' ||
+    (contest.value?.phase === 'upcoming' && now.value >= Date.parse(contest.value.startTime)),
+);
 const {
   data: ranking,
   isPending: rankingPending,
   error: rankingError,
+  isRefetchError: rankingRefreshFailed,
+  isPlaceholderData: rankingStale,
   refetch: refetchRanking,
 } = useRankingQuery(key, withVirtual, running);
 
@@ -37,10 +46,12 @@ const rows = computed(() => {
   const all = ranking.value?.rows ?? [];
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
+/** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
+const PODIUM_LIMIT = 6;
 const podium = computed(() =>
   (ranking.value?.rows ?? [])
     .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
-    .slice(0, 3),
+    .slice(0, PODIUM_LIMIT),
 );
 const summary = computed(() =>
   contest.value
@@ -156,25 +167,40 @@ const VIEW_MODES = [
       </template>
     </QueryState>
     <QueryState
-      v-if="!contestError"
+      v-if="contest"
       :loading="rankingPending"
-      :error="rankingError"
+      :error="ranking ? null : rankingError"
       @retry="refetchRanking()"
     >
       <p v-if="!ranking?.rows.length" class="glass rounded-card py-10 text-center text-muted">
         {{ $t('ranking.empty') }}
       </p>
-      <template v-else-if="ranking">
-        <RankingPodium v-if="podium.length" :rows="podium" :format-name="formatName" />
-        <GlassCard as="div" class="overflow-hidden">
+      <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">
+        <p
+          v-if="rankingRefreshFailed"
+          role="status"
+          class="glass rounded-pill px-4 py-2 text-sm text-muted"
+        >
+          {{ $t('ranking.refreshFailed') }}
+        </p>
+        <RankingPodium
+          v-if="podium.length"
+          :rows="podium"
+          :problems="ranking.problems"
+          :format-name="formatName"
+          :points-precision="contest.pointsPrecision"
+          :class="{ 'opacity-60': rankingStale }"
+        />
+        <GlassCard as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
           <RankingTable
             :ranking="ranking"
             :rows="rows"
             :format-name="formatName"
+            :points-precision="contest.pointsPrecision"
             :viewer-id="session.user?.id ?? null"
           />
         </GlassCard>
-      </template>
+      </div>
     </QueryState>
   </div>
 </template>

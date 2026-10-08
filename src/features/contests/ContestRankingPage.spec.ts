@@ -200,8 +200,10 @@ describe('contest ranking', () => {
     await flushPromises();
     expect(wrapper.findAll('tbody tr')).toHaveLength(4);
     expect(wrapper.text()).not.toContain('Đang tải');
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
     release();
     await flushPromises();
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
     expect(wrapper.findAll('tbody tr')).toHaveLength(4);
   });
 
@@ -225,6 +227,148 @@ describe('contest ranking', () => {
     await flushPromises();
     expect(calls.filter((call) => call.path === '/contests/r42/ranking')).toHaveLength(1);
     visibility.mockRestore();
+  });
+
+  it('keeps the last board and says so when a poll fails', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
+    let polls = 0;
+    mockApi(
+      routes({
+        'GET /contests/r42/ranking': () => (polls++ === 0 ? ok(ranking()) : fail(500, 'internal')),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    await vi.advanceTimersByTimeAsync(30_000);
+    await flushPromises();
+    expect(wrapper.findAll('tbody tr')).toHaveLength(4);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+    expect(wrapper.text()).toContain('Không cập nhật được bảng');
+  });
+
+  it('shows the error when there is no board yet', async () => {
+    mockApi(routes({ 'GET /contests/r42/ranking': fail(500, 'internal') }));
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+  });
+
+  it('starts polling when an upcoming contest begins while the page is open', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
+    const calls = mockApi(
+      routes({
+        'GET /contests/r42': ok(
+          contestDetail({ phase: 'upcoming', startTime: '2026-10-08T10:00:20Z' }),
+        ),
+      }),
+    );
+    await mountApp('/contests/r42/ranking');
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(calls.filter((call) => call.path === '/contests/r42/ranking')).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(60_000);
+    await flushPromises();
+    expect(
+      calls.filter((call) => call.path === '/contests/r42/ranking').length,
+    ).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shares medals between tied ranks and keeps a tied first place', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
+    mockApi(
+      routes({
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            rows: [
+              rankingRow(1, 'part-07', 'user_07', 1, 10, cell),
+              rankingRow(1, 'part-12', 'user_12', 1, 10, cell),
+              rankingRow(3, 'part-03', 'user_03', 1, 20, cell),
+              rankingRow(4, 'part-01', 'user_01', 1, 30, cell),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const podium = wrapper.get('section[aria-label="Top 3"]');
+    expect(podium.findAll('a').map((link) => link.text())).toEqual([
+      'user_07',
+      'user_12',
+      'user_03',
+    ]);
+    const [first, tiedFirst, third] = podium.findAll('span[aria-hidden="true"]');
+    expect(first!.classes()).toEqual(tiedFirst!.classes());
+    expect(third!.classes()).not.toEqual(first!.classes());
+  });
+
+  it('drops the time column for formats without cumulative time', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    mockApi(
+      routes({
+        'GET /contests/r42': ok(contestDetail({ formatName: 'ioi16' })),
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            frozen: false,
+            problems: [
+              {
+                problemId: problemA,
+                code: 'r42a',
+                label: 'A',
+                points: 100,
+                firstSolve: null,
+                acceptedCount: 0,
+              },
+            ],
+            rows: [
+              rankingRow(1, 'part-07', 'user_07', 50, 0, { [problemA]: { points: 50, time: 0 } }),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const headings = wrapper.findAll('thead th').map((cell) => cell.text());
+    expect(headings).toContain('Điểm');
+    expect(headings).not.toContain('Thời gian');
+    expect(rowOf(wrapper, 'user_07').findAll('td')).toHaveLength(3);
+  });
+
+  it('prints cell points at the contest precision', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    mockApi(
+      routes({
+        'GET /contests/r42': ok(contestDetail({ formatName: 'ioi', pointsPrecision: 1 })),
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            frozen: false,
+            problems: [
+              {
+                problemId: problemA,
+                code: 'r42a',
+                label: 'A',
+                points: 100,
+                firstSolve: null,
+                acceptedCount: 0,
+              },
+            ],
+            rows: [
+              rankingRow(1, 'part-07', 'user_07', 99.5, 600, {
+                [problemA]: { points: 99.5, time: 600 },
+              }),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    expect(cellTexts(rowOf(wrapper, 'user_07'))).toEqual(['99,5']);
+    expect(rowOf(wrapper, 'user_07').findAll('td')[1]!.text()).toBe('99,5');
+  });
+
+  it('hints that the board scrolls sideways', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    expect(wrapper.text()).toContain('Vuốt ngang');
   });
 
   it('reports an unknown contest', async () => {
