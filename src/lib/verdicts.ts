@@ -29,6 +29,15 @@ const TONES: Record<VerdictCode, VerdictTone> = {
   D: 'pending',
   PD: 'pending',
 };
+/** Tone classes shared by VerdictBadge and VerdictLabel: tokens only (lint:tokens). */
+export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
+  ac: 'bg-verdict-ac-bg text-verdict-ac',
+  wa: 'bg-verdict-wa-bg text-verdict-wa',
+  tle: 'bg-verdict-tle-bg text-verdict-tle',
+  rte: 'bg-verdict-rte-bg text-verdict-rte',
+  ce: 'bg-verdict-ce-bg text-verdict-ce',
+  pending: 'bg-verdict-pending-bg text-verdict-pending',
+};
 export const VERDICT_CODES = Object.keys(TONES) as VerdictCode[];
 
 /** A finished submission shows its result (or its final status when it has none); an unfinished one its status. */

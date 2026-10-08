@@ -131,15 +131,17 @@
     "banned_from_problem": "Bạn bị cấm nộp bài này.",
     "contest_submission_limit": "Bạn đã dùng hết số lần nộp bài này trong kỳ thi.",
     "unfinished_submission_limit": "Bạn có quá nhiều bài nộp đang chờ chấm. Hãy đợi chúng chấm xong.",
-    "solve_first": "Hãy giải bài yêu cầu trước để xem nội dung này.",
-    "contest_running": "Nội dung này bị ẩn trong lúc kỳ thi diễn ra.",
+    "solve_first": "Hãy giải bài này để xem bài nộp này.",
+    "contest_running": "Chưa xem được: bài nộp của kỳ thi chưa được công khai.",
     "hidden": "Nội dung này bị ẩn với bạn."
   },
   "common": {
     "retry": "Thử lại",
     "loading": "Đang tải…",
     "viewAll": "Xem tất cả",
-    "you": "Bạn"
+    "you": "Bạn",
+    "copy": "Sao chép",
+    "copied": "Đã chép"
   },
   "verdicts": {
     "AC": "Chấp nhận",
@@ -207,6 +209,9 @@
     "topRating": "Top rating",
     "welcomeTitle": "Luyện thuật toán, thi đấu trực tuyến",
     "welcomeBody": "Đăng nhập để nộp bài, theo dõi rating và tham gia kỳ thi."
+  },
+  "problem": {
+    "copySample": "Sao chép ví dụ"
   },
   "problems": {
     "title": "Chọn bài, bắt đầu giải",
@@ -298,7 +303,7 @@
       "scratchInvalid": "Đây không phải dự án Scratch hợp lệ.",
       "fileUploadDisabled": "Ngôn ngữ này không cho tải tệp lên.",
       "fileRejected": "Tệp bị từ chối.",
-      "sourceLength": "Mã nguồn dài quá {max} ký tự."
+      "sourceLength": "Mã nguồn vượt quá {max} ký tự."
     }
   }
 }

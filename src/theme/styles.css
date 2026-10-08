@@ -248,3 +248,29 @@
     overflow-x: auto;
   }
 }
+
+/* Problem statement typography (StatementBody). Scoped to .statement so other user content keeps its own rhythm. */
+.user-content.statement {
+  font-family: var(--qh-font-body);
+  line-height: 1.75;
+  & h3 {
+    font-family: var(--qh-font-display);
+    font-weight: 600;
+  }
+}
+
+/* Copy button on each sample block (use-copyable-blocks.ts): floats inside the block's scroll box. */
+@utility copy-block {
+  position: sticky;
+  top: 0;
+  float: right;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding-inline: 0.75rem;
+  font: inherit;
+  font-size: 13px;
+  color: var(--qh-text);
+  background-color: var(--qh-surface-solid);
+  border: 1px solid var(--qh-line-strong);
+  border-radius: var(--qh-radius-pill);
+}

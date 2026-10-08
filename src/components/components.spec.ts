@@ -4,6 +4,7 @@ import stylesCss from '@/theme/styles.css?raw';
 import { ApiError } from '@/api/client';
 import { verdictOf } from '@/lib/verdicts';
 import { mountComponent } from '@/test/mount';
+import CopyButton from './CopyButton.vue';
 import CountdownTimer from './CountdownTimer.vue';
 import GlassCard from './GlassCard.vue';
 import QueryState from './QueryState.vue';
@@ -12,9 +13,48 @@ import TokenCoin from './TokenCoin.vue';
 import UserContent from './UserContent.vue';
 import UserName from './UserName.vue';
 import VerdictBadge from './VerdictBadge.vue';
+import VerdictLabel from './VerdictLabel.vue';
+
+const stubClipboard = (writeText: ((text: string) => Promise<void>) | undefined) =>
+  Object.defineProperty(navigator, 'clipboard', {
+    value: writeText === undefined ? undefined : { writeText },
+    configurable: true,
+  });
 
 describe('shared components', () => {
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    Reflect.deleteProperty(navigator, 'clipboard');
+  });
+
+  it('VerdictLabel shows the code and the localized verdict name in plain text', () => {
+    const label = mountComponent(VerdictLabel, {
+      props: { verdict: verdictOf({ status: 'D', result: 'WA' }) },
+    });
+    expect(label.text()).toBe('WA · Sai kết quả');
+    expect(label.find('[aria-hidden="true"]').exists()).toBe(false);
+  });
+
+  it('CopyButton copies its text, says "copied" for two seconds, then clears it', async () => {
+    vi.useFakeTimers();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    stubClipboard(writeText);
+    const copy = mountComponent(CopyButton, {
+      props: { text: '0 5 7 8', label: 'Sao chép ví dụ' },
+    });
+    await copy.get('button').trigger('click');
+    await vi.advanceTimersByTimeAsync(0);
+    expect(writeText).toHaveBeenCalledWith('0 5 7 8');
+    expect(copy.get('[aria-live="polite"]').text()).toBe('Đã chép');
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(copy.get('[aria-live="polite"]').text()).toBe('');
+  });
+
+  it('CopyButton renders nothing without the Clipboard API', () => {
+    stubClipboard(undefined);
+    const copy = mountComponent(CopyButton, { props: { text: 'x', label: 'Sao chép' } });
+    expect(copy.find('button').exists()).toBe(false);
+  });
 
   it('VerdictBadge shows the code and names the verdict for assistive tech', () => {
     const badge = mountComponent(VerdictBadge, {

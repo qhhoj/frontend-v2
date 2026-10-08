@@ -131,15 +131,17 @@
     "banned_from_problem": "You are banned from submitting to this problem.",
     "contest_submission_limit": "You have used all your submissions for this problem in the contest.",
     "unfinished_submission_limit": "You have too many submissions still being judged. Wait for them to finish.",
-    "solve_first": "Solve the required problem first to see this.",
-    "contest_running": "This is hidden while the contest is running.",
+    "solve_first": "Solve this problem to see this submission.",
+    "contest_running": "Not available yet: the contest's submissions are not public.",
     "hidden": "This is hidden from you."
   },
   "common": {
     "retry": "Retry",
     "loading": "Loading…",
     "viewAll": "View all",
-    "you": "You"
+    "you": "You",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "verdicts": {
     "AC": "Accepted",
@@ -207,6 +209,9 @@
     "topRating": "Top rating",
     "welcomeTitle": "Practise algorithms, compete online",
     "welcomeBody": "Sign in to submit, follow your rating and join contests."
+  },
+  "problem": {
+    "copySample": "Copy sample"
   },
   "problems": {
     "title": "Pick a problem, start solving",
