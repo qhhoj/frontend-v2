@@ -506,7 +506,19 @@
     "unfinished_submission_limit": "Bạn có quá nhiều bài nộp đang chờ chấm. Hãy đợi chúng chấm xong.",
     "solve_first": "Hãy giải bài này để xem bài nộp này.",
     "contest_running": "Chưa xem được: bài nộp của kỳ thi chưa được công khai.",
-    "hidden": "Nội dung này bị ẩn với bạn."
+    "hidden": "Nội dung này bị ẩn với bạn.",
+    "editor_cannot_register": "Người ra đề và người thử đề không cần đăng ký.",
+    "banned_from_contest": "Bạn bị cấm tham gia kỳ thi này.",
+    "registration_not_required": "Kỳ thi này không cần đăng ký: vào thi khi kỳ thi bắt đầu.",
+    "registration_closed": "Kỳ thi này đã đóng đăng ký. Bạn không thể đăng ký thêm.",
+    "contest_ended": "Kỳ thi đã kết thúc.",
+    "already_registered": "Bạn đã đăng ký kỳ thi này rồi.",
+    "contest_not_started": "Kỳ thi chưa bắt đầu. Hãy quay lại khi kỳ thi mở.",
+    "virtual_disallowed": "Ban tổ chức không cho phép thi ảo kỳ thi này.",
+    "not_registered": "Bạn chưa đăng ký kỳ thi này.",
+    "access_code_required": "Cần mã tham gia. Nhập mã do ban tổ chức cung cấp rồi thử lại.",
+    "wrong_access_code": "Mã tham gia chưa đúng. Kiểm tra lại mã với ban tổ chức rồi nhập lại.",
+    "not_in_contest": "Bạn không ở trong kỳ thi này."
   },
   "common": {
     "retry": "Thử lại",

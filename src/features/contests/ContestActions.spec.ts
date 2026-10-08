@@ -1,11 +1,14 @@
 import { flushPromises } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ApiError } from '@/api/client';
+import { errorMessageKey } from '@/i18n/error-message';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { PARTICIPATION_REFUSALS } from './participation-refusal';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
 const BEFORE_START = Date.parse('2026-10-08T07:59:58Z');
@@ -363,5 +366,69 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     expect(button.element.getAttribute('aria-busy')).toBe('true');
     await flushPromises();
     expect(joinCalls(calls)).toHaveLength(1);
+  });
+});
+
+describe('contest refusals', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it.each([
+    ['contest_not_started', 409, 'Kỳ thi chưa bắt đầu. Hãy quay lại khi kỳ thi mở.'],
+    ['registration_closed', 409, 'Kỳ thi này đã đóng đăng ký. Bạn không thể đăng ký thêm.'],
+    ['virtual_disallowed', 409, 'Ban tổ chức không cho phép thi ảo kỳ thi này.'],
+    ['not_registered', 409, 'Bạn chưa đăng ký kỳ thi này.'],
+    ['banned_from_contest', 403, 'Bạn bị cấm tham gia kỳ thi này.'],
+    ['rate_limited', 429, 'Bạn thao tác quá nhanh. Hãy thử lại sau.'],
+  ])('says what %s means, next to the sweating Bit', async (code, status, text) => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'POST /contests/r42/join': fail(status, code),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    const alert = actionsOf(wrapper).get('[role="alert"]');
+    expect(alert.text()).toBe(text);
+    expect(alert.find('[aria-hidden="true"]').exists()).toBe(true);
+  });
+
+  it('opens the code dialog when the backend asks for a code the page did not know about', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'POST /contests/r42/join': fail(403, 'access_code_required'),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()).not.toBeNull();
+    expect(dialog()!.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it('keeps a wrong code inside the dialog in words', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
+      'POST /contests/r42/join': fail(403, 'wrong_access_code'),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    const input = dialog()!.querySelector<HTMLInputElement>('input')!;
+    input.value = 'x';
+    input.dispatchEvent(new Event('input'));
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(dialog()!.querySelector('[role="alert"]')!.textContent.trim()).toBe(
+      'Mã tham gia chưa đúng. Kiểm tra lại mã với ban tổ chức rồi nhập lại.',
+    );
+  });
+
+  it.each(PARTICIPATION_REFUSALS)('gives %s its own text rather than the generic one', (code) => {
+    expect(errorMessageKey(new ApiError(code, 409, 'x'))).toBe(`errors.${code}`);
   });
 });

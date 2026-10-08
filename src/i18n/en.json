@@ -506,7 +506,19 @@
     "unfinished_submission_limit": "You have too many submissions still being judged. Wait for them to finish.",
     "solve_first": "Solve this problem to see this submission.",
     "contest_running": "Not available yet: the contest's submissions are not public.",
-    "hidden": "This is hidden from you."
+    "hidden": "This is hidden from you.",
+    "editor_cannot_register": "Setters and testers do not register.",
+    "banned_from_contest": "You are banned from this contest.",
+    "registration_not_required": "This contest needs no registration: enter when it starts.",
+    "registration_closed": "Registration for this contest is closed.",
+    "contest_ended": "The contest has ended.",
+    "already_registered": "You are already registered.",
+    "contest_not_started": "The contest has not started. Come back when it opens.",
+    "virtual_disallowed": "The organizers do not allow virtual runs of this contest.",
+    "not_registered": "You are not registered for this contest.",
+    "access_code_required": "An access code is required. Enter the organizers' code and try again.",
+    "wrong_access_code": "Wrong access code. Check it with the organizers and try again.",
+    "not_in_contest": "You are not in this contest."
   },
   "common": {
     "retry": "Retry",

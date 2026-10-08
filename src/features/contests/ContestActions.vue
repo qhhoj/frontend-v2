@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { ApiError } from '@/api/client';
 import type { ContestDetail } from '@/api/types/contests';
 import InlineBit from '@/components/InlineBit.vue';
 import { translate } from '@/i18n';
@@ -17,8 +18,11 @@ import { actionFactsOf, commandOf, contestAction } from './contest-action';
 import type { ContestActionKind } from './contest-action';
 import { useCurrentParticipationQuery } from './contests.queries';
 import InContestStatus from './InContestStatus.vue';
+import type { ParticipationRefusal } from './participation-refusal';
 import { useParticipation } from './use-participation';
 
+/** The list or a stale detail may not know the contest needs a code: the backend's answer opens the dialog instead. */
+const ACCESS_CODE_REQUIRED: ParticipationRefusal = 'access_code_required';
 /** The text each kind shows: a button label, or the notice itself when the kind has no request. Exhaustive, so a new kind fails to compile here. */
 const TEXT_KEYS: Record<ContestActionKind, string> = {
   signIn: 'contests.actions.signIn',
@@ -76,11 +80,21 @@ const actionLabel = computed(() =>
 const isLocked = computed(() => LOCKED_KINDS.includes(chosen.value.kind));
 const hasButton = computed(() => isLocked.value || commandOf(chosen.value.kind) !== null);
 
+function isAccessCodeRequired(failure: unknown): boolean {
+  return failure instanceof ApiError && failure.code === ACCESS_CODE_REQUIRED;
+}
 /** Runs the request behind the chosen action; the access code is passed through and never kept. */
 async function perform(accessCode?: string) {
   const command = commandOf(chosen.value.kind);
   if (!command || isPending.value) return;
-  await run(command, accessCode);
+  try {
+    await run(command, accessCode);
+  } catch (failure: unknown) {
+    if (!isAccessCodeRequired(failure)) throw failure;
+    reset();
+    isDialogOpen.value = true;
+    return;
+  }
   isDialogOpen.value = false;
   participationStatus.value = translate(`contests.actions.done.${command}`);
   await nextTick();
