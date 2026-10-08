@@ -15,11 +15,13 @@ import TicketTable from './TicketTable.vue';
 import TicketTableSkeleton from './TicketTableSkeleton.vue';
 import { ticketQueryFromRoute } from './ticket-filters';
 import { useTicketsQuery } from './tickets.queries';
+import { useTicketStream } from './use-ticket-stream';
 
 const route = useRoute();
 const locale = useLocaleStore();
 const filters = computed(() => ticketQueryFromRoute(route.query));
 const { data, error, isPending, refetch } = useTicketsQuery(filters);
+const { isLive, announcement } = useTicketStream(null);
 
 const tickets = computed(() => data.value?.items ?? []);
 const total = computed(() => data.value?.meta.total ?? 0);
@@ -51,6 +53,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
     <TicketFilterNav :filters="filters" :total="data?.meta.total" />
     <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
     <StaffTicketFilters :key="route.fullPath" :filters="filters" />
+    <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     <GlassCard as="div" class="overflow-hidden">
       <QueryState :loading="isPending" :error="null">
         <template #skeleton><TicketTableSkeleton /></template>
@@ -99,7 +102,10 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
             <footer
               class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13px] text-muted md:px-6"
             >
-              <span>{{ $t('tickets.footer', { total: formatNumber(total, locale.locale) }) }}</span>
+              <span>
+                {{ $t('tickets.footer', { total: formatNumber(total, locale.locale) })
+                }}<template v-if="isLive">{{ $t('ticket.liveFooter') }}</template>
+              </span>
               <NumberedPager :meta="data.meta" :label="$t('tickets.pager')" />
             </footer>
           </template>

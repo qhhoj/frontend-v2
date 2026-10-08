@@ -13,7 +13,6 @@
     "organizations": "Organizations"
   },
   "pages": {
-    "problem": "Problem",
     "submissions": "Submissions",
     "submission": "Submission",
     "submissionTitle": "Submission {id}",
@@ -1497,7 +1496,52 @@
     "title": "Support tickets"
   },
   "ticket": {
-    "title": "Ticket"
+    "title": "Ticket",
+    "breadcrumb": "Breadcrumb",
+    "list": "Support tickets",
+    "yours": "Your ticket",
+    "staffView": "Staff view",
+    "meta": "{creator} · {date} · {count} messages · assignees {assignees}",
+    "messages": "Messages",
+    "assigneeChip": "Assignee",
+    "liveOn": "Receiving new messages live",
+    "liveOff": "Live updates stopped. Reload to see new messages.",
+    "reply": "Reply",
+    "replyPlaceholder": "Write a message (up to 8192 characters; HTML is escaped)",
+    "send": "Send message",
+    "messageCap": "This ticket reached its 500-message limit.",
+    "muted": "Muted users cannot open or answer tickets.",
+    "link": "Link",
+    "creator": "Creator",
+    "assignees": "Assignees",
+    "updated": "Updated",
+    "notes": "Assignee notes",
+    "notesInternal": "Internal notes",
+    "noNotes": "No notes.",
+    "notesHint": "Everyone who can read the ticket sees the notes; only assignees and staff edit them.",
+    "saveNotes": "Save notes",
+    "status": "Status",
+    "close": "Close ticket",
+    "reopen": "Reopen ticket",
+    "statusHint": "Creators close or reopen their tickets. Only staff mark good contributions, never on their own tickets.",
+    "handle": "Handle ticket",
+    "markGood": "Mark as good contribution",
+    "assigneesInput": "Assignees (usernames)",
+    "assigneesMax": "At most 20 assignees.",
+    "save": "Save",
+    "sentTitle": "Ticket sent",
+    "sentBody": "Staff will answer here.",
+    "forbiddenTitle": "You cannot read this ticket",
+    "forbiddenBody": "Tickets open only to their creator, assignees and staff.",
+    "notFoundTitle": "Ticket not found",
+    "backToList": "Back to tickets",
+    "live": {
+      "messages": "{count} new message | {count} new messages",
+      "updated": "{count} ticket updated | {count} tickets updated",
+      "closed": "The ticket was closed",
+      "reopened": "The ticket was reopened"
+    },
+    "liveFooter": " · new messages appear live"
   },
   "flatpage": {
     "title": "Page"

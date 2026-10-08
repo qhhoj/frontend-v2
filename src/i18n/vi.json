@@ -13,7 +13,6 @@
     "organizations": "Tổ chức"
   },
   "pages": {
-    "problem": "Đề bài",
     "submissions": "Bài nộp",
     "submission": "Chi tiết bài nộp",
     "submissionTitle": "Bài nộp {id}",
@@ -1497,7 +1496,52 @@
     "title": "Phiếu hỗ trợ"
   },
   "ticket": {
-    "title": "Chi tiết phiếu"
+    "title": "Chi tiết phiếu",
+    "breadcrumb": "Đường dẫn",
+    "list": "Phiếu hỗ trợ",
+    "yours": "Phiếu của bạn",
+    "staffView": "Góc nhìn quản trị viên",
+    "meta": "{creator} · {date} · {count} tin nhắn · người xử lý {assignees}",
+    "messages": "Tin nhắn",
+    "assigneeChip": "Người xử lý",
+    "liveOn": "Đang nhận tin nhắn mới trực tiếp",
+    "liveOff": "Cập nhật trực tiếp đã dừng. Tải lại trang để xem tin mới.",
+    "reply": "Trả lời",
+    "replyPlaceholder": "Viết tin nhắn (tối đa 8192 ký tự; HTML được thoát)",
+    "send": "Gửi tin nhắn",
+    "messageCap": "Phiếu đã đạt giới hạn 500 tin nhắn.",
+    "muted": "Người dùng bị tắt tiếng không thể mở hoặc trả lời phiếu.",
+    "link": "Liên kết",
+    "creator": "Người tạo",
+    "assignees": "Xử lý",
+    "updated": "Cập nhật",
+    "notes": "Ghi chú của người xử lý",
+    "notesInternal": "Ghi chú nội bộ",
+    "noNotes": "Chưa có ghi chú.",
+    "notesHint": "Mọi người đọc phiếu đều xem được ghi chú; chỉ người xử lý và quản trị viên sửa được.",
+    "saveNotes": "Lưu ghi chú",
+    "status": "Trạng thái",
+    "close": "Đóng phiếu",
+    "reopen": "Mở lại phiếu",
+    "statusHint": "Người tạo đóng hoặc mở lại phiếu của mình. Chỉ quản trị viên đánh dấu đóng góp tốt, và không thể tự đánh dấu phiếu của mình.",
+    "handle": "Xử lý phiếu",
+    "markGood": "Đánh dấu đóng góp tốt",
+    "assigneesInput": "Người xử lý (tên đăng nhập)",
+    "assigneesMax": "Tối đa 20 người xử lý.",
+    "save": "Lưu",
+    "sentTitle": "Đã gửi phiếu",
+    "sentBody": "Quản trị viên sẽ trả lời tại đây.",
+    "forbiddenTitle": "Không có quyền xem phiếu này",
+    "forbiddenBody": "Phiếu chỉ mở cho người tạo, người xử lý và quản trị viên.",
+    "notFoundTitle": "Không tìm thấy phiếu",
+    "backToList": "Về danh sách phiếu",
+    "live": {
+      "messages": "{count} tin nhắn mới",
+      "updated": "{count} phiếu vừa cập nhật",
+      "closed": "Phiếu đã đóng",
+      "reopened": "Phiếu đã mở lại"
+    },
+    "liveFooter": " · tin nhắn mới tự hiện nhờ luồng trực tiếp"
   },
   "flatpage": {
     "title": "Trang"
