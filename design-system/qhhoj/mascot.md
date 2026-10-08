@@ -41,10 +41,13 @@ These are sprite colours, not theme tokens: Bit keeps them in every theme (they 
 | Home hero | graduation cap with tassel | blink every few seconds | terracotta |
 | Accepted | crown | open | terracotta |
 | Wrong answer / errors | sweat drop (highlight colour) beside the head | closed | terracotta |
-| 404 | magnifying glass | open | terracotta |
+| 404 | crying: no headgear; one highlight tear pixel under each eye, two falling drops (highlight colour, outline), 1 px sob in steps | closed | terracotta |
 | Empty lists | nightcap | closed | charcoal |
+| Loading swarm | cap, nightcap (charcoal twin), crown, antenna, none, one per Bit; 5 on desktop, 3 under 768 px (cap, nightcap, crown), 1 under reduced motion (cap) | open, blink once when the Bits stop | terracotta (one charcoal) |
+
+Antenna: a 1 px stalk (rows 2–3) under a 2×2 knob (rows 0–1). Every headgear's last row sits directly above the body (row 6).
 
 New variants: keep body, eyes, legs and palette identical; at most 1–2 px of pose change; the silhouette filled solid black must still read.
-Motion: blinking only, disabled under `prefers-reduced-motion`. Every placement has an `aria-label` (decorative placements next to a heading use `aria-hidden`).
+Motion: blinking, the loading swarm and the 404 sob. Blinking and the sob are disabled under `prefers-reduced-motion`; the 404's falling tears are hidden there. Loading Bits walk: the walk frame moves each leg one pixel inward and drops the sprite one pixel (`translateY`, the stand frame has no offset), hops lift it 6 px, and it faces its direction of travel. Under reduced motion one Bit stands still. Every placement has an `aria-label` (decorative placements next to a heading use `aria-hidden`); the loading swarm is `aria-hidden`. Sprite data and palettes live in `src/mascot/bit-sprite.ts`, the one source file that `lint:tokens` skips.
 
 Reference mock-up: canvas section 5, artboard "Claw D" (https://claude.ai/artifact/KjFHNR7yonzVtbF8BUNmYW).

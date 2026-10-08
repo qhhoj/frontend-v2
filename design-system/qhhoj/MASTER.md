@@ -62,6 +62,19 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover.
 - `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`: the card surface is opaque (`--qh-surface-solid`) and blur is 0. No `backdrop-filter` support: the card surface is opaque; inner tiles and hover rows keep their Glass tint. Clay is already opaque.
 
+## Loading states
+
+- Skeletons: `SkeletonBlock` in `--qh-skeleton`, pulsing 1.4 s between full and 45 % opacity; static under reduced motion. Shapes: `text` (1em tall, inline), `round`, `pill`, or a plain block; never a radius class.
+- Shaped like the real content: a block inside a wrapper that carries the real text classes, fixed sizes for coins, badges and tiles, the real row count. Skeleton rows also reserve phone-only rows that would otherwise shift (the ranking scroll hint below `md`).
+- `QueryState` owns the loading branch and shows the card's own `skeleton` slot; the error branch with retry is unchanged. Wrapper and blocks are `aria-hidden`; no loading text per block.
+- Waiting means first data only (`isPending`). A wait is shown after 600 ms of continuous waiting; a wait that ends is over after 100 ms, so the gap between a navigation ending and the page's queries starting does not count as done.
+- Bit swarm: after the 600 ms, 5 Bits (3 under 768 px) wander the viewport: random walk at 40-120 px/s, bouncing off the edges, small hops, leg steps, facing their direction. Fixed, `z-40`, `aria-hidden`, `pointer-events: none`, below menus and dialogs.
+- When waiting ends, the Bits stop after 100 ms, blink once (160 ms), hold 1.5 s, then fade out over 300 ms. A new wait while they fade walks again.
+- Under reduced motion one Bit (the cap) stands in the bottom-left corner, does not blink, and disappears at once when the wait ends (no fade: the global 0 ms transition rule applies).
+- Background refetches, polls and kept-data filter changes show neither skeletons nor Bits.
+- One polite live region in the shell says the loading text ("Đang tải…") while the Bits walk; it still announces under reduced motion.
+- 404: crying Bit in front of a pale "404" built from `--qh-skeleton` blocks; heading "Page not found", one line, "Back to home" (primary) and "Browse problems" (secondary), the requested path in mono.
+
 ## Components
 
 - **Card**: `GlassCard` (`glass rounded-card`; callers add padding): a white hairline card in Clay, frosted in Glass.
@@ -90,3 +103,4 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - [ ] Focus visible for keyboard nav
 - [ ] Reduced motion and reduced transparency respected
 - [ ] 375 / 768 / 1024 / 1440 px, no horizontal page scroll
+- [ ] Loading: skeleton added for each new card, reduced motion checked

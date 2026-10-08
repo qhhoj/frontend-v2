@@ -19,7 +19,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 
 ## State and data
 
-- Pinia holds client state only: `session`, `theme`, `locale`. Server data is never copied into Pinia
+- Pinia holds client state only: `session`, `theme`, `locale`, `loading` (which parts are waiting on first data). Server data is never copied into Pinia
 - vue-query keys: `[area, resource, params]` (`['problems', 'list', filters, lang]`); invalidate by prefix (`['submissions']`)
 - Account-owned queries include the user id in the key (`profileKey(userId)`); `useAccountCacheSync` (in the shell) is the only place that clears the cache, whenever the signed-in user changes: login, logout, expiry or another account taking over
 - Lists and polls keep the previous data while a new key loads (`keepPreviousData`, `placeholderData`), so a filter change or a failed poll does not blank the screen
@@ -29,10 +29,18 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Realtime: `openEventStream` (`src/api/events.ts`); follow a submission with `useSubmissionStatus`
 - Redirects from the URL (`?redirect=`) pass through `safeRedirect` (`src/router/safe-redirect.ts`) before any navigation
 
+## Loading states
+
+- A card, list or table that waits on a query uses `QueryState :loading="isPending"` and fills its `#skeleton` slot; no loading text. Pass the query's `isPending`, never `isFetching`: background refetches, polls and kept data must not show skeletons or Bits
+- Only pass `isPending` for an enabled query: it stays true while a query is disabled or paused offline. For a query that can be disabled, pass `isLoading`
+- Adding a skeleton for a new card: copy the loaded markup's wrapper elements (same text, spacing and grid classes), replace each text line with `<SkeletonBlock text class="w-..." />` inside the element that carries the font classes, replace avatars, badges and tiles with fixed-size `SkeletonBlock` (`round` for circles), and repeat rows as many times as the query's page size. Heights then match without magic numbers; confirm with an e2e `boundingBox` comparison before and after (see `e2e/loading.e2e.ts`)
+- The Bit swarm and the live region live once in the shell (`LoadingLayer`); pages never mount their own. A new route is covered automatically (navigation and `QueryState` register as waiting sources)
+- Tests that need a page to stay loading: `hangRequestsExcept([...])` (unit), `api.hold('GET /path')` (e2e)
+
 ## Styling
 
 - Components use the semantic utilities from `src/theme/styles.css` only (`bg-surface`, `text-content`, `text-muted`, `border-line`, `rounded-card`, `font-display`, ...). Tailwind's own palette, fonts and radii are removed
-- No colour literals outside `src/theme/themes/*.css` (specs excepted): `npm run lint:tokens` fails on them
+- No colour literals outside `src/theme/themes/*.css` (specs excepted): `npm run lint:tokens` fails on them. Bit's sprite palettes in `src/mascot/bit-sprite.ts` are the only exception (sprite colours, like an image asset); `lint:tokens` skips that one file
 - Classes picked at runtime come from a static `Record<..., string>` map (Tailwind must see the full class names)
 - Card: `GlassCard` (frosted in the Glass themes, a flat hairline card in Clay: the theme decides); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
 - Overlays (menus, popovers) are opaque `bg-surface-solid`
@@ -61,7 +69,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - Never remove the focus ring; real `<button>`/`<a>`; `aria-label` on icon-only buttons; icons `aria-hidden="true"`
 - Meaning never by colour alone: verdicts carry their code and a spoken label; ranking cells `+n`/`−n`/`?n` plus a label
 - Touch targets at least 44 px (`min-h-11`, `size-11`); wide tables scroll inside their card
-- `prefers-reduced-motion` and `prefers-reduced-transparency` are handled in the token layer; do not add motion that bypasses `--qh-duration`
+- `prefers-reduced-motion` and `prefers-reduced-transparency` are handled in the token layer; do not add motion that bypasses `--qh-duration`. The loading indicators are the exception: the Bit swarm runs on `requestAnimationFrame`, and the skeleton pulse and Bit's sob and tear animations keep their own durations; all of them stop under reduced motion
 
 ## i18n
 
@@ -76,7 +84,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - Fixtures in `src/test/fixtures.ts` are plain data with relative imports; e2e reuses them
 - SSE: `installFakeEventSource()` and `latestEventSource().emit(type, data)`
 - E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310`, then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
-- E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`
+- E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
 - Playwright never kills processes by name; stop only the servers you started
 
 ## Commits

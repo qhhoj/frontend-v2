@@ -112,6 +112,17 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | B8 | Login ban error carries a structured `banReason` (the frontend parses `Reason:` text today) | ban reason on login |
 | B9 | Distinct error codes for the per-user rate limit, the unfinished-submission limit, a problem ban and a contest submission cap | precise submit messages |
 
+## Loading states
+
+- Loading: `QueryState` shows a caller-supplied skeleton instead of text; blocks are `aria-hidden` and one shell live region announces once, because per-card regions would announce once per card.
+- Loading: "waiting" is a registry of sources (`QueryState` while `isPending`, plus an in-flight navigation), not `useIsFetching`, because refetches, polls and kept-data filter changes must never show mascots.
+- Loading: Bits appear after 600 ms of continuous waiting and a 100 ms gap does not break it, so fast pages stay calm and the tick between navigation end and the page's queries is not read as "done".
+- Loading: 5 Bits (3 under 768 px) random-walk over the viewport with one shared rAF loop, dt-capped at 100 ms, paused in hidden tabs, because one loop is cheap and a stalled frame must not teleport them; they stop, blink once, hold 1.5 s and fade 300 ms.
+- Loading: under reduced motion one Bit (the cap) stands in the bottom-left corner without blinking and disappears at once, with no fade: wandering is motion, `mascot.md` disables blinking, and the global 0 ms transition rule ends the fade before it starts.
+- Mascot: `src/mascot/bit-sprite.ts` is the single source of Bit's pixels and the only source file outside `src/theme/themes/` that `lint:tokens` skips, because Bit keeps its sprite colours in every theme like an image asset.
+- Motion: skeleton pulse, Bit sob and tears use their own durations and switch themselves off under reduced motion, because `--qh-duration` is 0 there and would freeze them mid-frame instead of removing them.
+- 404: `NotFoundPage` (crying Bit, pale 404) replaces the placeholder on the catch-all route; the mascot's 404 variant is crying, not a magnifying glass (user's pick "404 B").
+
 ## Known gaps (later sub-projects)
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.
