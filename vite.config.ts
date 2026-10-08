@@ -19,7 +19,7 @@ export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   build: { rollupOptions: { output: { chunkFileNames: chunkFileName } } },
   server: { port: 5173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
-  preview: { port: 4173, strictPort: true },
+  preview: { port: 4173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
   test: {
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],

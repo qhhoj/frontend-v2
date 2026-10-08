@@ -135,12 +135,12 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Submission list: stats strip (B24), URL-synced filter rail, live updates over the public feed with a throttled refetch.
 - Contest context (B19) shows only the attempts left in the dock; no banner until 8d.
 - Dates from the API show as UTC calendar dates (the SPA does not know site.timeZone).
+- Real-backend e2e is a separate opt-in Playwright project (`E2E_REAL_API`, `e2e-real/`), so the fake-API suite and CI never depend on a running backend; without a judge it asserts `QU`/`P` and says why it skips the AC check.
 
 ## Known gaps (later sub-projects)
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.
 - Session expiry mid-page redirects on the next navigation only — 8b.
-- Real-backend e2e and the submission screens — 8c.
 - Contest screens beyond ranking — 8d; admin screens — sub-project 7.
 - Header nav: at phone widths items use `px-2 text-sm` so all five fit at 375 px; at 320 px the pill still scrolls on its own.
 - E2E: `FakeApi` matches `:param` keys (an exact key wins), records every request in `requests` and serves PDF and event-stream replies; the editor and language packs must never be modulepreloaded (`bundle.e2e.ts`).

@@ -87,6 +87,21 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
 - Playwright never kills processes by name; stop only the servers you started
 
+## Real-backend e2e
+
+Opt-in, never part of `npm run e2e` or CI: `E2E_REAL_API` adds the `real-backend` Playwright project (`e2e-real/*.real.ts`); the preview server then proxies `/api` to it. Without the variable the project does not exist.
+
+Local stack (backend-v2 `README.md` "Run", `CONTRIBUTING.md` "Seed script"):
+
+1. Mongo as a replica set and Redis: `docker compose up -d mongo redis` in backend-v2 (use a scratch database name, e.g. `qhhoj_e2e_real`)
+2. Env for api and seed: `MONGO_URL`, `REDIS_URL`, `ENCRYPTION_KEY` (64 hex), `TOKEN_SECRET`, `PROBLEM_DATA_ROOT`, `PDF_CACHE_ROOT`, `SITE_URL=http://127.0.0.1:4310` (the Origin the browser sends), `COOKIE_SECURE=false`, `NODE_ENV=development`
+3. `npm run seed:e2e` (idempotent: `e2e_user`, `e2e_admin`, problem `e2e_sum`, language `PY3`), then `npm run start:dev` (`:3000`, or set `PORT`)
+4. `E2E_REAL_API=http://127.0.0.1:3000 npx playwright test --project=real-backend`
+
+`E2E_USER`, `E2E_PASSWORD`, `E2E_PROBLEM`, `E2E_LANGUAGE` default to `e2e_user`, `e2e-user-pass-1`, `e2e_sum`, `PY3`. The submitted program is a Python `a + b`.
+
+A verdict needs the worker, the bridge and a judge as well. Without a judge the row stays `QU`: the test asserts `QU`/`P`, prints why it skipped the AC check, and waits 60 s first. A queued row counts toward the unfinished-submission limit, so a second judge-less run answers 429 `unfinished_submission_limit`: clear the scratch database's `submissions` collection (or re-create the database) between runs. `e2e_sum` has no archive and no `pdfStatementUrl`: never use it for data-editing tests, and the PDF endpoint is probed directly.
+
 ## Commits
 
 - One-line conventional subject: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
