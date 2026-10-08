@@ -331,6 +331,7 @@
     "upload": "Tải tệp lên",
     "fileOnly": "tải tệp",
     "signIn": "Đăng nhập để nộp bài",
+    "overLimit": "Vượt quá giới hạn {max} ký tự",
     "templateRestored": "Đã khôi phục mẫu",
     "limits": "{time} · {memory}",
     "inContest": "Kỳ thi {key}",

@@ -121,7 +121,8 @@ watch(
             @gone="editorialGone = true"
           />
         </div>
-        <SubmitDock :problem="problem" />
+        <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
+        <SubmitDock :key="problem.code" :problem="problem" />
       </template>
     </QueryState>
   </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FileUp, Upload, X } from 'lucide-vue-next';
 import Select from 'primevue/select';
-import { reactive, useId } from 'vue';
+import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
 import { formatMemoryLimit, formatTimeLimit } from '@/lib/format';
@@ -18,6 +18,13 @@ const props = defineProps<{
 const state = reactive(props.form);
 const uploadInputId = useId();
 const fileInputId = useId();
+const errorId = useId();
+/** Ties the error line to the control the viewer is working in. */
+const errorReference = computed(() => (state.errorText ? errorId : undefined));
+const submitLabelKey = computed(() => {
+  if (state.submitting) return 'submit.submitting';
+  return state.fileMode ? 'submit.submitFile' : 'submit.submit';
+});
 const EDITOR_MIN_LINES = 8;
 
 /** The same file picked twice must fire `change` again, so the input is emptied after each read. */
@@ -101,7 +108,13 @@ function onUploadFilePicked(event: Event) {
     </div>
 
     <div v-show="!collapsed" class="order-6 min-w-0 basis-full">
-      <div v-if="!state.fileMode" class="max-h-[45dvh] overflow-auto rounded-tile">
+      <div
+        v-if="!state.fileMode"
+        role="group"
+        :aria-label="$t('submit.source')"
+        :aria-describedby="errorReference"
+        class="max-h-[45dvh] overflow-auto rounded-tile"
+      >
         <CodeEditor
           v-model="state.source"
           :label="$t('submit.source')"
@@ -121,6 +134,7 @@ function onUploadFilePicked(event: Event) {
             :id="fileInputId"
             type="file"
             :accept="acceptedExtension(state.language!)"
+            :aria-describedby="errorReference"
             class="peer sr-only"
             @change="onUploadFilePicked"
           />
@@ -150,7 +164,12 @@ function onUploadFilePicked(event: Event) {
         </div>
       </div>
     </div>
-    <p v-if="state.errorText" role="alert" class="order-7 basis-full text-sm text-negative">
+    <p
+      v-if="state.errorText"
+      :id="errorId"
+      role="alert"
+      class="order-7 basis-full text-sm text-negative"
+    >
       {{ state.errorText }}
     </p>
     <p v-if="state.resubmitUnavailable" role="status" class="order-7 basis-full text-sm text-muted">
@@ -165,8 +184,8 @@ function onUploadFilePicked(event: Event) {
           data-testid="source-counter"
           >{{ state.length }} / {{ MAX_SOURCE_LENGTH }}</span
         >
-        <span v-if="state.tooLong" role="alert" class="sr-only">{{
-          $t('submit.errors.sourceLength', { max: MAX_SOURCE_LENGTH })
+        <span v-if="state.tooLong" role="alert" class="text-negative">{{
+          $t('submit.overLimit', { max: MAX_SOURCE_LENGTH })
         }}</span>
         <span v-if="state.templateRestored" class="text-muted">{{
           $t('submit.templateRestored')
@@ -179,15 +198,7 @@ function onUploadFilePicked(event: Event) {
       class="bg-gradient-accent h-11 shrink-0 rounded-pill px-6 font-display font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
       :class="collapsed ? 'order-4 ml-auto' : 'order-9'"
     >
-      {{
-        $t(
-          state.submitting
-            ? 'submit.submitting'
-            : state.fileMode
-              ? 'submit.submitFile'
-              : 'submit.submit',
-        )
-      }}
+      {{ $t(submitLabelKey) }}
     </button>
   </form>
 </template>

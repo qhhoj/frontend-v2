@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PY3_ID, SCRATCH_ID, problemDetail } from '@/test/fixtures';
+import { PY3_ID, SCRATCH_ID, problemDetail, sessionUser } from '@/test/fixtures';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
@@ -121,6 +121,7 @@ describe('source counter', () => {
       'text-negative',
     );
     expect(dockOf(wrapper).findAll('[role="alert"]')).toHaveLength(1);
+    expect(dockOf(wrapper).get('[role="alert"]').text()).toBe('Vượt quá giới hạn 65536 ký tự');
     expect(submitButton(wrapper).attributes('aria-disabled')).toBe('true');
   });
 });
@@ -217,7 +218,47 @@ describe('?resubmit', () => {
   });
 });
 
+describe('another problem', () => {
+  it('starts fresh when the viewer leaves a problem and comes back to it', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper, router, queryClient } = await openProblem();
+    // A cached detail shows at once, so the page (and the dock) is not torn down by a loading state.
+    queryClient.setQueryData(
+      ['problems', 'detail', sessionUser().id, 'lis', 'vi'],
+      problemDetail({ code: 'lis', name: 'Dãy con tăng dài nhất' }),
+    );
+    await openLanguageList(wrapper);
+    await pickLanguage('Python 3');
+    await dockOf(wrapper).get('textarea').setValue('my python');
+    await router.push('/problems/lis');
+    await vi.waitFor(() => expect(wrapper.get('#main h1').text()).toBe('Dãy con tăng dài nhất'));
+    await router.push('/problems/duongdi');
+    await vi.waitFor(() => expect(wrapper.get('#main h1').text()).toBe('Đường đi ngắn nhất'));
+    await flushPromises();
+    expect(dockOf(wrapper).get('textarea').element.value).toContain('int main');
+    expect(dockOf(wrapper).text()).toContain('C++17');
+  });
+});
+
 describe('--dock-height', () => {
+  it('prefers the border box, which includes the border and the safe-area padding', async () => {
+    let notify: ((entries: unknown[]) => void) | undefined;
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: (entries: unknown[]) => void) {
+          notify = callback;
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+    mockApi(signedInRoutes());
+    await openProblem();
+    notify!([{ borderBoxSize: [{ blockSize: 135 }], contentRect: { height: 120 } }]);
+    expect(document.documentElement.style.getPropertyValue('--dock-height')).toBe('135px');
+  });
   it('follows the dock size and is removed with the dock', async () => {
     let notify: ((entries: unknown[]) => void) | undefined;
     vi.stubGlobal(

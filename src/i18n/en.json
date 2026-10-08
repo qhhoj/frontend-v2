@@ -331,6 +331,7 @@
     "upload": "Upload file",
     "fileOnly": "file upload",
     "signIn": "Sign in to submit",
+    "overLimit": "Over the {max} character limit",
     "templateRestored": "Template restored",
     "limits": "{time} · {memory}",
     "inContest": "Contest {key}",

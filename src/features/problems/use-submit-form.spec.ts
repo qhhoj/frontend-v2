@@ -30,16 +30,17 @@ const submitCalls = (calls: ApiCall[]) => calls.filter((call) => call.path.inclu
 
 function mountForm(problem: ProblemDetail = problemDetail(), resubmitId: string | null = null) {
   let form!: ReturnType<typeof useSubmitForm>;
+  const problemRef = ref(problem);
   const wrapper = mountComponent(
     defineComponent({
       setup() {
-        form = useSubmitForm(ref(problem), ref(resubmitId));
+        form = useSubmitForm(problemRef, ref(resubmitId));
         return () => null;
       },
     }),
   );
   const push = vi.spyOn(wrapper.vm.$router, 'push').mockResolvedValue(undefined);
-  return { form, push };
+  return { form, push, problemRef };
 }
 beforeEach(() => {
   profileData.value = undefined;
@@ -104,6 +105,42 @@ describe('language default and templates', () => {
     form.setLanguage(PY3_ID);
     await flushPromises();
     expect(form.source.value).toBe('print()\n');
+  });
+});
+
+describe("late profile and the viewer's code", () => {
+  it('never switches the language under code the viewer has typed', async () => {
+    const { form } = mountForm();
+    form.source.value = 'int x;';
+    await flushPromises();
+    profileData.value = profile({ languageId: PY3_ID });
+    await flushPromises();
+    expect(form.languageId.value).toBe(CPP17_ID);
+    expect(form.source.value).toBe('int x;');
+  });
+  it('does not announce a restored template when only the profile changed the language', async () => {
+    const { form } = mountForm();
+    profileData.value = profile({ languageId: PY3_ID });
+    await flushPromises();
+    expect(form.source.value).toBe('print()\n');
+    expect(form.templateRestored.value).toBe(false);
+  });
+});
+
+describe('a problem change under the form', () => {
+  it('falls back to the default language and its template when the pick is not allowed any more, and never posts it', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+    });
+    const { form, problemRef } = mountForm();
+    form.setLanguage(PY3_ID);
+    await flushPromises();
+    problemRef.value = problemDetail({ allowedLanguages: [problemDetail().allowedLanguages[0]!] });
+    await flushPromises();
+    expect(form.languageId.value).toBe(CPP17_ID);
+    await form.submitNow();
+    expect(submitCalls(calls)[0]!.body).toMatchObject({ language: CPP17_ID });
   });
 });
 
@@ -277,6 +314,57 @@ describe('file-only languages', () => {
   });
 });
 
+describe('file mode requests and messages', () => {
+  const catFile = () => new File([new Uint8Array(10)], 'cat.sb3');
+  it('sends one request for a double click on a file', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      'POST /problems/duongdi/submit/file': ok({ id: 'sub-9' }),
+    });
+    const { form } = mountForm();
+    form.setLanguage(SCRATCH_ID);
+    form.chooseFile(catFile());
+    void form.submitNow();
+    await form.submitNow();
+    expect(submitCalls(calls)).toHaveLength(1);
+  });
+  it('keeps the chosen file after a server refusal and shows why', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'POST /problems/duongdi/submit/file': invalid(issue('file', 'scratch_project_invalid', 'x')),
+    });
+    const { form } = mountForm();
+    form.setLanguage(SCRATCH_ID);
+    form.chooseFile(catFile());
+    await form.submitNow();
+    expect(form.chosenFile.value?.name).toBe('cat.sb3');
+    expect(form.errorText.value).toBe('Đây không phải dự án Scratch hợp lệ.');
+  });
+  it('says uploads are off when the language takes none', () => {
+    const closed = problemDetail({
+      allowedLanguages: [
+        languageItem(SCRATCH_ID, 'SCRATCH', 'Scratch 3', {
+          fileOnly: true,
+          extension: 'sb3',
+          fileSizeLimit: 0,
+        }),
+      ],
+    });
+    const { form } = mountForm(closed);
+    form.setLanguage(SCRATCH_ID);
+    form.chooseFile(catFile());
+    expect(form.errorText.value).toBe('Ngôn ngữ này không nhận tệp tải lên.');
+  });
+  it('drops an old refusal when the language changes', () => {
+    const { form } = mountForm();
+    form.setLanguage(SCRATCH_ID);
+    form.chooseFile(new File(['x'], 'cat.zip'));
+    expect(form.errorText.value).not.toBeNull();
+    form.setLanguage(CPP17_ID);
+    expect(form.errorText.value).toBeNull();
+  });
+});
+
 describe('contest attempts (B19)', () => {
   it('blocks submit at 0 attempts left and says so, and allows it with attempts left or no cap', () => {
     const spent = mountForm(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 0 } }));
@@ -315,6 +403,18 @@ describe('resubmit prefill', () => {
     const { form } = mountForm(problemDetail(), 'sub-1');
     await vi.waitFor(() => expect(form.source.value).toBe('print(42)\n'));
     expect(form.languageId.value).toBe(CPP17_ID);
+  });
+  it('drops the unavailable notice at the first edit', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /submissions/sub-1': fail(403, 'forbidden'),
+      'GET /submissions/sub-1/source': fail(403, 'forbidden'),
+    });
+    const { form } = mountForm(problemDetail(), 'sub-1');
+    await vi.waitFor(() => expect(form.resubmitUnavailable.value).toBe(true));
+    form.source.value = 'typed';
+    await flushPromises();
+    expect(form.resubmitUnavailable.value).toBe(false);
   });
   it('says so when the submission cannot be read and leaves the editor as it was', async () => {
     mockApi({
