@@ -69,7 +69,9 @@ const whenText = (contest: ContestListItem) => {
           </th>
           <td class="px-3 py-3 whitespace-nowrap">{{ whenText(contest) }}</td>
           <td class="px-3 py-3">
-            <span class="flex flex-wrap gap-1.5"><ContestChips :contest="contest" /></span>
+            <span class="flex flex-wrap gap-1.5"
+              ><ContestChips :contest="contest" with-code-needed
+            /></span>
           </td>
           <td class="px-3 py-3 text-right font-mono tabular-nums">
             {{ formatNumber(contest.userCount, locale.locale) }}

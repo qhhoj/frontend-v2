@@ -137,9 +137,8 @@ const VISITOR_LABELS: Record<ContestPhase, string> = {
   upcoming: LIST_LABELS.register,
   ended: LIST_LABELS.virtual,
 };
-export const IN_CONTEST_BADGE = 'contests.list.badges.inContest';
 const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
-  leave: IN_CONTEST_BADGE,
+  leave: 'contests.list.badges.inContest',
   registered: 'contests.list.badges.registered',
   finished: 'contests.list.badges.finished',
 };

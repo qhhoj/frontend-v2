@@ -2,7 +2,7 @@
 import { Lock, TrendingUp } from 'lucide-vue-next';
 import type { ContestSummary } from '@/api/types/contests';
 
-defineProps<{ contest: ContestSummary; withTags?: boolean }>();
+defineProps<{ contest: ContestSummary; withTags?: boolean; withCodeNeeded?: boolean }>();
 const CHIP =
   'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-[12.5px] font-medium whitespace-nowrap';
 </script>
@@ -17,7 +17,7 @@ const CHIP =
   >
     <TrendingUp class="size-3" aria-hidden="true" />{{ $t('contests.rated') }}
   </span>
-  <span v-if="contest.requiresAccessCode" :class="[CHIP, 'text-muted']"
+  <span v-if="withCodeNeeded && contest.requiresAccessCode" :class="[CHIP, 'text-muted']"
     ><Lock class="size-3" aria-hidden="true" />{{ $t('contests.list.codeNeeded') }}</span
   >
   <span v-if="contest.isPrivate" :class="[CHIP, 'text-muted']">{{ $t('contests.private') }}</span>

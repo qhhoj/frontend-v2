@@ -36,7 +36,7 @@ const perParticipation = computed(() =>
     <div class="flex flex-wrap items-center gap-1.5">
       <PhasePill phase="running" />
       <ViewerBadge :call="call" />
-      <ContestChips :contest="contest" />
+      <ContestChips :contest="contest" with-code-needed />
     </div>
     <div>
       <h3 class="font-display text-xl font-semibold">

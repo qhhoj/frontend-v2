@@ -4,8 +4,8 @@ import { contestItem } from '@/test/fixtures';
 import { mountComponent } from '@/test/mount';
 import ContestChips from './ContestChips.vue';
 
-const chipsOf = (contest: ContestSummary, withTags = false) =>
-  mountComponent(ContestChips, { props: { contest, withTags } })
+const chipsOf = (contest: ContestSummary, withTags = false, withCodeNeeded = false) =>
+  mountComponent(ContestChips, { props: { contest, withTags, withCodeNeeded } })
     .findAll('span')
     .map((chip) => chip.text());
 
@@ -36,5 +36,11 @@ describe('contest chips', () => {
     const contest = contestItem({ ...PLAIN, tags: ['dp', 'graphs'] });
     expect(chipsOf(contest)).toEqual(['ICPC']);
     expect(chipsOf(contest, true)).toEqual(['ICPC', 'dp', 'graphs']);
+  });
+
+  it('shows the code-needed chip only where the list asks for it', () => {
+    const coded = contestItem({ ...PLAIN, requiresAccessCode: true });
+    expect(chipsOf(coded)).toEqual(['ICPC']);
+    expect(chipsOf(coded, false, true)).toEqual(['ICPC', 'Cần mã']);
   });
 });

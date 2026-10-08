@@ -288,6 +288,7 @@ describe('contest list', () => {
     const card = wrapper.get('[data-testid="running-contest"]');
     expect(card.text()).toContain('Bạn đang thi');
     expect(card.text()).toContain('Cần mã');
+    expect(card.get('[data-testid="viewer-badge"]').classes()).toContain('bg-accent-soft');
     expect(card.get('a[href="/contests/r42"].bg-gradient-accent').text()).toContain(
       'Quay lại kỳ thi',
     );
