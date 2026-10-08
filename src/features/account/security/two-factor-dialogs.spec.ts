@@ -34,9 +34,14 @@ async function openSecurity(routes: Record<string, MockHandler>) {
   const { wrapper } = await mountApp('/settings/security');
   return { wrapper, calls };
 }
+/** PrimeVue moves focus into a dialog only when its enter transition ends, so a click sent before that races the move. */
+async function settleDialog() {
+  await vi.waitFor(() => expect(document.activeElement?.closest('[role="dialog"]')).toBeTruthy());
+}
 async function openDisableDialog(wrapper: VueWrapper) {
   await pageButton(wrapper, 'Tắt').trigger('click');
   await flushPromises();
+  await settleDialog();
 }
 const sent = (calls: { method: string; path: string; body: unknown }[], path: string) =>
   calls.filter((call) => call.method === 'POST' && call.path === path).map((call) => call.body);
