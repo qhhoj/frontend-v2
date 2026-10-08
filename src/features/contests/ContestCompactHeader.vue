@@ -12,11 +12,7 @@ defineProps<{ contest: ContestSummary }>();
         $t('contests.title')
       }}</RouterLink>
       <span aria-hidden="true"> / </span>
-      <RouterLink
-        :to="{ name: 'contest', params: { key: contest.key } }"
-        class="font-mono hover:text-content"
-        >{{ contest.key }}</RouterLink
-      >
+      <span class="font-mono">{{ contest.key }}</span>
     </nav>
     <div class="flex flex-wrap items-center gap-3">
       <PhasePill :phase="contest.phase" />

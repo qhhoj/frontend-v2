@@ -16,11 +16,11 @@ describe('contest compact header', () => {
     expect(header.get('h1').element.parentElement!.textContent).toContain('Sắp diễn ra');
   });
 
-  it('links the breadcrumb to the contest list and to the contest by its key', () => {
-    const links = headerFor({ key: 'r42' }).findAll('nav a');
-    expect(links.map((link) => [link.text(), link.attributes('href')])).toEqual([
+  it('links the breadcrumb to the contest list and shows the key as plain text', () => {
+    const header = headerFor({ key: 'r42' });
+    expect(header.findAll('nav a').map((link) => [link.text(), link.attributes('href')])).toEqual([
       ['Kỳ thi', '/contests'],
-      ['r42', '/contests/r42'],
     ]);
+    expect(header.get('nav').text()).toContain('r42');
   });
 });
