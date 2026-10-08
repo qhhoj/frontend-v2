@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/** Decoration: the heading beside it says the same, so the badge is hidden from assistive technology. */
 defineProps<{ tone: 'accent' | 'positive' | 'warning' | 'negative' }>();
 const TONES = {
   accent: 'bg-accent-soft text-accent-text',
@@ -9,7 +10,6 @@ const TONES = {
 </script>
 
 <template>
-  <!-- Decoration: the heading beside it says the same. -->
   <span
     aria-hidden="true"
     class="flex size-14 items-center justify-center self-center rounded-full [&>svg]:size-7"

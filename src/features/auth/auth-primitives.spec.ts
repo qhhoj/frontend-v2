@@ -107,7 +107,7 @@ describe('AuthField', () => {
     await toggle.trigger('click');
     expect(wrapper.get('input').attributes('type')).toBe('text');
     expect(toggle.attributes('aria-pressed')).toBe('true');
-    expect(toggle.attributes('aria-label')).toBe('Ẩn mật khẩu');
+    expect(toggle.attributes('aria-label')).toBe('Hiện mật khẩu');
     await toggle.trigger('click');
     expect(wrapper.get('input').attributes('type')).toBe('password');
   });

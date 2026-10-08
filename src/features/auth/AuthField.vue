@@ -16,7 +16,7 @@ const props = withDefaults(
     hint?: string;
     /** Ids of extra elements that describe the input (a strength meter, the username line). */
     describedBy?: string;
-    /** A verdict that is not an error text: the username line's free (positive) or taken (negative). */
+    /** A verdict that is not an error text: the username line's free (positive) or taken (negative). Colour only, so the caller's text must say which. */
     tone?: 'positive' | 'negative';
   }>(),
   {
@@ -34,9 +34,9 @@ const model = defineModel<string>({ required: true });
 const inputId = useId();
 const hintId = `${inputId}-hint`;
 const errorId = `${inputId}-error`;
-const isPassword = props.type === 'password';
+const isPassword = computed(() => props.type === 'password');
 const passwordShown = ref(false);
-const shownType = computed(() => (isPassword && passwordShown.value ? 'text' : props.type));
+const shownType = computed(() => (isPassword.value && passwordShown.value ? 'text' : props.type));
 const invalid = computed(() => Boolean(props.error) || props.tone === 'negative');
 const describedIds = computed(
   () =>
@@ -72,7 +72,7 @@ const border = computed(() =>
         type="button"
         class="absolute top-0.5 right-0.5 flex size-11 items-center justify-center rounded-full text-muted hover:bg-surface-hover"
         :aria-pressed="passwordShown ? 'true' : 'false'"
-        :aria-label="passwordShown ? $t('auth.hidePassword') : $t('auth.showPassword')"
+        :aria-label="$t('auth.showPassword')"
         @click="passwordShown = !passwordShown"
       >
         <EyeOff v-if="passwordShown" aria-hidden="true" class="size-[18px]" />
