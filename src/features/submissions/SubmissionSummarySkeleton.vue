@@ -4,6 +4,9 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
 /** Mirrors `SubmissionSummary.vue`: keep its cards, grid and text classes in sync. */
 const FACT_COUNT = 6;
+/** The real line holds a `VerdictBadge` (h-7); the score is `text-[56px] leading-none`, so a block as tall (h-14). */
+const BADGE_LINE_CLASS = 'min-h-7';
+const SCORE_BLOCK_CLASS = 'h-14 w-40';
 </script>
 
 <template>
@@ -17,12 +20,11 @@ const FACT_COUNT = 6;
     >
       <SkeletonBlock data-skeleton-region="ring" round class="size-32 shrink-0" />
       <div class="min-w-0 flex-1 basis-40">
-        <!-- The real line holds a 28 px verdict badge; the score is 56 px of `leading-none` text, so a block of that height. -->
-        <p data-skeleton-region="line" class="flex min-h-7 items-center text-sm">
+        <p data-skeleton-region="line" :class="BADGE_LINE_CLASS" class="flex items-center text-sm">
           <SkeletonBlock text class="w-32" />
         </p>
         <p data-skeleton-region="score" class="mt-1 font-mono text-[56px] leading-none">
-          <SkeletonBlock class="h-14 w-40" />
+          <SkeletonBlock :class="SCORE_BLOCK_CLASS" />
         </p>
       </div>
     </GlassCard>
@@ -35,9 +37,7 @@ const FACT_COUNT = 6;
           <dt data-skeleton-region="fact" class="text-[13px]">
             <SkeletonBlock text class="w-16" />
           </dt>
-          <dd>
-            <SkeletonBlock text class="w-32" />
-          </dd>
+          <dd><SkeletonBlock text class="w-32" /></dd>
         </template>
       </dl>
     </GlassCard>

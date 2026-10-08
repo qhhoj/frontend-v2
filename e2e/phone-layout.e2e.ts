@@ -74,22 +74,35 @@ test('the nav pill shows every item inside the viewport at 375 px', async ({ pag
   expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
 });
 
-test('at 320 px the nav pill scrolls on its own, reaches its last item and never widens the page', async ({
-  page,
-  api,
-}) => {
+for (const { locale, navName } of [
+  { locale: 'vi', navName: NAV_NAME },
+  { locale: 'en', navName: 'Main navigation' },
+])
+  for (const width of [375, 320])
+    test(`the ${locale} nav pill reaches its last item and never widens the page at ${width} px`, async ({
+      page,
+      api,
+    }) => {
+      void api;
+      await page.addInitScript((value) => localStorage.setItem('qhhoj.locale', value), locale);
+      await page.setViewportSize({ width, height: PHONE.height });
+      await page.goto('/blog');
+      const nav = page.getByRole('navigation', { name: navName });
+      await nav.getByRole('link', { name: 'Blog' }).focus();
+      const last = (await nav.getByRole('link', { name: 'Blog' }).boundingBox())!;
+      const pill = (await nav.boundingBox())!;
+      expect(last.x + last.width, 'a focused item scrolls fully into view').toBeLessThanOrEqual(
+        pill.x + pill.width + 1,
+      );
+      expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
+    });
+
+test('at 320 px the nav pill scrolls on its own', async ({ page, api }) => {
   void api;
   await page.setViewportSize({ width: 320, height: PHONE.height });
   await page.goto('/blog');
   const nav = page.getByRole('navigation', { name: NAV_NAME });
   expect(await nav.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  await nav.getByRole('link', { name: 'Blog' }).focus();
-  const last = (await nav.getByRole('link', { name: 'Blog' }).boundingBox())!;
-  const pill = (await nav.boundingBox())!;
-  expect(last.x + last.width, 'a focused item scrolls fully into view').toBeLessThanOrEqual(
-    pill.x + pill.width + 1,
-  );
-  expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
 });
 
 test('home: recent submissions and the rating hero fit and keep their text readable', async ({

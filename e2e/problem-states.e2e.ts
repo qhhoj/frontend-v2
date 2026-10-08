@@ -278,5 +278,5 @@ for (const viewport of AUDIT_VIEWPORTS)
         await state.enter(page, api);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
         // The dock and the sheet sit outside #main, so the audit covers the whole page body.
-        expect(await axeViolationsIn(page, 'body')).toEqual([]);
+        expect(await axeViolationsIn(page)).toEqual([]);
       });

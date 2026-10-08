@@ -7,9 +7,10 @@ test('the built page does not preload the editor or a language pack', async ({ p
   void api;
   const html = await (await page.request.get('/')).text();
   expect(html).toContain('modulepreload'); // the check below is about the right links, not about there being none
-  expect(
-    [...html.matchAll(/<link[^>]*rel="modulepreload"[^>]*>/g)].map(([link]) => link),
-  ).not.toEqual(expect.arrayContaining([expect.stringMatching(HEAVY_CHUNK)]));
+  const preloadLinks = [...html.matchAll(/<link[^>]*rel="modulepreload"[^>]*>/g)].map(
+    ([link]) => link,
+  );
+  expect(preloadLinks.filter((link) => HEAVY_CHUNK.test(link))).toEqual([]);
 });
 
 test('an anonymous problem page loads no editor code', async ({ page, api }) => {

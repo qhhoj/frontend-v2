@@ -17,8 +17,8 @@ export async function applyTheme(page: Page, api: FakeApi, theme: ThemeDefinitio
   await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
 }
 
-/** WCAG 2.1 A/AA on `#main` (the shell has its own audit); empty when clean. */
-export async function axeViolationsIn(page: Page, selector = '#main') {
+/** WCAG 2.1 A/AA on the whole body by default: the dock, the sheet and body-appended overlays sit outside `#main`. Empty when clean. */
+export async function axeViolationsIn(page: Page, selector = 'body') {
   const { violations } = await new AxeBuilder({ page })
     .include(selector)
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

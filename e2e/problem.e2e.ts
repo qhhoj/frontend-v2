@@ -15,6 +15,8 @@ import { applyTheme } from './fixtures/audit';
 
 const DESKTOP = { width: 1280, height: 900 };
 const OVER_LIMIT_LENGTH = 65_537;
+/** Long enough for a stray late POST to show up in the request log. */
+const REFUSAL_WAIT_MS = 500;
 /** The first poll answers 202 with a 3 s wait; the PDF is ready on the next one. */
 const PDF_READY_TIMEOUT_MS = 8000;
 const dockOf = (page: Page) => page.getByRole('region', { name: 'Nộp bài' });
@@ -185,20 +187,38 @@ test.describe('the submit dock', () => {
     expect(sent?.headers['x-csrf-token']).toBe('csrf-1');
   });
 
-  test('refuses an over-limit source without asking the server', async ({ page, api }) => {
-    await openProblem(page, api);
-    await page.locator('.cm-content').first().click();
-    await page.evaluate((length) => {
+  const pasteSource = (page: Page, length: number) =>
+    page.evaluate((count) => {
       const data = new DataTransfer();
-      data.setData('text/plain', 'x'.repeat(length));
+      data.setData('text/plain', 'x'.repeat(count));
       document
         .querySelector('.cm-content')!
         .dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
-    }, OVER_LIMIT_LENGTH);
+    }, length);
+
+  test('refuses an over-limit source without asking the server, while the same flow in the limit posts once', async ({
+    page,
+    api,
+  }) => {
+    api.routes['GET /submissions/sub-9'] = { body: { data: submissionDetail({ id: 'sub-9' }) } };
+    await openProblem(page, api);
+    await page.locator('.cm-content').first().click();
+    await pasteSource(page, OVER_LIMIT_LENGTH);
     await expect(dockOf(page).getByTestId('source-counter')).toHaveClass(/text-negative/);
     // aria-disabled keeps the button focusable, so the click reaches the handler and must be refused there.
     await submitButton(page).click({ force: true });
+    await page.waitForTimeout(REFUSAL_WAIT_MS);
     expect(api.requestsTo('POST /problems/duongdi/submit')).toEqual([]);
+
+    // Positive control: the same clicks send the request once as soon as the source fits.
+    await page.locator('.cm-content').first().click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await page.keyboard.insertText('int main() {}');
+    await expect(dockOf(page).getByTestId('source-counter')).not.toHaveClass(/text-negative/);
+    await submitButton(page).click();
+    await expect(page).toHaveURL(/\/submissions\/sub-9$/);
+    expect(api.requestsTo('POST /problems/duongdi/submit')).toHaveLength(1);
   });
 
   test('offers an anonymous visitor a sign-in link that comes back to the problem', async ({
