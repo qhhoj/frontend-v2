@@ -1,0 +1,95 @@
+{
+  "title": "Kiểm tra tương đồng",
+  "lead": "So sánh mã nguồn bài nộp theo một bài hoặc theo cả kỳ thi.",
+  "scope": {
+    "heading": "Chọn phạm vi",
+    "lead": "Phạm vi quyết định lượt chạy nào được tạo và xem.",
+    "kindLegend": "Phạm vi",
+    "problem": "Bài tập",
+    "contest": "Kỳ thi",
+    "problemCode": "Mã bài",
+    "contestKey": "Khóa kỳ thi",
+    "view": "Xem các lượt chạy",
+    "start": "Chạy kiểm tra tương đồng",
+    "startHint": "Mỗi tài khoản tối đa 10 lượt mỗi giờ.",
+    "noScope": "Chọn một bài hoặc một kỳ thi để xem các lượt chạy."
+  },
+  "start": {
+    "queued": "202 · Đã xếp hàng — Lượt chạy mới đã vào hàng đợi. Danh sách tự cập nhật, mở lượt đó để xem tiến trình.",
+    "conflict": "409 · Đang có lượt chạy — Phạm vi này đang có một lượt chưa xong. Chờ lượt đó kết thúc rồi chạy lại.",
+    "openRunning": "Mở lượt đang chạy",
+    "rateLimited": "429 · Quá nhiều lượt chạy — Tối đa 10 lượt mỗi giờ cho mỗi tài khoản.",
+    "retryWithoutHeader": "Hãy thử lại sau.",
+    "retryAfter": "Thử lại sau {count} {unit} (theo Retry-After)."
+  },
+  "units": {
+    "seconds": "giây",
+    "minutes": "phút",
+    "hours": "giờ"
+  },
+  "runs": {
+    "ofProblem": "Các lượt chạy của bài {code}",
+    "ofContest": "Các lượt chạy của kỳ thi {key}",
+    "note": "Danh sách không phân trang.",
+    "empty": "Chưa có lượt chạy nào cho phạm vi này.",
+    "columns": {
+      "id": "Mã lượt",
+      "status": "Trạng thái",
+      "createdAt": "Tạo lúc",
+      "duration": "Thời gian chạy",
+      "groups": "Nhóm",
+      "pairs": "Cặp",
+      "detail": "Chi tiết"
+    },
+    "duration": "{minutes} phút {seconds} giây",
+    "running": "đang chạy",
+    "notStarted": "chưa bắt đầu",
+    "detail": "Chi tiết",
+    "label": "Các lượt chạy"
+  },
+  "status": {
+    "queued": "Đang chờ",
+    "running": "Đang chạy",
+    "done": "Xong",
+    "failed": "Thất bại"
+  },
+  "runError": {
+    "deadline": "Quá thời gian cho phép",
+    "engine_failed": "Bộ so sánh bị lỗi",
+    "internal_error": "Lỗi hệ thống",
+    "abandoned": "Bị bỏ dở, đã giải phóng"
+  },
+  "notFound": {
+    "title": "Không tìm thấy",
+    "body": "Khóa kỳ thi hoặc lượt chạy này không tồn tại, hoặc bạn không có quyền sửa. Hệ thống trả về 404 trong cả hai trường hợp nên không có lời giải thích thêm.",
+    "back": "Về danh sách"
+  },
+  "summary": {
+    "heading": "Tóm tắt lượt chạy {id}",
+    "startedAt": "Bắt đầu",
+    "finishedAt": "Kết thúc",
+    "threshold": "Ngưỡng tương đồng",
+    "limits": "Giới hạn",
+    "limitsValue": "{pairs} cặp · {submissions} bài nộp",
+    "notYet": "Chưa có",
+    "truncated": "Có nhóm bị cắt bớt. Nhóm {code} · {language} có {count} bài nộp nhưng chỉ {compared} bài nộp mới nhất được so sánh. Cặp giữa các bài nộp cũ hơn sẽ không xuất hiện.",
+    "someFailed": "Nhóm lỗi không có cặp nào; các nhóm còn lại vẫn hoàn tất.",
+    "viewPairs": "Xem {count} cặp",
+    "unsupported": "Ngôn ngữ chưa hỗ trợ (không được so sánh)",
+    "unsupportedChip": "{language} · {count} bài nộp"
+  },
+  "groups": {
+    "problem": "Bài",
+    "family": "Họ ngôn ngữ",
+    "tokenizer": "Bộ tách từ",
+    "submissions": "Bài nộp",
+    "compared": "Đã so sánh",
+    "skipped": "Bỏ qua: rỗng / lớn",
+    "truncated": "Cắt bớt",
+    "pairs": "Số cặp",
+    "yes": "Có",
+    "no": "Không",
+    "failed": "Lỗi",
+    "label": "Các nhóm so sánh"
+  }
+}

@@ -25,7 +25,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   contestRanking: placeholder,
   contestActions: placeholder,
   contestParticipants: placeholder,
-  similarity: placeholder,
+  similarity: () => import('./similarity/SimilarityRunsPage.vue'),
   similarityPairs: placeholder,
   similarityPair: placeholder,
   rejudge: () => import('./rejudge/BulkRejudgePage.vue'),
