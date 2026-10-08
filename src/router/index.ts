@@ -13,22 +13,22 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
     routes,
     scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 },
   });
-  // One source per navigation, so a cancelled slow one never ends the source of the navigation that replaced it.
+  // One source per navigation, shared along a redirect chain: a redirect starts a new navigation and never reaches
+  // afterEach for the original, while a cancelled slow navigation must not end the source of the one that replaced it.
   const navigationSources = new WeakMap<RouteLocationNormalized, symbol>();
+  const sourceOf = (to: RouteLocationNormalized) =>
+    navigationSources.get(to) ?? (to.redirectedFrom && navigationSources.get(to.redirectedFrom));
   const endNavigation = (to: RouteLocationNormalized) => {
-    const source = navigationSources.get(to);
+    const source = sourceOf(to);
     if (source) useLoadingStore().end(source);
   };
-  router.beforeEach(async (to) => {
-    const source = Symbol('navigation');
+  router.beforeEach((to) => {
+    const source = sourceOf(to) || Symbol('navigation');
     navigationSources.set(to, source);
     useLoadingStore().begin(source);
-    const verdict = await resolveNavigation(to, useSessionStore());
-    // A redirect starts a new navigation with its own source and never reaches afterEach for this one.
-    if (verdict !== true) endNavigation(to);
-    return verdict;
+    return resolveNavigation(to, useSessionStore());
   });
-  // afterEach also runs for cancelled navigations; onError covers a failed chunk or a throwing guard.
+  // afterEach also runs for cancelled and duplicate navigations; onError covers a failed chunk or a throwing guard.
   router.afterEach(endNavigation);
   router.onError((_error, to) => endNavigation(to));
   const titleDocument = () => {
