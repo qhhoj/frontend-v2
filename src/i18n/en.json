@@ -508,6 +508,28 @@
       "useBackup": "Or enter a backup code",
       "useApp": "Use the app's 6-digit code",
       "backupLabel": "Backup code"
+    },
+    "keys": {
+      "title": "Security keys (WebAuthn)",
+      "description": "A physical key, or fingerprint / Face ID on a device.",
+      "kind": "Security key",
+      "empty": "No key yet.",
+      "add": "Add a key",
+      "unsupported": "This browser does not support security keys. Open the page in another browser to add one.",
+      "remove": "Remove",
+      "removeLabel": "Remove {name}",
+      "addTitle": "Add a security key",
+      "addLead": "Name the key so you can recognise it, then confirm your password. The browser will ask you to touch the key or use your fingerprint.",
+      "nameLabel": "Key name",
+      "nameHint": "Up to 100 characters.",
+      "waiting": "Waiting for the key… Touch your security key when the browser asks.",
+      "register": "Register the key",
+      "registering": "Registering…",
+      "added": "Added the key {name}.",
+      "removed": "Removed the key {name}.",
+      "removeTitle": "Remove the security key?",
+      "removeBody": "The key {name} will no longer sign you in.",
+      "removeConfirm": "Remove the key"
     }
   },
   "appearance": {

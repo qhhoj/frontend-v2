@@ -508,6 +508,28 @@
       "useBackup": "Hoặc nhập một mã dự phòng",
       "useApp": "Dùng mã 6 số của ứng dụng",
       "backupLabel": "Mã dự phòng"
+    },
+    "keys": {
+      "title": "Khoá bảo mật (WebAuthn)",
+      "description": "Khoá vật lý hoặc vân tay / Face ID trên thiết bị.",
+      "kind": "Khoá bảo mật",
+      "empty": "Chưa có khoá nào.",
+      "add": "Thêm khoá",
+      "unsupported": "Trình duyệt này chưa hỗ trợ khoá bảo mật. Hãy mở trang bằng trình duyệt khác để thêm khoá.",
+      "remove": "Xoá",
+      "removeLabel": "Xoá {name}",
+      "addTitle": "Thêm khoá bảo mật",
+      "addLead": "Đặt tên để nhận ra khoá, rồi xác nhận mật khẩu. Trình duyệt sẽ yêu cầu bạn chạm vào khoá hoặc dùng vân tay.",
+      "nameLabel": "Tên khoá",
+      "nameHint": "Tối đa 100 ký tự.",
+      "waiting": "Đang chờ khoá… Hãy chạm vào khoá bảo mật của bạn khi trình duyệt hỏi.",
+      "register": "Đăng ký khoá",
+      "registering": "Đang đăng ký…",
+      "added": "Đã thêm khoá {name}.",
+      "removed": "Đã xoá khoá {name}.",
+      "removeTitle": "Xoá khoá bảo mật?",
+      "removeBody": "Khoá {name} sẽ không dùng để đăng nhập được nữa.",
+      "removeConfirm": "Xoá khoá"
     }
   },
   "appearance": {

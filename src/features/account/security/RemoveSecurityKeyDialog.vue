@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
+import { ref, watch } from 'vue';
+import { removeSecurityKey } from '@/api/account.api';
+import type { SecurityKey } from '@/api/types/account';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AuthError from '@/features/auth/AuthError.vue';
+import AuthField from '@/features/auth/AuthField.vue';
+import { useAuthAction } from '@/features/auth/use-auth-action';
+import { useSessionStore } from '@/stores/session.store';
+import { SECURITY_KEYS_KEY } from './security.queries';
+
+/** Board SetSecurityD "Xoá khoá bảo mật?": the backend wants the current password. */
+const props = defineProps<{ securityKey: SecurityKey | null }>();
+const visible = defineModel<boolean>('visible', { required: true });
+const emit = defineEmits<{ removed: [key: SecurityKey] }>();
+const session = useSessionStore();
+const queryClient = useQueryClient();
+const password = ref('');
+/** A wrapper around the field, so a refused password gets the focus (the dialog's own form is not reachable from here). */
+const fieldsElement = ref<HTMLElement | null>(null);
+const { pending, fieldErrors, summary, run, dismiss, reset } = useAuthAction(fieldsElement, [
+  'currentPassword',
+]);
+
+watch(visible, (open) => {
+  if (!open) return;
+  password.value = '';
+  reset();
+});
+
+async function remove() {
+  const key = props.securityKey;
+  if (!key || !(await run(() => removeSecurityKey(key.id, password.value)))) return;
+  visible.value = false;
+  emit('removed', key);
+  await queryClient.invalidateQueries({ queryKey: SECURITY_KEYS_KEY });
+  await session.refresh().catch(() => undefined);
+}
+</script>
+
+<template>
+  <ConfirmDialog
+    v-model:visible="visible"
+    tone="danger"
+    :title="$t('settings.keys.removeTitle')"
+    :body="$t('settings.keys.removeBody', { name: securityKey?.name ?? '' })"
+    :confirm-label="$t('settings.keys.removeConfirm')"
+    :busy="pending"
+    :can-confirm="password !== ''"
+    @confirm="remove"
+  >
+    <div ref="fieldsElement">
+      <AuthField
+        v-model="password"
+        type="password"
+        name="removeKeyPassword"
+        autocomplete="current-password"
+        :label="$t('auth.changePassword.currentPassword')"
+        :error="fieldErrors.currentPassword"
+        @input="dismiss('currentPassword')"
+      />
+    </div>
+    <template #error><AuthError :text="summary" /></template>
+  </ConfirmDialog>
+</template>

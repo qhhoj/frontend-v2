@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { SecurityKey } from '@/api/types/account';
+import SettingsNotice from '../settings/SettingsNotice.vue';
+import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
+import AddSecurityKeyForm from './AddSecurityKeyForm.vue';
 import RegenerateCodesCard from './RegenerateCodesCard.vue';
+import SecurityKeys from './SecurityKeys.vue';
 import TotpEnrollWizard from './TotpEnrollWizard.vue';
 import TotpRow from './TotpRow.vue';
 
@@ -11,17 +15,26 @@ import TotpRow from './TotpRow.vue';
  * Board SetSecurityA "Xác thực hai bước": one row per factor; a flow that needs room opens below as its own card.
  * Only one card is open at a time, and every row is busy while one is.
  */
-type OpenPanel = 'none' | 'enrol' | 'regenerate';
+type OpenPanel = 'none' | 'enrol' | 'regenerate' | 'addKey';
 const session = useSessionStore();
 const enabled = computed(() =>
   Boolean(session.user?.isTotpEnabled || session.user?.isWebauthnEnabled),
 );
 const panel = ref<OpenPanel>('none');
 const turnedOff = ref(false);
+const keyNotice = ref<string | null>(null);
 
 function open(next: OpenPanel) {
   turnedOff.value = false;
+  keyNotice.value = null;
   panel.value = next;
+}
+function keyAdded(key: SecurityKey) {
+  panel.value = 'none';
+  keyNotice.value = translate('settings.keys.added', { name: key.name });
+}
+function keyRemoved(key: SecurityKey) {
+  keyNotice.value = translate('settings.keys.removed', { name: key.name });
 }
 </script>
 
@@ -41,6 +54,7 @@ function open(next: OpenPanel) {
     <SettingsNotice v-if="turnedOff" tone="success">{{
       $t('settings.totp.disabled')
     }}</SettingsNotice>
+    <SettingsNotice v-if="keyNotice" tone="success">{{ keyNotice }}</SettingsNotice>
     <ul :aria-label="$t('settings.twoFactor.methods')" class="m-0 flex list-none flex-col p-0">
       <TotpRow
         :busy="panel !== 'none'"
