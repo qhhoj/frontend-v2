@@ -282,3 +282,34 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Confirm dialogs**: one shared `ConfirmDialog.vue`, driven in specs and e2e by its confirm button's label — no second dialog implementation.
 - **Superuser without the staff flag**: `/admin` stays not-found for them (the router checks `isStaff`), although every permission check passes superusers — existence of the area follows the staff flag, the screens follow the permissions.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
+
+## Settings (8h)
+
+- Settings keep flat routes and `/settings` stays the profile page: a `/settings → /settings/profile` redirect would rewrite the `redirect=` queries the guards and e2e pin.
+- One frame (`SettingsLayout`) for all four sections, Appearance included: one `h1`, one breadcrumb, one section nav, so no section draws its own heading.
+- Settings inputs reuse 8b's `AuthField` and `AuthSelect` (48 px, label above): one form language across auth and settings.
+- No editor-colour and no maths-engine select: nothing in v2 reads `aceTheme` or `mathEngine`, so the controls would do nothing; the stored values are never sent.
+- No display-badge select: the profile sends badge ids without names (backend ask A1); a later change adds it once names arrive.
+- The UI language select applies at once and is device-only: it is a browser setting, so Undo and Save leave it alone.
+- No "session expired, press Save again" banner: `client.ts` retries a `csrf_failed` once and an `unauthorized` answer signs out; keeping a draft across a sign-in would need persistence (YAGNI).
+- Profile save is all or nothing, like the backend: a failed save keeps every change on the page and the summary names the fields to fix.
+- Profile name and about counters follow validator's `isLength` (a surrogate pair counts 1), the rule the backend's `@MaxLength` applies.
+- A 409 on organizations reloads the server's list and re-adds every organization it lists, with honest text: a retry must never drop an organization the viewer never saw.
+- Organization admins cannot leave from settings (backend 409): their row shows "Quản trị viên" instead of the leave button.
+- Security-key removal confirms in a dialog that asks for the current password (board D, not inline): the backend requires the password, and every destructive action confirms the same way.
+- Data export shows no daily counter: the backend says only whether a request is allowed (`canPrepare`, `nextPrepareAt`), so a "3 / 3" chip would be invented.
+- A 404 on the export status means "not available for this account" and is not retried.
+- While an export is preparing the status polls every 5 s and stops once it is ready or empty: a finished job must not keep the page polling.
+- Backup codes are shown grouped (`K7QM-2XRA-9PTD-4WLE`) and copied, downloaded and printed the same way: it is how people type them; every code field strips dashes and spaces (`normalizeBackupCode`) because the backend only upper-cases.
+- Leaving the backup-code step before ticking "Tôi đã lưu…" asks first: the codes are never shown again.
+- The one-time secrets (TOTP secret and QR, backup codes, API token) live only in component state or in mutations with `gcTime: 0`, never in a cached query: a later visit must not show them.
+- A 429 that names its wait shows "Thử lại sau N giây" in the 2FA, backup-code and security-key dialogs, instead of a generic failure.
+- Notices reuse the verdict and accent tints (success AC, error WA, warning TLE, info accent-soft), as `AuthNotice` does; only the impersonation banner has new tokens (`caution-strong`), so it reads apart from the brand colour.
+- Bit in settings: crown and sweat mark results only (save, backup codes shown, 2FA turned on, export ready or failed); the `security` padlock marks the security-page empties, the locked notices and the TOTP header, because a lock says "private", not "done".
+- Sign out everywhere is locked while viewing as another user: it would end every session of the real user, and the backend refuses it too.
+- The data page is locked while viewing as another user: export request and download are private data (`@NoImpersonation`, a backend task of 2026-10-09), so the page sends nothing.
+- `PATCH /profile` stays allowed while viewing as another user: staff may fix a profile.
+- One shared confirm dialog: `src/components/ConfirmDialog.vue` is extended (`canConfirm`, Enter submits, focus returns to the opener), not copied, so every confirm behaves the same.
+- `uqr` 0.1.3 draws the TOTP QR in the browser: the secret must never reach a QR service, and a hand-written encoder is hundreds of lines.
+- Backend ask still open: A1 (badge names on `/profile`). A2 (issue codes on `/profile`) shipped; the form still maps issues by field name.
+- G1 and G2 are consumed as merged (`{ id, name }[]`, `{ remaining }`); the impersonation banner names the viewed account, not the staff member.
