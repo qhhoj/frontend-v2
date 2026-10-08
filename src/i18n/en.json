@@ -486,7 +486,8 @@
       "regenerateSubmit": "Regenerate codes",
       "regenerated": "Five new backup codes were created. The old ones no longer work.",
       "remaining": "{count} backup codes left.",
-      "remainingLow": "{count} backup code(s) left: regenerate before they run out."
+      "remainingLow": "{count} backup code(s) left: regenerate before they run out.",
+      "remainingNone": "No backup codes left: regenerate now."
     },
     "codes": {
       "title": "Save backup codes",

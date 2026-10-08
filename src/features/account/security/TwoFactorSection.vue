@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
+import SettingsNotice from '../settings/SettingsNotice.vue';
 import AddSecurityKeyForm from './AddSecurityKeyForm.vue';
 import RegenerateCodesCard from './RegenerateCodesCard.vue';
 import SecurityKeys from './SecurityKeys.vue';
@@ -21,20 +21,22 @@ const enabled = computed(() =>
   Boolean(session.user?.isTotpEnabled || session.user?.isWebauthnEnabled),
 );
 const panel = ref<OpenPanel>('none');
-const turnedOff = ref(false);
-const keyNotice = ref<string | null>(null);
+/** One success notice at a time: the last finished action says what happened. */
+const notice = ref<string | null>(null);
 
 function open(next: OpenPanel) {
-  turnedOff.value = false;
-  keyNotice.value = null;
+  notice.value = null;
   panel.value = next;
 }
 function keyAdded(key: SecurityKey) {
   panel.value = 'none';
-  keyNotice.value = translate('settings.keys.added', { name: key.name });
+  notice.value = translate('settings.keys.added', { name: key.name });
 }
 function keyRemoved(key: SecurityKey) {
-  keyNotice.value = translate('settings.keys.removed', { name: key.name });
+  notice.value = translate('settings.keys.removed', { name: key.name });
+}
+function totpDisabled() {
+  notice.value = translate('settings.totp.disabled');
 }
 </script>
 
@@ -51,16 +53,13 @@ function keyRemoved(key: SecurityKey) {
         >{{ enabled ? $t('settings.twoFactor.on') : $t('settings.twoFactor.off') }}</span
       >
     </template>
-    <SettingsNotice v-if="turnedOff" tone="success">{{
-      $t('settings.totp.disabled')
-    }}</SettingsNotice>
-    <SettingsNotice v-if="keyNotice" tone="success">{{ keyNotice }}</SettingsNotice>
+    <SettingsNotice v-if="notice" tone="success">{{ notice }}</SettingsNotice>
     <ul :aria-label="$t('settings.twoFactor.methods')" class="m-0 flex list-none flex-col p-0">
       <TotpRow
         :busy="panel !== 'none'"
         @enable="open('enrol')"
         @regenerate="open('regenerate')"
-        @disabled="turnedOff = true"
+        @disabled="totpDisabled"
       />
       <SecurityKeys :busy="panel !== 'none'" @add="open('addKey')" @removed="keyRemoved" />
     </ul>

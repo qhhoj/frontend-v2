@@ -9,6 +9,7 @@ import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
 import { BUTTON } from '../settings/buttons';
+import { rateLimitWaitText } from './totp-setup';
 import { addSecurityKey } from './security-key';
 import { SECURITY_KEYS_KEY } from './security.queries';
 
@@ -20,10 +21,11 @@ const queryClient = useQueryClient();
 const name = ref('');
 const password = ref('');
 const formElement = ref<HTMLFormElement | null>(null);
-const { pending, fieldErrors, summary, run } = useAuthAction(formElement, [
+const { pending, fieldErrors, summary, error, run, dismiss } = useAuthAction(formElement, [
   'name',
   'currentPassword',
 ]);
+const errorText = computed(() => rateLimitWaitText(error.value) ?? summary.value);
 const canSubmit = computed(
   () => !pending.value && name.value.trim() !== '' && password.value !== '',
 );
@@ -55,6 +57,7 @@ async function submit() {
         autocomplete="off"
         :maxlength="KEY_NAME_MAX_LENGTH"
         :label="$t('settings.keys.nameLabel')"
+        @input="dismiss('name')"
         :hint="$t('settings.keys.nameHint')"
         :error="fieldErrors.name"
         required
@@ -67,14 +70,20 @@ async function submit() {
         :label="$t('auth.changePassword.currentPassword')"
         :error="fieldErrors.currentPassword"
         required
+        @input="dismiss('currentPassword')"
       />
       <SettingsNotice v-if="pending" tone="info">{{ $t('settings.keys.waiting') }}</SettingsNotice>
-      <AuthError :text="summary" />
+      <AuthError :text="errorText" />
       <div class="flex flex-wrap gap-2.5">
         <button type="submit" :class="BUTTON.primary" :aria-disabled="!canSubmit">
           {{ pending ? $t('settings.keys.registering') : $t('settings.keys.register') }}
         </button>
-        <button type="button" :class="BUTTON.secondary" @click="emit('close')">
+        <button
+          type="button"
+          :class="BUTTON.secondary"
+          :aria-disabled="pending"
+          @click="pending || emit('close')"
+        >
           {{ $t('common.cancel') }}
         </button>
       </div>

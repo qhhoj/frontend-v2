@@ -486,7 +486,8 @@
       "regenerateSubmit": "Tạo lại mã",
       "regenerated": "Đã tạo năm mã dự phòng mới. Các mã cũ không dùng được nữa.",
       "remaining": "Còn {count} mã dự phòng.",
-      "remainingLow": "Còn {count} mã dự phòng: hãy tạo lại trước khi hết."
+      "remainingLow": "Còn {count} mã dự phòng: hãy tạo lại trước khi hết.",
+      "remainingNone": "Đã hết mã dự phòng: hãy tạo lại ngay."
     },
     "codes": {
       "title": "Lưu mã dự phòng",

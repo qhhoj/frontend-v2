@@ -2,6 +2,7 @@
 import { Smartphone } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import { BUTTON } from '../settings/buttons';
 import DisableTotpDialog from './DisableTotpDialog.vue';
@@ -17,7 +18,21 @@ const disabling = ref(false);
 const remaining = useScratchCodesRemainingQuery();
 /** One code left is the last chance to regenerate before a lost phone locks the account. */
 const LOW_CODES = 1;
-const remainingCount = computed(() => remaining.data.value?.remaining);
+const remainingCount = computed(() =>
+  enabled.value ? remaining.data.value?.remaining : undefined,
+);
+const lowOnCodes = computed(
+  () => remainingCount.value !== undefined && remainingCount.value <= LOW_CODES,
+);
+/** The count line: none left, low, or the plain count. Undefined while the count is unknown. */
+const remainingText = computed(() => {
+  const count = remainingCount.value;
+  if (count === undefined) return null;
+  if (count === 0) return translate('settings.totp.remainingNone');
+  return translate(lowOnCodes.value ? 'settings.totp.remainingLow' : 'settings.totp.remaining', {
+    count,
+  });
+});
 
 function regenerate() {
   confirmingRegenerate.value = false;
@@ -40,15 +55,10 @@ function regenerate() {
         enabled ? $t('settings.totp.descriptionOn') : $t('settings.totp.descriptionOff')
       }}</span>
       <span
-        v-if="enabled && remainingCount !== undefined"
+        v-if="remainingText"
         class="text-[13px]"
-        :class="remainingCount <= LOW_CODES ? 'font-semibold text-negative' : 'text-muted'"
-        >{{
-          $t(
-            remainingCount <= LOW_CODES ? 'settings.totp.remainingLow' : 'settings.totp.remaining',
-            { count: remainingCount },
-          )
-        }}</span
+        :class="lowOnCodes ? 'font-semibold text-negative' : 'text-muted'"
+        >{{ remainingText }}</span
       >
     </span>
     <span

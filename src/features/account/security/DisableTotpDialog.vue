@@ -29,10 +29,10 @@ watch(visible, (open) => {
 async function turnOff() {
   if (!(await run(() => disableTotp(code.value)))) return;
   visible.value = false;
-  // The count belonged to the codes that are now deleted; a later re-enable must not show it.
-  queryClient.removeQueries({ queryKey: SCRATCH_CODES_REMAINING_KEY });
   emit('disabled');
   await session.refresh().catch(() => undefined);
+  // The count belonged to the codes that are now deleted; a later re-enable must not show it.
+  queryClient.removeQueries({ queryKey: SCRATCH_CODES_REMAINING_KEY });
 }
 </script>
 

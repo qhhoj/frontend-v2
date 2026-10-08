@@ -66,7 +66,12 @@ async function regenerate() {
         >
           {{ $t('settings.totp.regenerateSubmit') }}
         </button>
-        <button type="button" :class="BUTTON.secondary" @click="emit('close')">
+        <button
+          type="button"
+          :class="BUTTON.secondary"
+          :aria-disabled="pending"
+          @click="pending || emit('close')"
+        >
           {{ $t('common.cancel') }}
         </button>
       </div>

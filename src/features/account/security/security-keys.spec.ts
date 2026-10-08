@@ -143,3 +143,70 @@ describe('Settings › Security › security keys', () => {
     ]);
   });
 });
+
+describe('Settings › Security › rate-limited password confirms', () => {
+  it('shows how long to wait when adding a key is rate-limited', async () => {
+    supportKeys();
+    const { wrapper } = await openSecurity({
+      'GET /auth/2fa/webauthn/credentials': ok([]),
+      'POST /auth/2fa/webauthn/register/options': {
+        status: 429,
+        body: { error: { code: 'rate_limited', message: 'rate_limited' } },
+        headers: { 'Retry-After': '42' },
+      },
+    });
+    await addKey(wrapper);
+    expect(wrapper.get('#main [role="alert"]').text()).toContain('Thử lại sau 42 giây');
+  });
+
+  it('shows how long to wait when removing a key is rate-limited', async () => {
+    supportKeys();
+    const { wrapper } = await openSecurity({
+      'GET /auth/2fa/webauthn/credentials': ok([YUBIKEY]),
+      'DELETE /auth/2fa/webauthn/credentials/key-1': {
+        status: 429,
+        body: { error: { code: 'rate_limited', message: 'rate_limited' } },
+        headers: { 'Retry-After': '42' },
+      },
+    });
+    await wrapper.get(`button[aria-label="Xoá ${YUBIKEY.name}"]`).trigger('click');
+    await flushPromises();
+    const password = document.body.querySelector<HTMLInputElement>(
+      '[role="dialog"] input[name="removeKeyPassword"]',
+    )!;
+    password.value = 'mật khẩu';
+    password.dispatchEvent(new Event('input'));
+    await flushPromises();
+    dialogButton('Xoá khoá').click();
+    await flushPromises();
+    expect(document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent).toContain(
+      'Thử lại sau 42 giây',
+    );
+  });
+
+  it('refreshes the list when the key is already gone (404)', async () => {
+    supportKeys();
+    const { wrapper, calls } = await openSecurity({
+      'GET /auth/2fa/webauthn/credentials': sequence(ok([YUBIKEY, PIXEL]), ok([YUBIKEY])),
+      'DELETE /auth/2fa/webauthn/credentials/key-2': fail(404, 'not_found'),
+    });
+    await wrapper.get(`button[aria-label="Xoá ${PIXEL.name}"]`).trigger('click');
+    await flushPromises();
+    const password = document.body.querySelector<HTMLInputElement>(
+      '[role="dialog"] input[name="removeKeyPassword"]',
+    )!;
+    password.value = 'mật khẩu';
+    password.dispatchEvent(new Event('input'));
+    await flushPromises();
+    dialogButton('Xoá khoá').click();
+    await flushPromises();
+    expect(
+      calls.filter(
+        (call) => call.method === 'GET' && call.path === '/auth/2fa/webauthn/credentials',
+      ),
+    ).toHaveLength(2);
+    expect(wrapper.findAll('[data-security-key] strong').map((name) => name.text())).toEqual([
+      YUBIKEY.name,
+    ]);
+  });
+});
