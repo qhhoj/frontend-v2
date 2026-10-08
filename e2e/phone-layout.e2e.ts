@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, test } from './fixtures/api';
+import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 
 const PHONE = { width: 375, height: 812 };
 test.use({ viewport: PHONE });
@@ -27,6 +27,10 @@ const PAGES = [
   { path: '/', signedIn: true, ready: 'Tổng hai số' },
   { path: '/problems', signedIn: true, ready: 'Chọn bài, bắt đầu giải' },
   { path: '/contests/r42/ranking', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
+  { path: '/contests', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
+  { path: '/contests/r42', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
+  { path: '/contests/r42/announcements', signedIn: true, ready: 'Thông báo 1' },
+  { path: '/contests/r42/stats', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
   { path: '/login', signedIn: false, ready: 'Đăng nhập' },
   { path: '/blog', signedIn: true, ready: 'Blog' },
   { path: '/problems/duongdi', signedIn: true, ready: 'Thời gian' },
@@ -38,8 +42,11 @@ const PAGES = [
 for (const { path, signedIn, ready } of PAGES)
   test(`${path} does not scroll sideways at 375 px`, async ({ page, api }) => {
     api.signedIn = signedIn;
+    if (path.startsWith('/contests')) await page.clock.setFixedTime(CONTEST_FIXTURE_NOW);
     await page.goto(path);
-    await expect(page.getByText(ready, { exact: true }).first()).toBeVisible();
+    await expect(
+      page.getByText(ready, { exact: true }).filter({ visible: true }).first(),
+    ).toBeVisible();
     expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
   });
 

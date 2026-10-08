@@ -38,6 +38,7 @@ function cancel() {
     :close-on-escape="!isPending"
     @show="input?.focus()"
   >
+    <!-- PrimeVue moves focus to the first [autofocus] field after the open transition; without it the close button gets focus. -->
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <p class="text-muted">{{ $t('contests.actions.codeBody', { name: contestName }) }}</p>
       <label :for="INPUT_ID" class="text-[12px] font-semibold tracking-wider text-muted uppercase">
@@ -47,6 +48,7 @@ function cancel() {
         :id="INPUT_ID"
         ref="input"
         v-model="code"
+        autofocus
         type="password"
         autocomplete="new-password"
         required

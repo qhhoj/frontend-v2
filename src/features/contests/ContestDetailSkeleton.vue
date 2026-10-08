@@ -7,23 +7,35 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
     data-skeleton-region="contest-header"
     class="glass grid gap-5 rounded-card p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
   >
+    <!-- Line boxes mirror ContestHeaderCard: the phone line and the authors line each show at one width only. -->
     <div class="flex flex-col gap-3">
       <SkeletonBlock pill class="h-7 w-48" />
-      <div class="font-display text-2xl leading-tight font-bold md:text-4xl">
-        <SkeletonBlock text class="w-3/4" />
+      <div>
+        <div class="font-display text-2xl leading-tight font-bold md:text-4xl">
+          <SkeletonBlock text class="w-3/4" />
+        </div>
+        <p class="font-mono text-[12px] md:hidden"><SkeletonBlock text class="w-48" /></p>
+        <p class="mt-1 hidden items-center gap-1.5 text-sm md:flex">
+          <SkeletonBlock class="size-6 shrink-0" />
+          <SkeletonBlock text class="w-48" />
+        </p>
       </div>
-      <SkeletonBlock class="h-2 w-full" />
-      <p class="hidden items-center gap-1.5 text-sm md:flex">
-        <SkeletonBlock class="size-6 shrink-0" />
-        <SkeletonBlock text class="w-48" />
-      </p>
+      <div class="flex flex-col gap-1.5">
+        <p class="hidden h-5 md:block"><SkeletonBlock text class="w-full" /></p>
+        <SkeletonBlock class="h-2 w-full" />
+      </div>
       <p class="hidden text-sm md:block"><SkeletonBlock text class="w-80" /></p>
     </div>
-    <div data-skeleton-region="countdown" class="flex flex-col gap-1">
-      <p class="text-[12px]"><SkeletonBlock text class="w-20" /></p>
-      <p class="font-mono text-3xl leading-tight md:text-5xl">
-        <SkeletonBlock text class="w-48" />
-      </p>
+    <div data-skeleton-region="countdown" class="flex items-center gap-4">
+      <!-- The stopwatch Bit box: 32 rows of 3 px on a phone, 4 px from md up (ContestCountdown). -->
+      <SkeletonBlock round class="size-24 shrink-0 md:size-32" />
+      <div class="flex min-w-0 flex-1 flex-col">
+        <p class="text-[12px]"><SkeletonBlock text class="w-20" /></p>
+        <p class="font-mono text-3xl leading-tight md:text-5xl">
+          <SkeletonBlock text class="w-48" />
+        </p>
+        <p class="text-sm"><SkeletonBlock text class="w-40" /></p>
+      </div>
     </div>
   </div>
   <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />

@@ -129,6 +129,36 @@ describe('the contest list shows blocks shaped like its groups', () => {
   });
 });
 
+describe('the contest detail, announcements and stats load with skeletons shaped like their cards', () => {
+  it('the contest header, countdown, tabs, problems and rules show blocks, inert, while the contest is on its way', async () => {
+    mockApi({ 'GET /auth/me': signedIn() });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests/r42');
+    for (const region of ['contest-header', 'countdown', 'tabs', 'problems', 'rules'])
+      expect(regionsIn(wrapper.element, region), region).toBe(1);
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton.element, 'contest detail skeleton');
+  });
+
+  it('the announcements tab shows three inert rows while the list is on its way', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests/r42/announcements');
+    expect(regionsIn(wrapper.element, 'announcement')).toBe(3);
+    expect(wrapper.get('main').text()).not.toContain('Chưa có thông báo');
+  });
+
+  it('the stats tab shows four tiles and the results block, inert, while the stats are on its way', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests/r42/stats');
+    expect(regionsIn(wrapper.element, 'stats-tile')).toBe(4);
+    expect(regionsIn(wrapper.element, 'problem-results')).toBe(1);
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton.element, 'contest stats skeleton');
+  });
+});
+
 describe('the editorial tab loads with a statement-shaped skeleton', () => {
   it('shows the statement blocks inside its own panel, inert, while the editorial is on its way', async () => {
     mockApi({

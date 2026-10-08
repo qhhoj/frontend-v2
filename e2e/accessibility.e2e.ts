@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { profile } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
-import { expect, test } from './fixtures/api';
+import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 
 /**
  * `ready` is text that only shows once the page has left its loading state, so axe never audits skeletons.
@@ -35,6 +35,29 @@ const PAGES = [
     path: '/settings/appearance',
     ready: { anonymous: 'Dùng giao diện riêng', 'signed-in': 'Dùng giao diện riêng' },
   },
+  {
+    path: '/contests',
+    ready: { anonymous: 'QHH Round #42 (Div. 2)', 'signed-in': 'QHH Round #42 (Div. 2)' },
+  },
+  {
+    path: '/contests/r42',
+    ready: { anonymous: 'QHH Round #42 (Div. 2)', 'signed-in': 'QHH Round #42 (Div. 2)' },
+  },
+  {
+    path: '/contests/r42/announcements',
+    ready: { anonymous: 'Thông báo 1', 'signed-in': 'Thông báo 1' },
+  },
+  {
+    path: '/contests/r42/submissions',
+    ready: {
+      anonymous: 'Đăng nhập để xem bài nộp của bạn',
+      'signed-in': 'Chỉ hiện bài nộp của bạn',
+    },
+  },
+  {
+    path: '/contests/r42/stats',
+    ready: { anonymous: 'QHH Round #42 (Div. 2)', 'signed-in': 'QHH Round #42 (Div. 2)' },
+  },
 ] as const;
 
 const VIEWPORTS = [
@@ -52,6 +75,7 @@ for (const viewport of VIEWPORTS)
         }) => {
           await page.setViewportSize({ width: viewport.width, height: viewport.height });
           api.signedIn = viewer === 'signed-in';
+          if (path.startsWith('/contests')) await page.clock.setFixedTime(CONTEST_FIXTURE_NOW);
           // A signed-in account's theme outranks the browser's choice.
           api.routes['GET /profile'] = { body: { data: profile({ siteTheme: theme.id }) } };
           await page.emulateMedia({ colorScheme: theme.scheme });
@@ -59,7 +83,9 @@ for (const viewport of VIEWPORTS)
           await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
           await page.goto(path);
           await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-          await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();
+          await expect(
+            page.getByText(readyText, { exact: true }).filter({ visible: true }).first(),
+          ).toBeVisible();
           const { violations } = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
             .analyze();

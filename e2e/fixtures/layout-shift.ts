@@ -17,6 +17,8 @@ export interface ShiftCase {
   placedOnly?: string[];
   /** Parts whose distance from the first part's top is compared as well; a taller or shorter part above moves them. */
   placed?: string[];
+  /** Pins the page clock, for screens whose layout depends on the time (a contest's phase). */
+  clockAt?: Date;
 }
 export const PHONE = 375;
 export const DESKTOP = 1280;
@@ -61,6 +63,7 @@ export function defineShiftTests(cases: ShiftCase[]) {
       }) => {
         await page.setViewportSize({ width, height: 900 });
         api.signedIn = shift.signedIn;
+        if (shift.clockAt) await page.clock.setFixedTime(shift.clockAt);
         shift.answer?.(api);
         const release = api.hold(shift.hold);
         await page.goto(shift.path);

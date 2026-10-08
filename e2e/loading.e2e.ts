@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import type { Locator, Page } from '@playwright/test';
 import {
+  contestItem,
   leaderboardEntry,
   problemItem,
   RANKING_PROBLEM_IDS,
@@ -11,7 +12,7 @@ import {
   submissionItem,
 } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
-import { expect, list, test } from './fixtures/api';
+import { CONTEST_FIXTURE_NOW, expect, list, test } from './fixtures/api';
 import { closeStream, installControlledEventSource } from './fixtures/controlled-event-source';
 import {
   defineShiftTests,
@@ -426,6 +427,47 @@ const SHIFT_CASES: ShiftCase[] = [
     }),
     viewports: PHONE_AND_DESKTOP,
     placed: ['table header', 'table rows'],
+  },
+  {
+    name: 'running contest cards',
+    path: '/contests',
+    signedIn: false,
+    hold: 'GET /contests',
+    answer: (api) =>
+      (api.routes['GET /contests'] = list([
+        contestItem(),
+        contestItem({ key: 'r44', name: 'QHH Round #44' }),
+      ])),
+    parts: (page) => ({
+      card: page.locator('[data-skeleton-region="running-card"], [data-testid="running-contest"]'),
+    }),
+    placedOnly: ['card'],
+    viewports: PHONE_AND_DESKTOP,
+    clockAt: CONTEST_FIXTURE_NOW,
+  },
+  {
+    name: 'contest header card',
+    path: '/contests/r42',
+    signedIn: true,
+    hold: 'GET /contests/r42',
+    clockAt: CONTEST_FIXTURE_NOW,
+    parts: (page) => ({
+      header: page.locator(
+        '[data-skeleton-region="contest-header"], [data-testid="contest-header"]',
+      ),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+  },
+  {
+    name: 'contest stats tiles',
+    path: '/contests/r42/stats',
+    signedIn: false,
+    hold: 'GET /contests/r42/stats',
+    clockAt: CONTEST_FIXTURE_NOW,
+    parts: (page) => ({
+      tile: page.locator('[data-skeleton-region="stats-tile"], [data-testid="stats-tiles"] > div'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
   },
   {
     name: 'problem header and tab row',

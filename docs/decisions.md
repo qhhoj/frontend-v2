@@ -174,6 +174,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
 - After backend 4c the detail's actions read `viewer.liveStatus`/`isCurrent`; the client-side copy of `liveStatusOf` is gone.
+- E2E: `e2e/contests.e2e.ts` covers the list, the detail (390 px layout A, access-code dialog under axe), announcements over SSE and the points cells; every contest page is in the axe and phone-layout lists, and the contest fixtures run on a clock pinned inside Round #42 (`CONTEST_FIXTURE_NOW`).
 
 ## Avatars
 

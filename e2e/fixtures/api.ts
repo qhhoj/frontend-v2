@@ -45,6 +45,8 @@ const eventStream = (...frames: string[]): Reply => ({
   // The long retry stops the browser re-requesting a finished stream.
   raw: `retry: 600000\n\n${frames.join('')}`,
 });
+/** The contest fixtures are dated 8 Oct 2026: a page that shows them reads the clock from here, so Round #42 is running. */
+export const CONTEST_FIXTURE_NOW = new Date('2026-10-08T10:00:00Z');
 export const streamFrame = (event: string, data: unknown) =>
   `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 export const pdfReady: Reply = {
