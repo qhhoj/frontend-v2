@@ -4,10 +4,17 @@ import { OTP_LENGTH, enterDigits, eraseDigit } from '@/lib/otp';
 import type { OtpEdit } from '@/lib/otp';
 
 /** TwoFactorA's six boxes over one string: paste and autofill spread across them, digits advance, backspace walks back, no gaps. */
-const props = withDefaults(defineProps<{ readonly?: boolean; label?: string }>(), {
-  readonly: false,
-  label: undefined,
-});
+const props = withDefaults(
+  defineProps<{
+    readonly?: boolean;
+    /** The group's name for assistive technology; the default is the 6-digit code. */
+    label?: string;
+    /** The last code was refused: every box says so and points at `describedBy` (the error text's id). */
+    invalid?: boolean;
+    describedBy?: string;
+  }>(),
+  { readonly: false, label: undefined, invalid: false, describedBy: undefined },
+);
 const emit = defineEmits<{ complete: [code: string] }>();
 const model = defineModel<string>({ required: true });
 const POSITIONS = [...Array(OTP_LENGTH).keys()];
@@ -80,6 +87,8 @@ defineExpose({ focus: () => boxes[firstEmptyBox()]?.focus() });
       :autocomplete="index === 0 ? 'one-time-code' : 'off'"
       :aria-label="$t('auth.twoFactor.digit', { index: index + 1 })"
       :readonly="props.readonly"
+      :aria-invalid="props.invalid ? 'true' : undefined"
+      :aria-describedby="props.describedBy"
       class="mx-auto h-[60px] w-full max-w-[52px] min-w-0 rounded-row border border-line-strong bg-surface-solid text-center font-mono text-[26px] font-semibold text-content tabular-nums"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"

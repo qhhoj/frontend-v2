@@ -56,6 +56,8 @@ const click = async (wrapper: Wrapper, label: string) => {
 const KEY_OPTIONS = { 'POST /auth/2fa/webauthn/login/options': ok({ challenge: 'Y2hhbGxlbmdl' }) };
 const verifiedWithKey = (calls: ReturnType<typeof twoFactorApi>) =>
   calls.some((call) => call.path === '/auth/2fa/webauthn/login/verify');
+const twoFactorCalls = (calls: ReturnType<typeof twoFactorApi>) =>
+  calls.filter((call) => call.path === '/auth/2fa/totp/verify');
 
 describe('two-factor page', () => {
   it('verifies a pasted code once without a click, signs in and returns to the safe redirect', async () => {
@@ -86,10 +88,18 @@ describe('two-factor page', () => {
   });
 
   it('empties the boxes, refocuses the first and announces a wrong code', async () => {
-    twoFactorApi(['totp'], { 'POST /auth/2fa/totp/verify': fail(400, 'invalid_code') });
+    const calls = twoFactorApi(['totp'], {
+      'POST /auth/2fa/totp/verify': fail(400, 'invalid_code'),
+    });
     const { wrapper } = await mountApp('/login/2fa');
     await pasteCode(wrapper, '000000');
     expect(wrapper.get('#main [role="alert"]').text()).toBe('Mã sai hoặc đã hết hạn.');
+    expect(twoFactorCalls(calls)).toHaveLength(1);
+    const alertId = wrapper.get('#main [role="alert"]').attributes('id');
+    expect(boxesOf(wrapper).every((box) => box.attributes('aria-invalid') === 'true')).toBe(true);
+    expect(boxesOf(wrapper).every((box) => box.attributes('aria-describedby') === alertId)).toBe(
+      true,
+    );
     expect(boxesOf(wrapper).map((box) => (box.element as HTMLInputElement).value)).toEqual([
       '',
       '',
@@ -185,6 +195,7 @@ describe('two-factor page', () => {
     expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
     expect(verifiedWithKey(calls)).toBe(false);
     expect(buttonNamed(wrapper, 'Thử lại')).toBeDefined();
+    expect(document.activeElement).toBe(buttonNamed(wrapper, 'Thử lại')!.element);
   });
 
   it('explains another browser failure and keeps the backup code within reach', async () => {
@@ -204,6 +215,7 @@ describe('two-factor page', () => {
     const calls = twoFactorApi(['webauthn'], KEY_OPTIONS);
     const { wrapper, router } = await mountApp('/login/2fa');
     expect(wrapper.get('h1').text()).toBe('Chạm vào khoá bảo mật');
+    expect(wrapper.find('#main [role="status"]').exists()).toBe(true);
     expect(boxesOf(wrapper)).toHaveLength(0);
     expect(buttonNamed(wrapper, 'Dùng mã dự phòng')).toBeUndefined();
     await click(wrapper, 'Dùng khoá bảo mật');
@@ -242,6 +254,38 @@ describe('two-factor page', () => {
     await click(wrapper, 'Đăng xuất');
     expect(calls.some((call) => call.path === '/auth/logout')).toBe(true);
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
+  });
+
+  it('reloads the session when the code was removed meanwhile, so the cards match the account', async () => {
+    let codeRemoved = false;
+    mockApi({
+      'GET /auth/me': () =>
+        signedIn(partialSession(codeRemoved ? ['webauthn'] : ['totp', 'webauthn'], 'user_07')),
+      'POST /auth/2fa/totp/verify': () => {
+        codeRemoved = true;
+        return fail(400, 'totp_not_enabled');
+      },
+    });
+    const { wrapper } = await mountApp('/login/2fa');
+    await pasteCode(wrapper, '000000');
+    expect(wrapper.get('h1').text()).toBe('Không dùng được khoá');
+    expect(boxesOf(wrapper)).toHaveLength(0);
+  });
+
+  it('ignores a key request while a code check is still pending', async () => {
+    stubPasskey(() => Promise.resolve({ toJSON: () => ({ id: 'cred-1' }) }));
+    const calls = twoFactorApi(['totp', 'webauthn'], KEY_OPTIONS);
+    const answer = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/auth/2fa/totp/verify')
+        ? new Promise<Response>(() => {})
+        : answer(input, init),
+    );
+    const { wrapper } = await mountApp('/login/2fa');
+    await pasteCode(wrapper, '481923');
+    await click(wrapper, 'Dùng khoá bảo mật');
+    expect(calls.some((call) => call.path === '/auth/2fa/webauthn/login/options')).toBe(false);
+    expect(boxesOf(wrapper)).toHaveLength(6);
   });
 
   it('keeps a partial session on this page when it tries to navigate away', async () => {

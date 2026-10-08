@@ -5,6 +5,10 @@ import type { SecondFactorMethod } from '@/api/types/auth';
 export type SecondFactorMode = 'app' | 'backup' | 'key';
 export type TwoFactorView = SecondFactorMode | 'keyUnsupported' | 'sessionChanged';
 
+/** A key is usable when the account has one and this browser can sign with it: the one rule the page and the cards share. */
+export const isKeyUsable = (methods: readonly SecondFactorMethod[], keySupported: boolean) =>
+  methods.includes('webauthn') && keySupported;
+
 /** Which card to show (Decision 9): only the account's factors, and only a key the browser can use. */
 export function twoFactorView(
   methods: readonly SecondFactorMethod[],
@@ -13,7 +17,7 @@ export function twoFactorView(
 ): TwoFactorView {
   if (methods.length === 0) return 'sessionChanged';
   const hasCode = methods.includes('totp');
-  const keyUsable = methods.includes('webauthn') && keySupported;
+  const keyUsable = isKeyUsable(methods, keySupported);
   if (!hasCode) return keyUsable ? 'key' : 'keyUnsupported';
   return mode === 'key' && !keyUsable ? 'app' : mode;
 }

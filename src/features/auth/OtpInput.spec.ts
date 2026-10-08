@@ -138,6 +138,17 @@ describe('OtpInput', () => {
     expect(document.activeElement).toBe(boxesOf(wrapper)[1]!.element);
   });
 
+  it('marks every box invalid and points each at the error text while the code is refused', () => {
+    const wrapper = mountOtp('', { invalid: true, describedBy: 'code-error' });
+    expect(
+      boxesOf(wrapper).every(
+        (box) =>
+          box.attributes('aria-invalid') === 'true' &&
+          box.attributes('aria-describedby') === 'code-error',
+      ),
+    ).toBe(true);
+  });
+
   it('is read-only while busy but keeps its focus', () => {
     const wrapper = mountOtp('4', { readonly: true });
     expect(boxesOf(wrapper).every((box) => box.attributes('readonly') !== undefined)).toBe(true);
