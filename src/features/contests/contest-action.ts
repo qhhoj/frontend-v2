@@ -1,6 +1,5 @@
-import type { ContestDetail, ContestPhase } from '@/api/types/contests';
-import { liveStatusOf, phaseAt, registrationState } from '@/lib/contest-time';
-import type { LiveStatus } from '@/lib/contest-time';
+import type { ContestDetail, ContestPhase, LiveStatus } from '@/api/types/contests';
+import { phaseAt, registrationState } from '@/lib/contest-time';
 
 export type ContestActionKind =
   | 'signIn'
@@ -83,8 +82,8 @@ export function actionFactsOf(
   return {
     isSignedIn,
     phase: phaseAt(contest, now),
-    liveStatus: liveStatusOf(contest, viewer.liveParticipation, now),
-    isCurrent: viewer.inContest,
+    liveStatus: viewer.liveStatus,
+    isCurrent: viewer.isCurrent,
     canSpectate: viewer.isEditor || viewer.isTester,
     skipsAccessCode: viewer.canEdit,
     registration: registrationState(contest, now),

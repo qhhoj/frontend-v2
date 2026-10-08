@@ -113,11 +113,25 @@ describe('actionFactsOf', () => {
     );
   });
 
-  it('counts a registered row as registered until the contest ends', () => {
+  it('takes the live status and the current flag from the server, not from the participation times', () => {
     const contest = contestDetail({
-      viewer: contestViewer({ liveParticipation: participationSummary({ isRegistered: true }) }),
+      viewer: contestViewer({
+        liveStatus: 'finished',
+        isCurrent: false,
+        inContest: true,
+        liveParticipation: participationSummary({ endTime: '2099-01-01T00:00:00Z' }),
+      }),
     });
-    const beforeEnd = Date.parse(contest.endTime) - 1000;
-    expect(actionFactsOf(contest, true, beforeEnd).liveStatus).toBe('registered');
+    expect(actionFactsOf(contest, true, Date.parse('2026-10-08T09:00:00Z'))).toMatchObject({
+      liveStatus: 'finished',
+      isCurrent: false,
+    });
+  });
+
+  it('passes a registered row from the server straight through', () => {
+    const contest = contestDetail({ viewer: contestViewer({ liveStatus: 'registered' }) });
+    expect(actionFactsOf(contest, true, Date.parse(contest.endTime) - 1000).liveStatus).toBe(
+      'registered',
+    );
   });
 });

@@ -7,7 +7,10 @@ export type ContestFormatName =
 export type ScoreboardVisibility = 'V' | 'H' | 'C' | 'P';
 export type LabelStyle = 'numeric' | 'alpha';
 
-/** backend: contests/core/dto/contest-list.response.ts (fields of every row). */
+/** backend: libs/contests LIVE_STATUSES; the viewer's own live participation in the contest. */
+export type LiveStatus = 'registered' | 'participating' | 'finished';
+
+/** backend: contest-list.response.ts ContestSummaryResponse (fields of every contest view). */
 export interface ContestSummary {
   key: string;
   name: string;
@@ -24,9 +27,41 @@ export interface ContestSummary {
   virtualCount: number;
   isPrivate: boolean;
   isOrganizationPrivate: boolean;
+  /** Registering and joining (live or virtual) ask for the access code; editors skip it. */
+  requiresAccessCode: boolean;
+  /** The public ranking links ask for a ranking access code. */
+  requiresRankingAccessCode: boolean;
+  disallowVirtual: boolean;
+  /** Both null: the contest takes no registration. */
+  registrationStart: string | null;
+  registrationEnd: string | null;
 }
-/** A list row; backend 4c adds the join rules and the viewer block (Task 13). */
-export type ContestListItem = ContestSummary;
+
+/** backend: contest-list.response.ts ContestListViewerResponse: the signed-in viewer's own state in one contest. */
+export interface ContestListViewer {
+  /** Their live participation; null when they have none. */
+  liveStatus: LiveStatus | null;
+  /** Their current contest is this one, and that participation has not ended. */
+  isCurrent: boolean;
+}
+
+/** backend: contest-list.response.ts ContestListItemResponse */
+export interface ContestListItem extends ContestSummary {
+  /** Null for a signed-out visitor. */
+  viewer: ContestListViewer | null;
+}
+
+/** backend: contest-detail.response.ts ContestProblemViewerResultResponse */
+export interface ProblemViewerResult {
+  /** The format's cell; null before a scored submission. */
+  cell: ProblemCell | null;
+  /** The cell is worth the problem's full points. */
+  isSolved: boolean;
+  /** Submissions counted against `maxSubmissions`. */
+  attempts: number;
+  /** A submission waits for a verdict. */
+  hasPendingSubmission: boolean;
+}
 
 /** backend: contest-detail.response.ts ContestProblemResponse */
 export interface ContestProblem {
@@ -39,6 +74,10 @@ export interface ContestProblem {
   isPretested: boolean;
   /** Null: no cap. */
   maxSubmissions: number | null;
+  /** Live participants whose cell is worth the full points; null unless the viewer may see the full ranking. Up to 30 s old. */
+  solverCount: number | null;
+  /** Null when signed out, without a scoring participation, or when the board is hidden from the viewer. */
+  viewerResult: ProblemViewerResult | null;
 }
 
 /** backend: contest-detail.response.ts ParticipationSummaryResponse */
@@ -52,8 +91,8 @@ export interface ParticipationSummary {
   endTime: string;
 }
 
-/** backend: contest-detail.response.ts ContestViewerResponse */
-export interface ContestViewer {
+/** backend: contest-detail.response.ts ContestViewerResponse; non-null for a visitor too (then all false and null). */
+export interface ContestViewer extends ContestListViewer {
   canEdit: boolean;
   isEditor: boolean;
   isTester: boolean;
@@ -68,8 +107,6 @@ export interface ContestDetail extends ContestSummary {
   /** Sanitized by the backend; render only through UserContent. */
   descriptionHtml: string;
   authors: Array<{ id: string; username: string }>;
-  registrationStart: string | null;
-  registrationEnd: string | null;
   frozenLastMinutes: number;
   scoreboardVisibility: ScoreboardVisibility;
   showSubmissionList: boolean;
@@ -81,8 +118,6 @@ export interface ContestDetail extends ContestSummary {
   labelStyle: LabelStyle;
   /** The stored config: keys the contest never set are missing (the format's default applies). */
   formatConfig: Record<string, number | boolean>;
-  disallowVirtual: boolean;
-  requiresAccessCode: boolean;
   /** Null until the viewer may see them. */
   problems: ContestProblem[] | null;
   viewer: ContestViewer;

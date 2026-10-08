@@ -29,7 +29,12 @@ describe('contest actions', () => {
   it('joins a running contest, reloads it and says so once', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const joined = contestDetail({
-      viewer: contestViewer({ inContest: true, liveParticipation: participationSummary() }),
+      viewer: contestViewer({
+        inContest: true,
+        isCurrent: true,
+        liveStatus: 'participating',
+        liveParticipation: participationSummary(),
+      }),
     });
     const calls = mockApi({
       ...signedInViewer(),
@@ -52,7 +57,12 @@ describe('contest actions', () => {
   it('leaves the current contest and explains that the score stays', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const inside = contestDetail({
-      viewer: contestViewer({ inContest: true, liveParticipation: participationSummary() }),
+      viewer: contestViewer({
+        inContest: true,
+        isCurrent: true,
+        liveStatus: 'participating',
+        liveParticipation: participationSummary(),
+      }),
     });
     const calls = mockApi({
       ...signedInViewer(),
@@ -125,7 +135,10 @@ describe('contest actions', () => {
     const registered = contestDetail({
       phase: 'upcoming',
       registrationEnd: '2026-10-08T07:30:00Z',
-      viewer: contestViewer({ liveParticipation: participationSummary({ isRegistered: true }) }),
+      viewer: contestViewer({
+        liveStatus: 'registered',
+        liveParticipation: participationSummary({ isRegistered: true }),
+      }),
     });
     mockApi({ ...signedInViewer(), ...contestPageRoutes(registered) });
     const { wrapper } = await mountApp('/contests/r42');
@@ -142,10 +155,16 @@ describe('contest actions', () => {
     });
     const registered = contestDetail({
       phase: 'upcoming',
-      viewer: contestViewer({ liveParticipation: participationSummary({ isRegistered: true }) }),
+      viewer: contestViewer({
+        liveStatus: 'registered',
+        liveParticipation: participationSummary({ isRegistered: true }),
+      }),
     });
     const started = contestDetail({
-      viewer: contestViewer({ liveParticipation: participationSummary({ isRegistered: true }) }),
+      viewer: contestViewer({
+        liveStatus: 'registered',
+        liveParticipation: participationSummary({ isRegistered: true }),
+      }),
     });
     const calls = mockApi({
       ...signedInViewer(),
@@ -186,7 +205,10 @@ describe('contest actions', () => {
     mockApi({
       ...signedInViewer(),
       ...contestPageRoutes(
-        contestDetail({ phase: 'ended', viewer: contestViewer({ inContest: true }) }),
+        contestDetail({
+          phase: 'ended',
+          viewer: contestViewer({ inContest: true, isCurrent: true }),
+        }),
       ),
       'GET /contests/current': ok({
         contest: { key: 'r42', name: 'x', startTime: '', endTime: '' },
@@ -246,6 +268,7 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     const finished = contestDetail({
       requiresAccessCode: true,
       viewer: contestViewer({
+        liveStatus: 'finished',
         liveParticipation: participationSummary({ endTime: '2026-10-08T09:00:00Z' }),
       }),
     });

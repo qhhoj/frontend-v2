@@ -1,4 +1,4 @@
-import type { ContestFormatName, ContestPhase, ParticipationSummary } from '@/api/types/contests';
+import type { ContestFormatName, ContestPhase } from '@/api/types/contests';
 
 /** Mirrors backend libs/contests/src/contest-time.ts; times are ISO strings, `now` is epoch ms. */
 export interface ContestTimes {
@@ -19,7 +19,6 @@ export interface MessageRef {
   /** The plural count, for `t(key, params, count)`. */
   count?: number;
 }
-export type LiveStatus = 'registered' | 'participating' | 'finished';
 
 const MINUTE_MS = 60_000;
 const FREEZE_FORMATS: readonly ContestFormatName[] = ['icpc', 'vnoj'];
@@ -104,19 +103,4 @@ export function spanMessage(seconds: number): MessageRef {
     return { key: 'contests.span.minutes', params: { count: minutes }, count: minutes };
   }
   return { key: 'contests.span.underMinute', params: {} };
-}
-
-/**
- * Backend `liveStatusOf` (4c Task 1), derived from the detail until 4c sends `viewer.liveStatus` (Task 13 deletes this).
- * A registration that never joined lasts until the contest ends; its own `endTime` is not meaningful.
- */
-export function liveStatusOf(
-  times: ContestTimes,
-  participation: ParticipationSummary | null,
-  now: number,
-): LiveStatus | null {
-  if (participation === null) return null;
-  const end = participation.isRegistered ? times.endTime : participation.endTime;
-  if (now > Date.parse(end)) return 'finished';
-  return participation.isRegistered ? 'registered' : 'participating';
 }

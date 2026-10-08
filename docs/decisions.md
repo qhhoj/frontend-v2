@@ -173,6 +173,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Each contest tab is its own route; a tab page renders `ContestTabs` itself (the ranking page does today, the other tabs are placeholders).
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
+- After backend 4c the detail's actions read `viewer.liveStatus`/`isCurrent`; the client-side copy of `liveStatusOf` is gone.
 
 ## Avatars
 

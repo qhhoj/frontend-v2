@@ -4,9 +4,11 @@ import type {
   ContestListItem,
   ContestProblem,
   ContestStats,
+  ContestListViewer,
   ContestViewer,
   ParticipationSummary,
   ProblemCell,
+  ProblemViewerResult,
   Ranking,
   RankingRow,
 } from '../api/types/contests';
@@ -202,6 +204,12 @@ export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestLi
   virtualCount: 0,
   isPrivate: false,
   isOrganizationPrivate: false,
+  requiresAccessCode: false,
+  requiresRankingAccessCode: false,
+  disallowVirtual: false,
+  registrationStart: null,
+  registrationEnd: null,
+  viewer: null,
   ...overrides,
 });
 
@@ -263,6 +271,18 @@ export const contestProblem = (
   partial: false,
   isPretested: false,
   maxSubmissions: null,
+  solverCount: null,
+  viewerResult: null,
+  ...overrides,
+});
+
+export const viewerResult = (
+  overrides: Partial<ProblemViewerResult> = {},
+): ProblemViewerResult => ({
+  cell: null,
+  isSolved: false,
+  attempts: 0,
+  hasPendingSubmission: false,
   ...overrides,
 });
 
@@ -278,7 +298,14 @@ export const participationSummary = (
   ...overrides,
 });
 
+export const listViewer = (overrides: Partial<ContestListViewer> = {}): ContestListViewer => ({
+  liveStatus: null,
+  isCurrent: false,
+  ...overrides,
+});
+
 export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestViewer => ({
+  ...listViewer(),
   canEdit: false,
   isEditor: false,
   isTester: false,
@@ -292,8 +319,6 @@ export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDe
   description: '',
   descriptionHtml: '<p>Vòng tuần cho đội tuyển, xếp hạng kiểu ICPC.</p>',
   authors: [{ id: '0192a000-0000-7000-8000-0000000003a1', username: 'thayhung' }],
-  registrationStart: null,
-  registrationEnd: null,
   frozenLastMinutes: 60,
   scoreboardVisibility: 'V',
   showSubmissionList: false,
@@ -304,8 +329,6 @@ export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDe
   showShortDisplay: false,
   labelStyle: 'alpha',
   formatConfig: {},
-  disallowVirtual: false,
-  requiresAccessCode: false,
   problems: null,
   viewer: contestViewer(),
   ...overrides,

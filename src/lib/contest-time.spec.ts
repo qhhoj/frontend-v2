@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { participationSummary } from '@/test/fixtures';
 import {
   contestProgress,
   countdownTarget,
@@ -7,7 +6,6 @@ import {
   freezeStart,
   isFrozenAt,
   localDayOffset,
-  liveStatusOf,
   phaseAt,
   registrationState,
   spanMessage,
@@ -122,26 +120,6 @@ describe('spanMessage', () => {
   it('never says zero minutes', () => {
     expect(spanMessage(59)).toEqual({ key: 'contests.span.underMinute', params: {} });
     expect(spanMessage(-5)).toEqual({ key: 'contests.span.underMinute', params: {} });
-  });
-});
-
-describe('liveStatusOf (until 4c sends it)', () => {
-  const now = at('2026-10-08T08:00:00Z');
-  it('is null without a live participation', () => {
-    expect(liveStatusOf(times, null, now)).toBeNull();
-  });
-  it('keeps a registration that never joined until the contest ends, whatever its own end says', () => {
-    const registered = participationSummary({
-      isRegistered: true,
-      endTime: '2026-10-08T06:10:00Z',
-    });
-    expect(liveStatusOf(times, registered, now)).toBe('registered');
-    expect(liveStatusOf(times, registered, at('2026-10-08T10:00:01Z'))).toBe('finished');
-  });
-  it('is participating inside its own window and finished after it', () => {
-    const joined = participationSummary({ endTime: '2026-10-08T08:30:00Z' });
-    expect(liveStatusOf(times, joined, now)).toBe('participating');
-    expect(liveStatusOf(times, joined, at('2026-10-08T08:30:01Z'))).toBe('finished');
   });
 });
 
