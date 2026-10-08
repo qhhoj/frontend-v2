@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/** Not vite's default 4173, which a developer's own `vite preview` may hold. */
-const PORT = 4310;
+/** Not vite's default 4173, which a developer's own `vite preview` may hold; `E2E_PORT` lets parallel runs use their own. */
+const PORT = Number(process.env.E2E_PORT ?? 4310);
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 /** Set to a running backend's origin to add the opt-in `real-backend` project (`e2e-real/`). */
 const REAL_API = process.env.E2E_REAL_API;
