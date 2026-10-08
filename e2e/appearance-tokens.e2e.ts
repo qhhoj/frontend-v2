@@ -18,7 +18,9 @@ for (const theme of THEMES.filter((entry) => entry.glass)) {
     });
 
     test('glass 100 is the opaque fallback with no blur', async ({ page }) => {
-      await page.evaluate(() => document.documentElement.style.setProperty('--qh-glass', '100'));
+      await page.evaluate(() =>
+        document.documentElement.style.setProperty('--qh-glass-level', '100'),
+      );
       const look = await readGlass(page);
       expectSameColour(look.fill, look.solid);
       expect(look.blur).toBe('blur(0px)');
@@ -26,7 +28,9 @@ for (const theme of THEMES.filter((entry) => entry.glass)) {
 
     test('glass 50 blurs half as much and is more opaque than Clear', async ({ page }) => {
       const clear = await readGlass(page);
-      await page.evaluate(() => document.documentElement.style.setProperty('--qh-glass', '50'));
+      await page.evaluate(() =>
+        document.documentElement.style.setProperty('--qh-glass-level', '50'),
+      );
       const frosted = await readGlass(page);
       expect(frosted.blur).toBe('blur(12px)');
       expect(channelsOf(frosted.fill)[3]).toBeGreaterThan(channelsOf(clear.fill)[3]);
@@ -55,7 +59,7 @@ for (const theme of THEMES.filter((entry) => !entry.glass)) {
     test('a stored glass 0, 50 or 100 leaves the card opaque and unblurred', async ({ page }) => {
       for (const level of ['0', '50', '100']) {
         await page.evaluate(
-          (value) => document.documentElement.style.setProperty('--qh-glass', value),
+          (value) => document.documentElement.style.setProperty('--qh-glass-level', value),
           level,
         );
         const look = await readGlass(page);
