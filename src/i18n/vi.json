@@ -352,7 +352,8 @@
     "submitLogin": "Đăng nhập",
     "submitRegister": "Tạo tài khoản",
     "socialSignup": {
-      "lead": "Tài khoản mạng xã hội này chưa gắn với tài khoản QHHOJ nào. Chọn tên đăng nhập và mật khẩu để hoàn tất."
+      "lead": "Tài khoản mạng xã hội này chưa gắn với tài khoản QHHOJ nào. Chọn tên đăng nhập và mật khẩu để hoàn tất.",
+      "linked": "Tài khoản mạng xã hội này đã được liên kết với một tài khoản QHHOJ. Hãy đăng nhập."
     },
     "noAccountPrompt": "Chưa có tài khoản?",
     "resendLink": "Gửi lại email kích hoạt",

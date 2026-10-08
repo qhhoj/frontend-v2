@@ -61,6 +61,19 @@ describe('navigation guards', () => {
     },
   );
 
+  it.each([
+    ['a pending second factor', signedIn({ user: null, twoFactorRequired: true }), 'login-2fa'],
+    ['a forced password change', signedIn({ passwordChangeRequired: true }), 'account-password'],
+  ])(
+    'sends %s on a social signup link without copying its token into the query',
+    async (_case, session, gate) => {
+      const { route } = await navigate('/register/social?token=pending-1', () => session);
+      expect(route.name).toBe(gate);
+      expect(route.query.redirect).toBeUndefined();
+      expect(route.fullPath).not.toContain('pending-1');
+    },
+  );
+
   it('keeps the 2FA step for a pending second factor', async () => {
     const { route } = await navigate(
       '/login/2fa?redirect=/settings',

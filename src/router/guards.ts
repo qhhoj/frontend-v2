@@ -10,10 +10,11 @@ type SessionStore = ReturnType<typeof useSessionStore>;
  * `onGateRequired` (`router/index.ts`).
  */
 /**
- * A link credential (`/activate/:key`, `/reset-password/:token`) is never copied into `redirect`: the gate is reached
- * without it, so the key stays out of query strings, history entries and any page without `no-referrer`.
+ * A link credential (`/activate/:key`, `/reset-password/:token`, and the social signup page whose `?token=` is the
+ * credential) is never copied into `redirect`: the gate is reached without it, so the key stays out of query strings,
+ * history entries and any page without `no-referrer`.
  */
-const LINK_CREDENTIAL_PATH = /^\/(activate|reset-password)\//;
+const LINK_CREDENTIAL_PATH = /^\/(activate\/|reset-password\/|register\/social$)/;
 const withRedirect = (to: RouteLocationNormalized) =>
   LINK_CREDENTIAL_PATH.test(to.path) ? {} : { redirect: safeRedirect(to.fullPath) };
 const toLogin = (to: RouteLocationNormalized): RouteLocationRaw => ({

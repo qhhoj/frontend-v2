@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
+import { createMemoryHistory } from 'vue-router';
 import {
   CPP17_ID,
   organizationItem,
@@ -9,7 +10,7 @@ import {
   signedOut,
 } from '@/test/fixtures';
 import { registerRoutes } from '@/test/auth-routes';
-import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { homeRoutes } from '@/test/home-routes';
 import { mountApp } from '@/test/mount';
@@ -90,6 +91,31 @@ describe('social signup page', () => {
     expect(router.currentRoute.value.query).toEqual({ redirect: '/blog' });
   });
 
+  it('replaces the token-bearing entry rather than pushing a second one, so Back never shows the token', async () => {
+    routes();
+    const history = createMemoryHistory();
+    const push = vi.spyOn(history, 'push');
+    const replace = vi.spyOn(history, 'replace');
+    await mountApp('/register/social?token=pending-1&redirect=/blog', history);
+    // The first navigation is a replace (no previous page), so an extra push can only come from the token removal.
+    expect(push).not.toHaveBeenCalled();
+    expect(String(replace.mock.calls.at(-1)?.[0])).toBe('/register/social?redirect=/blog');
+  });
+
+  it('sends no referrer from its first request on, so the token never leaves the page', async () => {
+    const policiesSeen: (string | undefined)[] = [];
+    routes(ok(sessionResponse()), {
+      'GET /organizations': () => {
+        policiesSeen.push(
+          document.head.querySelector<HTMLMetaElement>('meta[name="referrer"]')?.content,
+        );
+        return page([organizationItem()]);
+      },
+    });
+    await mountApp('/register/social?token=pending-1');
+    expect(policiesSeen).toEqual(['no-referrer']);
+  });
+
   it('asks for a username, a password and the optional pickers, never for an email', async () => {
     routes();
     const { wrapper } = await mountApp('/register/social?token=pending-1');
@@ -122,6 +148,7 @@ describe('social signup page', () => {
       'Liên kết không hợp lệ hoặc đã hết hạn.',
     );
     expect(wrapper.find('#main a[href="/login"]').exists()).toBe(true);
+    expect(document.activeElement).toBe(document.getElementById('main'));
   });
 
   it('keeps the form and the token when the username is taken, and shows it at the input', async () => {
@@ -138,23 +165,28 @@ describe('social signup page', () => {
     expect(bodies[1]).toMatchObject({ token: 'pending-1', username: 'another_name' });
   });
 
-  it('explains in the summary that the provider email is already registered, since it has no input here', async () => {
+  it('ends with the provider email already registered, and offers sign-in and password reset', async () => {
     routes(invalid(issue('email', 'email_taken', 'Email is already registered.')));
     const { wrapper } = await mountApp('/register/social?token=pending-1');
     await submit(wrapper);
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
       'Email này đã được đăng ký. Hãy đăng nhập hoặc đặt lại mật khẩu.',
     );
-    expect(wrapper.find('form').exists()).toBe(true);
+    expect(wrapper.find('form').exists()).toBe(false);
+    expect(wrapper.find('#main a[href="/login"]').exists()).toBe(true);
+    expect(wrapper.find('#main a[href="/forgot-password"]').exists()).toBe(true);
+    expect(document.activeElement).toBe(document.getElementById('main'));
   });
 
-  it('explains an identity that was linked meanwhile', async () => {
+  it('ends with the identity already linked, and sends the viewer to sign in', async () => {
     routes(fail(409, 'conflict'));
     const { wrapper } = await mountApp('/register/social?token=pending-1');
     await submit(wrapper);
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Thao tác không thực hiện được do trạng thái hiện tại. Hãy tải lại và thử lại.',
+      'Tài khoản mạng xã hội này đã được liên kết với một tài khoản QHHOJ. Hãy đăng nhập.',
     );
+    expect(wrapper.find('form').exists()).toBe(false);
+    expect(wrapper.find('#main a[href="/login"]').exists()).toBe(true);
   });
 
   it('will not send a username the backend would reject', async () => {

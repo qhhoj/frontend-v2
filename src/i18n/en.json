@@ -352,7 +352,8 @@
     "submitLogin": "Sign in",
     "submitRegister": "Create account",
     "socialSignup": {
-      "lead": "This social account is not linked to a QHHOJ account yet. Pick a username and a password to finish."
+      "lead": "This social account is not linked to a QHHOJ account yet. Pick a username and a password to finish.",
+      "linked": "This social account is already linked to a QHHOJ account. Sign in instead."
     },
     "noAccountPrompt": "No account yet?",
     "resendLink": "Resend the activation email",
