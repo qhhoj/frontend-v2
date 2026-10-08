@@ -13,7 +13,14 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: ORIGIN, trace: 'retain-on-failure', reducedMotion: 'reduce' },
+  use: {
+    baseURL: ORIGIN,
+    trace: 'retain-on-failure',
+    reducedMotion: 'reduce',
+    // Date text must not depend on the host's zone or language.
+    timezoneId: 'Asia/Ho_Chi_Minh',
+    locale: 'vi-VN',
+  },
   /** Builds `dist/` and previews it; the only build step, so CI does not build twice. */
   webServer: {
     command: `npm run build && npx vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,

@@ -144,7 +144,9 @@ describe('the contest detail, announcements and stats load with skeletons shaped
     mockApi({ 'GET /auth/me': signedOut });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/contests/r42/announcements');
-    expect(regionsIn(wrapper.element, 'announcement')).toBe(3);
+    const rows = wrapper.findAll('[data-skeleton-region="announcement"]');
+    expect(rows).toHaveLength(3);
+    for (const row of rows) expectInert(row.element, 'announcement skeleton');
     expect(wrapper.get('main').text()).not.toContain('Chưa có thông báo');
   });
 

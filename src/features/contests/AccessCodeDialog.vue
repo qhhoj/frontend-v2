@@ -14,7 +14,6 @@ const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ submit: [code: string] }>();
 /** The code lives only in this field: it is cleared as soon as the dialog closes, never kept or logged. */
 const code = ref('');
-const input = ref<HTMLInputElement | null>(null);
 const INPUT_ID = 'contest-access-code';
 
 watch(visible, (isOpen) => {
@@ -36,9 +35,8 @@ function cancel() {
     :draggable="false"
     :closable="!isPending"
     :close-on-escape="!isPending"
-    @show="input?.focus()"
   >
-    <!-- PrimeVue moves focus to the first [autofocus] field after the open transition; without it the close button gets focus. -->
+    <!-- PrimeVue focuses the first [autofocus] field after the open transition; without it the close button gets focus. -->
     <form class="flex flex-col gap-3" @submit.prevent="submit">
       <p class="text-muted">{{ $t('contests.actions.codeBody', { name: contestName }) }}</p>
       <label :for="INPUT_ID" class="text-[12px] font-semibold tracking-wider text-muted uppercase">
@@ -46,7 +44,6 @@ function cancel() {
       </label>
       <input
         :id="INPUT_ID"
-        ref="input"
         v-model="code"
         autofocus
         type="password"

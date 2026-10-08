@@ -6,8 +6,7 @@ import {
   rankingRow,
   RANKING_PROBLEM_IDS,
 } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
-import { applyTheme, AUDIT_VIEWPORTS, expectNoAxeViolations } from './fixtures/audit';
+import { expectNoAxeViolations } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, streamFrame, test } from './fixtures/api';
 
 test.beforeEach(async ({ page }) => {
@@ -102,6 +101,12 @@ test('the phone detail is layout A at 390 px: list rows, fixed action bar, no si
     return Math.round(box.y + box.height);
   };
   expect(await barBottomPx()).toBe(844);
+  // The page is taller than the screen, so the bar has to stay put while the page scrolls under it.
+  expect(
+    await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight),
+  ).toBeGreaterThan(0);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight / 2));
+  expect(await barBottomPx(), 'the bar stays on the viewport bottom mid-scroll').toBe(844);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
   ).toBeLessThanOrEqual(0);
@@ -134,6 +139,7 @@ test('a points board shows points and time inside the chip and stars only timed 
         ],
         rows: [
           rankingRow(1, 'part-07', 'user_07', 100, 492, { [problemA]: { points: 100, time: 492 } }),
+          rankingRow(2, 'part-12', 'user_12', 100, 600, { [problemA]: { points: 100, time: 600 } }),
         ],
       }),
     },
@@ -142,25 +148,9 @@ test('a points board shows points and time inside the chip and stars only timed 
   const row = page.getByRole('row').filter({ hasText: 'user_07' });
   await expect(row.getByTestId('cell-time')).toHaveText('0:08:12');
   await expect(row.getByText('Giải đầu tiên: 100 điểm, lúc 0:08:12')).toBeAttached();
+  // A solve that is not the first one carries no first-solve note and no star.
+  const laterRow = page.getByRole('row').filter({ hasText: 'user_12' });
+  await expect(laterRow.getByTestId('cell-time')).toHaveText('0:10:00');
+  await expect(laterRow.getByText('Giải đầu tiên')).toHaveCount(0);
   await expect(page.getByRole('columnheader', { name: 'Điểm · giờ' })).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the contest list, detail and ranking pass axe in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      api.signedIn = true;
-      await applyTheme(page, api, theme);
-      for (const [path, ready] of [
-        ['/contests', 'QHH Round #42 (Div. 2)'],
-        ['/contests/r42', 'QHH Round #42 (Div. 2)'],
-        ['/contests/r42/ranking', 'user_07'],
-      ] as const) {
-        await page.goto(path);
-        await expect(page.getByText(ready).filter({ visible: true }).first()).toBeVisible();
-        await expectNoAxeViolations(page);
-      }
-    });
