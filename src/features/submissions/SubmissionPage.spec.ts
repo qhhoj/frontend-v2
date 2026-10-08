@@ -400,7 +400,6 @@ describe('submission page', () => {
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
     const served = globalThis.fetch;
     vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
-      String(input).endsWith('/problems/duongdi?lang=vi') ||
       String(input).includes('/problems/duongdi')
         ? new Promise<Response>(() => {})
         : served(input, init),
@@ -418,5 +417,21 @@ describe('submission page', () => {
     expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Sai kết quả');
     expect(wrapper.get('[role="img"]').attributes('style')).toContain('--qh-verdict-wa');
     expect(wrapper.get('time').attributes('title')).toMatch(/2026/);
+  });
+
+  it('shows an empty neutral ring, never a green percentage, for a result that is pending until the contest ends', async () => {
+    const pending = submissionDetail({
+      status: 'PD',
+      result: null,
+      points: null,
+      cases: null,
+      totalCases: null,
+    });
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(pending), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    const ring = wrapper.get('[role="img"]');
+    expect(ring.attributes('aria-label')).toBe('Chờ chấm cuối kỳ thi');
+    expect(ring.text()).not.toContain('%');
+    expect(ring.attributes('style')).not.toContain('--qh-positive');
   });
 });

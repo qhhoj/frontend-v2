@@ -75,7 +75,11 @@ const facts = computed(() => [
       as="div"
       class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
     >
-      <VerdictRing :progress="isFinished ? null : ringProgress(submission)" :verdict="verdict" />
+      <VerdictRing
+        :progress="isFinished ? null : ringProgress(submission)"
+        :verdict="verdict"
+        :is-empty="submission.status === 'PD'"
+      />
       <div class="min-w-0 flex-1 basis-40">
         <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
           <span
