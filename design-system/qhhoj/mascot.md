@@ -45,7 +45,7 @@ These are sprite colours, not theme tokens: Bit keeps them in every theme (they 
 | Empty lists | nightcap | closed | charcoal |
 | Loading swarm | cap, nightcap (charcoal twin), crown, antenna, none, one per Bit; 5 on desktop, 3 under 768 px (cap, nightcap, crown), 1 under reduced motion (cap) | open, blink once when the Bits stop | terracotta (one charcoal) |
 
-Antenna: a 1 px stalk (rows 2–3) under a 2×2 knob (rows 0–1). Every headgear's last row sits directly above the body (row 6).
+Antenna: a 2×2 knob (rows 2–3) on a 1 px stalk (rows 4–5); rows 0–1 stay empty. Every headgear's last row sits directly above the body (row 6).
 
 New variants: keep body, eyes, legs and palette identical; at most 1–2 px of pose change; the silhouette filled solid black must still read.
 Motion: blinking, the loading swarm and the 404 sob. Blinking and the sob are disabled under `prefers-reduced-motion`; the 404's falling tears are hidden there. Loading Bits walk: the walk frame moves each leg one pixel inward and drops the sprite one pixel (`translateY`, the stand frame has no offset), hops lift it 6 px, and it faces its direction of travel. Under reduced motion one Bit stands still. Every placement has an `aria-label` (decorative placements next to a heading use `aria-hidden`); the loading swarm is `aria-hidden`. Sprite data and palettes live in `src/mascot/bit-sprite.ts`, the one source file that `lint:tokens` skips.

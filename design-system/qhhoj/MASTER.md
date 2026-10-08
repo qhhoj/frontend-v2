@@ -70,7 +70,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - Waiting means first data only (`isPending`). A wait is shown after 600 ms of continuous waiting; a wait that ends is over after 100 ms, so the gap between a navigation ending and the page's queries starting does not count as done.
 - Bit swarm: after the 600 ms, 5 Bits (3 under 768 px) wander the viewport: random walk at 40-120 px/s, bouncing off the edges, small hops, leg steps, facing their direction. Fixed, `z-40`, `aria-hidden`, `pointer-events: none`, below menus and dialogs.
 - When waiting ends, the Bits stop after 100 ms, blink once (160 ms), hold 1.5 s, then fade out over 300 ms. A new wait while they fade walks again.
-- Under reduced motion one Bit (the cap) stands in the bottom-left corner, does not blink, and disappears at once when the wait ends (no fade: the global 0 ms transition rule applies).
+- Under reduced motion one Bit (the cap) stands in the bottom-left corner, does not blink, stays through the 1.5 s hold, then disappears without a fade (the global 0 ms transition rule applies).
 - Background refetches, polls and kept-data filter changes show neither skeletons nor Bits.
 - One polite live region in the shell says the loading text ("Đang tải…") while the Bits walk; it still announces under reduced motion.
 - 404: crying Bit in front of a pale "404" built from `--qh-skeleton` blocks; heading "Page not found", one line, "Back to home" (primary) and "Browse problems" (secondary), the requested path in mono.
