@@ -222,10 +222,21 @@ test.describe('loading with motion', () => {
 
   test('a page that loads quickly never shows a Bit', async ({ page, api }) => {
     void api; // installs the fake API
-    await page.clock.install();
+    await page.addInitScript((selector) => {
+      new MutationObserver(() => {
+        if (document.querySelector(selector)) Object.assign(window, { bitSeen: true });
+      }).observe(document, { childList: true, subtree: true });
+    }, BITS);
+    // Time stands still until the test moves it, so a slow machine cannot run the wait out while the page loads.
+    await page.clock.install({ time: 0 });
+    await page.clock.pauseAt(1000);
     await page.goto('/problems');
-    await expect(page.getByText(LOADED_ROW).first()).toBeVisible();
+    const loadedRow = page.getByText(LOADED_ROW);
+    for (let step = 0; step < 200 && (await loadedRow.count()) === 0; step += 1)
+      await page.clock.runFor(1);
+    await expect(loadedRow.first()).toBeVisible();
     await page.clock.runFor(THRESHOLD_MS * 2); // well past the wait: a Bit that was going to appear would be here
+    expect(await page.evaluate(() => 'bitSeen' in window), 'a Bit appeared meanwhile').toBe(false);
     await expect(page.locator(BITS)).toHaveCount(0);
     await expect(page.locator('[role="status"]')).toHaveText('');
   });
@@ -274,6 +285,8 @@ interface ShiftCase {
   answer?: (api: FakeApi) => void;
   parts: (page: Page, width: number) => Record<string, Locator>;
   viewports: number[];
+  /** Parts whose distance from the first part's top is compared as well; a taller or shorter part above moves them. */
+  placed?: string[];
 }
 const PHONE = 375;
 const DESKTOP = 1280;
@@ -312,7 +325,7 @@ const SHIFT_CASES: ShiftCase[] = [
         : {
             card: page.getByTestId('rating-hero'),
             'rating row': page.locator(
-              '[data-skeleton-region="rating"], [data-testid="rating-hero"] > div.mt-2',
+              '[data-skeleton-region="rating"], [data-testid="rating-row"]',
             ),
           }),
       chart: page.locator(
@@ -397,16 +410,31 @@ const SHIFT_CASES: ShiftCase[] = [
       'table rows': page.locator('[data-skeleton-region="row"], main tbody tr'),
     }),
     viewports: PHONE_AND_DESKTOP,
+    placed: ['table header', 'table rows'],
   },
 ];
 
-const spanHeight = (locator: Locator) =>
+const spanOf = (locator: Locator) =>
   locator.evaluateAll((elements) => {
     const rects = elements.map((element) => element.getBoundingClientRect());
-    return (
-      Math.max(...rects.map((rect) => rect.bottom)) - Math.min(...rects.map((rect) => rect.top))
-    );
+    const top = Math.min(...rects.map((rect) => rect.top));
+    return { top, height: Math.max(...rects.map((rect) => rect.bottom)) - top };
   });
+/** Every part's height, and for the `placed` ones the distance of their top from the first part's top. */
+const layoutOf = async (parts: Record<string, Locator>, placed: string[] = []) => {
+  const spans = Object.fromEntries(
+    await Promise.all(
+      Object.entries(parts).map(async ([part, locator]) => [part, await spanOf(locator)] as const),
+    ),
+  );
+  const firstTop = Object.values(spans)[0].top;
+  return {
+    ...Object.fromEntries(
+      Object.entries(spans).map(([part, span]) => [`${part} height`, span.height]),
+    ),
+    ...Object.fromEntries(placed.map((part) => [`${part} offset`, spans[part].top - firstTop])),
+  };
+};
 
 for (const shift of SHIFT_CASES)
   for (const width of shift.viewports)
@@ -420,32 +448,24 @@ for (const shift of SHIFT_CASES)
       const release = api.hold(shift.hold);
       await page.goto(shift.path);
       const parts = shift.parts(page, width);
-      const skeletonHeights: Record<string, number> = {};
-      for (const [part, locator] of Object.entries(parts)) {
-        await expect(locator.first(), `${part} skeleton`).toBeVisible();
-        skeletonHeights[part] = await spanHeight(locator);
-      }
-      await expect(page.locator('[data-skeleton]').first()).toBeVisible();
-      await page.evaluate(() => document.fonts.ready);
       for (const [part, locator] of Object.entries(parts))
-        skeletonHeights[part] = await spanHeight(locator);
+        await expect(locator.first(), `${part} skeleton`).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const skeleton = await layoutOf(parts, shift.placed);
       release();
       await expect(page.locator('[data-skeleton]')).toHaveCount(0);
       await page.evaluate(() => document.fonts.ready);
-      const measured = Object.entries(parts);
-      /** Per part the change in height once loaded; 0 stands for "within the tolerance". */
+      /** Per measure the change in px once loaded; 0 stands for "within the tolerance". */
       const changes = async () =>
         Object.fromEntries(
-          await Promise.all(
-            measured.map(async ([part, locator]) => {
-              const change = (await spanHeight(locator)) - skeletonHeights[part];
-              return [part, Math.abs(change) <= SHIFT_TOLERANCE_PX ? 0 : change];
-            }),
-          ),
+          Object.entries(await layoutOf(parts, shift.placed)).map(([measure, value]) => {
+            const change = value - skeleton[measure];
+            return [measure, Math.abs(change) <= SHIFT_TOLERANCE_PX ? 0 : change];
+          }),
         );
       await expect
-        .poll(changes, { message: 'height change in px per part, skeleton to loaded' })
-        .toEqual(Object.fromEntries(measured.map(([part]) => [part, 0])));
+        .poll(changes, { message: 'change in px per measure, skeleton to loaded' })
+        .toEqual(Object.fromEntries(Object.keys(skeleton).map((measure) => [measure, 0])));
     });
 
 for (const theme of THEMES)

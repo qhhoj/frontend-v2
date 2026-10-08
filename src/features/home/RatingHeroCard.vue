@@ -83,7 +83,7 @@ const tiles = computed(() =>
       </template>
       <template v-if="user">
         <p class="text-muted">{{ $t(greeting, { username }) }}</p>
-        <div class="mt-2 flex flex-wrap items-end gap-4">
+        <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
           <span class="font-mono text-6xl font-semibold tracking-tight tabular-nums">{{
             user.rating ?? '—'
           }}</span>

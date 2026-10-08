@@ -215,6 +215,9 @@ const VIEW_MODES = [
             </div>
           </div>
           <div class="glass overflow-hidden rounded-card">
+            <p aria-hidden="true" class="px-5 pt-3 text-[13px] md:hidden">
+              <SkeletonBlock text class="w-48" />
+            </p>
             <div
               data-skeleton-region="table-header"
               class="flex items-center gap-4 px-5 py-4 text-[13px]"
