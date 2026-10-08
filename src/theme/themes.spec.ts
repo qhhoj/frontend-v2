@@ -41,8 +41,11 @@ const themes = Object.entries(themeFiles).map(([path, css]) => ({
 
 const BLOBS = ['blob-1', 'blob-2', 'blob-3'];
 const COINS = [1, 2, 3, 4, 5, 6].map((index) => `coin-${index}`);
+const SYNTAX_TOKENS = ['keyword', 'type', 'number', 'string', 'comment', 'function'].map(
+  (name) => `syntax-${name}`,
+);
 
-/** Tokens used as text colour directly on a ground. */
+/** Tokens used as text colour directly on a ground; the syntax colours are drawn on the inner tile, which this check also covers. */
 const TEXT_TOKENS = [
   'text',
   'text-muted',
@@ -58,6 +61,7 @@ const TEXT_TOKENS = [
   'tier-candidate-master',
   'tier-master',
   'tier-grandmaster',
+  ...SYNTAX_TOKENS,
 ];
 /** Text token and the tint it sits on. */
 const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
@@ -103,14 +107,6 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
     expect([...usedNames].filter((name) => !globalNames.has(name) && !tokens.has(name))).toEqual(
       [],
     );
-  });
-
-  it('keeps the accent border at 3:1 on the ground and the opaque fallback', () => {
-    const ground = colour('ground');
-    const solid = over(colour('surface-solid'), ground);
-    const border = colour('line-accent');
-    expect(contrastRatio(border, ground)).toBeGreaterThanOrEqual(3);
-    expect(contrastRatio(border, solid)).toBeGreaterThanOrEqual(3);
   });
 
   it('keeps text at 4.5:1 on every ground, every blob centre and the opaque fallback included', () => {
@@ -163,6 +159,42 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
   it('keeps text on both accent fills at 4.5:1', () => {
     for (const fill of ['accent', 'accent-2'])
       expect(contrastRatio(colour('on-accent'), colour(fill))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('keeps the accent fills and the accent border at 3:1 on the ground and the opaque fallback', () => {
+    const ground = colour('ground');
+    const solid = over(colour('surface-solid'), ground);
+    for (const token of ['accent', 'accent-2', 'line-accent'])
+      for (const base of [ground, solid])
+        expect(contrastRatio(colour(token), base), `--qh-${token}`).toBeGreaterThanOrEqual(3);
+  });
+
+  it('gives the six syntax tokens six different colours', () => {
+    const values = SYNTAX_TOKENS.map((name) => tokens.get(name));
+    expect(new Set(values).size).toBe(SYNTAX_TOKENS.length);
+  });
+
+  it('is flat or frosted exactly as its registry entry says', () => {
+    const entry = THEMES.find((theme) => theme.id === id)!;
+    if (entry.glass) {
+      expect(tokens.get('blur')).toMatch(/^[1-9]\d*px$/);
+      expect(tokens.get('blob-display')).toBe('block');
+      return;
+    }
+    expect(tokens.get('blur')).toBe('0px');
+    expect(tokens.get('blob-display')).toBe('none');
+    // Opaque everywhere: a personal Glass level has nothing to mix, and the blobs have nothing to show.
+    expect(colour('surface')).toEqual(colour('surface-solid'));
+    for (const name of ['surface', 'surface-strong', 'surface-hover'])
+      expect(colour(name)[3], `--qh-${name} alpha`).toBe(1);
+    for (const blob of BLOBS) expect(colour(blob)[3], `--qh-${blob} alpha`).toBe(0);
+    // Buttons are one colour, and the live-dot glow is invisible.
+    const stops = [...(tokens.get('gradient-accent') ?? '').matchAll(/#[0-9a-f]{6}/gi)].map(
+      ([stop]) => stop.toLowerCase(),
+    );
+    expect(stops).toHaveLength(2);
+    expect(new Set([...stops, tokens.get('accent')!.toLowerCase()]).size).toBe(1);
+    expect(tokens.get('glow')).toMatch(/rgba\(0, 0, 0, 0\)$/);
   });
 
   it('keeps coin text at 4.5:1 on both stops of every coin gradient', () => {

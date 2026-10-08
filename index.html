@@ -9,7 +9,12 @@
       // Pre-paint: the theme last painted (src/theme/theme.store.ts), else the OS scheme.
       // `grounds` (theme id -> its --qh-ground, for the address bar) and the fallback ids must match
       // src/theme/registry.ts and src/theme/themes/; prepaint.spec.ts enforces it.
-      var grounds = { 'glass-dark': '#0d0a1a', 'glass-light': '#f6f2ff' };
+      var grounds = {
+        'glass-dark': '#0d0a1a',
+        'glass-light': '#f6f2ff',
+        'clay-light': '#faf9f5',
+        'clay-dark': '#1a1816',
+      };
       var known = Object.keys(grounds);
       var stored = null;
       var prefersLight = false;

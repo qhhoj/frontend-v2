@@ -7,6 +7,8 @@ export interface ThemeDefinition {
   scheme: ColorScheme;
   /** The value saved in the account's `siteTheme` (backend allows `auto | light | dark` today). */
   storedAs: string;
+  /** Frosted surfaces over background blobs (Glass). Flat themes (Clay) ignore the personal Glass and Glow levels. */
+  glass: boolean;
 }
 
 /**
@@ -14,8 +16,28 @@ export interface ThemeDefinition {
  * A new theme also goes into `grounds` in the pre-paint script of index.html; as the default for its scheme it also replaces the fallback id there.
  */
 export const THEMES: readonly ThemeDefinition[] = [
-  { id: 'glass-dark', labelKey: 'theme.glassDark', scheme: 'dark', storedAs: 'dark' },
-  { id: 'glass-light', labelKey: 'theme.glassLight', scheme: 'light', storedAs: 'light' },
+  { id: 'glass-dark', labelKey: 'theme.glassDark', scheme: 'dark', storedAs: 'dark', glass: true },
+  {
+    id: 'glass-light',
+    labelKey: 'theme.glassLight',
+    scheme: 'light',
+    storedAs: 'light',
+    glass: true,
+  },
+  {
+    id: 'clay-light',
+    labelKey: 'theme.clayLight',
+    scheme: 'light',
+    storedAs: 'clay-light',
+    glass: false,
+  },
+  {
+    id: 'clay-dark',
+    labelKey: 'theme.clayDark',
+    scheme: 'dark',
+    storedAs: 'clay-dark',
+    glass: false,
+  },
 ];
 
 export const AUTO_THEME = 'auto';

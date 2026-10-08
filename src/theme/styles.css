@@ -9,6 +9,8 @@
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/600.css';
 @import './tokens.css';
+@import './themes/clay-light.css';
+@import './themes/clay-dark.css';
 @import './themes/glass-dark.css';
 @import './themes/glass-light.css';
 
@@ -93,6 +95,10 @@
 }
 @utility bg-gradient-accent {
   background-image: var(--qh-gradient-accent);
+}
+/* Background blobs are shown or hidden by the theme (`--qh-blob-display`): Clay has none. */
+@utility blob-field {
+  display: var(--qh-blob-display);
 }
 @utility bg-first-solve {
   background-image: linear-gradient(90deg, var(--qh-first-solve-bg), var(--qh-first-solve-bg-2));

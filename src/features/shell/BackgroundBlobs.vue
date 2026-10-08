@@ -1,6 +1,9 @@
 <template>
   <!-- Phone: two small blobs, because the desktop-sized ones would cover each other on a 375 px screen. -->
-  <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+  <div
+    aria-hidden="true"
+    class="blob-field pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+  >
     <div
       class="blob-1 absolute -top-24 -left-20 size-[300px] rounded-full md:-top-48 md:-left-44 md:size-[720px]"
     />

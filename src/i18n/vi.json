@@ -49,6 +49,8 @@
   "theme": {
     "menu": "Đổi giao diện",
     "auto": "Tự động theo hệ thống",
+    "clayLight": "Clay sáng",
+    "clayDark": "Clay tối",
     "glassDark": "Glass tối",
     "glassLight": "Glass sáng",
     "current": "đang dùng"

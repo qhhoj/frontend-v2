@@ -49,6 +49,8 @@
   "theme": {
     "menu": "Change theme",
     "auto": "Automatic (system)",
+    "clayLight": "Clay light",
+    "clayDark": "Clay dark",
     "glassDark": "Glass dark",
     "glassLight": "Glass light",
     "current": "current"
