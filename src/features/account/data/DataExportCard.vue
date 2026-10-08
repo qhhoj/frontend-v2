@@ -10,7 +10,6 @@ import { translate } from '@/i18n';
 import { formatDateTime, formatFileSize } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
 import { BUTTON } from '../settings/buttons';
@@ -25,14 +24,13 @@ const CHIPS = {
   preparing: 'bg-accent-soft text-accent-soft-text',
   ready: 'bg-verdict-ac-bg text-verdict-ac',
 } as const;
-const session = useSessionStore();
 const locale = useLocaleStore();
 const now = useNow(60_000);
 const queryClient = useQueryClient();
 const ruleId = useId();
 const { pending, error, summary, run } = useAuthAction();
 const file = computed(() => exportFileOf(props.status));
-const rule = computed(() => requestRuleOf(props.status, session.impersonatorId !== null));
+const rule = computed(() => requestRuleOf(props.status));
 const canRequest = computed(() => rule.value.kind === 'allowed' && !pending.value);
 const when = (date: string) => formatDateTime(date, locale.locale);
 

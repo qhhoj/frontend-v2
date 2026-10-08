@@ -29,30 +29,22 @@ describe('exportFileOf', () => {
 
 describe('requestRuleOf', () => {
   it('allows a request whenever the backend says so', () => {
-    expect(requestRuleOf(dataExportStatus({ canPrepare: true }), false)).toEqual({
+    expect(requestRuleOf(dataExportStatus({ canPrepare: true }))).toEqual({
       kind: 'allowed',
     });
   });
 
   it('waits for a running job, then for the once-a-day rule, else the daily limit is used up', () => {
-    expect(
-      requestRuleOf(dataExportStatus({ state: 'preparing', canPrepare: false }), false),
-    ).toEqual({
+    expect(requestRuleOf(dataExportStatus({ state: 'preparing', canPrepare: false }))).toEqual({
       kind: 'preparing',
     });
-    expect(
-      requestRuleOf(dataExportStatus({ canPrepare: false, nextPrepareAt: AT }), false),
-    ).toEqual({
+    expect(requestRuleOf(dataExportStatus({ canPrepare: false, nextPrepareAt: AT }))).toEqual({
       kind: 'wait',
       until: AT,
     });
-    expect(requestRuleOf(dataExportStatus({ canPrepare: false }), false)).toEqual({
+    expect(requestRuleOf(dataExportStatus({ canPrepare: false }))).toEqual({
       kind: 'dailyLimit',
     });
-  });
-
-  it('is locked while viewing as another user, even when the backend would allow a request', () => {
-    expect(requestRuleOf(dataExportStatus({ canPrepare: true }), true)).toEqual({ kind: 'locked' });
   });
 });
 

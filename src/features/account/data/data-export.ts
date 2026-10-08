@@ -20,18 +20,13 @@ export function exportFileOf(status: DataExportStatus): ExportFile {
 }
 
 export type RequestRule =
-  | { kind: 'locked' }
   | { kind: 'allowed' }
   | { kind: 'preparing' }
   | { kind: 'wait'; until: string }
   | { kind: 'dailyLimit' };
 
-/**
- * Why a request is not possible now. The backend only says `canPrepare` and the once-a-day time (Decision 11).
- * While viewing as another user the backend refuses the export (private data), so the rule is `locked` whatever the status says.
- */
-export function requestRuleOf(status: DataExportStatus, impersonating = false): RequestRule {
-  if (impersonating) return { kind: 'locked' };
+/** Why a request is not possible now. The backend only says `canPrepare` and the once-a-day time (Decision 11). */
+export function requestRuleOf(status: DataExportStatus): RequestRule {
   if (status.canPrepare) return { kind: 'allowed' };
   if (status.state === 'preparing') return { kind: 'preparing' };
   if (status.nextPrepareAt) return { kind: 'wait', until: status.nextPrepareAt };

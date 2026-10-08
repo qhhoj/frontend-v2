@@ -93,17 +93,17 @@ describe('SettingsNotice', () => {
 });
 
 describe('SettingsCard', () => {
-  it('names its section by its heading: level 2 by default, level 3 when nested, with the lead under it', () => {
+  it('names its section by its h2 heading, with the lead under it', () => {
     const top = mountComponent(SettingsCard, {
       props: { title: 'Mật khẩu' },
       slots: { default: '<p>Nội dung</p>' },
     });
     expect(top.get('h2').text()).toBe('Mật khẩu');
     expect(top.attributes('aria-labelledby')).toBe(top.get('h2').attributes('id'));
-    const nested = mountComponent(SettingsCard, {
-      props: { title: 'Bước 1', headingLevel: 3, lead: 'Giải thích ngắn' },
+    const withLead = mountComponent(SettingsCard, {
+      props: { title: 'Bước 1', lead: 'Giải thích ngắn' },
     });
-    expect(nested.get('h3').text()).toBe('Bước 1');
-    expect(nested.text()).toContain('Giải thích ngắn');
+    expect(withLead.get('h2').text()).toBe('Bước 1');
+    expect(withLead.text()).toContain('Giải thích ngắn');
   });
 });
