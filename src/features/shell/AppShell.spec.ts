@@ -9,6 +9,7 @@ import {
   signedIn,
   signedOut,
 } from '@/test/fixtures';
+import { loginRoutes } from '@/test/auth-routes';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
@@ -58,7 +59,7 @@ describe('app shell', () => {
   });
 
   it('shows the header on the sign-in page, which draws no AuthLayout yet', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ 'GET /auth/me': signedOut, ...loginRoutes });
     const { wrapper } = await mountApp('/login');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(true);
   });

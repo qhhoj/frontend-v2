@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { socialRoutes } from '@/test/auth-routes';
+import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { profile, signedIn } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
@@ -20,7 +20,7 @@ function changeApi(routes: Record<string, MockHandler> = {}, forced = true) {
     },
     'GET /profile': ok(profile()),
     'POST /auth/logout': noContent(),
-    ...socialRoutes,
+    ...loginRoutes,
     ...routes,
   });
 }
@@ -142,7 +142,7 @@ describe('change-password page', () => {
         changed = true;
         return noContent();
       },
-      ...socialRoutes,
+      ...loginRoutes,
     });
     const { wrapper, router } = await mountApp('/account/password');
     await fill(wrapper);

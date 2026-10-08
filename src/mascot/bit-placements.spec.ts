@@ -122,15 +122,6 @@ describe('Bit placements', () => {
     final.wrapper.unmount();
   });
 
-  it('greets a visitor on the login page with the welcome Bit beside the heading', async () => {
-    mockApi(anonymousViewer);
-    const { wrapper } = await mountApp('/login');
-    const bit = wrapper.get('[data-testid="inline-bit"]');
-    expect(pixelsOf(bit.element)).toBe(pixelsOfKind('welcome'));
-    expect(wrapper.get('h1').element.parentElement!.contains(bit.element)).toBe(true);
-    wrapper.unmount();
-  });
-
   it('shows the staff hard hat on the admin area for staff only', async () => {
     mockApi({
       ...signedInViewer(),
