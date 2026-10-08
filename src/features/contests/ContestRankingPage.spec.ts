@@ -160,6 +160,28 @@ describe('contest ranking', () => {
     expect(calls.filter((call) => call.path === '/contests/r42/ranking')).toHaveLength(2);
   });
 
+  it('keeps the board and shows a sweating Bit beside the notice when a refresh fails', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
+    let answers = 0;
+    mockApi(
+      routes({
+        'GET /contests/r42/ranking': () =>
+          answers++ === 0 ? ok(ranking()) : fail(500, 'internal'),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    expect(wrapper.find('[data-testid="inline-bit"]').exists()).toBe(false);
+    await vi.advanceTimersByTimeAsync(30_000);
+    await flushPromises();
+    const notice = wrapper
+      .findAll('[role="status"]')
+      .find((status) => status.text().includes('Không cập nhật được bảng'))!;
+    expect(notice.text()).toBe('Không cập nhật được bảng, đang thử lại.');
+    expect(notice.get('[data-testid="inline-bit"]').attributes('aria-hidden')).toBe('true');
+    expect(rowOf(wrapper, 'user_07').exists()).toBe(true);
+  });
+
   it('does not poll an ended contest', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const calls = mockApi(routes({ 'GET /contests/r42': ok(contestDetail({ phase: 'ended' })) }));

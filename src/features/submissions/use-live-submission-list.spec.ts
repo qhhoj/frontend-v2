@@ -162,6 +162,11 @@ describe('live updates on the submission list', () => {
     expect(wrapper.get('[data-testid="live-paused"]').text()).toContain(
       'Cập nhật trực tiếp tạm dừng',
     );
+    expect(
+      wrapper
+        .get('[data-testid="live-paused"] [data-testid="inline-bit"]')
+        .attributes('aria-hidden'),
+    ).toBe('true');
   });
   it('announces a second batch with the same text again, after clearing the region', async () => {
     mockApi({
