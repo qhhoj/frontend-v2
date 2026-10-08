@@ -21,6 +21,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
       <p><SkeletonBlock text class="w-48" /></p>
       <p class="min-h-5 text-sm"><SkeletonBlock text class="w-40" /></p>
     </div>
-    <!-- Task 10 adds the membership panel's reserve back when it builds the real panel. -->
+    <!-- Reserves the membership panel's height and width: the signed-out panel is one 44 px button. -->
+    <SkeletonBlock pill class="h-11 w-full md:w-72" />
   </section>
 </template>

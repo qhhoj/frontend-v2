@@ -40,6 +40,8 @@ export const requestToJoin = (slug: string, reason: string) =>
     method: 'POST',
     body: { reason },
   });
+export const fetchJoinRequest = (slug: string, id: string) =>
+  apiRequest<JoinRequest>(`${organizationPath(slug)}/requests/${encodeURIComponent(id)}`);
 export const fetchJoinRequests = (slug: string, state: JoinRequestState, page: number) =>
   apiPage<JoinRequest>(`${organizationPath(slug)}/requests`, { query: { state, page } });
 export const decideJoinRequest = (slug: string, id: string, state: 'A' | 'R') =>

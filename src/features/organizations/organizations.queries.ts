@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import {
+  fetchJoinRequest,
   fetchJoinRequests,
   fetchMembers,
   fetchOrganization,
@@ -65,6 +66,7 @@ export const useJoinRequestsQuery = (
   slug: MaybeRefOrGetter<string>,
   state: MaybeRefOrGetter<JoinRequestState>,
   page: MaybeRefOrGetter<number>,
+  isEnabled: MaybeRefOrGetter<boolean>,
 ) =>
   useQuery({
     queryKey: computed(() => [
@@ -76,4 +78,16 @@ export const useJoinRequestsQuery = (
     ]),
     queryFn: () => fetchJoinRequests(toValue(slug), toValue(state), toValue(page)),
     placeholderData: keepPreviousData,
+    enabled: computed(() => toValue(isEnabled)),
+  });
+
+/** The viewer's own pending request; idle when there is none. */
+export const usePendingRequestQuery = (
+  slug: MaybeRefOrGetter<string>,
+  id: MaybeRefOrGetter<string | null>,
+) =>
+  useQuery({
+    queryKey: computed(() => ['organizations', 'request', toValue(slug), toValue(id)]),
+    queryFn: () => fetchJoinRequest(toValue(slug), toValue(id) as string),
+    enabled: computed(() => toValue(id) !== null),
   });
