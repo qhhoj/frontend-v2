@@ -54,7 +54,7 @@ const TAB_COMPONENTS: Record<ContestTabId, Component | null> = {
   general: defineAsyncComponent(() => import('./general/ContestGeneralTab.vue')),
   problems: defineAsyncComponent(() => import('./problems/ContestProblemsTab.vue')),
   announcements: defineAsyncComponent(() => import('./announcements/ContestAnnouncementsTab.vue')),
-  ranking: null,
+  ranking: defineAsyncComponent(() => import('./ranking/ContestRankingTab.vue')),
   actions: null,
   participants: null,
 };

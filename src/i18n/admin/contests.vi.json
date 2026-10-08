@@ -192,5 +192,61 @@
     "pager": "{total} thông báo · trang {page} của {pages}",
     "previous": "Trang trước",
     "next": "Trang sau"
+  },
+  "ranking": {
+    "official": {
+      "title": "Bảng xếp hạng chính thức",
+      "lead": "Tải bảng điểm chính thức do ban tổ chức chốt (sau khi xét lại). Bảng này hiện cạnh bảng tự động và thay cho nó khi công bố.",
+      "sourceLegend": "Nguồn",
+      "modeCsv": "Tải tệp CSV",
+      "modeUrl": "Từ đường dẫn",
+      "csvHint": "Tối đa 1 MiB, 10 000 dòng, 105 cột.",
+      "chooseFile": "Chọn tệp CSV",
+      "upload": "Tải lên",
+      "urlLabel": "Đường dẫn https của tệp CSV",
+      "refusedTitle": "Tệp bị từ chối",
+      "current": "Bảng hiện tại · {count} bài · 3 dòng đầu",
+      "columns": {
+        "rank": "Hạng",
+        "username": "Tên đăng nhập",
+        "fullName": "Họ tên",
+        "total": "Tổng"
+      },
+      "remove": "Xóa bảng chính thức",
+      "removeTitle": "Xóa bảng xếp hạng chính thức?",
+      "removeBody": "Bảng tự động sẽ hiện lại cho mọi người.",
+      "removeConfirm": "Xóa",
+      "empty": "Chưa có bảng chính thức."
+    },
+    "link": {
+      "title": "Liên kết xếp hạng công khai",
+      "none": "Chưa có liên kết? Nhấn Tạo liên kết để sinh đường dẫn mới; trạng thái ban đầu theo cấu hình kỳ thi.",
+      "create": "Tạo liên kết",
+      "activeLine": "Liên kết đang hoạt động. Người có đường dẫn xem được bảng xếp hạng không cần đăng nhập.",
+      "inactiveLine": "Liên kết đã hết hạn hoặc đang riêng tư.",
+      "copy": "Sao chép đường dẫn",
+      "regeneratedAt": "Tạo lại lúc {time}. Tạo lại làm mất hiệu lực đường dẫn cũ.",
+      "statusLegend": "Trạng thái",
+      "statusPublic": "Công khai",
+      "statusPrivate": "Riêng tư",
+      "expiryLegend": "Hết hạn",
+      "expiryNone": "Không",
+      "expiryMinutes": "Sau một số phút",
+      "expiryDays": "Sau một số ngày",
+      "expiryAt": "Vào lúc",
+      "amountLabel": "Số lượng",
+      "atLabel": "Thời điểm hết hạn",
+      "save": "Lưu liên kết",
+      "regenerate": "Tạo lại đường dẫn",
+      "regenerateTitle": "Tạo lại đường dẫn?",
+      "regenerateBody": "Đường dẫn cũ sẽ ngừng hoạt động ngay.",
+      "regenerateConfirm": "Tạo lại",
+      "needsDate": "Chọn thời điểm hết hạn.",
+      "needsAmount": "Nhập một số nguyên từ 1 đến 1 000 000.",
+      "preview": {
+        "M": "Hết hạn sau {amount} phút kể từ lúc lưu, tức {date}.",
+        "D": "Hết hạn sau {amount} ngày kể từ lúc lưu, tức {date}."
+      }
+    }
   }
 }

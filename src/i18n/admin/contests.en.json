@@ -192,5 +192,61 @@
     "pager": "{total} announcements · page {page} of {pages}",
     "previous": "Previous page",
     "next": "Next page"
+  },
+  "ranking": {
+    "official": {
+      "title": "Official ranking",
+      "lead": "Upload the official scoreboard the organisers settled after review. It shows next to the automatic ranking and replaces it when published.",
+      "sourceLegend": "Source",
+      "modeCsv": "Upload a CSV file",
+      "modeUrl": "From a link",
+      "csvHint": "At most 1 MiB, 10 000 rows, 105 columns.",
+      "chooseFile": "Choose a CSV file",
+      "upload": "Upload",
+      "urlLabel": "https link to the CSV file",
+      "refusedTitle": "File refused",
+      "current": "Current table · {count} problems · first 3 rows",
+      "columns": {
+        "rank": "Rank",
+        "username": "Username",
+        "fullName": "Full name",
+        "total": "Total"
+      },
+      "remove": "Delete official ranking",
+      "removeTitle": "Delete the official ranking?",
+      "removeBody": "The automatic ranking shows again for everyone.",
+      "removeConfirm": "Delete",
+      "empty": "No official ranking yet."
+    },
+    "link": {
+      "title": "Public ranking link",
+      "none": "No link yet? Press Create link to make a new URL; the starting state follows the contest settings.",
+      "create": "Create link",
+      "activeLine": "The link is active. Anyone with the URL can view the ranking without signing in.",
+      "inactiveLine": "The link has expired or is private.",
+      "copy": "Copy URL",
+      "regeneratedAt": "Regenerated at {time}. Regenerating stops the old URL from working.",
+      "statusLegend": "Status",
+      "statusPublic": "Public",
+      "statusPrivate": "Private",
+      "expiryLegend": "Expires",
+      "expiryNone": "Never",
+      "expiryMinutes": "After some minutes",
+      "expiryDays": "After some days",
+      "expiryAt": "At a time",
+      "amountLabel": "Amount",
+      "atLabel": "Expiry time",
+      "save": "Save link",
+      "regenerate": "Regenerate URL",
+      "regenerateTitle": "Regenerate the URL?",
+      "regenerateBody": "The old URL stops working at once.",
+      "regenerateConfirm": "Regenerate",
+      "needsDate": "Pick an expiry time.",
+      "needsAmount": "Enter a whole number from 1 to 1 000 000.",
+      "preview": {
+        "M": "Expires {amount} minutes after saving, that is {date}.",
+        "D": "Expires {amount} days after saving, that is {date}."
+      }
+    }
   }
 }

@@ -165,3 +165,37 @@ export interface Announcement {
   descriptionHtml: string;
   createdAt: string;
 }
+
+export interface OfficialRankingRow {
+  rank: number;
+  username: string;
+  fullName: string;
+  scores: number[];
+  totalScore: number;
+}
+
+/** backend: `OfficialRankingResponse`: the stored official table, or 404 when none is stored (read as null). */
+export interface OfficialRanking {
+  url: string | null;
+  problems: string[];
+  rows: OfficialRankingRow[];
+}
+
+/** backend: `RankingLinkResponse`. The token is the public part of the URL. */
+export interface RankingLink {
+  token: string;
+  status: 'public' | 'private';
+  expiryMode: 'U' | 'M' | 'D' | 'A';
+  expiryAmount: number | null;
+  expiresAt: string | null;
+  regeneratedAt: string;
+  isValid: boolean;
+}
+
+/** backend: `RankingLinkDto`: `expiryAmount` for M (minutes) and D (days), `expiresAt` for A (at a time). */
+export interface RankingLinkPatch {
+  status: 'public' | 'private';
+  expiryMode: 'U' | 'M' | 'D' | 'A';
+  expiryAmount?: number;
+  expiresAt?: string;
+}

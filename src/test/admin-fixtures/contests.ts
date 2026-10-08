@@ -4,6 +4,8 @@ import type {
   ContestSettings,
   EditableContest,
   EditableContestProblem,
+  OfficialRanking,
+  RankingLink,
 } from '../../api/types/contest-editing';
 
 export const CURATOR_ID = '0192c5a1-7e2f-7a31-9b4c-0e6d1f4a9c21';
@@ -105,5 +107,45 @@ export const announcement = (overrides: Partial<Announcement> = {}): Announcemen
   description: 'Đồ thị…',
   descriptionHtml: '<p>Đồ thị…</p>',
   createdAt: '2026-10-08T08:02:00.000Z',
+  ...overrides,
+});
+
+export const officialRanking = (overrides: Partial<OfficialRanking> = {}): OfficialRanking => ({
+  url: null,
+  problems: ['A', 'B', 'C', 'D', 'E', 'F'],
+  rows: [
+    {
+      rank: 1,
+      username: 'ngocanh',
+      fullName: 'Nguyễn Ngọc Ánh',
+      scores: [100, 100, 100, 70, 40, 0],
+      totalScore: 410,
+    },
+    {
+      rank: 2,
+      username: 'minhtu',
+      fullName: 'Trần Minh Tú',
+      scores: [100, 100, 80, 70, 0, 0],
+      totalScore: 350,
+    },
+    {
+      rank: 3,
+      username: 'bichngoc',
+      fullName: 'Lê Bích Ngọc',
+      scores: [100, 80, 60, 50, 20, 0],
+      totalScore: 310,
+    },
+  ],
+  ...overrides,
+});
+
+export const rankingLink = (overrides: Partial<RankingLink> = {}): RankingLink => ({
+  token: 'q7Hk2xVn9aTzP4mR',
+  status: 'public',
+  expiryMode: 'U',
+  expiryAmount: null,
+  expiresAt: null,
+  regeneratedAt: '2026-10-06T02:12:00.000Z',
+  isValid: true,
   ...overrides,
 });

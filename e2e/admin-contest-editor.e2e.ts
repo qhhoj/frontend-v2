@@ -3,7 +3,12 @@ import type { FakeApi } from './fixtures/api';
 import type { Page } from '@playwright/test';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
-import { announcement, editableContest } from '../src/test/admin-fixtures/contests';
+import {
+  announcement,
+  editableContest,
+  officialRanking,
+  rankingLink,
+} from '../src/test/admin-fixtures/contests';
 
 export const openContestEditor = async (
   page: Page,
@@ -49,6 +54,20 @@ for (const viewport of AUDIT_VIEWPORTS)
     });
     await openContestEditor(page, api, 'announcements');
     await expect(page.getByRole('heading', { name: 'Làm rõ đề bài C' })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`contest ranking tab is accessible and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    api.routes['GET /contests/hcmus-w41/official-ranking'] = adminOk(officialRanking());
+    api.routes['GET /contests/hcmus-w41/ranking-link'] = adminOk(rankingLink());
+    await openContestEditor(page, api, 'ranking');
+    await expect(page.getByTestId('official-table')).toBeVisible();
+    await expect(page.getByText('/public-rankings/q7Hk2xVn9aTzP4mR')).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
