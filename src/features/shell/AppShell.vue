@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
+import AdminShell from '@/features/admin/shell/AdminShell.vue';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
@@ -28,10 +29,15 @@ const route = useRoute();
       {{ $t('app.skipToContent') }}
     </a>
     <ImpersonationBanner />
-    <AppHeader v-if="route.meta.layout !== 'auth'" />
-    <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
+    <AdminShell v-if="route.meta.layout === 'admin'">
       <slot />
-    </main>
+    </AdminShell>
+    <template v-else>
+      <AppHeader v-if="route.meta.layout !== 'auth'" />
+      <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
+        <slot />
+      </main>
+    </template>
     <LoadingLayer />
   </div>
 </template>

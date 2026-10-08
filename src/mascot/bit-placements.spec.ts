@@ -126,7 +126,7 @@ describe('Bit placements', () => {
       'GET /auth/me': signedIn({ user: sessionUser({ isStaff: true }) }),
     });
     const staff = await mountApp('/admin');
-    expect(pixelsOf(staff.wrapper.get('[data-testid="inline-bit"]').element)).toBe(
+    expect(pixelsOf(staff.wrapper.get('[data-testid="admin-bit"]').element)).toBe(
       pixelsOfKind('staff'),
     );
     staff.wrapper.unmount();

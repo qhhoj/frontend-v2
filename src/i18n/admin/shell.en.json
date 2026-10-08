@@ -1,5 +1,53 @@
 {
   "placeholder": "This screen has no approved drawing yet.",
+  "title": "Admin",
+  "staffOnly": "Staff only",
+  "backToSite": "Back to the site",
+  "navLabel": "Admin",
+  "navToggle": "Admin sections",
+  "navNote": "Items show only when the account holds the matching permission. Non-staff opening /admin see a not-found page.",
+  "groups": {
+    "content": "Content",
+    "contests": "Contests",
+    "users": "Users",
+    "site": "Site",
+    "judging": "Judging"
+  },
+  "forbidden": {
+    "title": "You do not have access to this section",
+    "body": "This section needs this permission: | This section needs one of these permissions:",
+    "back": "Back to admin home"
+  },
+  "dashboard": {
+    "lead": "Shortcuts to everyday tasks.",
+    "hello": "Hello {name}",
+    "helloBody": "Pick a section on the left or use a shortcut below. Only sections your account may open are shown.",
+    "actions": {
+      "problemNew": "New problem",
+      "problemImport": "Import from Polygon",
+      "contestNew": "New contest"
+    },
+    "sections": {
+      "content": "Content",
+      "contests": "Contests and judging",
+      "people": "Users and site"
+    },
+    "descriptions": {
+      "problems": "Edit statements, translations, editorials and test data; clone a problem.",
+      "problemImport": "Upload a Polygon package and follow the import progress.",
+      "posts": "Review and remove posts and reported comments.",
+      "contests": "Announcements, official rankings, rejudging and rating.",
+      "similarity": "Run a code similarity check by problem or by contest.",
+      "rejudge": "Rejudge the submissions of a problem that match a filter.",
+      "judges": "The list of judges, locking and disconnecting them.",
+      "users": "Ban or unban accounts and sign in as a user.",
+      "activity": "View and export logs, summaries by user.",
+      "settings": "Limits, similarity and other settings, and the change history.",
+      "nav": "Arrange the links on the main bar.",
+      "pages": "Create and edit about and policy pages.",
+      "tickets": "Tickets sent by users."
+    }
+  },
   "screens": {
     "dashboard": "Admin home",
     "problems": "Problems",
@@ -35,6 +83,7 @@
     "config": "Raw config",
     "nav": "Navigation bar",
     "pages": "Static pages",
-    "log": "Change log"
+    "log": "Change log",
+    "submissions": "Submissions"
   }
 }

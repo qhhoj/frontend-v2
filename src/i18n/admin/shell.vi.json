@@ -1,5 +1,53 @@
 {
   "placeholder": "Màn hình này chưa có bản vẽ.",
+  "title": "Quản trị",
+  "staffOnly": "Chỉ dành cho nhân viên",
+  "backToSite": "Về trang chính",
+  "navLabel": "Quản trị",
+  "navToggle": "Mục quản trị",
+  "navNote": "Mục chỉ hiện khi tài khoản có quyền tương ứng. Người không phải nhân viên mở /admin sẽ thấy trang không tồn tại.",
+  "groups": {
+    "content": "Nội dung",
+    "contests": "Kỳ thi",
+    "users": "Người dùng",
+    "site": "Trang web",
+    "judging": "Chấm bài"
+  },
+  "forbidden": {
+    "title": "Bạn chưa có quyền mở mục này",
+    "body": "Mục này cần quyền sau: | Mục này cần một trong các quyền sau:",
+    "back": "Về trang chủ quản trị"
+  },
+  "dashboard": {
+    "lead": "Lối tắt tới các việc thường làm.",
+    "hello": "Chào {name}",
+    "helloBody": "Chọn một mục ở cột trái hoặc dùng lối tắt bên dưới. Chỉ những mục tài khoản được phép mới hiện ra.",
+    "actions": {
+      "problemNew": "Tạo bài tập",
+      "problemImport": "Nhập từ Polygon",
+      "contestNew": "Tạo kỳ thi"
+    },
+    "sections": {
+      "content": "Nội dung",
+      "contests": "Kỳ thi và chấm bài",
+      "people": "Người dùng và trang web"
+    },
+    "descriptions": {
+      "problems": "Sửa đề, bản dịch, lời giải, dữ liệu chấm; nhân bản bài.",
+      "problemImport": "Tải gói Polygon lên, theo dõi tiến trình nhập.",
+      "posts": "Duyệt và gỡ bài viết, bình luận bị báo cáo.",
+      "contests": "Thông báo, bảng xếp hạng chính thức, chấm lại, tính rating.",
+      "similarity": "Chạy so sánh mã nguồn theo bài hoặc theo kỳ thi.",
+      "rejudge": "Xếp lại các bài nộp của một bài theo bộ lọc.",
+      "judges": "Danh sách máy chấm, khóa, ngắt kết nối.",
+      "users": "Cấm hoặc bỏ cấm tài khoản, đăng nhập thay.",
+      "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
+      "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
+      "nav": "Sắp xếp liên kết trên thanh chính.",
+      "pages": "Tạo và sửa trang giới thiệu, quy định.",
+      "tickets": "Phiếu do người dùng gửi."
+    }
+  },
   "screens": {
     "dashboard": "Trang chủ quản trị",
     "problems": "Bài tập",
@@ -35,6 +83,7 @@
     "config": "Cấu hình thô",
     "nav": "Thanh điều hướng",
     "pages": "Trang tĩnh",
-    "log": "Nhật ký thay đổi"
+    "log": "Nhật ký thay đổi",
+    "submissions": "Bài nộp"
   }
 }

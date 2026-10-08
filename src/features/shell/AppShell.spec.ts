@@ -15,6 +15,7 @@ import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
 import { useSessionStore } from '@/stores/session.store';
+import { superuserViewer } from '@/test/admin-routes';
 
 const clickMenuItem = async (label: string) => {
   const item = [...document.body.querySelectorAll('[role="menuitem"]')].find((element) =>
@@ -295,5 +296,20 @@ describe('app shell', () => {
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.get('a[href="#main"]').text()).toBe('Bỏ qua đến nội dung chính');
     expect(wrapper.find('main#main').exists()).toBe(true);
+  });
+  it('draws the admin top bar instead of the site header on an admin screen, with one main landmark', async () => {
+    mockApi(superuserViewer());
+    const { wrapper } = await mountApp('/admin');
+    expect(wrapper.find('[data-testid="admin-topbar"]').exists()).toBe(true);
+    expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
+    expect(wrapper.findAll('#main')).toHaveLength(1);
+  });
+
+  it('gives a page that draws AuthLayout neither the site header nor the admin top bar', async () => {
+    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    const { wrapper } = await mountApp('/login/2fa');
+    expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="admin-topbar"]').exists()).toBe(false);
+    expect(wrapper.findAll('#main')).toHaveLength(1);
   });
 });

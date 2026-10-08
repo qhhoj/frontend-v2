@@ -7,7 +7,7 @@ const placeholder: Loader = () => import('./shell/AdminPlaceholder.vue');
 
 /** One line per screen: each screen task swaps only its own line (records are separated, so merges stay clean). */
 const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
-  dashboard: placeholder,
+  dashboard: () => import('./shell/AdminDashboard.vue'),
   problems: placeholder,
   problemNew: placeholder,
   problemImport: placeholder,
