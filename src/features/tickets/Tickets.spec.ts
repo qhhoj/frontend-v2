@@ -1,9 +1,13 @@
+import { flushPromises } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { sessionUser } from '@/test/fixtures';
 import { ticketItem } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
+
+const CHANGE_TICKET = 'judge.change_ticket';
 
 const closedGeneral = ticketItem({
   id: 't2',
@@ -48,20 +52,18 @@ describe('ticket list', () => {
 });
 
 describe('ticket list: staff and closed filters', () => {
-  it('gives staff the creator and assignee filters, nobody else', async () => {
+  it('gives the creator and assignee filters to the judge.change_ticket permission, not to the staff flag', async () => {
     mockApi({
-      ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
+      ...signedInViewer({ user: sessionUser({ isStaff: true, permissions: [] }) }),
       'GET /tickets': page([]),
     });
-    const staff = (await mountApp('/tickets')).wrapper;
-    expect(staff.find('input[name="user"]').exists()).toBe(true);
-    mockApi({ ...signedInViewer(), 'GET /tickets': page([]) });
-    const member = (await mountApp('/tickets')).wrapper;
-    expect(member.find('input[name="user"]').exists()).toBe(false);
+    expect((await mountApp('/tickets')).wrapper.find('input[name="user"]').exists()).toBe(false);
+    mockApi({
+      ...signedInViewer({ user: sessionUser({ permissions: [CHANGE_TICKET] }) }),
+      'GET /tickets': page([]),
+    });
+    expect((await mountApp('/tickets')).wrapper.find('input[name="user"]').exists()).toBe(true);
   });
-});
-
-describe('ticket list states', () => {
   it('shows the sleeping Bit with a new-ticket link when the viewer has none', async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets': page([]) });
     const { wrapper } = await mountApp('/tickets');
@@ -84,5 +86,48 @@ describe('ticket list states', () => {
     hangRequestsExcept(['/auth/me', '/profile']);
     const { wrapper } = await mountApp('/tickets');
     expect(wrapper.get('[data-testid="query-skeleton"]').findAll('thead th')).toHaveLength(5);
+  });
+});
+
+describe('ticket list: applying staff filters', () => {
+  const staffRoutes = () =>
+    mockApi({
+      ...signedInViewer({ user: sessionUser({ permissions: [CHANGE_TICKET] }) }),
+      'GET /tickets': page([]),
+    });
+  it('applies typed usernames on Enter and goes back to the first page', async () => {
+    staffRoutes();
+    const { wrapper, router } = await mountApp('/tickets?page=3');
+    await wrapper.get('input[name="user"]').setValue('colan, thayhung');
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ user: 'colan,thayhung' });
+  });
+  it('applies the assignee filter when its field loses focus', async () => {
+    staffRoutes();
+    const { wrapper, router } = await mountApp('/tickets');
+    await wrapper.get('input[name="assignee"]').setValue('colan');
+    await wrapper.get('input[name="assignee"]').trigger('blur');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ assignee: 'colan' });
+  });
+});
+
+describe('ticket list: tab links', () => {
+  const tabNamed = (wrapper: VueWrapper, name: string) =>
+    wrapper.findAll('nav a').find((link) => link.text() === name)!;
+  it('the closed tab keeps the scope and writes open=0', async () => {
+    mockApi({ ...signedInViewer(), 'GET /tickets': page([]) });
+    const { wrapper, router } = await mountApp('/tickets?scope=all');
+    await tabNamed(wrapper, 'Đã đóng').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ scope: 'all', open: '0' });
+  });
+  it('the all-visible tab keeps the open filter and drops the own scope', async () => {
+    mockApi({ ...signedInViewer(), 'GET /tickets': page([]) });
+    const { wrapper, router } = await mountApp('/tickets?open=1');
+    await tabNamed(wrapper, 'Tất cả phiếu tôi xem được').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ scope: 'all', open: '1' });
   });
 });

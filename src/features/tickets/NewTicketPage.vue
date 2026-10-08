@@ -147,7 +147,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
             v-if="panelFailure"
             kind="error"
             :title="$t(panelFailure.titleKey)"
-            :body="$t(panelFailure.bodyKey)"
+            :body="$t(panelFailure.bodyKey, panelFailure.bodyParams ?? {})"
           />
           <div class="flex flex-wrap items-center justify-end gap-3">
             <RouterLink

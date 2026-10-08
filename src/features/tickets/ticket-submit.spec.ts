@@ -20,7 +20,20 @@ describe('submit failure', () => {
   it('does not blame the problem code for a 404 on a general issue', () => {
     expect(submitFailureOf(new ApiError('not_found', 404, 'nope'), 'general').kind).toBe('panel');
   });
-  it('explains a rate limit with its own message', () => {
+});
+
+describe('submit failure: rate limits', () => {
+  it('tells a rate-limited viewer how long to wait, from the Retry-After the server sent', () => {
+    expect(
+      submitFailureOf(new ApiError('rate_limited', 429, 'slow', {}, [], {}, 42), 'problem'),
+    ).toEqual({
+      kind: 'panel',
+      titleKey: 'tickets.new.failedTitle',
+      bodyKey: 'tickets.new.rateLimitedWait',
+      bodyParams: { seconds: 42 },
+    });
+  });
+  it('falls back to the generic rate-limit message when the server named no wait', () => {
     expect(submitFailureOf(new ApiError('rate_limited', 429, 'slow'), 'problem')).toEqual({
       kind: 'panel',
       titleKey: 'tickets.new.failedTitle',

@@ -73,7 +73,7 @@ describe('new ticket validation and failures', () => {
     await flushPromises();
     expect(wrapper.get('[data-state="error"]').text()).toContain('Tài khoản đang bị tắt tiếng');
   });
-  it('tells the viewer when the problem code names no problem, and sends nothing for it', async () => {
+  it('shows a problem code the server does not know as a field error', async () => {
     const calls = mockApi({
       ...signedInViewer(),
       'GET /problems/nope': fail(404, 'not_found'),

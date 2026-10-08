@@ -1383,7 +1383,8 @@
       "describe": "Mô tả bước lặp lại lỗi, kèm mã bài nộp nếu có.",
       "mutedTitle": "Tài khoản đang bị tắt tiếng",
       "mutedBody": "Người dùng bị tắt tiếng không thể mở hoặc trả lời phiếu.",
-      "failedTitle": "Chưa gửi được phiếu"
+      "failedTitle": "Chưa gửi được phiếu",
+      "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây."
     },
     "title": "Phiếu hỗ trợ"
   },

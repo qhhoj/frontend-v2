@@ -1383,7 +1383,8 @@
       "describe": "Describe how to reproduce it, with a submission id if there is one.",
       "mutedTitle": "Your account is muted",
       "mutedBody": "Muted users cannot open or answer tickets.",
-      "failedTitle": "The ticket was not sent"
+      "failedTitle": "The ticket was not sent",
+      "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds."
     },
     "title": "Support tickets"
   },

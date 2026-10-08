@@ -23,15 +23,43 @@ describe('ticket draft', () => {
       { field: 'title', key: 'tickets.new.titleTooLong' },
     ]);
   });
-  it('needs an http(s) link without credentials for a general issue and ignores the problem code', () => {
-    expect(
-      draftIssues({ ...draft, kind: 'general', problemCode: '', issueUrl: 'ftp://x' }),
-    ).toEqual([{ field: 'issueUrl', key: 'tickets.new.urlInvalid' }]);
-    expect(isHttpUrl('https://qhhoj.vn/contests/r42')).toBe(true);
-    expect(isHttpUrl('https://user:pw@qhhoj.vn')).toBe(false);
-    expect(isHttpUrl('javascript:alert(1)')).toBe(false);
+  it('asks a general issue for a valid link and ignores the problem code', () => {
+    const general = { ...draft, kind: 'general' as const, problemCode: '' };
+    expect(draftIssues({ ...general, issueUrl: 'ftp://example.com' })).toEqual([
+      { field: 'issueUrl', key: 'tickets.new.urlInvalid' },
+    ]);
+    expect(draftIssues({ ...general, issueUrl: 'https://example.com/x' })).toEqual([]);
   });
-  it('refuses a general link longer than the backend allows', () => {
-    expect(isHttpUrl(`https://qhhoj.vn/${'a'.repeat(200)}`)).toBe(false);
+});
+
+describe('isHttpUrl (backend IsUrl: http or https, a TLD or an IP, no credentials)', () => {
+  it.each([
+    ['https://example.com/x', true],
+    ['https://qhhoj.vn/contests/r42', true],
+    ['  https://example.com  ', true],
+    ['HTTPS://EXAMPLE.COM', true],
+    ['https://sub.example.co.vn?q=1#top', true],
+    ['http://127.0.0.1:8000/x', true],
+    ['https://[2001:db8::1]:443/', true],
+    ['http://foo', false],
+    ['http://localhost', false],
+    ['https://example.c', false],
+    ['https://example.com.', false],
+    ['http://exa_mple.com', false],
+    ['http://-bad.com', false],
+    ['http://.com', false],
+    ['https://a b.c', false],
+    ['https://example.com/<x>', false],
+    ['https:/x', false],
+    ['https://', false],
+    ['ftp://example.com', false],
+    ['example.com', false],
+    ['javascript:alert(1)', false],
+    ['https://user:pw@example.com', false],
+    ['https://example.com:99999', false],
+    ['https://example.com:443x', false],
+    [`https://${'a'.repeat(200)}.com`, false],
+  ])('%s is %s', (url, accepted) => {
+    expect(isHttpUrl(url)).toBe(accepted);
   });
 });
