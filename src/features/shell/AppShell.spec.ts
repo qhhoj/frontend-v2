@@ -42,10 +42,12 @@ describe('app shell', () => {
       'GET /profile': ok(profile()),
       'POST /auth/logout': noContent(),
     });
-    const { wrapper, router } = await mountApp('/blog');
+    const { wrapper, router, queryClient } = await mountApp('/blog');
+    queryClient.setQueryData(['problems', 'list', { page: 1 }], { rows: ['signed-in view'] });
     await wrapper.get('button[aria-label="Tài khoản của user_01"]').trigger('click');
     expect(document.body.textContent).not.toContain('Quản trị');
     await clickMenuItem('Đăng xuất');
+    expect(queryClient.getQueryData(['problems', 'list', { page: 1 }])).toBeUndefined();
     expect(calls.some((call) => call.method === 'POST' && call.path === '/auth/logout')).toBe(true);
     expect(router.currentRoute.value.path).toBe('/blog');
     expect(wrapper.find('a[href="/login?redirect=/blog"]').exists()).toBe(true);

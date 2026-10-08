@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -10,7 +9,6 @@ import { useSessionStore } from '@/stores/session.store';
 
 // Unstyled placeholder: logic only until the login mock-up is approved (plan 8b).
 const session = useSessionStore();
-const queryClient = useQueryClient();
 const route = useRoute();
 const router = useRouter();
 const username = ref('');
@@ -31,8 +29,6 @@ async function submit() {
   error.value = null;
   try {
     await session.login({ username: username.value, password: password.value });
-    // Drops the previous account's data; active queries (the shell's profile, which adopts the theme) refetch in the background.
-    void queryClient.resetQueries();
     const redirect = safeRedirect(route.query.redirect);
     await router.push(
       session.status === 'partial' ? { name: 'login-2fa', query: { redirect } } : redirect,
