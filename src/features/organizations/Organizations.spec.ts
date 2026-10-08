@@ -1,0 +1,115 @@
+import { describe, expect, it } from 'vitest';
+import { userPage } from '@/test/fixtures';
+import {
+  member,
+  organizationDetail,
+  organizationItem,
+  organizationSummary,
+  postItem,
+} from '@/test/community-fixtures';
+import { organizationListRoutes, organizationRoutes } from '@/test/community-routes';
+import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
+import { mountApp } from '@/test/mount';
+import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
+
+describe('organization list', () => {
+  it('lists the viewer’s own organizations above all of them, with join mode, members and PP', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationListRoutes,
+      'GET /organizations': page([
+        organizationItem(),
+        organizationItem({
+          id: 'o2',
+          slug: 'hcmus',
+          shortName: 'HCMUS',
+          name: 'Đội tuyển HCMUS',
+          isOpen: false,
+        }),
+      ]),
+      'GET /users/user_01': ok(userPage({ organizations: [organizationSummary()] })),
+    });
+    const { wrapper } = await mountApp('/organizations');
+    const mine = wrapper.get('[data-testid="my-organizations"]');
+    expect(mine.text()).toContain('THPT chuyên Lê Hồng Phong');
+    const cards = wrapper.findAll('[data-testid="organization-card"]');
+    expect(cards.map((card) => card.text())).toEqual([
+      expect.stringContaining('Tham gia tự do'),
+      expect.stringContaining('Riêng tư · cần duyệt'),
+    ]);
+    expect(cards[0]!.text()).toContain('842 thành viên');
+  });
+  it('hides "your organizations" from anonymous visitors and never asks for their profile', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...organizationListRoutes });
+    const { wrapper } = await mountApp('/organizations');
+    expect(wrapper.find('[data-testid="my-organizations"]').exists()).toBe(false);
+    expect(calls.some((call) => call.path.startsWith('/users/'))).toBe(false);
+  });
+});
+
+describe('organization page', () => {
+  it('shows an organization’s header, about text, posts, admins and top members with avatars', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...organizationRoutes(organizationDetail()),
+      'GET /organizations/lhp/members': page([member(1, 'tuanlq'), member(2, 'khoa.tran')], {
+        pageSize: 5,
+        total: 842,
+      }),
+      'GET /organizations/lhp/posts': page([postItem({ title: 'Lịch kỳ thi nội bộ tháng 10' })]),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.get('h1').text()).toBe('THPT chuyên Lê Hồng Phong');
+    expect(wrapper.get('[data-testid="organization-header"]').text()).toContain(
+      'Còn chỗ: không giới hạn',
+    );
+    expect(wrapper.text()).toContain('Câu lạc bộ Tin học.');
+    expect(wrapper.text()).toContain('Lịch kỳ thi nội bộ tháng 10');
+    expect(wrapper.get('[data-testid="organization-admins"]').text()).toContain('thayhung');
+    expect(wrapper.get('[data-testid="top-members"]').findAllComponents(UserAvatar)).toHaveLength(
+      2,
+    );
+    expect(wrapper.get('nav[aria-label="Mục tổ chức"]').text()).toContain('Thành viên 842');
+  });
+});
+
+describe('organization access and states', () => {
+  it('shows card-shaped blocks while the list loads', async () => {
+    mockApi({ ...anonymousViewer });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/organizations');
+    expect(
+      wrapper.findAll('[data-testid="query-skeleton"] [data-skeleton-region="organization-card"]'),
+    ).toHaveLength(6);
+  });
+  it('offers the requests tab to administrators only', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        organizationDetail({
+          viewer: { isMember: true, canAdminister: true, pendingRequestId: null },
+        }),
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.get('nav[aria-label="Mục tổ chức"]').text()).toContain('Yêu cầu tham gia');
+  });
+  it('hides the requests tab from members who are not administrators', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        organizationDetail({
+          viewer: { isMember: true, canAdminister: false, pendingRequestId: null },
+        }),
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.get('nav[aria-label="Mục tổ chức"]').text()).not.toContain('Yêu cầu tham gia');
+  });
+  it('shows the crying Bit for an unknown organization', async () => {
+    mockApi({ ...anonymousViewer, 'GET /organizations/khong-co': fail(404, 'not_found') });
+    const { wrapper } = await mountApp('/organizations/khong-co');
+    expect(wrapper.get('[data-state="notFound"] h1').text()).toBe('Không tìm thấy tổ chức');
+  });
+});

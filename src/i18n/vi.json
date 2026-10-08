@@ -1109,6 +1109,47 @@
     "title": "Mục hồ sơ"
   },
   "orgs": {
+    "lead": "Trường, câu lạc bộ và đội tuyển. Mỗi người tham gia tối đa 3 tổ chức mở; tổ chức riêng tư không tính vào giới hạn.",
+    "mine": "Tổ chức của bạn",
+    "member": "Thành viên",
+    "all": "Tất cả tổ chức",
+    "allHint": "Tối đa 100 tổ chức mỗi trang · tổ chức ẩn chỉ hiện với thành viên",
+    "open": "Tham gia tự do",
+    "private": "Riêng tư · cần duyệt",
+    "unlisted": "Ẩn",
+    "members": "{count} thành viên",
+    "pp": "{pp} PP",
+    "ppLong": "{pp} điểm PP",
+    "founded": "Lập ngày {date}",
+    "slotsUnlimited": "Còn chỗ: không giới hạn",
+    "slotsLeft": "còn {free} chỗ trên {slots}",
+    "breadcrumb": "Đường dẫn",
+    "tabsLabel": "Mục tổ chức",
+    "tabs": {
+      "about": "Giới thiệu",
+      "members": "Thành viên",
+      "posts": "Bài viết",
+      "requests": "Yêu cầu tham gia"
+    },
+    "noAbout": "Tổ chức chưa có giới thiệu.",
+    "posts": "Bài viết của tổ chức",
+    "noPosts": "Chưa có bài viết.",
+    "postStats": "{score} điểm · {comments} bình luận",
+    "admins": "Quản trị viên",
+    "topMembers": "Thành viên nổi bật theo điểm PP",
+    "allMembers": "Xem tất cả thành viên",
+    "pager": "Trang tổ chức",
+    "empty": "Chưa có tổ chức nào.",
+    "notFoundTitle": "Không tìm thấy tổ chức",
+    "notFoundBody": "Đường dẫn không đúng hoặc tổ chức đã bị xoá.",
+    "backToList": "Xem các tổ chức",
+    "columns": {
+      "rank": "Hạng",
+      "user": "Người dùng",
+      "performancePoints": "Điểm PP",
+      "points": "Tổng điểm",
+      "problemCount": "Số bài giải"
+    },
     "title": "Tổ chức"
   },
   "orgMembership": {

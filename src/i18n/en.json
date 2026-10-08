@@ -1109,6 +1109,47 @@
     "title": "Profile sections"
   },
   "orgs": {
+    "lead": "Schools, clubs and teams. You may be in at most 3 open organizations; private ones do not count.",
+    "mine": "Your organizations",
+    "member": "Member",
+    "all": "All organizations",
+    "allHint": "Up to 100 per page · hidden organizations show to their members only",
+    "open": "Open to join",
+    "private": "Private · approval needed",
+    "unlisted": "Hidden",
+    "members": "{count} members",
+    "pp": "{pp} PP",
+    "ppLong": "{pp} performance points",
+    "founded": "Founded {date}",
+    "slotsUnlimited": "Places: unlimited",
+    "slotsLeft": "{free} of {slots} places left",
+    "breadcrumb": "Breadcrumb",
+    "tabsLabel": "Organization sections",
+    "tabs": {
+      "about": "About",
+      "members": "Members",
+      "posts": "Posts",
+      "requests": "Join requests"
+    },
+    "noAbout": "No description yet.",
+    "posts": "Organization posts",
+    "noPosts": "No posts yet.",
+    "postStats": "{score} points · {comments} comments",
+    "admins": "Administrators",
+    "topMembers": "Top members by performance points",
+    "allMembers": "See all members",
+    "pager": "Organization pages",
+    "empty": "No organizations yet.",
+    "notFoundTitle": "Organization not found",
+    "notFoundBody": "The link is wrong or the organization was removed.",
+    "backToList": "See all organizations",
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "performancePoints": "PP",
+      "points": "Points",
+      "problemCount": "Solved"
+    },
     "title": "Organizations"
   },
   "orgMembership": {
