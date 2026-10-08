@@ -39,6 +39,9 @@ describe('organization list', () => {
       expect.stringContaining('Riêng tư · cần duyệt'),
     ]);
     expect(cards[0]!.text()).toContain('842 thành viên');
+    expect(
+      mine.element.compareDocumentPosition(cards[0]!.element) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
   it('hides "your organizations" from anonymous visitors and never asks for their profile', async () => {
     const calls = mockApi({ ...anonymousViewer, ...organizationListRoutes });
@@ -111,5 +114,53 @@ describe('organization access and states', () => {
     mockApi({ ...anonymousViewer, 'GET /organizations/khong-co': fail(404, 'not_found') });
     const { wrapper } = await mountApp('/organizations/khong-co');
     expect(wrapper.get('[data-state="notFound"] h1').text()).toBe('Không tìm thấy tổ chức');
+  });
+});
+
+describe('organization list states', () => {
+  it('marks an unlisted organization with the "Ẩn" chip and leaves listed ones without it', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /organizations': page([
+        organizationItem({ isUnlisted: true }),
+        organizationItem({ id: 'o2', slug: 'hcmus', isUnlisted: false }),
+      ]),
+    });
+    const { wrapper } = await mountApp('/organizations');
+    const [hidden, listed] = wrapper.findAll('[data-testid="organization-card"]');
+    expect(hidden!.text()).toContain('Ẩn');
+    expect(listed!.text()).not.toContain('Ẩn');
+  });
+  it('offers the next page of organizations when there are more than one page', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /organizations': page([organizationItem()], { page: 1, pageSize: 100, total: 250 }),
+    });
+    const { wrapper } = await mountApp('/organizations');
+    const pager = wrapper.get('nav[aria-label="Trang tổ chức"]');
+    expect(pager.find('a[aria-label="Trang sau"]').exists()).toBe(true);
+  });
+  it('says there are no organizations when the list is empty', async () => {
+    mockApi({ ...anonymousViewer, 'GET /organizations': page([]) });
+    const { wrapper } = await mountApp('/organizations');
+    expect(wrapper.findAll('[data-testid="organization-card"]')).toHaveLength(0);
+    expect(wrapper.text()).toContain('Chưa có tổ chức nào.');
+  });
+});
+
+describe('organization members', () => {
+  it('shows each top member’s display name beside the username', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...organizationRoutes(organizationDetail()),
+      'GET /organizations/lhp/members': page(
+        [member(1, 'tuanlq', { displayName: 'Lê Quang Tuấn' })],
+        { pageSize: 5, total: 1 },
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    const topMembers = wrapper.get('[data-testid="top-members"]');
+    expect(topMembers.text()).toContain('tuanlq');
+    expect(topMembers.text()).toContain('Lê Quang Tuấn');
   });
 });

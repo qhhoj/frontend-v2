@@ -4,11 +4,12 @@ import type { OrganizationDetail } from '@/api/types/organizations';
 import { formatNumber, formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import MembershipPanel from './MembershipPanel.vue';
-import { joinModeKey, slotsLine } from './organization-facts';
+import OrganizationBadge from './OrganizationBadge.vue';
+import OrganizationJoinChip from './OrganizationJoinChip.vue';
+import { slotsLine } from './organization-facts';
 
 const props = defineProps<{ organization: OrganizationDetail }>();
 const locale = useLocaleStore();
-const joinMode = computed(() => joinModeKey(props.organization.isOpen));
 const places = computed(() => slotsLine(props.organization));
 const founded = computed(() => formatNumericDate(props.organization.createdAt, locale.locale));
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
@@ -24,14 +25,8 @@ const performancePoints = computed(() =>
   >
     <div class="flex min-w-0 flex-1 flex-col gap-3">
       <div class="flex flex-wrap items-center gap-2">
-        <span
-          class="rounded-tile bg-accent-soft px-2.5 py-1 text-sm font-bold text-accent-soft-text"
-        >
-          {{ organization.shortName }}
-        </span>
-        <span class="rounded-pill border border-line px-3 py-1 text-sm text-muted">
-          {{ $t(joinMode) }}
-        </span>
+        <OrganizationBadge :short-name="organization.shortName" />
+        <OrganizationJoinChip :is-open="organization.isOpen" />
         <span class="text-sm text-muted">{{ $t('orgs.founded', { date: founded }) }}</span>
       </div>
       <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">

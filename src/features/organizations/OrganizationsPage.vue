@@ -9,6 +9,7 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useUserPageQuery } from '@/features/users/users.queries';
+import OrganizationBadge from './OrganizationBadge.vue';
 import OrganizationCard from './OrganizationCard.vue';
 import OrganizationCardSkeleton from './OrganizationCardSkeleton.vue';
 import { useOrganizationsQuery } from './organizations.queries';
@@ -50,11 +51,7 @@ const myOrganizations = computed(() => viewerPage.value?.organizations ?? []);
           :key="organization.id"
           class="flex flex-wrap items-center gap-3"
         >
-          <span
-            class="rounded-tile bg-accent-soft px-2.5 py-1 text-sm font-bold text-accent-soft-text"
-          >
-            {{ organization.shortName }}
-          </span>
+          <OrganizationBadge :short-name="organization.shortName" />
           <RouterLink
             :to="{ name: 'organization', params: { slug: organization.slug } }"
             class="font-semibold hover:underline"

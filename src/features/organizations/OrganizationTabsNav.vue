@@ -35,7 +35,6 @@ const tabs = computed<OrganizationTab[]>(() => {
       :key="tab.routeName"
       :to="{ name: tab.routeName, params: { slug: organization.slug } }"
       class="inline-flex min-h-11 items-center whitespace-nowrap border-b-2 border-transparent px-4 font-semibold text-muted hover:text-content"
-      active-class="border-accent text-content"
       exact-active-class="border-accent text-content"
     >
       {{ $t(tab.labelKey) }}

@@ -39,7 +39,15 @@ const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
         <td class="py-2">
           <div class="flex min-w-0 items-center gap-2">
             <UserAvatar :username="member.username" :size="24" />
-            <UserName :username="member.username" :rating="member.rating" />
+            <div class="flex min-w-0 flex-col">
+              <UserName :username="member.username" :rating="member.rating" />
+              <span
+                v-if="member.displayName !== member.username"
+                class="truncate text-sm text-muted"
+              >
+                {{ member.displayName }}
+              </span>
+            </div>
           </div>
         </td>
         <td

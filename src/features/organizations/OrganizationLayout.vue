@@ -15,20 +15,21 @@ usePageTitle(() => organization.value?.name);
 </script>
 
 <template>
-  <StatePanel
-    v-if="isNotFound"
-    kind="notFound"
-    :title="$t('orgs.notFoundTitle')"
-    :body="$t('orgs.notFoundBody')"
-    is-page-heading
-  >
-    <RouterLink
-      :to="{ name: 'organizations' }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
+  <div v-if="isNotFound" class="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+    <StatePanel
+      kind="notFound"
+      :title="$t('orgs.notFoundTitle')"
+      :body="$t('orgs.notFoundBody')"
+      is-page-heading
     >
-      {{ $t('orgs.backToList') }}
-    </RouterLink>
-  </StatePanel>
+      <RouterLink
+        :to="{ name: 'organizations' }"
+        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
+      >
+        {{ $t('orgs.backToList') }}
+      </RouterLink>
+    </StatePanel>
+  </div>
   <div v-else class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-8">
     <nav :aria-label="$t('orgs.breadcrumb')" class="text-sm text-muted">
       <RouterLink :to="{ name: 'organizations' }" class="hover:underline">

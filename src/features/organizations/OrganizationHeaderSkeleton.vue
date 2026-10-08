@@ -15,6 +15,6 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
       <p><SkeletonBlock text class="w-48" /></p>
       <p><SkeletonBlock text class="w-40" /></p>
     </div>
-    <SkeletonBlock class="h-40 w-full rounded-card md:w-72" />
+    <!-- Task 10 adds the membership panel's reserve back when it builds the real panel. -->
   </section>
 </template>
