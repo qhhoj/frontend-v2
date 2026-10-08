@@ -218,6 +218,9 @@
       "submissions": "Submissions"
     },
     "tabsLabel": "Problem sections",
+    "editorial": {
+      "editorsOnly": "Only editors can see this"
+    },
     "limits": {
       "time": "Time",
       "memory": "Memory",

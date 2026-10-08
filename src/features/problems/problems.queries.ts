@@ -1,7 +1,7 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
-import { fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
+import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { useSessionStore } from '@/stores/session.store';
 import type { ProblemFilters } from './use-problem-filters';
@@ -33,21 +33,48 @@ const ANONYMOUS = 'anonymous';
 const VIEWER_KEY_INDEX = 2;
 const CODE_KEY_INDEX = 3;
 
+const useViewerId = () => {
+  const session = useSessionStore();
+  return computed(() => session.user?.id ?? ANONYMOUS);
+};
+
+/**
+ * Keeps the previous answer on screen only while the viewer and the problem stay the same: another problem
+ * or another viewer never shows it. Both problem keys are `[prefix, kind, viewer, code, lang]`.
+ */
+const keepForSameProblem = <Data>(
+  previous: Data | undefined,
+  previousQuery: { queryKey: readonly unknown[] } | undefined,
+  viewerId: string,
+  code: string,
+): Data | undefined =>
+  previousQuery?.queryKey[VIEWER_KEY_INDEX] === viewerId &&
+  previousQuery.queryKey[CODE_KEY_INDEX] === code
+    ? previous
+    : undefined;
+
 /**
  * One problem in one statement language, per viewer (the detail carries the viewer's own status and contest).
  * A language switch keeps the old statement on screen while the other loads; another problem or another
  * viewer never does, so one problem's header never sits under another problem's address.
  */
 export const useProblemQuery = (code: Ref<string>, lang: Ref<StatementLanguage>) => {
-  const session = useSessionStore();
-  const viewerId = computed(() => session.user?.id ?? ANONYMOUS);
+  const viewerId = useViewerId();
   return useQuery({
     queryKey: computed(() => ['problems', 'detail', viewerId.value, code.value, lang.value]),
     queryFn: () => fetchProblem(code.value, lang.value),
     placeholderData: (previous, previousQuery) =>
-      previousQuery?.queryKey[VIEWER_KEY_INDEX] === viewerId.value &&
-      previousQuery.queryKey[CODE_KEY_INDEX] === code.value
-        ? previous
-        : undefined,
+      keepForSameProblem(previous, previousQuery, viewerId.value, code.value),
+  });
+};
+
+/** The editorial of one problem in one language, per viewer. Mounted only while its tab is selected. */
+export const useEditorialQuery = (code: Ref<string>, lang: Ref<StatementLanguage>) => {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => ['problems', 'editorial', viewerId.value, code.value, lang.value]),
+    queryFn: () => fetchEditorial(code.value, lang.value),
+    placeholderData: (previous, previousQuery) =>
+      keepForSameProblem(previous, previousQuery, viewerId.value, code.value),
   });
 };

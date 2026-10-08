@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { contestDetail, signedIn, signedOut } from '@/test/fixtures';
+import { contestDetail, problemEditorial, signedIn, signedOut } from '@/test/fixtures';
 import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer } from '@/test/problem-routes';
+import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
 
 const regionsIn = (root: ParentNode, region: string) =>
   root.querySelectorAll(`[data-skeleton-region="${region}"]`).length;
@@ -102,5 +102,25 @@ describe('loading screens show blocks shaped like their content', () => {
       expectInert(skeleton.element, 'problem skeleton');
     }
     expect(blocksIn(wrapper.element)).toBeGreaterThan(5);
+  });
+});
+
+describe('the editorial tab loads with a statement-shaped skeleton', () => {
+  it('shows the statement blocks inside its own panel, inert, while the editorial is on its way', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(),
+      'GET /problems/duongdi/editorial': ok(problemEditorial()),
+    });
+    const served = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/editorial') ? new Promise<Response>(() => {}) : served(input, init),
+    );
+    const { wrapper } = await mountApp('/problems/duongdi?tab=editorial');
+    const panel = wrapper.get('#problem-panel-editorial');
+    await vi.waitFor(() =>
+      expect(panel.find('[data-skeleton-region="statement"]').exists()).toBe(true),
+    );
+    expectInert(panel.get('[data-testid="query-skeleton"]').element, 'editorial skeleton');
   });
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef, watch } from 'vue';
+import { computed, ref, toRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import GlassCard from '@/components/GlassCard.vue';
@@ -8,6 +8,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useLocaleStore } from '@/stores/locale.store';
+import EditorialTab from './EditorialTab.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import PdfButton from './PdfButton.vue';
 import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
@@ -24,6 +25,12 @@ const locale = useLocaleStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
 
+/** Set when the editorial answers 404 for this problem; the tab then disappears until another problem is opened. */
+const editorialGone = ref(false);
+watch(code, () => {
+  editorialGone.value = false;
+});
+
 const isNotFound = computed(
   () => error.value instanceof ApiError && error.value.code === 'not_found',
 );
@@ -31,7 +38,9 @@ const isNotFound = computed(
 /** Page tabs; 8e adds `discussion` here. `submissions` is filled by the submissions tab. */
 const tabs = computed(() => [
   { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement' },
-  ...(problem.value?.hasEditorial ? [{ id: 'editorial', labelKey: 'problem.tabs.editorial' }] : []),
+  ...(problem.value?.hasEditorial && !editorialGone.value
+    ? [{ id: 'editorial', labelKey: 'problem.tabs.editorial' }]
+    : []),
   { id: 'submissions', labelKey: 'problem.tabs.submissions' },
 ]);
 const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route.query.tab : null));
@@ -45,7 +54,7 @@ const tab = computed({
 
 // An unknown or unavailable ?tab= (an editorial that does not exist) is dropped once the detail is known.
 watch(
-  [problem, requestedTab],
+  [problem, requestedTab, editorialGone],
   ([loaded, requested]) => {
     if (loaded && requested !== null && tab.value !== requested)
       void router.replace({ query: { ...route.query, tab: undefined } });
@@ -104,6 +113,11 @@ watch(
               /></template>
             </p>
           </GlassCard>
+          <EditorialTab
+            v-if="panel.id === 'editorial' && tab === 'editorial'"
+            :code="code"
+            @gone="editorialGone = true"
+          />
         </div>
       </template>
     </QueryState>

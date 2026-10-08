@@ -2,10 +2,12 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import { problemDetail, sessionUser } from '@/test/fixtures';
-import { mockApi, ok, sequence } from '@/test/mock-api';
+import { problemDetail, problemEditorial, sessionUser } from '@/test/fixtures';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
+
+const editorialRoute = { 'GET /problems/duongdi/editorial': ok(problemEditorial()) };
 
 const openProblem = async (path = '/problems/duongdi') => {
   const mounted = await mountApp(path);
@@ -88,7 +90,7 @@ describe('problem page', () => {
   });
 
   it('moves between tabs with the arrow keys and keeps exactly one tab in the tab order', async () => {
-    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(), ...editorialRoute });
     const { wrapper, router } = await openProblem();
     const tabs = () => wrapper.findAll('[role="tab"]');
     expect(tabs().filter((tab) => tab.attributes('tabindex') === '0')).toHaveLength(1);
@@ -137,7 +139,7 @@ describe('problem page', () => {
   });
 
   it('changes tabs without adding history entries', async () => {
-    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(), ...editorialRoute });
     const { wrapper, router } = await openProblem();
     const push = vi.spyOn(router, 'push');
     const tabs = () => wrapper.findAll('[role="tab"]');
@@ -162,5 +164,60 @@ describe('problem page', () => {
     for (const tab of wrapper.findAll('[role="tab"]'))
       expect(wrapper.find(`#${tab.attributes('aria-controls')}`).exists()).toBe(true);
     expect(wrapper.findAll('[role="tabpanel"]:not([hidden])')).toHaveLength(1);
+  });
+});
+
+describe('problem page editorial tab', () => {
+  it('drops the tab again on a later visit when the editorial still answers 404', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail()),
+      ...problemPageRoutes(problemDetail({ code: 'lis', name: 'Dãy con tăng dài nhất' })),
+      'GET /problems/duongdi/editorial': fail(404, 'not_found'),
+    });
+    const { wrapper, router } = await openProblem('/problems/duongdi?tab=editorial');
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBeUndefined());
+    await router.push('/problems/lis');
+    await vi.waitFor(() => expect(wrapper.get('#main h1').text()).toBe('Dãy con tăng dài nhất'));
+    await router.push('/problems/duongdi?tab=editorial');
+    await vi.waitFor(() =>
+      expect(wrapper.findAll('[role="tab"]').map((tab) => tab.text())).not.toContain('Lời giải'),
+    );
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBeUndefined());
+  });
+
+  it('does not ask for the editorial while the statement tab is active', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    await openProblem('/problems/duongdi');
+    expect(calls.some((call) => call.path.endsWith('/editorial'))).toBe(false);
+  });
+
+  it('drops the tab and ?tab= with replace (no history entry) when the editorial answers 404', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(),
+      'GET /problems/duongdi/editorial': fail(404, 'not_found'),
+    });
+    // Hold the 404 until the spies are in place, so every navigation the gone answer causes is seen.
+    const answer = globalThis.fetch;
+    let releaseAnswer = () => {};
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/editorial')
+        ? new Promise<Response>((resolve) => {
+            releaseAnswer = () => resolve(answer(input, init));
+          })
+        : answer(input, init),
+    );
+    const { wrapper, router } = await openProblem('/problems/duongdi?tab=editorial');
+    const push = vi.spyOn(router, 'push');
+    const replace = vi.spyOn(router, 'replace');
+    releaseAnswer();
+    await vi.waitFor(() =>
+      expect(wrapper.findAll('[role="tab"]').map((tab) => tab.text())).not.toContain('Lời giải'),
+    );
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBeUndefined());
+    expect(wrapper.find('.statement').exists()).toBe(true);
+    expect(replace).toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
   });
 });

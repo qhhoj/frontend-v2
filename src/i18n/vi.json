@@ -218,6 +218,9 @@
       "submissions": "Bài nộp"
     },
     "tabsLabel": "Mục của bài",
+    "editorial": {
+      "editorsOnly": "Chỉ người chỉnh sửa thấy"
+    },
     "limits": {
       "time": "Thời gian",
       "memory": "Bộ nhớ",
