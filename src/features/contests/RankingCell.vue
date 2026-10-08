@@ -32,7 +32,12 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       <span aria-hidden="true"
         ><Star v-if="view.kind === 'first-solve'" class="mr-1 inline size-3 align-baseline" />{{
           view.text
-        }}</span
+        }}<small
+          v-if="view.time"
+          data-testid="cell-time"
+          class="block text-[11px] leading-tight font-medium"
+          >{{ view.time }}</small
+        ></span
       >
       <span class="sr-only">{{ $t(view.labelKey, view.labelParams, labelCount) }}</span>
     </span>

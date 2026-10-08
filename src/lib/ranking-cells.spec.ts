@@ -5,6 +5,7 @@ import {
   formatCumtime,
   isPenaltyFormat,
   rankingCell,
+  showsCellTime,
   showsCumtime,
   solvedCount,
 } from './ranking-cells';
@@ -19,14 +20,19 @@ const problem = (overrides: Partial<RankingProblem> = {}): RankingProblem => ({
   ...overrides,
 });
 
-const context = (formatName: ContestFormatName, pointsPrecision = 2): RankingContext => ({
+const context = (
+  formatName: ContestFormatName,
+  pointsPrecision = 2,
+  formatConfig: Record<string, number | boolean> = {},
+): RankingContext => ({
   formatName,
   pointsPrecision,
   locale: 'en',
+  showsTime: showsCellTime(formatName, formatConfig),
 });
 const icpc = context('icpc');
 const vnoj = context('vnoj');
-const ioi = context('ioi');
+const timedDefault = context('default');
 
 describe('ranking cells, icpc', () => {
   it('shows a first-try solve with its time', () => {
@@ -156,35 +162,80 @@ describe('ranking cells, vnoj', () => {
   });
 });
 
-describe('ranking cells, points formats', () => {
-  it('shows full points as solved and the first full solve as first', () => {
-    expect(rankingCell({ points: 100, time: 600 }, problem(), 'me', ioi)).toMatchObject({
+describe('ranking cells, points formats (Cells A)', () => {
+  it('puts the time under full points and marks the first full solve with a star', () => {
+    expect(rankingCell({ points: 100, time: 492 }, problem(), 'me', timedDefault)).toEqual({
       kind: 'solved',
       text: '100',
+      time: '0:08:12',
+      labelKey: 'ranking.cell.pointsAt',
+      labelParams: { points: '100', time: '0:08:12' },
     });
     expect(
-      rankingCell({ points: 100, time: 600 }, problem({ firstSolve: 'me' }), 'me', ioi).kind,
-    ).toBe('first-solve');
+      rankingCell({ points: 100, time: 492 }, problem({ firstSolve: 'me' }), 'me', timedDefault),
+    ).toMatchObject({
+      kind: 'first-solve',
+      labelKey: 'ranking.cell.firstPointsAt',
+    });
   });
 
-  it('grades partial points in three steps', () => {
-    expect(rankingCell({ points: 20, time: 0 }, problem(), 'me', ioi)).toMatchObject({
+  it('keeps the time on partial points and grades them in three steps', () => {
+    expect(rankingCell({ points: 20, time: 600 }, problem(), 'me', timedDefault)).toMatchObject({
       kind: 'partial',
       partialStep: 1,
       text: '20',
+      time: '0:10:00',
     });
-    expect(rankingCell({ points: 50, time: 0 }, problem(), 'me', ioi).partialStep).toBe(2);
-    expect(rankingCell({ points: 99.5, time: 0 }, problem(), 'me', ioi).partialStep).toBe(3);
+    expect(rankingCell({ points: 50, time: 0 }, problem(), 'me', timedDefault).partialStep).toBe(2);
+    expect(rankingCell({ points: 99.5, time: 0 }, problem(), 'me', timedDefault).partialStep).toBe(
+      3,
+    );
   });
 
-  it('shows zero points as failed and survives a zero-point problem', () => {
-    expect(rankingCell({ points: 0, time: 0 }, problem(), 'me', ioi)).toMatchObject({
-      kind: 'failed',
-      text: '0',
-    });
-    expect(rankingCell({ points: 0, time: 0 }, problem({ points: 0 }), 'me', ioi).kind).toBe(
-      'solved',
+  it('shows zero points as failed without a time, and survives a zero-point problem', () => {
+    const zero = rankingCell({ points: 0, time: 300 }, problem(), 'me', timedDefault);
+    expect(zero).toMatchObject({ kind: 'failed', text: '0' });
+    expect(zero.time).toBeUndefined();
+    expect(
+      rankingCell({ points: 0, time: 0 }, problem({ points: 0 }), 'me', timedDefault).kind,
+    ).toBe('solved');
+  });
+
+  it.each([
+    ['ioi16', {}],
+    ['final_submission', {}],
+    ['ioi', {}],
+  ] as const)(
+    'shows neither a time nor a star for %s %o, even when the backend names a first solve',
+    (format, config) => {
+      const view = rankingCell(
+        { points: 100, time: 0 },
+        problem({ firstSolve: 'me' }),
+        'me',
+        context(format, 2, config),
+      );
+      expect(view.kind).toBe('solved');
+      expect(view.time).toBeUndefined();
+      expect(view.labelKey).toBe('ranking.cell.points');
+    },
+  );
+
+  it.each([
+    ['ioi', { cumtime: true }],
+    ['ioi', { lastScoreAltering: true }],
+    ['ultimate', {}],
+  ] as const)('shows the time and the star for %s %o', (format, config) => {
+    const view = rankingCell(
+      { points: 100, time: 75 },
+      problem({ firstSolve: 'me' }),
+      'me',
+      context(format, 2, config),
     );
+    expect(view).toMatchObject({ kind: 'first-solve', time: '0:01:15' });
+  });
+
+  it('keeps ioi16 timeless even with cumtime (its cells always store time 0)', () => {
+    expect(showsCellTime('ioi16', { cumtime: true })).toBe(false);
   });
 });
 

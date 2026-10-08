@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { RankingProblem, RankingRow } from '@/api/types/contests';
+import BitLoop from '@/components/BitLoop.vue';
 import UserName from '@/components/UserName.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
 import { formatCumtime, isPenaltyFormat, solvedCount } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
@@ -48,6 +50,7 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
       >
         {{ row.rank }}
       </span>
+      <UserAvatar :username="row.user.username" :size="24" />
       <div class="min-w-0">
         <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ row.rank }}:</span>
         <UserName :username="row.user.username" class="text-lg" />
@@ -59,6 +62,13 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
           }}
         </p>
       </div>
+      <!-- Decorative: the rank and name say who won. Only the first place gets the approved rankUp loop. -->
+      <BitLoop
+        v-if="row.rank === 1"
+        data-testid="podium-bit"
+        kind="rankUp"
+        class="ml-auto shrink-0 [--bit-px:3px]"
+      />
     </div>
   </section>
 </template>

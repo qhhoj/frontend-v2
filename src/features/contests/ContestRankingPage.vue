@@ -9,6 +9,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
+import { showsCellTime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -52,6 +53,9 @@ const rankingContext = computed<RankingContext>(() => ({
   formatName: contest.value?.formatName ?? 'default',
   pointsPrecision: contest.value?.pointsPrecision ?? 0,
   locale: locale.locale,
+  showsTime: contest.value
+    ? showsCellTime(contest.value.formatName, contest.value.formatConfig)
+    : false,
 }));
 const rows = computed(() => {
   const needle = search.value.trim().toLocaleLowerCase();
@@ -188,6 +192,7 @@ const VIEW_MODES = [
               class="glass flex items-center gap-3.5 rounded-card p-5"
             >
               <SkeletonBlock round class="shrink-0" :class="place === 1 ? 'size-15' : 'size-13'" />
+              <SkeletonBlock class="size-6 shrink-0" />
               <div class="min-w-0 flex-1">
                 <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
                 <p class="font-mono text-[13px]"><SkeletonBlock text class="w-1/2" /></p>

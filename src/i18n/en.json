@@ -663,13 +663,19 @@
       "solved": "Solved",
       "penalty": "Penalty",
       "score": "Score",
-      "time": "Time"
+      "time": "Time",
+      "scoreTime": "Score · time"
     },
     "legend": {
       "firstSolve": "first solve",
       "solved": "+n: solved after n wrong tries, with the time",
       "failed": "−n: n wrong tries",
-      "pending": "?n: waiting to be revealed"
+      "pending": "?n: waiting to be revealed",
+      "firstPoints": "full points and first to solve",
+      "fullPoints": "green: the problem's full points",
+      "partialPoints": "Partial points, tinted in three steps",
+      "zeroPoints": "0: submitted, no points yet",
+      "notAttempted": "blank: not attempted"
     },
     "cell": {
       "firstSolve": "First solve, after {tries} wrong try, at {time} | First solve, after {tries} wrong tries, at {time}",
@@ -677,7 +683,9 @@
       "failed": "{tries} wrong try | {tries} wrong tries",
       "pending": "{tries} submission waiting to be revealed | {tries} submissions waiting to be revealed",
       "points": "{points} points",
-      "empty": "Not attempted"
+      "empty": "Not attempted",
+      "pointsAt": "{points} points at {time}",
+      "firstPointsAt": "First solve: {points} points at {time}"
     },
     "solvedCount": "{count} solved",
     "empty": "No contestants yet.",

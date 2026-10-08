@@ -663,13 +663,19 @@
       "solved": "Giải",
       "penalty": "Phạt",
       "score": "Điểm",
-      "time": "Thời gian"
+      "time": "Thời gian",
+      "scoreTime": "Điểm · giờ"
     },
     "legend": {
       "firstSolve": "giải đầu tiên",
       "solved": "+n: giải sau n lần sai, kèm thời điểm",
       "failed": "−n: n lần sai",
-      "pending": "?n: chờ công bố"
+      "pending": "?n: chờ công bố",
+      "firstPoints": "đủ điểm và giải đầu tiên",
+      "fullPoints": "nền xanh: đủ điểm của bài",
+      "partialPoints": "Một phần điểm, nền đậm dần theo ba mức",
+      "zeroPoints": "0: đã nộp nhưng chưa được điểm",
+      "notAttempted": "trống: chưa nộp"
     },
     "cell": {
       "firstSolve": "Giải đầu tiên, sau {tries} lần sai, lúc {time}",
@@ -677,7 +683,9 @@
       "failed": "{tries} lần sai",
       "pending": "{tries} lần nộp chờ công bố",
       "points": "{points} điểm",
-      "empty": "Chưa nộp"
+      "empty": "Chưa nộp",
+      "pointsAt": "{points} điểm, lúc {time}",
+      "firstPointsAt": "Giải đầu tiên: {points} điểm, lúc {time}"
     },
     "solvedCount": "{count} bài",
     "empty": "Chưa có thí sinh.",

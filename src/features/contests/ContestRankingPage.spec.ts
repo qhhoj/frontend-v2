@@ -151,6 +151,63 @@ describe('contest ranking', () => {
     expect(cellTexts(rowOf(wrapper, 'user_07'))).toEqual(['50']);
   });
 
+  it('shows points and time in one chip and one "score · time" column on a timed points board', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    mockApi(
+      routes({
+        'GET /contests/r42': ok(contestDetail({ formatName: 'default' })),
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            frozen: false,
+            problems: [
+              {
+                problemId: problemA,
+                code: 'r42a',
+                label: 'A',
+                points: 100,
+                firstSolve: 'part-07',
+                acceptedCount: 1,
+              },
+            ],
+            rows: [
+              rankingRow(1, 'part-07', 'user_07', 100, 492, {
+                [problemA]: { points: 100, time: 492 },
+              }),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const headers = wrapper.findAll('thead th').map((cell) => cell.text());
+    expect(headers).toContain('Điểm · giờ');
+    expect(headers).not.toContain('Thời gian');
+    const row = rowOf(wrapper, 'user_07');
+    expect(row.get('[data-testid="cell-time"]').text()).toBe('0:08:12');
+    expect(row.text()).toContain('Giải đầu tiên: 100 điểm, lúc 0:08:12');
+    expect(wrapper.text()).toContain('Một phần điểm, nền đậm dần theo ba mức');
+  });
+
+  it('marks the podium Bit on first place only', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
+    mockApi(
+      routes({
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            rows: [
+              rankingRow(1, 'part-07', 'user_07', 1, 10, cell),
+              rankingRow(1, 'part-12', 'user_12', 1, 10, cell),
+              rankingRow(3, 'part-03', 'user_03', 1, 20, cell),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    expect(wrapper.findAll('[data-testid="podium-bit"]')).toHaveLength(2);
+  });
+
   it('refreshes the board every 30 s while the contest runs', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));

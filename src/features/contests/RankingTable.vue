@@ -32,6 +32,21 @@ const LEGEND = [
   'ranking.legend.failed',
   'ranking.legend.pending',
 ] as const;
+const POINTS_LEGEND = [
+  'ranking.legend.fullPoints',
+  'ranking.legend.partialPoints',
+  'ranking.legend.zeroPoints',
+  'ranking.legend.notAttempted',
+] as const;
+/** Points boards put the cumulative time under the score (Cells A); penalty boards keep Solved and Penalty. */
+const hasCombinedScore = computed(
+  () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
+);
+const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
+const scoreHeaderKey = computed(() => {
+  if (penalty.value) return 'ranking.columns.solved';
+  return hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score';
+});
 </script>
 
 <template>
@@ -59,10 +74,10 @@ const LEGEND = [
             {{ $t('ranking.columns.user') }}
           </th>
           <th scope="col" class="px-2.5 py-4 font-medium">
-            {{ $t(penalty ? 'ranking.columns.solved' : 'ranking.columns.score') }}
+            {{ $t(scoreHeaderKey) }}
           </th>
-          <th v-if="showsCumtime(context.formatName)" scope="col" class="px-2.5 py-4 font-medium">
-            {{ $t(penalty ? 'ranking.columns.penalty' : 'ranking.columns.time') }}
+          <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium">
+            {{ $t('ranking.columns.penalty') }}
           </th>
           <th
             v-for="problem in ranking.problems"
@@ -104,8 +119,11 @@ const LEGEND = [
                 ? solvedCount(row, ranking.problems, context)
                 : formatNumber(row.score, context.locale, context.pointsPrecision)
             }}
+            <small v-if="hasCombinedScore" class="block text-[11px] font-medium text-muted">{{
+              formatCumtime(context.formatName, row.cumtime)
+            }}</small>
           </td>
-          <td v-if="showsCumtime(context.formatName)">
+          <td v-if="hasTimeColumn">
             {{ formatCumtime(context.formatName, row.cumtime) }}
           </td>
           <RankingCell v-for="cell in cellsOf(row)" :key="cell.problemId" :view="cell.view" />
@@ -126,5 +144,18 @@ const LEGEND = [
       {{ $t('ranking.legend.firstSolve') }}
     </li>
     <li v-for="key in LEGEND" :key="key">{{ $t(key) }}</li>
+  </ul>
+  <ul
+    v-else
+    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-[13px] text-muted"
+  >
+    <li v-if="context.showsTime" class="flex items-center gap-1.5">
+      <span
+        class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
+        ><Star class="size-3" aria-hidden="true"
+      /></span>
+      {{ $t('ranking.legend.firstPoints') }}
+    </li>
+    <li v-for="key in POINTS_LEGEND" :key="key">{{ $t(key) }}</li>
   </ul>
 </template>

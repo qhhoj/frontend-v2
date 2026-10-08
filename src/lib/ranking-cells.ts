@@ -5,13 +5,15 @@ import type {
   RankingRow,
 } from '@/api/types/contests';
 import type { Locale } from '@/i18n';
-import { formatElapsed, formatNumber } from './format';
+import { formatElapsed, formatElapsedSeconds, formatNumber } from './format';
 
 export type CellKind = 'empty' | 'first-solve' | 'solved' | 'partial' | 'failed' | 'pending';
 export interface RankingCellView {
   kind: CellKind;
   /** What the cell shows; the label says the same in words for screen readers. */
   text: string;
+  /** Points formats with times: the small second line (`0:08:12`). */
+  time?: string;
   labelKey: string;
   labelParams: Record<string, string | number>;
   partialStep?: 1 | 2 | 3;
@@ -26,6 +28,21 @@ export interface RankingContext {
   formatName: ContestFormatName;
   pointsPrecision: number;
   locale: Locale;
+  /** The format prints solve times (`showsCellTime`); the first-solve star needs them too. */
+  showsTime: boolean;
+}
+
+/**
+ * Which formats print a time in their cells (backend libs/contests/src/formats): ioi only with `cumtime` or
+ * `lastScoreAltering`; ioi16 and final_submission store `time: 0` on every cell; the rest always.
+ */
+export function showsCellTime(
+  formatName: ContestFormatName,
+  formatConfig: Record<string, number | boolean>,
+): boolean {
+  if (formatName === 'ioi')
+    return formatConfig.cumtime === true || formatConfig.lastScoreAltering === true;
+  return formatName !== 'ioi16' && formatName !== 'final_submission';
 }
 
 const roundTo = (value: number, precision: number) => {
@@ -73,6 +90,16 @@ const READ_TRIES: Partial<Record<ContestFormatName, (cell: ProblemCell) => Tries
   vnoj: (cell) => ({ wrong: Number(cell.penalty ?? 0), pending: Number(cell.pending ?? 0) }),
 };
 
+function solvedPenaltyCell(cell: ProblemCell, wrong: number, isFirst: boolean): RankingCellView {
+  const time = formatElapsed(Number(cell.time ?? 0));
+  return {
+    kind: isFirst ? 'first-solve' : 'solved',
+    text: `+${wrong || ''} ${time}`,
+    labelKey: isFirst ? 'ranking.cell.firstSolve' : 'ranking.cell.solved',
+    labelParams: { tries: wrong, time },
+  };
+}
+
 function penaltyCell(
   cell: ProblemCell,
   problem: RankingProblem,
@@ -86,15 +113,7 @@ function penaltyCell(
     context.formatName === 'icpc'
       ? points > 0
       : isFullPoints(points, problem, context.pointsPrecision);
-  if (solved) {
-    const time = formatElapsed(Number(cell.time ?? 0));
-    return {
-      kind: isFirst ? 'first-solve' : 'solved',
-      text: `+${wrong || ''} ${time}`,
-      labelKey: isFirst ? 'ranking.cell.firstSolve' : 'ranking.cell.solved',
-      labelParams: { tries: wrong, time },
-    };
-  }
+  if (solved) return solvedPenaltyCell(cell, wrong, isFirst);
   if (pending > 0)
     return {
       kind: 'pending',
@@ -102,7 +121,7 @@ function penaltyCell(
       labelKey: 'ranking.cell.pending',
       labelParams: { tries: pending },
     };
-  if (points > 0) return partialCell(points, problem, context);
+  if (points > 0) return partialCell(points, problem, cell, context);
   return wrong > 0
     ? {
         kind: 'failed',
@@ -113,17 +132,32 @@ function penaltyCell(
     : EMPTY;
 }
 
+const cellTime = (cell: ProblemCell, context: RankingContext) =>
+  context.showsTime && typeof cell.time === 'number' ? formatElapsedSeconds(cell.time) : undefined;
+
+/** Full or partial points, with the time under them when the format has one. */
+function scoredCell(
+  points: number,
+  cell: ProblemCell,
+  kind: 'first-solve' | 'solved' | 'partial',
+  context: RankingContext,
+): Omit<RankingCellView, 'partialStep'> {
+  const text = pointsText(points, context);
+  const time = cellTime(cell, context);
+  if (time === undefined)
+    return { kind, text, labelKey: 'ranking.cell.points', labelParams: { points: text } };
+  const labelKey = kind === 'first-solve' ? 'ranking.cell.firstPointsAt' : 'ranking.cell.pointsAt';
+  return { kind, text, time, labelKey, labelParams: { points: text, time } };
+}
+
 function partialCell(
   points: number,
   problem: RankingProblem,
+  cell: ProblemCell,
   context: RankingContext,
 ): RankingCellView {
-  const text = pointsText(points, context);
   return {
-    kind: 'partial',
-    text,
-    labelKey: 'ranking.cell.points',
-    labelParams: { points: text },
+    ...scoredCell(points, cell, 'partial', context),
     partialStep: Math.min(3, Math.ceil((points / problem.points) * 3)) as 1 | 2 | 3,
   };
 }
@@ -135,20 +169,13 @@ function pointsCell(
   context: RankingContext,
 ): RankingCellView {
   const points = Number(cell.points ?? 0);
-  if (isFullPoints(points, problem, context.pointsPrecision)) {
-    const text = pointsText(points, context);
-    return {
-      kind: isFirst ? 'first-solve' : 'solved',
-      text,
-      labelKey: 'ranking.cell.points',
-      labelParams: { points: text },
-    };
-  }
+  if (isFullPoints(points, problem, context.pointsPrecision))
+    return scoredCell(points, cell, isFirst ? 'first-solve' : 'solved', context);
   if (points <= 0) {
     const text = pointsText(0, context);
     return { kind: 'failed', text, labelKey: 'ranking.cell.points', labelParams: { points: text } };
   }
-  return partialCell(points, problem, context);
+  return partialCell(points, problem, cell, context);
 }
 
 export function rankingCell(
@@ -158,7 +185,8 @@ export function rankingCell(
   context: RankingContext,
 ): RankingCellView {
   if (!cell) return EMPTY;
-  const isFirst = problem.firstSolve === participationId;
+  // A first solve needs a time to be first by (Cells A); ioi16 can name one with time 0.
+  const isFirst = problem.firstSolve === participationId && context.showsTime;
   return isPenaltyFormat(context.formatName)
     ? penaltyCell(cell, problem, isFirst, context)
     : pointsCell(cell, problem, isFirst, context);
