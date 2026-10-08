@@ -59,20 +59,30 @@ const lineClass = (line: number): string => {
     <p v-if="isDeleted" class="text-sm text-muted">
       {{ $t('admin.similarity.pair.pane.deleted') }}
     </p>
-    <ol v-else class="max-h-[70vh] overflow-auto font-mono text-sm">
-      <li
-        v-for="(text, index) in lines"
-        :id="lineIdOf(side, index + 1)"
-        :key="index"
-        :data-fragment="fragmentOf.get(index + 1)"
-        class="flex gap-3 whitespace-pre"
-        :class="lineClass(index + 1)"
-      >
-        <span aria-hidden="true" class="w-10 shrink-0 text-right text-muted select-none">{{
-          index + 1
-        }}</span>
-        <span>{{ text }}</span>
-      </li>
-    </ol>
+    <div
+      v-else
+      role="region"
+      tabindex="0"
+      :aria-label="
+        $t('admin.similarity.pair.pane.code', { side: $t(`admin.similarity.pair.pane.${side}`) })
+      "
+      class="max-h-[70vh] overflow-auto font-mono text-sm"
+    >
+      <ol class="font-mono text-sm">
+        <li
+          v-for="(text, index) in lines"
+          :id="lineIdOf(side, index + 1)"
+          :key="index"
+          :data-fragment="fragmentOf.get(index + 1)"
+          class="flex gap-3 whitespace-pre"
+          :class="lineClass(index + 1)"
+        >
+          <span aria-hidden="true" class="w-10 shrink-0 text-right text-muted select-none">{{
+            index + 1
+          }}</span>
+          <span>{{ text }}</span>
+        </li>
+      </ol>
+    </div>
   </section>
 </template>

@@ -45,7 +45,8 @@
     "running": "running",
     "notStarted": "not started",
     "detail": "Details",
-    "label": "Runs"
+    "label": "Runs",
+    "seconds": "{seconds} s"
   },
   "status": {
     "queued": "Waiting",
@@ -155,7 +156,10 @@
       "points": "{points} points",
       "deleted": "This submission was deleted",
       "oddFragment": "Odd fragment",
-      "evenFragment": "Even fragment"
+      "evenFragment": "Even fragment",
+      "left": "Left",
+      "right": "Right",
+      "code": "Source code, {side} side"
     }
   }
 }

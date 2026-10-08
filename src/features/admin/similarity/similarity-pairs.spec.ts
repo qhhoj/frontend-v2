@@ -43,3 +43,12 @@ describe('similarity pairs', () => {
     expect(sourceLines('')).toEqual([]);
   });
 });
+
+describe('similarity pairs: the problem filter', () => {
+  it('drops a problem filter that is not a uuid and keeps one that is', () => {
+    expect(pairFilterFromQuery({ problemId: 'hcmus41c' }).problemId).toBe('');
+    expect(
+      pairFilterFromQuery({ problemId: '0198c3a1-7d2e-7b10-9a4f-1c2d3e4f5a6b' }).problemId,
+    ).toBe('0198c3a1-7d2e-7b10-9a4f-1c2d3e4f5a6b');
+  });
+});

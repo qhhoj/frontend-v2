@@ -45,7 +45,8 @@
     "running": "đang chạy",
     "notStarted": "chưa bắt đầu",
     "detail": "Chi tiết",
-    "label": "Các lượt chạy"
+    "label": "Các lượt chạy",
+    "seconds": "{seconds} giây"
   },
   "status": {
     "queued": "Đang chờ",
@@ -155,7 +156,10 @@
       "points": "{points} điểm",
       "deleted": "Bài nộp đã bị xóa",
       "oddFragment": "Đoạn lẻ",
-      "evenFragment": "Đoạn chẵn"
+      "evenFragment": "Đoạn chẵn",
+      "left": "Trái",
+      "right": "Phải",
+      "code": "Mã nguồn bên {side}"
     }
   }
 }

@@ -27,8 +27,12 @@ const percentOf = (value: string) => {
 };
 const pageOf = (value: string) => (/^[1-9]\d*$/.test(value) ? Number(value) : 1);
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** The backend takes a problem filter only as a uuid (`IsUUID`); anything else is dropped, not sent. */
+const problemIdOf = (value: string) => (UUID_PATTERN.test(value) ? value : '');
+
 export const pairFilterFromQuery = (query: LocationQuery): PairFilter => ({
-  problemId: text(query.problemId),
+  problemId: problemIdOf(text(query.problemId)),
   language: text(query.language),
   minPercent: percentOf(text(query.minPercent)),
   page: pageOf(text(query.page)),

@@ -75,3 +75,26 @@ test('pressing fragment #1 scrolls the right pane to its line', async ({ page, a
   await page.getByRole('button', { name: /#1 trái 4–6/ }).click();
   await expect(page.locator('#right-line-6')).toBeInViewport();
 });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`a long source scrolls in its own focusable region at ${viewport.name}`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, PERMISSIONS);
+    const detail = similarityPairDetail();
+    const longSource = Array.from(
+      { length: 160 },
+      (_unused, index) => `int value${index + 1} = ${index + 1};`,
+    ).join('\n');
+    api.routes['GET /similarity/pairs/pair-1'] = adminOk({
+      ...detail,
+      left: { ...detail.left, source: longSource },
+    });
+    await page.goto('/admin/similarity/pairs/pair-1');
+    const region = page.getByRole('region', { name: 'Mã nguồn bên Trái' });
+    await expect(region).toBeVisible();
+    expect(await region.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
+    expect(await axeViolationsIn(page)).toEqual([]);
+  });
