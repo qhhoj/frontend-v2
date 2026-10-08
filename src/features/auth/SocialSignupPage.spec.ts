@@ -11,6 +11,7 @@ import {
 } from '@/test/fixtures';
 import { registerRoutes } from '@/test/auth-routes';
 import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { homeRoutes } from '@/test/home-routes';
 import { mountApp } from '@/test/mount';
@@ -24,6 +25,7 @@ const routes = (
   overrides: Record<string, MockHandler> = {},
 ) =>
   mockApi({
+    ...blogListRoutes,
     'GET /auth/me': signedOut,
     ...registerRoutes,
     ...homeRoutes,

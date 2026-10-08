@@ -11,6 +11,7 @@ import {
 } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { mockApi, noContent, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
 import { useSessionStore } from '@/stores/session.store';
@@ -49,7 +50,7 @@ const patchesOf = (calls: Array<{ method: string; body: unknown }>) =>
 
 describe('app shell', () => {
   it('has exactly one live region, outside the page content, and it is quiet when nothing loads', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     const regions = wrapper.findAll('[role="status"]');
     expect(regions).toHaveLength(1);
@@ -59,19 +60,23 @@ describe('app shell', () => {
   });
 
   it('shows the header on the sign-in page, which draws no AuthLayout yet', async () => {
-    mockApi({ 'GET /auth/me': signedOut, ...loginRoutes });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut, ...loginRoutes });
     const { wrapper } = await mountApp('/login');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(true);
   });
 
   it('hides the header on the second-factor page, which draws AuthLayout', async () => {
-    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(partialSession()) });
     const { wrapper } = await mountApp('/login/2fa');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
   });
 
   it('marks the current section in the main navigation', async () => {
-    mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ code: 'aplusb' })) });
+    mockApi({
+      ...blogListRoutes,
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail({ code: 'aplusb' })),
+    });
     const { wrapper } = await mountApp('/problems/aplusb');
     const nav = wrapper.get('nav[aria-label="Điều hướng chính"]');
     expect(nav.get('[aria-current="page"]').text()).toBe('Bài tập');
@@ -86,7 +91,7 @@ describe('app shell', () => {
   });
 
   it('offers sign in (returning here) and sign up to anonymous viewers', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.get('a[href="/login?redirect=/blog"]').text()).toBe('Đăng nhập');
     expect(wrapper.get('a[href="/register"]').text()).toBe('Đăng ký');
@@ -94,6 +99,7 @@ describe('app shell', () => {
 
   it('signs out from the user menu and stays on a public page', async () => {
     const calls = mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile()),
       'POST /auth/logout': noContent(),
@@ -111,6 +117,7 @@ describe('app shell', () => {
 
   it('offers administration to staff', async () => {
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn({ user: sessionUser({ isStaff: true }) }),
       'GET /profile': ok(profile()),
     });
@@ -120,7 +127,7 @@ describe('app shell', () => {
   });
 
   it('tells assistive technology whether the appearance panel is open', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     const trigger = wrapper.get('button[aria-label="Giao diện"]');
     expect(trigger.attributes('aria-expanded')).toBe('false');
@@ -132,7 +139,7 @@ describe('app shell', () => {
   });
 
   it('switches theme at runtime without saving for anonymous viewers', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedOut });
+    const calls = mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     await openPanel(wrapper);
     await clickInPanel('Glass');
@@ -143,6 +150,7 @@ describe('app shell', () => {
 
   it('saves only the mode to the account when signed in, and leaves the look off', async () => {
     const calls = mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile()),
       'PATCH /profile': ({ body }) => ok(profile(body as object)),
@@ -157,7 +165,7 @@ describe('app shell', () => {
   });
 
   it('offers the style, Clay or Glass, and the mode, light, dark or automatic', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     await openPanel(wrapper);
     const labels = (group: string) =>
@@ -174,7 +182,7 @@ describe('app shell', () => {
 
   it('shows the legacy stored value as the Clay choice', async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     await openPanel(wrapper);
     expect(pressedIn('Kiểu')).toEqual(['Clay']);
@@ -186,6 +194,7 @@ describe('app shell', () => {
     [['Glass', 'Tự động'], 'glass-auto', 'glass-light'],
   ])('saves %j to the account as %s and follows the device', async (picks, saved, shown) => {
     const calls = mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile({ siteTheme: 'clay-dark' })),
       'PATCH /profile': ({ body }) => ok(profile(body as object)),
@@ -199,6 +208,7 @@ describe('app shell', () => {
 
   it('keeps the local theme when saving to the account fails', async () => {
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile()),
       'PATCH /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
@@ -213,6 +223,7 @@ describe('app shell', () => {
   it("adopts the account's theme after sign-in and drops it on sign-out", async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile({ siteTheme: 'light' })),
       'POST /auth/logout': noContent(),
@@ -229,6 +240,7 @@ describe('app shell', () => {
     localStorage.setItem('qhhoj.resolvedBy', 'account');
     document.documentElement.dataset.theme = 'glass-light';
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
     });
@@ -243,6 +255,7 @@ describe('app shell', () => {
     });
     let profileReads = 0;
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'POST /auth/login': signedIn({ user: secondUser }),
       'GET /profile': () => {
@@ -261,13 +274,16 @@ describe('app shell', () => {
   });
 
   it('does not read the profile while a password change is required', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedIn({ passwordChangeRequired: true }) });
+    const calls = mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn({ passwordChangeRequired: true }),
+    });
     await mountApp('/blog');
     expect(calls.some((call) => call.path === '/profile')).toBe(false);
   });
 
   it('switches the interface language', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     await wrapper.get('button[aria-label="Switch to English"]').trigger('click');
     expect(wrapper.get('nav[aria-label="Main navigation"]').text()).toContain('Problems');
@@ -275,7 +291,7 @@ describe('app shell', () => {
   });
 
   it('has a skip link to the main content', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.get('a[href="#main"]').text()).toBe('Bỏ qua đến nội dung chính');
     expect(wrapper.find('main#main').exists()).toBe(true);

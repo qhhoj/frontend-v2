@@ -4,6 +4,7 @@ import { defineComponent } from 'vue';
 import { useSessionStore } from '@/stores/session.store';
 import { profile, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { mountApp, mountComponent } from '@/test/mount';
 import { useAccountAppearanceSync } from './use-account-appearance';
 import { useAppearanceChoice } from './use-appearance-choice';
@@ -50,7 +51,11 @@ function mountSyncedChoice() {
 
 describe('account appearance sync', () => {
   it("paints the account's look once the profile is loaded", async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile({ appearance: OCEAN })) });
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile({ appearance: OCEAN })),
+    });
     await mountApp('/blog');
     expect(root.dataset.accent).toBe('ocean');
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('40');
@@ -60,20 +65,25 @@ describe('account appearance sync', () => {
   it("lets the account outrank this browser, and null mean the site's own look", async () => {
     localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
     localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile({ appearance: null })) });
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile({ appearance: null })),
+    });
     await mountApp('/blog');
     expect(root.dataset.accent).toBeUndefined();
   });
 
   it('keeps the pre-painted look while the profile fails to load', async () => {
     localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': failedProfile });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(), 'GET /profile': failedProfile });
     await mountApp('/blog');
     expect(root.dataset.accent).toBe('ocean');
   });
 
   it('reads an invalid account value as the site look', async () => {
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile({ appearance: { accent: 'violet', glass: 1, glow: 1 } })),
     });
@@ -83,7 +93,7 @@ describe('account appearance sync', () => {
 
   it("uses this browser's look for an anonymous visitor", async () => {
     localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     await mountApp('/blog');
     expect(root.dataset.accent).toBe('mint');
   });
@@ -91,14 +101,18 @@ describe('account appearance sync', () => {
   it("uses this browser's look while a password change blocks the profile, not the painted account look", async () => {
     localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
     localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
-    mockApi({ 'GET /auth/me': signedIn({ passwordChangeRequired: true }) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn({ passwordChangeRequired: true }) });
     await mountApp('/blog');
     expect(root.dataset.accent).toBe('mint');
   });
 
   it("hands back to this browser's look on sign-out", async () => {
     localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile({ appearance: OCEAN })) });
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile({ appearance: OCEAN })),
+    });
     await mountApp('/blog');
     expect(root.dataset.accent).toBe('ocean');
     useSessionStore().$patch({ status: 'anonymous', user: null }); // what a 401 on any request does
@@ -107,7 +121,7 @@ describe('account appearance sync', () => {
   });
 
   it('does not snap the controls back to a save answer after the user painted another look', async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) });
     const answers = holdProfileSaves();
     const choice = mountSyncedChoice();
     await flushPromises();
@@ -122,7 +136,7 @@ describe('account appearance sync', () => {
   });
 
   it("keeps the newest choice when an older save's answer arrives", async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) });
     const answers = holdProfileSaves();
     const choice = mountSyncedChoice();
     await flushPromises();

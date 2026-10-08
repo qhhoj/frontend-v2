@@ -2,13 +2,14 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 
 const root = document.documentElement;
 /** Glass and Glow only act on a Glass theme; the site default is a Clay theme. */
 const useGlassTheme = () => localStorage.setItem('qhhoj.theme', 'glass-dark');
 const openPanel = async () => {
-  mockApi({ 'GET /auth/me': signedOut });
+  mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
   const { wrapper, router } = await mountApp('/blog');
   await wrapper.get('button[aria-label="Giao diện"]').trigger('click');
   await flushPromises();

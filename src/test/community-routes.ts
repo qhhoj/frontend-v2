@@ -37,6 +37,8 @@ export const profileTabRoutes = (username = 'user_01'): Routes => ({
 });
 /** `/home` for the community screens: recent comments, new problems and the top users. */
 export const communityHomeRoutes: Routes = { 'GET /home': ok(homeResponse()) };
+/** Answers for any screen that renders the blog list (`/blog`): its empty newsfeed and the rail's home data. */
+export const blogListRoutes: Routes = { ...communityHomeRoutes, 'GET /posts': page([]) };
 /** The organization layout and its about tab. */
 export const organizationRoutes = (detail: OrganizationDetail = organizationDetail()): Routes => ({
   [`GET /organizations/${detail.slug}`]: ok(detail),

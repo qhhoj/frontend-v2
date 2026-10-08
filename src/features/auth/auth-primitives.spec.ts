@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { partialSession, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { mountApp, mountComponent } from '@/test/mount';
 import AuthError from './AuthError.vue';
 import AuthField from './AuthField.vue';
@@ -11,7 +12,7 @@ import AuthSubmit from './AuthSubmit.vue';
 
 describe('auth layout', () => {
   it('drops the pill navigation on the second-factor page, which draws AuthLayout, and keeps the skip link and the main landmark', async () => {
-    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(partialSession()) });
     const { wrapper } = await mountApp('/login/2fa');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
     expect(wrapper.find('a[href="#main"]').exists()).toBe(true);
@@ -19,7 +20,7 @@ describe('auth layout', () => {
   });
 
   it('keeps the shell loading region (outside the page) on auth routes', async () => {
-    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(partialSession()) });
     const { wrapper } = await mountApp('/login/2fa');
     const regions = wrapper.findAll('[role="status"]');
     expect(regions).toHaveLength(1);
@@ -28,13 +29,13 @@ describe('auth layout', () => {
   });
 
   it('keeps the pill navigation on every other route', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(true);
   });
 
   it('titles the resend page from its route meta', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
     await mountApp('/activate');
     expect(document.title).toBe('Gửi lại email kích hoạt · QHHOJ');
   });
