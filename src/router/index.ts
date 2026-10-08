@@ -15,7 +15,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
   });
   // One source per navigation, shared along a redirect chain: a redirect starts a new navigation and never reaches
   // afterEach for the original, while a cancelled slow navigation must not end the source of the one that replaced it.
-  const navigationSources = new WeakMap<RouteLocationNormalized, symbol>();
+  const navigationSources = new WeakMap<object, symbol>();
   const sourceOf = (to: RouteLocationNormalized) =>
     navigationSources.get(to) ?? (to.redirectedFrom && navigationSources.get(to.redirectedFrom));
   const endNavigation = (to: RouteLocationNormalized) => {
