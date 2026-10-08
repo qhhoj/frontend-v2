@@ -351,6 +351,9 @@
     "email": "Email",
     "submitLogin": "Sign in",
     "submitRegister": "Create account",
+    "socialSignup": {
+      "lead": "This social account is not linked to a QHHOJ account yet. Pick a username and a password to finish."
+    },
     "noAccountPrompt": "No account yet?",
     "resendLink": "Resend the activation email",
     "brand": {

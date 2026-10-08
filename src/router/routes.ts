@@ -207,8 +207,8 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/register/social',
     name: 'register-social',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.socialSignup', guestOnly: true },
+    component: () => import('@/features/auth/SocialSignupPage.vue'),
+    meta: { titleKey: 'pages.socialSignup', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/activate',
