@@ -196,6 +196,57 @@ describe('stepWalker', () => {
     const landed = run(hopping, HOP_MS + 50, 16, () => 0.99);
     expect(landed.hopMsLeft).toBe(0);
   });
+  it('stands still, and stays finite, on a zero, negative or NaN frame', () => {
+    const start = walkerAt({ heading: 0, speed: 80, travelled: 3 });
+    for (const frameMs of [0, -16, Number.NaN]) {
+      const next = stepWalker(start, bounds, frameMs, seededRandom(4));
+      expect(next.x).toBe(start.x);
+      expect(next.y).toBe(start.y);
+      expect(next.travelled).toBe(start.travelled);
+      expect(next.heading).toBeCloseTo(start.heading);
+      expect(next.speed).toBeCloseTo(start.speed);
+      const after = stepWalker(next, bounds, 100, seededRandom(4));
+      expect([after.x, after.y, after.heading, after.speed].every(Number.isFinite)).toBe(true);
+    }
+  });
+
+  it('scales the wobble with the square root of the frame time, not linearly', () => {
+    const open: Bounds = { minX: -1e9, maxX: 1e9, minY: -1e9, maxY: 1e9 };
+    const median = (values: number[]) =>
+      [...values].sort((first, second) => first - second)[Math.floor(values.length / 2)]!;
+    const medianHeadingChange = (frameMs: number) =>
+      median(
+        Array.from({ length: 2000 }, (_value, index) => {
+          const start = walkerAt({ heading: 1, x: 0, y: 0 });
+          const end = run(start, 200, frameMs, seededRandom(index + 1), open);
+          return angleBetween(start.heading, end.heading);
+        }),
+      );
+    const ratio = medianHeadingChange(100) / medianHeadingChange(10);
+    expect(ratio).toBeGreaterThan(0.85);
+    expect(ratio).toBeLessThan(1.15);
+  });
+
+  it('stays finite and inside the bounds on a viewport with no room for the sprite', () => {
+    for (const viewport of [
+      { width: 0, height: 0 },
+      { width: 10, height: 10 },
+    ]) {
+      const area = walkBounds(viewport, LOADING_BIT_SIZE);
+      const random = seededRandom(11);
+      let walker = spawnWalker(area, random);
+      for (let index = 0; index < 500; index += 1) {
+        walker = stepWalker(walker, area, 16, random);
+        expect([walker.x, walker.y, walker.heading, walker.speed].every(Number.isFinite)).toBe(
+          true,
+        );
+        expect(walker.x).toBeGreaterThanOrEqual(area.minX);
+        expect(walker.x).toBeLessThanOrEqual(area.maxX);
+        expect(walker.y).toBeGreaterThanOrEqual(area.minY);
+        expect(walker.y).toBeLessThanOrEqual(area.maxY);
+      }
+    }
+  });
 });
 
 describe('hopOffset', () => {

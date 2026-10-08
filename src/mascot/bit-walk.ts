@@ -83,7 +83,8 @@ export const stepWalker = (
   frameMs: number,
   random: Random,
 ): Walker => {
-  const seconds = Math.min(frameMs, MAX_FRAME_MS) / 1000;
+  // NaN counts as no time passed; negative frames are clamped too, so sqrt() never sees a negative.
+  const seconds = (Number.isNaN(frameMs) ? 0 : clamp(frameMs, 0, MAX_FRAME_MS)) / 1000;
   let heading = walker.heading + (random() - 0.5) * 2 * HEADING_JITTER * Math.sqrt(seconds);
   if (random() < chance(TURN_RATE, seconds)) heading = random() * FULL_TURN;
   const speed = clamp(
