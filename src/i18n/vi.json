@@ -36,6 +36,26 @@
     "admin": "Quản trị",
     "notFound": "Không tìm thấy trang"
   },
+  "contests": {
+    "title": "Kỳ thi",
+    "phase": {
+      "upcoming": "Sắp diễn ra",
+      "running": "Đang diễn ra",
+      "ended": "Đã kết thúc"
+    },
+    "span": {
+      "days": "{count} ngày",
+      "hoursMinutes": "{hours} giờ {minutes} phút",
+      "hours": "{count} giờ",
+      "minutes": "{count} phút",
+      "underMinute": "dưới 1 phút"
+    },
+    "participants": "{count} thí sinh",
+    "virtualExtra": "+{count} ảo",
+    "rated": "Tính rating",
+    "private": "Riêng tư",
+    "organizationPrivate": "Nội bộ"
+  },
   "placeholder": {
     "pending": "Màn hình này đang chờ mockup được duyệt."
   },

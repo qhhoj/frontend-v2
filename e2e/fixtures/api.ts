@@ -1,12 +1,16 @@
 import { test as base, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import {
+  announcement,
   contestDetail,
   contestItem,
+  contestProblem,
+  contestStats,
   leaderboardEntry,
   problemItem,
   problemDetail,
   problemEditorial,
+  participationSummary,
   problemMeta,
   profile,
   ranking,
@@ -120,9 +124,45 @@ export class FakeApi {
     'GET /problems/:code/editorial': ok(problemEditorial()),
     'POST /problems/:code/submit': ok({ id: 'sub-9' }),
     'POST /problems/:code/submit/file': ok({ id: 'sub-9' }),
-    'GET /contests': list([contestItem()]),
-    'GET /contests/r42': ok(contestDetail()),
+    'GET /contests': ({ url }) => {
+      const phase = url.searchParams.get('phase');
+      return list(
+        phase === 'running'
+          ? [contestItem()]
+          : phase === 'upcoming'
+            ? [
+                contestItem({
+                  key: 'r43',
+                  name: 'QHH Round #43',
+                  phase: 'upcoming',
+                  startTime: '2026-10-11T12:30:00Z',
+                  endTime: '2026-10-11T15:00:00Z',
+                }),
+              ]
+            : [
+                contestItem({
+                  key: 'r41',
+                  name: 'QHH Round #41',
+                  phase: 'ended',
+                  startTime: '2026-10-01T12:30:00Z',
+                  endTime: '2026-10-01T15:00:00Z',
+                  virtualCount: 318,
+                }),
+              ],
+      );
+    },
+    'GET /contests/current': ok(null),
+    'GET /contests/r42': ok(
+      contestDetail({ problems: [contestProblem(0), contestProblem(1), contestProblem(2)] }),
+    ),
     'GET /contests/r42/ranking': ok(ranking()),
+    'GET /contests/:key/announcements': list([announcement(1)]),
+    'GET /contests/:key/stats': ok(contestStats()),
+    'GET /contests/:key/submissions': list([submissionItem()]),
+    'POST /contests/:key/join': ok(participationSummary()),
+    'POST /contests/:key/register': ok(participationSummary({ isRegistered: true })),
+    'POST /contests/:key/leave': { status: 204 },
+    'GET /events/contests/:key': eventStream(),
     'GET /users': list([
       leaderboardEntry(1, 'user_07', 2788),
       leaderboardEntry(2, 'user_12', 2431),

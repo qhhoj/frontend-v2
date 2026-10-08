@@ -36,6 +36,26 @@
     "admin": "Administration",
     "notFound": "Page not found"
   },
+  "contests": {
+    "title": "Contests",
+    "phase": {
+      "upcoming": "Upcoming",
+      "running": "Running",
+      "ended": "Ended"
+    },
+    "span": {
+      "days": "{count} day | {count} days",
+      "hoursMinutes": "{hours} h {minutes} min",
+      "hours": "{count} hour | {count} hours",
+      "minutes": "{count} minute | {count} minutes",
+      "underMinute": "under a minute"
+    },
+    "participants": "{count} contestant | {count} contestants",
+    "virtualExtra": "+{count} virtual",
+    "rated": "Rated",
+    "private": "Private",
+    "organizationPrivate": "Organization only"
+  },
   "placeholder": {
     "pending": "This screen is waiting for an approved mock-up."
   },

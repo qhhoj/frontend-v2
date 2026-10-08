@@ -48,6 +48,8 @@ export interface SubmissionListQuery {
   pageSize?: number;
   language?: string[];
   result?: SubmissionResult[];
+  /** Repeat the parameter; contest lists use QU/P/G (being judged) and PD (waiting for the final judging). */
+  status?: SubmissionStatus[];
 }
 
 /** backend: submissions/create/dto/submit.dto.ts and submit.response.ts */

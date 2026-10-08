@@ -167,6 +167,17 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - E2E: `FakeApi` matches `:param` keys (an exact key wins), records every request in `requests` and serves PDF and event-stream replies; the editor and language packs must never be modulepreloaded (`bundle.e2e.ts`).
 - Real-backend e2e is a separate opt-in Playwright project (`E2E_REAL_API`, `e2e-real/`), so the fake-API suite and CI never depend on a running backend; without a judge it asserts `QU`/`P` and says why it skips the AC check.
 
+## Contests (8d)
+
+- Routes per tab with one `ContestTabs`: each contest tab is its own route, the tab bar and the live announcement feed do not remount between them.
+- List groups (running, upcoming, ended) and URL filters: the list state lives in the URL, so a filtered list can be shared and reloaded.
+- Rated filter as two pressed buttons, not a select: the two states are the whole choice.
+- Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
+- Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
+- Announcement read state lives per browser (newest seen id); the first visit marks every announcement unread.
+- Own-only submissions banner is inferred until backend ask B-8d1 is answered.
+- Official and public rankings need a mock-up round before their layout is final.
+
 ## Known gaps (later sub-projects)
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.

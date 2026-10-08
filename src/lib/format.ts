@@ -87,3 +87,43 @@ export const formatDate = (date: string, locale: Locale) =>
   new Intl.DateTimeFormat(INTL_LOCALES[locale], { dateStyle: 'medium', timeZone: 'UTC' }).format(
     new Date(date),
   );
+
+/** Contest start and end are instants: they show in the viewer's own zone (decisions.md, "Dates from the API"). */
+export const formatClock = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(date));
+
+/** The list's date chip: day number and short month (`11` / `thg 10`). */
+export function formatDayMonth(date: string, locale: Locale): { day: string; month: string } {
+  const instant = new Date(date);
+  return {
+    day: new Intl.DateTimeFormat(INTL_LOCALES[locale], { day: 'numeric' }).format(instant),
+    month: new Intl.DateTimeFormat(INTL_LOCALES[locale], { month: 'short' }).format(instant),
+  };
+}
+
+/** `04/10` (vi) or `10/04` (en): the day and month parts joined with a slash, whatever separator ICU picks. */
+export const formatShortDate = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], { day: '2-digit', month: '2-digit' })
+    .formatToParts(new Date(date))
+    .filter((part) => part.type === 'day' || part.type === 'month')
+    .map((part) => part.value)
+    .join('/');
+
+/** `Thứ Năm, 08/10/2026`: the detail's date line. */
+export const formatWeekdayDate = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(new Date(date));
+
+/** `H:MM:SS` since the contest start: the time line of a points cell (Cells A). */
+export function formatElapsedSeconds(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  return `${Math.floor(seconds / 3600)}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
+}

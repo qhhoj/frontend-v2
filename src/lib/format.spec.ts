@@ -3,13 +3,18 @@ import {
   coinIndex,
   formatCaseMemory,
   formatCaseTime,
+  formatClock,
   formatDate,
   formatDateTime,
+  formatDayMonth,
   formatDuration,
   formatElapsed,
+  formatElapsedSeconds,
   formatFileSize,
   formatMemoryLimit,
   formatNumber,
+  formatShortDate,
+  formatWeekdayDate,
   formatRelative,
   greetingKey,
   formatTimeLimit,
@@ -90,5 +95,32 @@ describe('formatDate', () => {
     expect(formatDate('2026-10-08T23:30:00Z', 'en')).toBe('Oct 8, 2026');
     expect(formatDate('2026-10-08T23:30:00Z', 'vi')).toContain('2026');
     expect(formatDate('2026-10-08T23:30:00Z', 'vi')).toContain('8');
+  });
+});
+
+describe('contest instants in the viewer time zone', () => {
+  afterEach(() => vi.unstubAllEnvs());
+  it('shows the local clock and day, so a late-evening contest keeps its own day', () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    // 18:00Z on Oct 10 is 01:00 on Oct 11 in Vietnam.
+    expect(formatClock('2026-10-10T18:00:00Z', 'vi')).toBe('01:00');
+    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi')).toEqual({ day: '11', month: 'Tháng 10' });
+    expect(formatDayMonth('2026-10-10T18:00:00Z', 'en')).toEqual({ day: '11', month: 'Oct' });
+    expect(formatShortDate('2026-10-10T18:00:00Z', 'vi')).toBe('11/10');
+    vi.stubEnv('TZ', 'UTC');
+    expect(formatClock('2026-10-10T18:00:00Z', 'vi')).toBe('18:00');
+    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi').day).toBe('10');
+  });
+  it('writes the weekday and full date for the detail line', () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    expect(formatWeekdayDate('2026-10-08T06:00:00Z', 'vi')).toBe('Thứ Năm, 08/10/2026');
+  });
+});
+
+describe('formatElapsedSeconds', () => {
+  it('prints H:MM:SS from the contest start', () => {
+    expect(formatElapsedSeconds(492)).toBe('0:08:12');
+    expect(formatElapsedSeconds(17_607)).toBe('4:53:27');
+    expect(formatElapsedSeconds(-3)).toBe('0:00:00');
   });
 });

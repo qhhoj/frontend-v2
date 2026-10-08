@@ -1,6 +1,11 @@
 import type {
+  Announcement,
   ContestDetail,
   ContestListItem,
+  ContestProblem,
+  ContestStats,
+  ContestViewer,
+  ParticipationSummary,
   ProblemCell,
   Ranking,
   RankingRow,
@@ -238,11 +243,121 @@ export const PARTICIPATION_IDS = ['part-07', 'part-12', 'part-03', 'part-01'] as
 export const RANKING_PROBLEM_IDS = ['prob-a', 'prob-b', 'prob-c'] as const;
 const [PROBLEM_A, PROBLEM_B, PROBLEM_C] = RANKING_PROBLEM_IDS;
 
+export const CONTEST_PROBLEM_IDS = RANKING_PROBLEM_IDS;
+const CONTEST_PROBLEM_NAMES = [
+  'Dãy số đẹp',
+  'Trò chơi trên cây',
+  'Đường đi ngắn nhất có ràng buộc',
+];
+
+export const contestProblem = (
+  index: number,
+  overrides: Partial<ContestProblem> = {},
+): ContestProblem => ({
+  problemId: CONTEST_PROBLEM_IDS[index]!,
+  code: `r42${'abc'[index]}`,
+  name: CONTEST_PROBLEM_NAMES[index]!,
+  label: 'ABC'[index]!,
+  points: 100,
+  partial: false,
+  isPretested: false,
+  maxSubmissions: null,
+  ...overrides,
+});
+
+export const participationSummary = (
+  overrides: Partial<ParticipationSummary> = {},
+): ParticipationSummary => ({
+  id: 'part-01',
+  virtual: 0,
+  isRegistered: false,
+  isDisqualified: false,
+  realStart: '2026-10-08T08:00:00Z',
+  endTime: '2026-10-08T11:24:37Z',
+  ...overrides,
+});
+
+export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestViewer => ({
+  canEdit: false,
+  isEditor: false,
+  isTester: false,
+  inContest: false,
+  liveParticipation: null,
+  ...overrides,
+});
+
 export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDetail => ({
   ...contestItem(),
+  description: '',
+  descriptionHtml: '<p>Vòng tuần cho đội tuyển, xếp hạng kiểu ICPC.</p>',
+  authors: [{ id: '0192a000-0000-7000-8000-0000000003a1', username: 'thayhung' }],
+  registrationStart: null,
+  registrationEnd: null,
   frozenLastMinutes: 60,
+  scoreboardVisibility: 'V',
+  showSubmissionList: false,
   pointsPrecision: 0,
+  runPretestsOnly: false,
+  hideProblemTags: false,
+  hideProblemAuthors: false,
+  showShortDisplay: false,
+  labelStyle: 'alpha',
+  formatConfig: {},
+  disallowVirtual: false,
+  requiresAccessCode: false,
   problems: null,
+  viewer: contestViewer(),
+  ...overrides,
+});
+
+/** Ids grow with `index` like UUID v7, so a higher index is a newer announcement. */
+export const announcement = (
+  index: number,
+  overrides: Partial<Announcement> = {},
+): Announcement => ({
+  id: `0192a000-0000-7000-8000-0000000004${String(index).padStart(2, '0')}`,
+  title: `Thông báo ${index}`,
+  description: `Nội dung ${index}`,
+  descriptionHtml: `<p>Nội dung ${index}</p>`,
+  createdAt: `2026-10-08T0${Math.min(index, 9)}:00:00Z`,
+  ...overrides,
+});
+
+export const contestStats = (overrides: Partial<ContestStats> = {}): ContestStats => ({
+  problems: [
+    {
+      problemId: CONTEST_PROBLEM_IDS[0],
+      code: 'r42a',
+      name: 'Dãy số đẹp',
+      label: 'A',
+      results: { AC: 412, WA: 61, CE: 18, TLE: 9, ERR: 5, RJ: 0 },
+      total: 505,
+      acRate: 81.6,
+    },
+    {
+      problemId: CONTEST_PROBLEM_IDS[1],
+      code: 'r42b',
+      name: 'Trò chơi trên cây',
+      label: 'B',
+      results: { AC: 0, WA: 0, CE: 0, TLE: 0, ERR: 0, RJ: 0 },
+      total: 0,
+      acRate: 0,
+    },
+  ],
+  languages: [
+    {
+      languageId: '0192a000-0000-7000-8000-0000000000c1',
+      name: 'C++20',
+      count: 1952,
+      acRate: 38.4,
+    },
+    {
+      languageId: '0192a000-0000-7000-8000-0000000000c2',
+      name: 'Python 3',
+      count: 402,
+      acRate: 21.9,
+    },
+  ],
   ...overrides,
 });
 

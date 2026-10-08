@@ -3,15 +3,18 @@ export type ContestPhase = 'upcoming' | 'running' | 'ended';
 /** backend: libs/database contest.schema.ts CONTEST_FORMAT_NAMES */
 export type ContestFormatName =
   'default' | 'ioi' | 'ioi16' | 'icpc' | 'vnoj' | 'ultimate' | 'final_submission';
+/** backend: contest.schema.ts SCOREBOARD_VISIBILITIES: Visible, Hidden, hidden during the Contest, hidden during the Participation. */
+export type ScoreboardVisibility = 'V' | 'H' | 'C' | 'P';
+export type LabelStyle = 'numeric' | 'alpha';
 
-/** backend: apps/api/src/modules/contests/core/dto/contest-list.response.ts */
-export interface ContestListItem {
+/** backend: contests/core/dto/contest-list.response.ts (fields of every row). */
+export interface ContestSummary {
   key: string;
   name: string;
   summary: string;
   startTime: string;
   endTime: string;
-  /** Seconds. */
+  /** Seconds per participation. */
   timeLimit: number | null;
   phase: ContestPhase;
   formatName: ContestFormatName;
@@ -22,8 +25,10 @@ export interface ContestListItem {
   isPrivate: boolean;
   isOrganizationPrivate: boolean;
 }
+/** A list row; backend 4c adds the join rules and the viewer block (Task 13). */
+export type ContestListItem = ContestSummary;
 
-/** backend: contests/core/dto/contest-detail.response.ts (ContestProblemResponse) */
+/** backend: contest-detail.response.ts ContestProblemResponse */
 export interface ContestProblem {
   problemId: string;
   code: string;
@@ -31,19 +36,113 @@ export interface ContestProblem {
   label: string;
   points: number;
   partial: boolean;
+  isPretested: boolean;
+  /** Null: no cap. */
+  maxSubmissions: number | null;
 }
 
-/** backend: contest-detail.response.ts (ContestDetailResponse, fields the SPA reads in 8a) */
-export interface ContestDetail extends ContestListItem {
+/** backend: contest-detail.response.ts ParticipationSummaryResponse */
+export interface ParticipationSummary {
+  id: string;
+  /** 0 live, -1 spectate, n ≥ 1 the n-th virtual run. */
+  virtual: number;
+  isRegistered: boolean;
+  isDisqualified: boolean;
+  realStart: string;
+  endTime: string;
+}
+
+/** backend: contest-detail.response.ts ContestViewerResponse */
+export interface ContestViewer {
+  canEdit: boolean;
+  isEditor: boolean;
+  isTester: boolean;
+  /** This contest is the viewer's current one. */
+  inContest: boolean;
+  liveParticipation: ParticipationSummary | null;
+}
+
+/** backend: contest-detail.response.ts ContestDetailResponse (settings are editor-only and unused here). */
+export interface ContestDetail extends ContestSummary {
+  description: string;
+  /** Sanitized by the backend; render only through UserContent. */
+  descriptionHtml: string;
+  authors: Array<{ id: string; username: string }>;
+  registrationStart: string | null;
+  registrationEnd: string | null;
   frozenLastMinutes: number;
+  scoreboardVisibility: ScoreboardVisibility;
+  showSubmissionList: boolean;
   pointsPrecision: number;
+  runPretestsOnly: boolean;
+  hideProblemTags: boolean;
+  hideProblemAuthors: boolean;
+  showShortDisplay: boolean;
+  labelStyle: LabelStyle;
+  /** The stored config: keys the contest never set are missing (the format's default applies). */
+  formatConfig: Record<string, number | boolean>;
+  disallowVirtual: boolean;
+  requiresAccessCode: boolean;
   /** Null until the viewer may see them. */
   problems: ContestProblem[] | null;
+  viewer: ContestViewer;
 }
 
-/** backend: contests/core/dto/contest-list.dto.ts */
+/** backend: participation.response.ts CurrentParticipationResponse */
+export interface CurrentParticipation {
+  contest: { key: string; name: string; startTime: string; endTime: string };
+  participation: ParticipationSummary;
+}
+
+/** backend: announcements/dto/announcement.response.ts */
+export interface Announcement {
+  /** UUID v7: later announcements sort after earlier ones as strings. */
+  id: string;
+  title: string;
+  description: string;
+  descriptionHtml: string;
+  createdAt: string;
+}
+
+/** backend: stats/dto/contest-stats.response.ts */
+export interface ContestProblemResults {
+  AC: number;
+  WA: number;
+  CE: number;
+  TLE: number;
+  /** MLE, OLE, IR, RTE, AB and IE together. */
+  ERR: number;
+  RJ: number;
+}
+export interface ContestProblemStats {
+  problemId: string;
+  code: string;
+  name: string;
+  label: string;
+  results: ContestProblemResults;
+  /** Every submission, pending ones included. */
+  total: number;
+  /** Percent of `total`. */
+  acRate: number;
+}
+export interface ContestLanguageStats {
+  languageId: string;
+  name: string;
+  count: number;
+  /** Percent of `count`. */
+  acRate: number;
+}
+export interface ContestStats {
+  problems: ContestProblemStats[];
+  /** Most used first. */
+  languages: ContestLanguageStats[];
+}
+
+/** backend: contests/core/dto/contest-list.dto.ts (the filters the SPA uses). */
 export interface ContestListQuery {
   phase?: ContestPhase;
+  rated?: boolean;
+  search?: string;
   page?: number;
   pageSize?: number;
 }
