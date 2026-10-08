@@ -171,6 +171,7 @@ describe('usePdfStatement', () => {
     lang.value = 'en';
     await nextTick();
     expect(signalOf(0).aborted).toBe(true);
+    await vi.advanceTimersByTimeAsync(3000); // the 3 s floor applies to the next probe
     start();
     code.value = 'lis';
     await nextTick();
@@ -201,6 +202,21 @@ describe('usePdfStatement', () => {
     start();
     await vi.advanceTimersByTimeAsync(0);
     expect(probe).toHaveBeenCalledTimes(1);
+  });
+  it('does not probe again within 3 s of the last probe after the language changed while preparing', async () => {
+    probe.mockImplementation(neverAnswers);
+    const { lang, start } = setup();
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    lang.value = 'en';
+    await nextTick();
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(probe).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(3000);
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(probe).toHaveBeenCalledTimes(2);
   });
   it('stops polling when its scope is disposed', async () => {
     probe.mockResolvedValue(rendering(3000));

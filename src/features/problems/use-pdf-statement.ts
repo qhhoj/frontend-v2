@@ -70,10 +70,12 @@ export function usePdfStatement(code: Ref<string>, lang: Ref<StatementLanguage>)
     void poll(generation);
   };
   // A new statement starts from idle; a wait the server asked for still applies to it.
+  // The 3 s floor outlives the probe it was measured from: a change while preparing still waits it out.
   watch([code, lang], () => {
     stop();
     failure.value = null;
     phase.value = 'idle';
+    retryAt.value = Math.max(retryAt.value, lastProbeAt + MIN_POLL_MS);
   });
   onScopeDispose(stop);
   return { phase, failure, retryAt, start };
