@@ -67,7 +67,7 @@ describe('Settings › Security while viewing as someone', () => {
       (call) =>
         call.path.startsWith('/auth/2fa') ||
         call.path.startsWith('/auth/password') ||
-        call.path.startsWith('/auth/api-token') ||
+        call.path.startsWith('/auth/token') ||
         call.path === '/auth/logout-all',
     );
     expect(securityCalls).toEqual([]);
