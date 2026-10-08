@@ -9,6 +9,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
 import { usePageTitle } from '@/router/page-title';
+import { useViewerId } from '@/stores/use-viewer-id';
 import AnnouncementItem from './AnnouncementItem.vue';
 import {
   isUnread,
@@ -23,6 +24,7 @@ import { useContestAnnouncementsQuery, useContestQuery } from './contests.querie
 
 const route = useRoute();
 const router = useRouter();
+const viewerId = useViewerId();
 const key = computed(() => String(route.params.key));
 const page = computed(() => Math.max(1, Number(route.query.page) || 1));
 const { data: contest, error: contestError } = useContestQuery(key);
@@ -31,10 +33,10 @@ usePageTitle(() => contest.value?.name);
 /** "Mới" marks what was new when the tab opened (per contest; the badge clears at once). */
 const seenAtOpen = ref('');
 watch(
-  key,
-  (contestKey) => {
-    loadSeenAnnouncement(contestKey);
-    seenAtOpen.value = seenAnnouncementId(contestKey);
+  [viewerId, key],
+  ([viewer, contestKey]) => {
+    loadSeenAnnouncement(viewer, contestKey);
+    seenAtOpen.value = seenAnnouncementId(viewer, contestKey);
   },
   { immediate: true },
 );
@@ -43,7 +45,7 @@ watch(
   (value) => {
     const newest = value?.items[0];
     if (newest && page.value === ANNOUNCEMENT_FIRST_PAGE)
-      markAnnouncementsSeen(key.value, newest.id);
+      markAnnouncementsSeen(viewerId.value, key.value, newest.id);
   },
   { immediate: true },
 );

@@ -10,6 +10,7 @@ import {
   signedOut,
 } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
+import { signedInViewer } from '@/test/problem-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -278,7 +279,7 @@ describe('contest ranking', () => {
   });
 
   it('keeps the board on screen while the virtual toggle loads', async () => {
-    mockApi(routes());
+    mockApi(routes({ ...signedInViewer() }));
     const answer = fetch;
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => (release = resolve));

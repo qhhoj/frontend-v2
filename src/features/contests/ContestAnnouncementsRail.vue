@@ -5,6 +5,7 @@ import type { ContestDetail } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { useViewerId } from '@/stores/use-viewer-id';
 import AnnouncementItem from './AnnouncementItem.vue';
 import { isUnread, loadSeenAnnouncement, seenAnnouncementId } from './announcement-seen';
 import { useContestAnnouncementsQuery } from './contests.queries';
@@ -12,7 +13,10 @@ import { isAnnouncementStreamPaused } from './use-announcement-feed';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const key = computed(() => props.contest.key);
-watch(key, loadSeenAnnouncement, { immediate: true });
+const viewerId = useViewerId();
+watch([viewerId, key], ([viewer, contestKey]) => loadSeenAnnouncement(viewer, contestKey), {
+  immediate: true,
+});
 const RAIL_SIZE = 3;
 const { data, isPending, isSuccess } = useContestAnnouncementsQuery(
   key,
@@ -46,7 +50,7 @@ const isLive = computed(
       v-for="item in latest"
       :key="item.id"
       :announcement="item"
-      :is-unread="isUnread(item, seenAnnouncementId(contest.key))"
+      :is-unread="isUnread(item, seenAnnouncementId(viewerId, contest.key))"
       is-compact
     />
     <RouterLink

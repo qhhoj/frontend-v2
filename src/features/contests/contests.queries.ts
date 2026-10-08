@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter, Ref } from 'vue';
 import { ApiError } from '@/api/client';
@@ -12,6 +12,10 @@ import {
 } from '@/api/contests.api';
 import type { ContestListQuery } from '@/api/types/contests';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForSameViewer } from './keep-previous-for-viewer';
+
+/** Every account-owned key carries the viewer id at this index: `['contests', <scope>, viewerId, ...]`. */
+const VIEWER_KEY_INDEX = 2;
 
 /** No ranking event exists yet (backend ask B4): a running board is re-read on this interval. */
 export const RANKING_POLL_MS = 30_000;
@@ -22,7 +26,7 @@ export const useContestListQuery = (query: Ref<ContestListQuery>) => {
   return useQuery({
     queryKey: computed(() => ['contests', 'list', viewerId.value, query.value]),
     queryFn: () => fetchContests(query.value),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),
   });
 };
 
@@ -50,7 +54,7 @@ export const useContestAnnouncementsQuery = (key: Ref<string>, page: Ref<number>
   return useQuery({
     queryKey: computed(() => ['contests', 'announcements', viewerId.value, key.value, page.value]),
     queryFn: () => fetchContestAnnouncements(key.value, page.value),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),
   });
 };
 
@@ -71,6 +75,18 @@ const rankingKey = (viewerId: string, contestKey: string, virtual: boolean) =>
 const RANKING_KEY_CONTEST_INDEX = 3;
 const contestOfRankingKey = (queryKey: readonly unknown[]) => queryKey[RANKING_KEY_CONTEST_INDEX];
 
+/** The previous board stays a placeholder only for the same contest and the same viewer. */
+const keepBoardOfContest = (viewerId: string, contestKey: string) => {
+  const keepForViewer = keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId);
+  return <T>(
+    previous: T | undefined,
+    previousQuery: { queryKey: readonly unknown[] } | undefined,
+  ) =>
+    previousQuery && contestOfRankingKey(previousQuery.queryKey) === contestKey
+      ? keepForViewer(previous, previousQuery)
+      : undefined;
+};
+
 export const useRankingQuery = (
   key: MaybeRefOrGetter<string>,
   withVirtual: Ref<boolean>,
@@ -80,11 +96,8 @@ export const useRankingQuery = (
   return useQuery({
     queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
-    /** Switching the virtual toggle keeps the old board on screen (never another contest's). */
-    placeholderData: (previous, previousQuery) =>
-      previousQuery && contestOfRankingKey(previousQuery.queryKey) === toValue(key)
-        ? previous
-        : undefined,
+    /** Switching the virtual toggle keeps the old board on screen (never another contest's or viewer's). */
+    placeholderData: computed(() => keepBoardOfContest(viewerId.value, toValue(key))),
     refetchInterval: computed(() => (running.value ? RANKING_POLL_MS : false)),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
     refetchIntervalInBackground: false,

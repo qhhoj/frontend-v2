@@ -17,7 +17,7 @@ describe('contest announcements', () => {
   beforeEach(() => localStorage.clear());
 
   it('counts unread announcements on the tab, from the newest id this browser has seen', async () => {
-    localStorage.setItem('qhhoj.contest-announcements-seen.r42', announcement(1).id);
+    localStorage.setItem('qhhoj.contest-announcements-seen.anonymous:r42', announcement(1).id);
     mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(contestDetail(), [announcement(3), announcement(2), announcement(1)]),
@@ -67,7 +67,7 @@ describe('contest announcements', () => {
   });
 
   it('lists every announcement on its tab, marks the new ones and then counts them as read', async () => {
-    localStorage.setItem('qhhoj.contest-announcements-seen.r42', announcement(1).id);
+    localStorage.setItem('qhhoj.contest-announcements-seen.anonymous:r42', announcement(1).id);
     mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
@@ -194,7 +194,7 @@ describe('contest announcements', () => {
   });
 
   it('shows the announcements of the contest now open, with its own marks, when the key changes', async () => {
-    localStorage.setItem('qhhoj.contest-announcements-seen.r43', announcement(4).id);
+    localStorage.setItem('qhhoj.contest-announcements-seen.anonymous:r43', announcement(4).id);
     mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
