@@ -77,6 +77,35 @@ describe('contest submissions tab', () => {
     );
   });
 
+  it('shows the four-column table in the own-only state and the full table otherwise', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail()),
+      'GET /contests/r42/submissions': page([submissionItem()]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.findAll('thead th').map((header) => header.text())).toEqual([
+      'Kết quả',
+      'Bài',
+      'Điểm',
+      'Nộp lúc',
+    ]);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(4);
+  });
+  it('keeps all eight columns once the list is public', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(open),
+      'GET /contests/r42/submissions': page([submissionItem()]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.findAll('thead th')).toHaveLength(8);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(8);
+  });
+
   it('shows the full list to an editor without the banner', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     mockApi({

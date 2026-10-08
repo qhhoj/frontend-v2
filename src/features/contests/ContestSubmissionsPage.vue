@@ -51,6 +51,9 @@ const labels = computed(() =>
   ),
 );
 const rows = computed(() => list.value?.items ?? []);
+/** The narrowed list shows the mock's four columns: every row is the viewer's own, so user, language and cost add nothing. */
+const OWN_ONLY_COLUMNS = ['verdict', 'problem', 'score', 'when'] as const;
+const listColumns = computed(() => (isOwnOnly.value ? OWN_ONLY_COLUMNS : undefined));
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
@@ -90,11 +93,16 @@ function goToPage(page: number) {
         />
         <div ref="listTop" class="min-w-0 flex-1 scroll-mt-20" :aria-busy="isPlaceholderData">
           <QueryState :loading="isPending" :error="error" @retry="refetch()">
-            <template #skeleton><SubmissionTableSkeleton /></template>
+            <template #skeleton><SubmissionTableSkeleton :column-keys="listColumns" /></template>
             <GlassCard v-if="!rows.length" as="div">
               <EmptyState>{{ $t('contests.submissions.empty') }}</EmptyState>
             </GlassCard>
-            <SubmissionTable v-else :submissions="rows" :problem-labels="labels" />
+            <SubmissionTable
+              v-else
+              :submissions="rows"
+              :problem-labels="labels"
+              :column-keys="listColumns"
+            />
             <SubmissionPager
               :page="filters.page"
               :page-size="SUBMISSION_PAGE_SIZE"

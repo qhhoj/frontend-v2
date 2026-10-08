@@ -6,7 +6,11 @@ import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells
 
 /** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
 const ROW_COUNT = 10;
-const props = withDefaults(defineProps<{ showProblem?: boolean }>(), { showProblem: true });
+type ColumnKey = 'verdict' | 'problem' | 'user' | 'score' | 'time' | 'memory' | 'language' | 'when';
+const props = withDefaults(
+  defineProps<{ showProblem?: boolean; columnKeys?: readonly ColumnKey[] }>(),
+  { showProblem: true, columnKeys: undefined },
+);
 /** Header cell width, then the cell's own width, per column in the table's order. */
 const COLUMNS = [
   { key: 'verdict', header: 'w-14', cell: 'w-16', isNumber: false },
@@ -19,7 +23,11 @@ const COLUMNS = [
   { key: 'when', header: 'w-14', cell: 'w-20', isNumber: false },
 ] as const;
 const columns = computed(() =>
-  COLUMNS.filter((column) => props.showProblem || column.key !== 'problem'),
+  COLUMNS.filter(
+    (column) =>
+      (props.showProblem || column.key !== 'problem') &&
+      (!props.columnKeys || props.columnKeys.includes(column.key)),
+  ),
 );
 </script>
 

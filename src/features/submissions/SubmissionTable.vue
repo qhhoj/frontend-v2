@@ -20,17 +20,26 @@ import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells';
 
+type ColumnKey = 'verdict' | 'problem' | 'user' | 'score' | 'time' | 'memory' | 'language' | 'when';
+
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
   defineProps<{
     submissions: SubmissionListItem[];
     showProblem?: boolean;
+    /** Columns to show, in table order; omitted shows all of them. */
+    columnKeys?: readonly ColumnKey[];
     /** Rows that just arrived: they fade in from the accent colour. */
     highlightIds?: ReadonlySet<string>;
     /** Problem code to the contest letter, shown before the name (contest lists only). */
     problemLabels?: Record<string, string>;
   }>(),
-  { showProblem: true, highlightIds: () => new Set<string>(), problemLabels: () => ({}) },
+  {
+    showProblem: true,
+    highlightIds: () => new Set<string>(),
+    problemLabels: () => ({}),
+    columnKeys: undefined,
+  },
 );
 const locale = useLocaleStore();
 /** "2 minutes ago" does not need a tick every second. */
@@ -51,8 +60,13 @@ const COLUMNS = [
   { key: 'when', isNumber: false },
 ] as const;
 const columns = computed(() =>
-  COLUMNS.filter((column) => props.showProblem || column.key !== 'problem'),
+  COLUMNS.filter(
+    (column) =>
+      (props.showProblem || column.key !== 'problem') &&
+      (!props.columnKeys || props.columnKeys.includes(column.key)),
+  ),
 );
+const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
 
 const rowLabel = (row: SubmissionListItem) =>
   translate('submissions.rowLabel', {
@@ -124,7 +138,7 @@ const formatScore = (value: number) =>
                 >
               </RouterLink>
             </td>
-            <td v-if="showProblem" :class="BODY_CELL_CLASSES">
+            <td v-if="isShown('problem')" :class="BODY_CELL_CLASSES">
               <template v-if="row.problem">
                 <span
                   v-if="problemLabels[row.problem.code]"
@@ -140,24 +154,35 @@ const formatScore = (value: number) =>
               </template>
               <template v-else>{{ NO_VALUE }}</template>
             </td>
-            <td :class="BODY_CELL_CLASSES">
+            <td v-if="isShown('user')" :class="BODY_CELL_CLASSES">
               <span v-if="row.user" class="flex items-center gap-2">
                 <UserAvatar :username="row.user.username" :size="24" />
                 <UserName :username="row.user.username" />
               </span>
               <template v-else>{{ NO_VALUE }}</template>
             </td>
-            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
+            <td
+              v-if="isShown('score')"
+              :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']"
+            >
               {{ finishedValue(row, formatScore, row.points) }}
             </td>
-            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
+            <td
+              v-if="isShown('time')"
+              :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']"
+            >
               {{ finishedValue(row, formatCaseTime, row.time) }}
             </td>
-            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
+            <td
+              v-if="isShown('memory')"
+              :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']"
+            >
               {{ finishedValue(row, formatCaseMemory, row.memory) }}
             </td>
-            <td :class="[BODY_CELL_CLASSES, 'text-muted']">{{ row.language?.name ?? NO_VALUE }}</td>
-            <td :class="[BODY_CELL_CLASSES, 'whitespace-nowrap text-muted']">
+            <td v-if="isShown('language')" :class="[BODY_CELL_CLASSES, 'text-muted']">
+              {{ row.language?.name ?? NO_VALUE }}
+            </td>
+            <td v-if="isShown('when')" :class="[BODY_CELL_CLASSES, 'whitespace-nowrap text-muted']">
               <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
                 formatRelative(row.date, now, locale.locale)
               }}</time>
