@@ -60,4 +60,9 @@ describe('contest list filters', () => {
       pageSize: 20,
     });
   });
+
+  it('caps the search at 100 code points, so a cut never splits a surrogate pair', () => {
+    const emojis = parseContestListFilters({ search: '😀'.repeat(150) }).search;
+    expect(emojis).toBe('😀'.repeat(100));
+  });
 });

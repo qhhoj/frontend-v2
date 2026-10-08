@@ -114,6 +114,21 @@ describe('loading screens show blocks shaped like their content', () => {
   });
 });
 
+describe('the contest list shows blocks shaped like its groups', () => {
+  it('fills the running cards, the upcoming rows and the ended table while the groups load, inert', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests');
+    const dom = wrapper.element;
+    expect(regionsIn(dom, 'running-card')).toBe(2);
+    expect(regionsIn(dom, 'upcoming-row')).toBe(3);
+    expect(regionsIn(dom, 'ended-header')).toBe(1);
+    expect(regionsIn(dom, 'ended-row')).toBe(5);
+    for (const skeleton of dom.querySelectorAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton, 'contest list skeleton');
+  });
+});
+
 describe('the editorial tab loads with a statement-shaped skeleton', () => {
   it('shows the statement blocks inside its own panel, inert, while the editorial is on its way', async () => {
     mockApi({

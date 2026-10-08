@@ -230,7 +230,9 @@
         "upcomingHint": "Hiện chưa có kỳ thi nào được lên lịch. Trong lúc chờ, hãy thi ảo một kỳ thi đã kết thúc.",
         "seeEnded": "Xem kỳ thi đã kết thúc",
         "ended": "Chưa có kỳ thi nào kết thúc",
-        "noMatch": "Không có kỳ thi nào khớp bộ lọc"
+        "noMatch": "Không có kỳ thi nào khớp bộ lọc",
+        "pastLastPage": "Trang này không tồn tại.",
+        "backToFirstPage": "Về trang 1"
       }
     }
   },

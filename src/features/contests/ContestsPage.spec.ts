@@ -226,4 +226,55 @@ describe('contest list', () => {
     expect(upcoming.text()).toContain('Không có kỳ thi nào khớp bộ lọc');
     expect(upcoming.find('a[href="/contests?phase=ended"]').exists()).toBe(false);
   });
+
+  it('marks an upcoming contest that ends on a later local day with its day offset', async () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    // 20:00Z Oct 10 is 03:00 on Oct 11; 18:00Z Oct 11 is 01:00 on Oct 12.
+    const overnight = contestItem({
+      key: 'r44',
+      phase: 'upcoming',
+      startTime: '2026-10-10T20:00:00Z',
+      endTime: '2026-10-11T18:00:00Z',
+    });
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ upcoming: [overnight] }) });
+    const { wrapper } = await mountApp('/contests');
+    expect(wrapper.get('[data-testid="upcoming-contest"]').text()).toContain('03:00–01:00 (+1)');
+    vi.unstubAllEnvs();
+  });
+
+  it('pages back to page 1 through the pager and drops the page from the URL', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestListRoutes({}),
+      'GET /contests': (call) =>
+        call.query.get('phase') === 'ended'
+          ? {
+              body: {
+                data: [contestItem({ phase: 'ended' })],
+                meta: { page: Number(call.query.get('page')), pageSize: 20, total: 31 },
+              },
+            }
+          : { body: { data: [], meta: { page: 1, pageSize: 3, total: 0 } } },
+    });
+    const { wrapper, router } = await mountApp('/contests?phase=ended&page=2');
+    await wrapper.get('button[data-direction="previous"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.page).toBeUndefined();
+    expect(
+      calls
+        .filter((call) => call.path === '/contests')
+        .at(-1)!
+        .query.get('page'),
+    ).toBe('1');
+  });
+
+  it('says a page past the last does not exist, with a way back to page 1, not that nothing ended', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({}) });
+    const { wrapper } = await mountApp('/contests?phase=ended&page=99');
+    const ended = wrapper.get('section[aria-labelledby="contest-group-ended"]');
+    expect(ended.text()).toContain('Trang này không tồn tại.');
+    expect(ended.text()).not.toContain('Chưa có kỳ thi nào kết thúc');
+    expect(ended.get('a[href="/contests?phase=ended"]').text()).toContain('Về trang 1');
+  });
 });

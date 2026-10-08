@@ -230,7 +230,9 @@
         "upcomingHint": "Nothing is scheduled yet. Meanwhile, take an ended contest as a virtual run.",
         "seeEnded": "See ended contests",
         "ended": "No contest has ended yet",
-        "noMatch": "No contest matches these filters"
+        "noMatch": "No contest matches these filters",
+        "pastLastPage": "This page does not exist.",
+        "backToFirstPage": "Back to page 1"
       }
     }
   },

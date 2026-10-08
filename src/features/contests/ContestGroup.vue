@@ -69,6 +69,14 @@ const toggleTarget = computed(() => ({
 }));
 const headingId = computed(() => `contest-group-${props.phase}`);
 const countId = computed(() => `contest-group-${props.phase}-count`);
+/** A page past the last one comes back empty: say so, rather than that the phase has no contests. */
+const isPastLastPage = computed(
+  () => isSingleGroup.value && props.filters.page > 1 && contests.value.length === 0,
+);
+const firstPageTarget = computed(() => ({
+  name: 'contests',
+  query: toContestListLocation({ ...props.filters, page: 1 }),
+}));
 </script>
 
 <template>
@@ -91,7 +99,13 @@ const countId = computed(() => `contest-group-${props.phase}-count`);
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestListSkeletons :kind="phase" /></template>
-      <ContestListEmpty v-if="!shownContests.length" :phase="phase" :is-filtered="isFiltered" />
+      <ContestListEmpty
+        v-if="!shownContests.length"
+        :phase="phase"
+        :is-filtered="isFiltered"
+        :is-past-last-page="isPastLastPage"
+        :first-page-target="firstPageTarget"
+      />
       <div v-else-if="phase === 'running'" class="grid gap-4 lg:grid-cols-2">
         <RunningContestCard
           v-for="contest in shownContests"

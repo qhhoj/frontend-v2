@@ -22,6 +22,8 @@ export const OVERVIEW_PAGE_SIZE: Record<ContestPhase, number> = {
 };
 export const PHASE_PAGE_SIZE = 20;
 const MAX_SEARCH_LENGTH = 100;
+/** Counted in code points, so a cut never splits an emoji or another surrogate pair. */
+const capSearch = (text: string) => Array.from(text).slice(0, MAX_SEARCH_LENGTH).join('');
 const MAX_PAGE = 10_000;
 const RATED_ONLY = '1';
 
@@ -37,7 +39,7 @@ function pageOf(query: LocationQuery): number {
 export function parseContestListFilters(query: LocationQuery): ContestListFilters {
   const phase = valuesOf(query.phase)[0];
   return {
-    search: (valuesOf(query.search)[0] ?? '').slice(0, MAX_SEARCH_LENGTH),
+    search: capSearch(valuesOf(query.search)[0] ?? ''),
     isRatedOnly: valuesOf(query.rated)[0] === RATED_ONLY,
     phase: isPhase(phase) ? phase : null,
     page: pageOf(query),
