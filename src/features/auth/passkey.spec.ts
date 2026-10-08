@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
-import { isPasskeySupported, signInWithPasskey } from './passkey';
+import { isPasskeySupported, isPromptCancelled, signInWithPasskey } from './passkey';
 
 const OPTIONS = { challenge: 'Y2hhbGxlbmdl', rpId: 'localhost' };
 
@@ -67,5 +67,16 @@ describe('signInWithPasskey', () => {
     stubBrowser(() => Promise.resolve(null));
     mockApi({ 'POST /auth/2fa/webauthn/login/options': fail(400, 'webauthn_not_enabled') });
     await expect(signInWithPasskey()).rejects.toMatchObject({ code: 'webauthn_not_enabled' });
+  });
+});
+
+describe('isPromptCancelled', () => {
+  it.each(['NotAllowedError', 'AbortError'])('is true for a %s prompt', (name) => {
+    expect(isPromptCancelled(new DOMException('closed', name))).toBe(true);
+  });
+
+  it('is false for any other failure', () => {
+    expect(isPromptCancelled(new DOMException('known key', 'InvalidStateError'))).toBe(false);
+    expect(isPromptCancelled(new Error('boom'))).toBe(false);
   });
 });

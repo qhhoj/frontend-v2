@@ -4,10 +4,12 @@ import { webauthnLoginOptions, webauthnLoginVerify } from '@/api/auth.api';
 interface PasskeyStatics {
   parseRequestOptionsFromJSON?: (options: object) => PublicKeyCredentialRequestOptions;
 }
-const statics = () =>
-  typeof PublicKeyCredential === 'undefined'
-    ? null
-    : (PublicKeyCredential as unknown as PasskeyStatics);
+
+/** `PublicKeyCredential` with the static helpers `Statics` names, or null when the browser has no WebAuthn at all. */
+export const webauthnStatics = <Statics extends object>() =>
+  typeof PublicKeyCredential === 'undefined' ? null : (PublicKeyCredential as unknown as Statics);
+
+const statics = () => webauthnStatics<PasskeyStatics>();
 
 export const isPasskeySupported = () =>
   typeof statics()?.parseRequestOptionsFromJSON === 'function' &&
@@ -15,6 +17,10 @@ export const isPasskeySupported = () =>
 
 export type PasskeyOutcome = 'verified' | 'not-needed' | 'cancelled';
 const CANCELLED_PROMPTS = ['NotAllowedError', 'AbortError'];
+
+/** The viewer closed the browser's prompt or let it time out: not an error. */
+export const isPromptCancelled = (error: unknown) =>
+  error instanceof DOMException && CANCELLED_PROMPTS.includes(error.name);
 
 /**
  * Second factor through the browser's WebAuthn API: the backend issues the challenge (stored in the session), the
@@ -28,7 +34,7 @@ export async function signInWithPasskey(): Promise<PasskeyOutcome> {
   try {
     credential = await navigator.credentials.get({ publicKey });
   } catch (error) {
-    if (error instanceof DOMException && CANCELLED_PROMPTS.includes(error.name)) return 'cancelled';
+    if (isPromptCancelled(error)) return 'cancelled';
     throw error;
   }
   if (!credential) return 'cancelled';
