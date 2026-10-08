@@ -12,7 +12,7 @@ import ScratchCodesPanel from './ScratchCodesPanel.vue';
 
 type EnrolStep = 'password' | 'scan' | 'codes';
 const STEPS: readonly EnrolStep[] = ['password', 'scan', 'codes'];
-const emit = defineEmits<{ close: [] }>();
+const emit = defineEmits<{ close: []; done: [] }>();
 const session = useSessionStore();
 const step = ref<EnrolStep>('password');
 const enrollment = ref<TotpEnrollment | null>(null);
@@ -88,7 +88,7 @@ function onConfirmed(value: string[]) {
       :codes="codes"
       :username="session.user?.username ?? ''"
       :notice="$t('settings.totp.enabled')"
-      @done="emit('close')"
+      @done="emit('done')"
     />
   </SettingsCard>
 </template>

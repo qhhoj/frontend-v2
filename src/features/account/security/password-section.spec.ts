@@ -53,6 +53,14 @@ describe('Settings › Security › password', () => {
     expect(wrapper.find('#main [role="status"]').exists()).toBe(false);
   });
 
+  it('moves focus to the section heading after a finished change, never to the body', async () => {
+    const { wrapper } = await openSecurity();
+    await fillAndSubmit(wrapper);
+    expect(document.activeElement?.tagName).toBe('H2');
+    expect(document.activeElement?.textContent).toBe('Đổi mật khẩu');
+    expect(document.activeElement).not.toBe(document.body);
+  });
+
   it('says how long to wait when the password budget is spent, as the other security flows do', async () => {
     const { wrapper, calls } = await openSecurity(rateLimited(42));
     await fillAndSubmit(wrapper);

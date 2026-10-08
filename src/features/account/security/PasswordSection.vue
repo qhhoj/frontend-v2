@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import ChangePasswordForm from '@/features/auth/ChangePasswordForm.vue';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
@@ -12,14 +12,22 @@ const reloadFailed = ref(false);
 const formKey = ref(0);
 const reloadSession = () => session.refresh();
 
+const card = ref<{ focusHeading: () => void } | null>(null);
+
+/** The remounted form takes the focus with it, so the focus goes to the card heading instead. */
 function finished() {
   reloadFailed.value = false;
   formKey.value += 1;
+  void nextTick(() => card.value?.focusHeading());
 }
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.password.title')" :lead="$t('settings.password.lead')">
+  <SettingsCard
+    ref="card"
+    :title="$t('settings.password.title')"
+    :lead="$t('settings.password.lead')"
+  >
     <SettingsNotice v-if="reloadFailed" tone="success">{{
       $t('auth.changePassword.changedNotLoaded')
     }}</SettingsNotice>

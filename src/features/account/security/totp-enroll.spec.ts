@@ -96,6 +96,8 @@ describe('Settings › Security › turning on the authenticator app', () => {
     await button(wrapper, 'Xong').trigger('click');
     expect(wrapper.text()).not.toContain('K7QM-2XRA-9PTD-4WLE');
     expect(wrapper.find('form[data-step="password"], form[data-step="scan"]').exists()).toBe(false);
+    expect(document.activeElement?.tagName).toBe('H2');
+    expect(document.activeElement?.textContent).toBe('Xác thực hai bước');
     expect(wrapper.html()).not.toContain('K7QM2XRA9PTD4WLE');
     expect(wrapper.html()).not.toContain('K7QM-2XRA-9PTD-4WLE');
   });

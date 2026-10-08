@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
@@ -38,10 +38,20 @@ function keyRemoved(key: SecurityKey) {
 function totpDisabled() {
   notice.value = translate('settings.totp.disabled');
 }
+/** The wizard's codes step is gone once it closes: the focus goes to this card's heading, not the body. */
+const card = ref<{ focusHeading: () => void } | null>(null);
+function enrolled() {
+  panel.value = 'none';
+  void nextTick(() => card.value?.focusHeading());
+}
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.twoFactor.title')" :lead="$t('settings.twoFactor.lead')">
+  <SettingsCard
+    ref="card"
+    :title="$t('settings.twoFactor.title')"
+    :lead="$t('settings.twoFactor.lead')"
+  >
     <template #header-end>
       <span
         class="rounded-pill px-2.5 py-0.5 text-xs font-semibold"
@@ -64,7 +74,7 @@ function totpDisabled() {
       <SecurityKeys :busy="panel !== 'none'" @add="open('addKey')" @removed="keyRemoved" />
     </ul>
   </SettingsCard>
-  <TotpEnrollWizard v-if="panel === 'enrol'" @close="panel = 'none'" />
+  <TotpEnrollWizard v-if="panel === 'enrol'" @close="panel = 'none'" @done="enrolled" />
   <RegenerateCodesCard v-if="panel === 'regenerate'" @close="panel = 'none'" />
   <AddSecurityKeyForm v-if="panel === 'addKey'" @added="keyAdded" @close="panel = 'none'" />
 </template>
