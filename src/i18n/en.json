@@ -471,7 +471,22 @@
       "confirm": "Confirm and turn on",
       "wrongCode": "The code is wrong or expired. Check the phone's clock, then enter a new code.",
       "enabled": "Two-step verification is on. The next sign-in asks for a 6-digit code.",
-      "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds."
+      "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds.",
+      "regenerate": "Regenerate backup codes",
+      "disable": "Turn off",
+      "disabled": "The authenticator app is off. The old backup codes were deleted.",
+      "disableTitle": "Turn off two-step verification?",
+      "disableBody": "The account will be protected by the password only. Existing backup codes are deleted. Security keys, if any, are removed separately.",
+      "disableConfirm": "Turn off",
+      "disableCode": "6-digit code from the authenticator app",
+      "regenerateTitle": "Regenerate backup codes?",
+      "regenerateBody": "Five new codes replace all old ones. The next step asks for the app's 6-digit code.",
+      "regenerateLead": "Enter the app's current 6-digit code. Five new codes replace all old ones; remaining codes cannot be shown again.",
+      "regenerateCode": "Verification code",
+      "regenerateSubmit": "Regenerate codes",
+      "regenerated": "Five new backup codes were created. The old ones no longer work.",
+      "remaining": "{count} backup codes left.",
+      "remainingLow": "{count} backup code(s) left: regenerate before they run out."
     },
     "codes": {
       "title": "Save backup codes",
@@ -488,6 +503,11 @@
       "leave": "Leave",
       "stay": "Stay",
       "fileHeader": "QHHOJ - backup codes for {username}. Each code works once."
+    },
+    "secondFactor": {
+      "useBackup": "Or enter a backup code",
+      "useApp": "Use the app's 6-digit code",
+      "backupLabel": "Backup code"
     }
   },
   "appearance": {

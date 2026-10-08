@@ -1,14 +1,28 @@
 <script setup lang="ts">
 import { Smartphone } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useSessionStore } from '@/stores/session.store';
 import { BUTTON } from '../settings/buttons';
+import DisableTotpDialog from './DisableTotpDialog.vue';
+import { useScratchCodesRemainingQuery } from './security.queries';
 
-/** The authenticator-app row of "Xác thực hai bước"; Task 10 adds regenerate and turn-off. */
+/** The authenticator-app row of "Xác thực hai bước" (boards SetSecurityA and B). `busy`: a wizard or the regenerate card is open. */
 defineProps<{ busy: boolean }>();
-const emit = defineEmits<{ enable: [] }>();
+const emit = defineEmits<{ enable: []; regenerate: []; disabled: [] }>();
 const session = useSessionStore();
 const enabled = computed(() => session.user?.isTotpEnabled ?? false);
+const confirmingRegenerate = ref(false);
+const disabling = ref(false);
+const remaining = useScratchCodesRemainingQuery();
+/** One code left is the last chance to regenerate before a lost phone locks the account. */
+const LOW_CODES = 1;
+const remainingCount = computed(() => remaining.data.value?.remaining);
+
+function regenerate() {
+  confirmingRegenerate.value = false;
+  emit('regenerate');
+}
 </script>
 
 <template>
@@ -25,6 +39,17 @@ const enabled = computed(() => session.user?.isTotpEnabled ?? false);
       <span class="text-[13px] text-muted">{{
         enabled ? $t('settings.totp.descriptionOn') : $t('settings.totp.descriptionOff')
       }}</span>
+      <span
+        v-if="enabled && remainingCount !== undefined"
+        class="text-[13px]"
+        :class="remainingCount <= LOW_CODES ? 'font-semibold text-negative' : 'text-muted'"
+        >{{
+          $t(
+            remainingCount <= LOW_CODES ? 'settings.totp.remainingLow' : 'settings.totp.remaining',
+            { count: remainingCount },
+          )
+        }}</span
+      >
     </span>
     <span
       v-if="enabled"
@@ -41,6 +66,32 @@ const enabled = computed(() => session.user?.isTotpEnabled ?? false);
       >
         {{ $t('settings.totp.enable') }}
       </button>
+      <template v-else>
+        <button
+          type="button"
+          :class="BUTTON.secondary"
+          :aria-disabled="busy"
+          @click="busy || (confirmingRegenerate = true)"
+        >
+          {{ $t('settings.totp.regenerate') }}
+        </button>
+        <button
+          type="button"
+          :class="BUTTON.danger"
+          :aria-disabled="busy"
+          @click="busy || (disabling = true)"
+        >
+          {{ $t('settings.totp.disable') }}
+        </button>
+      </template>
     </span>
+    <ConfirmDialog
+      v-model:visible="confirmingRegenerate"
+      :title="$t('settings.totp.regenerateTitle')"
+      :body="$t('settings.totp.regenerateBody')"
+      :confirm-label="$t('settings.totp.continue')"
+      @confirm="regenerate"
+    />
+    <DisableTotpDialog v-model:visible="disabling" @disabled="emit('disabled')" />
   </li>
 </template>

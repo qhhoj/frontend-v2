@@ -471,7 +471,22 @@
       "confirm": "Xác nhận và bật",
       "wrongCode": "Mã không đúng hoặc đã hết hạn. Kiểm tra giờ trên điện thoại rồi nhập mã mới.",
       "enabled": "Đã bật xác thực hai bước. Lần đăng nhập sau sẽ hỏi mã 6 số.",
-      "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây."
+      "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây.",
+      "regenerate": "Tạo lại mã dự phòng",
+      "disable": "Tắt",
+      "disabled": "Đã tắt ứng dụng xác thực. Các mã dự phòng cũ đã bị xoá.",
+      "disableTitle": "Tắt xác thực hai bước?",
+      "disableBody": "Tài khoản sẽ chỉ còn được bảo vệ bằng mật khẩu. Các mã dự phòng hiện có sẽ bị xoá. Khoá bảo mật (nếu có) cần gỡ riêng.",
+      "disableConfirm": "Tắt xác thực",
+      "disableCode": "Mã 6 số của ứng dụng xác thực",
+      "regenerateTitle": "Tạo lại mã dự phòng?",
+      "regenerateBody": "Năm mã mới thay thế toàn bộ mã cũ. Bạn cần nhập mã 6 số của ứng dụng xác thực ở bước tiếp theo.",
+      "regenerateLead": "Cần nhập mã 6 số hiện tại của ứng dụng xác thực. Năm mã mới thay thế toàn bộ mã cũ; hệ thống không cho xem lại mã còn lại.",
+      "regenerateCode": "Mã xác thực",
+      "regenerateSubmit": "Tạo lại mã",
+      "regenerated": "Đã tạo năm mã dự phòng mới. Các mã cũ không dùng được nữa.",
+      "remaining": "Còn {count} mã dự phòng.",
+      "remainingLow": "Còn {count} mã dự phòng: hãy tạo lại trước khi hết."
     },
     "codes": {
       "title": "Lưu mã dự phòng",
@@ -488,6 +503,11 @@
       "leave": "Rời trang",
       "stay": "Ở lại",
       "fileHeader": "QHHOJ - mã dự phòng của {username}. Mỗi mã dùng được một lần."
+    },
+    "secondFactor": {
+      "useBackup": "Hoặc nhập một mã dự phòng",
+      "useApp": "Dùng mã 6 số của ứng dụng",
+      "backupLabel": "Mã dự phòng"
     }
   },
   "appearance": {
