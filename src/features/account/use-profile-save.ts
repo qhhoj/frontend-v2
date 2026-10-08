@@ -15,7 +15,8 @@ export function useProfileSave() {
   const session = useSessionStore();
   const queryClient = useQueryClient();
   return async (patch: ProfilePatch) => {
-    if (session.status !== 'authenticated') return;
+    // A required password change blocks the API for this account, so nothing is sent.
+    if (session.status !== 'authenticated' || session.passwordChangeRequired) return;
     const userId = session.user?.id;
     const request = ++latestRequest;
     try {

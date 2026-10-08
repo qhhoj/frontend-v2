@@ -88,6 +88,38 @@ describe('profile save', () => {
     );
   });
 
+  it('sends nothing while a password change is required', async () => {
+    const calls = mockApi({ 'PATCH /profile': ok(profile()) });
+    const { saveProfile } = mountSavers();
+    useSessionStore().$patch({ passwordChangeRequired: true });
+    await saveProfile({ siteTheme: 'clay-dark' });
+    expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
+  });
+
+  it('drops an answer that arrives after sign-out', async () => {
+    const answers = holdPatches();
+    const { saveProfile, queryClient } = mountSavers();
+    const save = saveProfile({ siteTheme: 'glass-dark' });
+    await flushPromises();
+    useSessionStore().$patch({ status: 'anonymous', user: null });
+    answers[0]!(profile({ siteTheme: 'glass-dark' }));
+    await save;
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
+  });
+
+  it('drops an answer that arrives after the signed-in account changed', async () => {
+    const answers = holdPatches();
+    const { saveProfile, queryClient } = mountSavers();
+    const save = saveProfile({ siteTheme: 'glass-dark' });
+    await flushPromises();
+    const otherId = '0192a000-0000-7000-8000-00000000000b';
+    useSessionStore().$patch({ user: sessionUser({ id: otherId }) });
+    answers[0]!(profile({ siteTheme: 'glass-dark' }));
+    await save;
+    expect(queryClient.getQueryData(profileKey(otherId))).toBeUndefined();
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
+  });
+
   it('swallows a failed save and leaves the cache alone', async () => {
     mockApi({
       'PATCH /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
