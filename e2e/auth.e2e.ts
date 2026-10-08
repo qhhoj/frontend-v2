@@ -1,6 +1,6 @@
 import { generateKeyPairSync } from 'node:crypto';
 import type { Page } from '@playwright/test';
-import { organizationItem } from '../src/test/fixtures';
+import { CPP17_ID, organizationItem } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS } from './fixtures/audit';
 import { PASSKEY_CREDENTIAL_ID, fail, installAuth, invalid } from './fixtures/auth';
@@ -226,6 +226,12 @@ test.describe('registration, activation and resend', () => {
   }) => {
     const auth = installAuth(api);
     await page.goto('/register');
+    await expect(page.getByLabel('Ngôn ngữ mặc định (tuỳ chọn)')).toHaveValue(CPP17_ID);
+    const terms = page.locator('label:has(input[name="rules"])');
+    await expect(terms).toContainText(
+      'Tôi đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư.',
+    );
+    await expect(terms.locator('a')).toHaveCount(0);
     await fillRegistration(page, 'taken_name');
     await expect(page.getByText('Tên đã có người dùng')).toBeVisible();
     await expect(page.getByRole('meter', { name: 'Độ mạnh mật khẩu' })).toHaveAttribute(

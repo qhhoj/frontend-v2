@@ -1,8 +1,9 @@
 import { Buffer } from 'node:buffer';
 import type { SecondFactorMethod } from '../../src/api/types/auth';
 import type { FieldIssue } from '../../src/api/client';
-import { partialSession, sessionResponse } from '../../src/test/fixtures';
+import { organizationItem, partialSession, sessionResponse } from '../../src/test/fixtures';
 import type { FakeApi, Handler, Reply } from './api';
+import { list } from './reply';
 
 /** What `/auth/me` answers: nobody, a pending second factor, a viewer who must change a breached password, or a full session. */
 export type AuthPhase = 'anonymous' | 'partial' | 'forced' | 'authenticated';
@@ -62,6 +63,14 @@ function authRoutes(scenario: AuthScenario): Record<string, Handler> {
   const session = (phase: AuthPhase) => sessionFor(phase, scenario.methods);
   return {
     'GET /auth/me': () => session(scenario.phase),
+    'GET /organizations': list([
+      organizationItem(),
+      organizationItem({
+        id: '0192a000-0000-7000-8000-0000000000a2',
+        slug: 'thpt-b',
+        name: 'THPT B',
+      }),
+    ]),
     'POST /auth/login': recorded('login', (body) =>
       (body as { password: string }).password === 'wrong'
         ? fail(401, 'invalid_credentials')
