@@ -13,12 +13,14 @@ const UNAUTHORIZED = {
   body: { error: { code: 'unauthorized', message: 'Unauthorized' } },
 };
 const NOT_FOUND = { status: 404, body: { error: { code: 'not_found', message: 'Not found' } } };
-const WIDE_TABLE = `<table><tr>${'<td>Ô của bảng rất rộng rộng rộng rộng</td>'.repeat(14)}</tr></table>`;
+// Nowrap cells: wrapping text would shrink the table to fit the box and never overflow.
+const WIDE_TABLE = `<table><tr>${'<td style="white-space:nowrap">Bảng rất rộng</td>'.repeat(14)}</tr></table>`;
 
 const noPageScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 
-test('a stored page renders with its breadcrumb and title', async ({ page }) => {
+test('a stored page renders with its breadcrumb and title', async ({ page, api }) => {
+  api.signedIn = false;
   await page.goto(PAGE);
   await expect(page.getByRole('heading', { level: 1, name: 'Quy tắc cộng đồng' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Đường dẫn' })).toContainText('Trang chủ');
@@ -50,14 +52,18 @@ test('a wide table in a stored page scrolls inside its box on a phone', async ({
   await page.setViewportSize({ width: 375, height: 812 });
   api.routes[`GET /pages${PAGE}`] = ok(flatpage({ contentHtml: WIDE_TABLE }));
   await page.goto(PAGE);
-  const box = page.locator('.user-content');
-  await expect(box).toBeVisible();
+  // user-content makes each table a horizontal scroller (display block, overflow-x auto); the page never scrolls.
+  const table = page.locator('.user-content table');
+  await expect(table).toBeVisible();
   expect(await noPageScroll(page)).toBe(true);
-  const { client, scroll } = await box.evaluate((element) => ({
-    client: element.clientWidth,
-    scroll: element.scrollWidth,
-  }));
-  expect(scroll).toBeGreaterThan(client);
+  const overflows = await table.evaluate((element) => element.scrollWidth > element.clientWidth);
+  expect(overflows).toBe(true);
+  const movedBy = await table.evaluate((element) => {
+    element.scrollLeft = 100;
+    return element.scrollLeft;
+  });
+  expect(movedBy).toBeGreaterThan(0);
+  expect(await noPageScroll(page)).toBe(true);
 });
 
 const STATES = [

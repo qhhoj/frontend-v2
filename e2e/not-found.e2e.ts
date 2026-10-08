@@ -11,7 +11,9 @@ const runningCssAnimations = (page: Page) =>
 
 test('an unknown path shows the 404 page with two focusable links and the path', async ({
   page,
+  api,
 }) => {
+  api.signedIn = false;
   await page.goto(UNKNOWN);
   await expect(page.getByRole('heading', { level: 1, name: 'Không tìm thấy trang' })).toBeVisible();
   await expect(page.getByTestId('requested-path')).toHaveText(UNKNOWN);
@@ -26,7 +28,9 @@ test('an unknown path shows the 404 page with two focusable links and the path',
 
 test('with motion the sob and the falling tears run; with reduced motion nothing animates', async ({
   page,
+  api,
 }) => {
+  api.signedIn = false;
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto(UNKNOWN);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -42,7 +46,9 @@ for (const theme of THEMES)
   ])
     test(`the 404 page has no WCAG 2.1 A/AA violations and no horizontal scroll in ${theme.id}, ${viewport.name}`, async ({
       page,
+      api,
     }) => {
+      api.signedIn = false;
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.emulateMedia({ colorScheme: theme.scheme });
       await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);

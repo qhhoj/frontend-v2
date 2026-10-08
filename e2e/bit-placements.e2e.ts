@@ -72,7 +72,8 @@ test('an empty problem list shows Bit asleep above the message', async ({ page, 
   await expect(page.getByRole('main')).toContainText('Không có bài phù hợp');
 });
 
-test('the 404 page shows Bit crying with two falling tears', async ({ page }) => {
+test('the 404 page shows Bit crying with two falling tears', async ({ page, api }) => {
+  api.signedIn = false;
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/no/such/page');
   const crying = page.getByRole('img', { name: 'Bit đang khóc' });
