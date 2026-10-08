@@ -211,7 +211,7 @@ const VIEW_MODES = [
               v-for="row in RANKING_SKELETON_ROWS"
               :key="row"
               data-skeleton-region="row"
-              class="flex items-center gap-4 border-t border-line px-5 py-3 font-mono text-sm"
+              class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm"
             >
               <SkeletonBlock text class="w-8" />
               <span class="flex min-w-0 flex-1 items-center gap-2">

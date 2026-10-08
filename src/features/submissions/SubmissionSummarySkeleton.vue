@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { AUTHOR_FACT_KEY, SUMMARY_FACT_KEYS } from './summary-facts';
 
 /** Mirrors `SubmissionSummary.vue`: keep its cards, grid and text classes in sync. */
-const FACT_COUNT = 6;
-/** The author row (second fact) holds a 32 px avatar, so it reserves the same square. Keep in step with SubmissionSummary. */
-const AUTHOR_FACT = 2;
 /** The real line holds a `VerdictBadge` (h-7); the score is `text-[56px] leading-none`, so a block as tall (h-14). */
 const BADGE_LINE_CLASS = 'min-h-7';
 /** The verdict Bit's box in `SubmissionSummary.vue` (16 pixels of 4 px, 6 px from sm up), so the row wraps the same. */
@@ -38,12 +36,12 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
         data-skeleton-region="facts"
         class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]"
       >
-        <template v-for="fact in FACT_COUNT" :key="fact">
+        <template v-for="key in SUMMARY_FACT_KEYS" :key="key">
           <dt data-skeleton-region="fact" class="text-[13px]">
             <SkeletonBlock text class="w-16" />
           </dt>
           <dd>
-            <span v-if="fact === AUTHOR_FACT" class="flex items-center gap-2.5">
+            <span v-if="key === AUTHOR_FACT_KEY" class="flex items-center gap-2.5">
               <SkeletonBlock class="size-8 shrink-0" />
               <SkeletonBlock text class="w-32" />
             </span>

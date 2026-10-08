@@ -127,7 +127,9 @@ const facts = computed(() => [
     </GlassCard>
     <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
       <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]">
-        <dt class="text-[13px] text-muted">{{ $t('submission.facts.problem') }}</dt>
+        <dt data-fact="problem" class="text-[13px] text-muted">
+          {{ $t('submission.facts.problem') }}
+        </dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
           <RouterLink
             v-if="submission.problem"
@@ -136,7 +138,7 @@ const facts = computed(() => [
             >{{ problemName ?? submission.problem.name }}</RouterLink
           ><template v-else>{{ NO_VALUE }}</template>
         </dd>
-        <dt class="text-[13px] text-muted">{{ $t('submission.facts.user') }}</dt>
+        <dt data-fact="user" class="text-[13px] text-muted">{{ $t('submission.facts.user') }}</dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
           <span v-if="submission.user" class="flex items-center gap-2.5">
             <UserAvatar :username="submission.user.username" :size="32" />
@@ -144,7 +146,9 @@ const facts = computed(() => [
           </span>
           <template v-else>{{ NO_VALUE }}</template>
         </dd>
-        <dt class="text-[13px] text-muted">{{ $t('submission.facts.submitted') }}</dt>
+        <dt data-fact="submitted" class="text-[13px] text-muted">
+          {{ $t('submission.facts.submitted') }}
+        </dt>
         <dd class="min-w-0">
           <time
             :datetime="submission.date"
@@ -153,7 +157,9 @@ const facts = computed(() => [
           >
         </dd>
         <template v-for="fact in facts" :key="fact.key">
-          <dt class="text-[13px] text-muted">{{ $t(`submission.facts.${fact.key}`) }}</dt>
+          <dt :data-fact="fact.key" class="text-[13px] text-muted">
+            {{ $t(`submission.facts.${fact.key}`) }}
+          </dt>
           <dd class="min-w-0 font-mono [overflow-wrap:anywhere]">{{ fact.value }}</dd>
         </template>
       </dl>
