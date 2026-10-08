@@ -29,13 +29,7 @@
         prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
       } catch {}
       var scheme = prefersDark ? 'dark' : 'light';
-      // The painted theme is kept for no or `auto` preference, and for `glass-auto` only if it is a Glass theme.
-      var keepsPainted =
-        known.includes(stored) &&
-        (preference === null ||
-          preference === 'auto' ||
-          (preference === 'glass-auto' && stored.startsWith('glass-')));
-      var theme = keepsPainted
+      var theme = known.includes(stored)
         ? stored
         : known.includes(preference)
           ? preference

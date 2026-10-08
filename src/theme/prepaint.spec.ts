@@ -91,12 +91,9 @@ describe('pre-paint script in index.html', () => {
         );
   });
 
-  it('lets an explicit stored preference outrank the last painted theme, as the store does', () => {
-    expect(prepaint({ stored: 'glass-light', preference: 'clay-dark' }).theme).toBe('clay-dark');
-    expect(prepaint({ stored: 'clay-light', preference: 'glass-auto' }).theme).toBe('glass-light');
-    expect(prepaint({ stored: 'glass-light', preference: 'auto', dark: true }).theme).toBe(
-      'glass-light',
-    );
+  it('keeps the last painted theme for every preference, as the store does', () => {
+    for (const preference of [null, ...PREFERENCES])
+      expect(prepaint({ stored: 'glass-light', preference, dark: true }).theme).toBe('glass-light');
   });
 
   it('falls back to the default theme of the OS scheme for a missing or retired id', () => {

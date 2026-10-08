@@ -163,13 +163,12 @@ describe('useThemeStore', () => {
     write.mockRestore();
   });
 
-  it('does not hold a cached Clay theme for a stored glass-auto', () => {
+  it('keeps a cached Clay theme for a stored glass-auto until the account or the OS says otherwise', () => {
     localStorage.setItem('qhhoj.theme', 'glass-auto');
     localStorage.setItem('qhhoj.resolvedTheme', 'clay-light');
     stubMatchMedia({ dark: false });
     useThemeStore();
-    expect(appliedTheme()).toBe('glass-light');
-    expect(localStorage.getItem('qhhoj.resolvedTheme')).toBe('glass-light');
+    expect(appliedTheme()).toBe('clay-light');
   });
 
   it('re-resolves from the OS when the system scheme changes while the cache is held', async () => {
@@ -188,11 +187,30 @@ describe('useThemeStore', () => {
     expect(appliedTheme()).toBe('clay-light');
   });
 
-  it('prefers an explicit local choice over the cached theme', () => {
+  it('keeps the cached theme over an explicit local choice at start-up, until a choice is made', async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
     localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
-    useThemeStore();
+    const store = useThemeStore();
+    expect(appliedTheme()).toBe('glass-light');
+    store.choose('dark');
+    await nextTick();
     expect(appliedTheme()).toBe('clay-dark');
+  });
+
+  it('adopts the account theme that is already painted with no repaint, whatever the local choice', async () => {
+    localStorage.setItem('qhhoj.theme', 'dark');
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    document.documentElement.dataset.theme = 'glass-light';
+    const repaints: MutationRecord[] = [];
+    const observer = new MutationObserver((records) => repaints.push(...records));
+    observer.observe(document.documentElement, { attributeFilter: ['data-theme'] });
+    const store = useThemeStore();
+    store.adopt('glass-light');
+    await nextTick();
+    repaints.push(...observer.takeRecords());
+    observer.disconnect();
+    expect(repaints).toHaveLength(0);
+    expect(appliedTheme()).toBe('glass-light');
   });
 
   it('drops the account theme on sign-out and returns to the local choice, then the OS', async () => {

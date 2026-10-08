@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
-import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
+import { AUTO_THEME, resolveTheme, THEMES } from './registry';
 import type { ColorScheme } from './registry';
 
 const PREFERENCE_KEY = 'qhhoj.theme';
@@ -18,14 +18,8 @@ export const useThemeStore = defineStore('theme', () => {
   /** The signed-in account's `siteTheme`; it outranks the browser preference until `adopt(null)`. */
   const accountTheme = ref<string | null>(null);
 
-  // Without an explicit local choice the pre-painted theme stays until the account or the OS says otherwise.
-  // A stored glass-auto is a choice of style: only a cached Glass theme is the one it would resolve to.
-  const paintedTheme = THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY));
-  const cachedTheme =
-    localPreference.value === AUTO_THEME ||
-    (localPreference.value === GLASS_AUTO_THEME && paintedTheme?.glass)
-      ? paintedTheme
-      : undefined;
+  // The pre-painted theme stays, whatever the preference, until the account, a choice or the OS says otherwise.
+  const cachedTheme = THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY));
   const holdingCache = ref(cachedTheme !== undefined);
 
   const media = typeof matchMedia === 'function' ? matchMedia(DARK_QUERY) : undefined;

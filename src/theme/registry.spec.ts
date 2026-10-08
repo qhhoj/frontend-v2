@@ -37,9 +37,11 @@ describe('resolveTheme', () => {
 });
 
 describe('canonicalPreference', () => {
-  it('turns a legacy value into the Clay id and leaves the current values alone', () => {
+  it('turns a legacy value into the Clay id and leaves current and inherited-looking values alone', () => {
     expect(canonicalPreference('light')).toBe('clay-light');
     expect(canonicalPreference('dark')).toBe('clay-dark');
+    for (const inherited of ['constructor', '__proto__', 'toString'])
+      expect(canonicalPreference(inherited)).toBe(inherited);
     for (const value of [AUTO_THEME, GLASS_AUTO_THEME, ...THEMES.map((theme) => theme.id)])
       expect(canonicalPreference(value)).toBe(value);
   });
