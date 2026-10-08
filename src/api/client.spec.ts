@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fail, mockApi, noContent, ok, page } from '@/test/mock-api';
+import { fail, mockApi, noContent, ok, page, rateLimited } from '@/test/mock-api';
 import {
   ApiError,
   apiPage,
@@ -259,4 +259,15 @@ it('still sends a plain object as JSON', async () => {
   await apiRequest('/x', { method: 'POST', body: { a: 1 } });
   expect(calls[0]!.body).toEqual({ a: 1 });
   expect(calls[0]!.headers.get('Content-Type')).toBe('application/json');
+});
+
+it('keeps Retry-After of a refusal in whole seconds, and null when the server sent none', async () => {
+  mockApi({ 'POST /x': rateLimited(2520), 'POST /y': fail(429, 'rate_limited') });
+  await expect(apiRequest('/x', { method: 'POST' })).rejects.toMatchObject({
+    code: 'rate_limited',
+    retryAfterSeconds: 2520,
+  });
+  await expect(apiRequest('/y', { method: 'POST' })).rejects.toMatchObject({
+    retryAfterSeconds: null,
+  });
 });

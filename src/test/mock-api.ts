@@ -105,6 +105,12 @@ export function invalid(...issues: FieldIssue[]): MockResponse {
 }
 export const noContent = (): MockResponse => ({ status: 204 });
 
+/** A 429 `rate_limited` carrying `Retry-After` (whole seconds), as the backend's rate limiter sends it. */
+export const rateLimited = (seconds: number): MockResponse => ({
+  ...fail(429, 'rate_limited'),
+  headers: { 'Retry-After': String(seconds) },
+});
+
 /** After `mockApi`: requests whose URL contains none of `allowed` never answer, so a screen stays in its loading state. */
 export function hangRequestsExcept(allowed: string[]) {
   const answer = globalThis.fetch;
