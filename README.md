@@ -68,7 +68,7 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 
 ## Auth screens
 
-Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activate` (resend), `/activate/:key` (`done` after success), `/forgot-password`, `/reset-password/:token` (`expired` after a dead link), `/account/password`. Each carries `meta.titleKey` (the document title). Every route but `/login` carries `meta.layout: 'auth'`: the shell draws no pill header and each page draws `AuthLayout`'s top bar. `/login` keeps the pill header and draws its own brand panel and locale toggle.
+Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activate` (resend), `/activate/:key` (`done` after success), `/forgot-password`, `/reset-password/:token` (`expired` after a dead link), `/account/password`. Each carries `meta.titleKey` (the document title). Every route but `/login` carries `meta.layout: 'auth'`: the shell draws no pill header and each page draws `AuthLayout`'s top bar. `/login` keeps the pill header and draws its own brand panel; its locale toggle is the shell header's.
 
 | To change                                                        | Edit                                                                                                                                           |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |

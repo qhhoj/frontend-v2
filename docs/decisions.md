@@ -23,13 +23,13 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - The CSRF token lives in memory only — storage would expose it to any script on the origin.
 - `csrf_failed` reloads the session and retries once — a rotated cookie must not fail a click; parallel failures share one refresh and never loop.
 - Session status `unknown | anonymous | partial | authenticated`; `/auth/me` 401 is anonymous, other failures keep the status unknown and retry on the next navigation — an offline backend must not lock out public pages.
-- A 401 on a protected request signs the viewer out in the store — otherwise an expired session leaves the shell signed in while every request fails; a page-level redirect comes in 8b.
+- A 401 on a protected request signs the viewer out in the store — otherwise an expired session leaves the shell signed in while every request fails; there is no redirect at that moment, the next navigation applies the routing rules.
 - Profile query runs only when authenticated with no password change pending — the guard answers every other request with 403 `password_change_required`.
 - Account-owned queries keep the user id in their key and the cache is cleared in one place (`useAccountCacheSync`) whenever the signed-in user changes (login, logout, expiry, another account) — the next viewer must never see the previous account's data.
 - `redirect` values pass through `safeRedirect`: only `/path`; `//`, `/\`, scheme URLs and arrays become `/` — open-redirect protection.
 - A route takes `layout:'auth'` only when its page renders AuthLayout. The shell then drops the pill header and keeps blobs, loading layer and `#main`; set on any other page, the viewer has no nav, locale toggle or sign-out.
 - Non-staff on `/admin/**` get not-found at the same URL — existence is not revealed. Admin is one lazy chunk.
-- Guards route page navigations only; `csrf_failed`, `two_factor_required` and `password_change_required` from an API call are not turned into redirects (8b). Their messages exist in both locales.
+- Guards route page navigations only; `two_factor_required` and `password_change_required` from an API call are turned into redirects through `onGateRequired` (reload the session, re-run the guard rules), so a gate set mid-session takes effect at once; `csrf_failed` only shows its message (both locales).
 - Every existing account carries `siteTheme: 'light'` (schema default) — so the account theme must not overwrite a browser's own choice on sign-in (and `light` now resolves to Clay light; see Theme).
 
 ## Data reads
@@ -199,7 +199,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Known gaps (later sub-projects)
 
-- Session expiry mid-page redirects on the next navigation only — 8b.
+- Session expiry mid-page does not redirect: the store signs out and the page keeps showing until the next navigation, to avoid yanking a viewer who is typing.
 - Admin screens — sub-project 7.
 
 ## Community (8e)
@@ -230,7 +230,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## 8b auth screens
 
 - `meta.layout: 'auth'` hides the shell's pill header only: theme and account-cache sync, the loading layer and `#main` keep running, so auth pages need no second shell.
-- `/login` has no layout meta: it keeps the pill header and draws its own brand panel and locale toggle; the other auth pages draw `AuthLayout`'s top bar.
+- `/login` has no layout meta: it keeps the pill header and draws its own brand panel (the locale toggle is the shell header's, one per page); the other auth pages draw `AuthLayout`'s top bar.
 - Card widths follow the boards: 460 px for state cards and 2FA, 480 for forced change, 520 for social signup, 660 for register (two columns from `sm`).
 - On phones login follows the LoginPhone board: a band with Bit, logo and counts above a borderless form.
 - Each page has one `h1` (the form or card title); the login brand headline is a styled paragraph.
