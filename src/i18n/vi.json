@@ -95,6 +95,16 @@
       "afterJoin": "Đề bài sẽ hiện ngay khi bạn vào thi.",
       "hidden": "Đề bài chưa được công khai."
     },
+    "announcements": {
+      "arrived": "Thông báo mới: {title}",
+      "unread": "{count} chưa đọc",
+      "new": "Mới",
+      "live": "Trực tiếp",
+      "empty": "Chưa có thông báo.",
+      "emptyPage": "Chưa có thông báo nào.",
+      "paused": "Cập nhật trực tiếp tạm dừng.",
+      "reconnect": "Kết nối lại"
+    },
     "rules": {
       "intro": "Giới thiệu",
       "title": "Thể thức & quy định",

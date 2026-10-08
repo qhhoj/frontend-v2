@@ -103,7 +103,7 @@ const VIEW_MODES = [
         </div>
       </template>
       <template v-if="contest">
-        <ContestTabs :contest-key="key" />
+        <ContestTabs :contest-key="key" :phase="contest.phase" />
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-muted">{{ summary }}</p>

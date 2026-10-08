@@ -6,6 +6,7 @@ import QueryState from '@/components/QueryState.vue';
 import { phaseAt } from '@/lib/contest-time';
 import { usePageTitle } from '@/router/page-title';
 import ContestActions from './ContestActions.vue';
+import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
 import ContestHeaderCard from './ContestHeaderCard.vue';
 import ContestIntroCard from './ContestIntroCard.vue';
@@ -55,7 +56,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
           <template #actions><ContestActions :contest="contest" /></template>
         </ContestHeaderCard>
-        <ContestTabs :contest-key="key" />
+        <ContestTabs :contest-key="key" :phase="contest.phase" />
         <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div class="flex min-w-0 flex-col gap-5">
             <ContestProblemsTable :contest="contest" />
@@ -63,6 +64,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
           </div>
           <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-5">
             <ContestRulesCard :contest="contest" />
+            <ContestAnnouncementsRail :contest="contest" />
           </aside>
         </div>
       </template>

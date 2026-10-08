@@ -72,7 +72,7 @@ describe('contest ranking', () => {
   it('renders frozen cells and the banner', async () => {
     mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42/ranking');
-    const banner = wrapper.get('p[role="status"]');
+    const banner = wrapper.get('p[role="status"]:not(.sr-only)');
     expect(banner.text()).toContain('Bảng đang đóng băng');
     expect(banner.text()).toContain('60 phút cuối');
   });

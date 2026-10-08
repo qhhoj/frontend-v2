@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { contestDetail, problemEditorial, signedIn, signedOut } from '@/test/fixtures';
+import { problemEditorial, signedIn, signedOut } from '@/test/fixtures';
+import { contestPageRoutes } from '@/test/contest-routes';
 import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -74,7 +75,7 @@ describe('loading screens show blocks shaped like their content', () => {
   });
 
   it('the ranking board skeleton has the podium, the table header and 10 rows once the contest is known', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'GET /contests/r42': ok(contestDetail()) });
+    mockApi({ 'GET /auth/me': signedOut, ...contestPageRoutes() });
     // Hold only the ranking request; the contest answers.
     const answer = globalThis.fetch;
     vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>

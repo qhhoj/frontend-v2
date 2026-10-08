@@ -95,6 +95,16 @@
       "afterJoin": "The problems show as soon as you enter.",
       "hidden": "The problems are not public yet."
     },
+    "announcements": {
+      "arrived": "New announcement: {title}",
+      "unread": "{count} unread | {count} unread",
+      "new": "New",
+      "live": "Live",
+      "empty": "No announcements yet.",
+      "emptyPage": "No announcements yet.",
+      "paused": "Live updates paused.",
+      "reconnect": "Reconnect"
+    },
     "rules": {
       "intro": "About",
       "title": "Format and rules",
