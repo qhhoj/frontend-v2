@@ -22,7 +22,7 @@
     "matches": "Wrong format.",
     "is_not_empty": "Must not be empty.",
     "must_not_be_null": "This field cannot be cleared.",
-    "is_uuid": "Invalid user id.",
+    "is_uuid": "Invalid id.",
     "is_timestamp": "Invalid time.",
     "array_max_size": "Too many items.",
     "array_min_size": "Needs at least one item.",
@@ -32,5 +32,8 @@
     "is_boolean": "Must be true or false.",
     "is_url": "Invalid address.",
     "is_object": "Invalid value."
-  }
+  },
+  "uploading": "Uploading…",
+  "uploadBusy": "Still uploading. Choose the file again when it finishes.",
+  "maxReached": "Limit of {max} reached."
 }

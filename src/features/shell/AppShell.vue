@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
-import AdminShell from '@/features/admin/shell/AdminShell.vue';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
+
+/** Lazy: the admin nav and icons stay out of the bundle every visitor loads. */
+const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/AdminShell.vue'));
 
 useAccountCacheSync();
 useAccountThemeSync();

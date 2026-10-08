@@ -6,7 +6,8 @@ export interface AdminScreen {
   permission: PermissionRule | null;
 }
 
-const PROBLEM_EDIT = ['judge.edit_own_problem', 'judge.edit_all_problem'] as const;
+/** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
+const PROBLEM_EDIT = 'judge.edit_own_problem';
 const CONTEST_EDIT = ['judge.edit_own_contest', 'judge.edit_all_contest'] as const;
 const problemTab = (tab: string): AdminScreen => ({
   path: `/admin/problems/:code/${tab}`,
@@ -20,7 +21,7 @@ const contestTab = (tab: string): AdminScreen => ({
 /** Every admin screen of plans 8f-1 and 8f-2. Ids are camelCase; route names are `admin-<id>`; titles `admin.shell.screens.<id>`. */
 export const ADMIN_SCREENS = {
   dashboard: { path: '/admin', permission: null },
-  problems: { path: '/admin/problems', permission: ['judge.add_problem', ...PROBLEM_EDIT] },
+  problems: { path: '/admin/problems', permission: ['judge.add_problem', PROBLEM_EDIT] },
   problemNew: {
     path: '/admin/problems/new',
     permission: ['judge.add_problem', 'judge.suggest_new_problem'],

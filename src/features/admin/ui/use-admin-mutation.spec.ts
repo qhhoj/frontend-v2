@@ -33,9 +33,9 @@ describe('useAdminMutation', () => {
   it('turns a validation failure into field texts and resolves undefined', async () => {
     const { api } = host(() =>
       Promise.reject(
-        new ApiError('validation_failed', 400, 'bad', {}, [
-          { field: 'name', code: 'max_length', message: 'm' },
-        ]),
+        new ApiError('validation_failed', 400, 'bad', {
+          issues: [{ field: 'name', code: 'max_length', message: 'm' }],
+        }),
       ),
     );
     await expect(api().run({ name: 'a' })).resolves.toBeUndefined();
@@ -55,5 +55,25 @@ describe('useAdminMutation', () => {
     expect(api().failure.value?.code).toBe('conflict');
     await api().run({ name: 'a' });
     expect(api().failure.value).toBeNull();
+  });
+
+  it('sends nothing for a second run while the first is pending, and settles once', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const mutate = vi.fn((vars: { name: string }) => gate.then(() => vars.name));
+    const { api } = host(mutate);
+    const first = api().run({ name: 'a' });
+    await expect(api().run({ name: 'a' })).resolves.toBeUndefined();
+    expect(mutate).toHaveBeenCalledTimes(1);
+    release();
+    await expect(first).resolves.toBe('a');
+    expect(api().isPending.value).toBe(false);
+    expect(api().isDone.value).toBe(true);
+  });
+
+  it('lets a programming error through instead of turning it into a page line', async () => {
+    const { api } = host(() => Promise.reject(new TypeError('bug in the page')));
+    await expect(api().run({ name: 'a' })).rejects.toThrow('bug in the page');
+    expect(api().isPending.value).toBe(false);
   });
 });

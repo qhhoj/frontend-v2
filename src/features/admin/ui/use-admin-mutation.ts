@@ -1,18 +1,17 @@
 import { ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
-import type { QueryKey } from '@tanstack/vue-query';
 import { ApiError } from '@/api/client';
 import { fieldErrorsOf } from './admin-errors';
 import type { FieldErrors } from './admin-errors';
 
+/** Every admin query key starts with `'admin'` (the viewer id follows), so a write can only touch admin data. */
+export type AdminQueryKey = readonly ['admin', ...unknown[]];
+
 interface AdminMutationOptions<Vars, Result> {
   mutate: (vars: Vars) => Promise<Result>;
-  invalidates?: (vars: Vars) => QueryKey[];
+  invalidates?: (vars: Vars) => AdminQueryKey[];
   onDone?: (result: Result, vars: Vars) => void;
 }
-
-const asApiError = (error: unknown) =>
-  error instanceof ApiError ? error : new ApiError('generic', 0, String(error));
 
 /** One admin write: pending flag, per-field texts from `issues[]`, the failure for the page line, and cache invalidation. */
 export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Vars, Result>) {
@@ -38,7 +37,9 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
     options.onDone?.(result, vars);
   }
 
+  /** A second call while one write is in flight sends nothing: a double click must not run the write twice. */
   async function run(vars: Vars): Promise<Result | undefined> {
+    if (isPending.value) return undefined;
     reset();
     isPending.value = true;
     try {
@@ -46,7 +47,9 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
       await settle(result, vars);
       return result;
     } catch (error) {
-      failure.value = asApiError(error);
+      // A programming error (not an ApiError) must surface, not turn into a page line.
+      if (!(error instanceof ApiError)) throw error;
+      failure.value = error;
       fieldErrors.value = fieldErrorsOf(error);
       return undefined;
     } finally {

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { defineComponent, h, ref } from 'vue';
 import type { Component, PropType } from 'vue';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import { anonymousViewer } from '@/test/problem-routes';
 import { mountComponent } from '@/test/mount';
 import { staffViewer, switchNamed } from '@/test/admin-routes';
@@ -18,6 +18,7 @@ import OrganizationChips from './OrganizationChips.vue';
 import UploadButton from './UploadButton.vue';
 import UsernameChips from './UsernameChips.vue';
 import { PREVIEW_DELAY_MS } from './use-render-preview';
+import { translate } from '@/i18n';
 
 describe('AdminSwitch', () => {
   it('is a switch that flips its model', async () => {
@@ -97,6 +98,45 @@ describe('UsernameChips', () => {
     await flushPromises();
     expect(wrapper.text()).toContain('Không có tài khoản "nobody".');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
+  });
+
+  it('says the account does not exist only for a real not_found', async () => {
+    mockApi({ ...anonymousViewer, 'GET /users/nobody': fail(404, 'not_found') });
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [{ id: ID_A, username: null }] },
+    });
+    await wrapper.get('input').setValue('nobody');
+    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+    expect(wrapper.text()).toContain('Không có tài khoản "nobody".');
+  });
+
+  it('shows the wait for a 429 instead of saying the account is missing', async () => {
+    mockApi({ ...anonymousViewer, 'GET /users/busy': rateLimited(42) });
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [{ id: ID_A, username: null }] },
+    });
+    await wrapper.get('input').setValue('busy');
+    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+    expect(wrapper.text()).toContain('Thử lại sau 42 giây.');
+    expect(wrapper.text()).not.toContain('Không có tài khoản');
+  });
+
+  it('shows a network failure as a failure, not as a missing account', async () => {
+    mockApi({ ...anonymousViewer });
+    const answer = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init: RequestInit) =>
+      input.includes('/users/') ? Promise.reject(new TypeError('offline')) : answer(input, init),
+    );
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [{ id: ID_A, username: null }] },
+    });
+    await wrapper.get('input').setValue('thayhung');
+    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+    expect(wrapper.text()).toContain('Không kết nối được máy chủ.');
+    expect(wrapper.text()).not.toContain('Không có tài khoản');
   });
 
   it('removes a chip with its button and never adds the same user twice', async () => {
@@ -317,13 +357,23 @@ describe('UploadButton', () => {
     );
   });
 
-  it('ignores a pick while an upload is running, and says so to assistive technology', async () => {
+  it('disables the picker while an upload runs, and a pick that still arrives is said, not dropped', async () => {
     const wrapper = mountComponent(UploadButton, {
       props: { label: 'Tải lên', isPending: true },
     });
-    await pickFile(wrapper, new File(['x'], 'a.pdf'));
+    const input = wrapper.get('input[type="file"]');
+    expect(input.attributes('disabled')).toBeDefined();
+    expect(wrapper.get('label').text()).toBe('Đang tải lên…');
+    Object.defineProperty(input.element, 'files', {
+      value: [new File(['x'], 'a.pdf')],
+      configurable: true,
+    });
+    input.element.dispatchEvent(new Event('change'));
+    await flushPromises();
     expect(wrapper.emitted('picked')).toBeUndefined();
-    expect(wrapper.get('label').attributes('aria-disabled')).toBe('true');
+    expect(wrapper.get('[role="status"]').text()).toBe(
+      'Đang tải lên. Hãy chọn lại tệp sau khi xong.',
+    );
   });
 });
 
@@ -368,5 +418,39 @@ describe('OrganizationChips', () => {
     expect(wrapper.get('input').attributes('disabled')).toBeDefined();
     expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.text()).toContain('Cần quyền judge.edit_all_problem');
+  });
+});
+
+describe('preview failure and the reasons a control is off', () => {
+  it('shows a preview failure in words, not as a stale or blank preview', async () => {
+    vi.useFakeTimers();
+    mockApi({ ...anonymousViewer, 'POST /problems/render-preview': fail(403, 'forbidden') });
+    const wrapper = mountComponent(MarkdownField, {
+      props: { modelValue: 'Xin chào', label: 'Đề bài', previewStyle: 'problem' },
+    });
+    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
+    await flushPromises();
+    expect(wrapper.get('section').text()).toContain(translate('errors.forbidden'));
+    vi.useRealTimers();
+  });
+
+  it('ties a locked switch to its reason through aria-describedby', () => {
+    const wrapper = mountComponent(AdminSwitch, {
+      props: { modelValue: false, label: 'Công khai', lockedBy: 'judge.change_public_visibility' },
+    });
+    const describedBy = wrapper.get('[role="switch"]').attributes('aria-describedby')!;
+    expect(wrapper.get(`#${describedBy}`).text()).toContain(
+      'Cần quyền judge.change_public_visibility',
+    );
+  });
+
+  it('says why a full chip list is closed, and ties that reason to the input', () => {
+    mockApi({ ...anonymousViewer });
+    const wrapper = mountComponent(UsernameChips, {
+      props: { modelValue: [{ id: ID_A, username: 'a' }], label: 'Người duyệt', max: 1 },
+    });
+    expect(wrapper.get('input').attributes('disabled')).toBeDefined();
+    const describedBy = wrapper.get('input').attributes('aria-describedby')!;
+    expect(wrapper.get(`#${describedBy}`).text()).toBe('Đã đủ 1 mục.');
   });
 });

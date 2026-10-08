@@ -120,4 +120,25 @@ describe('useRenderPreview', () => {
     expect(posts(calls)).toHaveLength(0);
     expect(preview.html.value).toBe('');
   });
+
+  it('sends nothing while the server asked to wait, and resumes after the wait', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      'POST /problems/render-preview': () => rateLimited(42),
+    });
+    mountComponent(Host);
+    text.value = 'x';
+    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
+    await flushPromises();
+    expect(posts(calls)).toHaveLength(1);
+    text.value = 'y';
+    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS * 2);
+    await flushPromises();
+    expect(posts(calls)).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(42_000);
+    text.value = 'z';
+    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
+    await flushPromises();
+    expect(posts(calls)).toHaveLength(2);
+  });
 });

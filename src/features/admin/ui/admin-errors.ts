@@ -31,8 +31,9 @@ export function fieldErrorsOf(error: unknown): FieldErrors {
 }
 
 /** The page-line text of a failed write: the SPA text of its code, then the wait when the server said how long (`Retry-After`). */
-export function failureTextOf(error: ApiError): string {
+export function failureTextOf(error: unknown): string {
   const text = i18n.global.t(errorMessageKey(error));
-  if (error.retryAfterSeconds === null) return text;
-  return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds: error.retryAfterSeconds })}`;
+  const seconds = error instanceof ApiError ? error.retryAfterSeconds : null;
+  if (seconds === null) return text;
+  return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds })}`;
 }

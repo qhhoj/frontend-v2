@@ -3,6 +3,7 @@ import { computed, useId } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import type { PreviewSource } from '@/api/types/admin-common';
 import { ADMIN_INPUT_CLASS } from './classes';
+import { failureTextOf } from './admin-errors';
 import { useRenderPreview } from './use-render-preview';
 
 const text = defineModel<string>({ required: true });
@@ -53,6 +54,9 @@ const describedBy = computed(() =>
         <template v-if="preview.retryAfterSeconds.value">
           {{ $t('admin.ui.retryIn', { seconds: preview.retryAfterSeconds.value }) }}
         </template>
+      </p>
+      <p v-if="preview.failure.value" class="text-sm text-negative">
+        {{ failureTextOf(preview.failure.value) }}
       </p>
       <p class="text-xs text-muted">{{ $t('admin.ui.previewHint') }}</p>
     </section>

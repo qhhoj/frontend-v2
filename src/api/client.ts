@@ -182,6 +182,17 @@ async function request(
   throw error;
 }
 
+/** A raw text body (no `{ data }` envelope), with the same error and session handling as `apiRequest`. */
+export async function apiText(path: string): Promise<string> {
+  const response = await send(path, {});
+  if (!response.ok) {
+    const error = await errorOf(response);
+    notifySessionHooks(error, path);
+    throw error;
+  }
+  return response.text();
+}
+
 /** A single value (`{ data }`), or undefined for 204. */
 export const apiRequest = async <Result>(
   path: string,

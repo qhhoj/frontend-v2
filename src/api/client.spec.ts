@@ -4,6 +4,7 @@ import {
   ApiError,
   apiPage,
   apiRequest,
+  apiText,
   buildUrl,
   onCsrfFailed,
   onGateRequired,
@@ -270,4 +271,16 @@ it('keeps Retry-After of a refusal in whole seconds, and null when the server se
   await expect(apiRequest('/y', { method: 'POST' })).rejects.toMatchObject({
     retryAfterSeconds: null,
   });
+});
+
+it('sends a raw text request through the session hooks: a 401 reaches onUnauthorized', async () => {
+  const handler = vi.fn();
+  onUnauthorized(handler);
+  mockApi({ 'GET /raw/init': fail(401, 'unauthorized') });
+  try {
+    await expect(apiText('/raw/init')).rejects.toMatchObject({ code: 'unauthorized' });
+    expect(handler).toHaveBeenCalledTimes(1);
+  } finally {
+    onUnauthorized(null);
+  }
 });

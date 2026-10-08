@@ -1,5 +1,7 @@
 <script setup lang="ts" generic="Chip extends { id: string }">
-import { ref, useId } from 'vue';
+import { computed, ref, useId } from 'vue';
+import { ApiError } from '@/api/client';
+import { failureTextOf } from './admin-errors';
 import { X } from 'lucide-vue-next';
 import { ADMIN_INPUT_CLASS } from './classes';
 
@@ -18,9 +20,24 @@ const props = defineProps<{
   lockedBy?: string;
 }>();
 const id = useId();
+
+/** Only a real `not_found` says the account or organization does not exist; a network drop or a 429 says its own thing. */
+function lookupFailureText(error: unknown, typed: string): string {
+  if (error instanceof ApiError && error.code === 'not_found') return props.noSuchText(typed);
+  return failureTextOf(error);
+}
 const typed = ref('');
 const lookupError = ref('');
 const isLooking = ref(false);
+const describedBy = computed(() => {
+  const ids = [
+    props.lockedBy ? `${id}-locked` : null,
+    isChipsFull.value ? `${id}-full` : null,
+    lookupError.value || props.error ? `${id}-error` : null,
+  ];
+  return ids.filter(Boolean).join(' ') || undefined;
+});
+const isChipsFull = computed(() => props.max !== undefined && chips.value.length >= props.max);
 
 async function add() {
   const text = typed.value.trim();
@@ -31,15 +48,14 @@ async function add() {
     const found = await props.lookup(text);
     if (!chips.value.some((chip) => chip.id === found.id)) chips.value = [...chips.value, found];
     typed.value = '';
-  } catch {
-    lookupError.value = text;
+  } catch (error) {
+    lookupError.value = lookupFailureText(error, text);
   } finally {
     isLooking.value = false;
   }
 }
 
 const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => chip.id !== chipId));
-const isFull = () => props.max !== undefined && chips.value.length >= props.max;
 </script>
 
 <template>
@@ -70,16 +86,17 @@ const isFull = () => props.max !== undefined && chips.value.length >= props.max;
       v-model="typed"
       :class="ADMIN_INPUT_CLASS"
       :placeholder="placeholder"
-      :disabled="isFull() || Boolean(lockedBy)"
+      :disabled="isChipsFull || Boolean(lockedBy)"
       :aria-invalid="lookupError || error ? 'true' : undefined"
-      :aria-describedby="
-        lockedBy ? `${id}-locked` : lookupError || error ? `${id}-error` : undefined
-      "
+      :aria-describedby="describedBy"
       autocomplete="off"
       @keydown.enter.prevent="add"
     />
     <p v-if="lookupError || error" :id="`${id}-error`" class="text-sm text-negative">
-      {{ lookupError ? noSuchText(lookupError) : error }}
+      {{ lookupError || error }}
+    </p>
+    <p v-if="isChipsFull" :id="`${id}-full`" class="text-xs text-muted">
+      {{ $t('admin.ui.maxReached', { max }) }}
     </p>
     <p v-if="lockedBy" :id="`${id}-locked`" class="text-xs text-muted">
       {{ $t('admin.ui.needsPermission', { permission: lockedBy }) }}

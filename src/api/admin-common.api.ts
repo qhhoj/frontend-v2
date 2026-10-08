@@ -1,4 +1,4 @@
-import { API_BASE, ApiError, apiRequest } from './client';
+import { apiRequest, apiText } from './client';
 import { fetchOrganization } from './organizations.api';
 import type { OrganizationChip, PreviewSource, UserChip } from './types/admin-common';
 import { fetchUserPage } from './users.api';
@@ -28,15 +28,5 @@ export async function renderPreview(source: PreviewSource, markdown: string): Pr
   return html;
 }
 
-/** Raw text endpoints (`init.yml`): not a `{ data }` envelope. */
-export async function fetchText(path: string): Promise<string> {
-  const response = await fetch(`${API_BASE}${path}`, { credentials: 'same-origin' });
-  if (!response.ok) {
-    throw new ApiError(
-      response.status === 404 ? 'not_found' : 'http_error',
-      response.status,
-      response.statusText,
-    );
-  }
-  return response.text();
-}
+/** Raw text endpoints (`init.yml`): not a `{ data }` envelope, same session handling. */
+export const fetchText = (path: string): Promise<string> => apiText(path);

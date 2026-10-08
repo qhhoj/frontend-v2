@@ -17,6 +17,7 @@ const toggle = () => {
       :aria-checked="model"
       :aria-disabled="lockedBy ? 'true' : undefined"
       :aria-labelledby="labelId"
+      :aria-describedby="lockedBy ? `${labelId}-locked` : undefined"
       class="relative mt-0.5 inline-flex h-7 w-12 shrink-0 items-center rounded-pill border border-line-strong bg-surface-solid aria-checked:bg-gradient-accent"
       @click="toggle"
     >
@@ -29,7 +30,7 @@ const toggle = () => {
     <div class="flex flex-col">
       <span :id="labelId" class="font-semibold">{{ label }}</span>
       <span v-if="description" class="text-sm text-muted">{{ description }}</span>
-      <span v-if="lockedBy" class="text-xs text-muted">
+      <span v-if="lockedBy" :id="`${labelId}-locked`" class="text-xs text-muted">
         {{ $t('admin.ui.needsPermission', { permission: lockedBy }) }}
       </span>
     </div>

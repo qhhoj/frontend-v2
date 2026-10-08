@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   partialSession,
   problemDetail,
@@ -300,7 +300,9 @@ describe('app shell', () => {
   it('draws the admin top bar instead of the site header on an admin screen, with one main landmark', async () => {
     mockApi(superuserViewer());
     const { wrapper } = await mountApp('/admin');
-    expect(wrapper.find('[data-testid="admin-topbar"]').exists()).toBe(true);
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="admin-topbar"]').exists()).toBe(true),
+    );
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
     expect(wrapper.findAll('#main')).toHaveLength(1);
   });

@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { allowsAny } from '@/lib/permissions';
 import { routes } from '@/router/routes';
-import {
-  ADMIN_NAV,
-  firstPermission,
-  isCurrentNav,
-  visibleDashboard,
-  visibleNav,
-} from './admin-nav';
+import { ADMIN_NAV, heldPermission, isCurrentNav, visibleDashboard, visibleNav } from './admin-nav';
 
 const staff = (permissions: string[], isSuperuser = false) => ({ isSuperuser, permissions });
 const idsOf = (groups: ReturnType<typeof visibleNav>) =>
@@ -72,14 +66,18 @@ describe('admin nav', () => {
     expect(isCurrentNav('/admin/nav', '/admin/navigation-old')).toBe(false);
   });
 
-  it('builds the dashboard from the same rules and names the first permission of a rule', () => {
+  it('builds the dashboard from the same rules and names only a permission the viewer holds', () => {
     const sections = visibleDashboard(staff(['judge.add_contest', 'judge.change_judge']));
     expect(sections.map((section) => section.items.map((item) => item.id))).toEqual([
       ['contests', 'judges'],
     ]);
-    expect(firstPermission(['judge.add_problem', 'judge.edit_own_problem'])).toBe(
-      'judge.add_problem',
-    );
-    expect(firstPermission(null)).toBeNull();
+    expect(
+      heldPermission(
+        ['judge.add_contest', 'judge.edit_own_contest'],
+        staff(['judge.edit_own_contest']),
+      ),
+    ).toBe('judge.edit_own_contest');
+    expect(heldPermission(['judge.add_contest', 'judge.edit_own_contest'], staff([]))).toBeNull();
+    expect(heldPermission(null, staff([], true))).toBeNull();
   });
 });

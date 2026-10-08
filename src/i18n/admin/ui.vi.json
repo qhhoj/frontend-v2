@@ -22,7 +22,7 @@
     "matches": "Định dạng chưa đúng.",
     "is_not_empty": "Không được để trống.",
     "must_not_be_null": "Không được xóa trắng trường này.",
-    "is_uuid": "Mã người dùng không hợp lệ.",
+    "is_uuid": "Mã không hợp lệ.",
     "is_timestamp": "Thời điểm không hợp lệ.",
     "array_max_size": "Quá nhiều mục.",
     "array_min_size": "Cần ít nhất một mục.",
@@ -32,5 +32,8 @@
     "is_boolean": "Phải là đúng hoặc sai.",
     "is_url": "Địa chỉ không hợp lệ.",
     "is_object": "Giá trị không hợp lệ."
-  }
+  },
+  "uploading": "Đang tải lên…",
+  "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",
+  "maxReached": "Đã đủ {max} mục."
 }

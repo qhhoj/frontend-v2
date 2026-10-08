@@ -126,6 +126,9 @@ describe('Bit placements', () => {
       'GET /auth/me': signedIn({ user: sessionUser({ isStaff: true }) }),
     });
     const staff = await mountApp('/admin');
+    await vi.waitFor(() =>
+      expect(staff.wrapper.find('[data-testid="admin-bit"]').exists()).toBe(true),
+    );
     expect(pixelsOf(staff.wrapper.get('[data-testid="admin-bit"]').element)).toBe(
       pixelsOfKind('staff'),
     );

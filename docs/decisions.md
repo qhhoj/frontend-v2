@@ -280,4 +280,5 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Submission staff panel**: staff only, buttons follow `viewer.canRejudge/canReject/canAbort` — the server decides, the 409 stays as the stale-page fallback.
 - **Downloads**: raw endpoints are plain `<a href>` to the API URL — they are not `{data}` envelopes.
 - **Confirm dialogs**: one shared `ConfirmDialog.vue`, driven in specs and e2e by its confirm button's label — no second dialog implementation.
+- **Superuser without the staff flag**: `/admin` stays not-found for them (the router checks `isStaff`), although every permission check passes superusers — existence of the area follows the staff flag, the screens follow the permissions.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.

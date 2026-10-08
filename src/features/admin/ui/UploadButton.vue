@@ -4,6 +4,10 @@ import { formatFileSize } from '@/lib/format';
 import { ADMIN_BUTTON_CLASS } from './classes';
 import { tooLargeFor } from './upload-limits';
 
+/**
+ * Checks the size locally and refuses a pick while an upload runs (said in words, never dropped silently).
+ * Server answers (413, 429) belong to the consumer, which shows them through `failureTextOf`.
+ */
 const props = defineProps<{
   label: string;
   accept?: string;
@@ -13,13 +17,19 @@ const props = defineProps<{
 const emit = defineEmits<{ picked: [file: File] }>();
 const id = useId();
 const refusal = ref('');
+const isBusyNoticeShown = ref(false);
 
 function onChange(event: Event) {
   const input = event.target as HTMLInputElement;
   const [file] = input.files ?? [];
   input.value = '';
   refusal.value = '';
-  if (!file || props.isPending) return;
+  isBusyNoticeShown.value = false;
+  if (!file) return;
+  if (props.isPending) {
+    isBusyNoticeShown.value = true;
+    return;
+  }
   if (props.maxBytes !== undefined && tooLargeFor(file, props.maxBytes)) {
     refusal.value = formatFileSize(props.maxBytes);
     return;
@@ -34,20 +44,23 @@ function onChange(event: Event) {
       :for="id"
       :class="ADMIN_BUTTON_CLASS"
       class="cursor-pointer focus-within:ring-2 focus-within:ring-accent"
-      :aria-disabled="isPending ? 'true' : undefined"
     >
-      {{ label }}
+      {{ isPending ? $t('admin.ui.uploading') : label }}
       <input
         :id="id"
         type="file"
         class="sr-only"
         :accept="accept"
-        :aria-describedby="refusal ? `${id}-error` : undefined"
+        :disabled="isPending"
+        :aria-describedby="refusal ? `${id}-error` : isBusyNoticeShown ? `${id}-busy` : undefined"
         @change="onChange"
       />
     </label>
     <span v-if="refusal" :id="`${id}-error`" role="alert" class="text-sm text-negative">
       {{ $t('admin.ui.tooLarge', { max: refusal }) }}
+    </span>
+    <span v-if="isBusyNoticeShown" :id="`${id}-busy`" role="status" class="text-sm text-muted">
+      {{ $t('admin.ui.uploadBusy') }}
     </span>
   </span>
 </template>

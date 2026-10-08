@@ -20,7 +20,7 @@ import {
   Trophy,
   Users,
 } from 'lucide-vue-next';
-import { allowsAny } from '@/lib/permissions';
+import { allowsAny, hasPermission } from '@/lib/permissions';
 import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import type { AdminScreenId } from '../admin-screens';
@@ -116,10 +116,15 @@ export function isCurrentNav(itemPath: string, routePath: string): boolean {
   );
 }
 
-export const firstPermission = (rule: PermissionRule | null): string | null => {
+/** The first permission of a rule that this viewer holds: a card names what the viewer can use, never a permission they lack. */
+export function heldPermission(
+  rule: PermissionRule | null,
+  user: PermissionHolder | null,
+): string | null {
   if (rule === null) return null;
-  return typeof rule === 'string' ? rule : (rule[0] ?? null);
-};
+  const permissions = typeof rule === 'string' ? [rule] : rule;
+  return permissions.find((permission) => hasPermission(user, permission)) ?? null;
+}
 
 interface DashboardSection {
   labelKey: string;

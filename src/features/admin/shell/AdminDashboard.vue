@@ -5,7 +5,7 @@ import { allowsAny } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import AdminBit from './AdminBit.vue';
-import { QUICK_ACTIONS, firstPermission, visibleDashboard } from './admin-nav';
+import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
 
 const session = useSessionStore();
 const sections = computed(() => visibleDashboard(session.user));
@@ -65,10 +65,10 @@ const actions = computed(() =>
             </span>
             <span class="mt-auto flex flex-wrap items-center gap-2 text-xs">
               <span
-                v-if="firstPermission(item.permission)"
+                v-if="heldPermission(item.permission, session.user)"
                 class="rounded-pill border border-line px-2 py-0.5"
               >
-                {{ firstPermission(item.permission) }}
+                {{ heldPermission(item.permission, session.user) }}
               </span>
               <span class="font-mono text-muted">{{ item.path }}</span>
             </span>
