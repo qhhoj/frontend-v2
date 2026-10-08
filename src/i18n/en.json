@@ -87,7 +87,11 @@
     "customLookHelp": "Off: you see the site's own look. On: your choices below.",
     "style": "Style",
     "mode": "Mode",
-    "modeOption": { "light": "Light", "dark": "Dark", "auto": "Automatic" },
+    "modeOption": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Automatic"
+    },
     "accentTitle": "Accent",
     "accentHelp": "Every preset is checked for readable text in light and dark.",
     "accent": {
@@ -102,7 +106,11 @@
     "glass": "Glass",
     "glassOnly": "Glass and glow only apply to the Glass themes.",
     "glassHelp": "How see-through cards are. Solid is easiest to read and lightest on older devices.",
-    "glassStop": { "clear": "Clear", "frosted": "Frosted", "solid": "Solid" },
+    "glassStop": {
+      "clear": "Clear",
+      "frosted": "Frosted",
+      "solid": "Solid"
+    },
     "glow": "Background glow",
     "reset": "Reset to site default",
     "useSite": "Use site default",
@@ -162,6 +170,25 @@
       "email_invalid": "Enter a valid email address.",
       "organization_unavailable": "That school is not accepting new members. Choose another.",
       "language_unknown": "Choose a language from the list."
+    },
+    "usernameHint": "Letters, digits and underscores, up to 30 characters.",
+    "usernameChecking": "Checking the name…",
+    "usernameFree": "Username available",
+    "usernameBusy": "Username already taken",
+    "usernameTooLong": "At most 30 characters.",
+    "newPassword": "New password",
+    "confirmPassword": "Repeat the password",
+    "passwordMismatch": "The two passwords do not match",
+    "strength": {
+      "label": "Password strength",
+      "level": {
+        "0": "No password yet",
+        "1": "Weak",
+        "2": "Fair",
+        "3": "Strong",
+        "4": "Very strong"
+      },
+      "tip": "add a symbol or a few more words"
     }
   },
   "errors": {

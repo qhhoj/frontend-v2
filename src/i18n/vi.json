@@ -87,7 +87,11 @@
     "customLookHelp": "Tắt: bạn thấy giao diện của trang. Bật: dùng các lựa chọn bên dưới.",
     "style": "Kiểu",
     "mode": "Chế độ",
-    "modeOption": { "light": "Sáng", "dark": "Tối", "auto": "Tự động" },
+    "modeOption": {
+      "light": "Sáng",
+      "dark": "Tối",
+      "auto": "Tự động"
+    },
     "accentTitle": "Màu nhấn",
     "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả nền sáng lẫn tối.",
     "accent": {
@@ -102,7 +106,11 @@
     "glass": "Kính",
     "glassOnly": "Glass và quầng sáng chỉ áp dụng cho giao diện Glass.",
     "glassHelp": "Độ trong của các thẻ. Đặc là dễ đọc nhất và nhẹ nhất cho máy cũ.",
-    "glassStop": { "clear": "Trong", "frosted": "Mờ", "solid": "Đặc" },
+    "glassStop": {
+      "clear": "Trong",
+      "frosted": "Mờ",
+      "solid": "Đặc"
+    },
     "glow": "Quầng sáng nền",
     "reset": "Về mặc định của trang",
     "useSite": "Dùng mặc định của trang",
@@ -162,6 +170,25 @@
       "email_invalid": "Nhập một địa chỉ email hợp lệ.",
       "organization_unavailable": "Trường này không nhận thành viên mới. Hãy chọn trường khác.",
       "language_unknown": "Hãy chọn một ngôn ngữ trong danh sách."
+    },
+    "usernameHint": "Chữ cái, chữ số và dấu gạch dưới, tối đa 30 ký tự.",
+    "usernameChecking": "Đang kiểm tra tên…",
+    "usernameFree": "Tên khả dụng",
+    "usernameBusy": "Tên đã có người dùng",
+    "usernameTooLong": "Tối đa 30 ký tự.",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Nhập lại mật khẩu",
+    "passwordMismatch": "Hai mật khẩu chưa khớp",
+    "strength": {
+      "label": "Độ mạnh mật khẩu",
+      "level": {
+        "0": "Chưa nhập mật khẩu",
+        "1": "Yếu",
+        "2": "Mức vừa",
+        "3": "Mạnh",
+        "4": "Rất mạnh"
+      },
+      "tip": "thêm ký tự đặc biệt hoặc vài từ nữa"
     }
   },
   "errors": {
