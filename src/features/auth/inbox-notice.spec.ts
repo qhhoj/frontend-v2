@@ -44,6 +44,27 @@ describe('InboxNotice', () => {
     expect(button(wrapper).attributes('aria-disabled')).toBe('true');
   });
 
+  it('keeps the sent line while a second resend is pending, and sends once', async () => {
+    let finishSending: () => void = () => {};
+    const resend = vi
+      .fn<() => Promise<unknown>>()
+      .mockResolvedValueOnce(undefined)
+      .mockImplementationOnce(() => new Promise<void>((resolve) => (finishSending = resolve)));
+    const wrapper = mountNotice(resend);
+    vi.advanceTimersByTime(60_000);
+    await flushPromises();
+    await button(wrapper).trigger('click');
+    await flushPromises();
+    vi.advanceTimersByTime(60_000);
+    await flushPromises();
+    await button(wrapper).trigger('click');
+    await button(wrapper).trigger('click');
+    expect(wrapper.get('[role="status"]').text()).toContain('Đã gửi lại.');
+    finishSending();
+    await flushPromises();
+    expect(resend).toHaveBeenCalledTimes(2);
+  });
+
   it('announces a refused resend and lets the viewer try again at once', async () => {
     const resend = vi.fn(() => Promise.reject(new ApiError('rate_limited', 429, 'Too many')));
     const wrapper = mountNotice(resend);

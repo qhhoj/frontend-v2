@@ -14,7 +14,7 @@ const resent = ref(false);
 start();
 
 async function resendMail() {
-  if (coolingDown.value) return;
+  if (coolingDown.value || pending.value) return;
   const sentAgain = await run(props.resend);
   resent.value = sentAgain;
   if (sentAgain) start();

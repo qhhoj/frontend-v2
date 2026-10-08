@@ -48,6 +48,19 @@ describe('navigation guards', () => {
     expect(route.query.redirect).toBe('/problems');
   });
 
+  it.each([
+    ['a pending second factor', signedIn({ user: null, twoFactorRequired: true }), 'login-2fa'],
+    ['a forced password change', signedIn({ passwordChangeRequired: true }), 'account-password'],
+  ])(
+    'sends %s on an activation link without copying the key into the query',
+    async (_case, session, gate) => {
+      const { route } = await navigate('/activate/k123', () => session);
+      expect(route.name).toBe(gate);
+      expect(route.query.redirect).toBeUndefined();
+      expect(route.fullPath).not.toContain('k123');
+    },
+  );
+
   it('keeps the 2FA step for a pending second factor', async () => {
     const { route } = await navigate(
       '/login/2fa?redirect=/settings',

@@ -249,14 +249,19 @@ describe('register page', () => {
     });
   });
 
-  it('goes back to the filled form from "Sai email? Đăng ký lại"', async () => {
+  it('starts again with the name empty and focused, the other answers kept, and says why the name is held', async () => {
     register();
     const { wrapper } = await mountApp('/register');
     await fill(wrapper);
+    expect(wrapper.get('#main').text()).toContain('new_user');
     await wrapper
       .findAll('button')
       .find((button) => button.text() === 'Đăng ký lại')!
       .trigger('click');
+    await flushPromises();
+    const username = wrapper.get('input[name="username"]');
+    expect((username.element as HTMLInputElement).value).toBe('');
+    expect(document.activeElement).toBe(username.element);
     expect((wrapper.get('input[name="email"]').element as HTMLInputElement).value).toBe(
       'new@example.com',
     );

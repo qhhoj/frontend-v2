@@ -63,6 +63,14 @@ async function showPhase(next: Phase) {
   focusMain(); // the form is gone; focus must not fall to the body
 }
 
+/** The name stays reserved for an unactivated account, so the form starts again with the name empty and focused. */
+async function registerAgain() {
+  form.username = '';
+  phase.value = 'form';
+  await nextTick();
+  formElement.value?.querySelector<HTMLInputElement>('input[name="username"]')?.focus();
+}
+
 async function submit() {
   rulesMissing.value = !acceptedRules.value;
   if (!readyToSend()) {
@@ -87,12 +95,12 @@ async function submit() {
       <p class="font-mono text-lg font-semibold text-content">{{ maskEmail(form.email) }}</p>
       <p>{{ $t('auth.registeredOpenMail') }}</p>
     </InboxNotice>
-    <p class="text-center text-sm text-muted">
-      {{ $t('auth.wrongEmailPrompt') }}
-      <button type="button" :class="LINK" @click="phase = 'form'">
+    <div class="flex flex-col gap-3 text-center text-sm text-muted">
+      <p>{{ $t('auth.heldUsername', { username: form.username }) }}</p>
+      <button type="button" :class="LINK" @click="registerAgain">
         {{ $t('auth.registerAgain') }}
       </button>
-    </p>
+    </div>
   </AuthLayout>
   <AuthLayout
     v-else-if="phase === 'mailUnavailable'"

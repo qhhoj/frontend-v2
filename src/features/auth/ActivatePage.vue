@@ -41,6 +41,7 @@ const CARDS: Record<
   failed: { titleKey: 'pages.activate' },
 };
 
+// Set before the activation request below (onMounted), so that request already carries no Referer.
 useNoReferrer();
 const route = useRoute();
 const router = useRouter();
@@ -52,6 +53,7 @@ const asksForEmail = computed(() => state.value === 'linkDead' || state.value ==
 useWaitingWhile(() => state.value === 'pending');
 
 /** An expired or used key is not a failure to retry: the page offers a new link instead. */
+/** A failure other than a dead link (a throttled or dropped request) keeps the key, so the viewer can try again. */
 function showFailure(caught: unknown) {
   const linkDead = caught instanceof ApiError && caught.code === 'invalid_token';
   if (linkDead) {
@@ -73,6 +75,11 @@ async function activateKey() {
   state.value = 'activated';
   // The used key does not stay in the address bar or the history (same page instance, no reload).
   await router.replace({ name: 'activate', params: { key: DONE_KEY } });
+}
+
+function retryActivation() {
+  state.value = 'pending';
+  void activateKey();
 }
 
 onMounted(() => {
@@ -106,6 +113,16 @@ onMounted(() => {
         <p>{{ $t('auth.resend.sent', { email }) }}</p>
       </template>
     </EmailLinkRequest>
-    <AuthError v-else :text="errorText" />
+    <template v-else>
+      <AuthError :text="errorText" />
+      <button
+        v-if="state === 'failed'"
+        type="button"
+        class="flex h-12 items-center justify-center rounded-pill border border-line-strong bg-surface-solid font-display font-semibold text-content"
+        @click="retryActivation"
+      >
+        {{ $t('auth.activation.retry') }}
+      </button>
+    </template>
   </AuthLayout>
 </template>

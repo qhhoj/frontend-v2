@@ -68,7 +68,10 @@
     },
     "submissions": {
       "statusTitle": "Trạng thái chấm",
-      "status": { "grading": "Đang chờ / đang chấm", "final": "Chờ chấm cuối" },
+      "status": {
+        "grading": "Đang chờ / đang chấm",
+        "final": "Chờ chấm cuối"
+      },
       "ownOnlyTitle": "Chỉ hiện bài nộp của bạn",
       "ownOnlyBody": "Bài nộp của thí sinh khác chưa công khai trong lúc kỳ thi đang diễn ra hoặc bảng đóng băng.",
       "signIn": "Đăng nhập để xem bài nộp của bạn",
@@ -434,7 +437,6 @@
     "rulesRequired": "Hãy đồng ý với điều khoản để tiếp tục.",
     "registeredSentTo": "Chúng tôi đã gửi liên kết kích hoạt tới",
     "registeredOpenMail": "Mở email và bấm vào liên kết để kích hoạt tài khoản. Nếu chưa thấy, hãy xem thư mục spam.",
-    "wrongEmailPrompt": "Sai email?",
     "registerAgain": "Đăng ký lại",
     "backToLogin": "Quay lại đăng nhập",
     "toLogin": "Về trang đăng nhập",
@@ -452,14 +454,16 @@
       "doneTitle": "Tài khoản đã kích hoạt",
       "doneLead": "Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.",
       "deadTitle": "Liên kết đã hết hạn",
-      "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới."
+      "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới.",
+      "retry": "Thử lại"
     },
     "resend": {
       "title": "Gửi lại email kích hoạt",
       "lead": "Nhập email đã dùng để đăng ký, chúng tôi sẽ gửi lại liên kết kích hoạt.",
       "send": "Gửi lại liên kết",
       "sent": "Nếu {email} đang chờ kích hoạt, bạn sẽ nhận được liên kết mới trong vài phút."
-    }
+    },
+    "heldUsername": "Tên {username} được giữ cho địa chỉ này trong 7 ngày cho tới khi kích hoạt. Muốn dùng email khác, hãy đăng ký lại với tên mới. Muốn nhận lại email tới địa chỉ này, hãy dùng nút gửi lại ở trên."
   },
   "errors": {
     "generic": "Đã có lỗi xảy ra. Hãy thử lại.",

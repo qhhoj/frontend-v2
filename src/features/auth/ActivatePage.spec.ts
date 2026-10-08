@@ -1,7 +1,9 @@
+import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
+import { createMemoryHistory } from 'vue-router';
 import { signedOut } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
-import { fail, hangRequestsExcept, mockApi, noContent } from '@/test/mock-api';
+import { fail, hangRequestsExcept, mockApi, noContent, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useLoadingStore } from '@/stores/loading.store';
 
@@ -27,6 +29,17 @@ describe('activate page', () => {
     );
     expect(router.currentRoute.value.fullPath).toBe('/activate/done');
     expect(wrapper.get('#main [role="status"]').text()).toBe(DONE);
+  });
+
+  it('leaves the used key out of history: the done address replaces it, never adds an entry', async () => {
+    const history = createMemoryHistory();
+    const pushed = vi.spyOn(history, 'push');
+    const replaced = vi.spyOn(history, 'replace');
+    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
+    await mountApp('/activate/k123', history);
+    // The router's own first navigation replaces too; after it, the used key is replaced, not pushed.
+    expect(pushed).not.toHaveBeenCalled();
+    expect(replaced.mock.calls.at(-1)?.[0]).toBe('/activate/done');
   });
 
   it('sends no Referer while the key is in the address, and stops once the viewer leaves', async () => {
@@ -66,6 +79,21 @@ describe('activate page', () => {
     );
     await vi.waitFor(() => expect(wrapper.get('h1').text()).toBe('Kiểm tra hộp thư'));
     expect(wrapper.get('#main [role="status"]').text()).toContain('u***@example.com');
+  });
+
+  it('lets the viewer try a still-valid key again after a throttled attempt', async () => {
+    const calls = mockApi({
+      'GET /auth/me': signedOut,
+      'POST /auth/activate': sequence(fail(429, 'rate_limited'), noContent()),
+    });
+    const { wrapper } = await mountApp('/activate/k123');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Thử lại')!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.filter((call) => call.path === '/auth/activate')).toHaveLength(2);
+    expect(wrapper.get('h1').text()).toBe('Tài khoản đã kích hoạt');
   });
 
   it('does not tell a viewer to get a new link when the server failed', async () => {
