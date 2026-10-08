@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
+import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
@@ -16,6 +17,7 @@ import {
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import type { Verdict } from '@/lib/verdicts';
 import { useNow } from '@/lib/use-now';
+import { verdictBitLook } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import VerdictRing from './VerdictRing.vue';
 
@@ -62,6 +64,8 @@ const runtime = computed(() =>
     : `${formatCaseTime(props.submission.time)} · ${formatCaseMemory(props.submission.memory)}`,
 );
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
+/** Only a finished submission has a final verdict worth a crown or a sweat drop. */
+const bitLook = computed(() => (isFinished.value ? verdictBitLook(props.verdict) : null));
 const facts = computed(() => [
   { key: 'language', value: props.submission.language?.name ?? NO_VALUE },
   { key: 'runtime', value: runtime.value },
@@ -108,6 +112,13 @@ const facts = computed(() => [
           {{ $t('submission.provisional') }}
         </p>
       </div>
+      <BitMascot
+        v-if="bitLook"
+        :look="bitLook"
+        :label="$t(bitLook.headgear === 'crown' ? 'bit.accepted' : 'bit.rejected')"
+        :closed-eyes="bitLook.headgear === 'sweat'"
+        class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
+      />
     </GlassCard>
     <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
       <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]">

@@ -443,6 +443,29 @@ describe('submission page', () => {
     expect(wrapper.get('time').attributes('title')).toMatch(/2026/);
   });
 
+  it.each([
+    ['AC', 'Bit đội vương miện'],
+    ['WA', 'Bit toát mồ hôi'],
+    ['TLE', 'Bit toát mồ hôi'],
+  ] as const)('shows Bit for a final %s: %s', async (result, label) => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(submissionDetail({ result })),
+      ...problemPageRoutes(),
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    expect(
+      wrapper.get(`[data-testid="submission-summary"] [aria-label="${label}"]`).attributes('role'),
+    ).toBe('img');
+  });
+
+  it('shows no Bit while the submission is still grading', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    const summary = wrapper.get('[data-testid="submission-summary"]');
+    expect(summary.find('[aria-label^="Bit"]').exists()).toBe(false);
+  });
+
   it('shows an empty neutral ring, never a green percentage, for a result that is pending until the contest ends', async () => {
     const pending = submissionDetail({
       status: 'PD',

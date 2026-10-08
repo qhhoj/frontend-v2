@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { TrendingDown, TrendingUp } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
+import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -8,6 +9,7 @@ import { useRatingHistoryQuery, useUserPageQuery } from '@/features/users/users.
 import { formatNumber, greetingKey } from '@/lib/format';
 import { ratingTier } from '@/lib/rating-tiers';
 import { sparklinePath } from '@/lib/sparkline';
+import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useLocaleStore } from '@/stores/locale.store';
 
 const props = defineProps<{ username: string }>();
@@ -82,29 +84,41 @@ const tiles = computed(() =>
         </div>
       </template>
       <template v-if="user">
-        <p class="text-muted">{{ $t(greeting, { username }) }}</p>
-        <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
-          <span class="font-mono text-6xl font-semibold tracking-tight tabular-nums">{{
-            user.rating ?? '—'
-          }}</span>
-          <span
-            v-if="delta !== null"
-            class="mb-3 inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
-            :class="
-              delta >= 0 ? 'bg-verdict-ac-bg text-verdict-ac' : 'bg-verdict-wa-bg text-verdict-wa'
-            "
-          >
-            <component
-              :is="delta >= 0 ? TrendingUp : TrendingDown"
-              class="size-4"
-              aria-hidden="true"
-            />
-            {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
-          </span>
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-muted">{{ $t(greeting, { username }) }}</p>
+            <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
+              <span class="font-mono text-6xl font-semibold tracking-tight tabular-nums">{{
+                user.rating ?? '—'
+              }}</span>
+              <span
+                v-if="delta !== null"
+                class="mb-3 inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
+                :class="
+                  delta >= 0
+                    ? 'bg-verdict-ac-bg text-verdict-ac'
+                    : 'bg-verdict-wa-bg text-verdict-wa'
+                "
+              >
+                <component
+                  :is="delta >= 0 ? TrendingUp : TrendingDown"
+                  class="size-4"
+                  aria-hidden="true"
+                />
+                {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
+              </span>
+            </div>
+            <p class="text-muted">
+              {{ $t('home.ratingTier', { tier: $t(tier ? `tiers.${tier}` : 'tiers.unrated') }) }}
+            </p>
+          </div>
+          <BitMascot
+            data-testid="home-bit"
+            :look="PLACEMENT_LOOKS.hero"
+            blinks
+            class="[--bit-px:5px] sm:[--bit-px:7px]"
+          />
         </div>
-        <p class="text-muted">
-          {{ $t('home.ratingTier', { tier: $t(tier ? `tiers.${tier}` : 'tiers.unrated') }) }}
-        </p>
         <svg
           v-if="ratings.length >= 2"
           viewBox="0 0 640 110"

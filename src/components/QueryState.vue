@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import BitMascot from '@/components/BitMascot.vue';
 import { errorMessageKey } from '@/i18n/error-message';
+import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useWaitingWhile } from '@/stores/use-waiting-while';
 import SkeletonBlock from './SkeletonBlock.vue';
 
@@ -19,6 +21,13 @@ useWaitingWhile(() => props.loading);
     role="alert"
     class="flex flex-wrap items-center justify-center gap-3 py-6 text-center"
   >
+    <!-- The message beside it says what happened, so the sweating Bit is decoration. -->
+    <BitMascot
+      data-testid="bit"
+      :look="PLACEMENT_LOOKS.rejected"
+      closed-eyes
+      class="[--bit-px:3px]"
+    />
     <span>{{ $t(errorMessageKey(error)) }}</span>
     <button
       type="button"

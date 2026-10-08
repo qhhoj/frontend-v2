@@ -37,6 +37,11 @@
   "placeholder": {
     "pending": "Màn hình này đang chờ mockup được duyệt."
   },
+  "bit": {
+    "accepted": "Bit đội vương miện",
+    "rejected": "Bit toát mồ hôi",
+    "asleep": "Bit ngủ trong mũ ngủ"
+  },
   "notFound": {
     "title": "Không tìm thấy trang",
     "body": "Bit khóc cả một vũng nước mắt. Trang này không tồn tại, thử một trong các lối sau.",

@@ -9,7 +9,7 @@ import {
 } from './bit-sprite';
 import type { BitHeadgear } from './bit-sprite';
 
-const HEADGEARS: BitHeadgear[] = ['none', 'cap', 'crown', 'antenna', 'nightcap'];
+const HEADGEARS: BitHeadgear[] = ['none', 'cap', 'crown', 'antenna', 'nightcap', 'sweat'];
 const ROLES = new Set(['.', 'O', 'B', 'S', 'H', 'E', 'A']);
 const EMPTY_ROW = '.'.repeat(SPRITE_SIZE);
 
@@ -32,12 +32,22 @@ describe('bitFrame', () => {
   });
 
   it('puts headgear in rows 0-5 only: accent pixels above the body, none below', () => {
-    for (const headgear of HEADGEARS.filter((candidate) => candidate !== 'none')) {
+    for (const headgear of HEADGEARS.filter(
+      (candidate) => candidate !== 'none' && candidate !== 'sweat',
+    )) {
       const frame = bitFrame({ headgear });
       expect(frame.slice(0, 6).join('')).toContain('A');
       expect(frame.slice(6).join('')).not.toContain('A');
     }
     expect(bitFrame({ headgear: 'none' }).join('')).not.toContain('A');
+  });
+
+  it('draws the sweat drop in the highlight colour above the shoulder, never in the accent colour', () => {
+    const frame = bitFrame({ headgear: 'sweat' });
+    const headRows = frame.slice(0, 6).join('');
+    expect(headRows).toContain('H');
+    expect(headRows).not.toContain('A');
+    expect(frame.slice(0, 6).filter((row) => row.includes('H'))).toHaveLength(2);
   });
 
   it('keeps body, eyes and legs identical whatever the headgear', () => {

@@ -37,6 +37,11 @@
   "placeholder": {
     "pending": "This screen is waiting for an approved mock-up."
   },
+  "bit": {
+    "accepted": "Bit wearing a crown",
+    "rejected": "Bit with a sweat drop",
+    "asleep": "Bit asleep in a nightcap"
+  },
   "notFound": {
     "title": "Page not found",
     "body": "Bit cried a whole puddle. This page does not exist, try one of these instead.",

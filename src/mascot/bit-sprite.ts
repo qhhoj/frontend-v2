@@ -19,7 +19,7 @@ export const BIT_PALETTES = {
 export type BitPaletteName = keyof typeof BIT_PALETTES;
 export type PixelRole = keyof (typeof BIT_PALETTES)['terracotta'];
 
-export type BitHeadgear = 'none' | 'cap' | 'crown' | 'antenna' | 'nightcap';
+export type BitHeadgear = 'none' | 'cap' | 'crown' | 'antenna' | 'nightcap' | 'sweat';
 export interface BitLook {
   headgear: BitHeadgear;
   palette: BitPaletteName;
@@ -32,6 +32,14 @@ export const BIT_LOOKS: readonly BitLook[] = [
   { headgear: 'antenna', palette: 'terracotta' },
   { headgear: 'none', palette: 'terracotta' },
 ];
+
+/** Where Bit appears (mascot.md, Variants); eyes are closed or blinking per placement, not part of the look. */
+export const PLACEMENT_LOOKS = {
+  hero: { headgear: 'cap', palette: 'terracotta' },
+  accepted: { headgear: 'crown', palette: 'terracotta' },
+  rejected: { headgear: 'sweat', palette: 'terracotta' },
+  emptyList: { headgear: 'nightcap', palette: 'charcoal' },
+} as const satisfies Record<string, BitLook>;
 
 const EMPTY_ROW = '.'.repeat(SPRITE_SIZE);
 const HEADGEAR_ROWS = 6;
@@ -51,6 +59,8 @@ const HEADGEAR: Record<BitHeadgear, readonly string[]> = {
     '.......A........',
     '.......A........',
   ),
+  /** A sweat drop in the highlight colour beside the head. */
+  sweat: headgearRows('............H...', '...........HH...'),
   nightcap: headgearRows('.....AAAAA......', '....AAAAAAA.....', '...AAAAAAAAA....'),
 };
 

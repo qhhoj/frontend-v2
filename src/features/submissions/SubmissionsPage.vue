@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
@@ -102,8 +103,8 @@ function goToPage(page: number) {
         </div>
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
           <template #skeleton><SubmissionTableSkeleton /></template>
-          <GlassCard v-if="!submissions.length" as="div" class="px-6 py-10 text-center text-muted">
-            {{ emptyText }}
+          <GlassCard v-if="!submissions.length" as="div">
+            <EmptyState>{{ emptyText }}</EmptyState>
           </GlassCard>
           <SubmissionTable v-else :submissions="submissions" :highlight-ids="live.addedIds.value" />
           <SubmissionPager

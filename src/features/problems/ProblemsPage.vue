@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
@@ -62,9 +63,7 @@ const summary = computed(() => {
         @retry="refetch()"
       >
         <template #skeleton><ProblemTableSkeleton /></template>
-        <p v-if="!problems.length" class="py-10 text-center text-muted">
-          {{ $t('problems.empty') }}
-        </p>
+        <EmptyState v-if="!problems.length">{{ $t('problems.empty') }}</EmptyState>
         <ProblemTable
           v-else
           :problems="problems"

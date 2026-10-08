@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
@@ -31,8 +32,8 @@ const { data: list, isPending, error, refetch } = useSubmissionListQuery(filters
   </GlassCard>
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton><SubmissionTableSkeleton :show-problem="false" /></template>
-    <GlassCard v-if="!list?.items.length" as="div" class="px-6 py-10 text-center text-muted">
-      {{ $t('problem.noSubmissions') }}
+    <GlassCard v-if="!list?.items.length" as="div">
+      <EmptyState>{{ $t('problem.noSubmissions') }}</EmptyState>
     </GlassCard>
     <SubmissionTable v-else :submissions="list.items" :show-problem="false" />
     <RouterLink

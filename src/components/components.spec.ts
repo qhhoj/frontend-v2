@@ -103,6 +103,7 @@ describe('shared components', () => {
       slots: { default: '<p>content</p>' },
     });
     expect(failed.text()).toContain('Không tìm thấy.');
+    expect(failed.get('[role="alert"] [data-testid="bit"]').attributes('aria-hidden')).toBe('true');
     await failed.get('button').trigger('click');
     expect(failed.emitted('retry')).toHaveLength(1);
     const ready = mountComponent(QueryState, {
@@ -111,6 +112,7 @@ describe('shared components', () => {
     });
     await flushPromises();
     expect(ready.text()).toBe('content');
+    expect(ready.find('[data-testid="bit"]').exists()).toBe(false);
   });
 
   it('QueryState renders the caller skeleton while loading and the content once ready, with no blocks left', async () => {

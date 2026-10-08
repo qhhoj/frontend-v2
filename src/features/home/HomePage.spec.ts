@@ -101,6 +101,21 @@ describe('home', () => {
     expect(top.get('a[href="/users/user_07"]').classes()).toContain('text-tier-grandmaster');
   });
 
+  it('seats a decorative Bit in a graduation cap in the greeting card, and offers no quick submit', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    const bit = wrapper.get('[data-testid="rating-hero"] [data-testid="home-bit"]');
+    expect(bit.attributes('aria-hidden')).toBe('true');
+    expect(wrapper.find('[data-testid="quick-submit"]').exists()).toBe(false);
+  });
+
+  it('seats the same Bit in the welcome card of an anonymous viewer', async () => {
+    mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/');
+    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán, thi đấu trực tuyến');
+    expect(wrapper.get('[data-testid="home-bit"]').attributes('aria-hidden')).toBe('true');
+  });
+
   it('says so when no contest is running', async () => {
     mockApi(signedInRoutes({ 'GET /contests': page([]) }));
     const { wrapper } = await mountApp('/');

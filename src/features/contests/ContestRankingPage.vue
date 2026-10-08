@@ -3,6 +3,7 @@ import { Search, Snowflake } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import CountdownTimer from '@/components/CountdownTimer.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -240,9 +241,9 @@ const VIEW_MODES = [
           </div>
         </div>
       </template>
-      <p v-if="!ranking?.rows.length" class="glass rounded-card py-10 text-center text-muted">
-        {{ $t('ranking.empty') }}
-      </p>
+      <EmptyState v-if="!ranking?.rows.length" class="glass rounded-card">{{
+        $t('ranking.empty')
+      }}</EmptyState>
       <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">
         <p
           v-if="rankingRefreshFailed"

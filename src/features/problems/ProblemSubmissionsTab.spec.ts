@@ -60,6 +60,9 @@ describe('the problem Submissions tab', () => {
     await vi.waitFor(() =>
       expect(wrapper.get('#problem-panel-submissions').text()).toContain('Bạn chưa nộp bài này.'),
     );
+    expect(wrapper.get('#problem-panel-submissions [role="img"]').attributes('aria-label')).toBe(
+      'Bit ngủ trong mũ ngủ',
+    );
   });
 
   it('does not ask for submissions while another tab is open', async () => {
