@@ -67,7 +67,7 @@ test.describe('password sign-in', () => {
     installAuth(api);
     await page.goto('/login');
     await page.getByLabel('Tên đăng nhập').fill('user_01');
-    await page.locator('#main').getByRole('button', { name: 'Switch to English' }).click();
+    await page.getByRole('button', { name: 'Switch to English' }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Sign in');
     await expect(page.getByLabel('Username')).toHaveValue('user_01');
   });
