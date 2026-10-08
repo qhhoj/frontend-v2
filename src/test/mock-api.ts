@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import type { FieldIssue } from '@/api/client';
 
 export interface MockResponse {
   status?: number;
@@ -65,10 +66,27 @@ export const fail = (
   status: number,
   code: string,
   fields?: Record<string, string[]>,
+  issues?: FieldIssue[],
+  extra: Record<string, unknown> = {},
 ): MockResponse => ({
   status,
-  body: { error: { code, message: code, ...(fields && { fields }) } },
+  body: {
+    error: { code, message: code, ...(fields && { fields }), ...(issues && { issues }), ...extra },
+  },
 });
+
+export const issue = (field: string, code: string, message: string): FieldIssue => ({
+  field,
+  code,
+  message,
+});
+
+/** A `validation_failed` shaped like the backend's: `issues`, and `fields` built from their messages. */
+export function invalid(...issues: FieldIssue[]): MockResponse {
+  const fields: Record<string, string[]> = {};
+  for (const { field, message } of issues) (fields[field] ??= []).push(message);
+  return fail(400, 'validation_failed', fields, issues);
+}
 export const noContent = (): MockResponse => ({ status: 204 });
 
 /** After `mockApi`: requests whose URL contains none of `allowed` never answer, so a screen stays in its loading state. */

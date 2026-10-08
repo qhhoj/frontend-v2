@@ -12,13 +12,25 @@ export interface Page<Item> {
   meta: PageMeta;
 }
 
-/** A failed request: the backend's `{ error: { code, message, fields } }`, or `network_error` / `invalid_response`. */
+/** backend: libs/common (`FieldIssue`): one failed validation, the machine-readable twin of a `fields` message (B10). */
+export interface FieldIssue {
+  field: string;
+  code: string;
+  message: string;
+}
+
+/**
+ * A failed request: the backend's `{ error: { code, message, fields?, issues?, ...extra } }`, or `network_error` / `invalid_response`.
+ * `extra` holds the members `AppError` merges next to `code` and `message` (`banReason` of a banned login, B8).
+ */
 export class ApiError extends Error {
   constructor(
     readonly code: string,
     readonly status: number,
     message: string,
     readonly fields: Record<string, string[]> = {},
+    readonly issues: FieldIssue[] = [],
+    readonly extra: Record<string, unknown> = {},
   ) {
     super(message);
     this.name = 'ApiError';
@@ -93,14 +105,21 @@ async function send(
 
 async function errorOf(response: Response): Promise<ApiError> {
   const body = (await response.json().catch(() => null)) as {
-    error?: { code?: string; message?: string; fields?: Record<string, string[]> };
+    error?: {
+      code?: string;
+      message?: string;
+      fields?: Record<string, string[]>;
+      issues?: FieldIssue[];
+    } & Record<string, unknown>;
   } | null;
-  const error = body?.error;
+  const { code, message, fields, issues, ...extra } = body?.error ?? {};
   return new ApiError(
-    error?.code ?? 'http_error',
+    code ?? 'http_error',
     response.status,
-    error?.message ?? response.statusText,
-    error?.fields,
+    message ?? response.statusText,
+    fields,
+    issues,
+    extra,
   );
 }
 

@@ -78,7 +78,21 @@
     "forgot": "Quên mật khẩu?",
     "registered": "Đã tạo tài khoản. Hãy mở email để kích hoạt.",
     "activating": "Đang kích hoạt…",
-    "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập."
+    "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập.",
+    "issues": {
+      "password_too_short": "Mật khẩu phải có ít nhất 8 ký tự.",
+      "password_numeric": "Mật khẩu không được chỉ gồm chữ số.",
+      "password_similar_to_identity": "Mật khẩu quá giống tên đăng nhập hoặc email.",
+      "password_pwned": "Mật khẩu này từng bị lộ trong một vụ rò rỉ dữ liệu.",
+      "password_unchanged": "Mật khẩu mới phải khác mật khẩu hiện tại.",
+      "password_incorrect": "Mật khẩu hiện tại không đúng.",
+      "username_taken": "Tên đăng nhập đã được dùng.",
+      "email_taken": "Email này đã được đăng ký. Hãy đăng nhập hoặc đặt lại mật khẩu.",
+      "username_invalid_characters": "Chỉ dùng chữ cái, chữ số và dấu gạch dưới.",
+      "email_invalid": "Nhập một địa chỉ email hợp lệ.",
+      "organization_unavailable": "Trường này không nhận thành viên mới. Hãy chọn trường khác.",
+      "language_unknown": "Hãy chọn một ngôn ngữ trong danh sách."
+    }
   },
   "errors": {
     "generic": "Đã có lỗi xảy ra. Hãy thử lại.",
@@ -94,7 +108,7 @@
     "invalid_token": "Liên kết không hợp lệ hoặc đã hết hạn.",
     "validation_failed": "Dữ liệu chưa hợp lệ.",
     "conflict": "Thao tác không thực hiện được do trạng thái hiện tại. Hãy tải lại và thử lại.",
-    "mail_unavailable": "Chưa gửi được email. Hãy thử lại sau.",
+    "mail_unavailable": "Chưa gửi được email kích hoạt nên tài khoản chưa được tạo. Hãy thử lại sau.",
     "csrf_failed": "Phiên làm việc đã hết hạn. Hãy tải lại trang.",
     "invalid_code": "Mã sai hoặc đã hết hạn.",
     "totp_not_enabled": "Tài khoản chưa bật ứng dụng xác thực.",
@@ -104,7 +118,11 @@
     "file_too_large": "Tệp quá lớn.",
     "not_impersonating": "Bạn không đang đóng vai người dùng khác.",
     "two_factor_required": "Cần xác thực hai lớp để tiếp tục.",
-    "password_change_required": "Bạn cần đổi mật khẩu trước khi tiếp tục."
+    "password_change_required": "Bạn cần đổi mật khẩu trước khi tiếp tục.",
+    "bannedWithReason": "Tài khoản đã bị khoá. Lý do: {reason}",
+    "oauth_state": "Phiên đăng nhập bằng mạng xã hội đã hết hạn. Hãy thử lại.",
+    "oauth_failed": "Đăng nhập bằng mạng xã hội không thành công.",
+    "email_unverified": "Email của tài khoản mạng xã hội này chưa được xác minh."
   },
   "common": {
     "retry": "Thử lại",

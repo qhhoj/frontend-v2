@@ -187,4 +187,29 @@ describe('api client', () => {
     mockApi({ 'GET /problems/meta': ok({ types: [] }) });
     await expect(apiPage('/problems/meta')).rejects.toMatchObject({ code: 'invalid_response' });
   });
+
+  it('keeps the field issues and the extra members of an error answer', async () => {
+    mockApi({
+      'POST /x': fail(
+        403,
+        'banned',
+        undefined,
+        [{ field: 'username', code: 'username_taken', message: 'Username is taken.' }],
+        { banReason: 'cheating in R41' },
+      ),
+    });
+    const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({
+      code: 'banned',
+      issues: [{ field: 'username', code: 'username_taken', message: 'Username is taken.' }],
+      extra: { banReason: 'cheating in R41' },
+    });
+  });
+
+  it('has no issues and no extra members when the answer carries none', async () => {
+    mockApi({ 'POST /x': fail(429, 'rate_limited') });
+    const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
+    expect(error).toMatchObject({ code: 'rate_limited', fields: {}, issues: [], extra: {} });
+  });
 });
