@@ -4,11 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>QHHOJ</title>
-    <meta name="theme-color" />
+    <meta name="theme-color" content="#0d0a1a" />
     <script>
       // Pre-paint: the theme last painted (src/theme/theme.store.ts), else the OS scheme.
-      // `known` and the fallback ids must match src/theme/registry.ts; prepaint.spec.ts enforces it.
-      var known = ['glass-dark', 'glass-light'];
+      // `grounds` (theme id -> its --qh-ground, for the address bar) and the fallback ids must match
+      // src/theme/registry.ts and src/theme/themes/; prepaint.spec.ts enforces it.
+      var grounds = { 'glass-dark': '#0d0a1a', 'glass-light': '#f6f2ff' };
+      var known = Object.keys(grounds);
       var stored = null;
       var prefersLight = false;
       try {
@@ -17,11 +19,9 @@
       try {
         prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
       } catch {}
-      document.documentElement.dataset.theme = known.includes(stored)
-        ? stored
-        : prefersLight
-          ? 'glass-light'
-          : 'glass-dark';
+      var theme = known.includes(stored) ? stored : prefersLight ? 'glass-light' : 'glass-dark';
+      document.documentElement.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
     </script>
   </head>
   <body>

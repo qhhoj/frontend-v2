@@ -1,10 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
+import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 
-const THEMES = [
-  { id: 'glass-dark', scheme: 'dark' },
-  { id: 'glass-light', scheme: 'light' },
-] as const;
 /**
  * `ready` is text that only shows once the page has left its loading state, so axe never audits skeletons.
  * Keys are the viewers the page is audited for.
@@ -35,6 +32,8 @@ for (const theme of THEMES)
       }) => {
         api.signedIn = viewer === 'signed-in';
         await page.emulateMedia({ colorScheme: theme.scheme });
+        // The OS scheme only selects the first theme of that scheme; the pre-paint script honours the remembered id.
+        await page.addInitScript((id) => localStorage.setItem('qhhoj.resolvedTheme', id), theme.id);
         await page.goto(path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
         await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();

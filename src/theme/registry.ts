@@ -11,7 +11,7 @@ export interface ThemeDefinition {
 
 /**
  * The single source of themes. Add a theme: a CSS file in themes/, its import in styles.css, an entry here, its label in both locale files.
- * A theme meant to become the default for its scheme also replaces the id in the pre-paint script of index.html.
+ * A new theme also goes into `grounds` in the pre-paint script of index.html; as the default for its scheme it also replaces the fallback id there.
  */
 export const THEMES: readonly ThemeDefinition[] = [
   { id: 'glass-dark', labelKey: 'theme.glassDark', scheme: 'dark', storedAs: 'dark' },

@@ -1,3 +1,4 @@
+import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 
 test('the theme menu opens with Enter, moves with arrows, closes with Escape and returns focus', async ({
@@ -35,12 +36,12 @@ test('choosing a theme item with the keyboard applies it and returns focus to th
   await trigger.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('menu')).toBeFocused();
-  // auto, glass-dark, glass-light
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('ArrowDown');
+  // The menu lists `auto` first, then the registered themes in order; ArrowDown enters it, then steps.
+  const target = THEMES.find((theme) => theme.scheme === 'light')!;
+  for (let step = 0; step < THEMES.indexOf(target) + 2; step += 1)
+    await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', target.id);
   await expect(page.getByRole('menu')).toBeHidden();
   await expect(trigger).toBeFocused();
 });

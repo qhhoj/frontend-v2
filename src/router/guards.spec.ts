@@ -1,6 +1,8 @@
+import { nextTick } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
+import { i18n } from '@/i18n';
 import { onCsrfFailed, onUnauthorized } from '@/api/client';
 import { sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
@@ -120,5 +122,13 @@ describe('navigation guards', () => {
   it('titles the document from the route', async () => {
     await navigate('/problems', signedOut);
     expect(document.title).toBe('Bài tập · QHHOJ');
+  });
+
+  it('retitles the document when the interface language changes', async () => {
+    await navigate('/problems', signedOut);
+    i18n.global.locale.value = 'en';
+    await nextTick();
+    expect(document.title).toBe('Problems · QHHOJ');
+    i18n.global.locale.value = 'vi';
   });
 });
