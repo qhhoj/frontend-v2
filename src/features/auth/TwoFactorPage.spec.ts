@@ -112,13 +112,19 @@ describe('two-factor page', () => {
     expect(wrapper.find('[data-testid="inline-bit"]').exists()).toBe(true);
   });
 
-  it('tells a throttled viewer to wait', async () => {
+  it('tells a throttled viewer to wait, keeping the typed code and not marking it wrong', async () => {
     twoFactorApi(['totp'], { 'POST /auth/2fa/totp/verify': fail(429, 'rate_limited') });
     const { wrapper } = await mountApp('/login/2fa');
     await pasteCode(wrapper, '000000');
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
       'Bạn thao tác quá nhanh. Hãy thử lại sau.',
     );
+    expect(boxesOf(wrapper).some((box) => box.attributes('aria-invalid') === 'true')).toBe(false);
+    expect(
+      boxesOf(wrapper)
+        .map((box) => (box.element as HTMLInputElement).value)
+        .join(''),
+    ).toBe('000000');
   });
 
   it('does not submit an incomplete code from the button', async () => {

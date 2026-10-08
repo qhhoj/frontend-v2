@@ -41,7 +41,11 @@ const CODE_ERROR_ID = 'two-factor-code-error';
 const formElement = ref<HTMLFormElement | null>(null);
 const { pending, error, fieldErrors, summary, run } = useAuthAction(formElement, ['code']);
 const waitingForKey = computed(() => view.value === 'key' && pending.value);
-const codeInvalid = computed(() => view.value === 'app' && Boolean(summary.value));
+/** Only a refused code marks the boxes and empties them; a network error or a 429 keeps what was typed. */
+const wrongCode = computed(
+  () => error.value instanceof ApiError && error.value.code === 'invalid_code',
+);
+const codeInvalid = computed(() => view.value === 'app' && wrongCode.value);
 /** A failed attempt or a dead end: Bit sweats in place of the card's icon. */
 const failed = computed(
   () =>
@@ -80,7 +84,7 @@ async function submitCode() {
       await finish();
     }),
   );
-  if (accepted || mode.value !== 'app') return;
+  if (accepted || mode.value !== 'app' || !wrongCode.value) return;
   digits.value = '';
   await nextTick();
   otp.value?.focus();
