@@ -279,7 +279,11 @@
   "bit": {
     "accepted": "Bit đội vương miện",
     "rejected": "Bit toát mồ hôi",
-    "asleep": "Bit ngủ trong mũ ngủ"
+    "asleep": "Bit ngủ trong mũ ngủ",
+    "community": "Ba Bit trên bục",
+    "security": "Bit cầm ổ khóa",
+    "envelope": "Bit cầm phong thư",
+    "staff": "Bit đội mũ bảo hộ"
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -979,9 +983,15 @@
     "title": "Trạng thái"
   },
   "pager": {
+    "previous": "Trang trước",
+    "next": "Trang sau",
     "title": "Phân trang"
   },
   "vote": {
+    "up": "Bình chọn lên",
+    "down": "Bình chọn xuống",
+    "refusedGate": "Cần giải ít nhất 5 bài để bình chọn.",
+    "refusedRate": "Bạn bình chọn quá nhanh. Hãy thử lại sau ít giây.",
     "title": "Bình chọn"
   },
   "leaderboard": {

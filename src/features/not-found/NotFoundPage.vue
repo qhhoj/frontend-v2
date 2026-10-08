@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import BitSprite from '@/components/BitSprite.vue';
-import { BIT_PALETTES, PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
+import CryingBit from '@/components/CryingBit.vue';
 
 const route = useRoute();
-const TEAR = BIT_PALETTES.terracotta;
 /** Pixel font for the giant 404; X is a filled block. */
 const DIGIT_ROWS = {
   '4': ['X..X', 'X..X', 'XXXX', '...X', '...X'],
@@ -13,16 +11,6 @@ const DIGIT_ROWS = {
 const DIGITS = ['4', '0', '4'] as const;
 const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
   DIGIT_ROWS[digit].flatMap((row) => [...row].map((cell) => cell === 'X'));
-/** Where the two tears start, in sprite pixels: just under each eye (columns 5 and 9, row 11) and staggered. */
-const TEARS = [
-  { column: 5, delay: '0s' },
-  { column: 9, delay: '0.55s' },
-] as const;
-const tearColours = {
-  backgroundColor: TEAR.H,
-  boxShadow: `0 0 0 calc(var(--bit-px) / 2) ${TEAR.O}`,
-};
-const puddleStyle = { backgroundColor: TEAR.H, boxShadow: `0 0 0 3px ${TEAR.O}59` };
 </script>
 
 <template>
@@ -49,33 +37,7 @@ const puddleStyle = { backgroundColor: TEAR.H, boxShadow: `0 0 0 3px ${TEAR.O}59
           />
         </div>
       </div>
-      <div
-        role="img"
-        :aria-label="$t('notFound.bitLabel')"
-        class="bit-sob relative [--bit-px:8px] sm:[--bit-px:12px]"
-        style="width: calc(var(--bit-px) * 16); height: calc(var(--bit-px) * 16)"
-      >
-        <BitSprite :look="PLACEMENT_LOOKS.crying" blinking tears />
-        <span
-          v-for="tear in TEARS"
-          :key="tear.column"
-          class="bit-tear absolute motion-reduce:hidden"
-          :style="{
-            left: `calc(var(--bit-px) * ${tear.column})`,
-            top: 'calc(var(--bit-px) * 11)',
-            width: 'var(--bit-px)',
-            height: 'calc(var(--bit-px) * 2)',
-            ...tearColours,
-            animationDelay: tear.delay,
-          }"
-        />
-      </div>
-      <!-- A soft puddle under Bit, in Bit's tear colour. -->
-      <div
-        aria-hidden="true"
-        class="-mt-5 h-[18px] w-60 max-w-full rounded-[50%] opacity-55"
-        :style="puddleStyle"
-      />
+      <CryingBit class="[--bit-px:8px] sm:[--bit-px:12px]" :label="$t('notFound.bitLabel')" />
     </div>
     <h1 class="mt-2 font-display text-3xl font-bold tracking-tight sm:text-[40px]">
       {{ $t('notFound.title') }}
