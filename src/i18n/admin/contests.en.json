@@ -140,5 +140,37 @@
   "create": {
     "title": "Create contest",
     "submit": "Create contest"
+  },
+  "problems": {
+    "columns": {
+      "label": "Label",
+      "problem": "Problem",
+      "points": "Points",
+      "partial": "Partial",
+      "pretest": "Pretest",
+      "prefix": "Output cut",
+      "maxSubmissions": "Maximum submissions",
+      "order": "Order"
+    },
+    "addLabel": "Add a problem by code",
+    "addPlaceholder": "Add a problem by code…",
+    "full": "At most 100 problems.",
+    "notFound": "There is no problem {code}.",
+    "alreadyListed": "Problem {code} is already in the contest.",
+    "orderLine": "The table order is the contest order (at most 100 problems). Use the up and down buttons to change it.",
+    "prefixLine": "Output cut: leave empty for the judge's default.",
+    "rescoreWarning": "Changing points or scoring after submissions exist does not rescore them automatically.",
+    "rescoreLink": "Use Rescore on the Actions tab.",
+    "save": "Save contest problems",
+    "prefixDefault": "default",
+    "maxNone": "none",
+    "pointsFor": "Points of {code}",
+    "partialFor": "Partial for {code}",
+    "pretestFor": "Pretest for {code}",
+    "prefixFor": "Output cut for {code}",
+    "maxFor": "Maximum submissions for {code}",
+    "moveUp": "Move {code} up",
+    "moveDown": "Move {code} down",
+    "remove": "Remove {code} from the contest"
   }
 }

@@ -26,3 +26,14 @@ for (const viewport of AUDIT_VIEWPORTS)
       true,
     );
   });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`contest problems tab is accessible and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    await openContestEditor(page, api, 'problems');
+    await expect(page.getByTestId('code').nth(2)).toHaveText('hcmus41c');
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });

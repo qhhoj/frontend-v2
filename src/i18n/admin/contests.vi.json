@@ -140,5 +140,37 @@
   "create": {
     "title": "Tạo kỳ thi",
     "submit": "Tạo kỳ thi"
+  },
+  "problems": {
+    "columns": {
+      "label": "Nhãn",
+      "problem": "Bài",
+      "points": "Điểm",
+      "partial": "Từng phần",
+      "pretest": "Pretest",
+      "prefix": "Cắt output",
+      "maxSubmissions": "Số lần nộp tối đa",
+      "order": "Thứ tự"
+    },
+    "addLabel": "Thêm bài theo mã",
+    "addPlaceholder": "Thêm bài theo mã…",
+    "full": "Tối đa 100 bài.",
+    "notFound": "Không có bài {code}.",
+    "alreadyListed": "Bài {code} đã có trong kỳ thi.",
+    "orderLine": "Thứ tự trong bảng là thứ tự trong kỳ thi (tối đa 100 bài). Dùng nút lên/xuống để đổi.",
+    "prefixLine": "Cắt output: để trống là dùng mặc định của máy chấm.",
+    "rescoreWarning": "Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.",
+    "rescoreLink": "Dùng Tính lại điểm ở tab Thao tác.",
+    "save": "Lưu bài trong kỳ thi",
+    "prefixDefault": "mặc định",
+    "maxNone": "không",
+    "pointsFor": "Điểm của {code}",
+    "partialFor": "Từng phần cho {code}",
+    "pretestFor": "Pretest cho {code}",
+    "prefixFor": "Cắt output cho {code}",
+    "maxFor": "Số lần nộp tối đa cho {code}",
+    "moveUp": "Chuyển {code} lên",
+    "moveDown": "Chuyển {code} xuống",
+    "remove": "Bỏ {code} khỏi kỳ thi"
   }
 }
