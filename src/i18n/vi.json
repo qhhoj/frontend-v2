@@ -367,6 +367,28 @@
       "limitDaily": "Tối đa 3 lần mỗi ngày.",
       "limitOneAtATime": "Mỗi lúc chỉ chuẩn bị một tệp; yêu cầu thêm sẽ bị từ chối cho đến khi xong.",
       "limitLifetime": "Tệp có hiệu lực 7 ngày kể từ lúc tạo."
+    },
+    "password": {
+      "title": "Đổi mật khẩu",
+      "lead": "Sau khi đổi, mọi thiết bị khác sẽ bị đăng xuất; phiên hiện tại được giữ. API token không thay đổi.",
+      "changed": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất."
+    },
+    "token": {
+      "title": "API token",
+      "lead": "Dùng cho công cụ dòng lệnh và script nộp bài. Token chỉ hiện đúng một lần sau khi tạo; hệ thống không thể hiện lại token cũ.",
+      "create": "Tạo token mới",
+      "copyNow": "Hãy sao chép ngay. Rời trang này là bạn sẽ không xem lại được token. Token cũ đã hết hiệu lực.",
+      "copy": "Sao chép API token",
+      "risk": "Ai có token đều nộp bài được dưới tên bạn. Đổi mật khẩu không làm token mất hiệu lực; hãy tạo token mới nếu nghi ngờ bị lộ.",
+      "confirmTitle": "Tạo token mới?",
+      "confirmBody": "Token hiện tại sẽ hết hiệu lực ngay. Mọi script đang dùng nó sẽ lỗi cho đến khi bạn thay token mới. Token mới chỉ hiện một lần."
+    },
+    "logoutAll": {
+      "title": "Đăng xuất mọi nơi",
+      "lead": "Kết thúc tất cả phiên đăng nhập, kể cả thiết bị này. Bạn sẽ cần đăng nhập lại.",
+      "action": "Đăng xuất mọi nơi",
+      "confirmTitle": "Đăng xuất mọi nơi?",
+      "confirmBody": "Tất cả phiên đăng nhập, kể cả trên thiết bị này, sẽ kết thúc ngay. Bạn sẽ được đưa về trang đăng nhập."
     }
   },
   "appearance": {

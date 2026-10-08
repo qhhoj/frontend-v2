@@ -1,62 +1,30 @@
 <script setup lang="ts">
 import { LogOut } from 'lucide-vue-next';
-import { computed, nextTick, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { changePassword } from '@/api/auth.api';
 import InlineBit from '@/components/InlineBit.vue';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
-import AuthError from './AuthError.vue';
-import AuthField from './AuthField.vue';
 import AuthLayout from './AuthLayout.vue';
 import AuthNotice from './AuthNotice.vue';
-import AuthSubmit from './AuthSubmit.vue';
-import NewPasswordPair from './NewPasswordPair.vue';
-import { useAuthAction } from './use-auth-action';
+import ChangePasswordForm from './ChangePasswordForm.vue';
 
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
-const form = reactive({ currentPassword: '', newPassword: '', confirmation: '' });
-const formElement = ref<HTMLFormElement | null>(null);
-const { pending, fieldErrors, summary, run, dismiss, focusFirstInvalid } = useAuthAction(
-  formElement,
-  ['currentPassword', 'newPassword'],
-);
 /** The viewer's password is in a breach list: the guard sends them here from every page until it is changed. */
 const forced = computed(() => session.passwordChangeRequired);
 /** The server has the new password, but this tab has not reloaded the session yet: only "try again" is left. */
 const passwordChanged = ref(false);
 const sessionStale = ref(false);
-const owner = computed(() => ({ username: session.user?.username, email: session.user?.email }));
-const passwordsMatch = computed(() => form.newPassword === form.confirmation);
 
-/** A failed reload is not a failed change: the password is already new, so the form must not come back with the old one. */
-async function leaveAfterChange() {
+/** The form's `afterChange`: reload the session (the guard reads the breach flag from it). A failure rejects, so the form stays "accepted" and says so through `reloadFailed`. */
+async function reloadSession() {
   sessionStale.value = false;
-  try {
-    await session.refresh();
-  } catch {
-    sessionStale.value = true;
-    return;
-  }
-  await router.push(safeRedirect(route.query.redirect));
+  await session.refresh();
 }
-
-async function changeThenLeave() {
-  await changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword });
-  passwordChanged.value = true;
-  await leaveAfterChange();
-}
-
-async function submit() {
-  if (passwordChanged.value) return run(leaveAfterChange);
-  if (!passwordsMatch.value) {
-    await nextTick();
-    return focusFirstInvalid();
-  }
-  await run(changeThenLeave);
-}
+/** Back to where the guard took the viewer from. */
+const returnToPage = () => router.push(safeRedirect(route.query.redirect));
 
 /** Not `useLogout`: it first sends a viewer on an account page home, a page this screen then leaves at once. */
 async function signOut() {
@@ -93,43 +61,11 @@ async function signOut() {
     <AuthNotice v-if="sessionStale" tone="success">{{
       $t('auth.changePassword.changedNotLoaded')
     }}</AuthNotice>
-    <form ref="formElement" class="flex flex-col gap-[18px]" @submit.prevent="submit">
-      <!-- Password managers file the saved entry under the username; this field is never shown or edited. -->
-      <input
-        type="text"
-        name="username"
-        autocomplete="username"
-        :value="session.user?.username"
-        readonly
-        tabindex="-1"
-        aria-hidden="true"
-        class="sr-only"
-      />
-      <template v-if="!passwordChanged">
-        <AuthField
-          v-model="form.currentPassword"
-          type="password"
-          name="currentPassword"
-          :label="$t('auth.changePassword.currentPassword')"
-          autocomplete="current-password"
-          placeholder="••••••••"
-          :error="fieldErrors.currentPassword"
-          required
-          @input="dismiss('currentPassword')"
-        />
-        <NewPasswordPair
-          v-model:password="form.newPassword"
-          v-model:confirmation="form.confirmation"
-          :confirm-label="$t('auth.changePassword.confirmNew')"
-          :owner="owner"
-          :error="fieldErrors.newPassword"
-          @input="dismiss('newPassword')"
-        />
-      </template>
-      <AuthError :text="summary" />
-      <AuthSubmit :pending="pending">{{
-        passwordChanged ? $t('auth.changePassword.retry') : $t('auth.changePassword.submit')
-      }}</AuthSubmit>
-    </form>
+    <ChangePasswordForm
+      :after-change="reloadSession"
+      @accepted="passwordChanged = true"
+      @reload-failed="sessionStale = true"
+      @changed="returnToPage"
+    />
   </AuthLayout>
 </template>

@@ -367,6 +367,28 @@
       "limitDaily": "At most 3 requests a day.",
       "limitOneAtATime": "One file at a time; another request is refused until it is done.",
       "limitLifetime": "A file stays valid for 7 days after it is created."
+    },
+    "password": {
+      "title": "Change password",
+      "lead": "Every other device is signed out after the change; this session stays. The API token does not change.",
+      "changed": "Password changed. Other devices were signed out."
+    },
+    "token": {
+      "title": "API token",
+      "lead": "For command-line tools and submit scripts. A token is shown exactly once after it is created; an old one cannot be shown again.",
+      "create": "Create a new token",
+      "copyNow": "Copy it now. Once you leave this page the token cannot be shown again. The old token no longer works.",
+      "copy": "Copy the API token",
+      "risk": "Anyone holding the token can submit as you. Changing the password does not revoke it; create a new token if it may have leaked.",
+      "confirmTitle": "Create a new token?",
+      "confirmBody": "The current token stops working at once. Scripts using it fail until you give them the new one. The new token is shown once."
+    },
+    "logoutAll": {
+      "title": "Sign out everywhere",
+      "lead": "Ends every session, this device included. You will need to sign in again.",
+      "action": "Sign out everywhere",
+      "confirmTitle": "Sign out everywhere?",
+      "confirmBody": "Every session, this device included, ends now. You will be taken to the sign-in page."
     }
   },
   "appearance": {
