@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import BitSprite from '@/components/BitSprite.vue';
-
-/** The crying 404 Bit, drawn as NotFoundPage draws it. */
-const CRYING_LOOK = { headgear: 'none', palette: 'terracotta' } as const;
+import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 </script>
 
 <template>
@@ -11,7 +9,7 @@ const CRYING_LOOK = { headgear: 'none', palette: 'terracotta' } as const;
     class="mx-auto flex max-w-xl flex-col items-center gap-3 py-10 text-center"
   >
     <div data-testid="crying-bit" aria-hidden="true" class="[--bit-px:6px]">
-      <BitSprite :look="CRYING_LOOK" blinking tears />
+      <BitSprite :look="PLACEMENT_LOOKS.crying" blinking tears />
     </div>
     <h1 class="font-display text-3xl font-bold">{{ $t('contests.detail.notFoundTitle') }}</h1>
     <p class="text-muted">{{ $t('contests.detail.notFoundBody') }}</p>

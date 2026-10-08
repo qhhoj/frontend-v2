@@ -40,6 +40,21 @@ describe('contest detail header', () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail({ formatName: 'ioi' })) });
     const { wrapper } = await mountApp('/contests/r42');
     expect(wrapper.find('[data-testid="freeze-label"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="freeze-hatch"]').exists()).toBe(false);
+  });
+
+  it('hatches the frozen stretch from the freeze point to the bar end', async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    /** 08:00 to 12:00 frozen for 60 minutes: the freeze sits at 75% of the bar. */
+    const frozenLastHour = contestDetail({
+      endTime: '2026-10-08T12:00:00Z',
+      frozenLastMinutes: 60,
+    });
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(frozenLastHour) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const hatchStyle = wrapper.get('[data-testid="freeze-hatch"]').attributes('style') ?? '';
+    expect(hatchStyle).toContain('left: 75%');
+    expect(hatchStyle).toContain('width: 25%');
   });
 
   it('puts a Bit beside the countdown while the contest runs, and not the upcoming one', async () => {

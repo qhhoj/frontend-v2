@@ -39,6 +39,8 @@ export const PLACEMENT_LOOKS = {
   accepted: { headgear: 'crown', palette: 'terracotta' },
   rejected: { headgear: 'sweat', palette: 'terracotta' },
   emptyList: { headgear: 'nightcap', palette: 'charcoal' },
+  /** The 404 look: bare head, tears drawn by the caller. */
+  crying: { headgear: 'none', palette: 'terracotta' },
 } as const satisfies Record<string, BitLook>;
 
 const EMPTY_ROW = '.'.repeat(SPRITE_SIZE);

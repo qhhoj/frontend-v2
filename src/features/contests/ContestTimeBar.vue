@@ -12,6 +12,9 @@ const freezePercent = computed(() => {
   const fraction = freezeFraction(props.contest);
   return fraction === null ? null : fraction * 100;
 });
+/** Stripes in the theme's line and surface tokens, as the approved mock draws the frozen stretch. */
+const FREEZE_HATCH =
+  'repeating-linear-gradient(45deg, var(--color-line-strong) 0 4px, var(--color-surface-hover) 4px 8px)';
 const freezeClock = computed(() => {
   const from = freezeStart(props.contest);
   return from === null ? '' : formatClock(new Date(from).toISOString(), locale.locale);
@@ -31,15 +34,20 @@ const freezeClock = computed(() => {
       >
       <span class="absolute right-0">{{ formatClock(contest.endTime, locale.locale) }}</span>
     </div>
-    <div aria-hidden="true" class="relative h-2 rounded-pill bg-surface-hover">
+    <div aria-hidden="true" class="relative h-2 overflow-hidden rounded-pill bg-surface-hover">
+      <span
+        v-if="freezePercent !== null"
+        data-testid="freeze-hatch"
+        class="absolute inset-y-0"
+        :style="{
+          left: `${freezePercent}%`,
+          width: `${100 - freezePercent}%`,
+          backgroundImage: FREEZE_HATCH,
+        }"
+      />
       <span
         class="absolute inset-y-0 left-0 rounded-pill bg-accent"
         :style="{ width: `${filledPercent}%` }"
-      />
-      <span
-        v-if="freezePercent !== null"
-        class="absolute -inset-y-1 w-0.5 rounded-pill bg-verdict-tle"
-        :style="{ left: `${freezePercent}%` }"
       />
     </div>
   </div>

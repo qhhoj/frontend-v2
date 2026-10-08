@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import BitSprite from '@/components/BitSprite.vue';
-import { BIT_PALETTES } from '@/mascot/bit-sprite';
+import { BIT_PALETTES, PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 
 const route = useRoute();
-const CRYING_LOOK = { headgear: 'none', palette: 'terracotta' } as const;
 const TEAR = BIT_PALETTES.terracotta;
 /** Pixel font for the giant 404; X is a filled block. */
 const DIGIT_ROWS = {
@@ -56,7 +55,7 @@ const puddleStyle = { backgroundColor: TEAR.H, boxShadow: `0 0 0 3px ${TEAR.O}59
         class="bit-sob relative [--bit-px:8px] sm:[--bit-px:12px]"
         style="width: calc(var(--bit-px) * 16); height: calc(var(--bit-px) * 16)"
       >
-        <BitSprite :look="CRYING_LOOK" blinking tears />
+        <BitSprite :look="PLACEMENT_LOOKS.crying" blinking tears />
         <span
           v-for="tear in TEARS"
           :key="tear.column"
