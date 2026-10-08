@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
 
 export type ContestTabId =
@@ -50,7 +51,7 @@ export const CONTEST_TABS: ContestTab[] = [
 ];
 
 const TAB_COMPONENTS: Record<ContestTabId, Component | null> = {
-  general: null,
+  general: defineAsyncComponent(() => import('./general/ContestGeneralTab.vue')),
   problems: null,
   announcements: null,
   ranking: null,

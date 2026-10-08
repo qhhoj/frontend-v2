@@ -1,9 +1,9 @@
+// Relative type-only imports and no test helpers: the e2e tsconfig has no `@/` alias, and Playwright loads this file too.
 import type {
   ContestSettings,
   EditableContest,
   EditableContestProblem,
-} from '@/api/types/contest-editing';
-import { ok } from '../mock-api';
+} from '../../api/types/contest-editing';
 
 export const CURATOR_ID = '0192c5a1-7e2f-7a31-9b4c-0e6d1f4a9c21';
 
@@ -95,5 +95,5 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
 });
 
 export const contestEditorRoutes = (contest: EditableContest = editableContest()) => ({
-  [`GET /contests/${contest.key}`]: ok(contest),
+  [`GET /contests/${contest.key}`]: { body: { data: contest } },
 });
