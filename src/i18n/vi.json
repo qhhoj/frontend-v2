@@ -313,6 +313,21 @@
       "security": "Bảo mật",
       "data": "Dữ liệu"
     },
+    "organizations": {
+      "title": "Tổ chức",
+      "lead": "Sắp xếp lại hoặc rời khỏi các tổ chức bạn đang tham gia. Tổ chức đầu tiên hiện cạnh tên bạn (thường là trường). Muốn tham gia thêm, vào trang tổ chức.",
+      "list": "Tổ chức của bạn",
+      "shownBesideName": "Hiển thị cạnh tên",
+      "admin": "Quản trị viên",
+      "adminNote": "Quản trị viên không rời tổ chức ở đây.",
+      "up": "Chuyển {name} lên",
+      "down": "Chuyển {name} xuống",
+      "leave": "Rời {name} khỏi danh sách",
+      "moved": "Đã chuyển {name} tới vị trí {position}.",
+      "left": "Đã bỏ {name} khỏi danh sách. Bấm Lưu để rời hẳn, hoặc Hoàn tác.",
+      "empty": "Bạn chưa tham gia tổ chức nào.",
+      "browse": "Xem danh sách tổ chức"
+    },
     "profile": {
       "lead": "Thông tin công khai và lựa chọn mặc định khi bạn nộp bài.",
       "saved": "Đã lưu hồ sơ.",

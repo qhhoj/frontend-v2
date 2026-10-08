@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { settingsRoutes } from '@/test/account-routes';
-import { profile } from '@/test/fixtures';
+import { profile, profileOrganization } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -136,5 +136,49 @@ describe('Settings › Profile', () => {
     expect(wrapper.get('[role="tabpanel"]:not([style*="none"]) .user-content').html()).toContain(
       '<p>Học sinh lớp 11</p>',
     );
+  });
+
+  it('saves a new organization order as the full id list', async () => {
+    const first = profileOrganization();
+    const second = profileOrganization({ id: 'org-hcm', name: 'Đội tuyển Tin học TP.HCM' });
+    const calls = mockApi({
+      ...settingsRoutes({}, { organizations: [first, second] }),
+      'PATCH /profile': ({ body }) => {
+        const ids = (body as { organizations: string[] }).organizations;
+        return ok(
+          profile({
+            organizations: ids.map((id) =>
+              [first, second].find((organization) => organization.id === id)!,
+            ),
+          }),
+        );
+      },
+    });
+    const { wrapper } = await mountApp('/settings');
+    await wrapper.get('button[aria-label="Chuyển Đội tuyển Tin học TP.HCM lên"]').trigger('click');
+    await wrapper.get('button[type="submit"]').trigger('submit');
+    await flushPromises();
+    expect(patches(calls)).toEqual([{ organizations: ['org-hcm', first.id] }]);
+  });
+
+  it('shows the organizations sentence under the list when the server refuses it', async () => {
+    mockApi({
+      ...settingsRoutes({}, { organizations: [profileOrganization()] }),
+      'PATCH /profile': invalid(
+        issue(
+          'organizations',
+          'organizations_not_editable',
+          'Organizations can only be reordered or shortened.',
+        ),
+      ),
+    });
+    const { wrapper } = await mountApp('/settings');
+    await wrapper
+      .get('button[aria-label="Rời THPT Chuyên Lê Hồng Phong khỏi danh sách"]')
+      .trigger('click');
+    await wrapper.get('button[type="submit"]').trigger('submit');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Chỉ sắp xếp hoặc rời các tổ chức bạn đang tham gia.');
+    expect(wrapper.text()).not.toContain('can only be reordered');
   });
 });

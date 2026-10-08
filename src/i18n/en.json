@@ -313,6 +313,21 @@
       "security": "Security",
       "data": "Data"
     },
+    "organizations": {
+      "title": "Organizations",
+      "lead": "Reorder or leave the organizations you belong to. The first one shows beside your name (usually your school). To join more, open the organization pages.",
+      "list": "Your organizations",
+      "shownBesideName": "Shown beside your name",
+      "admin": "Admin",
+      "adminNote": "Admins do not leave an organization from here.",
+      "up": "Move {name} up",
+      "down": "Move {name} down",
+      "leave": "Remove {name} from the list",
+      "moved": "Moved {name} to position {position}.",
+      "left": "Removed {name} from the list. Save to leave it, or undo.",
+      "empty": "You do not belong to any organization yet.",
+      "browse": "Browse organizations"
+    },
     "profile": {
       "lead": "Public details and the defaults used when you submit.",
       "saved": "Profile saved.",

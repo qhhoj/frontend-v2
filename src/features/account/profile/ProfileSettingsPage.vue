@@ -9,6 +9,7 @@ import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsLayout from '../settings/SettingsLayout.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
 import IdentityFields from './IdentityFields.vue';
+import OrganizationsEditor from './OrganizationsEditor.vue';
 import SaveBar from './SaveBar.vue';
 import { invalidSummary, lengthErrors, saveErrorText, serverFieldErrors } from './profile-errors';
 import { useProfileDraft } from './use-profile-draft';
@@ -89,6 +90,11 @@ async function submit() {
             :errors="fieldErrors"
           />
         </SettingsCard>
+        <OrganizationsEditor
+          v-model="draft.organizationIds"
+          :organizations="profile.organizations"
+          :error="fieldErrors.organizations"
+        />
         <SaveBar
           :dirty="dirty"
           :pending="pending"
