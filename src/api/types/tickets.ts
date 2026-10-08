@@ -3,7 +3,7 @@ import type { UserSummary } from './problems';
 /** backend: libs/community tickets.ts */
 export const TICKET_TITLE_MAX_LENGTH = 100;
 export const TICKET_BODY_MAX_LENGTH = 8192;
-export const TICKET_URL_MAX_LENGTH = 200;
+export const TICKET_ISSUE_URL_MAX_LENGTH = 200;
 export const TICKETS_PAGE_SIZE = 50;
 
 /** backend: tickets/core/dto/ticket.response.ts (TicketLinkResponse) */

@@ -1,9 +1,8 @@
-import { HOME_COUNTS, ratingHistory, userPage } from '../../src/test/fixtures';
+import { ratingHistory, userPage } from '../../src/test/fixtures';
 import {
   activity,
   commentThreadPage,
   flatpage,
-  homeResponse,
   member,
   organizationDetail,
   organizationItem,
@@ -20,9 +19,7 @@ import type { Handler } from './reply';
 const NOT_FOUND = { status: 404, body: { error: { code: 'not_found', message: 'Not found' } } };
 const eventStream = { contentType: 'text/event-stream', raw: 'retry: 600000\n\n' };
 
-/** Default answers for every 8e endpoint; specs replace single keys (`api.routes['GET /posts'] = …`). Exact keys win over patterns. */
 const userAndContentRoutes = (): Record<string, Handler> => ({
-  'GET /home': ok(homeResponse({ counts: HOME_COUNTS })),
   'GET /contributors': list([]),
   'GET /users/:username/rank': ok({ rank: 1134, page: 12, pageSize: 100 }),
   'GET /users/:username': ({ params }) => ok(userPage({ username: params.username })),

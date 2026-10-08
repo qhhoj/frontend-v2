@@ -25,6 +25,7 @@ import {
 } from '../../src/test/fixtures';
 import { homeResponse } from '../../src/test/community-fixtures';
 import { communityRoutes } from './community-api';
+import { matchPattern } from '../../src/test/route-match';
 import { list, ok } from './reply';
 import type { Handler, Reply } from './reply';
 
@@ -39,24 +40,6 @@ interface SeenRequest {
   replyStatus: number;
   replyContentType: string;
 }
-/** `GET /problems/:code` style keys: a segment starting with `:` matches any one segment. */
-function matchPattern(pattern: string, key: string): Record<string, string> | null {
-  const patternParts = pattern.split('/');
-  const keyParts = key.split('/');
-  // A trailing `*` matches one or more remaining segments (`GET /pages/*` answers every unknown page).
-  if (patternParts.at(-1) === '*' && keyParts.length >= patternParts.length) {
-    const fixed = patternParts.slice(0, -1);
-    return fixed.every((part, index) => part === keyParts[index]) ? {} : null;
-  }
-  if (patternParts.length !== keyParts.length) return null;
-  const params: Record<string, string> = {};
-  for (const [index, part] of patternParts.entries()) {
-    if (part.startsWith(':')) params[part.slice(1)] = decodeURIComponent(keyParts[index]);
-    else if (part !== keyParts[index]) return null;
-  }
-  return params;
-}
-
 const eventStream = (...frames: string[]): Reply => ({
   contentType: 'text/event-stream',
   // The long retry stops the browser re-requesting a finished stream.
