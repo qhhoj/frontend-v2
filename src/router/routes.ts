@@ -295,6 +295,13 @@ export const routes: RouteRecordRaw[] = [
     path: '/contest/:key',
     redirect: (to) => ({ name: 'contest', params: { key: to.params.key } }),
   },
+  /** Unknown paths try a stored page first; its 404 renders NotFoundPage. Same path as `not-found`: the earlier record wins for a URL, `not-found` stays reachable by name. */
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'flatpage',
+    component: () => import('@/features/flatpages/FlatpagePage.vue'),
+    meta: { titleKey: 'pages.flatpage' },
+  },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',

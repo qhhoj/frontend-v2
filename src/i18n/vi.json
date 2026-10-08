@@ -859,8 +859,33 @@
     "endsIn": "Kết thúc sau",
     "noUsers": "Chưa có người dùng nào có rating.",
     "topRating": "Top rating",
-    "welcomeTitle": "Luyện thuật toán, thi đấu trực tuyến",
-    "welcomeBody": "Đăng nhập để nộp bài, theo dõi rating và tham gia kỳ thi."
+    "anon": {
+      "eyebrow": "Dành cho học sinh THPT Việt Nam",
+      "title": "Luyện thuật toán mỗi ngày, thi đấu cùng cả nước",
+      "body": "{problems} bài tập, kỳ thi hằng tuần và bảng xếp hạng rating dành cho học sinh chuyên Tin. Đăng ký miễn phí để nộp bài và lưu tiến độ.",
+      "register": "Đăng ký tài khoản",
+      "signIn": "Đăng nhập",
+      "problems": "Xem bài tập",
+      "bit": "Bit đội mũ tốt nghiệp",
+      "counts": {
+        "users": "người dùng",
+        "problems": "bài tập",
+        "submissions": "bài nộp",
+        "contests": "kỳ thi"
+      },
+      "running": "Kỳ thi đang diễn ra",
+      "allContests": "Tất cả kỳ thi",
+      "contestants": "{key} · {count} thí sinh",
+      "elapsed": "Đã qua {percent}% thời gian",
+      "viewContest": "Xem kỳ thi",
+      "newPosts": "Bài viết mới",
+      "allPosts": "Tất cả bài viết",
+      "score": "{score} điểm",
+      "topPp": "Top điểm PP",
+      "pp": "{pp} PP",
+      "leaderboard": "Bảng xếp hạng",
+      "noPerformers": "Chưa có ai có điểm PP."
+    }
   },
   "problem": {
     "copySample": "Sao chép ví dụ",
@@ -1544,6 +1569,11 @@
     "liveFooter": " · tin nhắn mới tự hiện nhờ luồng trực tiếp"
   },
   "flatpage": {
+    "breadcrumb": "Đường dẫn",
+    "home": "Trang chủ",
+    "signInTitle": "Đăng nhập để đọc trang này",
+    "signInBody": "Trang này chỉ mở cho thành viên đã đăng nhập.",
+    "signIn": "Đăng nhập",
     "title": "Trang"
   }
 }

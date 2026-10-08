@@ -27,7 +27,9 @@ for (const viewport of VIEWPORTS)
       await expect(bit).toBeVisible();
       const bitBox = await boxOf(bit);
       expect(bitBox.width).toBeGreaterThanOrEqual(viewport.minBitPx);
-      const card = page.getByTestId(viewer === 'signed-in' ? 'rating-hero' : 'welcome-card');
+      if (viewer === 'anonymous')
+        await expect(bit).toHaveAttribute('aria-label', 'Bit đội mũ tốt nghiệp');
+      const card = page.getByTestId(viewer === 'signed-in' ? 'rating-hero' : 'anonymous-hero');
       const texts = card.locator('p, h1, [data-testid="rating-row"]');
       for (const text of await texts.all()) expect(overlaps(bitBox, await boxOf(text))).toBe(false);
       const scrolls = await page.evaluate(

@@ -40,4 +40,13 @@ describe('8e routes', () => {
     const landed = await landOn('/ticket/t-1');
     expect([landed.name, landed.query.redirect]).toEqual(['login', '/tickets/t-1']);
   });
+  it('tries a stored page on an unknown path, and keeps the not-found record by name', () => {
+    expect(resolve('/about/rules').name).toBe('flatpage');
+    expect(resolve('/about/rules').params.pathMatch).toEqual(['about', 'rules']);
+    expect(resolve('/problems').name).toBe('problems');
+    const router = createAppRouter(createMemoryHistory());
+    expect(router.resolve({ name: 'not-found', params: { pathMatch: ['x'] } }).name).toBe(
+      'not-found',
+    );
+  });
 });

@@ -1,0 +1,27 @@
+<script setup lang="ts">
+import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
+import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
+import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
+import AnonymousHero from './AnonymousHero.vue';
+import NewPostsCard from './NewPostsCard.vue';
+import RunningContestsCard from './RunningContestsCard.vue';
+import TopPerformersCard from './TopPerformersCard.vue';
+</script>
+
+<template>
+  <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8">
+    <AnonymousHero />
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div class="flex min-w-0 flex-col gap-6">
+        <RunningContestsCard />
+        <NewPostsCard />
+      </div>
+      <div class="flex min-w-0 flex-col gap-6">
+        <TopPerformersCard />
+        <TopContributorsCard :limit="3" />
+        <NewProblemsCard :limit="7" variant="home" />
+        <RecentCommentsCard :limit="4" />
+      </div>
+    </div>
+  </div>
+</template>

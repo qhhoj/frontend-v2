@@ -10,12 +10,15 @@ import {
   submissionItem,
   userPage,
 } from '@/test/fixtures';
+import { homeResponse } from '@/test/community-fixtures';
 import { installFakeEventSource } from '@/test/fake-event-source';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
 const publicRoutes: Record<string, MockHandler> = {
+  'GET /home': ok(homeResponse()),
+  'GET /posts': page([]),
   'GET /contests': page([contestItem()]),
   'GET /users': page([
     leaderboardEntry(1, 'user_07', 2788),
@@ -108,11 +111,13 @@ describe('home', () => {
     expect(bit.attributes('aria-hidden')).toBe('true');
   });
 
-  it('seats the same Bit in the welcome card of an anonymous viewer', async () => {
+  it('seats a labelled Bit in a graduation cap in the hero of an anonymous viewer', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
-    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán, thi đấu trực tuyến');
-    expect(wrapper.get('[data-testid="home-bit"]').attributes('aria-hidden')).toBe('true');
+    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán mỗi ngày, thi đấu cùng cả nước');
+    expect(wrapper.get('[data-testid="home-bit"]').attributes('aria-label')).toBe(
+      'Bit đội mũ tốt nghiệp',
+    );
   });
 
   it('says so when no contest is running', async () => {
@@ -168,8 +173,9 @@ describe('home', () => {
   it('shows anonymous viewers the public cards only', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
-    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán, thi đấu trực tuyến');
+    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán mỗi ngày, thi đấu cùng cả nước');
     expect(wrapper.find('[data-testid="rating-hero"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="live-contest"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="top-users"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="running-contests"]').exists()).toBe(true);
   });
 });

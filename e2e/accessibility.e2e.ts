@@ -10,7 +10,10 @@ import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 const PAGES = [
   {
     path: '/',
-    ready: { anonymous: 'Luyện thuật toán, thi đấu trực tuyến', 'signed-in': 'Tổng hai số' },
+    ready: {
+      anonymous: 'Luyện thuật toán mỗi ngày, thi đấu cùng cả nước',
+      'signed-in': 'Tổng hai số',
+    },
   },
   {
     path: '/problems',

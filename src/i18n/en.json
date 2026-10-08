@@ -859,8 +859,33 @@
     "endsIn": "Ends in",
     "noUsers": "Nobody has a rating yet.",
     "topRating": "Top rating",
-    "welcomeTitle": "Practise algorithms, compete online",
-    "welcomeBody": "Sign in to submit, follow your rating and join contests."
+    "anon": {
+      "eyebrow": "For Vietnamese high-school students",
+      "title": "Practise algorithms every day, compete with the whole country",
+      "body": "{problems} problems, weekly contests and rating leaderboards for informatics students. Sign up free to submit and keep your progress.",
+      "register": "Create an account",
+      "signIn": "Sign in",
+      "problems": "Browse problems",
+      "bit": "Bit in a graduation cap",
+      "counts": {
+        "users": "users",
+        "problems": "problems",
+        "submissions": "submissions",
+        "contests": "contests"
+      },
+      "running": "Running contests",
+      "allContests": "All contests",
+      "contestants": "{key} · {count} contestants",
+      "elapsed": "{percent}% of the time has passed",
+      "viewContest": "View contest",
+      "newPosts": "New posts",
+      "allPosts": "All posts",
+      "score": "{score} points",
+      "topPp": "Top performance points",
+      "pp": "{pp} PP",
+      "leaderboard": "Leaderboard",
+      "noPerformers": "No one has performance points yet."
+    }
   },
   "problem": {
     "copySample": "Copy sample",
@@ -1544,6 +1569,11 @@
     "liveFooter": " · new messages appear live"
   },
   "flatpage": {
+    "breadcrumb": "Breadcrumb",
+    "home": "Home",
+    "signInTitle": "Sign in to read this page",
+    "signInBody": "This page is for signed-in members.",
+    "signIn": "Sign in",
     "title": "Page"
   }
 }
