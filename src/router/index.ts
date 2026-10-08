@@ -23,14 +23,12 @@ export const scrollOnNavigation: RouterScrollBehavior = (to, from, saved) =>
 export const isNewPage = (to: RouteLocationNormalized, from: RouteLocationNormalized) =>
   from !== START_LOCATION && to.path !== from.path;
 
-export function createAppRouter(history: RouterHistory = createWebHistory()): Router {
-  const router = createRouter({
-    history,
-    routes,
-    scrollBehavior: scrollOnNavigation,
-  });
-  // One source per navigation, shared along a redirect chain: a redirect starts a new navigation and never reaches
-  // afterEach for the original, while a cancelled slow navigation must not end the source of the one that replaced it.
+/**
+ * One loading source per navigation, shared along a redirect chain: a redirect starts a new navigation and never
+ * reaches afterEach for the original, while a cancelled slow navigation must not end the source of the one that
+ * replaced it.
+ */
+function installNavigationLoading(router: Router) {
   const navigationSources = new WeakMap<object, symbol>();
   const sourceOf = (to: RouteLocationNormalized) =>
     navigationSources.get(to) ?? (to.redirectedFrom && navigationSources.get(to.redirectedFrom));
@@ -47,6 +45,32 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
   // afterEach also runs for cancelled and duplicate navigations; onError covers a failed chunk or a throwing guard.
   router.afterEach(endNavigation);
   router.onError((_error, to) => endNavigation(to));
+}
+
+/**
+ * A request refused with a gate (a second factor required, or a password change: set on another device, or by a
+ * breach check during this session): reload the session and apply the navigation rules to where the viewer is, as
+ * a navigation there would. Several refused requests at once share one reload.
+ */
+function installGateSync(router: Router) {
+  const reloadAndApplyRules = async () => {
+    const session = useSessionStore();
+    await session.refresh().catch(() => undefined);
+    const target = await resolveNavigation(router.currentRoute.value, session);
+    if (target !== true) await router.replace(target);
+  };
+  let syncing: Promise<void> | null = null;
+  const syncToGate = () => {
+    syncing ??= reloadAndApplyRules().finally(() => (syncing = null));
+    return syncing;
+  };
+  onGateRequired(() => void syncToGate());
+}
+
+export function createAppRouter(history: RouterHistory = createWebHistory()): Router {
+  const router = createRouter({ history, routes, scrollBehavior: scrollOnNavigation });
+  installNavigationLoading(router);
+  installGateSync(router);
   const titleDocument = () => {
     const title =
       pageTitle.value ?? translate(router.currentRoute.value.meta.titleKey ?? 'app.name');
@@ -56,23 +80,6 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
     if (!failure && isNewPage(to, from)) focusMain();
   });
   router.afterEach(titleDocument);
-  const reloadAndApplyRules = async () => {
-    const session = useSessionStore();
-    await session.refresh().catch(() => undefined);
-    const target = await resolveNavigation(router.currentRoute.value, session);
-    if (target !== true) await router.replace(target);
-  };
-  let syncing: Promise<void> | null = null;
-  /**
-   * A request refused with a gate (a second factor required, or a password change: set on another device, or by a
-   * breach check during this session): reload the session and apply the navigation rules to where the viewer is, as
-   * a navigation there would. Several refused requests at once share one reload.
-   */
-  const syncToGate = () => {
-    syncing ??= reloadAndApplyRules().finally(() => (syncing = null));
-    return syncing;
-  };
-  onGateRequired(() => void syncToGate());
   watch([() => i18n.global.locale.value, pageTitle], titleDocument);
   return router;
 }

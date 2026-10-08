@@ -19,6 +19,24 @@ import type {
 
 export type SessionStatus = 'unknown' | 'anonymous' | 'partial' | 'authenticated';
 
+const statusOf = (session: SessionResponse | null): SessionStatus => {
+  if (!session) return 'anonymous';
+  return session.twoFactorRequired ? 'partial' : 'authenticated';
+};
+
+/** What a session response (or none: signed out) sets in the store; absent members reset to their empty value. */
+const sessionFields = (session: SessionResponse | null) => {
+  const source: Partial<SessionResponse> = session ?? {};
+  return {
+    user: source.user ?? null,
+    passwordChangeRequired: source.passwordChangeRequired ?? false,
+    impersonatorId: source.impersonatorId ?? null,
+    twoFactor: source.twoFactor ?? null,
+    csrfToken: source.csrfToken ?? null,
+    status: statusOf(session),
+  };
+};
+
 export const useSessionStore = defineStore('session', () => {
   const status = ref<SessionStatus>('unknown');
   const user = ref<SessionUser | null>(null);
@@ -30,12 +48,13 @@ export const useSessionStore = defineStore('session', () => {
   let loading: Promise<void> | null = null;
 
   function apply(session: SessionResponse | null) {
-    user.value = session?.user ?? null;
-    passwordChangeRequired.value = session?.passwordChangeRequired ?? false;
-    impersonatorId.value = session?.impersonatorId ?? null;
-    twoFactor.value = session?.twoFactor ?? null;
-    setCsrfToken(session?.csrfToken ?? null);
-    status.value = !session ? 'anonymous' : session.twoFactorRequired ? 'partial' : 'authenticated';
+    const fields = sessionFields(session);
+    user.value = fields.user;
+    passwordChangeRequired.value = fields.passwordChangeRequired;
+    impersonatorId.value = fields.impersonatorId;
+    twoFactor.value = fields.twoFactor;
+    setCsrfToken(fields.csrfToken);
+    status.value = fields.status;
   }
 
   /** 401 means signed out; any other failure leaves the status unknown and is rethrown. */

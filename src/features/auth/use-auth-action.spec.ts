@@ -116,7 +116,9 @@ describe('useAuthAction', () => {
   it('still reads an answer that has fields but no issues', async () => {
     const action = mountForm(['first']);
     await action.run(
-      rejected(new ApiError('validation_failed', 400, 'x', { fields: { first: ['Username is taken.'] } })),
+      rejected(
+        new ApiError('validation_failed', 400, 'x', { fields: { first: ['Username is taken.'] } }),
+      ),
     );
     expect(action.fieldErrors.value).toEqual({ first: 'Username is taken.' });
   });

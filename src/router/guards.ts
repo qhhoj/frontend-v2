@@ -47,6 +47,47 @@ const notFound = (to: RouteLocationNormalized): RouteLocationRaw => ({
   hash: to.hash,
 });
 
+/** `null` means the rule has nothing to say and the next one decides; `true` lets the navigation through. */
+type RuleResult = true | RouteLocationRaw | null;
+type Rule = (to: RouteLocationNormalized, session: SessionStore) => RuleResult;
+
+/** A pending second factor holds the viewer on pages that allow it, and on the 2FA step otherwise. */
+const pendingSecondFactorRule: Rule = (to, session) => {
+  if (session.status !== 'partial') return null;
+  return to.meta.allowPartial ? true : { name: 'login-2fa', query: withRedirect(to) };
+};
+
+/** The 2FA step exists only for a pending second factor; anyone else is sent on (the redirect is re-guarded). */
+const secondFactorStepRule: Rule = (to, session) => {
+  if (to.name !== 'login-2fa') return null;
+  return session.status === 'authenticated'
+    ? safeRedirect(to.query.redirect)
+    : { name: 'login', query: loginQuery(to.query.redirect) };
+};
+
+const passwordChangeRule: Rule = (to, session) => {
+  if (!session.passwordChangeRequired || to.name === 'account-password') return null;
+  return {
+    name: 'account-password',
+    query: isLinkCredential(to) ? {} : loginQuery(to.fullPath),
+  };
+};
+
+/** Who may open the page: signed-in only, guests only, staff only. */
+const accessRule: Rule = (to, session) => {
+  if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
+  if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
+  if (to.meta.staffOnly && !session.isStaff) return notFound(to);
+  return null;
+};
+
+const RULES: readonly Rule[] = [
+  pendingSecondFactorRule,
+  secondFactorStepRule,
+  passwordChangeRule,
+  accessRule,
+];
+
 /** Session-dependent routing rules, in order; spec "Routing". */
 export async function resolveNavigation(
   to: RouteLocationNormalized,
@@ -57,20 +98,9 @@ export async function resolveNavigation(
   } catch {
     return to.meta.requiresAuth ? toLogin(to) : true;
   }
-  if (session.status === 'partial')
-    return to.meta.allowPartial ? true : { name: 'login-2fa', query: withRedirect(to) };
-  // The 2FA step exists only for a pending second factor; anyone else is sent on (the redirect is re-guarded).
-  if (to.name === 'login-2fa')
-    return session.status === 'authenticated'
-      ? safeRedirect(to.query.redirect)
-      : { name: 'login', query: loginQuery(to.query.redirect) };
-  if (session.passwordChangeRequired && to.name !== 'account-password')
-    return {
-      name: 'account-password',
-      query: isLinkCredential(to) ? {} : loginQuery(to.fullPath),
-    };
-  if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
-  if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
-  if (to.meta.staffOnly && !session.isStaff) return notFound(to);
+  for (const rule of RULES) {
+    const result = rule(to, session);
+    if (result !== null) return result;
+  }
   return true;
 }

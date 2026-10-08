@@ -3,16 +3,11 @@ import type { Ref } from 'vue';
 import { authErrorText, fieldErrorTexts, hiddenIssueTexts } from './auth-errors';
 
 /**
- * What every auth form does around its request: a pending flag, the failure as text, per-field messages for the
- * inputs, and focus on the first invalid input. `visibleFields` are the field names the form renders; an issue for
- * any other name has no input to sit under, so the summary line explains it (or says "invalid data").
+ * The failure as the form shows it: per-field messages for the inputs and the summary line above the button.
+ * `visibleFields` are the field names the form renders; an issue for any other name has no input to sit under, so
+ * the summary line explains it (or says "invalid data").
  */
-export function useAuthAction(
-  formElement: Ref<HTMLElement | null> = ref(null),
-  visibleFields: readonly string[] = [],
-) {
-  const pending = ref(false);
-  const error = ref<unknown>(null);
+function useFailureTexts(error: Ref<unknown>, visibleFields: readonly string[]) {
   const dismissed = ref<string[]>([]);
   const allFieldErrors = computed(() => fieldErrorTexts(error.value));
   const fieldErrors = computed(() =>
@@ -29,11 +24,28 @@ export function useAuthAction(
     const allShown = names.length > 0 && names.every((name) => visibleFields.includes(name));
     return allShown ? null : authErrorText(error.value);
   });
-
   /** The viewer is fixing this field: its old server message is stale. */
   const dismiss = (name: string) => {
     if (!dismissed.value.includes(name)) dismissed.value.push(name);
   };
+  const clearDismissed = () => {
+    dismissed.value = [];
+  };
+  return { fieldErrors, summary, dismiss, clearDismissed };
+}
+
+/**
+ * What every auth form does around its request: a pending flag, the failure as text (`useFailureTexts`), and focus
+ * on the first invalid input.
+ */
+export function useAuthAction(
+  formElement: Ref<HTMLElement | null> = ref(null),
+  visibleFields: readonly string[] = [],
+) {
+  const pending = ref(false);
+  const error = ref<unknown>(null);
+  const { fieldErrors, summary, dismiss, clearDismissed } = useFailureTexts(error, visibleFields);
+
   const focusFirstInvalid = () =>
     formElement.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   /** Forget the failure: a reopened dialog starts clean. */
@@ -46,7 +58,7 @@ export function useAuthAction(
     if (pending.value) return false;
     pending.value = true;
     error.value = null;
-    dismissed.value = [];
+    clearDismissed();
     try {
       await action();
       return true;
