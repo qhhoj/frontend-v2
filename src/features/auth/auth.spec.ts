@@ -158,7 +158,7 @@ describe('auth screens', () => {
     await wrapper.get('input[name="password"]').setValue('correct horse');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    await vi.waitFor(() => expect(useThemeStore().theme.id).toBe('glass-light'));
+    await vi.waitFor(() => expect(useThemeStore().theme.id).toBe('clay-light'));
   });
 
   it('tells a throttled viewer to wait', async () => {

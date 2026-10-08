@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
-import { THEMES } from './registry';
+import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 
 const script = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)![1]!;
 const groundsOf = new Map(
@@ -17,10 +17,21 @@ const groundOfThemeFile = (id: string) =>
   /--qh-ground:\s*(#\w+)/.exec(themeFiles[`./themes/${id}.css`]!)![1];
 const firstThemeOf = (scheme: string) => THEMES.find((theme) => theme.scheme === scheme)!.id;
 
+/** Every value `siteTheme` or the browser preference can hold, the legacy aliases and a retired one included. */
+const PREFERENCES = [
+  AUTO_THEME,
+  GLASS_AUTO_THEME,
+  ...THEMES.map((theme) => theme.id),
+  'light',
+  'dark',
+  'neon-retired',
+];
+
 /** Runs the real inline script against a stand-in page. */
 function prepaint({
   stored = null as string | null,
-  light = false,
+  preference = null as string | null,
+  dark = false,
   storageThrows = false,
   mediaThrows = false,
 }) {
@@ -30,14 +41,14 @@ function prepaint({
     setAttribute: (_name: string, value: string) => (themeColor.content = value),
   };
   const localStorageStub = {
-    getItem: () => {
+    getItem: (key: string) => {
       if (storageThrows) throw new Error('storage blocked');
-      return stored;
+      return key === 'qhhoj.resolvedTheme' ? stored : key === 'qhhoj.theme' ? preference : null;
     },
   };
-  const matchMediaStub = () => {
+  const matchMediaStub = (query: string) => {
     if (mediaThrows) throw new Error('no matchMedia');
-    return { matches: light };
+    return { matches: dark && query.includes('prefers-color-scheme: dark') };
   };
   // The script is the page's own source under test, so evaluating it here is the point.
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -61,21 +72,44 @@ describe('pre-paint script in index.html', () => {
   });
 
   it('paints the last applied theme whatever the OS says', () => {
-    expect(prepaint({ stored: 'glass-light', light: false }).theme).toBe('glass-light');
-    expect(prepaint({ stored: 'glass-dark', light: true }).theme).toBe('glass-dark');
+    expect(prepaint({ stored: 'glass-light', dark: true }).theme).toBe('glass-light');
+    expect(prepaint({ stored: 'glass-dark', dark: false }).theme).toBe('glass-dark');
+    expect(prepaint({ stored: 'clay-dark', dark: false }).theme).toBe('clay-dark');
+  });
+
+  it('resolves every stored preference like the app does when nothing was painted yet', () => {
+    for (const preference of PREFERENCES)
+      for (const dark of [false, true])
+        expect(prepaint({ preference, dark }).theme, `${preference}, OS dark ${dark}`).toBe(
+          resolveTheme(preference, dark ? 'dark' : 'light').id,
+        );
+  });
+
+  it('prefers the last painted theme over the stored preference', () => {
+    expect(prepaint({ stored: 'glass-light', preference: 'clay-dark' }).theme).toBe('glass-light');
   });
 
   it('falls back to the default theme of the OS scheme for a missing or retired id', () => {
-    expect(prepaint({ stored: null, light: true }).theme).toBe(firstThemeOf('light'));
-    expect(prepaint({ stored: null, light: false }).theme).toBe(firstThemeOf('dark'));
-    expect(prepaint({ stored: 'neon-retired', light: true }).theme).toBe(firstThemeOf('light'));
+    expect(prepaint({ stored: null, dark: false }).theme).toBe(firstThemeOf('light'));
+    expect(prepaint({ stored: null, dark: true }).theme).toBe(firstThemeOf('dark'));
+    expect(prepaint({ stored: 'neon-retired', dark: true }).theme).toBe(firstThemeOf('dark'));
+  });
+
+  it('falls back to a flat Clay theme, never to Glass', () => {
+    for (const dark of [false, true])
+      expect(THEMES.find((theme) => theme.id === prepaint({ dark }).theme)?.glass).toBe(false);
   });
 
   it('still follows the OS when storage is blocked', () => {
-    expect(prepaint({ storageThrows: true, light: true }).theme).toBe(firstThemeOf('light'));
+    expect(prepaint({ storageThrows: true, dark: true }).theme).toBe(firstThemeOf('dark'));
   });
 
-  it('paints dark when matchMedia is unavailable', () => {
-    expect(prepaint({ mediaThrows: true }).theme).toBe(firstThemeOf('dark'));
+  it('paints light when matchMedia is unavailable', () => {
+    expect(prepaint({ mediaThrows: true }).theme).toBe(firstThemeOf('light'));
+  });
+
+  it('declares the default light theme ground as the static theme-color, so the first frame matches', () => {
+    const declared = /<meta name="theme-color" content="(#\w+)"/.exec(indexHtml)![1];
+    expect(declared).toBe(groundOfThemeFile(firstThemeOf('light')));
   });
 });

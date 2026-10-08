@@ -97,7 +97,7 @@ const tiles = computed(() =>
         >
           <defs>
             <linearGradient :id="gradientId" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" style="stop-color: var(--qh-accent-2)" />
+              <stop offset="0" style="stop-color: var(--qh-chart-line-start)" />
               <stop offset="1" style="stop-color: var(--qh-accent)" />
             </linearGradient>
           </defs>

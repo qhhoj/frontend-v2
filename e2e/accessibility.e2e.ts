@@ -1,4 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
+import { profile } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 
@@ -31,9 +32,11 @@ for (const theme of THEMES)
         api,
       }) => {
         api.signedIn = viewer === 'signed-in';
+        // A signed-in account's theme outranks the browser's choice.
+        api.routes['GET /profile'] = { body: { data: profile({ siteTheme: theme.id }) } };
         await page.emulateMedia({ colorScheme: theme.scheme });
-        // The OS scheme only selects the first theme of that scheme; the pre-paint script honours the remembered id.
-        await page.addInitScript((id) => localStorage.setItem('qhhoj.resolvedTheme', id), theme.id);
+        // The OS scheme only selects Clay; an explicit browser choice puts every theme on screen.
+        await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
         await page.goto(path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
         await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();

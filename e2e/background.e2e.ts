@@ -14,9 +14,11 @@ for (const viewport of VIEWPORTS)
   }) => {
     void api;
     await page.setViewportSize(viewport);
+    // Only Glass shows the blobs; Clay hides them.
+    await page.addInitScript(() => localStorage.setItem('qhhoj.theme', 'glass-dark'));
     await page.goto('/blog');
     const boxes = await page.evaluate(() =>
-      [...document.querySelectorAll('[class*="blob-"]')]
+      [...document.querySelectorAll('.blob-1, .blob-2, .blob-3')]
         .map((blob) => blob.getBoundingClientRect())
         .filter((rect) => rect.width > 0)
         .map(({ left, right, top, bottom }) => ({ left, right, top, bottom })),

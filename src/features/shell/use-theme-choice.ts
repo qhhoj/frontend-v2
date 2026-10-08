@@ -4,7 +4,7 @@ import { profileKey } from '@/features/account/profile.queries';
 import { useSessionStore } from '@/stores/session.store';
 import { useThemeStore } from '@/theme/theme.store';
 
-/** Applies a theme at once and, when signed in, saves it as the account's `siteTheme` (`preference` is a registry `storedAs` or `auto`). */
+/** Applies a theme at once and, when signed in, saves it as the account's `siteTheme` (`preference` is a theme id, `auto` or `glass-auto`). */
 export function useThemeChoice() {
   const theme = useThemeStore();
   const session = useSessionStore();

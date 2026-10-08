@@ -93,8 +93,62 @@ describe('app shell', () => {
     const { wrapper } = await mountApp('/blog');
     await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
     await clickMenuItem('Glass sáng');
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ siteTheme: 'light' });
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({
+      siteTheme: 'glass-light',
+    });
     expect(document.documentElement.dataset.theme).toBe('glass-light');
+  });
+
+  it('lists the themes grouped by style, each with its automatic option', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/blog');
+    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
+    await flushPromises();
+    const entries = [...document.body.querySelectorAll('[role="menu"] > li')].map((entry) =>
+      entry.textContent?.replace(/\(đang dùng\)/, '').trim(),
+    );
+    expect(entries).toEqual([
+      'Clay',
+      'Clay sáng',
+      'Clay tối',
+      'Clay tự động',
+      'Glass',
+      'Glass sáng',
+      'Glass tối',
+      'Glass tự động',
+    ]);
+  });
+
+  it('marks the legacy stored value as the current Clay choice', async () => {
+    localStorage.setItem('qhhoj.theme', 'dark');
+    mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/blog');
+    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
+    await flushPromises();
+    const current = [...document.body.querySelectorAll('[role="menuitem"]')].filter((item) =>
+      item.textContent?.includes('(đang dùng)'),
+    );
+    expect(current.map((item) => item.textContent?.replace(/\(đang dùng\)/, '').trim())).toEqual([
+      'Clay tối',
+    ]);
+  });
+
+  it.each([
+    ['Clay tự động', 'auto'],
+    ['Glass tự động', 'glass-auto'],
+  ])('saves %s to the account as %s and follows the device', async (label, saved) => {
+    const calls = mockApi({
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile()),
+      'PATCH /profile': ({ body }) => ok(profile(body as object)),
+    });
+    const { wrapper } = await mountApp('/blog');
+    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
+    await clickMenuItem(label);
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ siteTheme: saved });
+    expect(document.documentElement.dataset.theme).toBe(
+      saved === 'auto' ? 'clay-light' : 'glass-light',
+    );
   });
 
   it('keeps the local theme when saving to the account fails', async () => {
@@ -117,10 +171,10 @@ describe('app shell', () => {
       'POST /auth/logout': noContent(),
     });
     const { wrapper } = await mountApp('/blog');
-    expect(document.documentElement.dataset.theme).toBe('glass-light');
+    expect(document.documentElement.dataset.theme).toBe('clay-light');
     await wrapper.get('button[aria-label="Tài khoản của user_01"]').trigger('click');
     await clickMenuItem('Đăng xuất');
-    expect(document.documentElement.dataset.theme).toBe('glass-dark');
+    expect(document.documentElement.dataset.theme).toBe('clay-dark');
   });
 
   it('keeps the pre-painted account theme while the profile is still loading', async () => {
@@ -149,13 +203,13 @@ describe('app shell', () => {
       },
     });
     await mountApp('/blog');
-    expect(document.documentElement.dataset.theme).toBe('glass-light');
+    expect(document.documentElement.dataset.theme).toBe('clay-light');
     const session = useSessionStore();
     session.$patch({ status: 'anonymous', user: null }); // what a 401 on any request does
     await flushPromises();
     await session.login({ username: 'user_02', password: 'secret-password' });
     await flushPromises();
-    expect(document.documentElement.dataset.theme).toBe('glass-dark');
+    expect(document.documentElement.dataset.theme).toBe('clay-dark');
   });
 
   it('does not read the profile while a password change is required', async () => {

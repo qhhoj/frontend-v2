@@ -4,27 +4,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>QHHOJ</title>
-    <meta name="theme-color" content="#0d0a1a" />
+    <meta name="theme-color" content="#faf9f5" />
     <script>
-      // Pre-paint: the theme last painted (src/theme/theme.store.ts), else the OS scheme.
-      // `grounds` (theme id -> its --qh-ground, for the address bar) and the fallback ids must match
-      // src/theme/registry.ts and src/theme/themes/; prepaint.spec.ts enforces it.
+      // Pre-paint: the theme last painted (src/theme/theme.store.ts), else the stored preference, else the OS scheme.
+      // `grounds` (theme id -> its --qh-ground, for the address bar), the aliases and the fallbacks must match
+      // src/theme/registry.ts and src/theme/themes/; the fallbacks are the default (first) theme of each scheme.
+      // prepaint.spec.ts enforces it.
       var grounds = {
-        'glass-dark': '#0d0a1a',
-        'glass-light': '#f6f2ff',
         'clay-light': '#faf9f5',
         'clay-dark': '#1a1816',
+        'glass-light': '#f6f2ff',
+        'glass-dark': '#0d0a1a',
       };
+      var legacy = { light: 'clay-light', dark: 'clay-dark' };
       var known = Object.keys(grounds);
       var stored = null;
-      var prefersLight = false;
+      var preference = null;
+      var prefersDark = false;
       try {
         stored = localStorage.getItem('qhhoj.resolvedTheme');
+        preference = localStorage.getItem('qhhoj.theme');
       } catch {}
       try {
-        prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
+        prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
       } catch {}
-      var theme = known.includes(stored) ? stored : prefersLight ? 'glass-light' : 'glass-dark';
+      var scheme = prefersDark ? 'dark' : 'light';
+      var theme = known.includes(stored)
+        ? stored
+        : known.includes(preference)
+          ? preference
+          : legacy[preference] || (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
     </script>

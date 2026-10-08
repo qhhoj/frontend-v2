@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
-import { AUTO_THEME, resolveTheme, THEMES } from './registry';
+import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 import type { ColorScheme } from './registry';
 
 const PREFERENCE_KEY = 'qhhoj.theme';
 /** The theme last painted, whatever chose it. Read by the pre-paint script in index.html to avoid a flash. */
 const RESOLVED_KEY = 'qhhoj.resolvedTheme';
-const LIGHT_QUERY = '(prefers-color-scheme: light)';
+const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-/** No preference or `no-preference` counts as dark: Glass is dark-first. */
-const schemeOf = (prefersLight: boolean): ColorScheme => (prefersLight ? 'light' : 'dark');
+/** No preference counts as light: Clay & ivory is light-first. */
+const schemeOf = (prefersDark: boolean): ColorScheme => (prefersDark ? 'dark' : 'light');
 
 export const useThemeStore = defineStore('theme', () => {
   const storedPreference = readStorage(PREFERENCE_KEY);
@@ -19,20 +19,23 @@ export const useThemeStore = defineStore('theme', () => {
   const accountTheme = ref<string | null>(null);
 
   // Without an explicit local choice the pre-painted theme stays until the account or the OS says otherwise.
+  // A stored glass-auto is a choice of style: only a cached Glass theme is the one it would resolve to.
+  const paintedTheme = THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY));
   const cachedTheme =
-    localPreference.value === AUTO_THEME
-      ? THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY))
+    localPreference.value === AUTO_THEME ||
+    (localPreference.value === GLASS_AUTO_THEME && paintedTheme?.glass)
+      ? paintedTheme
       : undefined;
   const holdingCache = ref(cachedTheme !== undefined);
 
-  const media = matchMedia(LIGHT_QUERY);
-  const systemScheme = ref(schemeOf(media.matches));
+  const media = typeof matchMedia === 'function' ? matchMedia(DARK_QUERY) : undefined;
+  const systemScheme = ref(schemeOf(media?.matches ?? false));
   const onSystemChange = (event: { matches: boolean }) => {
     systemScheme.value = schemeOf(event.matches);
     holdingCache.value = false;
   };
-  media.addEventListener('change', onSystemChange);
-  onScopeDispose(() => media.removeEventListener('change', onSystemChange));
+  media?.addEventListener('change', onSystemChange);
+  onScopeDispose(() => media?.removeEventListener('change', onSystemChange));
 
   /** What the theme menu shows as selected: the account's theme while signed in, else the browser's choice. */
   const preference = computed(() => accountTheme.value ?? localPreference.value);

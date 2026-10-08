@@ -194,6 +194,8 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
     );
     expect(stops).toHaveLength(2);
     expect(new Set([...stops, tokens.get('accent')!.toLowerCase()]).size).toBe(1);
+    // The rating chart line is one colour too.
+    expect(tokens.get('chart-line-start')).toBe('var(--qh-accent)');
     expect(tokens.get('glow')).toMatch(/rgba\(0, 0, 0, 0\)$/);
   });
 

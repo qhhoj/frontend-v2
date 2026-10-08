@@ -48,11 +48,14 @@
   },
   "theme": {
     "menu": "Change theme",
-    "auto": "Automatic (system)",
+    "styleClay": "Clay",
+    "styleGlass": "Glass",
+    "clayAuto": "Clay automatic",
     "clayLight": "Clay light",
     "clayDark": "Clay dark",
     "glassDark": "Glass dark",
     "glassLight": "Glass light",
+    "glassAuto": "Glass automatic",
     "current": "current"
   },
   "locale": {

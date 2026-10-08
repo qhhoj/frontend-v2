@@ -36,9 +36,9 @@ test('choosing a theme item with the keyboard applies it and returns focus to th
   await trigger.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('menu')).toBeFocused();
-  // The menu lists `auto` first, then the registered themes in order; ArrowDown enters it, then steps.
-  const target = THEMES.find((theme) => theme.scheme === 'light')!;
-  for (let step = 0; step < THEMES.indexOf(target) + 2; step += 1)
+  // The menu lists the Clay themes first, in registry order; the first ArrowDown enters it, each next one steps.
+  const target = THEMES.find((theme) => theme.scheme === 'light')!; // Clay light
+  for (let step = 0; step < THEMES.indexOf(target) + 1; step += 1)
     await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', target.id);

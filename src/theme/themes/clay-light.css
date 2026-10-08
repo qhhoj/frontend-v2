@@ -16,6 +16,7 @@
   --qh-text-muted: #5e5a52;
   --qh-accent: #b4532f;
   --qh-accent-2: #9a3f22;
+  --qh-chart-line-start: var(--qh-accent);
   --qh-accent-text: #a64a28;
   --qh-accent-soft: rgba(180, 83, 47, 0.1);
   --qh-accent-soft-text: #8f3f20;

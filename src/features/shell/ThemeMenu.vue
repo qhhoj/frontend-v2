@@ -4,7 +4,7 @@ import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
-import { AUTO_THEME, THEMES } from '@/theme/registry';
+import { AUTO_THEME, canonicalPreference, GLASS_AUTO_THEME, THEMES } from '@/theme/registry';
 import { useThemeStore } from '@/theme/theme.store';
 import { useThemeChoice } from './use-theme-choice';
 
@@ -13,20 +13,40 @@ const chooseTheme = useThemeChoice();
 const menu = ref<InstanceType<typeof Menu>>();
 const isOpen = ref(false);
 
-const OPTIONS = [
-  { value: AUTO_THEME, labelKey: 'theme.auto' },
-  ...THEMES.map((entry) => ({ value: entry.storedAs, labelKey: entry.labelKey })),
-];
+/** Choices grouped by style: the style's themes, then its automatic option that follows the device. */
+const STYLES = [
+  {
+    labelKey: 'theme.styleClay',
+    glass: false,
+    auto: { value: AUTO_THEME, labelKey: 'theme.clayAuto' },
+  },
+  {
+    labelKey: 'theme.styleGlass',
+    glass: true,
+    auto: { value: GLASS_AUTO_THEME, labelKey: 'theme.glassAuto' },
+  },
+].map((style) => ({
+  labelKey: style.labelKey,
+  options: [
+    ...THEMES.filter((entry) => entry.glass === style.glass).map((entry) => ({
+      value: entry.id,
+      labelKey: entry.labelKey,
+    })),
+    style.auto,
+  ],
+}));
 const items = computed<MenuItem[]>(() =>
-  OPTIONS.map((option) => ({
-    label: translate(option.labelKey),
-    current: theme.preference === option.value,
-    command: () => void chooseTheme(option.value),
+  STYLES.map((style) => ({
+    label: translate(style.labelKey),
+    items: style.options.map((option) => ({
+      label: translate(option.labelKey),
+      current: canonicalPreference(theme.preference) === option.value,
+      command: () => void chooseTheme(option.value),
+    })),
   })),
 );
-const icon = computed(() =>
-  theme.preference === AUTO_THEME ? Monitor : theme.theme.scheme === 'light' ? Sun : Moon,
-);
+const isAuto = computed(() => [AUTO_THEME, GLASS_AUTO_THEME].includes(theme.preference));
+const icon = computed(() => (isAuto.value ? Monitor : theme.theme.scheme === 'light' ? Sun : Moon));
 </script>
 
 <template>
@@ -51,6 +71,11 @@ const icon = computed(() =>
         <span>{{ item.label }}</span>
         <span v-if="item.current" class="sr-only">({{ $t('theme.current') }})</span>
       </a>
+    </template>
+    <template #submenulabel="{ item }">
+      <span class="block px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">{{
+        item.label
+      }}</span>
     </template>
   </Menu>
 </template>

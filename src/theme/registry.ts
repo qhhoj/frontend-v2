@@ -1,49 +1,46 @@
 export type ColorScheme = 'dark' | 'light';
 
 export interface ThemeDefinition {
-  /** `html[data-theme]` value and the CSS file name in `themes/`. */
+  /** `html[data-theme]` value, the CSS file name in `themes/` and the value saved as a preference. */
   id: string;
   labelKey: string;
   scheme: ColorScheme;
-  /** The value saved in the account's `siteTheme` (backend allows `auto | light | dark` today). */
-  storedAs: string;
   /** Frosted surfaces over background blobs (Glass). Flat themes (Clay) ignore the personal Glass and Glow levels. */
   glass: boolean;
 }
 
 /**
- * The single source of themes. Add a theme: a CSS file in themes/, its import in styles.css, an entry here, its label in both locale files.
- * A new theme also goes into `grounds` in the pre-paint script of index.html; as the default for its scheme it also replaces the fallback id there.
+ * The single source of themes; the first theme of a scheme is that scheme's default. Add a theme: a CSS file in themes/, its import in styles.css, an entry here, its label in both locale files.
+ * A new theme also goes into `grounds` in the pre-paint script of index.html; as the default for its scheme it is also listed first here and replaces the fallback id there.
  */
 export const THEMES: readonly ThemeDefinition[] = [
-  { id: 'glass-dark', labelKey: 'theme.glassDark', scheme: 'dark', storedAs: 'dark', glass: true },
-  {
-    id: 'glass-light',
-    labelKey: 'theme.glassLight',
-    scheme: 'light',
-    storedAs: 'light',
-    glass: true,
-  },
-  {
-    id: 'clay-light',
-    labelKey: 'theme.clayLight',
-    scheme: 'light',
-    storedAs: 'clay-light',
-    glass: false,
-  },
-  {
-    id: 'clay-dark',
-    labelKey: 'theme.clayDark',
-    scheme: 'dark',
-    storedAs: 'clay-dark',
-    glass: false,
-  },
+  { id: 'clay-light', labelKey: 'theme.clayLight', scheme: 'light', glass: false },
+  { id: 'clay-dark', labelKey: 'theme.clayDark', scheme: 'dark', glass: false },
+  { id: 'glass-light', labelKey: 'theme.glassLight', scheme: 'light', glass: true },
+  { id: 'glass-dark', labelKey: 'theme.glassDark', scheme: 'dark', glass: true },
 ];
 
+/**
+ * A preference is what the browser or the account's `siteTheme` stores (the backend takes any `^[a-z][a-z0-9-]{0,31}$`):
+ * a theme id, or one of two automatic values that follow the device scheme within a style.
+ * `auto` is Clay (also the legacy default); `glass-auto` is Glass.
+ */
 export const AUTO_THEME = 'auto';
+export const GLASS_AUTO_THEME = 'glass-auto';
 
-/** `auto`, an unknown or a retired preference all resolve to the first theme of the system scheme. */
-export const resolveTheme = (preference: string, systemScheme: ColorScheme): ThemeDefinition =>
-  THEMES.find((theme) => theme.storedAs === preference || theme.id === preference) ??
-  THEMES.find((theme) => theme.scheme === systemScheme) ??
-  THEMES[0]!;
+/** Values saved before Clay existed: every existing account holds one, and they now mean Clay. */
+const LEGACY_PREFERENCES: Record<string, string> = { light: 'clay-light', dark: 'clay-dark' };
+
+export const canonicalPreference = (preference: string): string =>
+  LEGACY_PREFERENCES[preference] ?? preference;
+
+/** An unknown or retired preference, like `auto`, resolves to the Clay theme of the system scheme. */
+export const resolveTheme = (preference: string, systemScheme: ColorScheme): ThemeDefinition => {
+  const wanted = canonicalPreference(preference);
+  const glass = wanted === GLASS_AUTO_THEME;
+  return (
+    THEMES.find((theme) => theme.id === wanted) ??
+    THEMES.find((theme) => theme.scheme === systemScheme && theme.glass === glass) ??
+    THEMES[0]!
+  );
+};
