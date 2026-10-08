@@ -1,0 +1,52 @@
+{
+  "crumbs": { "judging": "Judging" },
+  "lead": "Reset and rejudge many submissions of one problem by a filter.",
+  "filter": {
+    "title": "Submission filter",
+    "problem": "Problem code",
+    "problemHint": "Required. Rejudge one problem at a time.",
+    "idFrom": "From submission (id)",
+    "idTo": "To submission (id)",
+    "idHint": "Submission ids follow the submission time, so they form a time range.",
+    "languages": "Languages",
+    "languagesHint": "Leave empty for every language.",
+    "results": "Current result",
+    "resultsHint": "Leave empty for every result.",
+    "force": "Include locked submissions",
+    "forceHint": "By default submissions past their lock time are skipped.",
+    "lockedNote": "Submissions still held by a judge and the final-judging submissions of a contest are always skipped.",
+    "reset": "Reset",
+    "submit": "Rejudge these submissions"
+  },
+  "summary": {
+    "title": "Selected filter",
+    "problem": "Problem",
+    "from": "From id",
+    "to": "To id",
+    "noLimit": "No limit",
+    "languages": "Languages",
+    "allLanguages": "All languages",
+    "results": "Results",
+    "allResults": "All results",
+    "locked": "Locked submissions",
+    "lockedSkip": "Skip",
+    "lockedRejudge": "Rejudge",
+    "countNote": "The number of matching submissions is only known after the rejudge; the server reports how many it queued.",
+    "lastResult": "Last result"
+  },
+  "done": "Queued {count} submissions for rejudging. They run at batch priority and emit no per-submission events, so the submission table updates when a judge picks them up.",
+  "refusedLot": "403 · Rejudging a large number needs a permission. More than 10 submissions need judge.rejudge_submission_lot. Narrow the filter or ask someone who holds it.",
+  "confirm": {
+    "title": "Rejudge submissions of {problem}?",
+    "body": "The submissions that match are reset to waiting: their current result and points are cleared until judging ends. This cannot be undone.",
+    "line": "Filter: {problem} · {languages} · {results} · from {from} · {locked}",
+    "fromStart": "the start",
+    "countNote": "The number of matching submissions is reported after confirming.",
+    "label": "Confirm rejudge"
+  },
+  "errors": {
+    "problem": "A problem code is required.",
+    "id": "Not a submission id.",
+    "languages": "At most 50 languages."
+  }
+}

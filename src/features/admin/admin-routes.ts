@@ -28,7 +28,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   similarity: placeholder,
   similarityPairs: placeholder,
   similarityPair: placeholder,
-  rejudge: placeholder,
+  rejudge: () => import('./rejudge/BulkRejudgePage.vue'),
   judges: placeholder,
   judgeNew: placeholder,
   languages: placeholder,
