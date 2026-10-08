@@ -95,7 +95,7 @@ describe('Settings › Security › turning on the authenticator app', () => {
     await wrapper.get('input[type="checkbox"]').setValue(true);
     await button(wrapper, 'Xong').trigger('click');
     expect(wrapper.text()).not.toContain('K7QM-2XRA-9PTD-4WLE');
-    expect(wrapper.find('form[data-step]').exists()).toBe(false);
+    expect(wrapper.find('form[data-step="password"], form[data-step="scan"]').exists()).toBe(false);
     expect(wrapper.html()).not.toContain('K7QM2XRA9PTD4WLE');
     expect(wrapper.html()).not.toContain('K7QM-2XRA-9PTD-4WLE');
   });
@@ -113,11 +113,15 @@ describe('Settings › Security › turning on the authenticator app', () => {
   it('takes the setup key and the QR off the page when the viewer cancels the scan step', async () => {
     const { wrapper } = await startEnrolment();
     await confirmPassword(wrapper);
-    await button(wrapper, 'Hủy').trigger('click');
+    const cancel = wrapper
+      .get('form[data-step="scan"]')
+      .findAll('button')
+      .find((item) => item.text() === 'Hủy')!;
+    await cancel.trigger('click');
     await flushPromises();
     expect(wrapper.html()).not.toContain('JBSW Y3DP EHPK 3PXP');
     expect(wrapper.html()).not.toContain(ENROLLMENT.otpauthUrl);
-    expect(wrapper.find('form[data-step]').exists()).toBe(false);
+    expect(wrapper.find('form[data-step="password"], form[data-step="scan"]').exists()).toBe(false);
   });
 
   it('marks the code boxes invalid and points them at the clock hint after a wrong code', async () => {
