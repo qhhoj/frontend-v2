@@ -38,6 +38,6 @@ const performancePoints = computed(() =>
       </p>
       <p class="text-sm font-semibold">{{ $t(places.key, places.params ?? {}) }}</p>
     </div>
-    <MembershipPanel :organization="organization" class="md:w-72 md:shrink-0" />
+    <MembershipPanel :organization="organization" />
   </section>
 </template>

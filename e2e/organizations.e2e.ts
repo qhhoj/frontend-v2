@@ -89,7 +89,10 @@ defineShiftTests([
     signedIn: false,
     hold: 'GET /organizations/lhp',
     answer: (api) => {
-      api.routes['GET /organizations/lhp'] = { body: { data: organizationDetail() } };
+      // A one-line name: the header skeleton's title is one line, so the loaded title must be too.
+      api.routes['GET /organizations/lhp'] = {
+        body: { data: organizationDetail({ name: 'Tin học LHP' }) },
+      };
     },
     parts: (page) => ({
       'organization header': page.locator(
