@@ -3,7 +3,7 @@ import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescri
 import pluginVue from 'eslint-plugin-vue';
 
 export default defineConfigWithVueTs(
-  { ignores: ['dist/', 'coverage/', 'playwright-report/', 'test-results/', 'docs/'] },
+  { ignores: ['dist/', 'coverage/', 'playwright-report/', 'test-results/', 'docs/', '.superpowers/'] },
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommendedTypeChecked,
   {
