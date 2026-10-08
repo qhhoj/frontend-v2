@@ -27,7 +27,8 @@ const accentNamed = (name: string) =>
 describe('appearance panel', () => {
   it('opens as a named dialog from a button that says it is expanded', async () => {
     const { wrapper } = await openPanel();
-    expect(panel().getAttribute('aria-label')).toBe('Giao diện');
+    const titleId = panel().getAttribute('aria-labelledby')!;
+    expect(panel().ownerDocument.getElementById(titleId)?.textContent).toBe('Giao diện');
     expect(wrapper.get('button[aria-label="Giao diện"]').attributes('aria-expanded')).toBe('true');
   });
 
