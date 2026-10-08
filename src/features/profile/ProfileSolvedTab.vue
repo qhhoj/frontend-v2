@@ -38,7 +38,7 @@ const isFullScore = (points: number, total: number) => points >= total;
               {{
                 $t('profileTabs.groupLine', {
                   count: group.problems.length,
-                  points: formatNumber(group.points, locale.locale),
+                  points: formatNumber(group.points, locale.locale, 1),
                 })
               }}
             </span>
@@ -66,7 +66,9 @@ const isFullScore = (points: number, total: number) => points >= total;
                     : 'bg-partial-bg-2'
                 "
               >
-                {{ problem.points }}/{{ problem.total }}
+                {{ formatNumber(problem.points, locale.locale, 1) }}/{{
+                  formatNumber(problem.total, locale.locale, 1)
+                }}
               </span>
             </li>
           </ul>

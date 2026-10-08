@@ -26,6 +26,13 @@ export const formatNumber = (
     useGrouping,
   }).format(value);
 
+/** A number with exactly `digits` decimals: `100` reads `100,0` at one, so weights and counted points line up. */
+export const formatFixed = (value: number, locale: Locale, digits: number) =>
+  new Intl.NumberFormat(INTL_LOCALES[locale], {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+
 export function formatRelative(date: string, now: number, locale: Locale): string {
   const seconds = Math.round((Date.parse(date) - now) / 1000);
   const magnitude = Math.abs(seconds);

@@ -9,20 +9,22 @@ import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { usePpQuery } from '@/features/users/users.queries';
-import { INTL_LOCALES, formatDate, formatNumber } from '@/lib/format';
+import { formatDate, formatFixed, formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { VERDICT_TONES, verdictOf } from '@/lib/verdicts';
 import type { Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
+import {
+  BODY_CELL_CLASSES,
+  HEADER_CELL_CLASSES,
+} from '@/features/submissions/submission-table-cells';
 import ProfileTabSkeleton from './ProfileTabSkeleton.vue';
 
 /** The PP table, one page of `/users/:username/pp-breakdown`; the phone width keeps rank, problem and counted PP. */
 const PP_PAGE_SIZE = 10;
 const HIDDEN_ON_PHONE = 'hidden md:table-cell';
-const HEADER = 'px-3 py-3.5 font-medium first:pl-6 last:pr-6';
-const HEADER_LEFT = `${HEADER} text-left`;
-const HEADER_RIGHT = `${HEADER} text-right`;
-const CELL = 'px-3 py-[11px] first:pl-6 last:pr-6';
+const HEADER_LEFT = `${HEADER_CELL_CLASSES} text-left`;
+const HEADER_RIGHT = `${HEADER_CELL_CLASSES} text-right`;
 const route = useRoute();
 const locale = useLocaleStore();
 const username = computed(() => String(route.params.username));
@@ -34,14 +36,9 @@ const ranks = computed(() => ({
   last: entries.value.at(-1)?.rank ?? 0,
 }));
 
-/** Weights and counted points always show one decimal, so `100` reads `100,0`. */
-const oneDecimal = (value: number) =>
-  new Intl.NumberFormat(INTL_LOCALES[locale.locale], {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(value);
+/** Weights and counted PP always show one decimal (`100,0`); points show at most one. */
 const isResult = (value: string | null): value is SubmissionResult =>
-  value !== null && value in VERDICT_TONES;
+  value !== null && Object.hasOwn(VERDICT_TONES, value);
 /** The verdict of the submission a PP row counts (a judged row without a known result reads as done). */
 const verdictFor = (result: string | null): Verdict =>
   verdictOf({ status: 'D', result: isResult(result) ? result : null });
@@ -92,8 +89,8 @@ const verdictFor = (result: string | null): Verdict =>
               </thead>
               <tbody>
                 <tr v-for="entry in entries" :key="entry.rank" class="border-t border-line">
-                  <td :class="[CELL, 'font-mono']">{{ entry.rank }}</td>
-                  <td :class="CELL">
+                  <td :class="[BODY_CELL_CLASSES, 'font-mono']">{{ entry.rank }}</td>
+                  <td :class="BODY_CELL_CLASSES">
                     <RouterLink
                       :to="{ name: 'problem', params: { code: entry.problem.code } }"
                       class="font-semibold text-accent-text hover:underline"
@@ -102,16 +99,16 @@ const verdictFor = (result: string | null): Verdict =>
                     </RouterLink>
                     <div class="font-mono text-xs text-muted">{{ entry.problem.code }}</div>
                   </td>
-                  <td :class="[CELL, HIDDEN_ON_PHONE, 'text-right font-mono']">
-                    {{ oneDecimal(entry.weight) }}%
+                  <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE, 'text-right font-mono']">
+                    {{ formatFixed(entry.weight, locale.locale, 1) }}%
                   </td>
-                  <td :class="[CELL, HIDDEN_ON_PHONE, 'text-right font-mono']">
-                    {{ formatNumber(entry.points, locale.locale) }}
+                  <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE, 'text-right font-mono']">
+                    {{ formatNumber(entry.points, locale.locale, 1) }}
                   </td>
-                  <td :class="[CELL, 'text-right font-mono font-semibold']">
-                    {{ oneDecimal(entry.scaledPoints) }}
+                  <td :class="[BODY_CELL_CLASSES, 'text-right font-mono font-semibold']">
+                    {{ formatFixed(entry.scaledPoints, locale.locale, 1) }}
                   </td>
-                  <td :class="[CELL, HIDDEN_ON_PHONE]">
+                  <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE]">
                     <RouterLink
                       :to="{ name: 'submission', params: { id: entry.submission.id } }"
                       class="flex flex-col items-start gap-1 hover:underline"

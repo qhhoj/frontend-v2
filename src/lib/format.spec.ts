@@ -15,6 +15,7 @@ import {
   formatElapsedSeconds,
   formatFileSize,
   formatMemoryLimit,
+  formatFixed,
   formatNumber,
   formatShortDate,
   formatWeekdayDate,
@@ -40,6 +41,13 @@ describe('format helpers', () => {
   it('formats numbers per locale', () => {
     expect(formatNumber(386.4, 'vi', 1)).toBe('386,4');
     expect(formatNumber(386.4, 'en', 1)).toBe('386.4');
+  });
+
+  it('formats a number with exactly the given decimals, per locale', () => {
+    expect(formatFixed(100, 'vi', 1)).toBe('100,0');
+    expect(formatFixed(100, 'en', 1)).toBe('100.0');
+    expect(formatFixed(386.4, 'vi', 2)).toBe('386,40');
+    expect(formatFixed(7, 'en', 0)).toBe('7');
   });
 
   it('formats past dates relative to now', () => {
