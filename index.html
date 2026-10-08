@@ -29,11 +29,19 @@
         prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
       } catch {}
       var scheme = prefersDark ? 'dark' : 'light';
-      var theme = known.includes(stored)
+      // The painted theme is kept for no or `auto` preference, and for `glass-auto` only if it is a Glass theme.
+      var keepsPainted =
+        known.includes(stored) &&
+        (preference === null ||
+          preference === 'auto' ||
+          (preference === 'glass-auto' && stored.startsWith('glass-')));
+      var theme = keepsPainted
         ? stored
         : known.includes(preference)
           ? preference
-          : legacy[preference] || (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
+          : Object.prototype.hasOwnProperty.call(legacy, preference)
+            ? legacy[preference]
+            : (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
     </script>

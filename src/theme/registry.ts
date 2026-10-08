@@ -32,7 +32,7 @@ export const GLASS_AUTO_THEME = 'glass-auto';
 const LEGACY_PREFERENCES: Record<string, string> = { light: 'clay-light', dark: 'clay-dark' };
 
 export const canonicalPreference = (preference: string): string =>
-  LEGACY_PREFERENCES[preference] ?? preference;
+  Object.hasOwn(LEGACY_PREFERENCES, preference) ? LEGACY_PREFERENCES[preference]! : preference;
 
 /** An unknown or retired preference, like `auto`, resolves to the Clay theme of the system scheme. */
 export const resolveTheme = (preference: string, systemScheme: ColorScheme): ThemeDefinition => {

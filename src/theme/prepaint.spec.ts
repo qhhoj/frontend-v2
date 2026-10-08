@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
+import { createPinia, setActivePinia } from 'pinia';
+import { stubMatchMedia } from '@/test/match-media';
+import { useThemeStore } from './theme.store';
 import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 
 const script = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)![1]!;
@@ -25,6 +28,9 @@ const PREFERENCES = [
   'light',
   'dark',
   'neon-retired',
+  'constructor',
+  'toString',
+  '__proto__',
 ];
 
 /** Runs the real inline script against a stand-in page. */
@@ -85,8 +91,12 @@ describe('pre-paint script in index.html', () => {
         );
   });
 
-  it('prefers the last painted theme over the stored preference', () => {
-    expect(prepaint({ stored: 'glass-light', preference: 'clay-dark' }).theme).toBe('glass-light');
+  it('lets an explicit stored preference outrank the last painted theme, as the store does', () => {
+    expect(prepaint({ stored: 'glass-light', preference: 'clay-dark' }).theme).toBe('clay-dark');
+    expect(prepaint({ stored: 'clay-light', preference: 'glass-auto' }).theme).toBe('glass-light');
+    expect(prepaint({ stored: 'glass-light', preference: 'auto', dark: true }).theme).toBe(
+      'glass-light',
+    );
   });
 
   it('falls back to the default theme of the OS scheme for a missing or retired id', () => {
@@ -111,5 +121,24 @@ describe('pre-paint script in index.html', () => {
   it('declares the default light theme ground as the static theme-color, so the first frame matches', () => {
     const declared = /<meta name="theme-color" content="(#\w+)"/.exec(indexHtml)![1];
     expect(declared).toBe(groundOfThemeFile(firstThemeOf('light')));
+  });
+
+  it('paints what the store resolves at start-up, for every preference, cache and OS scheme', () => {
+    for (const preference of [null, ...PREFERENCES])
+      for (const cache of [null, 'clay-light', 'clay-dark', 'glass-light', 'glass-dark'])
+        for (const dark of [false, true]) {
+          localStorage.clear();
+          if (preference !== null) localStorage.setItem('qhhoj.theme', preference);
+          if (cache !== null) localStorage.setItem('qhhoj.resolvedTheme', cache);
+          delete document.documentElement.dataset.theme;
+          stubMatchMedia({ dark });
+          setActivePinia(createPinia());
+          const fromStore = useThemeStore().theme.id;
+          const painted = prepaint({ stored: cache, preference, dark });
+          expect(painted.theme, `preference ${preference}, cache ${cache}, OS dark ${dark}`).toBe(
+            fromStore,
+          );
+          expect(painted.themeColor).toBe(groundOfThemeFile(fromStore));
+        }
   });
 });
