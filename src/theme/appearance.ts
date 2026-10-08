@@ -37,7 +37,7 @@ export const GLASS_STOPS = [
 ] as const;
 
 const isPercent = (value: unknown): value is number =>
-  Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 100;
+  typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 100;
 
 /** Stored JSON and backend values are untrusted: anything but a complete valid look is "no look". */
 export function parseAppearance(value: unknown): Appearance | null {
@@ -47,6 +47,7 @@ export function parseAppearance(value: unknown): Appearance | null {
   return preset && isPercent(glass) && isPercent(glow) ? { accent: preset.id, glass, glow } : null;
 }
 
+/** Expects a glass value from a parsed look (an integer 0-100). */
 export const nearestGlassStop = (glass: number): 0 | 50 | 100 =>
   (Math.round(glass / 50) * 50) as 0 | 50 | 100;
 

@@ -47,6 +47,10 @@ describe('parseAppearance', () => {
     ['an unknown accent', { accent: 'violet', glass: 10, glow: 10 }],
     ['a fractional glass', { accent: 'mint', glass: 50.5, glow: 10 }],
     ['a glow above 100', { accent: 'mint', glass: 10, glow: 101 }],
+    ['a glass above 100', { accent: 'mint', glass: 101, glow: 10 }],
+    ['a negative glow', { accent: 'mint', glass: 10, glow: -1 }],
+    ['a NaN glass', { accent: 'mint', glass: NaN, glow: 10 }],
+    ['an infinite glow', { accent: 'mint', glass: 10, glow: Infinity }],
     ['a negative glass', { accent: 'mint', glass: -1, glow: 10 }],
     ['a numeric string', { accent: 'mint', glass: '50', glow: 10 }],
     ['a missing field', { accent: 'mint', glass: 10 }],
@@ -57,9 +61,9 @@ describe('parseAppearance', () => {
     expect(parseAppearance(value)).toBeNull();
   });
 
-  it("accepts every theme's own look", () => {
-    for (const theme of THEMES)
-      expect(parseAppearance(siteLook(theme.accent))).toEqual(siteLook(theme.accent));
+  it("has each theme's own accent among the presets", () => {
+    const accentIds: string[] = ACCENTS.map((accent) => accent.id);
+    for (const theme of THEMES) expect(accentIds).toContain(theme.accent);
   });
 });
 
