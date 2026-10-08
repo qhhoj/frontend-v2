@@ -18,6 +18,14 @@ const buttonNamed = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], n
   actionsOf(wrapper)
     .findAll('button')
     .find((button) => button.text().startsWith(name))!;
+const cancelButton = () =>
+  [...dialog()!.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Hủy')!;
+const typeCode = async (code: string) => {
+  const input = dialog()!.querySelector<HTMLInputElement>('input')!;
+  input.value = code;
+  input.dispatchEvent(new Event('input'));
+  await flushPromises();
+};
 const dialog = () => document.body.querySelector<HTMLElement>('[role="dialog"]');
 
 describe('contest actions', () => {
@@ -98,12 +106,14 @@ describe('contest actions', () => {
     expect(document.activeElement).toBe(input);
     input.value = 'wrong';
     input.dispatchEvent(new Event('input'));
+    await flushPromises();
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
     expect(dialog()!.querySelector('[role="alert"]')!.textContent).not.toBe('');
     expect(dialog()!.querySelector('[role="alert"] [aria-hidden="true"]')).not.toBeNull();
     input.value = 'opensesame';
     input.dispatchEvent(new Event('input'));
+    await flushPromises();
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
     expect(
@@ -125,7 +135,8 @@ describe('contest actions', () => {
     const input = dialog()!.querySelector<HTMLInputElement>('input')!;
     input.value = 'typed-then-closed';
     input.dispatchEvent(new Event('input'));
-    dialog()!.querySelector<HTMLButtonElement>('form button[type="button"]')!.click();
+    await flushPromises();
+    cancelButton().click();
     await flushPromises();
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
@@ -301,6 +312,7 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     const input = dialog()!.querySelector<HTMLInputElement>('input')!;
     input.value = 'opensesame';
     input.dispatchEvent(new Event('input'));
+    await flushPromises();
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
     const cachedCodes = () =>
@@ -324,12 +336,11 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     const { wrapper } = await mountApp('/contests/r42');
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
+    await typeCode('wrong');
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
-    const cancel = [...dialog()!.querySelectorAll('button')].find(
-      (button) => button.textContent?.trim() === 'Hủy',
-    )!;
-    cancel.click();
+    expect(dialog()!.querySelector('[role="alert"]')).not.toBeNull();
+    cancelButton().click();
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
   });
@@ -344,8 +355,10 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     const { wrapper } = await mountApp('/contests/r42');
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
+    await typeCode('wrong');
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
+    expect(dialog()!.querySelector('[role="alert"]')).not.toBeNull();
     pressEscape();
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
@@ -421,6 +434,7 @@ describe('contest refusals', () => {
     const input = dialog()!.querySelector<HTMLInputElement>('input')!;
     input.value = 'x';
     input.dispatchEvent(new Event('input'));
+    await flushPromises();
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
     expect(dialog()!.querySelector('[role="alert"]')!.textContent.trim()).toBe(
