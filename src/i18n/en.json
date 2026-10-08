@@ -64,6 +64,21 @@
       "submissions": "Submissions",
       "stats": "Statistics",
       "ranking": "Ranking"
+    },
+    "breadcrumb": "Breadcrumb",
+    "detail": {
+      "authors": "Set by:",
+      "freezeAt": "{time} freeze",
+      "freeze": "Freeze",
+      "timeLeft": "Time left",
+      "notStarted": "Not started yet",
+      "endsAt": "Ends at {time}",
+      "startsAt": "Starts at {time}",
+      "endedAt": "Ended at {time}",
+      "elapsed": "{span} in",
+      "notFoundTitle": "Contest not found",
+      "notFoundBody": "This contest does not exist or is hidden from you.",
+      "backToList": "Back to contests"
     }
   },
   "placeholder": {

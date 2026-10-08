@@ -64,6 +64,21 @@
       "submissions": "Bài nộp",
       "stats": "Thống kê",
       "ranking": "Bảng xếp hạng"
+    },
+    "breadcrumb": "Đường dẫn",
+    "detail": {
+      "authors": "Ra đề:",
+      "freezeAt": "{time} đóng băng",
+      "freeze": "Đóng băng",
+      "timeLeft": "Còn lại",
+      "notStarted": "Kỳ thi chưa bắt đầu",
+      "endsAt": "Kết thúc lúc {time}",
+      "startsAt": "Bắt đầu lúc {time}",
+      "endedAt": "Đã kết thúc lúc {time}",
+      "elapsed": "đã qua {span}",
+      "notFoundTitle": "Không tìm thấy kỳ thi",
+      "notFoundBody": "Kỳ thi không tồn tại hoặc bạn không được xem.",
+      "backToList": "Về danh sách kỳ thi"
     }
   },
   "placeholder": {

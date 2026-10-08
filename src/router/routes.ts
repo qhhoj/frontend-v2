@@ -43,7 +43,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/contests/:key',
     name: 'contest',
-    component: PlaceholderPage,
+    component: () => import('@/features/contests/ContestPage.vue'),
     meta: { titleKey: 'pages.contest' },
   },
   {
