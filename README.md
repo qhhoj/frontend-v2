@@ -66,6 +66,30 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | Ranking cell rules                       | `src/lib/ranking-cells.ts`                          |
 | Live submission status                   | `src/api/use-submission-status.ts`                  |
 
+## Auth screens
+
+Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activate` (resend), `/activate/:key` (`done` after success), `/forgot-password`, `/reset-password/:token` (`expired` after a dead link), `/account/password`. Each carries `meta.titleKey` (the document title). Every route but `/login` carries `meta.layout: 'auth'`: the shell draws no pill header and each page draws `AuthLayout`'s top bar. `/login` keeps the pill header and draws its own brand panel and locale toggle.
+
+| To change                                                        | Edit                                                                                                                                           |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Text of a backend refusal                                        | `errors.<code>` in `src/i18n/*.json`                                                                                                           |
+| Text of a field refusal (`issues[].code`)                        | `auth.issues.<code>`; `issueText` in `src/features/auth/auth-errors.ts` falls back to the backend message                                      |
+| Top bar, card, badge, field, button, banners                     | `AuthLayout`, `AuthBadge`, `AuthField`, `AuthSubmit`, `AuthError`, `AuthNotice` in `src/features/auth/`                                        |
+| What a form does around its request (pending, error text, focus) | `use-auth-action.ts`                                                                                                                           |
+| Where a sign-in ends                                             | `use-after-sign-in.ts` (always through `safeRedirect`)                                                                                         |
+| What a guard copies into `?redirect`                             | `src/router/guards.ts` (`LINK_CREDENTIAL_PATH`: activation, reset and social signup paths are never copied)                                    |
+| Default sign-up language                                         | `DEFAULT_LANGUAGE_KEY` in `signup-choices.ts` (`CPP17`; without it the picker starts at "Chưa chọn")                                           |
+| Password strength                                                | `src/lib/password-strength.ts` (mirrors the backend's `password-policy.ts`; the backend decides and checks breached passwords)                 |
+| Username check                                                   | `use-username-availability.ts` (`GET /auth/username-available`; a hint, never a gate)                                                          |
+| School and default-language pickers                              | `SignupChoices.vue` (`SchoolPicker`, `AuthSelect`), shared by register and social signup                                                       |
+| Terms and privacy line                                           | `auth.rules` in `src/i18n/*.json`; plain text, no links, until the pages exist (5c)                                                            |
+| "Email me a link" and "Kiểm tra hộp thư"                         | `EmailLinkRequest.vue`, `InboxNotice.vue`, cooldown in `use-cooldown.ts`                                                                       |
+| Which second-factor card shows                                   | `two-factor-view.ts`                                                                                                                           |
+| Social buttons                                                   | the list comes from `GET /auth/social/providers`; `social-providers.ts` knows their labels                                                     |
+| Pages with a credential in the address                           | call `useNoReferrer()`; for a credential in the path, add the route to `CREDENTIAL_ROUTES` in `backend-v2/libs/community/src/user-activity.ts` |
+| Query parameters the login screen reads                          | `redirect` (a safe in-app path), `error` (OAuth callback codes), `notice` (`password-reset`)                                                   |
+| Auth e2e                                                         | `e2e/auth.e2e.ts`, `e2e/auth-accessibility.e2e.ts`; `installAuth` and its scoped `GET /organizations` in `e2e/fixtures/auth.ts`                |
+
 ## More
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): conventions, styling and theme rules, testing

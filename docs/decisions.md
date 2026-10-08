@@ -96,7 +96,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Submission errors
 
 - B9 landed: `banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit` and `rate_limited` have their own `errors.*` messages; field refusals map by `issues[].code` (`submitErrorKey`), never by the English text.
-- A banned login shows the generic ban message; the reason waits for B8 (structured `banReason`).
+- A banned login shows the moderator's reason from the error's `extra.banReason` (B8), else the generic ban message.
 - Unknown backend codes show `errors.generic`.
 
 ## Appearance
@@ -129,9 +129,12 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | B5 | `rating` and first organization short name on ranking row users | tier colours, captions |
 | B6 | `solved=false` filter on `GET /problems` | "Chưa giải" chip |
 | B7 | Weekly top users, or drop the idea | home "Top tuần" |
-| B8 | Login ban error carries a structured `banReason` (the frontend parses `Reason:` text today) | ban reason on login |
+| B8 | Login ban error carries a structured `banReason` (the frontend parses `Reason:` text today) | done in backend-v2 ba8890a: the login screen reads `error.extra.banReason` |
 | B9 | Distinct error codes for the per-user rate limit, the unfinished-submission limit, a problem ban and a contest submission cap | precise submit messages |
 | B25 | `appearance: {accent, glass, glow} \| null` on `GET/PATCH /profile` and `/auth/me` (accents `clay, orchid, ocean, mint, sunset, gold, mono`) | done in backend-v2 27c7485 (`APPEARANCE_ACCENTS`, `null` clears) |
+| A1 | `email_invalid` issue code on the reset email (`PasswordResetRequestDto.email` sends the bare `email.matches`) | the reset address text without the alias in `ISSUE_ALIASES` |
+| A2 | `open` filter on `GET /organizations` (the signup list reads every page and filters here) | server-side filtering of the school picker |
+| A3 | Provider name and email on the social completion screen (the client never learns them) | the provider line and the email on `/register/social` |
 
 ## Loading states
 
@@ -196,7 +199,6 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Known gaps (later sub-projects)
 
-- Reloading `/activate/done` shows the invalid-link page — 8b polish.
 - Session expiry mid-page redirects on the next navigation only — 8b.
 - Admin screens — sub-project 7.
 
@@ -224,3 +226,37 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ### Known gaps
 
 - Backend asks B-8e1 to B-8e4 are merged (`455fb44`, `1c7edc7`, `7c2977f`): comment body for editing, closed tickets in the list, organization `isOpen`, school short name on home users; no 8e screen waits for them.
+
+## 8b auth screens
+
+- `meta.layout: 'auth'` hides the shell's pill header only: theme and account-cache sync, the loading layer and `#main` keep running, so auth pages need no second shell.
+- `/login` has no layout meta: it keeps the pill header and draws its own brand panel and locale toggle; the other auth pages draw `AuthLayout`'s top bar.
+- Card widths follow the boards: 460 px for state cards and 2FA, 480 for forced change, 520 for social signup, 660 for register (two columns from `sm`).
+- On phones login follows the LoginPhone board: a band with Bit, logo and counts above a borderless form.
+- Each page has one `h1` (the form or card title); the login brand headline is a styled paragraph.
+- No "remember me" and no "or email" on login: `LoginDto` has neither, so the board's controls would send nothing.
+- Login counts ("{problems} bài · {users} thành viên") come from `GET /home`: decoration only, no wait, empty on failure.
+- Social buttons appear only on login (RegisterA has none) and are text-only, because lucide 1.0 has no brand icons.
+- The school picker is a searchable PrimeVue `Select` ("Gõ để tìm trường"), 44 px tall (`min-h-11`), also on social signup, where the board drew a native select.
+- The default-language select is native and starts at C++17 (`DEFAULT_LANGUAGE_KEY` is `CPP17`), as the board preselects; without that language it starts at "Chưa chọn".
+- Both pickers are optional: ids are sent only when chosen (`chosenIds`), and their skeletons never hold the form (`registersWait: false`).
+- Terms and privacy: the rules checkbox is plain text with no links and a client-side gate (`rulesMissing`), because the pages do not exist yet (5c) and the backend stores no consent.
+- Username availability shows checking, free and taken as drawn; taken marks the input invalid but never blocks, and errors and a 429 show nothing.
+- "Kiểm tra hộp thư" shows the address masked (`maskEmail`); resend cools down 60 s (`RESEND_COOLDOWN_SECONDS`).
+- The wrong-email dead end ("Đăng ký lại") clears the name and shows that the name is held for 7 days (`ACTIVATION_DAYS`) until activation; no backend change stands behind the notice.
+- `mail_unavailable` on register shows the "Đăng ký tạm thời không khả dụng" card instead of the form.
+- Activation success lives at `/activate/done`, so a reload shows the success card and never posts the placeholder as a key; a dead key shows the "Liên kết đã hết hạn" card with the email form.
+- An expired or used reset link replaces the token in the address with `/reset-password/expired`, so the token leaves history and a reload shows the dead-link card.
+- Pages that take a link credential (`/activate/:key`, `/reset-password/:token`, `/register/social?token=`) call `useNoReferrer()`, so their requests carry no Referer; the social token leaves the address on mount.
+- Guards never copy an activation key, a reset token or the social signup path into `?redirect` (`LINK_CREDENTIAL_PATH`).
+- Social completion: `email_taken`, a linked identity (`conflict`) and a refused token each end in a terminal card, because the provider's address cannot change on this page.
+- 2FA offers only the account's factors (B14); `methods: []` is the "Phiên đã thay đổi" card; sign-out sits in the top bar and under the card on every state.
+- A WebAuthn prompt cancelled or timed out (`NotAllowedError`, `AbortError`) is not an error and sends nothing; the key button hides where `parseRequestOptionsFromJSON` is missing.
+- The backup-code placeholder is 16 characters (`XXXX-XXXX-XXXX-XXXX`), the length of scratch codes, not the board's 8.
+- Reset copy names no account and gives no validity period; the reset mail says 3 days.
+- Password strength is a local estimate mirroring `passwordProblems`; the meter is `role="meter"` with the level in text; the backend decides and checks breached passwords.
+- Field texts follow `issues[].code` (B10); the ban reason is `error.extra.banReason` (B8); `email.matches` is aliased to `email_invalid` until ask A1.
+- A request answered `two_factor_required` or `password_change_required` reloads the session and re-runs the navigation rules (`onGateRequired`), because the route guard never saw that gate.
+- Titles come from `meta.titleKey`; a page that swaps its form for a result card on the same path moves focus to `#main` (`focusMain`), as the router does on a path change.
+- Backend asks left: A1 (`email_invalid` code), A2 (`open` filter), A3 (provider and email on social completion).
+- E2E: `e2e/auth.e2e.ts` and `e2e/auth-accessibility.e2e.ts` run the flows and axe in every theme; `installAuth` in `e2e/fixtures/auth.ts` answers the scoped `GET /organizations`.
