@@ -45,7 +45,12 @@ const HEADGEAR: Record<BitHeadgear, readonly string[]> = {
   none: headgearRows(),
   cap: headgearRows('..AAAAAAAAAAA...', '....AAAAAAA..A..', '....AAAAAAA..A..'),
   crown: headgearRows('....A..A..A.....', '....AAAAAAA.....'),
-  antenna: headgearRows('......AAA.......', '.......A........', '.......A........'),
+  antenna: headgearRows(
+    '.......AA.......',
+    '.......AA.......',
+    '.......A........',
+    '.......A........',
+  ),
   nightcap: headgearRows('.....AAAAA......', '....AAAAAAA.....', '...AAAAAAAAA....'),
 };
 

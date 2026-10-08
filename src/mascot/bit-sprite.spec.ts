@@ -41,7 +41,7 @@ describe('bitFrame', () => {
   });
 
   it('keeps body, eyes and legs identical whatever the headgear', () => {
-    const bodyRows = (headgear: BitHeadgear) => bitFrame({ headgear }).slice(7);
+    const bodyRows = (headgear: BitHeadgear) => bitFrame({ headgear }).slice(6);
     for (const headgear of HEADGEARS) expect(bodyRows(headgear)).toEqual(bodyRows('none'));
   });
 
@@ -97,6 +97,14 @@ describe('withOutline', () => {
 
   it('does not outline around outline pixels (legs are outline-coloured)', () => {
     expect(withOutline(['.O.'])).toEqual(['.O.']);
+  });
+});
+
+describe('spriteCells coordinates', () => {
+  it('places the left eye top and the highlight on their exact 1-based column and row', () => {
+    const cells = spriteCells(bitFrame({ headgear: 'none' }));
+    expect(cells).toContainEqual({ column: 6, row: 9, colour: BIT_PALETTES.terracotta.E });
+    expect(cells).toContainEqual({ column: 4, row: 7, colour: BIT_PALETTES.terracotta.H });
   });
 });
 
