@@ -23,6 +23,9 @@ watch(visible, (isOpen) => {
 function submit() {
   if (!props.isPending) emit('submit', code.value.trim());
 }
+function cancel() {
+  if (!props.isPending) visible.value = false;
+}
 </script>
 
 <template>
@@ -31,6 +34,8 @@ function submit() {
     modal
     :header="$t('contests.actions.codeTitle')"
     :draggable="false"
+    :closable="!isPending"
+    :close-on-escape="!isPending"
     @show="input?.focus()"
   >
     <form class="flex flex-col gap-3" @submit.prevent="submit">
@@ -43,7 +48,7 @@ function submit() {
         ref="input"
         v-model="code"
         type="password"
-        autocomplete="off"
+        autocomplete="new-password"
         required
         maxlength="255"
         aria-describedby="contest-access-code-hint"
@@ -59,15 +64,17 @@ function submit() {
       <div class="flex justify-end gap-2.5">
         <button
           type="button"
-          class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-          @click="visible = false"
+          class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+          :aria-disabled="isPending || undefined"
+          @click="cancel"
         >
-          {{ $t('contests.actions.cancel') }}
+          {{ $t('common.cancel') }}
         </button>
         <button
           type="submit"
           :aria-disabled="isPending || undefined"
-          class="min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
+          :aria-busy="isPending || undefined"
+          class="min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:opacity-60"
         >
           {{ actionLabel }}
         </button>

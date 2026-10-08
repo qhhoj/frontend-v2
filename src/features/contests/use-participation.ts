@@ -16,6 +16,8 @@ const send = (key: string, { command, accessCode }: Request): Promise<unknown> =
 export function useParticipation(key: Ref<string>) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
+    /** The request holds the access code: drop it from the cache as soon as no observer needs it. */
+    gcTime: 0,
     mutationFn: (request: Request) => send(key.value, request),
     onSuccess: () =>
       Promise.all([

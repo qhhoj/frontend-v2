@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import InlineBit from '@/components/InlineBit.vue';
@@ -7,16 +7,43 @@ import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { spanMessage } from '@/lib/contest-time';
 import { formatClock } from '@/lib/format';
-import { useMediaQuery, PHONE_QUERY } from '@/lib/use-media-query';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useNow } from '@/lib/use-now';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import AccessCodeDialog from './AccessCodeDialog.vue';
 import { actionFactsOf, commandOf, contestAction } from './contest-action';
+import type { ContestActionKind } from './contest-action';
 import { useCurrentParticipationQuery } from './contests.queries';
 import InContestStatus from './InContestStatus.vue';
 import { useParticipation } from './use-participation';
+
+/** The text each kind shows: a button label, or the notice itself when the kind has no request. Exhaustive, so a new kind fails to compile here. */
+const TEXT_KEYS: Record<ContestActionKind, string> = {
+  signIn: 'contests.actions.signIn',
+  join: 'contests.actions.join',
+  rejoin: 'contests.actions.rejoin',
+  register: 'contests.actions.register',
+  registered: 'contests.actions.opensAt',
+  spectate: 'contests.actions.spectate',
+  virtual: 'contests.actions.virtual',
+  leave: 'contests.actions.leave',
+  finished: 'contests.actions.continueSpectating',
+  opensLater: 'contests.actions.opensAt',
+  registrationClosed: 'contests.actions.registrationClosed',
+  virtualDisallowed: 'contests.actions.virtualDisallowed',
+};
+/** A notice shown above the button: the time is over, and the button continues as a spectator. */
+const NOTICE_KEYS: Partial<Record<ContestActionKind, string>> = {
+  finished: 'contests.actions.finished',
+};
+/** Kinds whose button shows the opening time and cannot be pressed. */
+const LOCKED_KINDS: readonly ContestActionKind[] = ['opensLater', 'registered'];
+const ACTIVE_BUTTON =
+  'inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:opacity-60';
+const LOCKED_BUTTON =
+  'inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-pill border border-line bg-surface-hover px-5 font-semibold text-content';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const route = useRoute();
@@ -43,14 +70,11 @@ const signInTarget = computed(() => ({
   path: '/login',
   query: { redirect: safeRedirect(route.fullPath) },
 }));
-const isButton = computed(
-  () => commandOf(chosen.value.kind) !== null && chosen.value.kind !== 'leave',
-);
 const actionLabel = computed(() =>
-  isButton.value
-    ? translate(`contests.actions.${chosen.value.kind}`, { time: startClock.value })
-    : '',
+  translate(TEXT_KEYS[chosen.value.kind], { time: startClock.value }),
 );
+const isLocked = computed(() => LOCKED_KINDS.includes(chosen.value.kind));
+const hasButton = computed(() => isLocked.value || commandOf(chosen.value.kind) !== null);
 
 /** Runs the request behind the chosen action; the access code is passed through and never kept. */
 async function perform(accessCode?: string) {
@@ -63,10 +87,15 @@ async function perform(accessCode?: string) {
   root.value?.focus();
 }
 function start() {
+  if (isPending.value || commandOf(chosen.value.kind) === null) return;
   reset();
   if (chosen.value.needsAccessCode) isDialogOpen.value = true;
   else void perform().catch(() => undefined);
 }
+/** Closing the dialog (Cancel, Escape, a successful join) drops the last error, so it does not reappear in the bar. */
+watch(isDialogOpen, (isOpen) => {
+  if (!isOpen) reset();
+});
 </script>
 
 <template>
@@ -94,15 +123,27 @@ function start() {
         :is-pending="isPending"
         @leave="perform().catch(() => undefined)"
       />
-      <template v-else-if="isButton">
+      <template v-else>
+        <span
+          v-if="chosen.kind === 'registered'"
+          class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
+        >
+          {{ $t('contests.actions.registeredBadge') }}
+        </span>
+        <p v-if="NOTICE_KEYS[chosen.kind]" class="text-muted">
+          {{ $t(NOTICE_KEYS[chosen.kind]!) }}
+        </p>
         <button
+          v-if="hasButton"
           type="button"
-          :aria-disabled="isPending || undefined"
-          class="inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
+          :aria-disabled="isLocked || isPending || undefined"
+          :aria-busy="isPending || undefined"
+          :class="isLocked ? LOCKED_BUTTON : ACTIVE_BUTTON"
           @click="start"
         >
           {{ actionLabel }}
         </button>
+        <p v-else class="text-muted">{{ actionLabel }}</p>
         <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted">
           {{
             $t('contests.actions.virtualNote', {
@@ -114,22 +155,6 @@ function start() {
           {{ $t('contests.actions.spectateNote') }}
         </p>
       </template>
-      <template v-else-if="chosen.kind === 'registered' || chosen.kind === 'opensLater'">
-        <span
-          v-if="chosen.kind === 'registered'"
-          class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
-        >
-          {{ $t('contests.actions.registeredBadge') }}
-        </span>
-        <button
-          type="button"
-          aria-disabled="true"
-          class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-pill border border-line bg-surface-hover px-5 font-semibold text-content"
-        >
-          {{ $t('contests.actions.opensAt', { time: startClock }) }}
-        </button>
-      </template>
-      <p v-else class="text-muted">{{ $t(`contests.actions.${chosen.kind}`) }}</p>
       <p
         v-if="error && !isDialogOpen"
         role="alert"

@@ -283,3 +283,19 @@ describe('contest detail problems and rules', () => {
     expect(aside.text()).toContain('Thể thức & quy định');
   });
 });
+
+describe('contest page bottom reserve', () => {
+  it('reserves the phone action bar space once the contest is loaded', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(running) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const page = wrapper.get('[data-testid="contest-header"]').element.closest('.max-w-7xl');
+    expect(page!.classList).toContain('pb-36');
+  });
+
+  it('reserves no bar space on a missing contest', async () => {
+    mockApi({ ...anonymousViewer, 'GET /contests/nope': fail(404, 'not_found') });
+    const { wrapper } = await mountApp('/contests/nope');
+    const page = wrapper.get('[data-testid="contest-not-found"]').element.closest('.max-w-7xl');
+    expect(page!.classList).not.toContain('pb-36');
+  });
+});

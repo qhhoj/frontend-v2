@@ -9,6 +9,7 @@ const facts = (overrides: Partial<ActionFacts> = {}): ActionFacts => ({
   liveStatus: null,
   isCurrent: false,
   canSpectate: false,
+  skipsAccessCode: false,
   registration: 'none',
   requiresAccessCode: false,
   disallowVirtual: false,
@@ -71,20 +72,33 @@ describe('contestAction', () => {
     expect(
       contestAction(facts({ ...coded, phase: 'upcoming', registration: 'open' })).needsAccessCode,
     ).toBe(true);
-    // An existing participation re-enters and a registered row joins without it; editors never need it.
+    // An existing participation re-enters and a registered row joins without it; a finished row continues without it.
     expect(contestAction(facts({ ...coded, liveStatus: 'participating' })).needsAccessCode).toBe(
       false,
     );
     expect(contestAction(facts({ ...coded, liveStatus: 'registered' })).needsAccessCode).toBe(
       false,
     );
-    expect(contestAction(facts({ ...coded, canSpectate: true })).needsAccessCode).toBe(false);
+    expect(contestAction(facts({ ...coded, liveStatus: 'finished' })).needsAccessCode).toBe(false);
+  });
+
+  it('skips the code only for viewers who may edit the contest, as the backend does', () => {
+    const coded = { requiresAccessCode: true, canSpectate: true };
+    expect(contestAction(facts({ ...coded, skipsAccessCode: true })).needsAccessCode).toBe(false);
+    // A tester spectates but still needs the code for a new row, running or upcoming.
+    expect(contestAction(facts(coded)).needsAccessCode).toBe(true);
+    expect(contestAction(facts({ ...coded, phase: 'upcoming' })).needsAccessCode).toBe(true);
+    expect(contestAction(facts({ ...coded, phase: 'ended' })).needsAccessCode).toBe(true);
+    expect(
+      contestAction(facts({ ...coded, phase: 'ended', skipsAccessCode: true })).needsAccessCode,
+    ).toBe(false);
   });
 
   it('maps only the requests to commands', () => {
     expect(commandOf('rejoin')).toBe('join');
     expect(commandOf('register')).toBe('register');
     expect(commandOf('leave')).toBe('leave');
+    expect(commandOf('finished')).toBe('join');
     expect(commandOf('opensLater')).toBeNull();
   });
 });

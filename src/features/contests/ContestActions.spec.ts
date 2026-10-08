@@ -1,4 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
@@ -195,5 +196,149 @@ describe('contest actions', () => {
     const { wrapper } = await mountApp('/contests/r42');
     expect(actionsOf(wrapper).text()).toContain('Thi ảo #2 đang chạy');
     expect(actionsOf(wrapper).get('[role="timer"]').text()).toBe('01:12:05');
+  });
+});
+
+const pressEscape = () =>
+  document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+const joinCalls = (calls: ReturnType<typeof mockApi>) =>
+  calls.filter((call) => call.path === '/contests/r42/join');
+
+describe('contest actions: access codes, busy state and the spectator path', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('asks a tester for the code on a coded contest', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(
+        contestDetail({ requiresAccessCode: true, viewer: contestViewer({ isTester: true }) }),
+      ),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Theo dõi').trigger('click');
+    await flushPromises();
+    expect(dialog()).not.toBeNull();
+    expect(joinCalls(calls)).toHaveLength(0);
+  });
+
+  it('lets an editor who may edit the contest in without the code', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(
+        contestDetail({
+          requiresAccessCode: true,
+          viewer: contestViewer({ isEditor: true, canEdit: true }),
+        }),
+      ),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Theo dõi').trigger('click');
+    await flushPromises();
+    expect(dialog()).toBeNull();
+    expect(joinCalls(calls).map((call) => call.body)).toEqual([{}]);
+  });
+
+  it('continues a finished participation as a spectator without the code', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const finished = contestDetail({
+      requiresAccessCode: true,
+      viewer: contestViewer({
+        liveParticipation: participationSummary({ endTime: '2026-10-08T09:00:00Z' }),
+      }),
+    });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(finished),
+      'POST /contests/r42/join': ok(participationSummary({ virtual: -1 })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(actionsOf(wrapper).text()).toContain('Bạn đã hết giờ làm bài.');
+    await buttonNamed(wrapper, 'Xem tiếp ở chế độ theo dõi').trigger('click');
+    await flushPromises();
+    expect(dialog()).toBeNull();
+    expect(joinCalls(calls).map((call) => call.body)).toEqual([{}]);
+  });
+
+  it('drops the code from the mutation cache once the dialog is done with it', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper, queryClient } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    const input = dialog()!.querySelector<HTMLInputElement>('input')!;
+    input.value = 'opensesame';
+    input.dispatchEvent(new Event('input'));
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    const cachedCodes = () =>
+      queryClient
+        .getMutationCache()
+        .getAll()
+        .filter(
+          (mutation) =>
+            (mutation.state.variables as { accessCode?: string } | undefined)?.accessCode,
+        );
+    await vi.waitFor(() => expect(cachedCodes()).toHaveLength(0));
+  });
+
+  it('forgets a wrong-code error when the dialog is cancelled', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
+      'POST /contests/r42/join': fail(403, 'wrong_access_code'),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    const cancel = [...dialog()!.querySelectorAll('button')].find(
+      (button) => button.textContent?.trim() === 'Hủy',
+    )!;
+    cancel.click();
+    await vi.waitFor(() => expect(dialog()).toBeNull());
+    expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
+  });
+
+  it('closes the dialog on Escape and forgets its error the same way', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
+      'POST /contests/r42/join': fail(403, 'wrong_access_code'),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    pressEscape();
+    await vi.waitFor(() => expect(dialog()).toBeNull());
+    expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
+  });
+
+  it('sends one join for a double press and marks the button busy while it runs', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    const button = buttonNamed(wrapper, 'Vào thi');
+    button.element.click();
+    button.element.click();
+    await nextTick();
+    expect(button.element.getAttribute('aria-busy')).toBe('true');
+    await flushPromises();
+    expect(joinCalls(calls)).toHaveLength(1);
   });
 });

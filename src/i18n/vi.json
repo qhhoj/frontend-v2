@@ -167,6 +167,7 @@
       "opensAt": "Vào thi (mở lúc {time})",
       "registeredBadge": "Bạn đã đăng ký",
       "finished": "Bạn đã hết giờ làm bài.",
+      "continueSpectating": "Xem tiếp ở chế độ theo dõi",
       "registrationClosed": "Kỳ thi này đã đóng đăng ký.",
       "virtualDisallowed": "Ban tổ chức không cho phép thi ảo kỳ thi này.",
       "virtualNote": "Thi ảo: làm lại đề trong {span} kể từ lúc bạn bắt đầu. Kết quả chỉ hiện ở bảng khi chọn “Gồm thi ảo”.",
@@ -181,7 +182,6 @@
       "codeBody": "“{name}” cần mã do ban tổ chức cung cấp.",
       "codeLabel": "Mã tham gia",
       "codeHint": "Mã phân biệt chữ hoa, chữ thường.",
-      "cancel": "Hủy",
       "done": {
         "join": "Bạn đã vào kỳ thi.",
         "register": "Bạn đã đăng ký kỳ thi.",

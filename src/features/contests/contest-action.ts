@@ -20,8 +20,10 @@ export interface ActionFacts {
   phase: ContestPhase;
   liveStatus: LiveStatus | null;
   isCurrent: boolean;
-  /** Editors and testers spectate instead of competing, and never need the access code. */
+  /** Editors and testers spectate instead of competing. */
   canSpectate: boolean;
+  /** Backend `canEdit`: the only viewers the access code is skipped for. */
+  skipsAccessCode: boolean;
   registration: 'none' | 'open' | 'closed';
   requiresAccessCode: boolean;
   disallowVirtual: boolean;
@@ -37,8 +39,12 @@ const action = (kind: ContestActionKind, needsAccessCode = false): ContestAction
   needsAccessCode,
 });
 
+/** A new participation row needs the code unless the viewer may edit the contest (backend `assertAccessCode`). */
+const newRowNeedsCode = (facts: ActionFacts): boolean =>
+  facts.liveStatus === null && facts.requiresAccessCode && !facts.skipsAccessCode;
+
 function upcomingAction(facts: ActionFacts): ContestAction {
-  if (facts.canSpectate) return action('spectate');
+  if (facts.canSpectate) return action('spectate', newRowNeedsCode(facts));
   if (facts.liveStatus === 'registered') return action('registered');
   if (facts.registration === 'open') return action('register', facts.requiresAccessCode);
   return action(facts.registration === 'closed' ? 'registrationClosed' : 'opensLater');
@@ -46,8 +52,9 @@ function upcomingAction(facts: ActionFacts): ContestAction {
 
 /** Backend `join`: an existing row re-enters (no code), a registered row joins (no code), a new one needs the window and the code. */
 function runningAction(facts: ActionFacts): ContestAction {
-  if (facts.canSpectate) return action('spectate');
+  if (facts.canSpectate) return action('spectate', newRowNeedsCode(facts));
   if (facts.liveStatus === 'participating') return action('rejoin');
+  /** Backend `reenter`: a finished row continues as a spectator row, with no code. */
   if (facts.liveStatus === 'finished') return action('finished');
   if (facts.liveStatus === 'registered') return action('join');
   if (facts.registration === 'closed') return action('registrationClosed');
@@ -56,7 +63,7 @@ function runningAction(facts: ActionFacts): ContestAction {
 
 function endedAction(facts: ActionFacts): ContestAction {
   if (facts.disallowVirtual) return action('virtualDisallowed');
-  return action('virtual', facts.requiresAccessCode && !facts.canSpectate);
+  return action('virtual', facts.requiresAccessCode && !facts.skipsAccessCode);
 }
 
 export function contestAction(facts: ActionFacts): ContestAction {
@@ -79,6 +86,7 @@ export function actionFactsOf(
     liveStatus: liveStatusOf(contest, viewer.liveParticipation, now),
     isCurrent: viewer.inContest,
     canSpectate: viewer.isEditor || viewer.isTester,
+    skipsAccessCode: viewer.canEdit,
     registration: registrationState(contest, now),
     requiresAccessCode: contest.requiresAccessCode,
     disallowVirtual: contest.disallowVirtual,
@@ -90,6 +98,7 @@ const COMMANDS: Partial<Record<ContestActionKind, ParticipationCommand>> = {
   rejoin: 'join',
   spectate: 'join',
   virtual: 'join',
+  finished: 'join',
   register: 'register',
   leave: 'leave',
 };

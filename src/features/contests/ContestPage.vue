@@ -41,8 +41,13 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>
 
 <template>
-  <!-- pb-36 keeps the last row clear of the phone action bar, which is fixed to the bottom below md. -->
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-5 pb-36 sm:px-8 md:pb-5">
+  <!-- A loaded contest shows the phone action bar, fixed to the bottom below md: keep the last row clear of it. -->
+  <div
+    :class="[
+      'mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-5 sm:px-8',
+      contest ? 'pb-36 md:pb-5' : 'pb-5',
+    ]"
+  >
     <ContestNotFound v-if="isMissing" />
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestDetailSkeleton /></template>
