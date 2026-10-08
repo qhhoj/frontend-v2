@@ -11,7 +11,11 @@ export interface RuleRow {
   params: Record<string, string | number>;
   /** Params that are message keys themselves; the card translates them before filling `valueKey`. */
   paramKeys?: Record<string, string>;
+  /** A message key appended after the value, e.g. the "per participation" of a time limit. */
+  suffixKey?: string;
 }
+
+type RowExtras = Pick<RuleRow, 'paramKeys' | 'suffixKey'>;
 
 /** Backend formats/icpc.ts and vnoj.ts defaults, used when the stored config lacks `penalty`. */
 export const DEFAULT_PENALTY_MINUTES: Partial<Record<ContestFormatName, number>> = {
@@ -23,8 +27,8 @@ const row = (
   term: string,
   valueKey: string,
   params: RuleRow['params'] = {},
-  paramKeys?: RuleRow['paramKeys'],
-): RuleRow => ({ termKey: `contests.rules.${term}`, valueKey, params, paramKeys });
+  extras: RowExtras = {},
+): RuleRow => ({ termKey: `contests.rules.${term}`, valueKey, params, ...extras });
 
 function formatRule(contest: ContestDetail): RuleRow {
   const format = translate(`formats.${contest.formatName}`);
@@ -43,7 +47,7 @@ function scoreboardRule(contest: ContestDetail): RuleRow {
         'scoreboard',
         'contests.rules.scoreboardFrozen',
         { minutes: contest.frozenLastMinutes },
-        { visibility: visibilityKey },
+        { paramKeys: { visibility: visibilityKey } },
       );
 }
 
@@ -65,7 +69,9 @@ function registrationRule(contest: ContestDetail, locale: Locale): RuleRow[] {
 function timeLimitRule(contest: ContestDetail): RuleRow[] {
   if (contest.timeLimit === null) return [];
   const span = spanMessage(contest.timeLimit);
-  return [row('timeLimit', span.key, span.params)];
+  return [
+    row('timeLimit', span.key, span.params, { suffixKey: 'contests.rules.perParticipation' }),
+  ];
 }
 
 /** The "Thể thức & quy định" card, top to bottom. */

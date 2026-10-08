@@ -50,6 +50,9 @@ describe('contest rules', () => {
       'vi',
     );
     expect(ruleFor(timed, 'contests.rules.timeLimit')!.params).toEqual({ count: 3 });
+    expect(ruleFor(timed, 'contests.rules.timeLimit')!.suffixKey).toBe(
+      'contests.rules.perParticipation',
+    );
     expect(ruleFor(timed, 'contests.rules.registration')!.valueKey).toBe(
       'contests.rules.registrationUntil',
     );

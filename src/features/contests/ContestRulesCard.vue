@@ -8,8 +8,6 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { contestRules } from './contest-rules';
 import type { RuleRow } from './contest-rules';
 
-const TIME_LIMIT_TERM = 'contests.rules.timeLimit';
-
 const props = defineProps<{ contest: ContestDetail }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -21,7 +19,8 @@ function valueText(rule: RuleRow): string {
     Object.entries(rule.paramKeys ?? {}).map(([name, key]) => [name, t(key)]),
   );
   const count = typeof rule.params.count === 'number' ? rule.params.count : 1;
-  return t(rule.valueKey, { ...rule.params, ...translatedParams }, count);
+  const value = t(rule.valueKey, { ...rule.params, ...translatedParams }, count);
+  return rule.suffixKey ? `${value} ${t(rule.suffixKey)}` : value;
 }
 </script>
 
@@ -40,10 +39,7 @@ function valueText(rule: RuleRow): string {
       >
         <dt class="text-muted">{{ $t(rule.termKey) }}</dt>
         <dd>
-          {{ valueText(rule)
-          }}<template v-if="rule.termKey === TIME_LIMIT_TERM">
-            {{ $t('contests.rules.perParticipation') }}</template
-          >
+          {{ valueText(rule) }}
         </dd>
       </div>
     </dl>

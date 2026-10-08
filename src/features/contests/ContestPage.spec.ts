@@ -223,7 +223,18 @@ describe('contest detail problems and rules', () => {
     const items = wrapper.findAll('[data-testid="contest-problems"] ul > li');
     expect(items).toHaveLength(3);
     expect(items[1]!.get('a[href="/problems/r42b"]').text()).toBe('B. Trò chơi trên cây');
-    expect(items[1]!.text()).toContain('r42b · 100 điểm');
+    expect(items[1]!.text()).toContain('r42b · Tối đa 20 lượt · 100 điểm');
+    expect(items[0]!.text()).toContain('r42a · 100 điểm');
+    expect(items[0]!.text()).not.toContain('Tối đa');
+  });
+
+  it('reads the time limit as the time per participation', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ timeLimit: 3 * 3600, problems: null })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.get('aside').text()).toContain('3 giờ mỗi lượt kể từ lúc vào thi');
   });
 
   it('leaves the introduction out when the contest has none', async () => {

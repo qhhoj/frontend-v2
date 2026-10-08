@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ExternalLink } from 'lucide-vue-next';
+import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
 import GlassCard from '@/components/GlassCard.vue';
 import { formatNumber } from '@/lib/format';
@@ -7,12 +8,15 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
+const { t } = useI18n();
 const pointsOf = (problem: ContestProblem) =>
   formatNumber(problem.points, locale.locale, props.contest.pointsPrecision);
 const problemLink = (problem: ContestProblem) => ({
   name: 'problem',
   params: { code: problem.code },
 });
+/** The attempt cap line, shown only for problems that cap their submissions. */
+const capText = (cap: number) => t('contests.problems.cap', { count: cap }, cap);
 /** Why the statements are not listed yet, per phase. */
 const HIDDEN_KEYS: Record<ContestPhase, string> = {
   upcoming: 'contests.problems.afterStart',
@@ -65,14 +69,7 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
               <span class="block font-mono text-[12.5px] text-muted">
                 {{ problem.code
                 }}<template v-if="problem.maxSubmissions">
-                  ·
-                  {{
-                    $t(
-                      'contests.problems.cap',
-                      { count: problem.maxSubmissions },
-                      problem.maxSubmissions,
-                    )
-                  }}</template
+                  · {{ capText(problem.maxSubmissions) }}</template
                 >
               </span>
             </td>
@@ -100,11 +97,18 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
             {{ problem.label }}
           </span>
           <div class="min-w-0 flex-1">
-            <RouterLink :to="problemLink(problem)" class="block truncate font-semibold"
-              ><span class="sr-only">{{ problem.label }}. </span>{{ problem.name }}</RouterLink
+            <RouterLink
+              :to="problemLink(problem)"
+              class="flex min-h-11 min-w-0 items-center font-semibold"
+              ><span class="sr-only">{{ problem.label }}. </span
+              ><span class="truncate">{{ problem.name }}</span></RouterLink
             >
             <p class="text-[12px] text-muted">
-              {{ problem.code }} ·
+              {{ problem.code
+              }}<template v-if="problem.maxSubmissions">
+                · {{ capText(problem.maxSubmissions) }}</template
+              >
+              ·
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
             </p>
           </div>
