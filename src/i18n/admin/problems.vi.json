@@ -1,0 +1,24 @@
+{
+  "view": "Xem bài",
+  "tabsLabel": "Các phần của bài",
+  "tabs": {
+    "general": "Thông tin chung",
+    "statements": "Đề bài và bản dịch",
+    "editorial": "Lời giải",
+    "data": "Dữ liệu chấm",
+    "files": "Tệp và tải lên"
+  },
+  "leads": {
+    "general": "Sửa thông tin chung. Mỗi tab lưu riêng.",
+    "statements": "Đề bài theo ngôn ngữ, xem trước trực tiếp.",
+    "editorial": "Lời giải, công khai và tác giả.",
+    "data": "Gói dữ liệu, cấu hình checker và danh sách test.",
+    "files": "Ảnh trong đề, đề PDF và tài liệu kèm."
+  },
+  "notFound": "Không tìm thấy bài {code}.",
+  "cannotEdit": "Tài khoản này không sửa được bài {code}.",
+  "indexLead": "Mở bài theo mã để sửa đề, dữ liệu chấm và người phụ trách.",
+  "lookupLabel": "Mã bài",
+  "lookupSubmit": "Mở bài",
+  "lookupHint": "Chưa có danh sách quản trị: nhập đúng mã bài."
+}

@@ -1,0 +1,24 @@
+{
+  "view": "View problem",
+  "tabsLabel": "Problem sections",
+  "tabs": {
+    "general": "General",
+    "statements": "Statements and translations",
+    "editorial": "Editorial",
+    "data": "Test data",
+    "files": "Files and uploads"
+  },
+  "leads": {
+    "general": "Edit the general details. Each tab saves on its own.",
+    "statements": "Statements per language, with a live preview.",
+    "editorial": "The editorial, its visibility and its authors.",
+    "data": "The data package, checker settings and the test list.",
+    "files": "Images in the statement, the PDF statement and attached material."
+  },
+  "notFound": "Problem {code} not found.",
+  "cannotEdit": "This account cannot edit problem {code}.",
+  "indexLead": "Open a problem by code to edit its statement, test data and people.",
+  "lookupLabel": "Problem code",
+  "lookupSubmit": "Open",
+  "lookupHint": "No admin list yet: type the exact code."
+}
