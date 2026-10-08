@@ -1,36 +1,38 @@
 <script setup lang="ts">
 import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { RATING_BOX_CLASSES } from './profile-geometry';
 
-/** Shaped like `ProfileHeader` and `ProfileTabsNav`, so the loaded page does not move. */
+/**
+ * Shaped like the common loaded profile: the avatar, the tier pill, the name and the joined line, then the rating box
+ * at its fixed height. Organization chips and own or staff actions are data-dependent and are not drawn.
+ * The breadcrumb line above the card is the one `ProfileLayout` shows once the user loads.
+ */
 const TAB_COUNT = 5;
 </script>
 
 <template>
+  <SkeletonBlock class="h-5 w-40" />
   <GlassCard
     data-testid="profile-header"
     class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
   >
     <div data-skeleton-region="header" class="flex min-w-0 flex-col gap-4">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
         <SkeletonBlock class="size-24" round />
-        <div class="flex flex-col gap-2">
+        <div class="flex min-w-0 flex-col gap-2">
           <SkeletonBlock class="h-[26px] w-24" pill />
           <SkeletonBlock class="h-9 w-56" />
           <SkeletonBlock class="h-6 w-64" />
-          <div class="flex gap-2">
-            <SkeletonBlock class="h-8 w-16" pill />
-            <SkeletonBlock class="h-8 w-16" pill />
-          </div>
         </div>
-      </div>
-      <div class="flex gap-2.5">
-        <SkeletonBlock class="h-11 w-32" pill />
-        <SkeletonBlock class="h-11 w-28" pill />
       </div>
     </div>
     <div data-skeleton-region="rating" class="flex flex-col">
-      <SkeletonBlock class="min-h-28 w-full" />
+      <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
+        <SkeletonBlock class="h-5 w-16" />
+        <SkeletonBlock class="h-10 w-24" />
+        <SkeletonBlock class="h-5 w-48" />
+      </div>
     </div>
   </GlassCard>
   <div data-skeleton-region="tabs" class="flex gap-2 overflow-hidden">

@@ -22,6 +22,9 @@ export interface UserPage {
   staff: UserPageStaff | null;
 }
 
+/** backend: apps/api/src/modules/users/moderation/dto/ban.dto.ts (BAN_REASON_MAX_LENGTH) */
+export const BAN_REASON_MAX_LENGTH = 4096;
+
 /** backend: user-page.response.ts (UserPageStaffResponse) */
 export interface UserPageStaff {
   isSuperuser: boolean;

@@ -1,11 +1,7 @@
 import type { Page } from '@playwright/test';
-import { ok } from './fixtures/reply';
-import { organizationSummary } from '../src/test/community-fixtures';
-import { userPage } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { applyTheme, AUDIT_VIEWPORTS, expectNoAxeViolations } from './fixtures/audit';
 import { expect, test } from './fixtures/api';
-import type { FakeApi } from './fixtures/api';
 import { defineShiftTests, PHONE, DESKTOP, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import type { ShiftCase } from './fixtures/layout-shift';
 
@@ -19,18 +15,6 @@ const runningCssAnimations = (page: Page) =>
   );
 const fitsWithoutSideScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
-
-/** Two organizations, so the loaded header has the chip row the skeleton draws. */
-const withOrganizations = (api: FakeApi) => {
-  api.routes['GET /users/user_01'] = ok(
-    userPage({
-      organizations: [
-        organizationSummary(),
-        organizationSummary({ slug: 'thcs', shortName: 'THCS', name: 'THCS Lê Lợi' }),
-      ],
-    }),
-  );
-};
 
 test('on a phone the stats come before the rating chart and the page does not scroll sideways', async ({
   page,
@@ -59,22 +43,21 @@ test('an unknown user shows the crying Bit; its tears move only with motion', as
   expect(await runningCssAnimations(page)).toBe(0);
 });
 
+/** Anonymous visitors on a profile without organizations: the common loaded shape the skeleton draws. */
 const SHIFT_CASES: ShiftCase[] = [
   {
     name: 'profile header',
-    path: OWN,
-    signedIn: true,
-    hold: 'GET /users/user_01',
-    answer: withOrganizations,
+    path: OTHER,
+    signedIn: false,
+    hold: 'GET /users/ngoc_anh',
     parts: (page) => ({ header: page.getByTestId('profile-header') }),
     viewports: PHONE_AND_DESKTOP,
   },
   {
     name: 'rating chart card',
-    path: OWN,
-    signedIn: true,
-    hold: 'GET /users/user_01/ratings',
-    answer: withOrganizations,
+    path: OTHER,
+    signedIn: false,
+    hold: 'GET /users/ngoc_anh/ratings',
     parts: (page) => ({ chart: page.getByTestId('rating-card') }),
     viewports: [PHONE, DESKTOP],
   },

@@ -2,11 +2,15 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, ref, useId } from 'vue';
 import { banUser } from '@/api/users.api';
+import { BAN_REASON_MAX_LENGTH } from '@/api/types/users';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 
-/** Staff ban: a required reason, then the crowned success line in place of the opener. */
+/**
+ * Staff ban: a required reason, then the crowned success line in place of the opener.
+ * The parent keys it by username, so a ban on one profile never shows on the next.
+ */
 const props = defineProps<{ username: string }>();
 const visible = ref(false);
 const reason = ref('');
@@ -24,6 +28,11 @@ const ban = useMutation({
   },
 });
 
+function open() {
+  ban.reset();
+  visible.value = true;
+}
+
 function confirm() {
   if (canConfirm.value) ban.mutate();
 }
@@ -35,7 +44,7 @@ function confirm() {
     type="button"
     data-testid="ban-open"
     class="min-h-11 rounded-pill border border-negative px-5 font-semibold text-negative hover:bg-surface-hover"
-    @click="visible = true"
+    @click="open"
   >
     {{ $t('profile.ban.open') }}
   </button>
@@ -60,7 +69,7 @@ function confirm() {
       :id="reasonId"
       v-model="reason"
       required
-      maxlength="4096"
+      :maxlength="BAN_REASON_MAX_LENGTH"
       rows="4"
       class="rounded-tile border border-line bg-surface-solid p-3 text-content"
     />

@@ -1157,7 +1157,7 @@
     "about": "About",
     "organizations": "Organizations",
     "notFoundTitle": "User not found",
-    "notFoundBody": "No user “{username}”, or the account was banned.",
+    "notFoundBody": "No user named “{username}”.",
     "toLeaderboard": "Back to the leaderboard",
     "ban": {
       "open": "Ban user",
@@ -1166,7 +1166,8 @@
       "reason": "Reason (up to 4096 characters)",
       "submit": "Ban",
       "done": "{username} is banned",
-      "doneBody": "The account can no longer sign in and left the leaderboards."
+      "doneBody": "The account can no longer sign in and left the leaderboards.",
+      "bannedWithReason": "This account is banned. Reason: {reason}"
     },
     "title": "Profile"
   },

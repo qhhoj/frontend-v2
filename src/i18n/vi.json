@@ -1157,7 +1157,7 @@
     "about": "Giới thiệu",
     "organizations": "Tổ chức",
     "notFoundTitle": "Không tìm thấy người dùng",
-    "notFoundBody": "Tên đăng nhập “{username}” không tồn tại hoặc đã bị cấm.",
+    "notFoundBody": "Không có người dùng nào tên “{username}”.",
     "toLeaderboard": "Về bảng xếp hạng",
     "ban": {
       "open": "Cấm người dùng",
@@ -1166,7 +1166,8 @@
       "reason": "Lý do (tối đa 4096 ký tự)",
       "submit": "Cấm",
       "done": "Đã cấm {username}",
-      "doneBody": "Tài khoản không đăng nhập được và đã rời bảng xếp hạng."
+      "doneBody": "Tài khoản không đăng nhập được và đã rời bảng xếp hạng.",
+      "bannedWithReason": "Tài khoản đã bị cấm. Lý do: {reason}"
     },
     "title": "Hồ sơ"
   },

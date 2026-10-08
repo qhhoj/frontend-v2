@@ -10,6 +10,7 @@ import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import BanUserDialog from './BanUserDialog.vue';
+import { RATING_BOX_CLASSES } from './profile-geometry';
 
 const props = defineProps<{ user: UserPage }>();
 const session = useSessionStore();
@@ -19,7 +20,15 @@ const tier = computed(() => ratingTier(props.user.rating));
 const tierClass = computed(() => TIER_TEXT_CLASSES[tierColor(tier.value)]);
 const tierLabelKey = computed(() => `tiers.${tier.value ?? 'unrated'}`);
 const isOwn = computed(() => props.user.username === session.user?.username);
-const canBan = computed(() => hasPermission(session.user, 'judge.ban_user'));
+const banReason = computed(() => props.user.staff?.banReason ?? null);
+/** The backend refuses to ban a superuser, an account already banned (409) or oneself: offer the action only where it can work. */
+const canBan = computed(
+  () =>
+    hasPermission(session.user, 'judge.ban_user') &&
+    !isOwn.value &&
+    !props.user.staff?.isSuperuser &&
+    !banReason.value,
+);
 const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, locale.locale));
 </script>
 
@@ -80,10 +89,13 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
             {{ $t('profile.write') }}
           </RouterLink>
         </template>
-        <BanUserDialog v-else :username="user.username" />
+        <BanUserDialog v-else :key="user.username" :username="user.username" />
       </div>
+      <p v-if="banReason" data-testid="ban-status" class="text-sm text-negative">
+        {{ $t('profile.ban.bannedWithReason', { reason: banReason }) }}
+      </p>
     </div>
-    <div class="flex flex-col gap-2 rounded-tile border border-line p-5">
+    <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
       <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
       <p :class="tierClass" class="font-display text-4xl font-semibold">{{ user.rating ?? '—' }}</p>
       <p v-if="user.ratingSummary" class="text-sm text-muted">
