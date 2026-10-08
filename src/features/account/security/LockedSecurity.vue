@@ -4,8 +4,8 @@ import SettingsNotice from '../settings/SettingsNotice.vue';
 import { BUTTON } from '../settings/buttons';
 
 /**
- * Board SetImpersonation: what the owner could do, each with the reason it is locked. The backend refuses the first three (403); it
- * would allow the fourth, but ending every session of the real user on all their devices is not for a viewer to do (Decision 16).
+ * Board SetImpersonation: what the owner could do, each with the reason it is locked. The backend refuses all four while
+ * impersonating (403); ending every session of the real user on all their devices is not for a viewer to do (Decision 16).
  */
 const LOCKED_ACTIONS = [
   {
