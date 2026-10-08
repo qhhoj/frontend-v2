@@ -64,7 +64,7 @@ function cancel() {
       <div class="flex justify-end gap-2.5">
         <button
           type="button"
-          class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+          class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:bg-surface-hover aria-disabled:text-muted"
           :aria-disabled="isPending || undefined"
           @click="cancel"
         >
@@ -74,7 +74,7 @@ function cancel() {
           type="submit"
           :aria-disabled="isPending || undefined"
           :aria-busy="isPending || undefined"
-          class="min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:opacity-60"
+          class="min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
         >
           {{ actionLabel }}
         </button>

@@ -41,7 +41,7 @@ const NOTICE_KEYS: Partial<Record<ContestActionKind, string>> = {
 /** Kinds whose button shows the opening time and cannot be pressed. */
 const LOCKED_KINDS: readonly ContestActionKind[] = ['opensLater', 'registered'];
 const ACTIVE_BUTTON =
-  'inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:opacity-60';
+  'inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text';
 const LOCKED_BUTTON =
   'inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-pill border border-line bg-surface-hover px-5 font-semibold text-content';
 

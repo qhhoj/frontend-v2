@@ -47,7 +47,7 @@ function confirm() {
       <button
         type="button"
         :aria-disabled="busy || undefined"
-        class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+        class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:bg-surface-hover aria-disabled:text-muted"
         @click="cancel"
       >
         {{ cancelLabel ?? $t('common.cancel') }}
@@ -58,8 +58,8 @@ function confirm() {
         :aria-busy="busy || undefined"
         :class="
           tone === 'danger'
-            ? 'min-h-11 rounded-pill border border-negative px-5 font-semibold text-negative aria-disabled:cursor-progress aria-disabled:opacity-60'
-            : 'min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:opacity-60'
+            ? 'min-h-11 rounded-pill border border-negative px-5 font-semibold text-negative aria-disabled:cursor-progress aria-disabled:bg-surface-hover aria-disabled:text-muted'
+            : 'min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text'
         "
         @click="confirm"
       >
