@@ -31,6 +31,10 @@ const PAGES = [
   { path: '/submissions/sub-1', ready: { 'signed-in': 'Kết quả từng test' } },
   { path: '/login', ready: { anonymous: 'Đăng nhập' } },
   { path: '/blog', ready: { anonymous: 'Blog', 'signed-in': 'Blog' } },
+  {
+    path: '/settings/appearance',
+    ready: { anonymous: 'Dùng giao diện riêng', 'signed-in': 'Dùng giao diện riêng' },
+  },
 ] as const;
 
 const VIEWPORTS = [
