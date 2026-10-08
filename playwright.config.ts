@@ -11,7 +11,8 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: ORIGIN, trace: 'retain-on-failure' },
+  use: { baseURL: ORIGIN, trace: 'retain-on-failure', reducedMotion: 'reduce' },
+  /** Builds `dist/` and previews it; the only build step, so CI does not build twice. */
   webServer: {
     command: `npm run build && npx vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,
     url: ORIGIN,

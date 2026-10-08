@@ -22,11 +22,20 @@ const overflowingChildren = (container: Locator) =>
       );
   });
 
-for (const path of ['/', '/problems', '/contests/r42/ranking', '/login', '/blog'])
+/** `ready` is text that only shows once the page has left its loading state. */
+const PAGES = [
+  { path: '/', signedIn: true, ready: 'Tổng hai số' },
+  { path: '/problems', signedIn: true, ready: 'Chọn bài, bắt đầu giải' },
+  { path: '/contests/r42/ranking', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
+  { path: '/login', signedIn: false, ready: 'Đăng nhập' },
+  { path: '/blog', signedIn: true, ready: 'Blog' },
+] as const;
+
+for (const { path, signedIn, ready } of PAGES)
   test(`${path} does not scroll sideways at 375 px`, async ({ page, api }) => {
-    api.signedIn = path !== '/login';
+    api.signedIn = signedIn;
     await page.goto(path);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(ready, { exact: true }).first()).toBeVisible();
     expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
   });
 
@@ -115,9 +124,9 @@ for (const { path, name, label } of [
   }) => {
     api.signedIn = true;
     await page.goto(path);
-    await page.waitForLoadState('networkidle');
     const region = page.getByRole('region', { name: label });
     await expect(region).toBeVisible();
+    await expect(region.getByRole('row').nth(1)).toBeVisible();
     expect(await region.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
       true,
     );

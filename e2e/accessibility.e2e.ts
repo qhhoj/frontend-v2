@@ -5,22 +5,30 @@ const THEMES = [
   { id: 'glass-dark', scheme: 'dark' },
   { id: 'glass-light', scheme: 'light' },
 ] as const;
-/** `ready` is a heading that only exists once the page has left its loading state, so axe never audits skeletons. */
+/**
+ * `ready` is text that only shows once the page has left its loading state, so axe never audits skeletons.
+ * Keys are the viewers the page is audited for.
+ */
 const PAGES = [
-  { path: '/', ready: 'Tổng hai số', viewers: ['anonymous', 'signed-in'] },
-  { path: '/problems', ready: 'Chọn bài, bắt đầu giải', viewers: ['anonymous', 'signed-in'] },
+  {
+    path: '/',
+    ready: { anonymous: 'Luyện thuật toán, thi đấu trực tuyến', 'signed-in': 'Tổng hai số' },
+  },
+  {
+    path: '/problems',
+    ready: { anonymous: 'Chọn bài, bắt đầu giải', 'signed-in': 'Chọn bài, bắt đầu giải' },
+  },
   {
     path: '/contests/r42/ranking',
-    ready: 'QHH Round #42 (Div. 2)',
-    viewers: ['anonymous', 'signed-in'],
+    ready: { anonymous: 'QHH Round #42 (Div. 2)', 'signed-in': 'QHH Round #42 (Div. 2)' },
   },
-  { path: '/login', ready: 'Đăng nhập', viewers: ['anonymous'] },
-  { path: '/blog', ready: 'Blog', viewers: ['anonymous', 'signed-in'] },
+  { path: '/login', ready: { anonymous: 'Đăng nhập' } },
+  { path: '/blog', ready: { anonymous: 'Blog', 'signed-in': 'Blog' } },
 ] as const;
 
 for (const theme of THEMES)
-  for (const { path, ready, viewers } of PAGES)
-    for (const viewer of viewers)
+  for (const { path, ready } of PAGES)
+    for (const [viewer, readyText] of Object.entries(ready))
       test(`${path} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewer}`, async ({
         page,
         api,
@@ -29,9 +37,7 @@ for (const theme of THEMES)
         await page.emulateMedia({ colorScheme: theme.scheme });
         await page.goto(path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-        await page.waitForLoadState('networkidle');
-        if (path !== '/' || api.signedIn)
-          await expect(page.getByText(ready, { exact: true }).first()).toBeVisible();
+        await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();
         const { violations } = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
           .analyze();
