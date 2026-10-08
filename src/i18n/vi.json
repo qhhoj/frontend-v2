@@ -169,6 +169,14 @@
       "signInWith": "Đăng nhập với {provider}",
       "signUpWith": "Đăng ký với {provider}"
     },
+    "signup": {
+      "school": "Trường",
+      "language": "Ngôn ngữ mặc định",
+      "optional": "(tuỳ chọn)",
+      "schoolSearch": "Gõ để tìm trường",
+      "schoolNone": "Không tìm thấy trường",
+      "none": "Chưa chọn"
+    },
     "issues": {
       "password_too_short": "Mật khẩu phải có ít nhất 8 ký tự.",
       "password_numeric": "Mật khẩu không được chỉ gồm chữ số.",

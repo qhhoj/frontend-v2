@@ -13,6 +13,14 @@ export const primeVuePreset: PrimeVuePTOptions = {
       class: 'mt-2 rounded-tile border border-line-strong bg-surface-solid p-1 text-content',
     },
     listContainer: { class: 'max-h-72 overflow-auto' },
+    header: { class: 'p-1 pb-2' },
+    pcFilter: {
+      root: {
+        class:
+          'h-11 w-full rounded-row border border-line-strong bg-surface-solid px-3 text-sm text-content placeholder:text-muted',
+      },
+    },
+    emptyMessage: { class: 'px-3 py-2 text-sm text-muted' },
     list: { class: 'm-0 list-none p-0' },
     option: ({ context }) => ({
       class: [

@@ -5,10 +5,16 @@ import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useWaitingWhile } from '@/stores/use-waiting-while';
 import SkeletonBlock from './SkeletonBlock.vue';
 
-const props = defineProps<{ loading: boolean; error: unknown }>();
+const props = withDefaults(
+  defineProps<{ loading: boolean; error: unknown; registersWait?: boolean }>(),
+  {
+    registersWait: true,
+  },
+);
 defineEmits<{ retry: [] }>();
 // `loading` is the query's isPending: first data only. Background refetches and kept data never register.
-useWaitingWhile(() => props.loading);
+// `registersWait` is false for data beside a form the viewer can already use (the signup pickers): no Bit.
+useWaitingWhile(() => props.loading && props.registersWait);
 </script>
 
 <template>

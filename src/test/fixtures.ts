@@ -26,6 +26,7 @@ import type {
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
 import type { SecondFactorMethod, SessionResponse, SessionUser } from '../api/types/auth';
 import type { Profile } from '../api/types/profile';
+import type { OrganizationListItem } from '../api/types/organizations';
 
 export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   id: '0192a000-0000-7000-8000-000000000001',
@@ -538,5 +539,19 @@ export const submissionStats = (overrides: Partial<SubmissionStats> = {}): Submi
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,
+  ...overrides,
+});
+
+export const organizationItem = (
+  overrides: Partial<OrganizationListItem> = {},
+): OrganizationListItem => ({
+  id: '0192a000-0000-7000-8000-0000000000a1',
+  slug: 'thpt-a',
+  name: 'THPT A',
+  shortName: 'A',
+  isOpen: true,
+  isUnlisted: false,
+  memberCount: 120,
+  performancePoints: 4200,
   ...overrides,
 });
