@@ -4,7 +4,12 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { LEADERBOARD_PAGE_SIZE } from '@/api/types/users';
 import type { BoardSort } from '@/api/types/users';
 import {
+  BOARD_HEAD_CLASS,
   BOARD_ROW_CLASS,
+  ORGANIZATION_HEAD_CLASS,
+  RANK_HEAD_CLASS,
+  USER_HEAD_CLASS,
+  valueHeadClass,
   ORGANIZATION_CELL_CLASS,
   RANK_CELL_CLASS,
   USER_CELL_CLASS,
@@ -20,19 +25,18 @@ const rows = Array.from({ length: LEADERBOARD_PAGE_SIZE }, (_row, index) => inde
 
 <template>
   <table class="w-full text-sm" data-skeleton-region="board">
-    <thead class="text-left text-[12px] font-semibold tracking-wide text-muted uppercase">
+    <thead :class="BOARD_HEAD_CLASS">
       <tr>
-        <th scope="col" class="px-3 py-2 text-right"><SkeletonBlock text class="w-8" /></th>
-        <th scope="col" class="px-3 py-2"><SkeletonBlock text class="w-24" /></th>
-        <th v-if="sort !== 'contributors'" scope="col" class="hidden px-3 py-2 md:table-cell">
+        <th scope="col" :class="RANK_HEAD_CLASS"><SkeletonBlock text class="w-8" /></th>
+        <th scope="col" :class="USER_HEAD_CLASS"><SkeletonBlock text class="w-24" /></th>
+        <th v-if="sort !== 'contributors'" scope="col" :class="ORGANIZATION_HEAD_CLASS">
           <SkeletonBlock text class="w-20" />
         </th>
         <th
           v-for="column in columns"
           :key="column.key"
           scope="col"
-          class="px-3 py-2 text-right"
-          :class="column.isActive ? '' : 'hidden md:table-cell'"
+          :class="valueHeadClass(column.isActive)"
         >
           <SkeletonBlock text class="w-16" />
         </th>

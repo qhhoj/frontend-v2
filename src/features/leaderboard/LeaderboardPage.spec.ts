@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { leaderboardEntry, userPage } from '@/test/fixtures';
 import { organizationSummary } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
@@ -18,6 +19,17 @@ const board = page(
   ],
   { page: 12, pageSize: 100, total: 4562 },
 );
+
+/** jsdom has no scrollIntoView: each test gets a mock, and the original (absent) method is put back after it. */
+let scrollIntoView: Mock;
+const originalScrollIntoView = Reflect.get(Element.prototype, 'scrollIntoView') as unknown;
+beforeEach(() => {
+  scrollIntoView = vi.fn();
+  Element.prototype.scrollIntoView = scrollIntoView;
+});
+afterEach(() => {
+  Object.assign(Element.prototype, { scrollIntoView: originalScrollIntoView });
+});
 
 describe('leaderboard page: reads the board from the URL', () => {
   it('reads sort and page from the URL, asks the API for them and shows rows with avatar, tier colour and school', async () => {
@@ -55,7 +67,6 @@ describe('leaderboard page: shows the viewer’s own rank', () => {
       'GET /users/user_01': ok(userPage({ rating: 1487 })),
       'GET /users/user_01/rank': ok({ rank: 1134, page: 12, pageSize: 100 }),
     });
-    Element.prototype.scrollIntoView = vi.fn();
     const { wrapper, router } = await mountApp('/users');
     const card = wrapper.get('[data-testid="my-rank"]');
     expect(card.text()).toContain('1.134');
@@ -146,8 +157,6 @@ describe('leaderboard page: find-my-rank again and errors', () => {
       'GET /users/user_01': ok(userPage({ rating: 1487 })),
       'GET /users/user_01/rank': ok({ rank: 1134, page: 12, pageSize: 100 }),
     });
-    const scrollIntoView = vi.fn();
-    Element.prototype.scrollIntoView = scrollIntoView;
     const { wrapper } = await mountApp('/users');
     await wrapper.get('[data-testid="my-rank"] button').trigger('click');
     await flushPromises();

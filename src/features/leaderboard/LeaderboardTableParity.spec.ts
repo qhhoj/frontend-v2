@@ -1,37 +1,82 @@
 import { describe, expect, it } from 'vitest';
+import type { VueWrapper } from '@vue/test-utils';
 import { leaderboardEntry } from '@/test/fixtures';
 import { mountComponent } from '@/test/mount';
 import LeaderboardTable from './LeaderboardTable.vue';
 import LeaderboardTableSkeleton from './LeaderboardTableSkeleton.vue';
-import { AVATAR_PX } from './leaderboard-cells';
-import type { BoardSort } from '@/api/types/users';
 
-const cellClasses = (row: HTMLElement) =>
-  Array.from(row.querySelectorAll('td'), (cell: HTMLTableCellElement) =>
-    cell.getAttribute('class'),
-  );
+// Literal class strings, written out here on purpose: the spec must fail when a shared class changes.
+const HEAD = 'text-left text-[12px] font-semibold tracking-wide text-muted uppercase';
+const ROW = 'border-t border-line target:bg-accent-soft';
+const RANK_CELL = 'px-3 py-2.5 text-right font-mono tabular-nums';
+const USER_CELL = 'px-3 py-2.5';
+const ORGANIZATION_CELL = 'hidden px-3 py-2.5 text-muted md:table-cell';
+const VALUE_CELL_ACTIVE = `${RANK_CELL} font-semibold`;
+const VALUE_CELL_HIDDEN = `${RANK_CELL} hidden md:table-cell`;
+const RANK_HEAD = 'px-3 py-2 text-right';
+const USER_HEAD = 'px-3 py-2';
+const ORGANIZATION_HEAD = 'hidden px-3 py-2 md:table-cell';
+const VALUE_HEAD_ACTIVE = 'px-3 py-2 text-right text-content';
+const VALUE_HEAD_HIDDEN = 'px-3 py-2 text-right hidden md:table-cell';
+
+const EXPECTED = {
+  rating: {
+    head: [
+      RANK_HEAD,
+      USER_HEAD,
+      ORGANIZATION_HEAD,
+      VALUE_HEAD_ACTIVE,
+      VALUE_HEAD_HIDDEN,
+      VALUE_HEAD_HIDDEN,
+      VALUE_HEAD_HIDDEN,
+    ],
+    cells: [
+      RANK_CELL,
+      USER_CELL,
+      ORGANIZATION_CELL,
+      VALUE_CELL_ACTIVE,
+      VALUE_CELL_HIDDEN,
+      VALUE_CELL_HIDDEN,
+      VALUE_CELL_HIDDEN,
+    ],
+  },
+  contributors: {
+    head: [RANK_HEAD, USER_HEAD, VALUE_HEAD_ACTIVE],
+    cells: [RANK_CELL, USER_CELL, VALUE_CELL_ACTIVE],
+  },
+};
+
+/** The first body row's cells, read from the DOM; the component's own constants are not consulted. */
+const cellClasses = (wrapper: VueWrapper) =>
+  wrapper
+    .findAll('tbody tr')[0]!
+    .findAll('td')
+    .map((cell) => cell.attributes('class'));
+const headClasses = (wrapper: VueWrapper) =>
+  wrapper.findAll('thead th').map((cell) => cell.attributes('class'));
 
 describe('leaderboard skeleton parity', () => {
-  for (const sort of ['rating', 'contributors'] as BoardSort[]) {
-    it(`gives a skeleton row the same row and cell classes as a loaded row on the ${sort} board`, () => {
+  for (const sort of ['rating', 'contributors'] as const) {
+    it(`draws the ${sort} board and its skeleton with the literal header, row and cell classes`, () => {
       const table = mountComponent(LeaderboardTable, {
         props: { entries: [leaderboardEntry(1, 'user_01', 1500)], sort, viewerName: null },
       });
       const skeleton = mountComponent(LeaderboardTableSkeleton, { props: { sort } });
-      const loadedRow = table.get('tbody tr').element as HTMLElement;
-      const skeletonRow = skeleton.get('tbody tr').element as HTMLElement;
-      expect(skeletonRow.getAttribute('class')).toBe(loadedRow.getAttribute('class'));
-      expect(cellClasses(skeletonRow)).toEqual(cellClasses(loadedRow));
+      for (const wrapper of [table, skeleton]) {
+        expect(wrapper.get('thead').attributes('class')).toBe(HEAD);
+        expect(headClasses(wrapper)).toEqual(EXPECTED[sort].head);
+        expect(wrapper.get('tbody tr').attributes('class')).toBe(ROW);
+        expect(cellClasses(wrapper)).toEqual(EXPECTED[sort].cells);
+      }
     });
   }
 
-  it('draws the avatar at the same pixel size as a loaded row', () => {
+  it('draws the avatar at 28 px on a loaded row and as a size-7 block in the skeleton', () => {
     const table = mountComponent(LeaderboardTable, {
       props: { entries: [leaderboardEntry(1, 'user_01', 1500)], sort: 'rating', viewerName: null },
     });
     const skeleton = mountComponent(LeaderboardTableSkeleton, { props: { sort: 'rating' } });
-    expect(table.get('tbody svg').attributes('width')).toBe(String(AVATAR_PX));
+    expect(table.get('tbody svg').attributes('width')).toBe('28');
     expect(skeleton.find('tbody .size-7').exists()).toBe(true);
-    expect(AVATAR_PX).toBe(28);
   });
 });

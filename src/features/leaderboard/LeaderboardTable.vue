@@ -9,11 +9,16 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   AVATAR_PX,
+  BOARD_HEAD_CLASS,
   BOARD_ROW_CLASS,
   ORGANIZATION_CELL_CLASS,
+  ORGANIZATION_HEAD_CLASS,
   RANK_CELL_CLASS,
+  RANK_HEAD_CLASS,
   USER_CELL_CLASS,
+  USER_HEAD_CLASS,
   valueCellClass,
+  valueHeadClass,
 } from './leaderboard-cells';
 import { boardColumns, rowAnchor } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
@@ -36,19 +41,18 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
 
 <template>
   <table class="w-full text-sm">
-    <thead class="text-left text-[12px] font-semibold tracking-wide text-muted uppercase">
+    <thead :class="BOARD_HEAD_CLASS">
       <tr>
-        <th scope="col" class="px-3 py-2 text-right">{{ $t('leaderboard.columns.rank') }}</th>
-        <th scope="col" class="px-3 py-2">{{ $t('leaderboard.columns.user') }}</th>
-        <th v-if="sort !== 'contributors'" scope="col" class="hidden px-3 py-2 md:table-cell">
+        <th scope="col" :class="RANK_HEAD_CLASS">{{ $t('leaderboard.columns.rank') }}</th>
+        <th scope="col" :class="USER_HEAD_CLASS">{{ $t('leaderboard.columns.user') }}</th>
+        <th v-if="sort !== 'contributors'" scope="col" :class="ORGANIZATION_HEAD_CLASS">
           {{ $t('leaderboard.columns.organization') }}
         </th>
         <th
           v-for="column in boardColumns(sort)"
           :key="column.key"
           scope="col"
-          class="px-3 py-2 text-right"
-          :class="column.isActive ? 'text-content' : 'hidden md:table-cell'"
+          :class="valueHeadClass(column.isActive)"
         >
           {{ $t(column.labelKey) }}
         </th>

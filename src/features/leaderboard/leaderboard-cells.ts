@@ -13,3 +13,14 @@ export const valueCellClass = (isActive: boolean) =>
 
 /** The avatar's size in px. The skeleton's `size-7` is the same 28 px (Tailwind classes cannot be computed). */
 export const AVATAR_PX = 28 as const;
+
+/** The header row and its cells, shared by the board and its skeleton. */
+export const BOARD_HEAD_CLASS =
+  'text-left text-[12px] font-semibold tracking-wide text-muted uppercase';
+export const RANK_HEAD_CLASS = 'px-3 py-2 text-right';
+export const USER_HEAD_CLASS = 'px-3 py-2';
+export const ORGANIZATION_HEAD_CLASS = 'hidden px-3 py-2 md:table-cell';
+
+/** The active number's heading is in full colour; the others show from md up. */
+export const valueHeadClass = (isActive: boolean) =>
+  `${RANK_HEAD_CLASS} ${isActive ? 'text-content' : 'hidden md:table-cell'}`;
