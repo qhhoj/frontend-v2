@@ -15,6 +15,7 @@ import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
+import SubmitDock from './SubmitDock.vue';
 import { useProblemQuery } from './problems.queries';
 
 const DEFAULT_TAB = 'statement';
@@ -120,6 +121,7 @@ watch(
             @gone="editorialGone = true"
           />
         </div>
+        <SubmitDock :problem="problem" />
       </template>
     </QueryState>
   </div>

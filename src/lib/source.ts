@@ -6,7 +6,7 @@ import { errorMessageKey } from '@/i18n/error-message';
 /** backend: libs/database MAX_SOURCE_LENGTH, counted in code points (`IsSourceLength`). */
 export const MAX_SOURCE_LENGTH = 65_536;
 /** A UTF-8 file of valid source is at most four bytes per code point. */
-const MAX_SOURCE_BYTES = MAX_SOURCE_LENGTH * 4;
+export const MAX_SOURCE_BYTES = MAX_SOURCE_LENGTH * 4;
 const SURROGATE_PAIR = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 
 export const codePointCount = (text: string) =>

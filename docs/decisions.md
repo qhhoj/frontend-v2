@@ -131,6 +131,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - PDF: the button prepares it in the page (poll the PDF URL no faster than every 3 s, 202 + Retry-After while rendering, B20), stops on 503 pdf_unavailable and 429, gives up after 120 s, then offers "Open PDF"; no percentage.
 - Editor coloured from the start: the --qh-syntax-* tokens of every theme, lazy language packs, plain text for languages without a pack.
 - Phone submit is a bottom sheet under 768 px; file-only languages submit a file (multipart, language id, B17); fileSizeLimit 0 means uploads off, as on the server.
+- Submit form state is split into one composable per concern (language, template, file, resubmit) behind `useSubmitForm`; the dock reports its height as `--dock-height` and starts expanded each page load (no storage).
 - Submission list: stats strip (B24), URL-synced filter rail, live updates over the public feed with a throttled refetch.
 - Contest context (B19) shows only the attempts left in the dock; no banner until 8d.
 - Dates from the API show as UTC calendar dates (the SPA does not know site.timeZone).

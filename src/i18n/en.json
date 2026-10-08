@@ -320,6 +320,33 @@
     "final_submission": "Final submission"
   },
   "submit": {
+    "title": "Submit",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "submitFile": "Submit file",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "language": "Language",
+    "source": "Source code",
+    "upload": "Upload file",
+    "fileOnly": "file upload",
+    "signIn": "Sign in to submit",
+    "templateRestored": "Template restored",
+    "limits": "{time} · {memory}",
+    "inContest": "Contest {key}",
+    "attemptsLeft": "{count} attempt left | {count} attempts left",
+    "attemptsNone": "No attempts left for this problem.",
+    "resubmitUnavailable": "The submission to resubmit could not be loaded.",
+    "file": {
+      "choose": "Choose a {extension} file",
+      "remove": "Remove file",
+      "uploadDisabled": "This language does not take file uploads.",
+      "wrongExtension": "The file must end in {extension}.",
+      "empty": "The file is empty.",
+      "tooLarge": "The file is too large (at most {size}).",
+      "notText": "This file is not text.",
+      "tooLong": "The source in the file is longer than {max} characters."
+    },
     "errors": {
       "problemGone": "This problem no longer exists.",
       "languageNotAllowed": "This language is not allowed for this problem.",
