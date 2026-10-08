@@ -15,7 +15,9 @@ const effectivePolicy = () => {
   return metas.at(-1)?.content ?? 'strict-origin-when-cross-origin';
 };
 
-afterEach(() => document.head.querySelectorAll('meta[name="referrer"]').forEach((meta) => meta.remove()));
+afterEach(() =>
+  document.head.querySelectorAll('meta[name="referrer"]').forEach((meta) => meta.remove()),
+);
 
 describe('useNoReferrer', () => {
   it('sends no referrer while mounted and returns to the default policy after', () => {
