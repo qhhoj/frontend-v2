@@ -1,30 +1,40 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { useId } from 'vue';
+import { computed, useId } from 'vue';
 
 /**
  * One confirm step for the destructive or irreversible choices, on the shared Dialog preset.
  * `confirm` only says the user chose it: the consumer closes the dialog (set `visible` false) once its request is done.
  * Busy blocks Cancel, Escape and the close button, and a second confirm, until the consumer clears it.
+ * `canConfirm` is false while a required input in the body (a code, a password) is still empty: the confirm button turns
+ * `aria-disabled` (focus is kept) and neither it nor Enter confirms.
+ * The body is a `<form>` and the confirm button (in the footer, outside it) submits it by id, so Enter in an input and a click
+ * each emit once. Focus returns to the element that opened it (PrimeVue restores it when the dialog hides).
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
  */
-const props = defineProps<{
-  title: string;
-  body?: string;
-  confirmLabel: string;
-  cancelLabel?: string;
-  tone?: 'neutral' | 'danger';
-  busy?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    body?: string;
+    confirmLabel: string;
+    cancelLabel?: string;
+    tone?: 'neutral' | 'danger';
+    busy?: boolean;
+    canConfirm?: boolean;
+  }>(),
+  { body: undefined, cancelLabel: undefined, tone: 'neutral', busy: false, canConfirm: true },
+);
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [] }>();
 const bodyId = useId();
+const cannotConfirm = computed(() => props.busy || !props.canConfirm);
 
 function cancel() {
   if (!props.busy) visible.value = false;
 }
+/** The form's submit (Enter, or the confirm button): the one place that emits. */
 function confirm() {
-  if (!props.busy) emit('confirm');
+  if (!cannotConfirm.value) emit('confirm');
 }
 </script>
 
@@ -36,13 +46,14 @@ function confirm() {
     :draggable="false"
     :closable="!busy"
     :close-on-escape="!busy"
+    :close-button-props="{ 'aria-label': $t('common.close') }"
     :aria-describedby="bodyId"
   >
-    <div :id="bodyId" class="flex flex-col gap-3">
+    <form :id="bodyId" class="flex flex-col gap-3" @submit.prevent="confirm">
       <p v-if="body" class="text-muted">{{ body }}</p>
       <slot />
       <slot name="error" />
-    </div>
+    </form>
     <template #footer>
       <button
         type="button"
@@ -53,15 +64,15 @@ function confirm() {
         {{ cancelLabel ?? $t('common.cancel') }}
       </button>
       <button
-        type="button"
-        :aria-disabled="busy || undefined"
+        type="submit"
+        :form="bodyId"
+        :aria-disabled="cannotConfirm || undefined"
         :aria-busy="busy || undefined"
         :class="
           tone === 'danger'
             ? 'min-h-11 rounded-pill border border-negative px-5 font-semibold text-negative aria-disabled:cursor-progress aria-disabled:bg-surface-hover aria-disabled:text-muted'
             : 'min-h-11 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text'
         "
-        @click="confirm"
       >
         {{ confirmLabel }}
       </button>

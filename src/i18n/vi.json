@@ -553,7 +553,8 @@
     "copy": "Sao chép",
     "copied": "Đã chép",
     "breadcrumb": "Đường dẫn",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "close": "Đóng"
   },
   "verdicts": {
     "AC": "Chấp nhận",

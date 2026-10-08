@@ -8,7 +8,7 @@ import { authErrorText, fieldErrorTexts, hiddenIssueTexts } from './auth-errors'
  * any other name has no input to sit under, so the summary line explains it (or says "invalid data").
  */
 export function useAuthAction(
-  formElement: Ref<HTMLElement | null>,
+  formElement: Ref<HTMLElement | null> = ref(null),
   visibleFields: readonly string[] = [],
 ) {
   const pending = ref(false);
@@ -36,6 +36,11 @@ export function useAuthAction(
   };
   const focusFirstInvalid = () =>
     formElement.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  /** Forget the failure and the dismissed fields: a reopened dialog starts clean. */
+  const reset = () => {
+    error.value = null;
+    dismissed.value = [];
+  };
 
   /** Runs one attempt; true when it succeeded. A second call while one is pending does nothing. */
   async function run(action: () => Promise<unknown>): Promise<boolean> {
@@ -56,5 +61,5 @@ export function useAuthAction(
     }
   }
 
-  return { pending, error, fieldErrors, summary, run, dismiss, focusFirstInvalid };
+  return { pending, error, fieldErrors, summary, run, dismiss, reset, focusFirstInvalid };
 }

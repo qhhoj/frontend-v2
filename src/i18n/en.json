@@ -553,7 +553,8 @@
     "copy": "Copy",
     "copied": "Copied",
     "breadcrumb": "Breadcrumb",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "verdicts": {
     "AC": "Accepted",

@@ -145,3 +145,26 @@ describe('useAuthAction', () => {
     expect(action.summary.value).toBeNull();
   });
 });
+
+describe('useAuthAction without a form, and reset', () => {
+  it('reset forgets the failure and the dismissed fields, so a reopened dialog starts clean', async () => {
+    const action = mountForm(['first']);
+    await action.run(rejected(validation(taken('first'))));
+    action.dismiss('first');
+    action.reset();
+    expect(action.error.value).toBeNull();
+    expect(action.fieldErrors.value).toEqual({});
+  });
+
+  it('needs no form element: a dialog or banner uses it for pending and the failure text only', async () => {
+    let action!: ReturnType<typeof useAuthAction>;
+    mountComponent({
+      setup() {
+        action = useAuthAction();
+        return () => null;
+      },
+    });
+    await expect(action.run(rejected(new ApiError('rate_limited', 429, 'x')))).resolves.toBe(false);
+    expect(action.summary.value).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
+  });
+});

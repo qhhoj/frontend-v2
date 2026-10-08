@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import type { VueWrapper } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
 import { mountComponent } from '@/test/mount';
 import ConfirmDialog from './ConfirmDialog.vue';
 
@@ -11,6 +12,11 @@ const buttonNamed = (name: string) =>
   )!;
 const pressEscape = () =>
   document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+const mountDialog = (props: Record<string, unknown>) =>
+  mountComponent(ConfirmDialog, { props }) as unknown as VueWrapper<{
+    visible: boolean;
+    canConfirm: boolean;
+  }>;
 
 describe('ConfirmDialog', () => {
   it('shows its title, body and labels', async () => {
@@ -87,5 +93,45 @@ describe('ConfirmDialog', () => {
     pressEscape();
     await flushPromises();
     expect(wrapper.emitted('update:visible')).toBeUndefined();
+  });
+});
+
+describe('ConfirmDialog with an input in its body', () => {
+  it('confirms once on Enter: the body is a form that the confirm button submits', async () => {
+    const wrapper = mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
+    await flushPromises();
+    dialog()
+      .querySelector('form')!
+      .dispatchEvent(new Event('submit', { cancelable: true }));
+    expect(wrapper.emitted('confirm')).toHaveLength(1);
+  });
+
+  it('cannot confirm while canConfirm is false: aria-disabled and no event, by button or by Enter', async () => {
+    const wrapper = mountDialog({ ...ASK, visible: true, canConfirm: false });
+    await flushPromises();
+    expect(buttonNamed('Rời kỳ thi').getAttribute('aria-disabled')).toBe('true');
+    buttonNamed('Rời kỳ thi').click();
+    dialog()
+      .querySelector('form')!
+      .dispatchEvent(new Event('submit', { cancelable: true }));
+    expect(wrapper.emitted('confirm')).toBeUndefined();
+    await wrapper.setProps({ canConfirm: true });
+    expect(buttonNamed('Rời kỳ thi').getAttribute('aria-disabled')).toBeNull();
+    buttonNamed('Rời kỳ thi').click();
+    await flushPromises();
+    expect(wrapper.emitted('confirm')).toHaveLength(1);
+  });
+
+  it('labels the close button and gives focus back to the element that opened it', async () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const wrapper = mountDialog({ ...ASK, visible: false });
+    await wrapper.setProps({ visible: true });
+    await flushPromises();
+    expect(dialog().querySelector('button[aria-label="Đóng"]')).not.toBeNull();
+    await wrapper.setProps({ visible: false });
+    await vi.waitFor(() => expect(document.activeElement).toBe(opener));
+    opener.remove();
   });
 });
