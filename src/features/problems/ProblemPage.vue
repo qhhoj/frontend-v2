@@ -37,16 +37,20 @@ const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route
 const tab = computed({
   get: () => tabs.value.find((candidate) => candidate.id === requestedTab.value)?.id ?? DEFAULT_TAB,
   set: (id: string) =>
-    void router.push({
+    void router.replace({
       query: { ...route.query, tab: id === DEFAULT_TAB ? undefined : id },
     }),
 });
 
 // An unknown or unavailable ?tab= (an editorial that does not exist) is dropped once the detail is known.
-watch(problem, (loaded) => {
-  if (loaded && requestedTab.value !== null && tab.value !== requestedTab.value)
-    void router.replace({ query: { ...route.query, tab: undefined } });
-});
+watch(
+  [problem, requestedTab],
+  ([loaded, requested]) => {
+    if (loaded && requested !== null && tab.value !== requested)
+      void router.replace({ query: { ...route.query, tab: undefined } });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -68,13 +72,16 @@ watch(problem, (loaded) => {
         <ProblemHeader :problem="problem"><template #actions /></ProblemHeader>
         <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
         <div
-          :id="`problem-panel-${tab}`"
+          v-for="panel in tabs"
+          :id="`problem-panel-${panel.id}`"
+          :key="panel.id"
           role="tabpanel"
-          :aria-labelledby="`problem-tab-${tab}`"
-          tabindex="0"
+          :aria-labelledby="`problem-tab-${panel.id}`"
+          :hidden="panel.id !== tab"
+          :tabindex="panel.id === tab ? 0 : undefined"
         >
           <GlassCard
-            v-if="tab === DEFAULT_TAB"
+            v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
             as="div"
             data-testid="statement-card"
             class="rounded-panel p-6 text-[15px] sm:p-8"

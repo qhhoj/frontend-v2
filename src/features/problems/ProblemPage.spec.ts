@@ -126,4 +126,32 @@ describe('problem page', () => {
     const { wrapper } = await openProblem();
     expect(wrapper.get('[data-testid="header-actions"]').text()).toBe('');
   });
+
+  it('changes tabs without adding history entries', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { wrapper, router } = await openProblem();
+    const push = vi.spyOn(router, 'push');
+    const tabs = () => wrapper.findAll('[role="tab"]');
+    await tabs()[0]!.trigger('keydown', { key: 'ArrowRight' });
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBe('editorial'));
+    await tabs()[1]!.trigger('click');
+    await tabs()[2]!.trigger('click');
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBe('submissions'));
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it('drops an unknown ?tab= at once, also when the detail is already cached', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { router } = await openProblem();
+    await router.replace('/problems/duongdi?tab=bogus');
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBeUndefined());
+  });
+
+  it('gives every tab a panel its aria-controls resolves to, with only the selected one shown', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { wrapper } = await openProblem();
+    for (const tab of wrapper.findAll('[role="tab"]'))
+      expect(wrapper.find(`#${tab.attributes('aria-controls')}`).exists()).toBe(true);
+    expect(wrapper.findAll('[role="tabpanel"]:not([hidden])')).toHaveLength(1);
+  });
 });

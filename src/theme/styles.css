@@ -259,11 +259,26 @@
   }
 }
 
-/* Copy bar above each sample block (use-copyable-blocks.ts). The padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */
+/* Sample blocks in a statement are one rounded box: the copy bar is its top edge, the pre its body. The bar's padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */
+.user-content.statement pre {
+  padding: 0.75rem 1rem;
+  background-color: var(--qh-surface-strong);
+  border: 1px solid var(--qh-line);
+  border-radius: var(--qh-radius-cell);
+}
 @utility copy-bar {
   display: flex;
   justify-content: flex-end;
-  padding: 4px 4px 0;
+  padding: 8px 8px 0;
+  background-color: var(--qh-surface-strong);
+  border: 1px solid var(--qh-line);
+  border-bottom: 0;
+  border-radius: var(--qh-radius-cell) var(--qh-radius-cell) 0 0;
+}
+.user-content.statement .copy-bar + pre {
+  margin-top: 0;
+  border-top: 0;
+  border-radius: 0 0 var(--qh-radius-cell) var(--qh-radius-cell);
 }
 
 /* The copy button itself. */
