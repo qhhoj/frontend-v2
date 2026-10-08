@@ -1,5 +1,6 @@
 // Relative type-only imports and no test helpers: the e2e tsconfig has no `@/` alias, and Playwright loads this file too.
 import type {
+  Announcement,
   ContestSettings,
   EditableContest,
   EditableContestProblem,
@@ -96,4 +97,13 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
 
 export const contestEditorRoutes = (contest: EditableContest = editableContest()) => ({
   [`GET /contests/${contest.key}`]: { body: { data: contest } },
+});
+
+export const announcement = (overrides: Partial<Announcement> = {}): Announcement => ({
+  id: 'a-1',
+  title: 'Làm rõ đề bài C',
+  description: 'Đồ thị…',
+  descriptionHtml: '<p>Đồ thị…</p>',
+  createdAt: '2026-10-08T08:02:00.000Z',
+  ...overrides,
 });

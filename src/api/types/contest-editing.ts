@@ -156,3 +156,12 @@ export interface ContestBody {
 
 /** backend: `UpdateContestDto` (PATCH): only the members that changed are sent. */
 export type ContestPatch = Partial<ContestBody>;
+
+/** backend: `AnnouncementResponse`. */
+export interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  descriptionHtml: string;
+  createdAt: string;
+}

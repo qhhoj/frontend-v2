@@ -172,5 +172,25 @@
     "moveUp": "Chuyển {code} lên",
     "moveDown": "Chuyển {code} xuống",
     "remove": "Bỏ {code} khỏi kỳ thi"
+  },
+  "announcements": {
+    "composeTitle": "Đăng thông báo",
+    "titleLabel": "Tiêu đề",
+    "titleHint": "Tối đa 100 ký tự.",
+    "bodyLabel": "Nội dung (Markdown)",
+    "pushOn": "Đã bật gửi qua kênh trực tiếp.",
+    "pushOff": "Chưa bật gửi qua kênh trực tiếp. Bật ở tab Thông tin chung.",
+    "post": "Đăng thông báo",
+    "posted": "Đã đăng.",
+    "justPosted": "Vừa đăng",
+    "resend": "Gửi lại",
+    "resent": "Đã gửi lại thông báo.",
+    "delete": "Xóa",
+    "deleteTitle": "Xóa thông báo “{title}”?",
+    "deleteBody": "Thí sinh không còn thấy thông báo này.",
+    "empty": "Chưa có thông báo nào.",
+    "pager": "{total} thông báo · trang {page} của {pages}",
+    "previous": "Trang trước",
+    "next": "Trang sau"
   }
 }
