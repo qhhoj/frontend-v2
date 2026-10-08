@@ -1,0 +1,99 @@
+import { useQueryClient } from '@tanstack/vue-query';
+import { flushPromises } from '@vue/test-utils';
+import { defineComponent, h } from 'vue';
+import { describe, expect, it, vi } from 'vitest';
+import type { ProfilePatch } from '@/api/types/profile';
+import { useThemeChoice } from '@/features/shell/use-theme-choice';
+import { useSessionStore } from '@/stores/session.store';
+import { profile, sessionUser, signedOut } from '@/test/fixtures';
+import { mockApi, ok } from '@/test/mock-api';
+import { mountComponent } from '@/test/mount';
+import { profileKey } from './profile.queries';
+import { useProfileSave } from './use-profile-save';
+
+const OCEAN = { accent: 'ocean', glass: 40, glow: 60 } as const;
+
+function mountSavers({ signedIn = true } = {}) {
+  const wrapper = mountComponent(
+    defineComponent({
+      setup: () => ({
+        saveProfile: useProfileSave(),
+        chooseTheme: useThemeChoice(),
+        queryClient: useQueryClient(),
+      }),
+      render: () => h('div'),
+    }),
+  );
+  if (signedIn) useSessionStore().$patch({ status: 'authenticated', user: sessionUser() });
+  return wrapper.vm as unknown as {
+    saveProfile: (patch: ProfilePatch) => Promise<void>;
+    chooseTheme: (preference: string) => Promise<void>;
+    queryClient: ReturnType<typeof useQueryClient>;
+  };
+}
+
+/** `PATCH /profile` answers held until the test releases them, in any order. */
+function holdPatches() {
+  const pending: Array<(data: unknown) => void> = [];
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      () =>
+        new Promise<Response>((resolve) =>
+          pending.push((data) =>
+            resolve(
+              new Response(JSON.stringify({ data }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+              }),
+            ),
+          ),
+        ),
+    ),
+  );
+  return pending;
+}
+
+describe('profile save', () => {
+  it('sends nothing for an anonymous visitor', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedOut });
+    const { saveProfile } = mountSavers({ signedIn: false });
+    await saveProfile({ siteTheme: 'clay-dark' });
+    expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
+  });
+
+  it('puts the answer in the profile cache', async () => {
+    mockApi({ 'PATCH /profile': ({ body }) => ok(profile(body as object)) });
+    const { saveProfile, queryClient } = mountSavers();
+    await saveProfile({ siteTheme: 'clay-dark' });
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toEqual(
+      profile({ siteTheme: 'clay-dark' }),
+    );
+  });
+
+  it('never lets an older answer overwrite a newer one, whichever saver sent it', async () => {
+    const answers = holdPatches();
+    const { saveProfile, chooseTheme, queryClient } = mountSavers();
+    const themeSave = chooseTheme('glass-dark');
+    const lookSave = saveProfile({ appearance: OCEAN });
+    await flushPromises(); // both requests are on the wire
+    expect(answers).toHaveLength(2);
+    answers[1]!(profile({ siteTheme: 'glass-dark', appearance: OCEAN }));
+    await lookSave;
+    // The theme answer arrives last, carrying the look as it was before: it must not undo the newer look.
+    answers[0]!(profile({ siteTheme: 'glass-dark', appearance: null }));
+    await themeSave;
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toEqual(
+      profile({ siteTheme: 'glass-dark', appearance: OCEAN }),
+    );
+  });
+
+  it('swallows a failed save and leaves the cache alone', async () => {
+    mockApi({
+      'PATCH /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
+    });
+    const { saveProfile, queryClient } = mountSavers();
+    await expect(saveProfile({ siteTheme: 'clay-dark' })).resolves.toBeUndefined();
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
+  });
+});

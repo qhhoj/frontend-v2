@@ -69,6 +69,7 @@ export const profile = (overrides: Partial<Profile> = {}): Profile => ({
   languageId: '0192a000-0000-7000-8000-00000000c017',
   aceTheme: 'auto',
   siteTheme: 'auto',
+  appearance: null,
   mathEngine: 'auto',
   ...overrides,
 });

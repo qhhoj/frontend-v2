@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import AppHeader from './AppHeader.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
@@ -7,6 +8,7 @@ import { useAccountThemeSync } from './use-account-theme';
 
 useAccountCacheSync();
 useAccountThemeSync();
+useAccountAppearanceSync();
 </script>
 
 <template>
