@@ -47,7 +47,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         </RouterLink>
       </h2>
       <UserContent :html="post.summaryHtml" class="line-clamp-3 min-h-18 text-muted" />
-      <footer class="flex min-h-5 flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+      <footer
+        class="flex min-h-11 flex-wrap sm:min-h-5 items-center gap-x-3 gap-y-1 text-sm text-muted"
+      >
         <UserName v-for="author in post.authors" :key="author.id" :username="author.username" />
         <time :datetime="post.publishOn">
           {{ formatNumericDate(post.publishOn, locale.locale) }}

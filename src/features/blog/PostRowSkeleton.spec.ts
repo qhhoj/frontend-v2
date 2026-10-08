@@ -35,9 +35,13 @@ describe('post row skeleton parity', () => {
     mockApi({ ...anonymousViewer });
     expect(loaded().get('h2').classes()).toContain('min-h-14');
     expect(loaded().get('.user-content, [class~="line-clamp-3"]').classes()).toContain('min-h-18');
-    expect(loaded().get('footer').classes()).toContain('min-h-5');
+    expect(loaded().get('footer').classes()).toEqual(
+      expect.arrayContaining(['min-h-11', 'sm:min-h-5']),
+    );
     expect(skeleton().get('[data-part="title"]').classes()).toContain('h-14');
     expect(skeleton().get('[data-part="summary"]').classes()).toContain('h-18');
-    expect(skeleton().get('[data-part="footer"]').classes()).toContain('h-5');
+    expect(skeleton().get('[data-part="footer"]').classes()).toEqual(
+      expect.arrayContaining(['min-h-11', 'sm:min-h-5']),
+    );
   });
 });

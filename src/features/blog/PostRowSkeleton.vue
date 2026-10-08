@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-// Same box as PostRow: the vote column is VoteControl's 116 px; the body is a 56 px title, a 72 px summary and a 20 px footer.
+// Same box as PostRow: the vote column is VoteControl's 116 px; the body is a 56 px title, a 72 px summary and a footer that is two 20 px lines on a phone (the meta wraps there) and one on wider screens.
 </script>
 
 <template>
@@ -19,7 +19,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
         <SkeletonBlock pill class="h-4 w-11/12" />
         <SkeletonBlock pill class="h-4 w-2/3" />
       </div>
-      <div data-part="footer" class="h-5">
+      <div data-part="footer" class="min-h-11 sm:min-h-5">
         <SkeletonBlock pill class="h-3.5 w-1/2" />
       </div>
     </div>
