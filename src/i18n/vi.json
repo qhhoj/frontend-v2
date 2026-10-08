@@ -119,7 +119,6 @@
       "pending": "Đang chấm",
       "attempted": "{count} lượt nộp",
       "solvedSummary": "Bạn đã giải {solved}/{total} bài",
-      "resultHidden": "Kết quả đang ẩn",
       "pointsShort": "{points} điểm",
       "afterStart": "Đề bài sẽ hiện khi kỳ thi bắt đầu và bạn vào thi.",
       "afterJoin": "Đề bài sẽ hiện ngay khi bạn vào thi.",

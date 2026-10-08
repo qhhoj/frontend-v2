@@ -392,20 +392,19 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     expect(pixelsOf(row.get('[data-testid="judging-bit"]').element)).toBe(pixelsOfKind('judging'));
   });
 
-  it('says the result is hidden, not untouched, when the board is closed to the viewer', async () => {
-    const hiddenBoard = contestDetail({
+  it('shows no own-result column when the backend sends no results (hidden board or no participation)', async () => {
+    const noResults = contestDetail({
       problems: [
         contestProblem(0, { solverCount: null, viewerResult: null }),
-        contestProblem(1, { solverCount: null, viewerResult: viewerResult() }),
+        contestProblem(1, { solverCount: null, viewerResult: null }),
       ],
     });
-    mockApi({ ...signedInViewer(), ...contestPageRoutes(hiddenBoard) });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(noResults) });
     const { wrapper } = await mountApp('/contests/r42');
-    const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
-    expect(rows[0]!.text()).toContain('Kết quả đang ẩn');
-    expect(rows[0]!.text()).not.toContain('Chưa nộp');
-    expect(rows[1]!.text()).toContain('Chưa nộp');
-    expect(rows[1]!.text()).not.toContain('Kết quả đang ẩn');
+    const table = wrapper.get('[data-testid="contest-problems"]');
+    expect(table.findAll('tbody tr')).toHaveLength(2);
+    expect(table.text()).not.toContain('Của bạn');
+    expect(table.text()).not.toContain('Chưa nộp');
   });
 
   it('draws a dash, never a zero, for a solver count the viewer may not see', async () => {

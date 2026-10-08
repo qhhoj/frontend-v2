@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { contestProblem, viewerResult } from '@/test/fixtures';
 import type { RankingContext } from '@/lib/ranking-cells';
-import { attemptsLeft, ownResultView, solvedSummary } from './own-result';
+import { attemptsLeftUnderCap, ownResultView, solvedSummary } from './own-result';
 
 const icpc: RankingContext = {
   formatName: 'icpc',
@@ -59,25 +59,13 @@ describe('own result', () => {
     });
   });
 
-  it('tells a hidden board apart from an untouched problem', () => {
-    expect(ownResultView(contestProblem(0), icpc)).toEqual({ kind: 'hidden' });
-    expect(ownResultView(contestProblem(0, { viewerResult: viewerResult() }), icpc)).toEqual({
-      kind: 'untouched',
-    });
+  it('reads a problem with no result entry as untouched', () => {
+    expect(ownResultView(contestProblem(0), icpc)).toEqual({ kind: 'untouched' });
   });
 
   it('knows the attempts left under a cap, never below zero', () => {
-    expect(
-      attemptsLeft(
-        contestProblem(0, { maxSubmissions: 20, viewerResult: viewerResult({ attempts: 3 }) }),
-      ),
-    ).toBe(17);
-    expect(
-      attemptsLeft(
-        contestProblem(0, { maxSubmissions: 2, viewerResult: viewerResult({ attempts: 5 }) }),
-      ),
-    ).toBe(0);
-    expect(attemptsLeft(contestProblem(0, { maxSubmissions: null }))).toBeNull();
+    expect(attemptsLeftUnderCap(20, 3)).toBe(17);
+    expect(attemptsLeftUnderCap(2, 5)).toBe(0);
   });
 
   it('sums the solved problems', () => {

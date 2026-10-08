@@ -118,7 +118,6 @@
       "pending": "Being judged",
       "attempted": "{count} submission | {count} submissions",
       "solvedSummary": "You solved {solved}/{total} problems",
-      "resultHidden": "Result hidden",
       "cap": "At most {count} submission | At most {count} submissions",
       "pointsShort": "{points} points",
       "afterStart": "The problems show when the contest starts and you enter.",

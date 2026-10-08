@@ -50,11 +50,5 @@ const cellLabel = computed(() => {
   <span v-else-if="view.kind === 'attempted'" class="text-[13px] whitespace-nowrap text-muted">
     {{ $t('contests.problems.attempted', { count: view.attempts }, view.attempts) }}
   </span>
-  <span v-else-if="view.kind === 'untouched'" class="text-[13px] text-muted">
-    {{ $t('ranking.cell.empty') }}
-  </span>
-  <span v-else class="text-muted">
-    <span aria-hidden="true">—</span>
-    <span class="sr-only">{{ $t('contests.problems.resultHidden') }}</span>
-  </span>
+  <span v-else class="text-[13px] text-muted">{{ $t('ranking.cell.empty') }}</span>
 </template>
