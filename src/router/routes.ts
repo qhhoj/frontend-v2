@@ -142,8 +142,8 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/account/password',
     name: 'account-password',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.changePassword', requiresAuth: true },
+    component: () => import('@/features/auth/ChangePasswordPage.vue'),
+    meta: { titleKey: 'pages.changePassword', requiresAuth: true, layout: 'auth' },
   },
   {
     path: '/settings/appearance',

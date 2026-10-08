@@ -71,6 +71,11 @@ let handleUnauthorized: (() => void) | null = null;
 /** The session store installs this: a protected request answered `unauthorized` means the session expired. */
 export const onUnauthorized = (handler: (() => void) | null) => void (handleUnauthorized = handler);
 
+let handleGate: (() => void) | null = null;
+/** The router installs this: a request answered `two_factor_required` or `password_change_required` means the session needs a step this page did not know about. */
+export const onGateRequired = (handler: (() => void) | null) => void (handleGate = handler);
+const GATE_CODES = ['two_factor_required', 'password_change_required'];
+
 /** Repeated keys for arrays (`typeIds=a&typeIds=b`, never `typeIds[]`); null, undefined and '' are left out. */
 export function buildUrl(path: string, query: Record<string, QueryValue> = {}): string {
   const params = new URLSearchParams();
@@ -143,6 +148,7 @@ async function request(
     return request(path, options, true);
   }
   if (error.code === 'unauthorized' && path !== '/auth/me') handleUnauthorized?.();
+  if (GATE_CODES.includes(error.code)) handleGate?.();
   throw error;
 }
 

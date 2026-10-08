@@ -79,6 +79,7 @@ describe('navigation guards', () => {
   it('forces a password change when the password is pwned', async () => {
     const { route } = await navigate('/problems', signedIn({ passwordChangeRequired: true }));
     expect(route.name).toBe('account-password');
+    expect(route.query.redirect).toBe('/problems');
   });
 
   it('shows not-found to non-staff on admin routes and keeps the URL', async () => {

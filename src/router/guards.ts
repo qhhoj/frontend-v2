@@ -5,9 +5,9 @@ import { safeRedirect } from './safe-redirect';
 type SessionStore = ReturnType<typeof useSessionStore>;
 
 /**
- * Only page navigations are routed here. API-level gates (`csrf_failed`, `two_factor_required`,
- * `password_change_required` answered to a request) are not turned into redirects; that is sub-project 8b.
- * `redirect` is always an in-app path (`safeRedirect`), never a URL typed into the query.
+ * `redirect` is always an in-app path (`safeRedirect`), never a URL typed into the query. API-level gates
+ * (`two_factor_required`, `password_change_required` answered to a request) re-run these rules through
+ * `onGateRequired` (`router/index.ts`).
  */
 const withRedirect = (to: RouteLocationNormalized) => ({ redirect: safeRedirect(to.fullPath) });
 const toLogin = (to: RouteLocationNormalized): RouteLocationRaw => ({
@@ -56,7 +56,7 @@ export async function resolveNavigation(
       ? safeRedirect(to.query.redirect)
       : { name: 'login', query: loginQuery(to.query.redirect) };
   if (session.passwordChangeRequired && to.name !== 'account-password')
-    return { name: 'account-password' };
+    return { name: 'account-password', query: loginQuery(to.fullPath) };
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
   if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
   if (to.meta.staffOnly && !session.isStaff) return notFound(to);

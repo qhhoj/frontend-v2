@@ -221,6 +221,15 @@
     "newPassword": "Mật khẩu mới",
     "confirmPassword": "Nhập lại mật khẩu",
     "passwordMismatch": "Hai mật khẩu chưa khớp",
+    "changePassword": {
+      "title": "Đổi mật khẩu",
+      "titleForced": "Đổi mật khẩu để tiếp tục",
+      "lead": "Mọi thiết bị khác sẽ bị đăng xuất.",
+      "breached": "Mật khẩu của bạn xuất hiện trong một vụ rò rỉ dữ liệu công khai. Để bảo vệ tài khoản {username}, hãy đặt mật khẩu mới trước khi tiếp tục.",
+      "currentPassword": "Mật khẩu hiện tại",
+      "confirmNew": "Nhập lại mật khẩu mới",
+      "submit": "Đổi mật khẩu"
+    },
     "strength": {
       "label": "Độ mạnh mật khẩu",
       "level": {

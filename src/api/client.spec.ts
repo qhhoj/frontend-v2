@@ -6,6 +6,7 @@ import {
   apiRequest,
   buildUrl,
   onCsrfFailed,
+  onGateRequired,
   onUnauthorized,
   setCsrfToken,
 } from './client';
@@ -15,6 +16,7 @@ describe('api client', () => {
     setCsrfToken(null);
     onCsrfFailed(null);
     onUnauthorized(null);
+    onGateRequired(null);
   });
 
   it('unwraps a single value and sends same-origin JSON requests', async () => {
@@ -222,6 +224,25 @@ describe('api client', () => {
     });
     const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
     expect(error).toMatchObject({ code: 'validation_failed', fields: {}, issues: [], extra: {} });
+  });
+
+  it.each(['two_factor_required', 'password_change_required'])(
+    'tells the gate hook about %s and still throws it',
+    async (code) => {
+      mockApi({ 'POST /x': fail(403, code) });
+      const hook = vi.fn();
+      onGateRequired(hook);
+      await expect(apiRequest('/x', { method: 'POST' })).rejects.toMatchObject({ code });
+      expect(hook).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('does not call the gate hook for other refusals', async () => {
+    mockApi({ 'POST /x': fail(403, 'forbidden') });
+    const hook = vi.fn();
+    onGateRequired(hook);
+    await apiRequest('/x', { method: 'POST' }).catch(() => undefined);
+    expect(hook).not.toHaveBeenCalled();
   });
 });
 

@@ -6,6 +6,7 @@ import type {
   RouterHistory,
   RouterScrollBehavior,
 } from 'vue-router';
+import { onGateRequired } from '@/api/client';
 import { i18n, translate } from '@/i18n';
 import { useLoadingStore } from '@/stores/loading.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -55,6 +56,17 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
     if (!failure && isNewPage(to, from)) focusMain();
   });
   router.afterEach(titleDocument);
+  /**
+   * A request refused with a gate (another tab signed in as an account that needs a second factor): reload the
+   * session and apply the navigation rules to where the viewer is, as a navigation there would.
+   */
+  const syncToGate = async () => {
+    const session = useSessionStore();
+    await session.refresh().catch(() => undefined);
+    const target = await resolveNavigation(router.currentRoute.value, session);
+    if (target !== true) await router.replace(target);
+  };
+  onGateRequired(() => void syncToGate());
   watch([() => i18n.global.locale.value, pageTitle], titleDocument);
   return router;
 }
