@@ -329,6 +329,7 @@
     "language": "Language",
     "source": "Source code",
     "upload": "Upload file",
+    "fileHelp": "This language is submitted as a {extension} file, not pasted source.",
     "fileOnly": "file upload",
     "signIn": "Sign in to submit",
     "overLimit": "Over the {max} character limit",
@@ -339,6 +340,7 @@
     "attemptsNone": "No attempts left for this problem.",
     "resubmitUnavailable": "The submission to resubmit could not be loaded.",
     "file": {
+      "limit": "Up to {size}",
       "choose": "Choose a {extension} file",
       "remove": "Remove file",
       "uploadDisabled": "This language does not take file uploads.",

@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronUp, LogIn } from 'lucide-vue-next';
+import { ChevronDown, ChevronUp } from 'lucide-vue-next';
 import { computed, ref, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
 import SubmitForm from './SubmitForm.vue';
+import SubmitSheet from './SubmitSheet.vue';
+import SubmitSignInLink from './SubmitSignInLink.vue';
 import { useDockHeight } from './use-dock-height';
 import { useSubmitForm } from './use-submit-form';
 
+/** The phone gets a bottom sheet, anything wider the pinned dock; both share one form state. */
 const BODY_ID = 'submit-dock-body';
 const props = defineProps<{ problem: ProblemDetail }>();
+const isPhone = useMediaQuery(PHONE_QUERY);
 const route = useRoute();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
@@ -30,21 +35,29 @@ const signInTarget = computed(() => ({
 </script>
 
 <template>
+  <SubmitSheet
+    v-if="isPhone"
+    :problem="problem"
+    :form="form"
+    :is-signed-in="isSignedIn"
+    :sign-in-target="signInTarget"
+  />
   <section
+    v-else
     ref="dock"
     :aria-label="$t('submit.title')"
     class="fixed inset-x-0 bottom-0 z-30 border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
   >
     <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-3">
-      <RouterLink
-        v-if="!isSignedIn"
-        :to="signInTarget"
-        class="flex h-11 items-center justify-center gap-2 font-display font-semibold text-accent"
+      <SubmitSignInLink v-if="!isSignedIn" :to="signInTarget" />
+      <SubmitForm
+        v-else
+        :id="BODY_ID"
+        :problem="problem"
+        :form="form"
+        layout="dock"
+        :collapsed="isCollapsed"
       >
-        <LogIn class="size-5" aria-hidden="true" />
-        {{ $t('submit.signIn') }}
-      </RouterLink>
-      <SubmitForm v-else :id="BODY_ID" :problem="problem" :form="form" :collapsed="isCollapsed">
         <template #actions>
           <button
             type="button"

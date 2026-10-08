@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { FileUp, Upload, X } from 'lucide-vue-next';
-import Select from 'primevue/select';
 import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
 import { formatMemoryLimit, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
+import FileDropzone from './FileDropzone.vue';
+import LanguagePicker from './LanguagePicker.vue';
+import SourceUploadButton from './SourceUploadButton.vue';
 import type { useSubmitForm } from './use-submit-form';
 
 const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
-  /** The editor, counter and upload are hidden; the language, the contest line, the error and submit stay. */
+  /** `dock` is the desktop strip (a wrapping row); `sheet` the phone's column that fills the sheet's height. */
+  layout: 'dock' | 'sheet';
+  /** Dock only: the editor, counter and upload are hidden; the language, the contest line, the error and submit stay. */
   collapsed?: boolean;
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
-const uploadInputId = useId();
-const fileInputId = useId();
 const errorId = useId();
 /** Ties the error line to the control the viewer is working in. */
 const errorReference = computed(() => (state.errorText ? errorId : undefined));
@@ -25,53 +26,49 @@ const submitLabelKey = computed(() => {
   if (state.submitting) return 'submit.submitting';
   return state.fileMode ? 'submit.submitFile' : 'submit.submit';
 });
-const EDITOR_MIN_LINES = 8;
 
-/** The same file picked twice must fire `change` again, so the input is emptied after each read. */
-function takePickedFile(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const [file] = input.files ?? [];
-  input.value = '';
-  return file;
-}
-function onSourceFilePicked(event: Event) {
-  const file = takePickedFile(event);
-  if (file) void state.loadFile(file);
-}
-function onUploadFilePicked(event: Event) {
-  const file = takePickedFile(event);
-  if (file) state.chooseFile(file);
-}
+/** Everything that differs between the two layouts, so the template reads the same for both. */
+const LAYOUTS = {
+  dock: {
+    form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
+    languageRow: '',
+    body: 'basis-full',
+    editor: 'max-h-[45dvh] overflow-auto rounded-tile',
+    editorMinLines: 8,
+    counterRow: 'flex-1',
+    submit: 'h-11 px-6',
+  },
+  sheet: {
+    form: 'flex min-h-0 flex-1 flex-col gap-3',
+    languageRow: 'w-full',
+    body: 'flex min-h-0 flex-1 flex-col',
+    editor: 'min-h-0 flex-1 overflow-auto rounded-tile',
+    editorMinLines: 6,
+    counterRow: 'justify-between',
+    submit: 'h-14 w-full',
+  },
+} as const;
+const classes = computed(() => LAYOUTS[props.layout]);
+const isSheet = computed(() => props.layout === 'sheet');
+const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
 </script>
 
 <template>
-  <form class="flex flex-wrap items-center gap-x-3 gap-y-2" @submit.prevent="state.submitNow()">
-    <Select
-      :model-value="state.languageId"
-      :options="problem.allowedLanguages"
-      option-label="name"
-      option-value="id"
-      :aria-label="$t('submit.language')"
-      class="order-1 min-w-44"
-      @update:model-value="state.setLanguage"
-    >
-      <template #value>
-        {{ state.language?.name }}
-        <span
-          v-if="state.fileMode"
-          class="ml-2 rounded-pill bg-surface-strong px-2 text-xs text-muted"
-          >{{ $t('submit.fileOnly') }}</span
-        >
-      </template>
-      <template #option="{ option }">
-        {{ option.name }}
-        <span
-          v-if="option.fileOnly"
-          class="ml-2 rounded-pill bg-surface-strong px-2 text-xs text-muted"
-          >{{ $t('submit.fileOnly') }}</span
-        >
-      </template>
-    </Select>
+  <form :class="classes.form" @submit.prevent="state.submitNow()">
+    <div class="order-1 flex items-center gap-2" :class="classes.languageRow">
+      <LanguagePicker
+        :languages="problem.allowedLanguages"
+        :selected-id="state.languageId"
+        :selected="state.language"
+        :is-sheet="isSheet"
+        @pick="state.setLanguage"
+      />
+      <SourceUploadButton
+        v-if="isSheet && hasSourceUpload"
+        icon-only
+        @pick="(file) => state.loadFile(file)"
+      />
+    </div>
     <span v-if="state.languageLimits" class="order-2 text-sm text-muted">{{
       $t('submit.limits', {
         time: formatTimeLimit(state.languageLimits.timeLimit),
@@ -93,75 +90,44 @@ function onUploadFilePicked(event: Event) {
         }}</span>
       </template>
     </p>
-    <template v-if="!state.fileMode && !collapsed">
-      <input :id="uploadInputId" type="file" class="peer sr-only" @change="onSourceFilePicked" />
-      <label
-        :for="uploadInputId"
-        class="order-3 inline-flex h-11 cursor-pointer items-center gap-2 rounded-pill border border-line bg-surface px-4 text-sm hover:bg-surface-hover peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
-      >
-        <Upload class="size-4" aria-hidden="true" />
-        {{ $t('submit.upload') }}
-      </label>
-    </template>
-    <div :class="collapsed ? 'order-5' : 'order-4 ml-auto'">
+    <SourceUploadButton
+      v-if="!isSheet && hasSourceUpload"
+      :icon-only="false"
+      class="order-3"
+      @pick="(file) => state.loadFile(file)"
+    />
+    <div v-if="$slots.actions" :class="collapsed ? 'order-5' : 'order-4 ml-auto'">
       <slot name="actions" />
     </div>
 
-    <div v-show="!collapsed" class="order-6 min-w-0 basis-full">
+    <div v-show="!collapsed" class="order-6 min-w-0" :class="classes.body">
       <div
         v-if="!state.fileMode"
         role="group"
         :aria-label="$t('submit.source')"
         :aria-describedby="errorReference"
-        class="max-h-[45dvh] overflow-auto rounded-tile"
+        :class="classes.editor"
       >
         <CodeEditor
           v-model="state.source"
           :label="$t('submit.source')"
           :language="state.language?.ace ?? null"
-          :min-lines="EDITOR_MIN_LINES"
+          :min-lines="classes.editorMinLines"
+          class="min-h-full"
         />
       </div>
-      <div v-else class="flex flex-col gap-2">
-        <p
-          v-if="state.uploadsOff"
-          class="rounded-tile border border-dashed border-line p-4 text-sm text-muted"
-        >
-          {{ $t('submit.file.uploadDisabled') }}
+      <div v-else-if="state.language" class="flex flex-col gap-2">
+        <p v-if="!state.uploadsOff" class="text-sm text-muted">
+          {{ $t('submit.fileHelp', { extension: acceptedExtension(state.language) }) }}
         </p>
-        <template v-else>
-          <input
-            :id="fileInputId"
-            type="file"
-            :accept="acceptedExtension(state.language!)"
-            :aria-describedby="errorReference"
-            class="peer sr-only"
-            @change="onUploadFilePicked"
-          />
-          <label
-            :for="fileInputId"
-            class="flex h-24 cursor-pointer items-center justify-center gap-2 rounded-tile border border-dashed border-line-accent bg-accent-soft text-sm text-accent-soft-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
-          >
-            <FileUp class="size-5" aria-hidden="true" />
-            {{ $t('submit.file.choose', { extension: acceptedExtension(state.language!) }) }}
-          </label>
-        </template>
-        <div
-          v-if="state.chosenFile"
-          class="flex items-center gap-2 rounded-tile bg-surface-strong px-3 py-1 text-sm"
-        >
-          <span class="min-w-0 flex-1 truncate" :title="state.chosenFile.name">{{
-            state.chosenFile.name
-          }}</span>
-          <button
-            type="button"
-            :aria-label="$t('submit.file.remove')"
-            class="flex size-11 shrink-0 items-center justify-center rounded-pill text-muted hover:bg-surface-hover"
-            @click="state.clearFile()"
-          >
-            <X class="size-4" aria-hidden="true" />
-          </button>
-        </div>
+        <FileDropzone
+          :language="state.language"
+          :file="state.chosenFile"
+          :disabled="state.uploadsOff"
+          :described-by="errorReference"
+          @choose="state.chooseFile"
+          @remove="state.clearFile()"
+        />
       </div>
     </div>
     <p
@@ -176,7 +142,12 @@ function onUploadFilePicked(event: Event) {
       {{ $t('submit.resubmitUnavailable') }}
     </p>
 
-    <div v-show="!collapsed" class="order-8 flex min-w-0 flex-1 items-center gap-3 text-sm">
+    <div
+      v-if="!isSheet || !state.fileMode"
+      v-show="!collapsed"
+      class="order-8 flex min-w-0 items-center gap-3 text-sm"
+      :class="classes.counterRow"
+    >
       <template v-if="!state.fileMode">
         <span
           class="font-mono"
@@ -195,8 +166,8 @@ function onUploadFilePicked(event: Event) {
     <button
       type="submit"
       :aria-disabled="!state.canSubmit"
-      class="bg-gradient-accent h-11 shrink-0 rounded-pill px-6 font-display font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
-      :class="collapsed ? 'order-4 ml-auto' : 'order-9'"
+      class="bg-gradient-accent shrink-0 rounded-pill font-display font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+      :class="[classes.submit, collapsed ? 'order-4 ml-auto' : 'order-9']"
     >
       {{ $t(submitLabelKey) }}
     </button>

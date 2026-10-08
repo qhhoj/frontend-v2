@@ -329,6 +329,7 @@
     "language": "Ngôn ngữ",
     "source": "Mã nguồn",
     "upload": "Tải tệp lên",
+    "fileHelp": "Ngôn ngữ này nộp bằng tệp {extension}, không dán mã nguồn.",
     "fileOnly": "tải tệp",
     "signIn": "Đăng nhập để nộp bài",
     "overLimit": "Vượt quá giới hạn {max} ký tự",
@@ -339,6 +340,7 @@
     "attemptsNone": "Đã hết lượt nộp cho bài này.",
     "resubmitUnavailable": "Không lấy được bài nộp để nộp lại.",
     "file": {
+      "limit": "Tối đa {size}",
       "choose": "Chọn tệp {extension}",
       "remove": "Bỏ tệp",
       "uploadDisabled": "Ngôn ngữ này không nhận tệp tải lên.",
