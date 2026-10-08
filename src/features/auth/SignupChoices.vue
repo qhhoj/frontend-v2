@@ -13,22 +13,26 @@ withDefaults(defineProps<{ errors?: { organizationId?: string; languageId?: stri
   errors: () => ({}),
 });
 const organizationId = defineModel<string>('organizationId', { required: true });
-const languageId = defineModel<string>('languageId', { required: true });
+/** `undefined` until the parent sets it: only then does the C++17 default apply, so a remount keeps the viewer's choice. */
+const languageId = defineModel<string | undefined>('languageId');
+/** The select always holds a string; `undefined` shows as "Chưa chọn" until the default lands. */
+const languageIdValue = computed({
+  get: () => languageId.value ?? '',
+  set: (value: string) => (languageId.value = value),
+});
 const schools = useOpenOrganizationsQuery();
 const meta = useProblemMetaQuery();
 /** A file-only language (output only) cannot be somebody's default; the problem list's own filter applies too. */
 const isSignupLanguage = (language: Language) => language.includeInProblem && !language.fileOnly;
 const languages = computed(() => meta.data.value?.languages.filter(isSignupLanguage) ?? []);
 
-/** Starts at C++17 once, when the languages first load. Later the viewer's choice (even "Chưa chọn") stays. */
-let defaultApplied = false;
+/** Once the languages load, a parent that never set the language starts at C++17. */
 watch(
   languages,
   (list) => {
-    if (defaultApplied || list.length === 0) return;
-    defaultApplied = true;
+    if (languageId.value !== undefined || list.length === 0) return;
     const defaultId = defaultLanguageId(list);
-    if (languageId.value === '' && defaultId !== '') languageId.value = defaultId;
+    if (defaultId !== '') languageId.value = defaultId;
   },
   { immediate: true },
 );
@@ -60,7 +64,7 @@ watch(
       <template #skeleton><PickerSkeleton /></template>
       <AuthSelect
         v-if="languages.length"
-        v-model="languageId"
+        v-model="languageIdValue"
         name="languageId"
         :label="$t('auth.signup.language')"
         :placeholder="$t('auth.signup.none')"

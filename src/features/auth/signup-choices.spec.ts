@@ -31,7 +31,6 @@ function mountChoices(props: Record<string, unknown> = {}) {
   const wrapper = mountComponent(SignupChoices, {
     props: {
       organizationId: '',
-      languageId: '',
       'onUpdate:organizationId': (value: string) => setProps({ organizationId: value }),
       'onUpdate:languageId': (value: string) => setProps({ languageId: value }),
       ...props,
@@ -97,6 +96,14 @@ describe('SignupChoices', () => {
     const wrapper = await mountLoaded();
     expect(languageValue(wrapper)).toBe('');
     expect(wrapper.emitted('update:languageId')).toBeUndefined();
+  });
+
+  it('does not apply C++17 again after the viewer chose "Chưa chọn" and the picker remounts', async () => {
+    mockRegisterApi();
+    // The parent keeps '' once the viewer chose "Chưa chọn"; a fresh mount must not start over at C++17.
+    const remounted = await mountLoaded({ languageId: '' });
+    expect(languageValue(remounted)).toBe('');
+    expect(remounted.emitted('update:languageId')).toBeUndefined();
   });
 
   it('keeps a language the viewer already chose instead of the C++17 default', async () => {

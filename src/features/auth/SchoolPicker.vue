@@ -3,14 +3,16 @@ import { ChevronDown, CircleAlert, Search } from 'lucide-vue-next';
 import Select from 'primevue/select';
 import { computed, useId } from 'vue';
 import type { OrganizationListItem } from '@/api/types/organizations';
+import { translate } from '@/i18n';
 
 /**
  * The school type-to-search combobox ("Gõ để tìm trường"): PrimeVue `Select` with `filter`, framed like `AuthField`.
  * The combobox is labelled by the label's id; `show-clear` takes a choice back (`''`).
  */
-const props = withDefaults(defineProps<{ schools: OrganizationListItem[]; error?: string }>(), {
-  error: undefined,
-});
+const props = withDefaults(
+  defineProps<{ schools: OrganizationListItem[]; error?: string; optional?: boolean }>(),
+  { error: undefined, optional: true },
+);
 const model = defineModel<string>({ required: true });
 const labelId = useId();
 const errorId = `${labelId}-error`;
@@ -23,8 +25,12 @@ const passThrough = computed(() => ({
     ],
   },
   label: {
-    class: 'flex-1 truncate py-2 focus-visible:outline-none',
+    // The empty state is the placeholder: muted, so it does not read as a chosen school.
+    class: 'flex-1 truncate py-2 focus-visible:outline-none data-[p~=placeholder]:text-muted',
     'aria-describedby': props.error ? errorId : undefined,
+  },
+  pcFilter: {
+    root: { 'aria-label': translate('auth.signup.schoolFilter') },
   },
 }));
 </script>
@@ -33,7 +39,9 @@ const passThrough = computed(() => ({
   <div data-auth-select data-testid="school-picker" class="flex flex-col gap-1.5">
     <span :id="labelId" class="text-sm font-semibold text-content"
       >{{ $t('auth.signup.school') }}
-      <span class="font-normal text-muted">{{ $t('auth.signup.optional') }}</span></span
+      <span v-if="optional" class="font-normal text-muted">{{
+        $t('auth.signup.optional')
+      }}</span></span
     >
     <div class="relative">
       <Search
@@ -55,6 +63,8 @@ const passThrough = computed(() => ({
         :pt="passThrough"
         @update:model-value="(value: string | null) => (model = value ?? '')"
       >
+        <!-- The overlay's filter already sits beside the search glyph above; PrimeVue's own magnifier would be a second one. -->
+        <template #filtericon><span hidden /></template>
         <template #dropdownicon>
           <ChevronDown class="size-[18px]" aria-hidden="true" />
         </template>

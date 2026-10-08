@@ -175,6 +175,7 @@
       "optional": "(optional)",
       "schoolSearch": "Type to find a school",
       "schoolNone": "No school found",
+      "schoolFilter": "Find a school",
       "none": "Not chosen"
     },
     "issues": {

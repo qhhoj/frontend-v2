@@ -1,9 +1,12 @@
 import type { Language } from '@/api/types/problems';
 
-/** The optional ids of a signup; `''` means "not chosen", and the backend must not see it (UUID validation). */
+/**
+ * The optional ids of a signup. `''` means "chosen as none" ("Chưa chọn"); `undefined` means the parent never set it.
+ * The backend must not see either (UUID validation), so only real ids are sent.
+ */
 export interface SignupChoiceIds {
-  organizationId: string;
-  languageId: string;
+  organizationId?: string;
+  languageId?: string;
 }
 
 /** The language a new account starts with (ruling 2026-10-08). */

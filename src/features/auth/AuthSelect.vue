@@ -2,11 +2,18 @@
 import { ChevronDown, CircleAlert } from 'lucide-vue-next';
 import { useId } from 'vue';
 
-/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages). Extra attributes go to the select. */
+/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages). `optional` adds "(tuỳ chọn)" to the label. Extra attributes go to the select. */
 defineOptions({ inheritAttrs: false });
-withDefaults(defineProps<{ label: string; name: string; placeholder: string; error?: string }>(), {
-  error: undefined,
-});
+withDefaults(
+  defineProps<{
+    label: string;
+    name: string;
+    placeholder: string;
+    error?: string;
+    optional?: boolean;
+  }>(),
+  { error: undefined, optional: true },
+);
 const model = defineModel<string>({ required: true });
 const selectId = useId();
 const errorId = `${selectId}-error`;
@@ -16,7 +23,9 @@ const errorId = `${selectId}-error`;
   <div data-auth-select class="flex flex-col gap-1.5">
     <label :for="selectId" class="text-sm font-semibold text-content"
       >{{ label }}
-      <span class="font-normal text-muted">{{ $t('auth.signup.optional') }}</span></label
+      <span v-if="optional" class="font-normal text-muted">{{
+        $t('auth.signup.optional')
+      }}</span></label
     >
     <span class="relative block">
       <select
