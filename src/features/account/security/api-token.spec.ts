@@ -82,13 +82,13 @@ describe('Settings › Security › sign out everywhere', () => {
     expect(calls.some((call) => call.path === '/auth/logout-all')).toBe(false);
   });
 
-  it('is not offered while viewing as another user', async () => {
+  it('is locked, not clickable, while viewing as another user', async () => {
     const calls = mockApi({
       ...settingsRoutes({ impersonatorId: 'staff-1' }),
       'POST /auth/logout-all': noContent(),
     });
     const { wrapper } = await mountApp('/settings/security');
-    expect(pageButton(wrapper, 'Đăng xuất mọi nơi')).toBeUndefined();
+    expect(pageButton(wrapper, 'Đăng xuất mọi nơi').attributes('disabled')).toBeDefined();
     expect(calls.some((call) => call.path === '/auth/logout-all')).toBe(false);
   });
 });

@@ -432,6 +432,13 @@
       "confirmTitle": "Đăng xuất mọi nơi?",
       "confirmBody": "Tất cả phiên đăng nhập, kể cả trên thiết bị này, sẽ kết thúc ngay. Bạn sẽ được đưa về trang đăng nhập."
     },
+    "locked": {
+      "title": "Bảo mật",
+      "lead": "Với quyền xem dưới tên người khác, các thao tác nhạy cảm bị khoá.",
+      "notice": "Đổi mật khẩu, 2FA, khoá bảo mật, API token và đăng xuất mọi nơi chỉ chủ tài khoản thực hiện được. Bấm “Dừng xem” để trở lại tài khoản của bạn.",
+      "reason": "Không dùng được khi đang xem dưới tên người khác.",
+      "logoutAllReason": "Không dùng được khi đang xem dưới tên người khác: thao tác này sẽ đăng xuất chủ tài khoản khỏi mọi thiết bị."
+    },
     "twoFactor": {
       "title": "Xác thực hai bước",
       "lead": "Khi đăng nhập, ngoài mật khẩu bạn cần thêm một mã hoặc khoá bảo mật.",

@@ -432,6 +432,13 @@
       "confirmTitle": "Sign out everywhere?",
       "confirmBody": "Every session, this device included, ends now. You will be taken to the sign-in page."
     },
+    "locked": {
+      "title": "Security",
+      "lead": "While viewing as another user, sensitive actions are locked.",
+      "notice": "Only the account owner can change the password, 2FA, security keys and the API token, or sign out everywhere. Press “Stop viewing” to return to your account.",
+      "reason": "Not available while viewing as another user.",
+      "logoutAllReason": "Not available while viewing as another user: it would sign the account owner out on every device."
+    },
     "twoFactor": {
       "title": "Two-step verification",
       "lead": "Signing in asks for a code or a security key besides the password.",
