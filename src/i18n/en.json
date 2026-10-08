@@ -1117,6 +1117,57 @@
     "title": "Rating chart"
   },
   "profile": {
+    "own": "Your profile",
+    "edit": "Edit profile",
+    "write": "Write a post",
+    "joined": "{name} · Joined {date}",
+    "rating": "Rating",
+    "ratingSummary": "Highest {max} · lowest {min} · {count} contests",
+    "tabs": {
+      "overview": "Overview",
+      "solved": "Solved",
+      "pp": "Performance points",
+      "blog": "Posts",
+      "comments": "Comments"
+    },
+    "chartLead": "{count} contests · updated after every rated contest",
+    "activityTitle": "Activity",
+    "unratedTitle": "No rated contest yet",
+    "unratedBody": "Rating and the chart appear after the first rated contest.",
+    "upcoming": "See upcoming contests",
+    "recent": "Recent contests",
+    "columns": {
+      "contest": "Contest",
+      "rank": "Rank",
+      "performance": "Performance",
+      "rating": "Rating",
+      "delta": "Change"
+    },
+    "rankLine": "Rank {rank}",
+    "stats": "Statistics",
+    "ppRank": "PP rank",
+    "ppRankHint": "among active users",
+    "ratingRank": "Rating rank",
+    "ratingRankHint": "rated users only",
+    "pp": "Performance points",
+    "points": "Points",
+    "solved": "Solved",
+    "contribution": "Contribution",
+    "contributionHint": "contribution points",
+    "about": "About",
+    "organizations": "Organizations",
+    "notFoundTitle": "User not found",
+    "notFoundBody": "No user “{username}”, or the account was banned.",
+    "toLeaderboard": "Back to the leaderboard",
+    "ban": {
+      "open": "Ban user",
+      "title": "Ban {username}?",
+      "body": "The account will not be able to sign in and leaves the leaderboards. The reason is required and kept.",
+      "reason": "Reason (up to 4096 characters)",
+      "submit": "Ban",
+      "done": "{username} is banned",
+      "doneBody": "The account can no longer sign in and left the leaderboards."
+    },
     "title": "Profile"
   },
   "profileTabs": {

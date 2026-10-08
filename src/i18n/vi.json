@@ -1117,6 +1117,57 @@
     "title": "Biểu đồ rating"
   },
   "profile": {
+    "own": "Hồ sơ của bạn",
+    "edit": "Chỉnh sửa hồ sơ",
+    "write": "Viết bài",
+    "joined": "{name} · Tham gia {date}",
+    "rating": "Rating",
+    "ratingSummary": "Cao nhất {max} · thấp nhất {min} · {count} kỳ thi",
+    "tabs": {
+      "overview": "Tổng quan",
+      "solved": "Bài đã giải",
+      "pp": "Điểm PP",
+      "blog": "Bài viết",
+      "comments": "Bình luận"
+    },
+    "chartLead": "{count} kỳ thi · cập nhật sau mỗi kỳ thi tính rating",
+    "activityTitle": "Hoạt động",
+    "unratedTitle": "Chưa có kỳ thi tính rating",
+    "unratedBody": "Rating và biểu đồ sẽ xuất hiện sau kỳ thi đầu tiên có tính rating.",
+    "upcoming": "Xem kỳ thi sắp tới",
+    "recent": "Kỳ thi gần đây",
+    "columns": {
+      "contest": "Kỳ thi",
+      "rank": "Hạng",
+      "performance": "Hiệu suất",
+      "rating": "Rating",
+      "delta": "Thay đổi"
+    },
+    "rankLine": "Hạng {rank}",
+    "stats": "Thống kê",
+    "ppRank": "Hạng PP",
+    "ppRankHint": "trong người dùng hoạt động",
+    "ratingRank": "Hạng rating",
+    "ratingRankHint": "chỉ tính người có rating",
+    "pp": "Điểm PP",
+    "points": "Tổng điểm",
+    "solved": "Bài đã giải",
+    "contribution": "Đóng góp",
+    "contributionHint": "điểm đóng góp",
+    "about": "Giới thiệu",
+    "organizations": "Tổ chức",
+    "notFoundTitle": "Không tìm thấy người dùng",
+    "notFoundBody": "Tên đăng nhập “{username}” không tồn tại hoặc đã bị cấm.",
+    "toLeaderboard": "Về bảng xếp hạng",
+    "ban": {
+      "open": "Cấm người dùng",
+      "title": "Cấm người dùng {username}?",
+      "body": "Tài khoản sẽ không đăng nhập được và biến khỏi bảng xếp hạng. Lý do bắt buộc và được lưu lại.",
+      "reason": "Lý do (tối đa 4096 ký tự)",
+      "submit": "Cấm",
+      "done": "Đã cấm {username}",
+      "doneBody": "Tài khoản không đăng nhập được và đã rời bảng xếp hạng."
+    },
     "title": "Hồ sơ"
   },
   "profileTabs": {
