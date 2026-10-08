@@ -34,6 +34,7 @@ const toggleType = (id: string) =>
   });
 
 const pointsPopover = ref<InstanceType<typeof Popover>>();
+const pointsOpen = ref(false);
 const pointsLabel = computed(() => {
   const { pointsMin, pointsMax } = props.filters;
   return pointsMin === null && pointsMax === null
@@ -86,18 +87,26 @@ function setPoints(key: 'pointsMin' | 'pointsMax', event: Event) {
       <button
         type="button"
         aria-haspopup="dialog"
+        :aria-expanded="pointsOpen"
+        :aria-label="`${$t('problems.pointsFilter')}: ${pointsLabel}`"
         class="flex h-11 items-center gap-1.5 rounded-pill border border-line bg-surface px-4 text-sm hover:bg-surface-hover"
         @click="pointsPopover?.toggle($event)"
       >
         {{ pointsLabel }}
         <ChevronDown class="size-4" aria-hidden="true" />
       </button>
-      <Popover ref="pointsPopover">
+      <Popover
+        ref="pointsPopover"
+        :pt="{ root: { 'aria-label': $t('problems.pointsFilter') } }"
+        @show="pointsOpen = true"
+        @hide="pointsOpen = false"
+      >
         <div class="flex gap-3">
           <label class="flex flex-col gap-1 text-sm">
             {{ $t('problems.pointsMin') }}
             <input
               name="pointsMin"
+              autofocus
               type="number"
               inputmode="numeric"
               :value="filters.pointsMin ?? ''"

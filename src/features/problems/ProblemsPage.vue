@@ -17,8 +17,17 @@ const locale = useLocaleStore();
 const session = useSessionStore();
 const lang = computed(() => locale.locale);
 const { data: meta } = useProblemMetaQuery();
-const { data, isPending, error, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } =
-  useProblemListQuery(filters, lang);
+const {
+  data,
+  isPending,
+  error,
+  refetch,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
+  isFetchNextPageError,
+  isPlaceholderData,
+} = useProblemListQuery(filters, lang);
 const { data: viewer } = useUserPageQuery(() => session.user?.username ?? '');
 
 const problems = computed(() => data.value?.pages.flatMap((result) => result.items) ?? []);
@@ -46,7 +55,11 @@ const summary = computed(() => {
     </header>
     <ProblemFilters :filters="filters" :types="meta?.types ?? []" @update="update" />
     <GlassCard as="div" class="overflow-hidden">
-      <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <QueryState
+        :loading="isPending"
+        :error="isFetchNextPageError ? null : error"
+        @retry="refetch()"
+      >
         <p v-if="!problems.length" class="py-10 text-center text-muted">
           {{ $t('problems.empty') }}
         </p>
@@ -59,7 +72,7 @@ const summary = computed(() => {
         <div v-if="hasNextPage" class="flex justify-center p-4">
           <button
             type="button"
-            :disabled="isFetchingNextPage"
+            :disabled="isFetchingNextPage || isPlaceholderData"
             class="h-12 rounded-pill border border-line bg-surface-strong px-7 font-semibold hover:bg-surface-hover"
             @click="fetchNextPage()"
           >
@@ -67,6 +80,12 @@ const summary = computed(() => {
           </button>
         </div>
       </QueryState>
+      <QueryState
+        v-if="isFetchNextPageError"
+        :loading="false"
+        :error="error"
+        @retry="fetchNextPage()"
+      />
     </GlassCard>
   </div>
 </template>

@@ -176,6 +176,9 @@
     "search": "Tìm theo mã hoặc tên bài",
     "types": "Lọc theo chủ đề",
     "pointsAny": "Điểm",
+    "pointsFilter": "Lọc theo điểm",
+    "listName": "Danh sách bài",
+    "scrollRegion": "Bảng bài, cuộn ngang",
     "pointsRange": "Điểm {min}–{max}",
     "pointsMin": "Điểm từ",
     "pointsMax": "Điểm đến",
@@ -188,7 +191,7 @@
       "status": "Trạng thái"
     },
     "solved": "Đã giải",
-    "attempted": "Đang thử",
+    "attempted": "Đã thử",
     "solve": "Giải ngay",
     "loadMore": "Tải thêm bài",
     "empty": "Không có bài phù hợp."

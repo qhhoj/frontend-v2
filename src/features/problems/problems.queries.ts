@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/vue-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { fetchProblemMeta, fetchProblems } from '@/api/problems.api';
@@ -22,6 +22,8 @@ export const useProblemListQuery = (filters: Ref<ProblemFilters>, lang: Ref<Stat
         pageSize: PROBLEM_PAGE_SIZE,
       }),
     initialPageParam: 1,
+    /** The table stays mounted (and focused) while a new sort or filter loads. */
+    placeholderData: keepPreviousData,
     getNextPageParam: ({ meta }) =>
       meta.page * meta.pageSize < (meta.total ?? 0) ? meta.page + 1 : undefined,
   });

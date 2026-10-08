@@ -15,10 +15,16 @@ export function formatElapsed(totalSeconds: number): string {
   return `${Math.floor(minutes / 60)}:${pad(minutes % 60)}`;
 }
 
-export const formatNumber = (value: number, locale: Locale, fractionDigits = 0) =>
-  new Intl.NumberFormat(INTL_LOCALES[locale], { maximumFractionDigits: fractionDigits }).format(
-    value,
-  );
+export const formatNumber = (
+  value: number,
+  locale: Locale,
+  fractionDigits = 0,
+  useGrouping = true,
+) =>
+  new Intl.NumberFormat(INTL_LOCALES[locale], {
+    maximumFractionDigits: fractionDigits,
+    useGrouping,
+  }).format(value);
 
 export function formatRelative(date: string, now: number, locale: Locale): string {
   const seconds = Math.round((Date.parse(date) - now) / 1000);

@@ -22,11 +22,16 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
 </script>
 
 <template>
-  <div tabindex="0" role="region" :aria-label="$t('problems.title')" class="overflow-x-auto">
+  <div
+    tabindex="0"
+    role="region"
+    :aria-label="$t('problems.scrollRegion')"
+    class="overflow-x-auto focus-visible:-outline-offset-2"
+  >
     <table class="w-full min-w-[900px] border-collapse text-[15px]">
       <caption class="sr-only">
         {{
-          $t('problems.title')
+          $t('problems.listName')
         }}
       </caption>
       <thead>
@@ -74,7 +79,7 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
             {{ problem.types.map((type) => type.fullName).join(', ') }}
           </td>
           <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
-            {{ formatNumber(problem.points, locale.locale, 2) }}
+            {{ formatNumber(problem.points, locale.locale, 2, false) }}
           </td>
           <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
             {{ formatNumber(problem.acRate, locale.locale, 1) }}%
