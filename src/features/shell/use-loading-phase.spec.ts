@@ -1,4 +1,5 @@
 import { effectScope, ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LOADING_TIMING, useLoadingPhase, type LoadingPhase } from './use-loading-phase';
 
@@ -102,6 +103,56 @@ describe('useLoadingPhase', () => {
       vi.advanceTimersByTime(showAfterMs + settleMs + holdMs + fadeMs);
       expect(seen).toEqual([]);
       expect(phase.value).toBe('hidden');
+    },
+  );
+
+  it('shows only after a full threshold of waiting when an earlier short wait ended in a gap', () => {
+    const { waiting, phase } = setup();
+    waiting.value = true;
+    vi.advanceTimersByTime(50);
+    waiting.value = false;
+    vi.advanceTimersByTime(settleMs + 150); // settled: the first wait is forgotten (t = 300)
+    waiting.value = true;
+    vi.advanceTimersByTime(showAfterMs - 1);
+    expect(phase.value).toBe('hidden');
+    vi.advanceTimersByTime(1);
+    expect(phase.value).toBe('walking');
+  });
+
+  it.each([
+    ['show', () => undefined],
+    [
+      'settle',
+      (waiting: Ref<boolean>) => {
+        vi.advanceTimersByTime(showAfterMs);
+        waiting.value = false;
+      },
+    ],
+    [
+      'hold',
+      (waiting: Ref<boolean>) => {
+        vi.advanceTimersByTime(showAfterMs);
+        waiting.value = false;
+        vi.advanceTimersByTime(settleMs);
+      },
+    ],
+    [
+      'fade',
+      (waiting: Ref<boolean>) => {
+        vi.advanceTimersByTime(showAfterMs);
+        waiting.value = false;
+        vi.advanceTimersByTime(settleMs + holdMs);
+      },
+    ],
+  ])(
+    'leaves no timer running when its scope stops while the %s timer is pending',
+    (_name, advance) => {
+      const { waiting, scope } = setup();
+      waiting.value = true;
+      advance(waiting);
+      expect(vi.getTimerCount()).toBeGreaterThan(0);
+      scope.stop();
+      expect(vi.getTimerCount()).toBe(0);
     },
   );
 
