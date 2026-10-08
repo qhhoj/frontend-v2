@@ -9,6 +9,6 @@ Mock-ups: the account-settings canvas (2026-10-08): SetProfile, SetProfileErrors
 - **Buttons**: `BUTTON` in `settings/buttons.ts`. Primary is a pill on `bg-gradient-accent` (flat accent-soft while pending or not yet allowed); secondary is a pill with a hairline; danger is outlined in `negative`, never filled. No opacity on disabled or busy states: token colour pairs only.
 - **Save bar**: the profile's `SaveBar` is a sticky glass bar at the bottom (safe-area aware), with the status text and Undo and Save. The status reads "Có thay đổi chưa lưu" or "Không có thay đổi chưa lưu".
 - **Errors**: a failed save puts `SaveErrorSummary` (a `role="alert"` with the sweat Bit) above the form; it takes focus and each line links to its field.
-- **Impersonation banner**: `caution-strong`, 56 px minimum, sticky at the top above the page, with a pill "Dừng xem" button. The locked security and data pages carry the padlock notice and disabled actions.
+- **Impersonation banner**: `caution-strong`, 56 px minimum, sticky at the top above the page, with a pill "Dừng xem" button. The locked security page carries the padlock notice and disabled actions; the locked data page carries the padlock notice only.
 - **QR tile**: `qr-ink` modules on `qr-paper` in every theme, with a quiet zone. Shown from `md` up; below `md` the page shows the app link instead ("Mở trực tiếp trong ứng dụng trên điện thoại này").
 - **Phone**: no sideways scroll at 375 px; the nav pills scroll inside themselves; the save bar stays on screen.

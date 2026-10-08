@@ -248,7 +248,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Activation success lives at `/activate/done`, so a reload shows the success card and never posts the placeholder as a key; a dead key shows the "Liên kết đã hết hạn" card with the email form.
 - An expired or used reset link replaces the token in the address with `/reset-password/expired`, so the token leaves history and a reload shows the dead-link card.
 - Pages that take a link credential (`/activate/:key`, `/reset-password/:token`, `/register/social?token=`) call `useNoReferrer()`, so their requests carry no Referer; the social token leaves the address on mount.
-- Guards never copy an activation key, a reset token or the social signup path into `?redirect` (`LINK_CREDENTIAL_PATH`).
+- Guards never copy an activation key, a reset token or the social signup path into `?redirect` (`LINK_CREDENTIAL_ROUTES`).
 - Social completion: `email_taken`, a linked identity (`conflict`) and a refused token each end in a terminal card, because the provider's address cannot change on this page.
 - 2FA offers only the account's factors (B14); `methods: []` is the "Phiên đã thay đổi" card; sign-out sits in the top bar and under the card on every state.
 - A WebAuthn prompt cancelled or timed out (`NotAllowedError`, `AbortError`) is not an error and sends nothing; the key button hides where `parseRequestOptionsFromJSON` is missing.
@@ -302,7 +302,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - While an export is preparing the status polls every 5 s and stops once it is ready or empty: a finished job must not keep the page polling.
 - Backup codes are shown grouped (`K7QM-2XRA-9PTD-4WLE`) and copied, downloaded and printed the same way: it is how people type them; every code field strips dashes and spaces (`normalizeBackupCode`) because the backend only upper-cases.
 - Leaving the backup-code step before ticking "Tôi đã lưu…" asks first: the codes are never shown again.
-- The one-time secrets (TOTP secret and QR, backup codes, API token) live only in component state or in mutations with `gcTime: 0`, never in a cached query: a later visit must not show them.
+- The one-time secrets (TOTP secret and QR, backup codes, API token) live only in component state, never in a cached query, store, URL or storage: a later visit must not show them.
 - A 429 that names its wait shows "Thử lại sau N giây" on every auth-action form, because `authErrorText` owns it: the 2FA, backup-code, security-key and password forms (settings and the forced `/account/password` page). A 429 with no `Retry-After` shows the generic text.
 - Notices reuse the verdict and accent tints (success AC, error WA, warning TLE, info accent-soft), as `AuthNotice` does; only the impersonation banner has new tokens (`caution-strong`), so it reads apart from the brand colour.
 - Bit in settings: crown and sweat mark results only (save, backup codes shown, 2FA turned on, export ready or failed); the `security` padlock marks the security-page empties, the locked notices and the TOTP header, because a lock says "private", not "done".
