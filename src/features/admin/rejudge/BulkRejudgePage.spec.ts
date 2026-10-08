@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -115,5 +115,26 @@ describe('BulkRejudgePage', () => {
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
     expect(wrapper.get('#rejudge-problem').attributes('aria-invalid')).toBe('true');
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
+  });
+  it('words a dry run that is rate limited as a wait, not as the lot refusal or a plain refusal', async () => {
+    mockApi(routes((call) => (isDryRun(call) ? rateLimited(30) : fail(403, 'forbidden'))));
+    const { wrapper } = await mountRejudge();
+    await fillAndConfirm(wrapper);
+    const alert = wrapper.get('[role="alert"]').text();
+    expect(alert).toContain('Thử lại sau 30 giây.');
+    expect(alert).not.toContain('judge.rejudge_submission_lot');
+    expect(alert).not.toContain('Bạn không có quyền làm việc này.');
+  });
+
+  it('words a server error on the dry run as a failure, not as a refusal', async () => {
+    mockApi(
+      routes((call) => (isDryRun(call) ? fail(500, 'internal_error') : fail(403, 'forbidden'))),
+    );
+    const { wrapper } = await mountRejudge();
+    await fillAndConfirm(wrapper);
+    const alert = wrapper.get('[role="alert"]').text();
+    expect(alert).toContain('Đã có lỗi xảy ra. Hãy thử lại.');
+    expect(alert).not.toContain('judge.rejudge_submission_lot');
+    expect(alert).not.toContain('Bạn không có quyền làm việc này.');
   });
 });

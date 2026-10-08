@@ -17,7 +17,8 @@
   "reason": {
     "waiting": "Chờ chấm xong.",
     "finished": "Đã chấm xong.",
-    "locked": "Bài nộp đã bị khóa."
+    "locked": "Bài nộp đã bị khóa.",
+    "sent": "Đã gửi. Chờ trang tải lại trạng thái mới."
   },
   "noPoints": "chưa có điểm",
   "points": "{points} điểm",

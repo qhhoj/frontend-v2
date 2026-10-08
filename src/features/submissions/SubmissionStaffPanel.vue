@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { abortSubmission, rejectSubmission, rejudgeSubmission } from '@/api/submission-actions.api';
@@ -15,6 +16,7 @@ import { useNow } from '@/lib/use-now';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import { useViewerId } from '@/stores/use-viewer-id';
 import {
   hasAnyStaffAction,
   holdsAnyStaffPermission,
@@ -22,7 +24,6 @@ import {
   lockLineOf,
   staffActionsFor,
 } from './staff-actions';
-import type { StaffActionState } from './staff-actions';
 
 type StaffAction = 'rejudge' | 'reject' | 'abort';
 interface Outcome {
@@ -58,16 +59,41 @@ const stateLineKey = computed(() =>
 const pending = ref<StaffAction | null>(null);
 const isDialogOpen = ref(false);
 const outcome = ref<Outcome | null>(null);
+const viewerId = useViewerId();
+const queryClient = useQueryClient();
+
+/** What the row says about its state: an action sent against this state is not sent again while the row still says it. */
+const stateKey = computed(() =>
+  [
+    props.submission.status,
+    props.submission.result,
+    props.submission.judgedDate,
+    props.submission.rejudgedDate,
+  ].join('|'),
+);
+const sent = ref<{ action: StaffAction; key: string } | null>(null);
+const isSentFor = (action: StaffAction) =>
+  sent.value?.action === action && sent.value.key === stateKey.value;
+
 const mutation = useAdminMutation<StaffAction, StaffAction>({
   mutate: async (action) => {
     await CALLS[action](props.submission.id);
     return action;
   },
+  /** The page's row is refetched after a write: the panel shows the new state and the live stream follows a queued row. */
+  onDone: (action) => {
+    sent.value = { action, key: stateKey.value };
+    void queryClient.invalidateQueries({
+      queryKey: ['submissions', 'detail', viewerId.value, props.submission.id],
+    });
+  },
 });
 
-/** A button the account may press now: ready. Waiting and locked buttons stay on screen, `aria-disabled`, and say why. */
-const isReady = (action: StaffAction) => actions.value[action] === 'ready';
-function reasonOf(action: StaffAction, state: StaffActionState): string | null {
+/** A button the account may press now: ready and not already sent for this state. Other buttons stay on screen, `aria-disabled`, and say why. */
+const isReady = (action: StaffAction) => actions.value[action] === 'ready' && !isSentFor(action);
+function reasonOf(action: StaffAction): string | null {
+  if (isSentFor(action)) return translate('admin.staff.reason.sent');
+  const state = actions.value[action];
   if (state === 'locked') return translate('admin.staff.reason.locked');
   if (state !== 'waiting') return null;
   return translate(
@@ -76,7 +102,7 @@ function reasonOf(action: StaffAction, state: StaffActionState): string | null {
 }
 const blockedReasons = computed(() =>
   order.value.flatMap((action) => {
-    const reason = reasonOf(action, actions.value[action]);
+    const reason = reasonOf(action);
     return reason ? [{ action, reason }] : [];
   }),
 );

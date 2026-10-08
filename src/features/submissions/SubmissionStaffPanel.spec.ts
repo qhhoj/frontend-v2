@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi } from '@/test/mock-api';
+import { fail, mockApi, ok } from '@/test/mock-api';
+import { FakeEventSource, installFakeEventSource } from '@/test/fake-event-source';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { signedInViewer, submissionPageRoutes } from '@/test/problem-routes';
@@ -94,5 +95,57 @@ describe('SubmissionStaffPanel', () => {
     const { wrapper } = await mountApp(`/submissions/${locked.id}`);
     expect(wrapper.get('[data-testid="staff-panel"]').text()).toContain('bị khóa từ');
     expect(panelButton(wrapper, 'Chấm lại').attributes('aria-disabled')).toBe('true');
+  });
+  const queued = submissionDetail({
+    id: finished.id,
+    status: 'QU',
+    result: null,
+    points: null,
+    viewer: { canAbort: false, canRejudge: false, canReject: false },
+  });
+
+  it('refetches the row after a rejudge, so the panel shows the new state and the live stream follows the queued row', async () => {
+    installFakeEventSource();
+    let isRejudged = false;
+    const calls = mockApi({
+      ...staffViewer(['judge.rejudge_submission']),
+      ...pageRoutes(),
+      [`GET /submissions/${finished.id}`]: () => ok(isRejudged ? queued : finished),
+      [`POST /submissions/${finished.id}/rejudge`]: () => {
+        isRejudged = true;
+        return { status: 204 };
+      },
+    });
+    const { wrapper } = await mountApp(`/submissions/${finished.id}`);
+    await panelButton(wrapper, 'Chấm lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Chấm lại');
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="staff-panel"]').text()).toContain('Chờ chấm xong.'),
+    );
+    expect(
+      calls.filter((call) => call.method === 'GET' && call.path === `/submissions/${finished.id}`)
+        .length,
+    ).toBeGreaterThan(1);
+    expect(FakeEventSource.instances.at(-1)?.url).toContain(`/events/submissions/${finished.id}`);
+  });
+
+  it('sends no second request for a rejudge the row has not yet reflected', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.rejudge_submission']),
+      ...pageRoutes(),
+      [`POST /submissions/${finished.id}/rejudge`]: { status: 204 },
+    });
+    const { wrapper } = await mountApp(`/submissions/${finished.id}`);
+    await panelButton(wrapper, 'Chấm lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Chấm lại');
+    expect(wrapper.get('[data-testid="staff-panel"] [role="status"]').text()).toContain(
+      'Đã gửi chấm lại.',
+    );
+    await panelButton(wrapper, 'Chấm lại').trigger('click');
+    await flushPromises();
+    expect(panelButton(wrapper, 'Chấm lại').attributes('aria-disabled')).toBe('true');
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
   });
 });

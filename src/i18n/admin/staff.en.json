@@ -17,7 +17,8 @@
   "reason": {
     "waiting": "Waiting for judging to finish.",
     "finished": "Judging is already finished.",
-    "locked": "The submission is locked."
+    "locked": "The submission is locked.",
+    "sent": "Sent. Waiting for the page to reload the new state."
   },
   "noPoints": "no points yet",
   "points": "{points} points",

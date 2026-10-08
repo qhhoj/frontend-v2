@@ -12,26 +12,28 @@ export interface RejudgeOutcome {
   text: string;
 }
 
-/** A dry run names the cause of a 403: `allowed: false` is the lot limit; a dry run that is refused too means a plain refusal. */
-async function isOverLotLimit(body: RejudgeBody): Promise<boolean> {
+/** The dry run's answer, or the ApiError it failed with. Anything else is a bug and is not hidden here. */
+async function dryRunOf(body: RejudgeBody): Promise<RejudgeResult | ApiError> {
   try {
-    const dryRun = await rejudgeSubmissions({ ...body, dryRun: true });
-    return !dryRun.allowed;
+    return await rejudgeSubmissions({ ...body, dryRun: true });
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return false;
+    if (error instanceof ApiError) return error;
+    throw error;
   }
 }
 
-/** Only a 403 is worded by its cause; every other failure keeps its own text. */
+/**
+ * A 403 is worded by its cause. A dry run that answers names the cause: `allowed: false` is the lot limit. A dry run that
+ * fails (a wait, a server error, or its own 403) is a failure, worded as one, never as the lot refusal.
+ */
 async function refusalTextOf(error: ApiError, body: RejudgeBody): Promise<string> {
   if (error.status !== 403) return failureTextOf(error);
-  return (await isOverLotLimit(body))
-    ? translate('admin.rejudge.refusedLot')
-    : translate('errors.forbidden');
+  const dryRun = await dryRunOf(body);
+  if (dryRun instanceof ApiError) return failureTextOf(dryRun);
+  return dryRun.allowed ? translate('errors.forbidden') : translate('admin.rejudge.refusedLot');
 }
 
-/** One bulk rejudge: the request, and the line the page shows for its answer. The filter is never cleared here. */
+/** One bulk rejudge: the request, and the line the page shows for its answer. Never throws; the filter is never cleared here. */
 export function useBulkRejudge() {
   const outcome = ref<RejudgeOutcome | null>(null);
   const mutation = useAdminMutation<RejudgeBody, RejudgeResult>({
@@ -39,15 +41,19 @@ export function useBulkRejudge() {
   });
 
   async function rejudge(body: RejudgeBody): Promise<void> {
-    const result = await mutation.run(body);
-    if (result) {
-      outcome.value = {
-        kind: 'done',
-        text: translate('admin.rejudge.done', { count: result.count }),
-      };
-    } else if (mutation.failure.value) {
-      const text = await refusalTextOf(mutation.failure.value, body);
-      outcome.value = { kind: 'refused', text };
+    try {
+      const result = await mutation.run(body);
+      if (result) {
+        outcome.value = {
+          kind: 'done',
+          text: translate('admin.rejudge.done', { count: result.count }),
+        };
+      } else if (mutation.failure.value) {
+        const text = await refusalTextOf(mutation.failure.value, body);
+        outcome.value = { kind: 'refused', text };
+      }
+    } catch (error) {
+      outcome.value = { kind: 'refused', text: failureTextOf(error) };
     }
   }
 
