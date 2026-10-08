@@ -24,29 +24,36 @@ const PAGES = [
   { path: '/blog', ready: { anonymous: 'Blog', 'signed-in': 'Blog' } },
 ] as const;
 
-for (const theme of THEMES)
-  for (const { path, ready } of PAGES)
-    for (const [viewer, readyText] of Object.entries(ready))
-      test(`${path} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewer}`, async ({
-        page,
-        api,
-      }) => {
-        api.signedIn = viewer === 'signed-in';
-        // A signed-in account's theme outranks the browser's choice.
-        api.routes['GET /profile'] = { body: { data: profile({ siteTheme: theme.id }) } };
-        await page.emulateMedia({ colorScheme: theme.scheme });
-        // The OS scheme only selects Clay; an explicit browser choice puts every theme on screen.
-        await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
-        await page.goto(path);
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-        await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();
-        const { violations } = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-          .analyze();
-        expect(
-          violations.map(
-            (violation) =>
-              `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
-          ),
-        ).toEqual([]);
-      });
+const VIEWPORTS = [
+  { name: 'desktop', width: 1280, height: 800 },
+  { name: 'phone 375 px', width: 375, height: 812 },
+] as const;
+
+for (const viewport of VIEWPORTS)
+  for (const theme of THEMES)
+    for (const { path, ready } of PAGES)
+      for (const [viewer, readyText] of Object.entries(ready))
+        test(`${path} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewer}, ${viewport.name}`, async ({
+          page,
+          api,
+        }) => {
+          await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          api.signedIn = viewer === 'signed-in';
+          // A signed-in account's theme outranks the browser's choice.
+          api.routes['GET /profile'] = { body: { data: profile({ siteTheme: theme.id }) } };
+          await page.emulateMedia({ colorScheme: theme.scheme });
+          // The OS scheme only selects Clay; an explicit browser choice puts every theme on screen.
+          await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
+          await page.goto(path);
+          await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
+          await expect(page.getByText(readyText, { exact: true }).first()).toBeVisible();
+          const { violations } = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .analyze();
+          expect(
+            violations.map(
+              (violation) =>
+                `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
+            ),
+          ).toEqual([]);
+        });

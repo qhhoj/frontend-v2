@@ -8,7 +8,7 @@ const VIEWPORTS = [
 ];
 
 for (const viewport of VIEWPORTS)
-  test(`the background blobs stay apart at ${viewport.width}x${viewport.height}`, async ({
+  test(`the Glass background blobs stay apart at ${viewport.width}x${viewport.height}`, async ({
     page,
     api,
   }) => {
@@ -17,6 +17,7 @@ for (const viewport of VIEWPORTS)
     // Only Glass shows the blobs; Clay hides them.
     await page.addInitScript(() => localStorage.setItem('qhhoj.theme', 'glass-dark'));
     await page.goto('/blog');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-dark');
     const boxes = await page.evaluate(() =>
       [...document.querySelectorAll('.blob-1, .blob-2, .blob-3')]
         .map((blob) => blob.getBoundingClientRect())
