@@ -47,7 +47,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
         <EmptyState compact>{{ $t('home.noLiveContest') }}</EmptyState>
         <RouterLink
           :to="{ name: 'contests' }"
-          class="mt-2 inline-block text-accent-text underline"
+          class="mt-5 inline-block text-accent-text underline"
           >{{ $t('home.browseContests') }}</RouterLink
         >
       </template>

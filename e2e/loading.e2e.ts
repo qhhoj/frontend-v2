@@ -374,6 +374,21 @@ const SHIFT_CASES: ShiftCase[] = [
     parts: (page) => ({ card: page.getByTestId('top-users') }),
     viewports: HOME_VIEWPORTS,
   },
+  ...(
+    [
+      ['recent submissions card', 'recent-submissions', 'GET /submissions'],
+      ['live contest card', 'live-contest', 'GET /contests'],
+      ['top users card', 'top-users', 'GET /users'],
+    ] as const
+  ).map(([name, testId, route]): ShiftCase => ({
+    name: `${name} when it has nothing to list`,
+    path: '/',
+    signedIn: true,
+    hold: route,
+    answer: (api) => (api.routes[route] = list([])),
+    parts: (page) => ({ card: page.getByTestId(testId) }),
+    viewports: PHONE_AND_DESKTOP,
+  })),
   {
     name: 'ranking board',
     path: '/contests/r42/ranking',

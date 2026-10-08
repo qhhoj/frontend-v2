@@ -49,7 +49,12 @@ const now = useNow(60_000);
         </ul>
       </template>
 
-      <EmptyState v-if="!submissions?.length" compact>{{ $t('home.noSubmissions') }}</EmptyState>
+      <EmptyState
+        v-if="!submissions?.length"
+        compact
+        class="mt-3.5 min-h-[382px] justify-center sm:min-h-0"
+        >{{ $t('home.noSubmissions') }}</EmptyState
+      >
       <ul v-else class="mt-3.5 flex flex-col gap-2">
         <li v-for="item in submissions" :key="item.id">
           <RouterLink
