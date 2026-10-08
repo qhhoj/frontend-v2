@@ -15,7 +15,7 @@ export const fetchSession = () => apiRequest<SessionResponse>('/auth/me');
 export const login = (body: LoginBody) =>
   apiRequest<SessionResponse>('/auth/login', { method: 'POST', body });
 export const logout = () => apiRequest<void>('/auth/logout', { method: 'POST' });
-/** Ends every session of the account, this one included; the server clears the cookie. The backend allows it while impersonating; the UI locks it then (Decision 16). */
+/** Ends every session of the account, this one included; the server clears the cookie. The backend refuses it while impersonating (`@NoImpersonation()`); the UI also locks it then (Decision 16). */
 export const logoutAllSessions = () => apiRequest<void>('/auth/logout-all', { method: 'POST' });
 /** Back to the staff account that started viewing as this user. */
 export const stopImpersonation = () =>
