@@ -15,10 +15,10 @@ describe('keepPreviousForSameViewer', () => {
     expect(keep('board of A', queryOf('user-a'))).toBeUndefined();
   });
 
-  it('drops the previous data for a signed-out viewer, even one who was signed out before', () => {
+  it('after sign-out drops what the account loaded but keeps a visitor page for a visitor', () => {
     const keep = keepPreviousForSameViewer(VIEWER_INDEX, 'anonymous');
     expect(keep('board of A', queryOf('user-a'))).toBeUndefined();
-    expect(keep('public board', queryOf('anonymous'))).toBeUndefined();
+    expect(keep('public board', queryOf('anonymous'))).toBe('public board');
   });
 
   it('drops the data when there is no previous query', () => {
