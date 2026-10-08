@@ -153,3 +153,7 @@ export const formatAgo = (date: string, now: number, locale: Locale) =>
   now - Date.parse(date) <= WEEK_MS
     ? formatRelative(date, now, locale)
     : formatNumericDate(date, locale);
+
+/** A vote score with its sign (`+4`, `−3`, `0`); the minus is U+2212 so it reads as a minus, not a hyphen. */
+export const signedScore = (score: number) =>
+  score > 0 ? `+${score}` : score < 0 ? `−${-score}` : '0';

@@ -19,6 +19,7 @@ import {
   formatShortDate,
   formatWeekdayDate,
   formatRelative,
+  signedScore,
   greetingKey,
   formatTimeLimit,
   initials,
@@ -146,5 +147,11 @@ describe('formatAgo', () => {
   it('still says "ago" at exactly seven days and shows the date one second further back', () => {
     expect(formatAgo('2026-10-01T12:00:00Z', now, 'en')).toBe('7 days ago');
     expect(formatAgo('2026-10-01T11:59:59Z', now, 'en')).toBe('10/01/2026');
+  });
+});
+
+describe('signedScore', () => {
+  it('writes the sign of a vote score with a real minus', () => {
+    expect([signedScore(4), signedScore(-3), signedScore(0)]).toEqual(['+4', '\u22123', '0']);
   });
 });

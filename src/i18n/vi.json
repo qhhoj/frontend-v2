@@ -947,6 +947,8 @@
     "title": "Bài viết"
   },
   "comments": {
+    "deletedAccount": "Tài khoản đã xóa",
+    "inPage": "trong",
     "title": "Bình luận"
   },
   "commentEditor": {

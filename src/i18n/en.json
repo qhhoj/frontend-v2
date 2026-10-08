@@ -947,6 +947,8 @@
     "title": "Post"
   },
   "comments": {
+    "deletedAccount": "Deleted account",
+    "inPage": "on",
     "title": "Comments"
   },
   "commentEditor": {
