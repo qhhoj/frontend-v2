@@ -48,7 +48,9 @@
       var look = null;
       try {
         look = JSON.parse(localStorage.getItem('qhhoj.paintedAppearance'));
-      } catch {}
+      } catch {
+        // Blocked or malformed storage: paint the site look.
+      }
       var isPercent = function (value) {
         return Number.isInteger(value) && value >= 0 && value <= 100;
       };

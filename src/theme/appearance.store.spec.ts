@@ -1,6 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { nextTick } from 'vue';
 import { useAppearanceStore } from './appearance.store';
 
 const OCEAN = { accent: 'ocean', glass: 40, glow: 60 } as const;
@@ -17,22 +16,20 @@ describe('appearance store', () => {
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('');
   });
 
-  it('applies a chosen look at once and remembers it for this browser and for the pre-paint script', async () => {
+  it('applies a chosen look at once and remembers it for this browser and for the pre-paint script', () => {
     const store = useAppearanceStore();
     store.choose(OCEAN);
     expect(root.dataset.accent).toBe('ocean');
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('40');
     expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('0.6');
     expect(JSON.parse(localStorage.getItem('qhhoj.appearance')!)).toEqual(OCEAN);
-    await nextTick(); // the watcher that writes the painted copy flushes after the choice
     expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(OCEAN);
   });
 
-  it('removes everything when the look is turned off', async () => {
+  it('removes everything when the look is turned off', () => {
     const store = useAppearanceStore();
     store.choose(OCEAN);
     store.choose(null);
-    await nextTick();
     expect(root.dataset.accent).toBeUndefined();
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('');
     expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('');
@@ -91,6 +88,47 @@ describe('appearance store', () => {
     const write = vi.spyOn(Storage.prototype, 'setItem');
     useAppearanceStore();
     expect(write).not.toHaveBeenCalledWith('qhhoj.paintedAppearance', expect.anything());
+    write.mockRestore();
+  });
+
+  it('writes the painted copy when the account look is the first thing to speak', () => {
+    const store = useAppearanceStore();
+    store.adopt(OCEAN);
+    expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(OCEAN);
+  });
+
+  it('writes the painted copy once, with the final look, when adopting over a held painted look', () => {
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
+    const store = useAppearanceStore();
+    const write = vi.spyOn(Storage.prototype, 'setItem');
+    store.adopt(OCEAN);
+    expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
+      ['qhhoj.paintedAppearance', JSON.stringify(OCEAN)],
+    ]);
+    write.mockRestore();
+  });
+
+  it('writes the painted copy once, with the final look, when choosing over a held painted look', () => {
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
+    localStorage.setItem('qhhoj.appearance', JSON.stringify(OCEAN));
+    const store = useAppearanceStore();
+    const write = vi.spyOn(Storage.prototype, 'setItem');
+    store.choose(MINT);
+    expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
+      ['qhhoj.paintedAppearance', JSON.stringify(MINT)],
+    ]);
+    write.mockRestore();
+  });
+
+  it('writes the painted copy once, with the final look, for a choice', () => {
+    const store = useAppearanceStore();
+    store.adopt(MINT);
+    const write = vi.spyOn(Storage.prototype, 'setItem');
+    store.choose(OCEAN);
+    expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
+      ['qhhoj.paintedAppearance', JSON.stringify(OCEAN)],
+    ]);
+    expect(root.dataset.accent).toBe('ocean');
     write.mockRestore();
   });
 

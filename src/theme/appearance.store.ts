@@ -34,43 +34,52 @@ function paint(look: Appearance | null) {
   root.style.setProperty('--qh-blob-strength', variables.blobStrength);
 }
 
-export const useAppearanceStore = defineStore('appearance', () => {
-  const browserLook = ref(readLook(CHOICE_KEY));
+/** Where the look comes from. One object, so each action changes it in a single assignment. */
+interface LookSources {
+  /** This browser's own choice. */
+  browser: Appearance | null;
   /** The signed-in account's look; `null` is "the account has none"; `undefined` is "not signed in (or not known yet)". */
-  const accountLook = ref<Appearance | null | undefined>(undefined);
-  // Until the account, the browser or a user choice speaks, the look the pre-paint script already painted stays.
+  account: Appearance | null | undefined;
+  /** True until the account, the browser or a choice speaks: the look the pre-paint script painted stays. */
+  holdingPainted: boolean;
+}
+
+export const useAppearanceStore = defineStore('appearance', () => {
   // Unlike the theme store, no `resolvedBy` marker is needed: a look has no OS-dependent resolution, and a look painted
   // from this browser always equals `qhhoj.appearance`, so holding any painted look never shows a stale one.
   const paintedLook = readLook(PAINTED_KEY);
-  const holdingPainted = ref(true);
+  const sources = ref<LookSources>({
+    browser: readLook(CHOICE_KEY),
+    account: undefined,
+    holdingPainted: true,
+  });
 
   /** The account outranks this browser; `null` from the account means the site look. */
   const look = computed(() => {
-    if (accountLook.value !== undefined) return accountLook.value;
-    return holdingPainted.value ? paintedLook : browserLook.value;
+    const { account, holdingPainted, browser } = sources.value;
+    if (account !== undefined) return account;
+    return holdingPainted ? paintedLook : browser;
   });
-  // Synchronous: the page must show a choice before the call returns, not on a later tick.
+  // Synchronous: the page must show a choice before the call returns, not on a later tick. Each action assigns
+  // `sources` once, so this runs once with the final look.
   watch(
     look,
     (active) => {
       paint(active);
-      if (!holdingPainted.value) rememberLook(PAINTED_KEY, active);
+      if (!sources.value.holdingPainted) rememberLook(PAINTED_KEY, active);
     },
     { immediate: true, flush: 'sync' },
   );
 
   /** A user action: applies the look and remembers it as this browser's. */
   function choose(next: Appearance | null) {
-    accountLook.value = undefined;
-    holdingPainted.value = false;
-    browserLook.value = next;
+    sources.value = { browser: next, account: undefined, holdingPainted: false };
     rememberLook(CHOICE_KEY, next);
   }
 
   /** The signed-in account's look, or `undefined` once signed out (back to this browser's own look). */
   function adopt(next: Appearance | null | undefined) {
-    accountLook.value = next;
-    holdingPainted.value = false;
+    sources.value = { ...sources.value, account: next, holdingPainted: false };
   }
 
   return { look, choose, adopt };
