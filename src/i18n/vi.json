@@ -66,6 +66,14 @@
       "stats": "Thống kê",
       "ranking": "Bảng xếp hạng"
     },
+    "submissions": {
+      "statusTitle": "Trạng thái chấm",
+      "status": { "grading": "Đang chờ / đang chấm", "final": "Chờ chấm cuối" },
+      "ownOnlyTitle": "Chỉ hiện bài nộp của bạn",
+      "ownOnlyBody": "Bài nộp của thí sinh khác chưa công khai trong lúc kỳ thi đang diễn ra hoặc bảng đóng băng.",
+      "signIn": "Đăng nhập để xem bài nộp của bạn",
+      "empty": "Chưa có bài nộp nào trong kỳ thi."
+    },
     "detail": {
       "authors": "Ra đề:",
       "freezeAt": "{time} đóng băng",

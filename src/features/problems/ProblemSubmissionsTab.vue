@@ -20,6 +20,7 @@ const filters = computed<SubmissionFilters>(() => ({
   user: username.value,
   results: [],
   languageIds: [],
+  statusGroups: [],
   page: 1,
   live: false,
 }));

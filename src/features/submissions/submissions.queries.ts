@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
+import { fetchContestSubmissions } from '@/api/contests.api';
 import {
   fetchSubmission,
   fetchSubmissionSource,
@@ -8,11 +9,18 @@ import {
   fetchSubmissions,
 } from '@/api/submissions.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { STATUS_GROUP_STATUSES } from './use-submission-filters';
 import type { SubmissionFilters } from './use-submission-filters';
 
 export const SUBMISSION_PAGE_SIZE = 50;
 /** The server caches the stats for 30 s: polling faster would only read the same answer. */
 const STATS_REFRESH_MS = 30_000;
+
+/** The judging-state boxes as the statuses they stand for, in box order (`undefined` when no box is ticked). */
+const statusesOf = (filters: SubmissionFilters) =>
+  filters.statusGroups.length
+    ? filters.statusGroups.flatMap((group) => STATUS_GROUP_STATUSES[group])
+    : undefined;
 
 /** The list filters as the API takes them (`live` is a view setting and stays out). */
 export const submissionListApiQuery = (filters: SubmissionFilters) => ({
@@ -20,6 +28,7 @@ export const submissionListApiQuery = (filters: SubmissionFilters) => ({
   user: filters.user || undefined,
   result: filters.results.length ? filters.results : undefined,
   language: filters.languageIds.length ? filters.languageIds : undefined,
+  status: statusesOf(filters),
   page: filters.page,
   pageSize: SUBMISSION_PAGE_SIZE,
 });
@@ -71,3 +80,23 @@ export const useSubmissionStatsQuery = () =>
     refetchInterval: STATS_REFRESH_MS,
     placeholderData: keepPreviousData,
   });
+
+/** One page of a contest's submissions per viewer; `ownUsername` narrows it to the viewer (the backend would anyway). */
+export const useContestSubmissionListQuery = (
+  key: Ref<string>,
+  filters: Ref<SubmissionFilters>,
+  ownUsername: Ref<string | null>,
+  isEnabled: Ref<boolean>,
+) => {
+  const viewerId = useViewerId();
+  const apiQuery = computed(() => ({
+    ...submissionListApiQuery(filters.value),
+    user: ownUsername.value ?? (filters.value.user || undefined),
+  }));
+  return useQuery({
+    enabled: isEnabled,
+    queryKey: computed(() => ['submissions', 'contest', viewerId.value, key.value, apiQuery.value]),
+    queryFn: () => fetchContestSubmissions(key.value, apiQuery.value),
+    placeholderData: keepPreviousData,
+  });
+};

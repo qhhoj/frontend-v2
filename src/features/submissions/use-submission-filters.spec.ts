@@ -19,6 +19,7 @@ describe('submission filters in the URL', () => {
       user: 'user_01',
       results: ['AC', 'WA'],
       languageIds: [UUID_OK],
+      statusGroups: [],
       page: 3,
       live: false,
     });
@@ -41,6 +42,12 @@ describe('submission filters in the URL', () => {
     expect(filters.user).toHaveLength(30);
     expect(parseSubmissionFilters({ page: '10001' }).page).toBe(1);
     expect(parseSubmissionFilters({ page: '0' }).page).toBe(1);
+  });
+
+  it('keeps only the known status groups and writes them back under waiting', () => {
+    const filters = parseSubmissionFilters({ waiting: ['final', 'nope'] });
+    expect(filters.statusGroups).toEqual(['final']);
+    expect(toSubmissionQuery(filters)).toEqual({ waiting: ['final'] });
   });
 
   it('accepts every result the backend accepts, not only the six checkboxes (nothing is staff-gated)', () => {

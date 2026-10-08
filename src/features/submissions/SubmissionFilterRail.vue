@@ -8,13 +8,24 @@ import GlassCard from '@/components/GlassCard.vue';
 import { translate } from '@/i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from './use-submission-filters';
-import type { SubmissionFilters } from './use-submission-filters';
+import type { StatusGroup, SubmissionFilters } from './use-submission-filters';
 
-const props = defineProps<{ filters: SubmissionFilters; languages: Language[] }>();
+/** `showLive`, `showUser` and `showStatusGroups` let the contest rail reuse this rail without the controls it lacks. */
+const props = withDefaults(
+  defineProps<{
+    filters: SubmissionFilters;
+    languages: Language[];
+    showLive?: boolean;
+    showUser?: boolean;
+    showStatusGroups?: boolean;
+  }>(),
+  { showLive: true, showUser: true, showStatusGroups: false },
+);
 const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [] }>();
 
 /** The mock-up's six; a URL may carry any other valid result, the table's empty state then names it. */
 const RESULT_CHOICES: readonly SubmissionResult[] = ['AC', 'WA', 'TLE', 'MLE', 'RTE', 'CE'];
+const STATUS_GROUPS: readonly StatusGroup[] = ['grading', 'final'];
 const ANY_LANGUAGE = '';
 const LANGUAGE_LABEL_ID = 'submission-language-label';
 const TEXT_INPUT_CLASSES =
@@ -38,6 +49,12 @@ const toggleResult = (code: SubmissionResult, isChecked: boolean) =>
     results: isChecked
       ? [...props.filters.results, code]
       : props.filters.results.filter((selected) => selected !== code),
+  });
+const toggleStatusGroup = (group: StatusGroup, isChecked: boolean) =>
+  emit('update', {
+    statusGroups: isChecked
+      ? [...props.filters.statusGroups, group]
+      : props.filters.statusGroups.filter((selected) => selected !== group),
   });
 const pickLanguage = (languageId: string) =>
   emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
@@ -77,6 +94,20 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         </label>
       </div>
     </fieldset>
+    <fieldset v-if="showStatusGroups" class="m-0 flex min-w-0 flex-col gap-1 border-0 p-0">
+      <legend class="mb-1 text-[13px] text-muted">
+        {{ $t('contests.submissions.statusTitle') }}
+      </legend>
+      <label v-for="group in STATUS_GROUPS" :key="group" class="flex min-h-11 items-center gap-2.5">
+        <input
+          type="checkbox"
+          class="size-4 accent-accent"
+          :checked="filters.statusGroups.includes(group)"
+          @change="toggleStatusGroup(group, checkedOf($event))"
+        />
+        <span class="text-[15px]">{{ $t(`contests.submissions.status.${group}`) }}</span>
+      </label>
+    </fieldset>
     <div class="flex flex-col gap-1">
       <span :id="LANGUAGE_LABEL_ID" class="text-[13px] text-muted">{{
         $t('submissions.rail.language')
@@ -106,7 +137,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         :class="TEXT_INPUT_CLASSES"
       />
     </label>
-    <label class="flex flex-col gap-1 text-[13px] text-muted">
+    <label v-if="showUser" class="flex flex-col gap-1 text-[13px] text-muted">
       {{ $t('submissions.rail.userLabel') }}
       <input
         v-model="userText"
@@ -118,7 +149,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         :class="TEXT_INPUT_CLASSES"
       />
     </label>
-    <label class="flex min-h-11 items-center gap-2.5">
+    <label v-if="showLive" class="flex min-h-11 items-center gap-2.5">
       <input
         type="checkbox"
         data-testid="live-toggle"

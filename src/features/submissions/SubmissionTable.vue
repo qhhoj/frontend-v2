@@ -27,8 +27,10 @@ const props = withDefaults(
     showProblem?: boolean;
     /** Rows that just arrived: they fade in from the accent colour. */
     highlightIds?: ReadonlySet<string>;
+    /** Problem code to the contest letter, shown before the name (contest lists only). */
+    problemLabels?: Record<string, string>;
   }>(),
-  { showProblem: true, highlightIds: () => new Set<string>() },
+  { showProblem: true, highlightIds: () => new Set<string>(), problemLabels: () => ({}) },
 );
 const locale = useLocaleStore();
 /** "2 minutes ago" does not need a tick every second. */
@@ -124,6 +126,11 @@ const formatScore = (value: number) =>
             </td>
             <td v-if="showProblem" :class="BODY_CELL_CLASSES">
               <template v-if="row.problem">
+                <span
+                  v-if="problemLabels[row.problem.code]"
+                  class="mr-1.5 font-display font-bold"
+                  >{{ problemLabels[row.problem.code] }}</span
+                >
                 <RouterLink
                   :to="{ name: 'problem', params: { code: row.problem.code } }"
                   class="font-semibold text-content hover:underline"

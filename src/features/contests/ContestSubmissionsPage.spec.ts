@@ -1,0 +1,91 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  contestDetail,
+  contestProblem,
+  contestViewer,
+  problemMeta,
+  sessionUser,
+  submissionItem,
+} from '@/test/fixtures';
+import { contestPageRoutes } from '@/test/contest-routes';
+import { mockApi, ok, page } from '@/test/mock-api';
+import { mountApp } from '@/test/mount';
+import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+
+const RUNNING = Date.parse('2026-10-08T09:00:00Z');
+const open = contestDetail({ phase: 'ended', frozenLastMinutes: 0, problems: [contestProblem(0)] });
+const listCalls = (calls: ReturnType<typeof mockApi>) =>
+  calls.filter((call) => call.path === '/contests/r42/submissions');
+
+describe('contest submissions tab', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('asks the contest list with the URL filters, the status groups included', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(open),
+      'GET /contests/r42/submissions': page([submissionItem()]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    await mountApp('/contests/r42/submissions?result=WA&waiting=grading&waiting=final');
+    const query = listCalls(calls)[0]!.query;
+    expect(query.getAll('result')).toEqual(['WA']);
+    expect(query.getAll('status')).toEqual(['QU', 'P', 'G', 'PD']);
+    expect(query.get('user')).toBeNull();
+  });
+
+  it('labels rows with the contest letter and offers no live toggle', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(open),
+      'GET /contests/r42/submissions': page([
+        submissionItem({ problem: { code: 'r42a', name: 'Dãy số đẹp' } }),
+      ]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.get('tbody tr').text()).toMatch(/A\s*Dãy số đẹp/);
+    expect(wrapper.text()).not.toContain('Cập nhật trực tiếp');
+    expect(wrapper.text()).toContain('Đang chờ / đang chấm');
+  });
+
+  it('says a signed-in contestant only sees their own rows during the contest, and asks only for those', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail()),
+      'GET /contests/r42/submissions': page([]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.get('[data-testid="own-only"]').text()).toContain('Chỉ hiện bài nộp của bạn');
+    expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
+    expect(wrapper.find('input[placeholder="tên đăng nhập"]').exists()).toBe(false);
+  });
+
+  it('asks a visitor to sign in instead of sending a request the backend refuses', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail()),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(listCalls(calls)).toHaveLength(0);
+    expect(wrapper.get('[data-testid="own-only"] a').attributes('href')).toBe(
+      '/login?redirect=/contests/r42/submissions',
+    );
+  });
+
+  it('shows the full list to an editor without the banner', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ viewer: contestViewer({ canEdit: true }) })),
+      'GET /contests/r42/submissions': page([submissionItem()]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.find('[data-testid="own-only"]').exists()).toBe(false);
+  });
+});

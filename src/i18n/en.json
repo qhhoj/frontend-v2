@@ -66,6 +66,14 @@
       "stats": "Statistics",
       "ranking": "Ranking"
     },
+    "submissions": {
+      "statusTitle": "Judging state",
+      "status": { "grading": "Waiting / being judged", "final": "Waiting for the final judging" },
+      "ownOnlyTitle": "Only your submissions",
+      "ownOnlyBody": "Other contestants' submissions are not public while the contest runs or the board is frozen.",
+      "signIn": "Sign in to see your submissions",
+      "empty": "No submissions in this contest yet."
+    },
     "detail": {
       "authors": "Set by:",
       "freezeAt": "{time} freeze",

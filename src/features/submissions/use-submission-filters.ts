@@ -2,8 +2,16 @@ import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
-import type { SubmissionResult } from '@/api/types/submissions';
+import type { SubmissionResult, SubmissionStatus } from '@/api/types/submissions';
 import { UUID, valuesOf } from '@/features/problems/use-problem-filters';
+
+export type StatusGroup = 'grading' | 'final';
+/** The contest rail's "Trạng thái chấm" boxes, as the statuses the API filters by. */
+export const STATUS_GROUP_STATUSES: Record<StatusGroup, SubmissionStatus[]> = {
+  grading: ['QU', 'P', 'G'],
+  final: ['PD'],
+};
+const isStatusGroup = (value: string): value is StatusGroup => value in STATUS_GROUP_STATUSES;
 
 export interface SubmissionFilters {
   /** Problem code: the backend filters by code, not by name. */
@@ -12,6 +20,8 @@ export interface SubmissionFilters {
   user: string;
   results: SubmissionResult[];
   languageIds: string[];
+  /** Contest rail only: the judging-state boxes; the main list shows no control for them. */
+  statusGroups: StatusGroup[];
   page: number;
   /** Live updates (8b); on unless the URL says `live=0`. */
   live: boolean;
@@ -37,6 +47,7 @@ export const parseSubmissionFilters = (query: LocationQuery): SubmissionFilters 
   user: (valuesOf(query.user)[0] ?? '').slice(0, MAX_USERNAME_LENGTH),
   results: valuesOf(query.result).filter(isResult),
   languageIds: valuesOf(query.language).filter((id) => UUID.test(id)),
+  statusGroups: valuesOf(query.waiting).filter(isStatusGroup),
   page: pageOf(query),
   live: valuesOf(query.live)[0] !== LIVE_OFF,
 });
@@ -47,6 +58,7 @@ export const toSubmissionQuery = (filters: SubmissionFilters): LocationQueryRaw 
   user: filters.user || undefined,
   result: filters.results.length ? filters.results : undefined,
   language: filters.languageIds.length ? filters.languageIds : undefined,
+  waiting: filters.statusGroups.length ? filters.statusGroups : undefined,
   page: filters.page > 1 ? String(filters.page) : undefined,
   live: filters.live ? undefined : LIVE_OFF,
 });
