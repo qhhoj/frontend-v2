@@ -11,8 +11,8 @@ const TokenPage = defineComponent({
 });
 /** The policy a browser applies: the last referrer meta wins; none means the default. */
 const effectivePolicy = () => {
-  const metas = document.head.querySelectorAll<HTMLMetaElement>('meta[name="referrer"]');
-  return metas.length ? metas[metas.length - 1].content : 'strict-origin-when-cross-origin';
+  const metas = [...document.head.querySelectorAll<HTMLMetaElement>('meta[name="referrer"]')];
+  return metas.at(-1)?.content ?? 'strict-origin-when-cross-origin';
 };
 
 afterEach(() => document.head.querySelectorAll('meta[name="referrer"]').forEach((m) => m.remove()));

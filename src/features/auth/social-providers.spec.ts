@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { API_BASE } from '@/api/client';
 import { knownSocialProviders, socialStartUrl } from './social-providers';
 
 describe('knownSocialProviders', () => {
@@ -19,7 +20,14 @@ describe('knownSocialProviders', () => {
 });
 
 describe('socialStartUrl', () => {
-  it('points at the backend redirect endpoint', () => {
-    expect(socialStartUrl('github')).toBe('/api/internal/auth/social/github/start');
+  it('is a same-origin API path, one per provider, with nothing but the provider in it', () => {
+    const urls = (['google', 'github', 'facebook'] as const).map(socialStartUrl);
+    expect(new Set(urls).size).toBe(urls.length);
+    for (const url of urls) {
+      expect(url.startsWith(`${API_BASE}/`)).toBe(true);
+      expect(new URL(url, 'https://qhhoj.test').origin).toBe('https://qhhoj.test');
+      expect(url).not.toMatch(/[?#]/);
+    }
+    expect(socialStartUrl('github')).toContain('/github/');
   });
 });

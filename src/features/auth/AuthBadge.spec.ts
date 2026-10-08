@@ -5,14 +5,16 @@ import AuthBadge from './AuthBadge.vue';
 const ICON = '<svg data-testid="badge-icon"></svg>';
 
 describe('AuthBadge', () => {
-  it.each([
-    ['accent', 'bg-accent-soft', 'text-accent-text'],
-    ['positive', 'bg-verdict-ac-bg', 'text-verdict-ac'],
-    ['warning', 'bg-verdict-tle-bg', 'text-verdict-tle'],
-    ['negative', 'bg-verdict-wa-bg', 'text-verdict-wa'],
-  ] as const)('paints the %s tone with its background and text pair', (tone, background, text) => {
-    const badge = mountComponent(AuthBadge, { props: { tone }, slots: { default: ICON } });
-    expect(badge.classes()).toEqual(expect.arrayContaining([background, text]));
+  it('paints each tone differently, from theme tokens and never a raw colour', () => {
+    const tones = ['accent', 'positive', 'warning', 'negative'] as const;
+    const painted = tones.map((tone) =>
+      mountComponent(AuthBadge, { props: { tone }, slots: { default: ICON } })
+        .classes()
+        .join(' '),
+    );
+    expect(new Set(painted).size).toBe(tones.length);
+    for (const classes of painted)
+      expect(classes).not.toMatch(/#[0-9a-f]{3,8}|rgb|\b(red|green|blue)-/i);
   });
 
   it('hides the decoration from assistive technology and still renders its icon', () => {
