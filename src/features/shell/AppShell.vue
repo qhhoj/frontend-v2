@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import AppHeader from './AppHeader.vue';
+import ImpersonationBanner from './ImpersonationBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
@@ -26,6 +27,7 @@ const route = useRoute();
     >
       {{ $t('app.skipToContent') }}
     </a>
+    <ImpersonationBanner />
     <AppHeader v-if="route.meta.layout !== 'auth'" />
     <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
       <slot />
