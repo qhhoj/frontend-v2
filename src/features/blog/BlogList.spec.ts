@@ -1,12 +1,14 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import type { VoteScore } from '@/api/types/votes';
 import { postItem } from '@/test/community-fixtures';
-import { communityHomeRoutes } from '@/test/community-routes';
+import { blogListRoutes, communityHomeRoutes } from '@/test/community-routes';
 import { hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 const OWN_AUTHOR_ID = '0192a000-0000-7000-8000-000000000001';
+const UP = 'button[aria-label="Bình chọn lên"]';
 
 describe('blog list: feed, pages and links', () => {
   it('reads the feed and page from the URL, pins sticky posts with a label and links each post', async () => {
@@ -43,38 +45,76 @@ describe('blog list: feed, pages and links', () => {
 });
 
 describe('blog list: votes', () => {
-  it('lets a signed-in reader vote and refreshes the list', async () => {
+  it('lets a signed-in reader vote, shows the new score and pressed state, and refreshes the list', async () => {
+    let vote: { score: number; viewerVote: VoteScore } = { score: 58, viewerVote: 0 };
     const calls = mockApi({
       ...signedInViewer(),
       ...communityHomeRoutes,
-      'GET /posts': page([postItem()]),
-      [`PUT /posts/${postItem().id}/vote`]: ok({ score: 59, viewerVote: 1 }),
+      'GET /posts': () => page([postItem({ ...vote })]),
+      [`PUT /posts/${postItem().id}/vote`]: ({ body }) => {
+        const { score } = body as { score: VoteScore };
+        vote = { score: 58 + score, viewerVote: score };
+        return ok(vote);
+      },
     });
     const { wrapper } = await mountApp('/blog');
-    await wrapper
-      .get('[data-testid="post-row"] button[aria-label="Bình chọn lên"]')
-      .trigger('click');
+    await wrapper.get(`[data-testid="post-row"] ${UP}`).trigger('click');
     await flushPromises();
     expect(calls.find((call) => call.method === 'PUT')!.body).toEqual({ score: 1 });
+    expect(wrapper.get('[data-testid="vote-score"]').text()).toBe('59');
+    expect(wrapper.get(UP).attributes('aria-pressed')).toBe('true');
     expect(calls.filter((call) => call.path === '/posts')).toHaveLength(2);
   });
-  it('keeps the arrows of the viewer’s own post inert', async () => {
-    mockApi({
+});
+
+describe('blog list: inert arrows', () => {
+  it('keeps the arrows of the viewer’s own post inert: a press sends nothing', async () => {
+    const calls = mockApi({
       ...signedInViewer(),
       ...communityHomeRoutes,
       'GET /posts': page([postItem({ authors: [{ id: OWN_AUTHOR_ID, username: 'user_01' }] })]),
     });
     const { wrapper } = await mountApp('/blog');
-    expect(wrapper.get('button[aria-label="Bình chọn lên"]').attributes('aria-disabled')).toBe(
-      'true',
-    );
+    expect(wrapper.get(UP).attributes('aria-disabled')).toBe('true');
+    await wrapper.get(UP).trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
   });
-  it('keeps a guest’s arrows inert', async () => {
-    mockApi({ ...anonymousViewer, ...communityHomeRoutes, 'GET /posts': page([postItem()]) });
+  it('keeps a guest’s arrows inert: a press sends nothing', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...communityHomeRoutes,
+      'GET /posts': page([postItem()]),
+    });
     const { wrapper } = await mountApp('/blog');
-    expect(wrapper.get('button[aria-label="Bình chọn lên"]').attributes('aria-disabled')).toBe(
-      'true',
-    );
+    expect(wrapper.get(UP).attributes('aria-disabled')).toBe('true');
+    await wrapper.get(UP).trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+  });
+});
+
+describe('blog list: pager and dividers', () => {
+  it('hides the pager and leaves no padding when one page holds every post', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...communityHomeRoutes,
+      'GET /posts': page([postItem()], { total: 1 }),
+    });
+    const { wrapper } = await mountApp('/blog');
+    expect(wrapper.find('nav[aria-label="Trang bài viết"]').exists()).toBe(false);
+    const list = wrapper.get('[data-testid="post-list"]').element;
+    expect(list.lastElementChild!.querySelector('[data-testid="post-row"]')).not.toBeNull();
+    expect(wrapper.get('[data-testid="post-list"] .divide-y').classes()).toContain('divide-line');
+  });
+  it('pads the pager when there is a second page', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...communityHomeRoutes,
+      'GET /posts': page([postItem()], { pageSize: 10, total: 25 }),
+    });
+    const { wrapper } = await mountApp('/blog');
+    expect(wrapper.get('nav[aria-label="Trang bài viết"]').classes()).toContain('p-4');
   });
 });
 
@@ -84,10 +124,11 @@ describe('blog list: states', () => {
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.get('[data-state="communityEmpty"]').text()).toContain('Chưa có bài viết nào');
   });
-  it('shows post-shaped blocks while loading', async () => {
-    mockApi({ ...anonymousViewer });
+  it('shows post-shaped blocks, in the same divider as the loaded list, while loading', async () => {
+    mockApi({ ...anonymousViewer, ...blogListRoutes });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.findAll('[data-skeleton-region="post-row"]')).toHaveLength(6);
+    expect(wrapper.get('[data-testid="post-list"] .divide-y').classes()).toContain('divide-line');
   });
 });

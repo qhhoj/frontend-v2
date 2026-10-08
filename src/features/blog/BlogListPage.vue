@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { Pencil, Rss } from 'lucide-vue-next';
+import type { RouteLocationRaw } from 'vue-router';
 import { computed, ref, watch } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
-import { useSessionStore } from '@/stores/session.store';
+import type { PostFeed } from '@/api/types/blog';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
 import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
+import { useSessionStore } from '@/stores/session.store';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
 import { usePostsQuery } from './blog.queries';
@@ -19,6 +21,10 @@ const session = useSessionStore();
 const { data, isPending, error, refetch } = usePostsQuery(feed, page);
 const posts = computed(() => data.value?.items ?? []);
 const meta = computed(() => data.value?.meta);
+const FEED_TABS: { feed: PostFeed; to: RouteLocationRaw }[] = [
+  { feed: 'global', to: { name: 'blog' } },
+  { feed: 'all', to: { name: 'blog', query: { feed: 'all' } } },
+];
 const TAB =
   'inline-flex min-h-11 items-center rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
 const TOOL =
@@ -39,30 +45,18 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
     </header>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <nav :aria-label="$t('blog.feedsLabel')" class="glass flex flex-wrap gap-1 rounded-pill p-1">
-        <RouterLink v-slot="{ href, navigate }" custom :to="{ name: 'blog' }">
-          <a
-            :href="href"
-            :class="TAB"
-            :aria-current="feed === 'global' ? 'page' : undefined"
-            @click="navigate"
-          >
-            {{ $t('blog.feeds.global') }}
-          </a>
-        </RouterLink>
-        <RouterLink
-          v-slot="{ href, navigate }"
-          custom
-          :to="{ name: 'blog', query: { feed: 'all' } }"
-        >
-          <a
-            :href="href"
-            :class="TAB"
-            :aria-current="feed === 'all' ? 'page' : undefined"
-            @click="navigate"
-          >
-            {{ $t('blog.feeds.all') }}
-          </a>
-        </RouterLink>
+        <template v-for="tab in FEED_TABS" :key="tab.feed">
+          <RouterLink v-slot="{ href, navigate }" custom :to="tab.to">
+            <a
+              :href="href"
+              :class="TAB"
+              :aria-current="feed === tab.feed ? 'page' : undefined"
+              @click="navigate"
+            >
+              {{ $t(`blog.feeds.${tab.feed}`) }}
+            </a>
+          </RouterLink>
+        </template>
       </nav>
       <div class="flex flex-wrap items-center gap-2.5">
         <RouterLink v-if="session.user" :to="{ name: 'post-new' }" :class="TOOL">
@@ -80,15 +74,15 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         <GlassCard as="div" data-testid="post-list" class="overflow-hidden">
           <QueryState :loading="isPending" :error="error" @retry="refetch()">
             <template #skeleton>
-              <PostRowSkeleton v-for="row in 6" :key="row" />
+              <div class="divide-y divide-line">
+                <PostRowSkeleton v-for="row in 6" :key="row" />
+              </div>
             </template>
             <StatePanel v-if="!posts.length" kind="communityEmpty" :title="$t('blog.empty')" />
             <div v-else class="divide-y divide-line">
               <PostRow v-for="post in posts" :key="post.id" :post="post" />
             </div>
-            <div v-if="meta" class="p-4">
-              <NumberedPager :meta="meta" :label="$t('blog.pager')" />
-            </div>
+            <NumberedPager v-if="meta" class="p-4" :meta="meta" :label="$t('blog.pager')" />
           </QueryState>
         </GlassCard>
       </div>

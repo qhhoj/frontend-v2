@@ -27,6 +27,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 <template>
   <article data-testid="post-row" class="flex gap-3 px-4 py-4 sm:px-5">
     <VoteControl
+      class="shrink-0"
       :score="post.score"
       :viewer-vote="post.viewerVote"
       :can-vote="canVote"
@@ -34,19 +35,19 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       @voted="refreshPosts"
     />
     <div class="flex min-w-0 flex-1 flex-col gap-2">
-      <span
-        v-if="post.sticky"
-        class="w-fit rounded-pill bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-soft-text"
-      >
-        {{ $t('blog.pinned') }}
-      </span>
-      <h2 class="text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
+      <h2 class="line-clamp-2 min-h-14 text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
+        <span
+          v-if="post.sticky"
+          class="mr-2 inline-flex rounded-pill bg-accent-soft px-2.5 py-0.5 align-middle text-xs font-semibold text-accent-soft-text"
+        >
+          {{ $t('blog.pinned') }}
+        </span>
         <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
           {{ post.title }}
         </RouterLink>
       </h2>
-      <UserContent :html="post.summaryHtml" class="line-clamp-3 text-muted" />
-      <footer class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+      <UserContent :html="post.summaryHtml" class="line-clamp-3 min-h-18 text-muted" />
+      <footer class="flex min-h-5 flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
         <UserName v-for="author in post.authors" :key="author.id" :username="author.username" />
         <time :datetime="post.publishOn">
           {{ formatNumericDate(post.publishOn, locale.locale) }}

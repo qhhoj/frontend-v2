@@ -7,10 +7,7 @@ import { useHomeQuery } from './community.queries';
 import CommunityCard from './CommunityCard.vue';
 import RecentCommentRow from './RecentCommentRow.vue';
 
-/** `variant` is part of the cards' shared props; the comment rows read the same on both screens. */
-const props = withDefaults(defineProps<{ limit: number; variant?: 'rail' | 'home' }>(), {
-  variant: 'rail',
-});
+const props = defineProps<{ limit: number }>();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const now = useNow();
 const comments = computed(() => (home.value?.recentComments ?? []).slice(0, props.limit));
