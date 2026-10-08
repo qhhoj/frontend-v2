@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PHONE_QUERY } from '@/lib/use-media-query';
-import { SCRATCH_ID, problemDetail } from '@/test/fixtures';
+import { PY3_ID, SCRATCH_ID, problemDetail } from '@/test/fixtures';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountApp } from '@/test/mount';
@@ -16,10 +16,10 @@ const signedInRoutes = (detail = problemDetail()) => ({
   ...signedInViewer(),
   ...problemPageRoutes(detail),
 });
-async function openProblem({ isPhone = true } = {}) {
+async function openProblem({ isPhone = true, path = '/problems/duongdi' } = {}) {
   const media = stubMatchMedia();
   media.setQuery(PHONE_QUERY, isPhone);
-  const mounted = await mountApp('/problems/duongdi');
+  const mounted = await mountApp(path);
   await vi.waitFor(() => expect(mounted.wrapper.find('#main h1').exists()).toBe(true));
   await flushPromises();
   return { ...mounted, media };
@@ -96,6 +96,31 @@ describe('the sheet shell', () => {
     await sheetOf(wrapper).trigger('keydown', { key: 'Escape' });
     await expandSheet(wrapper);
     expect(sheetOf(wrapper).get('textarea').element.value).toBe('my code');
+  });
+  describe('?resubmit', () => {
+    const earlier = {
+      'GET /submissions/sub-1': ok({
+        id: 'sub-1',
+        language: { id: PY3_ID, key: 'PY3', name: 'Python 3' },
+      }),
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'print(7)\n' }),
+    };
+    it('opens the sheet on the prefilled code when the page loads with it', async () => {
+      mockApi({ ...signedInRoutes(), ...earlier });
+      const { wrapper } = await openProblem({ path: '/problems/duongdi?resubmit=sub-1' });
+      await vi.waitFor(() =>
+        expect(sheetOf(wrapper).get('textarea').element.value).toBe('print(7)\n'),
+      );
+    });
+    it('opens a collapsed sheet when the parameter arrives later', async () => {
+      mockApi({ ...signedInRoutes(), ...earlier });
+      const { wrapper, router } = await openProblem();
+      expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
+      await router.push({ query: { resubmit: 'sub-1' } });
+      await vi.waitFor(() =>
+        expect(sheetOf(wrapper).get('textarea').element.value).toBe('print(7)\n'),
+      );
+    });
   });
   it('is a single sign-in bar for an anonymous viewer', async () => {
     mockApi({ ...anonymousViewer, ...problemPageRoutes() });

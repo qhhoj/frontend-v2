@@ -18,6 +18,7 @@ function follow(id: Ref<string | null>) {
     { global: { plugins: [[VueQueryPlugin, { queryClient }]] } },
   );
   return {
+    queryClient,
     live: (wrapper.vm as unknown as { live: ReturnType<typeof useSubmissionStatus> }).live,
     wrapper,
     invalidate,
@@ -48,7 +49,9 @@ describe('useSubmissionStatus', () => {
 
   it('reads the final row once on done, closes the stream and refreshes submission lists', async () => {
     const calls = mockApi({ 'GET /submissions/abc': row('D', 'AC') });
-    const { live, invalidate } = follow(ref('abc'));
+    const { live, queryClient } = follow(ref('abc'));
+    for (const scope of ['list', 'detail', 'stats', 'source'])
+      queryClient.setQueryData(['submissions', scope, 'x'], {});
     const stream = latestEventSource();
     stream.emit('done', { submissionId: 'abc', type: 'done', status: 'D' });
     stream.emit('done', { submissionId: 'abc', type: 'done', status: 'D' });
@@ -56,7 +59,11 @@ describe('useSubmissionStatus', () => {
     expect(live).toMatchObject({ status: 'D', result: 'AC', done: true });
     expect(stream.closed).toBe(true);
     expect(calls).toHaveLength(1);
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['submissions'] });
+    const isStale = (key: unknown[]) => queryClient.getQueryState(key)!.isInvalidated;
+    expect(
+      ['list', 'detail', 'stats'].map((scope) => isStale(['submissions', scope, 'x'])),
+    ).toEqual([true, true, true]);
+    expect(isStale(['submissions', 'source', 'x'])).toBe(false);
   });
 
   it('finishes at once when the state is already final', async () => {

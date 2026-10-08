@@ -11,7 +11,7 @@ const ROW_REFETCH_MAX_WAIT_MS = 2000;
 
 /**
  * The submission row kept up to date while it is judged. The stream is followed only while the stored row is
- * in progress. `useSubmissionStatus` reads the row once more when the stream ends (it invalidates `['submissions']`),
+ * in progress. `useSubmissionStatus` reads the row once more when the stream ends (it invalidates the list, detail and stats),
  * so that final read is not repeated here.
  */
 export function useLiveSubmission(id: Ref<string>) {

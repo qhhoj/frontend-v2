@@ -62,7 +62,7 @@ export function withPatch(
 function pageAfter(filters: SubmissionFilters, patch: Partial<SubmissionFilters>): number {
   if (patch.page !== undefined) return patch.page;
   // Live updates is a view setting, not a filter: the list is the same, so the page stays.
-  const changesOnlyLive = patch.live !== undefined;
+  const changesOnlyLive = Object.keys(patch).every((key) => key === 'live');
   return changesOnlyLive ? filters.page : 1;
 }
 

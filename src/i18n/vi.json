@@ -15,6 +15,7 @@
     "problem": "Đề bài",
     "submissions": "Bài nộp",
     "submission": "Chi tiết bài nộp",
+    "submissionTitle": "Bài nộp {id}",
     "contest": "Kỳ thi",
     "ranking": "Bảng xếp hạng",
     "user": "Hồ sơ",

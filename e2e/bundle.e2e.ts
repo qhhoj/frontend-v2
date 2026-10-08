@@ -1,7 +1,7 @@
 import { expect, test } from './fixtures/api';
 
 /** The editor and its language packs are lazy chunks (about 25 kB plus 30-100 kB each): a modulepreload would fetch them for every visitor. */
-const HEAVY_CHUNK = /\/assets\/(code-editor-cm|code-lang-[\w-]+)-[\w-]+\.js/;
+const HEAVY_CHUNK = /\/assets\/(code-editor-cm|code-editor-core|code-lang-[\w-]+)-[\w-]+\.js/;
 
 test('the built page does not preload the editor or a language pack', async ({ page, api }) => {
   void api;
@@ -36,6 +36,7 @@ test('the dock loads the editor and only the pack of its language', async ({ pag
   await expect(page.locator('.cm-content').first()).toBeVisible();
   const chunks = requested.filter((url) => HEAVY_CHUNK.test(url));
   expect(chunks.some((url) => url.includes('code-editor-cm'))).toBe(true);
+  expect(chunks.some((url) => url.includes('code-editor-core'))).toBe(true);
   expect(chunks.some((url) => url.includes('code-lang-cpp'))).toBe(true);
   expect(chunks.filter((url) => url.includes('code-lang-python'))).toEqual([]);
 });

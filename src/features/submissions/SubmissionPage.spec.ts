@@ -252,6 +252,30 @@ describe('submission page', () => {
     );
   });
 
+  it('names the tab after the short submission id', async () => {
+    const longId = '0192a000-aaaa-7000-8000-000000000abc';
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(submissionDetail({ id: longId })),
+      ...problemPageRoutes(),
+    });
+    await openSubmission(longId);
+    expect(document.title).toBe('Bài nộp #0192a0…abc · QHHOJ');
+  });
+
+  it("offers no Nộp lại on another user's submission", async () => {
+    const stranger = { id: 'someone-else', username: 'stranger' };
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(submissionDetail({ user: stranger })),
+      ...problemPageRoutes(),
+      ...sourceRoute,
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Mã nguồn'));
+    expect(wrapper.find('a[href*="resubmit"]').exists()).toBe(false);
+  });
+
   it('announces the status in one polite region inside the page and keeps it unchanged between test-case events', async () => {
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
     const { wrapper } = await openSubmission('sub-1');

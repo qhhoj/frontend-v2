@@ -8,7 +8,10 @@ import { mountApp } from '@/test/mount';
 import { anonymousViewer, submissionListRoutes } from '@/test/problem-routes';
 import { LIVE_SETTLE_MS } from './use-live-submission-list';
 
+const scrollIntoView = vi.fn();
 beforeEach(() => {
+  scrollIntoView.mockClear();
+  Element.prototype.scrollIntoView = scrollIntoView;
   installFakeEventSource();
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
 });
@@ -116,6 +119,7 @@ describe('live updates on the submission list', () => {
     await wrapper.get('[data-testid="new-pill"]').trigger('click');
     await vi.waitFor(() => expect(router.currentRoute.value.query.page).toBeUndefined());
     expect(wrapper.find('[data-testid="new-pill"]').exists()).toBe(false);
+    expect(scrollIntoView).toHaveBeenCalledTimes(1); // the new rows are in view, not just loaded
   });
   it('counts the queued frames when the API sends no total', async () => {
     mockApi(pageTwoRoutes(undefined));
@@ -255,9 +259,10 @@ describe('live updates on the submission list', () => {
     expect(refetches).toHaveLength(2);
     expect(calls.filter((call) => call.path === '/submissions/stats')).toHaveLength(2);
   });
-  it('keeps one polite status element in the page', async () => {
-    mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    const { wrapper } = await openList();
-    expect(wrapper.findAll('#main [role="status"][aria-live="polite"]')).toHaveLength(1);
+  it('keeps one polite live region in the page, even with a pager showing its position', async () => {
+    mockApi(pageTwoRoutes(100));
+    const { wrapper } = await openList('/submissions?page=2');
+    expect(wrapper.find('#main nav').exists()).toBe(true);
+    expect(wrapper.findAll('#main [aria-live="polite"], #main [role="status"]')).toHaveLength(1);
   });
 });

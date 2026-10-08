@@ -29,6 +29,14 @@ describe('problem page', () => {
     expect(wrapper.findAll('main')).toHaveLength(1);
   });
 
+  it('names the tab after the problem and goes back to the section title when leaving', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { router } = await openProblem();
+    await vi.waitFor(() => expect(document.title).toBe('Đường đi ngắn nhất · QHHOJ'));
+    await router.push('/contests');
+    await vi.waitFor(() => expect(document.title).toBe('Kỳ thi · QHHOJ'));
+  });
+
   it('sends the UI locale as statement language and refetches when it changes', async () => {
     const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper } = await openProblem();

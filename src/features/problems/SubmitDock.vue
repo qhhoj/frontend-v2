@@ -4,7 +4,6 @@ import { computed, ref, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
-import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
@@ -28,10 +27,6 @@ const form = useSubmitForm(toRef(props, 'problem'), resubmitId);
 const isCollapsed = ref(false);
 const dock = ref<HTMLElement | null>(null);
 useDockHeight(dock);
-const signInTarget = computed(() => ({
-  path: '/login',
-  query: { redirect: safeRedirect(route.fullPath) },
-}));
 </script>
 
 <template>
@@ -40,7 +35,7 @@ const signInTarget = computed(() => ({
     :problem="problem"
     :form="form"
     :is-signed-in="isSignedIn"
-    :sign-in-target="signInTarget"
+    :resubmit-id="resubmitId"
   />
   <section
     v-else
@@ -49,7 +44,7 @@ const signInTarget = computed(() => ({
     class="fixed inset-x-0 bottom-0 z-30 border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
   >
     <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-3">
-      <SubmitSignInLink v-if="!isSignedIn" :to="signInTarget" />
+      <SubmitSignInLink v-if="!isSignedIn" />
       <SubmitForm
         v-else
         :id="BODY_ID"

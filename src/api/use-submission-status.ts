@@ -23,9 +23,13 @@ export interface SubmissionLiveState {
 
 type StoredRow = { status: SubmissionStatus; result: SubmissionResult | null };
 
+/** What a finished grading changes: the list, detail and stats. The source (up to 64 KB) never changes, so it is not refetched. */
+const SUBMISSION_SCOPES_TO_REFRESH: unknown[] = ['list', 'detail', 'stats'];
+const changesWithGrading = (queryKey: readonly unknown[]) =>
+  queryKey[0] === 'submissions' && SUBMISSION_SCOPES_TO_REFRESH.includes(queryKey[1]);
 const PROGRESS_EVENTS = ['queued', 'processing', 'grading-begin', 'test-case', 'done'] as const;
 
-/** Follows one submission over SSE; once finished it reads the stored row (result and points live in REST) and refreshes submission lists. */
+/** Follows one submission over SSE; once finished it reads the stored row (result and points live in REST) and refreshes the list, detail and stats. */
 export function useSubmissionStatus(
   submissionId: Ref<string | null>,
 ): Readonly<SubmissionLiveState> {
@@ -67,7 +71,9 @@ export function useSubmissionStatus(
         if (generation !== mine) return;
         if (row) Object.assign(state, { status: row.status, result: row.result });
         state.done = true;
-        void queryClient.invalidateQueries({ queryKey: ['submissions'] });
+        void queryClient.invalidateQueries({
+          predicate: ({ queryKey }) => changesWithGrading(queryKey),
+        });
       }
 
       /** `stream` is null once finishing started, so a late final event does not finish twice. */

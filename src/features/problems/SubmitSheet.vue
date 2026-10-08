@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheetHeader from './SubmitSheetHeader.vue';
@@ -12,14 +11,23 @@ const SHEET_ID = 'submit-sheet';
 /** The bar and the open sheet are one surface in two sizes. */
 const SHEET_SURFACE =
   'fixed inset-x-0 bottom-0 z-30 rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
-defineProps<{
+const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   isSignedIn: boolean;
-  signInTarget: RouteLocationRaw;
+  /** `?resubmit=` of a signed-in viewer: the prefilled code is the point of the visit, so the sheet opens for it. */
+  resubmitId: string | null;
 }>();
 /** Per page load: no storage. Starts collapsed so the statement is what the viewer sees first. */
 const isExpanded = ref(false);
+// Every time the id appears, not only on load: an anonymous viewer arrives with it after signing in.
+watch(
+  () => props.resubmitId,
+  (id) => {
+    if (id) isExpanded.value = true;
+  },
+  { immediate: true },
+);
 /** The bar the page reserves room for; the expanded sheet overlays the statement instead. */
 const bar = ref<HTMLElement | null>(null);
 const header = ref<{ focusTitle: () => void; focusToggle: () => void } | null>(null);
@@ -40,7 +48,7 @@ watch(isExpanded, async (expanded) => {
     :aria-label="$t('submit.title')"
     :class="SHEET_SURFACE"
   >
-    <SubmitSignInLink v-if="!isSignedIn" :to="signInTarget" class="px-4 py-1" />
+    <SubmitSignInLink v-if="!isSignedIn" class="px-4 py-1" />
     <SubmitSheetHeader
       v-else
       ref="header"
@@ -65,6 +73,7 @@ watch(isExpanded, async (expanded) => {
       @toggle="isExpanded = false"
       @collapse="isExpanded = false"
     />
+    <!-- Mounted per expand, so a standing alert is announced again on reopening: accepted, a reopen is a new look at the form. -->
     <div class="flex min-h-0 flex-1 flex-col px-4 pb-3">
       <SubmitForm :problem="problem" :form="form" layout="sheet" />
     </div>

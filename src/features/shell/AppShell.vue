@@ -23,7 +23,7 @@ useAccountThemeSync();
       {{ $t('app.skipToContent') }}
     </a>
     <AppHeader />
-    <main id="main" tabindex="-1" class="relative">
+    <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
       <slot />
     </main>
     <LoadingLayer />

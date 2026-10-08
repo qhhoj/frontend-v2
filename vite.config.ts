@@ -6,12 +6,19 @@ import { defineConfig } from 'vitest/config';
 /** The api the dev server proxies `/api` to; same origin keeps the session cookie and the Origin check (`SITE_URL=http://localhost:5173`). */
 const apiOrigin = process.env.API_ORIGIN ?? 'http://localhost:3000';
 
-/** A language pack's chunk is named after its package (`code-lang-python`), not the bundler's `dist-<hash>`; the other chunks keep the default. */
+/**
+ * The editor's chunks are named for what they are (`code-lang-python`, `code-editor-core`), not the bundler's
+ * `dist-<hash>`, so a network tab tells them apart; the other chunks keep the default. All stay lazy.
+ */
 function chunkFileName(chunk: { moduleIds: string[] }) {
   const pack = chunk.moduleIds
     .map((id) => /@codemirror\/lang-([a-z]+)\//.exec(id)?.[1])
     .find(Boolean);
-  return pack ? `assets/code-lang-${pack}-[hash].js` : 'assets/[name]-[hash].js';
+  if (pack) return `assets/code-lang-${pack}-[hash].js`;
+  const isEditorCore = chunk.moduleIds.some((id) =>
+    /@codemirror\/(?:state|view|language)\//.test(id),
+  );
+  return isEditorCore ? 'assets/code-editor-core-[hash].js' : 'assets/[name]-[hash].js';
 }
 
 export default defineConfig({

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   coinIndex,
   formatCaseMemory,
@@ -77,8 +77,12 @@ describe('limits', () => {
   });
 });
 describe('formatDateTime', () => {
-  it('shows the UTC date and time in the locale', () => {
-    expect(formatDateTime('2026-10-08T23:30:00Z', 'en')).toBe('Oct 8, 2026, 11:30 PM');
+  afterEach(() => vi.unstubAllEnvs());
+  it('shows the instant in the viewer time zone, not UTC', () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    expect(formatDateTime('2026-10-08T07:05:00Z', 'en')).toBe('Oct 8, 2026, 2:05 PM');
+    vi.stubEnv('TZ', 'America/Los_Angeles');
+    expect(formatDateTime('2026-10-08T07:05:00Z', 'en')).toBe('Oct 8, 2026, 12:05 AM');
   });
 });
 describe('formatDate', () => {

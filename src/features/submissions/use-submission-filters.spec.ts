@@ -58,5 +58,6 @@ describe('submission filters in the URL', () => {
     expect(withPatch(current, { results: ['AC'] }).page).toBe(1);
     expect(withPatch(current, { page: 5 }).page).toBe(5);
     expect(withPatch(current, { live: false }).page).toBe(4);
+    expect(withPatch(current, { live: false, results: ['AC'] }).page).toBe(1);
   });
 });

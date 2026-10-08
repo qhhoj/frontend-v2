@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 import { submissionItem } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
+import type { FakeApi } from './fixtures/api';
 import { list } from './fixtures/api';
 
 const PHONE_WIDTH = 375;
@@ -47,6 +48,20 @@ const pushQueued = (page: Page) =>
     ),
   );
 const newRow = () => submissionItem({ id: 'new', status: 'QU', result: null, points: null });
+/** Page 2 of a long list, and a page-1 probe that reports rows beyond it. */
+const routePageTwoWithNewRows = (api: FakeApi) => {
+  api.routes['GET /submissions'] = ({ url }) =>
+    url.searchParams.get('pageSize') === '1'
+      ? { body: { data: [newRow()], meta: { page: 1, pageSize: 1, total: 103 } } }
+      : {
+          body: {
+            data: [...Array(LONG_PAGE_ROWS).keys()].map((index) =>
+              submissionItem({ id: `p2-${index}` }),
+            ),
+            meta: { page: 2, pageSize: 50, total: 100 },
+          },
+        };
+};
 
 for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
   for (const scheme of ['light', 'dark'] as const)
@@ -58,17 +73,7 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
       });
 
       test('shows the N new pill on a later page and fits the viewport', async ({ page, api }) => {
-        api.routes['GET /submissions'] = ({ url }) =>
-          url.searchParams.get('pageSize') === '1'
-            ? { body: { data: [newRow()], meta: { page: 1, pageSize: 1, total: 103 } } }
-            : {
-                body: {
-                  data: [...Array(LONG_PAGE_ROWS).keys()].map((index) =>
-                    submissionItem({ id: `p2-${index}` }),
-                  ),
-                  meta: { page: 2, pageSize: 50, total: 100 },
-                },
-              };
+        routePageTwoWithNewRows(api);
         await page.goto('/submissions?page=2');
         await expect(page.locator('tbody tr')).toHaveCount(LONG_PAGE_ROWS);
         await pushQueued(page);
@@ -83,6 +88,22 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
         if (SHOTS_DIR) {
           await page.screenshot({ path: `${SHOTS_DIR}/task-8b-pill-${width}-${scheme}.png` });
         }
+      });
+
+      test('brings the top of the list into view when the pill is clicked', async ({
+        page,
+        api,
+      }) => {
+        routePageTwoWithNewRows(api);
+        await page.goto('/submissions?page=2');
+        await expect(page.locator('tbody tr')).toHaveCount(LONG_PAGE_ROWS);
+        await pushQueued(page);
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.getByTestId('new-pill').click({ timeout: SETTLE_TIMEOUT_MS });
+        await expect(page).not.toHaveURL(/page=2/);
+        const firstRow = page.locator('tbody tr').first();
+        await expect(firstRow).toBeInViewport();
+        expect((await firstRow.boundingBox())!.y).toBeGreaterThanOrEqual(0);
       });
 
       test('prepends a new row on page 1 and marks it', async ({ page, api }) => {

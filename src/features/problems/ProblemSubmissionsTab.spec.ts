@@ -30,7 +30,7 @@ describe('the problem Submissions tab', () => {
     expect(headers).not.toContain('Bài');
   });
 
-  it('links to the full list of this problem', async () => {
+  it('links to the full list of this problem, narrowed to the viewer (the tab lists their own rows)', async () => {
     mockApi({
       ...signedInViewer(),
       ...problemPageRoutes(),
@@ -41,7 +41,7 @@ describe('the problem Submissions tab', () => {
       expect(wrapper.find('#problem-panel-submissions tbody tr').exists()).toBe(true),
     );
     const link = wrapper.get('#problem-panel-submissions a[href^="/submissions?"]');
-    expect(link.attributes('href')).toBe('/submissions?problem=duongdi');
+    expect(link.attributes('href')).toBe('/submissions?problem=duongdi&user=user_01');
     expect(link.text()).toBe('Xem tất cả');
   });
 

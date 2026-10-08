@@ -8,7 +8,10 @@ import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useProblemQuery } from '@/features/problems/problems.queries';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import { verdictOf } from '@/lib/verdicts';
+import { usePageTitle } from '@/router/page-title';
+import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useViewerId } from '@/stores/use-viewer-id';
 import CasesTable from './CasesTable.vue';
 import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
@@ -30,8 +33,12 @@ const shortId = computed(() =>
     ? `#${id.value}`
     : `#${id.value.slice(0, ID_HEAD_LENGTH)}…${id.value.slice(-ID_TAIL_LENGTH)}`,
 );
+usePageTitle(() => translate('pages.submissionTitle', { id: shortId.value }));
 
 // The problem gives the points and the name; it may be unreadable for this viewer, then the row's own name stands in.
+/** Loading another user's code into the viewer's editor is surprising, so only the author may resubmit. */
+const viewerId = useViewerId();
+const isOwn = computed(() => row.value?.user?.id === viewerId.value);
 const problemCode = computed(() => row.value?.problem?.code ?? null);
 const problemQuery = useProblemQuery(
   computed(() => problemCode.value ?? ''),
@@ -109,7 +116,7 @@ const verdict = computed(() => {
           :running="isLive"
           :compile-error="row.status === 'CE' ? row.error : null"
         />
-        <SourceView :id="row.id" :problem-code="problemCode" />
+        <SourceView :id="row.id" :problem-code="problemCode" :is-own="isOwn" />
       </template>
     </QueryState>
   </div>

@@ -134,7 +134,12 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Submit form state is split into one composable per concern (language, template, file, resubmit) behind `useSubmitForm`; the dock reports its height as `--dock-height` and starts expanded each page load (no storage).
 - Submission list: stats strip (B24), URL-synced filter rail, live updates over the public feed with a throttled refetch.
 - Contest context (B19) shows only the attempts left in the dock; no banner until 8d.
-- Dates from the API show as UTC calendar dates (the SPA does not know site.timeZone).
+- Dates from the API show as UTC calendar dates (the SPA does not know site.timeZone); instants (submission time) show in the viewer's own time zone, so a contestant in Vietnam sees 14:05 for 14:05.
+- Nộp lại shows only on the viewer's own submissions; the problem Submissions tab's "View all" goes to `/submissions?problem=<code>&user=<me>`, because the tab lists the viewer's own rows.
+- Navigating to another path moves focus to `#main` (router `afterEach`), so focus never falls to the body after a submit; query-only changes keep their own handling. Problem and submission pages name the tab (`usePageTitle`).
+- Chunks: language packs are `code-lang-<name>`, the CodeMirror core is `code-editor-core`, so a network tab says what they are; all stay lazy and unpreloaded.
+- Header nav: at phone widths items use `px-2 text-sm` so all five fit at 375 px; at 320 px the pill still scrolls on its own.
+- E2E: `FakeApi` matches `:param` keys (an exact key wins), records every request in `requests` and serves PDF and event-stream replies; the editor and language packs must never be modulepreloaded (`bundle.e2e.ts`).
 - Real-backend e2e is a separate opt-in Playwright project (`E2E_REAL_API`, `e2e-real/`), so the fake-API suite and CI never depend on a running backend; without a judge it asserts `QU`/`P` and says why it skips the AC check.
 
 ## Known gaps (later sub-projects)
@@ -142,5 +147,3 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.
 - Session expiry mid-page redirects on the next navigation only — 8b.
 - Contest screens beyond ranking — 8d; admin screens — sub-project 7.
-- Header nav: at phone widths items use `px-2 text-sm` so all five fit at 375 px; at 320 px the pill still scrolls on its own.
-- E2E: `FakeApi` matches `:param` keys (an exact key wins), records every request in `requests` and serves PDF and event-stream replies; the editor and language packs must never be modulepreloaded (`bundle.e2e.ts`).

@@ -9,7 +9,7 @@ import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
 /** Keep `SourceViewSkeleton.vue` in step: same card, header and line classes. */
-const props = defineProps<{ id: string; problemCode: string | null }>();
+const props = defineProps<{ id: string; problemCode: string | null; isOwn: boolean }>();
 const { data, isPending, error, refetch } = useSubmissionSourceQuery(toRef(props, 'id'));
 
 /** A 403 is a reason to show, not an error to retry: the B18 reason, else the plain "hidden" text. */
@@ -38,7 +38,7 @@ const lineNumbers = computed(() =>
       <div class="flex flex-wrap items-center gap-2">
         <CopyButton v-if="data" :text="source" :label="$t('submission.source.copy')" />
         <RouterLink
-          v-if="problemCode && !forbiddenText"
+          v-if="isOwn && problemCode && !forbiddenText"
           :to="{ name: 'problem', params: { code: problemCode }, query: { resubmit: id } }"
           class="inline-flex min-h-11 items-center rounded-pill bg-accent-soft px-4 text-sm font-semibold text-accent-soft-text"
           >{{ $t('submission.source.resubmit') }}</RouterLink

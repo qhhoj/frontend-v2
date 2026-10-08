@@ -15,6 +15,7 @@
     "problem": "Problem",
     "submissions": "Submissions",
     "submission": "Submission",
+    "submissionTitle": "Submission {id}",
     "contest": "Contest",
     "ranking": "Ranking",
     "user": "Profile",

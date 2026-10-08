@@ -7,6 +7,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import EditorialTab from './EditorialTab.vue';
 import ProblemHeader from './ProblemHeader.vue';
@@ -26,6 +27,8 @@ const router = useRouter();
 const locale = useLocaleStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
+
+usePageTitle(() => problem.value?.name);
 
 /** Set when the editorial answers 404 for this problem; the tab then disappears until another problem is opened. */
 const editorialGone = ref(false);

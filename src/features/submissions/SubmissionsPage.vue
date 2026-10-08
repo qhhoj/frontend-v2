@@ -16,6 +16,7 @@ import {
   useSubmissionListQuery,
   useSubmissionStatsQuery,
 } from './submissions.queries';
+import { FIRST_PAGE } from './live-passes';
 import { useLiveSubmissionList } from './use-live-submission-list';
 import { useSubmissionFilters } from './use-submission-filters';
 
@@ -37,7 +38,7 @@ const live = useLiveSubmissionList({
   total: computed(() => (isPlaceholderData.value ? undefined : list.value?.meta.total)),
   enabled: computed(() => filters.value.live),
   refetchRows: async () => (await refetch()).data?.items,
-  goToFirstPage: () => update({ page: 1 }),
+  goToFirstPage: () => goToPage(FIRST_PAGE),
 });
 const emptyText = computed(() => {
   const active = describeActiveFilters(filters.value, meta.value?.languages ?? []);
