@@ -208,7 +208,8 @@
       "allGroups": "All groups",
       "timeLeft": "{span} left",
       "perParticipation": "{span} per participation, from the moment you enter",
-      "enter": "Enter"
+      "enter": "Enter",
+      "searchPlaceholder": "Search by key or name"
     }
   },
   "placeholder": {

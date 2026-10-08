@@ -79,9 +79,15 @@ export function countdownTarget(
   return null;
 }
 
-/** Two instants on the same calendar day of the viewer's zone (the end label adds its date otherwise). */
-export function isSameLocalDay(first: string, second: string): boolean {
-  return new Date(first).toDateString() === new Date(second).toDateString();
+const DAY_MS = 86_400_000;
+
+/** Calendar days from the viewer-zone day of `from` to that of `to`: 0 the same day, 1 the next day (the `(+1)` label). */
+export function localDayOffset(from: string, to: string): number {
+  const dayOf = (iso: string) => {
+    const date = new Date(iso);
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  };
+  return Math.round((dayOf(to) - dayOf(from)) / DAY_MS);
 }
 
 /** A length in words (`2 giờ 30 phút`, `4 giờ`, `14 ngày`) as an i18n reference. */

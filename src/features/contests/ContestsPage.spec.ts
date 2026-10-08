@@ -73,20 +73,61 @@ describe('contest list', () => {
   it('starts again at page 1 when a filter changes, keeping the phase', async () => {
     mockApi({ ...anonymousViewer, ...contestListRoutes({}) });
     const { wrapper, router } = await mountApp('/contests?phase=ended&page=3');
-    await wrapper.get('button[aria-pressed="false"]').trigger('click');
+    await wrapper.get('select').setValue('rated');
     await flushPromises();
     expect(router.currentRoute.value.query).toMatchObject({ phase: 'ended', rated: '1' });
     expect(router.currentRoute.value.query.page).toBeUndefined();
   });
 
+  it('marks a running contest that ends on a later day with its day offset', async () => {
+    vi.stubEnv('TZ', 'UTC');
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const overnight = contestItem({ endTime: '2026-10-09T01:00:00Z' });
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ running: [overnight] }) });
+    const { wrapper } = await mountApp('/contests');
+    expect(wrapper.get('[data-testid="running-contest"]').text()).toContain('01:00 (+1)');
+    vi.unstubAllEnvs();
+  });
+
+  it('drops a running contest when its end passes and asks the server once more', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date', 'setInterval', 'clearInterval'] });
+    const endsSoon = contestItem({ key: 'soon', endTime: '2026-10-08T09:38:00Z' });
+    let runningRequests = 0;
+    const calls = mockApi({
+      ...anonymousViewer,
+      'GET /contests': (call) => {
+        if (call.query.get('phase') !== 'running')
+          return { body: { data: [], meta: { page: 1, pageSize: 3, total: 0 } } };
+        runningRequests += 1;
+        const rows = runningRequests === 1 ? [endsSoon] : [];
+        return { body: { data: rows, meta: { page: 1, pageSize: 100, total: rows.length } } };
+      },
+    });
+    const { wrapper } = await mountApp('/contests');
+    expect(wrapper.findAll('[data-testid="running-contest"]')).toHaveLength(1);
+    vi.advanceTimersByTime(60_000);
+    await flushPromises();
+    expect(wrapper.findAll('[data-testid="running-contest"]')).toHaveLength(0);
+    expect(groupCalls(calls).filter((query) => query.phase === 'running')).toHaveLength(2);
+  });
+
+  it('keeps the count out of the heading and names the group in its link', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ running: [running] }) });
+    const { wrapper } = await mountApp('/contests');
+    expect(wrapper.get('#contest-group-running').text()).toBe('Đang diễn ra');
+    expect(wrapper.get('section[aria-labelledby="contest-group-running"] a').text()).toContain(
+      'Đang diễn ra',
+    );
+  });
+
   it('turns the rated filter on through the URL and back off', async () => {
     const calls = mockApi({ ...anonymousViewer, ...contestListRoutes({}) });
     const { wrapper, router } = await mountApp('/contests');
-    await wrapper.get('button[aria-pressed="false"]').trigger('click');
+    await wrapper.get('select').setValue('rated');
     await flushPromises();
     expect(router.currentRoute.value.query.rated).toBe('1');
     expect(groupCalls(calls).at(-1)).toMatchObject({ rated: 'true' });
-    await wrapper.get('button[aria-pressed="false"]').trigger('click');
+    await wrapper.get('select').setValue('any');
     await flushPromises();
     expect(router.currentRoute.value.query.rated).toBeUndefined();
   });

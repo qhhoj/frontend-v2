@@ -3,8 +3,8 @@ import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
 import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { contestProgress, isSameLocalDay, spanMessage } from '@/lib/contest-time';
-import { formatClock, formatNumber, formatShortDate } from '@/lib/format';
+import { contestProgress, localDayOffset, spanMessage } from '@/lib/contest-time';
+import { formatClock, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestChips from './ContestChips.vue';
@@ -22,9 +22,8 @@ const remaining = computed(() =>
 const progressPercent = computed(() => Math.round(contestProgress(props.contest, now.value) * 100));
 const endLabel = computed(() => {
   const clock = formatClock(props.contest.endTime, locale.locale);
-  return isSameLocalDay(props.contest.startTime, props.contest.endTime)
-    ? clock
-    : `${clock} · ${formatShortDate(props.contest.endTime, locale.locale)}`;
+  const dayOffset = localDayOffset(props.contest.startTime, props.contest.endTime);
+  return dayOffset > 0 ? `${clock} (+${dayOffset})` : clock;
 });
 const perParticipation = computed(() =>
   props.contest.timeLimit ? spanText(spanMessage(props.contest.timeLimit)) : null,

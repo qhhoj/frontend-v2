@@ -11,10 +11,11 @@ const search = useDebouncedText(
   (text) => update({ search: text }),
 );
 const shownPhases = computed(() => (filters.value.phase ? [filters.value.phase] : PHASE_ORDER));
-const RATED_CHOICES = [
-  { isRatedOnly: false, labelKey: 'contests.list.ratedAny' },
-  { isRatedOnly: true, labelKey: 'contests.list.ratedOnly' },
-] as const;
+/** The select's values are the URL's: `rated=1` for the rated-only choice, none for both. */
+const ratedChoice = computed({
+  get: () => (filters.value.isRatedOnly ? 'rated' : 'any'),
+  set: (choice: string) => update({ isRatedOnly: choice === 'rated' }),
+});
 </script>
 
 <template>
@@ -34,31 +35,17 @@ const RATED_CHOICES = [
             v-model="search"
             type="search"
             maxlength="100"
-            :placeholder="$t('contests.list.search')"
-            class="min-h-11 w-44 bg-transparent text-content"
+            :placeholder="$t('contests.list.searchPlaceholder')"
+            class="min-h-11 w-56 bg-transparent text-content"
           />
         </label>
-        <div
-          role="group"
-          :aria-label="$t('contests.list.ratedLabel')"
-          class="glass flex rounded-pill p-1"
-        >
-          <button
-            v-for="choice in RATED_CHOICES"
-            :key="choice.labelKey"
-            type="button"
-            :aria-pressed="filters.isRatedOnly === choice.isRatedOnly"
-            class="min-h-11 rounded-pill px-4 text-sm"
-            :class="
-              filters.isRatedOnly === choice.isRatedOnly
-                ? 'bg-gradient-accent font-bold text-on-accent'
-                : 'text-content hover:bg-surface-hover'
-            "
-            @click="update({ isRatedOnly: choice.isRatedOnly })"
-          >
-            {{ $t(choice.labelKey) }}
-          </button>
-        </div>
+        <label class="flex items-center">
+          <span class="sr-only">{{ $t('contests.list.ratedLabel') }}</span>
+          <select v-model="ratedChoice" class="glass h-12 w-52 rounded-pill px-4 text-content">
+            <option value="any">{{ $t('contests.list.ratedAny') }}</option>
+            <option value="rated">{{ $t('contests.list.ratedOnly') }}</option>
+          </select>
+        </label>
       </div>
     </header>
     <ContestGroup v-for="phase in shownPhases" :key="phase" :phase="phase" :filters="filters" />

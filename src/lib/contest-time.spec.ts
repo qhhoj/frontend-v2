@@ -6,7 +6,7 @@ import {
   freezeFraction,
   freezeStart,
   isFrozenAt,
-  isSameLocalDay,
+  localDayOffset,
   liveStatusOf,
   phaseAt,
   registrationState,
@@ -145,11 +145,12 @@ describe('liveStatusOf (until 4c sends it)', () => {
   });
 });
 
-describe('isSameLocalDay', () => {
+describe('localDayOffset', () => {
   afterEach(() => vi.unstubAllEnvs());
-  it('compares calendar days in the viewer zone', () => {
+  it('counts the calendar days between two instants in the viewer zone', () => {
     vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
-    expect(isSameLocalDay('2026-10-08T01:00:00Z', '2026-10-08T16:59:00Z')).toBe(true);
-    expect(isSameLocalDay('2026-10-08T01:00:00Z', '2026-10-08T17:00:00Z')).toBe(false);
+    expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-08T16:59:00Z')).toBe(0);
+    expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-08T17:00:00Z')).toBe(1);
+    expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-11T03:00:00Z')).toBe(3);
   });
 });

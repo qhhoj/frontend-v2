@@ -208,7 +208,8 @@
       "allGroups": "Xem mọi nhóm",
       "timeLeft": "còn {span}",
       "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
-      "enter": "Vào thi"
+      "enter": "Vào thi",
+      "searchPlaceholder": "Tìm theo mã hoặc tên"
     }
   },
   "placeholder": {
