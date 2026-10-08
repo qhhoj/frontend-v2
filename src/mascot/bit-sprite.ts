@@ -63,7 +63,7 @@ const BODY = [
   '...SSSSSSSSS....',
 ];
 const LEGS_STAND = '...O.O...O.O....';
-const LEGS_STEP = '....O.O...O.O...';
+const LEGS_STEP = '....O.O.O.O.....';
 
 export interface BitPose {
   headgear: BitHeadgear;

@@ -62,11 +62,11 @@ describe('bitFrame', () => {
     );
   });
 
-  it('steps by moving the legs one pixel sideways and bobbing the whole body one pixel down', () => {
+  it('steps by moving the legs one pixel towards the middle (under the body, never past its edge) and bobbing the whole body one pixel down', () => {
     const stand = bitFrame({ headgear: 'none' });
     const step = bitFrame({ headgear: 'none', step: true });
     expect(stand[12]).toBe('...O.O...O.O....');
-    expect(step[13]).toBe('....O.O...O.O...');
+    expect(step[13]).toBe('....O.O.O.O.....');
     expect(step.slice(1, 12)).toEqual(stand.slice(0, 11));
   });
 

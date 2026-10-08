@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppHeader from './AppHeader.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
+import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
 
@@ -22,5 +23,6 @@ useAccountThemeSync();
     <main id="main" tabindex="-1" class="relative">
       <slot />
     </main>
+    <LoadingLayer />
   </div>
 </template>

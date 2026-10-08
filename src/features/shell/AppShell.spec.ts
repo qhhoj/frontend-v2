@@ -15,6 +15,16 @@ const clickMenuItem = async (label: string) => {
 };
 
 describe('app shell', () => {
+  it('has exactly one live region, outside the page content, and it is quiet when nothing loads', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/problems/aplusb');
+    const regions = wrapper.findAll('[role="status"]');
+    expect(regions).toHaveLength(1);
+    expect(regions[0]!.attributes('aria-live')).toBe('polite');
+    expect(regions[0]!.text()).toBe('');
+    expect(wrapper.get('#main').find('[role="status"]').exists()).toBe(false);
+  });
+
   it('marks the current section in the main navigation', async () => {
     mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/problems/aplusb');
