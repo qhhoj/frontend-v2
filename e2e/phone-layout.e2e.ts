@@ -37,6 +37,9 @@ const PAGES = [
   { path: '/submissions', signedIn: true, ready: 'Tổng hai số' },
   { path: '/submissions/sub-1', signedIn: true, ready: 'Kết quả từng test' },
   { path: '/settings/appearance', signedIn: false, ready: 'Dùng giao diện riêng' },
+  { path: '/settings', signedIn: true, ready: 'Mặc định và hiển thị' },
+  { path: '/settings/security', signedIn: true, ready: 'Xác thực hai bước' },
+  { path: '/settings/data', signedIn: true, ready: 'Giới hạn' },
 ] as const;
 
 for (const { path, signedIn, ready } of PAGES)
@@ -240,4 +243,18 @@ test.describe('the problem page sheet and tabs at 375 px', () => {
       expect(box.x + box.width).toBeLessThanOrEqual(PHONE.width);
     }
   });
+});
+
+test('settings at 375 px: section pills scroll on their own, the save bar stays on screen', async ({
+  page,
+  api,
+}) => {
+  api.signedIn = true;
+  await page.goto('/settings');
+  const pills = page.getByRole('navigation', { name: 'Các mục cài đặt' });
+  expect((await pills.boundingBox())!.width).toBeLessThanOrEqual(PHONE.width);
+  await page.mouse.wheel(0, 3000);
+  const bar = (await page.getByRole('button', { name: 'Lưu thay đổi' }).boundingBox())!;
+  expect(bar.y + bar.height).toBeLessThanOrEqual(PHONE.height);
+  expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
 });

@@ -7,6 +7,7 @@ import {
   contestProblem,
   HOME_COUNTS,
   contestStats,
+  dataExportStatus,
   leaderboardEntry,
   problemItem,
   problemDetail,
@@ -17,6 +18,7 @@ import {
   ranking,
   ratingHistory,
   sessionResponse,
+  sessionUser,
   submissionDetail,
   submissionItem,
   submissionStats,
@@ -65,11 +67,80 @@ export class FakeApi {
   signedIn = false;
   readonly unmatched: string[] = [];
   readonly requests: SeenRequest[] = [];
+  totpEnabled = false;
+  impersonatorId: string | null = null;
+  profileState = profile();
+  securityKeys: Array<{ id: string; name: string }> = [];
+  dataExport = dataExportStatus();
+  static readonly CODES = [
+    'K7QM2XRA9PTD4WLE',
+    'H3ZN8CVB5YJF1MSU',
+    'R6DT0GKE7NAQ3HXP',
+    'W9LB4UFC2ZOV8TJY',
+    'M1EY5SIP6RQG0DNK',
+  ];
   private readonly gates = new Map<string, Promise<void>>();
   private readonly releases: Array<() => void> = [];
+
+  private session() {
+    return sessionResponse({
+      user: sessionUser({
+        isTotpEnabled: this.totpEnabled,
+        isWebauthnEnabled: this.securityKeys.length > 0,
+      }),
+      impersonatorId: this.impersonatorId,
+    });
+  }
+
   readonly routes: Record<string, Handler> = {
     ...communityRoutes(),
-    'GET /auth/me': () => (this.signedIn ? ok(sessionResponse()) : UNAUTHORIZED),
+    'GET /auth/me': () => (this.signedIn ? ok(this.session()) : UNAUTHORIZED),
+    'POST /auth/password/change': { status: 204 },
+    'POST /auth/2fa/totp/enroll': ok({
+      secret: 'JBSWY3DPEHPK3PXP',
+      otpauthUrl: 'otpauth://totp/QHHOJ:user_01?secret=JBSWY3DPEHPK3PXP&issuer=QHHOJ',
+    }),
+    'POST /auth/2fa/totp/confirm': () => {
+      this.totpEnabled = true;
+      return ok({ scratchCodes: FakeApi.CODES });
+    },
+    'POST /auth/2fa/totp/disable': () => {
+      this.totpEnabled = false;
+      return { status: 204 };
+    },
+    'POST /auth/2fa/totp/scratch-codes': ok({ scratchCodes: FakeApi.CODES }),
+    'GET /auth/2fa/totp/scratch-codes': ok({ remaining: 5 }),
+    'POST /auth/token/regenerate': ok({ token: 'qh_3f9a1c7e5b2d4a80b6e1c9d7f2a4538e91b0c6d2' }),
+    'POST /auth/logout-all': () => {
+      this.signedIn = false;
+      return { status: 204 };
+    },
+    'POST /auth/impersonate/stop': () => {
+      this.impersonatorId = null;
+      return ok(this.session());
+    },
+    'GET /profile/data': () => ok(this.dataExport),
+    'POST /profile/data': () => {
+      this.dataExport = dataExportStatus({
+        state: 'preparing',
+        preparedAt: new Date().toISOString(),
+        canPrepare: false,
+      });
+      return { status: 202, body: { data: { queued: true } } };
+    },
+    'GET /auth/2fa/webauthn/credentials': () => ok(this.securityKeys),
+    'POST /auth/2fa/webauthn/register/verify': ({ body }) => {
+      const key = {
+        id: `key-${this.securityKeys.length + 1}`,
+        name: (body as { name: string }).name,
+      };
+      this.securityKeys.push(key);
+      return ok(key);
+    },
+    'DELETE /auth/2fa/webauthn/credentials/:id': ({ params }) => {
+      this.securityKeys = this.securityKeys.filter((key) => key.id !== params.id);
+      return { status: 204 };
+    },
     'POST /auth/login': () => {
       this.signedIn = true;
       return ok(sessionResponse());
@@ -82,8 +153,9 @@ export class FakeApi {
     'GET /auth/username-available': ({ url }) =>
       ok({ available: url.searchParams.get('username') !== 'taken_name' }),
     'GET /home': ok(homeResponse({ counts: { ...HOME_COUNTS, users: 1284 } })),
-    'GET /profile': ok(profile()),
-    'PATCH /profile': ({ body }) => ok(profile(body as object)),
+    'GET /profile': () => ok(this.profileState),
+    'PATCH /profile': ({ body }) =>
+      ok((this.profileState = { ...this.profileState, ...(body as object) })),
     'GET /problems/meta': ok(problemMeta()),
     'GET /problems': ({ url }) =>
       list(
