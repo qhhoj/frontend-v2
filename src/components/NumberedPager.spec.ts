@@ -47,4 +47,16 @@ describe('NumberedPager', () => {
     expect(wrapper.get('a[aria-label="Trang sau"]').attributes('href')).toBe('/users?p=3');
     expect(wrapper.get('a[aria-label="Trang trước"]').attributes('href')).toBe('/users');
   });
+  it('shows a disabled arrow as an unlinked, named link in muted token colours, never faded', async () => {
+    const first = await mountPager({}, { page: 1, pageSize: 10, total: 30 });
+    const previous = first.get('[aria-label="Trang trước"]');
+    expect(previous.element.tagName).toBe('SPAN');
+    expect(previous.attributes('role')).toBe('link');
+    expect(previous.attributes('aria-disabled')).toBe('true');
+    expect(previous.attributes('href')).toBeUndefined();
+    expect(previous.classes()).toContain('aria-disabled:text-muted');
+    expect(previous.classes().some((name) => name.includes('opacity'))).toBe(false);
+    const last = await mountPager({ page: '3' }, { page: 3, pageSize: 10, total: 30 });
+    expect(last.get('[aria-label="Trang sau"]').attributes('aria-disabled')).toBe('true');
+  });
 });

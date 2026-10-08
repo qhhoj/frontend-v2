@@ -10,7 +10,7 @@ import type { BitVariant } from '@/mascot/state-bits';
 
 /**
  * REPLACEABLE HOOK: draws one Bit variant for a page state. Moods come from BIT_MOODS (BitMascot), moving kinds from BIT_LOOPS
- * (BitLoop), the 404 Bit is CryingBit. The pixel size is set here by class, never by InlineBit, which pins its own. `label` makes the
+ * (BitLoop; `community` is drawn this way, so BitTrio stays unused), the 404 Bit is CryingBit. The pixel size is set here by class, never by InlineBit, which pins its own. `label` makes the
  * Bit an image; without one it is decoration beside words that say it all.
  */
 const props = withDefaults(

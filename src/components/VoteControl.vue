@@ -24,7 +24,7 @@ const press = async (pressed: 1 | -1) => {
   if (await vote.cast(pressed)) emit('voted');
 };
 const ARROW =
-  'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
+  'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
 </script>
 
 <template>

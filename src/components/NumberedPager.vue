@@ -22,7 +22,8 @@ const linkTo = (page: number) => {
 };
 const CELL =
   'inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill px-3 font-semibold';
-const ARROW = `${CELL} border border-line hover:bg-surface-hover aria-disabled:cursor-not-allowed`;
+// A disabled arrow keeps its shape but reads as muted text with no hover fill (token colours only, no opacity).
+const ARROW = `${CELL} border border-line text-content hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:bg-transparent aria-disabled:text-muted aria-disabled:hover:bg-transparent`;
 </script>
 
 <template>
@@ -36,7 +37,7 @@ const ARROW = `${CELL} border border-line hover:bg-surface-hover aria-disabled:c
         <ChevronLeft aria-hidden="true" class="size-4" />
       </a>
     </RouterLink>
-    <span v-else :aria-label="$t('pager.previous')" aria-disabled="true" :class="ARROW">
+    <span v-else role="link" :aria-label="$t('pager.previous')" aria-disabled="true" :class="ARROW">
       <ChevronLeft aria-hidden="true" class="size-4" />
     </span>
     <template v-for="(slot, index) in slots" :key="index">
@@ -60,7 +61,7 @@ const ARROW = `${CELL} border border-line hover:bg-surface-hover aria-disabled:c
         <ChevronRight aria-hidden="true" class="size-4" />
       </a>
     </RouterLink>
-    <span v-else :aria-label="$t('pager.next')" aria-disabled="true" :class="ARROW">
+    <span v-else role="link" :aria-label="$t('pager.next')" aria-disabled="true" :class="ARROW">
       <ChevronRight aria-hidden="true" class="size-4" />
     </span>
   </nav>
