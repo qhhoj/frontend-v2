@@ -1,12 +1,15 @@
 import {
   contestDetail,
+  contestItem,
   contestProblem,
+  viewerResult,
   announcement,
   ranking,
   rankingRow,
   RANKING_PROBLEM_IDS,
 } from '../src/test/fixtures';
-import { expectNoAxeViolations } from './fixtures/audit';
+import { THEMES } from '../src/theme/registry';
+import { applyTheme, expectNoAxeViolations } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, streamFrame, test } from './fixtures/api';
 
 test.beforeEach(async ({ page }) => {
@@ -153,4 +156,68 @@ test('a points board shows points and time inside the chip and stars only timed 
   await expect(laterRow.getByTestId('cell-time')).toHaveText('0:10:00');
   await expect(laterRow.getByText('Giải đầu tiên')).toHaveCount(0);
   await expect(page.getByRole('columnheader', { name: 'Điểm · giờ' })).toBeVisible();
+});
+
+test('the signed-in list shows the current contest with a way back', async ({ page, api }) => {
+  api.signedIn = true;
+  api.routes['GET /contests'] = ({ url }) =>
+    url.searchParams.get('phase') === 'running'
+      ? {
+          body: {
+            data: [contestItem({ viewer: { liveStatus: 'participating', isCurrent: true } })],
+            meta: { page: 1, pageSize: 100, total: 1 },
+          },
+        }
+      : { body: { data: [], meta: { page: 1, pageSize: 5, total: 0 } } };
+  await page.goto('/contests');
+  await expect(page.getByText('Bạn đang thi')).toBeVisible();
+  // Chromium puts a space before the sr-only colon, so the name is "Quay lại kỳ thi : QHH Round #42 (Div. 2)".
+  await expect(
+    page.getByRole('link', { name: /^Quay lại kỳ thi\s?: QHH Round #42 \(Div\. 2\)$/ }),
+  ).toBeVisible();
+  await expectNoAxeViolations(page);
+});
+
+test('the problems table shows the own result and solvers, and passes axe in every theme', async ({
+  page,
+  api,
+}) => {
+  api.signedIn = true;
+  api.routes['GET /contests/r42'] = detailWith({
+    problems: [
+      contestProblem(0, {
+        solverCount: 188,
+        viewerResult: viewerResult({
+          cell: { time: 1450, points: 100, tries: 1 },
+          isSolved: true,
+          attempts: 1,
+        }),
+      }),
+      contestProblem(1, {
+        solverCount: 143,
+        viewerResult: viewerResult({ attempts: 1, hasPendingSubmission: true }),
+      }),
+    ],
+  });
+  for (const theme of THEMES) {
+    await applyTheme(page, api, theme);
+    await page.goto('/contests/r42');
+    await expect(page.getByText('+ 0:24').first()).toBeVisible();
+    await expect(page.getByText('Đang chấm').first()).toBeVisible();
+    await expectNoAxeViolations(page);
+  }
+});
+
+test('a refused join shows its own text beside Bit', async ({ page, api }) => {
+  api.signedIn = true;
+  api.routes['POST /contests/:key/join'] = {
+    status: 409,
+    body: { error: { code: 'contest_not_started', message: 'x' } },
+  };
+  await page.goto('/contests/r42');
+  await page.getByRole('button', { name: 'Vào thi' }).click();
+  await expect(page.getByRole('alert')).toHaveText(
+    'Kỳ thi chưa bắt đầu. Hãy quay lại khi kỳ thi mở.',
+  );
+  await expectNoAxeViolations(page);
 });

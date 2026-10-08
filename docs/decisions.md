@@ -175,6 +175,17 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
 - After backend 4c the detail's actions read `viewer.liveStatus`/`isCurrent`; the client-side copy of `liveStatusOf` is gone.
 - E2E: `e2e/contests.e2e.ts` covers the list, the detail (390 px layout A, access-code dialog under axe), announcements over SSE and the points cells; every contest page is in the axe and phone-layout lists, and the contest fixtures run on a clock pinned inside Round #42 (`CONTEST_FIXTURE_NOW`).
+- The list and detail read backend 4c's viewer fields (`viewer.liveStatus`, `isCurrent`, `viewerResult`, `solverCount`): the list's own state and the problems table's own result and solver count come from the server, not from the client.
+- Solver counts hide their column when every count is null: the viewer may not see the full ranking, so a column of dashes would read as zeros.
+- Every contest refusal code has its own text, and `access_code_required` opens the code dialog instead of only showing the text: the user can act on it in place.
+- The own-only submissions banner waits for backend ask B-8d1 (`viewer.canSeeFullSubmissionList`): until then the client infers "only your submissions" and the backend narrows silently.
+- Bit placements: nightcap on empty lists, sweat on refusals, crown on the solved summary, crying when the contest is missing; the podium and countdown `data-bit-hook` points wait for their Bit variants.
+- The user-picked mock-up wins over the brief where they differ: the picked look is what the user reviewed, so it is the target.
+- "Cần mã" chip shows on list rows only: the detail header's action already says the code is needed, so a chip there would repeat it.
+- Visitors get the signed-in label on list rows and link to the detail page: the list runs the action with the signed-in rules, and the detail page decides what a visitor can actually do.
+- A hidden result shows "Kết quả đang ẩn" in the cell: an empty cell would read as no attempt, and the server decides when a result is hidden.
+- `ConfirmDialog` is shared: one confirm step for destructive choices, so busy, Escape and focus return behave the same on every confirm.
+
 
 ## Avatars
 
@@ -188,7 +199,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.
 - Session expiry mid-page redirects on the next navigation only — 8b.
-- Contest screens beyond ranking — 8d; admin screens — sub-project 7.
+- Admin screens — sub-project 7.
 
 ## Community (8e)
 
