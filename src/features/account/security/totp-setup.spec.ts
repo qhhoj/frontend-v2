@@ -34,7 +34,9 @@ describe('rateLimitWaitText', () => {
 
   it('is null when a 429 sent no wait, and for any other failure', () => {
     expect(rateLimitWaitText(new ApiError('rate_limited', 429, 'x'))).toBeNull();
-    expect(rateLimitWaitText(new ApiError('invalid_code', 400, 'x', { retryAfterSeconds: 42 }))).toBeNull();
+    expect(
+      rateLimitWaitText(new ApiError('invalid_code', 400, 'x', { retryAfterSeconds: 42 })),
+    ).toBeNull();
     expect(rateLimitWaitText(new Error('boom'))).toBeNull();
   });
 });
