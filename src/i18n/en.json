@@ -393,6 +393,62 @@
       "action": "Sign out everywhere",
       "confirmTitle": "Sign out everywhere?",
       "confirmBody": "Every session, this device included, ends now. You will be taken to the sign-in page."
+    },
+    "twoFactor": {
+      "title": "Two-step verification",
+      "lead": "Signing in asks for a code or a security key besides the password.",
+      "on": "On",
+      "off": "Off",
+      "methods": "Verification methods"
+    },
+    "totp": {
+      "title": "Authenticator app (TOTP)",
+      "descriptionOn": "6-digit codes from Google Authenticator, Authy, 1Password…",
+      "descriptionOff": "Recommended. Comes with 5 one-time backup codes.",
+      "enable": "Turn on",
+      "wizardTitle": "Turn on the authenticator app",
+      "wizardLead": "Three steps, about two minutes.",
+      "steps": "Steps",
+      "step": {
+        "password": "Confirm password",
+        "scan": "Scan the QR code",
+        "codes": "Save backup codes"
+      },
+      "stepTitle": "Step {number} · {name}",
+      "continue": "Continue",
+      "passwordConfirmed": "Password confirmed. It is asked again every time you turn this on or add a key.",
+      "scanTitle": "Scan with your authenticator app",
+      "scanSteps": {
+        "0": "Open the authenticator app and add an account.",
+        "1": "Scan the QR code, or type the key below if scanning does not work.",
+        "2": "Enter the 6-digit code the app shows to confirm."
+      },
+      "phoneLead": "On this phone, tap the button below to open the authenticator app, or type the key by hand.",
+      "qrLabel": "QR code that adds the account to an authenticator app",
+      "secretLabel": "Setup key",
+      "copySecret": "Copy the setup key",
+      "openApp": "Open it in the app on this phone",
+      "openAppShort": "Open in the authenticator app",
+      "codeLabel": "Confirmation code",
+      "confirm": "Confirm and turn on",
+      "wrongCode": "The code is wrong or expired. Check the phone's clock, then enter a new code.",
+      "enabled": "Two-step verification is on. The next sign-in asks for a 6-digit code."
+    },
+    "codes": {
+      "title": "Save backup codes",
+      "warning": "Shown once. Each code works once if you lose your phone. Lose both and you cannot get into the account.",
+      "list": "Backup codes",
+      "copy": "Copy all backup codes",
+      "download": "Download .txt",
+      "print": "Print",
+      "acknowledge": "I saved these codes somewhere safe",
+      "acknowledgeFirst": "Tick the box once the codes are saved.",
+      "done": "Done",
+      "leaveConfirm": "You have not confirmed saving the backup codes. Leaving means they cannot be shown again. Leave anyway?",
+      "leaveTitle": "Leave this page?",
+      "leave": "Leave",
+      "stay": "Stay",
+      "fileHeader": "QHHOJ - backup codes for {username}. Each code works once."
     }
   },
   "appearance": {

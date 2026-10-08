@@ -379,3 +379,19 @@
   overflow-y: hidden;
   white-space: pre;
 }
+
+/* Printing the backup codes prints only them (ScratchCodesPanel sets the scope for the print call). */
+@media print {
+  html[data-print-scope='codes'] body * {
+    visibility: hidden;
+  }
+  html[data-print-scope='codes'] [data-print-target],
+  html[data-print-scope='codes'] [data-print-target] * {
+    visibility: visible;
+  }
+  html[data-print-scope='codes'] [data-print-target] {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}

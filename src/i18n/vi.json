@@ -393,6 +393,62 @@
       "action": "Đăng xuất mọi nơi",
       "confirmTitle": "Đăng xuất mọi nơi?",
       "confirmBody": "Tất cả phiên đăng nhập, kể cả trên thiết bị này, sẽ kết thúc ngay. Bạn sẽ được đưa về trang đăng nhập."
+    },
+    "twoFactor": {
+      "title": "Xác thực hai bước",
+      "lead": "Khi đăng nhập, ngoài mật khẩu bạn cần thêm một mã hoặc khoá bảo mật.",
+      "on": "Đang bật",
+      "off": "Chưa bật",
+      "methods": "Cách xác thực"
+    },
+    "totp": {
+      "title": "Ứng dụng xác thực (TOTP)",
+      "descriptionOn": "Mã 6 số từ Google Authenticator, Authy, 1Password…",
+      "descriptionOff": "Khuyến nghị. Kèm 5 mã dự phòng dùng một lần.",
+      "enable": "Bật",
+      "wizardTitle": "Bật ứng dụng xác thực",
+      "wizardLead": "Thực hiện ba bước, khoảng hai phút.",
+      "steps": "Các bước",
+      "step": {
+        "password": "Xác nhận mật khẩu",
+        "scan": "Quét mã QR",
+        "codes": "Lưu mã dự phòng"
+      },
+      "stepTitle": "Bước {number} · {name}",
+      "continue": "Tiếp tục",
+      "passwordConfirmed": "Đã xác nhận mật khẩu. Cần nhập lại mật khẩu mỗi lần bắt đầu bật hoặc thêm khoá.",
+      "scanTitle": "Quét bằng ứng dụng xác thực",
+      "scanSteps": {
+        "0": "Mở ứng dụng xác thực và chọn thêm tài khoản.",
+        "1": "Quét mã QR, hoặc nhập khoá bên dưới nếu không quét được.",
+        "2": "Nhập mã 6 số ứng dụng đang hiện để xác nhận."
+      },
+      "phoneLead": "Trên điện thoại này, chạm nút dưới để mở ứng dụng xác thực. Hoặc nhập khoá thủ công.",
+      "qrLabel": "Mã QR để thêm tài khoản vào ứng dụng xác thực",
+      "secretLabel": "Khoá thiết lập",
+      "copySecret": "Sao chép khoá thiết lập",
+      "openApp": "Mở trực tiếp trong ứng dụng trên điện thoại này",
+      "openAppShort": "Mở trong ứng dụng xác thực",
+      "codeLabel": "Mã xác nhận",
+      "confirm": "Xác nhận và bật",
+      "wrongCode": "Mã không đúng hoặc đã hết hạn. Kiểm tra giờ trên điện thoại rồi nhập mã mới.",
+      "enabled": "Đã bật xác thực hai bước. Lần đăng nhập sau sẽ hỏi mã 6 số."
+    },
+    "codes": {
+      "title": "Lưu mã dự phòng",
+      "warning": "Chỉ hiện một lần. Mỗi mã dùng được một lần khi bạn mất điện thoại. Nếu mất cả hai, bạn sẽ không vào được tài khoản.",
+      "list": "Mã dự phòng",
+      "copy": "Sao chép tất cả mã dự phòng",
+      "download": "Tải về .txt",
+      "print": "In",
+      "acknowledge": "Tôi đã lưu các mã này ở nơi an toàn",
+      "acknowledgeFirst": "Hãy đánh dấu là bạn đã lưu các mã trước.",
+      "done": "Xong",
+      "leaveConfirm": "Bạn chưa xác nhận đã lưu mã dự phòng. Rời trang thì sẽ không xem lại được các mã này. Vẫn rời?",
+      "leaveTitle": "Rời trang?",
+      "leave": "Rời trang",
+      "stay": "Ở lại",
+      "fileHeader": "QHHOJ - mã dự phòng của {username}. Mỗi mã dùng được một lần."
     }
   },
   "appearance": {
