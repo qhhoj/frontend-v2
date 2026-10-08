@@ -9,7 +9,8 @@
     "problems": "Problems",
     "contests": "Contests",
     "users": "Rankings",
-    "blog": "Blog"
+    "blog": "Blog",
+    "organizations": "Organizations"
   },
   "pages": {
     "problem": "Problem",
@@ -37,7 +38,13 @@
     "notFound": "Page not found",
     "contestAnnouncements": "Contest announcements",
     "contestSubmissions": "Contest submissions",
-    "contestStats": "Contest statistics"
+    "contestStats": "Contest statistics",
+    "joinRequests": "Join requests",
+    "postNew": "Write a post",
+    "tickets": "Support tickets",
+    "ticketNew": "New ticket",
+    "ticket": "Ticket",
+    "flatpage": "Page"
   },
   "contests": {
     "title": "Contests",
@@ -825,5 +832,53 @@
     },
     "casesHidden": "Viewers cannot see the results of individual tests",
     "sourceHidden": "You cannot see the source code of this submission."
+  },
+  "states": {
+    "title": "Status"
+  },
+  "pager": {
+    "title": "Pages"
+  },
+  "vote": {
+    "title": "Voting"
+  },
+  "leaderboard": {
+    "title": "Leaderboard"
+  },
+  "ratingChart": {
+    "title": "Rating chart"
+  },
+  "profile": {
+    "title": "Profile"
+  },
+  "profileTabs": {
+    "title": "Profile sections"
+  },
+  "orgs": {
+    "title": "Organizations"
+  },
+  "orgMembership": {
+    "title": "Joining"
+  },
+  "blog": {
+    "title": "Blog"
+  },
+  "blogPost": {
+    "title": "Post"
+  },
+  "comments": {
+    "title": "Comments"
+  },
+  "commentEditor": {
+    "title": "Your comment"
+  },
+  "tickets": {
+    "title": "Support tickets"
+  },
+  "ticket": {
+    "title": "Ticket"
+  },
+  "flatpage": {
+    "title": "Page"
   }
 }

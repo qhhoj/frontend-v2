@@ -62,12 +62,13 @@ test('the header stacks: brand, then the nav pill, with the tools beside the bra
 
 const NAV_NAME = 'Điều hướng chính';
 
-test('the nav pill shows every item inside the viewport at 375 px', async ({ page, api }) => {
+test('the nav pill reaches every item inside itself at 375 px', async ({ page, api }) => {
   void api;
   await page.goto('/blog');
   const nav = page.getByRole('navigation', { name: NAV_NAME });
   const pill = (await nav.boundingBox())!;
   for (const link of await nav.getByRole('link').all()) {
+    await link.scrollIntoViewIfNeeded();
     const box = (await link.boundingBox())!;
     expect(box.x, await link.innerText()).toBeGreaterThanOrEqual(pill.x);
     expect(box.x + box.width, await link.innerText()).toBeLessThanOrEqual(pill.x + pill.width + 1);

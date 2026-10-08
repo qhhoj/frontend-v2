@@ -9,7 +9,8 @@
     "problems": "Bài tập",
     "contests": "Kỳ thi",
     "users": "Xếp hạng",
-    "blog": "Blog"
+    "blog": "Blog",
+    "organizations": "Tổ chức"
   },
   "pages": {
     "problem": "Đề bài",
@@ -37,7 +38,13 @@
     "notFound": "Không tìm thấy trang",
     "contestAnnouncements": "Thông báo kỳ thi",
     "contestSubmissions": "Bài nộp kỳ thi",
-    "contestStats": "Thống kê kỳ thi"
+    "contestStats": "Thống kê kỳ thi",
+    "joinRequests": "Yêu cầu tham gia",
+    "postNew": "Viết bài",
+    "tickets": "Phiếu hỗ trợ",
+    "ticketNew": "Tạo phiếu mới",
+    "ticket": "Chi tiết phiếu",
+    "flatpage": "Trang"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -825,5 +832,53 @@
     },
     "casesHidden": "Người xem không được xem kết quả từng test",
     "sourceHidden": "Bạn không xem được mã nguồn của bài nộp này."
+  },
+  "states": {
+    "title": "Trạng thái"
+  },
+  "pager": {
+    "title": "Phân trang"
+  },
+  "vote": {
+    "title": "Bình chọn"
+  },
+  "leaderboard": {
+    "title": "Bảng xếp hạng"
+  },
+  "ratingChart": {
+    "title": "Biểu đồ rating"
+  },
+  "profile": {
+    "title": "Hồ sơ"
+  },
+  "profileTabs": {
+    "title": "Mục hồ sơ"
+  },
+  "orgs": {
+    "title": "Tổ chức"
+  },
+  "orgMembership": {
+    "title": "Tham gia tổ chức"
+  },
+  "blog": {
+    "title": "Blog"
+  },
+  "blogPost": {
+    "title": "Bài viết"
+  },
+  "comments": {
+    "title": "Bình luận"
+  },
+  "commentEditor": {
+    "title": "Bình luận của bạn"
+  },
+  "tickets": {
+    "title": "Phiếu hỗ trợ"
+  },
+  "ticket": {
+    "title": "Chi tiết phiếu"
+  },
+  "flatpage": {
+    "title": "Trang tĩnh"
   }
 }

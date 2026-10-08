@@ -187,3 +187,28 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.
 - Session expiry mid-page redirects on the next navigation only — 8b.
 - Contest screens beyond ranking — 8d; admin screens — sub-project 7.
+
+## Community (8e)
+
+- Routes: each tab of `/users/:username` and `/organizations/:slug` is its own child record under a layout, so every tab is a shareable URL; the leaderboard sorts live in the query string.
+- Legacy links: `/post/:id`, `/user/:username`, `/ticket/:id`, `/problem/:code`, `/problem/:code/editorial` and `/contest/:key` redirect to their new records, keeping the hash, so mails, Discord and feeds keep working; `/tagproblem/:code` has no screen and shows the 404 page.
+- Header nav: Organizations joins the pill as a sixth item, drawn on every board; at 375 px the pill keeps scrolling on its own (8c rule).
+- Avatars: scheme C (user pick) hashes the username into a Bit, built outside 8e; 8e only places `UserAvatar` (rows 28 px, comment and message headers 32 px, profile header 96 px) and keeps `TokenCoin` for problem and language coins; a deleted author keeps the grey fixed look at the same width.
+- Bit states: `StatePanel` kinds map to Bit variants (empty: nightcap, communityEmpty: trio, error: sweat, signIn and forbidden: security, notFound: crying, success: crown, sent: envelope, staff: staff) in `src/mascot/state-bits.ts`, the only place to swap variants; the sweat Bit no longer stands in for 401, 403 and 404.
+- Pager: numbered links (`?page=`) with a window around the current page, shareable and working without JS; without a total (PP tab) the last page is the next one while more entries exist.
+- Votes: the pressed arrow withdraws the vote; the viewer's own text and anonymous viewers see the control disabled; a 403 (too few solved problems) and a 429 show the server's message and restore the previous score, because the gate is not exposed to the SPA.
+- Leaderboard: sort tabs as links, columns collapse under 768 px to rank, user and the active column; the tier legend reads `RATING_TIERS` and `TIER_LOWER_BOUNDS`, so colours and bounds have one source; there is no search API, so "go to profile" uses the exact username.
+- Profile: owners see edit and write actions, others see the ban action for judges (reason required, 4096 characters at most); the comments tab shows only to viewers allowed to see every user's comments; the PP footer drops "100" because the backend keeps up to 300 entries.
+- Rating chart: SVG with tier bands from `TIER_LOWER_BOUNDS`, a summary `aria-label`, and hidden contests left out, because the chart must not reveal contests the viewer cannot see.
+- Heatmap: 53 Monday-first weeks ending on the viewer's today in the activity's time zone, levels by quarters of the busiest day, each cell carrying its date and count in a title, so the grid reads the same across zones.
+- Organizations: the join panel counts the viewer's open organizations (up to 3, from the viewer's own list) and shows the slots; 409s on join, leave and request show the action that failed, because the server decides and the SPA only explains.
+- Blog: feed tabs `global` and `all`, vote control, pinned chip, author card and "other posts" on the post page; edit and delete have no board yet, so they are not built.
+- Comments: roots newest first, replies indented up to four levels, collapsed rows (score at or below -5) folded, deleted accounts shown as deleted, replies hidden after 365 days for non-moderators; editing prefills from the comment's `body`, which the server sends only to people who can edit it, so no revision fetch is needed.
+- Tickets: every ticket route requires a session because the backend answers 401 to everyone signed out; the status filter offers all, open and closed (`open=1` and `open=0`), staff get the assignee inputs by the `can.*` flags, and new messages are announced through one polite live region instead of the whole list.
+- Flatpages: a catch-all record placed before `not-found` renders static pages from the backend; 404 reuses the not-found content and 401 asks for a sign-in with the page as the redirect.
+- Anonymous home: only the signed-out branch changes; the top performers show each school's short name, because the backend now sends the organization on every home user.
+- Not in 8e: post editor, problem Discussion tab, organization edit and kick, user unban, staff ticket administration beyond the board, because no board or no backend exists for them.
+
+### Known gaps
+
+- Backend asks B-8e1 to B-8e4 are merged (`455fb44`, `1c7edc7`, `7c2977f`): comment body for editing, closed tickets in the list, organization `isOpen`, school short name on home users; no 8e screen waits for them.

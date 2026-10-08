@@ -81,6 +81,7 @@ describe('app shell', () => {
       'Kỳ thi',
       'Xếp hạng',
       'Blog',
+      'Tổ chức',
     ]);
   });
 

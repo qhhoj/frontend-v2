@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { path: '/contests', labelKey: 'nav.contests' },
   { path: '/users', labelKey: 'nav.users' },
   { path: '/blog', labelKey: 'nav.blog' },
+  { path: '/organizations', labelKey: 'nav.organizations' },
 ] as const;
 /** A section stays current on its sub-pages (`/problems/aplusb` is in Problems). */
 const isCurrent = (path: string) =>

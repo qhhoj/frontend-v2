@@ -1,5 +1,5 @@
 /** Legacy `judge/ratings.py` RATING_CLASS and RATING_VALUES. */
-const TIERS = [
+export const RATING_TIERS = [
   'newbie',
   'pupil',
   'specialist',
@@ -11,9 +11,9 @@ const TIERS = [
   'international-grandmaster',
   'legendary-grandmaster',
 ] as const;
-const LOWER_BOUNDS = [1200, 1400, 1600, 1900, 2200, 2300, 2400, 2600, 2900];
+export const TIER_LOWER_BOUNDS = [1200, 1400, 1600, 1900, 2200, 2300, 2400, 2600, 2900] as const;
 
-export type RatingTier = (typeof TIERS)[number];
+export type RatingTier = (typeof RATING_TIERS)[number];
 export type TierColor =
   | 'none'
   | 'newbie'
@@ -25,7 +25,9 @@ export type TierColor =
   | 'grandmaster';
 
 export const ratingTier = (rating: number | null): RatingTier | null =>
-  rating === null ? null : TIERS[LOWER_BOUNDS.filter((bound) => rating >= bound).length]!;
+  rating === null
+    ? null
+    : RATING_TIERS[TIER_LOWER_BOUNDS.filter((bound) => rating >= bound).length]!;
 
 /** Legacy ranks.scss gives the master and grandmaster variants one colour each. */
 export function tierColor(tier: RatingTier | null): TierColor {
