@@ -22,6 +22,21 @@ const VERDICT_LABELS: Record<string, string> = {
   AC: 'Chấp nhận',
 };
 
+interface SubmissionStats {
+  judgedToday: number;
+  acceptedToday: number;
+  queueLength: number;
+  judgesOnline: number;
+  judgesTotal: number;
+}
+
+const STATS_LABELS = {
+  judged: 'bài đã chấm hôm nay',
+  accepted: 'được chấp nhận hôm nay',
+  queue: 'đang chờ chấm',
+  judges: 'máy chấm trực tuyến',
+};
+
 interface SubmissionState {
   status: string;
   result: string | null;
@@ -76,7 +91,10 @@ async function checkVerdict(page: Page, submissionId: string) {
     .catch(() => false);
   if (isAccepted) return;
   const state = await fetchSubmissionState(page, submissionId);
-  expect(['QU', 'P']).toContain(state.status);
+  expect(
+    ['QU', 'P'],
+    `submission ${submissionId} is neither accepted nor waiting for a judge: status ${state.status}, result ${state.result}`,
+  ).toContain(state.status);
   await expect(summary).toContainText(labelOf(state));
   console.log(
     `real-backend e2e: no judge graded submission ${submissionId} within ${VERDICT_TIMEOUT_MS / 1000} s ` +
@@ -90,27 +108,45 @@ async function checkReloadShowsServerState(page: Page, submissionId: string) {
   await expect(page.getByTestId('submission-summary')).toContainText(labelOf(state));
 }
 
+async function fetchStats(page: Page): Promise<SubmissionStats> {
+  return (await (await page.request.get(`${API}/submissions/stats`)).json()).data;
+}
+
+/** The strip shows a dash, not 0%, while nothing was judged today. */
+const acceptedText = (stats: SubmissionStats) =>
+  stats.judgedToday > 0 ? `${Math.round((stats.acceptedToday / stats.judgedToday) * 100)}%` : '—';
+
 async function checkListShowsStatsAndRow(page: Page, submissionId: string) {
   await page.goto('/submissions');
-  const stats = (await (await page.request.get(`${API}/submissions/stats`)).json()).data;
   const strip = page.getByTestId('stats-strip');
   await expect(strip).toBeVisible();
   await expect(strip).not.toContainText('Không có số liệu thống kê');
-  // The numbers are the server's own: the counts shown equal what the stats route answers.
+  // Tile by tile against the server's own numbers; read together so a changing queue cannot split them.
   await expect(async () => {
-    const tiles = await strip.locator('dd').allInnerTexts();
-    expect(tiles).toContain(String(stats.judgedToday));
-    expect(tiles).toContain(String(stats.queueLength));
-    expect(tiles).toContain(`${stats.judgesOnline} / ${stats.judgesTotal}`);
+    const stats = await fetchStats(page);
+    const tileValue = (label: string) =>
+      strip.locator('dl', { hasText: label }).locator('dd').first();
+    await expect(tileValue(STATS_LABELS.judged)).toHaveText(String(stats.judgedToday));
+    await expect(tileValue(STATS_LABELS.accepted)).toHaveText(acceptedText(stats), {
+      timeout: 1000,
+    });
+    await expect(tileValue(STATS_LABELS.queue)).toHaveText(String(stats.queueLength), {
+      timeout: 1000,
+    });
+    await expect(tileValue(STATS_LABELS.judges)).toHaveText(
+      `${stats.judgesOnline} / ${stats.judgesTotal}`,
+      { timeout: 1000 },
+    );
   }).toPass();
   await expect(page.locator(`a[href="/submissions/${submissionId}"]`).first()).toBeVisible();
 }
 
-/** The server's refusal of a text language on the file route, as `submitErrorKey` expects it. */
+/** The server's own refusal of a text language on the file route: the code and issue code `submitErrorKey` maps are the server's, not a fixture's. */
 async function checkFileRouteRefusal(page: Page) {
   const session = (await (await page.request.get(`${API}/auth/me`)).json()).data;
   const { languages } = (await (await page.request.get(`${API}/problems/meta`)).json()).data;
   const language = languages.find((candidate: { key: string }) => candidate.key === LANGUAGE_KEY);
+  expect(language, `language ${LANGUAGE_KEY} is not in /problems/meta`).toBeDefined();
   const answer = await page.request.post(`${API}/problems/${PROBLEM_CODE}/submit/file`, {
     headers: { 'X-CSRF-Token': session.csrfToken, Origin: new URL(page.url()).origin },
     multipart: {
@@ -122,6 +158,19 @@ async function checkFileRouteRefusal(page: Page) {
   const { error } = await answer.json();
   expect(error.code).toBe('validation_failed');
   expect(error.issues).toContainEqual(expect.objectContaining({ code: 'language_takes_text' }));
+}
+
+/** Login is public, so it carries no token yet: the server hands one out and the submit must send it back. */
+async function checkCsrfOnSubmit(sent: Request[]) {
+  const [login] = stateChangingRequests(sent, '/auth/login');
+  expect(login, 'no login request was captured').toBeDefined();
+  const [submit, ...otherSubmits] = stateChangingRequests(sent, `/problems/${PROBLEM_CODE}/submit`);
+  expect(submit, 'no submit request was captured').toBeDefined();
+  expect(otherSubmits).toEqual([]);
+  const issuedToken = (await (await login.response())!.json()).data.csrfToken;
+  expect(issuedToken).toBeTruthy();
+  expect((await submit.allHeaders())['x-csrf-token']).toBe(issuedToken);
+  expect((await submit.response())!.ok()).toBe(true);
 }
 
 test('log in, submit a solution, follow it to its verdict and find it in the list', async ({
@@ -139,14 +188,7 @@ test('log in, submit a solution, follow it to its verdict and find it in the lis
   const submissionId = await submitFromDock(page);
   await checkVerdict(page, submissionId);
 
-  // Login is public, so it carries no token yet: the server hands one out and the submit must send it back.
-  const [login] = stateChangingRequests(sent, '/auth/login');
-  const [submit, ...otherSubmits] = stateChangingRequests(sent, `/problems/${PROBLEM_CODE}/submit`);
-  expect(otherSubmits).toEqual([]);
-  const issuedToken = (await (await login.response())!.json()).data.csrfToken;
-  expect(issuedToken).toBeTruthy();
-  expect((await submit.allHeaders())['x-csrf-token']).toBe(issuedToken);
-  expect((await submit.response())!.ok()).toBe(true);
+  await checkCsrfOnSubmit(sent);
 
   await checkReloadShowsServerState(page, submissionId);
   await checkListShowsStatsAndRow(page, submissionId);

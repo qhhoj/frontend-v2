@@ -91,16 +91,22 @@ Change a palette: edit the values in the theme file and run `npm test`.
 
 Opt-in, never part of `npm run e2e` or CI: `E2E_REAL_API` adds the `real-backend` Playwright project (`e2e-real/*.real.ts`); the preview server then proxies `/api` to it. Without the variable the project does not exist.
 
-Local stack (backend-v2 `README.md` "Run", `CONTRIBUTING.md` "Seed script"):
+Local stack (backend-v2 `README.md` "Run", `CONTRIBUTING.md` "Seed script"). Always use a scratch database (`qhhoj_e2e_real`), never a production-like name.
 
-1. Mongo as a replica set and Redis: `docker compose up -d mongo redis` in backend-v2 (use a scratch database name, e.g. `qhhoj_e2e_real`)
-2. Env for api and seed: `MONGO_URL`, `REDIS_URL`, `ENCRYPTION_KEY` (64 hex), `TOKEN_SECRET`, `PROBLEM_DATA_ROOT`, `PDF_CACHE_ROOT`, `SITE_URL=http://127.0.0.1:4310` (the Origin the browser sends), `COOKIE_SECURE=false`, `NODE_ENV=development`
-3. `npm run seed:e2e` (idempotent: `e2e_user`, `e2e_admin`, problem `e2e_sum`, language `PY3`), then `npm run start:dev` (`:3000`, or set `PORT`)
-4. `E2E_REAL_API=http://127.0.0.1:3000 npx playwright test --project=real-backend`
+1. Mongo (replica set) and Redis, either way:
+   - docker: `docker compose up -d mongo redis` in backend-v2 (`MONGO_URL=mongodb://localhost:27017/qhhoj_e2e_real?replicaSet=rs0`, `REDIS_URL=redis://localhost:6379`)
+   - no docker: `mongod --replSet rs0 --bind_ip 127.0.0.1 --port 27018 --dbpath <empty dir> &`, once `mongosh --port 27018 --eval 'rs.initiate({_id:"rs0",members:[{_id:0,host:"127.0.0.1:27018"}]})'` (or the same `replSetInitiate` command from any driver), and `redis-server --port 6390 --save "" &` (`MONGO_URL='mongodb://127.0.0.1:27018/qhhoj_e2e_real?replicaSet=rs0&directConnection=true'`, `REDIS_URL=redis://127.0.0.1:6390`)
+2. Env for api and seed (backend-v2 shell): `NODE_ENV=development`, `ENCRYPTION_KEY` (64 hex), `TOKEN_SECRET`, `SITE_URL=http://127.0.0.1:4310` (the Origin the browser sends), `COOKIE_SECURE=false` (else Playwright's request context never sends the session cookie), `PORT=3100` (any free port; it must match `E2E_REAL_API`), and writable scratch dirs `MEDIA_ROOT`, `PROBLEM_DATA_ROOT`, `PDF_CACHE_ROOT`, `CONTEST_DATA_ROOT`, `USER_DATA_ROOT`
+3. `npm run seed:e2e` (idempotent: `e2e_user`, `e2e_admin`, problem `e2e_sum`, language `PY3`), then `npm run start:dev`
+4. `E2E_REAL_API=http://127.0.0.1:3100 npx playwright test --project=real-backend`. `reuseExistingServer` is on outside CI: a preview already on 4310 is reused even if it has no `API_ORIGIN`, so stop it first (only a server you started).
 
 `E2E_USER`, `E2E_PASSWORD`, `E2E_PROBLEM`, `E2E_LANGUAGE` default to `e2e_user`, `e2e-user-pass-1`, `e2e_sum`, `PY3`. The submitted program is a Python `a + b`.
 
-A verdict needs the worker, the bridge and a judge as well. Without a judge the row stays `QU`: the test asserts `QU`/`P`, prints why it skipped the AC check, and waits 60 s first. A queued row counts toward the unfinished-submission limit, so a second judge-less run answers 429 `unfinished_submission_limit`: clear the scratch database's `submissions` collection (or re-create the database) between runs. `e2e_sum` has no archive and no `pdfStatementUrl`: never use it for data-editing tests, and the PDF endpoint is probed directly.
+A verdict needs the worker, the bridge and a judge as well: start them as in backend-v2 `README.md` ("Run" table and "Submission flow"), then the test reaches AC. Without a judge the row stays `QU`: the test asserts `QU`/`P`, prints why it skipped the AC check, and waits 60 s first.
+
+Resetting between runs: a queued row counts toward the unfinished-submission limit, so a second judge-less run fails at the submit step with 429 `unfinished_submission_limit` (the page shows "too many submissions waiting"). Clear it with `mongosh --port 27018 qhhoj_e2e_real --eval 'db.submissions.deleteMany({})'` (adjust the port), or drop the scratch database and re-run `npm run seed:e2e`.
+
+`e2e_sum` has no archive and no `pdfStatementUrl`: never use it for data-editing tests; the PDF endpoint is probed directly.
 
 ## Commits
 
