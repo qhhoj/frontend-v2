@@ -93,7 +93,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - Components and pages: `mountApp(path)` (whole app, memory router) or `mountComponent(component)`; stub the API with `mockApi({ 'GET /path': ok(data) })`; any unmocked request fails the test
 - Fixtures in `src/test/fixtures.ts` are plain data with relative imports; e2e reuses them
 - SSE: `installFakeEventSource()` and `latestEventSource().emit(type, data)`
-- E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310`, then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
+- E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310` (or the port in `E2E_PORT`, for parallel runs), then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
 - E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
 - Playwright never kills processes by name; stop only the servers you started
 

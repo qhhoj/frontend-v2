@@ -64,7 +64,7 @@ const verdict = computed(() => {
 <template>
   <NotFoundPage v-if="isNotFound" />
   <div v-else class="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 py-6 sm:px-8">
-    <nav :aria-label="$t('submission.breadcrumbLabel')" class="flex items-center gap-2 text-sm">
+    <nav :aria-label="$t('common.breadcrumb')" class="flex items-center gap-2 text-sm">
       <RouterLink :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
         $t('pages.submissions')
       }}</RouterLink>

@@ -1,25 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import type { VerdictCode } from '@/lib/verdicts';
 import { verdictOf } from '@/lib/verdicts';
-import { verdictBitLook } from './verdict-bit';
+import { verdictBitMood } from './verdict-bit';
 
-const headgearFor = (code: VerdictCode) =>
-  verdictBitLook(verdictOf({ status: 'D', result: code as never }))?.headgear ?? null;
+const moodFor = (code: VerdictCode) =>
+  verdictBitMood(verdictOf({ status: 'D', result: code as never }));
 
-describe('verdictBitLook', () => {
+describe('verdictBitMood', () => {
   it('crowns an accepted solution', () => {
-    expect(headgearFor('AC')).toBe('crown');
+    expect(moodFor('AC')).toBe('crown');
   });
 
   it.each(['WA', 'TLE', 'MLE', 'RTE', 'OLE', 'IR', 'CE'] as const)('sweats over %s', (code) =>
-    expect(headgearFor(code)).toBe('sweat'),
+    expect(moodFor(code)).toBe('sweat'),
   );
 
   it.each(['IE', 'AB', 'SC', 'RJ'] as const)('shows nobody for the system outcome %s', (code) =>
-    expect(headgearFor(code)).toBeNull(),
+    expect(moodFor(code)).toBeNull(),
   );
 
   it('shows nobody while the submission is still being judged', () => {
-    expect(verdictBitLook(verdictOf({ status: 'G', result: null }))).toBeNull();
+    expect(verdictBitMood(verdictOf({ status: 'G', result: null }))).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ChevronDown, CircleAlert } from 'lucide-vue-next';
+import { ChevronDown } from 'lucide-vue-next';
 import { useId } from 'vue';
+import AuthFieldError from './AuthFieldError.vue';
 
 /** A native select in the `AuthField` frame (the language picker on the signup and social completion pages). `optional` adds "(tuỳ chọn)" to the label. Extra attributes go to the select. */
 defineOptions({ inheritAttrs: false });
@@ -46,9 +47,6 @@ const errorId = `${selectId}-error`;
         class="pointer-events-none absolute top-1/2 right-3.5 size-[18px] -translate-y-1/2 text-muted"
       />
     </span>
-    <p v-if="error" :id="errorId" class="flex items-center gap-1.5 text-[13px] text-negative">
-      <CircleAlert aria-hidden="true" class="size-3.5 shrink-0" />
-      {{ error }}
-    </p>
+    <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

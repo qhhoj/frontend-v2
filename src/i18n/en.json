@@ -54,7 +54,6 @@
       "underMinute": "under a minute"
     },
     "participants": "{count} contestant | {count} contestants",
-    "virtualExtra": "+{count} virtual",
     "rated": "Rated",
     "private": "Private",
     "organizationPrivate": "Organization only",
@@ -65,8 +64,7 @@
       "submissions": "Submissions",
       "stats": "Statistics",
       "ranking": "Ranking"
-    },
-    "breadcrumb": "Breadcrumb"
+    }
   },
   "placeholder": {
     "pending": "This screen is waiting for an approved mock-up."
@@ -92,11 +90,11 @@
     "admin": "Administration"
   },
   "appearance": {
-    "open": "Appearance",
     "title": "Appearance",
     "breadcrumb": "Settings › Appearance",
     "customLook": "Use my own look",
     "customLookHelp": "Off: you see the site's own look. On: your choices below.",
+    "styleAndMode": "Style and mode",
     "style": "Style",
     "mode": "Mode",
     "modeOption": {
@@ -277,7 +275,8 @@
     "viewAll": "View all",
     "you": "You",
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "breadcrumb": "Breadcrumb"
   },
   "verdicts": {
     "AC": "Accepted",
@@ -542,7 +541,6 @@
     }
   },
   "submission": {
-    "breadcrumbLabel": "Breadcrumb",
     "ringLabel": "Graded {graded} of {total} tests",
     "ringLabelPoints": "{percent}% of the points earned",
     "provisional": "provisional score",

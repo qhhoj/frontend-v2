@@ -54,7 +54,6 @@
       "underMinute": "dưới 1 phút"
     },
     "participants": "{count} thí sinh",
-    "virtualExtra": "+{count} ảo",
     "rated": "Tính rating",
     "private": "Riêng tư",
     "organizationPrivate": "Nội bộ",
@@ -65,8 +64,7 @@
       "submissions": "Bài nộp",
       "stats": "Thống kê",
       "ranking": "Bảng xếp hạng"
-    },
-    "breadcrumb": "Đường dẫn"
+    }
   },
   "placeholder": {
     "pending": "Màn hình này đang chờ mockup được duyệt."
@@ -92,11 +90,11 @@
     "admin": "Quản trị"
   },
   "appearance": {
-    "open": "Giao diện",
     "title": "Giao diện",
     "breadcrumb": "Cài đặt › Giao diện",
     "customLook": "Dùng giao diện riêng",
     "customLookHelp": "Tắt: bạn thấy giao diện của trang. Bật: dùng các lựa chọn bên dưới.",
+    "styleAndMode": "Kiểu và chế độ",
     "style": "Kiểu",
     "mode": "Chế độ",
     "modeOption": {
@@ -277,7 +275,8 @@
     "viewAll": "Xem tất cả",
     "you": "Bạn",
     "copy": "Sao chép",
-    "copied": "Đã chép"
+    "copied": "Đã chép",
+    "breadcrumb": "Đường dẫn"
   },
   "verdicts": {
     "AC": "Chấp nhận",
@@ -542,7 +541,6 @@
     }
   },
   "submission": {
-    "breadcrumbLabel": "Đường dẫn",
     "ringLabel": "Đã chấm {graded} trên {total} test",
     "ringLabelPoints": "Đã được {percent}% điểm",
     "provisional": "điểm tạm tính",

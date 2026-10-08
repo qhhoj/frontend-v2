@@ -9,7 +9,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - TypeScript 5.9, not 7 — typescript-eslint 8 supports `<6.1`; openapi-typescript 7 needs `^5`.
 - `engines.node >= 22.13`, jsdom 29.0.0 — jsdom 30 needs Node 22.22.2+ (or 24.15+) and the dev machine runs 22.22.1.
 - No `composite` in the tsconfigs — with it the e2e import of `src/test/fixtures.ts` fails with TS6307.
-- Playwright on port 4310, not vite's 4173 — a developer's own `vite preview` may hold 4173.
+- Playwright on port 4310 (`E2E_PORT` overrides it for parallel runs), not vite's 4173 — a developer's own `vite preview` may hold 4173.
 - The Playwright `webServer` runs the build, and CI has no separate build step — the build ran twice.
 - Playwright `reducedMotion: 'reduce'` and explicit locator waits, no `networkidle` — deterministic motion; `networkidle` waits on nothing the user sees.
 - E2E answers the API from the unit fixtures (`e2e/fixtures/api.ts`) — fast and deterministic; the real-backend run comes with submissions (8c).
@@ -27,6 +27,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Profile query runs only when authenticated with no password change pending — the guard answers every other request with 403 `password_change_required`.
 - Account-owned queries keep the user id in their key and the cache is cleared in one place (`useAccountCacheSync`) whenever the signed-in user changes (login, logout, expiry, another account) — the next viewer must never see the previous account's data.
 - `redirect` values pass through `safeRedirect`: only `/path`; `//`, `/\`, scheme URLs and arrays become `/` — open-redirect protection.
+- A route takes `layout:'auth'` only when its page renders AuthLayout. The shell then drops the pill header and keeps blobs, loading layer and `#main`; set on any other page, the viewer has no nav, locale toggle or sign-out.
 - Non-staff on `/admin/**` get not-found at the same URL — existence is not revealed. Admin is one lazy chunk.
 - Guards route page navigations only; `csrf_failed`, `two_factor_required` and `password_change_required` from an API call are not turned into redirects (8b). Their messages exist in both locales.
 - Every existing account carries `siteTheme: 'light'` (schema default) — so the account theme must not overwrite a browser's own choice on sign-in (and `light` now resolves to Clay light; see Theme).
@@ -169,14 +170,9 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Contests (8d)
 
-- Routes per tab with one `ContestTabs`: each contest tab is its own route, the tab bar and the live announcement feed do not remount between them.
-- List groups (running, upcoming, ended) and URL filters: the list state lives in the URL, so a filtered list can be shared and reloaded.
-- Rated filter as two pressed buttons, not a select: the two states are the whole choice.
+- Each contest tab is its own route; a tab page renders `ContestTabs` itself (the ranking page does today, the other tabs are placeholders).
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
-- Announcement read state lives per browser (newest seen id); the first visit marks every announcement unread.
-- Own-only submissions banner is inferred until backend ask B-8d1 is answered.
-- Official and public rankings need a mock-up round before their layout is final.
 
 ## Known gaps (later sub-projects)
 

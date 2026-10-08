@@ -7,7 +7,7 @@ defineProps<{ contest: ContestSummary }>();
 
 <template>
   <header class="flex flex-col gap-2">
-    <nav :aria-label="$t('contests.breadcrumb')" class="text-sm text-muted">
+    <nav :aria-label="$t('common.breadcrumb')" class="text-sm text-muted">
       <RouterLink :to="{ name: 'contests' }" class="hover:text-content">{{
         $t('contests.title')
       }}</RouterLink>

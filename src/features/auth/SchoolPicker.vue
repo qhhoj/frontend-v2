@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ChevronDown, CircleAlert, Search } from 'lucide-vue-next';
+import { ChevronDown, Search } from 'lucide-vue-next';
 import Select from 'primevue/select';
 import { computed, useId } from 'vue';
 import type { OrganizationListItem } from '@/api/types/organizations';
 import { translate } from '@/i18n';
+import AuthFieldError from './AuthFieldError.vue';
 
 /**
  * The school type-to-search combobox ("Gõ để tìm trường"): PrimeVue `Select` with `filter`, framed like `AuthField`.
@@ -70,9 +71,6 @@ const passThrough = computed(() => ({
         </template>
       </Select>
     </div>
-    <p v-if="error" :id="errorId" class="flex items-center gap-1.5 text-[13px] text-negative">
-      <CircleAlert aria-hidden="true" class="size-3.5 shrink-0" />
-      {{ error }}
-    </p>
+    <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

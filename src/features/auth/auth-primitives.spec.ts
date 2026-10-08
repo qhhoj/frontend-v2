@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { signedOut } from '@/test/fixtures';
+import { partialSession, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import { mountApp, mountComponent } from '@/test/mount';
 import AuthError from './AuthError.vue';
@@ -10,17 +10,17 @@ import AuthNotice from './AuthNotice.vue';
 import AuthSubmit from './AuthSubmit.vue';
 
 describe('auth layout', () => {
-  it('drops the pill navigation on auth routes but keeps the skip link and the main landmark', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/forgot-password');
+  it('drops the pill navigation on the second-factor page, which draws AuthLayout, and keeps the skip link and the main landmark', async () => {
+    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    const { wrapper } = await mountApp('/login/2fa');
     expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
     expect(wrapper.find('a[href="#main"]').exists()).toBe(true);
     expect(wrapper.find('main#main').exists()).toBe(true);
   });
 
   it('keeps the shell loading region (outside the page) on auth routes', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/forgot-password');
+    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    const { wrapper } = await mountApp('/login/2fa');
     const regions = wrapper.findAll('[role="status"]');
     expect(regions).toHaveLength(1);
     expect(regions[0]!.attributes('aria-live')).toBe('polite');

@@ -1,7 +1,14 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { problemDetail, profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
+import {
+  partialSession,
+  problemDetail,
+  profile,
+  sessionUser,
+  signedIn,
+  signedOut,
+} from '@/test/fixtures';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
@@ -48,6 +55,18 @@ describe('app shell', () => {
     expect(regions[0]!.attributes('aria-live')).toBe('polite');
     expect(regions[0]!.text()).toBe('');
     expect(wrapper.get('#main').find('[role="status"]').exists()).toBe(false);
+  });
+
+  it('shows the header on the sign-in page, which draws no AuthLayout yet', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/login');
+    expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(true);
+  });
+
+  it('hides the header on the second-factor page, which draws AuthLayout', async () => {
+    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    const { wrapper } = await mountApp('/login/2fa');
+    expect(wrapper.find('nav[aria-label="Điều hướng chính"]').exists()).toBe(false);
   });
 
   it('marks the current section in the main navigation', async () => {

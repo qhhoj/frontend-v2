@@ -5,6 +5,7 @@ import Popover from 'primevue/popover';
 import { computed, ref } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
 import { translate } from '@/i18n';
+import { useMediaQuery } from '@/lib/use-media-query';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
 import { useThemeStore } from '@/theme/theme.store';
@@ -12,13 +13,12 @@ import AccentChoice from './AccentChoice.vue';
 import ModeChoice from './ModeChoice.vue';
 import SegmentedChoice from './SegmentedChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
-import { useReducedTransparency } from './use-reduced-transparency';
 
 const vFocustrap = FocusTrap;
 const TITLE_ID = 'appearance-panel-title';
 const theme = useThemeStore();
 const { shown, update, reset } = useAppearanceChoice();
-const reducedTransparency = useReducedTransparency();
+const reducedTransparency = useMediaQuery('(prefers-reduced-transparency: reduce)');
 /** Glass acts on the Glass themes only; in Clay the segments are inert (the stored level is kept). */
 const isGlassTheme = computed(() => theme.theme.glass);
 const popover = ref<InstanceType<typeof Popover>>();
@@ -35,7 +35,7 @@ const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
     class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
-    :aria-label="$t('appearance.open')"
+    :aria-label="$t('appearance.title')"
     @click="popover?.toggle($event)"
   >
     <Palette class="size-5" aria-hidden="true" />

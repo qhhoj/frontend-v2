@@ -65,6 +65,12 @@ export const useContestStatsQuery = (key: Ref<string>) => {
   });
 };
 
+/** A ranking's key: `['contests', 'ranking', viewerId, contestKey, { virtual }]`. Read it only through `contestOfRankingKey`. */
+const rankingKey = (viewerId: string, contestKey: string, virtual: boolean) =>
+  ['contests', 'ranking', viewerId, contestKey, { virtual }] as const;
+const RANKING_KEY_CONTEST_INDEX = 3;
+const contestOfRankingKey = (queryKey: readonly unknown[]) => queryKey[RANKING_KEY_CONTEST_INDEX];
+
 export const useRankingQuery = (
   key: MaybeRefOrGetter<string>,
   withVirtual: Ref<boolean>,
@@ -72,17 +78,13 @@ export const useRankingQuery = (
 ) => {
   const viewerId = useViewerId();
   return useQuery({
-    queryKey: computed(() => [
-      'contests',
-      'ranking',
-      viewerId.value,
-      toValue(key),
-      { virtual: withVirtual.value },
-    ]),
+    queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
     /** Switching the virtual toggle keeps the old board on screen (never another contest's). */
     placeholderData: (previous, previousQuery) =>
-      previousQuery?.queryKey[3] === toValue(key) ? previous : undefined,
+      previousQuery && contestOfRankingKey(previousQuery.queryKey) === toValue(key)
+        ? previous
+        : undefined,
     refetchInterval: computed(() => (running.value ? RANKING_POLL_MS : false)),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
     refetchIntervalInBackground: false,

@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
+import { useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
@@ -12,13 +13,12 @@ import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
 import ModeChoice from './ModeChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
-import { useReducedTransparency } from './use-reduced-transparency';
 
 const appearance = useAppearanceStore();
 const session = useSessionStore();
 const theme = useThemeStore();
 const { shown, apply, save, update, turnOff, reset } = useAppearanceChoice();
-const reducedTransparency = useReducedTransparency();
+const reducedTransparency = useMediaQuery('(prefers-reduced-transparency: reduce)');
 /** Glass and Glow act on the Glass themes only; Clay is flat, so the controls are inert there (values are kept). */
 const isGlassTheme = computed(() => theme.theme.glass);
 
@@ -71,7 +71,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         </div>
 
         <div>
-          <p class="font-semibold">{{ $t('appearance.mode') }}</p>
+          <p class="font-semibold">{{ $t('appearance.styleAndMode') }}</p>
           <div class="mt-2.5"><ModeChoice /></div>
         </div>
 

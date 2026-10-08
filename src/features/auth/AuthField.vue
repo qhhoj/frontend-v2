@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { CircleAlert, Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff } from 'lucide-vue-next';
 import { computed, ref, useId } from 'vue';
+import AuthFieldError from './AuthFieldError.vue';
 
 /** Extra attributes (`required`, `spellcheck`, `@input`) belong to the input, not the wrapper. */
 defineOptions({ inheritAttrs: false });
@@ -87,9 +88,6 @@ const border = computed(() =>
     </div>
     <slot />
     <p v-if="hint" :id="hintId" class="text-[13px] text-muted">{{ hint }}</p>
-    <p v-if="error" :id="errorId" class="flex items-center gap-1.5 text-[13px] text-negative">
-      <CircleAlert aria-hidden="true" class="size-3.5 shrink-0" />
-      {{ error }}
-    </p>
+    <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

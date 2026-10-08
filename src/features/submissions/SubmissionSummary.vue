@@ -17,7 +17,8 @@ import {
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import type { Verdict } from '@/lib/verdicts';
 import { useNow } from '@/lib/use-now';
-import { verdictBitLook } from '@/mascot/verdict-bit';
+import { BIT_MOODS } from '@/mascot/bit-moods';
+import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import VerdictRing from './VerdictRing.vue';
 
@@ -65,7 +66,10 @@ const runtime = computed(() =>
 );
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
 /** Only a finished submission has a final verdict worth a crown or a sweat drop. */
-const bitLook = computed(() => (isFinished.value ? verdictBitLook(props.verdict) : null));
+const bit = computed(() => {
+  const mood = isFinished.value ? verdictBitMood(props.verdict) : null;
+  return mood ? BIT_MOODS[mood] : null;
+});
 const facts = computed(() => [
   { key: 'language', value: props.submission.language?.name ?? NO_VALUE },
   { key: 'runtime', value: runtime.value },
@@ -113,10 +117,10 @@ const facts = computed(() => [
         </p>
       </div>
       <BitMascot
-        v-if="bitLook"
-        :look="bitLook"
-        :label="$t(bitLook.headgear === 'crown' ? 'bit.accepted' : 'bit.rejected')"
-        :closed-eyes="bitLook.headgear === 'sweat'"
+        v-if="bit"
+        :look="bit.look"
+        :label="$t(bit.labelKey)"
+        :closed-eyes="bit.eyesShut"
         class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
       />
     </GlassCard>

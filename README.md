@@ -18,16 +18,16 @@ API_ORIGIN=http://localhost:3001 npm run dev
 
 `API_ORIGIN` defaults to `http://localhost:3000`.
 
-| Command             | Purpose                                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`       | dev server on :5173                                                                                                       |
-| `npm run build`     | typecheck (`vue-tsc --build`) and production build to `dist/`                                                             |
-| `npm run preview`   | serve `dist/` on :4173                                                                                                    |
-| `npm test`          | Vitest: unit and component specs                                                                                          |
-| `npm run e2e`       | Playwright on :4310: builds `dist/`, previews it and answers the API with a fake (`npx playwright install chromium` once) |
-| `npm run lint`      | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes)                                             |
-| `npm run typecheck` | `vue-tsc --build`                                                                                                         |
-| `npm run check`     | lint, typecheck, test                                                                                                     |
+| Command             | Purpose                                                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`       | dev server on :5173                                                                                                                                      |
+| `npm run build`     | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                            |
+| `npm run preview`   | serve `dist/` on :4173                                                                                                                                   |
+| `npm test`          | Vitest: unit and component specs                                                                                                                         |
+| `npm run e2e`       | Playwright on :4310 (`E2E_PORT` for parallel runs): builds `dist/`, previews it and answers the API with a fake (`npx playwright install chromium` once) |
+| `npm run lint`      | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes)                                                                            |
+| `npm run typecheck` | `vue-tsc --build`                                                                                                                                        |
+| `npm run check`     | lint, typecheck, test                                                                                                                                    |
 
 ## Architecture
 

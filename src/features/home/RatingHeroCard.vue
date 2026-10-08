@@ -61,13 +61,21 @@ const tiles = computed(() =>
       "
     >
       <template #skeleton>
-        <p data-skeleton-region="greeting" class="text-muted">
-          <SkeletonBlock text class="w-40" />
-        </p>
-        <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
-          <SkeletonBlock class="h-15 w-44" />
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p data-skeleton-region="greeting" class="text-muted">
+              <SkeletonBlock text class="w-40" />
+            </p>
+            <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
+              <SkeletonBlock class="h-15 w-44" />
+            </div>
+            <p data-skeleton-region="tier" class="text-muted">
+              <SkeletonBlock text class="w-32" />
+            </p>
+          </div>
+          <!-- The hero Bit's box (16 pixels of 5 px, 7 px from sm up), so the card keeps its height. -->
+          <SkeletonBlock data-skeleton-region="bit" class="size-20 shrink-0 sm:size-28" />
         </div>
-        <p data-skeleton-region="tier" class="text-muted"><SkeletonBlock text class="w-32" /></p>
         <div data-skeleton-region="chart" class="h-[110px]">
           <SkeletonBlock class="h-full w-full" />
         </div>
