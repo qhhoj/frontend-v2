@@ -6,6 +6,7 @@ import {
   lengthProblems,
   settleAfterSave,
   withOrganizationsOf,
+  withoutUnlistedOrganizations,
 } from './profile-draft';
 import type { ProfileDraft } from './profile-draft';
 
@@ -86,5 +87,42 @@ describe('withOrganizationsOf', () => {
       ...draft,
       organizationIds: [HCM.id],
     });
+  });
+});
+
+describe('Vietnamese text is counted and sent as NFC', () => {
+  const decomposedViet = 'Việt'.normalize('NFD');
+
+  it('counts a decomposed name as the composed one, so the same text is not over the limit', () => {
+    expect(decomposedViet.length).toBeGreaterThan('Việt'.length);
+    const composedTo30 = 'ệ'.repeat(30);
+    expect(lengthProblems({ ...base, firstName: 'ệ'.normalize('NFD').repeat(30) })).toEqual([]);
+    expect(lengthProblems({ ...base, firstName: composedTo30 })).toEqual([]);
+  });
+
+  it('reports the count of the composed form for a decomposed over-long name', () => {
+    expect(lengthProblems({ ...base, firstName: 'ệ'.normalize('NFD').repeat(31) })).toEqual([
+      { field: 'firstName', used: 31, max: 30 },
+    ]);
+  });
+
+  it('sends the composed form, and sends nothing when only the normalisation differs', () => {
+    expect(
+      changedFields({ ...base, firstName: decomposedViet }, { ...base, firstName: 'Việt' }),
+    ).toEqual({});
+    expect(
+      changedFields({ ...base, firstName: decomposedViet + '!' }, { ...base, firstName: 'Việt' }),
+    ).toEqual({
+      firstName: 'Việt!',
+    });
+  });
+});
+
+describe('withoutUnlistedOrganizations', () => {
+  it('drops the selected organizations the server no longer lists and keeps the viewer order of the rest', () => {
+    const draft = { ...base, organizationIds: [HCM.id, LHP.id] };
+    expect(
+      withoutUnlistedOrganizations(draft, profile({ organizations: [LHP] })).organizationIds,
+    ).toEqual([LHP.id]);
   });
 });

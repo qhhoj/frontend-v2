@@ -120,7 +120,7 @@ describe('useProfileDraft', () => {
     expect(form.error.value).toBeInstanceOf(ApiError);
   });
 
-  it('reloads the organizations after a conflict and keeps the other edits', async () => {
+  it('reloads the organizations after a conflict, keeps the other edits and drops the organizations the server no longer lists', async () => {
     const { form } = await mountDraft({
       'GET /profile': sequence(
         ok(profile({ firstName: 'Thư', organizations: [LHP, HCM] })),
@@ -131,9 +131,10 @@ describe('useProfileDraft', () => {
     form.draft.value!.firstName = 'Minh Thư';
     form.draft.value!.organizationIds = [HCM.id, LHP.id];
     await form.save();
+    // LHP left the server's list meanwhile: it has no row, so the retry must not send it.
     expect(form.draft.value).toMatchObject({
       firstName: 'Minh Thư',
-      organizationIds: [HCM.id, LHP.id],
+      organizationIds: [HCM.id],
     });
     expect(form.saved.value!.organizationIds).toEqual([HCM.id]);
     expect(form.dirty.value).toBe(true);

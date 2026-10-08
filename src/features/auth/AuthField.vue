@@ -19,6 +19,8 @@ const props = withDefaults(
     describedBy?: string;
     /** A verdict that is not an error text: the username line's free (positive) or taken (negative). Colour only, so the caller's text must say which. */
     tone?: 'positive' | 'negative';
+    /** The input's id, when a page links to it (the profile's error summary); generated when left out. */
+    id?: string;
   }>(),
   {
     type: 'text',
@@ -29,10 +31,11 @@ const props = withDefaults(
     hint: undefined,
     describedBy: undefined,
     tone: undefined,
+    id: undefined,
   },
 );
 const model = defineModel<string>({ required: true });
-const inputId = useId();
+const inputId = props.id ?? useId();
 const hintId = `${inputId}-hint`;
 const errorId = `${inputId}-error`;
 const isPassword = computed(() => props.type === 'password');

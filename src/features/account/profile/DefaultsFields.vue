@@ -7,6 +7,7 @@ import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { LOCALES, isLocale } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import SettingsCard from '../settings/SettingsCard.vue';
+import { profileFieldId } from './profile-field-ids';
 import { timeZoneOptions } from './time-zones';
 
 /** Board SetProfile "Mặc định và hiển thị", without the editor colour and maths engine (Decision 4). */
@@ -48,8 +49,10 @@ const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
       >
         <template #skeleton><SkeletonBlock class="h-[98px] w-full" /></template>
         <AuthSelect
+          :id="profileFieldId('languageId')"
           v-model="languageChoice"
           name="languageId"
+          class="scroll-mb-28"
           :optional="false"
           :label="$t('settings.profile.fieldName.languageId')"
           :placeholder="languageId === null ? $t('settings.defaults.noLanguage') : undefined"
@@ -62,8 +65,10 @@ const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
         </AuthSelect>
       </QueryState>
       <AuthSelect
+        :id="profileFieldId('timezone')"
         v-model="timezone"
         name="timezone"
+        class="scroll-mb-28"
         :optional="false"
         :label="$t('settings.profile.fieldName.timezone')"
         :hint="$t('settings.defaults.timezoneHint')"

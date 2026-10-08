@@ -25,6 +25,11 @@ const LIMITS: ReadonlyArray<readonly [LengthField, number]> = [
 ];
 const same = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
 
+/** The text as the backend stores it: NFC, so an accented letter is one unit whichever way the keyboard typed it. */
+export const toNfc = (text: string): string => text.normalize('NFC');
+/** The length the backend's `.length` sees: UTF-16 units of the NFC text. */
+export const storedLength = (text: string): number => toNfc(text).length;
+
 export const draftOf = (profile: Profile): ProfileDraft => ({
   firstName: profile.firstName,
   about: profile.about,
@@ -40,8 +45,8 @@ export const copyDraft = (draft: ProfileDraft): ProfileDraft => ({
 
 /** Only what changed, so a save never rewrites a field the viewer did not touch. */
 export const changedFields = (draft: ProfileDraft, saved: ProfileDraft): ProfilePatch => ({
-  ...(draft.firstName !== saved.firstName && { firstName: draft.firstName }),
-  ...(draft.about !== saved.about && { about: draft.about }),
+  ...(toNfc(draft.firstName) !== toNfc(saved.firstName) && { firstName: toNfc(draft.firstName) }),
+  ...(toNfc(draft.about) !== toNfc(saved.about) && { about: toNfc(draft.about) }),
   ...(draft.timezone !== saved.timezone && { timezone: draft.timezone }),
   // The backend refuses `null` for the language: a draft without one sends nothing.
   ...(draft.languageId !== null &&
@@ -53,9 +58,9 @@ export const changedFields = (draft: ProfileDraft, saved: ProfileDraft): Profile
 
 /** Over-long texts, caught before sending: the form shows the count as the viewer types. */
 export const lengthProblems = (draft: ProfileDraft): LengthProblem[] =>
-  LIMITS.filter(([field, max]) => draft[field].length > max).map(([field, max]) => ({
+  LIMITS.filter(([field, max]) => storedLength(draft[field]) > max).map(([field, max]) => ({
     field,
-    used: draft[field].length,
+    used: storedLength(draft[field]),
     max,
   }));
 
@@ -75,6 +80,15 @@ export function settleAfterSave(
     organizationIds: pick('organizationIds'),
   };
 }
+
+/** A selected organization the server no longer lists has no row to show, so the draft must not send it again. */
+export const withoutUnlistedOrganizations = (
+  draft: ProfileDraft,
+  profile: Profile,
+): ProfileDraft => {
+  const listed = new Set(profile.organizations.map((organization) => organization.id));
+  return { ...draft, organizationIds: draft.organizationIds.filter((id) => listed.has(id)) };
+};
 
 /** The server's membership list, keeping every other edit. */
 export const withOrganizationsOf = (draft: ProfileDraft, profile: Profile): ProfileDraft => ({

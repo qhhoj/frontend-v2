@@ -5,6 +5,7 @@ import type { ProfileOrganization } from '@/api/types/profile';
 import { translate } from '@/i18n';
 import SettingsCard from '../settings/SettingsCard.vue';
 import { moveItem, withoutItem } from './organization-order';
+import { profileFieldId } from './profile-field-ids';
 
 /** Board SetProfile "Tổ chức": reorder or leave; joining happens on the organization pages. */
 const props = withDefaults(
@@ -21,7 +22,7 @@ const rows = computed(() =>
   ids.value.flatMap((id) => props.organizations.filter((organization) => organization.id === id)),
 );
 const ICON_BUTTON =
-  'flex size-11 items-center justify-center rounded-full border border-line-strong bg-surface-solid hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:border-line aria-disabled:text-muted';
+  'scroll-mb-28 flex size-11 items-center justify-center rounded-full border border-line-strong bg-surface-solid hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:border-line aria-disabled:text-muted';
 
 /** Acts on the id, not the row index, so a row the list does not show can never be moved by mistake. */
 function move(organization: ProfileOrganization, offset: -1 | 1) {
@@ -49,6 +50,7 @@ function leave(organization: ProfileOrganization) {
   >
     <ul
       v-if="rows.length"
+      :id="profileFieldId('organizations')"
       ref="list"
       tabindex="-1"
       :aria-label="$t('settings.organizations.list')"

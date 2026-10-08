@@ -10,6 +10,7 @@ import {
   lengthProblems,
   settleAfterSave,
   withOrganizationsOf,
+  withoutUnlistedOrganizations,
 } from './profile-draft';
 import type { ProfileDraft } from './profile-draft';
 
@@ -44,12 +45,14 @@ type Refetch = () => Promise<{ data: Profile | undefined }>;
 
 /**
  * A 409 has two causes: an admin tried to leave an organization, or the memberships changed elsewhere. Either way the
- * server's list becomes the baseline, and the viewer's selection stays in the draft so a retry still sends it.
+ * server's list becomes the baseline, and the viewer's selection stays in the draft so a retry still sends it, except
+ * the organizations the server dropped: they have no row, so a retry must not send them.
  */
 async function reloadOrganizations(form: DraftState, refetch: Refetch) {
   const { data } = await refetch();
   if (!data || !form.saved.value) return;
   form.saved.value = withOrganizationsOf(form.saved.value, data);
+  if (form.draft.value) form.draft.value = withoutUnlistedOrganizations(form.draft.value, data);
 }
 
 /** All-or-nothing saves of the changed keys; over-long texts never leave the browser. */

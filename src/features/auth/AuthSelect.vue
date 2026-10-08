@@ -13,11 +13,13 @@ const props = withDefaults(
     hint?: string;
     error?: string;
     optional?: boolean;
+    /** The select's id, when a page links to it; generated when left out. */
+    id?: string;
   }>(),
-  { placeholder: undefined, hint: undefined, error: undefined, optional: true },
+  { placeholder: undefined, hint: undefined, error: undefined, optional: true, id: undefined },
 );
 const model = defineModel<string>({ required: true });
-const selectId = useId();
+const selectId = props.id ?? useId();
 const errorId = `${selectId}-error`;
 const hintId = `${selectId}-hint`;
 const describedIds = computed(

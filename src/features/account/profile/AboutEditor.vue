@@ -3,7 +3,8 @@ import { computed, ref, useId, watch } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import AuthFieldError from '@/features/auth/AuthFieldError.vue';
 import LengthCounter from './LengthCounter.vue';
-import { ABOUT_MAX_LENGTH } from './profile-draft';
+import { profileFieldId } from './profile-field-ids';
+import { ABOUT_MAX_LENGTH, storedLength } from './profile-draft';
 
 type AboutTab = 'write' | 'saved';
 const TABS: readonly AboutTab[] = ['write', 'saved'];
@@ -14,6 +15,7 @@ const about = defineModel<string>({ required: true });
 const tab = ref<AboutTab>('write');
 const tabButtons = ref<HTMLButtonElement[]>([]);
 const baseId = useId();
+const TEXT_ID = profileFieldId('about');
 const idOf = (part: string) => `${baseId}-${part}`;
 const describedBy = computed(() =>
   [props.error && idOf('error'), idOf('help')].filter(Boolean).join(' '),
@@ -38,7 +40,7 @@ function switchWithArrow(event: KeyboardEvent) {
 <template>
   <div class="flex flex-col gap-1.5">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <label :for="idOf('text')" class="text-sm font-semibold text-content">{{
+      <label :for="TEXT_ID" class="text-sm font-semibold text-content">{{
         $t('settings.profile.fieldName.about')
       }}</label>
       <div role="tablist" :aria-label="$t('settings.profile.aboutViews')" class="flex gap-1">
@@ -72,13 +74,13 @@ function switchWithArrow(event: KeyboardEvent) {
       :aria-labelledby="idOf('tab-write')"
     >
       <textarea
-        :id="idOf('text')"
+        :id="TEXT_ID"
         v-model="about"
         name="about"
         rows="8"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="block min-h-[150px] w-full resize-y rounded-row border bg-surface-solid px-3.5 py-3 font-mono text-[13.5px] leading-relaxed text-content"
+        class="scroll-mb-28 block min-h-[150px] w-full resize-y rounded-row border bg-surface-solid px-3.5 py-3 font-mono text-[13.5px] leading-relaxed text-content"
         :class="error ? 'border-negative' : 'border-line-strong'"
       />
     </div>
@@ -97,7 +99,7 @@ function switchWithArrow(event: KeyboardEvent) {
       <p :id="idOf('help')" class="text-[13px] leading-normal text-muted">
         {{ $t('settings.profile.aboutHelp') }}
       </p>
-      <LengthCounter :used="about.length" :max="ABOUT_MAX_LENGTH" />
+      <LengthCounter :used="storedLength(about)" :max="ABOUT_MAX_LENGTH" />
     </div>
     <AuthFieldError v-if="error" :id="idOf('error')" :message="error" />
   </div>

@@ -75,7 +75,7 @@ describe('Settings › Profile defaults', () => {
     await save(wrapper);
     expect(select(wrapper, 'timezone').attributes('aria-invalid')).toBe('true');
     expect(wrapper.text()).toContain('Múi giờ không hợp lệ.');
-    expect(document.activeElement).toBe(select(wrapper, 'timezone').element);
+    expect(document.activeElement).toBe(wrapper.get('#main [role="alert"]').element);
   });
 
   it('puts a refused language error under the language select, in Vietnamese', async () => {
@@ -91,7 +91,7 @@ describe('Settings › Profile defaults', () => {
     await save(wrapper);
     expect(select(wrapper, 'languageId').attributes('aria-invalid')).toBe('true');
     expect(wrapper.text()).toContain('Ngôn ngữ này không còn trên trang.');
-    expect(document.activeElement).toBe(select(wrapper, 'languageId').element);
+    expect(document.activeElement).toBe(wrapper.get('#main [role="alert"]').element);
   });
 
   it('switches the interface language at once, on this device only: no request, nothing to save', async () => {

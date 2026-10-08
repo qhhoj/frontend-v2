@@ -3,6 +3,7 @@ import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
@@ -12,7 +13,9 @@ import DefaultsFields from './DefaultsFields.vue';
 import IdentityFields from './IdentityFields.vue';
 import OrganizationsEditor from './OrganizationsEditor.vue';
 import SaveBar from './SaveBar.vue';
+import SaveErrorSummary from './SaveErrorSummary.vue';
 import { invalidSummary, lengthErrors, saveErrorText, serverFieldErrors } from './profile-errors';
+import { profileFieldId } from './profile-field-ids';
 import { useProfileDraft } from './use-profile-draft';
 
 /** Screen order: the summary names the fields in the order the viewer meets them. */
@@ -22,7 +25,8 @@ const session = useSessionStore();
 const { query, draft, dirty, problems, pending, error, attempted, justSaved, save, undo } =
   useProfileDraft();
 const { data: profile, isPending, error: loadError, refetch } = query;
-const formElement = ref<HTMLFormElement | null>(null);
+/** The summary exposes only `focus()`. */
+const summaryNotice = ref<{ focus: () => void } | null>(null);
 
 /** The viewer's live count wins over an older server message for the same field. */
 const fieldErrors = computed(() => ({
@@ -32,21 +36,30 @@ const fieldErrors = computed(() => ({
 const invalidFields = computed(() =>
   PROFILE_FIELD_ORDER.filter((field) => field in fieldErrors.value),
 );
-const summary = computed(() => {
-  if (!attempted.value && !error.value) return null;
-  return invalidFields.value.length
-    ? invalidSummary(invalidFields.value, locale.locale)
-    : saveErrorText(error.value);
+/** After a failed save: a summary whose links go to the invalid fields. */
+const fieldSummary = computed(() => {
+  if (!attempted.value || !invalidFields.value.length) return null;
+  return {
+    title: invalidSummary(invalidFields.value, locale.locale),
+    items: invalidFields.value.map((field) => ({
+      fieldId: profileFieldId(field),
+      text: `${translate(`settings.profile.fieldName.${field}`)}: ${fieldErrors.value[field]}`,
+    })),
+  };
 });
+/** A failed save that no field explains (locked, offline, the organizations conflict). */
+const saveErrorSentence = computed(() =>
+  error.value && !invalidFields.value.length ? saveErrorText(error.value) : null,
+);
 const offline = computed(
   () => error.value instanceof ApiError && error.value.code === 'network_error',
 );
 
-/** A failed save puts the focus on the first field that is wrong, so the viewer can fix it at once. */
+/** A failed save that names fields moves the focus to the summary, which lists them. */
 async function submit() {
   if (await save()) return;
   await nextTick();
-  formElement.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  if (fieldSummary.value) summaryNotice.value?.focus();
 }
 </script>
 
@@ -60,19 +73,19 @@ async function submit() {
           <SkeletonBlock class="h-[230px] w-full" />
         </div>
       </template>
-      <form
-        v-if="draft && profile"
-        ref="formElement"
-        class="flex flex-col gap-5"
-        novalidate
-        @submit.prevent="submit"
-      >
+      <form v-if="draft && profile" class="flex flex-col gap-5" novalidate @submit.prevent="submit">
+        <SaveErrorSummary
+          v-if="fieldSummary"
+          ref="summaryNotice"
+          :title="fieldSummary.title"
+          :items="fieldSummary.items"
+        />
         <SettingsCard :title="$t('settings.nav.profile')" :lead="$t('settings.profile.lead')">
           <SettingsNotice v-if="justSaved" tone="success" bit="crown">
             {{ $t('settings.profile.saved') }}
           </SettingsNotice>
-          <SettingsNotice v-if="summary" tone="error" bit="sweat">
-            {{ summary }}
+          <SettingsNotice v-else-if="saveErrorSentence" tone="error" bit="sweat">
+            {{ saveErrorSentence }}
             <template v-if="offline" #action>
               <button
                 type="button"
