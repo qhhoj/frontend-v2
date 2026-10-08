@@ -234,7 +234,8 @@
     },
     "solvedCount": "{count} solved",
     "empty": "No contestants yet.",
-    "disqualified": "Disqualified"
+    "disqualified": "Disqualified",
+    "scrollRegion": "Scrollable ranking board"
   },
   "formats": {
     "default": "Default",

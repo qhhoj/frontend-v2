@@ -234,7 +234,8 @@
     },
     "solvedCount": "{count} bài",
     "empty": "Chưa có thí sinh.",
-    "disqualified": "Bị loại"
+    "disqualified": "Bị loại",
+    "scrollRegion": "Vùng cuộn bảng xếp hạng"
   },
   "formats": {
     "default": "Mặc định",

@@ -1,4 +1,10 @@
-import type { ContestListItem } from '../api/types/contests';
+import type {
+  ContestDetail,
+  ContestListItem,
+  ProblemCell,
+  Ranking,
+  RankingRow,
+} from '../api/types/contests';
 import type { Language, ProblemListItem, ProblemMeta } from '../api/types/problems';
 import type { SubmissionListItem } from '../api/types/submissions';
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
@@ -194,5 +200,90 @@ export const problemItem = (overrides: Partial<ProblemListItem> = {}): ProblemLi
   hasPublicEditorial: false,
   hasPdfStatement: false,
   viewerStatus: null,
+  ...overrides,
+});
+
+export const PARTICIPATION_IDS = ['part-07', 'part-12', 'part-03', 'part-01'] as const;
+export const RANKING_PROBLEM_IDS = ['prob-a', 'prob-b', 'prob-c'] as const;
+const [PROBLEM_A, PROBLEM_B, PROBLEM_C] = RANKING_PROBLEM_IDS;
+
+export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDetail => ({
+  ...contestItem(),
+  frozenLastMinutes: 60,
+  pointsPrecision: 0,
+  problems: null,
+  ...overrides,
+});
+
+export const rankingRow = (
+  rank: number,
+  participationId: string,
+  username: string,
+  score: number,
+  cumtime: number,
+  cells: Record<string, ProblemCell>,
+): RankingRow => ({
+  rank,
+  participationId,
+  user: {
+    id: username === 'user_01' ? sessionUser().id : `${participationId}-user`,
+    username,
+  },
+  virtual: 0,
+  isDisqualified: false,
+  score,
+  cumtime,
+  tiebreaker: 0,
+  cells,
+});
+
+/** A frozen ICPC board: user_07 first-solved A, has B after one wrong try and C pending; user_01 is the viewer. */
+export const ranking = (overrides: Partial<Ranking> = {}): Ranking => ({
+  frozen: true,
+  problems: [
+    {
+      problemId: PROBLEM_A,
+      code: 'r42a',
+      label: 'A',
+      points: 1,
+      firstSolve: 'part-07',
+      acceptedCount: 4,
+    },
+    {
+      problemId: PROBLEM_B,
+      code: 'r42b',
+      label: 'B',
+      points: 1,
+      firstSolve: 'part-12',
+      acceptedCount: 2,
+    },
+    {
+      problemId: PROBLEM_C,
+      code: 'r42c',
+      label: 'C',
+      points: 1,
+      firstSolve: null,
+      acceptedCount: 0,
+    },
+  ],
+  rows: [
+    rankingRow(1, 'part-07', 'user_07', 2, 41, {
+      [PROBLEM_A]: { time: 540, points: 1, tries: 1 },
+      [PROBLEM_B]: { time: 1860, points: 1, tries: 2 },
+      [PROBLEM_C]: { time: null, points: 0, tries: 2, pending: true },
+    }),
+    rankingRow(2, 'part-12', 'user_12', 2, 55, {
+      [PROBLEM_A]: { time: 720, points: 1, tries: 1 },
+      [PROBLEM_B]: { time: 1320, points: 1, tries: 1 },
+      [PROBLEM_C]: { time: null, points: 0, tries: 4 },
+    }),
+    rankingRow(3, 'part-03', 'user_03', 1, 14, {
+      [PROBLEM_A]: { time: 840, points: 1, tries: 1 },
+    }),
+    rankingRow(4, 'part-01', 'user_01', 1, 18, {
+      [PROBLEM_A]: { time: 1080, points: 1, tries: 1 },
+      [PROBLEM_B]: { time: null, points: 0, tries: 2 },
+    }),
+  ],
   ...overrides,
 });
