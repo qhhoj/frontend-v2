@@ -35,7 +35,7 @@ const isCurrent = (path: string) =>
         :key="item.path"
         :to="item.path"
         :aria-current="isCurrent(item.path) ? 'page' : undefined"
-        class="inline-flex min-h-11 items-center rounded-pill px-4 whitespace-nowrap"
+        class="inline-flex min-h-11 items-center rounded-pill px-2 text-sm whitespace-nowrap sm:px-4 sm:text-base"
         :class="
           isCurrent(item.path)
             ? 'bg-surface-hover font-semibold text-content'

@@ -29,6 +29,9 @@ const PAGES = [
   { path: '/contests/r42/ranking', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
   { path: '/login', signedIn: false, ready: 'Đăng nhập' },
   { path: '/blog', signedIn: true, ready: 'Blog' },
+  { path: '/problems/duongdi', signedIn: true, ready: 'Thời gian' },
+  { path: '/submissions', signedIn: true, ready: 'Tổng hai số' },
+  { path: '/submissions/sub-1', signedIn: true, ready: 'Kết quả từng test' },
 ] as const;
 
 for (const { path, signedIn, ready } of PAGES)
@@ -56,29 +59,37 @@ test('the header stacks: brand, then the nav pill, with the tools beside the bra
   expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
 });
 
-test('the nav pill scrolls on its own and cuts an item off as the "more" cue', async ({
+const NAV_NAME = 'Điều hướng chính';
+
+test('the nav pill shows every item inside the viewport at 375 px', async ({ page, api }) => {
+  void api;
+  await page.goto('/blog');
+  const nav = page.getByRole('navigation', { name: NAV_NAME });
+  const pill = (await nav.boundingBox())!;
+  for (const link of await nav.getByRole('link').all()) {
+    const box = (await link.boundingBox())!;
+    expect(box.x, await link.innerText()).toBeGreaterThanOrEqual(pill.x);
+    expect(box.x + box.width, await link.innerText()).toBeLessThanOrEqual(pill.x + pill.width + 1);
+  }
+  expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
+});
+
+test('at 320 px the nav pill scrolls on its own, reaches its last item and never widens the page', async ({
   page,
   api,
 }) => {
   void api;
+  await page.setViewportSize({ width: 320, height: PHONE.height });
   await page.goto('/blog');
-  const nav = page.getByRole('navigation', { name: 'Điều hướng chính' });
-  const state = await nav.evaluate((element) => {
-    const bounds = element.getBoundingClientRect();
-    const links = [...element.querySelectorAll('a')].map((link) => link.getBoundingClientRect());
-    return {
-      scrolls: element.scrollWidth > element.clientWidth,
-      cutOff: links.some((rect) => rect.left < bounds.right && rect.right > bounds.right),
-    };
-  });
-  expect(state.scrolls).toBe(true);
-  expect(state.cutOff, 'a half-visible item tells the viewer there is more').toBe(true);
+  const nav = page.getByRole('navigation', { name: NAV_NAME });
+  expect(await nav.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
   await nav.getByRole('link', { name: 'Blog' }).focus();
   const last = (await nav.getByRole('link', { name: 'Blog' }).boundingBox())!;
   const pill = (await nav.boundingBox())!;
   expect(last.x + last.width, 'a focused item scrolls fully into view').toBeLessThanOrEqual(
     pill.x + pill.width + 1,
   );
+  expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
 });
 
 test('home: recent submissions and the rating hero fit and keep their text readable', async ({
@@ -158,3 +169,46 @@ for (const { path, name, label } of [
     await page.keyboard.press('ArrowRight');
     await expect.poll(() => region.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   });
+
+const SHEET_SUBMIT_HEIGHT_PX = 56;
+const SHEET_DRAG_PX = 200;
+
+test.describe('the problem page sheet and tabs at 375 px', () => {
+  test.beforeEach(async ({ page, api }) => {
+    api.signedIn = true;
+    await page.goto('/problems/duongdi');
+    await expect(page.locator('#main h1')).toBeVisible();
+  });
+
+  test('starts collapsed and gives the submit button a 56 px target', async ({ page }) => {
+    await expect(page.getByRole('dialog', { name: 'Nộp bài' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Mở rộng' }).click();
+    const submit = await page
+      .getByRole('dialog', { name: 'Nộp bài' })
+      .getByRole('button', { name: 'Nộp bài' })
+      .boundingBox();
+    expect(submit!.height).toBeGreaterThanOrEqual(SHEET_SUBMIT_HEIGHT_PX);
+  });
+
+  test('collapses when its handle is dragged down', async ({ page }) => {
+    await page.getByRole('button', { name: 'Mở rộng' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Nộp bài' });
+    const handle = (await sheet.locator('header .touch-none').boundingBox())!;
+    const pointerX = handle.x + handle.width / 2;
+    await page.mouse.move(pointerX, handle.y + handle.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(pointerX, handle.y + SHEET_DRAG_PX, { steps: 8 });
+    await page.mouse.up();
+    await expect(sheet).toHaveCount(0);
+  });
+
+  test('keeps the tab strip inside the screen with touchable tabs', async ({ page }) => {
+    for (const tab of await page.getByRole('tab').all()) {
+      await tab.scrollIntoViewIfNeeded();
+      const box = (await tab.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(PHONE.width);
+    }
+  });
+});

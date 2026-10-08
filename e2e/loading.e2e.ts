@@ -6,6 +6,8 @@ import {
   RANKING_PROBLEM_IDS,
   rankingRow,
   ranking,
+  submissionCase,
+  submissionDetail,
   submissionItem,
 } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -427,6 +429,65 @@ const SHIFT_CASES: ShiftCase[] = [
     viewports: PHONE_AND_DESKTOP,
     placed: ['tabs', 'statement'],
     placedOnly: ['statement'],
+  },
+  {
+    name: 'problem header limits',
+    path: '/problems/duongdi',
+    signedIn: false,
+    hold: 'GET /problems/duongdi',
+    parts: (page) => ({
+      card: page.getByTestId('problem-header'),
+      limits: page.locator('[data-skeleton-region="limits"], [data-testid="limits"]'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+    placed: ['limits'],
+  },
+  {
+    name: 'submission summary and cases card',
+    path: '/submissions/sub-1',
+    signedIn: true,
+    hold: 'GET /submissions/sub-1',
+    answer: (api) =>
+      (api.routes['GET /submissions/sub-1'] = {
+        body: {
+          data: submissionDetail({
+            cases: Array.from({ length: 6 }, (_row, index) =>
+              submissionCase({ position: index + 1 }),
+            ),
+            totalCases: 6,
+          }),
+        },
+      }),
+    parts: (page) => ({
+      summary: page.getByTestId('submission-summary'),
+      'cases card': page.getByTestId('cases-card'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+    placed: ['cases card'],
+  },
+  {
+    name: 'submission table card',
+    path: '/submissions',
+    signedIn: true,
+    hold: 'GET /submissions',
+    answer: (api) =>
+      (api.routes['GET /submissions'] = list(
+        Array.from({ length: 10 }, (_row, index) => submissionItem({ id: `sub-${index}` })),
+      )),
+    parts: (page) => ({
+      'table card': page.getByTestId('submission-table-card'),
+      'table rows': page.locator('[data-skeleton-region="row"], main tbody tr'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+    placed: ['table rows'],
+  },
+  {
+    name: 'stats strip',
+    path: '/submissions',
+    signedIn: true,
+    hold: 'GET /submissions/stats',
+    parts: (page) => ({ strip: page.getByTestId('stats-strip') }),
+    viewports: PHONE_AND_DESKTOP,
   },
 ];
 

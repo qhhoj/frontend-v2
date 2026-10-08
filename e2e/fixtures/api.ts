@@ -22,8 +22,55 @@ import {
 interface Reply {
   status?: number;
   body?: unknown;
+  /** Extra response headers (`Retry-After`, `Cache-Control`). */
+  headers?: Record<string, string>;
+  /** Defaults to application/json; `application/pdf` and `text/event-stream` for the PDF and the feeds. */
+  contentType?: string;
+  /** Sent as is instead of `JSON.stringify(body)`. */
+  raw?: string | Buffer;
 }
-type Handler = Reply | ((request: { url: URL; body: unknown }) => Reply);
+interface SeenRequest {
+  key: string;
+  url: URL;
+  headers: Record<string, string>;
+  /** Raw body: a multipart upload is asserted on its text (language id, file name). */
+  postData: Buffer | null;
+  replyStatus: number;
+  replyContentType: string;
+}
+interface HandlerInput {
+  url: URL;
+  body: unknown;
+  postData: Buffer | null;
+  headers: Record<string, string>;
+  params: Record<string, string>;
+}
+type Handler = Reply | ((request: HandlerInput) => Reply);
+
+/** `GET /problems/:code` style keys: a segment starting with `:` matches any one segment. */
+function matchPattern(pattern: string, key: string): Record<string, string> | null {
+  const patternParts = pattern.split('/');
+  const keyParts = key.split('/');
+  if (patternParts.length !== keyParts.length) return null;
+  const params: Record<string, string> = {};
+  for (const [index, part] of patternParts.entries()) {
+    if (part.startsWith(':')) params[part.slice(1)] = decodeURIComponent(keyParts[index]);
+    else if (part !== keyParts[index]) return null;
+  }
+  return params;
+}
+
+const eventStream = (...frames: string[]): Reply => ({
+  contentType: 'text/event-stream',
+  // The long retry stops the browser re-requesting a finished stream.
+  raw: `retry: 600000\n\n${frames.join('')}`,
+});
+export const streamFrame = (event: string, data: unknown) =>
+  `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+export const pdfReady: Reply = {
+  contentType: 'application/pdf',
+  raw: Buffer.from('%PDF-1.4\n%%EOF'),
+};
 
 const ok = (data: unknown): Reply => ({ body: { data } });
 export const list = (items: unknown[]): Reply => ({
@@ -38,6 +85,7 @@ const UNAUTHORIZED: Reply = {
 export class FakeApi {
   signedIn = false;
   readonly unmatched: string[] = [];
+  readonly requests: SeenRequest[] = [];
   private readonly gates = new Map<string, Promise<void>>();
   private readonly releases: Array<() => void> = [];
   readonly routes: Record<string, Handler> = {
@@ -68,8 +116,10 @@ export class FakeApi {
               }),
             ],
       ),
-    'GET /problems/duongdi': ok(problemDetail()),
-    'GET /problems/duongdi/editorial': ok(problemEditorial()),
+    'GET /problems/:code': ({ params }) => ok(problemDetail({ code: params.code })),
+    'GET /problems/:code/editorial': ok(problemEditorial()),
+    'POST /problems/:code/submit': ok({ id: 'sub-9' }),
+    'POST /problems/:code/submit/file': ok({ id: 'sub-9' }),
     'GET /contests': list([contestItem()]),
     'GET /contests/r42': ok(contestDetail()),
     'GET /contests/r42/ranking': ok(ranking()),
@@ -81,8 +131,10 @@ export class FakeApi {
     'GET /users/user_01/ratings': ok(ratingHistory()),
     'GET /submissions': list([submissionItem()]),
     'GET /submissions/stats': ok(submissionStats()),
-    'GET /submissions/sub-1': ok(submissionDetail()),
-    'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
+    'GET /submissions/:id': ({ params }) => ok(submissionDetail({ id: params.id })),
+    'GET /submissions/:id/source': ({ params }) => ok({ id: params.id, source: 'int main() {}\n' }),
+    'GET /events/submissions/:id': eventStream(),
+    'GET /events/submissions': eventStream(),
   };
 
   /** Delays every answer to `key` ("GET /problems") until the returned function is called; teardown releases whatever is left. */
@@ -97,27 +149,61 @@ export class FakeApi {
     this.releases.forEach((release) => release());
   }
 
+  /** An exact key always wins over a `:param` pattern, so `GET /submissions/stats` beats `GET /submissions/:id`. */
+  private lookup(key: string) {
+    const exact = this.routes[key];
+    if (exact) return { handler: exact, params: {} };
+    for (const [pattern, handler] of Object.entries(this.routes)) {
+      const params = pattern.includes(':') ? matchPattern(pattern, key) : null;
+      if (params) return { handler, params };
+    }
+    return undefined;
+  }
+
   async install(page: Page) {
     await page.route('**/api/internal/**', async (route) => {
       const request = route.request();
       const url = new URL(request.url());
       const key = `${request.method()} ${url.pathname.replace('/api/internal', '')}`;
-      const handler = this.routes[key];
-      if (!handler) {
+      const found = this.lookup(key);
+      if (!found) {
         this.unmatched.push(`${key}${url.search}`);
         return route.fulfill({ status: 501, json: { error: { code: 'unmocked', message: key } } });
       }
       await this.gates.get(key);
+      let body: unknown;
+      try {
+        body = request.postDataJSON();
+      } catch {
+        body = undefined; // multipart
+      }
+      const headers = request.headers();
+      const postData = request.postDataBuffer();
       const reply =
-        typeof handler === 'function'
-          ? handler({ url, body: request.postDataJSON() as unknown })
-          : handler;
+        typeof found.handler === 'function'
+          ? found.handler({ url, body, postData, headers, params: found.params })
+          : found.handler;
+      const contentType = reply.contentType ?? 'application/json';
+      const status = reply.status ?? 200;
+      this.requests.push({
+        key,
+        url,
+        headers,
+        postData,
+        replyStatus: status,
+        replyContentType: contentType,
+      });
       await route.fulfill({
-        status: reply.status ?? 200,
-        contentType: 'application/json',
-        body: reply.body === undefined ? '' : JSON.stringify(reply.body),
+        status,
+        headers: reply.headers,
+        contentType,
+        body: reply.raw ?? (reply.body === undefined ? '' : JSON.stringify(reply.body)),
       });
     });
+  }
+
+  requestsTo(key: string) {
+    return this.requests.filter((seen) => seen.key === key);
   }
 }
 

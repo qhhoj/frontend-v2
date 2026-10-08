@@ -86,7 +86,7 @@ const isHidden = computed(
 </script>
 
 <template>
-  <GlassCard as="div" class="overflow-hidden rounded-panel">
+  <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3 sm:px-8">
       <h2 class="font-display text-lg font-semibold">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-[13px] text-muted">{{ $t('submission.liveUpdates') }}</span>

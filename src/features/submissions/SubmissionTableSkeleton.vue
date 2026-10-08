@@ -57,6 +57,11 @@ const columns = computed(() =>
                 class="h-7"
                 :class="column.cell"
               />
+              <template v-else-if="column.key === 'problem'">
+                <!-- The real cell has the name and, under it, the code in a smaller font. -->
+                <SkeletonBlock text :class="column.cell" />
+                <div class="font-mono text-xs"><SkeletonBlock text class="w-16" /></div>
+              </template>
               <SkeletonBlock v-else text :class="column.cell" />
             </td>
           </tr>

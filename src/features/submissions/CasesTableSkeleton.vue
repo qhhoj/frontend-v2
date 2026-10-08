@@ -9,7 +9,7 @@ const NUMBER_COLUMN_COUNT = 3;
 </script>
 
 <template>
-  <GlassCard as="div" class="overflow-hidden rounded-panel">
+  <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3 sm:px-8">
       <h2 class="font-display text-lg font-semibold"><SkeletonBlock text class="w-40" /></h2>
     </div>

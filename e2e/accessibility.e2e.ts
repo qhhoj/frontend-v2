@@ -20,6 +20,14 @@ const PAGES = [
     path: '/contests/r42/ranking',
     ready: { anonymous: 'QHH Round #42 (Div. 2)', 'signed-in': 'QHH Round #42 (Div. 2)' },
   },
+  {
+    path: '/problems/duongdi',
+    ready: { anonymous: 'Thời gian', 'signed-in': 'Thời gian' },
+  },
+  {
+    path: '/submissions',
+    ready: { anonymous: 'Tổng hai số', 'signed-in': 'Tổng hai số' },
+  },
   { path: '/submissions/sub-1', ready: { 'signed-in': 'Kết quả từng test' } },
   { path: '/login', ready: { anonymous: 'Đăng nhập' } },
   { path: '/blog', ready: { anonymous: 'Blog', 'signed-in': 'Blog' } },

@@ -142,3 +142,5 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Session expiry mid-page redirects on the next navigation only — 8b.
 - Real-backend e2e and the submission screens — 8c.
 - Contest screens beyond ranking — 8d; admin screens — sub-project 7.
+- Header nav: at phone widths items use `px-2 text-sm` so all five fit at 375 px; at 320 px the pill still scrolls on its own.
+- E2E: `FakeApi` matches `:param` keys (an exact key wins), records every request in `requests` and serves PDF and event-stream replies; the editor and language packs must never be modulepreloaded (`bundle.e2e.ts`).

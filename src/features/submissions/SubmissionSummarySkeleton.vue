@@ -7,16 +7,22 @@ const FACT_COUNT = 6;
 </script>
 
 <template>
-  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+  <div
+    data-testid="submission-summary"
+    class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+  >
     <GlassCard
       as="div"
       class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
     >
       <SkeletonBlock data-skeleton-region="ring" round class="size-32 shrink-0" />
       <div class="min-w-0 flex-1 basis-40">
-        <p data-skeleton-region="line" class="text-sm"><SkeletonBlock text class="w-32" /></p>
+        <!-- The real line holds a 28 px verdict badge; the score is 56 px of `leading-none` text, so a block of that height. -->
+        <p data-skeleton-region="line" class="flex min-h-7 items-center text-sm">
+          <SkeletonBlock text class="w-32" />
+        </p>
         <p data-skeleton-region="score" class="mt-1 font-mono text-[56px] leading-none">
-          <SkeletonBlock text class="w-40" />
+          <SkeletonBlock class="h-14 w-40" />
         </p>
       </div>
     </GlassCard>
@@ -29,7 +35,9 @@ const FACT_COUNT = 6;
           <dt data-skeleton-region="fact" class="text-[13px]">
             <SkeletonBlock text class="w-16" />
           </dt>
-          <dd><SkeletonBlock text class="w-32" /></dd>
+          <dd>
+            <SkeletonBlock text class="w-32" />
+          </dd>
         </template>
       </dl>
     </GlassCard>

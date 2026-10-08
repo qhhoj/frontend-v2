@@ -70,7 +70,10 @@ const facts = computed(() => [
 </script>
 
 <template>
-  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+  <div
+    data-testid="submission-summary"
+    class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+  >
     <GlassCard
       as="div"
       class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
