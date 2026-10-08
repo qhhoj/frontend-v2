@@ -314,6 +314,19 @@
       "data": "Data"
     },
     "profile": {
+      "lead": "Public details and the defaults used when you submit.",
+      "saved": "Profile saved.",
+      "firstNameHint": "Shown on your profile page, the rankings and comments. The username {username} cannot change.",
+      "aboutViews": "About text views",
+      "aboutTab": { "write": "Write", "saved": "Saved version" },
+      "aboutHelp": "Markdown is supported. The server renders the saved text, so “Saved version” changes only after you save.",
+      "aboutEmpty": "No about text yet.",
+      "noChanges": "No unsaved changes.",
+      "unsaved": "You have unsaved changes.",
+      "fixToSave": "Fix {count} error(s), then save again.",
+      "undo": "Undo",
+      "save": "Save changes",
+      "saving": "Saving…",
       "fieldName": {
         "firstName": "Display name",
         "about": "About you",

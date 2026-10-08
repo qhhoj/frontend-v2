@@ -52,7 +52,10 @@ const border = computed(() =>
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <label :for="inputId" class="text-sm font-semibold text-content">{{ label }}</label>
+    <div class="flex items-baseline justify-between gap-3">
+      <label :for="inputId" class="text-sm font-semibold text-content">{{ label }}</label>
+      <slot name="label-end" />
+    </div>
     <div class="relative">
       <input
         v-bind="$attrs"

@@ -115,6 +115,17 @@ describe('AuthField', () => {
   it('has no visibility toggle on other inputs', () => {
     expect(mountField().find('button').exists()).toBe(false);
   });
+
+  it('puts label-end content on the label row, outside the label', () => {
+    const wrapper = mountComponent(AuthField, {
+      props: { label: 'Tên hiển thị', name: 'firstName', modelValue: '' },
+      slots: { 'label-end': '<span data-counter>3 / 30</span>' },
+    });
+    expect(wrapper.get('label').text()).toBe('Tên hiển thị');
+    expect(
+      wrapper.get('label').element.parentElement!.querySelector('[data-counter]'),
+    ).not.toBeNull();
+  });
 });
 
 describe('AuthError, AuthNotice and AuthSubmit', () => {

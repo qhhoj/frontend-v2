@@ -314,6 +314,19 @@
       "data": "Dữ liệu"
     },
     "profile": {
+      "lead": "Thông tin công khai và lựa chọn mặc định khi bạn nộp bài.",
+      "saved": "Đã lưu hồ sơ.",
+      "firstNameHint": "Hiện trên trang cá nhân, bảng xếp hạng và bình luận. Tên đăng nhập {username} không đổi được.",
+      "aboutViews": "Cách xem phần giới thiệu",
+      "aboutTab": { "write": "Soạn thảo", "saved": "Bản đã lưu" },
+      "aboutHelp": "Hỗ trợ Markdown. Máy chủ hiển thị bản đã lưu, nên tab “Bản đã lưu” chỉ cập nhật sau khi bạn bấm Lưu.",
+      "aboutEmpty": "Chưa có phần giới thiệu.",
+      "noChanges": "Không có thay đổi chưa lưu.",
+      "unsaved": "Có thay đổi chưa lưu.",
+      "fixToSave": "Sửa {count} lỗi rồi bấm Lưu lại.",
+      "undo": "Hoàn tác",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
       "fieldName": {
         "firstName": "Tên hiển thị",
         "about": "Giới thiệu bản thân",

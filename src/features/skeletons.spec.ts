@@ -277,3 +277,15 @@ describe('the data settings page shows blocks shaped like its card', () => {
     expectInert(skeleton.element, 'data skeleton');
   });
 });
+
+describe('the profile settings page shows blocks shaped like its first card', () => {
+  it('fills the card with inert blocks while the profile loads', async () => {
+    mockApi(settingsRoutes());
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/settings');
+    const skeleton = wrapper.get('#main [data-testid="query-skeleton"]');
+    expect(skeleton.attributes('aria-hidden')).toBe('true');
+    expect(blocksIn(skeleton.element)).toBeGreaterThan(0);
+    expectInert(skeleton.element, 'profile skeleton');
+  });
+});
