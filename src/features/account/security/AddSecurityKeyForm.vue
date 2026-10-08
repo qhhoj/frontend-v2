@@ -57,10 +57,10 @@ async function submit() {
         autocomplete="off"
         :maxlength="KEY_NAME_MAX_LENGTH"
         :label="$t('settings.keys.nameLabel')"
-        @input="dismiss('name')"
         :hint="$t('settings.keys.nameHint')"
         :error="fieldErrors.name"
         required
+        @input="dismiss('name')"
       />
       <AuthField
         v-model="password"
