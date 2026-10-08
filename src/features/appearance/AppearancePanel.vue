@@ -15,6 +15,7 @@ import { useAppearanceChoice } from './use-appearance-choice';
 import { useReducedTransparency } from './use-reduced-transparency';
 
 const vFocustrap = FocusTrap;
+const TITLE_ID = 'appearance-panel-title';
 const theme = useThemeStore();
 const { shown, update, reset } = useAppearanceChoice();
 const reducedTransparency = useReducedTransparency();
@@ -41,22 +42,21 @@ const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
   </button>
   <Popover
     ref="popover"
-    :pt="{ root: { 'aria-label': $t('appearance.open') } }"
+    :pt="{ root: { 'aria-labelledby': TITLE_ID } }"
     @show="isOpen = true"
     @hide="isOpen = false"
   >
-    <!-- v-focustrap keeps Tab inside while the panel is open; the popover returns focus to the button on Escape. -->
-    <div v-focustrap class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">
+    <!-- v-focustrap keeps Tab inside while the panel is open; autoFocus moves focus to the first button on open; the popover returns focus to the button on Escape. -->
+    <div
+      v-focustrap="{ autoFocus: true }"
+      class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4"
+    >
       <div class="flex items-center justify-between gap-3">
-        <p class="font-display text-lg font-bold">{{ $t('appearance.title') }}</p>
+        <p :id="TITLE_ID" class="font-display text-lg font-bold">{{ $t('appearance.title') }}</p>
         <BitMascot :look="PLACEMENT_LOOKS.hero" blinks class="[--bit-px:2px]" />
       </div>
-      <div>
-        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
-          {{ $t('appearance.mode') }}
-        </p>
-        <ModeChoice />
-      </div>
+      <!-- ModeChoice's two groups (Style, Mode) name themselves. -->
+      <ModeChoice />
       <div>
         <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
           {{ $t('appearance.accentTitle') }}
