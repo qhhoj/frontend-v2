@@ -936,5 +936,31 @@
   },
   "flatpage": {
     "title": "Page"
+  },
+  "settings": {
+    "profile": {
+      "fieldName": {
+        "firstName": "Display name",
+        "about": "About you",
+        "organizations": "Organizations",
+        "languageId": "Default programming language",
+        "timezone": "Time zone"
+      },
+      "invalid": {
+        "firstName": "The display name is not valid.",
+        "about": "The about text is not valid.",
+        "organizations": "You can only reorder or leave organizations you belong to. To join one, open its page.",
+        "languageId": "This language is no longer offered. Choose another one.",
+        "timezone": "This time zone is not valid. Choose one from the list (for example Asia/Ho_Chi_Minh)."
+      },
+      "tooLong": {
+        "firstName": "The display name takes at most {max} characters ({used} now).",
+        "about": "The about text is longer than {max} characters. Remove {over} characters."
+      },
+      "invalidSummary": "Not saved. Fix {count} field(s): {names}. Your other changes are still on this page.",
+      "locked": "The name or about text cannot be saved: the account must solve more problems before editing its profile, or the official contest locks profiles.",
+      "organizationsChanged": "Your organizations changed meanwhile. The list was reloaded; check it and save again.",
+      "offline": "Connection lost. The changes were not sent; check the network and try again."
+    }
   }
 }

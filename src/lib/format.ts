@@ -1,6 +1,6 @@
 import type { Locale } from '@/i18n';
 
-const INTL_LOCALES: Record<Locale, string> = { vi: 'vi-VN', en: 'en-US' };
+export const INTL_LOCALES: Record<Locale, string> = { vi: 'vi-VN', en: 'en-US' };
 const pad = (value: number) => String(value).padStart(2, '0');
 
 /** `HH:MM:SS`; hours are not wrapped into days (a 14-day contest shows 335:59:59). */

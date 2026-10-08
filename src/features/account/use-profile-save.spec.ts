@@ -2,14 +2,14 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { flushPromises } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import { describe, expect, it, vi } from 'vitest';
-import type { ProfilePatch } from '@/api/types/profile';
+import type { Profile, ProfilePatch } from '@/api/types/profile';
 import { useThemeChoice } from '@/features/shell/use-theme-choice';
 import { useSessionStore } from '@/stores/session.store';
 import { profile, sessionUser, signedOut } from '@/test/fixtures';
-import { mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { profileKey } from './profile.queries';
-import { useProfileSave } from './use-profile-save';
+import { useProfileSave, useProfileUpdate } from './use-profile-save';
 
 const OCEAN = { accent: 'ocean', glass: 40, glow: 60 } as const;
 
@@ -19,6 +19,7 @@ function mountSavers({ signedIn = true } = {}) {
       setup: () => ({
         saveProfile: useProfileSave(),
         chooseTheme: useThemeChoice(),
+        update: useProfileUpdate(),
         queryClient: useQueryClient(),
       }),
       render: () => h('div'),
@@ -28,6 +29,7 @@ function mountSavers({ signedIn = true } = {}) {
   return wrapper.vm as unknown as {
     saveProfile: (patch: ProfilePatch) => Promise<void>;
     chooseTheme: (preference: string) => Promise<void>;
+    update: (patch: ProfilePatch) => Promise<Profile>;
     queryClient: ReturnType<typeof useQueryClient>;
   };
 }
@@ -126,6 +128,34 @@ describe('profile save', () => {
     });
     const { saveProfile, queryClient } = mountSavers();
     await expect(saveProfile({ siteTheme: 'clay-dark' })).resolves.toBeUndefined();
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
+  });
+});
+
+describe('useProfileUpdate', () => {
+  it('returns the stored profile and caches it', async () => {
+    mockApi({ 'PATCH /profile': ok(profile({ firstName: 'Thư' })) });
+    const { update, queryClient } = mountSavers();
+    await expect(update({ firstName: 'Thư' })).resolves.toMatchObject({ firstName: 'Thư' });
+    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toMatchObject({
+      firstName: 'Thư',
+    });
+  });
+
+  it('rethrows a failure, unlike the theme saver', async () => {
+    mockApi({ 'PATCH /profile': fail(400, 'validation_failed') });
+    const { update } = mountSavers();
+    await expect(update({ timezone: 'Mars/Base' })).rejects.toMatchObject({
+      code: 'validation_failed',
+    });
+  });
+
+  it('shares one sequence with the theme saver: its answer is dropped once a newer save started', async () => {
+    mockApi({
+      'PATCH /profile': sequence(ok(profile({ firstName: 'Thư' })), fail(500, 'http_error')),
+    });
+    const { update, saveProfile, queryClient } = mountSavers();
+    await Promise.all([update({ firstName: 'Thư' }), saveProfile({ siteTheme: 'clay-dark' })]);
     expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
   });
 });
