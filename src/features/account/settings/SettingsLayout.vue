@@ -22,7 +22,7 @@ const SECTIONS = [
   { route: 'settings-data', labelKey: 'settings.nav.data', icon: Download, signedInOnly: true },
 ] as const;
 const LINK =
-  'flex min-h-11 shrink-0 items-center gap-3 rounded-pill border px-4 text-sm whitespace-nowrap no-underline';
+  'flex min-h-11 shrink-0 items-center gap-3 rounded-pill border px-4 text-sm whitespace-nowrap no-underline lg:text-[14.5px]';
 const LINK_STATE = {
   current: 'border-line-accent bg-accent-soft font-semibold text-accent-soft-text',
   other:
@@ -40,7 +40,10 @@ const current = computed(() => SECTIONS.find((section) => section.route === rout
 
 <template>
   <div class="mx-auto flex w-full max-w-[1216px] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
-    <nav :aria-label="$t('common.breadcrumb')" class="flex items-center gap-1.5 text-[13px]">
+    <nav
+      :aria-label="$t('common.breadcrumb')"
+      class="hidden items-center gap-1.5 text-[13px] sm:flex"
+    >
       <RouterLink
         v-if="signedIn"
         :to="{ name: 'settings' }"
@@ -50,14 +53,16 @@ const current = computed(() => SECTIONS.find((section) => section.route === rout
       </RouterLink>
       <span v-else>{{ $t('pages.settings') }}</span>
       <span aria-hidden="true" class="text-muted">/</span>
-      <span v-if="current" aria-current="page">{{ $t(current.labelKey) }}</span>
+      <span v-if="current" aria-current="page" class="text-muted">{{ $t(current.labelKey) }}</span>
     </nav>
-    <h1 class="font-display text-[34px] leading-tight font-bold">{{ $t('pages.settings') }}</h1>
+    <h1 class="-mt-3 font-display text-[28px] leading-tight font-bold sm:text-[34px]">
+      {{ $t('pages.settings') }}
+    </h1>
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <nav
         v-if="sections.length > 1"
         :aria-label="$t('settings.sections')"
-        class="flex gap-1.5 overflow-x-auto pb-1 lg:glass lg:w-60 lg:shrink-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:rounded-card lg:p-2.5"
+        class="flex gap-1.5 overflow-x-auto py-1 lg:glass lg:w-60 lg:shrink-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:rounded-card lg:p-2.5"
       >
         <RouterLink
           v-for="section in sections"
