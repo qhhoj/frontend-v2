@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { RankingContext } from './ranking-cells';
-import type { RankingProblem } from '@/api/types/contests';
+import type { ContestFormatName, RankingProblem } from '@/api/types/contests';
 import {
   formatCumtime,
   isPenaltyFormat,
@@ -19,7 +19,7 @@ const problem = (overrides: Partial<RankingProblem> = {}): RankingProblem => ({
   ...overrides,
 });
 
-const context = (formatName: string, pointsPrecision = 2): RankingContext => ({
+const context = (formatName: ContestFormatName, pointsPrecision = 2): RankingContext => ({
   formatName,
   pointsPrecision,
   locale: 'en',
@@ -196,10 +196,10 @@ describe('ranking helpers', () => {
   });
 
   it('knows which formats count penalties', () => {
-    expect(['icpc', 'vnoj'].every(isPenaltyFormat)).toBe(true);
-    expect(['default', 'ioi', 'ioi16', 'ultimate', 'final_submission'].some(isPenaltyFormat)).toBe(
-      false,
-    );
+    expect((['icpc', 'vnoj'] as const).every(isPenaltyFormat)).toBe(true);
+    expect(
+      (['default', 'ioi', 'ioi16', 'ultimate', 'final_submission'] as const).some(isPenaltyFormat),
+    ).toBe(false);
   });
 
   it('counts solved problems from the cells, frozen and partial ones excluded', () => {
@@ -218,8 +218,10 @@ describe('ranking helpers', () => {
   });
 
   it('hides the time column only for formats that never accumulate time', () => {
-    expect(['ioi16', 'final_submission'].some(showsCumtime)).toBe(false);
-    expect(['icpc', 'vnoj', 'ioi', 'default', 'ultimate'].every(showsCumtime)).toBe(true);
+    expect((['ioi16', 'final_submission'] as const).some(showsCumtime)).toBe(false);
+    expect((['icpc', 'vnoj', 'ioi', 'default', 'ultimate'] as const).every(showsCumtime)).toBe(
+      true,
+    );
   });
 });
 

@@ -5,21 +5,13 @@ import UserName from '@/components/UserName.vue';
 import { formatNumber } from '@/lib/format';
 import { formatCumtime, isPenaltyFormat, solvedCount } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
-import { useLocaleStore } from '@/stores/locale.store';
 
 const props = defineProps<{
   rows: RankingRow[];
   problems: RankingProblem[];
-  formatName: string;
-  pointsPrecision: number;
+  context: RankingContext;
 }>();
-const locale = useLocaleStore();
-const context = computed<RankingContext>(() => ({
-  formatName: props.formatName,
-  pointsPrecision: props.pointsPrecision,
-  locale: locale.locale,
-}));
-const solved = (row: RankingRow) => solvedCount(row, props.problems, context.value);
+const solved = (row: RankingRow) => solvedCount(row, props.problems, props.context);
 /** Medal and size follow the rank, so tied rows share a medal. */
 const MEDALS: Record<number, string> = {
   1: 'coin-3 size-15 text-[22px]',
@@ -61,9 +53,9 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
         <UserName :username="row.user.username" class="text-lg" />
         <p class="font-mono text-[13px] text-muted">
           {{
-            isPenaltyFormat(formatName)
-              ? `${$t('ranking.solvedCount', { count: solved(row) }, solved(row))} · ${formatCumtime(formatName, row.cumtime)}`
-              : formatNumber(row.score, locale.locale, pointsPrecision)
+            isPenaltyFormat(context.formatName)
+              ? `${$t('ranking.solvedCount', { count: solved(row) }, solved(row))} · ${formatCumtime(context.formatName, row.cumtime)}`
+              : formatNumber(row.score, context.locale, context.pointsPrecision)
           }}
         </p>
       </div>

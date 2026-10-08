@@ -6,7 +6,9 @@ import CountdownTimer from '@/components/CountdownTimer.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
+import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
+import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
@@ -40,7 +42,13 @@ const {
 } = useRankingQuery(key, withVirtual, running);
 
 const search = ref('');
-const formatName = computed(() => contest.value?.formatName ?? '');
+const locale = useLocaleStore();
+/** How this contest prints cells and scores; the podium and the table share it. */
+const rankingContext = computed<RankingContext>(() => ({
+  formatName: contest.value?.formatName ?? 'default',
+  pointsPrecision: contest.value?.pointsPrecision ?? 0,
+  locale: locale.locale,
+}));
 const rows = computed(() => {
   const needle = search.value.trim().toLocaleLowerCase();
   const all = ranking.value?.rows ?? [];
@@ -187,16 +195,14 @@ const VIEW_MODES = [
           v-if="podium.length"
           :rows="podium"
           :problems="ranking.problems"
-          :format-name="formatName"
-          :points-precision="contest.pointsPrecision"
+          :context="rankingContext"
           :class="{ 'opacity-60': rankingStale }"
         />
         <GlassCard as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
           <RankingTable
             :ranking="ranking"
             :rows="rows"
-            :format-name="formatName"
-            :points-precision="contest.pointsPrecision"
+            :context="rankingContext"
             :viewer-id="session.user?.id ?? null"
           />
         </GlassCard>

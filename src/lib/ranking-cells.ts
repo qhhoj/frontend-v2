@@ -1,4 +1,9 @@
-import type { ProblemCell, RankingProblem, RankingRow } from '@/api/types/contests';
+import type {
+  ContestFormatName,
+  ProblemCell,
+  RankingProblem,
+  RankingRow,
+} from '@/api/types/contests';
 import type { Locale } from '@/i18n';
 import { formatElapsed, formatNumber } from './format';
 
@@ -13,12 +18,12 @@ export interface RankingCellView {
 }
 
 /** Formats whose cells carry tries (and a penalty) instead of a plain score. */
-const PENALTY_FORMATS = new Set(['icpc', 'vnoj']);
-export const isPenaltyFormat = (formatName: string) => PENALTY_FORMATS.has(formatName);
+const PENALTY_FORMATS = new Set<ContestFormatName>(['icpc', 'vnoj']);
+export const isPenaltyFormat = (formatName: ContestFormatName) => PENALTY_FORMATS.has(formatName);
 
 /** How a contest prints its cells and scores. */
 export interface RankingContext {
-  formatName: string;
+  formatName: ContestFormatName;
   pointsPrecision: number;
   locale: Locale;
 }
@@ -32,12 +37,12 @@ const isFullPoints = (points: number, problem: RankingProblem, precision: number
   roundTo(points, precision) >= roundTo(problem.points, precision);
 
 /** icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). */
-export const formatCumtime = (formatName: string, cumtime: number) =>
+export const formatCumtime = (formatName: ContestFormatName, cumtime: number) =>
   formatName === 'icpc' ? String(cumtime) : formatElapsed(cumtime);
 
 /** ioi16 and final_submission never accumulate time. */
-const NO_CUMTIME_FORMATS = new Set(['ioi16', 'final_submission']);
-export const showsCumtime = (formatName: string) => !NO_CUMTIME_FORMATS.has(formatName);
+const NO_CUMTIME_FORMATS = new Set<ContestFormatName>(['ioi16', 'final_submission']);
+export const showsCumtime = (formatName: ContestFormatName) => !NO_CUMTIME_FORMATS.has(formatName);
 
 const EMPTY: RankingCellView = {
   kind: 'empty',
@@ -55,7 +60,7 @@ interface Tries {
   pending: number;
 }
 /** Each penalty format stores its tries differently; this is the only place that knows. */
-const READ_TRIES: Record<string, (cell: ProblemCell) => Tries> = {
+const READ_TRIES: Partial<Record<ContestFormatName, (cell: ProblemCell) => Tries>> = {
   /** `{time, points, tries, pending: boolean}` */
   icpc: (cell) => {
     const tries = Number(cell.tries ?? 0);
