@@ -1,4 +1,9 @@
-import type { ContestDetail, ContestPhase, LiveStatus } from '@/api/types/contests';
+import type {
+  ContestDetail,
+  ContestListItem,
+  ContestPhase,
+  LiveStatus,
+} from '@/api/types/contests';
 import { phaseAt, registrationState } from '@/lib/contest-time';
 
 export type ContestActionKind =
@@ -104,3 +109,58 @@ const COMMANDS: Partial<Record<ContestActionKind, ParticipationCommand>> = {
 /** The request behind an action; null for the actions that are only a message. */
 export const commandOf = (kind: ContestActionKind): ParticipationCommand | null =>
   COMMANDS[kind] ?? null;
+
+export interface ListCallToAction {
+  labelKey: string;
+  isPrimary: boolean;
+  /** A status pill before the contest name, or null. */
+  badgeKey: string | null;
+}
+
+const LIST_LABELS: Record<ContestActionKind, string> = {
+  signIn: 'contests.list.enter',
+  join: 'contests.list.enter',
+  rejoin: 'contests.actions.rejoin',
+  leave: 'contests.actions.rejoin',
+  register: 'contests.list.viewAndRegister',
+  registered: 'contests.list.view',
+  spectate: 'contests.list.view',
+  virtual: 'contests.list.virtual',
+  finished: 'contests.list.view',
+  opensLater: 'contests.list.view',
+  registrationClosed: 'contests.list.view',
+  virtualDisallowed: 'contests.list.view',
+};
+/** A signed-out visitor gets the phase's own verb: enter, register or take it as a virtual run. */
+const VISITOR_LABELS: Record<ContestPhase, string> = {
+  running: LIST_LABELS.join,
+  upcoming: LIST_LABELS.register,
+  ended: LIST_LABELS.virtual,
+};
+export const IN_CONTEST_BADGE = 'contests.list.badges.inContest';
+const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
+  leave: IN_CONTEST_BADGE,
+  registered: 'contests.list.badges.registered',
+  finished: 'contests.list.badges.finished',
+};
+const PRIMARY_KINDS: readonly ContestActionKind[] = ['signIn', 'join', 'rejoin', 'leave'];
+
+/** A list row's button: the detail's action as a link to the detail (a row never joins by itself). */
+export function listCallToAction(item: ContestListItem, now: number): ListCallToAction {
+  const { kind } = contestAction({
+    isSignedIn: item.viewer !== null,
+    phase: item.phase,
+    liveStatus: item.viewer?.liveStatus ?? null,
+    isCurrent: item.viewer?.isCurrent ?? false,
+    canSpectate: false,
+    skipsAccessCode: false,
+    registration: registrationState(item, now),
+    requiresAccessCode: item.requiresAccessCode,
+    disallowVirtual: item.disallowVirtual,
+  });
+  return {
+    labelKey: kind === 'signIn' ? VISITOR_LABELS[item.phase] : LIST_LABELS[kind],
+    isPrimary: PRIMARY_KINDS.includes(kind),
+    badgeKey: LIST_BADGES[kind] ?? null,
+  };
+}

@@ -5,15 +5,19 @@ import { spanMessage } from '@/lib/contest-time';
 import { formatClock, formatDayMonth, formatNumber, formatRelative } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
+import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import { listCallToAction } from './contest-action';
 import { endClockLabel } from './contest-clock';
 import { useSpanText } from './use-span-text';
+import ViewerBadge from './ViewerBadge.vue';
 
 const props = defineProps<{ contest: ContestListItem }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Relative start words move in minutes: a tick a minute is enough. */
 const now = useNow(60_000);
+const call = computed(() => listCallToAction(props.contest, now.value));
 const dayChip = computed(() => formatDayMonth(props.contest.startTime, locale.locale));
 const timeRange = computed(
   () =>
@@ -51,6 +55,7 @@ const startsInText = computed(() =>
       </h3>
       <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
       <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+        <ViewerBadge :call="call" />
         <ContestChips :contest="contest" />
         <span class="font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
       </div>
@@ -70,11 +75,6 @@ const startsInText = computed(() =>
         )
       }}
     </p>
-    <RouterLink
-      :to="{ name: 'contest', params: { key: contest.key } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-      >{{ $t('contests.list.viewAndRegister')
-      }}<span class="sr-only">: {{ contest.name }}</span></RouterLink
-    >
+    <ContestCallLink :contest="contest" :call="call" />
   </li>
 </template>

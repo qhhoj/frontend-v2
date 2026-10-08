@@ -7,16 +7,20 @@ import { contestProgress, spanMessage } from '@/lib/contest-time';
 import { formatClock, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
+import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import { listCallToAction } from './contest-action';
 import { endClockLabel } from './contest-clock';
 import PhasePill from './PhasePill.vue';
 import { useSpanText } from './use-span-text';
+import ViewerBadge from './ViewerBadge.vue';
 
 const props = defineProps<{ contest: ContestListItem }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Words to the minute: a tick every 15 s is enough. */
 const now = useNow(15_000);
+const call = computed(() => listCallToAction(props.contest, now.value));
 const remaining = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - now.value) / 1000),
 );
@@ -31,6 +35,7 @@ const perParticipation = computed(() =>
   <GlassCard as="article" data-testid="running-contest" class="flex flex-col gap-3 p-5">
     <div class="flex flex-wrap items-center gap-1.5">
       <PhasePill phase="running" />
+      <ViewerBadge :call="call" />
       <ContestChips :contest="contest" />
     </div>
     <div>
@@ -79,12 +84,7 @@ const perParticipation = computed(() =>
           }}</span
         >
       </p>
-      <RouterLink
-        :to="{ name: 'contest', params: { key: contest.key } }"
-        class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-        >{{ $t('contests.list.enter')
-        }}<span class="sr-only">: {{ contest.name }}</span></RouterLink
-      >
+      <ContestCallLink :contest="contest" :call="call" />
     </div>
   </GlassCard>
 </template>

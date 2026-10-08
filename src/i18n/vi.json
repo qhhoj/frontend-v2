@@ -247,6 +247,13 @@
       "shownOf": "{shown} trong {total}",
       "viewAll": "Xem tất cả",
       "viewAllCount": "Xem tất cả {count} kỳ thi",
+      "view": "Xem",
+      "codeNeeded": "Cần mã",
+      "badges": {
+        "inContest": "Bạn đang thi",
+        "registered": "Đã đăng ký",
+        "finished": "Đã thi xong"
+      },
       "columns": {
         "contest": "Kỳ thi",
         "when": "Ngày · thời lượng",

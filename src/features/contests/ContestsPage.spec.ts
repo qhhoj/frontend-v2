@@ -1,10 +1,10 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { contestItem } from '@/test/fixtures';
+import { contestItem, listViewer } from '@/test/fixtures';
 import { contestListRoutes } from '@/test/contest-routes';
 import { mockApi } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer } from '@/test/problem-routes';
+import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
 const running = contestItem(); // 08:00Z to 11:24:37Z
@@ -276,5 +276,43 @@ describe('contest list', () => {
     expect(ended.text()).toContain('Trang này không tồn tại.');
     expect(ended.text()).not.toContain('Chưa có kỳ thi nào kết thúc');
     expect(ended.get('a[href="/contests?phase=ended"]').text()).toContain('Về trang 1');
+  });
+  it('shows the viewer in their current contest with a way back, and a lock on coded contests', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const current = contestItem({
+      requiresAccessCode: true,
+      viewer: listViewer({ isCurrent: true, liveStatus: 'participating' }),
+    });
+    mockApi({ ...signedInViewer(), ...contestListRoutes({ running: [current] }) });
+    const { wrapper } = await mountApp('/contests');
+    const card = wrapper.get('[data-testid="running-contest"]');
+    expect(card.text()).toContain('Bạn đang thi');
+    expect(card.text()).toContain('Cần mã');
+    expect(card.get('a[href="/contests/r42"].bg-gradient-accent').text()).toContain(
+      'Quay lại kỳ thi',
+    );
+  });
+
+  it('marks an upcoming contest the viewer registered for, with a view link and no register call', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const registered = contestItem({
+      key: 'r44',
+      phase: 'upcoming',
+      startTime: '2026-10-10T08:00:00Z',
+      endTime: '2026-10-10T10:00:00Z',
+      registrationEnd: '2026-10-10T07:00:00Z',
+      viewer: listViewer({ liveStatus: 'registered' }),
+    });
+    mockApi({ ...signedInViewer(), ...contestListRoutes({ upcoming: [registered] }) });
+    const { wrapper } = await mountApp('/contests');
+    const row = wrapper.get('[data-testid="upcoming-contest"]');
+    expect(row.text()).toContain('Đã đăng ký');
+    expect(
+      row
+        .findAll('a')
+        .find((link) => link.text().includes('Xem'))
+        ?.attributes('href'),
+    ).toBe('/contests/r44');
+    expect(row.text()).not.toContain('Xem & đăng ký');
   });
 });

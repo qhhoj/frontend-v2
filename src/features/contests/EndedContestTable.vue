@@ -2,13 +2,20 @@
 import type { ContestListItem } from '@/api/types/contests';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatShortDate } from '@/lib/format';
+import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
+import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import { listCallToAction } from './contest-action';
 import { useSpanText } from './use-span-text';
+import ViewerBadge from './ViewerBadge.vue';
 
 defineProps<{ contests: ContestListItem[] }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
+/** Minutes are enough: a viewer's state changes at registration and contest boundaries. */
+const now = useNow(60_000);
+const callOf = (contest: ContestListItem) => listCallToAction(contest, now.value);
 /** The start date and the length, in one cell: `04/10 · 4 giờ`. */
 const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
@@ -52,6 +59,7 @@ const whenText = (contest: ContestListItem) => {
       <tbody>
         <tr v-for="contest in contests" :key="contest.key" class="border-t border-line">
           <th scope="row" class="px-5 py-3 text-left font-normal">
+            <ViewerBadge :call="callOf(contest)" />
             <RouterLink
               :to="{ name: 'contest', params: { key: contest.key } }"
               class="font-semibold hover:text-accent-text"
@@ -72,12 +80,7 @@ const whenText = (contest: ContestListItem) => {
             }}</span>
           </td>
           <td class="px-5 py-3 text-right">
-            <RouterLink
-              :to="{ name: 'contest', params: { key: contest.key } }"
-              class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-              >{{ $t('contests.list.virtual')
-              }}<span class="sr-only">: {{ contest.name }}</span></RouterLink
-            >
+            <ContestCallLink :contest="contest" :call="callOf(contest)" />
           </td>
         </tr>
       </tbody>

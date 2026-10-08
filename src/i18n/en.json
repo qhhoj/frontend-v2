@@ -247,6 +247,13 @@
       "shownOf": "{shown} of {total}",
       "viewAll": "View all",
       "viewAllCount": "View all {count} contests",
+      "view": "View",
+      "codeNeeded": "Code needed",
+      "badges": {
+        "inContest": "You are in it",
+        "registered": "Registered",
+        "finished": "Done"
+      },
       "columns": {
         "contest": "Contest",
         "when": "Date · length",

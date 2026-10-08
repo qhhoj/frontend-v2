@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
-import { actionFactsOf, commandOf, contestAction } from './contest-action';
+import {
+  contestDetail,
+  contestItem,
+  contestViewer,
+  listViewer,
+  participationSummary,
+} from '@/test/fixtures';
+import { actionFactsOf, commandOf, contestAction, listCallToAction } from './contest-action';
 import type { ActionFacts } from './contest-action';
 
 const facts = (overrides: Partial<ActionFacts> = {}): ActionFacts => ({
@@ -133,5 +139,73 @@ describe('actionFactsOf', () => {
     expect(actionFactsOf(contest, true, Date.parse(contest.endTime) - 1000).liveStatus).toBe(
       'registered',
     );
+  });
+});
+
+describe('listCallToAction', () => {
+  const NOW = Date.parse('2026-10-08T09:00:00Z');
+  it.each([
+    ['a visitor on a running contest', contestItem(), 'contests.list.enter', null],
+    [
+      'the viewer’s current contest',
+      contestItem({ viewer: listViewer({ isCurrent: true, liveStatus: 'participating' }) }),
+      'contests.actions.rejoin',
+      'contests.list.badges.inContest',
+    ],
+    [
+      'a finished run',
+      contestItem({ viewer: listViewer({ liveStatus: 'finished' }) }),
+      'contests.list.view',
+      'contests.list.badges.finished',
+    ],
+    [
+      'an upcoming contest the viewer registered for',
+      contestItem({
+        phase: 'upcoming',
+        registrationEnd: '2026-10-08T10:00:00Z',
+        viewer: listViewer({ liveStatus: 'registered' }),
+      }),
+      'contests.list.view',
+      'contests.list.badges.registered',
+    ],
+    [
+      'an upcoming contest with registration open',
+      contestItem({
+        phase: 'upcoming',
+        registrationEnd: '2026-10-08T10:00:00Z',
+        viewer: listViewer(),
+      }),
+      'contests.list.viewAndRegister',
+      null,
+    ],
+    [
+      'an upcoming contest without registration',
+      contestItem({ phase: 'upcoming', viewer: listViewer() }),
+      'contests.list.view',
+      null,
+    ],
+    [
+      'an ended contest',
+      contestItem({ phase: 'ended', viewer: listViewer() }),
+      'contests.list.virtual',
+      null,
+    ],
+    [
+      'an ended contest without virtual runs',
+      contestItem({ phase: 'ended', disallowVirtual: true, viewer: listViewer() }),
+      'contests.list.view',
+      null,
+    ],
+  ] as const)('%s', (_case, item, labelKey, badgeKey) =>
+    expect(listCallToAction(item, NOW)).toMatchObject({ labelKey, badgeKey }),
+  );
+
+  it('is primary for the actions that enter a contest, and not for a view', () => {
+    const current = contestItem({
+      viewer: listViewer({ isCurrent: true, liveStatus: 'participating' }),
+    });
+    const finished = contestItem({ viewer: listViewer({ liveStatus: 'finished' }) });
+    expect(listCallToAction(current, NOW).isPrimary).toBe(true);
+    expect(listCallToAction(finished, NOW).isPrimary).toBe(false);
   });
 });
