@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n';
+import { ADMIN_MESSAGES } from './admin-messages';
 import en from './en.json';
 import vi from './vi.json';
 
@@ -12,7 +13,7 @@ export const i18n = createI18n({
   globalInjection: true,
   locale: DEFAULT_LOCALE,
   fallbackLocale: DEFAULT_LOCALE,
-  messages: { vi, en },
+  messages: { vi: { ...vi, admin: ADMIN_MESSAGES.vi }, en: { ...en, admin: ADMIN_MESSAGES.en } },
 });
 
 /** Script-side translation; templates use `$t`. */

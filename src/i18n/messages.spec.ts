@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { i18n, translate } from '@/i18n';
 import { THEMES } from '@/theme/registry';
+import { ADMIN_MESSAGES } from './admin-messages';
 import en from './en.json';
 import vi from './vi.json';
 
@@ -20,8 +21,8 @@ const placeholderSets = (message: string) =>
     .map((form) =>
       [...new Set([...form.matchAll(/\{(\w+)\}/g)].map(([, name]) => name))].sort().join(),
     );
-const english = flatten(en);
-const vietnamese = flatten(vi);
+const english = flatten({ ...en, admin: ADMIN_MESSAGES.en });
+const vietnamese = flatten({ ...vi, admin: ADMIN_MESSAGES.vi });
 
 describe('messages', () => {
   it('have the same keys in Vietnamese and English', () => {
@@ -66,5 +67,15 @@ describe('messages', () => {
       expect(render(1), key).not.toContain('|');
       expect(render(1), key).not.toEqual(render(2));
     }
+  });
+});
+
+describe('admin messages', () => {
+  it('pair every area file: vi and en exist for each area', () => {
+    expect(Object.keys(ADMIN_MESSAGES.vi).sort()).toEqual(Object.keys(ADMIN_MESSAGES.en).sort());
+  });
+
+  it('are reachable through the app i18n under admin.<area>', () => {
+    expect(translate('admin.shell.screens.dashboard')).toBe('Trang chủ quản trị');
   });
 });

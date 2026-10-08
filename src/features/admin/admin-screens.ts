@@ -1,0 +1,74 @@
+import type { PermissionRule } from '@/lib/permissions';
+
+export interface AdminScreen {
+  path: string;
+  /** `null`: any staff member. */
+  permission: PermissionRule | null;
+}
+
+const PROBLEM_EDIT = ['judge.edit_own_problem', 'judge.edit_all_problem'] as const;
+const CONTEST_EDIT = ['judge.edit_own_contest', 'judge.edit_all_contest'] as const;
+const problemTab = (tab: string): AdminScreen => ({
+  path: `/admin/problems/:code/${tab}`,
+  permission: PROBLEM_EDIT,
+});
+const contestTab = (tab: string): AdminScreen => ({
+  path: `/admin/contests/:key/${tab}`,
+  permission: CONTEST_EDIT,
+});
+
+/** Every admin screen of plans 8f-1 and 8f-2. Ids are camelCase; route names are `admin-<id>`; titles `admin.shell.screens.<id>`. */
+export const ADMIN_SCREENS = {
+  dashboard: { path: '/admin', permission: null },
+  problems: { path: '/admin/problems', permission: ['judge.add_problem', ...PROBLEM_EDIT] },
+  problemNew: {
+    path: '/admin/problems/new',
+    permission: ['judge.add_problem', 'judge.suggest_new_problem'],
+  },
+  problemImport: { path: '/admin/problems/import', permission: 'judge.import_polygon_package' },
+  problemGeneral: problemTab('general'),
+  problemStatements: problemTab('statements'),
+  problemEditorial: problemTab('editorial'),
+  problemData: problemTab('data'),
+  problemFiles: problemTab('files'),
+  types: { path: '/admin/types', permission: 'judge.add_tagproblem' },
+  contests: { path: '/admin/contests', permission: ['judge.add_contest', ...CONTEST_EDIT] },
+  contestNew: { path: '/admin/contests/new', permission: 'judge.add_contest' },
+  contestGeneral: contestTab('general'),
+  contestProblems: contestTab('problems'),
+  contestAnnouncements: contestTab('announcements'),
+  contestRanking: contestTab('ranking'),
+  contestActions: contestTab('actions'),
+  contestParticipants: contestTab('participants'),
+  similarity: { path: '/admin/similarity', permission: 'judge.moss_contest' },
+  similarityPairs: {
+    path: '/admin/similarity/runs/:runId/pairs',
+    permission: 'judge.moss_contest',
+  },
+  similarityPair: { path: '/admin/similarity/pairs/:pairId', permission: 'judge.moss_contest' },
+  rejudge: { path: '/admin/rejudge', permission: 'judge.rejudge_submission' },
+  // Plan 8f-2 screens
+  judges: { path: '/admin/judges', permission: 'judge.change_judge' },
+  judgeNew: { path: '/admin/judges/new', permission: 'judge.change_judge' },
+  // Backend `LanguagesAdminController`: list and update need `change_language`, create needs `add_language`.
+  languages: {
+    path: '/admin/languages',
+    permission: ['judge.change_language', 'judge.add_language'],
+  },
+  users: { path: '/admin/users', permission: 'judge.ban_user' },
+  organizations: {
+    path: '/admin/organizations',
+    permission: ['judge.edit_all_organization', 'judge.add_organization'],
+  },
+  posts: { path: '/admin/posts', permission: 'judge.edit_all_post' },
+  tickets: { path: '/admin/tickets', permission: 'judge.change_ticket' },
+  activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },
+  settings: { path: '/admin/settings', permission: 'judge.change_settings' },
+  config: { path: '/admin/config', permission: 'judge.change_miscconfig' },
+  nav: { path: '/admin/nav', permission: 'judge.change_navigationbar' },
+  pages: { path: '/admin/pages', permission: 'flatpages.change_flatpage' },
+  log: { path: '/admin/log', permission: 'judge.change_settings' },
+} as const satisfies Record<string, AdminScreen>;
+
+export type AdminScreenId = keyof typeof ADMIN_SCREENS;
+export const adminRouteName = (id: AdminScreenId) => `admin-${id}`;

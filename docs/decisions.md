@@ -200,7 +200,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Known gaps (later sub-projects)
 
 - Session expiry mid-page does not redirect: the store signs out and the page keeps showing until the next navigation, to avoid yanking a viewer who is typing.
-- Admin screens — sub-project 7.
+- Admin screens — plans 8f-1 and 8f-2.
 
 ## Community (8e)
 
@@ -260,3 +260,24 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Titles come from `meta.titleKey`; a page that swaps its form for a result card on the same path moves focus to `#main` (`focusMain`), as the router does on a path change.
 - Backend asks left: A1 (`email_invalid` code), A2 (`open` filter), A3 (provider and email on social completion).
 - E2E: `e2e/auth.e2e.ts` and `e2e/auth-accessibility.e2e.ts` run the flows and axe in every theme; `installAuth` in `e2e/fixtures/auth.ts` answers the scoped `GET /organizations`.
+
+## Admin (plans 8f-1, 8f-2)
+
+- **One shell**: `AdminShell` hosts every admin screen; the nav is the content canvas's five groups plus Cấu hình thô, Nhật ký thay đổi and Ngôn ngữ — user ruling, one shell.
+- **Layout**: `meta.layout: 'admin'` makes AppShell render AdminShell instead of AppHeader — the board draws its own top bar; the auth pages keep theirs.
+- **Permission gate**: `meta.permission` is a permission or any-of list; staff without it see AdminForbidden in place with the URL kept — existence of `/admin` is hidden from non-staff only.
+- **Placeholder screens**: `/admin/types` renders AdminPlaceholder (it is drawn in the nav, has no board) — no invented visuals.
+- **Problem and contest indexes**: open by code or key plus "Tạo …" links, reusing the Users exact-lookup pattern — flagged for a mock-up round.
+- **Bài nộp nav item**: links to the public `/submissions` list — no admin submission list was drawn; staff controls live on the submission page.
+- **Problem editor tabs**: `/admin/problems/:code/{general,statements,editorial,data,files}` — shareable URLs, one job per page.
+- **Live preview**: `POST /problems/render-preview` 500 ms after the last key, latest answer wins — the board's debounce; a static-page editor lacks problem permissions, hence `flatpage` source later.
+- **Format config**: only fields in the backend registry — the board's extra fields do not exist in `libs/contests/src/formats`.
+- **Contest read-back**: `pushAnnouncements` is a switch; access codes are hashed, so a blank box keeps the code and "Bỏ mã" removes it.
+- **Contest user lists**: ids with `settings.users` naming them — chips show usernames, a short id only for a deleted account.
+- **Similarity 429**: the countdown comes from `ApiError.retryAfterSeconds` — the backend sends Retry-After on every rate-limit refusal.
+- **Similarity layout**: `/admin/similarity?contest=` lists runs and the summary below with `&run=` — the board shows list and summary on one screen.
+- **Bulk rejudge**: no count before confirm — a pre-confirm count is a new visual; after a 403 a dry run words the refusal by `allowed`.
+- **Submission staff panel**: staff only, buttons follow `viewer.canRejudge/canReject/canAbort` — the server decides, the 409 stays as the stale-page fallback.
+- **Downloads**: raw endpoints are plain `<a href>` to the API URL — they are not `{data}` envelopes.
+- **Confirm dialogs**: one shared `ConfirmDialog.vue`, driven in specs and e2e by its confirm button's label — no second dialog implementation.
+- **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.

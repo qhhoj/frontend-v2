@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import { adminRoutes } from '@/features/admin/admin-routes';
 
 /** Screens without an approved mock-up render this until their plan lands. */
 const PlaceholderPage = () => import('@/components/PlaceholderPage.vue');
@@ -264,12 +265,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/features/appearance/AppearancePage.vue'),
     meta: { titleKey: 'pages.appearance' },
   },
-  {
-    path: '/admin/:pathMatch(.*)*',
-    name: 'admin',
-    component: () => import('@/features/admin/AdminPage.vue'),
-    meta: { titleKey: 'pages.admin', requiresAuth: true, staffOnly: true },
-  },
+  ...adminRoutes,
   /** Links the backend writes into mails, Discord and feeds (backend CONTRIBUTING, SPA contract); the hash is kept. */
   {
     path: '/post/:id',

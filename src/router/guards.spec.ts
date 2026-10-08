@@ -128,7 +128,7 @@ describe('navigation guards', () => {
       '/admin/judges',
       signedIn({ user: sessionUser({ isStaff: true }) }),
     );
-    expect(route.name).toBe('admin');
+    expect(route.name).toBe('admin-judges');
   });
 
   it('loads the session once across navigations', async () => {
