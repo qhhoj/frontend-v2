@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { mountComponent } from '@/test/mount';
 import CodeEditor from './CodeEditor.vue';
 
@@ -21,12 +22,14 @@ interface FakeOptions {
 
 const fake = vi.hoisted(() => ({
   createdCount: 0,
+  createError: undefined as Error | undefined,
   options: undefined as FakeOptions | undefined,
   handle: undefined as FakeHandle | undefined,
 }));
 
 vi.mock('./code-editor-cm', () => ({
   createEditor: (_host: HTMLElement, options: FakeOptions) => {
+    if (fake.createError) throw fake.createError;
     fake.createdCount += 1;
     fake.options = options;
     fake.handle = {
@@ -48,10 +51,18 @@ const mountEditor = (props: Record<string, unknown> = {}) =>
   }) as unknown as VueWrapper<{ modelValue: string; disabled: boolean }>;
 
 describe('CodeEditor', () => {
+  let warn: MockInstance<typeof console.warn>;
+
   beforeEach(() => {
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     fake.createdCount = 0;
+    fake.createError = undefined;
     fake.options = undefined;
     fake.handle = undefined;
+  });
+
+  afterEach(() => {
+    warn.mockRestore();
   });
 
   it('shows a labelled textarea mirroring the value, with a line-number gutter, before the editor loads', () => {
@@ -129,21 +140,23 @@ describe('CodeEditor', () => {
     expect(fake.createdCount).toBe(0);
   });
 
-  it('warns once and keeps a working textarea when the chunk fails to load', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    vi.doMock('./code-editor-cm', () => {
-      throw new Error('chunk failed');
-    });
-    vi.resetModules();
-    const { default: FreshEditor } = await import('./CodeEditor.vue');
-    const editor = mountComponent(FreshEditor, {
-      props: { modelValue: 'x', label: 'Source code' },
-    });
+  it('brings the textarea back with the current text when creating the editor throws', async () => {
+    fake.createError = new Error('boom');
+    const editor = mountEditor({ modelValue: 'current text' });
     await flushPromises();
-    expect(warn).toHaveBeenCalledExactlyOnceWith('code editor failed to load', expect.any(Error));
-    await editor.get('textarea').setValue('typed');
+    expect(warn).toHaveBeenCalledExactlyOnceWith('code editor failed to load', fake.createError);
+    const textarea = editor.get('textarea');
+    expect((textarea.element as HTMLTextAreaElement).value).toBe('current text');
+    await textarea.setValue('typed');
     expect(editor.emitted('update:modelValue')).toEqual([['typed']]);
-    vi.doUnmock('./code-editor-cm');
-    warn.mockRestore();
+  });
+
+  it('keeps the anchor and head of a backward selection', async () => {
+    const editor = mountEditor({ modelValue: 'hello world' });
+    const textarea = editor.get('textarea').element as HTMLTextAreaElement;
+    textarea.focus();
+    textarea.setSelectionRange(2, 7, 'backward');
+    await flushPromises();
+    expect(options().selection).toEqual({ anchor: 7, head: 2 });
   });
 });

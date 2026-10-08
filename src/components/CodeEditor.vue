@@ -29,7 +29,11 @@ const lineNumbers = computed(() =>
 function readTextareaFocus() {
   const field = textarea.value;
   if (!field || document.activeElement !== field) return undefined;
-  return { anchor: field.selectionStart, head: field.selectionEnd };
+  const isBackward = field.selectionDirection === 'backward';
+  const { selectionStart, selectionEnd } = field;
+  return isBackward
+    ? { anchor: selectionEnd, head: selectionStart }
+    : { anchor: selectionStart, head: selectionEnd };
 }
 
 async function importEditorModule() {
@@ -50,15 +54,22 @@ async function loadEditor() {
   isEditorReady.value = true;
   await nextTick();
   if (isUnmounted || !host.value) return;
-  editor = editorModule.createEditor(host.value, {
-    doc: source.value,
-    label: props.label,
-    disabled: props.disabled,
-    selection,
-    onChange: (doc) => {
-      if (!isApplyingExternalValue) source.value = doc;
-    },
-  });
+  try {
+    editor = editorModule.createEditor(host.value, {
+      doc: source.value,
+      label: props.label,
+      disabled: props.disabled,
+      selection,
+      onChange: (doc) => {
+        if (!isApplyingExternalValue) source.value = doc;
+      },
+    });
+  } catch (error) {
+    // Bring the textarea back with the current text rather than leave an empty box.
+    console.warn('code editor failed to load', error);
+    isEditorReady.value = false;
+    return;
+  }
   if (selection) editor.focus();
 }
 
