@@ -209,7 +209,29 @@
       "timeLeft": "còn {span}",
       "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
       "enter": "Vào thi",
-      "searchPlaceholder": "Tìm theo mã hoặc tên"
+      "searchPlaceholder": "Tìm theo mã hoặc tên",
+      "startsIn": "bắt đầu {relative}",
+      "viewAndRegister": "Xem & đăng ký",
+      "virtual": "Thi ảo",
+      "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
+      "shownOf": "{shown} trong {total}",
+      "viewAll": "Xem tất cả",
+      "viewAllCount": "Xem tất cả {count} kỳ thi",
+      "columns": {
+        "contest": "Kỳ thi",
+        "when": "Ngày · thời lượng",
+        "format": "Thể thức",
+        "participants": "Thí sinh",
+        "action": "Thao tác"
+      },
+      "empty": {
+        "running": "Không có kỳ thi nào đang diễn ra",
+        "upcoming": "Chưa có kỳ thi sắp diễn ra",
+        "upcomingHint": "Hiện chưa có kỳ thi nào được lên lịch. Trong lúc chờ, hãy thi ảo một kỳ thi đã kết thúc.",
+        "seeEnded": "Xem kỳ thi đã kết thúc",
+        "ended": "Chưa có kỳ thi nào kết thúc",
+        "noMatch": "Không có kỳ thi nào khớp bộ lọc"
+      }
     }
   },
   "placeholder": {

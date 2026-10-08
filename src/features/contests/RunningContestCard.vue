@@ -3,11 +3,12 @@ import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
 import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { contestProgress, localDayOffset, spanMessage } from '@/lib/contest-time';
+import { contestProgress, spanMessage } from '@/lib/contest-time';
 import { formatClock, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestChips from './ContestChips.vue';
+import { endClockLabel } from './contest-clock';
 import PhasePill from './PhasePill.vue';
 import { useSpanText } from './use-span-text';
 
@@ -20,11 +21,7 @@ const remaining = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - now.value) / 1000),
 );
 const progressPercent = computed(() => Math.round(contestProgress(props.contest, now.value) * 100));
-const endLabel = computed(() => {
-  const clock = formatClock(props.contest.endTime, locale.locale);
-  const dayOffset = localDayOffset(props.contest.startTime, props.contest.endTime);
-  return dayOffset > 0 ? `${clock} (+${dayOffset})` : clock;
-});
+const endLabel = computed(() => endClockLabel(props.contest, locale.locale));
 const perParticipation = computed(() =>
   props.contest.timeLimit ? spanText(spanMessage(props.contest.timeLimit)) : null,
 );

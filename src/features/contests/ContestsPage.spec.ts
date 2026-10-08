@@ -131,4 +131,99 @@ describe('contest list', () => {
     await flushPromises();
     expect(router.currentRoute.value.query.rated).toBeUndefined();
   });
+
+  it('shows an upcoming contest on its local day with its local hours, length and start', async () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    // 18:00Z on Oct 10 is 01:00 on Oct 11 in Vietnam.
+    const upcoming = contestItem({
+      key: 'r43',
+      name: 'QHH Round #43',
+      phase: 'upcoming',
+      startTime: '2026-10-10T18:00:00Z',
+      endTime: '2026-10-10T20:30:00Z',
+    });
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ upcoming: [upcoming] }) });
+    const { wrapper } = await mountApp('/contests');
+    const row = wrapper.get('[data-testid="upcoming-contest"]');
+    expect(row.get('[data-testid="day-chip"]').text()).toMatch(/^11\s*thg 10$/);
+    expect(row.text()).toContain('01:00–03:30');
+    expect(row.text()).toContain('2 giờ 30 phút');
+    const registerLink = row.findAll('a').find((link) => link.text().includes('Xem & đăng ký'));
+    expect(registerLink?.attributes('href')).toBe('/contests/r43');
+    vi.unstubAllEnvs();
+  });
+
+  it('lists ended contests in a compact table with the virtual count and a virtual entry', async () => {
+    const ended = contestItem({
+      key: 'r41',
+      name: 'QHH Round #41',
+      phase: 'ended',
+      virtualCount: 318,
+      userCount: 1203,
+    });
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ ended: [ended] }) });
+    const { wrapper } = await mountApp('/contests');
+    const row = wrapper.get('[data-testid="ended-contests"] tbody tr');
+    expect(row.text()).toContain('QHH Round #41');
+    expect(row.text()).toContain('1.203');
+    expect(row.text()).toContain('+318 ảo');
+    expect(row.find('a[href="/contests/r41"]').exists()).toBe(true);
+  });
+
+  it('says how many ended contests exist and opens that group alone with a pager', async () => {
+    const many = Array.from({ length: 5 }, (_item, index) =>
+      contestItem({ key: `old${index}`, phase: 'ended' }),
+    );
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestListRoutes({}),
+      'GET /contests': (call) =>
+        call.query.get('phase') === 'ended'
+          ? {
+              body: {
+                data: many,
+                meta: {
+                  page: Number(call.query.get('page')),
+                  pageSize: Number(call.query.get('pageSize')),
+                  total: 31,
+                },
+              },
+            }
+          : { body: { data: [], meta: { page: 1, pageSize: 3, total: 0 } } },
+    });
+    const { wrapper, router } = await mountApp('/contests');
+    expect(wrapper.text()).toContain('5 trong 31');
+    await router.push('/contests?phase=ended');
+    await flushPromises();
+    expect(wrapper.findAll('main h2')).toHaveLength(1);
+    await wrapper.get('button[data-direction="next"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.page).toBe('2');
+    expect(
+      calls
+        .filter((call) => call.path === '/contests')
+        .at(-1)!
+        .query.get('page'),
+    ).toBe('2');
+  });
+
+  it('puts Bit in an empty upcoming group and points to the ended contests', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({}) });
+    const { wrapper } = await mountApp('/contests');
+    const upcoming = wrapper.get('section[aria-labelledby="contest-group-upcoming"]');
+    expect(upcoming.text()).toContain('Chưa có kỳ thi sắp diễn ra');
+    expect(upcoming.find('[role="img"]').exists()).toBe(true);
+    expect(upcoming.get('a[href="/contests?phase=ended"]').text()).toContain(
+      'Xem kỳ thi đã kết thúc',
+    );
+  });
+
+  it('says no contest matches while a filter is set, without the upcoming hint', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({}) });
+    const { wrapper } = await mountApp('/contests?search=zzz');
+    const upcoming = wrapper.get('section[aria-labelledby="contest-group-upcoming"]');
+    expect(upcoming.text()).toContain('Không có kỳ thi nào khớp bộ lọc');
+    expect(upcoming.find('a[href="/contests?phase=ended"]').exists()).toBe(false);
+  });
 });

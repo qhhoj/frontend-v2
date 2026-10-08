@@ -48,6 +48,12 @@ const ratedChoice = computed({
         </label>
       </div>
     </header>
-    <ContestGroup v-for="phase in shownPhases" :key="phase" :phase="phase" :filters="filters" />
+    <ContestGroup
+      v-for="phase in shownPhases"
+      :key="phase"
+      :phase="phase"
+      :filters="filters"
+      @page="(page) => update({ page })"
+    />
   </div>
 </template>

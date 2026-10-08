@@ -209,7 +209,29 @@
       "timeLeft": "{span} left",
       "perParticipation": "{span} per participation, from the moment you enter",
       "enter": "Enter",
-      "searchPlaceholder": "Search by key or name"
+      "searchPlaceholder": "Search by key or name",
+      "startsIn": "starts {relative}",
+      "viewAndRegister": "View & register",
+      "virtual": "Virtual",
+      "endedRegion": "Ended contests, scrolls sideways",
+      "shownOf": "{shown} of {total}",
+      "viewAll": "View all",
+      "viewAllCount": "View all {count} contests",
+      "columns": {
+        "contest": "Contest",
+        "when": "Date · length",
+        "format": "Format",
+        "participants": "Contestants",
+        "action": "Action"
+      },
+      "empty": {
+        "running": "No contest is running",
+        "upcoming": "No upcoming contest",
+        "upcomingHint": "Nothing is scheduled yet. Meanwhile, take an ended contest as a virtual run.",
+        "seeEnded": "See ended contests",
+        "ended": "No contest has ended yet",
+        "noMatch": "No contest matches these filters"
+      }
     }
   },
   "placeholder": {

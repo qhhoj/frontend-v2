@@ -24,4 +24,33 @@ defineProps<{ kind: ContestPhase }>();
       </div>
     </div>
   </div>
+  <div v-else-if="kind === 'upcoming'" class="glass rounded-card">
+    <div
+      v-for="row in 3"
+      :key="row"
+      data-skeleton-region="upcoming-row"
+      class="flex flex-wrap items-center gap-4 border-t border-line px-5 py-4 first:border-t-0"
+    >
+      <SkeletonBlock class="size-16 shrink-0 rounded-tile" />
+      <div class="min-w-0 flex-1">
+        <div class="font-display text-lg font-semibold"><SkeletonBlock text class="w-2/3" /></div>
+        <p class="text-sm"><SkeletonBlock text class="w-1/2" /></p>
+      </div>
+      <SkeletonBlock pill class="h-11 w-36" />
+    </div>
+  </div>
+  <div v-else class="glass rounded-card">
+    <div data-skeleton-region="ended-header" class="px-5 py-3 text-[12px]">
+      <SkeletonBlock text class="w-64" />
+    </div>
+    <div
+      v-for="row in 5"
+      :key="row"
+      data-skeleton-region="ended-row"
+      class="flex items-center gap-4 border-t border-line px-5 py-3 text-sm"
+    >
+      <span class="flex-1"><SkeletonBlock text class="w-48" /></span>
+      <SkeletonBlock pill class="h-11 w-24" />
+    </div>
+  </div>
 </template>
