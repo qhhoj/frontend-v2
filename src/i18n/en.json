@@ -1193,6 +1193,26 @@
     "title": "Joining"
   },
   "blog": {
+    "lead": "News, guides and stories from the community. Pinned posts stay on top.",
+    "feedsLabel": "Post feeds",
+    "feeds": {
+      "global": "News feed",
+      "all": "All posts"
+    },
+    "write": "Write a post",
+    "rss": "RSS feed",
+    "pinned": "Pinned",
+    "comments": "{count} comments",
+    "readMore": "Read more",
+    "pager": "Post pages",
+    "empty": "No posts yet",
+    "recentComments": "Recent comments",
+    "noComments": "No comments yet.",
+    "newProblems": "New problems",
+    "problemLine": "{code} · {date}",
+    "problemPoints": "{points} points",
+    "topContributors": "Top contributors",
+    "toLeaderboard": "Leaderboard",
     "title": "Blog"
   },
   "blogPost": {

@@ -1193,6 +1193,26 @@
     "title": "Tham gia tổ chức"
   },
   "blog": {
+    "lead": "Thông báo, hướng dẫn và chia sẻ từ cộng đồng. Bài ghim luôn nằm đầu bảng tin.",
+    "feedsLabel": "Nguồn bài viết",
+    "feeds": {
+      "global": "Bảng tin",
+      "all": "Tất cả bài viết"
+    },
+    "write": "Viết bài",
+    "rss": "Nguồn RSS",
+    "pinned": "Ghim",
+    "comments": "{count} bình luận",
+    "readMore": "Đọc tiếp",
+    "pager": "Trang bài viết",
+    "empty": "Chưa có bài viết nào",
+    "recentComments": "Bình luận gần đây",
+    "noComments": "Chưa có bình luận nào.",
+    "newProblems": "Bài tập mới",
+    "problemLine": "{code} · {date}",
+    "problemPoints": "{points} điểm",
+    "topContributors": "Top đóng góp",
+    "toLeaderboard": "Bảng xếp hạng",
     "title": "Blog"
   },
   "blogPost": {
