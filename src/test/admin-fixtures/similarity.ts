@@ -4,7 +4,7 @@ import type {
   SimilarityPair,
   SimilarityPairDetail,
   SimilarityRun,
-} from '@/api/types/similarity';
+} from '../../api/types/similarity';
 
 interface GroupSpec extends Partial<SimilarityGroup> {
   problemCode: string;
