@@ -118,6 +118,7 @@ const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['verdict-partial', 'partial-bg-2'],
   ['verdict-partial', 'partial-bg-3'],
   ['accent-soft-text', 'accent-soft'],
+  ['text-muted', 'accent-soft'],
   ['first-solve-text', 'first-solve-bg'],
   ['first-solve-text', 'first-solve-bg-2'],
   ['positive', 'verdict-ac-bg'],

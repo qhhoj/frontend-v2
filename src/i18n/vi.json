@@ -154,7 +154,16 @@
     "email": "Email",
     "submitLogin": "Đăng nhập",
     "submitRegister": "Tạo tài khoản",
-    "noAccount": "Chưa có tài khoản? Đăng ký",
+    "noAccountPrompt": "Chưa có tài khoản?",
+    "resendLink": "Gửi lại email kích hoạt",
+    "brand": {
+      "headline": "Luyện thuật toán mỗi ngày, cùng Bit.",
+      "lead": "Nộp bài, xem kết quả chấm ngay và leo bảng xếp hạng.",
+      "counts": "{problems} bài · {users} thành viên"
+    },
+    "notice": {
+      "passwordReset": "Mật khẩu đã được đổi, hãy đăng nhập lại."
+    },
     "haveAccount": "Đã có tài khoản? Đăng nhập",
     "forgot": "Quên mật khẩu?",
     "registered": "Đã tạo tài khoản. Hãy mở email để kích hoạt.",
@@ -164,8 +173,7 @@
     "dismissNotice": "Đóng thông báo",
     "social": {
       "or": "hoặc tiếp tục với",
-      "signInWith": "Đăng nhập với {provider}",
-      "signUpWith": "Đăng ký với {provider}"
+      "signInWith": "Đăng nhập với {provider}"
     },
     "signup": {
       "school": "Trường",

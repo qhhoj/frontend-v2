@@ -10,8 +10,8 @@ import SocialButtons from './SocialButtons.vue';
 /** `mountComponent` installs the router, whose first navigation asks `/auth/me`. */
 const mockProviders = (reply: MockResponse) =>
   mockApi({ 'GET /auth/me': signedOut, 'GET /auth/social/providers': reply });
-const mountButtons = async (mode: 'login' | 'register') => {
-  const wrapper = mountComponent(SocialButtons, { props: { mode } });
+const mountButtons = async () => {
+  const wrapper = mountComponent(SocialButtons);
   await flushPromises();
   return wrapper;
 };
@@ -19,7 +19,7 @@ const mountButtons = async (mode: 'login' | 'register') => {
 describe('SocialButtons', () => {
   it('links each provider the backend enables to its start endpoint as a full page navigation', async () => {
     mockProviders(ok({ providers: ['google', 'github'] }));
-    const wrapper = await mountButtons('login');
+    const wrapper = await mountButtons();
     expect(wrapper.findAll('a').map((link) => link.attributes('href'))).toEqual([
       '/api/internal/auth/social/google/start',
       '/api/internal/auth/social/github/start',
@@ -28,30 +28,23 @@ describe('SocialButtons', () => {
 
   it('offers only what the backend lists, so a disabled provider has no button', async () => {
     mockProviders(ok({ providers: ['github'] }));
-    const wrapper = await mountButtons('login');
+    const wrapper = await mountButtons();
     expect(wrapper.findAll('a').map((link) => link.text())).toEqual(['GitHub']);
   });
 
   it('labels sign-in buttons by provider with a fuller accessible name and a divider', async () => {
     mockProviders(ok({ providers: ['google'] }));
-    const wrapper = await mountButtons('login');
+    const wrapper = await mountButtons();
     const link = wrapper.get('a');
     expect(link.text()).toBe('Google');
     expect(link.attributes('aria-label')).toBe('Đăng nhập với Google');
     expect(wrapper.text()).toContain('hoặc tiếp tục với');
   });
 
-  it('labels sign-up buttons in full and has no divider', async () => {
-    mockProviders(ok({ providers: ['github'] }));
-    const wrapper = await mountButtons('register');
-    expect(wrapper.get('a').text()).toBe('Đăng ký với GitHub');
-    expect(wrapper.text()).not.toContain('hoặc tiếp tục với');
-  });
-
   it('holds the space with inert blocks while the list loads, without registering a wait', async () => {
     mockProviders(ok({ providers: ['google'] }));
     hangRequestsExcept(['/auth/me']);
-    const wrapper = mountComponent(SocialButtons, { props: { mode: 'login' } });
+    const wrapper = mountComponent(SocialButtons);
     await wrapper.vm.$router.isReady(); // the router's first navigation is a wait of its own; let it end
     const skeleton = wrapper.get('[data-testid="social-skeleton"]');
     expect(skeleton.attributes('aria-hidden')).toBe('true');
@@ -67,7 +60,7 @@ describe('SocialButtons', () => {
     ],
   ])('renders nothing, and no alert, when %s', async (_name, reply) => {
     mockProviders(reply);
-    const wrapper = await mountButtons('login');
+    const wrapper = await mountButtons();
     expect(wrapper.find('a').exists()).toBe(false);
     expect(wrapper.find('[data-testid="social-skeleton"]').exists()).toBe(false);
     expect(wrapper.find('[role="alert"]').exists()).toBe(false);

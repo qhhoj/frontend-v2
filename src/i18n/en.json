@@ -154,7 +154,16 @@
     "email": "Email",
     "submitLogin": "Sign in",
     "submitRegister": "Create account",
-    "noAccount": "No account yet? Sign up",
+    "noAccountPrompt": "No account yet?",
+    "resendLink": "Resend the activation email",
+    "brand": {
+      "headline": "Practice algorithms every day, with Bit.",
+      "lead": "Submit, see your verdict at once and climb the rankings.",
+      "counts": "{problems} problems · {users} members"
+    },
+    "notice": {
+      "passwordReset": "Your password was changed. Sign in again."
+    },
     "haveAccount": "Already have an account? Sign in",
     "forgot": "Forgot password?",
     "registered": "Account created. Open your email to activate it.",
@@ -164,8 +173,7 @@
     "dismissNotice": "Dismiss",
     "social": {
       "or": "or continue with",
-      "signInWith": "Sign in with {provider}",
-      "signUpWith": "Sign up with {provider}"
+      "signInWith": "Sign in with {provider}"
     },
     "signup": {
       "school": "School",

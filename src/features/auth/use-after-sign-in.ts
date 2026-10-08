@@ -16,8 +16,8 @@ export function useAfterSignIn() {
     // Active queries (the shell's profile, which adopts the theme) refetch in the background.
     void queryClient.resetQueries();
     const redirect = safeRedirect(route.query.redirect);
-    await router.push(
-      session.status === 'partial' ? { name: 'login-2fa', query: { redirect } } : redirect,
-    );
+    // `/` is the default, so it is not carried (the same rule as the guards' `loginQuery`).
+    const query = redirect === '/' ? {} : { redirect };
+    await router.push(session.status === 'partial' ? { name: 'login-2fa', query } : redirect);
   };
 }

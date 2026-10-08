@@ -7,7 +7,7 @@ import {
   latestEventSource,
 } from '@/test/fake-event-source';
 import { sessionUser, submissionCase, submissionDetail } from '@/test/fixtures';
-import { socialRoutes } from '@/test/auth-routes';
+import { loginRoutes } from '@/test/auth-routes';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -303,7 +303,7 @@ describe('submission page', () => {
   });
 
   it('sends an anonymous viewer to sign in and keeps the address', async () => {
-    mockApi({ ...anonymousViewer, ...socialRoutes });
+    mockApi({ ...anonymousViewer, ...loginRoutes });
     const { router } = await mountApp('/submissions/sub-1');
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
     expect(router.currentRoute.value.query.redirect).toBe('/submissions/sub-1');

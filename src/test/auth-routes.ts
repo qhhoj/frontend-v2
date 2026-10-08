@@ -11,3 +11,17 @@ export const registerRoutes = {
   'GET /organizations': page([organizationItem()]),
   'GET /problems/meta': ok(problemMeta()),
 };
+
+export const HOME_COUNTS = {
+  users: 905,
+  problems: 412,
+  submissions: 90210,
+  contests: 7,
+  languages: 12,
+};
+
+/** What the login screen loads: the social buttons and the brand panel's counts. */
+export const loginRoutes = {
+  ...socialRoutes,
+  'GET /home': ok({ counts: HOME_COUNTS }),
+};

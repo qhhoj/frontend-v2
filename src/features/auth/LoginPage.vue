@@ -1,92 +1,105 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
+import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import { translate } from '@/i18n';
-import InlineBit from '@/components/InlineBit.vue';
-import { errorMessageKey } from '@/i18n/error-message';
-import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
+import { queryErrorText } from './auth-errors';
+import AuthError from './AuthError.vue';
+import AuthField from './AuthField.vue';
+import AuthNotice from './AuthNotice.vue';
+import AuthSubmit from './AuthSubmit.vue';
+import LoginBrandPanel from './LoginBrandPanel.vue';
+import SocialButtons from './SocialButtons.vue';
+import { useAfterSignIn } from './use-after-sign-in';
+import { useAuthAction } from './use-auth-action';
 
-// Unstyled placeholder: logic only until the login mock-up is approved (plan 8b).
 const session = useSessionStore();
 const route = useRoute();
-const router = useRouter();
-const username = ref('');
-const password = ref('');
-const pending = ref(false);
-const error = ref<unknown>(null);
-/** A ban carries the moderator's reason in the backend message (English); everything else is translated by code. */
-const errorText = computed(() =>
-  error.value instanceof ApiError &&
-  error.value.code === 'banned' &&
-  error.value.message.includes('Reason:')
-    ? error.value.message
-    : translate(errorMessageKey(error.value)),
-);
+const afterSignIn = useAfterSignIn();
+const form = reactive({ username: '', password: '' });
+const formElement = ref<HTMLFormElement | null>(null);
+const { pending, error, summary, run } = useAuthAction(formElement, ['username', 'password']);
 
-async function submit() {
-  pending.value = true;
-  error.value = null;
-  try {
-    await session.login({ username: username.value, password: password.value });
-    const redirect = safeRedirect(route.query.redirect);
-    await router.push(
-      session.status === 'partial' ? { name: 'login-2fa', query: { redirect } } : redirect,
-    );
-  } catch (caught) {
-    error.value = caught;
-  } finally {
-    pending.value = false;
-  }
-}
+/** Messages other pages hand over through `?notice=`; any other value is ignored. */
+const NOTICES = new Map([['password-reset', 'auth.notice.passwordReset']]);
+const noticeDismissed = ref(false);
+const notice = computed(() => {
+  const key = typeof route.query.notice === 'string' ? NOTICES.get(route.query.notice) : undefined;
+  return key && !noticeDismissed.value ? translate(key) : null;
+});
+/** A failed attempt wins over the social-callback error that brought the viewer here. */
+const errorText = computed(() => summary.value ?? queryErrorText(route.query.error));
+/** A pending account, from this attempt or from the OAuth callback, can ask for its activation mail again (B16). */
+const notActivated = computed(() =>
+  error.value
+    ? error.value instanceof ApiError && error.value.code === 'account_not_activated'
+    : route.query.error === 'account_not_activated',
+);
+const LINK = 'font-semibold text-accent-text underline';
+
+const submit = () =>
+  run(async () => {
+    await session.login({ ...form });
+    await afterSignIn();
+  });
 </script>
 
 <template>
-  <section class="mx-auto max-w-md px-4 py-12">
-    <div class="flex items-center gap-4">
-      <h1 class="font-display text-3xl font-semibold">{{ $t('pages.login') }}</h1>
-      <InlineBit kind="welcome" class="shrink-0" />
-    </div>
-    <p class="mt-2 text-muted">{{ $t('placeholder.pending') }}</p>
-    <form class="mt-6 flex flex-col gap-4" @submit.prevent="submit">
-      <label class="flex flex-col gap-1">
-        {{ $t('auth.username') }}
-        <input
-          v-model="username"
-          name="username"
-          autocomplete="username"
-          required
-          class="min-h-11 rounded-row border border-line bg-surface-strong px-3"
-        />
-      </label>
-      <label class="flex flex-col gap-1">
-        {{ $t('auth.password') }}
-        <input
-          v-model="password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          required
-          class="min-h-11 rounded-row border border-line bg-surface-strong px-3"
-        />
-      </label>
-      <p v-if="error" role="alert" class="text-negative">{{ errorText }}</p>
-      <button
-        type="submit"
-        :disabled="pending"
-        class="min-h-11 rounded-pill border border-line font-semibold"
+  <div
+    class="relative grid min-h-[calc(100dvh-env(safe-area-inset-top))] grid-cols-1 content-start pb-[env(safe-area-inset-bottom)] lg:grid-cols-[minmax(0,7fr)_minmax(0,9fr)] lg:content-stretch"
+  >
+    <div class="absolute top-3 right-4 z-10 lg:top-5 lg:right-6"><LocaleToggle /></div>
+    <LoginBrandPanel />
+    <section class="flex items-center justify-center lg:p-8">
+      <form
+        ref="formElement"
+        class="flex w-full max-w-[440px] flex-col gap-4 px-6 py-6 lg:glass lg:gap-[18px] lg:rounded-panel lg:p-8"
+        @submit.prevent="submit"
       >
-        {{ $t('auth.submitLogin') }}
-      </button>
-    </form>
-    <p class="mt-4 flex flex-wrap gap-4 text-sm">
-      <RouterLink :to="{ name: 'register' }" class="text-accent-text underline">{{
-        $t('auth.noAccount')
-      }}</RouterLink>
-      <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{
-        $t('auth.forgot')
-      }}</RouterLink>
-    </p>
-  </section>
+        <h1 class="font-display text-[26px] leading-tight font-bold">{{ $t('pages.login') }}</h1>
+        <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
+          notice
+        }}</AuthNotice>
+        <AuthError :text="errorText">
+          <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="LINK">{{
+            $t('auth.resendLink')
+          }}</RouterLink>
+        </AuthError>
+        <AuthField
+          v-model="form.username"
+          name="username"
+          :label="$t('auth.username')"
+          autocomplete="username"
+          placeholder="minhthu"
+          required
+          spellcheck="false"
+          autocapitalize="none"
+        />
+        <AuthField
+          v-model="form.password"
+          type="password"
+          name="password"
+          :label="$t('auth.password')"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          required
+        />
+        <p class="-mt-1 flex justify-end text-sm">
+          <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{
+            $t('auth.forgot')
+          }}</RouterLink>
+        </p>
+        <AuthSubmit :pending="pending">{{ $t('auth.submitLogin') }}</AuthSubmit>
+        <SocialButtons />
+        <p class="text-center text-sm text-muted">
+          {{ $t('auth.noAccountPrompt') }}
+          <RouterLink :to="{ name: 'register' }" :class="LINK">{{
+            $t('account.register')
+          }}</RouterLink>
+        </p>
+      </form>
+    </section>
+  </div>
 </template>

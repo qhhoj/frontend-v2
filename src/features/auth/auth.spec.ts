@@ -1,8 +1,9 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { apiRequest } from '@/api/client';
+import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
-import { profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
@@ -10,6 +11,7 @@ import { useThemeStore } from '@/theme/theme.store';
 describe('auth screens', () => {
   it('returns to a safe redirect after login', async () => {
     const calls = mockApi({
+      ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile()),
@@ -28,20 +30,25 @@ describe('auth screens', () => {
   });
 
   it('shows why a login failed and stays on the page', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/login': fail(401, 'invalid_credentials') });
+    mockApi({
+      ...loginRoutes,
+      'GET /auth/me': signedOut,
+      'POST /auth/login': fail(401, 'invalid_credentials'),
+    });
     const { wrapper, router } = await mountApp('/login');
     await wrapper.get('input[name="username"]').setValue('user_01');
     await wrapper.get('input[name="password"]').setValue('wrong');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).toBe('Sai tên đăng nhập hoặc mật khẩu.');
+    expect(wrapper.get('#main [role="alert"]').text()).toBe('Sai tên đăng nhập hoặc mật khẩu.');
     expect(router.currentRoute.value.name).toBe('login');
   });
 
   it('sends a viewer with a pending second factor to 2FA, keeping the redirect', async () => {
     mockApi({
+      ...loginRoutes,
       'GET /auth/me': signedOut,
-      'POST /auth/login': ok(sessionResponse({ user: null, twoFactorRequired: true })),
+      'POST /auth/login': ok(partialSession()),
     });
     const { wrapper, router } = await mountApp('/login?redirect=/settings');
     await wrapper.get('input[name="username"]').setValue('user_01');
@@ -108,16 +115,19 @@ describe('auth screens', () => {
   it('explains an invalid activation link', async () => {
     mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(400, 'invalid_token') });
     const { wrapper } = await mountApp('/activate/expired');
-    expect(wrapper.get('[role="alert"]').text()).toBe('Liên kết không hợp lệ hoặc đã hết hạn.');
-    expect(wrapper.get('[role="alert"] [data-testid="inline-bit"]').attributes('aria-hidden')).toBe(
-      'true',
+    expect(wrapper.get('#main [role="alert"]').text()).toBe(
+      'Liên kết không hợp lệ hoặc đã hết hạn.',
     );
+    expect(
+      wrapper.get('#main [role="alert"] [data-testid="inline-bit"]').attributes('aria-hidden'),
+    ).toBe('true');
   });
 
   it.each(['//evil.example/x', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)'])(
     'does not follow the hostile redirect %s after login',
     async (hostile) => {
       mockApi({
+        ...loginRoutes,
         'GET /auth/me': signedOut,
         'POST /auth/login': ok(sessionResponse()),
         'GET /profile': ok(profile()),
@@ -134,6 +144,7 @@ describe('auth screens', () => {
 
   it('applies the account theme after login', async () => {
     mockApi({
+      ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile({ siteTheme: 'light' })),
@@ -148,17 +159,24 @@ describe('auth screens', () => {
   });
 
   it('tells a throttled viewer to wait', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/login': fail(429, 'rate_limited') });
+    mockApi({
+      ...loginRoutes,
+      'GET /auth/me': signedOut,
+      'POST /auth/login': fail(429, 'rate_limited'),
+    });
     const { wrapper } = await mountApp('/login');
     await wrapper.get('input[name="username"]').setValue('user_01');
     await wrapper.get('input[name="password"]').setValue('x');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
+    expect(wrapper.get('#main [role="alert"]').text()).toBe(
+      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
+    );
   });
 
   it('drops the previous account data when another account logs in', async () => {
     mockApi({
+      ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile()),
@@ -190,11 +208,16 @@ describe('auth screens', () => {
 
   it('shows the moderator reason of a banned account', async () => {
     mockApi({
+      ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': {
         status: 403,
         body: {
-          error: { code: 'banned', message: 'This account has been banned. Reason: cheating' },
+          error: {
+            code: 'banned',
+            message: 'This account has been banned. Reason: cheating',
+            banReason: 'cheating',
+          },
         },
       },
     });
@@ -203,7 +226,9 @@ describe('auth screens', () => {
     await wrapper.get('input[name="password"]').setValue('x');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).toContain('Reason: cheating');
+    expect(wrapper.get('#main [role="alert"]').text()).toBe(
+      'Tài khoản đã bị khoá. Lý do: cheating',
+    );
   });
 
   it('keeps a field error out of the input label', async () => {
@@ -225,6 +250,8 @@ describe('auth screens', () => {
   it('does not tell a viewer to get a new link when the server failed', async () => {
     mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(429, 'rate_limited') });
     const { wrapper } = await mountApp('/activate/k123');
-    expect(wrapper.get('[role="alert"]').text()).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
+    expect(wrapper.get('#main [role="alert"]').text()).toBe(
+      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
+    );
   });
 });
