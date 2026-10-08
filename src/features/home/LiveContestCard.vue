@@ -12,12 +12,16 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
   <GlassCard data-testid="live-contest" class="border-line-accent! p-6">
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <p class="text-[13px] font-semibold"><SkeletonBlock text class="w-28" /></p>
-        <h2 class="mt-2 font-display text-xl font-semibold">
+        <p data-skeleton-region="label" class="text-[13px] font-semibold">
+          <SkeletonBlock text class="w-28" />
+        </p>
+        <h2 data-skeleton-region="name" class="mt-2 font-display text-xl font-semibold">
           <SkeletonBlock text class="w-3/4" />
         </h2>
-        <p class="mt-1.5 text-[32px] font-semibold"><SkeletonBlock text class="w-2/3" /></p>
-        <SkeletonBlock class="mt-3.5 h-12 w-full" />
+        <p data-skeleton-region="countdown" class="mt-1.5 text-[32px] font-semibold">
+          <SkeletonBlock text class="w-2/3" />
+        </p>
+        <SkeletonBlock data-skeleton-region="enter" class="mt-3.5 h-12 w-full" />
       </template>
 
       <template v-if="contest">

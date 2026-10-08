@@ -1,8 +1,18 @@
-import { describe, expect, it } from 'vitest';
-import { signedIn, signedOut } from '@/test/fixtures';
-import { hangRequestsExcept, mockApi } from '@/test/mock-api';
+import { describe, expect, it, vi } from 'vitest';
+import { contestDetail, signedIn, signedOut } from '@/test/fixtures';
+import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
+const regionsIn = (root: ParentNode, region: string) =>
+  root.querySelectorAll(`[data-skeleton-region="${region}"]`).length;
+/** Skeletons are decoration: no text to read, nothing to focus or click. */
+const expectInert = (root: Element, label: string) => {
+  expect(root.textContent?.trim(), label).toBe('');
+  expect(
+    root.querySelectorAll('a, button, input, textarea, select, [tabindex]'),
+    label,
+  ).toHaveLength(0);
+};
 const blocksIn = (root: ParentNode) => root.querySelectorAll('[data-skeleton]').length;
 
 describe('loading screens show blocks shaped like their content', () => {
@@ -23,6 +33,18 @@ describe('loading screens show blocks shaped like their content', () => {
       expect(card.textContent?.includes('Đang tải'), testId).toBe(false);
       expect(card.querySelector('[role="status"]'), testId).toBeNull(); // the shell announces loading once
     }
+    const regionCounts: Record<string, Record<string, number>> = {
+      'rating-hero': { greeting: 1, rating: 1, tier: 1, chart: 1, tile: 3 },
+      'quick-submit': { code: 1, source: 1, submit: 1, status: 1 },
+      'live-contest': { label: 1, name: 1, countdown: 1, enter: 1 },
+    };
+    for (const [testId, regions] of Object.entries(regionCounts)) {
+      const card = dom.querySelector(`[data-testid="${testId}"]`)!;
+      for (const [region, count] of Object.entries(regions))
+        expect(regionsIn(card, region), `${testId} ${region}`).toBe(count);
+    }
+    for (const skeleton of dom.querySelectorAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton, 'skeleton');
     // The lists show the page-size number of rows.
     expect(dom.querySelectorAll('[data-testid="top-users"] li')).toHaveLength(3);
     expect(dom.querySelectorAll('[data-testid="recent-submissions"] li')).toHaveLength(4);
@@ -36,6 +58,7 @@ describe('loading screens show blocks shaped like their content', () => {
     expect(skeleton.attributes('aria-hidden')).toBe('true');
     expect(skeleton.findAll('tbody tr')).toHaveLength(8);
     expect(skeleton.findAll('thead th')).toHaveLength(6);
+    expectInert(skeleton.element, 'problem table skeleton');
     expect(wrapper.findAll('table[aria-hidden="true"] [data-skeleton]').length).toBeGreaterThan(8);
   });
 
@@ -45,5 +68,24 @@ describe('loading screens show blocks shaped like their content', () => {
     const { wrapper } = await mountApp('/contests/r42/ranking');
     expect(wrapper.findAll('[data-testid="query-skeleton"]').length).toBeGreaterThanOrEqual(1);
     expect(blocksIn(wrapper.element)).toBeGreaterThan(0);
+    for (const region of ['nav', 'title', 'controls'])
+      expect(regionsIn(wrapper.element, region), region).toBe(1);
+    expect(regionsIn(wrapper.element, 'row')).toBe(0); // the board mounts once the contest is known
+  });
+
+  it('the ranking board skeleton has the podium, the table header and 10 rows once the contest is known', async () => {
+    mockApi({ 'GET /auth/me': signedOut, 'GET /contests/r42': ok(contestDetail()) });
+    // Hold only the ranking request; the contest answers.
+    const answer = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/ranking') ? new Promise<Response>(() => {}) : answer(input, init),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const board = wrapper.findAll('[data-testid="query-skeleton"]').at(-1)!.element;
+    expect(regionsIn(board, 'podium')).toBe(1);
+    expect(regionsIn(board, 'podium-card')).toBe(3);
+    expect(regionsIn(board, 'table-header')).toBe(1);
+    expect(regionsIn(board, 'row')).toBe(10);
+    expectInert(board, 'ranking board skeleton');
   });
 });

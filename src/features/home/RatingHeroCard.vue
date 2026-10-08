@@ -59,14 +59,23 @@ const tiles = computed(() =>
       "
     >
       <template #skeleton>
-        <p class="text-muted"><SkeletonBlock text class="w-40" /></p>
-        <div class="mt-2 flex flex-wrap items-end gap-4">
+        <p data-skeleton-region="greeting" class="text-muted">
+          <SkeletonBlock text class="w-40" />
+        </p>
+        <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
           <span class="font-mono text-6xl tracking-tight"><SkeletonBlock text class="w-44" /></span>
         </div>
-        <p class="text-muted"><SkeletonBlock text class="w-32" /></p>
-        <div class="h-[110px]"><SkeletonBlock class="h-full w-full" /></div>
+        <p data-skeleton-region="tier" class="text-muted"><SkeletonBlock text class="w-32" /></p>
+        <div data-skeleton-region="chart" class="h-[110px]">
+          <SkeletonBlock class="h-full w-full" />
+        </div>
         <div class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
-          <div v-for="tile in 3" :key="tile" class="min-w-0 rounded-tile bg-surface-strong p-4">
+          <div
+            v-for="tile in 3"
+            :key="tile"
+            data-skeleton-region="tile"
+            class="min-w-0 rounded-tile bg-surface-strong p-4"
+          >
             <p class="text-[13px]"><SkeletonBlock text class="w-14" /></p>
             <p class="font-mono text-[26px]"><SkeletonBlock text class="w-20" /></p>
           </div>

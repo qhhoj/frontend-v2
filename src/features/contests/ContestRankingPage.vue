@@ -58,6 +58,7 @@ const rows = computed(() => {
 /** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
 const PODIUM_LIMIT = 6;
 const RANKING_SKELETON_ROWS = 10;
+const PODIUM_SKELETON_CARDS = 3;
 const podium = computed(() =>
   (ranking.value?.rows ?? [])
     .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
@@ -84,13 +85,17 @@ const VIEW_MODES = [
   <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
     <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
       <template #skeleton>
-        <SkeletonBlock pill class="h-[52px] w-72 max-w-full" />
+        <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
         <div class="flex flex-wrap items-end justify-between gap-4">
-          <div>
+          <div data-skeleton-region="title">
             <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
             <div class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
               <SkeletonBlock text class="w-80 max-w-full" />
             </div>
+          </div>
+          <div data-skeleton-region="controls" class="flex flex-wrap items-center gap-2.5">
+            <SkeletonBlock pill class="h-[52px] w-44" />
+            <SkeletonBlock pill class="h-12 w-48" />
           </div>
         </div>
       </template>
@@ -194,16 +199,41 @@ const VIEW_MODES = [
       @retry="refetchRanking()"
     >
       <template #skeleton>
-        <div class="glass overflow-hidden rounded-card">
-          <div
-            v-for="row in RANKING_SKELETON_ROWS"
-            :key="row"
-            class="flex items-center gap-4 border-t border-line px-6 py-3.5 first:border-t-0"
-          >
-            <SkeletonBlock class="h-6 w-8" />
-            <SkeletonBlock round class="size-10 shrink-0" />
-            <SkeletonBlock class="h-5 flex-1" />
-            <SkeletonBlock class="hidden h-9 w-64 sm:block" />
+        <div class="flex flex-col gap-5">
+          <div data-skeleton-region="podium" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div
+              v-for="place in PODIUM_SKELETON_CARDS"
+              :key="place"
+              data-skeleton-region="podium-card"
+              class="glass flex items-center gap-3.5 rounded-card p-5"
+            >
+              <SkeletonBlock round class="size-13 shrink-0" />
+              <div class="min-w-0 flex-1">
+                <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
+                <p class="font-mono text-[13px]"><SkeletonBlock text class="w-1/2" /></p>
+              </div>
+            </div>
+          </div>
+          <div class="glass overflow-hidden rounded-card">
+            <div
+              data-skeleton-region="table-header"
+              class="flex items-center gap-4 px-5 py-4 text-[13px]"
+            >
+              <SkeletonBlock text class="w-8" />
+              <SkeletonBlock text class="w-24" />
+              <span class="flex-1" />
+              <SkeletonBlock text class="hidden w-64 sm:inline-block" />
+            </div>
+            <div
+              v-for="row in RANKING_SKELETON_ROWS"
+              :key="row"
+              data-skeleton-region="row"
+              class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm"
+            >
+              <SkeletonBlock text class="w-8" />
+              <span class="flex-1"><SkeletonBlock text class="w-40 max-w-full" /></span>
+              <SkeletonBlock text class="hidden w-64 sm:inline-block" />
+            </div>
           </div>
         </div>
       </template>

@@ -23,7 +23,7 @@ const NUMBER_COLUMNS = 3;
               ><SkeletonBlock text class="w-12"
             /></span>
           </th>
-          <th scope="col" class="px-6 py-4 font-medium" />
+          <th scope="col" class="px-6 py-4 text-right font-medium" />
         </tr>
       </thead>
       <tbody>

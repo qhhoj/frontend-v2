@@ -16,6 +16,9 @@ import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { verdictOf } from '@/lib/verdicts';
 
+/** Rows of the source textarea; the skeleton draws as many lines. */
+const SOURCE_ROWS = 4;
+
 /** Backend limit (`IsSourceLength`), counted in code points. */
 const MAX_SOURCE_LENGTH = 65_536;
 
@@ -95,21 +98,29 @@ const progressText = computed(() => {
     <QueryState :loading="metaPending" :error="metaError" @retry="refetchMeta()">
       <template #skeleton>
         <div class="flex flex-col gap-1">
-          <div class="rounded-tile bg-surface-strong p-4">
-            <p class="text-[13px]"><SkeletonBlock text class="w-24" /></p>
-            <div class="mt-1.5 flex min-h-11 items-center justify-between gap-3">
-              <SkeletonBlock class="h-7 w-40" />
+          <div data-skeleton-region="code" class="rounded-tile bg-surface-strong p-4">
+            <div>
+              <span class="text-[13px]"><SkeletonBlock text class="w-24" /></span>
+            </div>
+            <div class="mt-1.5 flex items-center justify-between gap-3">
+              <SkeletonBlock class="h-11 w-40" />
               <SkeletonBlock class="h-11 w-32 shrink-0" />
             </div>
           </div>
           <div class="-my-3.5 h-9" />
-          <div class="rounded-tile bg-surface-strong p-4">
-            <p class="text-[13px]"><SkeletonBlock text class="w-16" /></p>
-            <SkeletonBlock class="mt-1.5 h-24 w-full" />
+          <div data-skeleton-region="source" class="rounded-tile bg-surface-strong p-4">
+            <div>
+              <span class="text-[13px]"><SkeletonBlock text class="w-16" /></span>
+            </div>
+            <div class="mt-1.5 font-mono text-[13px] leading-relaxed">
+              <div v-for="line in SOURCE_ROWS" :key="line">
+                <SkeletonBlock text class="w-full" />
+              </div>
+            </div>
           </div>
-          <SkeletonBlock class="mt-1 h-14 w-full" />
+          <SkeletonBlock data-skeleton-region="submit" class="mt-1 h-14 w-full" />
         </div>
-        <div class="min-h-11" />
+        <div data-skeleton-region="status" class="min-h-11" />
       </template>
       <form class="flex flex-col gap-1" @submit.prevent="send">
         <div class="rounded-tile bg-surface-strong p-4">
@@ -151,7 +162,7 @@ const progressText = computed(() => {
             id="quick-submit-source"
             v-model="source"
             required
-            rows="4"
+            :rows="SOURCE_ROWS"
             spellcheck="false"
             class="mt-1.5 block w-full resize-y bg-transparent font-mono text-[13px] leading-relaxed text-content"
           />
