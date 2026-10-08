@@ -55,8 +55,7 @@ const perParticipation = computed(() =>
       <span>{{ endLabel }}</span>
     </div>
     <div class="flex items-center gap-2 font-semibold">
-      <!-- REPLACEABLE: contest kind (stopwatch) once bit/variants merges; crown is a stand-in. -->
-      <InlineBit kind="crown" />
+      <InlineBit kind="contest" />
       <p>{{ $t('contests.list.timeLeft', { span: spanText(remaining) }) }}</p>
     </div>
     <p v-if="perParticipation" class="text-sm text-muted">
