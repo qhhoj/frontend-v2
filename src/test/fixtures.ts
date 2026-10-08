@@ -27,7 +27,8 @@ import type {
 } from '../api/types/submissions';
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
 import type { SecondFactorMethod, SessionResponse, SessionUser } from '../api/types/auth';
-import type { Profile } from '../api/types/profile';
+import type { DataExportStatus } from '../api/types/account';
+import type { Profile, ProfileOrganization } from '../api/types/profile';
 import type { OrganizationListItem } from '../api/types/organizations';
 
 export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
@@ -72,6 +73,8 @@ export const signedOut = {
 };
 
 export const profile = (overrides: Partial<Profile> = {}): Profile => ({
+  about: '',
+  aboutHtml: '',
   firstName: '',
   timezone: 'Asia/Ho_Chi_Minh',
   languageId: '0192a000-0000-7000-8000-00000000c017',
@@ -79,6 +82,33 @@ export const profile = (overrides: Partial<Profile> = {}): Profile => ({
   siteTheme: 'auto',
   appearance: null,
   mathEngine: 'auto',
+  userScript: '',
+  badges: [],
+  displayBadgeId: null,
+  organizations: [],
+  ...overrides,
+});
+
+export const profileOrganization = (
+  overrides: Partial<ProfileOrganization> = {},
+): ProfileOrganization => ({
+  id: '0192a000-0000-7000-8000-0000000001a1',
+  slug: 'lhp',
+  name: 'THPT Chuyên Lê Hồng Phong',
+  shortName: 'LHP',
+  isOpen: true,
+  isAdmin: false,
+  ...overrides,
+});
+
+export const dataExportStatus = (overrides: Partial<DataExportStatus> = {}): DataExportStatus => ({
+  state: 'none',
+  preparedAt: null,
+  readyAt: null,
+  expiresAt: null,
+  size: null,
+  nextPrepareAt: null,
+  canPrepare: true,
   ...overrides,
 });
 

@@ -5,6 +5,8 @@ import {
   fetchSession,
   login as loginRequest,
   logout as logoutRequest,
+  logoutAllSessions,
+  stopImpersonation,
 } from '@/api/auth.api';
 import { ApiError, onCsrfFailed, onUnauthorized, setCsrfToken } from '@/api/client';
 import type {
@@ -68,6 +70,15 @@ export const useSessionStore = defineStore('session', () => {
   /** The server ended this viewer's session and this tab could not learn it: the guest state, with no request. */
   const forgetSession = () => apply(null);
 
+  /** Every session of the account ends, this one included (the server clears the cookie). Rethrows, so the page can say it failed. */
+  async function logoutEverywhere() {
+    await logoutAllSessions();
+    apply(null);
+  }
+
+  /** Back to the staff account that started viewing as this user. */
+  const stopImpersonating = async () => apply(await stopImpersonation());
+
   onCsrfFailed(refresh);
   /** A protected request answered 401: the session expired, so the viewer is signed out here (guards redirect on the next navigation). */
   onUnauthorized(() => apply(null));
@@ -85,5 +96,7 @@ export const useSessionStore = defineStore('session', () => {
     login,
     completeSocialSignup,
     logout,
+    logoutEverywhere,
+    stopImpersonating,
   };
 });

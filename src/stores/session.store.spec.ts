@@ -141,4 +141,40 @@ describe('useSessionStore', () => {
     await session.logout();
     expect(calls[1]!.headers.get('X-CSRF-Token')).toBe('csrf-social');
   });
+
+  it('signs out every session: the server is told, then this viewer is anonymous', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout-all': noContent() });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await session.logoutEverywhere();
+    const logoutAll = calls.find((call) => call.path === '/auth/logout-all')!;
+    expect(logoutAll.method).toBe('POST');
+    expect(logoutAll.body).toBeUndefined();
+    expect(session.status).toBe('anonymous');
+  });
+
+  it('stays signed in when signing out everywhere fails, and rethrows', async () => {
+    mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout-all': fail(500, 'http_error') });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await expect(session.logoutEverywhere()).rejects.toMatchObject({ status: 500 });
+    expect(session.status).toBe('authenticated');
+  });
+
+  it('stopping an impersonation takes over the staff session the server returns', async () => {
+    const staff = sessionResponse({
+      user: { ...sessionResponse().user!, id: 'staff-1', username: 'admin', isStaff: true },
+    });
+    const calls = mockApi({
+      'GET /auth/me': signedIn({ impersonatorId: 'staff-1' }),
+      'POST /auth/impersonate/stop': ok(staff),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    expect(session.impersonatorId).toBe('staff-1');
+    await session.stopImpersonating();
+    expect(calls.at(-1)).toMatchObject({ method: 'POST', path: '/auth/impersonate/stop' });
+    expect(session.impersonatorId).toBeNull();
+    expect(session.user?.username).toBe('admin');
+  });
 });
