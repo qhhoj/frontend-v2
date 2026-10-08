@@ -1,31 +1,11 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { apiRequest } from '@/api/client';
-import {
-  contestItem,
-  leaderboardEntry,
-  problemMeta,
-  profile,
-  ratingHistory,
-  sessionResponse,
-  signedIn,
-  signedOut,
-  submissionItem,
-  userPage,
-} from '@/test/fixtures';
-import { fail, mockApi, noContent, ok, page } from '@/test/mock-api';
+import { homeRoutes } from '@/test/home-routes';
+import { profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
-
-/** What the home page loads for the signed-in viewer a login lands on. */
-const homeRoutes = {
-  'GET /users/user_01': ok(userPage()),
-  'GET /users/user_01/ratings': ok(ratingHistory()),
-  'GET /submissions': page([submissionItem()]),
-  'GET /problems/meta': ok(problemMeta()),
-  'GET /contests': page([contestItem()]),
-  'GET /users': page([leaderboardEntry(1, 'user_07', 2788)]),
-};
 
 describe('auth screens', () => {
   it('returns to a safe redirect after login', async () => {
@@ -68,7 +48,7 @@ describe('auth screens', () => {
     await wrapper.get('input[name="password"]').setValue('correct horse');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    expect(router.currentRoute.value.name).toBe('login-2fa');
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login-2fa'));
     expect(router.currentRoute.value.query.redirect).toBe('/settings');
   });
 

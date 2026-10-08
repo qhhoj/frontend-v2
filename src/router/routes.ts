@@ -100,7 +100,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login/2fa',
     name: 'login-2fa',
-    component: PlaceholderPage,
+    component: () => import('@/features/auth/TwoFactorPage.vue'),
     meta: { titleKey: 'pages.twoFactor', allowPartial: true, layout: 'auth' },
   },
   {
