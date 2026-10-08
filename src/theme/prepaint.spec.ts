@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
 import { createPinia, setActivePinia } from 'pinia';
 import { stubMatchMedia } from '@/test/match-media';
+import { ACCENTS, appearanceVariables } from './appearance';
+import { useAppearanceStore } from './appearance.store';
 import { useThemeStore } from './theme.store';
 import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 
@@ -38,11 +40,16 @@ function prepaint({
   stored = null as string | null,
   resolvedBy = 'account' as string | null,
   preference = null as string | null,
+  painted = null as string | null,
   dark = false,
   storageThrows = false,
   mediaThrows = false,
 }) {
-  const root = { dataset: {} as Record<string, string> };
+  const properties: Record<string, string> = {};
+  const root = {
+    dataset: {} as Record<string, string>,
+    style: { setProperty: (name: string, value: string) => (properties[name] = value) },
+  };
   const themeColor = {
     content: '',
     setAttribute: (_name: string, value: string) => (themeColor.content = value),
@@ -52,6 +59,7 @@ function prepaint({
       if (storageThrows) throw new Error('storage blocked');
       if (key === 'qhhoj.resolvedTheme') return stored;
       if (key === 'qhhoj.resolvedBy') return resolvedBy;
+      if (key === 'qhhoj.paintedAppearance') return painted;
       return key === 'qhhoj.theme' ? preference : null;
     },
   };
@@ -66,7 +74,12 @@ function prepaint({
     localStorageStub,
     matchMediaStub,
   );
-  return { theme: root.dataset.theme, themeColor: themeColor.content };
+  return {
+    theme: root.dataset.theme,
+    themeColor: themeColor.content,
+    accent: root.dataset.accent,
+    properties,
+  };
 }
 
 describe('pre-paint script in index.html', () => {
@@ -159,5 +172,78 @@ describe('pre-paint script in index.html', () => {
             ).toBe(fromStore);
             expect(painted.themeColor).toBe(groundOfThemeFile(fromStore));
           }
+  });
+});
+
+describe('pre-paint script: personal look', () => {
+  const look = { accent: 'sunset', glass: 40, glow: 35 } as const;
+
+  it('allows exactly the registered accent presets', () => {
+    const listed = /var accents = \[([^\]]*)\]/
+      .exec(script)![1]!
+      .match(/'([\w-]+)'/g)!
+      .map((id) => id.slice(1, -1));
+    expect(listed).toEqual(ACCENTS.map((accent) => accent.id));
+  });
+
+  it('paints the last painted look exactly as the store would', () => {
+    const { accent, properties } = prepaint({ painted: JSON.stringify(look) });
+    const expected = appearanceVariables(look);
+    expect(accent).toBe(expected.accent);
+    expect(properties).toEqual({
+      '--qh-glass-level': expected.glass,
+      '--qh-blob-strength': expected.blobStrength,
+    });
+  });
+
+  it('paints nothing when there is no look or it was turned off', () => {
+    expect(prepaint({ painted: null }).accent).toBeUndefined();
+    expect(prepaint({ painted: 'null' }).accent).toBeUndefined();
+  });
+
+  it.each([
+    ['broken JSON', 'not json'],
+    ['an unknown accent', '{"accent":"violet","glass":1,"glow":1}'],
+    ['a fractional glass', '{"accent":"mint","glass":5.5,"glow":1}'],
+    ['a glow above 100', '{"accent":"mint","glass":1,"glow":101}'],
+    ['a numeric string', '{"accent":"mint","glass":"1","glow":1}'],
+  ])('falls back to the site look for %s', (_name, painted) => {
+    const result = prepaint({ painted });
+    expect(result.accent).toBeUndefined();
+    expect(result.properties).toEqual({});
+  });
+
+  it('still paints the theme when storage is blocked, and no look', () => {
+    const result = prepaint({ storageThrows: true, dark: false });
+    expect(result.theme).toBe(firstThemeOf('light'));
+    expect(result.accent).toBeUndefined();
+  });
+
+  it('paints the look the store starts with, for no, a valid and an invalid painted look', () => {
+    const paintedValues = [
+      null,
+      'null',
+      JSON.stringify(look),
+      'not json',
+      '{"accent":"violet","glass":1,"glow":1}',
+      '{"accent":"mint","glass":5.5,"glow":1}',
+    ];
+    for (const painted of paintedValues) {
+      localStorage.clear();
+      if (painted !== null) localStorage.setItem('qhhoj.paintedAppearance', painted);
+      delete document.documentElement.dataset.accent;
+      setActivePinia(createPinia());
+      const fromStore = useAppearanceStore().look;
+      const result = prepaint({ painted });
+      expect(result.accent, `painted ${painted}`).toBe(fromStore?.accent);
+      expect(result.properties, `painted ${painted}`).toEqual(
+        fromStore
+          ? {
+              '--qh-glass-level': appearanceVariables(fromStore).glass,
+              '--qh-blob-strength': appearanceVariables(fromStore).blobStrength,
+            }
+          : {},
+      );
+    }
   });
 });

@@ -57,3 +57,19 @@ test('the remembered theme applies before any app script runs', async ({ page, a
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-light');
 });
+
+test('the remembered personal look applies before any app script runs', async ({ page, api }) => {
+  void api;
+  await page.addInitScript(() => {
+    const look = JSON.stringify({ accent: 'gold', glass: 100, glow: 0 });
+    localStorage.setItem('qhhoj.appearance', look);
+    localStorage.setItem('qhhoj.paintedAppearance', look);
+  });
+  await page.route(/\/assets\/.*\.js$/, (route) => route.abort());
+  await page.goto('/blog');
+  const html = page.locator('html');
+  await expect(html).toHaveAttribute('data-accent', 'gold');
+  expect(await html.evaluate((root) => root.style.getPropertyValue('--qh-glass-level'))).toBe(
+    '100',
+  );
+});

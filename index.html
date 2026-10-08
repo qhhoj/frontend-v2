@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#faf9f5" />
     <script>
       // Pre-paint: the theme last painted when the account chose it (src/theme/theme.store.ts), else the stored
-      // preference, else the OS scheme (`auto` follows today's scheme, not the last visit's).
+      // preference, else the OS scheme (`auto` follows today's scheme, not the last visit's). Then the personal
+      // look last painted (src/theme/appearance.store.ts), if every part is valid.
       // `grounds` (theme id -> its --qh-ground, for the address bar), the aliases and the fallbacks must match
       // src/theme/registry.ts and src/theme/themes/; the fallbacks are the default (first) theme of each scheme.
       // prepaint.spec.ts enforces it.
@@ -42,6 +43,20 @@
               : (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
+      // `accents` must match ACCENTS in src/theme/appearance.ts; prepaint.spec.ts enforces it.
+      var accents = ['clay', 'orchid', 'ocean', 'mint', 'sunset', 'gold', 'mono'];
+      var look = null;
+      try {
+        look = JSON.parse(localStorage.getItem('qhhoj.paintedAppearance'));
+      } catch {}
+      var isPercent = function (value) {
+        return Number.isInteger(value) && value >= 0 && value <= 100;
+      };
+      if (look && accents.includes(look.accent) && isPercent(look.glass) && isPercent(look.glow)) {
+        document.documentElement.dataset.accent = look.accent;
+        document.documentElement.style.setProperty('--qh-glass-level', String(look.glass));
+        document.documentElement.style.setProperty('--qh-blob-strength', String(look.glow / 100));
+      }
     </script>
   </head>
   <body>

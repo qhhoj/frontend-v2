@@ -23,6 +23,9 @@ afterEach(() => {
   const unmatched = takeUnmatchedRequests();
   localStorage.clear();
   delete document.documentElement.dataset.theme;
+  delete document.documentElement.dataset.accent;
+  document.documentElement.style.removeProperty('--qh-glass-level');
+  document.documentElement.style.removeProperty('--qh-blob-strength');
   document.documentElement.style.colorScheme = '';
   document.documentElement.lang = '';
   i18n.global.locale.value = DEFAULT_LOCALE;
