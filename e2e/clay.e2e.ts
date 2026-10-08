@@ -90,6 +90,7 @@ test.describe('a signed-in reload', () => {
       // The browser's own choice is Clay; the last painted theme came from the account.
       localStorage.setItem('qhhoj.theme', 'clay-light');
       localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
+      localStorage.setItem('qhhoj.resolvedBy', 'account');
       const painted: (string | null)[] = [];
       (window as unknown as { painted: unknown }).painted = painted;
       // `documentElement` does not exist yet when init scripts run; observe the document.
@@ -114,5 +115,39 @@ test.describe('a signed-in reload', () => {
       return [...painted, document.documentElement.dataset.theme].filter(Boolean);
     });
     expect(new Set(themes)).toEqual(new Set(['glass-dark']));
+  });
+});
+
+test.describe('an anonymous auto visitor', () => {
+  test('whose last visit painted dark loads with the OS now light and only ever paints light', async ({
+    page,
+    api,
+  }) => {
+    void api;
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.addInitScript(() => {
+      localStorage.setItem('qhhoj.resolvedTheme', 'clay-dark');
+      localStorage.setItem('qhhoj.resolvedBy', 'local');
+      const painted: (string | null)[] = [];
+      (window as unknown as { painted: unknown }).painted = painted;
+      new MutationObserver((records) =>
+        painted.push(...records.map((record) => record.oldValue)),
+      ).observe(document, {
+        subtree: true,
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ['data-theme'],
+      });
+    });
+    await page.goto('/blog');
+    await expect(
+      page.getByRole('banner').getByRole('button', { name: /Đổi giao diện/ }),
+    ).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    const themes = await page.evaluate(() => {
+      const { painted } = window as unknown as { painted: (string | null)[] };
+      return [...painted, document.documentElement.dataset.theme].filter(Boolean);
+    });
+    expect(new Set(themes)).toEqual(new Set(['clay-light']));
   });
 });

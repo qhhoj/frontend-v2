@@ -36,10 +36,13 @@ test('choosing a theme item with the keyboard applies it and returns focus to th
   await trigger.focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('menu')).toBeFocused();
-  // The menu lists the Clay themes first, in registry order; the first ArrowDown enters it, each next one steps.
+  // Step down by name, not by count: the order of the menu is not this test's business.
   const target = THEMES.find((theme) => theme.scheme === 'light')!; // Clay light
-  for (let step = 0; step < THEMES.indexOf(target) + 1; step += 1)
+  for (let step = 0; step < THEMES.length + 2; step += 1) {
     await page.keyboard.press('ArrowDown');
+    const activeId = await page.getByRole('menu').getAttribute('aria-activedescendant');
+    if ((await page.locator(`[id="${activeId}"]`).innerText()).trim() === 'Clay sáng') break;
+  }
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', target.id);
   await expect(page.getByRole('menu')).toBeHidden();

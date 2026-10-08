@@ -169,6 +169,29 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
         expect(contrastRatio(colour(token), base), `--qh-${token}`).toBeGreaterThanOrEqual(3);
   });
 
+  it('keeps the first-solve tint apart from the wrong-answer tint, and its text readable', () => {
+    const entry = THEMES.find((theme) => theme.id === id)!;
+    if (entry.glass) return;
+    const card = colour('surface-solid');
+    const hueOf = (tint: string) => {
+      const [red, green, blue] = over(colour(tint), card);
+      const [max, min] = [Math.max(red, green, blue), Math.min(red, green, blue)];
+      const hue =
+        max === red
+          ? ((green - blue) / (max - min)) * 60
+          : max === green
+            ? (2 + (blue - red) / (max - min)) * 60
+            : (4 + (red - green) / (max - min)) * 60;
+      return (hue + 360) % 360;
+    };
+    const gap = Math.abs(hueOf('first-solve-bg') - hueOf('verdict-wa-bg'));
+    expect(Math.min(gap, 360 - gap)).toBeGreaterThanOrEqual(30);
+    for (const tint of ['first-solve-bg', 'first-solve-bg-2'])
+      expect(
+        contrastRatio(colour('first-solve-text'), over(colour(tint), card)),
+      ).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('gives the six syntax tokens six different colours', () => {
     const values = SYNTAX_TOKENS.map((name) => tokens.get(name));
     expect(new Set(values).size).toBe(SYNTAX_TOKENS.length);

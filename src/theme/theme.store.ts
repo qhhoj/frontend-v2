@@ -7,6 +7,8 @@ import type { ColorScheme } from './registry';
 const PREFERENCE_KEY = 'qhhoj.theme';
 /** The theme last painted, whatever chose it. Read by the pre-paint script in index.html to avoid a flash. */
 const RESOLVED_KEY = 'qhhoj.resolvedTheme';
+/** Who painted it: `account` (an adopted `siteTheme`) or `local` (the browser preference and the OS). Only account paints are held at start-up. */
+const RESOLVED_BY_KEY = 'qhhoj.resolvedBy';
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
 /** No preference counts as light: Clay & ivory is light-first. */
@@ -18,9 +20,10 @@ export const useThemeStore = defineStore('theme', () => {
   /** The signed-in account's `siteTheme`; it outranks the browser preference until `adopt(null)`. */
   const accountTheme = ref<string | null>(null);
 
-  // The pre-painted theme stays, whatever the preference, until the account, a choice or the OS says otherwise.
+  // A theme painted from the account stays until the account, a choice or the OS says otherwise: the local
+  // preference cannot know the account's theme, while `auto` and `glass-auto` resolve afresh by today's OS scheme.
   const cachedTheme = THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY));
-  const holdingCache = ref(cachedTheme !== undefined);
+  const holdingCache = ref(cachedTheme !== undefined && readStorage(RESOLVED_BY_KEY) === 'account');
 
   const media = typeof matchMedia === 'function' ? matchMedia(DARK_QUERY) : undefined;
   const systemScheme = ref(schemeOf(media?.matches ?? false));
@@ -48,7 +51,10 @@ export const useThemeStore = defineStore('theme', () => {
       document
         .querySelector('meta[name="theme-color"]')
         ?.setAttribute('content', getComputedStyle(root).getPropertyValue('--qh-ground').trim());
-      if (!holdingCache.value) writeStorage(RESOLVED_KEY, active.id);
+      if (!holdingCache.value) {
+        writeStorage(RESOLVED_KEY, active.id);
+        writeStorage(RESOLVED_BY_KEY, accountTheme.value === null ? 'local' : 'account');
+      }
     },
     { immediate: true },
   );

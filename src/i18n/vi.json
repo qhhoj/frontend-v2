@@ -224,7 +224,7 @@
       "time": "Thời gian"
     },
     "legend": {
-      "firstSolve": "Hồng–tím: giải đầu tiên",
+      "firstSolve": "giải đầu tiên",
       "solved": "+n: giải sau n lần sai, kèm thời điểm",
       "failed": "−n: n lần sai",
       "pending": "?n: chờ công bố"

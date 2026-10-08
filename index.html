@@ -6,7 +6,8 @@
     <title>QHHOJ</title>
     <meta name="theme-color" content="#faf9f5" />
     <script>
-      // Pre-paint: the theme last painted (src/theme/theme.store.ts), else the stored preference, else the OS scheme.
+      // Pre-paint: the theme last painted when the account chose it (src/theme/theme.store.ts), else the stored
+      // preference, else the OS scheme (`auto` follows today's scheme, not the last visit's).
       // `grounds` (theme id -> its --qh-ground, for the address bar), the aliases and the fallbacks must match
       // src/theme/registry.ts and src/theme/themes/; the fallbacks are the default (first) theme of each scheme.
       // prepaint.spec.ts enforces it.
@@ -19,23 +20,26 @@
       var legacy = { light: 'clay-light', dark: 'clay-dark' };
       var known = Object.keys(grounds);
       var stored = null;
+      var resolvedBy = null;
       var preference = null;
       var prefersDark = false;
       try {
         stored = localStorage.getItem('qhhoj.resolvedTheme');
+        resolvedBy = localStorage.getItem('qhhoj.resolvedBy');
         preference = localStorage.getItem('qhhoj.theme');
       } catch {}
       try {
         prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
       } catch {}
       var scheme = prefersDark ? 'dark' : 'light';
-      var theme = known.includes(stored)
-        ? stored
-        : known.includes(preference)
-          ? preference
-          : Object.prototype.hasOwnProperty.call(legacy, preference)
-            ? legacy[preference]
-            : (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
+      var theme =
+        resolvedBy === 'account' && known.includes(stored)
+          ? stored
+          : known.includes(preference)
+            ? preference
+            : Object.prototype.hasOwnProperty.call(legacy, preference)
+              ? legacy[preference]
+              : (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
     </script>

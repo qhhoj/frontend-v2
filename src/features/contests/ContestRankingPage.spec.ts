@@ -55,6 +55,19 @@ describe('contest ranking', () => {
     expect(cellTexts(rowOf(wrapper, 'user_12'))).toContain('−4');
   });
 
+  it('explains the first-solve marker by a swatch and a star, never by a colour name', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const legend = wrapper.get('ul.border-t');
+    const firstSolve = legend.findAll('li')[0]!;
+    expect(firstSolve.text()).toBe('giải đầu tiên');
+    expect(firstSolve.get('[data-testid="first-solve-swatch"]').classes()).toContain(
+      'bg-first-solve',
+    );
+    expect(firstSolve.find('svg').exists()).toBe(true);
+    expect(legend.text()).not.toMatch(/hồng|tím|pink|violet|đỏ|vàng/i);
+  });
+
   it('renders frozen cells and the banner', async () => {
     mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42/ranking');

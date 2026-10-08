@@ -60,7 +60,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - Radii (tokens): `rounded-cell` 12 px, `rounded-row` 16 px, `rounded-tile` 20 px (inner tiles, submit), `rounded-card` 24 px, `rounded-panel` 28 px (swap card), `rounded-pill` 999 px.
 - Depth is hairlines and tone steps in Clay; Glass has blur 24 px. No drop shadows (the live-dot glow exists in Glass only).
 - Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover.
-- `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`, or no `backdrop-filter` support: surfaces are opaque (`--qh-surface-solid`) and blur is 0. Clay is already opaque; Glass becomes opaque.
+- `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`: the card surface is opaque (`--qh-surface-solid`) and blur is 0. No `backdrop-filter` support: the card surface is opaque; inner tiles and hover rows keep their Glass tint. Clay is already opaque.
 
 ## Components
 
@@ -69,7 +69,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - **Primary button**: `bg-gradient-accent` + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
 - **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.
 - **Verdict badge**: 40 px circle (`size-10`), verdict tint, abbreviation + accessible full label.
-- **Ranking cell**: `rounded-cell` block; first solve = accent tint (`bg-first-solve`); pending = `?n`.
+- **Ranking cell**: `rounded-cell` block; first solve = `bg-first-solve` with a star: pink-violet in Glass, gold/amber in Clay (kept apart from the red wrong-answer tint; `themes.spec.ts` checks the hue gap and 4.5:1 text); pending = `?n`.
 - **Overlays** (menus, popovers): opaque `bg-surface-solid`.
 
 ## Rules

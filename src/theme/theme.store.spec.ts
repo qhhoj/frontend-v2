@@ -5,6 +5,10 @@ import { stubMatchMedia } from '@/test/match-media';
 import { useThemeStore } from './theme.store';
 
 const appliedTheme = () => document.documentElement.dataset.theme;
+const paintedByAccount = (id: string) => {
+  localStorage.setItem('qhhoj.resolvedTheme', id);
+  localStorage.setItem('qhhoj.resolvedBy', 'account');
+};
 
 describe('useThemeStore', () => {
   beforeEach(() => setActivePinia(createPinia()));
@@ -124,7 +128,7 @@ describe('useThemeStore', () => {
   });
 
   it('keeps the pre-painted theme through init and adopt, with no repaint (legacy account: light, OS dark)', async () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'clay-light');
+    paintedByAccount('clay-light');
     document.documentElement.dataset.theme = 'clay-light';
     stubMatchMedia({ dark: true });
     const repaints: MutationRecord[] = [];
@@ -142,7 +146,7 @@ describe('useThemeStore', () => {
   });
 
   it('keeps the cached theme at init until the account or the OS says otherwise', () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     stubMatchMedia({ dark: true });
     const write = vi.spyOn(Storage.prototype, 'setItem');
     useThemeStore();
@@ -153,7 +157,7 @@ describe('useThemeStore', () => {
 
   it('keeps a cached Glass theme for a stored glass-auto, with no repaint', () => {
     localStorage.setItem('qhhoj.theme', 'glass-auto');
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     document.documentElement.dataset.theme = 'glass-light';
     stubMatchMedia({ dark: true });
     const write = vi.spyOn(Storage.prototype, 'setItem');
@@ -165,14 +169,14 @@ describe('useThemeStore', () => {
 
   it('keeps a cached Clay theme for a stored glass-auto until the account or the OS says otherwise', () => {
     localStorage.setItem('qhhoj.theme', 'glass-auto');
-    localStorage.setItem('qhhoj.resolvedTheme', 'clay-light');
+    paintedByAccount('clay-light');
     stubMatchMedia({ dark: false });
     useThemeStore();
     expect(appliedTheme()).toBe('clay-light');
   });
 
   it('re-resolves from the OS when the system scheme changes while the cache is held', async () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     const media = stubMatchMedia({ dark: false });
     useThemeStore();
     media.setDark(true);
@@ -180,8 +184,48 @@ describe('useThemeStore', () => {
     expect(appliedTheme()).toBe('clay-dark');
   });
 
+  it('resolves a locally painted cache by the OS today: auto follows the current scheme', () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'clay-dark');
+    localStorage.setItem('qhhoj.resolvedBy', 'local');
+    stubMatchMedia({ dark: false });
+    useThemeStore();
+    expect(appliedTheme()).toBe('clay-light');
+    expect(localStorage.getItem('qhhoj.resolvedTheme')).toBe('clay-light');
+  });
+
+  it('resolves a cache with no marker, such as one from an older version, locally', () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
+    localStorage.setItem('qhhoj.theme', 'glass-auto');
+    stubMatchMedia({ dark: false });
+    useThemeStore();
+    expect(appliedTheme()).toBe('glass-light');
+  });
+
+  it('a locally painted cache gives way to the stored fixed preference', () => {
+    localStorage.setItem('qhhoj.resolvedTheme', 'clay-dark');
+    localStorage.setItem('qhhoj.resolvedBy', 'local');
+    localStorage.setItem('qhhoj.theme', 'glass-light');
+    useThemeStore();
+    expect(appliedTheme()).toBe('glass-light');
+  });
+
+  it('marks what it paints: account after adopt, local after sign-out or a choice', async () => {
+    const store = useThemeStore();
+    expect(localStorage.getItem('qhhoj.resolvedBy')).toBe('local');
+    store.adopt('glass-dark');
+    await nextTick();
+    expect(localStorage.getItem('qhhoj.resolvedBy')).toBe('account');
+    store.adopt(null);
+    await nextTick();
+    expect(localStorage.getItem('qhhoj.resolvedBy')).toBe('local');
+    store.adopt('glass-dark');
+    store.choose('clay-dark');
+    await nextTick();
+    expect(localStorage.getItem('qhhoj.resolvedBy')).toBe('local');
+  });
+
   it('ignores a cached id that is no longer registered', () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'neon-retired');
+    paintedByAccount('neon-retired');
     stubMatchMedia({ dark: false });
     useThemeStore();
     expect(appliedTheme()).toBe('clay-light');
@@ -189,7 +233,7 @@ describe('useThemeStore', () => {
 
   it('keeps the cached theme over an explicit local choice at start-up, until a choice is made', async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     const store = useThemeStore();
     expect(appliedTheme()).toBe('glass-light');
     store.choose('dark');
@@ -199,7 +243,7 @@ describe('useThemeStore', () => {
 
   it('adopts the account theme that is already painted with no repaint, whatever the local choice', async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     document.documentElement.dataset.theme = 'glass-light';
     const repaints: MutationRecord[] = [];
     const observer = new MutationObserver((records) => repaints.push(...records));
@@ -264,7 +308,7 @@ describe('useThemeStore', () => {
   });
 
   it('applies the account theme over a held cache and rewrites the cache', async () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
+    paintedByAccount('glass-dark');
     const store = useThemeStore();
     store.adopt('light');
     await nextTick();
@@ -273,7 +317,7 @@ describe('useThemeStore', () => {
   });
 
   it('resolves from the OS when sign-out arrives while the cache is held', async () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-dark');
+    paintedByAccount('glass-dark');
     stubMatchMedia({ dark: false });
     const store = useThemeStore();
     store.adopt(null);
@@ -294,7 +338,7 @@ describe('useThemeStore', () => {
 
   it('treats a stored auto preference as no explicit choice for the cache hold', () => {
     localStorage.setItem('qhhoj.theme', 'auto');
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    paintedByAccount('glass-light');
     stubMatchMedia({ dark: true });
     useThemeStore();
     expect(appliedTheme()).toBe('glass-light');

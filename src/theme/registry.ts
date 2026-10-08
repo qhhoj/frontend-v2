@@ -5,7 +5,7 @@ export interface ThemeDefinition {
   id: string;
   labelKey: string;
   scheme: ColorScheme;
-  /** Frosted surfaces over background blobs (Glass). Flat themes (Clay) ignore the personal Glass and Glow levels. */
+  /** Frosted surfaces over background blobs (Glass); flat themes (Clay) are opaque with no blobs. */
   glass: boolean;
 }
 

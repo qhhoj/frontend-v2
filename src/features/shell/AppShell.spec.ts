@@ -179,6 +179,7 @@ describe('app shell', () => {
 
   it('keeps the pre-painted account theme while the profile is still loading', async () => {
     localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    localStorage.setItem('qhhoj.resolvedBy', 'account');
     document.documentElement.dataset.theme = 'glass-light';
     mockApi({
       'GET /auth/me': signedIn(),

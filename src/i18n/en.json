@@ -224,7 +224,7 @@
       "time": "Time"
     },
     "legend": {
-      "firstSolve": "Pink–violet: first solve",
+      "firstSolve": "first solve",
       "solved": "+n: solved after n wrong tries, with the time",
       "failed": "−n: n wrong tries",
       "pending": "?n: waiting to be revealed"

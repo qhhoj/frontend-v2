@@ -54,13 +54,14 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - The theme menu lists the six preferences grouped by style (Clay, then Glass; each style's themes, then its automatic option); a Style × Mode control is left to the appearance panel (8g).
 - Clay mock-up values adjusted by measurement: link and focus ring `#B4532F` to `#A64A28`, AC/positive `#15803D` to `#166534`, `tier-master` `#B45309` to `#9A3412`, `accent-2` `#D97757` to `#9A3F22`, dark button text charcoal `#1A1816` instead of white — never by loosening the spec.
 - Syntax tokens (`--qh-syntax-*`) live in the four theme files since this change (8c reuses them); Glass values moved: dark comment `#C4B9E0`, light number `#7C5200`, light function `#09617F`.
-- Hairlines stay decorative (`#E8E2D8` is 1.2:1 on ivory, like Glass's 10 % white): inputs and inner tiles are told apart by `surface-strong`, not by their border.
+- Clay's first-solve tint is gold/amber (Bit's accent family) with the star kept, so it reads apart from the red wrong-answer tint; `themes.spec.ts` checks the hue gap and 4.5:1 text. The ranking legend names no colour: a swatch and the star.
+- Hairlines stay decorative (`#E8E2D8` is 1.2:1 on ivory, like Glass's 10 % white): inputs and inner tiles are told apart by `surface-strong`, not by their border; menus, Select and popovers use `line-strong` so they separate from white cards.
 - Theme preference resolves through the registry: `auto`, `glass-auto`, a stored value or a theme id; an unknown value falls back to the Clay theme of the OS scheme — legacy and backend values always render; the legacy `light`/`dark` resolve to Clay.
 - `choose()` is a user action: it applies the theme and remembers it in this browser; signed in, the menu also saves it as `siteTheme`, and a failed save keeps the local choice — the account is the cross-device truth.
 - `adopt()` applies the account's theme without writing the browser preference — the account default must not overwrite the browser's own choice on each sign-in; `adopt(null)` on sign-out returns to the browser choice, then the OS.
-- A cached theme (`qhhoj.resolvedTheme`) is held at start-up for every preference, until `adopt`, `choose` or an OS scheme change releases it — no repaint of the theme already on screen.
-- The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) — no flash of the wrong theme. It repeats the registry ids and each theme's ground (address-bar colour); `prepaint.spec.ts` enforces that they match.
-- Glass: reduced transparency or no `backdrop-filter`: blur 0 and opaque surfaces (Clay is always opaque); reduced motion: durations 0 — glass stays readable.
+- The store writes `qhhoj.resolvedBy` (`account` or `local`) with `qhhoj.resolvedTheme`. A cached theme is held at start-up only when the account painted it, until `adopt`, `choose` or an OS scheme change releases it — a signed-in account's theme never flashes; `auto` and `glass-auto` resolve by today's OS scheme, so an OS change between visits does not repaint.
+- The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) when `qhhoj.resolvedBy` is `account`, else the local preference — no flash of the wrong theme. It repeats the registry ids and each theme's ground (address-bar colour); `prepaint.spec.ts` enforces that they match.
+- Glass: reduced transparency: card surface opaque and blur 0; no `backdrop-filter` support: card surface opaque, inner tiles and hover rows keep their Glass tint (Clay is always opaque); reduced motion: durations 0 — glass stays readable.
 - Background blobs: phones get two 300 px blobs; blob-3 is hidden below 768 px wide or at 759 px high and under — on narrow or short screens its centre would sink into blob-2 and break contrast.
 
 ## User content
@@ -103,7 +104,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 |---|---|---|
 | B1 | OpenAPI response schemas (`dtoFileNameSuffix` including `.response.ts`, fix circular refs, paginated response helper) | generated DTO types |
 | B2 | `siteTheme` (and `languageId`) on `GET /auth/me` | one request fewer at boot |
-| B3 | `siteTheme` default `auto` for new users; accept registered theme ids | done in backend plan S Task 10 (any `^[a-z][a-z0-9-]{0,31}$`) |
+| B3 | `siteTheme` default `auto` for new users; accept registered theme ids | done in backend-v2 263ec51 (`SITE_THEME_PATTERN`: any `^[a-z][a-z0-9-]{0,31}$`) |
 | B4 | `ranking` event on `contest-events` after a participation recompute | live ranking without polling |
 | B5 | `rating` and first organization short name on ranking row users | tier colours, captions |
 | B6 | `solved=false` filter on `GET /problems` | "Chưa giải" chip |

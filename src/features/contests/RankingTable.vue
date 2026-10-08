@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
@@ -26,7 +27,6 @@ const cellsOf = (row: RankingRow) =>
     view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.context),
   }));
 const LEGEND = [
-  'ranking.legend.firstSolve',
   'ranking.legend.solved',
   'ranking.legend.failed',
   'ranking.legend.pending',
@@ -113,6 +113,14 @@ const LEGEND = [
     v-if="penalty"
     class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-[13px] text-muted"
   >
+    <li class="flex items-center gap-1.5">
+      <span
+        data-testid="first-solve-swatch"
+        class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
+        ><Star class="size-3"
+      /></span>
+      {{ $t('ranking.legend.firstSolve') }}
+    </li>
     <li v-for="key in LEGEND" :key="key">{{ $t(key) }}</li>
   </ul>
 </template>

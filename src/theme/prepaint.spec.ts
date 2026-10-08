@@ -36,6 +36,7 @@ const PREFERENCES = [
 /** Runs the real inline script against a stand-in page. */
 function prepaint({
   stored = null as string | null,
+  resolvedBy = 'account' as string | null,
   preference = null as string | null,
   dark = false,
   storageThrows = false,
@@ -49,7 +50,9 @@ function prepaint({
   const localStorageStub = {
     getItem: (key: string) => {
       if (storageThrows) throw new Error('storage blocked');
-      return key === 'qhhoj.resolvedTheme' ? stored : key === 'qhhoj.theme' ? preference : null;
+      if (key === 'qhhoj.resolvedTheme') return stored;
+      if (key === 'qhhoj.resolvedBy') return resolvedBy;
+      return key === 'qhhoj.theme' ? preference : null;
     },
   };
   const matchMediaStub = (query: string) => {
@@ -91,6 +94,22 @@ describe('pre-paint script in index.html', () => {
         );
   });
 
+  it('paints the last painted theme only when the account chose it; a local paint resolves by the OS today', () => {
+    expect(prepaint({ stored: 'clay-dark', resolvedBy: 'local', dark: false }).theme).toBe(
+      'clay-light',
+    );
+    expect(prepaint({ stored: 'clay-dark', resolvedBy: null, dark: false }).theme).toBe(
+      'clay-light',
+    );
+    expect(
+      prepaint({ stored: 'clay-dark', resolvedBy: 'local', preference: 'glass-auto', dark: false })
+        .theme,
+    ).toBe('glass-light');
+    expect(prepaint({ stored: 'clay-dark', resolvedBy: 'account', dark: false }).theme).toBe(
+      'clay-dark',
+    );
+  });
+
   it('keeps the last painted theme for every preference, as the store does', () => {
     for (const preference of [null, ...PREFERENCES])
       expect(prepaint({ stored: 'glass-light', preference, dark: true }).theme).toBe('glass-light');
@@ -122,20 +141,23 @@ describe('pre-paint script in index.html', () => {
 
   it('paints what the store resolves at start-up, for every preference, cache and OS scheme', () => {
     for (const preference of [null, ...PREFERENCES])
-      for (const cache of [null, 'clay-light', 'clay-dark', 'glass-light', 'glass-dark'])
-        for (const dark of [false, true]) {
-          localStorage.clear();
-          if (preference !== null) localStorage.setItem('qhhoj.theme', preference);
-          if (cache !== null) localStorage.setItem('qhhoj.resolvedTheme', cache);
-          delete document.documentElement.dataset.theme;
-          stubMatchMedia({ dark });
-          setActivePinia(createPinia());
-          const fromStore = useThemeStore().theme.id;
-          const painted = prepaint({ stored: cache, preference, dark });
-          expect(painted.theme, `preference ${preference}, cache ${cache}, OS dark ${dark}`).toBe(
-            fromStore,
-          );
-          expect(painted.themeColor).toBe(groundOfThemeFile(fromStore));
-        }
+      for (const cache of [null, ...THEMES.map((theme) => theme.id)])
+        for (const resolvedBy of ['account', 'local', null])
+          for (const dark of [false, true]) {
+            localStorage.clear();
+            if (preference !== null) localStorage.setItem('qhhoj.theme', preference);
+            if (cache !== null) localStorage.setItem('qhhoj.resolvedTheme', cache);
+            if (resolvedBy !== null) localStorage.setItem('qhhoj.resolvedBy', resolvedBy);
+            delete document.documentElement.dataset.theme;
+            stubMatchMedia({ dark });
+            setActivePinia(createPinia());
+            const fromStore = useThemeStore().theme.id;
+            const painted = prepaint({ stored: cache, resolvedBy, preference, dark });
+            expect(
+              painted.theme,
+              `preference ${preference}, cache ${cache} by ${resolvedBy}, OS dark ${dark}`,
+            ).toBe(fromStore);
+            expect(painted.themeColor).toBe(groundOfThemeFile(fromStore));
+          }
   });
 });

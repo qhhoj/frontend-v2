@@ -9,7 +9,9 @@ export const primeVuePreset: PrimeVuePTOptions = {
     },
     label: { class: 'flex-1 truncate py-2 focus-visible:outline-none' },
     dropdown: { class: 'flex w-10 items-center justify-center text-muted' },
-    overlay: { class: 'mt-2 rounded-tile border border-line bg-surface-solid p-1 text-content' },
+    overlay: {
+      class: 'mt-2 rounded-tile border border-line-strong bg-surface-solid p-1 text-content',
+    },
     listContainer: { class: 'max-h-72 overflow-auto' },
     list: { class: 'm-0 list-none p-0' },
     option: ({ context }) => ({
@@ -21,8 +23,10 @@ export const primeVuePreset: PrimeVuePTOptions = {
     }),
   },
   menu: {
-    root: { class: 'min-w-52 rounded-tile border border-line bg-surface-solid p-1 text-content' },
-    list: { class: 'm-0 list-none p-0' },
+    root: {
+      class: 'min-w-52 rounded-tile border border-line-strong bg-surface-solid p-1 text-content',
+    },
+    list: { class: 'm-0 list-none rounded-tile p-0' },
     item: ({ context }) => ({
       class: [
         'rounded-cell',
@@ -37,6 +41,8 @@ export const primeVuePreset: PrimeVuePTOptions = {
     separator: { class: 'my-1 border-t border-line' },
   },
   popover: {
-    root: { class: 'z-50 mt-2 rounded-tile border border-line bg-surface-solid p-4 text-content' },
+    root: {
+      class: 'z-50 mt-2 rounded-tile border border-line-strong bg-surface-solid p-4 text-content',
+    },
   },
 };
