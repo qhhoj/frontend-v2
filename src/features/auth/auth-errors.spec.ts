@@ -11,16 +11,9 @@ import {
 } from './auth-errors';
 
 const banned = (extra: Record<string, unknown> = {}) =>
-  new ApiError(
-    'banned',
-    403,
-    'This account has been banned. Reason: from the message',
-    {},
-    [],
-    extra,
-  );
+  new ApiError('banned', 403, 'This account has been banned. Reason: from the message', { extra });
 const rejected = (issues: FieldIssue[], fields: Record<string, string[]> = {}) =>
-  new ApiError('validation_failed', 400, 'Registration rejected', fields, issues);
+  new ApiError('validation_failed', 400, 'Registration rejected', { fields, issues });
 const issue = (field: string, code: string, message: string): FieldIssue => ({
   field,
   code,
@@ -36,7 +29,7 @@ describe('banReason', () => {
     ['a blank reason', banned({ banReason: '  ' })],
     ['no member (the message still says Reason:)', banned()],
     ['a member that is not text', banned({ banReason: 7 })],
-    ['another code', new ApiError('forbidden', 403, 'x', {}, [], { banReason: 'r' })],
+    ['another code', new ApiError('forbidden', 403, 'x', { extra: { banReason: 'r' } })],
     ['not an ApiError', new Error('Reason: x')],
   ])('is null for %s', (_name, error) => {
     expect(banReason(error)).toBeNull();

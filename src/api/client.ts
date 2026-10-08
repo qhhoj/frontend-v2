@@ -25,19 +25,32 @@ export interface FieldIssue {
  * A failed request: the backend's `{ error: { code, message, fields?, issues?, ...extra } }`, or `network_error` / `invalid_response`.
  * `extra` holds the members `AppError` merges next to `code` and `message` (`banReason` of a banned login, B8).
  */
+export interface ApiErrorDetails {
+  fields?: Record<string, string[]>;
+  issues?: FieldIssue[];
+  extra?: Record<string, unknown>;
+  /** `Retry-After` in whole seconds when the backend sent one (a 429 names the wait). */
+  retryAfterSeconds?: number | null;
+}
+
 export class ApiError extends Error {
+  readonly fields: Record<string, string[]>;
+  readonly issues: FieldIssue[];
+  readonly extra: Record<string, unknown>;
+  readonly retryAfterSeconds: number | null;
+
   constructor(
     readonly code: string,
     readonly status: number,
     message: string,
-    readonly fields: Record<string, string[]> = {},
-    readonly issues: FieldIssue[] = [],
-    readonly extra: Record<string, unknown> = {},
-    /** `Retry-After` in whole seconds when the backend sent one (a 429 names the wait); null otherwise. */
-    readonly retryAfterSeconds: number | null = null,
+    details: ApiErrorDetails = {},
   ) {
     super(message);
     this.name = 'ApiError';
+    this.fields = details.fields ?? {};
+    this.issues = details.issues ?? [];
+    this.extra = details.extra ?? {};
+    this.retryAfterSeconds = details.retryAfterSeconds ?? null;
   }
 }
 
@@ -133,10 +146,12 @@ async function errorOf(response: Response): Promise<ApiError> {
     response.status,
     message ?? response.statusText,
     // A `null` (or otherwise malformed) member is as good as absent.
-    fields && typeof fields === 'object' && !Array.isArray(fields) ? fields : undefined,
-    Array.isArray(issues) ? issues : undefined,
-    extra,
-    retryAfterSecondsOf(response),
+    {
+      fields: fields && typeof fields === 'object' && !Array.isArray(fields) ? fields : undefined,
+      issues: Array.isArray(issues) ? issues : undefined,
+      extra,
+      retryAfterSeconds: retryAfterSecondsOf(response),
+    },
   );
 }
 

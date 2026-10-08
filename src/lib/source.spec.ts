@@ -106,7 +106,7 @@ describe('submitErrorKey', () => {
     message: 'English text',
   });
   const refusal = (code: string, status: number, ...issues: FieldIssue[]) =>
-    new ApiError(code, status, 'English text', {}, issues);
+    new ApiError(code, status, 'English text', { issues });
 
   it('maps each field issue the submit routes can send to its own message, by code and never by the English text', () => {
     const cases: Array<[FieldIssue, string]> = [

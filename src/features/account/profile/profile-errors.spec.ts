@@ -5,12 +5,12 @@ import { invalidSummary, lengthErrors, saveErrorText, serverFieldErrors } from '
 
 /** What the backend answers today: `issues` (code + field) next to the older `fields` map. */
 const issuesError = (field: string, code: string) =>
-  new ApiError('validation_failed', 400, 'Bad', {}, [
-    issue(field, code, `English prose about ${field}`),
-  ]);
+  new ApiError('validation_failed', 400, 'Bad', {
+    issues: [issue(field, code, `English prose about ${field}`)],
+  });
 /** An older backend, and the fallback for a field without an issue code. */
 const fieldsError = (fields: Record<string, string[]>) =>
-  new ApiError('validation_failed', 400, 'Bad', fields);
+  new ApiError('validation_failed', 400, 'Bad', { fields });
 
 describe('serverFieldErrors', () => {
   it.each([

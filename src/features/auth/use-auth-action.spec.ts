@@ -32,7 +32,7 @@ function mountForm(visibleFields: readonly string[]) {
 
 const rejected = (error: Error) => () => Promise.reject(error);
 const validation = (...issues: FieldIssue[]) =>
-  new ApiError('validation_failed', 400, 'x', {}, issues);
+  new ApiError('validation_failed', 400, 'x', { issues });
 const taken = (field: string) => ({ field, code: 'username_taken', message: 'Username is taken.' });
 
 describe('useAuthAction', () => {
@@ -116,7 +116,7 @@ describe('useAuthAction', () => {
   it('still reads an answer that has fields but no issues', async () => {
     const action = mountForm(['first']);
     await action.run(
-      rejected(new ApiError('validation_failed', 400, 'x', { first: ['Username is taken.'] })),
+      rejected(new ApiError('validation_failed', 400, 'x', { fields: { first: ['Username is taken.'] } })),
     );
     expect(action.fieldErrors.value).toEqual({ first: 'Username is taken.' });
   });
