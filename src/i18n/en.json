@@ -156,6 +156,37 @@
       "closedBody": "Statistics show after the contest ends or when the organizers make the submission list public.",
       "toRanking": "See the ranking",
       "region": "Statistics table, scrolls sideways"
+    },
+    "actions": {
+      "signIn": "Sign in to take part",
+      "join": "Enter",
+      "rejoin": "Back to the contest",
+      "register": "Register",
+      "spectate": "Spectate",
+      "virtual": "Start a virtual run",
+      "opensAt": "Enter (opens at {time})",
+      "registeredBadge": "You are registered",
+      "finished": "Your time is over.",
+      "registrationClosed": "Registration for this contest is closed.",
+      "virtualDisallowed": "The organizers do not allow virtual runs of this contest.",
+      "virtualNote": "Virtual run: solve the set within {span} from your start. Results show on the board only with “Include virtual”.",
+      "spectateNote": "You set this contest, so you enter as a spectator and score nothing.",
+      "inContest": "You are in this contest",
+      "since": "since {time}",
+      "spectating": "Spectating",
+      "virtualRunning": "Virtual run #{run} running",
+      "leave": "Leave contest",
+      "leaveNote": "Leaving only exits contest mode. Your score stays and you can come back while the contest runs.",
+      "codeTitle": "Enter the access code",
+      "codeBody": "“{name}” needs a code from the organizers.",
+      "codeLabel": "Access code",
+      "codeHint": "The code is case-sensitive.",
+      "cancel": "Cancel",
+      "done": {
+        "join": "You entered the contest.",
+        "register": "You registered for the contest.",
+        "leave": "You left the contest."
+      }
     }
   },
   "placeholder": {
@@ -387,7 +418,8 @@
     "you": "You",
     "copy": "Copy",
     "copied": "Copied",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "cancel": "Cancel"
   },
   "verdicts": {
     "AC": "Accepted",

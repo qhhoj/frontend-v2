@@ -156,6 +156,37 @@
       "closedBody": "Thống kê hiện sau khi kỳ thi kết thúc hoặc khi ban tổ chức công khai danh sách bài nộp.",
       "toRanking": "Xem bảng xếp hạng",
       "region": "Bảng thống kê, cuộn ngang"
+    },
+    "actions": {
+      "signIn": "Đăng nhập để tham gia",
+      "join": "Vào thi",
+      "rejoin": "Quay lại kỳ thi",
+      "register": "Đăng ký",
+      "spectate": "Theo dõi",
+      "virtual": "Bắt đầu thi ảo",
+      "opensAt": "Vào thi (mở lúc {time})",
+      "registeredBadge": "Bạn đã đăng ký",
+      "finished": "Bạn đã hết giờ làm bài.",
+      "registrationClosed": "Kỳ thi này đã đóng đăng ký.",
+      "virtualDisallowed": "Ban tổ chức không cho phép thi ảo kỳ thi này.",
+      "virtualNote": "Thi ảo: làm lại đề trong {span} kể từ lúc bạn bắt đầu. Kết quả chỉ hiện ở bảng khi chọn “Gồm thi ảo”.",
+      "spectateNote": "Bạn là người ra đề, nên vào ở chế độ theo dõi, không tính điểm.",
+      "inContest": "Bạn đang thi",
+      "since": "từ {time}",
+      "spectating": "Đang theo dõi",
+      "virtualRunning": "Thi ảo #{run} đang chạy",
+      "leave": "Rời kỳ thi",
+      "leaveNote": "Rời kỳ thi chỉ thoát khỏi chế độ thi. Điểm giữ nguyên, bạn có thể vào lại khi kỳ thi còn diễn ra.",
+      "codeTitle": "Nhập mã tham gia",
+      "codeBody": "“{name}” cần mã do ban tổ chức cung cấp.",
+      "codeLabel": "Mã tham gia",
+      "codeHint": "Mã phân biệt chữ hoa, chữ thường.",
+      "cancel": "Hủy",
+      "done": {
+        "join": "Bạn đã vào kỳ thi.",
+        "register": "Bạn đã đăng ký kỳ thi.",
+        "leave": "Bạn đã rời kỳ thi."
+      }
     }
   },
   "placeholder": {
@@ -387,7 +418,8 @@
     "you": "Bạn",
     "copy": "Sao chép",
     "copied": "Đã chép",
-    "breadcrumb": "Đường dẫn"
+    "breadcrumb": "Đường dẫn",
+    "cancel": "Hủy"
   },
   "verdicts": {
     "AC": "Chấp nhận",
