@@ -9,6 +9,15 @@
   --qh-radius-card: 24px;
   --qh-radius-panel: 28px;
   --qh-radius-pill: 999px;
+  /* Personal look (appearance.ts): --qh-glass 0 is the theme's own glass, 100 is opaque with no blur; blob strength is the opacity of the blobs. Unset, they equal the site look. */
+  --qh-glass: 0;
+  --qh-blob-strength: 1;
+  --qh-surface-live: color-mix(
+    in srgb,
+    var(--qh-surface-solid) calc(var(--qh-glass) * 1%),
+    var(--qh-surface)
+  );
+  --qh-blur-live: calc(var(--qh-blur) * (100 - var(--qh-glass)) / 100);
   --qh-radius-skeleton: 8px;
   --qh-duration-fast: 150ms;
   --qh-duration: 200ms;

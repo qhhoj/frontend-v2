@@ -1,6 +1,7 @@
 import { profile } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
+import { expectSameColour } from './fixtures/glass-probe';
 
 /** A probe element carrying the `glass` surface class, next to one painted with the opaque fallback token. */
 const measureGlassCard = () => {
@@ -31,7 +32,7 @@ for (const theme of THEMES.filter((entry) => !entry.glass)) {
 
     test('a glass card is the opaque fallback colour with no blur', async ({ page }) => {
       const look = await page.evaluate(measureGlassCard);
-      expect(look.fill).toBe(look.solid);
+      expectSameColour(look.fill, look.solid);
       expect(look.blur).toMatch(/^(none|blur\(0px\))$/);
     });
 

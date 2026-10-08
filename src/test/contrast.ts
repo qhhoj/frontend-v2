@@ -40,3 +40,16 @@ export function contrastRatio(first: Rgba, second: Rgba): number {
   ) as [number, number];
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+/** `top` mixed into `bottom` at `weight` (0-1 of `top`), premultiplied like CSS `color-mix(in srgb, top weight%, bottom)`. */
+export function mixPremultiplied(top: Rgba, bottom: Rgba, weight: number): Rgba {
+  const alpha = top[3] * weight + bottom[3] * (1 - weight);
+  const channel = (topValue: number, bottomValue: number) =>
+    (topValue * top[3] * weight + bottomValue * bottom[3] * (1 - weight)) / alpha;
+  return [
+    channel(top[0], bottom[0]),
+    channel(top[1], bottom[1]),
+    channel(top[2], bottom[2]),
+    alpha,
+  ];
+}

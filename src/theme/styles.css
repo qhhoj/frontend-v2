@@ -27,7 +27,7 @@
   --color-transparent: transparent;
   --color-current: currentColor;
   --color-ground: var(--qh-ground);
-  --color-surface: var(--qh-surface);
+  --color-surface: var(--qh-surface-live);
   --color-surface-strong: var(--qh-surface-strong);
   --color-surface-hover: var(--qh-surface-hover);
   --color-surface-solid: var(--qh-surface-solid);
@@ -83,17 +83,17 @@
   --radius-pill: var(--qh-radius-pill);
   --radius-skeleton: var(--qh-radius-skeleton);
   --shadow-glow: var(--qh-glow);
-  --blur-glass: var(--qh-blur);
+  --blur-glass: var(--qh-blur-live);
   --ease-standard: var(--qh-ease);
   --default-transition-duration: var(--qh-duration-fast);
   --default-transition-timing-function: var(--qh-ease);
 }
 
 @utility glass {
-  background-color: var(--qh-surface);
+  background-color: var(--qh-surface-live);
   border: 1px solid var(--qh-line);
-  -webkit-backdrop-filter: blur(var(--qh-blur));
-  backdrop-filter: blur(var(--qh-blur));
+  -webkit-backdrop-filter: blur(var(--qh-blur-live));
+  backdrop-filter: blur(var(--qh-blur-live));
 }
 @utility bg-gradient-accent {
   background-image: var(--qh-gradient-accent);
@@ -101,6 +101,7 @@
 /* Background blobs are shown or hidden by the theme (`--qh-blob-display`): Clay has none. */
 @utility blob-field {
   display: var(--qh-blob-display);
+  opacity: var(--qh-blob-strength);
 }
 /* Loading indicators keep their own durations (--qh-duration is 0 under reduced motion) and switch themselves off there. */
 @keyframes qh-skeleton-pulse {
