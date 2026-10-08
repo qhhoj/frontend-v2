@@ -50,7 +50,8 @@ const participation = computed(() => {
     <button
       type="button"
       :aria-disabled="isPending || undefined"
-      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line px-5 font-semibold text-negative hover:bg-surface-hover"
+      :aria-busy="isPending || undefined"
+      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line px-5 font-semibold text-negative hover:bg-surface-hover aria-disabled:cursor-progress aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
       @click="!isPending && emit('leave')"
     >
       <LogOut class="size-4" aria-hidden="true" />{{ $t('contests.actions.leave') }}
