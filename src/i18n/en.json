@@ -376,7 +376,8 @@
       "user": "Author",
       "language": "Language",
       "runtime": "Run time",
-      "judge": "Judge"
+      "judge": "Judge",
+      "submitted": "Submitted"
     },
     "pretest": "This submission was graded on the pretests only.",
     "cases": {

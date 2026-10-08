@@ -4,6 +4,7 @@ import {
   formatCaseMemory,
   formatCaseTime,
   formatDate,
+  formatDateTime,
   formatDuration,
   formatElapsed,
   formatFileSize,
@@ -73,6 +74,11 @@ describe('limits', () => {
     expect(formatFileSize(1_887_437)).toBe('1.8 MB');
     expect(formatFileSize(655_360)).toBe('640 KB');
     expect(formatFileSize(0)).toBe('0 KB');
+  });
+});
+describe('formatDateTime', () => {
+  it('shows the UTC date and time in the locale', () => {
+    expect(formatDateTime('2026-10-08T23:30:00Z', 'en')).toBe('Oct 8, 2026, 11:30 PM');
   });
 });
 describe('formatDate', () => {

@@ -76,6 +76,14 @@ export const formatFileSize = (bytes: number) =>
     ? `${(Math.floor((bytes / BYTES_PER_MEGABYTE) * 10) / 10).toFixed(1)} MB`
     : `${Math.round(bytes / 1024)} KB`;
 
+/** The UTC date and time of a timestamp, e.g. `Oct 8, 2026, 10:00 AM`. */
+export const formatDateTime = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(date));
+
 /** The UTC calendar date of a timestamp (the site time zone is not known to the SPA), e.g. `Oct 8, 2026`. */
 export const formatDate = (date: string, locale: Locale) =>
   new Intl.DateTimeFormat(INTL_LOCALES[locale], { dateStyle: 'medium', timeZone: 'UTC' }).format(

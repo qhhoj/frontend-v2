@@ -34,7 +34,9 @@ const NUMBER_COLUMN_COUNT = 3;
             data-skeleton-region="case-row"
             class="border-t border-line"
           >
-            <td class="px-6 py-3 font-mono"><SkeletonBlock text class="w-6" /></td>
+            <th scope="row" class="px-6 py-3 text-left font-mono font-normal">
+              <SkeletonBlock text class="w-6" />
+            </th>
             <td class="px-6 py-3"><SkeletonBlock pill class="h-7 w-32" /></td>
             <td
               v-for="column in NUMBER_COLUMN_COUNT"

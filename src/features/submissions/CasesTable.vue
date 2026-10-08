@@ -4,8 +4,9 @@ import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/su
 import GlassCard from '@/components/GlassCard.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
-import { formatCaseMemory, formatCaseTime } from '@/lib/format';
+import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
 import { verdictOf } from '@/lib/verdicts';
+import { useLocaleStore } from '@/stores/locale.store';
 
 /** Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = defineProps<{
@@ -13,15 +14,19 @@ const props = defineProps<{
   batches: SubmissionBatch[] | null;
   /** B21: the problem's test count, null when the viewer may not see case results. */
   totalCases: number | null;
-  /** The row is still in progress: the tests not graded yet are listed as waiting. */
+  /** The row is being graded live: the tests not graded yet are listed as waiting and results arrive by themselves. */
   running: boolean;
-  /** The stream is open: show that results arrive by themselves. */
-  live?: boolean;
   /** The compile log of a compile error. Text only. */
   compileError?: string | null;
 }>();
 
+const locale = useLocaleStore();
 const NO_VALUE = '—';
+const POINT_FRACTION_DIGITS = 2;
+const formatPoints = (earned: number, total: number) =>
+  [earned, total]
+    .map((value) => formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false))
+    .join('/');
 const COLUMN_KEYS = ['test', 'result', 'time', 'memory', 'points'] as const;
 /** Judge text a case may carry, in reading order. */
 const DETAIL_FIELDS = [
@@ -47,7 +52,7 @@ const caseRow = (testCase: SubmissionCase): GradedRow => ({
   status: testCase.status,
   time: formatCaseTime(testCase.time),
   memory: formatCaseMemory(testCase.memory),
-  points: `${testCase.points}/${testCase.total}`,
+  points: formatPoints(testCase.points, testCase.total),
   details: DETAIL_FIELDS.flatMap(({ field, labelKey }) =>
     testCase[field] ? [{ field, label: translate(labelKey), text: testCase[field] }] : [],
   ),
@@ -58,7 +63,7 @@ const batchRow = (batch: SubmissionBatch): GradedRow => ({
   status: batch.status,
   time: NO_VALUE,
   memory: NO_VALUE,
-  points: `${batch.points}/${batch.total}`,
+  points: formatPoints(batch.points, batch.total),
   details: [],
 });
 
@@ -84,12 +89,12 @@ const isHidden = computed(
   <GlassCard as="div" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3 sm:px-8">
       <h2 class="font-display text-lg font-semibold">{{ $t('submission.cases.title') }}</h2>
-      <span v-if="live" class="text-[13px] text-muted">{{ $t('submission.liveUpdates') }}</span>
+      <span v-if="running" class="text-[13px] text-muted">{{ $t('submission.liveUpdates') }}</span>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
       <p class="text-[13px] text-muted">{{ $t('submission.cases.compileLog') }}</p>
       <pre
-        class="mt-1.5 max-h-96 overflow-auto rounded-tile bg-surface-strong p-4 font-mono text-[13px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]"
+        class="mt-1.5 max-h-96 overflow-auto rounded-tile bg-surface-strong p-4 font-mono text-[13px] leading-relaxed whitespace-pre"
         >{{ compileError }}</pre>
     </div>
     <p v-if="isHidden" class="px-6 pb-6 text-muted sm:px-8">{{ $t('submission.casesHidden') }}</p>
@@ -122,7 +127,7 @@ const isHidden = computed(
         <tbody>
           <template v-for="row in gradedRows" :key="row.key">
             <tr data-testid="case-row" class="border-t border-line">
-              <td class="px-6 py-3 font-mono">{{ row.label }}</td>
+              <th scope="row" class="px-6 py-3 text-left font-mono font-normal">{{ row.label }}</th>
               <td class="px-6 py-3"><VerdictLabel :verdict="caseVerdict(row.status)" /></td>
               <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.time }}</td>
               <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.memory }}</td>
@@ -145,7 +150,7 @@ const isHidden = computed(
             data-testid="pending-row"
             class="border-t border-line text-muted"
           >
-            <td class="px-6 py-3 font-mono">{{ number }}</td>
+            <th scope="row" class="px-6 py-3 text-left font-mono font-normal">{{ number }}</th>
             <td class="px-6 py-3">{{ $t('submission.cases.pending') }}</td>
             <td class="px-6 py-3 text-right font-mono">{{ NO_VALUE }}</td>
             <td class="px-6 py-3 text-right font-mono">{{ NO_VALUE }}</td>

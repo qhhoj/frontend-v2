@@ -3,6 +3,8 @@ export type SubmissionStatus = 'QU' | 'P' | 'G' | 'D' | 'IE' | 'CE' | 'AB' | 'PD
 /** backend: submission.schema.ts SUBMISSION_RESULTS */
 export type SubmissionResult =
   'AC' | 'WA' | 'TLE' | 'MLE' | 'OLE' | 'IR' | 'RTE' | 'CE' | 'IE' | 'SC' | 'AB' | 'RJ';
+/** Statuses of a row that is still being judged. `PD` (final-only contest) emits no events, so it is not here. */
+export const IN_PROGRESS_STATUSES: readonly SubmissionStatus[] = ['QU', 'P', 'G'];
 /** Statuses after which a submission never changes again on its own. */
 export const FINISHED_STATUSES: readonly SubmissionStatus[] = ['D', 'IE', 'CE', 'AB'];
 

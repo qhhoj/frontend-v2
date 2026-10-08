@@ -137,7 +137,7 @@ describe('the submission page loads with skeletons shaped like its cards', () =>
     const { wrapper } = await mountApp('/submissions/sub-1');
     for (const region of ['ring', 'score', 'line', 'facts'])
       expect(regionsIn(wrapper.element, region), region).toBe(1);
-    expect(regionsIn(wrapper.element, 'fact')).toBe(5);
+    expect(regionsIn(wrapper.element, 'fact')).toBe(6);
     expect(regionsIn(wrapper.element, 'case-row')).toBe(6);
     expect(wrapper.findAll('table[aria-hidden="true"] thead th')).toHaveLength(5);
     for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {

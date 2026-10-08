@@ -166,7 +166,12 @@ describe('submission page', () => {
   });
 
   it('shows totals and a clear message, never an empty table, when the case results are hidden', async () => {
-    const hidden = submissionDetail({ cases: null, batches: null, totalCases: null });
+    const hidden = {
+      ...grading(),
+      cases: null,
+      batches: null,
+      totalCases: null,
+    };
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(hidden), ...problemPageRoutes() });
     const { wrapper } = await openSubmission('sub-1');
     expect(wrapper.text()).toContain('Người xem không được xem kết quả từng test');
@@ -290,5 +295,128 @@ describe('submission page', () => {
     await vi.waitFor(() => expect(detailCalls(calls)).toHaveLength(2));
     await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền xem bài nộp này'));
     expect(wrapper.find('[role="img"]').exists()).toBe(false);
+  });
+
+  it('opens a second stream and drops the hint when the reload button is pressed after the stream was lost', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    latestEventSource().fail();
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(true),
+    );
+    await wrapper.get('[data-testid="stale-reload"] button').trigger('click');
+    await vi.waitFor(() => expect(FakeEventSource.instances).toHaveLength(2));
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false),
+    );
+    expect(wrapper.find('[data-testid="grading-line"]').exists()).toBe(true);
+  });
+
+  it('numbers a source that ends in a newline without a phantom last line', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(),
+      ...problemPageRoutes(),
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() => expect(wrapper.find('pre[aria-hidden="true"]').exists()).toBe(true));
+    expect(wrapper.get('pre[aria-hidden="true"]').text()).toBe('1');
+  });
+
+  it('never announces a bare final status while the final read is on its way, and shows no provisional score beside the final verdict', async () => {
+    const final = ok(submissionDetail({ status: 'D', result: 'AC', points: 1600 }));
+    let rowReads = 0;
+    let releaseFinalRead = () => {};
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(),
+      ...sourceRoute,
+      'GET /submissions/sub-1': () => (++rowReads === 1 ? ok(grading()) : final),
+    });
+    const served = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).endsWith('/submissions/sub-1') && rowReads === 1
+        ? new Promise<Response>((resolve) => {
+            releaseFinalRead = () => resolve(served(input, init));
+          })
+        : served(input, init),
+    );
+    const { wrapper } = await openSubmission('sub-1');
+    const region = () => wrapper.get('#main [role="status"][aria-live="polite"]').text();
+    latestEventSource().emit('done', {
+      submissionId: 'sub-1',
+      type: 'done',
+      status: 'D',
+      currentTestcase: 0,
+    });
+    await flushPromises();
+    expect(region()).toBe('Đang chấm');
+    releaseFinalRead();
+    await vi.waitFor(() => expect(region()).toBe('Chấp nhận'));
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="provisional"]').exists()).toBe(false),
+    );
+  });
+
+  it('refetches during a long burst of test cases at least every 2 seconds', async () => {
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(grading()),
+      ...problemPageRoutes(),
+    });
+    await openSubmission('sub-1');
+    for (let testcase = 4; testcase <= 10; testcase++) {
+      latestEventSource().emit('test-case', {
+        submissionId: 'sub-1',
+        type: 'test-case',
+        status: 'G',
+        currentTestcase: testcase,
+      });
+      await vi.advanceTimersByTimeAsync(300);
+    }
+    await flushPromises();
+    expect(detailCalls(calls).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows the next submission after the address changes and carries nothing over', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(),
+      ...submissionPageRoutes(grading()),
+      ...submissionPageRoutes(submissionDetail({ id: 'sub-2', result: 'AC', points: 1600 })),
+    });
+    const { wrapper, router } = await openSubmission('sub-1');
+    const firstStream = latestEventSource();
+    await router.push('/submissions/sub-2');
+    await vi.waitFor(() => expect(wrapper.get('[data-testid="score"]').text()).toContain('1600'));
+    expect(firstStream.closed).toBe(true);
+    expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
+    expect(FakeEventSource.instances).toHaveLength(1);
+  });
+
+  it('shows the verdict before the problem arrives and a skeleton in the points cell only', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
+    const served = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).endsWith('/problems/duongdi?lang=vi') ||
+      String(input).includes('/problems/duongdi')
+        ? new Promise<Response>(() => {})
+        : served(input, init),
+    );
+    const { wrapper } = await mountApp('/submissions/sub-1');
+    await vi.waitFor(() => expect(wrapper.find('[data-testid="score"]').exists()).toBe(true));
+    expect(wrapper.text()).toContain('WA · Sai kết quả');
+    expect(wrapper.get('[data-testid="score"]').text()).toBe('');
+    expect(wrapper.find('[data-testid="score"] [data-skeleton]').exists()).toBe(true);
+  });
+
+  it('fills the ring of a final row in the verdict colour and shows when it was submitted', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Sai kết quả');
+    expect(wrapper.get('[role="img"]').attributes('style')).toContain('--qh-verdict-wa');
+    expect(wrapper.get('time').attributes('title')).toMatch(/2026/);
   });
 });

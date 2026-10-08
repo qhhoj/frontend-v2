@@ -3,7 +3,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
 /** Mirrors `SubmissionSummary.vue`: keep its cards, grid and text classes in sync. */
-const FACT_COUNT = 5;
+const FACT_COUNT = 6;
 </script>
 
 <template>

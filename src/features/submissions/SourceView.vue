@@ -4,7 +4,7 @@ import CopyButton from '@/components/CopyButton.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
-import { forbiddenMessageKey } from './forbidden-reason';
+import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
@@ -14,15 +14,20 @@ const { data, isPending, error, refetch } = useSubmissionSourceQuery(toRef(props
 
 /** A 403 is a reason to show, not an error to retry: the B18 reason, else the plain "hidden" text. */
 const forbiddenText = computed(() => {
-  const key = forbiddenMessageKey(error.value);
-  return key === null
-    ? null
-    : translate(key === 'errors.forbidden' ? 'submission.sourceHidden' : key);
+  const key =
+    forbiddenReasonKey(error.value) ??
+    (isForbidden(error.value) ? 'submission.sourceHidden' : null);
+  return key === null ? null : translate(key);
 });
+/** A source ending in a newline has no empty last line to number. */
+const TRAILING_NEWLINE = /\n$/;
 const source = computed(() => data.value?.source ?? '');
 /** One text node for the whole gutter, so a 65 536-line source adds one element, not thousands. */
 const lineNumbers = computed(() =>
-  Array.from({ length: source.value.split('\n').length }, (_unused, index) => index + 1).join('\n'),
+  Array.from(
+    { length: source.value.replace(TRAILING_NEWLINE, '').split('\n').length },
+    (_unused, index) => index + 1,
+  ).join('\n'),
 );
 </script>
 

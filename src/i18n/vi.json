@@ -376,7 +376,8 @@
       "user": "Người nộp",
       "language": "Ngôn ngữ",
       "runtime": "Thời gian chạy",
-      "judge": "Máy chấm"
+      "judge": "Máy chấm",
+      "submitted": "Nộp lúc"
     },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "cases": {

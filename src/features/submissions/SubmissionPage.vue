@@ -6,6 +6,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useProblemQuery } from '@/features/problems/problems.queries';
+import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import { verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import CasesTable from './CasesTable.vue';
@@ -22,7 +23,7 @@ const ID_TAIL_LENGTH = 3;
 const route = useRoute();
 const locale = useLocaleStore();
 const id = computed(() => String(route.params.id));
-const { submission: query, live, isLive } = useLiveSubmission(id);
+const { submission: query, live, isLive, refollow } = useLiveSubmission(id);
 const row = query.data;
 const shortId = computed(() =>
   id.value.length <= ID_HEAD_LENGTH + ID_TAIL_LENGTH
@@ -37,18 +38,18 @@ const problemQuery = useProblemQuery(
   toRef(locale, 'locale'),
   computed(() => problemCode.value !== null),
 );
-const isWaiting = computed(() => query.isPending.value || problemQuery.isLoading.value);
 
 const isNotFound = computed(
   () => query.error.value instanceof ApiError && query.error.value.code === 'not_found',
 );
 const forbiddenKey = computed(() => forbiddenMessageKey(query.error.value));
 
-/** Between stream events the stream's status leads; once it is gone the stored row is the truth. */
+/** The stream's status leads only while the grading goes on; a final status shows the stored row, which carries the result. */
 const verdict = computed(() => {
   if (!row.value) return null;
-  const leading = live.status ? live : row.value;
-  return verdictOf({ status: leading.status ?? row.value.status, result: leading.result });
+  const streamStatus = live.status;
+  const isStreamLeading = streamStatus !== null && IN_PROGRESS_STATUSES.includes(streamStatus);
+  return verdictOf(isStreamLeading ? { status: streamStatus, result: null } : row.value);
 });
 </script>
 
@@ -68,7 +69,12 @@ const verdict = computed(() => {
     <GlassCard v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
       <p role="alert">{{ $t(forbiddenKey) }}</p>
     </GlassCard>
-    <QueryState v-else :loading="isWaiting" :error="query.error.value" @retry="query.refetch()">
+    <QueryState
+      v-else
+      :loading="query.isPending.value"
+      :error="query.error.value"
+      @retry="query.refetch()"
+    >
       <template #skeleton>
         <SubmissionSummarySkeleton />
         <CasesTableSkeleton />
@@ -83,7 +89,7 @@ const verdict = computed(() => {
           <button
             type="button"
             class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
-            @click="query.refetch()"
+            @click="refollow()"
           >
             {{ $t('submission.reload') }}
           </button>
@@ -93,6 +99,7 @@ const verdict = computed(() => {
           :verdict="verdict"
           :problem-name="problemQuery.data.value?.name ?? null"
           :problem-points="problemQuery.data.value?.points ?? null"
+          :is-problem-loading="problemQuery.isLoading.value"
           :is-live="isLive"
         />
         <CasesTable
@@ -100,7 +107,6 @@ const verdict = computed(() => {
           :batches="row.batches"
           :total-cases="row.totalCases"
           :running="isLive"
-          :live="isLive"
           :compile-error="row.status === 'CE' ? row.error : null"
         />
         <SourceView :id="row.id" :problem-code="problemCode" />

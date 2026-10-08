@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
-import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import {
+  formatCaseMemory,
+  formatCaseTime,
+  formatDateTime,
+  formatNumber,
+  formatRelative,
+} from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import type { Verdict } from '@/lib/verdicts';
+import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import VerdictRing from './VerdictRing.vue';
-import { IN_PROGRESS_STATUSES } from './use-live-submission';
 
 /** Two decimals like the problem header; no digit grouping, scores are read as plain numbers. */
 const SCORE_FRACTION_DIGITS = 2;
 const NO_VALUE = '—';
+/** "3 minutes ago" only needs a fresh clock once a minute. */
+const CLOCK_REFRESH_MS = 60_000;
 
 /** Keep `SubmissionSummarySkeleton.vue` in step: same cards, grid and text classes. */
 const props = defineProps<{
@@ -22,10 +32,13 @@ const props = defineProps<{
   /** The problem's name and points when it is readable; the row's own name is the fallback. */
   problemName: string | null;
   problemPoints: number | null;
+  /** The problem is still loading: only the points cell waits for it. */
+  isProblemLoading: boolean;
   /** The stream is open and the grading is going on. */
   isLive: boolean;
 }>();
 const locale = useLocaleStore();
+const now = useNow(CLOCK_REFRESH_MS);
 const format = (points: number) =>
   formatNumber(points, locale.locale, SCORE_FRACTION_DIGITS, false);
 
@@ -48,6 +61,7 @@ const runtime = computed(() =>
     ? NO_VALUE
     : `${formatCaseTime(props.submission.time)} · ${formatCaseMemory(props.submission.memory)}`,
 );
+const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
 const facts = computed(() => [
   { key: 'language', value: props.submission.language?.name ?? NO_VALUE },
   { key: 'runtime', value: runtime.value },
@@ -61,7 +75,7 @@ const facts = computed(() => [
       as="div"
       class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
     >
-      <VerdictRing :progress="ringProgress(submission)" />
+      <VerdictRing :progress="isFinished ? null : ringProgress(submission)" :verdict="verdict" />
       <div class="min-w-0 flex-1 basis-40">
         <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
           <span
@@ -75,9 +89,12 @@ const facts = computed(() => [
           data-testid="score"
           class="mt-1 font-mono text-[56px] leading-none font-semibold tabular-nums"
         >
-          {{ score
-          }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted">
-            / {{ maxScore }}</span
+          <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
+          <template v-else
+            >{{ score
+            }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted">
+              / {{ maxScore }}</span
+            ></template
           >
         </p>
         <p v-if="isProvisional" data-testid="provisional" class="text-[13px] text-muted">
@@ -101,6 +118,14 @@ const facts = computed(() => [
           <UserName v-if="submission.user" :username="submission.user.username" /><template
             v-else
             >{{ NO_VALUE }}</template
+          >
+        </dd>
+        <dt class="text-[13px] text-muted">{{ $t('submission.facts.submitted') }}</dt>
+        <dd class="min-w-0">
+          <time
+            :datetime="submission.date"
+            :title="formatDateTime(submission.date, locale.locale)"
+            >{{ formatRelative(submission.date, now, locale.locale) }}</time
           >
         </dd>
         <template v-for="fact in facts" :key="fact.key">
