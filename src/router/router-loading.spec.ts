@@ -3,13 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
 import { useLoadingStore } from '@/stores/loading.store';
 import { mockApi, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { signedOut } from '@/test/fixtures';
 import { createAppRouter } from './index';
 
 describe('navigation as a waiting source', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    mockApi({ 'GET /auth/me': signedOut, 'GET /problems/meta': ok({}) });
+    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut, 'GET /problems/meta': ok({}) });
   });
 
   it('waits while a navigation is in flight and stops when it lands', async () => {

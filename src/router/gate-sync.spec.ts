@@ -5,6 +5,7 @@ import { createMemoryHistory } from 'vue-router';
 import { apiRequest, onCsrfFailed, onGateRequired, onUnauthorized } from '@/api/client';
 import { partialSession, signedIn } from '@/test/fixtures';
 import { fail, mockApi } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import type { MockResponse } from '@/test/mock-api';
 import { createAppRouter } from './index';
 
@@ -17,6 +18,7 @@ const refuse = (path: string) => apiRequest(path, { method: 'POST' }).catch(() =
 async function refusedWith(code: string, sessionAfter: () => MockResponse, requests = 1) {
   let gateClosed = false;
   const calls = mockApi({
+    ...blogListRoutes,
     'GET /auth/me': () => (gateClosed ? sessionAfter() : signedIn()),
     'POST /submissions/abc/abort': fail(403, code),
   });

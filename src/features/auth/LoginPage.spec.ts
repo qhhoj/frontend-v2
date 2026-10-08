@@ -4,6 +4,7 @@ import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, hangRequestsExcept, issue, mockApi, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useLoadingStore } from '@/stores/loading.store';
@@ -212,6 +213,7 @@ describe('after a sign-in', () => {
   const signedInRoutes = () => {
     let signedInNow = false;
     return mockApi({
+      ...blogListRoutes,
       ...routes(),
       ...homeRoutes,
       'GET /profile': ok(profile()),

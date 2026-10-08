@@ -4,6 +4,7 @@ import type { SecondFactorMethod } from '@/api/types/auth';
 import { partialSession, profile, signedIn } from '@/test/fixtures';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { loginRoutes } from '@/test/auth-routes';
 import { mountApp } from '@/test/mount';
@@ -17,6 +18,7 @@ function twoFactorApi(
 ) {
   let verified = false;
   return mockApi({
+    ...blogListRoutes,
     'GET /auth/me': () => signedIn(verified ? {} : partialSession(methods, 'user_07')),
     'POST /auth/2fa/totp/verify': () => {
       verified = true;
@@ -265,6 +267,7 @@ describe('two-factor page', () => {
   it('reloads the session when the code was removed meanwhile, so the cards match the account', async () => {
     let codeRemoved = false;
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': () =>
         signedIn(partialSession(codeRemoved ? ['webauthn'] : ['totp', 'webauthn'], 'user_07')),
       'POST /auth/2fa/totp/verify': () => {

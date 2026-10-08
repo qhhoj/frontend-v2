@@ -12,12 +12,14 @@ import {
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
 
 describe('auth screens', () => {
   it('returns to a safe redirect after login', async () => {
     const calls = mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
@@ -39,6 +41,7 @@ describe('auth screens', () => {
 
   it('shows why a login failed and stays on the page', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': fail(401, 'invalid_credentials'),
@@ -54,6 +57,7 @@ describe('auth screens', () => {
 
   it('sends a viewer with a pending second factor to 2FA, keeping the redirect', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(partialSession()),
@@ -71,6 +75,7 @@ describe('auth screens', () => {
     'does not follow the hostile redirect %s after login',
     async (hostile) => {
       mockApi({
+        ...blogListRoutes,
         ...loginRoutes,
         'GET /auth/me': signedOut,
         'POST /auth/login': ok(sessionResponse()),
@@ -88,6 +93,7 @@ describe('auth screens', () => {
 
   it('applies the account theme after login', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
@@ -104,6 +110,7 @@ describe('auth screens', () => {
 
   it('tells a throttled viewer to wait', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': fail(429, 'rate_limited'),
@@ -120,6 +127,7 @@ describe('auth screens', () => {
 
   it('drops the previous account data when another account logs in', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
@@ -139,6 +147,7 @@ describe('auth screens', () => {
 
   it('drops cached account data when the session expires', async () => {
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile()),
       'POST /submissions/abc/abort': fail(401, 'unauthorized'),
@@ -152,6 +161,7 @@ describe('auth screens', () => {
 
   it('shows the moderator reason of a banned account', async () => {
     mockApi({
+      ...blogListRoutes,
       ...loginRoutes,
       'GET /auth/me': signedOut,
       'POST /auth/login': {

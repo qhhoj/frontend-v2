@@ -4,6 +4,7 @@ import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { profile, signedIn } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
+import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -13,6 +14,7 @@ type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 function changeApi(routes: Record<string, MockHandler> = {}, forced = true) {
   let changed = false;
   return mockApi({
+    ...blogListRoutes,
     'GET /auth/me': () => signedIn({ passwordChangeRequired: forced && !changed }),
     'POST /auth/password/change': () => {
       changed = true;
@@ -136,6 +138,7 @@ describe('change-password page', () => {
   it('says the password changed, not that the change failed, when the session cannot be reloaded', async () => {
     let changed = false;
     mockApi({
+      ...blogListRoutes,
       'GET /auth/me': () =>
         changed ? fail(500, 'internal_error') : signedIn({ passwordChangeRequired: true }),
       'POST /auth/password/change': () => {
