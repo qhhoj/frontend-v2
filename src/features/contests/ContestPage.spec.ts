@@ -208,11 +208,14 @@ describe('contest detail problems and rules', () => {
     );
   });
 
-  it('renders the introduction through UserContent and the rules beside it', async () => {
+  it('renders the introduction in the left column through UserContent and the rules in the aside', async () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(withProblems) });
     const { wrapper } = await mountApp('/contests/r42');
     const aside = wrapper.get('aside');
-    expect(aside.get('.user-content').html()).toContain('Vòng tuần cho đội tuyển');
+    expect(wrapper.get('[data-testid="contest-intro"] .user-content').html()).toContain(
+      'Vòng tuần cho đội tuyển',
+    );
+    expect(aside.find('[data-testid="contest-intro"]').exists()).toBe(false);
     expect(aside.text()).toContain('ICPC · phạt 20 phút mỗi lần sai');
     expect(aside.text()).toContain('Cho phép sau khi kết thúc');
   });
@@ -244,7 +247,7 @@ describe('contest detail problems and rules', () => {
     });
     const { wrapper } = await mountApp('/contests/r42');
     const aside = wrapper.get('aside');
-    expect(aside.find('.user-content').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="contest-intro"]').exists()).toBe(false);
     expect(aside.text()).toContain('Thể thức & quy định');
   });
 });

@@ -7,6 +7,7 @@ import { phaseAt } from '@/lib/contest-time';
 import { usePageTitle } from '@/router/page-title';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
 import ContestHeaderCard from './ContestHeaderCard.vue';
+import ContestIntroCard from './ContestIntroCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestProblemsTable from './ContestProblemsTable.vue';
 import ContestRulesCard from './ContestRulesCard.vue';
@@ -47,7 +48,10 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed" />
         <ContestTabs :contest-key="key" />
         <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <ContestProblemsTable :contest="contest" />
+          <div class="flex min-w-0 flex-col gap-5">
+            <ContestProblemsTable :contest="contest" />
+            <ContestIntroCard :contest="contest" />
+          </div>
           <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-5">
             <ContestRulesCard :contest="contest" />
           </aside>
