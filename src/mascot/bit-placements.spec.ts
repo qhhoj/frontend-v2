@@ -5,9 +5,11 @@ import {
   ratingHistory,
   sessionUser,
   signedIn,
+  signedOut,
   submissionDetail,
   userPage,
 } from '@/test/fixtures';
+import { loginRoutes } from '@/test/auth-routes';
 import { installFakeEventSource } from '@/test/fake-event-source';
 import { problemPageRoutes, signedInViewer, submissionPageRoutes } from '@/test/problem-routes';
 import { stubMatchMedia } from '@/test/match-media';
@@ -104,6 +106,18 @@ describe('Bit placements', () => {
     expect(final.wrapper.find('[data-testid="judging-bit"]').exists()).toBe(false);
     expect(final.wrapper.find('[role="img"][aria-label="Bit đội vương miện"]').exists()).toBe(true);
     final.wrapper.unmount();
+  });
+
+  it('greets a visitor on the login page with the welcome Bit in the brand panel, decorative', async () => {
+    mockApi({ 'GET /auth/me': signedOut, ...loginRoutes });
+    const { wrapper } = await mountApp('/login');
+    const bits = wrapper.findAll('[data-testid="login-bit"]');
+    expect(bits).toHaveLength(2);
+    for (const bit of bits) {
+      expect(bit.attributes('aria-hidden')).toBe('true');
+      expect(pixelsOf(bit.element)).toBe(pixelsOfKind('welcome'));
+    }
+    wrapper.unmount();
   });
 
   it('shows the staff hard hat on the admin area for staff only', async () => {

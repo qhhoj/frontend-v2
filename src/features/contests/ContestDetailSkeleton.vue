@@ -13,6 +13,10 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
         <SkeletonBlock text class="w-3/4" />
       </div>
       <SkeletonBlock class="h-2 w-full" />
+      <p class="hidden items-center gap-1.5 text-sm md:flex">
+        <SkeletonBlock class="size-6 shrink-0" />
+        <SkeletonBlock text class="w-48" />
+      </p>
       <p class="hidden text-sm md:block"><SkeletonBlock text class="w-80" /></p>
     </div>
     <div data-skeleton-region="countdown" class="flex flex-col gap-1">

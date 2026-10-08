@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestProblem } from '@/test/fixtures';
 import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, hangRequestsExcept, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
 
@@ -34,6 +34,34 @@ describe('contest detail header', () => {
     expect(header.text()).toContain('Kết thúc lúc 11:24');
     expect(header.text()).toContain('đã qua 1 giờ 37 phút');
     expect(document.title).toContain('QHH Round #42 (Div. 2)');
+  });
+
+  it('puts a 24 px Bit avatar before each author name, decorative', async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    const twoAuthors = contestDetail({
+      authors: [
+        { id: 'author-1', username: 'thayhung' },
+        { id: 'author-2', username: 'minhthu' },
+      ],
+    });
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(twoAuthors) });
+    const { wrapper } = await mountApp('/contests/r42');
+    for (const username of ['thayhung', 'minhthu']) {
+      const name = wrapper.get(`[data-testid="contest-header"] a[href="/users/${username}"]`);
+      const avatar = name.element.previousElementSibling!;
+      expect(avatar.tagName.toLowerCase()).toBe('svg');
+      expect(avatar.getAttribute('aria-hidden')).toBe('true');
+      expect(avatar.getAttribute('width')).toBe('24');
+    }
+  });
+
+  it('reserves the same 24 px square for the author avatar while the header loads', async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    mockApi(anonymousViewer);
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests/r42');
+    const skeleton = wrapper.get('[data-skeleton-region="contest-header"]');
+    expect(skeleton.findAll('[data-skeleton].size-6')).toHaveLength(1);
   });
 
   it('marks no freeze for a format that never freezes the board', async () => {

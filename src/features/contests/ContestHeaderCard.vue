@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import GlassCard from '@/components/GlassCard.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
 import { formatClock, formatNumber, formatShortDate, formatWeekdayDate } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
@@ -53,10 +54,12 @@ const phoneLine = computed(
             {{ $t('contests.detail.authors') }}
             <template v-for="(author, index) in contest.authors" :key="author.id"
               >{{ index ? ', ' : ''
-              }}<RouterLink
-                :to="{ name: 'user', params: { username: author.username } }"
-                class="font-semibold text-content"
-                >{{ author.username }}</RouterLink
+              }}<span class="inline-flex items-center gap-1.5 align-middle"
+                ><UserAvatar :username="author.username" :size="24" /><RouterLink
+                  :to="{ name: 'user', params: { username: author.username } }"
+                  class="font-semibold text-content"
+                  >{{ author.username }}</RouterLink
+                ></span
               ></template
             >
             ·
