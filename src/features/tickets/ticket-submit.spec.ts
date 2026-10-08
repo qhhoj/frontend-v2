@@ -25,7 +25,10 @@ describe('submit failure', () => {
 describe('submit failure: rate limits', () => {
   it('tells a rate-limited viewer how long to wait, from the Retry-After the server sent', () => {
     expect(
-      submitFailureOf(new ApiError('rate_limited', 429, 'slow', {}, [], {}, 42), 'problem'),
+      submitFailureOf(
+        new ApiError('rate_limited', 429, 'slow', { retryAfterSeconds: 42 }),
+        'problem',
+      ),
     ).toEqual({
       kind: 'panel',
       titleKey: 'tickets.new.failedTitle',
