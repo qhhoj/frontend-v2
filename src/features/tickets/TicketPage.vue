@@ -19,7 +19,8 @@ import { useTicketStream } from './use-ticket-stream';
 const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 const route = useRoute();
 const router = useRouter();
-const id = String(route.params.id);
+/** Follows the route: a jump to another ticket reloads the page's data and moves the live feed. */
+const id = computed(() => String(route.params.id));
 const { data: ticket, error, isPending, refetch } = useTicketQuery(id);
 const { isLive, announcement } = useTicketStream(id);
 const justSent = takeSentFlag(router);

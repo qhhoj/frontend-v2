@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
 import GlassCard from '@/components/GlassCard.vue';
 import { useTicketPatch } from './use-ticket-patch';
@@ -7,7 +7,13 @@ import { useTicketPatch } from './use-ticket-patch';
 /** The backend's `TICKET_ASSIGNEES_MAX`. */
 const ASSIGNEES_MAX = 20;
 const props = defineProps<{ ticket: TicketDetail }>();
-const assigneesText = ref(props.ticket.assignees.map((assignee) => assignee.username).join(', '));
+const currentNames = () => props.ticket.assignees.map((assignee) => assignee.username).join(', ');
+const assigneesText = ref(currentNames());
+/** Set by typing, cleared once a save is accepted: a refetch never overwrites a list being edited. */
+const isEdited = ref(false);
+watch(currentNames, (names) => {
+  if (!isEdited.value) assigneesText.value = names;
+});
 const { isPending, failureKey, patch } = useTicketPatch(props.ticket.id);
 const assigneeNames = computed(() => splitUsernames(assigneesText.value));
 const isOverLimit = computed(() => assigneeNames.value.length > ASSIGNEES_MAX);
@@ -18,7 +24,8 @@ function splitUsernames(text: string): string[] {
   return [...new Set(text.split(/[\s,]+/).filter(Boolean))];
 }
 const saveAssignees = () => {
-  if (!isOverLimit.value) patch({ assignees: assigneeNames.value });
+  if (isOverLimit.value) return;
+  patch({ assignees: assigneeNames.value }, () => (isEdited.value = false));
 };
 const markGood = () => patch({ isContributive: !props.ticket.isContributive });
 </script>
@@ -53,9 +60,12 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
           type="text"
           autocomplete="off"
           class="min-h-11 rounded-lg border border-line bg-surface px-3.5 text-base text-content"
+          @input="isEdited = true"
         />
       </label>
-      <p v-if="isOverLimit" class="text-[13px] text-negative">{{ $t('ticket.assigneesMax') }}</p>
+      <p v-if="isOverLimit" role="alert" class="text-[13px] text-negative">
+        {{ $t('ticket.assigneesMax') }}
+      </p>
       <div class="flex justify-end">
         <button
           type="submit"

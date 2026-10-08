@@ -26,6 +26,15 @@ const meta = computed(() => ({
     props.ticket.assignees.map((assignee) => assignee.username).join(', ') ||
     translate('tickets.unassigned'),
 }));
+/** A general issue's address becomes a link only when it is http or https; anything else stays plain text. */
+function isWebUrl(text: string): boolean {
+  try {
+    const { protocol } = new URL(text);
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:underline';
 </script>
 
@@ -49,7 +58,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
         <span>{{ ticket.link.title }}</span>
       </RouterLink>
       <a
-        v-else-if="ticket.link.type === 'general'"
+        v-else-if="ticket.link.type === 'general' && isWebUrl(ticket.link.url)"
         :href="ticket.link.url"
         target="_blank"
         rel="noopener noreferrer"
@@ -60,6 +69,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
       </a>
       <span v-else :class="LINK_CLASS">
         <TicketLinkChip :link="ticket.link" />
+        <span class="break-all">{{ ticket.link.title }}</span>
       </span>
     </div>
     <h1 class="font-display text-2xl font-bold tracking-tight sm:text-3xl">{{ ticket.title }}</h1>

@@ -15,7 +15,7 @@ let client: QueryClient;
 afterEach(() => vi.useRealTimers());
 
 /** Mounts the composable in a probe that shows its announcement and live flag; the probe's client is kept to count refetches. */
-function mountStream(ticketId: string | null) {
+async function mountStream(ticketId: string | null) {
   const Probe = defineComponent({
     props: { ticketId: { type: String, default: null } },
     setup(props) {
@@ -29,7 +29,10 @@ function mountStream(ticketId: string | null) {
         );
     },
   });
-  return mountComponent(Probe, { props: { ticketId } });
+  const wrapper = mountComponent(Probe, { props: { ticketId } });
+  // The session loads after mount; a viewer change reopens the feed, so the test reads the settled one.
+  await flushPromises();
+  return wrapper;
 }
 
 const frame = (type: string, ticketId: string, open: boolean | null = null) => ({
@@ -43,7 +46,7 @@ describe('useTicketStream on the list', () => {
   it('opens the feed, refetches once and announces one count for a burst of new tickets', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
-    const wrapper = mountStream(null);
+    const wrapper = await mountStream(null);
     const stream = latestEventSource();
     expect(stream.url).toBe('/api/internal/events/tickets');
     const invalidate = vi.spyOn(client, 'invalidateQueries');
@@ -56,7 +59,7 @@ describe('useTicketStream on the list', () => {
   it('refetches silently on resync and announces nothing', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
-    const wrapper = mountStream(null);
+    const wrapper = await mountStream(null);
     const invalidate = vi.spyOn(client, 'invalidateQueries');
     latestEventSource().emit('resync', {});
     await vi.advanceTimersByTimeAsync(SETTLE_WAIT_MS);
@@ -70,7 +73,7 @@ describe('useTicketStream on the list: status and connection', () => {
   it('announces a closed ticket with its own line', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
-    const wrapper = mountStream(null);
+    const wrapper = await mountStream(null);
     latestEventSource().emit('ticket-status', frame('ticket-status', 't1', false));
     await vi.advanceTimersByTimeAsync(SETTLE_WAIT_MS);
     await flushPromises();
@@ -78,7 +81,7 @@ describe('useTicketStream on the list: status and connection', () => {
   });
   it('stops reporting live once the browser gives up on the feed', async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
-    const wrapper = mountStream(null);
+    const wrapper = await mountStream(null);
     latestEventSource().fail();
     await flushPromises();
     expect(wrapper.get('[data-testid="announce"]').attributes('data-live')).toBe('false');
@@ -89,7 +92,7 @@ describe('useTicketStream on one ticket', () => {
   it('listens to the ticket feed and says how many messages arrived', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     mockApi({ ...signedInViewer(), 'GET /tickets/t1': ok({}) });
-    const wrapper = mountStream('t1');
+    const wrapper = await mountStream('t1');
     const stream = latestEventSource();
     expect(stream.url).toBe('/api/internal/events/tickets/t1');
     stream.emit('ticket-message', frame('ticket-message', 't1'));
@@ -97,9 +100,9 @@ describe('useTicketStream on one ticket', () => {
     await flushPromises();
     expect(wrapper.get('[data-testid="announce"]').text()).toBe('1 tin nhắn mới');
   });
-  it('closes the feed when the owner unmounts', () => {
+  it('closes the feed when the owner unmounts', async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets/t1': ok({}) });
-    const wrapper = mountStream('t1');
+    const wrapper = await mountStream('t1');
     const stream = latestEventSource();
     wrapper.unmount();
     expect(stream.closed).toBe(true);

@@ -103,14 +103,27 @@ test('two new messages on the open ticket refetch it once and announce one count
   expect(api.requestsTo(TICKET_KEY)).toHaveLength(2);
 });
 
+/** Short text on every line: the skeleton's lines are one line each, so the loaded page must be too. */
+const SHIFT_DETAIL = ticketDetail({
+  title: 'Test 17 sai',
+  link: { type: 'problem', id: 'p', key: 'hcmus41b', title: 'Đề A', url: '/problems/hcmus41b' },
+  messages: [0, 1, 2].map((index) =>
+    ticketMessage({ id: `m${index}`, bodyHtml: '<p>Đáp án in ra 1.</p>' }),
+  ),
+});
+
 const SHIFT_CASES: ShiftCase[] = [
   {
     name: 'ticket header',
     path: TICKET_PATH,
     signedIn: true,
     hold: TICKET_KEY,
-    answer: (api) => (api.routes[TICKET_KEY] = ok(ticketDetail())),
-    parts: (page) => ({ header: page.getByTestId('ticket-header') }),
+    answer: (api) => (api.routes[TICKET_KEY] = ok(SHIFT_DETAIL)),
+    parts: (page) => ({
+      'ticket header': page.locator(
+        '[data-skeleton-region="ticket-header"], [data-testid="ticket-header"]',
+      ),
+    }),
     viewports: PHONE_AND_DESKTOP,
   },
   {
@@ -118,8 +131,12 @@ const SHIFT_CASES: ShiftCase[] = [
     path: TICKET_PATH,
     signedIn: true,
     hold: TICKET_KEY,
-    answer: (api) => (api.routes[TICKET_KEY] = ok(ticketDetail())),
-    parts: (page) => ({ messages: page.getByRole('region', { name: 'Tin nhắn' }) }),
+    answer: (api) => (api.routes[TICKET_KEY] = ok(SHIFT_DETAIL)),
+    parts: (page) => ({
+      'ticket messages': page.locator(
+        '[data-skeleton-region="message"], section[aria-label="Tin nhắn"] article',
+      ),
+    }),
     viewports: PHONE_AND_DESKTOP,
   },
 ];

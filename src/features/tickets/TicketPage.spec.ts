@@ -6,6 +6,7 @@ import { homeRoutes } from '@/test/home-routes';
 import { installFakeEventSource, latestEventSource } from '@/test/fake-event-source';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { useSessionStore } from '@/stores/session.store';
 import { signedInViewer } from '@/test/problem-routes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
@@ -128,5 +129,137 @@ describe('ticket page', () => {
     await router.push({ name: 'ticket', params: { id }, state: { ticketSent: true } });
     await flushPromises();
     expect(wrapper.get('[data-state="sent"]').text()).toContain('Đã gửi phiếu');
+  });
+});
+
+const OTHER_ID = '0192a000-0000-7000-8000-0000000000b2';
+const STAFF_ID = 'staff-account';
+
+describe('ticket page: route and account changes', () => {
+  it('loads the other ticket on a route change and closes the feed of the first', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...homeRoutes,
+      [`GET /tickets/${id}`]: ok(ticketDetail()),
+      [`GET /tickets/${OTHER_ID}`]: ok(ticketDetail({ id: OTHER_ID, title: 'Phiếu B' })),
+    });
+    const { wrapper, router } = await mountApp(`/tickets/${id}`);
+    const first = latestEventSource();
+    await router.push(`/tickets/${OTHER_ID}`);
+    await flushPromises();
+    expect(first.closed).toBe(true);
+    expect(latestEventSource().url).toBe(`/api/internal/events/tickets/${OTHER_ID}`);
+    expect(latestEventSource().closed).toBe(false);
+    expect(wrapper.get('h1').text()).toBe('Phiếu B');
+  });
+  it('reopens the feed for the new account when the viewer changes', async () => {
+    mockApi({ ...signedInViewer(), ...homeRoutes, [`GET /tickets/${id}`]: ok(ticketDetail()) });
+    await mountApp(`/tickets/${id}`);
+    const first = latestEventSource();
+    useSessionStore().user = sessionUser({ id: STAFF_ID, username: 'thayhung' });
+    await flushPromises();
+    expect(first.closed).toBe(true);
+    expect(latestEventSource()).not.toBe(first);
+    expect(latestEventSource().closed).toBe(false);
+  });
+});
+
+describe('ticket page: staff controls follow the backend permission', () => {
+  it('hides every staff control from a viewer whom the backend gives no staff rights', async () => {
+    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu' } });
+    mockApi({ ...signedInViewer(), [`GET /tickets/${id}`]: ok(detail) });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    expect(wrapper.find('button[data-testid="mark-good"]').exists()).toBe(false);
+    expect(wrapper.find('form[data-testid="assignees-form"]').exists()).toBe(false);
+    expect(wrapper.find('button[data-testid="toggle-open"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Góc nhìn quản trị viên');
+  });
+  it('shows no assignees form to staff whom the backend does not let assign', async () => {
+    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu' } });
+    mockApi({
+      ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
+      [`GET /tickets/${id}`]: ok(detail),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    expect(wrapper.find('form[data-testid="assignees-form"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Góc nhìn quản trị viên');
+  });
+});
+
+const EDITABLE = { editNotes: true, markGood: false, assign: false };
+describe('ticket page: drafts follow refetches unless edited', () => {
+  it('shows the notes the refetch brings when the viewer has not typed', async () => {
+    mockApi({
+      ...signedInViewer(),
+      [`GET /tickets/${id}`]: sequence(
+        ok(ticketDetail({ notes: 'Bản cũ', can: EDITABLE })),
+        ok(ticketDetail({ notes: 'Bản mới', can: EDITABLE })),
+      ),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    latestEventSource().emit('resync', {});
+    await flushPromises();
+    expect((wrapper.get('textarea[name="notes"]').element as HTMLTextAreaElement).value).toBe(
+      'Bản mới',
+    );
+  });
+});
+
+describe('ticket page: drafts follow refetches unless edited', () => {
+  it('keeps the notes the viewer is typing when a refetch brings others', async () => {
+    mockApi({
+      ...signedInViewer(),
+      [`GET /tickets/${id}`]: sequence(
+        ok(ticketDetail({ notes: 'Bản cũ', can: EDITABLE })),
+        ok(ticketDetail({ notes: 'Bản mới', can: EDITABLE })),
+      ),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    await wrapper.get('textarea[name="notes"]').setValue('Đang sửa dở');
+    latestEventSource().emit('resync', {});
+    await flushPromises();
+    expect((wrapper.get('textarea[name="notes"]').element as HTMLTextAreaElement).value).toBe(
+      'Đang sửa dở',
+    );
+  });
+});
+
+describe('ticket page: drafts follow refetches unless edited', () => {
+  it('shows the assignees the refetch brings when the viewer has not typed', async () => {
+    const staff = { editNotes: true, markGood: true, assign: true };
+    mockApi({
+      ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
+      [`GET /tickets/${id}`]: sequence(
+        ok(ticketDetail({ can: staff })),
+        ok(ticketDetail({ can: staff, assignees: [{ id: 'z', username: 'thayhung' }] })),
+      ),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    latestEventSource().emit('resync', {});
+    await flushPromises();
+    expect((wrapper.get('input[name="assignees"]').element as HTMLInputElement).value).toBe(
+      'thayhung',
+    );
+  });
+});
+
+describe('ticket page: general issue links', () => {
+  const general = (url: string) =>
+    ticketDetail({ link: { type: 'general', id: 'g', key: null, title: url, url } });
+  it('makes a general issue a link only when its address is http or https', async () => {
+    mockApi({
+      ...signedInViewer(),
+      [`GET /tickets/${id}`]: ok(general('https://example.org/bang')),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    const link = wrapper.get('[data-testid="ticket-header"] a[target="_blank"]');
+    expect(link.attributes('href')).toBe('https://example.org/bang');
+    expect(link.attributes('rel')).toBe('noopener noreferrer');
+  });
+  it('shows a javascript address as plain text, never as a link', async () => {
+    mockApi({ ...signedInViewer(), [`GET /tickets/${id}`]: ok(general('javascript:alert(1)')) });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    expect(wrapper.find('[data-testid="ticket-header"] a[target="_blank"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="ticket-header"]').text()).toContain('javascript:alert(1)');
   });
 });

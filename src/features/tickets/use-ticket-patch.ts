@@ -12,5 +12,8 @@ export function useTicketPatch(ticketId: string) {
     onSuccess: () => client.invalidateQueries({ queryKey: ['tickets'] }),
   });
   const failureKey = computed(() => (error.value ? errorMessageKey(error.value) : null));
-  return { isPending, failureKey, patch: (patch: TicketPatch) => mutate(patch) };
+  /** `onSaved` runs only when the server accepted the change, so a refused draft is never reset. */
+  const patch = (value: TicketPatch, onSaved?: () => void) =>
+    mutate(value, { onSuccess: () => onSaved?.() });
+  return { isPending, failureKey, patch };
 }

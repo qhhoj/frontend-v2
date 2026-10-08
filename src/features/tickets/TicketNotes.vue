@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
 import GlassCard from '@/components/GlassCard.vue';
 import { useTicketPatch } from './use-ticket-patch';
@@ -7,7 +7,16 @@ import { useTicketPatch } from './use-ticket-patch';
 /** Notes: everyone who reads the ticket sees them; assignees and staff (`can.editNotes`) edit them. */
 const props = defineProps<{ ticket: TicketDetail }>();
 const draft = ref(props.ticket.notes);
+/** Set by typing, cleared once a save is accepted: a refetch never overwrites text the viewer is still working on. */
+const isEdited = ref(false);
+watch(
+  () => props.ticket.notes,
+  (notes) => {
+    if (!isEdited.value) draft.value = notes;
+  },
+);
 const { isPending, failureKey, patch } = useTicketPatch(props.ticket.id);
+const save = () => patch({ notes: draft.value }, () => (isEdited.value = false));
 const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 </script>
 
@@ -16,12 +25,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
     <h2 class="font-display text-lg font-semibold">
       {{ ticket.can.assign ? $t('ticket.notesInternal') : $t('ticket.notes') }}
     </h2>
-    <form
-      v-if="ticket.can.editNotes"
-      class="flex flex-col gap-3"
-      novalidate
-      @submit.prevent="patch({ notes: draft })"
-    >
+    <form v-if="ticket.can.editNotes" class="flex flex-col gap-3" novalidate @submit.prevent="save">
       <label class="flex flex-col gap-1.5 text-sm font-medium">
         <span class="sr-only">{{ $t('ticket.notes') }}</span>
         <textarea
@@ -29,6 +33,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
           name="notes"
           rows="5"
           class="rounded-lg border border-line bg-surface px-3.5 py-2.5 text-base text-content"
+          @input="isEdited = true"
         />
       </label>
       <div class="flex justify-end">

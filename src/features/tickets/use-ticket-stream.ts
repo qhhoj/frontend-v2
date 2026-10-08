@@ -1,45 +1,32 @@
 import { useQueryClient } from '@tanstack/vue-query';
-import { onScopeDispose, ref } from 'vue';
-import { openEventStream } from '@/api/events';
-import { translate } from '@/i18n';
-import { createSettleWindow } from './settle-window';
+import { onScopeDispose, ref, toValue, watch } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
+import { useViewerId } from '@/stores/use-viewer-id';
+import { createTicketFeed } from './ticket-feed';
 
-const SETTLE_MS = 1000;
-
-/** Live ticket updates (E20): ids only, so each burst refetches the tickets once and is announced once. */
-export function useTicketStream(ticketId: string | null) {
+/**
+ * Live ticket updates (E20): ids only, so each burst refetches the tickets once and is announced once.
+ * The feed follows the ticket id and the viewer: a change closes the old stream and opens a new one.
+ */
+export function useTicketStream(ticketId: MaybeRefOrGetter<string | null>) {
   const client = useQueryClient();
+  const viewer = useViewerId();
   const isLive = ref(true);
   const announcement = ref('');
-  let lastStatus: boolean | null = null;
-  const refetch = () => client.invalidateQueries({ queryKey: ['tickets'] });
-  const describe = (count: number) =>
-    lastStatus !== null
-      ? translate(lastStatus ? 'ticket.live.reopened' : 'ticket.live.closed')
-      : translate(ticketId ? 'ticket.live.messages' : 'ticket.live.updated', { count }, count);
-  const burst = createSettleWindow(SETTLE_MS, (count) => {
-    announcement.value = describe(count);
-    lastStatus = null;
-    void refetch();
-  });
-  const onEvent = (data: unknown) => {
-    const open = (data as { open?: boolean | null }).open;
-    if (typeof open === 'boolean') lastStatus = open;
-    burst.add();
-  };
-  const stream = openEventStream(
-    ticketId ? `/events/tickets/${encodeURIComponent(ticketId)}` : '/events/tickets',
-    {
-      'new-ticket': onEvent,
-      'ticket-message': onEvent,
-      'ticket-status': onEvent,
-      resync: () => void refetch(),
+  const feed = createTicketFeed({
+    refetch: () => void client.invalidateQueries({ queryKey: ['tickets'] }),
+    announce: (text) => (announcement.value = text),
+    onOpened: () => {
+      isLive.value = true;
+      announcement.value = '';
     },
-    () => (isLive.value = false),
-  );
-  onScopeDispose(() => {
-    burst.cancel();
-    stream.close();
+    onGaveUp: () => (isLive.value = false),
   });
+  watch(
+    () => [toValue(ticketId), viewer.value] as const,
+    ([id]) => feed.follow(id),
+    { immediate: true },
+  );
+  onScopeDispose(feed.stop);
   return { isLive, announcement };
 }
