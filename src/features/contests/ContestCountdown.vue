@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
-import BitMascot from '@/components/BitMascot.vue';
+import BitLoop from '@/components/BitLoop.vue';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { countdownTarget, freezeStart } from '@/lib/contest-time';
 import { formatClock, formatShortDate } from '@/lib/format';
-import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -36,16 +35,14 @@ const freezeClock = computed(() => {
 
 <template>
   <div class="flex items-center gap-4">
-    <!-- Upcoming: the countdown Bit (hero look until its variant is approved; only `look` changes). -->
-    <BitMascot
+    <!-- Upcoming: the stopwatch Bit, bigger from md up. Running: the same loop at the one notice size. -->
+    <BitLoop
       v-if="target?.kind === 'start'"
       data-testid="countdown-bit"
-      :look="PLACEMENT_LOOKS.hero"
-      blinks
+      kind="contest"
       class="[--bit-px:3px] md:[--bit-px:4px]"
     />
-    <!-- Running: REPLACEABLE HOOK, the stopwatch `contest` kind once bit/bitvar lands on main. -->
-    <InlineBit v-else-if="target?.kind === 'end'" kind="crown" />
+    <InlineBit v-else-if="target?.kind === 'end'" kind="contest" />
     <div v-if="target" class="flex-1">
       <p class="text-[12px] font-semibold tracking-wider text-muted uppercase">
         {{ $t(LABELS[target.kind]) }}

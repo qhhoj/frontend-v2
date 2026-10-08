@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestStats } from '@/test/fixtures';
+import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -74,7 +75,8 @@ describe('contest stats tab', () => {
       const { wrapper } = await mountApp('/contests/r42/stats');
       await vi.advanceTimersByTimeAsync(PAST_FIRST_RETRY_MS);
       expect(wrapper.get('main').text()).toContain('Thống kê chưa mở');
-      expect(wrapper.find('main [role="img"]').exists()).toBe(true);
+      const bit = wrapper.get('main [role="img"]');
+      expect(pixelsOf(bit.element)).toBe(pixelsOfKind('security'));
       expect(wrapper.find('main a[href="/contests/r42/ranking"]').exists()).toBe(true);
       expect(calls.filter((call) => call.path === '/contests/r42/stats')).toHaveLength(1);
     });

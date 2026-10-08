@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestProblem } from '@/test/fixtures';
+import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -62,7 +63,9 @@ describe('contest detail header', () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(running) });
     const { wrapper } = await mountApp('/contests/r42');
     const header = wrapper.get('[data-testid="contest-header"]');
-    expect(header.find('[data-testid="inline-bit"]').exists()).toBe(true);
+    expect(pixelsOf(header.get('[data-testid="inline-bit"]').element)).toBe(
+      pixelsOfKind('contest'),
+    );
     expect(header.find('[data-testid="countdown-bit"]').exists()).toBe(false);
   });
 
@@ -152,7 +155,8 @@ describe('contest detail header', () => {
     vi.useFakeTimers({ now: Date.parse('2026-10-08T07:17:45Z'), toFake: ['Date'] });
     mockApi({ ...anonymousViewer, ...contestPageRoutes(UPCOMING) });
     const { wrapper } = await mountApp('/contests/r42');
-    expect(wrapper.find('[data-testid="countdown-bit"]').exists()).toBe(true);
+    const bit = wrapper.get('[data-testid="countdown-bit"]');
+    expect(pixelsOf(bit.element)).toBe(pixelsOfKind('contest'));
   });
 });
 

@@ -1,7 +1,4 @@
-import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import BitLoop from '@/components/BitLoop.vue';
-import type { BitKind } from '@/mascot/bit-frames';
 import {
   contestItem,
   profile,
@@ -12,25 +9,12 @@ import {
   userPage,
 } from '@/test/fixtures';
 import { installFakeEventSource } from '@/test/fake-event-source';
-import {
-  anonymousViewer,
-  problemPageRoutes,
-  signedInViewer,
-  submissionPageRoutes,
-} from '@/test/problem-routes';
+import { problemPageRoutes, signedInViewer, submissionPageRoutes } from '@/test/problem-routes';
 import { stubMatchMedia } from '@/test/match-media';
 import { mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
+import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { mountApp } from '@/test/mount';
-
-/** The drawn pixels of a Bit, so a placement can be told apart by its kind without knowing its markup. */
-const pixelsOf = (element: Element) => element.querySelector('.grid')?.innerHTML;
-const pixelsOfKind = (kind: BitKind) => {
-  const reference = mount(BitLoop, { props: { kind } });
-  const html = pixelsOf(reference.element)!;
-  reference.unmount();
-  return html;
-};
 
 const homeRoutes = (overrides: Record<string, MockHandler> = {}): Record<string, MockHandler> => ({
   'GET /auth/me': signedIn(),
