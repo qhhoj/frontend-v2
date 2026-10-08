@@ -1083,6 +1083,29 @@
     "title": "Profile"
   },
   "profileTabs": {
+    "groupLine": "{count} problems · {points} points",
+    "noSolved": "No problem solved yet.",
+    "columns": {
+      "rank": "Rank",
+      "problem": "Problem",
+      "weight": "Weight",
+      "points": "Points",
+      "scaled": "Counted PP",
+      "submission": "Submission"
+    },
+    "ppFooter": "Showing {first} – {last}. Each later problem weighs less; together they make the performance points.",
+    "ppPager": "PP pages",
+    "ppErrorTitle": "Could not load the PP table",
+    "ppErrorBody": "The server did not answer. Try again in a few seconds.",
+    "noPp": "No problem counts toward PP yet.",
+    "postLine": "{date} · {score} points · {count} comments",
+    "postsPager": "Post pages",
+    "noPosts": "No posts yet.",
+    "olderComments": "Load older comments",
+    "noComments": "No comments yet.",
+    "commentsSignIn": "Sign in to see a user's comments",
+    "commentsForbidden": "You may not list this user's comments",
+    "signIn": "Sign in",
     "title": "Profile sections"
   },
   "orgs": {

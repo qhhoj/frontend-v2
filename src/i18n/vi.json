@@ -1083,6 +1083,29 @@
     "title": "Hồ sơ"
   },
   "profileTabs": {
+    "groupLine": "{count} bài · {points} điểm",
+    "noSolved": "Chưa giải bài nào.",
+    "columns": {
+      "rank": "Hạng",
+      "problem": "Bài",
+      "weight": "Trọng số",
+      "points": "Điểm bài",
+      "scaled": "PP tính",
+      "submission": "Bài nộp"
+    },
+    "ppFooter": "Hiển thị {first} – {last}. Mỗi bài xếp sau bị giảm trọng số, tổng cộng ra điểm PP.",
+    "ppPager": "Trang PP",
+    "ppErrorTitle": "Không tải được bảng PP",
+    "ppErrorBody": "Máy chủ không phản hồi. Thử lại sau ít giây.",
+    "noPp": "Chưa có bài nào được tính PP.",
+    "postLine": "{date} · {score} điểm · {count} bình luận",
+    "postsPager": "Trang bài viết",
+    "noPosts": "Chưa có bài viết nào.",
+    "olderComments": "Tải bình luận cũ hơn",
+    "noComments": "Chưa có bình luận nào.",
+    "commentsSignIn": "Đăng nhập để xem bình luận của người dùng",
+    "commentsForbidden": "Bạn không có quyền xem bình luận của người dùng này",
+    "signIn": "Đăng nhập",
     "title": "Mục hồ sơ"
   },
   "orgs": {
