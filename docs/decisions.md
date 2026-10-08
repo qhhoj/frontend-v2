@@ -170,7 +170,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Contests (8d)
 
-- Each contest tab is its own route; a tab page renders `ContestTabs` itself (the ranking page does today, the other tabs are placeholders).
+- Each contest tab is its own route; a tab page renders `ContestTabs` itself and passes the contest phase, so every tab keeps the announcement stream and its paused notice.
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
 - After backend 4c the detail's actions read `viewer.liveStatus`/`isCurrent`; the client-side copy of `liveStatusOf` is gone.
@@ -179,12 +179,12 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Solver counts hide their column when every count is null: the viewer may not see the full ranking, so a column of dashes would read as zeros.
 - Every contest refusal code has its own text, and `access_code_required` opens the code dialog instead of only showing the text: the user can act on it in place.
 - The own-only submissions banner waits for backend ask B-8d1 (`viewer.canSeeFullSubmissionList`): until then the client infers "only your submissions" and the backend narrows silently.
-- Bit placements: nightcap on empty lists, sweat on refusals, crown on the solved summary, crying when the contest is missing; podium and countdown Bits are not placed yet.
+- Bit placements: nightcap on empty lists, sweat on refusals, crown on the solved summary, crying when the contest is missing; the podium and countdown Bits sit on the ranking and the header.
 - The user-picked mock-up wins over the brief where they differ: the picked look is what the user reviewed, so it is the target.
 - "Cần mã" chip shows on list rows only: the detail header's action already says the code is needed, so a chip there would repeat it.
 - Visitors get the signed-in label on list rows and link to the detail page: the list runs the action with the signed-in rules, and the detail page decides what a visitor can actually do.
-- A hidden result shows "Kết quả đang ẩn" in the cell: an empty cell would read as no attempt, and the server decides when a result is hidden.
-- `ConfirmDialog` is shared: one confirm step for destructive choices, so busy, Escape and focus return behave the same on every confirm.
+- The own-result column shows only when the server sends results: a hidden board and a viewer with no participation both arrive as all-null `viewerResult` (backend `contest-problem-facts.service.ts:46-52`), so the client cannot tell them apart and draws no "hidden" state.
+- `ConfirmDialog` is shared: one confirm step for destructive choices and input prompts (the access-code dialog is built on it), so busy, Escape, the labelled close button and focus return behave the same on every confirm.
 
 ## Avatars
 
