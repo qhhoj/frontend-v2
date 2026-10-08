@@ -178,6 +178,10 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - Every user's avatar is a Bit hashed from the username (scheme C, 24 576 looks), not uploads: no storage, moderation or image pipeline, and the same name shows the same face everywhere.
 
+## Bit mascot
+
+- Bit variants: the nine approved options (judging, contest, rankUp, welcome, envelope, writing, security, staff, community) play their preview loops from frames copied into `src/mascot/bit-frames.ts`, one timer per on-screen Bit and frame 0 under reduced motion; the other 18 options stay in mascot.md's Reserve.
+
 ## Known gaps (later sub-projects)
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.

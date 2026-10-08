@@ -171,3 +171,25 @@ export const spriteCells = (
           ],
     ),
   );
+
+/** Loop frames (bit-frames.ts): lowercase roles are the charcoal twin, `P` is the podium plinth. */
+const CHARCOAL_ROLES = Object.fromEntries(
+  Object.entries(BIT_PALETTES.charcoal).map(([role, colour]) => [role.toLowerCase(), colour]),
+);
+/** A theme token, so the plinth follows the theme (the sprite keeps its other colours in every theme). */
+export const PODIUM_COLOUR = 'var(--qh-line-strong)';
+const FRAME_COLOURS: Record<string, string> = {
+  ...BIT_PALETTES.terracotta,
+  ...CHARCOAL_ROLES,
+  P: PODIUM_COLOUR,
+};
+
+/** The filled pixels of a loop frame as CSS grid cells (1-based lines), for the frame's own roles. */
+export const frameCells = (frame: readonly string[]): SpriteCell[] =>
+  frame.flatMap((row, rowIndex) =>
+    [...row].flatMap((role, columnIndex) =>
+      role === '.' || FRAME_COLOURS[role] === undefined
+        ? []
+        : [{ column: columnIndex + 1, row: rowIndex + 1, colour: FRAME_COLOURS[role] }],
+    ),
+  );

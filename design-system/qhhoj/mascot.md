@@ -44,11 +44,22 @@ These are sprite colours, not theme tokens: Bit keeps them in every theme (they 
 | 404 | crying: no headgear; one highlight tear pixel under each eye, two falling drops (highlight colour, outline), 1 px sob in steps | closed | terracotta |
 | Empty lists | nightcap | closed | charcoal |
 | Loading swarm | cap, nightcap (charcoal twin), crown, antenna, none, one per Bit; 5 on desktop, 3 under 768 px (cap, nightcap, crown), 1 under reduced motion (cap) | open, blink once when the Bits stop | terracotta (one charcoal) |
+| Judging (submission pending or grading; `judging`) | hourglass held above the head, sand drains (rows 0–5) | blink in the loop | terracotta |
+| Contest running (`contest`) | stopwatch above the head, hand ticks round the dial | blink in the loop | terracotta |
+| Rating went up (`rankUp`) | up arrow above the head, bobs | blink in the loop | terracotta |
+| Welcome, log in (`welcome`) | raised arm, 4 px (waves) | blink in the loop | terracotta |
+| Sign-up, check email (`envelope`) | envelope held above the head, flap opens and shuts | blink in the loop | terracotta |
+| Writing (`writing`) | quill beside the head, writes a line of dots | blink in the loop | terracotta |
+| Security, two-factor (`security`) | padlock beside the head, shackle opens, clicks shut | blink in the loop | terracotta |
+| Staff, admin area (`staff`) | hard hat (rows 0–5), double nod | blink in the loop | terracotta |
+| Community (`community`, `BitTrio`) | three Bits on a podium, hop in turn; the third is the charcoal twin | blink in the loop | terracotta, charcoal (third) |
 
 Antenna: a 2×2 knob (rows 2–3) on a 1 px stalk (rows 4–5); rows 0–1 stay empty. Every headgear's last row sits directly above the body (row 6).
 
 New variants: keep body, eyes, legs and palette identical; at most 1–2 px of pose change; the silhouette filled solid black must still read.
-Motion: blinking, the loading swarm and the 404 sob. Blinking and the sob are disabled under `prefers-reduced-motion`; the 404's falling tears are hidden there. Loading Bits walk: the walk frame moves each leg one pixel inward and drops the sprite one pixel (`translateY`, the stand frame has no offset), hops lift it 6 px, and it faces its direction of travel. Under reduced motion one Bit stands still. Every placement has an `aria-label` (decorative placements next to a heading use `aria-hidden`); the loading swarm is `aria-hidden`. Sprite data and palettes live in `src/mascot/bit-sprite.ts` and, for avatars, `src/mascot/avatar/avatar-sprites.ts`; these are the sprite files that `lint:tokens` skips.
+Exception (approved): `welcome` (4B, raised arm) moves its arm 4 px, because the 2 px rule read as a bare wave. No other variant may exceed 2 px without a new approval.
+Motion: blinking, the loading swarm, the 404 sob and the loops below.
+Loops (`src/mascot/bit-frames.ts`, one loop per kind; `frameMs` is each frame's time): frames were run out of the approved preview's own frame engine and copied as data, so a change starts from the preview (the engine's grids and timings), not from a hand-edited frame. Blinks are part of each loop's frames, so a loop has no periodic blink of its own. `useSpriteLoop` (`src/mascot/use-sprite-loop.ts`, used by `BitLoop.vue`) runs one timer per Bit, only while it is mounted and on screen (IntersectionObserver where it exists); it stops off screen, holds its frame, and clears on unmount. Under reduced motion every loop shows frame 0 and runs no timer. The placement is decorative (`aria-hidden`) beside text that already says the state; `BitTrio` takes a `label` when it stands alone. The sprite of a loop keeps the box of its frame 0, so a loop never moves the layout; the skeleton of a placement reserves the same box. Blinking and the sob are disabled under `prefers-reduced-motion`; the 404's falling tears are hidden there. Loading Bits walk: the walk frame moves each leg one pixel inward and drops the sprite one pixel (`translateY`, the stand frame has no offset), hops lift it 6 px, and it faces its direction of travel. Under reduced motion one Bit stands still. Every placement has an `aria-label` (decorative placements next to a heading use `aria-hidden`); the loading swarm is `aria-hidden`. Sprite data and palettes live in `src/mascot/bit-sprite.ts` and, for avatars, `src/mascot/avatar/avatar-sprites.ts`; these are the sprite files that `lint:tokens` skips.
 
 Reference mock-up: canvas section 5, artboard "Claw D" (https://claude.ai/artifact/KjFHNR7yonzVtbF8BUNmYW).
 
@@ -77,3 +88,15 @@ The 12 × 16 × 8 × 4 × 4 = 24 576 looks are the same for every name, in every
 **Sizes.** 24, 28, 32, 96 and 128 px. The 16×16 grid is scaled with cell edges at `⌊i · size / 16⌋`, and each row's runs of one colour become one rect, so `shape-rendering="crispEdges"` gives crisp pixels. 32, 96 and 128 are whole-pixel multiples; 24 and 28 mix 1 and 2 px columns. The tile corner radius is 22 % of the size (rounded to whole pixels), and the box never changes size, so it causes no layout shift. Skeletons reserve the same square.
 
 **Where.** Home top users 24, submissions list rows 24, submission detail author 32, contest ranking rows 24, header user menu 28.
+
+## Reserve (approved previews, not implemented)
+The 18 options below were shown in the [approved preview](.superpowers/designs/bitmotion/index.html) (kept with the design work, not in this repo) and are not built. Pick one, then add its frames to `bit-frames.ts` and its kind to the table above.
+- Judging: magnifier sweeps left and right (1B); gear, teeth alternate (1C).
+- Contest: headband tail flutters (2A); flame flickers (2C).
+- Rank up: trophy, highlight sweeps the cup (3A); party hat, confetti falls (3C).
+- Welcome: small wave, 2 px (4A); bow (4C).
+- Sign-up: party hat, confetti falls (5B); paper plane glides in (5C).
+- Writing: pencil writes a line of dots (6A); beret, stalk wiggles (6C).
+- Security: key, teeth flip and the key pushes in (7A); shield, a shine sweeps across (7B).
+- Staff: wrench, jaws open and close (8B); headset, ear cups pulse (8C).
+- Community: two Bits hop (9A); pennant, tail ripples (9B).

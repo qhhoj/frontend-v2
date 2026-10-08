@@ -2,6 +2,7 @@
 import { TrendingDown, TrendingUp } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -115,6 +116,11 @@ const tiles = computed(() =>
                 />
                 {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
               </span>
+              <InlineBit
+                v-if="delta !== null && delta > 0"
+                data-testid="rank-up-bit"
+                kind="rankUp"
+              />
             </div>
             <p class="text-muted">
               {{ $t('home.ratingTier', { tier: $t(tier ? `tiers.${tier}` : 'tiers.unrated') }) }}

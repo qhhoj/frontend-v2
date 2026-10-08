@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
+import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
@@ -66,7 +67,7 @@ const runtime = computed(() =>
     : `${formatCaseTime(props.submission.time)} · ${formatCaseMemory(props.submission.memory)}`,
 );
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
-/** Only a finished submission has a final verdict worth a crown or a sweat drop. */
+/** Only a finished submission has a final verdict worth a crown or a sweat drop; until then the hourglass Bit judges. */
 const bit = computed(() => {
   const mood = isFinished.value ? verdictBitMood(props.verdict) : null;
   return mood ? BIT_MOODS[mood] : null;
@@ -117,8 +118,14 @@ const facts = computed(() => [
           {{ $t('submission.provisional') }}
         </p>
       </div>
+      <BitLoop
+        v-if="!isFinished"
+        data-testid="judging-bit"
+        kind="judging"
+        class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
+      />
       <BitMascot
-        v-if="bit"
+        v-else-if="bit"
         :look="bit.look"
         :label="$t(bit.labelKey)"
         :closed-eyes="bit.eyesShut"

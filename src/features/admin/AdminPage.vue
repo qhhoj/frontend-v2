@@ -3,5 +3,5 @@ import PlaceholderPage from '@/components/PlaceholderPage.vue';
 </script>
 
 <template>
-  <PlaceholderPage />
+  <PlaceholderPage bit-kind="staff" />
 </template>

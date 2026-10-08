@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import { translate } from '@/i18n';
+import InlineBit from '@/components/InlineBit.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
@@ -43,7 +44,10 @@ async function submit() {
 
 <template>
   <section class="mx-auto max-w-md px-4 py-12">
-    <h1 class="font-display text-3xl font-semibold">{{ $t('pages.login') }}</h1>
+    <div class="flex items-center gap-4">
+      <h1 class="font-display text-3xl font-semibold">{{ $t('pages.login') }}</h1>
+      <InlineBit kind="welcome" class="shrink-0" />
+    </div>
     <p class="mt-2 text-muted">{{ $t('placeholder.pending') }}</p>
     <form class="mt-6 flex flex-col gap-4" @submit.prevent="submit">
       <label class="flex flex-col gap-1">
