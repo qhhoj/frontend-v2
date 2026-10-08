@@ -82,6 +82,22 @@ describe('authErrorText', () => {
   });
 });
 
+describe('authErrorText and the 429 wait', () => {
+  it('says how long to wait when a 429 names its Retry-After', () => {
+    const limited = new ApiError('rate_limited', 429, 'x', { retryAfterSeconds: 42 });
+    expect(authErrorText(limited)).toBe('Bạn thử quá nhiều lần. Thử lại sau 42 giây.');
+  });
+
+  it('falls back to the code text for a 429 with no wait, and for a wait on any other status', () => {
+    expect(authErrorText(new ApiError('rate_limited', 429, 'x'))).toBe(
+      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
+    );
+    expect(
+      authErrorText(new ApiError('invalid_code', 400, 'x', { retryAfterSeconds: 42 })),
+    ).not.toContain('42');
+  });
+});
+
 describe('fieldErrorTexts', () => {
   it('translates each issue by its code and joins several per field', () => {
     const error = rejected([

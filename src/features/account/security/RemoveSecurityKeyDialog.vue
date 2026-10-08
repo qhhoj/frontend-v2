@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { removeSecurityKey } from '@/api/account.api';
 import { ApiError } from '@/api/client';
 import type { SecurityKey } from '@/api/types/account';
@@ -10,7 +10,6 @@ import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
 import { SECURITY_KEYS_KEY } from './security.queries';
-import { rateLimitWaitText } from './totp-setup';
 
 /** Board SetSecurityD "Xoá khoá bảo mật?": the backend wants the current password. */
 const props = defineProps<{ securityKey: SecurityKey | null }>();
@@ -24,7 +23,6 @@ const fieldsElement = ref<HTMLElement | null>(null);
 const { pending, fieldErrors, summary, error, run, dismiss, reset } = useAuthAction(fieldsElement, [
   'currentPassword',
 ]);
-const errorText = computed(() => rateLimitWaitText(error.value) ?? summary.value);
 
 watch(visible, (open) => {
   if (!open) return;
@@ -75,6 +73,6 @@ async function refreshKeys() {
         @input="dismiss('currentPassword')"
       />
     </div>
-    <template #error><AuthError :text="errorText" /></template>
+    <template #error><AuthError :text="summary" /></template>
   </ConfirmDialog>
 </template>

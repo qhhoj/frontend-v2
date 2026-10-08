@@ -1,4 +1,3 @@
-import { ApiError } from '@/api/client';
 import { translate } from '@/i18n';
 
 const groupsOfFour = (text: string) => text.match(/.{1,4}/g) ?? [];
@@ -17,9 +16,3 @@ export const scratchCodesText = (codes: readonly string[], username: string) =>
     ...codes.map(formatScratchCode),
     '',
   ].join('\n');
-
-/** "Try again in 42 seconds" for a 429 that named its wait; null for every other failure, so the caller shows the generic text. */
-export const rateLimitWaitText = (error: unknown): string | null =>
-  error instanceof ApiError && error.status === 429 && error.retryAfterSeconds !== null
-    ? translate('settings.totp.rateLimitedWait', { seconds: error.retryAfterSeconds })
-    : null;

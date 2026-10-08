@@ -20,10 +20,19 @@ const WEBAUTHN_ERROR_NAMES: readonly string[] = [
   'UnknownError',
 ];
 
+/** "Try again in 42 seconds" for a 429 that named its wait; null for every other failure. */
+function rateLimitWaitText(error: unknown): string | null {
+  return error instanceof ApiError && error.status === 429 && error.retryAfterSeconds !== null
+    ? translate('errors.rateLimitedWait', { seconds: error.retryAfterSeconds })
+    : null;
+}
+
 /** The one place an auth failure becomes text for the viewer. */
 export function authErrorText(error: unknown): string {
   const reason = banReason(error);
   if (reason) return translate('errors.bannedWithReason', { reason });
+  const waitText = rateLimitWaitText(error);
+  if (waitText) return waitText;
   // An `AbortError` is not the key's fault (a cancelled request), so it falls through to the generic text.
   if (error instanceof DOMException && WEBAUTHN_ERROR_NAMES.includes(error.name))
     return translate('errors.webauthn_failed');

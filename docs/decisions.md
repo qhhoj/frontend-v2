@@ -303,7 +303,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Backup codes are shown grouped (`K7QM-2XRA-9PTD-4WLE`) and copied, downloaded and printed the same way: it is how people type them; every code field strips dashes and spaces (`normalizeBackupCode`) because the backend only upper-cases.
 - Leaving the backup-code step before ticking "Tôi đã lưu…" asks first: the codes are never shown again.
 - The one-time secrets (TOTP secret and QR, backup codes, API token) live only in component state or in mutations with `gcTime: 0`, never in a cached query: a later visit must not show them.
-- A 429 that names its wait shows "Thử lại sau N giây" in the 2FA, backup-code and security-key dialogs, instead of a generic failure.
+- A 429 that names its wait shows "Thử lại sau N giây" on every auth-action form, because `authErrorText` owns it: the 2FA, backup-code, security-key and password forms (settings and the forced `/account/password` page). A 429 with no `Retry-After` shows the generic text.
 - Notices reuse the verdict and accent tints (success AC, error WA, warning TLE, info accent-soft), as `AuthNotice` does; only the impersonation banner has new tokens (`caution-strong`), so it reads apart from the brand colour.
 - Bit in settings: crown and sweat mark results only (save, backup codes shown, 2FA turned on, export ready or failed); the `security` padlock marks the security-page empties, the locked notices and the TOTP header, because a lock says "private", not "done".
 - Sign out everywhere is locked while viewing as another user: it would end every session of the real user, and the backend refuses it too.

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { regenerateScratchCodes } from '@/api/account.api';
 import AuthError from '@/features/auth/AuthError.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
@@ -11,7 +11,6 @@ import { BUTTON } from '../settings/buttons';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
 import SecondFactorCodeField from './SecondFactorCodeField.vue';
 import { SCRATCH_CODES_REMAINING_KEY } from './security.queries';
-import { rateLimitWaitText } from './totp-setup';
 
 /**
  * Board SetSecurityC "Tạo lại mã dự phòng": a code, then the new codes shown once; the remaining count is read again.
@@ -23,8 +22,7 @@ const queryClient = useQueryClient();
 const code = ref('');
 const codes = ref<string[]>([]);
 const formElement = ref<HTMLFormElement | null>(null);
-const { pending, error, summary, run } = useAuthAction(formElement);
-const errorText = computed(() => rateLimitWaitText(error.value) ?? summary.value);
+const { pending, summary, run } = useAuthAction(formElement);
 
 async function regenerate() {
   if (code.value.length < OTP_LENGTH) return;
@@ -57,7 +55,7 @@ async function regenerate() {
       @submit.prevent="regenerate"
     >
       <SecondFactorCodeField v-model="code" :label="$t('settings.totp.regenerateCode')" />
-      <AuthError :text="errorText" />
+      <AuthError :text="summary" />
       <div class="flex flex-wrap gap-2.5">
         <button
           type="submit"

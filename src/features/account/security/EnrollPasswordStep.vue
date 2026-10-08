@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { enrollTotp } from '@/api/account.api';
 import type { TotpEnrollment } from '@/api/types/account';
 import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { BUTTON } from '../settings/buttons';
-import { rateLimitWaitText } from './totp-setup';
 
 /** Step 1: the backend wants the current password before it issues a secret. */
 const emit = defineEmits<{ enrolled: [enrollment: TotpEnrollment]; cancel: [] }>();
 const password = ref('');
 const formElement = ref<HTMLFormElement | null>(null);
-const { pending, error, fieldErrors, summary, run, dismiss } = useAuthAction(formElement, [
+const { pending, fieldErrors, summary, run, dismiss } = useAuthAction(formElement, [
   'currentPassword',
 ]);
-const errorText = computed(() => rateLimitWaitText(error.value) ?? summary.value);
 
 async function submit() {
   let enrollment: TotpEnrollment | null = null;
@@ -36,7 +34,7 @@ async function submit() {
       required
       @input="dismiss('currentPassword')"
     />
-    <AuthError :text="errorText" />
+    <AuthError :text="summary" />
     <div class="flex flex-wrap gap-2.5">
       <button type="submit" :class="BUTTON.primary" :aria-disabled="pending">
         {{ $t('settings.totp.continue') }}

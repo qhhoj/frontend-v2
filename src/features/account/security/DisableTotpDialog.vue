@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { disableTotp } from '@/api/account.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AuthError from '@/features/auth/AuthError.vue';
@@ -9,7 +9,6 @@ import { OTP_LENGTH } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
 import SecondFactorCodeField from './SecondFactorCodeField.vue';
 import { SCRATCH_CODES_REMAINING_KEY } from './security.queries';
-import { rateLimitWaitText } from './totp-setup';
 
 /** Board SetSecurityD "Tắt xác thực hai bước?": a code (or backup code) proves the viewer holds the factor. */
 const visible = defineModel<boolean>('visible', { required: true });
@@ -17,8 +16,7 @@ const emit = defineEmits<{ disabled: [] }>();
 const session = useSessionStore();
 const queryClient = useQueryClient();
 const code = ref('');
-const { pending, error, summary, run, reset } = useAuthAction();
-const errorText = computed(() => rateLimitWaitText(error.value) ?? summary.value);
+const { pending, summary, run, reset } = useAuthAction();
 
 watch(visible, (open) => {
   if (!open) return;
@@ -48,6 +46,6 @@ async function turnOff() {
     @confirm="turnOff"
   >
     <SecondFactorCodeField v-model="code" :label="$t('settings.totp.disableCode')" />
-    <template #error><AuthError :text="errorText" /></template>
+    <template #error><AuthError :text="summary" /></template>
   </ConfirmDialog>
 </template>
