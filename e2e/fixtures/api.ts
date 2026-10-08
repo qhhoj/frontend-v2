@@ -13,6 +13,7 @@ import {
   problemEditorial,
   participationSummary,
   problemMeta,
+  organizationItem,
   profile,
   ranking,
   ratingHistory,
@@ -30,6 +31,7 @@ import { list, ok } from './reply';
 import type { Handler, Reply } from './reply';
 
 export { list } from './reply';
+export type { Handler, Reply } from './reply';
 
 interface SeenRequest {
   key: string;
@@ -78,7 +80,17 @@ export class FakeApi {
       return { status: 204 };
     },
     'GET /auth/social/providers': ok({ providers: ['google', 'github'] }),
-    'GET /home': ok(homeResponse({ counts: HOME_COUNTS })),
+    'GET /auth/username-available': ({ url }) =>
+      ok({ available: url.searchParams.get('username') !== 'taken_name' }),
+    'GET /organizations': list([
+      organizationItem(),
+      organizationItem({
+        id: '0192a000-0000-7000-8000-0000000000a2',
+        slug: 'thpt-b',
+        name: 'THPT B',
+      }),
+    ]),
+    'GET /home': ok(homeResponse({ counts: { ...HOME_COUNTS, users: 1284 } })),
     'GET /profile': ok(profile()),
     'PATCH /profile': ({ body }) => ok(profile(body as object)),
     'GET /problems/meta': ok(problemMeta()),

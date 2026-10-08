@@ -27,7 +27,8 @@ const passThrough = computed(() => ({
   },
   label: {
     // The empty state is the placeholder: muted, so it does not read as a chosen school.
-    class: 'flex-1 truncate py-2 focus-visible:outline-none data-[p~=placeholder]:text-muted',
+    class:
+      'min-h-11 flex-1 truncate py-2 focus-visible:outline-none data-[p~=placeholder]:text-muted',
     'aria-describedby': props.error ? errorId : undefined,
   },
   pcFilter: {
