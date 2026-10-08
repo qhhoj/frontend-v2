@@ -15,9 +15,12 @@ import { resolveNavigation } from './guards';
 import { pageTitle } from './page-title';
 import { routes } from './routes';
 
-/** Back/forward restores the saved position; a query-only change (a tab, a filter) keeps it; a new page starts at the top. */
-export const scrollOnNavigation: RouterScrollBehavior = (to, from, saved) =>
-  saved ?? (to.path === from.path ? false : { top: 0 });
+/** Back/forward restores the saved position; a hash scrolls to its element; a query-only change (a tab, a filter) keeps the position; a new page starts at the top. */
+export const scrollOnNavigation: RouterScrollBehavior = (to, from, saved) => {
+  if (saved) return saved;
+  if (to.hash) return { el: to.hash };
+  return to.path === from.path ? false : { top: 0 };
+};
 
 /** Another path is a new page: focus must not stay on a control of the old one (it is gone, and focus falls to the body). The first load and query-only changes (tabs, filters, the sheet) keep their own focus handling. */
 export const isNewPage = (to: RouteLocationNormalized, from: RouteLocationNormalized) =>

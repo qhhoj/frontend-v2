@@ -47,7 +47,10 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
       >
         {{ post.title }}
       </h1>
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+      <div
+        data-testid="post-byline"
+        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted"
+      >
         <span
           v-for="author in post.authors"
           :key="author.id"

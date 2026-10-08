@@ -58,7 +58,7 @@ usePageTitle(() => post.value?.title);
             {{ $t('blogPost.back') }}
           </RouterLink>
           <PostArticle :post="post" />
-          <section id="comments" aria-labelledby="comments-heading" class="mt-8">
+          <section id="comments" aria-labelledby="comments-heading" class="mt-8 scroll-mt-20">
             <h2 id="comments-heading" class="font-display text-xl font-semibold">
               {{ $t('comments.title') }}
             </h2>

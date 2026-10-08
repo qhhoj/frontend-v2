@@ -55,7 +55,14 @@ defineShiftTests([
     answer: (api) => {
       api.routes[`GET /posts/${POST_ID}`] = ok(postDetail({ id: POST_ID }));
     },
-    parts: (page) => ({ 'post article': page.locator('article').first() }),
+    // The title and byline are the same boxes in both states; the body's height follows the post, so only its place is compared.
+    parts: (page) => ({
+      'post title': page.locator('article h1, [data-skeleton-region="title"]'),
+      'post byline': page.locator('[data-testid="post-byline"], [data-skeleton-region="byline"]'),
+      'post body': page.locator('.user-content, [data-skeleton-region="body"]'),
+    }),
+    placed: ['post byline', 'post body'],
+    placedOnly: ['post body'],
     viewports: PHONE_AND_DESKTOP,
   },
 ]);
