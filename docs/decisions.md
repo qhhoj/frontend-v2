@@ -126,6 +126,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Motion: skeleton pulse, Bit sob and tears use their own durations and switch themselves off under reduced motion, because `--qh-duration` is 0 there and would freeze them mid-frame instead of removing them.
 - 404: `NotFoundPage` (crying Bit, pale 404) replaces the placeholder on the catch-all route; the mascot's 404 variant is crying, not a magnifying glass (user's pick "404 B").
 - More Bit: `InlineBit` (48 px, decorative) sits beside short notices (sweat: forbidden, stream stopped, refresh failed, activation failed; crown: account activated; nightcap: placeholder pages) and `EmptyState compact` fills the home cards' empty texts, because a notice beside its words needs no second label; per-row verdict Bits stay out as too noisy.
+- More Bit: the crown keeps open eyes (`mascot.md`: Accepted) while sweat and asleep shut them, and `EmptyState compact` renders `InlineBit kind="asleep"`, so the 48 px asleep Bit is defined once and its home-card copies are decorative because the words beside them say the list is empty.
 
 ## Problems and submissions
 

@@ -215,11 +215,8 @@ describe('submission page', () => {
     mockApi({ ...signedInViewer(), 'GET /submissions/sub-1': fail(403, 'forbidden') });
     const { wrapper } = await mountApp('/submissions/sub-1');
     await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền làm việc này.'));
-    expect(
-      wrapper
-        .get('[role="alert"]')
-        .element.parentElement?.querySelector('[data-testid="inline-bit"]'),
-    ).not.toBeNull();
+    const bit = wrapper.get('[data-testid="inline-bit"]');
+    expect(bit.attributes('aria-hidden')).toBe('true');
   });
 
   it('renders not-found in place for a 404', async () => {

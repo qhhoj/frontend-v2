@@ -80,7 +80,10 @@ test('the 404 page shows Bit crying with two falling tears', async ({ page }) =>
   await expect(crying.locator('.bit-tear').first()).toBeHidden();
 });
 
-test('home cards with nothing to list each show a small sleeping Bit', async ({ page, api }) => {
+test('home cards with nothing to list each show a small decorative sleeping Bit', async ({
+  page,
+  api,
+}) => {
   api.signedIn = true;
   api.routes['GET /contests'] = { body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } } };
   api.routes['GET /users'] = { body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } } };
@@ -89,8 +92,9 @@ test('home cards with nothing to list each show a small sleeping Bit', async ({ 
   };
   await page.goto('/');
   for (const card of ['live-contest', 'recent-submissions', 'top-users']) {
-    const bit = page.getByTestId(card).getByRole('img', { name: 'Bit ngủ trong mũ ngủ' });
+    const bit = page.getByTestId(card).getByTestId('inline-bit');
     await expect(bit).toBeVisible();
+    await expect(bit).toHaveAttribute('aria-hidden', 'true');
     expect((await boxOf(bit)).width).toBe(48);
   }
 });

@@ -19,6 +19,13 @@ const {
 } = useRecentSubmissionsQuery(() => props.username);
 const locale = useLocaleStore();
 const now = useNow(60_000);
+/**
+ * The list box on a phone: the four skeleton rows, measured at 382 px on a 375 px screen. The skeleton and the empty
+ * message both take it, so the card keeps its height when rows or the message replace the skeleton (CLS cases
+ * "recent submissions card" and "recent submissions card when it has nothing to list" in e2e/loading.e2e.ts). From `sm`
+ * the card sits beside the right column in a flex row that stretches it, so the box is dropped there.
+ */
+const LIST_BOX = 'min-h-[382px] sm:min-h-0';
 </script>
 
 <template>
@@ -33,7 +40,7 @@ const now = useNow(60_000);
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <ul class="mt-3.5 flex flex-col gap-2">
+        <ul class="mt-3.5 flex flex-col gap-2" :class="LIST_BOX">
           <li
             v-for="row in 4"
             :key="row"
@@ -52,7 +59,8 @@ const now = useNow(60_000);
       <EmptyState
         v-if="!submissions?.length"
         compact
-        class="mt-3.5 min-h-[382px] justify-center sm:min-h-0"
+        class="mt-3.5 justify-center"
+        :class="LIST_BOX"
         >{{ $t('home.noSubmissions') }}</EmptyState
       >
       <ul v-else class="mt-3.5 flex flex-col gap-2">

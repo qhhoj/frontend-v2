@@ -12,6 +12,10 @@ import {
 } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
+import { closeStream, installControlledEventSource } from './fixtures/controlled-event-source';
+
+/** Same as RANKING_POLL_MS in src/features/contests/contests.queries.ts. */
+const RANKING_POLL_MS = 30_000;
 import type { FakeApi } from './fixtures/api';
 
 const BITS = '[data-testid="loading-bit"]';
@@ -599,3 +603,108 @@ for (const theme of THEMES)
         ),
       ).toEqual([]);
     });
+
+/**
+ * Notices that appear after the page has loaded (a stream gone, a refresh that failed). They sit above the content they
+ * push down, so the check is: the heading above does not move, and what sits below moves by exactly the notice's own box
+ * plus its margin and any flex gap, nothing more.
+ */
+const NOTICE_SHIFT_TOLERANCE_PX = 2;
+const topOf = (locator: Locator) =>
+  locator.evaluate((element) => element.getBoundingClientRect().top);
+const noticeFootprint = (notice: Locator) =>
+  notice.evaluate((element) => {
+    const parent = element.parentElement!;
+    const gap = getComputedStyle(parent).display.includes('flex')
+      ? parseFloat(getComputedStyle(parent).rowGap) || 0
+      : 0;
+    return (
+      element.getBoundingClientRect().height +
+      parseFloat(getComputedStyle(element).marginBottom) +
+      gap
+    );
+  });
+
+const expectNoticeMovesOnlyWhatIsBelow = async (
+  trigger: () => Promise<void>,
+  notice: Locator,
+  above: Locator,
+  below: Locator,
+) => {
+  const aboveBefore = await topOf(above);
+  const belowBefore = await topOf(below);
+  await trigger();
+  await expect(notice).toBeVisible();
+  expect(
+    Math.abs((await topOf(above)) - aboveBefore),
+    'the heading above stays put',
+  ).toBeLessThanOrEqual(NOTICE_SHIFT_TOLERANCE_PX);
+  const shift = (await topOf(below)) - belowBefore;
+  expect(
+    Math.abs(shift - (await noticeFootprint(notice))),
+    'only the notice moves what is below',
+  ).toBeLessThanOrEqual(NOTICE_SHIFT_TOLERANCE_PX);
+};
+
+for (const width of [PHONE, DESKTOP]) {
+  test(`the live paused notice pushes the list down by its own box only, at ${width} px`, async ({
+    page,
+    api,
+  }) => {
+    await installControlledEventSource(page);
+    await page.setViewportSize({ width, height: 900 });
+    api.routes['GET /submissions'] = list([submissionItem({ id: 'sub-1' })]);
+    await page.goto('/submissions');
+    await expect(page.locator('tbody tr').first()).toBeVisible();
+    await expectNoticeMovesOnlyWhatIsBelow(
+      () => closeStream(page),
+      page.getByTestId('live-paused'),
+      page.getByRole('heading', { level: 1 }),
+      page.locator('tbody tr').first(),
+    );
+  });
+
+  test(`the stale reload notice pushes the verdict down by its own box only, at ${width} px`, async ({
+    page,
+    api,
+  }) => {
+    await installControlledEventSource(page);
+    await page.setViewportSize({ width, height: 900 });
+    api.signedIn = true;
+    api.routes['GET /submissions/:id'] = () => ({
+      body: { data: submissionDetail({ status: 'G', result: null, points: null }) },
+    });
+    await page.goto('/submissions/sub-1');
+    await expect(page.getByTestId('grading-line')).toBeVisible();
+    await expectNoticeMovesOnlyWhatIsBelow(
+      () => closeStream(page),
+      page.getByTestId('stale-reload'),
+      page.getByRole('heading', { level: 1 }),
+      page.locator('.rounded-panel').filter({ has: page.getByTestId('score') }),
+    );
+  });
+
+  test(`the ranking refresh notice pushes the board down by its own box only, at ${width} px`, async ({
+    page,
+    api,
+  }) => {
+    await page.clock.install();
+    await page.setViewportSize({ width, height: 900 });
+    let failing = false;
+    api.routes['GET /contests/r42/ranking'] = () =>
+      failing
+        ? { status: 500, body: { error: { code: 'internal', message: 'x' } } }
+        : { body: { data: ranking() } };
+    await page.goto('/contests/r42/ranking');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expectNoticeMovesOnlyWhatIsBelow(
+      async () => {
+        failing = true;
+        await page.clock.fastForward(RANKING_POLL_MS + 1000);
+      },
+      page.getByText('Không cập nhật được bảng, đang thử lại.'),
+      page.getByRole('heading', { level: 1 }),
+      page.locator('main tbody tr').first(),
+    );
+  });
+}

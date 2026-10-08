@@ -139,7 +139,7 @@ describe('home', () => {
     );
   });
 
-  it('puts a small sleeping Bit in each card whose list is empty, and none in a card with rows', async () => {
+  it('puts a small decorative sleeping Bit in each card whose list is empty, beside the words that say so', async () => {
     mockApi(
       signedInRoutes({
         'GET /contests': page([]),
@@ -149,20 +149,21 @@ describe('home', () => {
     );
     const { wrapper } = await mountApp('/');
     await flushPromises();
-    for (const card of ['live-contest', 'recent-submissions', 'top-users'])
-      expect(
-        wrapper.get(`[data-testid="${card}"]`).get('[role="img"]').attributes('aria-label'),
-      ).toBe('Bit ngủ trong mũ ngủ');
+    for (const card of ['live-contest', 'recent-submissions', 'top-users']) {
+      const cardBit = wrapper.get(`[data-testid="${card}"]`).get('[data-testid="inline-bit"]');
+      expect(cardBit.attributes('aria-hidden')).toBe('true');
+      expect(cardBit.attributes('role')).toBeUndefined();
+    }
   });
 
   it('draws no Bit in the cards while they have rows', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await mountApp('/');
     await flushPromises();
-    expect(wrapper.get('[data-testid="top-users"]').find('[role="img"]').exists()).toBe(false);
-    expect(wrapper.get('[data-testid="recent-submissions"]').find('[role="img"]').exists()).toBe(
-      false,
-    );
+    for (const card of ['top-users', 'recent-submissions'])
+      expect(
+        wrapper.get(`[data-testid="${card}"]`).find('[data-testid="inline-bit"]').exists(),
+      ).toBe(false);
   });
 
   it('shows anonymous viewers the public cards only', async () => {
