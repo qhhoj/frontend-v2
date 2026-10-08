@@ -125,7 +125,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Problems and submissions
 
-- CodeMirror 6, not Monaco (spec): about an order of magnitude lighter, tokens-themable, works on touch and under magnification; lazy chunk, coloured through the existing --qh-syntax-* tokens (8a2) with per-language lazy packs (sizes recorded in Tasks 5 and 5b).
+- CodeMirror 6, not Monaco (spec): about an order of magnitude lighter, tokens-themable, works on touch and under magnification; lazy chunk, coloured through the existing --qh-syntax-* tokens (8a2) with per-language lazy packs, one chunk each, none preloaded. Measured gzip (editor harness build): core editor 84.2 KB (state, view, language, highlight) + 8.5 KB (`code-editor-cm`), shared parser runtime 8.8 KB (+3.2 KB autocomplete shared by python, javascript, go); packs cpp 32.9, javascript 32.3, rust 29.3, java 18.7, python 18.5, go 12.3 KB. Pascal and other languages without an official pack render plain.
 - Discussion tab waits for 8e (comments are page-generic and need a threads mock-up).
 - Submit success goes to /submissions/:id; Nộp lại goes to /problems/:code?resubmit=<id>.
 - PDF: the button prepares it in the page (poll the PDF URL no faster than every 3 s, 202 + Retry-After while rendering, B20), stops on 503 pdf_unavailable and 429, gives up after 120 s, then offers "Open PDF"; no percentage.

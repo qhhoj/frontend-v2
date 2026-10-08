@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { EditorHandle } from './code-editor-cm';
+import { loadLanguagePack } from './code-languages';
 
 const props = withDefaults(
-  defineProps<{ label: string; disabled?: boolean; minLines?: number }>(),
+  defineProps<{
+    label: string;
+    disabled?: boolean;
+    minLines?: number;
+    /** The language's editor mode key (`Language.ace`); `null` or one without a pack is plain text. */
+    language?: string | null;
+  }>(),
   {
     disabled: false,
     minLines: 12,
+    language: null,
   },
 );
 const source = defineModel<string>({ required: true });
@@ -16,6 +24,8 @@ const textarea = ref<HTMLTextAreaElement>();
 const isEditorReady = ref(false);
 let editor: EditorHandle | undefined;
 let isUnmounted = false;
+// Language packs arrive asynchronously; only the answer to the latest request may be applied.
+let languageRequestCount = 0;
 // setDoc fires the editor's change listener; without this guard an external value would be echoed back.
 let isApplyingExternalValue = false;
 
@@ -46,6 +56,12 @@ async function importEditorModule() {
   }
 }
 
+async function applyLanguage() {
+  const thisRequest = ++languageRequestCount;
+  const pack = props.language ? await loadLanguagePack(props.language) : null;
+  if (thisRequest === languageRequestCount && !isUnmounted) editor?.setLanguage(pack);
+}
+
 async function loadEditor() {
   const editorModule = await importEditorModule();
   if (!editorModule || isUnmounted) return;
@@ -71,6 +87,7 @@ async function loadEditor() {
     return;
   }
   if (selection) editor.focus();
+  await applyLanguage();
 }
 
 watch(source, (value) => {
@@ -85,6 +102,8 @@ watch(
   () => props.disabled,
   (disabled) => editor?.setDisabled(disabled),
 );
+
+watch(() => props.language, applyLanguage);
 
 onMounted(loadEditor);
 onBeforeUnmount(() => {

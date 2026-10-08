@@ -1,6 +1,7 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { Compartment, EditorState } from '@codemirror/state';
+import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { EditorView, drawSelection, keymap, lineNumbers } from '@codemirror/view';
+import { syntaxHighlight } from './code-syntax';
 
 export interface EditorOptions {
   doc: string;
@@ -14,6 +15,8 @@ export interface EditorOptions {
 export interface EditorHandle {
   setDoc(doc: string): void;
   setDisabled(disabled: boolean): void;
+  /** Swaps the language pack only: the document, selection and undo history stay. `null` is plain text. */
+  setLanguage(extension: Extension | null): void;
   focus(): void;
   destroy(): void;
 }
@@ -42,6 +45,7 @@ const tokenTheme = EditorView.theme({
 /** Tab is deliberately not bound (only the default and history keymaps): binding it would trap keyboard users. */
 export function createEditor(host: HTMLElement, options: EditorOptions): EditorHandle {
   const editable = new Compartment();
+  const language = new Compartment();
   const view = new EditorView({
     parent: host,
     state: EditorState.create({
@@ -53,6 +57,8 @@ export function createEditor(host: HTMLElement, options: EditorOptions): EditorH
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         tokenTheme,
+        syntaxHighlight,
+        language.of([]),
         EditorView.contentAttributes.of({
           'aria-label': options.label,
           spellcheck: 'false',
@@ -71,6 +77,7 @@ export function createEditor(host: HTMLElement, options: EditorOptions): EditorH
       view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: doc } }),
     setDisabled: (disabled) =>
       view.dispatch({ effects: editable.reconfigure(EditorView.editable.of(!disabled)) }),
+    setLanguage: (extension) => view.dispatch({ effects: language.reconfigure(extension ?? []) }),
     focus: () => view.focus(),
     destroy: () => view.destroy(),
   };

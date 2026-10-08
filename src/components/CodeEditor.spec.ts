@@ -8,6 +8,7 @@ import CodeEditor from './CodeEditor.vue';
 interface FakeHandle {
   setDoc: ReturnType<typeof vi.fn>;
   setDisabled: ReturnType<typeof vi.fn>;
+  setLanguage: ReturnType<typeof vi.fn>;
   focus: ReturnType<typeof vi.fn>;
   destroy: ReturnType<typeof vi.fn>;
 }
@@ -35,11 +36,19 @@ vi.mock('./code-editor-cm', () => ({
     fake.handle = {
       setDoc: vi.fn(),
       setDisabled: vi.fn(),
+      setLanguage: vi.fn(),
       focus: vi.fn(),
       destroy: vi.fn(),
     };
     return fake.handle;
   },
+}));
+
+const packs = vi.hoisted(() => ({
+  load: undefined as undefined | ((ace: string) => Promise<unknown>),
+}));
+vi.mock('./code-languages', () => ({
+  loadLanguagePack: (ace: string) => packs.load!(ace),
 }));
 
 const options = () => fake.options as FakeOptions;
@@ -59,6 +68,7 @@ describe('CodeEditor', () => {
     fake.createError = undefined;
     fake.options = undefined;
     fake.handle = undefined;
+    packs.load = (ace) => Promise.resolve(ace === 'text' ? null : { pack: ace });
   });
 
   afterEach(() => {
@@ -158,5 +168,54 @@ describe('CodeEditor', () => {
     textarea.setSelectionRange(2, 7, 'backward');
     await flushPromises();
     expect(options().selection).toEqual({ anchor: 7, head: 2 });
+  });
+
+  describe('language', () => {
+    it('gives the editor the pack of the language prop once the chunk has loaded', async () => {
+      mountEditor({ language: 'c_cpp' });
+      await flushPromises();
+      expect(handle().setLanguage).toHaveBeenLastCalledWith({ pack: 'c_cpp' });
+    });
+
+    it('switches to the pack of a new language', async () => {
+      const editor = mountEditor({ language: 'c_cpp' });
+      await flushPromises();
+      await editor.setProps({ language: 'python' });
+      await flushPromises();
+      expect(handle().setLanguage).toHaveBeenLastCalledWith({ pack: 'python' });
+    });
+
+    it('drops an older, slower pack that arrives after the language changed', async () => {
+      let resolveSlowPython: (pack: unknown) => void = () => undefined;
+      const slowPython = new Promise((resolve) => (resolveSlowPython = resolve));
+      packs.load = (ace) => (ace === 'python' ? slowPython : Promise.resolve({ pack: ace }));
+      const editor = mountEditor({ language: 'python' });
+      await flushPromises();
+      await editor.setProps({ language: 'c_cpp' });
+      await flushPromises();
+      resolveSlowPython({ pack: 'python' });
+      await flushPromises();
+      expect(handle().setLanguage).toHaveBeenLastCalledWith({ pack: 'c_cpp' });
+      expect(handle().setLanguage).not.toHaveBeenCalledWith({ pack: 'python' });
+    });
+
+    it.each([[null], ['text']])(
+      'shows plain text for language %s and keeps working',
+      async (language) => {
+        const editor = mountEditor({ language });
+        await flushPromises();
+        expect(handle().setLanguage).toHaveBeenLastCalledWith(null);
+        options().onChange('still typing');
+        expect(editor.emitted('update:modelValue')).toEqual([['still typing']]);
+      },
+    );
+
+    it('stays plain text, without an error, when the pack failed to load', async () => {
+      packs.load = () => Promise.resolve(null);
+      mountEditor({ language: 'c_cpp' });
+      await flushPromises();
+      expect(handle().setLanguage).toHaveBeenLastCalledWith(null);
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });
