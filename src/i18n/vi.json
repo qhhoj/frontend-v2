@@ -132,6 +132,30 @@
       "registrationBetween": "Từ {start} đến {end}",
       "registrationFrom": "Từ {start}",
       "registrationUntil": "Đến {end}"
+    },
+    "stats": {
+      "submissions": "bài nộp",
+      "accepted": "được chấp nhận",
+      "problems": "bài trong kỳ thi",
+      "participants": "thí sinh",
+      "problemTitle": "Kết quả theo bài",
+      "columns": {
+        "label": "Bài",
+        "name": "Tên",
+        "results": "Kết quả của mọi bài nộp",
+        "total": "Tổng",
+        "acRate": "Tỷ lệ AC",
+        "language": "Ngôn ngữ",
+        "share": "Tỷ trọng",
+        "count": "Số bài",
+        "ac": "AC"
+      },
+      "errNote": "ERR gồm MLE, OLE, IR, RTE, AB và IE. Tổng tính cả bài nộp đang chờ chấm.",
+      "languageTitle": "Ngôn ngữ",
+      "closedTitle": "Thống kê chưa mở",
+      "closedBody": "Thống kê hiện sau khi kỳ thi kết thúc hoặc khi ban tổ chức công khai danh sách bài nộp.",
+      "toRanking": "Xem bảng xếp hạng",
+      "region": "Bảng thống kê, cuộn ngang"
     }
   },
   "placeholder": {

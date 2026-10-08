@@ -132,6 +132,30 @@
       "registrationBetween": "From {start} to {end}",
       "registrationFrom": "From {start}",
       "registrationUntil": "Until {end}"
+    },
+    "stats": {
+      "submissions": "submissions",
+      "accepted": "accepted",
+      "problems": "problems in the contest",
+      "participants": "contestants",
+      "problemTitle": "Results per problem",
+      "columns": {
+        "label": "Problem",
+        "name": "Name",
+        "results": "Results of every submission",
+        "total": "Total",
+        "acRate": "AC rate",
+        "language": "Language",
+        "share": "Share",
+        "count": "Submissions",
+        "ac": "AC"
+      },
+      "errNote": "ERR covers MLE, OLE, IR, RTE, AB and IE. Totals include submissions still waiting.",
+      "languageTitle": "Languages",
+      "closedTitle": "Statistics are not open yet",
+      "closedBody": "Statistics show after the contest ends or when the organizers make the submission list public.",
+      "toRanking": "See the ranking",
+      "region": "Statistics table, scrolls sideways"
     }
   },
   "placeholder": {

@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import type { ContestLanguageStats } from '@/api/types/contests';
+import { formatNumber } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
+import { formatPercent, languageShare } from './stats-summary';
+
+defineProps<{ languages: ContestLanguageStats[] }>();
+const locale = useLocaleStore();
+const count = (value: number) => formatNumber(value, locale.locale);
+</script>
+
+<template>
+  <section class="flex flex-col gap-2">
+    <h2 class="font-display text-xl font-bold">{{ $t('contests.stats.languageTitle') }}</h2>
+    <div
+      tabindex="0"
+      role="region"
+      :aria-label="$t('contests.stats.region')"
+      class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
+    >
+      <table data-testid="language-stats" class="w-full min-w-[480px] border-collapse">
+        <thead>
+          <tr class="text-left text-[13px] text-muted">
+            <th scope="col" class="px-4 py-3 font-medium">
+              {{ $t('contests.stats.columns.language') }}
+            </th>
+            <th scope="col" class="px-4 py-3 font-medium">
+              {{ $t('contests.stats.columns.share') }}
+            </th>
+            <th scope="col" class="px-4 py-3 text-right font-medium">
+              {{ $t('contests.stats.columns.count') }}
+            </th>
+            <th scope="col" class="px-4 py-3 text-right font-medium">
+              {{ $t('contests.stats.columns.ac') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="language in languages" :key="language.languageId" class="border-t border-line">
+            <th scope="row" class="px-4 py-3 text-left font-semibold">{{ language.name }}</th>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div
+                  aria-hidden="true"
+                  class="h-2.5 flex-1 overflow-hidden rounded-pill bg-surface-hover"
+                >
+                  <div
+                    class="h-full rounded-pill bg-accent"
+                    :style="{ width: `${languageShare(language, languages) * 100}%` }"
+                  />
+                </div>
+                <span class="w-16 text-right font-mono text-sm">
+                  {{ formatPercent(languageShare(language, languages) * 100, locale.locale) }}
+                </span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-right font-mono">{{ count(language.count) }}</td>
+            <td class="px-4 py-3 text-right font-mono font-semibold">
+              {{ formatPercent(language.acRate, locale.locale) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</template>
