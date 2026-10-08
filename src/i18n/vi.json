@@ -333,6 +333,40 @@
       "locked": "Chưa lưu được tên hoặc phần giới thiệu: tài khoản cần giải thêm bài trước khi sửa hồ sơ, hoặc kỳ thi chính thức đang khoá hồ sơ.",
       "organizationsChanged": "Chưa lưu được danh sách tổ chức. Có thể bạn là quản trị viên của tổ chức bạn muốn rời, hoặc danh sách tổ chức vừa thay đổi. Trang đã tải lại danh sách; lựa chọn của bạn vẫn còn, hãy kiểm tra rồi bấm Lưu lại.",
       "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại."
+    },
+    "data": {
+      "title": "Xuất dữ liệu cá nhân",
+      "lead": "Tải về một tệp .zip chứa dữ liệu tài khoản của bạn. Tệp được chuẩn bị nền; bạn có thể rời trang trong lúc chờ.",
+      "state": {
+        "none": "Chưa yêu cầu",
+        "expired": "Hết hạn",
+        "preparing": "Đang chạy",
+        "ready": "Sẵn sàng"
+      },
+      "noneText": "Bạn chưa yêu cầu xuất dữ liệu. Bản sẵn sàng sau vài phút.",
+      "expiredText": "Tệp cũ đã bị xoá sau 7 ngày. Bạn có thể yêu cầu bản mới.",
+      "preparingText": "Yêu cầu lúc {time}. Trang tự cập nhật khi xong.",
+      "fileFacts": "{size} · tạo lúc {time}",
+      "download": "Tải về",
+      "expires": "Đường tải hết hạn lúc {time} (còn {days} ngày). Sau đó bạn cần yêu cầu lại.",
+      "lastRequest": "Lần yêu cầu gần nhất",
+      "requestedAt": "Yêu cầu lúc",
+      "readyAt": "Hoàn tất lúc",
+      "nextAt": "Có thể yêu cầu lại",
+      "requestFirst": "Yêu cầu xuất dữ liệu",
+      "requestAgain": "Yêu cầu bản mới",
+      "preparing": "Đang chuẩn bị…",
+      "waitFor": "Bạn có thể yêu cầu lại sau {hours} giờ {minutes} phút.",
+      "dailyLimit": "Bạn đã dùng hết lượt yêu cầu hôm nay. Hãy thử lại vào ngày mai.",
+      "busy": "Đang có một yêu cầu chạy: hãy chờ xong rồi thử lại.",
+      "unavailable": "Xuất dữ liệu không khả dụng cho tài khoản này.",
+      "locked": "Chỉ chủ tài khoản xuất được dữ liệu cá nhân. Bấm “Dừng xem” để trở lại tài khoản của bạn.",
+      "limitsTitle": "Giới hạn",
+      "limitsLead": "Việc đóng gói dữ liệu khá nặng nên được giới hạn.",
+      "limitInterval": "Mỗi lần yêu cầu cách nhau ít nhất 1 ngày.",
+      "limitDaily": "Tối đa 3 lần mỗi ngày.",
+      "limitOneAtATime": "Mỗi lúc chỉ chuẩn bị một tệp; yêu cầu thêm sẽ bị từ chối cho đến khi xong.",
+      "limitLifetime": "Tệp có hiệu lực 7 ngày kể từ lúc tạo."
     }
   },
   "appearance": {

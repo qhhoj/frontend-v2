@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { problemEditorial, signedIn, signedOut } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
+import { settingsRoutes } from '@/test/account-routes';
 import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -262,5 +263,17 @@ describe('the submission list page loads its stats strip and table as independen
     expect(regionsIn(wrapper.element, 'announcement-rail')).toBe(1);
     expectInert(rail.element, 'rail skeleton');
     expect(wrapper.get('aside').text()).not.toContain('Chưa có thông báo.');
+  });
+});
+
+describe('the data settings page shows blocks shaped like its card', () => {
+  it('fills the card with inert blocks while the export status loads', async () => {
+    mockApi(settingsRoutes());
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/settings/data');
+    const skeleton = wrapper.get('#main [data-testid="query-skeleton"]');
+    expect(skeleton.attributes('aria-hidden')).toBe('true');
+    expect(blocksIn(skeleton.element)).toBeGreaterThan(0);
+    expectInert(skeleton.element, 'data skeleton');
   });
 });

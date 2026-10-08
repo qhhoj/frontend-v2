@@ -333,6 +333,40 @@
       "locked": "The name or about text cannot be saved: the account must solve more problems before editing its profile, or the official contest locks profiles.",
       "organizationsChanged": "The organization list was not saved. Either you are an admin of an organization you tried to leave, or your organizations changed meanwhile. The list was reloaded and your choice is still here; check it and save again.",
       "offline": "Connection lost. The changes were not sent; check the network and try again."
+    },
+    "data": {
+      "title": "Export your data",
+      "lead": "Download a .zip with your account's data. It is prepared in the background; you can leave the page while it runs.",
+      "state": {
+        "none": "Not requested",
+        "expired": "Expired",
+        "preparing": "Running",
+        "ready": "Ready"
+      },
+      "noneText": "You have not requested an export yet. It is ready a few minutes after you ask.",
+      "expiredText": "The old file was deleted after 7 days. You can request a new one.",
+      "preparingText": "Requested at {time}. This page updates when it is done.",
+      "fileFacts": "{size} · created {time}",
+      "download": "Download",
+      "expires": "The download link expires at {time} ({days} days left). After that, request it again.",
+      "lastRequest": "Last request",
+      "requestedAt": "Requested at",
+      "readyAt": "Finished at",
+      "nextAt": "Can request again",
+      "requestFirst": "Request an export",
+      "requestAgain": "Request a new one",
+      "preparing": "Preparing…",
+      "waitFor": "You can request again in {hours} h {minutes} min.",
+      "dailyLimit": "You have used today's requests. Try again tomorrow.",
+      "busy": "A request is already running: wait for it to finish, then try again.",
+      "unavailable": "Data export is not available for this account.",
+      "locked": "Only the account owner can export personal data. Press “Stop viewing” to return to your account.",
+      "limitsTitle": "Limits",
+      "limitsLead": "Packing the data is heavy, so it is limited.",
+      "limitInterval": "At least 1 day between requests.",
+      "limitDaily": "At most 3 requests a day.",
+      "limitOneAtATime": "One file at a time; another request is refused until it is done.",
+      "limitLifetime": "A file stays valid for 7 days after it is created."
     }
   },
   "appearance": {
