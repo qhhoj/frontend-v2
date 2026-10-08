@@ -21,6 +21,11 @@ const isNotFound = computed(
   () => problem.error.value instanceof ApiError && problem.error.value.code === 'not_found',
 );
 const canEdit = computed(() => Boolean(problem.data.value?.canEdit && problem.data.value.editor));
+
+const retry = () => {
+  void problem.refetch();
+  void meta.refetch();
+};
 </script>
 
 <template>
@@ -32,10 +37,7 @@ const canEdit = computed(() => Boolean(problem.data.value?.canEdit && problem.da
       v-else
       :loading="problem.isPending.value || meta.isPending.value"
       :error="problem.error.value ?? meta.error.value"
-      @retry="
-        problem.refetch();
-        meta.refetch();
-      "
+      @retry="retry"
     >
       <template #skeleton>
         <SkeletonBlock
