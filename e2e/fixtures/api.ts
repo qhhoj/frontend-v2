@@ -5,6 +5,7 @@ import {
   contestDetail,
   contestItem,
   contestProblem,
+  HOME_COUNTS,
   contestStats,
   leaderboardEntry,
   problemItem,
@@ -103,6 +104,7 @@ export class FakeApi {
       return { status: 204 };
     },
     'GET /auth/social/providers': ok({ providers: ['google', 'github'] }),
+    'GET /home': ok({ counts: HOME_COUNTS }),
     'GET /profile': ok(profile()),
     'PATCH /profile': ({ body }) => ok(profile(body as object)),
     'GET /problems/meta': ok(problemMeta()),

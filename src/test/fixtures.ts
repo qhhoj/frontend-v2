@@ -555,3 +555,12 @@ export const organizationItem = (
   performancePoints: 4200,
   ...overrides,
 });
+
+/** What `GET /home` counts for the login screen's counts line. */
+export const HOME_COUNTS = {
+  users: 905,
+  problems: 412,
+  submissions: 90210,
+  contests: 7,
+  languages: 12,
+};

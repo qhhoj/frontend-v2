@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
-import { fail, hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
+import { fail, hangRequestsExcept, issue, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { useLoadingStore } from '@/stores/loading.store';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
@@ -66,6 +67,7 @@ describe('login page', () => {
     expect(countsOf(wrapper).find('[data-skeleton]').exists()).toBe(true);
     expect(wrapper.find('input[name="username"]').exists()).toBe(true);
     expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
+    expect(useLoadingStore().isWaiting).toBe(false);
   });
 
   it('leaves the counts line empty instead of showing an error when they cannot load', async () => {
@@ -115,6 +117,20 @@ describe('login page', () => {
     expect(wrapper.get('#main [role="alert"]').text()).toBe('Sai tên đăng nhập hoặc mật khẩu.');
   });
 
+  it('shows a ban reason with markup as plain text', async () => {
+    mockApi(
+      routes({
+        'POST /auth/login': fail(403, 'banned', undefined, undefined, { banReason: '<b>x</b>' }),
+      }),
+    );
+    const { wrapper } = await mountApp('/login');
+    await signIn(wrapper);
+    expect(wrapper.get('#main [role="alert"]').text()).toBe(
+      'Tài khoản đã bị khoá. Lý do: <b>x</b>',
+    );
+    expect(wrapper.find('#main [role="alert"] b').exists()).toBe(false);
+  });
+
   it('shows the structured ban reason, not the English message', async () => {
     mockApi(
       routes({
@@ -141,6 +157,45 @@ describe('login page', () => {
 
     const callback = (await mountApp('/login?error=account_not_activated')).wrapper;
     expect(callback.find('#main [role="alert"] a[href="/activate"]').exists()).toBe(true);
+  });
+
+  it('shows a field issue under its input and focuses that input', async () => {
+    mockApi(
+      routes({
+        'POST /auth/login': fail(400, 'validation_failed', undefined, [
+          issue(
+            'username',
+            'max_length',
+            'username must be shorter than or equal to 150 characters',
+          ),
+        ]),
+      }),
+    );
+    const { wrapper } = await mountApp('/login');
+    await wrapper.get('input[name="username"]').setValue('a'.repeat(151));
+    await wrapper.get('input[name="password"]').setValue('correct horse');
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    const username = wrapper.get('input[name="username"]');
+    expect(username.attributes('aria-invalid')).toBe('true');
+    expect(wrapper.get(`#${username.attributes('aria-describedby')}`).text()).toBe(
+      'username must be shorter than or equal to 150 characters',
+    );
+    expect(document.activeElement).toBe(username.element);
+  });
+
+  it('clears a field issue once the viewer edits that field', async () => {
+    mockApi(
+      routes({
+        'POST /auth/login': fail(400, 'validation_failed', undefined, [
+          issue('username', 'max_length', 'too long'),
+        ]),
+      }),
+    );
+    const { wrapper } = await mountApp('/login');
+    await signIn(wrapper, 'correct horse');
+    await wrapper.get('input[name="username"]').setValue('user_01');
+    expect(wrapper.get('input[name="username"]').attributes('aria-invalid')).toBeUndefined();
   });
 
   it('does not offer a resend for other failures', async () => {

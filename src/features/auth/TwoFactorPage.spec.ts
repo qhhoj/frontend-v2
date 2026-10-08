@@ -5,7 +5,7 @@ import { partialSession, profile, signedIn } from '@/test/fixtures';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
-import { socialRoutes } from '@/test/auth-routes';
+import { loginRoutes } from '@/test/auth-routes';
 import { mountApp } from '@/test/mount';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
@@ -29,7 +29,7 @@ function twoFactorApi(
     'POST /auth/logout': noContent(),
     'GET /profile': ok(profile()),
     ...homeRoutes,
-    ...socialRoutes,
+    ...loginRoutes,
     ...routes,
   });
 }
