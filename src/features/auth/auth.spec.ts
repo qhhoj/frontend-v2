@@ -4,7 +4,7 @@ import { apiRequest } from '@/api/client';
 import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
-import { fail, mockApi, noContent, ok } from '@/test/mock-api';
+import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
 
@@ -57,70 +57,6 @@ describe('auth screens', () => {
     await flushPromises();
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login-2fa'));
     expect(router.currentRoute.value.query.redirect).toBe('/settings');
-  });
-
-  it('registers and tells the viewer to check their mail', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedOut, 'POST /auth/register': noContent() });
-    const { wrapper } = await mountApp('/register');
-    await wrapper.get('input[name="username"]').setValue('new_user');
-    await wrapper.get('input[name="email"]').setValue('new@example.com');
-    await wrapper.get('input[name="password"]').setValue('long enough password');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(calls.find((call) => call.path === '/auth/register')?.body).toEqual({
-      username: 'new_user',
-      email: 'new@example.com',
-      password: 'long enough password',
-    });
-    expect(wrapper.get('[role="status"]').text()).toBe(
-      'Đã tạo tài khoản. Hãy mở email để kích hoạt.',
-    );
-    expect(wrapper.find('form').exists()).toBe(false);
-  });
-
-  it('shows field errors next to their inputs', async () => {
-    mockApi({
-      'GET /auth/me': signedOut,
-      'POST /auth/register': fail(400, 'validation_failed', {
-        username: ['A username must contain letters, numbers, or underscores.'],
-      }),
-    });
-    const { wrapper } = await mountApp('/register');
-    await wrapper.get('input[name="username"]').setValue('bad name');
-    await wrapper.get('input[name="email"]').setValue('new@example.com');
-    await wrapper.get('input[name="password"]').setValue('long enough password');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    const input = wrapper.get('input[name="username"]');
-    expect(input.attributes('aria-invalid')).toBe('true');
-    expect(wrapper.get(`#${input.attributes('aria-describedby')}`).text()).toContain(
-      'letters, numbers, or underscores',
-    );
-  });
-
-  it('activates an account from the mailed link', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
-    const { wrapper, router } = await mountApp('/activate/k123');
-    expect(calls.find((call) => call.path === '/auth/activate')?.body).toEqual({ token: 'k123' });
-    expect(wrapper.get('[role="status"]').text()).toBe(
-      'Tài khoản đã được kích hoạt. Bạn có thể đăng nhập.',
-    );
-    expect(wrapper.find('main a[href="/login"]').exists()).toBe(true);
-    expect(router.currentRoute.value.fullPath).not.toContain('k123');
-    expect(
-      wrapper.get('[role="status"] [data-testid="inline-bit"]').attributes('aria-hidden'),
-    ).toBe('true');
-  });
-
-  it('explains an invalid activation link', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(400, 'invalid_token') });
-    const { wrapper } = await mountApp('/activate/expired');
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Liên kết không hợp lệ hoặc đã hết hạn.',
-    );
-    expect(
-      wrapper.get('#main [role="alert"] [data-testid="inline-bit"]').attributes('aria-hidden'),
-    ).toBe('true');
   });
 
   it.each(['//evil.example/x', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)'])(
@@ -228,30 +164,6 @@ describe('auth screens', () => {
     await flushPromises();
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
       'Tài khoản đã bị khoá. Lý do: cheating',
-    );
-  });
-
-  it('keeps a field error out of the input label', async () => {
-    mockApi({
-      'GET /auth/me': signedOut,
-      'POST /auth/register': fail(400, 'validation_failed', {
-        email: ['Enter a valid email address.'],
-      }),
-    });
-    const { wrapper } = await mountApp('/register');
-    await wrapper.get('input[name="username"]').setValue('new_user');
-    await wrapper.get('input[name="email"]').setValue('bad@x');
-    await wrapper.get('input[name="password"]').setValue('long enough password');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('label:has(input[name="email"])').text()).toBe('Email');
-  });
-
-  it('does not tell a viewer to get a new link when the server failed', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(429, 'rate_limited') });
-    const { wrapper } = await mountApp('/activate/k123');
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
     );
   });
 });

@@ -343,11 +343,8 @@
     "notice": {
       "passwordReset": "Your password was changed. Sign in again."
     },
-    "haveAccount": "Already have an account? Sign in",
     "forgot": "Forgot password?",
-    "registered": "Account created. Open your email to activate it.",
     "activating": "Activating…",
-    "activated": "Your account is active. You can sign in now.",
     "showPassword": "Show password",
     "dismissNotice": "Dismiss",
     "social": {
@@ -429,6 +426,39 @@
         "4": "Very strong"
       },
       "tip": "add a symbol or a few more words"
+    },
+    "haveAccountPrompt": "Already have an account?",
+    "registerTitle": "Create an account",
+    "registerLead": "Free, and it takes a minute.",
+    "rules": "I agree to the Terms of use and the Privacy policy.",
+    "rulesRequired": "Agree to the terms to continue.",
+    "registeredSentTo": "We sent an activation link to",
+    "registeredOpenMail": "Open the email and follow the link to activate your account. If it is not there, check your spam folder.",
+    "wrongEmailPrompt": "Wrong email?",
+    "registerAgain": "Register again",
+    "backToLogin": "Back to sign in",
+    "toLogin": "Go to sign in",
+    "mailUnavailable": {
+      "title": "Registration is unavailable for now",
+      "lead": "The server cannot send the confirmation email yet. Try again later or contact an administrator."
+    },
+    "inbox": {
+      "title": "Check your inbox",
+      "resend": "Send the email again",
+      "resendIn": "Send again in {time}",
+      "resent": "Sent again. Check your spam folder too."
+    },
+    "activation": {
+      "doneTitle": "Account activated",
+      "doneLead": "Your email is confirmed. You can sign in now.",
+      "deadTitle": "The link has expired",
+      "deadLead": "An activation link works for 7 days. Enter your email to get a new one."
+    },
+    "resend": {
+      "title": "Resend the activation email",
+      "lead": "Enter the email you registered with and we send the activation link again.",
+      "send": "Resend the link",
+      "sent": "If {email} is waiting for activation, a new link arrives within a few minutes."
     }
   },
   "errors": {

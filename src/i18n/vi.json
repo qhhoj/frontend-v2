@@ -343,11 +343,8 @@
     "notice": {
       "passwordReset": "Mật khẩu đã được đổi, hãy đăng nhập lại."
     },
-    "haveAccount": "Đã có tài khoản? Đăng nhập",
     "forgot": "Quên mật khẩu?",
-    "registered": "Đã tạo tài khoản. Hãy mở email để kích hoạt.",
     "activating": "Đang kích hoạt…",
-    "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập.",
     "showPassword": "Hiện mật khẩu",
     "dismissNotice": "Đóng thông báo",
     "social": {
@@ -429,6 +426,39 @@
         "4": "Rất mạnh"
       },
       "tip": "thêm ký tự đặc biệt hoặc vài từ nữa"
+    },
+    "haveAccountPrompt": "Đã có tài khoản?",
+    "registerTitle": "Tạo tài khoản",
+    "registerLead": "Miễn phí, chỉ mất một phút.",
+    "rules": "Tôi đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư.",
+    "rulesRequired": "Hãy đồng ý với điều khoản để tiếp tục.",
+    "registeredSentTo": "Chúng tôi đã gửi liên kết kích hoạt tới",
+    "registeredOpenMail": "Mở email và bấm vào liên kết để kích hoạt tài khoản. Nếu chưa thấy, hãy xem thư mục spam.",
+    "wrongEmailPrompt": "Sai email?",
+    "registerAgain": "Đăng ký lại",
+    "backToLogin": "Quay lại đăng nhập",
+    "toLogin": "Về trang đăng nhập",
+    "mailUnavailable": {
+      "title": "Đăng ký tạm thời không khả dụng",
+      "lead": "Máy chủ chưa thể gửi email xác nhận. Vui lòng thử lại sau hoặc liên hệ quản trị viên."
+    },
+    "inbox": {
+      "title": "Kiểm tra hộp thư",
+      "resend": "Gửi lại email",
+      "resendIn": "Gửi lại sau {time}",
+      "resent": "Đã gửi lại. Hãy kiểm tra cả thư mục spam."
+    },
+    "activation": {
+      "doneTitle": "Tài khoản đã kích hoạt",
+      "doneLead": "Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.",
+      "deadTitle": "Liên kết đã hết hạn",
+      "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới."
+    },
+    "resend": {
+      "title": "Gửi lại email kích hoạt",
+      "lead": "Nhập email đã dùng để đăng ký, chúng tôi sẽ gửi lại liên kết kích hoạt.",
+      "send": "Gửi lại liên kết",
+      "sent": "Nếu {email} đang chờ kích hoạt, bạn sẽ nhận được liên kết mới trong vài phút."
     }
   },
   "errors": {

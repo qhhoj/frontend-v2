@@ -107,7 +107,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/register',
     name: 'register',
     component: () => import('@/features/auth/RegisterPage.vue'),
-    meta: { titleKey: 'pages.register', guestOnly: true },
+    meta: { titleKey: 'pages.register', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/register/social',
@@ -118,14 +118,14 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/activate',
     name: 'activate-resend',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.activateResend', guestOnly: true },
+    component: () => import('@/features/auth/ResendActivationPage.vue'),
+    meta: { titleKey: 'pages.activateResend', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/activate/:key',
     name: 'activate',
     component: () => import('@/features/auth/ActivatePage.vue'),
-    meta: { titleKey: 'pages.activate' },
+    meta: { titleKey: 'pages.activate', layout: 'auth' },
   },
   {
     path: '/forgot-password',
