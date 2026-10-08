@@ -6,7 +6,7 @@ import {
   lengthProblems,
   settleAfterSave,
   withOrganizationsOf,
-  withoutUnlistedOrganizations,
+  rebaseOrganizationIds,
 } from './profile-draft';
 import type { ProfileDraft } from './profile-draft';
 
@@ -118,11 +118,30 @@ describe('Vietnamese text is counted and sent as NFC', () => {
   });
 });
 
-describe('withoutUnlistedOrganizations', () => {
-  it('drops the selected organizations the server no longer lists and keeps the viewer order of the rest', () => {
-    const draft = { ...base, organizationIds: [HCM.id, LHP.id] };
-    expect(
-      withoutUnlistedOrganizations(draft, profile({ organizations: [LHP] })).organizationIds,
-    ).toEqual([LHP.id]);
+describe('rebaseOrganizationIds', () => {
+  const [ORG_A, ORG_B, ORG_C] = ['org-a', 'org-b', 'org-c'];
+  it.each([
+    [
+      'another device added one: it is appended in server order',
+      [ORG_A, ORG_B],
+      [ORG_A, ORG_B, ORG_C],
+      [ORG_A, ORG_B, ORG_C],
+    ],
+    ['the server dropped one: it is gone', [ORG_A, ORG_B], [ORG_A], [ORG_A]],
+    ['the viewer removed one and the server agrees: it stays gone', [ORG_A], [ORG_A], [ORG_A]],
+    [
+      'the viewer reordered: the viewer order is kept',
+      [ORG_B, ORG_A],
+      [ORG_A, ORG_B],
+      [ORG_B, ORG_A],
+    ],
+    [
+      'an admin-leave refusal: the still-listed organization comes back',
+      [ORG_B],
+      [ORG_A, ORG_B],
+      [ORG_B, ORG_A],
+    ],
+  ])('%s', (_case, draftIds, serverIds, expected) => {
+    expect(rebaseOrganizationIds(draftIds, serverIds)).toEqual(expected);
   });
 });

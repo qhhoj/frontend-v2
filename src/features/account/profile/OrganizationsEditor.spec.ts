@@ -88,4 +88,11 @@ describe('OrganizationsEditor', () => {
     expect(wrapper.text()).toContain('Bạn chưa tham gia tổ chức nào.');
     expect(wrapper.get('a').attributes('href')).toBe('/organizations');
   });
+
+  it('moves focus to the browse link when the last organization is removed, not to the vanished list', async () => {
+    const wrapper = mountEditor([LHP.id]);
+    await button(wrapper, 'Rời THPT Chuyên Lê Hồng Phong khỏi danh sách').trigger('click');
+    expect(wrapper.find('ul').exists()).toBe(false);
+    expect(document.activeElement).toBe(wrapper.get('a').element);
+  });
 });

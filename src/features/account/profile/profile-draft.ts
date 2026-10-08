@@ -81,14 +81,32 @@ export function settleAfterSave(
   };
 }
 
-/** A selected organization the server no longer lists has no row to show, so the draft must not send it again. */
-export const withoutUnlistedOrganizations = (
-  draft: ProfileDraft,
-  profile: Profile,
-): ProfileDraft => {
-  const listed = new Set(profile.organizations.map((organization) => organization.id));
-  return { ...draft, organizationIds: draft.organizationIds.filter((id) => listed.has(id)) };
-};
+/**
+ * The draft ids rebased onto the server's list after a 409. The viewer's order holds for the organizations both still
+ * list; an organization another device added is appended in server order. An organization the server dropped leaves.
+ * An organization the viewer removed comes back while the server still lists it: the failed save refused the removal
+ * (an admin cannot leave), so the server's answer stands. A removal the server agrees with stays gone, because the
+ * server no longer lists the organization.
+ */
+export function rebaseOrganizationIds(
+  draftIds: readonly string[],
+  serverIds: readonly string[],
+): string[] {
+  const listed = new Set(serverIds);
+  const inDraft = new Set(draftIds);
+  return [
+    ...draftIds.filter((id) => listed.has(id)),
+    ...serverIds.filter((id) => !inDraft.has(id)),
+  ];
+}
+
+export const withRebasedOrganizations = (draft: ProfileDraft, profile: Profile): ProfileDraft => ({
+  ...draft,
+  organizationIds: rebaseOrganizationIds(
+    draft.organizationIds,
+    profile.organizations.map((organization) => organization.id),
+  ),
+});
 
 /** The server's membership list, keeping every other edit. */
 export const withOrganizationsOf = (draft: ProfileDraft, profile: Profile): ProfileDraft => ({

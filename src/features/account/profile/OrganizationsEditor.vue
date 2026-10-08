@@ -16,6 +16,8 @@ const props = withDefaults(
 );
 const ids = defineModel<string[]>({ required: true });
 const list = ref<HTMLElement | null>(null);
+/** The browse link never leaves, so it is where focus goes when the list has no row left to hold it. */
+const browseLink = ref<{ $el: HTMLElement } | null>(null);
 const announcement = ref('');
 /** Rows follow the chosen id order; an id the server no longer lists (after a reload) shows no row. */
 const rows = computed(() =>
@@ -37,9 +39,12 @@ function move(organization: ProfileOrganization, offset: -1 | 1) {
 }
 
 function leave(organization: ProfileOrganization) {
-  ids.value = withoutItem(ids.value, ids.value.indexOf(organization.id));
+  const remaining = withoutItem(ids.value, ids.value.indexOf(organization.id));
+  ids.value = remaining;
   announcement.value = translate('settings.organizations.left', { name: organization.name });
-  list.value?.focus();
+  // The list leaves the page with its last row; focus must not fall to the body.
+  if (remaining.length) list.value?.focus();
+  else browseLink.value?.$el.focus();
 }
 </script>
 
@@ -123,6 +128,7 @@ function leave(organization: ProfileOrganization) {
     <p v-if="error" class="text-[13px] text-negative" role="alert">{{ error }}</p>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     <RouterLink
+      ref="browseLink"
       :to="{ name: 'organizations' }"
       class="inline-flex min-h-11 items-center self-start font-semibold text-accent-text"
     >

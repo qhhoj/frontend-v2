@@ -131,7 +131,7 @@ describe('useProfileDraft', () => {
     form.draft.value!.firstName = 'Minh Thư';
     form.draft.value!.organizationIds = [HCM.id, LHP.id];
     await form.save();
-    // LHP left the server's list meanwhile: it has no row, so the retry must not send it.
+    // LHP left the server's list meanwhile: it has no row, so the draft does not send it again.
     expect(form.draft.value).toMatchObject({
       firstName: 'Minh Thư',
       organizationIds: [HCM.id],
@@ -150,12 +150,16 @@ describe('useProfileDraft', () => {
     });
     form.draft.value!.organizationIds = [HCM.id];
     await expect(form.save()).resolves.toBe(false);
-    expect(form.draft.value!.organizationIds).toEqual([HCM.id]);
+    // The removal was refused (the server still lists LHP), so LHP comes back, after the viewer's HCM.
+    expect(form.draft.value!.organizationIds).toEqual([HCM.id, LHP.id]);
     expect(form.saved.value!.organizationIds).toEqual([LHP.id, HCM.id]);
     expect(saveErrorText(form.error.value)).toMatch(/quản trị viên/);
     expect(saveErrorText(form.error.value)).toMatch(/vừa thay đổi/);
     await expect(form.save()).resolves.toBe(true);
-    expect(patches(calls)).toEqual([{ organizations: [HCM.id] }, { organizations: [HCM.id] }]);
+    expect(patches(calls)).toEqual([
+      { organizations: [HCM.id] },
+      { organizations: [HCM.id, LHP.id] },
+    ]);
   });
 
   it('undo returns to the last saved values and clears the failure', async () => {
