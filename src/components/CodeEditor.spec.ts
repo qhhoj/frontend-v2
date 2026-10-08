@@ -7,6 +7,7 @@ import CodeEditor from './CodeEditor.vue';
 interface FakeHandle {
   setDoc: ReturnType<typeof vi.fn>;
   setDisabled: ReturnType<typeof vi.fn>;
+  focus: ReturnType<typeof vi.fn>;
   destroy: ReturnType<typeof vi.fn>;
 }
 
@@ -14,22 +15,24 @@ interface FakeOptions {
   doc: string;
   label: string;
   disabled: boolean;
+  selection?: { anchor: number; head: number };
   onChange(doc: string): void;
 }
 
 const fake = vi.hoisted(() => ({
-  shouldFail: false,
+  createdCount: 0,
   options: undefined as FakeOptions | undefined,
   handle: undefined as FakeHandle | undefined,
 }));
 
 vi.mock('./code-editor-cm', () => ({
   createEditor: (_host: HTMLElement, options: FakeOptions) => {
-    if (fake.shouldFail) throw new Error('chunk failed');
+    fake.createdCount += 1;
     fake.options = options;
     fake.handle = {
       setDoc: vi.fn(),
       setDisabled: vi.fn(),
+      focus: vi.fn(),
       destroy: vi.fn(),
     };
     return fake.handle;
@@ -46,7 +49,7 @@ const mountEditor = (props: Record<string, unknown> = {}) =>
 
 describe('CodeEditor', () => {
   beforeEach(() => {
-    fake.shouldFail = false;
+    fake.createdCount = 0;
     fake.options = undefined;
     fake.handle = undefined;
   });
@@ -87,18 +90,60 @@ describe('CodeEditor', () => {
     expect(handle().setDisabled).toHaveBeenLastCalledWith(true);
   });
 
-  it('keeps a working textarea when the editor chunk fails to load', async () => {
-    fake.shouldFail = true;
-    const editor = mountEditor();
-    await flushPromises();
-    await editor.get('textarea').setValue('typed');
-    expect(editor.emitted('update:modelValue')).toEqual([['typed']]);
-  });
-
   it('destroys the editor on unmount', async () => {
     const editor = mountEditor();
     await flushPromises();
     editor.unmount();
     expect(handle().destroy).toHaveBeenCalledOnce();
+  });
+
+  it('passes text typed before the editor loaded as its document', async () => {
+    const editor = mountEditor({ modelValue: '' });
+    await editor.get('textarea').setValue('typed early');
+    await editor.setProps({ modelValue: 'typed early' });
+    await flushPromises();
+    expect(options().doc).toBe('typed early');
+  });
+
+  it('hands focus and the caret over from the textarea to the editor', async () => {
+    const editor = mountEditor({ modelValue: 'hello world' });
+    const textarea = editor.get('textarea').element as HTMLTextAreaElement;
+    textarea.focus();
+    textarea.setSelectionRange(2, 7);
+    await flushPromises();
+    expect(options().selection).toEqual({ anchor: 2, head: 7 });
+    expect(handle().focus).toHaveBeenCalledOnce();
+  });
+
+  it('does not steal focus when the textarea was not focused', async () => {
+    mountEditor();
+    await flushPromises();
+    expect(options().selection).toBeUndefined();
+    expect(handle().focus).not.toHaveBeenCalled();
+  });
+
+  it('creates no editor when the component unmounts before the chunk arrives', async () => {
+    const editor = mountEditor();
+    editor.unmount();
+    await flushPromises();
+    expect(fake.createdCount).toBe(0);
+  });
+
+  it('warns once and keeps a working textarea when the chunk fails to load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.doMock('./code-editor-cm', () => {
+      throw new Error('chunk failed');
+    });
+    vi.resetModules();
+    const { default: FreshEditor } = await import('./CodeEditor.vue');
+    const editor = mountComponent(FreshEditor, {
+      props: { modelValue: 'x', label: 'Source code' },
+    });
+    await flushPromises();
+    expect(warn).toHaveBeenCalledExactlyOnceWith('code editor failed to load', expect.any(Error));
+    await editor.get('textarea').setValue('typed');
+    expect(editor.emitted('update:modelValue')).toEqual([['typed']]);
+    vi.doUnmock('./code-editor-cm');
+    warn.mockRestore();
   });
 });
