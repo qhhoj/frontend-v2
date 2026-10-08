@@ -18,6 +18,7 @@ import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
 import SubmissionSummary from './SubmissionSummary.vue';
 import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
+import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
 
@@ -114,6 +115,7 @@ const verdict = computed(() => {
           :is-problem-loading="problemQuery.isLoading.value"
           :is-live="isLive"
         />
+        <SubmissionStaffPanel :submission="row" />
         <CasesTable
           :cases="row.cases"
           :batches="row.batches"

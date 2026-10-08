@@ -1,0 +1,47 @@
+{
+  "chip": "Nhân viên",
+  "title": "Thao tác nhân viên",
+  "state": {
+    "finished": "Chấm lại cần quyền chấm lại trên bài này. Từ chối đặt kết quả RJ khi đã chấm xong.",
+    "running": "Chủ bài nộp hoặc người có quyền hủy mọi bài nộp có thể hủy. Chấm lại và từ chối chờ chấm xong."
+  },
+  "lock": {
+    "since": "Bài nộp bị khóa từ {time}.",
+    "at": "Bài nộp khóa lúc {time}."
+  },
+  "buttons": {
+    "rejudge": "Chấm lại",
+    "reject": "Từ chối bài nộp",
+    "abort": "Hủy chấm"
+  },
+  "reason": {
+    "waiting": "Chờ chấm xong.",
+    "finished": "Đã chấm xong.",
+    "locked": "Bài nộp đã bị khóa."
+  },
+  "noPoints": "chưa có điểm",
+  "points": "{points} điểm",
+  "dialog": {
+    "rejudge": {
+      "title": "Chấm lại bài nộp này?",
+      "body": "Kết quả hiện tại ({result}, {points}) bị xóa và bài nộp được chấm lại ngay ở mức ưu tiên chấm lại.",
+      "label": "Chấm lại"
+    },
+    "reject": {
+      "title": "Từ chối bài nộp?",
+      "body": "Bài nộp được đánh dấu bị từ chối (RJ) và không còn tính điểm. Chỉ làm được khi máy chấm đã chấm xong.",
+      "label": "Từ chối"
+    },
+    "abort": {
+      "title": "Hủy chấm bài nộp?",
+      "body": "Bài nộp đang chờ sẽ chuyển ngay sang AB; bài nộp đang chạy sẽ được máy chấm dừng lại. Bài đã chấm xong thì không có gì thay đổi.",
+      "label": "Hủy chấm"
+    }
+  },
+  "done": {
+    "rejudge": "Đã gửi chấm lại.",
+    "reject": "Đã từ chối bài nộp.",
+    "abort": "Đã gửi yêu cầu hủy."
+  },
+  "conflict": "Bài nộp bị khóa, đang chờ chấm cuối kỳ thi hoặc đang được chấm (409). Chấm lại hàng loạt có tùy chọn “cả bài nộp đã bị khóa”; thao tác từng bài thì không."
+}

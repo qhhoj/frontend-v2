@@ -38,6 +38,17 @@ export interface SubmissionDetail extends SubmissionListItem {
   batches: SubmissionBatch[] | null;
   /** B21: the problem's test count, null when the viewer may not see case results. */
   totalCases: number | null;
+  /** backend: SubmissionViewerResponse. Each flag already holds the permission, edit-rights, lock and status rule of its action. */
+  viewer: SubmissionViewer;
+  /** Editors only: rejudging is refused after this instant; null for everyone else and when the submission never locks. */
+  lockedAfter: string | null;
+}
+
+/** backend: SubmissionViewerResponse (the action flags for the signed-in viewer). */
+export interface SubmissionViewer {
+  canAbort: boolean;
+  canRejudge: boolean;
+  canReject: boolean;
 }
 
 /** backend: submissions/core/dto/submission-list.dto.ts */

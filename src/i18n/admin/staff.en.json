@@ -1,0 +1,47 @@
+{
+  "chip": "Staff",
+  "title": "Staff actions",
+  "state": {
+    "finished": "Rejudging needs the rejudge permission on this problem. Rejecting sets the result to RJ once judging is over.",
+    "running": "The submitter, or anyone allowed to abort, can abort it. Rejudge and reject wait until judging is over."
+  },
+  "lock": {
+    "since": "The submission has been locked since {time}.",
+    "at": "The submission locks at {time}."
+  },
+  "buttons": {
+    "rejudge": "Rejudge",
+    "reject": "Reject submission",
+    "abort": "Abort judging"
+  },
+  "reason": {
+    "waiting": "Waiting for judging to finish.",
+    "finished": "Judging is already finished.",
+    "locked": "The submission is locked."
+  },
+  "noPoints": "no points yet",
+  "points": "{points} points",
+  "dialog": {
+    "rejudge": {
+      "title": "Rejudge this submission?",
+      "body": "The current result ({result}, {points}) is cleared and the submission is judged again at rejudge priority.",
+      "label": "Rejudge"
+    },
+    "reject": {
+      "title": "Reject this submission?",
+      "body": "The submission is marked rejected (RJ) and no longer scores. This works only once the judge has finished.",
+      "label": "Reject"
+    },
+    "abort": {
+      "title": "Abort judging?",
+      "body": "A waiting submission moves to AB at once; a running one is stopped by the judge. A finished submission does not change.",
+      "label": "Abort"
+    }
+  },
+  "done": {
+    "rejudge": "Rejudge requested.",
+    "reject": "Submission rejected.",
+    "abort": "Abort requested."
+  },
+  "conflict": "The submission is locked, waiting for the contest's final judging, or being judged (409). The bulk rejudge has an option to include locked submissions; a single rejudge does not."
+}
