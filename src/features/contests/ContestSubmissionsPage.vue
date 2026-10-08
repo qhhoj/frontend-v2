@@ -15,6 +15,7 @@ import {
   SUBMISSION_PAGE_SIZE,
   useContestSubmissionListQuery,
 } from '@/features/submissions/submissions.queries';
+import type { ColumnKey } from '@/features/submissions/submission-table-cells';
 import { useSubmissionFilters } from '@/features/submissions/use-submission-filters';
 import { useNow } from '@/lib/use-now';
 import { usePageTitle } from '@/router/page-title';
@@ -52,7 +53,7 @@ const labels = computed(() =>
 );
 const rows = computed(() => list.value?.items ?? []);
 /** The narrowed list shows the mock's four columns: every row is the viewer's own, so user, language and cost add nothing. */
-const OWN_ONLY_COLUMNS = ['verdict', 'problem', 'score', 'when'] as const;
+const OWN_ONLY_COLUMNS: readonly ColumnKey[] = ['verdict', 'problem', 'score', 'when'];
 const listColumns = computed(() => (isOwnOnly.value ? OWN_ONLY_COLUMNS : undefined));
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,

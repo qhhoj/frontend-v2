@@ -18,9 +18,12 @@ import { ringFraction } from '@/lib/grading';
 import { useNow } from '@/lib/use-now';
 import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
-import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells';
-
-type ColumnKey = 'verdict' | 'problem' | 'user' | 'score' | 'time' | 'memory' | 'language' | 'when';
+import {
+  BODY_CELL_CLASSES,
+  FULL_TABLE_MIN_WIDTH_CLASS,
+  HEADER_CELL_CLASSES,
+} from './submission-table-cells';
+import type { ColumnKey } from './submission-table-cells';
 
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
@@ -97,7 +100,10 @@ const formatScore = (value: number) =>
       :aria-label="$t('submissions.scrollRegion')"
       class="overflow-x-auto focus-visible:-outline-offset-2"
     >
-      <table class="w-full min-w-[900px] border-collapse text-[15px]">
+      <table
+        class="w-full border-collapse text-[15px]"
+        :class="columnKeys ? '' : FULL_TABLE_MIN_WIDTH_CLASS"
+      >
         <caption class="sr-only">
           {{
             $t('submissions.listName')

@@ -102,6 +102,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         <input
           type="checkbox"
           class="size-4 accent-accent"
+          :value="group"
           :checked="filters.statusGroups.includes(group)"
           @change="toggleStatusGroup(group, checkedOf($event))"
         />

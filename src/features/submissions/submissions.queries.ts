@@ -81,6 +81,9 @@ export const useSubmissionStatsQuery = () =>
     placeholderData: keepPreviousData,
   });
 
+const userOfQueryKey = (queryKey: readonly unknown[] | undefined) =>
+  (queryKey?.at(-1) as { user?: string } | undefined)?.user;
+
 /** One page of a contest's submissions per viewer; `ownUsername` narrows it to the viewer (the backend would anyway). */
 export const useContestSubmissionListQuery = (
   key: Ref<string>,
@@ -97,6 +100,8 @@ export const useContestSubmissionListQuery = (
     enabled: isEnabled,
     queryKey: computed(() => ['submissions', 'contest', viewerId.value, key.value, apiQuery.value]),
     queryFn: () => fetchContestSubmissions(key.value, apiQuery.value),
-    placeholderData: keepPreviousData,
+    /** Only a list for the same user stays on screen while the next one loads: a switch to the own-only list must not show the all-users rows. */
+    placeholderData: (previous, previousQuery) =>
+      userOfQueryKey(previousQuery?.queryKey) === apiQuery.value.user ? previous : undefined,
   });
 };

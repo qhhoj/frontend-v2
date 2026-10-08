@@ -2,11 +2,15 @@
 import { computed } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells';
+import {
+  BODY_CELL_CLASSES,
+  FULL_TABLE_MIN_WIDTH_CLASS,
+  HEADER_CELL_CLASSES,
+} from './submission-table-cells';
+import type { ColumnKey } from './submission-table-cells';
 
 /** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
 const ROW_COUNT = 10;
-type ColumnKey = 'verdict' | 'problem' | 'user' | 'score' | 'time' | 'memory' | 'language' | 'when';
 const props = withDefaults(
   defineProps<{ showProblem?: boolean; columnKeys?: readonly ColumnKey[] }>(),
   { showProblem: true, columnKeys: undefined },
@@ -34,7 +38,11 @@ const columns = computed(() =>
 <template>
   <GlassCard as="div" data-testid="submission-table-card" class="overflow-hidden">
     <div class="overflow-x-auto">
-      <table aria-hidden="true" class="w-full min-w-[900px] border-collapse text-[15px]">
+      <table
+        aria-hidden="true"
+        class="w-full border-collapse text-[15px]"
+        :class="columnKeys ? '' : FULL_TABLE_MIN_WIDTH_CLASS"
+      >
         <thead>
           <tr class="text-left text-[13px] text-muted">
             <th

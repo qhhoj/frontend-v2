@@ -56,6 +56,19 @@ describe('the submission filter rail', () => {
     expect(accepted.textContent).toContain('Chấp nhận');
   });
 
+  it('emits the judging-state box ticked, and only in the contest rail', async () => {
+    const wrapper = mountComponent(SubmissionFilterRail, {
+      props: {
+        filters: parseSubmissionFilters({}),
+        languages: problemMeta().languages,
+        showStatusGroups: true,
+      },
+    });
+    await wrapper.get('input[type="checkbox"][value="grading"]').setValue(true);
+    expect(wrapper.emitted('update')).toEqual([[{ statusGroups: ['grading'] }]]);
+    expect(mountRail().find('input[value="grading"]').exists()).toBe(false);
+  });
+
   it('emits the chosen language as a one-element list and an empty list for "any"', () => {
     const wrapper = mountRail();
     const [first] = problemMeta().languages;

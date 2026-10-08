@@ -1,3 +1,4 @@
+import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   contestDetail,
@@ -90,7 +91,7 @@ describe('contest submissions tab', () => {
       'Kết quả',
       'Bài',
       'Điểm',
-      'Nộp lúc',
+      'Lúc',
     ]);
     expect(wrapper.findAll('tbody tr td')).toHaveLength(4);
   });
@@ -104,6 +105,54 @@ describe('contest submissions tab', () => {
     const { wrapper } = await mountApp('/contests/r42/submissions');
     expect(wrapper.findAll('thead th')).toHaveLength(8);
     expect(wrapper.findAll('tbody tr td')).toHaveLength(8);
+  });
+
+  it('ignores a ?user= filter in the own-only state: the list still asks only for the viewer', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail()),
+      'GET /contests/r42/submissions': page([]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    await mountApp('/contests/r42/submissions?user=other');
+    expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
+  });
+
+  it('drops the 900 px table minimum in the four-column state only', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail()),
+      'GET /contests/r42/submissions': page([submissionItem()]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.get('table').classes()).not.toContain('min-w-[900px]');
+  });
+
+  it('shows no all-users rows while the own-only list replaces a public one', async () => {
+    vi.useFakeTimers({
+      now: Date.parse('2026-10-08T10:00:00Z'),
+      toFake: ['Date', 'setInterval', 'clearInterval'],
+    });
+    const everyone = submissionItem({
+      id: 'sub-everyone',
+      user: { id: 'u-2', username: 'other_user' },
+    });
+    const mine = submissionItem({ id: 'sub-mine' });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ showSubmissionList: true })),
+      'GET /contests/r42/submissions': (call) => page(call.query.get('user') ? [mine] : [everyone]),
+      'GET /problems/meta': ok(problemMeta()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(wrapper.find('tr[data-id="sub-everyone"]').exists()).toBe(true);
+    vi.setSystemTime(Date.parse('2026-10-08T10:30:00Z'));
+    vi.advanceTimersByTime(30_000);
+    await nextTick();
+    expect(wrapper.find('tr[data-id="sub-everyone"]').exists()).toBe(false);
   });
 
   it('shows the full list to an editor without the banner', async () => {
