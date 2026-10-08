@@ -1,4 +1,5 @@
 import type { VueWrapper } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountComponent } from '@/test/mount';
@@ -175,6 +176,44 @@ describe('LoadingBit', () => {
     await wrapper.setProps({ phase: 'hidden' });
     await wrapper.setProps({ phase: 'walking' });
     expect(positions(wrapper)).not.toEqual(first);
+  });
+
+  it('swaps the leg cells once a Bit has walked a step', async () => {
+    const wrapper = mountBits('walking');
+    const legs = () => wrapper.get('[data-testid="loading-bit"] .grid').html();
+    const standing = legs();
+    for (let frame = 1; frame <= 40; frame++) frames.runFrame(frame * 16);
+    await nextTick();
+    // 40 frames of at least 40 px/s cover well over one 6 px step; the leg frame is whichever one it lands on.
+    const seen = new Set([standing]);
+    for (let frame = 41; frame <= 80; frame++) {
+      frames.runFrame(frame * 16);
+      await nextTick();
+      seen.add(legs());
+    }
+    expect(seen.size).toBeGreaterThan(1);
+  });
+
+  it('turns a Bit that walks west to face west, and east to face east', () => {
+    const wrapper = mountBits('walking');
+    const flips = new Set<string>();
+    for (let frame = 1; frame <= 600; frame++) {
+      frames.runFrame(frame * 16);
+      flips.add((bits(wrapper)[0]!.element.firstElementChild as HTMLElement).style.transform);
+    }
+    expect(flips).toEqual(new Set(['scaleX(-1)', 'none']));
+  });
+
+  it('puts the Bit in its corner when reduced motion turns on mid-walk', async () => {
+    const media = stubMatchMedia();
+    const wrapper = mountBits('walking');
+    frames.runFrame(16);
+    expect(bits(wrapper)[0]!.attributes('style')).toContain('translate(');
+    media.setReducedMotion(true);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(bits(wrapper)).toHaveLength(1);
+    expect((bits(wrapper)[0]!.element as HTMLElement).style.transform).toBe('');
+    expect((bits(wrapper)[0]!.element.firstElementChild as HTMLElement).style.transform).toBe('');
   });
 
   it('under reduced motion stands one Bit in a corner, never animates, never blinks, and still goes', async () => {

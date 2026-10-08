@@ -55,6 +55,15 @@ function place(index: number) {
   if (legSteps.value[index] !== stepping) legSteps.value[index] = stepping;
 }
 
+/** Back to the CSS position (the corner under reduced motion). */
+function clearPlacement() {
+  bitElements.forEach((element) => {
+    if (!element) return;
+    element.style.transform = '';
+    if (element.firstElementChild) (element.firstElementChild as HTMLElement).style.transform = '';
+  });
+}
+
 function tick(timestamp: number) {
   const frameMs = lastTimestamp === null ? 0 : timestamp - lastTimestamp;
   lastTimestamp = timestamp;
@@ -83,6 +92,7 @@ watch(
   [() => props.phase, reducedMotion],
   () => {
     if (props.phase === 'hidden' || reducedMotion.value) walkers = [];
+    if (reducedMotion.value) clearPlacement();
     if (props.phase === 'walking' && !reducedMotion.value) startLoop();
     else stopLoop();
   },

@@ -69,6 +69,8 @@ export interface BitPose {
   headgear: BitHeadgear;
   /** Second leg frame; the whole sprite also bobs one pixel down. */
   step?: boolean;
+  /** With `step`: leave the whole sprite where it is (default false: shift it one row down). The renderer then bobs it with a transform. */
+  keepPosition?: boolean;
   /** Eyes closed (also the crying eyes). */
   blinking?: boolean;
   /** A highlight tear pixel under each eye (apply with `blinking`). */
@@ -120,13 +122,19 @@ const addTears = (rows: readonly string[]) =>
   );
 
 /** One 16x16 frame of role characters (`.` is transparent). */
-export const bitFrame = ({ headgear, step = false, blinking = false, tears = false }: BitPose) => {
+export const bitFrame = ({
+  headgear,
+  step = false,
+  keepPosition = false,
+  blinking = false,
+  tears = false,
+}: BitPose) => {
   const legs = step ? LEGS_STEP : LEGS_STAND;
   let rows = [...HEADGEAR[headgear], ...BODY, legs, legs, legs, EMPTY_ROW, EMPTY_ROW];
   if (tears) rows = addTears(rows);
   if (blinking) rows = closeEyes(rows);
   rows = withOutline(rows);
-  return step ? [EMPTY_ROW, ...rows.slice(0, -1)] : rows;
+  return step && !keepPosition ? [EMPTY_ROW, ...rows.slice(0, -1)] : rows;
 };
 
 export interface SpriteCell {
