@@ -8,6 +8,8 @@ import { usePageTitle } from '@/router/page-title';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
 import ContestHeaderCard from './ContestHeaderCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
+import ContestProblemsTable from './ContestProblemsTable.vue';
+import ContestRulesCard from './ContestRulesCard.vue';
 import ContestTabs from './ContestTabs.vue';
 import { useContestQuery } from './contests.queries';
 
@@ -44,6 +46,12 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
       <template v-if="contest">
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed" />
         <ContestTabs :contest-key="key" />
+        <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <ContestProblemsTable :contest="contest" />
+          <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-5">
+            <ContestRulesCard :contest="contest" />
+          </aside>
+        </div>
       </template>
     </QueryState>
   </div>

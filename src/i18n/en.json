@@ -78,7 +78,61 @@
       "elapsed": "{span} in",
       "notFoundTitle": "Contest not found",
       "notFoundBody": "This contest does not exist or is hidden from you.",
-      "backToList": "Back to contests"
+      "backToList": "Back to contests",
+      "aside": "Contest details"
+    },
+    "problems": {
+      "caption": "Contest problems",
+      "columns": {
+        "label": "Problem",
+        "name": "Name",
+        "points": "Points",
+        "open": "Open"
+      },
+      "open": "Open",
+      "cap": "At most {count} submission | At most {count} submissions",
+      "pointsShort": "{points} points",
+      "afterStart": "The problems show when the contest starts and you enter.",
+      "afterJoin": "The problems show as soon as you enter.",
+      "hidden": "The problems are not public yet."
+    },
+    "rules": {
+      "intro": "About",
+      "title": "Format and rules",
+      "format": "Format",
+      "formatOnly": "{format}",
+      "formatWithPenalty": "{format} · {minutes} min penalty per wrong try",
+      "scoreboard": "Ranking",
+      "scoreboardFrozen": "{visibility}; frozen for the last {minutes} min",
+      "visibility": {
+        "V": "Public",
+        "H": "Hidden until the organizers reveal it",
+        "C": "Hidden during the contest",
+        "P": "Hidden during your participation"
+      },
+      "rating": "Rating",
+      "rated": "Rated",
+      "unrated": "Unrated",
+      "virtual": "Virtual",
+      "virtualOn": "Allowed after the end",
+      "virtualOff": "Not allowed",
+      "labels": {
+        "alpha": "A, B, C…",
+        "numeric": "1, 2, 3…"
+      },
+      "labelsTerm": "Labels",
+      "judging": "Judging",
+      "fullTests": "All tests (not only pretests)",
+      "pretestsOnly": "Pretests only during the contest",
+      "submissionList": "Submission list",
+      "listOpen": "Public during the contest",
+      "listAfterEnd": "Public after the end",
+      "timeLimit": "Time",
+      "perParticipation": "per participation, from the moment you enter",
+      "registration": "Registration",
+      "registrationBetween": "From {start} to {end}",
+      "registrationFrom": "From {start}",
+      "registrationUntil": "Until {end}"
     }
   },
   "placeholder": {

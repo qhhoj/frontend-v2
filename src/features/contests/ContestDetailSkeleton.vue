@@ -23,4 +23,21 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
     </div>
   </div>
   <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
+  <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div data-skeleton-region="problems" class="glass flex flex-col rounded-card px-5">
+      <div v-for="row in 3" :key="row" class="py-3">
+        <SkeletonBlock text class="w-full" />
+      </div>
+    </div>
+    <aside class="flex flex-col gap-5">
+      <div data-skeleton-region="rules" class="glass rounded-card p-5">
+        <dl class="flex flex-col gap-2.5 text-sm">
+          <div v-for="row in 6" :key="row" class="grid grid-cols-[8rem_minmax(0,1fr)] gap-3">
+            <dt><SkeletonBlock text class="w-20" /></dt>
+            <dd><SkeletonBlock text class="w-full" /></dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </div>
 </template>

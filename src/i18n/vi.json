@@ -78,7 +78,61 @@
       "elapsed": "đã qua {span}",
       "notFoundTitle": "Không tìm thấy kỳ thi",
       "notFoundBody": "Kỳ thi không tồn tại hoặc bạn không được xem.",
-      "backToList": "Về danh sách kỳ thi"
+      "backToList": "Về danh sách kỳ thi",
+      "aside": "Thông tin kỳ thi"
+    },
+    "problems": {
+      "caption": "Các bài của kỳ thi",
+      "columns": {
+        "label": "Bài",
+        "name": "Đề bài",
+        "points": "Điểm",
+        "open": "Mở đề"
+      },
+      "open": "Mở đề",
+      "cap": "Tối đa {count} lượt",
+      "pointsShort": "{points} điểm",
+      "afterStart": "Đề bài sẽ hiện khi kỳ thi bắt đầu và bạn vào thi.",
+      "afterJoin": "Đề bài sẽ hiện ngay khi bạn vào thi.",
+      "hidden": "Đề bài chưa được công khai."
+    },
+    "rules": {
+      "intro": "Giới thiệu",
+      "title": "Thể thức & quy định",
+      "format": "Thể thức",
+      "formatOnly": "{format}",
+      "formatWithPenalty": "{format} · phạt {minutes} phút mỗi lần sai",
+      "scoreboard": "Bảng xếp hạng",
+      "scoreboardFrozen": "{visibility}; đóng băng {minutes} phút cuối",
+      "visibility": {
+        "V": "Công khai",
+        "H": "Ẩn đến khi ban tổ chức công bố",
+        "C": "Ẩn trong lúc thi",
+        "P": "Ẩn trong lượt thi của bạn"
+      },
+      "rating": "Rating",
+      "rated": "Có tính rating",
+      "unrated": "Không tính rating",
+      "virtual": "Thi ảo",
+      "virtualOn": "Cho phép sau khi kết thúc",
+      "virtualOff": "Không cho phép",
+      "labels": {
+        "alpha": "A, B, C…",
+        "numeric": "1, 2, 3…"
+      },
+      "labelsTerm": "Nhãn bài",
+      "judging": "Chấm bài",
+      "fullTests": "Đầy đủ test (không chỉ pretest)",
+      "pretestsOnly": "Chỉ pretest trong lúc thi",
+      "submissionList": "Danh sách bài nộp",
+      "listOpen": "Công khai trong lúc thi",
+      "listAfterEnd": "Công khai sau khi kết thúc",
+      "timeLimit": "Thời gian",
+      "perParticipation": "mỗi lượt kể từ lúc vào thi",
+      "registration": "Đăng ký",
+      "registrationBetween": "Từ {start} đến {end}",
+      "registrationFrom": "Từ {start}",
+      "registrationUntil": "Đến {end}"
     }
   },
   "placeholder": {

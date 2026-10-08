@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { contestDetail } from '@/test/fixtures';
+import { contestDetail, contestProblem } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -153,5 +153,63 @@ describe('contest detail header', () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(UPCOMING) });
     const { wrapper } = await mountApp('/contests/r42');
     expect(wrapper.find('[data-testid="countdown-bit"]').exists()).toBe(true);
+  });
+});
+
+describe('contest detail problems and rules', () => {
+  const withProblems = contestDetail({
+    problems: [contestProblem(0), contestProblem(1, { maxSubmissions: 20 }), contestProblem(2)],
+  });
+
+  it('lists each problem with its label, a link to the statement, its points and its attempt cap', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(withProblems) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
+    expect(rows).toHaveLength(3);
+    expect(rows[0]!.get('th').text()).toBe('A');
+    expect(rows[0]!.get('a[href="/problems/r42a"]').text()).toBe('Dãy số đẹp');
+    expect(rows[0]!.text()).toContain('100');
+    expect(rows[1]!.text()).toContain('Tối đa 20 lượt');
+  });
+
+  it('says when the problems will show instead of an empty table', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ phase: 'upcoming', problems: null })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.find('[data-testid="contest-problems"] table').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="contest-problems"]').text()).toContain(
+      'Đề bài sẽ hiện khi kỳ thi bắt đầu và bạn vào thi.',
+    );
+  });
+
+  it('renders the introduction through UserContent and the rules beside it', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(withProblems) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const aside = wrapper.get('aside');
+    expect(aside.get('.user-content').html()).toContain('Vòng tuần cho đội tuyển');
+    expect(aside.text()).toContain('ICPC · phạt 20 phút mỗi lần sai');
+    expect(aside.text()).toContain('Cho phép sau khi kết thúc');
+  });
+
+  it('lists the problems on a phone as a list with their code and points', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(withProblems) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const items = wrapper.findAll('[data-testid="contest-problems"] ul > li');
+    expect(items).toHaveLength(3);
+    expect(items[1]!.get('a[href="/problems/r42b"]').text()).toBe('B. Trò chơi trên cây');
+    expect(items[1]!.text()).toContain('r42b · 100 điểm');
+  });
+
+  it('leaves the introduction out when the contest has none', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ descriptionHtml: '', problems: null })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    const aside = wrapper.get('aside');
+    expect(aside.find('.user-content').exists()).toBe(false);
+    expect(aside.text()).toContain('Thể thức & quy định');
   });
 });
