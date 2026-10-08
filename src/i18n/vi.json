@@ -197,6 +197,18 @@
         "register": "Bạn đã đăng ký kỳ thi.",
         "leave": "Bạn đã rời kỳ thi."
       }
+    },
+    "list": {
+      "lead": "Chia theo giai đoạn: đang diễn ra, sắp tới và đã kết thúc.",
+      "search": "Tìm kỳ thi",
+      "ratedLabel": "Rating",
+      "ratedAny": "Có và không rating",
+      "ratedOnly": "Chỉ tính rating",
+      "onlyGroup": "Xem riêng nhóm này",
+      "allGroups": "Xem mọi nhóm",
+      "timeLeft": "còn {span}",
+      "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
+      "enter": "Vào thi"
     }
   },
   "placeholder": {

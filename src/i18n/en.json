@@ -197,6 +197,18 @@
         "register": "You registered for the contest.",
         "leave": "You left the contest."
       }
+    },
+    "list": {
+      "lead": "Grouped by phase: running, upcoming and ended.",
+      "search": "Find a contest",
+      "ratedLabel": "Rating",
+      "ratedAny": "Rated and unrated",
+      "ratedOnly": "Rated only",
+      "onlyGroup": "Only this group",
+      "allGroups": "All groups",
+      "timeLeft": "{span} left",
+      "perParticipation": "{span} per participation, from the moment you enter",
+      "enter": "Enter"
     }
   },
   "placeholder": {

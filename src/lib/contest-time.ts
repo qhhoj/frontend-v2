@@ -79,6 +79,11 @@ export function countdownTarget(
   return null;
 }
 
+/** Two instants on the same calendar day of the viewer's zone (the end label adds its date otherwise). */
+export function isSameLocalDay(first: string, second: string): boolean {
+  return new Date(first).toDateString() === new Date(second).toDateString();
+}
+
 /** A length in words (`2 giờ 30 phút`, `4 giờ`, `14 ngày`) as an i18n reference. */
 export function spanMessage(seconds: number): MessageRef {
   const days = Math.floor(seconds / 86_400);

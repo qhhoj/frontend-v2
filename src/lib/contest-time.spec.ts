@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { participationSummary } from '@/test/fixtures';
 import {
   contestProgress,
@@ -6,6 +6,7 @@ import {
   freezeFraction,
   freezeStart,
   isFrozenAt,
+  isSameLocalDay,
   liveStatusOf,
   phaseAt,
   registrationState,
@@ -141,5 +142,14 @@ describe('liveStatusOf (until 4c sends it)', () => {
     const joined = participationSummary({ endTime: '2026-10-08T08:30:00Z' });
     expect(liveStatusOf(times, joined, now)).toBe('participating');
     expect(liveStatusOf(times, joined, at('2026-10-08T08:30:01Z'))).toBe('finished');
+  });
+});
+
+describe('isSameLocalDay', () => {
+  afterEach(() => vi.unstubAllEnvs());
+  it('compares calendar days in the viewer zone', () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    expect(isSameLocalDay('2026-10-08T01:00:00Z', '2026-10-08T16:59:00Z')).toBe(true);
+    expect(isSameLocalDay('2026-10-08T01:00:00Z', '2026-10-08T17:00:00Z')).toBe(false);
   });
 });

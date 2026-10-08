@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import { contestListRoutes } from '@/test/contest-routes';
 import { problemDetail, problemEditorial, sessionUser } from '@/test/fixtures';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -30,7 +31,7 @@ describe('problem page', () => {
   });
 
   it('names the tab after the problem and goes back to the section title when leaving', async () => {
-    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(), ...contestListRoutes({}) });
     const { router } = await openProblem();
     await vi.waitFor(() => expect(document.title).toBe('Đường đi ngắn nhất · QHHOJ'));
     await router.push('/contests');
