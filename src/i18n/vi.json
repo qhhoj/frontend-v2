@@ -232,6 +232,8 @@
     "pdfOpen": "Mở PDF",
     "pdfReady": "PDF đã sẵn sàng",
     "pdfFailed": "Không thể chuẩn bị PDF",
+    "pdfMissing": "Đề bài này không có bản PDF",
+    "pdfRateLimited": "Quá nhiều yêu cầu PDF",
     "pdfRetry": "Thử lại",
     "pdfRetryIn": "Thử lại sau {seconds} giây"
   },

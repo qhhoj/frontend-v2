@@ -232,6 +232,8 @@
     "pdfOpen": "Open PDF",
     "pdfReady": "PDF ready",
     "pdfFailed": "The PDF could not be prepared",
+    "pdfMissing": "This statement has no PDF",
+    "pdfRateLimited": "Too many PDF requests",
     "pdfRetry": "Try again",
     "pdfRetryIn": "Try again in {seconds} s"
   },

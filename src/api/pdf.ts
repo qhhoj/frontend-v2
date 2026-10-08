@@ -5,7 +5,7 @@ import type { StatementLanguage } from './types/problems';
 export type PdfProbe =
   | { state: 'ready' }
   | { state: 'rendering'; retryAfterMs: number }
-  | { state: 'unavailable'; retryAfterMs: number };
+  | { state: 'unavailable'; reason: 'pdf_unavailable' | 'rate_limited'; retryAfterMs: number };
 
 /** The backend asks clients to poll no faster than every 3 s (CONTRIBUTING, error codes: `pdf_unavailable`). */
 export const MIN_POLL_MS = 3000;
@@ -40,11 +40,20 @@ export async function probePdf(
   }
   void response.body?.cancel();
   const retryAfter = response.headers.get('Retry-After');
-  if (response.status === 200) return { state: 'ready' };
+  if (response.status === 200) {
+    // A 200 from an SPA fallback or a proxy page is not the file: only a PDF counts as ready.
+    if (response.headers.get('Content-Type')?.startsWith('application/pdf'))
+      return { state: 'ready' };
+    throw new ApiError('generic', 200, 'Not a PDF');
+  }
   if (response.status === 202)
     return { state: 'rendering', retryAfterMs: parseRetryAfter(retryAfter) };
   if (response.status === 503 || response.status === 429)
-    return { state: 'unavailable', retryAfterMs: parseRetryAfter(retryAfter, MAX_WAIT_MS) };
+    return {
+      state: 'unavailable',
+      reason: response.status === 429 ? 'rate_limited' : 'pdf_unavailable',
+      retryAfterMs: parseRetryAfter(retryAfter, MAX_WAIT_MS),
+    };
   throw new ApiError(
     response.status === 404 ? 'not_found' : 'generic',
     response.status,
