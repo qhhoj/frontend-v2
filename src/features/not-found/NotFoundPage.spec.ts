@@ -16,8 +16,11 @@ describe('not found page', () => {
 
   it('shows the requested path as text, never as markup', async () => {
     mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/%3Cb%3Ex%3C%2Fb%3E');
-    expect(wrapper.find('[data-testid="requested-path"] b').exists()).toBe(false);
+    const { wrapper } = await mountApp('/a&amp;b');
+    const shown = wrapper.get('[data-testid="requested-path"]').element;
+    expect(shown.children).toHaveLength(0);
+    expect(shown.textContent?.trim()).toBe('/a&amp;b'); // markup would decode the entity to '&'
+    expect(shown.innerHTML).toContain('&amp;amp;'); // and the text is escaped on the way out
   });
 
   it('draws Bit crying with a spoken label, and the giant 404 is decoration', async () => {
