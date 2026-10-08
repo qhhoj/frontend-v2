@@ -2,10 +2,11 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import EmptyState from '@/components/EmptyState.vue';
+import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCompactHeader from './ContestCompactHeader.vue';
@@ -37,17 +38,26 @@ const tiles = computed(() =>
     <template v-else>
       <ContestCompactHeader v-if="contest" :contest="contest" />
       <ContestTabs :contest-key="key" />
-      <GlassCard v-if="isClosed" as="div">
-        <EmptyState>
-          <strong class="block text-content">{{ $t('contests.stats.closedTitle') }}</strong>
-          {{ $t('contests.stats.closedBody') }}
-          <RouterLink
-            :to="{ name: 'contest-ranking', params: { key } }"
-            class="mt-2 inline-flex min-h-11 items-center text-accent-text underline"
-          >
-            {{ $t('contests.stats.toRanking') }}
-          </RouterLink>
-        </EmptyState>
+      <GlassCard
+        v-if="isClosed"
+        as="div"
+        class="flex flex-col items-center gap-2 px-6 py-8 text-center"
+      >
+        <!-- REPLACEABLE: swap to the security (padlock) Bit kind once bit/variants merges; the asleep look stands in until then. -->
+        <BitMascot
+          :look="PLACEMENT_LOOKS.emptyList"
+          :label="$t('contests.stats.closedTitle')"
+          closed-eyes
+          class="[--bit-px:4px]"
+        />
+        <strong class="block text-content">{{ $t('contests.stats.closedTitle') }}</strong>
+        <p class="text-muted">{{ $t('contests.stats.closedBody') }}</p>
+        <RouterLink
+          :to="{ name: 'contest-ranking', params: { key } }"
+          class="mt-2 inline-flex min-h-11 items-center text-accent-text underline"
+        >
+          {{ $t('contests.stats.toRanking') }}
+        </RouterLink>
       </GlassCard>
       <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>

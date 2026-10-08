@@ -2,11 +2,21 @@
 import type { ContestProblemStats } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
 import { VERDICT_TONE_CLASSES } from '@/lib/verdicts';
+import type { VerdictTone } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { RESULT_ORDER, RESULT_TONES, formatPercent, resultSegments } from './stats-summary';
 import type { ResultCode } from './stats-summary';
 
 defineProps<{ problems: ContestProblemStats[] }>();
+/** Solid verdict fills for the stacked bar (no text sits on them); the chips keep the tinted tone classes. */
+const SEGMENT_FILLS: Record<VerdictTone, string> = {
+  ac: 'bg-verdict-ac',
+  wa: 'bg-verdict-wa',
+  tle: 'bg-verdict-tle',
+  rte: 'bg-verdict-rte',
+  ce: 'bg-verdict-ce',
+  pending: 'bg-verdict-pending',
+};
 const locale = useLocaleStore();
 const count = (value: number) => formatNumber(value, locale.locale);
 /** A result nobody got stays muted, so only the results that happened draw the eye. */
@@ -60,7 +70,7 @@ const chipClasses = (code: ResultCode, value: number) =>
                 <span
                   v-for="segment in resultSegments(problem.results, problem.total)"
                   :key="segment.code"
-                  :class="VERDICT_TONE_CLASSES[RESULT_TONES[segment.code]]"
+                  :class="SEGMENT_FILLS[RESULT_TONES[segment.code]]"
                   :style="{ width: `${segment.share * 100}%` }"
                 />
               </div>
