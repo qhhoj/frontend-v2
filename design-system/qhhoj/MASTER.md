@@ -30,6 +30,8 @@ Source of truth for values is the code: `src/theme/tokens.css` (global tokens) a
 
 Moved from the mock-up where measured contrast demanded it: link and focus ring `#B4532F` to `#A64A28` (4.26:1 on the hover row), positive/AC text `#15803D` to `#166534` (4.18:1 on the AC tint), `tier-master` `#B45309` to `#9A3412`, `accent-2` `#D97757` to `#9A3F22` (white on it is 3.12:1), dark button text is charcoal, not white (white on `#D97757` is 3.12:1). Lowest text pair per theme, as measured by the spec's formulas: clay-light 4.59:1, clay-dark 4.80:1.
 
+**Personal look.** Accent presets (Clay, Orchid, Ocean, Mint, Sunset, Gold, Mono) override the accent family per theme: `accent`, `accent-2`, `accent-text`, `accent-soft(-text)`, `on-accent`, `focus-ring`, `line-accent`, `gradient-accent`, `glow`, `surface-hover` and the three blobs. Each theme's own preset is Clay for Clay and Orchid for Glass. Verdict, first-solve, tier, coin and syntax colours never follow the accent. Values live in `src/theme/themes/*.css`; every preset is checked in all four themes at Glass 0/25/50/75/100 with blobs at full strength. In the flat Clay themes Glass and Glow do nothing (opaque surfaces, no blobs), and their controls are disabled with a reason.
+
 ## Glass roles (glass-dark / glass-light)
 
 | Role | Token | glass-dark | glass-light |
@@ -58,7 +60,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 ## Shape, depth, motion
 
 - Radii (tokens): `rounded-cell` 12 px, `rounded-row` 16 px, `rounded-tile` 20 px (inner tiles, submit), `rounded-card` 24 px, `rounded-panel` 28 px (swap card), `rounded-pill` 999 px.
-- Depth is hairlines and tone steps in Clay; Glass has blur 24 px. No drop shadows (the live-dot glow exists in Glass only).
+- Depth is hairlines and tone steps in Clay. Glass blurs 24 px at Glass 0 (Clear), scaled down to 0 at Glass 100 (Solid, opaque `--qh-surface-solid`); the personal Glass level moves `--qh-surface-live` and `--qh-blur-live` only. No drop shadows (the live-dot glow exists in Glass only).
 - Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover.
 - `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`: the card surface is opaque (`--qh-surface-solid`) and blur is 0. No `backdrop-filter` support: the card surface is opaque; inner tiles and hover rows keep their Glass tint. Clay is already opaque.
 
@@ -84,6 +86,9 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - **Verdict badge**: 40 px circle (`size-10`), verdict tint, abbreviation + accessible full label.
 - **Ranking cell**: `rounded-cell` block; first solve = `bg-first-solve` with a star: pink-violet in Glass, gold/amber in Clay (kept apart from the red wrong-answer tint; `themes.spec.ts` checks the hue gap and 4.5:1 text); pending = `?n`.
 - **Overlays** (menus, popovers): opaque `bg-surface-solid`.
+- **Appearance panel**: a 44 px palette button in the header opens an opaque popover with Style (Clay, Glass) and Mode (Light, Dark, Automatic), seven accent dots, Glass Clear, Frosted and Solid, "use site default" and a link to Settings › Appearance. It has a focus trap; Escape returns focus to the button.
+- **Settings › Appearance** (`/settings/appearance`, public): an opt-in switch, Style and Mode, accent swatches in a 4 + 3 grid, Glass and Glow sliders, reset and a live preview.
+- Disabled segments, swatches and sliders use a token fill, border and `cursor-not-allowed`, never `opacity`.
 
 ## Rules
 
@@ -92,10 +97,12 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - Meaning never by colour alone: verdicts carry text, frozen cells carry `?`, first solve carries a legend.
 - Touch targets >= 44 px; real `<button>`/`<a>`; icon-only buttons have `aria-label`.
 - Icons: Lucide only, no emoji.
+- Every accent preset keeps the default's contrast rules (`themes.spec.ts`). Disabled controls keep full-contrast labels: no `opacity` on text.
 - Responsive at 375, 768, 1024, 1440; wide tables scroll inside their card, never the page.
 
 ## Pre-delivery checklist
 
+- [ ] A new theme defines the seven accent presets and `npm test` is green for all
 - [ ] No emoji icons; Lucide only
 - [ ] No raw colours in components
 - [ ] Hover/focus states, 150-200 ms

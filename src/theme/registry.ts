@@ -16,6 +16,7 @@ export interface ThemeDefinition {
 /**
  * The single source of themes; the first theme of a scheme is that scheme's default. Add a theme: a CSS file in themes/, its import in styles.css, an entry here, its label in both locale files.
  * A new theme also goes into `grounds` in the pre-paint script of index.html; as the default for its scheme it is also listed first here and replaces the fallback id there.
+ * A new theme's CSS file also defines the seven accent presets, and its entry names its own preset in `accent` (see CONTRIBUTING, Add a theme).
  */
 export const THEMES: readonly ThemeDefinition[] = [
   { id: 'clay-light', labelKey: 'theme.clayLight', scheme: 'light', glass: false, accent: 'clay' },

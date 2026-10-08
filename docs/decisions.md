@@ -51,13 +51,13 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Flatness is tokens only: per-theme `--qh-blur` and `--qh-blob-display`, Clay `surface` = `surface-solid`, transparent blobs, a one-colour `gradient-accent`, an invisible `glow`; `ThemeDefinition.glass` marks the families — `GlassCard`, `.glass` and `bg-surface` render flat in Clay with no code change.
 - `auto` follows `prefers-color-scheme: dark` and anything else (light, no preference, no `matchMedia`) is light — Clay is light-first; the old default of dark belonged to Glass.
 - Stored values are the theme ids plus the two OS-following values of each style: `auto` (Clay), `glass-auto`, `clay-light`, `clay-dark`, `glass-light`, `glass-dark`. The legacy `light` / `dark` that every existing account holds resolve to Clay, so nothing is migrated and the backend, which accepts any id of the pattern, needs no change.
-- The theme menu lists the six preferences grouped by style (Clay, then Glass; each style's themes, then its automatic option); a Style × Mode control is left to the appearance panel (8g).
+- The six `siteTheme` preferences are shown as Style (Clay, Glass) × Mode (Light, Dark, Automatic) in the header's appearance panel (see Appearance).
 - Clay mock-up values adjusted by measurement: link and focus ring `#B4532F` to `#A64A28`, AC/positive `#15803D` to `#166534`, `tier-master` `#B45309` to `#9A3412`, `accent-2` `#D97757` to `#9A3F22`, dark button text charcoal `#1A1816` instead of white — never by loosening the spec.
 - Syntax tokens (`--qh-syntax-*`) live in the four theme files since this change (8c reuses them); Glass values moved: dark comment `#C4B9E0`, light number `#7C5200`, light function `#09617F`.
 - Clay's first-solve tint is gold/amber (Bit's accent family) with the star kept, so it reads apart from the red wrong-answer tint; `themes.spec.ts` checks the hue gap and 4.5:1 text. The ranking legend names no colour: a swatch and the star.
 - Hairlines stay decorative (`#E8E2D8` is 1.2:1 on ivory, like Glass's 10 % white): inputs and inner tiles are told apart by `surface-strong`, not by their border; menus, Select and popovers use `line-strong` so they separate from white cards.
 - Theme preference resolves through the registry: `auto`, `glass-auto`, a stored value or a theme id; an unknown value falls back to the Clay theme of the OS scheme — legacy and backend values always render; the legacy `light`/`dark` resolve to Clay.
-- `choose()` is a user action: it applies the theme and remembers it in this browser; signed in, the menu also saves it as `siteTheme`, and a failed save keeps the local choice — the account is the cross-device truth.
+- `choose()` is a user action: it applies the theme and remembers it in this browser; signed in, the mode control also saves it as `siteTheme`, and a failed save keeps the local choice — the account is the cross-device truth.
 - `adopt()` applies the account's theme without writing the browser preference — the account default must not overwrite the browser's own choice on each sign-in; `adopt(null)` on sign-out returns to the browser choice, then the OS.
 - The store writes `qhhoj.resolvedBy` (`account` or `local`) with `qhhoj.resolvedTheme`. A cached theme is held at start-up only when the account painted it, until `adopt`, `choose` or an OS scheme change releases it — a signed-in account's theme never flashes; `auto` and `glass-auto` resolve by today's OS scheme, so an OS change between visits does not repaint.
 - The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) when `qhhoj.resolvedBy` is `account`, else the local preference — no flash of the wrong theme. It repeats the registry ids and each theme's ground (address-bar colour); `prepaint.spec.ts` enforces that they match.
@@ -98,6 +98,25 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - A banned login shows the generic ban message; the reason waits for B8 (structured `banReason`).
 - Unknown backend codes show `errors.generic`.
 
+## Appearance
+
+- The personal look is opt-in: no look (`appearance` null) is the site's own theme, so the designed theme stays the default and the mode stays a separate preference.
+- Accent presets only, no free colour picker: each preset is contrast-checked in all four themes, and a free colour cannot be checked in advance.
+- Presets are `[data-accent]` token overrides in each theme file (they also match a descendant swatch), so `themes.spec.ts` checks them (`lint:tokens` keeps colours out of components) and a swatch needs no colour in a component.
+- Glass is one 0-100 value: the theme surface is mixed toward `--qh-surface-solid` and the blur scaled down; Clear, Frosted and Solid are 0, 50 and 100, one knob for the slider and the segments.
+- Glow is the opacity of the blob layer; 100 is the site's blobs, so the contrast worst case (full blobs) needs no extra maths.
+- Each theme names its own preset (`accent`: Clay for Clay, Orchid for Glass) and its base equals that preset, so turning the look on changes nothing until a control moves.
+- `first-solve-*` is not an accent token: each theme keeps its own trophy tint under every preset, as it keeps its verdict colours.
+- Glass and Glow are inert in the flat Clay themes; their controls are disabled with a reason rather than hidden, and the stored values are kept for a Glass theme.
+- Style × Mode saves `siteTheme` only and never turns the look on: mode existed before and is not "my own look".
+- Theme and look saves share one sequencer (`useProfileSave`): each answer carries the whole profile, so a late answer to an older save must not overwrite a newer one.
+- The account's look outranks the browser's, and `null` there means the site look; signed out, the browser's own look (localStorage only).
+- The pre-paint script validates `qhhoj.paintedAppearance` and paints the site look for anything invalid: no flash, no broken first paint.
+- Reduced transparency needs no rule of its own: the live tokens derive from the surface and blur that the existing media query already forces solid, so the personal Glass level cannot undo it.
+- The header appearance panel (PrimeVue `Popover` with `FocusTrap`) replaces the theme menu, so Style and Mode live in one place.
+- `/settings/appearance` is public: anonymous visitors can use the look.
+- The panel is opaque (overlay rule), and disabled controls keep full-contrast labels with no `opacity` (axe measures it).
+
 ## Backend asks
 
 | # | Ask | Unblocks |
@@ -111,6 +130,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | B7 | Weekly top users, or drop the idea | home "Top tuần" |
 | B8 | Login ban error carries a structured `banReason` (the frontend parses `Reason:` text today) | ban reason on login |
 | B9 | Distinct error codes for the per-user rate limit, the unfinished-submission limit, a problem ban and a contest submission cap | precise submit messages |
+| B25 | `appearance: {accent, glass, glow} \| null` on `GET/PATCH /profile` and `/auth/me` (accents `clay, orchid, ocean, mint, sunset, gold, mono`) | done in backend-v2 27c7485 (`APPEARANCE_ACCENTS`, `null` clears) |
 
 ## Loading states
 
