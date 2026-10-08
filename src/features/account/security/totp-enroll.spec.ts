@@ -96,6 +96,54 @@ describe('Settings › Security › turning on the authenticator app', () => {
     await button(wrapper, 'Xong').trigger('click');
     expect(wrapper.text()).not.toContain('K7QM-2XRA-9PTD-4WLE');
     expect(wrapper.find('form[data-step]').exists()).toBe(false);
+    expect(wrapper.html()).not.toContain('K7QM2XRA9PTD4WLE');
+    expect(wrapper.html()).not.toContain('K7QM-2XRA-9PTD-4WLE');
+  });
+
+  it('takes the setup key and the QR off the page once the first code is accepted', async () => {
+    const { wrapper } = await startEnrolment();
+    await confirmPassword(wrapper);
+    expect(wrapper.html()).toContain('JBSW Y3DP EHPK 3PXP');
+    await enterCode(wrapper);
+    expect(wrapper.html()).not.toContain('JBSW Y3DP EHPK 3PXP');
+    expect(wrapper.html()).not.toContain(ENROLLMENT.otpauthUrl);
+    expect(wrapper.find('svg[role="img"]').exists()).toBe(false);
+  });
+
+  it('takes the setup key and the QR off the page when the viewer cancels the scan step', async () => {
+    const { wrapper } = await startEnrolment();
+    await confirmPassword(wrapper);
+    await button(wrapper, 'Hủy').trigger('click');
+    await flushPromises();
+    expect(wrapper.html()).not.toContain('JBSW Y3DP EHPK 3PXP');
+    expect(wrapper.html()).not.toContain(ENROLLMENT.otpauthUrl);
+    expect(wrapper.find('form[data-step]').exists()).toBe(false);
+  });
+
+  it('marks the code boxes invalid and points them at the clock hint after a wrong code', async () => {
+    const { wrapper } = await startEnrolment({
+      'POST /auth/2fa/totp/confirm': fail(400, 'invalid_code'),
+    });
+    await confirmPassword(wrapper);
+    await enterCode(wrapper);
+    const alert = wrapper.get('#main [role="alert"]');
+    for (const box of codeBoxes(wrapper)) {
+      expect(box.attributes('aria-invalid')).toBe('true');
+      expect(box.attributes('aria-describedby')).toBe(alert.attributes('id'));
+    }
+  });
+
+  it('shows how long to wait when enrolment is rate-limited, and stays on step 1', async () => {
+    const { wrapper } = await startEnrolment({
+      'POST /auth/2fa/totp/enroll': {
+        status: 429,
+        body: { error: { code: 'rate_limited', message: 'rate_limited' } },
+        headers: { 'Retry-After': '42' },
+      },
+    });
+    await confirmPassword(wrapper);
+    expect(wrapper.get('#main [role="alert"]').text()).toContain('Thử lại sau 42 giây');
+    expect(wrapper.find('form[data-step="password"]').exists()).toBe(true);
   });
 
   it('shows the codes even when reloading the session afterwards fails', async () => {
@@ -143,6 +191,21 @@ describe('Settings › Security › turning on the authenticator app', () => {
     await flushPromises();
     expect(router.currentRoute.value.name).toBe('settings-security');
     expect(wrapper.text()).toContain('K7QM-2XRA-9PTD-4WLE');
+  });
+
+  it('goes back in history when the held leave was a browser Back', async () => {
+    const { wrapper, router } = await startEnrolment();
+    await confirmPassword(wrapper);
+    await enterCode(wrapper);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    await router.push('/settings');
+    await flushPromises();
+    const back = vi.spyOn(router, 'back').mockImplementation(() => undefined);
+    const push = vi.spyOn(router, 'push');
+    dialogButton('Rời trang').click();
+    await flushPromises();
+    expect(back).toHaveBeenCalledOnce();
+    expect(push).not.toHaveBeenCalled();
   });
 
   it('leaves once the viewer chooses Leave in the dialog', async () => {

@@ -4,6 +4,7 @@ import type { FieldIssue } from '@/api/client';
 export interface MockResponse {
   status?: number;
   body?: unknown;
+  headers?: Record<string, string>;
 }
 export interface ApiCall {
   method: string;
@@ -51,11 +52,15 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
           }),
         );
       }
-      const { status = 200, body } = typeof handler === 'function' ? handler(call) : handler;
+      const {
+        status = 200,
+        body,
+        headers,
+      } = typeof handler === 'function' ? handler(call) : handler;
       return Promise.resolve(
         new Response(body === undefined ? null : JSON.stringify(body), {
           status,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...headers },
         }),
       );
     }),

@@ -432,7 +432,8 @@
       "codeLabel": "Confirmation code",
       "confirm": "Confirm and turn on",
       "wrongCode": "The code is wrong or expired. Check the phone's clock, then enter a new code.",
-      "enabled": "Two-step verification is on. The next sign-in asks for a 6-digit code."
+      "enabled": "Two-step verification is on. The next sign-in asks for a 6-digit code.",
+      "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds."
     },
     "codes": {
       "title": "Save backup codes",

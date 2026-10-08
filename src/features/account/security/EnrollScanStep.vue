@@ -23,10 +23,12 @@ const code = ref('');
 const otp = ref<{ focus: () => void } | null>(null);
 const formElement = ref<HTMLFormElement | null>(null);
 const { pending, error, summary, run } = useAuthAction(formElement);
+const ERROR_ID = 'totp-code-error';
+const wrongCode = computed(
+  () => error.value instanceof ApiError && error.value.code === 'invalid_code',
+);
 const errorText = computed(() =>
-  error.value instanceof ApiError && error.value.code === 'invalid_code'
-    ? translate('settings.totp.wrongCode')
-    : summary.value,
+  wrongCode.value ? translate('settings.totp.wrongCode') : summary.value,
 );
 const SCAN_STEPS = [0, 1, 2];
 
@@ -91,9 +93,11 @@ async function submit() {
         ref="otp"
         v-model="code"
         :label="$t('settings.totp.codeLabel')"
+        :invalid="wrongCode"
+        :described-by="wrongCode ? ERROR_ID : undefined"
         @complete="submit"
       />
-      <AuthError :text="errorText" />
+      <AuthError :id="ERROR_ID" :text="errorText" />
       <div class="flex flex-wrap gap-2.5">
         <button type="submit" :class="BUTTON.primary" :aria-disabled="pending">
           {{ $t('settings.totp.confirm') }}

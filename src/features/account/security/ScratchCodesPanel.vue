@@ -19,6 +19,10 @@ const checkbox = ref<HTMLInputElement | null>(null);
 const text = computed(() => scratchCodesText(props.codes, props.username));
 /** The destination the viewer was heading to while the dialog asks; set only while it is open. */
 let pendingLeave: RouteLocationNormalized | null = null;
+/** The leave the dialog is holding was a browser Back, so Leave goes back rather than adding an entry. */
+let leaveFromHistory = false;
+/** A history move happened since the last leave check (set by `popstate`, read by the leave guard). */
+let historyMoved = false;
 let leaveApproved = false;
 
 function download() {
@@ -28,35 +32,59 @@ function download() {
     download: `qhhoj-${props.username}-backup-codes.txt`,
   });
   link.click();
-  URL.revokeObjectURL(url);
+  // Revoked after the click has been handled: Safari and older Firefox abort a download whose URL goes in the same tick.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
-/** `window.print` blocks until the dialog closes, so the scope only lasts for this print. */
+/**
+ * `window.print` can return before the print is rendered (iOS Safari, Chrome for Android), so the scope lasts until `afterprint`.
+ * Unmounting clears it too, in case `afterprint` never fires.
+ */
 function print() {
   document.documentElement.dataset.printScope = 'codes';
+  window.addEventListener('afterprint', clearPrintScope, { once: true });
   window.print();
+}
+function clearPrintScope() {
   delete document.documentElement.dataset.printScope;
+  window.removeEventListener('afterprint', clearPrintScope);
 }
 function finish() {
   if (acknowledged.value) return emit('done');
   reminded.value = true;
   checkbox.value?.focus();
 }
-/** Leaving is held back until the viewer answers the dialog; "Leave" then repeats the navigation once. */
+/** Leaving is held back until the viewer answers the dialog. Leave repeats the navigation once: a Back goes back, anything else pushes. */
 function leaveAnyway() {
   leaveOpen.value = false;
   const destination = pendingLeave;
   pendingLeave = null;
   if (!destination) return;
   leaveApproved = true;
-  void router.push(destination).finally(() => (leaveApproved = false));
+  if (leaveFromHistory) router.back();
+  else void router.push(destination.fullPath);
 }
+const noteHistoryMove = () => void (historyMoved = true);
 const keepUnsaved = (event: BeforeUnloadEvent) =>
   void (acknowledged.value || event.preventDefault());
-onMounted(() => window.addEventListener('beforeunload', keepUnsaved));
-onBeforeUnmount(() => window.removeEventListener('beforeunload', keepUnsaved));
+onMounted(() => {
+  window.addEventListener('beforeunload', keepUnsaved);
+  window.addEventListener('popstate', noteHistoryMove);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', keepUnsaved);
+  window.removeEventListener('popstate', noteHistoryMove);
+  clearPrintScope();
+});
 onBeforeRouteLeave((to) => {
-  if (acknowledged.value || leaveApproved) return true;
+  const byHistory = historyMoved;
+  historyMoved = false;
+  if (leaveApproved) {
+    leaveApproved = false;
+    return true;
+  }
+  if (acknowledged.value) return true;
   pendingLeave = to;
+  leaveFromHistory = byHistory;
   leaveOpen.value = true;
   return false;
 });

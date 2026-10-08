@@ -33,6 +33,8 @@ export class ApiError extends Error {
     readonly fields: Record<string, string[]> = {},
     readonly issues: FieldIssue[] = [],
     readonly extra: Record<string, unknown> = {},
+    /** `Retry-After` in whole seconds when the backend sent one (a 429 names the wait); null otherwise. */
+    readonly retryAfterSeconds: number | null = null,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -111,6 +113,11 @@ async function send(
   }
 }
 
+function retryAfterSecondsOf(response: Response): number | null {
+  const seconds = Number(response.headers.get('Retry-After'));
+  return Number.isInteger(seconds) && seconds > 0 ? seconds : null;
+}
+
 async function errorOf(response: Response): Promise<ApiError> {
   const body = (await response.json().catch(() => null)) as {
     error?: {
@@ -129,6 +136,7 @@ async function errorOf(response: Response): Promise<ApiError> {
     fields && typeof fields === 'object' && !Array.isArray(fields) ? fields : undefined,
     Array.isArray(issues) ? issues : undefined,
     extra,
+    retryAfterSecondsOf(response),
   );
 }
 

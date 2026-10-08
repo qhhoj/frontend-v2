@@ -432,7 +432,8 @@
       "codeLabel": "Mã xác nhận",
       "confirm": "Xác nhận và bật",
       "wrongCode": "Mã không đúng hoặc đã hết hạn. Kiểm tra giờ trên điện thoại rồi nhập mã mới.",
-      "enabled": "Đã bật xác thực hai bước. Lần đăng nhập sau sẽ hỏi mã 6 số."
+      "enabled": "Đã bật xác thực hai bước. Lần đăng nhập sau sẽ hỏi mã 6 số.",
+      "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây."
     },
     "codes": {
       "title": "Lưu mã dự phòng",
