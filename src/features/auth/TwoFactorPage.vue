@@ -103,7 +103,7 @@ async function signOut() {
       </button>
     </template>
     <template #badge>
-      <InlineBit v-if="failed" kind="sweat" />
+      <InlineBit v-if="failed" kind="sweat" class="self-center" />
       <AuthBadge v-else :tone="card.tone"><component :is="card.icon" /></AuthBadge>
     </template>
     <form

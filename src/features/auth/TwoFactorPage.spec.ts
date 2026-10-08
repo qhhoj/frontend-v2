@@ -5,6 +5,7 @@ import { partialSession, profile, signedIn } from '@/test/fixtures';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
+import { socialRoutes } from '@/test/auth-routes';
 import { mountApp } from '@/test/mount';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
@@ -28,6 +29,7 @@ function twoFactorApi(
     'POST /auth/logout': noContent(),
     'GET /profile': ok(profile()),
     ...homeRoutes,
+    ...socialRoutes,
     ...routes,
   });
 }
@@ -97,6 +99,7 @@ describe('two-factor page', () => {
       '',
     ]);
     expect(document.activeElement).toBe(wrapper.get('input[autocomplete="one-time-code"]').element);
+    expect(wrapper.find('[data-testid="inline-bit"]').exists()).toBe(true);
   });
 
   it('tells a throttled viewer to wait', async () => {
