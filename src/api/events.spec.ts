@@ -1,9 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { installFakeEventSource, latestEventSource } from '@/test/fake-event-source';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  FakeEventSource,
+  installFakeEventSource,
+  latestEventSource,
+} from '@/test/fake-event-source';
 import { openEventStream } from './events';
 
 describe('openEventStream', () => {
   beforeEach(installFakeEventSource);
+  afterEach(() => FakeEventSource.instances.forEach((source) => source.close()));
 
   it('opens the internal API path and hands parsed data to the named handler', () => {
     const onState = vi.fn();

@@ -1,7 +1,7 @@
 import { enableAutoUnmount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { DEFAULT_LOCALE, i18n } from '@/i18n';
-import { installFakeEventSource } from './fake-event-source';
+import { FakeEventSource, installFakeEventSource } from './fake-event-source';
 import { stubMatchMedia } from './match-media';
 import { takeUnmatchedRequests } from './mock-api';
 
@@ -28,6 +28,12 @@ afterEach(() => {
   i18n.global.locale.value = DEFAULT_LOCALE;
   document.body.innerHTML = '';
   expect(unmatched, 'requests without a mockApi route').toEqual([]);
+  // The auto-unmount hook (registered below) runs first, so a stream still open here leaked past its page.
+  const openStreams = FakeEventSource.instances.filter((source) => !source.closed);
+  expect(
+    openStreams.map((source) => source.url),
+    'event streams left open after unmount',
+  ).toEqual([]);
 });
 
 // Registered last so it runs first (after-hooks run in stack order): mounted apps stop their timers and streams.

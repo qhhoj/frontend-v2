@@ -159,6 +159,102 @@ describe('live updates on the submission list', () => {
       'Cập nhật trực tiếp tạm dừng',
     );
   });
+  it('announces a second batch with the same text again, after clearing the region', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...submissionListRoutes,
+      'GET /submissions': sequence(
+        page([row('a')]),
+        page([row('n1'), row('a')]),
+        page([row('n2'), row('n1'), row('a')]),
+      ),
+    });
+    const { wrapper } = await openList();
+    const region = wrapper.get('#main [role="status"][aria-live="polite"]').element;
+    const texts: string[] = [];
+    new MutationObserver(() => texts.push(region.textContent ?? '')).observe(region, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+    for (const id of ['x1', 'x2']) {
+      feed().emit('queued', frame('queued', id));
+      await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
+      await flushPromises();
+    }
+    expect(texts.filter((text) => text === 'Có 1 bài nộp mới')).toHaveLength(2);
+  });
+  it('drops the answer of a probe that returns after the filters changed', async () => {
+    let releaseProbe = () => {};
+    const probeGate = new Promise<void>((resolve) => (releaseProbe = resolve));
+    mockApi(pageTwoRoutes(105));
+    const { wrapper } = await openList('/submissions?page=2');
+    const realFetch = globalThis.fetch;
+    vi.stubGlobal('fetch', async (input: string, init?: RequestInit) => {
+      if (input.includes('pageSize=1&') || input.endsWith('pageSize=1')) await probeGate;
+      return realFetch(input, init);
+    });
+    feed().emit('queued', frame('queued', 'x'));
+    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
+    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
+    await flushPromises();
+    releaseProbe();
+    await flushPromises();
+    expect(wrapper.find('[data-testid="new-pill"]').exists()).toBe(false);
+    expect(announcement(wrapper)).toBe('');
+  });
+  it('closes the stream when the page is left', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper } = await openList();
+    wrapper.unmount();
+    expect(feed().closed).toBe(true);
+  });
+  it('reopens the stream and hides the paused hint when Reconnect is clicked', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper } = await openList();
+    feed().fail();
+    await flushPromises();
+    const first = feed();
+    await wrapper.get('[data-testid="live-paused"] button').trigger('click');
+    await flushPromises();
+    const feeds = FakeEventSource.instances.filter((source) =>
+      source.url.endsWith('/events/submissions'),
+    );
+    expect(feeds).toHaveLength(2);
+    expect(first.closed).toBe(true);
+    expect(wrapper.find('[data-testid="live-paused"]').exists()).toBe(false);
+  });
+  it('does not run a pending window after a filter change', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper } = await openList();
+    feed().emit('queued', frame('queued', 'x'));
+    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
+    await flushPromises();
+    const callsAfterFilter = listCalls(calls).length;
+    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
+    expect(listCalls(calls)).toHaveLength(callsAfterFilter);
+  });
+  it('does not replay frames of a switched-off stream when it is switched on again', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper } = await openList();
+    feed().emit('queued', frame('queued', 'x'));
+    const toggle = wrapper.get('input[data-testid="live-toggle"]');
+    await toggle.setValue(false);
+    await vi.waitFor(() => expect(feed().closed).toBe(true));
+    await toggle.setValue(true);
+    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
+    expect(listCalls(calls)).toHaveLength(1);
+  });
+  it('on page 2 refetches the shown page when one of its rows finishes and refreshes the stats', async () => {
+    const calls = mockApi(pageTwoRoutes(100));
+    await openList('/submissions?page=2');
+    feed().emit('done', frame('done', 'p2'));
+    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
+    await flushPromises();
+    const refetches = listCalls(calls).filter((call) => call.query.get('page') === '2');
+    expect(refetches).toHaveLength(2);
+    expect(calls.filter((call) => call.path === '/submissions/stats')).toHaveLength(2);
+  });
   it('keeps one polite status element in the page', async () => {
     mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const { wrapper } = await openList();

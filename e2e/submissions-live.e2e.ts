@@ -8,6 +8,9 @@ const DESKTOP_WIDTH = 1280;
 /** The settle window (3 s) plus a margin. */
 const SETTLE_TIMEOUT_MS = 6000;
 /** Set to a folder to save screenshots of the live states there. */
+/** Enough rows that the page scrolls well past the pill. */
+const LONG_PAGE_ROWS = 40;
+const STICKY_TOP_MAX_PX = 100;
 const SHOTS_DIR = process.env.LIVE_SHOTS_DIR;
 
 /** A browser EventSource that never connects: the test pushes frames through `window.pushEvent`. */
@@ -60,12 +63,14 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
             ? { body: { data: [newRow()], meta: { page: 1, pageSize: 1, total: 103 } } }
             : {
                 body: {
-                  data: [submissionItem({ id: 'p2' })],
+                  data: [...Array(LONG_PAGE_ROWS).keys()].map((index) =>
+                    submissionItem({ id: `p2-${index}` }),
+                  ),
                   meta: { page: 2, pageSize: 50, total: 100 },
                 },
               };
         await page.goto('/submissions?page=2');
-        await expect(page.locator('tbody tr')).toHaveCount(1);
+        await expect(page.locator('tbody tr')).toHaveCount(LONG_PAGE_ROWS);
         await pushQueued(page);
         const pill = page.getByTestId('new-pill');
         await expect(pill).toBeVisible({ timeout: SETTLE_TIMEOUT_MS });
@@ -73,8 +78,9 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
         expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(
           true,
         );
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+        expect((await pill.boundingBox())!.y).toBeLessThan(STICKY_TOP_MAX_PX);
         if (SHOTS_DIR) {
-          await pill.scrollIntoViewIfNeeded();
           await page.screenshot({ path: `${SHOTS_DIR}/task-8b-pill-${width}-${scheme}.png` });
         }
       });

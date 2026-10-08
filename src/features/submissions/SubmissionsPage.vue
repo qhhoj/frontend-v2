@@ -86,15 +86,19 @@ function goToPage(page: number) {
             {{ $t('submissions.liveReload') }}
           </button>
         </p>
-        <button
+        <div
           v-if="live.newCount.value > 0"
-          type="button"
-          data-testid="new-pill"
-          class="mb-3 min-h-11 rounded-pill border border-line-accent bg-accent-soft px-4 font-semibold text-accent-soft-text hover:opacity-90"
-          @click="live.showNew()"
+          class="sticky top-20 z-10 mb-3 w-fit rounded-pill bg-surface-solid"
         >
-          {{ $t('submissions.newPill', { count: live.newCount.value }, live.newCount.value) }}
-        </button>
+          <button
+            type="button"
+            data-testid="new-pill"
+            class="min-h-11 rounded-pill border border-line-accent bg-accent-soft px-4 font-semibold text-accent-soft-text hover:opacity-90"
+            @click="live.showNew()"
+          >
+            {{ $t('submissions.newPill', { count: live.newCount.value }, live.newCount.value) }}
+          </button>
+        </div>
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
           <template #skeleton><SubmissionTableSkeleton /></template>
           <GlassCard v-if="!submissions.length" as="div" class="px-6 py-10 text-center text-muted">
