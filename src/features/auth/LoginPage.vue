@@ -2,7 +2,6 @@
 import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import { queryErrorText } from './auth-errors';
@@ -53,7 +52,6 @@ const submit = () =>
   <div
     class="relative grid min-h-[calc(100dvh-env(safe-area-inset-top))] grid-cols-1 content-start pb-[env(safe-area-inset-bottom)] lg:grid-cols-[minmax(0,7fr)_minmax(0,9fr)] lg:content-stretch"
   >
-    <div class="absolute top-3 right-4 z-10 lg:top-5 lg:right-6"><LocaleToggle /></div>
     <LoginBrandPanel />
     <section class="flex items-center justify-center lg:p-8">
       <form
