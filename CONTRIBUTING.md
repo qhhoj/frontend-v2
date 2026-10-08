@@ -34,20 +34,24 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Components use the semantic utilities from `src/theme/styles.css` only (`bg-surface`, `text-content`, `text-muted`, `border-line`, `rounded-card`, `font-display`, ...). Tailwind's own palette, fonts and radii are removed
 - No colour literals outside `src/theme/themes/*.css` (specs excepted): `npm run lint:tokens` fails on them
 - Classes picked at runtime come from a static `Record<..., string>` map (Tailwind must see the full class names)
-- Glass card: `GlassCard`; user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
+- Card: `GlassCard` (frosted in the Glass themes, a flat hairline card in Clay: the theme decides); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
 - Overlays (menus, popovers) are opaque `bg-surface-solid`
 - PrimeVue is unstyled; its look lives in `src/theme/primevue-preset.ts` with the same utilities
 - Screens are built only from an approved mock-up; others get logic and plain placeholder markup
 
 ## Add a theme
 
-1. Copy `src/theme/themes/glass-dark.css` to `src/theme/themes/<id>.css`. Keep only `:root[data-theme='<id>']` as the selector (drop the `:root,` base that glass-dark carries) and change the values (6-digit hex or `rgba()` only; the `coin-*` gradient stops must be 6-digit hex, `themes.spec.ts` reads them as such)
-2. Import it in `src/theme/styles.css` next to the others
-3. Add `{ id: '<id>', labelKey: 'theme.<key>', scheme: 'dark' | 'light', storedAs: '<id>' }` to `THEMES` in `src/theme/registry.ts`, and the label to both locale files
-4. Add `'<id>': '<its --qh-ground>'` to `grounds` in the pre-paint script in `index.html` (the id list and the address-bar colour); `src/theme/prepaint.spec.ts` fails on a missing id or a ground that differs from the theme file
-5. If the theme should become the default for its scheme, also replace the fallback id in the `prefersLight` branch of that script
-6. `npm test`: `src/theme/themes.spec.ts` fails on a missing token, a CSS file that is not registered (or the reverse), a missing import in `styles.css`, the wrong `color-scheme`, or any text pair under 4.5:1 on the worst ground (blob centre + glass + hover, and the opaque fallback)
-7. Backend: the account's `siteTheme` accepts only `auto | light | dark` today; allow the new id there (backend ask B3) before the theme can be saved per account. Until then, `storedAs` maps the theme onto a backend value, and while signed in the account's theme wins on the next load, so the new theme is usable signed-out only until B3
+Two families exist: **Clay** (flat, the default: `clay-light`, `clay-dark`) and **Glass** (`glass-light`, `glass-dark`). Copy the file of the family you want.
+
+1. Copy `src/theme/themes/clay-light.css` (or a Glass file) to `src/theme/themes/<id>.css`. Keep only `:root[data-theme='<id>']` as the selector (the bare `:root,` fallback belongs to `clay-light` alone) and change the values (6-digit hex or `rgb()`/`rgba()` only; the `coin-*` gradient stops must be 6-digit hex, `themes.spec.ts` reads them as such). Keep `--qh-blur` and `--qh-blob-display`: a flat theme has `0px`, `none`, `surface` equal to `surface-solid`, transparent blobs, a transparent `glow`, a one-colour `gradient-accent` and `chart-line-start: var(--qh-accent)`; a frosted theme has a blur in px, `block` and `chart-line-start: var(--qh-accent-2)`
+2. Set the six `--qh-syntax-*` colours (keyword, type, number, string, comment, function); they are drawn on the inner tile (`--qh-surface-strong` over the card)
+3. Import it in `src/theme/styles.css` next to the others
+4. Add `{ id: '<id>', labelKey: 'theme.<key>', scheme: 'dark' | 'light', glass: true | false }` to `THEMES` in `src/theme/registry.ts`, and the label to both locale files. `auto` (Clay) and `glass-auto` (Glass) resolve to the first theme of their style and the system scheme, so list the default first
+5. Add `'<id>': '<its --qh-ground>'` to `grounds` in the pre-paint script in `index.html`; `src/theme/prepaint.spec.ts` fails on a missing id or a ground that differs from the theme file. If the theme becomes the default of its style and scheme, also change the fallback in the `var theme =` expression of that script (it builds `clay-` or `glass-` plus the scheme) and the static `theme-color` meta
+6. `npm test`: `src/theme/themes.spec.ts` fails on a missing token, a CSS file that is not registered (or the reverse), a missing import in `styles.css`, the wrong `color-scheme`, a flat theme that is not flat (or a frosted one that is), duplicate syntax colours, or any text pair under 4.5:1 on the worst ground (every blob centre, glass, hover row, inner tile and the opaque fallback)
+7. Backend: nothing to do. `siteTheme` accepts any id matching `^[a-z][a-z0-9-]{0,31}$`; the SPA resolves an id it does not know to the Clay theme of the OS scheme
+
+Stored values (`siteTheme` for signed-in accounts, the browser's preference otherwise): `auto` (Clay, follows the OS; the legacy default), `clay-light`, `clay-dark`, `glass-auto` (Glass, follows the OS), `glass-light`, `glass-dark`. The legacy `light` and `dark` resolve to `clay-light` and `clay-dark`, so existing accounts need no migration. The pre-paint script paints the last applied theme id (`qhhoj.resolvedTheme`), not the preference.
 
 Change a palette: edit the values in the theme file and run `npm test`.
 

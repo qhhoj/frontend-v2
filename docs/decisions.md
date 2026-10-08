@@ -29,7 +29,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - `redirect` values pass through `safeRedirect`: only `/path`; `//`, `/\`, scheme URLs and arrays become `/` — open-redirect protection.
 - Non-staff on `/admin/**` get not-found at the same URL — existence is not revealed. Admin is one lazy chunk.
 - Guards route page navigations only; `csrf_failed`, `two_factor_required` and `password_change_required` from an API call are not turned into redirects (8b). Their messages exist in both locales.
-- Every existing account carries `siteTheme: 'light'` (schema default) — so the account theme must not overwrite a browser's own choice on sign-in (see Theme).
+- Every existing account carries `siteTheme: 'light'` (schema default) — so the account theme must not overwrite a browser's own choice on sign-in (and `light` now resolves to Clay light; see Theme).
 
 ## Data reads
 
@@ -47,12 +47,20 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Tailwind's palette, fonts and radii are removed and colour literals are linted out of components (`lint:tokens`) — every colour goes through a token.
 - Theme invariants are tested: every token defined, text at 4.5:1 on the worst ground (blob centre, glass, hover), coin text on both stops of every coin gradient — a palette cannot ship unreadable.
 - Glass mock-up colours adjusted: blob peaks 24 % (pink) and 28 % (violet), muted text `#CFC5EA` (mock-up `#B7A9D6` measured 4.11:1), link text `#FDB8FF` (mock-up `#FC72FF` measured 3.82:1).
-- Theme preference resolves through the registry: `auto`, a stored value or a theme id; an unknown or retired value falls back to the OS scheme — legacy and backend values always render.
+- Clay & ivory is the default direction (user pick, mock-up "Palette", third option); Glass stays selectable as `glass-light` / `glass-dark` — one registry, two families, no component forks.
+- Flatness is tokens only: per-theme `--qh-blur` and `--qh-blob-display`, Clay `surface` = `surface-solid`, transparent blobs, a one-colour `gradient-accent`, an invisible `glow`; `ThemeDefinition.glass` marks the families — `GlassCard`, `.glass` and `bg-surface` render flat in Clay with no code change.
+- `auto` follows `prefers-color-scheme: dark` and anything else (light, no preference, no `matchMedia`) is light — Clay is light-first; the old default of dark belonged to Glass.
+- Stored values are the theme ids plus the two OS-following values of each style: `auto` (Clay), `glass-auto`, `clay-light`, `clay-dark`, `glass-light`, `glass-dark`. The legacy `light` / `dark` that every existing account holds resolve to Clay, so nothing is migrated and the backend, which accepts any id of the pattern, needs no change.
+- The theme menu lists the six preferences grouped by style (Clay, then Glass; each style's themes, then its automatic option); a Style × Mode control is left to the appearance panel (8g).
+- Clay mock-up values adjusted by measurement: link and focus ring `#B4532F` to `#A64A28`, AC/positive `#15803D` to `#166534`, `tier-master` `#B45309` to `#9A3412`, `accent-2` `#D97757` to `#9A3F22`, dark button text charcoal `#1A1816` instead of white — never by loosening the spec.
+- Syntax tokens (`--qh-syntax-*`) live in the four theme files since this change (8c reuses them); Glass values moved: dark comment `#C4B9E0`, light number `#7C5200`, light function `#09617F`.
+- Hairlines stay decorative (`#E8E2D8` is 1.2:1 on ivory, like Glass's 10 % white): inputs and inner tiles are told apart by `surface-strong`, not by their border.
+- Theme preference resolves through the registry: `auto`, `glass-auto`, a stored value or a theme id; an unknown value falls back to the Clay theme of the OS scheme — legacy and backend values always render; the legacy `light`/`dark` resolve to Clay.
 - `choose()` is a user action: it applies the theme and remembers it in this browser; signed in, the menu also saves it as `siteTheme`, and a failed save keeps the local choice — the account is the cross-device truth.
 - `adopt()` applies the account's theme without writing the browser preference — the account default must not overwrite the browser's own choice on each sign-in; `adopt(null)` on sign-out returns to the browser choice, then the OS.
-- A cached theme id is held at start-up until the account or the OS says otherwise — no repaint of the theme already on screen.
+- A cached theme (`qhhoj.resolvedTheme`) is held at start-up for every preference, until `adopt`, `choose` or an OS scheme change releases it — no repaint of the theme already on screen.
 - The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) — no flash of the wrong theme. It repeats the registry ids and each theme's ground (address-bar colour); `prepaint.spec.ts` enforces that they match.
-- Reduced transparency or no `backdrop-filter`: blur 0 and opaque surfaces; reduced motion: durations 0 — glass stays readable.
+- Glass: reduced transparency or no `backdrop-filter`: blur 0 and opaque surfaces (Clay is always opaque); reduced motion: durations 0 — glass stays readable.
 - Background blobs: phones get two 300 px blobs; blob-3 is hidden below 768 px wide or at 759 px high and under — on narrow or short screens its centre would sink into blob-2 and break contrast.
 
 ## User content
@@ -95,7 +103,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 |---|---|---|
 | B1 | OpenAPI response schemas (`dtoFileNameSuffix` including `.response.ts`, fix circular refs, paginated response helper) | generated DTO types |
 | B2 | `siteTheme` (and `languageId`) on `GET /auth/me` | one request fewer at boot |
-| B3 | `siteTheme` default `auto` for new users; accept registered theme ids when a third theme exists | theme preference, new themes |
+| B3 | `siteTheme` default `auto` for new users; accept registered theme ids | done in backend plan S Task 10 (any `^[a-z][a-z0-9-]{0,31}$`) |
 | B4 | `ranking` event on `contest-events` after a participation recompute | live ranking without polling |
 | B5 | `rating` and first organization short name on ranking row users | tier colours, captions |
 | B6 | `solved=false` filter on `GET /problems` | "Chưa giải" chip |

@@ -1,18 +1,38 @@
 # QHHOJ Design System (Master)
 
-Generated with ui-ux-pro-max (`"crypto defi glassmorphism" --design-system --density 6`), then adapted to the approved **I · Glass** direction (2026-10-08). Typography and checklist come from the tool; palette, style and component rules are Glass. Page overrides go in `pages/<page>.md`; they win over this file.
+Default direction: **Clay & ivory** (user pick, 2026-10-08, mock-up "Palette", third option): light-first, calm, ivory paper, white opaque surfaces, hairline borders, solid clay buttons, no blur, no blobs; the dark twin is warm charcoal. **Glass** (the earlier approved "I · Glass") stays as two optional themes, `glass-dark` and `glass-light`. Typography and the checklist come from ui-ux-pro-max (`"crypto defi glassmorphism" --design-system --density 6`). Page overrides go in `pages/<page>.md`; they win over this file.
 
-Source of truth for values is the code: `src/theme/tokens.css` (global tokens) and `src/theme/themes/<id>.css` (per-theme tokens). This file explains intent.
+Source of truth for values is the code: `src/theme/tokens.css` (global tokens) and `src/theme/themes/<id>.css` (per-theme tokens). This file explains intent. Bit, the pixel mascot (`mascot.md`), keeps its sprite colours in every theme: they are sprite data, not theme tokens.
 
 ## Style
 
-- Glassmorphism on a deep ground: frosted cards (`backdrop-filter: blur(var(--qh-blur))`, 4 % white fill, 1 px hairline border) over 2–3 large blurred radial blobs (pink, violet).
-- Consumer-DeFi tone: big friendly numbers, pill controls, token-pill tags with a gradient "coin", swap-card submit panel, podium for top 3.
-- One accent gradient (pink → violet) for primary actions and first-solve cells only.
+- **Clay (default)**: ivory ground, white cards (`bg-surface` = `--qh-surface-solid`) with a 1 px `--qh-line` hairline, no blur (`--qh-blur: 0px`), no background blobs (`--qh-blob-display: none`, blob colours transparent), one solid clay colour for primary actions (`--qh-gradient-accent` has two equal stops, so `bg-gradient-accent` is flat), no glow (`--qh-glow` is transparent).
+- **Glass (optional)**: frosted cards (`backdrop-filter: blur(var(--qh-blur))`, 24 px, translucent fill, hairline) over 2-3 large blurred radial blobs (pink, violet; the third is hidden on narrow or short screens); pink to violet accent gradient on primary actions and first-solve cells.
+- Components never know which: they use `glass rounded-card`, `bg-surface`, `bg-gradient-accent`; the theme decides what those render.
+- Tone: big friendly numbers, pill controls, token-pill tags with a "coin", swap-card submit panel, podium for top 3.
 
-## Colour roles (glass-dark / glass-light)
+## Colour roles (clay-light / clay-dark)
 
-| Role | Token | Dark | Light |
+| Role | Token | clay-light | clay-dark |
+|---|---|---|---|
+| Ground | `--qh-ground` | `#FAF9F5` | `#1A1816` |
+| Card | `--qh-surface` = `--qh-surface-solid` | `#FFFFFF` | `#24211E` |
+| Inner tile / input | `--qh-surface-strong` | `#F6F3EC` | `#2D2926` |
+| Hover row | `--qh-surface-hover` | `#F1EDE4` | `#352F2B` |
+| Hairline | `--qh-line` | `#E8E2D8` | `#39342F` |
+| Text | `--qh-text` | `#141413` | `#F2EEE8` |
+| Muted text | `--qh-text-muted` | `#5E5A52` | `#C9C1B6` |
+| Accent fill (buttons) | `--qh-accent` | `#B4532F` | `#D97757` |
+| Second accent (gradient end, SVG stops) | `--qh-accent-2` | `#9A3F22` | `#E8825F` |
+| Accent as text/link, focus ring | `--qh-accent-text`, `--qh-focus-ring` | `#A64A28`, `#A64A28` | `#EE9A7A`, `#F4A98B` |
+| Rating chart line start | `--qh-chart-line-start` | `var(--qh-accent)` | `var(--qh-accent)` |
+| Text on accent fill | `--qh-on-accent` | `#FFFFFF` | `#1A1816` |
+
+Moved from the mock-up where measured contrast demanded it: link and focus ring `#B4532F` to `#A64A28` (4.26:1 on the hover row), positive/AC text `#15803D` to `#166534` (4.18:1 on the AC tint), `tier-master` `#B45309` to `#9A3412`, `accent-2` `#D97757` to `#9A3F22` (white on it is 3.12:1), dark button text is charcoal, not white (white on `#D97757` is 3.12:1). Lowest text pair per theme, as measured by the spec's formulas: clay-light 4.59:1, clay-dark 4.80:1.
+
+## Glass roles (glass-dark / glass-light)
+
+| Role | Token | glass-dark | glass-light |
 |---|---|---|---|
 | Ground | `--qh-ground` | `#0D0A1A` | `#F6F2FF` |
 | Glass fill | `--qh-surface` | `rgba(255,255,255,.04)` | `rgba(255,255,255,.55)` |
@@ -23,39 +43,41 @@ Source of truth for values is the code: `src/theme/tokens.css` (global tokens) a
 | Accent fill (violet) | `--qh-accent-2` | `#7B61FF` | `#5B3FD6` |
 | Accent as text/link | `--qh-accent-text` | `#FDB8FF` | `#A21CAF` |
 | Text on accent gradient | `--qh-on-accent` | `#140A1F` | `#FFFFFF` |
+| Rating chart line start | `--qh-chart-line-start` | `var(--qh-accent-2)` | `var(--qh-accent-2)` |
 
-Measured on the worst ground (blob centre + glass + hover tint): the mockup's muted `#B7A9D6` (4.11) and pink text `#FC72FF` (3.82) fail 4.5:1. Fixes: blob peaks lowered to 24 % (pink) / 28 % (violet), muted `#CFC5EA`, pink never used as text (`--qh-accent-text` `#FDB8FF`), lighter verdict/tier text in dark and darker in light. Every theme is checked by `src/theme/themes.spec.ts`; worst pair is 5.57 (dark) and 4.61 (light).
+Blob peaks are 24 % (pink) and 28 % (violet) in glass-dark. The mock-up's muted `#B7A9D6` (4.11:1) and pink text `#FC72FF` (3.82:1) failed 4.5:1, hence `#CFC5EA` and `#FDB8FF`. Lowest text pair: glass-dark 4.93:1, glass-light 4.55:1.
 
-Verdicts (text + tint, always with a text label and an icon): AC green, WA red, TLE/MLE amber, RTE/OLE/IR violet, CE/IE slate, pending violet-grey, partial = 3-step green. Rating tiers follow legacy classes (newbie … grandmaster).
+Verdicts (text + tint, always with a text label and an icon): AC green, WA red, TLE/MLE amber, RTE/OLE/IR violet, CE/IE slate, pending neutral, partial = 3-step green. Rating tiers follow legacy classes (newbie ... grandmaster). Code syntax: six `--qh-syntax-*` tokens per theme. Every theme is checked by `src/theme/themes.spec.ts` on the worst ground it can produce.
 
 ## Typography
 
-- Display/headings: **Space Grotesk** 500–700. Body/UI: **Inter** 400–700. Numbers and code: **JetBrains Mono** with `tabular-nums`.
-- Base 15–16 px, line-height 1.5. Hero numbers 64 px, card numbers 26 px.
+- Display/headings: **Space Grotesk** 500-700. Body/UI: **Inter** 400-700. Numbers and code: **JetBrains Mono** (400, 600) with `tabular-nums`.
+- Base 16 px (browser default). Hero rating number 60 px (`text-6xl`), card numbers 26 px.
 - Self-hosted via `@fontsource` (no Google Fonts request).
 
 ## Shape, depth, motion
 
-- Radii: 12 (cells), 16 (rows), 20 (inner tiles, submit), 24 (cards), 28 (swap card), pill 999.
-- Blur 24 px; no drop shadows except the live-dot glow.
-- Motion 150–200 ms ease-out on colour/opacity only; no layout-shifting hover.
-- `prefers-reduced-motion`: no transitions or blob drift. `prefers-reduced-transparency` or no `backdrop-filter` support: blur off, opaque `--qh-surface-solid`.
+- Radii (tokens): `rounded-cell` 12 px, `rounded-row` 16 px, `rounded-tile` 20 px (inner tiles, submit), `rounded-card` 24 px, `rounded-panel` 28 px (swap card), `rounded-pill` 999 px.
+- Depth is hairlines and tone steps in Clay; Glass has blur 24 px. No drop shadows (the live-dot glow exists in Glass only).
+- Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover.
+- `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`, or no `backdrop-filter` support: surfaces are opaque (`--qh-surface-solid`) and blur is 0. Clay is already opaque; Glass becomes opaque.
 
 ## Components
 
-- **Glass card**: `glass rounded-card p-6`.
-- **Pill nav**: glass pill container, active item `bg-surface-hover` + `text-content`, others `text-muted`.
-- **Primary button**: accent gradient, `text-on-accent`, 56 px tall in the swap card, 44 px elsewhere.
-- **Token pill**: 40 px pill, 28 px gradient coin + label; selected = accent border + accent tint.
-- **Verdict badge**: 40 px circle, verdict tint, abbreviation + accessible full label.
-- **Ranking cell**: 12 px radius block; first solve = accent gradient tint; pending = `?n`.
+- **Card**: `GlassCard` (`glass rounded-card`; callers add padding): a white hairline card in Clay, frosted in Glass.
+- **Pill nav**: `glass` pill container, active item `bg-surface-hover` + `text-content`, others `text-muted`.
+- **Primary button**: `bg-gradient-accent` + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
+- **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.
+- **Verdict badge**: 40 px circle (`size-10`), verdict tint, abbreviation + accessible full label.
+- **Ranking cell**: `rounded-cell` block; first solve = accent tint (`bg-first-solve`); pending = `?n`.
+- **Overlays** (menus, popovers): opaque `bg-surface-solid`.
 
 ## Rules
 
 - No raw colour values outside `src/theme/themes/*.css` (`npm run lint:tokens`).
-- Text ≥ 4.5:1 on the worst ground, large text ≥ 3:1; focus ring 2 px `--qh-focus-ring`, offset 2 px, never removed.
+- Text >= 4.5:1 on the worst ground, large text >= 3:1; accent fills and the accent border >= 3:1; focus ring 2 px `--qh-focus-ring`, offset 2 px, never removed.
 - Meaning never by colour alone: verdicts carry text, frozen cells carry `?`, first solve carries a legend.
-- Touch targets ≥ 44 px; real `<button>`/`<a>`; icon-only buttons have `aria-label`.
+- Touch targets >= 44 px; real `<button>`/`<a>`; icon-only buttons have `aria-label`.
 - Icons: Lucide only, no emoji.
 - Responsive at 375, 768, 1024, 1440; wide tables scroll inside their card, never the page.
 
@@ -63,8 +85,8 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 - [ ] No emoji icons; Lucide only
 - [ ] No raw colours in components
-- [ ] Hover/focus states, 150–200 ms
-- [ ] Contrast checked in both themes
+- [ ] Hover/focus states, 150-200 ms
+- [ ] Contrast checked in all four themes
 - [ ] Focus visible for keyboard nav
 - [ ] Reduced motion and reduced transparency respected
 - [ ] 375 / 768 / 1024 / 1440 px, no horizontal page scroll

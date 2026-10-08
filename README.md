@@ -46,7 +46,7 @@ src/
   test/                     Vitest setup, mount and API mocks, fixtures (shared with e2e)
 e2e/                        Playwright specs and the fake API (e2e/fixtures/api.ts)
 scripts/check-tokens.mjs    lint:tokens
-design-system/qhhoj/        design notes (Glass)
+design-system/qhhoj/        design notes (Clay & ivory default, Glass optional)
 ```
 
 Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area>.api.ts` -> `api/client.ts`. Client state (session, theme, locale) is Pinia; server state is vue-query only.
