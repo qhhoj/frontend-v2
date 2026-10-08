@@ -56,15 +56,21 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
     if (!failure && isNewPage(to, from)) focusMain();
   });
   router.afterEach(titleDocument);
-  /**
-   * A request refused with a gate (another tab signed in as an account that needs a second factor): reload the
-   * session and apply the navigation rules to where the viewer is, as a navigation there would.
-   */
-  const syncToGate = async () => {
+  const reloadAndApplyRules = async () => {
     const session = useSessionStore();
     await session.refresh().catch(() => undefined);
     const target = await resolveNavigation(router.currentRoute.value, session);
     if (target !== true) await router.replace(target);
+  };
+  let syncing: Promise<void> | null = null;
+  /**
+   * A request refused with a gate (a second factor required, or a password change: set on another device, or by a
+   * breach check during this session): reload the session and apply the navigation rules to where the viewer is, as
+   * a navigation there would. Several refused requests at once share one reload.
+   */
+  const syncToGate = () => {
+    syncing ??= reloadAndApplyRules().finally(() => (syncing = null));
+    return syncing;
   };
   onGateRequired(() => void syncToGate());
   watch([() => i18n.global.locale.value, pageTitle], titleDocument);

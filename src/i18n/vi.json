@@ -228,7 +228,9 @@
       "breached": "Mật khẩu của bạn xuất hiện trong một vụ rò rỉ dữ liệu công khai. Để bảo vệ tài khoản {username}, hãy đặt mật khẩu mới trước khi tiếp tục.",
       "currentPassword": "Mật khẩu hiện tại",
       "confirmNew": "Nhập lại mật khẩu mới",
-      "submit": "Đổi mật khẩu"
+      "submit": "Đổi mật khẩu",
+      "changedNotLoaded": "Đã đổi mật khẩu. Chưa tải lại được tài khoản, hãy thử lại.",
+      "retry": "Thử lại"
     },
     "strength": {
       "label": "Độ mạnh mật khẩu",

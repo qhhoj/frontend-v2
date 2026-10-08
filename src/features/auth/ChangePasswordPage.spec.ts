@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { socialRoutes } from '@/test/auth-routes';
+import { homeRoutes } from '@/test/home-routes';
 import { profile, signedIn } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
@@ -52,7 +53,15 @@ describe('change-password page', () => {
     expect(router.currentRoute.value.query.redirect).toBe('/blog');
     expect(wrapper.get('h1').text()).toBe('Đổi mật khẩu để tiếp tục');
     expect(wrapper.get('#main [role="status"]').text()).toContain('rò rỉ dữ liệu công khai');
-    expect(wrapper.get('#main [role="status"]').text()).toContain('user_01');
+    expect(wrapper.get('#main [role="status"] strong').text()).toBe('user_01');
+  });
+
+  it('offers the account name to password managers, in a field the viewer never sees', async () => {
+    changeApi();
+    const { wrapper } = await mountApp('/account/password');
+    const username = wrapper.get('input[name="username"]');
+    expect(username.attributes('autocomplete')).toBe('username');
+    expect(username.element.getAttribute('value')).toBe('user_01');
   });
 
   it('labels the three fields as the board does', async () => {
@@ -115,6 +124,32 @@ describe('change-password page', () => {
     const confirm = wrapper.get('input[name="confirmPassword"]');
     expect(confirm.attributes('aria-invalid')).toBe('true');
     expect(document.activeElement).toBe(confirm.element);
+  });
+
+  it('never sends the viewer on to another site after the change', async () => {
+    changeApi(homeRoutes);
+    const { wrapper, router } = await mountApp('/account/password?redirect=//evil.example');
+    await fill(wrapper);
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/'));
+  });
+
+  it('says the password changed, not that the change failed, when the session cannot be reloaded', async () => {
+    let changed = false;
+    mockApi({
+      'GET /auth/me': () =>
+        changed ? fail(500, 'internal_error') : signedIn({ passwordChangeRequired: true }),
+      'POST /auth/password/change': () => {
+        changed = true;
+        return noContent();
+      },
+      ...socialRoutes,
+    });
+    const { wrapper, router } = await mountApp('/account/password');
+    await fill(wrapper);
+    expect(wrapper.get('#main [role="status"]').text()).toContain('Đã đổi mật khẩu');
+    expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
+    expect(wrapper.find('input[name="currentPassword"]').exists()).toBe(false);
+    expect(router.currentRoute.value.fullPath).toBe('/account/password');
   });
 
   it('lets a forced viewer sign out from the top bar, and offers no sign-out to a voluntary one', async () => {

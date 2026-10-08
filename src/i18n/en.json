@@ -228,7 +228,9 @@
       "breached": "Your password appeared in a public data breach. To protect the account {username}, set a new password before you continue.",
       "currentPassword": "Current password",
       "confirmNew": "Repeat the new password",
-      "submit": "Change password"
+      "submit": "Change password",
+      "changedNotLoaded": "Your password is changed. Your account could not be loaded yet; try again.",
+      "retry": "Try again"
     },
     "strength": {
       "label": "Password strength",

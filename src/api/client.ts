@@ -130,6 +130,12 @@ async function errorOf(response: Response): Promise<ApiError> {
   );
 }
 
+/** An expired session (`unauthorized`, except on `/auth/me` itself) and a gate both mean the session needs another look. */
+function notifySessionHooks(error: ApiError, path: string) {
+  if (error.code === 'unauthorized' && path !== '/auth/me') handleUnauthorized?.();
+  if (GATE_CODES.includes(error.code)) handleGate?.();
+}
+
 async function request(
   path: string,
   options: RequestOptions,
@@ -147,8 +153,7 @@ async function request(
     await refreshOnce();
     return request(path, options, true);
   }
-  if (error.code === 'unauthorized' && path !== '/auth/me') handleUnauthorized?.();
-  if (GATE_CODES.includes(error.code)) handleGate?.();
+  notifySessionHooks(error, path);
   throw error;
 }
 
