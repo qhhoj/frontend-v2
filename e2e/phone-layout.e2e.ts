@@ -99,12 +99,19 @@ for (const { locale, navName } of [
       expect(await horizontalPageScroll(page)).toBeLessThanOrEqual(0);
     });
 
-test('at 320 px the nav pill scrolls on its own', async ({ page, api }) => {
+test('at 320 px the nav pill scrolls on its own and shows the current item after load', async ({
+  page,
+  api,
+}) => {
   void api;
   await page.setViewportSize({ width: 320, height: PHONE.height });
-  await page.goto('/blog');
+  await page.goto('/organizations');
   const nav = page.getByRole('navigation', { name: NAV_NAME });
   expect(await nav.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  const pill = (await nav.boundingBox())!;
+  const current = (await nav.getByRole('link', { name: 'Tổ chức' }).boundingBox())!;
+  expect(current.x).toBeGreaterThanOrEqual(pill.x);
+  expect(current.x + current.width).toBeLessThanOrEqual(pill.x + pill.width + 1);
 });
 
 test('home: recent submissions and the rating hero fit and keep their text readable', async ({

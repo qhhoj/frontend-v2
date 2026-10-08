@@ -261,7 +261,7 @@ export const routes: RouteRecordRaw[] = [
   /** Links the backend writes into mails, Discord and feeds (backend CONTRIBUTING, SPA contract); the hash is kept. */
   {
     path: '/post/:id',
-    redirect: (to) => ({ name: 'post', params: { id: to.params.id }, hash: to.hash }),
+    redirect: (to) => ({ name: 'post', params: { id: to.params.id } }),
   },
   {
     path: '/user/:username',
@@ -273,7 +273,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/problem/:code',
-    redirect: (to) => ({ name: 'problem', params: { code: to.params.code }, hash: to.hash }),
+    redirect: (to) => ({ name: 'problem', params: { code: to.params.code } }),
   },
   {
     path: '/problem/:code/editorial',
@@ -281,12 +281,11 @@ export const routes: RouteRecordRaw[] = [
       name: 'problem',
       params: { code: to.params.code },
       query: { tab: 'editorial' },
-      hash: to.hash,
     }),
   },
   {
     path: '/contest/:key',
-    redirect: (to) => ({ name: 'contest', params: { key: to.params.key }, hash: to.hash }),
+    redirect: (to) => ({ name: 'contest', params: { key: to.params.key } }),
   },
   {
     path: '/:pathMatch(.*)*',
