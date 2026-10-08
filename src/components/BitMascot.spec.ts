@@ -52,6 +52,16 @@ describe('BitMascot', () => {
     expect(eyePixels(bit)).toBe(4);
   });
 
+  it('starts no timer unless it blinks, and clears it on unmount', () => {
+    stubMatchMedia({ reducedMotion: false });
+    mountHero().unmount();
+    expect(vi.getTimerCount()).toBe(0);
+    const bit = mountHero({ blinks: true });
+    expect(vi.getTimerCount()).toBe(1);
+    bit.unmount();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it('does not blink unless asked to', async () => {
     stubMatchMedia({ reducedMotion: false });
     const bit = mountHero();

@@ -295,6 +295,9 @@ interface ShiftCase {
 const PHONE = 375;
 const DESKTOP = 1280;
 const PHONE_AND_DESKTOP = [PHONE, DESKTOP];
+/** Widths where the verdict card's Bit could wrap to its own row. (The facts card wraps its labels at 320 px; that is not measured here.) */
+const NARROW_PHONE = 320;
+const LAPTOP = 1024;
 /** The home cards are measured on a phone, where each sits on its own row at its natural height. */
 const HOME_VIEWPORTS = [PHONE];
 const SHIFT_TOLERANCE_PX = 2;
@@ -456,6 +459,16 @@ const SHIFT_CASES: ShiftCase[] = [
     }),
     viewports: PHONE_AND_DESKTOP,
     placed: ['cases card'],
+  },
+  {
+    name: 'submission verdict card with its Bit',
+    path: '/submissions/sub-1',
+    signedIn: true,
+    hold: 'GET /submissions/sub-1',
+    parts: (page) => ({
+      card: page.locator('[data-testid="submission-summary"] > div:first-child'),
+    }),
+    viewports: [NARROW_PHONE, PHONE, LAPTOP, DESKTOP],
   },
   {
     name: 'submission table card',

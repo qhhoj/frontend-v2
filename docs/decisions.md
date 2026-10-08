@@ -75,7 +75,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Screens without an approved mock-up ship as logic plus plain placeholder markup — visuals come from mock-up rounds.
 - Home: "Top rating" (top 3 by rating) replaces "Top tuần" — there is no weekly board (B7).
 - Home: the rating delta is the change at the last rated contest — ratings move per contest.
-- Home: quick submit is a problem code, a language select and a plain monospace textarea; the full editor lives in the problem submit dock. Its status region is `aria-live="polite"`, which re-announces each test-case frame (up to 4 per second).
+- Home: no quick submit card (removed; the user found it unnecessary), so the rating hero spans the full row and submitting lives in the problem submit dock.
 - Ranking: podium medals use the `coin-3`/`coin-6`/`coin-5` tokens, not the mock-up's gold, silver and bronze gradients; the viewer's own row is `bg-surface-hover`, not a pink tint — both stay inside the theme tokens.
 - Problems: no "Chưa giải" chip — no unsolved filter (B6); the points range is a popover with two number inputs; columns sort on click.
 - Problems: the `attempted` label stays "Đã thử" — ruling from the Task 3 review.
@@ -119,6 +119,9 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Loading: Bits appear after 600 ms of continuous waiting and a 100 ms gap does not break it, so fast pages stay calm and the tick between navigation end and the page's queries is not read as "done".
 - Loading: 5 Bits (3 under 768 px) random-walk over the viewport with one shared rAF loop, dt-capped at 100 ms, paused in hidden tabs, because one loop is cheap and a stalled frame must not teleport them; they stop, blink once, hold 1.5 s and fade 300 ms.
 - Loading: under reduced motion one Bit (the cap) stands in the bottom-left corner without blinking and, after the hold, disappears with no fade: wandering is motion, `mascot.md` disables blinking, and the global 0 ms transition rule ends the fade before it starts.
+- Mascot placements: `BitMascot` is a fixed 16-pixel box (a blink never shifts layout) and decorative unless given a label; the home hero Bit wears the cap and blinks every 4 s (not under reduced motion), because mascot.md lists it as the home placement.
+- Mascot placements: a crown on AC and a sweat drop with closed eyes on WA, TLE, MLE, RTE, OLE, IR, CE and in `QueryState` errors, because mascot.md ties them to success and failure; system outcomes get no Bit.
+- Mascot placements: every empty list uses the shared `EmptyState` (asleep nightcap, charcoal twin), so a new list gets the mascot by using one component.
 - Mascot: `src/mascot/bit-sprite.ts` is the single source of Bit's pixels and the only source file outside `src/theme/themes/` that `lint:tokens` skips, because Bit keeps its sprite colours in every theme like an image asset.
 - Motion: skeleton pulse, Bit sob and tears use their own durations and switch themselves off under reduced motion, because `--qh-duration` is 0 there and would freeze them mid-frame instead of removing them.
 - 404: `NotFoundPage` (crying Bit, pale 404) replaces the placeholder on the catch-all route; the mascot's 404 variant is crying, not a magnifying glass (user's pick "404 B").

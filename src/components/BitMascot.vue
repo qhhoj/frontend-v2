@@ -17,7 +17,7 @@ const props = defineProps<{
   /** Eyes open, closing for a moment every few seconds. */
   blinks?: boolean;
 }>();
-const periodicBlink = usePeriodicBlink();
+const periodicBlink = usePeriodicBlink(() => Boolean(props.blinks));
 const eyesShut = computed(() => props.closedEyes || (props.blinks && periodicBlink.value));
 </script>
 

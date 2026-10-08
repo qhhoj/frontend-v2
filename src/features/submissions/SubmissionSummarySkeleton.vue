@@ -6,6 +6,8 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 const FACT_COUNT = 6;
 /** The real line holds a `VerdictBadge` (h-7); the score is `text-[56px] leading-none`, so a block as tall (h-14). */
 const BADGE_LINE_CLASS = 'min-h-7';
+/** The verdict Bit's box in `SubmissionSummary.vue` (16 pixels of 4 px, 6 px from sm up), so the row wraps the same. */
+const BIT_SLOT_CLASS = 'size-16 sm:size-24';
 const SCORE_BLOCK_CLASS = 'h-14 w-40';
 </script>
 
@@ -27,6 +29,7 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
           <SkeletonBlock :class="SCORE_BLOCK_CLASS" />
         </p>
       </div>
+      <SkeletonBlock data-skeleton-region="bit" :class="BIT_SLOT_CLASS" class="ml-auto shrink-0" />
     </GlassCard>
     <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
       <dl
