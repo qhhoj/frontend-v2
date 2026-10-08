@@ -49,30 +49,28 @@ describe('navigation guards', () => {
   });
 
   it.each([
-    ['a pending second factor', signedIn({ user: null, twoFactorRequired: true }), 'login-2fa'],
-    ['a forced password change', signedIn({ passwordChangeRequired: true }), 'account-password'],
-  ])(
-    'sends %s on an activation link without copying the key into the query',
-    async (_case, session, gate) => {
-      const { route } = await navigate('/activate/k123', () => session);
+    ['/activate/k123', 'k123'],
+    ['/Activate/KEY', 'KEY'],
+    ['/reset-password/TOKEN/', 'TOKEN'],
+    ['/Reset-Password/tok9', 'tok9'],
+    ['/register/social?token=pending-1', 'pending-1'],
+    ['/register/social/?token=x', 'token=x'],
+    ['/REGISTER/SOCIAL?token=x', 'token=x'],
+  ])('keeps the credential of %s out of the query under a gate', async (path, secret) => {
+    // The reset page is open to a pending second factor (`allowPartial`): it stays, so only the forced change moves it.
+    const stays = path.toLowerCase().startsWith('/reset-password');
+    const gates = [
+      [signedIn({ user: null, twoFactorRequired: true }), stays ? 'reset-password' : 'login-2fa'],
+      [signedIn({ passwordChangeRequired: true }), 'account-password'],
+    ] as const;
+    for (const [session, gate] of gates) {
+      setActivePinia(createPinia());
+      const { route } = await navigate(path, () => session);
       expect(route.name).toBe(gate);
       expect(route.query.redirect).toBeUndefined();
-      expect(route.fullPath).not.toContain('k123');
-    },
-  );
-
-  it.each([
-    ['a pending second factor', signedIn({ user: null, twoFactorRequired: true }), 'login-2fa'],
-    ['a forced password change', signedIn({ passwordChangeRequired: true }), 'account-password'],
-  ])(
-    'sends %s on a social signup link without copying its token into the query',
-    async (_case, session, gate) => {
-      const { route } = await navigate('/register/social?token=pending-1', () => session);
-      expect(route.name).toBe(gate);
-      expect(route.query.redirect).toBeUndefined();
-      expect(route.fullPath).not.toContain('pending-1');
-    },
-  );
+      if (route.name !== 'reset-password') expect(route.fullPath).not.toContain(secret);
+    }
+  });
 
   it('keeps the 2FA step for a pending second factor', async () => {
     const { route } = await navigate(

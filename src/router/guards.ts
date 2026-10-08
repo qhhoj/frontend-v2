@@ -14,9 +14,11 @@ type SessionStore = ReturnType<typeof useSessionStore>;
  * credential) is never copied into `redirect`: the gate is reached without it, so the key stays out of query strings,
  * history entries and any page without `no-referrer`.
  */
-const LINK_CREDENTIAL_PATH = /^\/(activate\/|reset-password\/|register\/social$)/;
+const LINK_CREDENTIAL_ROUTES = new Set<unknown>(['activate', 'reset-password', 'register-social']);
+/** By matched route name, not by path: the router also matches other letter cases and a trailing slash. */
+const isLinkCredential = (to: RouteLocationNormalized) => LINK_CREDENTIAL_ROUTES.has(to.name);
 const withRedirect = (to: RouteLocationNormalized) =>
-  LINK_CREDENTIAL_PATH.test(to.path) ? {} : { redirect: safeRedirect(to.fullPath) };
+  isLinkCredential(to) ? {} : { redirect: safeRedirect(to.fullPath) };
 const toLogin = (to: RouteLocationNormalized): RouteLocationRaw => ({
   name: 'login',
   query: withRedirect(to),
@@ -65,7 +67,7 @@ export async function resolveNavigation(
   if (session.passwordChangeRequired && to.name !== 'account-password')
     return {
       name: 'account-password',
-      query: LINK_CREDENTIAL_PATH.test(to.path) ? {} : loginQuery(to.fullPath),
+      query: isLinkCredential(to) ? {} : loginQuery(to.fullPath),
     };
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
   if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
