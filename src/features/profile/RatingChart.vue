@@ -16,6 +16,12 @@ import type { ChartBox } from '@/lib/rating-chart';
 /** Rating over the contests a viewer may see: tier bands behind a polyline, one dot per contest. Draws nothing without a rated contest. */
 const props = defineProps<{ history: RatingHistoryEntry[] }>();
 const BOX: ChartBox = { width: 640, height: 220, padding: 24 };
+/** The plot runs between the padding on both sides; the best contest's dot is drawn larger than the others. */
+const PLOT_LEFT = BOX.padding;
+const PLOT_WIDTH = BOX.width - 2 * BOX.padding;
+const PLOT_RIGHT = BOX.width - BOX.padding;
+const POINT_RADIUS = 4;
+const BEST_RADIUS = 6;
 const rated = computed(() => ratedHistory(props.history));
 const points = computed(() => chartPoints(props.history, BOX));
 const range = computed(() => ratingRange(rated.value.map((entry) => entry.rating ?? 0)));
@@ -30,6 +36,12 @@ const best = computed(() =>
   points.value.reduce((top, point) => (point.rating > top.rating ? point : top)),
 );
 const current = computed(() => points.value.at(-1)!);
+/** Every second contest is labelled `#1, #3, …` along the bottom edge, so the axis reads in contest order. */
+const xLabels = computed(() =>
+  points.value.flatMap((point, index) =>
+    index % 2 === 0 ? [{ x: point.x, text: `#${index + 1}` }] : [],
+  ),
+);
 const label = computed(() =>
   translate('ratingChart.label', {
     count: points.value.length,
@@ -49,21 +61,28 @@ const pointTitle = (point: { contestName: string | null; rating: number }) =>
     v-if="points.length"
     role="img"
     :aria-label="label"
-    viewBox="0 0 640 220"
+    :viewBox="`0 0 ${BOX.width} ${BOX.height}`"
     class="h-auto w-full"
   >
     <rect
       v-for="band in bands"
       :key="`${band.color}-${band.low}`"
-      x="24"
+      :x="PLOT_LEFT"
       :y="band.y"
-      width="592"
+      :width="PLOT_WIDTH"
       :height="band.height"
       :class="`fill-tier-${band.color}`"
       fill-opacity="0.12"
     />
     <g v-for="tick in ticks" :key="tick.rating">
-      <line x1="24" x2="616" :y1="tick.y" :y2="tick.y" class="stroke-line" stroke-width="1" />
+      <line
+        :x1="PLOT_LEFT"
+        :x2="PLOT_RIGHT"
+        :y1="tick.y"
+        :y2="tick.y"
+        class="stroke-line"
+        stroke-width="1"
+      />
       <text x="2" :y="tick.y + 3" class="fill-muted text-[10px]">{{ tick.rating }}</text>
     </g>
     <polyline :points="polyline" class="fill-none stroke-accent" stroke-width="2" />
@@ -72,11 +91,21 @@ const pointTitle = (point: { contestName: string | null; rating: number }) =>
       :key="index"
       :cx="point.x"
       :cy="point.y"
-      r="4"
+      :r="point === best ? BEST_RADIUS : POINT_RADIUS"
       class="fill-accent"
     >
       <title>{{ pointTitle(point) }}</title>
     </circle>
+    <text
+      v-for="mark in xLabels"
+      :key="mark.text"
+      :x="mark.x"
+      :y="BOX.height - 6"
+      text-anchor="middle"
+      class="fill-muted text-[10px]"
+    >
+      {{ mark.text }}
+    </text>
     <text
       :x="best.x"
       :y="best.y - 10"
