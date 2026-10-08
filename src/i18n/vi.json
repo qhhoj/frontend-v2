@@ -238,7 +238,8 @@
     "pdfMissing": "Đề bài này không có bản PDF",
     "pdfRateLimited": "Quá nhiều yêu cầu PDF",
     "pdfRetry": "Thử lại",
-    "pdfRetryIn": "Thử lại sau {seconds} giây"
+    "pdfRetryIn": "Thử lại sau {seconds} giây",
+    "noSubmissions": "Bạn chưa nộp bài này."
   },
   "problems": {
     "title": "Chọn bài, bắt đầu giải",
@@ -266,6 +267,54 @@
     "solve": "Giải ngay",
     "loadMore": "Tải thêm bài",
     "empty": "Không có bài phù hợp."
+  },
+  "submissions": {
+    "title": "Bài nộp",
+    "empty": "Chưa có bài nộp nào.",
+    "emptyFiltered": "Không có bài nộp phù hợp với bộ lọc: {filters}.",
+    "filterNames": {
+      "result": "kết quả",
+      "problem": "bài",
+      "user": "người nộp",
+      "language": "ngôn ngữ"
+    },
+    "listName": "Danh sách bài nộp",
+    "scrollRegion": "Bảng bài nộp, cuộn ngang",
+    "columns": {
+      "verdict": "Kết quả",
+      "problem": "Bài",
+      "user": "Người nộp",
+      "score": "Điểm",
+      "time": "Thời gian",
+      "memory": "Bộ nhớ",
+      "language": "Ngôn ngữ",
+      "when": "Nộp lúc"
+    },
+    "rail": {
+      "title": "Bộ lọc",
+      "reset": "Đặt lại",
+      "results": "Kết quả",
+      "language": "Ngôn ngữ",
+      "anyLanguage": "Mọi ngôn ngữ",
+      "problem": "mã bài",
+      "user": "tên đăng nhập",
+      "live": "Cập nhật trực tiếp"
+    },
+    "pager": {
+      "label": "Trang",
+      "previous": "Trước",
+      "next": "Sau",
+      "position": "Trang {page} / {total}",
+      "positionOpen": "Trang {page}"
+    },
+    "stats": {
+      "judgedToday": "bài đã chấm hôm nay",
+      "acceptedToday": "được chấp nhận hôm nay",
+      "queue": "đang chờ chấm",
+      "judges": "máy chấm trực tuyến",
+      "noJudge": "không có máy chấm",
+      "unavailable": "Không có số liệu thống kê"
+    }
   },
   "ranking": {
     "summary": "{format} · {problems} bài · {participants} thí sinh",

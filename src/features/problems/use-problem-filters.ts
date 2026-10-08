@@ -13,8 +13,8 @@ export interface ProblemFilters {
 }
 
 /** The API accepts UUID v7 only; any other id would turn the whole list into a 400. */
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const valuesOf = (value: LocationQueryValue | LocationQueryValue[] | undefined) =>
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export const valuesOf = (value: LocationQueryValue | LocationQueryValue[] | undefined) =>
   (Array.isArray(value) ? value : [value]).filter(
     (item): item is string => typeof item === 'string',
   );

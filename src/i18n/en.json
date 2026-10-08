@@ -238,7 +238,8 @@
     "pdfMissing": "This statement has no PDF",
     "pdfRateLimited": "Too many PDF requests",
     "pdfRetry": "Try again",
-    "pdfRetryIn": "Try again in {seconds} s"
+    "pdfRetryIn": "Try again in {seconds} s",
+    "noSubmissions": "You have not submitted this problem yet."
   },
   "problems": {
     "title": "Pick a problem, start solving",
@@ -266,6 +267,54 @@
     "solve": "Solve",
     "loadMore": "Load more problems",
     "empty": "No matching problems."
+  },
+  "submissions": {
+    "title": "Submissions",
+    "empty": "No submissions yet.",
+    "emptyFiltered": "No submissions match the filters: {filters}.",
+    "filterNames": {
+      "result": "result",
+      "problem": "problem",
+      "user": "user",
+      "language": "language"
+    },
+    "listName": "Submissions",
+    "scrollRegion": "Submissions table, scrolls horizontally",
+    "columns": {
+      "verdict": "Verdict",
+      "problem": "Problem",
+      "user": "User",
+      "score": "Score",
+      "time": "Time",
+      "memory": "Memory",
+      "language": "Language",
+      "when": "When"
+    },
+    "rail": {
+      "title": "Filters",
+      "reset": "Reset",
+      "results": "Verdict",
+      "language": "Language",
+      "anyLanguage": "Any language",
+      "problem": "problem code",
+      "user": "username",
+      "live": "Live updates"
+    },
+    "pager": {
+      "label": "Pages",
+      "previous": "Previous",
+      "next": "Next",
+      "position": "Page {page} / {total}",
+      "positionOpen": "Page {page}"
+    },
+    "stats": {
+      "judgedToday": "judged today",
+      "acceptedToday": "accepted today",
+      "queue": "waiting in queue",
+      "judges": "judges online",
+      "noJudge": "no judge online",
+      "unavailable": "Statistics unavailable"
+    }
   },
   "ranking": {
     "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",

@@ -11,6 +11,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import EditorialTab from './EditorialTab.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import PdfButton from './PdfButton.vue';
+import ProblemSubmissionsTab from './ProblemSubmissionsTab.vue';
 import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
@@ -36,7 +37,7 @@ const isNotFound = computed(
   () => error.value instanceof ApiError && error.value.code === 'not_found',
 );
 
-/** Page tabs; 8e adds `discussion` here. `submissions` is filled by the submissions tab. */
+/** Page tabs; 8e adds `discussion` here. */
 const tabs = computed(() => [
   { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement' },
   ...(problem.value?.hasEditorial && !editorialGone.value
@@ -119,6 +120,10 @@ watch(
             v-if="panel.id === 'editorial' && tab === 'editorial'"
             :code="code"
             @gone="editorialGone = true"
+          />
+          <ProblemSubmissionsTab
+            v-if="panel.id === 'submissions' && tab === 'submissions'"
+            :code="code"
           />
         </div>
         <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->

@@ -6,6 +6,7 @@ import {
   anonymousViewer,
   problemPageRoutes,
   signedInViewer,
+  submissionListRoutes,
   submissionPageRoutes,
 } from '@/test/problem-routes';
 
@@ -159,5 +160,37 @@ describe('the submission page loads with skeletons shaped like its cards', () =>
     const skeletons = wrapper.findAll('[data-testid="query-skeleton"]');
     expect(skeletons).toHaveLength(1);
     expectInert(skeletons[0]!.element, 'source skeleton');
+  });
+});
+
+describe('the submission list page loads its stats strip and table as independent cards', () => {
+  it('shows four tiles and a table skeleton with the 8 real header cells and 10 rows, all inert', async () => {
+    mockApi({ ...anonymousViewer });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/submissions');
+    const strip = wrapper.get('[data-testid="stats-strip"]').element;
+    expect(regionsIn(strip, 'tile')).toBe(4);
+    expect(regionsIn(strip, 'value')).toBe(4);
+    expect(regionsIn(strip, 'label')).toBe(4);
+    const card = wrapper.get('[data-testid="submission-table-card"]');
+    expect(card.findAll('thead th')).toHaveLength(8);
+    expect(regionsIn(card.element, 'row')).toBe(10);
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {
+      expect(skeleton.attributes('aria-hidden')).toBe('true');
+      expectInert(skeleton.element, 'submission list skeleton');
+    }
+  });
+
+  it('shows the rows while only the stats are still loading', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const served = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/submissions/stats')
+        ? new Promise<Response>(() => {})
+        : served(input, init),
+    );
+    const { wrapper } = await mountApp('/submissions');
+    await vi.waitFor(() => expect(wrapper.find('tbody tr[data-id="sub-1"]').exists()).toBe(true));
+    expect(regionsIn(wrapper.get('[data-testid="stats-strip"]').element, 'tile')).toBe(4);
   });
 });

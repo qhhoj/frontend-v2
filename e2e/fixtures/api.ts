@@ -14,6 +14,7 @@ import {
   sessionResponse,
   submissionDetail,
   submissionItem,
+  submissionStats,
   TYPE_DP_ID,
   userPage,
 } from '../../src/test/fixtures';
@@ -79,6 +80,7 @@ export class FakeApi {
     'GET /users/user_01': ok(userPage()),
     'GET /users/user_01/ratings': ok(ratingHistory()),
     'GET /submissions': list([submissionItem()]),
+    'GET /submissions/stats': ok(submissionStats()),
     'GET /submissions/sub-1': ok(submissionDetail()),
     'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
   };

@@ -1,0 +1,132 @@
+<script setup lang="ts">
+import { ChevronDown } from 'lucide-vue-next';
+import Select from 'primevue/select';
+import { computed } from 'vue';
+import type { Language } from '@/api/types/problems';
+import type { SubmissionResult } from '@/api/types/submissions';
+import GlassCard from '@/components/GlassCard.vue';
+import { translate } from '@/i18n';
+import { useDebouncedText } from '@/lib/use-debounced-text';
+import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from './use-submission-filters';
+import type { SubmissionFilters } from './use-submission-filters';
+
+const props = defineProps<{ filters: SubmissionFilters; languages: Language[] }>();
+const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [] }>();
+
+/** The mock-up's six; a URL may carry any other valid result, the table's empty state then names it. */
+const RESULT_CHOICES: readonly SubmissionResult[] = ['AC', 'WA', 'TLE', 'MLE', 'RTE', 'CE'];
+const ANY_LANGUAGE = '';
+const LANGUAGE_LABEL_ID = 'submission-language-label';
+const TEXT_INPUT_CLASSES =
+  'h-11 w-full rounded-pill border border-line bg-surface-strong px-4 text-base text-content placeholder:text-muted';
+
+const problemText = useDebouncedText(
+  () => props.filters.problem,
+  (problem) => emit('update', { problem }),
+);
+const userText = useDebouncedText(
+  () => props.filters.user,
+  (user) => emit('update', { user }),
+);
+
+const languageOptions = computed(() => [
+  { id: ANY_LANGUAGE, name: translate('submissions.rail.anyLanguage') },
+  ...props.languages,
+]);
+const toggleResult = (code: SubmissionResult, isChecked: boolean) =>
+  emit('update', {
+    results: isChecked
+      ? [...props.filters.results, code]
+      : props.filters.results.filter((selected) => selected !== code),
+  });
+const pickLanguage = (languageId: string) =>
+  emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
+const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
+</script>
+
+<template>
+  <GlassCard
+    as="aside"
+    :aria-label="$t('submissions.rail.title')"
+    class="flex flex-col gap-4 p-5 md:w-[280px] md:shrink-0"
+  >
+    <div class="flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold">{{ $t('submissions.rail.title') }}</h2>
+      <button
+        type="button"
+        data-testid="filters-reset"
+        class="min-h-11 px-2 text-accent-text hover:underline"
+        @click="emit('reset')"
+      >
+        {{ $t('submissions.rail.reset') }}
+      </button>
+    </div>
+    <fieldset class="m-0 min-w-0 border-0 p-0">
+      <legend class="mb-1 text-[13px] text-muted">{{ $t('submissions.rail.results') }}</legend>
+      <div class="grid grid-cols-2 gap-x-3 md:grid-cols-1">
+        <label v-for="code in RESULT_CHOICES" :key="code" class="flex min-h-11 items-center gap-2">
+          <input
+            type="checkbox"
+            :value="code"
+            :checked="filters.results.includes(code)"
+            class="size-4 accent-accent"
+            @change="toggleResult(code, isChecked($event))"
+          />
+          <span class="w-8 font-mono text-[13px] font-bold">{{ code }}</span>
+          <span class="text-[15px]">{{ $t(`verdicts.${code}`) }}</span>
+        </label>
+      </div>
+    </fieldset>
+    <div class="flex flex-col gap-1">
+      <span :id="LANGUAGE_LABEL_ID" class="text-[13px] text-muted">{{
+        $t('submissions.rail.language')
+      }}</span>
+      <Select
+        :model-value="filters.languageIds[0] ?? null"
+        :placeholder="$t('submissions.rail.anyLanguage')"
+        :options="languageOptions"
+        option-label="name"
+        option-value="id"
+        :aria-labelledby="LANGUAGE_LABEL_ID"
+        class="h-11 w-full"
+        @update:model-value="pickLanguage"
+      >
+        <template #dropdownicon><ChevronDown class="size-4" aria-hidden="true" /></template>
+      </Select>
+    </div>
+    <label class="flex flex-col gap-1 text-[13px] text-muted">
+      {{ $t('problems.columns.problem') }}
+      <input
+        v-model="problemText"
+        name="problem"
+        type="text"
+        :maxlength="MAX_PROBLEM_CODE_LENGTH"
+        autocomplete="off"
+        :placeholder="$t('submissions.rail.problem')"
+        :class="TEXT_INPUT_CLASSES"
+      />
+    </label>
+    <label class="flex flex-col gap-1 text-[13px] text-muted">
+      {{ $t('submissions.columns.user') }}
+      <input
+        v-model="userText"
+        name="user"
+        type="text"
+        :maxlength="MAX_USERNAME_LENGTH"
+        autocomplete="off"
+        :placeholder="$t('submissions.rail.user')"
+        :class="TEXT_INPUT_CLASSES"
+      />
+    </label>
+    <label class="flex min-h-11 items-center gap-2.5">
+      <input
+        type="checkbox"
+        data-testid="live-toggle"
+        :checked="filters.live"
+        class="size-4 accent-accent"
+        @change="emit('update', { live: isChecked($event) })"
+      />
+      <span class="text-[15px]">{{ $t('submissions.rail.live') }}</span>
+    </label>
+  </GlassCard>
+</template>

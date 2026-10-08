@@ -1,8 +1,18 @@
-import { useQuery } from '@tanstack/vue-query';
-import { computed } from 'vue';
+import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
-import { fetchSubmission, fetchSubmissionSource } from '@/api/submissions.api';
+import {
+  fetchSubmission,
+  fetchSubmissionSource,
+  fetchSubmissionStats,
+  fetchSubmissions,
+} from '@/api/submissions.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import type { SubmissionFilters } from './use-submission-filters';
+
+export const SUBMISSION_PAGE_SIZE = 50;
+/** The server caches the stats for 30 s: polling faster would only read the same answer. */
+const STATS_REFRESH_MS = 30_000;
 
 /** One submission row per viewer: what a viewer may see of it (cases, source) depends on who asks. */
 export const useSubmissionQuery = (id: Ref<string>) => {
@@ -21,3 +31,39 @@ export const useSubmissionSourceQuery = (id: Ref<string>) => {
     queryFn: () => fetchSubmissionSource(id.value),
   });
 };
+
+/**
+ * One page of the submission list per viewer (what a viewer may see depends on who asks). It shares the
+ * `['submissions', 'list']` prefix with Home's recent submissions, so a finished submission refreshes both.
+ * `enabled` keeps an anonymous viewer's tab from asking for a list it would get a 401 for.
+ */
+export const useSubmissionListQuery = (
+  filters: Ref<SubmissionFilters>,
+  enabled: Ref<boolean> = ref(true),
+) => {
+  const viewerId = useViewerId();
+  return useQuery({
+    enabled,
+    queryKey: computed(() => ['submissions', 'list', viewerId.value, filters.value]),
+    queryFn: () =>
+      fetchSubmissions({
+        problem: filters.value.problem || undefined,
+        user: filters.value.user || undefined,
+        result: filters.value.results.length ? filters.value.results : undefined,
+        language: filters.value.languageIds.length ? filters.value.languageIds : undefined,
+        page: filters.value.page,
+        pageSize: SUBMISSION_PAGE_SIZE,
+      }),
+    /** The table stays mounted while the next page or filter loads. */
+    placeholderData: keepPreviousData,
+  });
+};
+
+/** Today's numbers for the list's strip: public, polled in the background (a failed poll keeps the last numbers). */
+export const useSubmissionStatsQuery = () =>
+  useQuery({
+    queryKey: ['submissions', 'stats'],
+    queryFn: fetchSubmissionStats,
+    refetchInterval: STATS_REFRESH_MS,
+    placeholderData: keepPreviousData,
+  });

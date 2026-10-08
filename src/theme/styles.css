@@ -134,6 +134,20 @@
     opacity: 0;
   }
 }
+/* A row that just arrived in a list fades out of the accent for 2 s; reduced motion shows no fade. */
+@keyframes qh-row-added {
+  from {
+    background-color: var(--qh-accent-soft);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@utility row-added {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: qh-row-added 2s ease-out;
+  }
+}
 @utility skeleton-pulse {
   animation: qh-skeleton-pulse 1.4s ease-in-out infinite;
   @media (prefers-reduced-motion: reduce) {

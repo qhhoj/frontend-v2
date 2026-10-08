@@ -1,29 +1,20 @@
 <script setup lang="ts">
 import { ChevronDown, Search, X } from 'lucide-vue-next';
 import Popover from 'primevue/popover';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type { CatalogItem } from '@/api/types/problems';
 import TokenCoin from '@/components/TokenCoin.vue';
 import { translate } from '@/i18n';
+import { useDebouncedText } from '@/lib/use-debounced-text';
 import type { ProblemFilters } from './use-problem-filters';
 
-const SEARCH_DEBOUNCE_MS = 300;
 const props = defineProps<{ filters: ProblemFilters; types: CatalogItem[] }>();
 const emit = defineEmits<{ update: [patch: Partial<ProblemFilters>] }>();
 
-const searchText = ref(props.filters.search);
-let searchTimer: ReturnType<typeof setTimeout> | undefined;
-watch(searchText, (value) => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => emit('update', { search: value.trim() }), SEARCH_DEBOUNCE_MS);
-});
-watch(
+const searchText = useDebouncedText(
   () => props.filters.search,
-  (value) => {
-    if (value !== searchText.value.trim()) searchText.value = value;
-  },
+  (search) => emit('update', { search }),
 );
-onBeforeUnmount(() => clearTimeout(searchTimer));
 
 const isSelected = (id: string) => props.filters.typeIds.includes(id);
 const toggleType = (id: string) =>

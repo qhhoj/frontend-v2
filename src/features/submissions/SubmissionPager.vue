@@ -1,0 +1,62 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+
+/** `total` is optional in the API: without it only a full page tells that a next one may exist. */
+const props = defineProps<{
+  page: number;
+  pageSize: number;
+  total: number | undefined;
+  itemCount: number;
+}>();
+const emit = defineEmits<{ 'update:page': [page: number] }>();
+
+const pageCount = computed(() =>
+  props.total === undefined ? undefined : Math.max(1, Math.ceil(props.total / props.pageSize)),
+);
+const hasPrevious = computed(() => props.page > 1);
+const hasNext = computed(() =>
+  pageCount.value === undefined ? props.itemCount >= props.pageSize : props.page < pageCount.value,
+);
+const isHidden = computed(() => !hasPrevious.value && !hasNext.value);
+const go = (page: number, isAllowed: boolean) => {
+  if (isAllowed) emit('update:page', page);
+};
+
+/** Absent, not `false`, while the button works. */
+const ariaDisabled = (isEnabled: boolean) => (isEnabled ? undefined : 'true');
+
+const BUTTON_CLASSES =
+  'min-h-11 rounded-pill border border-line bg-surface-strong px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:hover:bg-surface-strong';
+</script>
+
+<template>
+  <nav
+    v-if="!isHidden"
+    :aria-label="$t('submissions.pager.label')"
+    class="flex items-center justify-center gap-4 pt-4"
+  >
+    <button
+      type="button"
+      data-direction="previous"
+      :aria-disabled="ariaDisabled(hasPrevious)"
+      :class="BUTTON_CLASSES"
+      @click="go(page - 1, hasPrevious)"
+    >
+      {{ $t('submissions.pager.previous') }}
+    </button>
+    <span class="font-mono text-[15px] tabular-nums" aria-live="polite">{{
+      pageCount === undefined
+        ? $t('submissions.pager.positionOpen', { page })
+        : $t('submissions.pager.position', { page, total: pageCount })
+    }}</span>
+    <button
+      type="button"
+      data-direction="next"
+      :aria-disabled="ariaDisabled(hasNext)"
+      :class="BUTTON_CLASSES"
+      @click="go(page + 1, hasNext)"
+    >
+      {{ $t('submissions.pager.next') }}
+    </button>
+  </nav>
+</template>
