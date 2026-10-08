@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { announcement, contestDetail } from '@/test/fixtures';
+import { announcement, contestDetail, contestStats, problemMeta } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { FakeEventSource, latestEventSource } from '@/test/fake-event-source';
 import { mockApi, ok, page, sequence } from '@/test/mock-api';
@@ -104,6 +104,26 @@ describe('contest announcements', () => {
     expect(wrapper.find('[data-testid="announcements-paused"]').exists()).toBe(false);
     expect(announcementCalls(calls)).toHaveLength(2);
   });
+
+  it.each(['stats', 'submissions'])(
+    'keeps the live stream and its paused notice on the %s tab of a running contest',
+    async (tab) => {
+      mockApi({
+        ...anonymousViewer,
+        ...contestPageRoutes(),
+        'GET /contests/r42/stats': ok(contestStats()),
+        'GET /contests/r42/submissions': page([]),
+        'GET /problems/meta': ok(problemMeta()),
+      });
+      const { wrapper } = await mountApp(`/contests/r42/${tab}`);
+      expect(FakeEventSource.instances).toHaveLength(1);
+      latestEventSource().fail();
+      await flushPromises();
+      expect(wrapper.get('[data-testid="announcements-paused"]').text()).toContain(
+        'Cập nhật trực tiếp tạm dừng.',
+      );
+    },
+  );
 
   it('opens no stream for an ended contest', async () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail({ phase: 'ended' })) });

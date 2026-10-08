@@ -71,7 +71,7 @@ function goToPage(page: number) {
     <ContestNotFound v-if="isMissing" />
     <template v-else>
       <ContestCompactHeader v-if="contest" :contest="contest" />
-      <ContestTabs :contest-key="key" />
+      <ContestTabs :contest-key="key" :phase="contest?.phase" />
       <p
         v-if="isOwnOnly"
         data-testid="own-only"
