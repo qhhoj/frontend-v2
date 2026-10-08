@@ -22,7 +22,7 @@ interface Reply {
 type Handler = Reply | ((request: { url: URL; body: unknown }) => Reply);
 
 const ok = (data: unknown): Reply => ({ body: { data } });
-const list = (items: unknown[]): Reply => ({
+export const list = (items: unknown[]): Reply => ({
   body: { data: items, meta: { page: 1, pageSize: 50, total: items.length } },
 });
 const UNAUTHORIZED: Reply = {
@@ -34,6 +34,8 @@ const UNAUTHORIZED: Reply = {
 export class FakeApi {
   signedIn = false;
   readonly unmatched: string[] = [];
+  private readonly gates = new Map<string, Promise<void>>();
+  private readonly releases: Array<() => void> = [];
   readonly routes: Record<string, Handler> = {
     'GET /auth/me': () => (this.signedIn ? ok(sessionResponse()) : UNAUTHORIZED),
     'POST /auth/login': () => {
@@ -73,6 +75,18 @@ export class FakeApi {
     'GET /submissions': list([submissionItem()]),
   };
 
+  /** Delays every answer to `key` ("GET /problems") until the returned function is called; teardown releases whatever is left. */
+  hold(key: string): () => void {
+    let release = () => {};
+    this.gates.set(key, new Promise<void>((resolve) => (release = resolve)));
+    this.releases.push(release);
+    return release;
+  }
+
+  releaseAll() {
+    this.releases.forEach((release) => release());
+  }
+
   async install(page: Page) {
     await page.route('**/api/internal/**', async (route) => {
       const request = route.request();
@@ -83,6 +97,7 @@ export class FakeApi {
         this.unmatched.push(`${key}${url.search}`);
         return route.fulfill({ status: 501, json: { error: { code: 'unmocked', message: key } } });
       }
+      await this.gates.get(key);
       const reply =
         typeof handler === 'function'
           ? handler({ url, body: request.postDataJSON() as unknown })
@@ -101,6 +116,7 @@ export const test = base.extend<{ api: FakeApi }>({
     const api = new FakeApi();
     await api.install(page);
     await use(api);
+    api.releaseAll();
     expect(api.unmatched, 'requests without a FakeApi route').toEqual([]);
   },
 });

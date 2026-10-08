@@ -63,7 +63,7 @@ const tiles = computed(() =>
           <SkeletonBlock text class="w-40" />
         </p>
         <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
-          <span class="font-mono text-6xl tracking-tight"><SkeletonBlock text class="w-44" /></span>
+          <SkeletonBlock class="h-15 w-44" />
         </div>
         <p data-skeleton-region="tier" class="text-muted"><SkeletonBlock text class="w-32" /></p>
         <div data-skeleton-region="chart" class="h-[110px]">

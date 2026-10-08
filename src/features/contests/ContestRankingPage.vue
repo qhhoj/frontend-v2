@@ -207,7 +207,7 @@ const VIEW_MODES = [
               data-skeleton-region="podium-card"
               class="glass flex items-center gap-3.5 rounded-card p-5"
             >
-              <SkeletonBlock round class="size-13 shrink-0" />
+              <SkeletonBlock round class="shrink-0" :class="place === 1 ? 'size-15' : 'size-13'" />
               <div class="min-w-0 flex-1">
                 <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
                 <p class="font-mono text-[13px]"><SkeletonBlock text class="w-1/2" /></p>
@@ -219,16 +219,16 @@ const VIEW_MODES = [
               data-skeleton-region="table-header"
               class="flex items-center gap-4 px-5 py-4 text-[13px]"
             >
-              <SkeletonBlock text class="w-8" />
-              <SkeletonBlock text class="w-24" />
+              <span class="block"><SkeletonBlock text class="w-8" /></span>
+              <span class="block"><SkeletonBlock text class="w-24" /></span>
               <span class="flex-1" />
-              <SkeletonBlock text class="hidden w-64 sm:inline-block" />
+              <span class="hidden sm:block"><SkeletonBlock text class="w-64" /></span>
             </div>
             <div
               v-for="row in RANKING_SKELETON_ROWS"
               :key="row"
               data-skeleton-region="row"
-              class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm"
+              class="flex items-center gap-4 border-t border-line px-5 py-3 font-mono text-sm"
             >
               <SkeletonBlock text class="w-8" />
               <span class="flex-1"><SkeletonBlock text class="w-40 max-w-full" /></span>
