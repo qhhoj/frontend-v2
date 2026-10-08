@@ -51,7 +51,7 @@ export function parseAppearance(value: unknown): Appearance | null {
 export const nearestGlassStop = (glass: number): 0 | 50 | 100 =>
   (Math.round(glass / 50) * 50) as 0 | 50 | 100;
 
-/** What goes on `<html>`: the `data-accent` value, `--qh-glass` and `--qh-blob-strength`. The pre-paint script in index.html does the same. */
+/** What goes on `<html>`: the `data-accent` value, `--qh-glass-level` and `--qh-blob-strength`. The pre-paint script in index.html does the same. */
 export const appearanceVariables = (look: Appearance) => ({
   accent: look.accent,
   glass: String(look.glass),

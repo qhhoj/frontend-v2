@@ -41,9 +41,13 @@ export function contrastRatio(first: Rgba, second: Rgba): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/** `top` mixed into `bottom` at `weight` (0-1 of `top`), premultiplied like CSS `color-mix(in srgb, top weight%, bottom)`. */
+/**
+ * `top` mixed into `bottom` at `weight` (0-1 of `top`), premultiplied like CSS `color-mix(in srgb, top weight%, bottom)`.
+ * Both sides fully transparent give a transparent result: the colour channels are divided by the alpha, so it is guarded.
+ */
 export function mixPremultiplied(top: Rgba, bottom: Rgba, weight: number): Rgba {
   const alpha = top[3] * weight + bottom[3] * (1 - weight);
+  if (alpha === 0) return [0, 0, 0, 0];
   const channel = (topValue: number, bottomValue: number) =>
     (topValue * top[3] * weight + bottomValue * bottom[3] * (1 - weight)) / alpha;
   return [

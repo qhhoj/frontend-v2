@@ -70,3 +70,130 @@
   --qh-coin-6: linear-gradient(135deg, #c4b5fd, #7b61ff);
   --qh-on-coin: #140a1f;
 }
+
+/* Accent presets, one rule per id in src/theme/appearance.ts; the first repeats the base above. Dark presets lighten the accent for text and keep blobs weak enough for 4.5:1 body text. Every preset is checked by themes.spec.ts. */
+:root[data-theme='glass-dark'][data-accent='orchid'],
+:root[data-theme='glass-dark'] [data-accent='orchid'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #a64aad;
+  --qh-accent: #fc72ff;
+  --qh-accent-2: #7b61ff;
+  --qh-accent-text: #fdb8ff;
+  --qh-accent-soft: rgba(252, 114, 255, 0.14);
+  --qh-accent-soft-text: #fed7ff;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #fdb8ff;
+  --qh-gradient-accent: linear-gradient(90deg, #fc72ff, #7b61ff);
+  --qh-glow: 0 0 12px #fc72ff;
+  --qh-blob-1: rgba(252, 114, 255, 0.24);
+  --qh-blob-2: rgba(123, 97, 255, 0.28);
+  --qh-blob-3: rgba(252, 114, 255, 0.14);
+}
+
+:root[data-theme='glass-dark'][data-accent='ocean'],
+:root[data-theme='glass-dark'] [data-accent='ocean'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #2f86b5;
+  --qh-accent: #38bdf8;
+  --qh-accent-2: #818cf8;
+  --qh-accent-text: #7dd3fc;
+  --qh-accent-soft: rgba(56, 189, 248, 0.14);
+  --qh-accent-soft-text: #bae6fd;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #7dd3fc;
+  --qh-gradient-accent: linear-gradient(90deg, #38bdf8, #818cf8);
+  --qh-glow: 0 0 12px #38bdf8;
+  --qh-blob-1: rgba(56, 189, 248, 0.24);
+  --qh-blob-2: rgba(129, 140, 248, 0.28);
+  --qh-blob-3: rgba(56, 189, 248, 0.14);
+}
+
+:root[data-theme='glass-dark'][data-accent='mint'],
+:root[data-theme='glass-dark'] [data-accent='mint'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #2a9f78;
+  --qh-accent: #34d399;
+  --qh-accent-2: #0ea5e9;
+  --qh-accent-text: #6ee7b7;
+  --qh-accent-soft: rgba(52, 211, 153, 0.14);
+  --qh-accent-soft-text: #a7f3d0;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #6ee7b7;
+  --qh-gradient-accent: linear-gradient(90deg, #34d399, #0ea5e9);
+  --qh-glow: 0 0 12px #34d399;
+  --qh-blob-1: rgba(52, 211, 153, 0.24);
+  --qh-blob-2: rgba(14, 165, 233, 0.28);
+  --qh-blob-3: rgba(52, 211, 153, 0.14);
+}
+
+:root[data-theme='glass-dark'][data-accent='sunset'],
+:root[data-theme='glass-dark'] [data-accent='sunset'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #b86a2e;
+  --qh-accent: #fb923c;
+  --qh-accent-2: #f43f5e;
+  --qh-accent-text: #fdba74;
+  --qh-accent-soft: rgba(251, 146, 60, 0.14);
+  --qh-accent-soft-text: #fed7aa;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #fdba74;
+  --qh-gradient-accent: linear-gradient(90deg, #fb923c, #f43f5e);
+  --qh-glow: 0 0 12px #fb923c;
+  --qh-blob-1: rgba(251, 146, 60, 0.24);
+  --qh-blob-2: rgba(244, 63, 94, 0.28);
+  --qh-blob-3: rgba(251, 146, 60, 0.14);
+}
+
+:root[data-theme='glass-dark'][data-accent='gold'],
+:root[data-theme='glass-dark'] [data-accent='gold'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #b8960f;
+  --qh-accent: #facc15;
+  --qh-accent-2: #f97316;
+  --qh-accent-text: #fde68a;
+  --qh-accent-soft: rgba(250, 204, 21, 0.14);
+  --qh-accent-soft-text: #fef3c7;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #fde68a;
+  --qh-gradient-accent: linear-gradient(90deg, #facc15, #f97316);
+  --qh-glow: 0 0 12px #facc15;
+  --qh-blob-1: rgba(250, 204, 21, 0.16);
+  --qh-blob-2: rgba(249, 115, 22, 0.2);
+  --qh-blob-3: rgba(250, 204, 21, 0.1);
+}
+
+:root[data-theme='glass-dark'][data-accent='mono'],
+:root[data-theme='glass-dark'] [data-accent='mono'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #7a808c;
+  --qh-accent: #e5e7eb;
+  --qh-accent-2: #94a3b8;
+  --qh-accent-text: #e5e7eb;
+  --qh-accent-soft: rgba(229, 231, 235, 0.14);
+  --qh-accent-soft-text: #f3f4f6;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #e5e7eb;
+  --qh-gradient-accent: linear-gradient(90deg, #e5e7eb, #94a3b8);
+  --qh-glow: 0 0 12px #e5e7eb;
+  --qh-blob-1: rgba(148, 163, 184, 0.14);
+  --qh-blob-2: rgba(148, 163, 184, 0.2);
+  --qh-blob-3: rgba(148, 163, 184, 0.08);
+}
+
+:root[data-theme='glass-dark'][data-accent='clay'],
+:root[data-theme='glass-dark'] [data-accent='clay'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #b8663f;
+  --qh-accent: #d97757;
+  --qh-accent-2: #f2a65a;
+  --qh-accent-text: #f4b89c;
+  --qh-accent-soft: rgba(217, 119, 87, 0.14);
+  --qh-accent-soft-text: #fbd9c8;
+  --qh-on-accent: #1a1816;
+  --qh-focus-ring: #f4b89c;
+  --qh-gradient-accent: linear-gradient(90deg, #d97757, #f2a65a);
+  --qh-glow: 0 0 12px #d97757;
+  --qh-blob-1: rgba(217, 119, 87, 0.24);
+  --qh-blob-2: rgba(242, 166, 90, 0.2);
+  --qh-blob-3: rgba(217, 119, 87, 0.14);
+}

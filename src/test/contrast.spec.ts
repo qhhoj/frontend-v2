@@ -44,4 +44,9 @@ describe('mixPremultiplied', () => {
     const surface = parseColour('rgba(255, 255, 255, 0.04)');
     expect(mixPremultiplied(solid, surface, 1)).toEqual(solid);
   });
+
+  it('returns transparent black, not NaN, when both sides are fully transparent', () => {
+    const clear = [0, 0, 0, 0] as const;
+    expect(mixPremultiplied(clear, clear, 0.5)).toEqual([0, 0, 0, 0]);
+  });
 });
