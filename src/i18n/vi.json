@@ -147,7 +147,7 @@
         "acRate": "Tỷ lệ AC",
         "language": "Ngôn ngữ",
         "share": "Tỷ trọng",
-        "count": "Số bài",
+        "count": "Số bài nộp",
         "ac": "AC"
       },
       "errNote": "ERR gồm MLE, OLE, IR, RTE, AB và IE. Tổng tính cả bài nộp đang chờ chấm.",

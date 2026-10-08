@@ -65,7 +65,7 @@ const chipClasses = (code: ResultCode, value: number) =>
             <td class="px-4 py-3">
               <div
                 aria-hidden="true"
-                class="flex h-3 overflow-hidden rounded-pill bg-surface-hover"
+                class="flex h-3 gap-px overflow-hidden rounded-pill bg-surface-hover"
               >
                 <span
                   v-for="segment in resultSegments(problem.results, problem.total)"

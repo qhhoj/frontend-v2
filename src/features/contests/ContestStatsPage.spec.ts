@@ -27,6 +27,29 @@ describe('contest stats tab', () => {
     expect(wrapper.text()).toContain('ERR gồm MLE, OLE, IR, RTE, AB và IE');
   });
 
+  it('fills each result segment in result order with its verdict colour', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ phase: 'ended' })),
+      'GET /contests/r42/stats': ok(contestStats()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/stats');
+    const firstBar = wrapper
+      .get('[data-testid="problem-results"] tbody tr')
+      .findAll('[aria-hidden="true"] > span');
+    const fills = firstBar.map((segment) =>
+      segment.classes().find((name) => name.startsWith('bg-verdict-')),
+    );
+    expect(fills).toEqual([
+      'bg-verdict-ac',
+      'bg-verdict-wa',
+      'bg-verdict-ce',
+      'bg-verdict-tle',
+      'bg-verdict-rte',
+    ]);
+    expect(firstBar[0]!.attributes('style')).toContain('width: 81.58');
+  });
+
   it('shows a dash for the accepted share while nothing was submitted', async () => {
     mockApi({
       ...anonymousViewer,

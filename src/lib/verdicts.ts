@@ -10,7 +10,8 @@ export interface Verdict {
 }
 
 /** Legacy colour groups (program spec): TLE/MLE amber, RTE/OLE/IR violet, CE and system outcomes slate. */
-const TONES: Record<VerdictCode, VerdictTone> = {
+/** One tone per code: the single source for verdict colours (badges, chips, result bars). */
+export const VERDICT_TONES: Record<VerdictCode, VerdictTone> = {
   AC: 'ac',
   WA: 'wa',
   TLE: 'tle',
@@ -38,7 +39,7 @@ export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ce: 'bg-verdict-ce-bg text-verdict-ce',
   pending: 'bg-verdict-pending-bg text-verdict-pending',
 };
-export const VERDICT_CODES = Object.keys(TONES) as VerdictCode[];
+export const VERDICT_CODES = Object.keys(VERDICT_TONES) as VerdictCode[];
 
 /** A finished submission shows its result (or its final status when it has none); an unfinished one its status. */
 export function verdictOf({
@@ -49,5 +50,5 @@ export function verdictOf({
   result: SubmissionResult | null;
 }): Verdict {
   const code: VerdictCode = FINISHED_STATUSES.includes(status) ? (result ?? status) : status;
-  return { code, tone: TONES[code], labelKey: `verdicts.${code}` };
+  return { code, tone: VERDICT_TONES[code], labelKey: `verdicts.${code}` };
 }

@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { ContestLanguageStats } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { formatPercent, languageShare } from './stats-summary';
 
-defineProps<{ languages: ContestLanguageStats[] }>();
+const props = defineProps<{ languages: ContestLanguageStats[] }>();
 const locale = useLocaleStore();
+/** Each language with its share of all submissions, computed once per row. */
+const rows = computed(() =>
+  props.languages.map((language) => ({
+    language,
+    share: languageShare(language, props.languages),
+  })),
+);
 const count = (value: number) => formatNumber(value, locale.locale);
 </script>
 
@@ -36,7 +44,11 @@ const count = (value: number) => formatNumber(value, locale.locale);
           </tr>
         </thead>
         <tbody>
-          <tr v-for="language in languages" :key="language.languageId" class="border-t border-line">
+          <tr
+            v-for="{ language, share } in rows"
+            :key="language.languageId"
+            class="border-t border-line"
+          >
             <th scope="row" class="px-4 py-3 text-left font-semibold">{{ language.name }}</th>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
@@ -46,11 +58,11 @@ const count = (value: number) => formatNumber(value, locale.locale);
                 >
                   <div
                     class="h-full rounded-pill bg-accent"
-                    :style="{ width: `${languageShare(language, languages) * 100}%` }"
+                    :style="{ width: `${share * 100}%` }"
                   />
                 </div>
                 <span class="w-16 text-right font-mono text-sm">
-                  {{ formatPercent(languageShare(language, languages) * 100, locale.locale) }}
+                  {{ formatPercent(share * 100, locale.locale) }}
                 </span>
               </div>
             </td>

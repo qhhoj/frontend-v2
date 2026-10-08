@@ -5,6 +5,7 @@ import type {
 } from '@/api/types/contests';
 import type { Locale } from '@/i18n';
 import { formatNumber } from '@/lib/format';
+import { VERDICT_TONES } from '@/lib/verdicts';
 import type { VerdictTone } from '@/lib/verdicts';
 
 export const RESULT_ORDER = [
@@ -17,13 +18,14 @@ export const RESULT_ORDER = [
 ] as const satisfies readonly (keyof ContestProblemResults)[];
 export type ResultCode = (typeof RESULT_ORDER)[number];
 /** ERR groups the runtime-ish results, RJ the rejected ones; both reuse existing verdict tones. */
+/** Each result takes its verdict's tone; ERR groups MLE, OLE, IR, RTE, AB and IE, so it takes RTE's. */
 export const RESULT_TONES: Record<ResultCode, VerdictTone> = {
-  AC: 'ac',
-  WA: 'wa',
-  CE: 'ce',
-  TLE: 'tle',
-  ERR: 'rte',
-  RJ: 'pending',
+  AC: VERDICT_TONES.AC,
+  WA: VERDICT_TONES.WA,
+  CE: VERDICT_TONES.CE,
+  TLE: VERDICT_TONES.TLE,
+  ERR: VERDICT_TONES.RTE,
+  RJ: VERDICT_TONES.RJ,
 };
 
 export function statsTotals(stats: ContestStats) {
