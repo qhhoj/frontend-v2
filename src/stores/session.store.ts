@@ -65,6 +65,9 @@ export const useSessionStore = defineStore('session', () => {
     apply(null);
   }
 
+  /** The server ended this viewer's session and this tab could not learn it: the guest state, with no request. */
+  const forgetSession = () => apply(null);
+
   onCsrfFailed(refresh);
   /** A protected request answered 401: the session expired, so the viewer is signed out here (guards redirect on the next navigation). */
   onUnauthorized(() => apply(null));
@@ -78,6 +81,7 @@ export const useSessionStore = defineStore('session', () => {
     isStaff,
     ensureLoaded,
     refresh,
+    forgetSession,
     login,
     completeSocialSignup,
     logout,

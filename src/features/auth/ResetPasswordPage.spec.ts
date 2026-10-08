@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { loginRoutes } from '@/test/auth-routes';
-import { profile, signedIn, signedOut } from '@/test/fixtures';
+import { partialSession, profile, signedIn, signedOut } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { createMemoryHistory } from 'vue-router';
@@ -110,6 +110,71 @@ describe('reset-password page', () => {
     expect(wrapper.text()).toContain('Mật khẩu này từng bị lộ trong một vụ rò rỉ dữ liệu.');
     expect(document.activeElement).toBe(input.element);
     expect(wrapper.find('form').exists()).toBe(true);
+  });
+
+  it('replaces the spent link in the address and history with the dead-link address, and never pushes an entry', async () => {
+    const history = createMemoryHistory();
+    const pushed = vi.spyOn(history, 'push');
+    const replaced = vi.spyOn(history, 'replace');
+    mockApi({
+      'GET /auth/me': signedOut,
+      'POST /auth/password/reset/confirm': fail(400, 'invalid_token'),
+    });
+    const { wrapper, router } = await mountApp('/reset-password/spent', history);
+    await fill(wrapper);
+    await vi.waitFor(() =>
+      expect(router.currentRoute.value.fullPath).toBe('/reset-password/expired'),
+    );
+    expect(wrapper.get('h1').text()).toBe('Liên kết không còn hiệu lực');
+    expect(pushed).not.toHaveBeenCalled();
+    expect(replaced.mock.calls.at(-1)?.[0]).toBe('/reset-password/expired');
+  });
+
+  it('shows the dead-link card for the dead-link address without sending anything', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/reset-password/expired');
+    expect(wrapper.get('h1').text()).toBe('Liên kết không còn hiệu lực');
+    expect(wrapper.find('form').exists()).toBe(false);
+    expect(calls.some((call) => call.path === '/auth/password/reset/confirm')).toBe(false);
+  });
+
+  it('moves focus to the page when the form gives way to the dead-link card', async () => {
+    mockApi({
+      'GET /auth/me': signedOut,
+      'POST /auth/password/reset/confirm': fail(400, 'invalid_token'),
+    });
+    const { wrapper, router } = await mountApp('/reset-password/spent');
+    await fill(wrapper);
+    await vi.waitFor(() =>
+      expect(router.currentRoute.value.fullPath).toBe('/reset-password/expired'),
+    );
+    expect(document.activeElement).toBe(document.getElementById('main'));
+  });
+
+  it('lands on sign-in even when the session cannot be reloaded after the reset', async () => {
+    let ended = false;
+    mockApi({
+      'GET /auth/me': () => (ended ? fail(500, 'generic') : signedIn()),
+      'GET /profile': ok(profile()),
+      'POST /auth/password/reset/confirm': () => {
+        ended = true;
+        return noContent();
+      },
+      ...loginRoutes,
+    });
+    const { wrapper, router } = await mountApp('/reset-password/tok-1');
+    await fill(wrapper);
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
+    expect(wrapper.get('#main [role="status"]').text()).toBe(
+      'Mật khẩu đã được đổi, hãy đăng nhập lại.',
+    );
+  });
+
+  it('opens for a viewer whose second factor is still pending, without sending them to the second-factor step', async () => {
+    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    const { wrapper, router } = await mountApp('/reset-password/tok-1');
+    expect(router.currentRoute.value.name).toBe('reset-password');
+    expect(wrapper.get('h1').text()).toBe('Đặt mật khẩu mới');
   });
 
   it('will not send two different passwords', async () => {

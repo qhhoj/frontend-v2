@@ -17,7 +17,7 @@ const send = async (wrapper: Wrapper, email = 'user_01@example.com') => {
 };
 
 describe('forgot-password page', () => {
-  it('asks for an email, then shows the same masked answer whatever the backend knows', async () => {
+  it('asks for an email and shows the masked answer, never whether the account exists', async () => {
     const calls = forgotApi();
     const { wrapper } = await mountApp('/forgot-password');
     expect(wrapper.get('h1').text()).toBe('Quên mật khẩu?');

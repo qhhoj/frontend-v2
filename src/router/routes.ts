@@ -232,7 +232,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/reset-password/:token',
     name: 'reset-password',
     component: () => import('@/features/auth/ResetPasswordPage.vue'),
-    meta: { titleKey: 'pages.resetPassword', layout: 'auth' },
+    meta: { titleKey: 'pages.resetPassword', allowPartial: true, layout: 'auth' },
   },
   {
     path: '/account/password',
