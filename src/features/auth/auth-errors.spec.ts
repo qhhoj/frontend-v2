@@ -62,10 +62,30 @@ describe('authErrorText', () => {
     );
   });
 
-  it('explains a failed browser security-key prompt', () => {
-    expect(authErrorText(new DOMException('blocked', 'SecurityError'))).toBe(
-      'Xác minh khoá bảo mật không thành công.',
+  it.each(['NotAllowedError', 'InvalidStateError', 'SecurityError', 'NotSupportedError'])(
+    'explains a failed browser security-key prompt (%s)',
+    (name) => {
+      expect(authErrorText(new DOMException('blocked', name))).toBe(
+        'Xác minh khoá bảo mật không thành công.',
+      );
+    },
+  );
+
+  it('does not blame the key for a cancelled request (AbortError)', () => {
+    expect(authErrorText(new DOMException('cancelled', 'AbortError'))).toBe(
+      'Đã có lỗi xảy ra. Hãy thử lại.',
     );
+  });
+
+  it.each([
+    [
+      'a 401 invalid_credentials',
+      new ApiError('invalid_credentials', 401, 'x'),
+      'Sai tên đăng nhập hoặc mật khẩu.',
+    ],
+    ['a network_error', new ApiError('network_error', 0, 'x'), 'Không kết nối được máy chủ.'],
+  ])('translates %s by its code', (_name, error, text) => {
+    expect(authErrorText(error)).toBe(text);
   });
 });
 
@@ -154,6 +174,10 @@ describe('queryErrorText', () => {
     expect(queryErrorText('oauth_failed')).toBe('Đăng nhập bằng mạng xã hội không thành công.');
     expect(queryErrorText('email_unverified')).toContain('chưa được xác minh');
     expect(queryErrorText('account_not_activated')).toContain('chưa được kích hoạt');
+  });
+
+  it('shows the ban notice for the banned callback code', () => {
+    expect(queryErrorText('banned')).toBe('Tài khoản đã bị khoá.');
   });
 
   it.each(['unknown', '__proto__', 'toString', '', ['oauth_failed'], undefined, 7])(

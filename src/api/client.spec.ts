@@ -212,4 +212,15 @@ describe('api client', () => {
     const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
     expect(error).toMatchObject({ code: 'rate_limited', fields: {}, issues: [], extra: {} });
   });
+
+  it('treats issues and fields arriving as null as absent', async () => {
+    mockApi({
+      'POST /x': {
+        status: 400,
+        body: { error: { code: 'validation_failed', message: 'x', issues: null, fields: null } },
+      },
+    });
+    const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
+    expect(error).toMatchObject({ code: 'validation_failed', fields: {}, issues: [], extra: {} });
+  });
 });

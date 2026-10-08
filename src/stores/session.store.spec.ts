@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiRequest, onCsrfFailed, onUnauthorized } from '@/api/client';
-import { sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import { partialSession, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { useSessionStore } from './session.store';
 
@@ -103,5 +103,42 @@ describe('useSessionStore', () => {
         .filter((call) => call.method === 'POST')
         .map((call) => call.headers.get('X-CSRF-Token')),
     ).toEqual(['csrf-1', 'csrf-2']);
+  });
+
+  it('keeps the factors a partial session may use, and forgets them once the session is whole', async () => {
+    let verified = false;
+    mockApi({
+      'GET /auth/me': () =>
+        verified ? signedIn() : signedIn(partialSession(['webauthn'], 'user_07')),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    expect(session.status).toBe('partial');
+    expect(session.twoFactor).toEqual({ username: 'user_07', methods: ['webauthn'] });
+    verified = true;
+    await session.refresh();
+    expect(session.status).toBe('authenticated');
+    expect(session.twoFactor).toBeNull();
+  });
+
+  it('adopts the session of a completed social signup', async () => {
+    const calls = mockApi({
+      'POST /auth/social/complete': ok(sessionResponse({ csrfToken: 'csrf-social' })),
+      'POST /auth/logout': noContent(),
+    });
+    const session = useSessionStore();
+    await session.completeSocialSignup({
+      token: 'pending-1',
+      username: 'new_user',
+      password: 'long enough password',
+    });
+    expect(calls[0]!.body).toEqual({
+      token: 'pending-1',
+      username: 'new_user',
+      password: 'long enough password',
+    });
+    expect(session.status).toBe('authenticated');
+    await session.logout();
+    expect(calls[1]!.headers.get('X-CSRF-Token')).toBe('csrf-social');
   });
 });

@@ -10,12 +10,23 @@ export function banReason(error: unknown): string | null {
   return typeof reason === 'string' && reason.trim() ? reason.trim() : null;
 }
 
+/** What the browser's WebAuthn API rejects with: a refused prompt, a known key, a blocked origin, no authenticator. */
+const WEBAUTHN_ERROR_NAMES: readonly string[] = [
+  'NotAllowedError',
+  'InvalidStateError',
+  'SecurityError',
+  'NotSupportedError',
+  'ConstraintError',
+  'UnknownError',
+];
+
 /** The one place an auth failure becomes text for the viewer. */
 export function authErrorText(error: unknown): string {
   const reason = banReason(error);
   if (reason) return translate('errors.bannedWithReason', { reason });
-  // The browser's WebAuthn API rejects with a DOMException (blocked origin, no authenticator, ...).
-  if (error instanceof DOMException) return translate('errors.webauthn_failed');
+  // An `AbortError` is not the key's fault (a cancelled request), so it falls through to the generic text.
+  if (error instanceof DOMException && WEBAUTHN_ERROR_NAMES.includes(error.name))
+    return translate('errors.webauthn_failed');
   return translate(errorMessageKey(error));
 }
 

@@ -66,6 +66,20 @@ describe('useAuthAction', () => {
     expect(action.summary.value).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
   });
 
+  it.each([
+    [
+      'a 401 invalid_credentials',
+      new ApiError('invalid_credentials', 401, 'x'),
+      'Sai tên đăng nhập hoặc mật khẩu.',
+    ],
+    ['a network_error', new ApiError('network_error', 0, 'x'), 'Không kết nối được máy chủ.'],
+  ])('ends %s with pending off and the translated text', async (_name, error, text) => {
+    const action = mountForm([]);
+    expect(await action.run(rejected(error))).toBe(false);
+    expect(action.pending.value).toBe(false);
+    expect(action.summary.value).toBe(text);
+  });
+
   it('puts field messages at their inputs and focuses the first invalid one', async () => {
     const action = mountForm(['first', 'second']);
     await action.run(rejected(validation(taken('second'))));

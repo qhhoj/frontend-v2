@@ -1,8 +1,19 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { fetchSession, login as loginRequest, logout as logoutRequest } from '@/api/auth.api';
+import {
+  completeSocialSignup as completeSocialSignupRequest,
+  fetchSession,
+  login as loginRequest,
+  logout as logoutRequest,
+} from '@/api/auth.api';
 import { ApiError, onCsrfFailed, onUnauthorized, setCsrfToken } from '@/api/client';
-import type { LoginBody, SessionResponse, SessionUser } from '@/api/types/auth';
+import type {
+  LoginBody,
+  SessionResponse,
+  SessionUser,
+  SocialCompleteBody,
+  TwoFactorPending,
+} from '@/api/types/auth';
 
 export type SessionStatus = 'unknown' | 'anonymous' | 'partial' | 'authenticated';
 
@@ -11,6 +22,8 @@ export const useSessionStore = defineStore('session', () => {
   const user = ref<SessionUser | null>(null);
   const passwordChangeRequired = ref(false);
   const impersonatorId = ref<string | null>(null);
+  /** While the second factor is pending: the account name and the factors it can use. */
+  const twoFactor = ref<TwoFactorPending | null>(null);
   const isStaff = computed(() => user.value?.isStaff ?? false);
   let loading: Promise<void> | null = null;
 
@@ -18,6 +31,7 @@ export const useSessionStore = defineStore('session', () => {
     user.value = session?.user ?? null;
     passwordChangeRequired.value = session?.passwordChangeRequired ?? false;
     impersonatorId.value = session?.impersonatorId ?? null;
+    twoFactor.value = session?.twoFactor ?? null;
     setCsrfToken(session?.csrfToken ?? null);
     status.value = !session ? 'anonymous' : session.twoFactorRequired ? 'partial' : 'authenticated';
   }
@@ -41,6 +55,10 @@ export const useSessionStore = defineStore('session', () => {
 
   const login = async (body: LoginBody) => apply(await loginRequest(body));
 
+  /** Finishing a social signup opens the session like a password login does. */
+  const completeSocialSignup = async (body: SocialCompleteBody) =>
+    apply(await completeSocialSignupRequest(body));
+
   /** Ends the session here even if the server cannot be told. */
   async function logout() {
     await logoutRequest().catch(() => undefined);
@@ -56,10 +74,12 @@ export const useSessionStore = defineStore('session', () => {
     user,
     passwordChangeRequired,
     impersonatorId,
+    twoFactor,
     isStaff,
     ensureLoaded,
     refresh,
     login,
+    completeSocialSignup,
     logout,
   };
 });

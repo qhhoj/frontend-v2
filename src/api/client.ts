@@ -117,8 +117,9 @@ async function errorOf(response: Response): Promise<ApiError> {
     code ?? 'http_error',
     response.status,
     message ?? response.statusText,
-    fields,
-    issues,
+    // A `null` (or otherwise malformed) member is as good as absent.
+    fields && typeof fields === 'object' && !Array.isArray(fields) ? fields : undefined,
+    Array.isArray(issues) ? issues : undefined,
     extra,
   );
 }

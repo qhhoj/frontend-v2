@@ -46,6 +46,7 @@ export class FakeApi {
       this.signedIn = false;
       return { status: 204 };
     },
+    'GET /auth/social/providers': ok({ providers: ['google', 'github'] }),
     'GET /profile': ok(profile()),
     'PATCH /profile': ({ body }) => ok(profile(body as object)),
     'GET /problems/meta': ok(problemMeta()),

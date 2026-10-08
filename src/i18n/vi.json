@@ -79,6 +79,11 @@
     "registered": "Đã tạo tài khoản. Hãy mở email để kích hoạt.",
     "activating": "Đang kích hoạt…",
     "activated": "Tài khoản đã được kích hoạt. Bạn có thể đăng nhập.",
+    "social": {
+      "or": "hoặc tiếp tục với",
+      "signInWith": "Đăng nhập với {provider}",
+      "signUpWith": "Đăng ký với {provider}"
+    },
     "issues": {
       "password_too_short": "Mật khẩu phải có ít nhất 8 ký tự.",
       "password_numeric": "Mật khẩu không được chỉ gồm chữ số.",

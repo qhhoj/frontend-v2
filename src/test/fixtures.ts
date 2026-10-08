@@ -8,7 +8,7 @@ import type {
 import type { Language, ProblemListItem, ProblemMeta } from '../api/types/problems';
 import type { SubmissionListItem } from '../api/types/submissions';
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
-import type { SessionResponse, SessionUser } from '../api/types/auth';
+import type { SecondFactorMethod, SessionResponse, SessionUser } from '../api/types/auth';
 import type { Profile } from '../api/types/profile';
 
 export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
@@ -20,6 +20,9 @@ export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser =
   permissions: [],
   isTotpEnabled: false,
   isWebauthnEnabled: false,
+  siteTheme: 'auto',
+  appearance: null,
+  languageId: null,
   ...overrides,
 });
 
@@ -27,10 +30,18 @@ export const sessionResponse = (overrides: Partial<SessionResponse> = {}): Sessi
   user: sessionUser(),
   csrfToken: 'csrf-1',
   twoFactorRequired: false,
+  twoFactor: null,
   passwordChangeRequired: false,
   impersonatorId: null,
   ...overrides,
 });
+
+/** A password-only session: no user yet, and the second factors the account can use (`[]` = disabled meanwhile). */
+export const partialSession = (
+  methods: SecondFactorMethod[] = ['totp', 'webauthn'],
+  username = 'user_01',
+): SessionResponse =>
+  sessionResponse({ user: null, twoFactorRequired: true, twoFactor: { username, methods } });
 
 /** `GET /auth/me` answers for a signed-in and a signed-out viewer. */
 export const signedIn = (overrides: Partial<SessionResponse> = {}) => ({
