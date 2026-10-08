@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { setCsrfToken } from '@/api/client';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import * as account from './account.api';
+import { API_BASE } from './client';
 
 /** Each call, the request it must send, and the body it must carry. */
 const CALLS: ReadonlyArray<readonly [string, () => Promise<unknown>, string, unknown]> = [
@@ -70,6 +72,28 @@ const CALLS: ReadonlyArray<readonly [string, () => Promise<unknown>, string, unk
 ];
 
 describe('account API', () => {
+  afterEach(() => setCsrfToken(null));
+
+  it.each(CALLS.filter(([, , route]) => !route.startsWith('GET ')))(
+    '%s sends the CSRF token on a write',
+    async (_name, call, route) => {
+      const calls = mockApi({ [route]: ok({}) });
+      setCsrfToken('csrf-account');
+      await call();
+      expect(calls[0]!.headers.get('X-CSRF-Token')).toBe('csrf-account');
+    },
+  );
+
+  it.each(CALLS.filter(([, , route]) => route.startsWith('GET ')))(
+    '%s sends no CSRF token on a read',
+    async (_name, call, route) => {
+      const calls = mockApi({ [route]: ok({}) });
+      setCsrfToken('csrf-account');
+      await call();
+      expect(calls[0]!.headers.has('X-CSRF-Token')).toBe(false);
+    },
+  );
+
   it.each(CALLS)('%s sends the backend request', async (_name, call, route, body) => {
     const calls = mockApi({ [route]: ok({}) });
     await call();
@@ -99,7 +123,9 @@ describe('account API', () => {
     expect(calls[0]!.path).toBe('/auth/2fa/webauthn/credentials/a%2Fb');
   });
 
-  it('downloads the export from the API base, never through fetch', () => {
-    expect(account.DATA_EXPORT_DOWNLOAD_URL).toBe('/api/internal/profile/data/download');
+  it('links the export under the API base, with no query to carry', () => {
+    const link = new URL(account.DATA_EXPORT_DOWNLOAD_URL, 'http://localhost');
+    expect(link.pathname.startsWith(`${API_BASE}/`)).toBe(true);
+    expect(link.search).toBe('');
   });
 });

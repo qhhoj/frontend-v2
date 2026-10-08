@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { regenerateApiToken } from '@/api/account.api';
 import { apiRequest, onCsrfFailed, onUnauthorized } from '@/api/client';
 import { partialSession, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
@@ -151,6 +152,20 @@ describe('useSessionStore', () => {
     expect(logoutAll.method).toBe('POST');
     expect(logoutAll.body).toBeUndefined();
     expect(session.status).toBe('anonymous');
+    expect(session.user).toBeNull();
+  });
+
+  it('clears the CSRF token with the session: later writes carry none', async () => {
+    const calls = mockApi({
+      'GET /auth/me': signedIn(),
+      'POST /auth/logout-all': noContent(),
+      'POST /auth/token/regenerate': ok({ token: 'new-token' }),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await session.logoutEverywhere();
+    await regenerateApiToken().catch(() => undefined);
+    expect(calls.at(-1)!.headers.get('X-CSRF-Token')).toBeNull();
   });
 
   it('stays signed in when signing out everywhere fails, and rethrows', async () => {
@@ -176,5 +191,17 @@ describe('useSessionStore', () => {
     expect(calls.at(-1)).toMatchObject({ method: 'POST', path: '/auth/impersonate/stop' });
     expect(session.impersonatorId).toBeNull();
     expect(session.user?.username).toBe('admin');
+  });
+
+  it('keeps the impersonation when stopping it fails, and rethrows', async () => {
+    mockApi({
+      'GET /auth/me': signedIn({ impersonatorId: 'staff-1' }),
+      'POST /auth/impersonate/stop': fail(500, 'http_error'),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await expect(session.stopImpersonating()).rejects.toMatchObject({ status: 500 });
+    expect(session.impersonatorId).toBe('staff-1');
+    expect(session.status).toBe('authenticated');
   });
 });
