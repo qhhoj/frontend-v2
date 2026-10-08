@@ -34,7 +34,10 @@
     "appearance": "Giao diện",
     "settings": "Cài đặt",
     "admin": "Quản trị",
-    "notFound": "Không tìm thấy trang"
+    "notFound": "Không tìm thấy trang",
+    "contestAnnouncements": "Thông báo kỳ thi",
+    "contestSubmissions": "Bài nộp kỳ thi",
+    "contestStats": "Thống kê kỳ thi"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -54,7 +57,16 @@
     "virtualExtra": "+{count} ảo",
     "rated": "Tính rating",
     "private": "Riêng tư",
-    "organizationPrivate": "Nội bộ"
+    "organizationPrivate": "Nội bộ",
+    "tabs": {
+      "label": "Mục kỳ thi",
+      "problems": "Đề bài",
+      "announcements": "Thông báo",
+      "submissions": "Bài nộp",
+      "stats": "Thống kê",
+      "ranking": "Bảng xếp hạng"
+    },
+    "breadcrumb": "Đường dẫn"
   },
   "placeholder": {
     "pending": "Màn hình này đang chờ mockup được duyệt."
@@ -407,10 +419,6 @@
   },
   "ranking": {
     "summary": "{format} · {problems} bài · {participants} thí sinh",
-    "contestNav": "Mục kỳ thi",
-    "navProblems": "Đề bài",
-    "navSubmissions": "Bài nộp",
-    "navRanking": "Bảng xếp hạng",
     "viewMode": "Chế độ bảng",
     "official": "Chính thức",
     "withVirtual": "Gồm thi ảo",

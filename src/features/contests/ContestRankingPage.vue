@@ -13,6 +13,7 @@ import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import ContestTabs from './ContestTabs.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useRankingQuery } from './contests.queries';
@@ -102,30 +103,7 @@ const VIEW_MODES = [
         </div>
       </template>
       <template v-if="contest">
-        <nav
-          :aria-label="$t('ranking.contestNav')"
-          class="glass flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-pill p-1"
-        >
-          <RouterLink
-            :to="{ name: 'contest', params: { key } }"
-            class="inline-flex min-h-11 items-center rounded-pill px-4 whitespace-nowrap text-muted hover:text-content"
-          >
-            {{ $t('ranking.navProblems') }}
-          </RouterLink>
-          <RouterLink
-            :to="{ name: 'submissions', query: { contest: key } }"
-            class="inline-flex min-h-11 items-center rounded-pill px-4 whitespace-nowrap text-muted hover:text-content"
-          >
-            {{ $t('ranking.navSubmissions') }}
-          </RouterLink>
-          <RouterLink
-            :to="{ name: 'contest-ranking', params: { key } }"
-            aria-current="page"
-            class="inline-flex min-h-11 items-center rounded-pill bg-surface-hover px-4 font-semibold whitespace-nowrap"
-          >
-            {{ $t('ranking.navRanking') }}
-          </RouterLink>
-        </nav>
+        <ContestTabs :contest-key="key" />
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-muted">{{ summary }}</p>

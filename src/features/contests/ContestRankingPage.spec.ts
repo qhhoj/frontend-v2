@@ -9,13 +9,14 @@ import {
   signedIn,
   signedOut,
 } from '@/test/fixtures';
+import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
 const routes = (overrides: Record<string, MockHandler> = {}): Record<string, MockHandler> => ({
   'GET /auth/me': signedOut,
-  'GET /contests/r42': ok(contestDetail()),
+  ...contestPageRoutes(),
   'GET /contests/r42/ranking': ok(ranking()),
   ...overrides,
 });

@@ -34,7 +34,10 @@
     "appearance": "Appearance",
     "settings": "Settings",
     "admin": "Administration",
-    "notFound": "Page not found"
+    "notFound": "Page not found",
+    "contestAnnouncements": "Contest announcements",
+    "contestSubmissions": "Contest submissions",
+    "contestStats": "Contest statistics"
   },
   "contests": {
     "title": "Contests",
@@ -54,7 +57,16 @@
     "virtualExtra": "+{count} virtual",
     "rated": "Rated",
     "private": "Private",
-    "organizationPrivate": "Organization only"
+    "organizationPrivate": "Organization only",
+    "tabs": {
+      "label": "Contest sections",
+      "problems": "Problems",
+      "announcements": "Announcements",
+      "submissions": "Submissions",
+      "stats": "Statistics",
+      "ranking": "Ranking"
+    },
+    "breadcrumb": "Breadcrumb"
   },
   "placeholder": {
     "pending": "This screen is waiting for an approved mock-up."
@@ -407,10 +419,6 @@
   },
   "ranking": {
     "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",
-    "contestNav": "Contest sections",
-    "navProblems": "Problems",
-    "navSubmissions": "Submissions",
-    "navRanking": "Ranking",
     "viewMode": "Board mode",
     "official": "Official",
     "withVirtual": "Include virtual",
