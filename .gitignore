@@ -8,3 +8,6 @@ test-results/
 .env.*
 docs/superpowers/
 .superpowers/
+
+# per-checkout TypeScript build info (worktrees share node_modules)
+.tsbuild/
