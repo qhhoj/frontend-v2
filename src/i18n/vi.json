@@ -1403,6 +1403,17 @@
     "title": "Blog"
   },
   "blogPost": {
+    "breadcrumb": "Đường dẫn",
+    "back": "Bảng tin",
+    "pinned": "Ghim",
+    "comments": "{count} bình luận",
+    "author": "Tác giả",
+    "viewProfile": "Xem hồ sơ",
+    "morePosts": "Bài viết khác",
+    "noMorePosts": "Chưa có bài viết khác.",
+    "notFoundTitle": "Không tìm thấy bài viết",
+    "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
+    "backToBlog": "Về blog",
     "title": "Bài viết"
   },
   "comments": {

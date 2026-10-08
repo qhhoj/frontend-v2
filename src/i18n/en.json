@@ -1403,6 +1403,17 @@
     "title": "Blog"
   },
   "blogPost": {
+    "breadcrumb": "Breadcrumb",
+    "back": "News feed",
+    "pinned": "Pinned",
+    "comments": "{count} comments",
+    "author": "Author",
+    "viewProfile": "View profile",
+    "morePosts": "More posts",
+    "noMorePosts": "No other posts yet.",
+    "notFoundTitle": "Post not found",
+    "notFoundBody": "The post does not exist or is not public yet.",
+    "backToBlog": "Back to the blog",
     "title": "Post"
   },
   "comments": {
