@@ -8,6 +8,7 @@ import { submit } from '@/api/submissions.api';
 import { useSubmissionStatus } from '@/api/use-submission-status';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { useProfileQuery } from '@/features/account/profile.queries';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
@@ -92,6 +93,24 @@ const progressText = computed(() => {
       <span class="text-[13px] text-muted">{{ languageName }}</span>
     </div>
     <QueryState :loading="metaPending" :error="metaError" @retry="refetchMeta()">
+      <template #skeleton>
+        <div class="flex flex-col gap-1">
+          <div class="rounded-tile bg-surface-strong p-4">
+            <p class="text-[13px]"><SkeletonBlock text class="w-24" /></p>
+            <div class="mt-1.5 flex min-h-11 items-center justify-between gap-3">
+              <SkeletonBlock class="h-7 w-40" />
+              <SkeletonBlock class="h-11 w-32 shrink-0" />
+            </div>
+          </div>
+          <div class="-my-3.5 h-9" />
+          <div class="rounded-tile bg-surface-strong p-4">
+            <p class="text-[13px]"><SkeletonBlock text class="w-16" /></p>
+            <SkeletonBlock class="mt-1.5 h-24 w-full" />
+          </div>
+          <SkeletonBlock class="mt-1 h-14 w-full" />
+        </div>
+        <div class="min-h-11" />
+      </template>
       <form class="flex flex-col gap-1" @submit.prevent="send">
         <div class="rounded-tile bg-surface-strong p-4">
           <label for="quick-submit-code" class="text-[13px] text-muted">{{

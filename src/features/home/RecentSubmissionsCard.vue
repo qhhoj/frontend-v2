@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { formatRelative } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
@@ -30,6 +31,23 @@ const now = useNow(60_000);
       >
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton>
+        <ul class="mt-3.5 flex flex-col gap-2">
+          <li
+            v-for="row in 4"
+            :key="row"
+            class="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-row bg-surface px-3.5 py-3"
+          >
+            <SkeletonBlock round class="size-10 shrink-0" />
+            <span class="min-w-32 flex-1">
+              <span class="block font-semibold"><SkeletonBlock text class="w-2/3" /></span>
+              <span class="block text-[13px]"><SkeletonBlock text class="w-1/3" /></span>
+            </span>
+            <span class="ml-auto font-mono text-[13px]"><SkeletonBlock text class="w-24" /></span>
+          </li>
+        </ul>
+      </template>
+
       <p v-if="!submissions?.length" class="py-6 text-muted">{{ $t('home.noSubmissions') }}</p>
       <ul v-else class="mt-3.5 flex flex-col gap-2">
         <li v-for="item in submissions" :key="item.id">

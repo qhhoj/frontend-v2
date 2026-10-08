@@ -106,6 +106,9 @@ describe('shared components', () => {
     expect(mountComponent(SkeletonBlock, { props: { round: true } }).classes()).toContain(
       'rounded-full',
     );
+    const pill = mountComponent(SkeletonBlock, { props: { pill: true } }).classes();
+    expect(pill).toContain('rounded-pill');
+    expect(pill).not.toContain('rounded-skeleton');
   });
 
   it('turns the skeleton, Bit sob and Bit tear animations off under reduced motion', () => {

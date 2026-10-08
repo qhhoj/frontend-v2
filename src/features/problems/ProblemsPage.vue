@@ -9,6 +9,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilters from './ProblemFilters.vue';
 import ProblemTable from './ProblemTable.vue';
+import ProblemTableSkeleton from './ProblemTableSkeleton.vue';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
 import { useProblemFilters } from './use-problem-filters';
 
@@ -60,6 +61,7 @@ const summary = computed(() => {
         :error="isFetchNextPageError ? null : error"
         @retry="refetch()"
       >
+        <template #skeleton><ProblemTableSkeleton /></template>
         <p v-if="!problems.length" class="py-10 text-center text-muted">
           {{ $t('problems.empty') }}
         </p>

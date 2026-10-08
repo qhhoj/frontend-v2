@@ -2,6 +2,7 @@
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRunningContestQuery } from './home.queries';
 
 const { data: contest, isPending, error, refetch } = useRunningContestQuery();
@@ -10,6 +11,15 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
 <template>
   <GlassCard data-testid="live-contest" class="border-line-accent! p-6">
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton>
+        <p class="text-[13px] font-semibold"><SkeletonBlock text class="w-28" /></p>
+        <h2 class="mt-2 font-display text-xl font-semibold">
+          <SkeletonBlock text class="w-3/4" />
+        </h2>
+        <p class="mt-1.5 text-[32px] font-semibold"><SkeletonBlock text class="w-2/3" /></p>
+        <SkeletonBlock class="mt-3.5 h-12 w-full" />
+      </template>
+
       <template v-if="contest">
         <p class="flex items-center gap-2 text-[13px] font-semibold text-accent-text">
           <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />

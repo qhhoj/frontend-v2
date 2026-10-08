@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
@@ -56,6 +57,7 @@ const rows = computed(() => {
 });
 /** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
 const PODIUM_LIMIT = 6;
+const RANKING_SKELETON_ROWS = 10;
 const podium = computed(() =>
   (ranking.value?.rows ?? [])
     .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
@@ -81,6 +83,17 @@ const VIEW_MODES = [
 <template>
   <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
     <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
+      <template #skeleton>
+        <SkeletonBlock pill class="h-[52px] w-72 max-w-full" />
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
+            <div class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
+              <SkeletonBlock text class="w-80 max-w-full" />
+            </div>
+          </div>
+        </div>
+      </template>
       <template v-if="contest">
         <nav
           :aria-label="$t('ranking.contestNav')"
@@ -180,6 +193,20 @@ const VIEW_MODES = [
       :error="ranking ? null : rankingError"
       @retry="refetchRanking()"
     >
+      <template #skeleton>
+        <div class="glass overflow-hidden rounded-card">
+          <div
+            v-for="row in RANKING_SKELETON_ROWS"
+            :key="row"
+            class="flex items-center gap-4 border-t border-line px-6 py-3.5 first:border-t-0"
+          >
+            <SkeletonBlock class="h-6 w-8" />
+            <SkeletonBlock round class="size-10 shrink-0" />
+            <SkeletonBlock class="h-5 flex-1" />
+            <SkeletonBlock class="hidden h-9 w-64 sm:block" />
+          </div>
+        </div>
+      </template>
       <p v-if="!ranking?.rows.length" class="glass rounded-card py-10 text-center text-muted">
         {{ $t('ranking.empty') }}
       </p>
