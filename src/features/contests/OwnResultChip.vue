@@ -39,6 +39,10 @@ const cellLabelCount = computed(() =>
   <span v-else-if="view.kind === 'attempted'" class="text-[13px] whitespace-nowrap text-muted">
     {{ $t('contests.problems.attempted', { count: view.attempts }, view.attempts) }}
   </span>
+  <span v-else-if="view.kind === 'hidden'" class="text-muted">
+    <span aria-hidden="true">—</span>
+    <span class="sr-only">{{ $t('contests.problems.resultHidden') }}</span>
+  </span>
   <span v-else class="text-muted">
     <span aria-hidden="true">—</span>
     <span class="sr-only">{{ $t('ranking.cell.empty') }}</span>

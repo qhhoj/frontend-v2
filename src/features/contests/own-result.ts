@@ -6,7 +6,9 @@ export type OwnResultView =
   | { kind: 'cell'; cell: RankingCellView }
   | { kind: 'pending' }
   | { kind: 'attempted'; attempts: number }
-  | { kind: 'untouched' };
+  | { kind: 'untouched' }
+  /** The board is hidden from the viewer, so their result is unknown (not "no submission"). */
+  | { kind: 'hidden' };
 
 /**
  * The ranking's view of the viewer's own result on a problem. No first-solve star: the detail does not
@@ -14,7 +16,7 @@ export type OwnResultView =
  */
 export function ownResultView(problem: ContestProblem, context: RankingContext): OwnResultView {
   const result = problem.viewerResult;
-  if (!result) return { kind: 'untouched' };
+  if (!result) return { kind: 'hidden' };
   if (result.cell) {
     const rankingProblem: RankingProblem = {
       ...problem,

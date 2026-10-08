@@ -57,7 +57,13 @@ describe('own result', () => {
     expect(ownResultView(contestProblem(0, { viewerResult: viewerResult() }), icpc)).toEqual({
       kind: 'untouched',
     });
-    expect(ownResultView(contestProblem(0), icpc)).toEqual({ kind: 'untouched' });
+  });
+
+  it('tells a hidden board apart from an untouched problem', () => {
+    expect(ownResultView(contestProblem(0), icpc)).toEqual({ kind: 'hidden' });
+    expect(ownResultView(contestProblem(0, { viewerResult: viewerResult() }), icpc)).toEqual({
+      kind: 'untouched',
+    });
   });
 
   it('knows the attempts left under a cap, never below zero', () => {
