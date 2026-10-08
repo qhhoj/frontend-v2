@@ -152,19 +152,12 @@ describe('change-password page', () => {
     expect(router.currentRoute.value.fullPath).toBe('/account/password');
   });
 
-  it('lets a forced viewer sign out from the top bar, and offers no sign-out to a voluntary one', async () => {
-    const forced = changeApi();
-    const first = await mountApp('/account/password');
-    await signOutButton(first.wrapper)!.trigger('click');
+  it('lets the viewer sign out from the top bar', async () => {
+    const calls = changeApi();
+    const { wrapper, router } = await mountApp('/account/password');
+    await signOutButton(wrapper)!.trigger('click');
     await flushPromises();
-    expect(forced.some((call) => call.path === '/auth/logout')).toBe(true);
-    await vi.waitFor(() => expect(first.router.currentRoute.value.name).toBe('login'));
-
-    changeApi({}, false);
-    const second = await mountApp('/account/password');
-    expect(second.wrapper.get('h1').text()).toBe('Đổi mật khẩu');
-    expect(second.wrapper.text()).toContain('Mọi thiết bị khác sẽ bị đăng xuất.');
-    expect(second.wrapper.find('#main [role="status"]').exists()).toBe(false);
-    expect(signOutButton(second.wrapper)).toBeUndefined();
+    expect(calls.some((call) => call.path === '/auth/logout')).toBe(true);
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
   });
 });

@@ -631,9 +631,7 @@
     "confirmPassword": "Repeat the password",
     "passwordMismatch": "The two passwords do not match",
     "changePassword": {
-      "title": "Change password",
       "titleForced": "Change your password to continue",
-      "lead": "Every other device is signed out.",
       "breached": "Your password appeared in a public data breach. To protect the account {username}, set a new password before you continue.",
       "currentPassword": "Current password",
       "confirmNew": "Repeat the new password",

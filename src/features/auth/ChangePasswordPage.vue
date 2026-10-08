@@ -1,6 +1,7 @@
 <script setup lang="ts">
+/** Only for a viewer whose password is in a breach list: the guard sends them here from every page until it is changed. The voluntary change lives in the security settings. */
 import { LogOut } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import InlineBit from '@/components/InlineBit.vue';
 import { safeRedirect } from '@/router/safe-redirect';
@@ -12,8 +13,6 @@ import ChangePasswordForm from './ChangePasswordForm.vue';
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
-/** The viewer's password is in a breach list: the guard sends them here from every page until it is changed. */
-const forced = computed(() => session.passwordChangeRequired);
 /** The server has the new password, but this tab has not reloaded the session yet: only "try again" is left. */
 const passwordChanged = ref(false);
 const sessionStale = ref(false);
@@ -34,12 +33,8 @@ async function signOut() {
 </script>
 
 <template>
-  <AuthLayout
-    :title="forced ? $t('auth.changePassword.titleForced') : $t('auth.changePassword.title')"
-    :lead="forced ? undefined : $t('auth.changePassword.lead')"
-    width="medium"
-  >
-    <template v-if="forced" #header-end>
+  <AuthLayout :title="$t('auth.changePassword.titleForced')" width="medium">
+    <template #header-end>
       <button
         type="button"
         class="flex h-11 items-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-4 font-semibold hover:bg-surface-hover"
@@ -48,7 +43,7 @@ async function signOut() {
         <LogOut aria-hidden="true" class="size-4" />{{ $t('account.logout') }}
       </button>
     </template>
-    <div v-if="forced && !passwordChanged" class="flex items-center gap-3">
+    <div v-if="!passwordChanged" class="flex items-center gap-3">
       <InlineBit kind="sweat" class="shrink-0" />
       <AuthNotice tone="warning" class="flex-1">
         <i18n-t keypath="auth.changePassword.breached" tag="span">

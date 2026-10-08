@@ -65,8 +65,13 @@ const secondFactorStepRule: Rule = (to, session) => {
     : { name: 'login', query: loginQuery(to.query.redirect) };
 };
 
+/** The password page serves only the forced change; anyone else changes it in the security settings. */
 const passwordChangeRule: Rule = (to, session) => {
-  if (!session.passwordChangeRequired || to.name === 'account-password') return null;
+  if (to.name === 'account-password')
+    return session.status === 'authenticated' && !session.passwordChangeRequired
+      ? { name: 'settings-security' }
+      : null;
+  if (!session.passwordChangeRequired) return null;
   return {
     name: 'account-password',
     query: isLinkCredential(to) ? {} : loginQuery(to.fullPath),

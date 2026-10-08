@@ -106,6 +106,11 @@ describe('navigation guards', () => {
     expect(route.query.redirect).toBe('/problems');
   });
 
+  it('sends a viewer with no forced change from the password page to the security settings', async () => {
+    const { route } = await navigate('/account/password', signedIn());
+    expect(route.name).toBe('settings-security');
+  });
+
   it('shows not-found to non-staff on admin routes and keeps the URL', async () => {
     const { route } = await navigate('/admin/judges', signedIn());
     expect(route.name).toBe('not-found');
