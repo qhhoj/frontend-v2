@@ -32,11 +32,15 @@ export function ownResultView(problem: ContestProblem, context: RankingContext):
     : { kind: 'untouched' };
 }
 
-/** Attempts left under the problem's cap, never below zero; null when the problem has no cap. */
+/** Attempts left under a cap, never below zero. */
+export const attemptsLeftUnderCap = (maxSubmissions: number, attempts: number): number =>
+  Math.max(0, maxSubmissions - attempts);
+
+/** Attempts left under the problem's cap; null when the problem has no cap. */
 export const attemptsLeft = (problem: ContestProblem): number | null =>
   problem.maxSubmissions === null
     ? null
-    : Math.max(0, problem.maxSubmissions - (problem.viewerResult?.attempts ?? 0));
+    : attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult?.attempts ?? 0);
 
 /** How many problems the viewer solved out of the contest's problems. */
 export const solvedSummary = (problems: ContestProblem[]) => ({

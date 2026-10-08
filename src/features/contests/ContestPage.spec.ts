@@ -335,6 +335,16 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     expect(rows[2]!.text()).toContain('Chưa nộp');
   });
 
+  it('shows the cell’s words under the chip, hidden from assistive technology so they are read once', async () => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(graded) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const row = wrapper.get('[data-testid="contest-problems"] tbody tr');
+    const caption = row
+      .findAll('[aria-hidden="true"]')
+      .find((element) => element.text() === 'Giải sau 0 lần sai, lúc 0:24');
+    expect(caption).toBeDefined();
+  });
+
   it('hides the solver column when the scoreboard is closed to the viewer', async () => {
     const closed = contestDetail({
       problems: [contestProblem(0, { solverCount: null, viewerResult: viewerResult() })],

@@ -10,7 +10,7 @@ import { showsCellTime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
-import { attemptsLeft, solvedSummary } from './own-result';
+import { attemptsLeftUnderCap, solvedSummary } from './own-result';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
@@ -46,11 +46,9 @@ const context = computed<RankingContext>(() => ({
 }));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
-const solverCountText = (problem: ContestProblem) =>
-  formatNumber(problem.solverCount ?? 0, locale.locale);
+const formatCount = (count: number) => formatNumber(count, locale.locale);
 /** The cap line, with the attempts the viewer has left once they have a result. */
-const leftText = (problem: ContestProblem) =>
-  t('contests.problems.left', { count: attemptsLeft(problem) ?? 0 });
+const leftText = (count: number) => t('contests.problems.left', { count }, count);
 </script>
 
 <template>
@@ -117,14 +115,19 @@ const leftText = (problem: ContestProblem) =>
                 {{ problem.code
                 }}<template v-if="problem.maxSubmissions">
                   · {{ capText(problem.maxSubmissions) }}</template
-                ><template v-if="problem.viewerResult && problem.maxSubmissions">
-                  · {{ leftText(problem) }}</template
+                ><template v-if="problem.viewerResult && problem.maxSubmissions !== null">
+                  ·
+                  {{
+                    leftText(
+                      attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult.attempts),
+                    )
+                  }}</template
                 >
               </span>
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
             <td v-if="hasSolverCounts" class="px-3 py-3 text-right font-mono tabular-nums">
-              {{ problem.solverCount === null ? '—' : solverCountText(problem) }}
+              {{ problem.solverCount === null ? '—' : formatCount(problem.solverCount) }}
             </td>
             <td v-if="hasOwnResults" class="px-3 py-3">
               <OwnResultChip :problem="problem" :context="context" />
@@ -170,7 +173,7 @@ const leftText = (problem: ContestProblem) =>
                 {{
                   $t(
                     'contests.problems.solvers',
-                    { count: solverCountText(problem) },
+                    { count: formatCount(problem.solverCount) },
                     problem.solverCount,
                   )
                 }}
