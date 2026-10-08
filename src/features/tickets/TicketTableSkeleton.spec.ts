@@ -22,6 +22,19 @@ describe('ticket table skeleton parity', () => {
       firstRowCells(table).map(sortedClasses),
     );
   });
+  it('reserves the same title line and meta row in the title cell: 24 px title, 54 px meta on a phone, 22 px from md', () => {
+    const TITLE_LINE = 'block leading-6';
+    const META_ROW = 'mt-1.5 flex min-h-[54px] flex-wrap items-center gap-2 md:min-h-[22px]';
+    const table = mountComponent(TicketTable, { props: { tickets: [ticketItem()] } });
+    const skeleton = mountComponent(TicketTableSkeleton);
+    const loadedTitle = firstRowCells(table)[0]!;
+    expect(loadedTitle.get('a').classes()).toContain('block');
+    expect(loadedTitle.get('a').classes()).toContain('leading-6');
+    expect(loadedTitle.get('div').attributes('class')).toBe(META_ROW);
+    const skeletonTitle = firstRowCells(skeleton)[0]!;
+    expect(skeletonTitle.findAll('div')[0]!.attributes('class')).toBe(TITLE_LINE);
+    expect(skeletonTitle.findAll('div')[1]!.attributes('class')).toBe(META_ROW);
+  });
   it('hides the status, assignee and message columns below md, and keeps the title and update padding', () => {
     const skeleton = mountComponent(TicketTableSkeleton);
     expect(headerCells(skeleton).map(sortedClasses)).toEqual([

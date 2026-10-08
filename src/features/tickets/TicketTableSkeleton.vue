@@ -25,10 +25,11 @@ const COLUMN_KEYS = ['title', 'status', 'assignees', 'messages', 'updated'] as c
       <tbody>
         <tr v-for="row in ROW_COUNT" :key="row" class="border-t border-line">
           <td :class="TICKET_COLUMNS.title.cell">
-            <SkeletonBlock text class="w-56" />
-            <div class="mt-1.5 flex flex-wrap items-center gap-2">
-              <SkeletonBlock text class="w-24" />
-              <SkeletonBlock text class="w-16 md:hidden" />
+            <div class="block leading-6"><SkeletonBlock text class="w-56" /></div>
+            <div class="mt-1.5 flex min-h-[54px] flex-wrap items-center gap-2 md:min-h-[22px]">
+              <SkeletonBlock pill class="h-[22px] w-20" />
+              <SkeletonBlock text class="w-16" />
+              <SkeletonBlock pill class="h-6 w-24 md:hidden" />
             </div>
           </td>
           <td :class="TICKET_COLUMNS.status.cell"><SkeletonBlock text class="w-20" /></td>

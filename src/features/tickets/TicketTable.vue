@@ -47,11 +47,11 @@ const now = useNow(60_000);
           <td :class="TICKET_COLUMNS.title.cell">
             <RouterLink
               :to="{ name: 'ticket', params: { id: ticket.id } }"
-              class="font-semibold text-content hover:underline"
+              class="block leading-6 font-semibold text-content hover:underline"
             >
               {{ ticket.title }}
             </RouterLink>
-            <div class="mt-1.5 flex flex-wrap items-center gap-2">
+            <div class="mt-1.5 flex min-h-[54px] flex-wrap items-center gap-2 md:min-h-[22px]">
               <TicketLinkChip :link="ticket.link" />
               <span class="font-mono text-xs text-muted">{{ shortTicketId(ticket.id) }}</span>
               <span class="md:hidden">
