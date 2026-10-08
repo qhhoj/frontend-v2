@@ -310,6 +310,13 @@ describe.each(themes)('theme $id', ({ id, css, tokens, presets }) => {
     });
     expect(failures).toEqual([]);
   });
+
+  it('keeps the impersonation banner text at 4.5:1 on its fill and the QR code at 7:1', () => {
+    expect(
+      contrastRatio(colour('on-caution-strong'), colour('caution-strong')),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(colour('qr-ink'), colour('qr-paper'))).toBeGreaterThanOrEqual(7);
+  });
 });
 
 describe.each(variants)('theme $theme with accent $accent', ({ theme, accent, tokens }) => {

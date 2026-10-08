@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
+import SettingsLayout from '@/features/account/settings/SettingsLayout.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
@@ -37,12 +38,9 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
 </script>
 
 <template>
-  <section class="mx-auto flex max-w-[1160px] flex-col gap-5 px-4 py-8 sm:px-8">
+  <SettingsLayout>
     <div class="flex items-center justify-between gap-4">
-      <div>
-        <p class="text-sm text-muted">{{ $t('appearance.breadcrumb') }}</p>
-        <h1 class="mt-1.5 font-display text-4xl font-bold">{{ $t('appearance.title') }}</h1>
-      </div>
+      <h2 class="font-display text-3xl font-bold">{{ $t('appearance.title') }}</h2>
       <BitMascot
         data-testid="appearance-bit"
         :look="PLACEMENT_LOOKS.hero"
@@ -135,5 +133,5 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         <p role="status" class="text-[13px] text-muted">{{ $t(saveNoteKey) }}</p>
       </section>
     </div>
-  </section>
+  </SettingsLayout>
 </template>

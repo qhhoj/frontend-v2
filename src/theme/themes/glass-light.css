@@ -26,6 +26,10 @@
   --qh-glow: 0 0 10px #a21caf;
   --qh-positive: #166534;
   --qh-negative: #991b1b;
+  --qh-caution-strong: #6b4200;
+  --qh-on-caution-strong: #ffffff;
+  --qh-qr-ink: #141413;
+  --qh-qr-paper: #ffffff;
   --qh-verdict-ac: #166534;
   --qh-verdict-ac-bg: rgba(22, 163, 74, 0.12);
   --qh-verdict-wa: #991b1b;

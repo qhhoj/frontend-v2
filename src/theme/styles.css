@@ -47,6 +47,10 @@
   --color-focus: var(--qh-focus-ring);
   --color-positive: var(--qh-positive);
   --color-negative: var(--qh-negative);
+  --color-caution-strong: var(--qh-caution-strong);
+  --color-on-caution-strong: var(--qh-on-caution-strong);
+  --color-qr-ink: var(--qh-qr-ink);
+  --color-qr-paper: var(--qh-qr-paper);
   --color-verdict-ac: var(--qh-verdict-ac);
   --color-verdict-ac-bg: var(--qh-verdict-ac-bg);
   --color-verdict-wa: var(--qh-verdict-wa);

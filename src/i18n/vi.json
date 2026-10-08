@@ -34,6 +34,9 @@
     "changePassword": "Đổi mật khẩu",
     "appearance": "Giao diện",
     "settings": "Cài đặt",
+    "settingsProfile": "Cài đặt hồ sơ",
+    "settingsSecurity": "Cài đặt bảo mật",
+    "settingsData": "Dữ liệu cá nhân",
     "admin": "Quản trị",
     "notFound": "Không tìm thấy trang",
     "contestAnnouncements": "Thông báo kỳ thi",
@@ -286,9 +289,17 @@
     "settings": "Cài đặt",
     "admin": "Quản trị"
   },
+  "settings": {
+    "sections": "Các mục cài đặt",
+    "nav": {
+      "profile": "Hồ sơ",
+      "appearance": "Giao diện",
+      "security": "Bảo mật",
+      "data": "Dữ liệu"
+    }
+  },
   "appearance": {
     "title": "Giao diện",
-    "breadcrumb": "Cài đặt › Giao diện",
     "customLook": "Dùng giao diện riêng",
     "customLookHelp": "Tắt: bạn thấy giao diện của trang. Bật: dùng các lựa chọn bên dưới.",
     "styleAndMode": "Kiểu và chế độ",

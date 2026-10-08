@@ -3,6 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { profile, signedIn, signedOut } from '@/test/fixtures';
 import { stubMatchMedia } from '@/test/match-media';
+import { settingsRoutes } from '@/test/account-routes';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -223,6 +224,20 @@ describe('Settings › Appearance', () => {
     const bit = wrapper.get('[data-testid="appearance-bit"]');
     expect(bit.attributes('aria-hidden')).toBe('true');
     expect(bit.attributes('role')).toBeUndefined();
+  });
+
+  it('sits in the settings frame: the frame owns the h1 and the one breadcrumb, the page heading is an h2 beside Bit', async () => {
+    mockApi(settingsRoutes());
+    const { wrapper } = await mountApp('/settings/appearance');
+    expect(wrapper.findAll('#main h1').map((heading) => heading.text())).toEqual(['Cài đặt']);
+    const headings = wrapper.findAll('#main h1, #main h2').map((heading) => heading.text());
+    expect(headings.slice(0, 2)).toEqual(['Cài đặt', 'Giao diện']);
+    expect(wrapper.findAll('#main nav[aria-label="Đường dẫn"]')).toHaveLength(1);
+    expect(wrapper.text()).not.toContain('Cài đặt › Giao diện');
+    expect(wrapper.find('[data-testid="appearance-bit"]').exists()).toBe(true);
+    expect(
+      wrapper.get('#main nav[aria-label="Các mục cài đặt"] [aria-current="page"]').text(),
+    ).toBe('Giao diện');
   });
 
   it('turning the look off again returns to the site look and saves that', async () => {

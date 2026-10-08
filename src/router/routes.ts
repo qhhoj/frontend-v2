@@ -241,16 +241,28 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.changePassword', requiresAuth: true, layout: 'auth' },
   },
   {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('@/features/account/profile/ProfileSettingsPage.vue'),
+    meta: { titleKey: 'pages.settingsProfile', requiresAuth: true },
+  },
+  {
+    path: '/settings/security',
+    name: 'settings-security',
+    component: () => import('@/features/account/security/SecuritySettingsPage.vue'),
+    meta: { titleKey: 'pages.settingsSecurity', requiresAuth: true },
+  },
+  {
+    path: '/settings/data',
+    name: 'settings-data',
+    component: () => import('@/features/account/data/DataSettingsPage.vue'),
+    meta: { titleKey: 'pages.settingsData', requiresAuth: true },
+  },
+  {
     path: '/settings/appearance',
     name: 'settings-appearance',
     component: () => import('@/features/appearance/AppearancePage.vue'),
     meta: { titleKey: 'pages.appearance' },
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.settings', requiresAuth: true },
   },
   {
     path: '/admin/:pathMatch(.*)*',

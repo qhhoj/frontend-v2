@@ -34,6 +34,9 @@
     "changePassword": "Change password",
     "appearance": "Appearance",
     "settings": "Settings",
+    "settingsProfile": "Profile settings",
+    "settingsSecurity": "Security settings",
+    "settingsData": "Personal data",
     "admin": "Administration",
     "notFound": "Page not found",
     "contestAnnouncements": "Contest announcements",
@@ -286,9 +289,17 @@
     "settings": "Settings",
     "admin": "Administration"
   },
+  "settings": {
+    "sections": "Settings sections",
+    "nav": {
+      "profile": "Profile",
+      "appearance": "Appearance",
+      "security": "Security",
+      "data": "Data"
+    }
+  },
   "appearance": {
     "title": "Appearance",
-    "breadcrumb": "Settings › Appearance",
     "customLook": "Use my own look",
     "customLookHelp": "Off: you see the site's own look. On: your choices below.",
     "styleAndMode": "Style and mode",
