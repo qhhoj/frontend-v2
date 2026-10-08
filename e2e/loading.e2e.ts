@@ -347,6 +347,17 @@ const SHIFT_CASES: ShiftCase[] = [
     viewports: PHONE_AND_DESKTOP,
   },
   {
+    // The rank-up Bit's reserved box is the same 32 px square as the loaded Bit (the rating row itself wraps on a phone, so only the box is compared).
+    name: 'rating-up Bit',
+    path: '/',
+    signedIn: true,
+    hold: 'GET /users/user_01',
+    parts: (page) => ({
+      'rank-up Bit': page.locator('[data-skeleton-region="rank-up"], [data-testid="rank-up-bit"]'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+  },
+  {
     name: 'recent submissions card',
     path: '/',
     signedIn: true,

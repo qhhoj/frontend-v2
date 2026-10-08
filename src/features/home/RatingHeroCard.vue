@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { TrendingDown, TrendingUp } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
+import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
-import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -69,6 +69,8 @@ const tiles = computed(() =>
             </p>
             <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
               <SkeletonBlock class="h-15 w-44" />
+              <!-- The rank-up Bit's box (32 px, `--bit-px:2px`), so a rise does not move the row when it arrives. -->
+              <SkeletonBlock data-skeleton-region="rank-up" round class="mb-3 size-8 shrink-0" />
             </div>
             <p data-skeleton-region="tier" class="text-muted">
               <SkeletonBlock text class="w-32" />
@@ -100,27 +102,30 @@ const tiles = computed(() =>
               <span class="font-mono text-6xl font-semibold tracking-tight tabular-nums">{{
                 user.rating ?? '—'
               }}</span>
-              <span
-                v-if="delta !== null"
-                class="mb-3 inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
-                :class="
-                  delta >= 0
-                    ? 'bg-verdict-ac-bg text-verdict-ac'
-                    : 'bg-verdict-wa-bg text-verdict-wa'
-                "
-              >
-                <component
-                  :is="delta >= 0 ? TrendingUp : TrendingDown"
-                  class="size-4"
-                  aria-hidden="true"
+              <!-- The delta pill and the rank-up Bit wrap as one group, so the Bit always sits beside its delta. -->
+              <span v-if="delta !== null" class="mb-3 flex flex-nowrap items-center gap-2">
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
+                  :class="
+                    delta >= 0
+                      ? 'bg-verdict-ac-bg text-verdict-ac'
+                      : 'bg-verdict-wa-bg text-verdict-wa'
+                  "
+                >
+                  <component
+                    :is="delta >= 0 ? TrendingUp : TrendingDown"
+                    class="size-4"
+                    aria-hidden="true"
+                  />
+                  {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
+                </span>
+                <BitLoop
+                  v-if="delta > 0"
+                  data-testid="rank-up-bit"
+                  kind="rankUp"
+                  class="[--bit-px:2px]"
                 />
-                {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
               </span>
-              <InlineBit
-                v-if="delta !== null && delta > 0"
-                data-testid="rank-up-bit"
-                kind="rankUp"
-              />
             </div>
             <p class="text-muted">
               {{ $t('home.ratingTier', { tier: $t(tier ? `tiers.${tier}` : 'tiers.unrated') }) }}

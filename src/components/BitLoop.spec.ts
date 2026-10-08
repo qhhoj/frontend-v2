@@ -1,5 +1,6 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BIT_LOOPS } from '@/mascot/bit-frames';
 import type { BitKind } from '@/mascot/bit-frames';
@@ -22,8 +23,33 @@ const colourAt = (wrapper: ReturnType<typeof mount>, row: number, column: number
         Number(cell.element.style.gridColumn) === column + 1,
     )?.element.style.backgroundColor;
 const frameOf = (wrapper: ReturnType<typeof mount>) => wrapper.attributes('data-frame');
-const mountLoop = (kind: BitKind, label?: string) =>
-  mount(BitLoop, { props: { kind, label }, attachTo: document.body });
+/** Every wrapper a test mounts, unmounted after it so the shared observer and the timers are released. */
+const mounted: VueWrapper[] = [];
+const mountLoop = (kind: BitKind, label?: string) => {
+  const wrapper = mount(BitLoop, { props: { kind, label }, attachTo: document.body });
+  mounted.push(wrapper);
+  return wrapper;
+};
+type ObserverReport = (entries: { target: Element; isIntersecting: boolean }[]) => void;
+/** Replaces IntersectionObserver with one that counts its instances and lets a test report visibility. */
+const stubObserver = () => {
+  const observers: { report: ObserverReport; observed: Element[]; disconnect: () => void }[] = [];
+  vi.stubGlobal(
+    'IntersectionObserver',
+    class {
+      observed: Element[] = [];
+      disconnect = vi.fn();
+      constructor(callback: ObserverReport) {
+        observers.push({ report: callback, observed: this.observed, disconnect: this.disconnect });
+      }
+      observe(element: Element) {
+        this.observed.push(element);
+      }
+      unobserve() {}
+    },
+  );
+  return observers;
+};
 
 describe('BitLoop', () => {
   beforeEach(() => {
@@ -31,6 +57,13 @@ describe('BitLoop', () => {
     stubMatchMedia({ reducedMotion: false });
   });
   afterEach(() => {
+    for (const wrapper of mounted.splice(0)) {
+      try {
+        wrapper.unmount();
+      } catch {
+        // Already unmounted by the test.
+      }
+    }
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
@@ -76,31 +109,60 @@ describe('BitLoop', () => {
   });
 
   it('stops while off screen and resumes when back on screen', async () => {
-    let report: ((entries: { isIntersecting: boolean }[]) => void) | undefined;
-    const disconnect = vi.fn();
-    vi.stubGlobal(
-      'IntersectionObserver',
-      class {
-        constructor(callback: typeof report) {
-          report = callback;
-        }
-        observe() {}
-        disconnect = disconnect;
-      },
-    );
+    const observers = stubObserver();
     const bit = mountLoop('rankUp');
+    const observer = observers[0];
     expect(vi.getTimerCount()).toBe(1);
-    report!([{ isIntersecting: false }]);
+    observer!.report([{ target: bit.element, isIntersecting: false }]);
     await nextTick();
     expect(vi.getTimerCount()).toBe(0);
     await vi.advanceTimersByTimeAsync(10_000);
     expect(frameOf(bit)).toBe('0');
-    report!([{ isIntersecting: true }]);
+    observer!.report([{ target: bit.element, isIntersecting: true }]);
     await nextTick();
     expect(vi.getTimerCount()).toBe(1);
     bit.unmount();
-    expect(disconnect).toHaveBeenCalled();
+    expect(observer!.disconnect).toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('shares one IntersectionObserver between every Bit on the page', () => {
+    const observers = stubObserver();
+    const first = mountLoop('judging');
+    const second = mountLoop('contest');
+    expect(observers).toHaveLength(1);
+    expect(observers[0]!.observed).toEqual([first.element, second.element]);
+    first.unmount();
+    expect(observers[0]!.disconnect).not.toHaveBeenCalled();
+    second.unmount();
+    expect(observers[0]!.disconnect).toHaveBeenCalled();
+  });
+
+  it('pauses while the tab is hidden and resumes when it is shown again', async () => {
+    let visibility: DocumentVisibilityState = 'visible';
+    vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => visibility);
+    const bit = mountLoop('welcome');
+    expect(vi.getTimerCount()).toBe(1);
+    visibility = 'hidden';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await nextTick();
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(frameOf(bit)).toBe('0');
+    visibility = 'visible';
+    document.dispatchEvent(new Event('visibilitychange'));
+    await nextTick();
+    expect(vi.getTimerCount()).toBe(1);
+    vi.restoreAllMocks();
+  });
+
+  it('starts again at frame 0 when its kind changes', async () => {
+    const bit = mountLoop('judging');
+    await vi.advanceTimersByTimeAsync(BIT_LOOPS.judging.frameMs[0]!);
+    expect(frameOf(bit)).toBe('1');
+    await bit.setProps({ kind: 'staff' });
+    expect(frameOf(bit)).toBe('0');
+    expect(vi.getTimerCount()).toBe(1);
   });
 
   it('is decorative without a label and an image with one', () => {
