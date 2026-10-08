@@ -1,10 +1,9 @@
-import { useQueryClient } from '@tanstack/vue-query';
 import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { createFrameSummary, createSettler, useFeedStream } from './live-feed';
 import { useAnnouncer, useListFilterKey, useNewRowBaseline } from './live-list-state';
-import { FIRST_PAGE, createListPasses } from './live-passes';
+import { createListPasses } from './live-passes';
 import type { SubmissionFilters } from './use-submission-filters';
 
 /** Frames of a burst are read together: the first one starts the window, the pass runs when it ends. */
@@ -29,10 +28,9 @@ interface LiveSubmissionListOptions {
  */
 export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
   const { filters, rows } = options;
-  const queryClient = useQueryClient();
   const announcer = useAnnouncer();
   const baseline = useNewRowBaseline(filters, options.total);
-  const newCount = ref(0);
+  const { newCount } = baseline;
   const addedIds = ref<ReadonlySet<string>>(new Set());
   const shownIds = () => new Set(rows.value.map((row) => row.id));
   const frames = createFrameSummary((id) => shownIds().has(id));
@@ -47,28 +45,12 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
     currentGeneration: () => generation,
   });
 
-  async function runPass() {
-    const settled = frames.take();
-    if (settled.finishedShownRow)
-      void queryClient.invalidateQueries({ queryKey: ['submissions', 'stats'] });
-    try {
-      if (filters.value.page === FIRST_PAGE) await passes.applyFirstPage();
-      else await passes.applyLaterPage(settled);
-    } catch {
-      // A failed read leaves the list as it is; the next frame tries again.
-    }
-  }
-  const settler = createSettler(LIVE_SETTLE_MS, runPass);
+  const settler = createSettler(LIVE_SETTLE_MS, () => passes.run(frames.take()));
   const forgetPendingWork = () => {
     generation += 1;
     frames.clear();
     settler.cancel();
   };
-  const forgetCountedRows = () => {
-    newCount.value = 0;
-    baseline.reset();
-  };
-
   const feed = useFeedStream({
     enabled: options.enabled,
     onFrame: (frame) => frames.add(frame) && settler.poke(),
@@ -77,7 +59,7 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
   /** A new filter is a new list: what was counted for the old one means nothing. */
   watch(useListFilterKey(filters), () => {
     forgetPendingWork();
-    forgetCountedRows();
+    baseline.reset();
   });
 
   return {
@@ -86,7 +68,7 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
     addedIds,
     paused: feed.paused,
     showNew() {
-      forgetCountedRows();
+      baseline.reset();
       options.goToFirstPage();
     },
     reconnect() {

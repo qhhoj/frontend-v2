@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/vue-query';
 import type { Ref } from 'vue';
 import { fetchSubmissions } from '@/api/submissions.api';
 import type { SubmissionListItem } from '@/api/types/submissions';
@@ -25,6 +26,7 @@ export interface PassContext {
 /** The two things a settled window can do to the list: take new rows in (page 1) or count them (later pages). */
 export function createListPasses(context: PassContext) {
   const { filters, newCount, currentGeneration } = context;
+  const queryClient = useQueryClient();
 
   async function applyFirstPage() {
     const before = context.shownIds();
@@ -53,5 +55,17 @@ export function createListPasses(context: PassContext) {
     newCount.value = count;
   }
 
-  return { applyFirstPage, applyLaterPage };
+  /** One pass over what a settle window collected. */
+  async function run(settled: FrameSummary) {
+    if (settled.finishedShownRow)
+      void queryClient.invalidateQueries({ queryKey: ['submissions', 'stats'] });
+    try {
+      if (filters.value.page === FIRST_PAGE) await applyFirstPage();
+      else await applyLaterPage(settled);
+    } catch {
+      // A failed read leaves the list as it is; the next frame tries again.
+    }
+  }
+
+  return { run };
 }

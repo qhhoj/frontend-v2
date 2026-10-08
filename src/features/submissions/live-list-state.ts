@@ -1,8 +1,7 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+import { FIRST_PAGE } from './live-passes';
 import type { SubmissionFilters } from './use-submission-filters';
-
-const FIRST_PAGE = 1;
 
 /** Changes when the list itself is another one (page and Live updates do not count). */
 export const useListFilterKey = (filters: Ref<SubmissionFilters>) =>
@@ -27,10 +26,13 @@ export function useAnnouncer() {
 
 /** What the viewed list held at its top when it was last seen whole; the pill counts growth from there. */
 export function useNewRowBaseline(filters: Ref<SubmissionFilters>, total: Ref<number | undefined>) {
+  /** Rows that arrived above the viewed page: the pill's number. */
+  const newCount = ref(0);
   let baselineTotal: number | undefined;
   /** Without a total the pill can only count `queued` frames. */
   let queuedSinceBaseline = 0;
   const reset = () => {
+    newCount.value = 0;
     baselineTotal = undefined;
     queuedSinceBaseline = 0;
   };
@@ -41,6 +43,7 @@ export function useNewRowBaseline(filters: Ref<SubmissionFilters>, total: Ref<nu
     if (page === FIRST_PAGE || baselineTotal === undefined) baselineTotal = knownTotal;
   });
   return {
+    newCount,
     reset,
     /** Rows that arrived above the viewed page, given the first page's current total (when the API sends one). */
     rowsAbove(firstPageTotal: number | undefined, queuedFrames: number): number {
