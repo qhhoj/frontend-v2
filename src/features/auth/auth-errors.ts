@@ -40,7 +40,7 @@ function knownIssueText({ field, code }: FieldIssue): string | null {
 }
 
 /** By code (B10); a code without text shows the backend's English message. */
-export const issueText = (issue: FieldIssue): string => knownIssueText(issue) ?? issue.message;
+const issueText = (issue: FieldIssue): string => knownIssueText(issue) ?? issue.message;
 
 /** Known issues on fields the form does not render: the one line that can still explain them. */
 export const hiddenIssueTexts = (error: unknown, visibleFields: readonly string[]): string[] =>
