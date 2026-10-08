@@ -1,14 +1,13 @@
 import { useQueryClient } from '@tanstack/vue-query';
-import { computed, onScopeDispose, ref, watch } from 'vue';
+import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import type { Page } from '@/api/client';
 import { openEventStream } from '@/api/events';
 import type { EventHandlers, EventStream } from '@/api/events';
 import type { Announcement } from '@/api/types/contests';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
-
-const FIRST_PAGE = 1;
 
 const announcementIdOf = (data: unknown) =>
   typeof data === 'object' &&
@@ -17,6 +16,11 @@ const announcementIdOf = (data: unknown) =>
   typeof data.announcementId === 'string'
     ? data.announcementId
     : null;
+
+/** Contest keys whose stream gave up; the rail stops claiming a live contest for them. */
+const pausedByContest = reactive(new Map<string, boolean>());
+export const isAnnouncementStreamPaused = (key: string): boolean =>
+  pausedByContest.get(key) === true;
 
 /** One stream at a time: reopened when `path` or `enabled` changes, closed when disabled or on scope end. */
 function useKeyedStream(path: Ref<string>, enabled: Ref<boolean>, handlers: EventHandlers) {
@@ -50,13 +54,23 @@ export function useAnnouncementFeed(key: Ref<string>, isStreaming: Ref<boolean>)
   const queryClient = useQueryClient();
   const viewerId = useViewerId();
   const message = ref('');
+  /** Ids already announced on this page: a repeated frame for one announcement says nothing new. */
+  const announcedIds = new Set<string>();
   const listKey = () => ['contests', 'announcements', viewerId.value, key.value];
   const refresh = () => queryClient.invalidateQueries({ queryKey: listKey() });
   async function onAnnouncement(data: unknown) {
     const id = announcementIdOf(data);
     if (!id) return;
+    const isRepeat = announcedIds.has(id);
+    announcedIds.add(id);
+    // Emptied first, so a second announcement with the same title changes the text and is read again.
+    if (!isRepeat) message.value = '';
     await refresh();
-    const first = queryClient.getQueryData<Page<Announcement>>([...listKey(), FIRST_PAGE]);
+    if (isRepeat) return;
+    const first = queryClient.getQueryData<Page<Announcement>>([
+      ...listKey(),
+      ANNOUNCEMENT_FIRST_PAGE,
+    ]);
     const item = first?.items.find((announcement) => announcement.id === id);
     if (item) message.value = translate('contests.announcements.arrived', { title: item.title });
   }
@@ -65,6 +79,10 @@ export function useAnnouncementFeed(key: Ref<string>, isStreaming: Ref<boolean>)
     announcement: (data) => void onAnnouncement(data),
     resync: () => void refresh(),
   });
+  watch([key, paused], ([contestKey, isPaused]) => pausedByContest.set(contestKey, isPaused), {
+    immediate: true,
+  });
+  onScopeDispose(() => pausedByContest.delete(key.value));
   return {
     message,
     paused,

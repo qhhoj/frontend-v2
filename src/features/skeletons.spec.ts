@@ -21,6 +21,15 @@ const expectInert = (root: Element, label: string) => {
     label,
   ).toHaveLength(0);
 };
+/** Holds only the announcement list, so its skeletons stay on screen. */
+function holdAnnouncements() {
+  const answer = globalThis.fetch;
+  vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+    String(input).includes('/announcements')
+      ? new Promise<Response>(() => {})
+      : answer(input, init),
+  );
+}
 const blocksIn = (root: ParentNode) => root.querySelectorAll('[data-skeleton]').length;
 
 describe('loading screens show blocks shaped like their content', () => {
@@ -186,5 +195,25 @@ describe('the submission list page loads its stats strip and table as independen
     const { wrapper } = await mountApp('/submissions');
     await vi.waitFor(() => expect(wrapper.find('tbody tr[data-id="sub-1"]').exists()).toBe(true));
     expect(regionsIn(wrapper.get('[data-testid="stats-strip"]').element, 'tile')).toBe(4);
+  });
+
+  it('the announcements page and the contest rail show inert rows while the list loads', async () => {
+    mockApi({ 'GET /auth/me': signedOut, ...contestPageRoutes() });
+    holdAnnouncements();
+    const { wrapper } = await mountApp('/contests/r42/announcements');
+    const rows = wrapper.findAll('[data-skeleton-region="announcement"]');
+    expect(rows).toHaveLength(3);
+    for (const row of rows) expectInert(row.element, 'announcement skeleton');
+    expect(wrapper.get('main').text()).not.toContain('Chưa có thông báo');
+  });
+
+  it('the contest rail shows one inert skeleton, not the empty text, while the list loads', async () => {
+    mockApi({ 'GET /auth/me': signedOut, ...contestPageRoutes() });
+    holdAnnouncements();
+    const { wrapper } = await mountApp('/contests/r42');
+    const rail = wrapper.get('[data-skeleton-region="announcement-rail"]');
+    expect(regionsIn(wrapper.element, 'announcement-rail')).toBe(1);
+    expectInert(rail.element, 'rail skeleton');
+    expect(wrapper.get('aside').text()).not.toContain('Chưa có thông báo.');
   });
 });

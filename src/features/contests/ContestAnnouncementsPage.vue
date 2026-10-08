@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
-import { ANNOUNCEMENT_PAGE_SIZE } from '@/api/contests.api';
+import { ANNOUNCEMENT_FIRST_PAGE, ANNOUNCEMENT_PAGE_SIZE } from '@/api/contests.api';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -25,18 +25,25 @@ const route = useRoute();
 const router = useRouter();
 const key = computed(() => String(route.params.key));
 const page = computed(() => Math.max(1, Number(route.query.page) || 1));
-const FIRST_PAGE = 1;
 const { data: contest, error: contestError } = useContestQuery(key);
 const { data: list, isPending, error, refetch } = useContestAnnouncementsQuery(key, page);
 usePageTitle(() => contest.value?.name);
-loadSeenAnnouncement(key.value);
-/** "Mới" marks what was new when the tab opened; the badge clears at once. */
-const seenAtOpen = seenAnnouncementId(key.value);
+/** "Mới" marks what was new when the tab opened (per contest; the badge clears at once). */
+const seenAtOpen = ref('');
+watch(
+  key,
+  (contestKey) => {
+    loadSeenAnnouncement(contestKey);
+    seenAtOpen.value = seenAnnouncementId(contestKey);
+  },
+  { immediate: true },
+);
 watch(
   list,
   (value) => {
     const newest = value?.items[0];
-    if (newest && page.value === FIRST_PAGE) markAnnouncementsSeen(key.value, newest.id);
+    if (newest && page.value === ANNOUNCEMENT_FIRST_PAGE)
+      markAnnouncementsSeen(key.value, newest.id);
   },
   { immediate: true },
 );
@@ -44,7 +51,9 @@ const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
 const goTo = (next: number) =>
-  void router.replace({ query: { page: next > FIRST_PAGE ? String(next) : undefined } });
+  void router.replace({
+    query: { page: next > ANNOUNCEMENT_FIRST_PAGE ? String(next) : undefined },
+  });
 </script>
 
 <template>

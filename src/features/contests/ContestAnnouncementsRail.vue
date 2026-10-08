@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import type { ContestDetail } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
@@ -7,14 +8,21 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AnnouncementItem from './AnnouncementItem.vue';
 import { isUnread, loadSeenAnnouncement, seenAnnouncementId } from './announcement-seen';
 import { useContestAnnouncementsQuery } from './contests.queries';
+import { isAnnouncementStreamPaused } from './use-announcement-feed';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const key = computed(() => props.contest.key);
 watch(key, loadSeenAnnouncement, { immediate: true });
-const FIRST_PAGE = 1;
 const RAIL_SIZE = 3;
-const { data, isPending, isSuccess } = useContestAnnouncementsQuery(key, ref(FIRST_PAGE));
+const { data, isPending, isSuccess } = useContestAnnouncementsQuery(
+  key,
+  ref(ANNOUNCEMENT_FIRST_PAGE),
+);
 const latest = computed(() => (data.value?.items ?? []).slice(0, RAIL_SIZE));
+/** "Trực tiếp" claims a live stream: not while the stream is down. */
+const isLive = computed(
+  () => props.contest.phase === 'running' && !isAnnouncementStreamPaused(key.value),
+);
 </script>
 
 <template>
@@ -22,7 +30,7 @@ const latest = computed(() => (data.value?.items ?? []).slice(0, RAIL_SIZE));
     <div class="mb-1 flex items-center justify-between gap-3">
       <h2 class="font-display text-lg font-semibold">{{ $t('contests.tabs.announcements') }}</h2>
       <span
-        v-if="contest.phase === 'running'"
+        v-if="isLive"
         class="rounded-pill bg-verdict-ac-bg px-2.5 text-[12px] font-semibold text-verdict-ac"
         >{{ $t('contests.announcements.live') }}</span
       >

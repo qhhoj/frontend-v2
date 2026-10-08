@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { announcement } from '@/test/fixtures';
 import {
   isUnread,
@@ -29,5 +29,21 @@ describe('announcement read state', () => {
   it('survives a reload through storage', () => {
     markAnnouncementsSeen('r40', announcement(4).id);
     expect(localStorage.getItem('qhhoj.contest-announcements-seen.r40')).toBe(announcement(4).id);
+  });
+
+  it('keeps a mark that storage refused for the rest of the session', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota exceeded');
+    });
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+    try {
+      markAnnouncementsSeen('r43', announcement(7).id);
+      loadSeenAnnouncement('r43');
+      expect(seenAnnouncementId('r43')).toBe(announcement(7).id);
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

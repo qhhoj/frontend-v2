@@ -1,9 +1,10 @@
 import { flushPromises } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { announcement, contestDetail } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { FakeEventSource, latestEventSource } from '@/test/fake-event-source';
-import { mockApi, page, sequence } from '@/test/mock-api';
+import { mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
 
@@ -108,5 +109,84 @@ describe('contest announcements', () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail({ phase: 'ended' })) });
     await mountApp('/contests/r42');
     expect(FakeEventSource.instances).toHaveLength(0);
+  });
+
+  it('reads a second announcement with the same title again', async () => {
+    const first = announcement(1, { title: 'Đính chính' });
+    const second = announcement(2, { title: 'Đính chính' });
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(),
+      'GET /contests/r42/announcements': sequence(page([]), page([first]), page([second, first])),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    const liveText = () => wrapper.get('[data-testid="announcement-live"]').text();
+    latestEventSource().emit('announcement', { contestId: 'c', announcementId: first.id });
+    await flushPromises();
+    expect(liveText()).toBe('Thông báo mới: Đính chính');
+    latestEventSource().emit('announcement', { contestId: 'c', announcementId: second.id });
+    await nextTick();
+    expect(liveText()).toBe('');
+    await flushPromises();
+    expect(liveText()).toBe('Thông báo mới: Đính chính');
+  });
+
+  it('says a repeated frame for one announcement nothing new', async () => {
+    const first = announcement(1, { title: 'Đính chính' });
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(),
+      'GET /contests/r42/announcements': sequence(page([]), page([first])),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    const liveText = () => wrapper.get('[data-testid="announcement-live"]').text();
+    latestEventSource().emit('announcement', { contestId: 'c', announcementId: first.id });
+    await flushPromises();
+    latestEventSource().emit('announcement', { contestId: 'c', announcementId: first.id });
+    await nextTick();
+    expect(liveText()).toBe('Thông báo mới: Đính chính');
+    await flushPromises();
+    expect(liveText()).toBe('Thông báo mới: Đính chính');
+  });
+
+  it('hides the Trực tiếp badge in the rail while the stream is down', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes() });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.get('aside').text()).toContain('Trực tiếp');
+    latestEventSource().fail();
+    await flushPromises();
+    expect(wrapper.get('aside').text()).not.toContain('Trực tiếp');
+  });
+
+  it('closes the stream when the contest turns ended while the page stays open', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(),
+      'GET /contests/r42': sequence(ok(contestDetail()), ok(contestDetail({ phase: 'ended' }))),
+    });
+    const { queryClient } = await mountApp('/contests/r42/announcements');
+    const stream = latestEventSource();
+    expect(stream.closed).toBe(false);
+    await queryClient.invalidateQueries({ queryKey: ['contests', 'detail'] });
+    await flushPromises();
+    expect(stream.closed).toBe(true);
+    expect(FakeEventSource.instances).toHaveLength(1);
+  });
+
+  it('shows the announcements of the contest now open, with its own marks, when the key changes', async () => {
+    localStorage.setItem('qhhoj.contest-announcements-seen.r43', announcement(4).id);
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
+      ...contestPageRoutes(contestDetail({ key: 'r43' }), [announcement(5), announcement(4)]),
+    });
+    const { wrapper, router } = await mountApp('/contests/r42/announcements');
+    await router.push('/contests/r43/announcements');
+    await flushPromises();
+    const items = wrapper.findAll('[data-testid="announcement"]');
+    expect(items.map((item) => item.find('[data-testid="unread-pill"]').exists())).toEqual([
+      true,
+      false,
+    ]);
   });
 });

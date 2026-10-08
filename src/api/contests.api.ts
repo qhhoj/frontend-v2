@@ -13,6 +13,7 @@ import type {
 } from './types/contests';
 
 export const ANNOUNCEMENT_PAGE_SIZE = 20;
+export const ANNOUNCEMENT_FIRST_PAGE = 1;
 
 const contestPath = (key: string, rest = '') => `/contests/${encodeURIComponent(key)}${rest}`;
 /** The code goes only when the viewer typed one: the backend treats an empty string as a wrong code. */
