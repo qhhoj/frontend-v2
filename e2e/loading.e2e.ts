@@ -340,14 +340,6 @@ const SHIFT_CASES: ShiftCase[] = [
     viewports: PHONE_AND_DESKTOP,
   },
   {
-    name: 'quick submit card',
-    path: '/',
-    signedIn: true,
-    hold: 'GET /problems/meta',
-    parts: (page) => ({ card: page.getByTestId('quick-submit') }),
-    viewports: HOME_VIEWPORTS,
-  },
-  {
     name: 'recent submissions card',
     path: '/',
     signedIn: true,

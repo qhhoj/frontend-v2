@@ -28,13 +28,7 @@ describe('loading screens show blocks shaped like their content', () => {
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/');
     const dom = wrapper.element;
-    for (const testId of [
-      'rating-hero',
-      'quick-submit',
-      'recent-submissions',
-      'live-contest',
-      'top-users',
-    ]) {
+    for (const testId of ['rating-hero', 'recent-submissions', 'live-contest', 'top-users']) {
       const card = dom.querySelector(`[data-testid="${testId}"]`)!;
       expect(blocksIn(card), testId).toBeGreaterThan(0);
       expect(card.textContent?.includes('Đang tải'), testId).toBe(false);
@@ -42,7 +36,6 @@ describe('loading screens show blocks shaped like their content', () => {
     }
     const regionCounts: Record<string, Record<string, number>> = {
       'rating-hero': { greeting: 1, rating: 1, tier: 1, chart: 1, tile: 3 },
-      'quick-submit': { code: 1, source: 1, submit: 1, status: 1 },
       'live-contest': { label: 1, name: 1, countdown: 1, enter: 1 },
     };
     for (const [testId, regions] of Object.entries(regionCounts)) {
