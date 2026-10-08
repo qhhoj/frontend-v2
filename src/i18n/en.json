@@ -1088,6 +1088,44 @@
     "title": "Voting"
   },
   "leaderboard": {
+    "lead": "{total} active users · 100 per page",
+    "sortNav": "Sort",
+    "sorts": {
+      "rating": "Rating",
+      "performancePoints": "Performance points",
+      "points": "Points",
+      "problemCount": "Solved",
+      "contributors": "Contributors"
+    },
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "organization": "Organization",
+      "rating": "Rating",
+      "performancePoints": "PP",
+      "points": "Points",
+      "problemCount": "Solved",
+      "contributionPoints": "Contribution"
+    },
+    "myRank": "Your rank",
+    "by": {
+      "rating": "By rating",
+      "performancePoints": "By performance points",
+      "points": "By points",
+      "problemCount": "By problems solved",
+      "contributors": "By contribution"
+    },
+    "pageOf": "Page {page}",
+    "findMe": "Find my rank",
+    "notListed": "Your account is not on the leaderboard.",
+    "jumpLabel": "Username",
+    "jumpPlaceholder": "Go to a profile by username",
+    "jumpSubmit": "Open",
+    "legend": "Rating colours",
+    "tierAtLeast": "{tier} ≥ {bound}",
+    "tierBelow": "{tier} < {bound}",
+    "pagerLabel": "Leaderboard pages",
+    "empty": "Nobody is on this board yet.",
     "title": "Leaderboard"
   },
   "ratingChart": {
