@@ -33,7 +33,12 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
         method: init.method ?? 'GET',
         path: url.pathname.replace(/^\/api\/internal/, ''),
         query: url.searchParams,
-        body: typeof init.body === 'string' ? JSON.parse(init.body) : undefined,
+        body:
+          init.body instanceof FormData
+            ? init.body
+            : typeof init.body === 'string'
+              ? JSON.parse(init.body)
+              : undefined,
         headers: new Headers(init.headers),
       };
       calls.push(call);
@@ -57,6 +62,12 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
   );
   return calls;
 }
+
+/** A handler that answers `responses` in order and keeps repeating the last one. */
+export const sequence = (...responses: MockResponse[]): MockHandler => {
+  let index = 0;
+  return () => responses[Math.min(index++, responses.length - 1)]!;
+};
 
 export const ok = (data: unknown): MockResponse => ({ body: { data } });
 export const page = (items: unknown[], meta: Record<string, unknown> = {}): MockResponse => ({

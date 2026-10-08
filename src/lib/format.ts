@@ -59,3 +59,25 @@ export const initials = (name: string) =>
 /** Stable 0..5 pick of a token-pill gradient for a code or username. */
 export const coinIndex = (seed: string) =>
   Array.from(seed).reduce((hash, symbol) => (hash * 31 + symbol.codePointAt(0)!) % 9973, 7) % 6;
+
+/** `seconds` with one decimal, two when needed: 1 -> `1.0s`, 0.25 -> `0.25s`. */
+export const formatTimeLimit = (seconds: number) =>
+  `${Number.isInteger(seconds * 10) ? seconds.toFixed(1) : seconds.toFixed(2)}s`;
+/** Problem and case memory are KiB (legacy `memory_limit`). */
+export const formatMemoryLimit = (kib: number) => `${Number((kib / 1024).toFixed(1))}MB`;
+export const formatCaseTime = (seconds: number) => `${seconds.toFixed(2)}s`;
+export const formatCaseMemory = (kib: number) =>
+  `${(Math.floor((kib / 1024) * 10) / 10).toFixed(1)} MB`;
+
+const BYTES_PER_MEGABYTE = 1024 * 1024;
+/** `1887437` -> `1.8 MB` (floored like `formatCaseMemory`), below 1 MB in whole KB. */
+export const formatFileSize = (bytes: number) =>
+  bytes >= BYTES_PER_MEGABYTE
+    ? `${(Math.floor((bytes / BYTES_PER_MEGABYTE) * 10) / 10).toFixed(1)} MB`
+    : `${Math.round(bytes / 1024)} KB`;
+
+/** The UTC calendar date of a timestamp (the site time zone is not known to the SPA), e.g. `Oct 8, 2026`. */
+export const formatDate = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], { dateStyle: 'medium', timeZone: 'UTC' }).format(
+    new Date(date),
+  );

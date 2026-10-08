@@ -127,7 +127,13 @@
     "bannedWithReason": "Tài khoản đã bị khoá. Lý do: {reason}",
     "oauth_state": "Phiên đăng nhập bằng mạng xã hội đã hết hạn. Hãy thử lại.",
     "oauth_failed": "Đăng nhập bằng mạng xã hội không thành công.",
-    "email_unverified": "Email của tài khoản mạng xã hội này chưa được xác minh."
+    "email_unverified": "Email của tài khoản mạng xã hội này chưa được xác minh.",
+    "banned_from_problem": "Bạn bị cấm nộp bài này.",
+    "contest_submission_limit": "Bạn đã dùng hết số lần nộp bài này trong kỳ thi.",
+    "unfinished_submission_limit": "Bạn có quá nhiều bài nộp đang chờ chấm. Hãy đợi chúng chấm xong.",
+    "solve_first": "Hãy giải bài yêu cầu trước để xem nội dung này.",
+    "contest_running": "Nội dung này bị ẩn trong lúc kỳ thi diễn ra.",
+    "hidden": "Nội dung này bị ẩn với bạn."
   },
   "common": {
     "retry": "Thử lại",
@@ -280,5 +286,19 @@
     "vnoj": "VNOJ",
     "ultimate": "Ultimate",
     "final_submission": "Lần nộp cuối"
+  },
+  "submit": {
+    "errors": {
+      "problemGone": "Bài này không còn tồn tại.",
+      "languageNotAllowed": "Ngôn ngữ này không được dùng cho bài này.",
+      "languageTakesFile": "Ngôn ngữ này nộp bằng tệp: hãy dùng phần tải lên.",
+      "languageTakesText": "Ngôn ngữ này nộp mã nguồn dán vào, không phải tệp.",
+      "languageBroken": "Ngôn ngữ này được cấu hình sai. Hãy báo quản trị viên.",
+      "fileWrongExtension": "Đuôi tệp không đúng với ngôn ngữ này.",
+      "scratchInvalid": "Đây không phải dự án Scratch hợp lệ.",
+      "fileUploadDisabled": "Ngôn ngữ này không cho tải tệp lên.",
+      "fileRejected": "Tệp bị từ chối.",
+      "sourceLength": "Mã nguồn dài quá {max} ký tự."
+    }
   }
 }

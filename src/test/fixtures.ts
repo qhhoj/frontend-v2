@@ -5,8 +5,19 @@ import type {
   Ranking,
   RankingRow,
 } from '../api/types/contests';
-import type { Language, ProblemListItem, ProblemMeta } from '../api/types/problems';
-import type { SubmissionListItem } from '../api/types/submissions';
+import type {
+  Language,
+  ProblemDetail,
+  ProblemEditorial,
+  ProblemListItem,
+  ProblemMeta,
+} from '../api/types/problems';
+import type {
+  SubmissionCase,
+  SubmissionDetail,
+  SubmissionListItem,
+  SubmissionStats,
+} from '../api/types/submissions';
 import type { LeaderboardEntry, RatingHistoryEntry, UserPage } from '../api/types/users';
 import type { SecondFactorMethod, SessionResponse, SessionUser } from '../api/types/auth';
 import type { Profile } from '../api/types/profile';
@@ -67,7 +78,12 @@ export const PY3_ID = '0192a000-0000-7000-8000-0000000000b3';
 export const TYPE_DP_ID = '0192a000-0000-7000-8000-0000000000d1';
 export const TYPE_GRAPH_ID = '0192a000-0000-7000-8000-0000000000d2';
 
-const language = (id: string, key: string, name: string, fileOnly = false): Language => ({
+export const languageItem = (
+  id: string,
+  key: string,
+  name: string,
+  overrides: Partial<Language> = {},
+): Language => ({
   id,
   key,
   name,
@@ -76,9 +92,10 @@ const language = (id: string, key: string, name: string, fileOnly = false): Lang
   ace: 'c_cpp',
   extension: 'cpp',
   template: '',
-  fileOnly,
+  fileOnly: false,
   fileSizeLimit: 0,
   includeInProblem: true,
+  ...overrides,
 });
 
 export const problemMeta = (): ProblemMeta => ({
@@ -88,9 +105,11 @@ export const problemMeta = (): ProblemMeta => ({
   ],
   groups: [],
   languages: [
-    language(CPP17_ID, 'CPP17', 'C++17'),
-    language(PY3_ID, 'PY3', 'Python 3'),
-    language('0192a000-0000-7000-8000-0000000000f1', 'OUTPUT', 'Output only', true),
+    languageItem(CPP17_ID, 'CPP17', 'C++17'),
+    languageItem(PY3_ID, 'PY3', 'Python 3'),
+    languageItem('0192a000-0000-7000-8000-0000000000f1', 'OUTPUT', 'Output only', {
+      fileOnly: true,
+    }),
   ],
 });
 
@@ -296,5 +315,112 @@ export const ranking = (overrides: Partial<Ranking> = {}): Ranking => ({
       [PROBLEM_B]: { time: null, points: 0, tries: 2 },
     }),
   ],
+  ...overrides,
+});
+
+export const SCRATCH_ID = '0192a000-0000-7000-8000-0000000000f2';
+/** A file-only language that takes up to 5 MB of `.sb3`. Not part of `problemMeta()` so existing lists stay as they are. */
+export const scratchLanguage = (overrides: Partial<Language> = {}): Language =>
+  languageItem(SCRATCH_ID, 'SCRATCH', 'Scratch 3', {
+    fileOnly: true,
+    extension: 'sb3',
+    fileSizeLimit: 5,
+    ace: 'text',
+    ...overrides,
+  });
+
+export const problemDetail = (overrides: Partial<ProblemDetail> = {}): ProblemDetail => ({
+  id: '0192a000-0000-7000-8000-0000000002c1',
+  code: 'duongdi',
+  name: 'Đường đi ngắn nhất',
+  language: 'vi',
+  translated: true,
+  descriptionHtml: '<p>Thành phố có n nút giao thông.</p><pre>4 4\n1 2 5</pre>',
+  source: '',
+  summary: '',
+  timeLimit: 1,
+  memoryLimit: 262144,
+  points: 1600,
+  partial: false,
+  types: [{ id: TYPE_GRAPH_ID, name: 'graph', fullName: 'Đồ thị' }],
+  group: null,
+  authors: [{ id: sessionUser().id, username: 'user_07' }],
+  allowedLanguages: [
+    languageItem(CPP17_ID, 'CPP17', 'C++17', {
+      template: '#include <bits/stdc++.h>\nint main() {}\n',
+    }),
+    languageItem(PY3_ID, 'PY3', 'Python 3', {
+      ace: 'python',
+      extension: 'py',
+      template: 'print()\n',
+    }),
+    scratchLanguage(),
+  ],
+  languageLimits: [{ language: 'PY3', timeLimit: 3, memoryLimit: 262144 }],
+  pdfStatementUrl: null,
+  availableTranslations: ['vi', 'en'],
+  hasEditorial: true,
+  userCount: 892,
+  acRate: 38.4,
+  canEdit: false,
+  viewerStatus: null,
+  contest: null,
+  ...overrides,
+});
+
+export const problemEditorial = (overrides: Partial<ProblemEditorial> = {}): ProblemEditorial => ({
+  problem: { code: 'duongdi', name: 'Đường đi ngắn nhất' },
+  isPublic: true,
+  publishOn: '2026-09-30T00:00:00Z',
+  authors: [{ id: sessionUser().id, username: 'user_07' }],
+  contentHtml: '<p>Dùng Dijkstra.</p>',
+  canEdit: false,
+  ...overrides,
+});
+
+export const submissionCase = (overrides: Partial<SubmissionCase> = {}): SubmissionCase => ({
+  position: 1,
+  status: 'AC',
+  time: 0.014,
+  memory: 3277,
+  points: 1,
+  total: 1,
+  batch: null,
+  ...overrides,
+});
+
+/** A graded WA submission of `duongdi`: 7 of 20 case points, 20 tests of which the viewer sees 3. */
+export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): SubmissionDetail => ({
+  ...submissionItem({
+    id: 'sub-1',
+    problem: { code: 'duongdi', name: 'Đường đi ngắn nhất' },
+    status: 'D',
+    result: 'WA',
+    points: 560,
+    casePoints: 7,
+    caseTotal: 20,
+  }),
+  error: null,
+  currentTestcase: 0,
+  isPretested: false,
+  judgedOn: 'judge-1',
+  judgedDate: '2026-10-08T09:58:03Z',
+  rejudgedDate: null,
+  cases: [
+    submissionCase({ position: 1 }),
+    submissionCase({ position: 2 }),
+    submissionCase({ position: 3, status: 'WA', points: 0 }),
+  ],
+  batches: null,
+  totalCases: 20,
+  ...overrides,
+});
+
+export const submissionStats = (overrides: Partial<SubmissionStats> = {}): SubmissionStats => ({
+  judgedToday: 1284,
+  acceptedToday: 526,
+  queueLength: 3,
+  judgesOnline: 4,
+  judgesTotal: 4,
   ...overrides,
 });

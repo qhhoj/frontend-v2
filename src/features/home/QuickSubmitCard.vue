@@ -14,13 +14,11 @@ import { useProfileQuery } from '@/features/account/profile.queries';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
+import { MAX_SOURCE_LENGTH, codePointCount } from '@/lib/source';
 import { verdictOf } from '@/lib/verdicts';
 
 /** Rows of the source textarea; the skeleton draws as many lines. */
 const SOURCE_ROWS = 4;
-
-/** Backend limit (`IsSourceLength`), counted in code points. */
-const MAX_SOURCE_LENGTH = 65_536;
 
 const {
   data: meta,
@@ -58,7 +56,7 @@ const submission = useMutation({
   onMutate: () => (submissionId.value = null),
   onSuccess: ({ id }) => (submissionId.value = id),
 });
-const sourceTooLong = computed(() => Array.from(source.value).length > MAX_SOURCE_LENGTH);
+const sourceTooLong = computed(() => codePointCount(source.value) > MAX_SOURCE_LENGTH);
 /** `aria-disabled` instead of `disabled` keeps keyboard focus on the button while it works. */
 const canSubmit = computed(
   () => !submission.isPending.value && !sourceTooLong.value && Boolean(languageId.value),

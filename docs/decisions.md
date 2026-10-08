@@ -75,7 +75,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Screens without an approved mock-up ship as logic plus plain placeholder markup — visuals come from mock-up rounds.
 - Home: "Top rating" (top 3 by rating) replaces "Top tuần" — there is no weekly board (B7).
 - Home: the rating delta is the change at the last rated contest — ratings move per contest.
-- Home: quick submit is a problem code, a language select and a plain monospace textarea — Monaco comes with 8c. Its status region is `aria-live="polite"`, which re-announces each test-case frame (up to 4 per second).
+- Home: quick submit is a problem code, a language select and a plain monospace textarea; the full editor lives in the problem submit dock. Its status region is `aria-live="polite"`, which re-announces each test-case frame (up to 4 per second).
 - Ranking: podium medals use the `coin-3`/`coin-6`/`coin-5` tokens, not the mock-up's gold, silver and bronze gradients; the viewer's own row is `bg-surface-hover`, not a pink tint — both stay inside the theme tokens.
 - Problems: no "Chưa giải" chip — no unsolved filter (B6); the points range is a popover with two number inputs; columns sort on click.
 - Problems: the `attempted` label stays "Đã thử" — ruling from the Task 3 review.
@@ -94,7 +94,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Submission errors
 
-- `rate_limited` covers both the per-user rate and the unfinished-submission limit; `forbidden` covers a problem ban and a contest cap — distinct messages wait for B9.
+- B9 landed: `banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit` and `rate_limited` have their own `errors.*` messages; field refusals map by `issues[].code` (`submitErrorKey`), never by the English text.
 - A banned login shows the generic ban message; the reason waits for B8 (structured `banReason`).
 - Unknown backend codes show `errors.generic`.
 
@@ -122,6 +122,18 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Mascot: `src/mascot/bit-sprite.ts` is the single source of Bit's pixels and the only source file outside `src/theme/themes/` that `lint:tokens` skips, because Bit keeps its sprite colours in every theme like an image asset.
 - Motion: skeleton pulse, Bit sob and tears use their own durations and switch themselves off under reduced motion, because `--qh-duration` is 0 there and would freeze them mid-frame instead of removing them.
 - 404: `NotFoundPage` (crying Bit, pale 404) replaces the placeholder on the catch-all route; the mascot's 404 variant is crying, not a magnifying glass (user's pick "404 B").
+
+## Problems and submissions
+
+- CodeMirror 6, not Monaco (spec): about an order of magnitude lighter, tokens-themable, works on touch and under magnification; lazy chunk, coloured through the existing --qh-syntax-* tokens (8a2) with per-language lazy packs (sizes recorded in Tasks 5 and 5b).
+- Discussion tab waits for 8e (comments are page-generic and need a threads mock-up).
+- Submit success goes to /submissions/:id; Nộp lại goes to /problems/:code?resubmit=<id>.
+- PDF: the button prepares it in the page (poll the PDF URL no faster than every 3 s, 202 + Retry-After while rendering, B20), stops on 503 pdf_unavailable and 429, gives up after 120 s, then offers "Open PDF"; no percentage.
+- Editor coloured from the start: the --qh-syntax-* tokens of every theme, lazy language packs, plain text for languages without a pack.
+- Phone submit is a bottom sheet under 768 px; file-only languages submit a file (multipart, language id, B17); fileSizeLimit 0 means uploads off, as on the server.
+- Submission list: stats strip (B24), URL-synced filter rail, live updates over the public feed with a throttled refetch.
+- Contest context (B19) shows only the attempts left in the dock; no banner until 8d.
+- Dates from the API show as UTC calendar dates (the SPA does not know site.timeZone).
 
 ## Known gaps (later sub-projects)
 

@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   coinIndex,
+  formatCaseMemory,
+  formatCaseTime,
+  formatDate,
   formatDuration,
   formatElapsed,
+  formatFileSize,
+  formatMemoryLimit,
   formatNumber,
   formatRelative,
   greetingKey,
+  formatTimeLimit,
   initials,
 } from './format';
 
@@ -49,5 +55,30 @@ describe('format helpers', () => {
     const coins = seeds.map(coinIndex);
     expect(coins.every((coin) => Number.isInteger(coin) && coin >= 0 && coin < 6)).toBe(true);
     expect(new Set(coins).size).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('limits', () => {
+  it('formats the time limit with one decimal and memory in MB from KiB', () => {
+    expect(formatTimeLimit(1)).toBe('1.0s');
+    expect(formatTimeLimit(0.25)).toBe('0.25s');
+    expect(formatMemoryLimit(262144)).toBe('256MB');
+    expect(formatMemoryLimit(1536)).toBe('1.5MB');
+  });
+  it('formats a case with two decimals and MB with one', () => {
+    expect(formatCaseTime(0.014)).toBe('0.01s');
+    expect(formatCaseMemory(3277)).toBe('3.2 MB');
+  });
+  it('formats an upload size in MB above 1 MB (floored) and whole KB below', () => {
+    expect(formatFileSize(1_887_437)).toBe('1.8 MB');
+    expect(formatFileSize(655_360)).toBe('640 KB');
+    expect(formatFileSize(0)).toBe('0 KB');
+  });
+});
+describe('formatDate', () => {
+  it('shows the UTC calendar date in the locale, whatever the machine time zone is', () => {
+    expect(formatDate('2026-10-08T23:30:00Z', 'en')).toBe('Oct 8, 2026');
+    expect(formatDate('2026-10-08T23:30:00Z', 'vi')).toContain('2026');
+    expect(formatDate('2026-10-08T23:30:00Z', 'vi')).toContain('8');
   });
 });

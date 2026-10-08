@@ -79,3 +79,53 @@ export interface ProblemListQuery {
   pointsMax?: number | null;
   sort?: ProblemSort | null;
 }
+
+/** backend: problems/core/dto/user-summary.response.ts */
+export interface UserSummary {
+  id: string;
+  username: string;
+}
+/** backend: problem-detail.response.ts ProblemContestResponse (B19) */
+export interface ProblemContest {
+  contestKey: string;
+  attemptsLeft: number | null;
+}
+/** backend: problem-detail.response.ts ProblemDetailResponse (the editor block, licence, material, visibility settings and flags 8c does not read are omitted) */
+export interface ProblemDetail {
+  id: string;
+  code: string;
+  name: string;
+  language: StatementLanguage;
+  translated: boolean;
+  descriptionHtml: string;
+  source: string;
+  summary: string;
+  /** Seconds. */ timeLimit: number;
+  /** KiB. */ memoryLimit: number;
+  points: number;
+  partial: boolean;
+  types: CatalogItem[];
+  group: CatalogItem | null;
+  authors: UserSummary[];
+  allowedLanguages: Language[];
+  /** `language` is the language `key`. */
+  languageLimits: Array<{ language: string; timeLimit: number; memoryLimit: number }>;
+  pdfStatementUrl: string | null;
+  availableTranslations: StatementLanguage[];
+  /** False inside a contest and when the viewer may not read it. */
+  hasEditorial: boolean;
+  userCount: number;
+  acRate: number;
+  canEdit: boolean;
+  viewerStatus: ViewerStatus;
+  contest: ProblemContest | null;
+}
+/** backend: problems/core/dto/editorial.response.ts (`problem` is ProblemRefResponse) */
+export interface ProblemEditorial {
+  problem: { code: string; name: string };
+  isPublic: boolean;
+  publishOn: string;
+  authors: UserSummary[];
+  contentHtml: string;
+  canEdit: boolean;
+}

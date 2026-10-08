@@ -224,3 +224,18 @@ describe('api client', () => {
     expect(error).toMatchObject({ code: 'validation_failed', fields: {}, issues: [], extra: {} });
   });
 });
+
+it('passes a FormData body through without a JSON content type', async () => {
+  const calls = mockApi({ 'POST /x': ok({}) });
+  const form = new FormData();
+  form.append('file', new File(['x'], 'a.sb3'));
+  await apiRequest('/x', { method: 'POST', body: form });
+  expect(calls[0]!.body).toBe(form);
+  expect(calls[0]!.headers.get('Content-Type')).toBeNull();
+});
+it('still sends a plain object as JSON', async () => {
+  const calls = mockApi({ 'POST /x': ok({}) });
+  await apiRequest('/x', { method: 'POST', body: { a: 1 } });
+  expect(calls[0]!.body).toEqual({ a: 1 });
+  expect(calls[0]!.headers.get('Content-Type')).toBe('application/json');
+});

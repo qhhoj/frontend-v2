@@ -127,7 +127,13 @@
     "bannedWithReason": "This account is banned. Reason: {reason}",
     "oauth_state": "The social sign-in session expired. Try again.",
     "oauth_failed": "Social sign-in failed.",
-    "email_unverified": "The email of that social account is not verified."
+    "email_unverified": "The email of that social account is not verified.",
+    "banned_from_problem": "You are banned from submitting to this problem.",
+    "contest_submission_limit": "You have used all your submissions for this problem in the contest.",
+    "unfinished_submission_limit": "You have too many submissions still being judged. Wait for them to finish.",
+    "solve_first": "Solve the required problem first to see this.",
+    "contest_running": "This is hidden while the contest is running.",
+    "hidden": "This is hidden from you."
   },
   "common": {
     "retry": "Retry",
@@ -280,5 +286,19 @@
     "vnoj": "VNOJ",
     "ultimate": "Ultimate",
     "final_submission": "Final submission"
+  },
+  "submit": {
+    "errors": {
+      "problemGone": "This problem no longer exists.",
+      "languageNotAllowed": "This language is not allowed for this problem.",
+      "languageTakesFile": "This language takes a file: use the upload.",
+      "languageTakesText": "This language takes pasted source, not a file.",
+      "languageBroken": "This language is set up incorrectly. Tell an administrator.",
+      "fileWrongExtension": "The file has the wrong extension for this language.",
+      "scratchInvalid": "This is not a valid Scratch project.",
+      "fileUploadDisabled": "Uploads are turned off for this language.",
+      "fileRejected": "The file was rejected.",
+      "sourceLength": "The source is longer than {max} characters."
+    }
   }
 }
