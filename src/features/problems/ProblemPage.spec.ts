@@ -127,6 +127,15 @@ describe('problem page', () => {
     expect(wrapper.get('[data-testid="header-actions"]').text()).toBe('');
   });
 
+  it('puts the PDF button in the header actions when the problem has a PDF', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail({ pdfStatementUrl: '/pdf' })),
+    });
+    const { wrapper } = await openProblem();
+    expect(wrapper.get('[data-testid="header-actions"] button').text()).toBe('PDF');
+  });
+
   it('changes tabs without adding history entries', async () => {
     mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper, router } = await openProblem();

@@ -226,7 +226,14 @@
     },
     "partialShort": " (partial)",
     "untranslated": "This statement has no translation in this language yet; showing the original.",
-    "authors": "Authors:"
+    "authors": "Authors:",
+    "pdf": "PDF",
+    "pdfPreparing": "Preparing PDF…",
+    "pdfOpen": "Open PDF",
+    "pdfReady": "PDF ready",
+    "pdfFailed": "The PDF could not be prepared",
+    "pdfRetry": "Try again",
+    "pdfRetryIn": "Try again in {seconds} s"
   },
   "problems": {
     "title": "Pick a problem, start solving",

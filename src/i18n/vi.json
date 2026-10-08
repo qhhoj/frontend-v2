@@ -226,7 +226,14 @@
     },
     "partialShort": " (một phần)",
     "untranslated": "Chưa có bản dịch cho ngôn ngữ này; đang hiện bản gốc.",
-    "authors": "Tác giả:"
+    "authors": "Tác giả:",
+    "pdf": "PDF",
+    "pdfPreparing": "Đang chuẩn bị PDF…",
+    "pdfOpen": "Mở PDF",
+    "pdfReady": "PDF đã sẵn sàng",
+    "pdfFailed": "Không thể chuẩn bị PDF",
+    "pdfRetry": "Thử lại",
+    "pdfRetryIn": "Thử lại sau {seconds} giây"
   },
   "problems": {
     "title": "Chọn bài, bắt đầu giải",

@@ -9,6 +9,7 @@ import UserName from '@/components/UserName.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemHeader from './ProblemHeader.vue';
+import PdfButton from './PdfButton.vue';
 import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
@@ -69,7 +70,13 @@ watch(
         <StatementSkeleton />
       </template>
       <template v-if="problem">
-        <ProblemHeader :problem="problem"><template #actions /></ProblemHeader>
+        <ProblemHeader :problem="problem"
+          ><template #actions
+            ><PdfButton
+              v-if="problem.pdfStatementUrl"
+              :code="problem.code"
+              :lang="locale.locale" /></template
+        ></ProblemHeader>
         <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
         <div
           v-for="panel in tabs"

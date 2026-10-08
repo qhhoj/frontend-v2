@@ -30,7 +30,7 @@ const limits = computed(() => [
 <template>
   <GlassCard data-testid="problem-header" class="rounded-panel p-6 sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
-      <div class="min-w-0 flex-1">
+      <div class="min-w-48 flex-1">
         <p class="font-mono text-sm text-muted">
           {{ problem.code
           }}<template v-if="problem.group"> · {{ problem.group.fullName }}</template>
@@ -51,7 +51,7 @@ const limits = computed(() => [
           <ProblemStatusChip :status="problem.viewerStatus" />
         </div>
       </div>
-      <div data-testid="header-actions" class="flex min-h-11 shrink-0 items-center">
+      <div data-testid="header-actions" class="flex min-h-11 max-w-full shrink-0 items-center">
         <slot name="actions" />
       </div>
     </div>
