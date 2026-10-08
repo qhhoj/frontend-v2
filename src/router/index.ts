@@ -11,7 +11,8 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
   const router = createRouter({
     history,
     routes,
-    scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 },
+    // A query-only change (a tab, a filter) keeps the scroll position.
+    scrollBehavior: (to, from, saved) => saved ?? (to.path === from.path ? false : { top: 0 }),
   });
   // One source per navigation, shared along a redirect chain: a redirect starts a new navigation and never reaches
   // afterEach for the original, while a cancelled slow navigation must not end the source of the one that replaced it.

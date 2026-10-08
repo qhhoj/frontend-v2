@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { contestDetail, signedIn, signedOut } from '@/test/fixtures';
 import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { anonymousViewer } from '@/test/problem-routes';
 
 const regionsIn = (root: ParentNode, region: string) =>
   root.querySelectorAll(`[data-skeleton-region="${region}"]`).length;
@@ -87,5 +88,19 @@ describe('loading screens show blocks shaped like their content', () => {
     expect(regionsIn(board, 'table-header')).toBe(1);
     expect(regionsIn(board, 'row')).toBe(10);
     expectInert(board, 'ranking board skeleton');
+  });
+
+  it('the problem page shows the header and statement skeletons, inert and hidden from assistive tech', async () => {
+    mockApi({ ...anonymousViewer });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/problems/duongdi');
+    for (const region of ['meta', 'title', 'chips', 'limits', 'statement'])
+      expect(regionsIn(wrapper.element, region), region).toBe(1);
+    expect(regionsIn(wrapper.element, 'limit')).toBe(4);
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {
+      expect(skeleton.attributes('aria-hidden')).toBe('true');
+      expectInert(skeleton.element, 'problem skeleton');
+    }
+    expect(blocksIn(wrapper.element)).toBeGreaterThan(5);
   });
 });

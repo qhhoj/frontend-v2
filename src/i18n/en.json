@@ -211,7 +211,22 @@
     "welcomeBody": "Sign in to submit, follow your rating and join contests."
   },
   "problem": {
-    "copySample": "Copy sample"
+    "copySample": "Copy sample",
+    "tabs": {
+      "statement": "Statement",
+      "editorial": "Editorial",
+      "submissions": "Submissions"
+    },
+    "tabsLabel": "Problem sections",
+    "limits": {
+      "time": "Time",
+      "memory": "Memory",
+      "points": "Points",
+      "acRate": "AC rate"
+    },
+    "partialShort": " (partial)",
+    "untranslated": "This statement has no translation in this language yet; showing the original.",
+    "authors": "Authors:"
   },
   "problems": {
     "title": "Pick a problem, start solving",

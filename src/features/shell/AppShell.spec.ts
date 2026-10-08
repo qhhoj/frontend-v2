@@ -1,8 +1,9 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
+import { problemDetail, profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
 import { useSessionStore } from '@/stores/session.store';
 
 const clickMenuItem = async (label: string) => {
@@ -17,7 +18,7 @@ const clickMenuItem = async (label: string) => {
 describe('app shell', () => {
   it('has exactly one live region, outside the page content, and it is quiet when nothing loads', async () => {
     mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/problems/aplusb');
+    const { wrapper } = await mountApp('/blog');
     const regions = wrapper.findAll('[role="status"]');
     expect(regions).toHaveLength(1);
     expect(regions[0]!.attributes('aria-live')).toBe('polite');
@@ -26,7 +27,7 @@ describe('app shell', () => {
   });
 
   it('marks the current section in the main navigation', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ code: 'aplusb' })) });
     const { wrapper } = await mountApp('/problems/aplusb');
     const nav = wrapper.get('nav[aria-label="Điều hướng chính"]');
     expect(nav.get('[aria-current="page"]').text()).toBe('Bài tập');

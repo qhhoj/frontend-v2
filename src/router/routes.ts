@@ -19,7 +19,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/problems/:code',
     name: 'problem',
-    component: PlaceholderPage,
+    component: () => import('@/features/problems/ProblemPage.vue'),
     meta: { titleKey: 'pages.problem' },
   },
   {

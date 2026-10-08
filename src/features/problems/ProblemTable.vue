@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, Check, CircleAlert } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp } from 'lucide-vue-next';
 import type { ProblemListItem, ProblemSort, ProblemSortField } from '@/api/types/problems';
 import TokenCoin from '@/components/TokenCoin.vue';
 import { formatNumber, initials } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import ProblemStatusChip from './ProblemStatusChip.vue';
 
 const props = defineProps<{ problems: ProblemListItem[]; sort: ProblemSort | null }>();
 const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
@@ -88,18 +89,7 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
             {{ formatNumber(problem.userCount, locale.locale) }}
           </td>
           <td class="px-6 py-3.5 text-right">
-            <span
-              v-if="problem.viewerStatus === 'solved'"
-              class="inline-flex items-center gap-1.5 rounded-pill bg-verdict-ac-bg px-3 py-1.5 text-[13px] font-semibold text-verdict-ac"
-            >
-              <Check class="size-4" aria-hidden="true" />{{ $t('problems.solved') }}
-            </span>
-            <span
-              v-else-if="problem.viewerStatus === 'attempted'"
-              class="inline-flex items-center gap-1.5 rounded-pill bg-verdict-tle-bg px-3 py-1.5 text-[13px] font-semibold text-verdict-tle"
-            >
-              <CircleAlert class="size-4" aria-hidden="true" />{{ $t('problems.attempted') }}
-            </span>
+            <ProblemStatusChip v-if="problem.viewerStatus" :status="problem.viewerStatus" />
             <RouterLink
               v-else
               :to="{ name: 'problem', params: { code: problem.code } }"

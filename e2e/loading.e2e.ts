@@ -285,6 +285,8 @@ interface ShiftCase {
   answer?: (api: FakeApi) => void;
   parts: (page: Page, width: number) => Record<string, Locator>;
   viewports: number[];
+  /** Parts whose height is not compared (a text block differs in length), only where they sit. */
+  placedOnly?: string[];
   /** Parts whose distance from the first part's top is compared as well; a taller or shorter part above moves them. */
   placed?: string[];
 }
@@ -412,6 +414,20 @@ const SHIFT_CASES: ShiftCase[] = [
     viewports: PHONE_AND_DESKTOP,
     placed: ['table header', 'table rows'],
   },
+  {
+    name: 'problem header and tab row',
+    path: '/problems/duongdi',
+    signedIn: false,
+    hold: 'GET /problems/duongdi',
+    parts: (page) => ({
+      header: page.getByTestId('problem-header'),
+      tabs: page.locator('[data-skeleton-region="tabs"], [role="tablist"]'),
+      statement: page.getByTestId('statement-card'),
+    }),
+    viewports: PHONE_AND_DESKTOP,
+    placed: ['tabs', 'statement'],
+    placedOnly: ['statement'],
+  },
 ];
 
 const spanOf = (locator: Locator) =>
@@ -421,7 +437,11 @@ const spanOf = (locator: Locator) =>
     return { top, height: Math.max(...rects.map((rect) => rect.bottom)) - top };
   });
 /** Every part's height, and for the `placed` ones the distance of their top from the first part's top. */
-const layoutOf = async (parts: Record<string, Locator>, placed: string[] = []) => {
+const layoutOf = async (
+  parts: Record<string, Locator>,
+  placed: string[] = [],
+  placedOnly: string[] = [],
+) => {
   const spans = Object.fromEntries(
     await Promise.all(
       Object.entries(parts).map(async ([part, locator]) => [part, await spanOf(locator)] as const),
@@ -430,7 +450,9 @@ const layoutOf = async (parts: Record<string, Locator>, placed: string[] = []) =
   const firstTop = Object.values(spans)[0].top;
   return {
     ...Object.fromEntries(
-      Object.entries(spans).map(([part, span]) => [`${part} height`, span.height]),
+      Object.entries(spans)
+        .filter(([part]) => !placedOnly.includes(part))
+        .map(([part, span]) => [`${part} height`, span.height]),
     ),
     ...Object.fromEntries(placed.map((part) => [`${part} offset`, spans[part].top - firstTop])),
   };
@@ -451,17 +473,19 @@ for (const shift of SHIFT_CASES)
       for (const [part, locator] of Object.entries(parts))
         await expect(locator.first(), `${part} skeleton`).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      const skeleton = await layoutOf(parts, shift.placed);
+      const skeleton = await layoutOf(parts, shift.placed, shift.placedOnly);
       release();
       await expect(page.locator('[data-skeleton]')).toHaveCount(0);
       await page.evaluate(() => document.fonts.ready);
       /** Per measure the change in px once loaded; 0 stands for "within the tolerance". */
       const changes = async () =>
         Object.fromEntries(
-          Object.entries(await layoutOf(parts, shift.placed)).map(([measure, value]) => {
-            const change = value - skeleton[measure];
-            return [measure, Math.abs(change) <= SHIFT_TOLERANCE_PX ? 0 : change];
-          }),
+          Object.entries(await layoutOf(parts, shift.placed, shift.placedOnly)).map(
+            ([measure, value]) => {
+              const change = value - skeleton[measure];
+              return [measure, Math.abs(change) <= SHIFT_TOLERANCE_PX ? 0 : change];
+            },
+          ),
         );
       await expect
         .poll(changes, { message: 'change in px per measure, skeleton to loaded' })

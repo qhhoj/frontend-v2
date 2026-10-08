@@ -1,6 +1,7 @@
 import type { VueWrapper } from '@vue/test-utils';
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLocaleStore } from '@/stores/locale.store';
 import { mockApi } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
@@ -64,6 +65,74 @@ describe('StatementBody', () => {
     await wrapper.get('button.copy-block').trigger('click');
     await flushPromises();
     expect(wrapper.get('[aria-live="polite"]').text()).toBe('');
+  });
+  it('puts the copy bar above the sample so the button never covers sample text', async () => {
+    stubClipboard(vi.fn().mockResolvedValue(undefined));
+    const wrapper = mountComponent(StatementBody, { props: { html: '<pre>a</pre>' } });
+    await flushPromises();
+    const pre = wrapper.get('pre');
+    expect(pre.find('button').exists()).toBe(false);
+    expect(pre.element.previousElementSibling?.classList.contains('copy-bar')).toBe(true);
+  });
+  it('relabels the buttons and the announcement when the language changes', async () => {
+    stubClipboard(vi.fn().mockResolvedValue(undefined));
+    const wrapper = mountComponent(StatementBody, { props: { html: '<pre>a</pre>' } });
+    await flushPromises();
+    expect(wrapper.get('button.copy-block').text()).toBe('Sao chép');
+    useLocaleStore().toggle();
+    await flushPromises();
+    const button = wrapper.get('button.copy-block');
+    expect(button.text()).toBe('Copy');
+    expect(button.attributes('aria-label')).toBe('Copy sample');
+    await button.trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('Copied');
+    useLocaleStore().toggle();
+    await flushPromises();
+    expect(wrapper.get('button.copy-block').text()).toBe('Đã chép');
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('Đã chép');
+  });
+  it('names the button by its visible text while "copied" shows, and restores the name after 2 s', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      stubClipboard(vi.fn().mockResolvedValue(undefined));
+      const wrapper = mountComponent(StatementBody, { props: { html: '<pre>a</pre>' } });
+      await vi.advanceTimersByTimeAsync(0);
+      const button = wrapper.get('button.copy-block');
+      await button.trigger('click');
+      await vi.advanceTimersByTimeAsync(0);
+      expect(button.text()).toBe('Đã chép');
+      expect(button.attributes('aria-label')).toBeUndefined();
+      await vi.advanceTimersByTimeAsync(1999);
+      expect(button.text()).toBe('Đã chép');
+      await vi.advanceTimersByTimeAsync(1);
+      expect(button.text()).toBe('Sao chép');
+      expect(button.attributes('aria-label')).toBe('Sao chép ví dụ');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('restarts the 2 s window on a second click and leaves no timer behind after unmount', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      stubClipboard(vi.fn().mockResolvedValue(undefined));
+      const wrapper = mountComponent(StatementBody, { props: { html: '<pre>a</pre>' } });
+      await vi.advanceTimersByTimeAsync(0);
+      const button = wrapper.get('button.copy-block');
+      await button.trigger('click');
+      await vi.advanceTimersByTimeAsync(1500);
+      await button.trigger('click');
+      await vi.advanceTimersByTimeAsync(1500);
+      expect(button.text()).toBe('Đã chép'); // 1.5 s after the second click
+      await vi.advanceTimersByTimeAsync(500);
+      expect(button.text()).toBe('Sao chép');
+      await button.trigger('click');
+      await vi.advanceTimersByTimeAsync(0);
+      wrapper.unmount();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it('adds no copy button without the Clipboard API and keeps the sample readable', async () => {
     stubClipboard(undefined);

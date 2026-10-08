@@ -259,11 +259,15 @@
   }
 }
 
-/* Copy button on each sample block (use-copyable-blocks.ts): floats inside the block's scroll box. */
+/* Copy bar above each sample block (use-copyable-blocks.ts). The padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */
+@utility copy-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 4px 0;
+}
+
+/* The copy button itself. */
 @utility copy-block {
-  position: sticky;
-  top: 0;
-  float: right;
   min-width: 2.75rem;
   min-height: 2.75rem;
   padding-inline: 0.75rem;

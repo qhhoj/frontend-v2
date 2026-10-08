@@ -211,7 +211,22 @@
     "welcomeBody": "Đăng nhập để nộp bài, theo dõi rating và tham gia kỳ thi."
   },
   "problem": {
-    "copySample": "Sao chép ví dụ"
+    "copySample": "Sao chép ví dụ",
+    "tabs": {
+      "statement": "Đề bài",
+      "editorial": "Lời giải",
+      "submissions": "Bài nộp"
+    },
+    "tabsLabel": "Mục của bài",
+    "limits": {
+      "time": "Thời gian",
+      "memory": "Bộ nhớ",
+      "points": "Điểm",
+      "acRate": "Tỉ lệ AC"
+    },
+    "partialShort": " (một phần)",
+    "untranslated": "Chưa có bản dịch cho ngôn ngữ này; đang hiện bản gốc.",
+    "authors": "Tác giả:"
   },
   "problems": {
     "title": "Chọn bài, bắt đầu giải",
