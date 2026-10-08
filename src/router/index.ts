@@ -9,6 +9,7 @@ import type {
 import { i18n, translate } from '@/i18n';
 import { useLoadingStore } from '@/stores/loading.store';
 import { useSessionStore } from '@/stores/session.store';
+import { focusMain } from './focus-main';
 import { resolveNavigation } from './guards';
 import { pageTitle } from './page-title';
 import { routes } from './routes';
@@ -51,8 +52,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
     document.title = `${title} · QHHOJ`;
   };
   router.afterEach((to, from, failure) => {
-    if (!failure && isNewPage(to, from))
-      document.getElementById('main')?.focus({ preventScroll: true });
+    if (!failure && isNewPage(to, from)) focusMain();
   });
   router.afterEach(titleDocument);
   watch([() => i18n.global.locale.value, pageTitle], titleDocument);

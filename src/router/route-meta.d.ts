@@ -11,6 +11,8 @@ declare module 'vue-router' {
     staffOnly?: boolean;
     /** Reachable while the second factor is pending. */
     allowPartial?: boolean;
+    /** `'auth'`: the page draws its own top bar; the shell keeps blobs, loading layer and the main landmark. */
+    layout?: 'auth';
   }
 }
 

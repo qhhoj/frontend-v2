@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import AppHeader from './AppHeader.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
@@ -9,6 +10,7 @@ import { useAccountThemeSync } from './use-account-theme';
 useAccountCacheSync();
 useAccountThemeSync();
 useAccountAppearanceSync();
+const route = useRoute();
 </script>
 
 <template>
@@ -24,7 +26,7 @@ useAccountAppearanceSync();
     >
       {{ $t('app.skipToContent') }}
     </a>
-    <AppHeader />
+    <AppHeader v-if="route.meta.layout !== 'auth'" />
     <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
       <slot />
     </main>
