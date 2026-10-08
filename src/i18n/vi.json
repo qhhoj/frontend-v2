@@ -998,6 +998,29 @@
     "title": "Bảng xếp hạng"
   },
   "ratingChart": {
+    "label": "Biểu đồ rating qua {count} kỳ thi, cao nhất {max}, hiện tại {current}",
+    "best": "Cao nhất {max}",
+    "pointTitle": "{contest}: {rating}",
+    "hiddenContest": "Kỳ thi bạn không được xem",
+    "heatmapLabel": "Biểu đồ hoạt động nộp bài 53 tuần",
+    "activityLine": "{count} bài nộp trong 53 tuần qua · múi giờ {zone}",
+    "cellTitle": "{date}: {count} bài nộp",
+    "less": "Ít",
+    "more": "Nhiều",
+    "months": {
+      "1": "Th1",
+      "2": "Th2",
+      "3": "Th3",
+      "4": "Th4",
+      "5": "Th5",
+      "6": "Th6",
+      "7": "Th7",
+      "8": "Th8",
+      "9": "Th9",
+      "10": "Th10",
+      "11": "Th11",
+      "12": "Th12"
+    },
     "title": "Biểu đồ rating"
   },
   "profile": {

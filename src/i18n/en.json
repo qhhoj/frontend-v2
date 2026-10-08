@@ -998,6 +998,29 @@
     "title": "Leaderboard"
   },
   "ratingChart": {
+    "label": "Rating over {count} contests, highest {max}, now {current}",
+    "best": "Highest {max}",
+    "pointTitle": "{contest}: {rating}",
+    "hiddenContest": "A contest you cannot see",
+    "heatmapLabel": "Submission activity over 53 weeks",
+    "activityLine": "{count} submissions in the last 53 weeks · time zone {zone}",
+    "cellTitle": "{date}: {count} submissions",
+    "less": "Less",
+    "more": "More",
+    "months": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Oct",
+      "11": "Nov",
+      "12": "Dec"
+    },
     "title": "Rating chart"
   },
   "profile": {
