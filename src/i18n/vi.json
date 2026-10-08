@@ -34,9 +34,14 @@
     "notFound": "Không tìm thấy trang"
   },
   "placeholder": {
-    "pending": "Màn hình này đang chờ mockup được duyệt.",
-    "notFound": "Trang bạn tìm không tồn tại.",
-    "backHome": "Về trang chủ"
+    "pending": "Màn hình này đang chờ mockup được duyệt."
+  },
+  "notFound": {
+    "title": "Không tìm thấy trang",
+    "body": "Bit khóc cả một vũng nước mắt. Trang này không tồn tại, thử một trong các lối sau.",
+    "home": "Về trang chủ",
+    "problems": "Xem danh sách bài",
+    "bitLabel": "Bit đang khóc"
   },
   "account": {
     "login": "Đăng nhập",

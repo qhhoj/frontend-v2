@@ -136,7 +136,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: PlaceholderPage,
+    component: () => import('@/features/not-found/NotFoundPage.vue'),
     meta: { titleKey: 'pages.notFound' },
   },
 ];

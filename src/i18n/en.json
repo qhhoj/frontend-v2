@@ -34,9 +34,14 @@
     "notFound": "Page not found"
   },
   "placeholder": {
-    "pending": "This screen is waiting for an approved mock-up.",
-    "notFound": "The page you are looking for does not exist.",
-    "backHome": "Back to home"
+    "pending": "This screen is waiting for an approved mock-up."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "Bit cried a whole puddle. This page does not exist, try one of these instead.",
+    "home": "Back to home",
+    "problems": "Browse problems",
+    "bitLabel": "Bit crying"
   },
   "account": {
     "login": "Sign in",
