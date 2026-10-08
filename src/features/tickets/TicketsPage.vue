@@ -49,7 +49,8 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
       </RouterLink>
     </header>
     <TicketFilterNav :filters="filters" :total="data?.meta.total" />
-    <StaffTicketFilters :filters="filters" />
+    <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
+    <StaffTicketFilters :key="route.fullPath" :filters="filters" />
     <GlassCard as="div" class="overflow-hidden">
       <QueryState :loading="isPending" :error="null">
         <template #skeleton><TicketTableSkeleton /></template>

@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { sessionUser } from '@/test/fixtures';
 import { ticketItem } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, page } from '@/test/mock-api';
@@ -129,5 +129,30 @@ describe('ticket list: tab links', () => {
     await tabNamed(wrapper, 'Tất cả phiếu tôi xem được').trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.query).toEqual({ scope: 'all', open: '1' });
+  });
+});
+
+describe('ticket list: staff inputs follow the route', () => {
+  const typeCreator = async (wrapper: VueWrapper, text: string) => {
+    const input = wrapper.get('input[name="user"]');
+    await input.setValue(text);
+    await input.trigger('blur');
+    await flushPromises();
+  };
+  it('shows the restored filters after Back, and a blur does not push the older text', async () => {
+    mockApi({
+      ...signedInViewer({ user: sessionUser({ permissions: [CHANGE_TICKET] }) }),
+      'GET /tickets': page([]),
+    });
+    const { wrapper, router } = await mountApp('/tickets');
+    await typeCreator(wrapper, 'alpha');
+    await typeCreator(wrapper, 'bravo');
+    router.back();
+    await vi.waitFor(() =>
+      expect((wrapper.get('input[name="user"]').element as HTMLInputElement).value).toBe('alpha'),
+    );
+    await wrapper.get('input[name="user"]').trigger('blur');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ user: 'alpha' });
   });
 });

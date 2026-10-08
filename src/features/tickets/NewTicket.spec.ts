@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { problemDetail } from '@/test/fixtures';
 import { ticketDetail } from '@/test/community-fixtures';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
@@ -88,5 +88,33 @@ describe('new ticket validation and failures', () => {
     expect(calls.find((call) => call.method === 'POST')!.path).toBe('/problems/nope/tickets');
     expect(wrapper.get('input[name="problemCode"]').attributes('aria-invalid')).toBe('true');
     expect(wrapper.get('#problemCode-error').text()).toContain('Không tìm thấy bài nope');
+  });
+});
+
+describe('new ticket: busy submit and the lookup line', () => {
+  it('points the problem code field at the lookup line', async () => {
+    mockApi({
+      ...signedInViewer(),
+      'GET /problems/hcmus41b': ok(problemDetail({ code: 'hcmus41b' })),
+    });
+    const { wrapper } = await mountApp('/tickets/new?problem=hcmus41b');
+    await flushPromises();
+    expect(wrapper.get('input[name="problemCode"]').attributes('aria-describedby')).toContain(
+      'problem-lookup',
+    );
+  });
+  it('shows a busy submit in its token colours while the request is out', async () => {
+    mockApi({ ...signedInViewer(), 'POST /tickets/general': ok(ticketDetail()) });
+    hangRequestsExcept(['/auth/me', '/profile']);
+    const { wrapper } = await mountApp('/tickets/new');
+    await wrapper.get('input[type="radio"][value="general"]').setValue(true);
+    await wrapper.get('input[name="issueUrl"]').setValue('https://example.com/x');
+    await wrapper.get('input[name="title"]').setValue('T');
+    await wrapper.get('textarea[name="body"]').setValue('B');
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    const button = wrapper.get('button[type="submit"]');
+    expect(button.attributes('aria-busy')).toBe('true');
+    expect(button.classes()).toContain('bg-accent-soft');
   });
 });

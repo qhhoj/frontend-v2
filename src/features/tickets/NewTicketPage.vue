@@ -34,6 +34,14 @@ const errorText = (field: keyof TicketDraft) => {
   return key ? translate(key, { code: draft.problemCode.trim() }) : undefined;
 };
 const trimmedCode = computed(() => draft.problemCode.trim());
+/** The lookup line describes the code field; the field error (when any) joins it. */
+const problemCodeDescribedBy = computed(() =>
+  ['problem-lookup', errorId('problemCode')].filter(Boolean).join(' '),
+);
+const SUBMIT = 'inline-flex min-h-11 items-center rounded-pill px-6 font-semibold';
+/** A busy submit keeps its shape and changes colour only (token colours, no opacity). */
+const IDLE = 'bg-accent text-on-accent';
+const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
 </script>
 
 <template>
@@ -84,7 +92,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
                 autocomplete="off"
                 :class="[INPUT, borderFor('problemCode')]"
                 :aria-invalid="invalid('problemCode')"
-                :aria-describedby="errorId('problemCode')"
+                :aria-describedby="problemCodeDescribedBy"
               />
             </label>
             <p id="problem-lookup" aria-live="polite" class="min-h-6 text-[13px] text-muted">
@@ -159,7 +167,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
             <button
               type="submit"
               :aria-busy="isPending ? 'true' : undefined"
-              class="inline-flex min-h-11 items-center rounded-pill bg-accent px-6 font-semibold text-on-accent"
+              :class="[SUBMIT, isPending ? BUSY : IDLE]"
             >
               {{ $t('tickets.new.submit') }}
             </button>
