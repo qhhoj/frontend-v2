@@ -1,0 +1,51 @@
+{
+  "tabs": {
+    "general": "Thông tin chung",
+    "problems": "Bài trong kỳ thi",
+    "announcements": "Thông báo",
+    "ranking": "Bảng xếp hạng",
+    "actions": "Thao tác",
+    "participants": "Thí sinh"
+  },
+  "leads": {
+    "general": "Thông tin kỳ thi, thời gian, thể thức, quyền xem, rating.",
+    "problems": "Thứ tự, điểm và cách tính từng bài.",
+    "announcements": "Đăng, gửi lại và xóa thông báo.",
+    "ranking": "Bảng chính thức và liên kết công khai.",
+    "actions": "Tính lại điểm, chấm lần cuối, rating, xuất dữ liệu, nhân bản.",
+    "participants": "Lượt tham gia và loại khỏi bảng."
+  },
+  "view": "Xem kỳ thi",
+  "tabsLabel": "Các phần của kỳ thi",
+  "crumb": "Kỳ thi",
+  "summaryLine": "{format} · {start} đến {end} · {count} thí sinh",
+  "formats": {
+    "default": "Mặc định",
+    "ioi": "IOI",
+    "ioi16": "IOI 2016",
+    "icpc": "ICPC",
+    "vnoj": "VNOJ",
+    "ultimate": "Ultimate",
+    "final_submission": "Lần nộp cuối"
+  },
+  "notFound": "Không có kỳ thi {key}.",
+  "cannotEdit": "Tài khoản này không sửa được kỳ thi {key}.",
+  "index": {
+    "title": "Kỳ thi",
+    "lead": "Mở kỳ thi theo khóa, hoặc tạo kỳ thi mới.",
+    "lookupLabel": "Khóa kỳ thi",
+    "openLabel": "Mở kỳ thi",
+    "lookupHint": "Chưa có danh sách quản trị: nhập đúng khóa kỳ thi.",
+    "create": "Tạo kỳ thi"
+  },
+  "general": {
+    "errors": {
+      "required": "Cần điền.",
+      "endBeforeStart": "Kết thúc phải sau bắt đầu.",
+      "cacheTimeout": "Từ 0 đến 86400 giây.",
+      "frozen": "Không được âm.",
+      "ratingRange": "Rating tối đa phải không nhỏ hơn tối thiểu.",
+      "tags": "Tối đa 20 thẻ."
+    }
+  }
+}

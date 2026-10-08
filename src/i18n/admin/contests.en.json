@@ -1,0 +1,51 @@
+{
+  "tabs": {
+    "general": "General",
+    "problems": "Problems",
+    "announcements": "Announcements",
+    "ranking": "Ranking",
+    "actions": "Actions",
+    "participants": "Participants"
+  },
+  "leads": {
+    "general": "Contest details, time, format, viewing and ranking access, rating.",
+    "problems": "Order, points and scoring of each problem.",
+    "announcements": "Post, resend and delete announcements.",
+    "ranking": "The official ranking and the public ranking link.",
+    "actions": "Rescore, final judging, rating, data export, clone.",
+    "participants": "Participations and disqualification."
+  },
+  "view": "View contest",
+  "tabsLabel": "Parts of the contest",
+  "crumb": "Contests",
+  "summaryLine": "{format} · {start} to {end} · {count} participants",
+  "formats": {
+    "default": "Default",
+    "ioi": "IOI",
+    "ioi16": "IOI 2016",
+    "icpc": "ICPC",
+    "vnoj": "VNOJ",
+    "ultimate": "Ultimate",
+    "final_submission": "Final submission"
+  },
+  "notFound": "There is no contest {key}.",
+  "cannotEdit": "This account cannot edit contest {key}.",
+  "index": {
+    "title": "Contests",
+    "lead": "Open a contest by its key, or create a new one.",
+    "lookupLabel": "Contest key",
+    "openLabel": "Open contest",
+    "lookupHint": "No list yet: type the exact contest key.",
+    "create": "Create contest"
+  },
+  "general": {
+    "errors": {
+      "required": "Required.",
+      "endBeforeStart": "The end must be after the start.",
+      "cacheTimeout": "From 0 to 86400 seconds.",
+      "frozen": "Cannot be negative.",
+      "ratingRange": "The maximum rating cannot be below the minimum.",
+      "tags": "At most 20 tags."
+    }
+  }
+}
