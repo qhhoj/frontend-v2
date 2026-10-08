@@ -122,6 +122,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.changePassword', requiresAuth: true },
   },
   {
+    path: '/settings/appearance',
+    name: 'settings-appearance',
+    component: () => import('@/features/appearance/AppearancePage.vue'),
+    meta: { titleKey: 'pages.appearance' },
+  },
+  {
     path: '/settings',
     name: 'settings',
     component: PlaceholderPage,
