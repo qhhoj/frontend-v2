@@ -31,6 +31,7 @@
   --color-surface-strong: var(--qh-surface-strong);
   --color-surface-hover: var(--qh-surface-hover);
   --color-surface-solid: var(--qh-surface-solid);
+  --color-skeleton: var(--qh-skeleton);
   --color-line: var(--qh-line);
   --color-line-strong: var(--qh-line-strong);
   --color-content: var(--qh-text);
@@ -80,6 +81,7 @@
   --radius-card: var(--qh-radius-card);
   --radius-panel: var(--qh-radius-panel);
   --radius-pill: var(--qh-radius-pill);
+  --radius-skeleton: var(--qh-radius-skeleton);
   --shadow-glow: var(--qh-glow);
   --blur-glass: var(--qh-blur);
   --ease-standard: var(--qh-ease);
@@ -99,6 +101,56 @@
 /* Background blobs are shown or hidden by the theme (`--qh-blob-display`): Clay has none. */
 @utility blob-field {
   display: var(--qh-blob-display);
+}
+/* Loading indicators keep their own durations (--qh-duration is 0 under reduced motion) and switch themselves off there. */
+@keyframes qh-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes qh-bit-sob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--bit-px, 4px) * -1));
+  }
+}
+@keyframes qh-bit-tear {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(var(--bit-px, 4px) * 9));
+    opacity: 0;
+  }
+}
+@utility skeleton-pulse {
+  animation: qh-skeleton-pulse 1.4s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+@utility bit-sob {
+  animation: qh-bit-sob 0.7s steps(1) infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+@utility bit-tear {
+  animation: qh-bit-tear 1.1s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 @utility bg-first-solve {
   background-image: linear-gradient(90deg, var(--qh-first-solve-bg), var(--qh-first-solve-bg-2));

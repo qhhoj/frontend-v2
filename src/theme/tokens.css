@@ -9,6 +9,7 @@
   --qh-radius-card: 24px;
   --qh-radius-panel: 28px;
   --qh-radius-pill: 999px;
+  --qh-radius-skeleton: 8px;
   --qh-duration-fast: 150ms;
   --qh-duration: 200ms;
   --qh-ease: cubic-bezier(0.2, 0, 0, 1);

@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { errorMessageKey } from '@/i18n/error-message';
+import { useWaitingWhile } from '@/stores/use-waiting-while';
+import SkeletonBlock from './SkeletonBlock.vue';
 
-defineProps<{ loading: boolean; error: unknown }>();
+const props = defineProps<{ loading: boolean; error: unknown }>();
 defineEmits<{ retry: [] }>();
+// `loading` is the query's isPending: first data only. Background refetches and kept data never register.
+useWaitingWhile(() => props.loading);
 </script>
 
 <template>
-  <p v-if="loading" role="status" class="py-6 text-center text-muted">{{ $t('common.loading') }}</p>
+  <!-- `contents`: the skeleton lays out exactly as the content will, with no wrapper box of its own. The shell announces "loading" once. -->
+  <div v-if="loading" class="contents" aria-hidden="true" data-testid="query-skeleton">
+    <slot name="skeleton"><SkeletonBlock class="h-24 w-full" /></slot>
+  </div>
   <div
     v-else-if="error"
     role="alert"

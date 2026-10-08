@@ -7,6 +7,7 @@
   --qh-surface: rgba(255, 255, 255, 0.04);
   --qh-surface-strong: rgba(255, 255, 255, 0.06);
   --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-skeleton: rgba(255, 255, 255, 0.1);
   --qh-surface-solid: #1b1530;
   --qh-line: rgba(255, 255, 255, 0.1);
   --qh-line-strong: rgba(255, 255, 255, 0.16);

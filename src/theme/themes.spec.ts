@@ -222,6 +222,16 @@ describe.each(themes)('theme $id', ({ id, css, tokens }) => {
     expect(tokens.get('glow')).toMatch(/rgba\(0, 0, 0, 0\)$/);
   });
 
+  it('draws a skeleton block that stands out from the card surface and from an inner tile', () => {
+    const ground = colour('ground');
+    const skeleton = over(colour('skeleton'), over(colour('surface-solid'), ground));
+    for (const base of ['surface-solid', 'surface-strong'])
+      expect(
+        contrastRatio(skeleton, over(colour(base), ground)),
+        `--qh-skeleton on --qh-${base}`,
+      ).toBeGreaterThanOrEqual(1.1);
+  });
+
   it('keeps coin text at 4.5:1 on both stops of every coin gradient', () => {
     const failures = COINS.flatMap((coin) => {
       const stops = [...(tokens.get(coin) ?? '').matchAll(/#[0-9a-f]{6}/gi)].map(([stop]) => stop);

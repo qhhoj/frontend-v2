@@ -70,3 +70,13 @@ export const fail = (
   body: { error: { code, message: code, ...(fields && { fields }) } },
 });
 export const noContent = (): MockResponse => ({ status: 204 });
+
+/** After `mockApi`: requests whose URL contains none of `allowed` never answer, so a screen stays in its loading state. */
+export function hangRequestsExcept(allowed: string[]) {
+  const answer = globalThis.fetch;
+  vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+    allowed.some((fragment) => String(input).includes(fragment))
+      ? answer(input, init)
+      : new Promise<Response>(() => {}),
+  );
+}

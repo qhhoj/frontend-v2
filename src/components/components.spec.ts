@@ -7,6 +7,7 @@ import { mountComponent } from '@/test/mount';
 import CountdownTimer from './CountdownTimer.vue';
 import GlassCard from './GlassCard.vue';
 import QueryState from './QueryState.vue';
+import SkeletonBlock from './SkeletonBlock.vue';
 import TokenCoin from './TokenCoin.vue';
 import UserContent from './UserContent.vue';
 import UserName from './UserName.vue';
@@ -53,7 +54,10 @@ describe('shared components', () => {
       props: { loading: true, error: null },
       slots: { default: '<p>content</p>' },
     });
-    expect(loading.text()).toBe('Đang tải…');
+    expect(loading.text()).toBe('');
+    expect(loading.find('[data-skeleton]').exists()).toBe(true); // the default skeleton
+    expect(loading.get('[data-testid="query-skeleton"]').attributes('aria-hidden')).toBe('true');
+    expect(loading.find('[role="status"]').exists()).toBe(false); // the shell announces, not each card
     const failed = mountComponent(QueryState, {
       props: { loading: false, error: new ApiError('not_found', 404, 'x') },
       slots: { default: '<p>content</p>' },
@@ -67,6 +71,52 @@ describe('shared components', () => {
     });
     await flushPromises();
     expect(ready.text()).toBe('content');
+  });
+
+  it('QueryState renders the caller skeleton while loading and the content once ready, with no blocks left', async () => {
+    const slots = {
+      skeleton: '<span data-testid="mine">shaped like the card</span>',
+      default: '<p>content</p>',
+    };
+    const loading = mountComponent(QueryState, { props: { loading: true, error: null }, slots });
+    expect(loading.find('[data-testid="mine"]').exists()).toBe(true);
+    expect(loading.find('p').exists()).toBe(false);
+    const ready = mountComponent(QueryState, { props: { loading: false, error: null }, slots });
+    await flushPromises();
+    expect(ready.find('[data-testid="mine"]').exists()).toBe(false);
+    expect(ready.find('[data-skeleton]').exists()).toBe(false);
+    expect(ready.text()).toBe('content');
+  });
+
+  it('QueryState shows the error and its retry instead of the skeleton', () => {
+    const failed = mountComponent(QueryState, {
+      props: { loading: false, error: new ApiError('not_found', 404, 'x') },
+      slots: { skeleton: '<span data-testid="mine" />' },
+    });
+    expect(failed.find('[data-testid="mine"]').exists()).toBe(false);
+    expect(failed.get('[role="alert"]').text()).toContain('Không tìm thấy.');
+  });
+
+  it('SkeletonBlock is hidden from assistive tech and a text block is as tall as its font', () => {
+    const block = mountComponent(SkeletonBlock, { props: { text: true } });
+    expect(block.attributes('aria-hidden')).toBe('true');
+    expect(block.classes()).toContain('h-[1em]');
+    expect(block.classes()).toContain('skeleton-pulse');
+    expect(block.classes()).toContain('bg-skeleton');
+    expect(mountComponent(SkeletonBlock, { props: { round: true } }).classes()).toContain(
+      'rounded-full',
+    );
+  });
+
+  it('turns the skeleton, Bit sob and Bit tear animations off under reduced motion', () => {
+    for (const utility of ['skeleton-pulse', 'bit-sob', 'bit-tear']) {
+      const start = stylesCss.indexOf(`@utility ${utility} {`);
+      expect(start, utility).toBeGreaterThanOrEqual(0);
+      const body = stylesCss.slice(start, stylesCss.indexOf('@utility', start + 1));
+      expect(body, utility).toMatch(
+        /@media \(prefers-reduced-motion: reduce\)\s*\{\s*animation: none;/,
+      );
+    }
   });
 
   it('GlassCard renders the requested element with its content', () => {
