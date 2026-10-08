@@ -1,7 +1,7 @@
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 
-/** Six categories, one existing token each (`--qh-syntax-*`, defined per theme by 8a2), so a theme or palette recolours code with CSS only. Comments are italic as in the mock-up. */
+/** Six colours from the theme's `--qh-syntax-*` tokens, so a theme recolours code with CSS only; comments are italic. */
 export const syntaxStyle = HighlightStyle.define([
   {
     tag: [

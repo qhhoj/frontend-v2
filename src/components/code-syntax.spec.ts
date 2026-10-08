@@ -31,9 +31,79 @@ describe('syntaxStyle', () => {
     expect((await classesOf('c_cpp', 'int lis(int a) { return a; }')).get('a')).toBeUndefined();
   });
 
-  it('colours Python too', async () => {
-    const classes = await classesOf('python', '# note\ndef lis(a):\n    return 42\n');
-    expect(classes.get('return')).toBeTruthy();
-    expect(classes.get('42')).not.toBe(classes.get('return'));
+  // Each case: one line of source and the token each category should land on (the five colour names are the style's categories).
+  const lines: Array<{
+    ace: string;
+    source: string;
+    keyword: string;
+    type?: string;
+    number: string;
+    string: string;
+    function: string;
+  }> = [
+    {
+      ace: 'python',
+      source: 'def lis(a): return 42 if a else "hi"',
+      keyword: 'return',
+      number: '42',
+      string: '"hi"',
+      function: 'lis',
+    },
+    {
+      ace: 'java',
+      source: 'class A { int f(int a) { return lis(42); } String s = "hi"; }',
+      keyword: 'return',
+      type: 'int',
+      number: '42',
+      string: '"hi"',
+      function: 'lis',
+    },
+    {
+      ace: 'javascript',
+      source: 'function lis(a) { return 42 + a; } const s = "hi";',
+      keyword: 'return',
+      number: '42',
+      string: '"hi"',
+      function: 'lis',
+    },
+    {
+      ace: 'rust',
+      source: 'fn lis(a: i32) -> i32 { return 42; } let s = "hi";',
+      keyword: 'return',
+      type: 'i32',
+      number: '42',
+      string: '"hi"',
+      function: 'lis',
+    },
+    {
+      ace: 'golang',
+      source: 'func lis(a int) int { return 42 }; var s = "hi"',
+      keyword: 'return',
+      type: 'int',
+      number: '42',
+      string: '"hi"',
+      function: 'lis',
+    },
+  ];
+
+  it.each(lines)(
+    'colours $ace keywords, numbers, strings, types and function names apart',
+    async (line) => {
+      const classes = await classesOf(line.ace, line.source);
+      const picks = [
+        line.keyword,
+        line.number,
+        line.string,
+        line.function,
+        ...(line.type ? [line.type] : []),
+      ].map((token) => classes.get(token));
+      expect(picks.every(Boolean), `every token coloured: ${picks.join(' | ')}`).toBe(true);
+      expect(new Set(picks).size).toBe(picks.length);
+    },
+  );
+
+  it('colours a Python call to a built-in like a function', async () => {
+    const classes = await classesOf('python', 'def lis(a): return len(a)');
+    expect(classes.get('len')).toBe(classes.get('lis'));
   });
 });

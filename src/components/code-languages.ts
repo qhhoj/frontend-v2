@@ -14,7 +14,9 @@ export async function loadLanguagePack(ace: string): Promise<Extension | null> {
   if (!Object.hasOwn(PACKS, ace)) return null;
   try {
     return await PACKS[ace]!();
-  } catch {
+  } catch (error) {
+    // Plain text keeps the editor usable, but a broken chunk should not go unnoticed.
+    console.warn('code language pack failed to load', ace, error);
     return null;
   }
 }
