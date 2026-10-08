@@ -25,7 +25,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Session status `unknown | anonymous | partial | authenticated`; `/auth/me` 401 is anonymous, other failures keep the status unknown and retry on the next navigation — an offline backend must not lock out public pages.
 - A 401 on a protected request signs the viewer out in the store — otherwise an expired session leaves the shell signed in while every request fails; a page-level redirect comes in 8b.
 - Profile query runs only when authenticated with no password change pending — the guard answers every other request with 403 `password_change_required`.
-- Account-owned queries keep the user id in their key and the cache is cleared on logout, login and expiry — the next viewer must never see the previous account's data.
+- Account-owned queries keep the user id in their key and the cache is cleared in one place (`useAccountCacheSync`) whenever the signed-in user changes (login, logout, expiry, another account) — the next viewer must never see the previous account's data.
 - `redirect` values pass through `safeRedirect`: only `/path`; `//`, `/\`, scheme URLs and arrays become `/` — open-redirect protection.
 - Non-staff on `/admin/**` get not-found at the same URL — existence is not revealed. Admin is one lazy chunk.
 - Guards route page navigations only; `csrf_failed`, `two_factor_required` and `password_change_required` from an API call are not turned into redirects (8b). Their messages exist in both locales.
@@ -51,7 +51,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - `choose()` is a user action: it applies the theme and remembers it in this browser; signed in, the menu also saves it as `siteTheme`, and a failed save keeps the local choice — the account is the cross-device truth.
 - `adopt()` applies the account's theme without writing the browser preference — the account default must not overwrite the browser's own choice on each sign-in; `adopt(null)` on sign-out returns to the browser choice, then the OS.
 - A cached theme id is held at start-up until the account or the OS says otherwise — no repaint of the theme already on screen.
-- The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) — no flash of the wrong theme. It repeats the registry ids; `prepaint.spec.ts` enforces that they match.
+- The pre-paint script in `index.html` applies the last painted theme id (`qhhoj.resolvedTheme`) — no flash of the wrong theme. It repeats the registry ids and each theme's ground (address-bar colour); `prepaint.spec.ts` enforces that they match.
 - Reduced transparency or no `backdrop-filter`: blur 0 and opaque surfaces; reduced motion: durations 0 — glass stays readable.
 - Background blobs: phones get two 300 px blobs; blob-3 is hidden below 768 px wide or at 759 px high and under — on narrow or short screens its centre would sink into blob-2 and break contrast.
 
@@ -59,7 +59,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - `UserContent` containment is load-bearing: `overflow: clip; contain: paint inline-size; isolation: isolate; min-width: 0`, with pre, `.katex-display` and tables scrolling inside the box — sanitized user HTML cannot paint, size or stack outside its box.
 - The backend sanitizer must keep blocking the `popover` attribute — a popover opens in the top layer and escapes the containment.
-- No `v-html` in 8a; backend strings are rendered as text.
+- `v-html` only in `UserContent`; no 8a route renders it yet. Other backend strings are rendered as text.
 
 ## Screens and mock-up deviations
 
@@ -67,6 +67,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Home: "Top rating" (top 3 by rating) replaces "Top tuần" — there is no weekly board (B7).
 - Home: the rating delta is the change at the last rated contest — ratings move per contest.
 - Home: quick submit is a problem code, a language select and a plain monospace textarea — Monaco comes with 8c. Its status region is `aria-live="polite"`, which re-announces each test-case frame (up to 4 per second).
+- Ranking: podium medals use the `coin-3`/`coin-6`/`coin-5` tokens, not the mock-up's gold, silver and bronze gradients; the viewer's own row is `bg-surface-hover`, not a pink tint — both stay inside the theme tokens.
 - Problems: no "Chưa giải" chip — no unsolved filter (B6); the points range is a popover with two number inputs; columns sort on click.
 - Problems: the `attempted` label stays "Đã thử" — ruling from the Task 3 review.
 - Ranking: the contest tabs become a contest sub-nav under the shared header.

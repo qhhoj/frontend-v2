@@ -21,7 +21,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 
 - Pinia holds client state only: `session`, `theme`, `locale`. Server data is never copied into Pinia
 - vue-query keys: `[area, resource, params]` (`['problems', 'list', filters, lang]`); invalidate by prefix (`['submissions']`)
-- Account-owned queries include the user id in the key (`profileKey(userId)`); signing out or an expired session clears the cache (`useAccountCacheSync`)
+- Account-owned queries include the user id in the key (`profileKey(userId)`); `useAccountCacheSync` (in the shell) is the only place that clears the cache, whenever the signed-in user changes: login, logout, expiry or another account taking over
 - Lists and polls keep the previous data while a new key loads (`keepPreviousData`, `placeholderData`), so a filter change or a failed poll does not blank the screen
 - API calls go through `apiRequest` (single value) or `apiPage` (list) in `src/api/client.ts`; it sends `X-CSRF-Token` on unsafe methods, unwraps the envelope and throws `ApiError { code, status, fields }`
 - DTO types are hand-written in `src/api/types/<area>.ts` with a `backend:` pointer to the response class, until the backend OpenAPI carries response schemas; then they are generated
@@ -41,12 +41,13 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 
 ## Add a theme
 
-1. Copy `src/theme/themes/glass-dark.css` to `src/theme/themes/<id>.css`. Keep only `:root[data-theme='<id>']` as the selector (drop the `:root,` base that glass-dark carries) and change the values (6-digit hex or `rgba()` only)
+1. Copy `src/theme/themes/glass-dark.css` to `src/theme/themes/<id>.css`. Keep only `:root[data-theme='<id>']` as the selector (drop the `:root,` base that glass-dark carries) and change the values (6-digit hex or `rgba()` only; the `coin-*` gradient stops must be 6-digit hex, `themes.spec.ts` reads them as such)
 2. Import it in `src/theme/styles.css` next to the others
 3. Add `{ id: '<id>', labelKey: 'theme.<key>', scheme: 'dark' | 'light', storedAs: '<id>' }` to `THEMES` in `src/theme/registry.ts`, and the label to both locale files
-4. If the theme should become the default for its scheme, replace the fallback id in the pre-paint script in `index.html` (`known` and the `prefersLight` branch); the `known` list must contain every registered id, and `src/theme/prepaint.spec.ts` enforces that
-5. `npm test`: `src/theme/themes.spec.ts` fails on a missing token, a CSS file that is not registered (or the reverse), a missing import in `styles.css`, the wrong `color-scheme`, or any text pair under 4.5:1 on the worst ground (blob centre + glass + hover, and the opaque fallback)
-6. Backend: the account's `siteTheme` accepts only `auto | light | dark` today; allow the new id there (backend ask B3) before the theme can be saved per account. Until then, `storedAs` maps the theme onto a backend value
+4. Add `'<id>': '<its --qh-ground>'` to `grounds` in the pre-paint script in `index.html` (the id list and the address-bar colour); `src/theme/prepaint.spec.ts` fails on a missing id or a ground that differs from the theme file
+5. If the theme should become the default for its scheme, also replace the fallback id in the `prefersLight` branch of that script
+6. `npm test`: `src/theme/themes.spec.ts` fails on a missing token, a CSS file that is not registered (or the reverse), a missing import in `styles.css`, the wrong `color-scheme`, or any text pair under 4.5:1 on the worst ground (blob centre + glass + hover, and the opaque fallback)
+7. Backend: the account's `siteTheme` accepts only `auto | light | dark` today; allow the new id there (backend ask B3) before the theme can be saved per account. Until then, `storedAs` maps the theme onto a backend value, and while signed in the account's theme wins on the next load, so the new theme is usable signed-out only until B3
 
 Change a palette: edit the values in the theme file and run `npm test`.
 
