@@ -57,7 +57,7 @@ const pageTo = (page: number) => ({
       <span class="block">{{ emptyTitle }}</span>
       <span class="block">{{ $t('admin.similarity.pairs.emptyHint') }}</span>
       <button type="button" class="mt-3" :class="ADMIN_BUTTON_CLASS" @click="$emit('reset')">
-        {{ $t('admin.similarity.pairs.filters.reset') }}
+        {{ $t('admin.similarity.pairs.resetFilters') }}
       </button>
     </EmptyState>
     <ul v-else class="flex flex-col gap-2">

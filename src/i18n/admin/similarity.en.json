@@ -104,7 +104,7 @@
       "allLanguages": "All",
       "minPercent": "Minimum similarity",
       "minPercentHint": "The value sent is {fraction} (0 to 1). The run's threshold is {minPercent}%; no pair sits below it.",
-      "reset": "Reset filters",
+      "reset": "Reset",
       "hiddenNote": "Pairs of problems you cannot view are hidden, so the total here can be smaller than the run's total."
     },
     "count": "{count} pairs",
@@ -128,7 +128,8 @@
     "emptyHint": "Lower the similarity threshold or pick another problem to see more pairs.",
     "kgram": "{count} k-grams",
     "pager": "Pagination",
-    "contestCrumb": "Contest"
+    "contestCrumb": "Contest",
+    "resetFilters": "Reset filters"
   },
   "pair": {
     "title": "Similar pair",

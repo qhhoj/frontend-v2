@@ -104,7 +104,7 @@
       "allLanguages": "Tất cả",
       "minPercent": "Độ tương đồng tối thiểu",
       "minPercentHint": "Giá trị gửi là {fraction} (từ 0 đến 1). Ngưỡng của lượt chạy là {minPercent}%, thấp hơn mức đó không có cặp.",
-      "reset": "Đặt lại bộ lọc",
+      "reset": "Đặt lại",
       "hiddenNote": "Cặp thuộc bài bạn không xem được sẽ bị ẩn, nên tổng ở đây có thể nhỏ hơn tổng của lượt chạy."
     },
     "count": "{count} cặp",
@@ -128,7 +128,8 @@
     "emptyHint": "Hạ ngưỡng tương đồng hoặc đổi bài để xem thêm cặp.",
     "kgram": "{count} k-gram",
     "pager": "Phân trang",
-    "contestCrumb": "Kỳ thi"
+    "contestCrumb": "Kỳ thi",
+    "resetFilters": "Đặt lại bộ lọc"
   },
   "pair": {
     "title": "Cặp tương đồng",

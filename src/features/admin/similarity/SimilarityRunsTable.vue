@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyState from '@/components/EmptyState.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import { shortId } from '../ui/short-id';
 import { formatDateTime, formatNumber } from '@/lib/format';
@@ -32,9 +33,7 @@ const detailTo = (run: SimilarityRun) => ({
       }}
     </h2>
     <p class="text-sm text-muted">{{ $t('admin.similarity.runs.note') }}</p>
-    <div v-if="runs.length === 0" class="text-sm text-muted">
-      {{ $t('admin.similarity.runs.empty') }}
-    </div>
+    <EmptyState v-if="runs.length === 0">{{ $t('admin.similarity.runs.empty') }}</EmptyState>
     <div
       v-else
       class="overflow-x-auto"
