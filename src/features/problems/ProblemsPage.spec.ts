@@ -129,7 +129,7 @@ describe('problem list', () => {
   it('moves focus into the points popover from the keyboard', async () => {
     mockApi(anonymous());
     const { wrapper } = await mountApp('/problems');
-    const trigger = wrapper.get('button[aria-haspopup="dialog"]');
+    const trigger = wrapper.get('#main button[aria-haspopup="dialog"]');
     expect(trigger.attributes('aria-expanded')).toBe('false');
     await trigger.trigger('keydown.enter');
     await trigger.trigger('click');
@@ -213,14 +213,14 @@ describe('problem list', () => {
   it('sets a points range from the popover', async () => {
     mockApi(anonymous());
     const { wrapper, router } = await mountApp('/problems');
-    await wrapper.get('button[aria-haspopup="dialog"]').trigger('click');
+    await wrapper.get('#main button[aria-haspopup="dialog"]').trigger('click');
     await flushPromises();
     const minimum = document.body.querySelector<HTMLInputElement>('input[name="pointsMin"]')!;
     minimum.value = '800';
     minimum.dispatchEvent(new Event('change'));
     await flushPromises();
     expect(router.currentRoute.value.query.min).toBe('800');
-    expect(wrapper.get('button[aria-haspopup="dialog"]').text()).toBe('Điểm 800–…');
+    expect(wrapper.get('#main button[aria-haspopup="dialog"]').text()).toBe('Điểm 800–…');
   });
 
   it('says when nothing matches', async () => {

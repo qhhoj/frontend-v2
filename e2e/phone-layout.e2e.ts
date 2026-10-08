@@ -32,6 +32,7 @@ const PAGES = [
   { path: '/problems/duongdi', signedIn: true, ready: 'Thời gian' },
   { path: '/submissions', signedIn: true, ready: 'Tổng hai số' },
   { path: '/submissions/sub-1', signedIn: true, ready: 'Kết quả từng test' },
+  { path: '/settings/appearance', signedIn: false, ready: 'Dùng giao diện riêng' },
 ] as const;
 
 for (const { path, signedIn, ready } of PAGES)
@@ -50,7 +51,7 @@ test('the header stacks: brand, then the nav pill, with the tools beside the bra
   await page.goto('/blog');
   const brand = (await page.getByRole('link', { name: 'QHHOJ' }).first().boundingBox())!;
   const nav = (await page.getByRole('navigation', { name: 'Điều hướng chính' }).boundingBox())!;
-  const tools = (await page.getByRole('button', { name: 'Đổi giao diện' }).boundingBox())!;
+  const tools = (await page.getByRole('button', { name: 'Giao diện', exact: true }).boundingBox())!;
   const account = (await page.getByRole('button', { name: /Tài khoản của/ }).boundingBox())!;
   expect(nav.y).toBeGreaterThanOrEqual(brand.y + brand.height);
   expect(nav.x + nav.width).toBeLessThanOrEqual(PHONE.width);

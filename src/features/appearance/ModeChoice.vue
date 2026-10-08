@@ -33,13 +33,14 @@ const mode = computed<Mode>(
 );
 
 /** One of the six preferences: `auto`, `glass-auto`, or the theme of that style and scheme. */
-const preferenceOf = (nextStyle: Style, nextMode: Mode) =>
-  nextMode === 'auto'
-    ? nextStyle === 'glass'
-      ? GLASS_AUTO_THEME
-      : AUTO_THEME
-    : THEMES.find((entry) => entry.glass === (nextStyle === 'glass') && entry.scheme === nextMode)!
-        .id;
+const preferenceOf = (nextStyle: Style, nextMode: Mode): string => {
+  const isGlass = nextStyle === 'glass';
+  if (nextMode === 'auto') return isGlass ? GLASS_AUTO_THEME : AUTO_THEME;
+  const chosen = THEMES.find((entry) => entry.glass === isGlass && entry.scheme === nextMode);
+  // Every style has a light and a dark theme (registry), so this only guards a registry edit.
+  if (!chosen) throw new Error(`No ${nextStyle} theme for mode ${nextMode}`);
+  return chosen.id;
+};
 </script>
 
 <template>

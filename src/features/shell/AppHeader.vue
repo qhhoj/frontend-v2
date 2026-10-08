@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
+import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import LocaleToggle from './LocaleToggle.vue';
-import ThemeMenu from './ThemeMenu.vue';
 import UserMenu from './UserMenu.vue';
 
 const route = useRoute();
@@ -47,7 +47,7 @@ const isCurrent = (path: string) =>
     </nav>
     <div class="ml-auto flex items-center gap-2">
       <LocaleToggle />
-      <ThemeMenu />
+      <AppearancePanel />
       <UserMenu />
     </div>
   </header>

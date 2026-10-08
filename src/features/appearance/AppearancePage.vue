@@ -9,6 +9,7 @@ import { useAppearanceStore } from '@/theme/appearance.store';
 import { useThemeStore } from '@/theme/theme.store';
 import AccentChoice from './AccentChoice.vue';
 import AppearancePreview from './AppearancePreview.vue';
+import LevelSlider from './LevelSlider.vue';
 import ModeChoice from './ModeChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 import { useReducedTransparency } from './use-reduced-transparency';
@@ -19,7 +20,7 @@ const theme = useThemeStore();
 const { shown, apply, save, update, turnOff, reset } = useAppearanceChoice();
 const reducedTransparency = useReducedTransparency();
 /** Glass and Glow act on the Glass themes only; Clay is flat, so the controls are inert there (values are kept). */
-const frosted = computed(() => theme.theme.glass);
+const isGlassTheme = computed(() => theme.theme.glass);
 
 const isOn = computed(() => appearance.look !== null);
 const glassStopKey = computed(
@@ -33,9 +34,6 @@ const saveNoteKey = computed(() =>
       : 'appearance.savedBrowser',
 );
 const toggle = () => (isOn.value ? turnOff() : update({}));
-const onGlass = (event: Event) =>
-  apply({ glass: Number((event.target as HTMLInputElement).value) });
-const onGlow = (event: Event) => apply({ glow: Number((event.target as HTMLInputElement).value) });
 </script>
 
 <template>
@@ -83,54 +81,40 @@ const onGlow = (event: Event) => apply({ glow: Number((event.target as HTMLInput
           <div class="mt-3"><AccentChoice :disabled="!isOn" /></div>
         </div>
 
-        <div>
-          <div class="flex items-baseline justify-between">
-            <label for="glass-level" class="font-semibold">{{ $t('appearance.glass') }}</label>
-            <span class="font-mono text-[13px] text-muted">{{ $t(glassStopKey) }}</span>
-          </div>
-          <p class="mt-1 text-[13px] text-muted">{{ $t('appearance.glassHelp') }}</p>
-          <input
-            id="glass-level"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            :value="shown.glass"
-            :disabled="!isOn || reducedTransparency || !frosted"
-            :aria-valuetext="$t(glassStopKey)"
-            class="mt-2 h-11 w-full accent-accent disabled:cursor-not-allowed"
-            @input="onGlass"
-            @change="save()"
-          />
+        <LevelSlider
+          id="glass-level"
+          :label="$t('appearance.glass')"
+          :readout="$t(glassStopKey)"
+          :help="$t('appearance.glassHelp')"
+          :value="shown.glass"
+          :step="1"
+          :disabled="!isOn || reducedTransparency || !isGlassTheme"
+          :value-text="$t(glassStopKey)"
+          @input="(glass) => apply({ glass })"
+          @commit="save()"
+        >
           <div class="flex justify-between text-xs text-muted" aria-hidden="true">
             <span v-for="stop in GLASS_STOPS" :key="stop.value">{{ $t(stop.labelKey) }}</span>
           </div>
           <p v-if="reducedTransparency" class="mt-2 text-[13px] text-muted">
             {{ $t('appearance.solidByDevice') }}
           </p>
-        </div>
+        </LevelSlider>
 
-        <div>
-          <div class="flex items-baseline justify-between">
-            <label for="glow-level" class="font-semibold">{{ $t('appearance.glow') }}</label>
-            <span class="font-mono text-[13px] text-muted">{{ shown.glow }}%</span>
-          </div>
-          <input
-            id="glow-level"
-            type="range"
-            min="0"
-            max="100"
-            step="5"
-            :value="shown.glow"
-            :disabled="!isOn || !frosted"
-            class="mt-2 h-11 w-full accent-accent disabled:cursor-not-allowed"
-            @input="onGlow"
-            @change="save()"
-          />
-          <p v-if="!frosted" class="mt-2 text-[13px] text-muted">
+        <LevelSlider
+          id="glow-level"
+          :label="$t('appearance.glow')"
+          :readout="`${shown.glow}%`"
+          :value="shown.glow"
+          :step="5"
+          :disabled="!isOn || !isGlassTheme"
+          @input="(glow) => apply({ glow })"
+          @commit="save()"
+        >
+          <p v-if="!isGlassTheme" class="mt-2 text-[13px] text-muted">
             {{ $t('appearance.glassOnly') }}
           </p>
-        </div>
+        </LevelSlider>
 
         <div>
           <button

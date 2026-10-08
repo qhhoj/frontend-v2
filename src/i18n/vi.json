@@ -98,16 +98,12 @@
     "solidByDevice": "Thiết bị của bạn yêu cầu giảm độ trong suốt, nên các thẻ luôn đặc."
   },
   "theme": {
-    "menu": "Đổi giao diện",
     "styleClay": "Clay",
     "styleGlass": "Glass",
-    "clayAuto": "Clay tự động",
     "clayLight": "Clay sáng",
     "clayDark": "Clay tối",
     "glassDark": "Glass tối",
-    "glassLight": "Glass sáng",
-    "glassAuto": "Glass tự động",
-    "current": "đang dùng"
+    "glassLight": "Glass sáng"
   },
   "locale": {
     "switchTo": "Switch to English",

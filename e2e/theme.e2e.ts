@@ -6,8 +6,10 @@ test('a theme choice applies at once and survives a reload', async ({ page, api 
   await page.goto('/blog');
   const html = page.locator('html');
   await expect(html).toHaveAttribute('data-theme', 'clay-dark');
-  await page.getByRole('button', { name: 'Đổi giao diện' }).click();
-  await page.getByRole('menuitem', { name: 'Glass sáng' }).click();
+  await page.getByRole('button', { name: 'Giao diện', exact: true }).click();
+  const panel = page.getByRole('dialog', { name: 'Giao diện' });
+  await panel.getByRole('button', { name: 'Glass', exact: true }).click();
+  await panel.getByRole('button', { name: 'Sáng', exact: true }).click();
   await expect(html).toHaveAttribute('data-theme', 'glass-light');
   await page.reload();
   await expect(html).toHaveAttribute('data-theme', 'glass-light');
@@ -31,8 +33,14 @@ test('Glass automatic follows the system colour scheme live, on Glass, and survi
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/blog');
   const html = page.locator('html');
-  await page.getByRole('button', { name: 'Đổi giao diện' }).click();
-  await page.getByRole('menuitem', { name: 'Glass tự động' }).click();
+  await page.getByRole('button', { name: 'Giao diện', exact: true }).click();
+  const panel = page.getByRole('dialog', { name: 'Giao diện' });
+  // The mode is already automatic, so picking the Glass style stores `glass-auto`.
+  await expect(panel.getByRole('button', { name: 'Tự động', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await panel.getByRole('button', { name: 'Glass', exact: true }).click();
   await expect(html).toHaveAttribute('data-theme', 'glass-light');
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(html).toHaveAttribute('data-theme', 'glass-dark');
@@ -51,8 +59,11 @@ test('the remembered theme applies before any app script runs', async ({ page, a
   void api;
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/blog');
-  await page.getByRole('button', { name: 'Đổi giao diện' }).click();
-  await page.getByRole('menuitem', { name: 'Glass sáng' }).click();
+  await page.getByRole('button', { name: 'Giao diện', exact: true }).click();
+  const panel = page.getByRole('dialog', { name: 'Giao diện' });
+  await panel.getByRole('button', { name: 'Glass', exact: true }).click();
+  await panel.getByRole('button', { name: 'Sáng', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-light');
   await page.route(/\/assets\/.*\.js$/, (route) => route.abort());
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-light');

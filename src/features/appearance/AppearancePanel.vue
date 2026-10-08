@@ -1,0 +1,102 @@
+<script setup lang="ts">
+import { Palette } from 'lucide-vue-next';
+import FocusTrap from 'primevue/focustrap';
+import Popover from 'primevue/popover';
+import { computed, ref } from 'vue';
+import BitMascot from '@/components/BitMascot.vue';
+import { translate } from '@/i18n';
+import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
+import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
+import { useThemeStore } from '@/theme/theme.store';
+import AccentChoice from './AccentChoice.vue';
+import ModeChoice from './ModeChoice.vue';
+import SegmentedChoice from './SegmentedChoice.vue';
+import { useAppearanceChoice } from './use-appearance-choice';
+import { useReducedTransparency } from './use-reduced-transparency';
+
+const vFocustrap = FocusTrap;
+const theme = useThemeStore();
+const { shown, update, reset } = useAppearanceChoice();
+const reducedTransparency = useReducedTransparency();
+/** Glass acts on the Glass themes only; in Clay the segments are inert (the stored level is kept). */
+const isGlassTheme = computed(() => theme.theme.glass);
+const popover = ref<InstanceType<typeof Popover>>();
+const isOpen = ref(false);
+const glassOptions = computed(() =>
+  GLASS_STOPS.map((stop) => ({ value: stop.value, label: translate(stop.labelKey) })),
+);
+const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
+</script>
+
+<template>
+  <button
+    type="button"
+    class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
+    aria-haspopup="dialog"
+    :aria-expanded="isOpen"
+    :aria-label="$t('appearance.open')"
+    @click="popover?.toggle($event)"
+  >
+    <Palette class="size-5" aria-hidden="true" />
+  </button>
+  <Popover
+    ref="popover"
+    :pt="{ root: { 'aria-label': $t('appearance.open') } }"
+    @show="isOpen = true"
+    @hide="isOpen = false"
+  >
+    <!-- v-focustrap keeps Tab inside while the panel is open; the popover returns focus to the button on Escape. -->
+    <div v-focustrap class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">
+      <div class="flex items-center justify-between gap-3">
+        <p class="font-display text-lg font-bold">{{ $t('appearance.title') }}</p>
+        <BitMascot :look="PLACEMENT_LOOKS.hero" blinks class="[--bit-px:2px]" />
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+          {{ $t('appearance.mode') }}
+        </p>
+        <ModeChoice />
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+          {{ $t('appearance.accentTitle') }}
+        </p>
+        <AccentChoice />
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+          {{ $t('appearance.glass') }}
+        </p>
+        <SegmentedChoice
+          :label="$t('appearance.glass')"
+          :options="glassOptions"
+          :selected="nearestStop"
+          :disabled="reducedTransparency || !isGlassTheme"
+          @pick="(stop) => void update({ glass: stop })"
+        />
+        <p v-if="!isGlassTheme" class="mt-2 text-[13px] text-muted">
+          {{ $t('appearance.glassOnly') }}
+        </p>
+        <p v-else-if="reducedTransparency" class="mt-2 text-[13px] text-muted">
+          {{ $t('appearance.solidByDevice') }}
+        </p>
+      </div>
+      <div class="flex items-center justify-between gap-3 border-t border-line pt-3">
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center px-1 text-[13px] text-muted underline hover:text-content"
+          @click="reset"
+        >
+          {{ $t('appearance.useSite') }}
+        </button>
+        <RouterLink
+          :to="{ name: 'settings-appearance' }"
+          class="inline-flex min-h-11 items-center text-[13px] text-accent-text underline"
+          @click="popover?.hide()"
+        >
+          {{ $t('appearance.moreSettings') }}
+        </RouterLink>
+      </div>
+    </div>
+  </Popover>
+</template>

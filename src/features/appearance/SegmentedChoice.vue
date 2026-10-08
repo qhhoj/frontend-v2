@@ -16,11 +16,11 @@ defineEmits<{ pick: [value: Value] }>();
       type="button"
       :disabled="disabled"
       :aria-pressed="option.value === selected"
-      class="min-h-11 flex-1 rounded-pill border px-2 text-sm leading-tight disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-strong disabled:text-muted"
+      class="min-h-11 flex-1 rounded-pill border px-2 text-sm leading-tight disabled:cursor-not-allowed"
       :class="
         option.value === selected
-          ? 'border-accent bg-accent-soft font-semibold text-accent-soft-text'
-          : 'border-transparent text-muted hover:text-content'
+          ? 'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content'
+          : 'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong'
       "
       @click="$emit('pick', option.value)"
     >

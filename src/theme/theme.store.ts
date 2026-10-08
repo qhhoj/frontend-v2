@@ -34,7 +34,7 @@ export const useThemeStore = defineStore('theme', () => {
   media?.addEventListener('change', onSystemChange);
   onScopeDispose(() => media?.removeEventListener('change', onSystemChange));
 
-  /** What the theme menu shows as selected: the account's theme while signed in, else the browser's choice. */
+  /** What the Style and Mode controls show as selected: the account's theme while signed in, else the browser's choice. */
   const preference = computed(() => accountTheme.value ?? localPreference.value);
   const theme = computed(
     () =>

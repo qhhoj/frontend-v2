@@ -4,52 +4,47 @@ import { THEMES } from '../src/theme/registry';
 import { expect, pdfReady, streamFrame, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 
-test('the theme menu opens with Enter, moves with arrows, closes with Escape and returns focus', async ({
+test('the appearance panel opens with Enter, traps Tab, closes with Escape and returns focus', async ({
   page,
   api,
 }) => {
   void api;
   await page.goto('/blog');
-  const trigger = page.getByRole('button', { name: 'Đổi giao diện' });
+  const trigger = page.getByRole('button', { name: 'Giao diện', exact: true });
   await trigger.focus();
   await page.keyboard.press('Enter');
-  const menu = page.getByRole('menu');
-  await expect(menu).toBeVisible();
+  const panel = page.getByRole('dialog', { name: 'Giao diện' });
+  await expect(panel).toBeVisible();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  await expect(menu).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(menu).toHaveAttribute('aria-activedescendant', /.+/);
-  const first = await menu.getAttribute('aria-activedescendant');
-  await page.keyboard.press('ArrowDown');
-  expect(await menu.getAttribute('aria-activedescendant')).not.toBe(first);
+  await expect(panel.getByRole('button').first()).toBeFocused();
+  // More Tab presses than the panel has stops: focus wraps inside it and never reaches the page behind.
+  for (let step = 0; step < 24; step += 1) {
+    await page.keyboard.press('Tab');
+    await expect(panel.locator(':focus')).toHaveCount(1);
+  }
   await page.keyboard.press('Escape');
-  await expect(menu).toBeHidden();
+  await expect(panel).toBeHidden();
   await expect(trigger).toBeFocused();
   await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 });
 
-test('choosing a theme item with the keyboard applies it and returns focus to the button', async ({
-  page,
-  api,
-}) => {
+test('choosing a mode in the panel with the keyboard applies it', async ({ page, api }) => {
   void api;
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/blog');
-  const trigger = page.getByRole('button', { name: 'Đổi giao diện' });
+  const trigger = page.getByRole('button', { name: 'Giao diện', exact: true });
   await trigger.focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('menu')).toBeFocused();
-  // Step down by name, not by count: the order of the menu is not this test's business.
-  const target = THEMES.find((theme) => theme.scheme === 'light')!; // Clay light
-  for (let step = 0; step < THEMES.length + 2; step += 1) {
-    await page.keyboard.press('ArrowDown');
-    const activeId = await page.getByRole('menu').getAttribute('aria-activedescendant');
-    if ((await page.locator(`[id="${activeId}"]`).innerText()).trim() === 'Clay sáng') break;
-  }
-  await page.keyboard.press('Enter');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', target.id);
-  await expect(page.getByRole('menu')).toBeHidden();
-  await expect(trigger).toBeFocused();
+  const panel = page.getByRole('dialog', { name: 'Giao diện' });
+  // The style on screen is Clay (the default), so Mode "Sáng" is the Clay light theme.
+  const lightTheme = THEMES.find((theme) => theme.scheme === 'light' && !theme.glass)!;
+  const lightButton = panel
+    .getByRole('group', { name: 'Chế độ' })
+    .getByRole('button', { name: 'Sáng', exact: true });
+  await lightButton.focus();
+  await page.keyboard.press('Space');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', lightTheme.id);
+  await expect(lightButton).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('the account menu works from the keyboard and Escape returns focus', async ({ page, api }) => {

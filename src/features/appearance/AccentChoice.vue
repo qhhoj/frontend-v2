@@ -9,7 +9,11 @@ const isPressed = (accent: string) => shown.value.accent === accent;
 </script>
 
 <template>
-  <div role="group" :aria-label="$t('appearance.accentTitle')" class="flex flex-wrap gap-1">
+  <div
+    role="group"
+    :aria-label="$t('appearance.accentTitle')"
+    class="grid grid-cols-[repeat(4,2.75rem)] gap-1"
+  >
     <button
       v-for="preset in ACCENTS"
       :key="preset.id"

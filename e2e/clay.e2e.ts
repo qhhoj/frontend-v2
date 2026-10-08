@@ -108,7 +108,7 @@ test.describe('a signed-in reload', () => {
     await page.goto('/blog');
     await page.reload();
     await expect(
-      page.getByRole('banner').getByRole('button', { name: /Đổi giao diện/ }),
+      page.getByRole('banner').getByRole('button', { name: 'Giao diện', exact: true }),
     ).toBeVisible();
     await page.waitForLoadState('networkidle');
     const themes = await page.evaluate(() => {
@@ -142,7 +142,7 @@ test.describe('an anonymous auto visitor', () => {
     });
     await page.goto('/blog');
     await expect(
-      page.getByRole('banner').getByRole('button', { name: /Đổi giao diện/ }),
+      page.getByRole('banner').getByRole('button', { name: 'Giao diện', exact: true }),
     ).toBeVisible();
     await page.waitForLoadState('networkidle');
     const themes = await page.evaluate(() => {

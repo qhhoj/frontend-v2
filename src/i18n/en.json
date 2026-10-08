@@ -98,16 +98,12 @@
     "solidByDevice": "Your device asks for less transparency, so cards stay solid."
   },
   "theme": {
-    "menu": "Change theme",
     "styleClay": "Clay",
     "styleGlass": "Glass",
-    "clayAuto": "Clay automatic",
     "clayLight": "Clay light",
     "clayDark": "Clay dark",
     "glassDark": "Glass dark",
-    "glassLight": "Glass light",
-    "glassAuto": "Glass automatic",
-    "current": "current"
+    "glassLight": "Glass light"
   },
   "locale": {
     "switchTo": "Chuyển sang tiếng Việt",

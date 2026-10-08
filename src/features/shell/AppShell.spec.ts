@@ -1,4 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { problemDetail, profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi, noContent, ok } from '@/test/mock-api';
@@ -14,6 +15,29 @@ const clickMenuItem = async (label: string) => {
   (item.querySelector('a') ?? (item as HTMLElement)).click();
   await flushPromises();
 };
+
+const openPanel = async (wrapper: VueWrapper) => {
+  await wrapper.get('button[aria-label="Giao diện"]').trigger('click');
+  await flushPromises();
+};
+/** A Style, Mode or Glass button of the open panel by its visible text. */
+const clickInPanel = async (label: string) => {
+  const button = [
+    ...document.body.querySelectorAll<HTMLButtonElement>('[role="dialog"] button'),
+  ].find((element) => element.textContent?.trim() === label);
+  if (!button) throw new Error(`No panel button "${label}"`);
+  button.click();
+  await flushPromises();
+};
+/** The pressed button texts of a panel group ("Kiểu" is Style, "Chế độ" is Mode). */
+const pressedIn = (group: string) =>
+  [
+    ...document.body.querySelectorAll(
+      `[role="dialog"] [role="group"][aria-label="${group}"] button[aria-pressed="true"]`,
+    ),
+  ].map((button) => button.textContent?.trim());
+const patchesOf = (calls: Array<{ method: string; body: unknown }>) =>
+  calls.filter((call) => call.method === 'PATCH').map((call) => call.body);
 
 describe('app shell', () => {
   it('has exactly one live region, outside the page content, and it is quiet when nothing loads', async () => {
@@ -74,92 +98,82 @@ describe('app shell', () => {
     expect(document.body.textContent).toContain('Quản trị');
   });
 
-  it('tells assistive technology whether a menu is open', async () => {
+  it('tells assistive technology whether the appearance panel is open', async () => {
     mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
-    const trigger = wrapper.get('button[aria-label="Đổi giao diện"]');
+    const trigger = wrapper.get('button[aria-label="Giao diện"]');
     expect(trigger.attributes('aria-expanded')).toBe('false');
+    await openPanel(wrapper);
+    expect(trigger.attributes('aria-expanded')).toBe('true');
     await trigger.trigger('click');
     await flushPromises();
-    expect(trigger.attributes('aria-expanded')).toBe('true');
-    await clickMenuItem('Glass sáng');
     expect(trigger.attributes('aria-expanded')).toBe('false');
   });
 
   it('switches theme at runtime without saving for anonymous viewers', async () => {
     const calls = mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await clickMenuItem('Glass sáng');
+    await openPanel(wrapper);
+    await clickInPanel('Glass');
+    await clickInPanel('Sáng');
     expect(document.documentElement.dataset.theme).toBe('glass-light');
-    expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
+    expect(patchesOf(calls)).toEqual([]);
   });
 
-  it('saves the theme to the account when signed in', async () => {
+  it('saves only the mode to the account when signed in, and leaves the look off', async () => {
     const calls = mockApi({
       'GET /auth/me': signedIn(),
       'GET /profile': ok(profile()),
       'PATCH /profile': ({ body }) => ok(profile(body as object)),
     });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await clickMenuItem('Glass sáng');
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({
-      siteTheme: 'glass-light',
-    });
+    await openPanel(wrapper);
+    await clickInPanel('Glass');
+    await clickInPanel('Sáng');
+    expect(patchesOf(calls)).toEqual([{ siteTheme: 'glass-auto' }, { siteTheme: 'glass-light' }]);
     expect(document.documentElement.dataset.theme).toBe('glass-light');
+    expect(document.documentElement.dataset.accent).toBeUndefined();
   });
 
-  it('lists the themes grouped by style, each with its automatic option', async () => {
+  it('offers the style, Clay or Glass, and the mode, light, dark or automatic', async () => {
     mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await flushPromises();
-    const entries = [...document.body.querySelectorAll('[role="menu"] > li')].map((entry) =>
-      entry.textContent?.replace(/\(đang dùng\)/, '').trim(),
-    );
-    expect(entries).toEqual([
-      'Clay',
-      'Clay sáng',
-      'Clay tối',
-      'Clay tự động',
-      'Glass',
-      'Glass sáng',
-      'Glass tối',
-      'Glass tự động',
-    ]);
+    await openPanel(wrapper);
+    const labels = (group: string) =>
+      [
+        ...document.body.querySelectorAll(
+          `[role="dialog"] [role="group"][aria-label="${group}"] button`,
+        ),
+      ].map((button) => button.textContent?.trim());
+    expect(labels('Kiểu')).toEqual(['Clay', 'Glass']);
+    expect(labels('Chế độ')).toEqual(['Sáng', 'Tối', 'Tự động']);
+    expect(pressedIn('Kiểu')).toEqual(['Clay']);
+    expect(pressedIn('Chế độ')).toEqual(['Tự động']);
   });
 
-  it('marks the legacy stored value as the current Clay choice', async () => {
+  it('shows the legacy stored value as the Clay choice', async () => {
     localStorage.setItem('qhhoj.theme', 'dark');
     mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await flushPromises();
-    const current = [...document.body.querySelectorAll('[role="menuitem"]')].filter((item) =>
-      item.textContent?.includes('(đang dùng)'),
-    );
-    expect(current.map((item) => item.textContent?.replace(/\(đang dùng\)/, '').trim())).toEqual([
-      'Clay tối',
-    ]);
+    await openPanel(wrapper);
+    expect(pressedIn('Kiểu')).toEqual(['Clay']);
+    expect(pressedIn('Chế độ')).toEqual(['Tối']);
   });
 
   it.each([
-    ['Clay tự động', 'auto'],
-    ['Glass tự động', 'glass-auto'],
-  ])('saves %s to the account as %s and follows the device', async (label, saved) => {
+    [['Tự động'], 'auto', 'clay-light'],
+    [['Glass', 'Tự động'], 'glass-auto', 'glass-light'],
+  ])('saves %j to the account as %s and follows the device', async (picks, saved, shown) => {
     const calls = mockApi({
       'GET /auth/me': signedIn(),
-      'GET /profile': ok(profile()),
+      'GET /profile': ok(profile({ siteTheme: 'clay-dark' })),
       'PATCH /profile': ({ body }) => ok(profile(body as object)),
     });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await clickMenuItem(label);
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ siteTheme: saved });
-    expect(document.documentElement.dataset.theme).toBe(
-      saved === 'auto' ? 'clay-light' : 'glass-light',
-    );
+    await openPanel(wrapper);
+    for (const pick of picks) await clickInPanel(pick);
+    expect(patchesOf(calls).at(-1)).toEqual({ siteTheme: saved });
+    expect(document.documentElement.dataset.theme).toBe(shown);
   });
 
   it('keeps the local theme when saving to the account fails', async () => {
@@ -169,8 +183,9 @@ describe('app shell', () => {
       'PATCH /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
     });
     const { wrapper } = await mountApp('/blog');
-    await wrapper.get('button[aria-label="Đổi giao diện"]').trigger('click');
-    await clickMenuItem('Glass sáng');
+    await openPanel(wrapper);
+    await clickInPanel('Glass');
+    await clickInPanel('Sáng');
     expect(document.documentElement.dataset.theme).toBe('glass-light');
   });
 
