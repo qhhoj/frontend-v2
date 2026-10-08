@@ -298,7 +298,9 @@
       "anyLanguage": "Any language",
       "problem": "problem code",
       "user": "username",
-      "live": "Live updates"
+      "live": "Live updates",
+      "problemLabel": "Problem",
+      "userLabel": "User"
     },
     "pager": {
       "label": "Pages",
@@ -314,7 +316,8 @@
       "judges": "judges online",
       "noJudge": "no judge online",
       "unavailable": "Statistics unavailable"
-    }
+    },
+    "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}"
   },
   "ranking": {
     "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",

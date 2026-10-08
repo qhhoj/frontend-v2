@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells';
 
 /** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
 const ROW_COUNT = 10;
@@ -32,8 +33,7 @@ const columns = computed(() =>
               v-for="column in columns"
               :key="column.key"
               scope="col"
-              class="px-3 py-3.5 font-medium first:pl-6 last:pr-6"
-              :class="{ 'text-right': column.isNumber }"
+              :class="[HEADER_CELL_CLASSES, { 'text-right': column.isNumber }]"
             >
               <SkeletonBlock text :class="column.header" />
             </th>
@@ -49,8 +49,7 @@ const columns = computed(() =>
             <td
               v-for="column in columns"
               :key="column.key"
-              class="px-3 py-[11px] first:pl-6 last:pr-6"
-              :class="{ 'text-right font-mono': column.isNumber }"
+              :class="[BODY_CELL_CLASSES, { 'text-right font-mono': column.isNumber }]"
             >
               <SkeletonBlock
                 v-if="column.key === 'verdict'"

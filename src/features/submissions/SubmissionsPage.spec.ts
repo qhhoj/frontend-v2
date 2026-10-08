@@ -181,4 +181,28 @@ describe('the submission list page', () => {
     const { wrapper } = await mountApp('/submissions');
     await vi.waitFor(() => expect(wrapper.text()).toContain('Chưa có bài nộp nào.'));
   });
+
+  it('names each row link with the submission, its user, problem and verdict', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper } = await openList();
+    expect(wrapper.get('tbody tr a').attributes('aria-label')).toBe(
+      'Bài nộp #sub-1 của user_01 cho bài Tổng hai số: Chấp nhận',
+    );
+  });
+
+  it('empties the URL (filters, page and Live updates) when Reset is clicked', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper, router } = await openList('/submissions?result=AC&user=x&page=2&live=0');
+    await wrapper.get('button[data-testid="filters-reset"]').trigger('click');
+    await vi.waitFor(() => expect(router.currentRoute.value.query).toEqual({}));
+  });
+
+  it('does not refetch when Live updates is toggled', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper, router } = await openList();
+    await wrapper.get('input[data-testid="live-toggle"]').setValue(false);
+    await vi.waitFor(() => expect(router.currentRoute.value.query.live).toBe('0'));
+    await flushPromises();
+    expect(calls.filter((call) => call.path === '/submissions')).toHaveLength(1);
+  });
 });

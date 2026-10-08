@@ -42,18 +42,19 @@ export const useSubmissionListQuery = (
   enabled: Ref<boolean> = ref(true),
 ) => {
   const viewerId = useViewerId();
+  /** What reaches the API: `live` is not part of it, so toggling Live updates never refetches. */
+  const apiQuery = computed(() => ({
+    problem: filters.value.problem || undefined,
+    user: filters.value.user || undefined,
+    result: filters.value.results.length ? filters.value.results : undefined,
+    language: filters.value.languageIds.length ? filters.value.languageIds : undefined,
+    page: filters.value.page,
+    pageSize: SUBMISSION_PAGE_SIZE,
+  }));
   return useQuery({
     enabled,
-    queryKey: computed(() => ['submissions', 'list', viewerId.value, filters.value]),
-    queryFn: () =>
-      fetchSubmissions({
-        problem: filters.value.problem || undefined,
-        user: filters.value.user || undefined,
-        result: filters.value.results.length ? filters.value.results : undefined,
-        language: filters.value.languageIds.length ? filters.value.languageIds : undefined,
-        page: filters.value.page,
-        pageSize: SUBMISSION_PAGE_SIZE,
-      }),
+    queryKey: computed(() => ['submissions', 'list', viewerId.value, apiQuery.value]),
+    queryFn: () => fetchSubmissions(apiQuery.value),
     /** The table stays mounted while the next page or filter loads. */
     placeholderData: keepPreviousData,
   });

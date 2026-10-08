@@ -42,5 +42,10 @@ const signInTarget = computed(() => ({
       {{ $t('problem.noSubmissions') }}
     </GlassCard>
     <SubmissionTable v-else :submissions="list.items" :show-problem="false" />
+    <RouterLink
+      :to="{ name: 'submissions', query: { problem: code } }"
+      class="mt-3 inline-flex min-h-11 items-center text-accent-text hover:underline"
+      >{{ $t('common.viewAll') }}</RouterLink
+    >
   </QueryState>
 </template>

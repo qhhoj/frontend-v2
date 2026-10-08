@@ -30,6 +30,21 @@ describe('the problem Submissions tab', () => {
     expect(headers).not.toContain('Bài');
   });
 
+  it('links to the full list of this problem', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(),
+      'GET /submissions': page([submissionItem()]),
+    });
+    const { wrapper } = await mountApp(TAB_PATH);
+    await vi.waitFor(() =>
+      expect(wrapper.find('#problem-panel-submissions tbody tr').exists()).toBe(true),
+    );
+    const link = wrapper.get('#problem-panel-submissions a[href^="/submissions?"]');
+    expect(link.attributes('href')).toBe('/submissions?problem=duongdi');
+    expect(link.text()).toBe('Xem tất cả');
+  });
+
   it('sends an anonymous viewer to sign in without asking for anything', async () => {
     const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper } = await mountApp(TAB_PATH);

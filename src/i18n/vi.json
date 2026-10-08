@@ -298,7 +298,9 @@
       "anyLanguage": "Mọi ngôn ngữ",
       "problem": "mã bài",
       "user": "tên đăng nhập",
-      "live": "Cập nhật trực tiếp"
+      "live": "Cập nhật trực tiếp",
+      "problemLabel": "Bài",
+      "userLabel": "Người nộp"
     },
     "pager": {
       "label": "Trang",
@@ -314,7 +316,8 @@
       "judges": "máy chấm trực tuyến",
       "noJudge": "không có máy chấm",
       "unavailable": "Không có số liệu thống kê"
-    }
+    },
+    "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}"
   },
   "ranking": {
     "summary": "{format} · {problems} bài · {participants} thí sinh",

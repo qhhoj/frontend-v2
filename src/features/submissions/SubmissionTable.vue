@@ -12,10 +12,12 @@ import {
   formatNumber,
   formatRelative,
 } from '@/lib/format';
+import { translate } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 import { useNow } from '@/lib/use-now';
 import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
+import { BODY_CELL_CLASSES, HEADER_CELL_CLASSES } from './submission-table-cells';
 
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
@@ -49,6 +51,13 @@ const columns = computed(() =>
   COLUMNS.filter((column) => props.showProblem || column.key !== 'problem'),
 );
 
+const rowLabel = (row: SubmissionListItem) =>
+  translate('submissions.rowLabel', {
+    id: row.id,
+    user: row.user?.username ?? NO_VALUE,
+    problem: row.problem?.name ?? NO_VALUE,
+    verdict: translate(verdictOf(row).labelKey),
+  });
 const isFinished = (row: SubmissionListItem) => FINISHED_STATUSES.includes(row.status);
 /** Points based: the list rows carry no test count. */
 const gradingPercent = (row: SubmissionListItem) =>
@@ -83,8 +92,7 @@ const formatScore = (value: number) =>
               v-for="column in columns"
               :key="column.key"
               scope="col"
-              class="px-3 py-3.5 font-medium first:pl-6 last:pr-6"
-              :class="{ 'text-right': column.isNumber }"
+              :class="[HEADER_CELL_CLASSES, { 'text-right': column.isNumber }]"
             >
               {{ $t(`submissions.columns.${column.key}`) }}
             </th>
@@ -98,9 +106,10 @@ const formatScore = (value: number) =>
             class="border-t border-line"
             :class="{ 'row-added': highlightIds.has(row.id) }"
           >
-            <td class="px-3 py-[11px] first:pl-6">
+            <td :class="BODY_CELL_CLASSES">
               <RouterLink
                 :to="{ name: 'submission', params: { id: row.id } }"
+                :aria-label="rowLabel(row)"
                 class="flex min-h-7 items-center text-content hover:underline"
               >
                 <VerdictBadge v-if="isFinished(row)" :verdict="verdictOf(row)" size="sm" />
@@ -112,7 +121,7 @@ const formatScore = (value: number) =>
                 >
               </RouterLink>
             </td>
-            <td v-if="showProblem" class="px-3 py-[11px]">
+            <td v-if="showProblem" :class="BODY_CELL_CLASSES">
               <template v-if="row.problem">
                 <RouterLink
                   :to="{ name: 'problem', params: { code: row.problem.code } }"
@@ -123,21 +132,21 @@ const formatScore = (value: number) =>
               </template>
               <template v-else>{{ NO_VALUE }}</template>
             </td>
-            <td class="px-3 py-[11px]">
+            <td :class="BODY_CELL_CLASSES">
               <UserName v-if="row.user" :username="row.user.username" />
               <template v-else>{{ NO_VALUE }}</template>
             </td>
-            <td class="px-3 py-[11px] text-right font-mono tabular-nums">
+            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
               {{ finishedValue(row, formatScore, row.points) }}
             </td>
-            <td class="px-3 py-[11px] text-right font-mono tabular-nums">
+            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
               {{ finishedValue(row, formatCaseTime, row.time) }}
             </td>
-            <td class="px-3 py-[11px] text-right font-mono tabular-nums">
+            <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">
               {{ finishedValue(row, formatCaseMemory, row.memory) }}
             </td>
-            <td class="px-3 py-[11px] text-muted">{{ row.language?.name ?? NO_VALUE }}</td>
-            <td class="px-3 py-[11px] whitespace-nowrap text-muted last:pr-6">
+            <td :class="[BODY_CELL_CLASSES, 'text-muted']">{{ row.language?.name ?? NO_VALUE }}</td>
+            <td :class="[BODY_CELL_CLASSES, 'whitespace-nowrap text-muted']">
               <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
                 formatRelative(row.date, now, locale.locale)
               }}</time>

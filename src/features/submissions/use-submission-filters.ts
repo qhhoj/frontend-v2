@@ -52,14 +52,19 @@ export const toSubmissionQuery = (filters: SubmissionFilters): LocationQueryRaw 
 });
 
 /** Any change but a page change starts again at page 1: the old page number means nothing for new filters. */
-export const withPatch = (
+export function withPatch(
   filters: SubmissionFilters,
   patch: Partial<SubmissionFilters>,
-): SubmissionFilters => ({
-  ...filters,
-  ...patch,
-  page: patch.page ?? (patch.live === undefined ? 1 : filters.page),
-});
+): SubmissionFilters {
+  return { ...filters, ...patch, page: pageAfter(filters, patch) };
+}
+
+function pageAfter(filters: SubmissionFilters, patch: Partial<SubmissionFilters>): number {
+  if (patch.page !== undefined) return patch.page;
+  // Live updates is a view setting, not a filter: the list is the same, so the page stays.
+  const changesOnlyLive = patch.live !== undefined;
+  return changesOnlyLive ? filters.page : 1;
+}
 
 export function useSubmissionFilters() {
   const route = useRoute();

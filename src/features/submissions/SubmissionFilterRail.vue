@@ -41,7 +41,7 @@ const toggleResult = (code: SubmissionResult, isChecked: boolean) =>
   });
 const pickLanguage = (languageId: string) =>
   emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
-const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
+const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
 </script>
 
 <template>
@@ -70,7 +70,7 @@ const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
             :value="code"
             :checked="filters.results.includes(code)"
             class="size-4 accent-accent"
-            @change="toggleResult(code, isChecked($event))"
+            @change="toggleResult(code, checkedOf($event))"
           />
           <span class="w-8 font-mono text-[13px] font-bold">{{ code }}</span>
           <span class="text-[15px]">{{ $t(`verdicts.${code}`) }}</span>
@@ -95,7 +95,7 @@ const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
       </Select>
     </div>
     <label class="flex flex-col gap-1 text-[13px] text-muted">
-      {{ $t('problems.columns.problem') }}
+      {{ $t('submissions.rail.problemLabel') }}
       <input
         v-model="problemText"
         name="problem"
@@ -107,7 +107,7 @@ const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
       />
     </label>
     <label class="flex flex-col gap-1 text-[13px] text-muted">
-      {{ $t('submissions.columns.user') }}
+      {{ $t('submissions.rail.userLabel') }}
       <input
         v-model="userText"
         name="user"
@@ -124,7 +124,7 @@ const isChecked = (event: Event) => (event.target as HTMLInputElement).checked;
         data-testid="live-toggle"
         :checked="filters.live"
         class="size-4 accent-accent"
-        @change="emit('update', { live: isChecked($event) })"
+        @change="emit('update', { live: checkedOf($event) })"
       />
       <span class="text-[15px]">{{ $t('submissions.rail.live') }}</span>
     </label>
