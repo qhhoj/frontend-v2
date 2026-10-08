@@ -317,7 +317,12 @@
       "noJudge": "no judge online",
       "unavailable": "Statistics unavailable"
     },
-    "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}"
+    "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}",
+    "liveAdded": "{count} new submission | {count} new submissions",
+    "liveNew": "{count} new submission on the first page | {count} new submissions on the first page",
+    "newPill": "{count} new | {count} new",
+    "livePaused": "Live updates paused",
+    "liveReload": "Reconnect"
   },
   "ranking": {
     "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",

@@ -16,6 +16,7 @@ import {
   useSubmissionListQuery,
   useSubmissionStatsQuery,
 } from './submissions.queries';
+import { useLiveSubmissionList } from './use-live-submission-list';
 import { useSubmissionFilters } from './use-submission-filters';
 
 const { filters, update, reset } = useSubmissionFilters();
@@ -30,6 +31,14 @@ const {
 } = useSubmissionListQuery(filters);
 
 const submissions = computed(() => list.value?.items ?? []);
+const live = useLiveSubmissionList({
+  filters,
+  rows: submissions,
+  total: computed(() => (isPlaceholderData.value ? undefined : list.value?.meta.total)),
+  enabled: computed(() => filters.value.live),
+  refetchRows: async () => (await refetch()).data?.items,
+  goToFirstPage: () => update({ page: 1 }),
+});
 const emptyText = computed(() => {
   const active = describeActiveFilters(filters.value, meta.value?.languages ?? []);
   return active
@@ -50,6 +59,7 @@ function goToPage(page: number) {
     <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
       {{ $t('submissions.title') }}
     </h1>
+    <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>
     <QueryState :loading="isStatsPending" :error="null">
       <template #skeleton><SubmissionStatsStripSkeleton /></template>
       <SubmissionStatsStrip :stats="stats" />
@@ -62,12 +72,35 @@ function goToPage(page: number) {
         @reset="reset"
       />
       <div ref="listTop" class="min-w-0 flex-1 scroll-mt-20" :aria-busy="isPlaceholderData">
+        <p
+          v-if="live.paused.value"
+          data-testid="live-paused"
+          class="mb-3 flex flex-wrap items-center gap-3 text-sm text-muted"
+        >
+          {{ $t('submissions.livePaused') }}
+          <button
+            type="button"
+            class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
+            @click="live.reconnect()"
+          >
+            {{ $t('submissions.liveReload') }}
+          </button>
+        </p>
+        <button
+          v-if="live.newCount.value > 0"
+          type="button"
+          data-testid="new-pill"
+          class="mb-3 min-h-11 rounded-pill border border-line-accent bg-accent-soft px-4 font-semibold text-accent-soft-text hover:opacity-90"
+          @click="live.showNew()"
+        >
+          {{ $t('submissions.newPill', { count: live.newCount.value }, live.newCount.value) }}
+        </button>
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
           <template #skeleton><SubmissionTableSkeleton /></template>
           <GlassCard v-if="!submissions.length" as="div" class="px-6 py-10 text-center text-muted">
             {{ emptyText }}
           </GlassCard>
-          <SubmissionTable v-else :submissions="submissions" />
+          <SubmissionTable v-else :submissions="submissions" :highlight-ids="live.addedIds.value" />
           <SubmissionPager
             :page="filters.page"
             :page-size="SUBMISSION_PAGE_SIZE"

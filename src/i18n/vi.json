@@ -317,7 +317,12 @@
       "noJudge": "không có máy chấm",
       "unavailable": "Không có số liệu thống kê"
     },
-    "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}"
+    "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}",
+    "liveAdded": "Có {count} bài nộp mới | Có {count} bài nộp mới",
+    "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",
+    "newPill": "{count} bài mới | {count} bài mới",
+    "livePaused": "Cập nhật trực tiếp tạm dừng",
+    "liveReload": "Kết nối lại"
   },
   "ranking": {
     "summary": "{format} · {problems} bài · {participants} thí sinh",

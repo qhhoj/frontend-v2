@@ -14,6 +14,16 @@ export const SUBMISSION_PAGE_SIZE = 50;
 /** The server caches the stats for 30 s: polling faster would only read the same answer. */
 const STATS_REFRESH_MS = 30_000;
 
+/** The list filters as the API takes them (`live` is a view setting and stays out). */
+export const submissionListApiQuery = (filters: SubmissionFilters) => ({
+  problem: filters.problem || undefined,
+  user: filters.user || undefined,
+  result: filters.results.length ? filters.results : undefined,
+  language: filters.languageIds.length ? filters.languageIds : undefined,
+  page: filters.page,
+  pageSize: SUBMISSION_PAGE_SIZE,
+});
+
 /** One submission row per viewer: what a viewer may see of it (cases, source) depends on who asks. */
 export const useSubmissionQuery = (id: Ref<string>) => {
   const viewerId = useViewerId();
@@ -43,14 +53,7 @@ export const useSubmissionListQuery = (
 ) => {
   const viewerId = useViewerId();
   /** What reaches the API: `live` is not part of it, so toggling Live updates never refetches. */
-  const apiQuery = computed(() => ({
-    problem: filters.value.problem || undefined,
-    user: filters.value.user || undefined,
-    result: filters.value.results.length ? filters.value.results : undefined,
-    language: filters.value.languageIds.length ? filters.value.languageIds : undefined,
-    page: filters.value.page,
-    pageSize: SUBMISSION_PAGE_SIZE,
-  }));
+  const apiQuery = computed(() => submissionListApiQuery(filters.value));
   return useQuery({
     enabled,
     queryKey: computed(() => ['submissions', 'list', viewerId.value, apiQuery.value]),

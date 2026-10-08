@@ -1,10 +1,12 @@
 import { enableAutoUnmount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { DEFAULT_LOCALE, i18n } from '@/i18n';
+import { installFakeEventSource } from './fake-event-source';
 import { stubMatchMedia } from './match-media';
 import { takeUnmatchedRequests } from './mock-api';
 
 beforeEach(() => {
+  installFakeEventSource(); // jsdom has no EventSource; pages with a live feed open one on mount
   stubMatchMedia();
   vi.stubGlobal('scrollTo', vi.fn()); // jsdom does not implement it; the router scrolls on every navigation
   vi.stubGlobal(
