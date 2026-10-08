@@ -98,7 +98,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
       <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
       <p :class="tierClass" class="font-display text-4xl font-semibold">{{ user.rating ?? '—' }}</p>
-      <p v-if="user.ratingSummary" class="text-sm text-muted">
+      <p v-if="user.ratingSummary" class="min-h-10 text-sm text-muted">
         {{
           $t('profile.ratingSummary', {
             max: user.ratingSummary.max,

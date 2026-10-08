@@ -7,15 +7,15 @@ import { anonymousViewer } from '@/test/problem-routes';
 import ProfileOverviewSkeleton from './ProfileOverviewSkeleton.vue';
 
 /** Literal expectations, so a drifting class fails here and not as a silent layout shift at 375 px. */
-const RATING_BOX = 'flex min-h-[138px] flex-col gap-2 rounded-tile border border-line p-5';
+const RATING_BOX = 'flex min-h-[158px] flex-col gap-2 rounded-tile border border-line p-5';
 
-it('the loaded rating box at 375 px is 138 px tall: the literal class string', async () => {
+it('the loaded rating box at 375 px is 158 px tall: the literal class string', async () => {
   mockApi({ ...anonymousViewer, ...profileRoutes(userPage({ organizations: [] })) });
   const { wrapper } = await mountApp('/users/user_01');
   expect(wrapper.get('[data-testid="rating-box"]').attributes('class')).toBe(RATING_BOX);
 });
 
-it('the rating box of the skeleton is the same 138 px box, with 20, 40 and 20 px lines inside', async () => {
+it('the rating box of the skeleton is the same 158 px box, with 20, 40 and 40 px lines inside', async () => {
   mockApi({ ...anonymousViewer });
   hangRequestsExcept(['/auth/me']);
   const { wrapper } = await mountApp('/users/user_01');
@@ -24,7 +24,7 @@ it('the rating box of the skeleton is the same 138 px box, with 20, 40 and 20 px
   const lines = box.findAll('[data-skeleton]').map((block) => block.attributes('class'));
   expect(lines[0]).toContain('h-5 w-16');
   expect(lines[1]).toContain('h-10 w-24');
-  expect(lines[2]).toContain('h-5 w-48');
+  expect(lines[2]).toContain('h-10 w-56');
 });
 
 it('the header skeleton draws the common shape: avatar, tier pill, name and joined line, no chips or actions', async () => {

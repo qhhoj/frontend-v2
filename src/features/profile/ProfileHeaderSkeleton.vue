@@ -31,7 +31,7 @@ const TAB_COUNT = 5;
       <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
         <SkeletonBlock class="h-5 w-16" />
         <SkeletonBlock class="h-10 w-24" />
-        <SkeletonBlock class="h-5 w-48" />
+        <SkeletonBlock class="h-10 w-56" />
       </div>
     </div>
   </GlassCard>
