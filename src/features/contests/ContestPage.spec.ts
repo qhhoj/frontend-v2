@@ -184,6 +184,30 @@ describe('contest detail problems and rules', () => {
     );
   });
 
+  it('says the problems show as soon as the viewer joins while the contest runs', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ phase: 'running', problems: null })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.find('[data-testid="contest-problems"] table').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="contest-problems"]').text()).toContain(
+      'Đề bài sẽ hiện ngay khi bạn vào thi.',
+    );
+  });
+
+  it('says the problems are not public once the contest has ended', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(contestDetail({ phase: 'ended', problems: null })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.find('[data-testid="contest-problems"] table').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="contest-problems"]').text()).toContain(
+      'Đề bài chưa được công khai.',
+    );
+  });
+
   it('renders the introduction through UserContent and the rules beside it', async () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(withProblems) });
     const { wrapper } = await mountApp('/contests/r42');
