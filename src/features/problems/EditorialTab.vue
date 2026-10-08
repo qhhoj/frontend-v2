@@ -23,9 +23,13 @@ const {
 } = useEditorialQuery(toRef(props, 'code'), toRef(locale, 'locale'));
 
 const isGone = computed(() => error.value instanceof ApiError && error.value.status === 404);
-watch(isGone, (gone) => {
-  if (gone) emit('gone');
-});
+watch(
+  isGone,
+  (gone) => {
+    if (gone) emit('gone');
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

@@ -113,6 +113,7 @@ watch(
               /></template>
             </p>
           </GlassCard>
+          <!-- Mounted only while selected, so the editorial request is lazy. -->
           <EditorialTab
             v-if="panel.id === 'editorial' && tab === 'editorial'"
             :code="code"

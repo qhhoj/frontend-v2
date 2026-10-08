@@ -168,6 +168,24 @@ describe('problem page', () => {
 });
 
 describe('problem page editorial tab', () => {
+  it('drops the tab on a revisit when the cached editorial already holds a 404 after an earlier success', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(),
+      'GET /problems/duongdi/editorial': sequence(ok(problemEditorial()), fail(404, 'not_found')),
+    });
+    const { wrapper, router, queryClient } = await openProblem('/problems/duongdi?tab=editorial');
+    await vi.waitFor(() => expect(wrapper.find('.user-content').exists()).toBe(true));
+    await router.replace({ query: {} });
+    // A refetch while the tab is unmounted leaves the cache with the old editorial and an error.
+    await queryClient.refetchQueries({ queryKey: ['problems', 'editorial'] });
+    await router.replace({ query: { tab: 'editorial' } });
+    await vi.waitFor(() =>
+      expect(wrapper.findAll('[role="tab"]').map((tab) => tab.text())).not.toContain('Lời giải'),
+    );
+    await vi.waitFor(() => expect(router.currentRoute.value.query.tab).toBeUndefined());
+  });
+
   it('drops the tab again on a later visit when the editorial still answers 404', async () => {
     mockApi({
       ...anonymousViewer,
