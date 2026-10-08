@@ -1,7 +1,11 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
-import { similarityRun } from '../src/test/admin-fixtures/similarity';
+import {
+  similarityPair,
+  similarityPairDetail,
+  similarityRun,
+} from '../src/test/admin-fixtures/similarity';
 
 const PERMISSIONS = ['judge.moss_contest'];
 
@@ -33,4 +37,41 @@ test('starting a run shows it queued and the list follows', async ({ page, api }
     'Lượt chạy mới đã vào hàng đợi.',
   );
   expect(api.requests.some((request) => request.key === 'POST /similarity/runs')).toBe(true);
+});
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`similar pairs list is accessible and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, PERMISSIONS);
+    api.routes['GET /similarity/runs/run-9f02'] = adminOk(similarityRun());
+    api.routes['GET /similarity/runs/run-9f02/pairs'] = adminList([similarityPair()], {
+      total: 1204,
+    });
+    await page.goto('/admin/similarity/runs/run-9f02/pairs?minPercent=70');
+    await expect(page.getByText('1.204 cặp, độ tương đồng từ 70%')).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`pair detail is accessible and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, PERMISSIONS);
+    api.routes['GET /similarity/pairs/pair-1'] = adminOk(similarityPairDetail());
+    await page.goto('/admin/similarity/pairs/pair-1');
+    await expect(page.getByRole('heading', { name: 'ngocanh ↔ bao_ly' })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+
+test('pressing fragment #1 scrolls the right pane to its line', async ({ page, api }) => {
+  signInAsStaff(api, PERMISSIONS);
+  api.routes['GET /similarity/pairs/pair-1'] = adminOk(similarityPairDetail());
+  await page.goto('/admin/similarity/pairs/pair-1');
+  await page.getByRole('button', { name: /#1 trái 4–6/ }).click();
+  await expect(page.locator('#right-line-6')).toBeInViewport();
 });

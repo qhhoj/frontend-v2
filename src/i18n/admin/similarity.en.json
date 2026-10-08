@@ -91,5 +91,70 @@
     "no": "No",
     "failed": "Failed",
     "label": "Comparison groups"
+  },
+  "pairs": {
+    "title": "Similar pairs",
+    "lead": "Run {id} · finished at {finishedAt}",
+    "backToSummary": "Run summary",
+    "filters": {
+      "heading": "Filters",
+      "problem": "Problem",
+      "allProblems": "All ({count})",
+      "language": "Language family",
+      "allLanguages": "All",
+      "minPercent": "Minimum similarity",
+      "minPercentHint": "The value sent is {fraction} (0 to 1). The run's threshold is {minPercent}%; no pair sits below it.",
+      "reset": "Reset filters",
+      "hiddenNote": "Pairs of problems you cannot view are hidden, so the total here can be smaller than the run's total."
+    },
+    "count": "{count} pairs",
+    "countAbove": "{count} pairs, similarity from {percent}%",
+    "sortNote": "Sorted by similarity, highest first",
+    "columns": {
+      "similarity": "Similarity",
+      "users": "Two submissions",
+      "problem": "Problem",
+      "language": "Language",
+      "longest": "Longest",
+      "overlap": "Overlap",
+      "fragments": "Fragments"
+    },
+    "open": "Compare",
+    "showing": "Showing {from} to {to} of {total} pairs",
+    "previous": "Previous",
+    "next": "Next",
+    "emptyAbove": "No pairs at {percent}% or above",
+    "emptyAny": "No pairs in this run yet.",
+    "emptyHint": "Lower the similarity threshold or pick another problem to see more pairs.",
+    "kgram": "{count} k-grams",
+    "pager": "Pagination",
+    "contestCrumb": "Contest"
+  },
+  "pair": {
+    "title": "Similar pair",
+    "lead": "Similar pair · {problemCode} · run {runId}",
+    "crumbPair": "Pair",
+    "backToList": "Back to the pairs",
+    "notFound": "Not found",
+    "stats": {
+      "similarity": "Similarity",
+      "problem": "Problem",
+      "language": "Language",
+      "longest": "Longest fragment",
+      "overlap": "Total overlap",
+      "fragments": "Matched fragments",
+      "fragmentsLimit": "{count} (at most 50)"
+    },
+    "fragments": {
+      "heading": "Matched fragments",
+      "item": "#{index} left {leftStart}–{leftEnd} ↔ right {rightStart}–{rightEnd} · {lines} lines",
+      "scrolls": "Pick a fragment to scroll both sides to its lines."
+    },
+    "pane": {
+      "points": "{points} points",
+      "deleted": "This submission was deleted",
+      "oddFragment": "Odd fragment",
+      "evenFragment": "Even fragment"
+    }
   }
 }

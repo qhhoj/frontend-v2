@@ -91,5 +91,70 @@
     "no": "Không",
     "failed": "Lỗi",
     "label": "Các nhóm so sánh"
+  },
+  "pairs": {
+    "title": "Các cặp tương đồng",
+    "lead": "Lượt chạy {id} · hoàn tất lúc {finishedAt}",
+    "backToSummary": "Tóm tắt lượt chạy",
+    "filters": {
+      "heading": "Bộ lọc",
+      "problem": "Bài",
+      "allProblems": "Tất cả ({count})",
+      "language": "Họ ngôn ngữ",
+      "allLanguages": "Tất cả",
+      "minPercent": "Độ tương đồng tối thiểu",
+      "minPercentHint": "Giá trị gửi là {fraction} (từ 0 đến 1). Ngưỡng của lượt chạy là {minPercent}%, thấp hơn mức đó không có cặp.",
+      "reset": "Đặt lại bộ lọc",
+      "hiddenNote": "Cặp thuộc bài bạn không xem được sẽ bị ẩn, nên tổng ở đây có thể nhỏ hơn tổng của lượt chạy."
+    },
+    "count": "{count} cặp",
+    "countAbove": "{count} cặp, độ tương đồng từ {percent}%",
+    "sortNote": "Sắp xếp theo độ tương đồng giảm dần",
+    "columns": {
+      "similarity": "Tương đồng",
+      "users": "Hai bài nộp",
+      "problem": "Bài",
+      "language": "Ngôn ngữ",
+      "longest": "Dài nhất",
+      "overlap": "Trùng",
+      "fragments": "Đoạn"
+    },
+    "open": "So sánh",
+    "showing": "Hiện {from} đến {to} trong {total} cặp",
+    "previous": "Trước",
+    "next": "Sau",
+    "emptyAbove": "Không có cặp nào từ {percent}% trở lên",
+    "emptyAny": "Chưa có cặp nào trong lượt chạy này.",
+    "emptyHint": "Hạ ngưỡng tương đồng hoặc đổi bài để xem thêm cặp.",
+    "kgram": "{count} k-gram",
+    "pager": "Phân trang",
+    "contestCrumb": "Kỳ thi"
+  },
+  "pair": {
+    "title": "Cặp tương đồng",
+    "lead": "Cặp tương đồng · {problemCode} · lượt chạy {runId}",
+    "crumbPair": "Cặp",
+    "backToList": "Về danh sách cặp",
+    "notFound": "Không tìm thấy",
+    "stats": {
+      "similarity": "Tương đồng",
+      "problem": "Bài",
+      "language": "Ngôn ngữ",
+      "longest": "Đoạn dài nhất",
+      "overlap": "Trùng tổng",
+      "fragments": "Số đoạn trùng",
+      "fragmentsLimit": "{count} (tối đa 50)"
+    },
+    "fragments": {
+      "heading": "Các đoạn trùng",
+      "item": "#{index} trái {leftStart}–{leftEnd} ↔ phải {rightStart}–{rightEnd} · {lines} dòng",
+      "scrolls": "Chọn một đoạn để cuộn cả hai bên tới đúng dòng."
+    },
+    "pane": {
+      "points": "{points} điểm",
+      "deleted": "Bài nộp đã bị xóa",
+      "oddFragment": "Đoạn lẻ",
+      "evenFragment": "Đoạn chẵn"
+    }
   }
 }
