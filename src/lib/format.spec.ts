@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   coinIndex,
+  formatAgo,
+  formatNumericDate,
+  formatNumericDateTime,
   formatCaseMemory,
   formatCaseTime,
   formatClock,
@@ -123,5 +126,25 @@ describe('formatElapsedSeconds', () => {
     expect(formatElapsedSeconds(492)).toBe('0:08:12');
     expect(formatElapsedSeconds(17_607)).toBe('4:53:27');
     expect(formatElapsedSeconds(-3)).toBe('0:00:00');
+  });
+});
+
+describe('numeric dates in the viewer zone', () => {
+  it('writes day/month/year in Vietnamese and month/day/year in English', () => {
+    expect(formatNumericDate('2026-10-08T20:12:00Z', 'vi')).toBe('08/10/2026');
+    expect(formatNumericDate('2026-10-08T20:12:00Z', 'en')).toBe('10/08/2026');
+    expect(formatNumericDateTime('2026-10-08T20:12:00Z', 'vi')).toBe('08/10/2026 20:12');
+  });
+});
+describe('formatAgo', () => {
+  const now = Date.parse('2026-10-08T12:00:00Z');
+  it('is relative under a week and a date after', () => {
+    expect(formatAgo('2026-10-08T10:00:00Z', now, 'vi')).toBe('2 giờ trước');
+    expect(formatAgo('2026-10-01T12:00:01Z', now, 'en')).toBe('7 days ago');
+    expect(formatAgo('2026-09-30T12:00:00Z', now, 'vi')).toMatch(/^\d\d\/\d\d\/2026$/);
+  });
+  it('still says "ago" at exactly seven days and shows the date one second further back', () => {
+    expect(formatAgo('2026-10-01T12:00:00Z', now, 'en')).toBe('7 days ago');
+    expect(formatAgo('2026-10-01T11:59:59Z', now, 'en')).toBe('10/01/2026');
   });
 });

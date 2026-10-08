@@ -129,3 +129,27 @@ export function formatElapsedSeconds(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
   return `${Math.floor(seconds / 3600)}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
 }
+
+const NUMERIC_DATE: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+/** An instant as a numeric date in the viewer's zone: `08/10/2026` (vi), `10/08/2026` (en). */
+export const formatNumericDate = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], NUMERIC_DATE).format(new Date(date));
+/** `08/10/2026 20:12`, 24-hour clock in both locales. */
+export const formatNumericDateTime = (date: string, locale: Locale) => {
+  const time = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(date));
+  return `${formatNumericDate(date, locale)} ${time}`;
+};
+const WEEK_MS = 7 * 86_400_000;
+/** "2 giờ trước" within a week, the numeric date after. */
+export const formatAgo = (date: string, now: number, locale: Locale) =>
+  now - Date.parse(date) <= WEEK_MS
+    ? formatRelative(date, now, locale)
+    : formatNumericDate(date, locale);

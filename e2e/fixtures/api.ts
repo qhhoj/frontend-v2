@@ -23,17 +23,13 @@ import {
   TYPE_DP_ID,
   userPage,
 } from '../../src/test/fixtures';
+import { homeResponse } from '../../src/test/community-fixtures';
+import { communityRoutes } from './community-api';
+import { list, ok } from './reply';
+import type { Handler, Reply } from './reply';
 
-interface Reply {
-  status?: number;
-  body?: unknown;
-  /** Extra response headers (`Retry-After`, `Cache-Control`). */
-  headers?: Record<string, string>;
-  /** Defaults to application/json; `application/pdf` and `text/event-stream` for the PDF and the feeds. */
-  contentType?: string;
-  /** Sent as is instead of `JSON.stringify(body)`. */
-  raw?: string | Buffer;
-}
+export { list } from './reply';
+
 interface SeenRequest {
   key: string;
   url: URL;
@@ -43,19 +39,15 @@ interface SeenRequest {
   replyStatus: number;
   replyContentType: string;
 }
-interface HandlerInput {
-  url: URL;
-  body: unknown;
-  postData: Buffer | null;
-  headers: Record<string, string>;
-  params: Record<string, string>;
-}
-type Handler = Reply | ((request: HandlerInput) => Reply);
-
 /** `GET /problems/:code` style keys: a segment starting with `:` matches any one segment. */
 function matchPattern(pattern: string, key: string): Record<string, string> | null {
   const patternParts = pattern.split('/');
   const keyParts = key.split('/');
+  // A trailing `*` matches one or more remaining segments (`GET /pages/*` answers every unknown page).
+  if (patternParts.at(-1) === '*' && keyParts.length >= patternParts.length) {
+    const fixed = patternParts.slice(0, -1);
+    return fixed.every((part, index) => part === keyParts[index]) ? {} : null;
+  }
   if (patternParts.length !== keyParts.length) return null;
   const params: Record<string, string> = {};
   for (const [index, part] of patternParts.entries()) {
@@ -77,10 +69,6 @@ export const pdfReady: Reply = {
   raw: Buffer.from('%PDF-1.4\n%%EOF'),
 };
 
-const ok = (data: unknown): Reply => ({ body: { data } });
-export const list = (items: unknown[]): Reply => ({
-  body: { data: items, meta: { page: 1, pageSize: 50, total: items.length } },
-});
 const UNAUTHORIZED: Reply = {
   status: 401,
   body: { error: { code: 'unauthorized', message: 'Unauthorized' } },
@@ -94,6 +82,7 @@ export class FakeApi {
   private readonly gates = new Map<string, Promise<void>>();
   private readonly releases: Array<() => void> = [];
   readonly routes: Record<string, Handler> = {
+    ...communityRoutes(),
     'GET /auth/me': () => (this.signedIn ? ok(sessionResponse()) : UNAUTHORIZED),
     'POST /auth/login': () => {
       this.signedIn = true;
@@ -104,7 +93,7 @@ export class FakeApi {
       return { status: 204 };
     },
     'GET /auth/social/providers': ok({ providers: ['google', 'github'] }),
-    'GET /home': ok({ counts: HOME_COUNTS }),
+    'GET /home': ok(homeResponse({ counts: HOME_COUNTS })),
     'GET /profile': ok(profile()),
     'PATCH /profile': ({ body }) => ok(profile(body as object)),
     'GET /problems/meta': ok(problemMeta()),
@@ -196,7 +185,8 @@ export class FakeApi {
     const exact = this.routes[key];
     if (exact) return { handler: exact, params: {} };
     for (const [pattern, handler] of Object.entries(this.routes)) {
-      const params = pattern.includes(':') ? matchPattern(pattern, key) : null;
+      const params =
+        pattern.includes(':') || pattern.endsWith('/*') ? matchPattern(pattern, key) : null;
       if (params) return { handler, params };
     }
     return undefined;

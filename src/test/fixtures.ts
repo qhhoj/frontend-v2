@@ -132,6 +132,13 @@ export const userPage = (overrides: Partial<UserPage> = {}): UserPage => ({
   rating: 2104,
   rank: 27,
   ratingRank: 30,
+  displayRank: 'user',
+  aboutHtml: '',
+  contributionPoints: 0,
+  ratingSummary: { min: 1200, max: 2104, contests: 3 },
+  organizations: [],
+  dateJoined: '2024-09-14T03:00:00Z',
+  staff: null,
   ...overrides,
 });
 
@@ -227,6 +234,8 @@ export const leaderboardEntry = (
   problemCount: 0,
   rating,
   contributionPoints: 0,
+  displayRank: 'user',
+  organization: null,
 });
 
 export const problemItem = (overrides: Partial<ProblemListItem> = {}): ProblemListItem => ({

@@ -6,6 +6,8 @@ export interface PageMeta {
   pageSize: number;
   total?: number;
   hasMore?: boolean;
+  /** Keyset lists (a user's comments): the cursor of the next page, null at the end. */
+  nextBefore?: string | null;
 }
 export interface Page<Item> {
   items: Item[];
