@@ -81,7 +81,7 @@ const facts = computed(() => [
 <template>
   <div
     data-testid="submission-summary"
-    class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+    class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
   >
     <GlassCard
       as="div"

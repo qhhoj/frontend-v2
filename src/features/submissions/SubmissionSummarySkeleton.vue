@@ -14,11 +14,11 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
 <template>
   <div
     data-testid="submission-summary"
-    class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+    class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
   >
     <GlassCard
       as="div"
-      class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
+      class="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
     >
       <SkeletonBlock data-skeleton-region="ring" round class="size-32 shrink-0" />
       <div class="min-w-0 flex-1 basis-40">
