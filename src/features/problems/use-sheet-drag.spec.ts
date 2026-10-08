@@ -13,6 +13,15 @@ describe('useSheetDrag', () => {
     drag.onPointerup();
     expect(onCollapse).toHaveBeenCalledTimes(1);
   });
+  it('forgets a cancelled gesture, so a later release does not collapse', () => {
+    const onCollapse = vi.fn();
+    const drag = useSheetDrag(onCollapse);
+    drag.onPointerdown(at(100));
+    drag.onPointermove(at(300));
+    drag.onPointercancel();
+    drag.onPointerup();
+    expect(onCollapse).not.toHaveBeenCalled();
+  });
   it('does nothing for a shorter drag, an upward drag or a release without a press', () => {
     const onCollapse = vi.fn();
     const drag = useSheetDrag(onCollapse);

@@ -12,9 +12,9 @@ import SubmitSignInLink from './SubmitSignInLink.vue';
 import { useDockHeight } from './use-dock-height';
 import { useSubmitForm } from './use-submit-form';
 
-/** The phone gets a bottom sheet, anything wider the pinned dock; both share one form state. */
 const BODY_ID = 'submit-dock-body';
 const props = defineProps<{ problem: ProblemDetail }>();
+/** The phone gets a bottom sheet, anything wider the pinned dock; both share one form state. */
 const isPhone = useMediaQuery(PHONE_QUERY);
 const route = useRoute();
 const session = useSessionStore();

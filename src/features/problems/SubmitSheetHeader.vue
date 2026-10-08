@@ -23,6 +23,7 @@ defineExpose({
       @pointerdown="drag.onPointerdown"
       @pointermove="drag.onPointermove"
       @pointerup="drag.onPointerup"
+      @pointercancel="drag.onPointercancel"
     >
       <span aria-hidden="true" class="h-1 w-10 rounded-pill bg-line-strong"></span>
     </div>

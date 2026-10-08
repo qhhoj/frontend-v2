@@ -5,7 +5,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
   select: {
     root: {
       class:
-        'relative inline-flex h-11 min-w-0 cursor-pointer items-center rounded-pill border border-line bg-surface-strong pl-4 text-sm text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus',
+        'relative inline-flex min-w-0 cursor-pointer items-center rounded-pill border border-line bg-surface-strong pl-4 text-sm text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus',
     },
     label: { class: 'flex-1 truncate py-2 focus-visible:outline-none' },
     dropdown: { class: 'flex w-10 items-center justify-center text-muted' },

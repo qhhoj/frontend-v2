@@ -22,7 +22,7 @@ defineEmits<{ pick: [languageId: string] }>();
     option-label="name"
     option-value="id"
     :aria-label="$t('submit.language')"
-    :class="isSheet ? 'h-12 min-w-0 flex-1' : 'min-w-44'"
+    :class="isSheet ? 'h-12 min-w-0 flex-1' : 'h-11 min-w-44'"
     @update:model-value="$emit('pick', $event)"
   >
     <template #value>

@@ -3,6 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PY3_ID, SCRATCH_ID, problemDetail, sessionUser } from '@/test/fixtures';
 import { fail, mockApi, ok } from '@/test/mock-api';
+import { useLocaleStore } from '@/stores/locale.store';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -109,12 +110,19 @@ describe('language and template', () => {
 });
 
 describe('source counter', () => {
+  it('groups the limit per locale', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await openProblem();
+    useLocaleStore().toggle();
+    await flushPromises();
+    expect(wrapper.get('[data-testid="source-counter"]').text()).toMatch(/ \/ 65,536$/);
+  });
   it('counts the code points and turns into an alert beyond the limit', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
     const area = dockOf(wrapper).get('textarea');
     await area.setValue('abc');
-    expect(dockOf(wrapper).get('[data-testid="source-counter"]').text()).toBe('3 / 65536');
+    expect(dockOf(wrapper).get('[data-testid="source-counter"]').text()).toBe('3 / 65.536');
     expect(dockOf(wrapper).find('[role="alert"]').exists()).toBe(false);
     await area.setValue('x'.repeat(65_537));
     expect(dockOf(wrapper).get('[data-testid="source-counter"]').classes()).toContain(

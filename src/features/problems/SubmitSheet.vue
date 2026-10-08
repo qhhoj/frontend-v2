@@ -9,6 +9,9 @@ import { useDockHeight } from './use-dock-height';
 import type { useSubmitForm } from './use-submit-form';
 
 const SHEET_ID = 'submit-sheet';
+/** The bar and the open sheet are one surface in two sizes. */
+const SHEET_SURFACE =
+  'fixed inset-x-0 bottom-0 z-30 rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
 defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
@@ -35,7 +38,7 @@ watch(isExpanded, async (expanded) => {
     v-if="!isSignedIn || !isExpanded"
     ref="bar"
     :aria-label="$t('submit.title')"
-    class="fixed inset-x-0 bottom-0 z-30 rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
+    :class="SHEET_SURFACE"
   >
     <SubmitSignInLink v-if="!isSignedIn" :to="signInTarget" class="px-4 py-1" />
     <SubmitSheetHeader
@@ -52,7 +55,7 @@ watch(isExpanded, async (expanded) => {
     role="dialog"
     aria-modal="false"
     :aria-label="$t('submit.title')"
-    class="fixed inset-x-0 bottom-0 z-30 flex h-[min(640px,85dvh)] flex-col rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
+    :class="[SHEET_SURFACE, 'flex h-[min(640px,85dvh)] flex-col']"
     @keydown.esc="isExpanded = false"
   >
     <SubmitSheetHeader

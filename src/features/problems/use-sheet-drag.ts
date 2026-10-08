@@ -17,11 +17,15 @@ export function useSheetDrag(onCollapse: () => void) {
   function onPointermove(event: PointerEvent) {
     lastY = event.clientY;
   }
+  /** The browser took the gesture over (a scroll, a call): forget it. */
+  function onPointercancel() {
+    startY = null;
+  }
   function onPointerup() {
     if (startY === null) return;
     const draggedDown = lastY - startY >= COLLAPSE_DRAG_PX;
     startY = null;
     if (draggedDown) onCollapse();
   }
-  return { onPointerdown, onPointermove, onPointerup };
+  return { onPointerdown, onPointermove, onPointerup, onPointercancel };
 }

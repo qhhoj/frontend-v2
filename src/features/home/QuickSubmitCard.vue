@@ -141,7 +141,7 @@ const progressText = computed(() => {
               option-label="name"
               option-value="id"
               :aria-label="$t('home.language')"
-              class="shrink-0"
+              class="h-11 shrink-0"
             />
           </div>
         </div>

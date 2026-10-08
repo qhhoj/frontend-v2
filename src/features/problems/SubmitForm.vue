@@ -2,11 +2,12 @@
 import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
-import { formatMemoryLimit, formatTimeLimit } from '@/lib/format';
+import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
 import FileDropzone from './FileDropzone.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
+import { useLocaleStore } from '@/stores/locale.store';
 import type { useSubmitForm } from './use-submit-form';
 
 const props = defineProps<{
@@ -19,6 +20,8 @@ const props = defineProps<{
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
+const locale = useLocaleStore();
+const formatCount = (count: number) => formatNumber(count, locale.locale);
 const errorId = useId();
 /** Ties the error line to the control the viewer is working in. */
 const errorReference = computed(() => (state.errorText ? errorId : undefined));
@@ -26,6 +29,23 @@ const submitLabelKey = computed(() => {
   if (state.submitting) return 'submit.submitting';
   return state.fileMode ? 'submit.submitFile' : 'submit.submit';
 });
+
+/**
+ * Where each region sits, top to bottom (dock: left to right, wrapping). Collapsing the dock moves the actions and
+ * the submit button up beside the language, so those two have a second place.
+ */
+const REGION_ORDER = {
+  languageRow: 'order-1',
+  info: 'order-2',
+  upload: 'order-3',
+  actions: 'order-4 ml-auto',
+  actionsCollapsed: 'order-5',
+  body: 'order-6',
+  message: 'order-7',
+  counterRow: 'order-8',
+  submit: 'order-9',
+  submitCollapsed: 'order-4 ml-auto',
+} as const;
 
 /** Everything that differs between the two layouts, so the template reads the same for both. */
 const LAYOUTS = {
@@ -55,7 +75,7 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
 
 <template>
   <form :class="classes.form" @submit.prevent="state.submitNow()">
-    <div class="order-1 flex items-center gap-2" :class="classes.languageRow">
+    <div class="flex items-center gap-2" :class="[REGION_ORDER.languageRow, classes.languageRow]">
       <LanguagePicker
         :languages="problem.allowedLanguages"
         :selected-id="state.languageId"
@@ -69,13 +89,18 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         @pick="(file) => state.loadFile(file)"
       />
     </div>
-    <span v-if="state.languageLimits" class="order-2 text-sm text-muted">{{
+    <span v-if="state.languageLimits" :class="REGION_ORDER.info" class="text-sm text-muted">{{
       $t('submit.limits', {
         time: formatTimeLimit(state.languageLimits.timeLimit),
         memory: formatMemoryLimit(state.languageLimits.memoryLimit),
       })
     }}</span>
-    <p v-if="problem.contest" class="order-2 text-sm" data-testid="submit-contest">
+    <p
+      v-if="problem.contest"
+      class="text-sm"
+      :class="REGION_ORDER.info"
+      data-testid="submit-contest"
+    >
       <RouterLink
         :to="`/contests/${encodeURIComponent(problem.contest.contestKey)}`"
         class="font-semibold text-accent underline"
@@ -93,14 +118,17 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
     <SourceUploadButton
       v-if="!isSheet && hasSourceUpload"
       :icon-only="false"
-      class="order-3"
+      :class="REGION_ORDER.upload"
       @pick="(file) => state.loadFile(file)"
     />
-    <div v-if="$slots.actions" :class="collapsed ? 'order-5' : 'order-4 ml-auto'">
+    <div
+      v-if="$slots.actions"
+      :class="collapsed ? REGION_ORDER.actionsCollapsed : REGION_ORDER.actions"
+    >
       <slot name="actions" />
     </div>
 
-    <div v-show="!collapsed" class="order-6 min-w-0" :class="classes.body">
+    <div v-show="!collapsed" class="min-w-0" :class="[REGION_ORDER.body, classes.body]">
       <div
         v-if="!state.fileMode"
         role="group"
@@ -134,26 +162,32 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
       v-if="state.errorText"
       :id="errorId"
       role="alert"
-      class="order-7 basis-full text-sm text-negative"
+      class="basis-full text-sm text-negative"
+      :class="REGION_ORDER.message"
     >
       {{ state.errorText }}
     </p>
-    <p v-if="state.resubmitUnavailable" role="status" class="order-7 basis-full text-sm text-muted">
+    <p
+      v-if="state.resubmitUnavailable"
+      role="status"
+      class="basis-full text-sm text-muted"
+      :class="REGION_ORDER.message"
+    >
       {{ $t('submit.resubmitUnavailable') }}
     </p>
 
     <div
       v-if="!isSheet || !state.fileMode"
       v-show="!collapsed"
-      class="order-8 flex min-w-0 items-center gap-3 text-sm"
-      :class="classes.counterRow"
+      class="flex min-w-0 items-center gap-3 text-sm"
+      :class="[REGION_ORDER.counterRow, classes.counterRow]"
     >
       <template v-if="!state.fileMode">
         <span
           class="font-mono"
           :class="state.tooLong ? 'text-negative' : 'text-muted'"
           data-testid="source-counter"
-          >{{ state.length }} / {{ MAX_SOURCE_LENGTH }}</span
+          >{{ formatCount(state.length) }} / {{ formatCount(MAX_SOURCE_LENGTH) }}</span
         >
         <span v-if="state.tooLong" role="alert" class="text-negative">{{
           $t('submit.overLimit', { max: MAX_SOURCE_LENGTH })
@@ -167,7 +201,7 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
       type="submit"
       :aria-disabled="!state.canSubmit"
       class="bg-gradient-accent shrink-0 rounded-pill font-display font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
-      :class="[classes.submit, collapsed ? 'order-4 ml-auto' : 'order-9']"
+      :class="[classes.submit, collapsed ? REGION_ORDER.submitCollapsed : REGION_ORDER.submit]"
     >
       {{ $t(submitLabelKey) }}
     </button>

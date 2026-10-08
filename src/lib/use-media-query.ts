@@ -9,7 +9,7 @@ export function useMediaQuery(query: string) {
   if (typeof matchMedia !== 'function') return readonly(matches);
   const media = matchMedia(query);
   matches.value = media.matches;
-  const update = () => (matches.value = matchMedia(query).matches);
+  const update = (event: { matches: boolean }) => (matches.value = event.matches);
   media.addEventListener('change', update);
   onScopeDispose(() => media.removeEventListener('change', update));
   return readonly(matches);

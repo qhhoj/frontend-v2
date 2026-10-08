@@ -59,7 +59,7 @@ function removeFile() {
         class="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-tile border border-dashed border-line-accent bg-accent-soft p-3 text-center text-sm text-accent-soft-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
         :class="{ 'bg-surface-hover': isDraggingOver }"
         @dragover.prevent="isDraggingOver = true"
-        @dragleave="isDraggingOver = false"
+        @dragleave.self="isDraggingOver = false"
         @drop.prevent="onDropped"
       >
         <FileUp class="size-6" aria-hidden="true" />

@@ -73,13 +73,13 @@ describe('the sheet shell', () => {
     expect(collapse.classes()).toContain('size-11');
     expect(sheet.get('button[type="submit"]').classes()).toContain('h-14');
     expect(sheet.find('textarea').exists()).toBe(true);
-    expect(sheet.get('[data-testid="source-counter"]').text()).toMatch(/^\d+ \/ 65536$/);
+    expect(sheet.get('[data-testid="source-counter"]').text()).toMatch(/^\d+ \/ 65\.536$/);
   });
   it('collapses on Escape and on the button, returning focus to the expand button', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
     await expandSheet(wrapper);
-    await sheetOf(wrapper).trigger('keydown', { key: 'Escape' });
+    await sheetOf(wrapper).get('textarea').trigger('keydown', { key: 'Escape' });
     await flushPromises();
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false);
     expect(document.activeElement).toBe(expandButton(wrapper).element);
