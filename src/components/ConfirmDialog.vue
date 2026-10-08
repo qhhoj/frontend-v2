@@ -11,6 +11,7 @@ import { computed, useId } from 'vue';
  * The body is a `<form>` and the confirm button (in the footer, outside it) submits it by id, so Enter in an input and a click
  * each emit once. Focus returns to the element that opened it (PrimeVue restores it when the dialog hides).
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
+ * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */
 const props = withDefaults(
   defineProps<{

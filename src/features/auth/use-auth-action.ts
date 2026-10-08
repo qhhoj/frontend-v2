@@ -36,10 +36,9 @@ export function useAuthAction(
   };
   const focusFirstInvalid = () =>
     formElement.value?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
-  /** Forget the failure and the dismissed fields: a reopened dialog starts clean. */
+  /** Forget the failure: a reopened dialog starts clean. */
   const reset = () => {
     error.value = null;
-    dismissed.value = [];
   };
 
   /** Runs one attempt; true when it succeeded. A second call while one is pending does nothing. */

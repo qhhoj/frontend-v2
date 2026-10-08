@@ -97,7 +97,7 @@ describe('ConfirmDialog', () => {
 });
 
 describe('ConfirmDialog with an input in its body', () => {
-  it('confirms once on Enter: the body is a form that the confirm button submits', async () => {
+  it('emits once when the form is submitted', async () => {
     const wrapper = mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
     await flushPromises();
     dialog()
@@ -122,14 +122,20 @@ describe('ConfirmDialog with an input in its body', () => {
     expect(wrapper.emitted('confirm')).toHaveLength(1);
   });
 
-  it('labels the close button and gives focus back to the element that opened it', async () => {
+  it('labels the close button with common.close', async () => {
+    mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
+    await flushPromises();
+    expect(dialog().querySelector('button[aria-label="Đóng"]')).not.toBeNull();
+  });
+
+  // Regression guard for PrimeVue's own focus restore (ConfirmDialog no longer implements it).
+  it('gives focus back to the element that opened it', async () => {
     const opener = document.createElement('button');
     document.body.append(opener);
     opener.focus();
     const wrapper = mountDialog({ ...ASK, visible: false });
     await wrapper.setProps({ visible: true });
     await flushPromises();
-    expect(dialog().querySelector('button[aria-label="Đóng"]')).not.toBeNull();
     await wrapper.setProps({ visible: false });
     await vi.waitFor(() => expect(document.activeElement).toBe(opener));
     opener.remove();

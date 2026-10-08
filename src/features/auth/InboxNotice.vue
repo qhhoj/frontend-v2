@@ -8,7 +8,7 @@ import { useCooldown } from './use-cooldown';
 /** The "Kiểm tra hộp thư" body: where the mail went (one status) and a resend button that cools down after each send. */
 const props = defineProps<{ resend: () => Promise<unknown> }>();
 const { coolingDown, remainingText, start } = useCooldown();
-const { pending, summary, run } = useAuthAction(ref<HTMLElement | null>(null));
+const { pending, summary, run } = useAuthAction();
 const resent = ref(false);
 // The mail was just sent when this card appears, so the first render already shows the cooldown.
 start();

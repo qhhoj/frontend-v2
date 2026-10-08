@@ -147,13 +147,11 @@ describe('useAuthAction', () => {
 });
 
 describe('useAuthAction without a form, and reset', () => {
-  it('reset forgets the failure and the dismissed fields, so a reopened dialog starts clean', async () => {
+  it('reset forgets the failure, so a reopened dialog starts clean', async () => {
     const action = mountForm(['first']);
     await action.run(rejected(validation(taken('first'))));
-    action.dismiss('first');
     action.reset();
     expect(action.error.value).toBeNull();
-    expect(action.fieldErrors.value).toEqual({});
   });
 
   it('needs no form element: a dialog or banner uses it for pending and the failure text only', async () => {
