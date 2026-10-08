@@ -1,12 +1,13 @@
+import { LEADERBOARD_PAGE_SIZE } from '../src/api/types/users';
 import { leaderboardEntry } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
-/** One full page of the board: 14 rows, as the table draws them. */
-const fullPage = Array.from({ length: 14 }, (_row, index) =>
-  leaderboardEntry(index + 1, `user_${index + 10}`, 2900 - index * 120),
+/** One full page of the board, as the query asks for it (`LEADERBOARD_PAGE_SIZE` rows). */
+const fullPage = Array.from({ length: LEADERBOARD_PAGE_SIZE }, (_row, index) =>
+  leaderboardEntry(index + 1, `user_${index + 10}`, 2900 - (index % 20) * 120),
 );
 
 test.beforeEach(({ api }) => {
@@ -25,7 +26,7 @@ test('a signed-in viewer finds their rank and lands on their row', async ({ page
 test('the exact-username box opens that profile', async ({ page }) => {
   await page.goto('/users');
   await page.getByLabel('Tên đăng nhập').fill('khoa.tran');
-  await page.getByRole('button', { name: 'Mở' }).click();
+  await page.getByRole('button', { name: 'Mở', exact: true }).click();
   await expect(page).toHaveURL('/users/khoa.tran');
 });
 

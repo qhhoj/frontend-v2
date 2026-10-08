@@ -34,6 +34,8 @@ export interface UserPageStaff {
 /** backend: users/leaderboards/dto/leaderboard.dto.ts USER_SORTS */
 export const LEADERBOARD_SORTS = ['rating', 'performancePoints', 'points', 'problemCount'] as const;
 export type LeaderboardSort = (typeof LEADERBOARD_SORTS)[number];
+/** Rows per board page; the backend's default and maximum. The board query and its skeleton both read it. */
+export const LEADERBOARD_PAGE_SIZE = 100;
 /** The leaderboard tabs: the four `/users` sorts and `/contributors`. */
 export const BOARD_SORTS = [...LEADERBOARD_SORTS, 'contributors'] as const;
 export type BoardSort = (typeof BOARD_SORTS)[number];

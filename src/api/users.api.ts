@@ -1,6 +1,7 @@
 import { apiPage, apiRequest } from './client';
 import type { PostListItem } from './types/blog';
 import type { RecentComment } from './types/comments';
+import { LEADERBOARD_PAGE_SIZE } from './types/users';
 import type {
   ActivityResponse,
   LeaderboardEntry,
@@ -21,7 +22,7 @@ export const fetchRatingHistory = (username: string) =>
 export const fetchLeaderboard = (query: LeaderboardQuery) =>
   apiPage<LeaderboardEntry>('/users', { query: { ...query } });
 export const fetchContributors = (page: number) =>
-  apiPage<LeaderboardEntry>('/contributors', { query: { page } });
+  apiPage<LeaderboardEntry>('/contributors', { query: { page, pageSize: LEADERBOARD_PAGE_SIZE } });
 export const fetchRank = (username: string, field: RankField) =>
   apiRequest<RankResponse>(`${userPath(username)}/rank`, { query: { sort: field } });
 export const fetchSolved = (username: string) =>

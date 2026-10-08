@@ -5,6 +5,7 @@ import { organizationSummary } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { LEADERBOARD_PAGE_SIZE } from '@/api/types/users';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
 const board = page(
@@ -111,12 +112,12 @@ describe('leaderboard page: opens a profile by username', () => {
 });
 
 describe('leaderboard page: loading and empty boards', () => {
-  it('shows a table skeleton with the header and 14 rows while loading, inert', async () => {
+  it('shows a table skeleton with the header and one row per page item while loading, inert', async () => {
     mockApi({ ...anonymousViewer });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/users');
     const skeleton = wrapper.get('[data-testid="query-skeleton"]');
-    expect(skeleton.findAll('tbody tr')).toHaveLength(14);
+    expect(skeleton.findAll('tbody tr')).toHaveLength(LEADERBOARD_PAGE_SIZE);
     expect(skeleton.findAll('thead th')).toHaveLength(7);
     expect(skeleton.text().trim()).toBe('');
   });
@@ -134,5 +135,41 @@ describe('leaderboard page: loading and empty boards', () => {
     const { wrapper: top } = await mountApp('/users');
     expect(top.findAll('[data-bit-variant="rankUp"]')).toHaveLength(1);
     expect(top.find('[data-bit-variant="rankUp"] [aria-hidden="true"]').exists()).toBe(true);
+  });
+});
+
+describe('leaderboard page: find-my-rank again and errors', () => {
+  it('reveals and focuses the viewer row again when the board is already on that page', async () => {
+    mockApi({
+      ...signedInViewer(),
+      'GET /users': board,
+      'GET /users/user_01': ok(userPage({ rating: 1487 })),
+      'GET /users/user_01/rank': ok({ rank: 1134, page: 12, pageSize: 100 }),
+    });
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    const { wrapper } = await mountApp('/users');
+    await wrapper.get('[data-testid="my-rank"] button').trigger('click');
+    await flushPromises();
+    (document.activeElement as HTMLElement | null)?.blur();
+    scrollIntoView.mockClear();
+    await wrapper.get('[data-testid="my-rank"] button').trigger('click');
+    await flushPromises();
+    expect(scrollIntoView).toHaveBeenCalled();
+    expect(document.activeElement?.id).toBe('user-user_01');
+  });
+
+  it('shows the query error with a retry in the rank card when the rank request fails', async () => {
+    mockApi({
+      ...signedInViewer(),
+      'GET /users': board,
+      'GET /users/user_01': ok(userPage()),
+      'GET /users/user_01/rank': fail(500, 'internal_error'),
+    });
+    const { wrapper } = await mountApp('/users');
+    const card = wrapper.get('[data-testid="my-rank"]');
+    expect(card.find('[role="alert"]').exists()).toBe(true);
+    expect(card.text()).toContain('Thử lại');
+    expect(card.text()).not.toContain('Tài khoản của bạn không có trên bảng xếp hạng');
   });
 });

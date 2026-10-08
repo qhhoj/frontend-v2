@@ -2,12 +2,21 @@
 import { nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { BoardSort, LeaderboardEntry, RankField } from '@/api/types/users';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import StateBit from '@/components/StateBit.vue';
 import UserName from '@/components/UserName.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import {
+  AVATAR_PX,
+  BOARD_ROW_CLASS,
+  ORGANIZATION_CELL_CLASS,
+  RANK_CELL_CLASS,
+  USER_CELL_CLASS,
+  valueCellClass,
+} from './leaderboard-cells';
 import { boardColumns, rowAnchor } from './leaderboard-columns';
+import { revealRow } from './reveal-row';
 
 const props = defineProps<{
   entries: LeaderboardEntry[];
@@ -20,7 +29,7 @@ const valueOf = (entry: LeaderboardEntry, key: RankField) =>
   entry[key] === null ? '—' : formatNumber(entry[key], locale.locale);
 const scrollToTarget = async () => {
   await nextTick();
-  if (route.hash) document.getElementById(route.hash.slice(1))?.scrollIntoView({ block: 'center' });
+  if (route.hash) revealRow(route.hash.slice(1));
 };
 watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
 </script>
@@ -50,18 +59,18 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
         v-for="entry in entries"
         :id="rowAnchor(entry.username)"
         :key="entry.id"
-        class="border-t border-line target:bg-accent-soft"
-        :class="{ 'bg-accent-soft': entry.username === viewerName }"
+        tabindex="-1"
+        :class="[BOARD_ROW_CLASS, { 'bg-accent-soft': entry.username === viewerName }]"
       >
-        <td class="px-3 py-2.5 text-right font-mono tabular-nums">
+        <td :class="RANK_CELL_CLASS">
           <span class="inline-flex items-center justify-end gap-1.5">
             <StateBit v-if="entry.rank <= 3" variant="rankUp" size="tiny" />
             {{ formatNumber(entry.rank, locale.locale) }}
           </span>
         </td>
-        <td class="px-3 py-2.5">
+        <td :class="USER_CELL_CLASS">
           <span class="flex items-center gap-2.5">
-            <UserAvatar :username="entry.username" :size="28" />
+            <UserAvatar :username="entry.username" :size="AVATAR_PX" />
             <span class="flex min-w-0 flex-col">
               <span class="flex items-center gap-2">
                 <UserName :username="entry.username" :rating="entry.rating" />
@@ -78,14 +87,13 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
             </span>
           </span>
         </td>
-        <td v-if="sort !== 'contributors'" class="hidden px-3 py-2.5 text-muted md:table-cell">
+        <td v-if="sort !== 'contributors'" :class="ORGANIZATION_CELL_CLASS">
           {{ entry.organization?.shortName ?? '—' }}
         </td>
         <td
           v-for="column in boardColumns(sort)"
           :key="column.key"
-          class="px-3 py-2.5 text-right font-mono tabular-nums"
-          :class="column.isActive ? 'font-semibold' : 'hidden md:table-cell'"
+          :class="valueCellClass(column.isActive)"
         >
           {{ valueOf(entry, column.key) }}
         </td>

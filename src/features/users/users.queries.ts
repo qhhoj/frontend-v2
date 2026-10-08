@@ -1,6 +1,7 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
+import { LEADERBOARD_PAGE_SIZE } from '@/api/types/users';
 import type { BoardSort, RankField } from '@/api/types/users';
 import {
   fetchActivity,
@@ -44,7 +45,9 @@ export const useTopUsersQuery = () =>
   });
 
 const fetchBoard = (sort: BoardSort, page: number) =>
-  sort === 'contributors' ? fetchContributors(page) : fetchLeaderboard({ sort, page });
+  sort === 'contributors'
+    ? fetchContributors(page)
+    : fetchLeaderboard({ sort, page, pageSize: LEADERBOARD_PAGE_SIZE });
 export const useLeaderboardQuery = (
   sort: MaybeRefOrGetter<BoardSort>,
   page: MaybeRefOrGetter<number>,
