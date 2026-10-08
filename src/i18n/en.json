@@ -478,7 +478,20 @@
       "send": "Resend the link",
       "sent": "If {email} is waiting for activation, a new link arrives within a few minutes."
     },
-    "heldUsername": "The name {username} stays reserved for this address for 7 days, until it is activated. To use another email, register again with a new name. To get this email again, use the send-again button above."
+    "heldUsername": "The name {username} stays reserved for this address for 7 days, until it is activated. To use another email, register again with a new name. To get this email again, use the send-again button above.",
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "lead": "Enter the email you registered with and we send a reset link.",
+      "send": "Send the link",
+      "sent": "If {email} has an account, a reset link arrives within a few minutes."
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "submit": "Change password",
+      "deadTitle": "This link no longer works",
+      "deadLead": "The reset link has expired or was already used. Ask for a new one.",
+      "requestNew": "Ask for a new link"
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

@@ -478,7 +478,20 @@
       "send": "Gửi lại liên kết",
       "sent": "Nếu {email} đang chờ kích hoạt, bạn sẽ nhận được liên kết mới trong vài phút."
     },
-    "heldUsername": "Tên {username} được giữ cho địa chỉ này trong 7 ngày cho tới khi kích hoạt. Muốn dùng email khác, hãy đăng ký lại với tên mới. Muốn nhận lại email tới địa chỉ này, hãy dùng nút gửi lại ở trên."
+    "heldUsername": "Tên {username} được giữ cho địa chỉ này trong 7 ngày cho tới khi kích hoạt. Muốn dùng email khác, hãy đăng ký lại với tên mới. Muốn nhận lại email tới địa chỉ này, hãy dùng nút gửi lại ở trên.",
+    "forgotPassword": {
+      "title": "Quên mật khẩu?",
+      "lead": "Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại.",
+      "send": "Gửi liên kết",
+      "sent": "Nếu {email} có tài khoản, bạn sẽ nhận được liên kết đặt lại trong vài phút."
+    },
+    "resetPassword": {
+      "title": "Đặt mật khẩu mới",
+      "submit": "Đổi mật khẩu",
+      "deadTitle": "Liên kết không còn hiệu lực",
+      "deadLead": "Liên kết đặt lại đã hết hạn hoặc đã được dùng. Hãy yêu cầu liên kết mới.",
+      "requestNew": "Yêu cầu liên kết mới"
+    }
   },
   "errors": {
     "generic": "Đã có lỗi xảy ra. Hãy thử lại.",

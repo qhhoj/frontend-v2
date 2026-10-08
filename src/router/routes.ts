@@ -225,14 +225,14 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/forgot-password',
     name: 'forgot-password',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.forgotPassword', guestOnly: true },
+    component: () => import('@/features/auth/ForgotPasswordPage.vue'),
+    meta: { titleKey: 'pages.forgotPassword', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/reset-password/:token',
     name: 'reset-password',
-    component: PlaceholderPage,
-    meta: { titleKey: 'pages.resetPassword' },
+    component: () => import('@/features/auth/ResetPasswordPage.vue'),
+    meta: { titleKey: 'pages.resetPassword', layout: 'auth' },
   },
   {
     path: '/account/password',
