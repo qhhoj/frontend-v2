@@ -69,3 +69,43 @@ test('an empty problem list shows Bit asleep above the message', async ({ page, 
   await expect(asleep).toBeVisible();
   await expect(page.getByRole('main')).toContainText('Không có bài phù hợp');
 });
+
+test('the 404 page shows Bit crying with two falling tears', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/no/such/page');
+  const crying = page.getByRole('img', { name: 'Bit đang khóc' });
+  await expect(crying).toBeVisible();
+  await expect(crying.locator('.bit-tear')).toHaveCount(2);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(crying.locator('.bit-tear').first()).toBeHidden();
+});
+
+test('home cards with nothing to list each show a small sleeping Bit', async ({ page, api }) => {
+  api.signedIn = true;
+  api.routes['GET /contests'] = { body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } } };
+  api.routes['GET /users'] = { body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } } };
+  api.routes['GET /submissions'] = {
+    body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } },
+  };
+  await page.goto('/');
+  for (const card of ['live-contest', 'recent-submissions', 'top-users']) {
+    const bit = page.getByTestId(card).getByRole('img', { name: 'Bit ngủ trong mũ ngủ' });
+    await expect(bit).toBeVisible();
+    expect((await boxOf(bit)).width).toBe(48);
+  }
+});
+
+test('a hidden submission shows a sweating Bit beside the reason, not a verdict Bit', async ({
+  page,
+  api,
+}) => {
+  api.signedIn = true;
+  api.routes['GET /submissions/:id'] = {
+    status: 403,
+    body: { error: { code: 'hidden', message: 'x' } },
+  };
+  await page.goto('/submissions/sub-1');
+  const reason = page.getByRole('alert').filter({ hasText: 'Bạn không có quyền xem bài nộp này' });
+  await expect(reason).toBeVisible();
+  await expect(page.getByTestId('inline-bit')).toBeVisible();
+});

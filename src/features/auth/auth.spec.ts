@@ -120,12 +120,18 @@ describe('auth screens', () => {
     );
     expect(wrapper.find('main a[href="/login"]').exists()).toBe(true);
     expect(router.currentRoute.value.fullPath).not.toContain('k123');
+    expect(
+      wrapper.get('[role="status"] [data-testid="inline-bit"]').attributes('aria-hidden'),
+    ).toBe('true');
   });
 
   it('explains an invalid activation link', async () => {
     mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(400, 'invalid_token') });
     const { wrapper } = await mountApp('/activate/expired');
     expect(wrapper.get('[role="alert"]').text()).toBe('Liên kết không hợp lệ hoặc đã hết hạn.');
+    expect(wrapper.get('[role="alert"] [data-testid="inline-bit"]').attributes('aria-hidden')).toBe(
+      'true',
+    );
   });
 
   it.each(['//evil.example/x', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)'])(

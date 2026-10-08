@@ -3,6 +3,7 @@ import { computed, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import GlassCard from '@/components/GlassCard.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useProblemQuery } from '@/features/problems/problems.queries';
@@ -74,7 +75,10 @@ const verdict = computed(() => {
       {{ verdict ? $t(verdict.labelKey) : '' }}
     </p>
     <GlassCard v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
-      <p role="alert">{{ $t(forbiddenKey) }}</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <InlineBit kind="sweat" />
+        <p role="alert">{{ $t(forbiddenKey) }}</p>
+      </div>
     </GlassCard>
     <QueryState
       v-else
@@ -92,6 +96,7 @@ const verdict = computed(() => {
           data-testid="stale-reload"
           class="flex flex-wrap items-center gap-3 text-sm text-muted"
         >
+          <InlineBit kind="sweat" />
           {{ $t('submission.staleReload') }}
           <button
             type="button"

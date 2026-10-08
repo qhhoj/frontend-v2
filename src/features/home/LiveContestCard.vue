@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CountdownTimer from '@/components/CountdownTimer.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -43,7 +44,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
       </template>
       <template v-else>
         <h2 class="font-display text-lg font-semibold">{{ $t('home.liveContest') }}</h2>
-        <p class="mt-2 text-muted">{{ $t('home.noLiveContest') }}</p>
+        <EmptyState compact>{{ $t('home.noLiveContest') }}</EmptyState>
         <RouterLink
           :to="{ name: 'contests' }"
           class="mt-2 inline-block text-accent-text underline"

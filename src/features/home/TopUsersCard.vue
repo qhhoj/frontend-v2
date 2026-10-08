@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -23,7 +24,7 @@ const { data: users, isPending, error, refetch } = useTopUsersQuery();
         </ol>
       </template>
 
-      <p v-if="!users?.length" class="text-muted">{{ $t('home.noUsers') }}</p>
+      <EmptyState v-if="!users?.length" compact>{{ $t('home.noUsers') }}</EmptyState>
       <ol v-else class="flex flex-col gap-2.5">
         <li v-for="entry in users" :key="entry.id" class="flex items-center gap-2.5">
           <TokenCoin :seed="entry.username" size="sm" />

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import InlineBit from '@/components/InlineBit.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 import { activate } from '@/api/auth.api';
 
@@ -29,11 +30,15 @@ onMounted(async () => {
     <h1 class="font-display text-3xl font-semibold">{{ $t('pages.activate') }}</h1>
     <p v-if="state === 'pending'" role="status" class="mt-6">{{ $t('auth.activating') }}</p>
     <template v-else-if="state === 'activated'">
-      <p role="status" class="mt-6">{{ $t('auth.activated') }}</p>
+      <p role="status" class="mt-6 flex items-center gap-3">
+        <InlineBit kind="crown" />{{ $t('auth.activated') }}
+      </p>
       <RouterLink :to="{ name: 'login' }" class="mt-4 inline-block text-accent-text underline">{{
         $t('account.login')
       }}</RouterLink>
     </template>
-    <p v-else role="alert" class="mt-6 text-negative">{{ $t(errorMessageKey(error)) }}</p>
+    <p v-else role="alert" class="mt-6 flex items-center gap-3 text-negative">
+      <InlineBit kind="sweat" />{{ $t(errorMessageKey(error)) }}
+    </p>
   </section>
 </template>

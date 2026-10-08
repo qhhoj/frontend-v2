@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -248,8 +249,9 @@ const VIEW_MODES = [
         <p
           v-if="rankingRefreshFailed"
           role="status"
-          class="glass rounded-pill px-4 py-2 text-sm text-muted"
+          class="glass flex items-center gap-3 rounded-pill px-4 py-2 text-sm text-muted"
         >
+          <InlineBit kind="sweat" />
           {{ $t('ranking.refreshFailed') }}
         </p>
         <RankingPodium

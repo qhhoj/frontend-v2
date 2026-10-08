@@ -139,6 +139,32 @@ describe('home', () => {
     );
   });
 
+  it('puts a small sleeping Bit in each card whose list is empty, and none in a card with rows', async () => {
+    mockApi(
+      signedInRoutes({
+        'GET /contests': page([]),
+        'GET /users': page([]),
+        'GET /submissions': page([]),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    for (const card of ['live-contest', 'recent-submissions', 'top-users'])
+      expect(
+        wrapper.get(`[data-testid="${card}"]`).get('[role="img"]').attributes('aria-label'),
+      ).toBe('Bit ngủ trong mũ ngủ');
+  });
+
+  it('draws no Bit in the cards while they have rows', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="top-users"]').find('[role="img"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="recent-submissions"]').find('[role="img"]').exists()).toBe(
+      false,
+    );
+  });
+
   it('shows anonymous viewers the public cards only', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');

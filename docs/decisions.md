@@ -125,6 +125,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Mascot: `src/mascot/bit-sprite.ts` is the single source of Bit's pixels and the only source file outside `src/theme/themes/` that `lint:tokens` skips, because Bit keeps its sprite colours in every theme like an image asset.
 - Motion: skeleton pulse, Bit sob and tears use their own durations and switch themselves off under reduced motion, because `--qh-duration` is 0 there and would freeze them mid-frame instead of removing them.
 - 404: `NotFoundPage` (crying Bit, pale 404) replaces the placeholder on the catch-all route; the mascot's 404 variant is crying, not a magnifying glass (user's pick "404 B").
+- More Bit: `InlineBit` (48 px, decorative) sits beside short notices (sweat: forbidden, stream stopped, refresh failed, activation failed; crown: account activated; nightcap: placeholder pages) and `EmptyState compact` fills the home cards' empty texts, because a notice beside its words needs no second label; per-row verdict Bits stay out as too noisy.
 
 ## Problems and submissions
 

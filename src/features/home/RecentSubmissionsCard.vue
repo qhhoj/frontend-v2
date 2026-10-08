@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -48,7 +49,7 @@ const now = useNow(60_000);
         </ul>
       </template>
 
-      <p v-if="!submissions?.length" class="py-6 text-muted">{{ $t('home.noSubmissions') }}</p>
+      <EmptyState v-if="!submissions?.length" compact>{{ $t('home.noSubmissions') }}</EmptyState>
       <ul v-else class="mt-3.5 flex flex-col gap-2">
         <li v-for="item in submissions" :key="item.id">
           <RouterLink

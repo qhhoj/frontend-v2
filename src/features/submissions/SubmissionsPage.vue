@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
@@ -79,6 +80,7 @@ function goToPage(page: number) {
           data-testid="live-paused"
           class="mb-3 flex flex-wrap items-center gap-3 text-sm text-muted"
         >
+          <InlineBit kind="sweat" />
           {{ $t('submissions.livePaused') }}
           <button
             type="button"

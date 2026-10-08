@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue';
 import CopyButton from '@/components/CopyButton.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
@@ -45,7 +46,9 @@ const lineNumbers = computed(() =>
         >
       </div>
     </div>
-    <p v-if="forbiddenText" class="px-6 pb-6 text-muted sm:px-8">{{ forbiddenText }}</p>
+    <p v-if="forbiddenText" class="flex flex-wrap items-center gap-3 px-6 pb-6 text-muted sm:px-8">
+      <InlineBit kind="sweat" />{{ forbiddenText }}
+    </p>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
       <div
