@@ -1,11 +1,11 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { contestDetail, contestProblem } from '@/test/fixtures';
+import { contestDetail, contestProblem, viewerResult } from '@/test/fixtures';
 import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, hangRequestsExcept, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer } from '@/test/problem-routes';
+import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 /** 08:00Z to 11:24:37Z, frozen for the last 60 minutes (from 10:24:37Z). */
 const running = contestDetail();
@@ -297,5 +297,112 @@ describe('contest page bottom reserve', () => {
     const { wrapper } = await mountApp('/contests/nope');
     const page = wrapper.get('[data-testid="contest-not-found"]').element.closest('.max-w-7xl');
     expect(page!.classList).not.toContain('pb-36');
+  });
+});
+
+describe('contest problems with the viewer’s results (backend 4c)', () => {
+  const graded = contestDetail({
+    phase: 'ended',
+    problems: [
+      contestProblem(0, {
+        solverCount: 188,
+        viewerResult: viewerResult({
+          cell: { time: 1450, points: 100, tries: 1 },
+          isSolved: true,
+          attempts: 1,
+        }),
+      }),
+      contestProblem(1, {
+        solverCount: 143,
+        viewerResult: viewerResult({ cell: { time: null, points: 0, tries: 3 }, attempts: 3 }),
+      }),
+      contestProblem(2, { solverCount: 6, viewerResult: viewerResult() }),
+    ],
+  });
+
+  it('adds the solver count and the viewer’s own cell to each row, in words for screen readers', async () => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(graded) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const headers = wrapper
+      .findAll('[data-testid="contest-problems"] thead th')
+      .map((cell) => cell.text());
+    expect(headers).toEqual(expect.arrayContaining(['Đã giải', 'Của bạn']));
+    const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
+    expect(rows[0]!.text()).toContain('188');
+    expect(rows[0]!.text()).toContain('+ 0:24');
+    expect(rows[0]!.text()).toContain('Giải sau 0 lần sai, lúc 0:24');
+    expect(rows[1]!.text()).toContain('−3');
+    expect(rows[2]!.text()).toContain('Chưa nộp');
+  });
+
+  it('hides the solver column when the scoreboard is closed to the viewer', async () => {
+    const closed = contestDetail({
+      problems: [contestProblem(0, { solverCount: null, viewerResult: viewerResult() })],
+    });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(closed) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const headers = wrapper
+      .findAll('[data-testid="contest-problems"] thead th')
+      .map((cell) => cell.text());
+    expect(headers).not.toContain('Đã giải');
+  });
+
+  it('crowns the viewer’s solved count once the contest is over', async () => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(graded) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const summary = wrapper.get('[data-testid="solved-summary"]');
+    expect(summary.text()).toBe('Bạn đã giải 1/3 bài');
+    expect(summary.find('[aria-hidden="true"]').exists()).toBe(true);
+  });
+
+  it('does not crown a solved count while the contest still runs', async () => {
+    const solvedWhileRunning = contestDetail({
+      phase: 'running',
+      problems: [
+        contestProblem(0, { viewerResult: viewerResult({ isSolved: true, attempts: 1 }) }),
+      ],
+    });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(solvedWhileRunning) });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.find('[data-testid="solved-summary"]').exists()).toBe(false);
+  });
+
+  it('shows a judging Bit beside a problem whose submission is still waiting for its verdict', async () => {
+    const judging = contestDetail({
+      problems: [
+        contestProblem(0, {
+          viewerResult: viewerResult({ hasPendingSubmission: true, attempts: 1 }),
+        }),
+      ],
+    });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(judging) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const row = wrapper.get('[data-testid="contest-problems"] tbody tr');
+    expect(row.text()).toContain('Đang chấm');
+    expect(pixelsOf(row.get('[data-testid="judging-bit"]').element)).toBe(pixelsOfKind('judging'));
+  });
+
+  it('draws a dash, never a zero, for a solver count the viewer may not see', async () => {
+    const mixed = contestDetail({
+      problems: [
+        contestProblem(0, { solverCount: null, viewerResult: viewerResult() }),
+        contestProblem(1, { solverCount: 6, viewerResult: viewerResult() }),
+      ],
+    });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(mixed) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
+    // Cells: name, points, solvers, own result, open. The own chip also draws a dash, so read the solver cell alone.
+    const SOLVERS_CELL = 2;
+    expect(rows[0]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('—');
+    expect(rows[1]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('6');
+  });
+
+  it('gives the phone row its solver count in words', async () => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(graded) });
+    const { wrapper } = await mountApp('/contests/r42');
+    const phoneRows = wrapper.findAll('[data-testid="contest-problems"] ul li');
+    expect(phoneRows[0]!.text()).toContain('188 người giải');
+    expect(phoneRows[2]!.text()).toContain('6 người giải');
   });
 });

@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ExternalLink } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
 import GlassCard from '@/components/GlassCard.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber } from '@/lib/format';
+import { showsCellTime } from '@/lib/ranking-cells';
+import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
+import OwnResultChip from './OwnResultChip.vue';
+import { attemptsLeft, solvedSummary } from './own-result';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
@@ -23,10 +29,45 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
   running: 'contests.problems.afterJoin',
   ended: 'contests.problems.hidden',
 };
+
+const problems = computed(() => props.contest.problems ?? []);
+/** Null solver counts (the viewer may not see the full ranking) draw a dash, never a zero. */
+const hasSolverCounts = computed(() =>
+  problems.value.some((problem) => problem.solverCount !== null),
+);
+const hasOwnResults = computed(() =>
+  problems.value.some((problem) => problem.viewerResult !== null),
+);
+const context = computed<RankingContext>(() => ({
+  formatName: props.contest.formatName,
+  pointsPrecision: props.contest.pointsPrecision,
+  locale: locale.locale,
+  showsTime: showsCellTime(props.contest.formatName, props.contest.formatConfig),
+}));
+const solvedCounts = computed(() => solvedSummary(problems.value));
+const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
+const solverCountText = (problem: ContestProblem) =>
+  formatNumber(problem.solverCount ?? 0, locale.locale);
+/** The cap line, with the attempts the viewer has left once they have a result. */
+const leftText = (problem: ContestProblem) =>
+  t('contests.problems.left', { count: attemptsLeft(problem) ?? 0 });
 </script>
 
 <template>
   <GlassCard data-testid="contest-problems" class="overflow-hidden">
+    <p
+      v-if="isCrowned"
+      data-testid="solved-summary"
+      class="flex items-center gap-3 border-b border-line px-5 py-3 font-semibold"
+    >
+      <InlineBit kind="crown" />
+      {{
+        $t('contests.problems.solvedSummary', {
+          solved: solvedCounts.solved,
+          total: solvedCounts.total,
+        })
+      }}
+    </p>
     <p v-if="!contest.problems" class="px-5 py-8 text-center text-muted">
       {{ $t(HIDDEN_KEYS[contest.phase]) }}
     </p>
@@ -47,6 +88,12 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
             </th>
             <th scope="col" class="px-3 py-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
+            </th>
+            <th v-if="hasSolverCounts" scope="col" class="px-3 py-3 text-right font-semibold">
+              {{ $t('contests.problems.columns.solvers') }}
+            </th>
+            <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold">
+              {{ $t('contests.problems.columns.own') }}
             </th>
             <th scope="col" class="px-5 py-3">
               <span class="sr-only">{{ $t('contests.problems.columns.open') }}</span>
@@ -70,10 +117,18 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
                 {{ problem.code
                 }}<template v-if="problem.maxSubmissions">
                   · {{ capText(problem.maxSubmissions) }}</template
+                ><template v-if="problem.viewerResult && problem.maxSubmissions">
+                  · {{ leftText(problem) }}</template
                 >
               </span>
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
+            <td v-if="hasSolverCounts" class="px-3 py-3 text-right font-mono tabular-nums">
+              {{ problem.solverCount === null ? '—' : solverCountText(problem) }}
+            </td>
+            <td v-if="hasOwnResults" class="px-3 py-3">
+              <OwnResultChip :problem="problem" :context="context" />
+            </td>
             <td class="px-5 py-3 text-right">
               <RouterLink
                 :to="problemLink(problem)"
@@ -110,8 +165,19 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
               >
               ·
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
+              <template v-if="problem.solverCount !== null">
+                ·
+                {{
+                  $t(
+                    'contests.problems.solvers',
+                    { count: solverCountText(problem) },
+                    problem.solverCount,
+                  )
+                }}
+              </template>
             </p>
           </div>
+          <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
         </li>
       </ul>
     </template>

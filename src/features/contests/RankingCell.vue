@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
-import type { CellKind, RankingCellView } from '@/lib/ranking-cells';
+import type { RankingCellView } from '@/lib/ranking-cells';
+import { KIND_CLASSES, PARTIAL_CLASSES } from './ranking-cell-classes';
 
 const props = defineProps<{ view: RankingCellView }>();
 
-const KIND_CLASSES: Record<Exclude<CellKind, 'empty'>, string> = {
-  'first-solve': 'bg-first-solve text-first-solve-text',
-  solved: 'bg-verdict-ac-bg text-verdict-ac',
-  partial: 'text-verdict-partial',
-  failed: 'bg-verdict-wa-bg text-verdict-wa',
-  pending: 'bg-verdict-pending-bg text-verdict-pending',
-};
-const PARTIAL_CLASSES = {
-  1: 'bg-partial-bg-1',
-  2: 'bg-partial-bg-2',
-  3: 'bg-partial-bg-3',
-} as const;
 /** The spoken label pluralises on the number of tries (a label without tries is not plural). */
 const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
 </script>
