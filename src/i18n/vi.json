@@ -313,6 +313,17 @@
       "security": "Bảo mật",
       "data": "Dữ liệu"
     },
+    "defaults": {
+      "title": "Mặc định và hiển thị",
+      "lead": "Áp dụng cho trang nộp bài và cách hiện thời gian.",
+      "languageHint": "Chọn sẵn ở trang nộp bài.",
+      "noLanguage": "Chưa chọn",
+      "timezoneHint": "Dùng cho giờ bắt đầu kỳ thi và thời điểm nộp bài.",
+      "interfaceLanguage": "Ngôn ngữ giao diện",
+      "deviceOnly": "Lưu trên thiết bị này",
+      "deviceOnlyNote": "Ngôn ngữ giao diện chỉ áp dụng cho trình duyệt đang dùng, không lưu vào tài khoản."
+    },
+    "locales": { "vi": "Tiếng Việt", "en": "English" },
     "organizations": {
       "title": "Tổ chức",
       "lead": "Sắp xếp lại hoặc rời khỏi các tổ chức bạn đang tham gia. Tổ chức đầu tiên hiện cạnh tên bạn (thường là trường). Muốn tham gia thêm, vào trang tổ chức.",

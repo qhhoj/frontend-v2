@@ -1,7 +1,14 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { apiRequest } from '@/api/client';
-import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import {
+  partialSession,
+  profile,
+  problemMeta,
+  sessionResponse,
+  signedIn,
+  signedOut,
+} from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
@@ -15,6 +22,7 @@ describe('auth screens', () => {
       'GET /auth/me': signedOut,
       'POST /auth/login': ok(sessionResponse()),
       'GET /profile': ok(profile()),
+      'GET /problems/meta': ok(problemMeta()),
       ...homeRoutes,
     });
     const { wrapper, router } = await mountApp('/login?redirect=/settings');

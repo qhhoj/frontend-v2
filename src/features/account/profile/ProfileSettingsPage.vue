@@ -8,6 +8,7 @@ import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsLayout from '../settings/SettingsLayout.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
+import DefaultsFields from './DefaultsFields.vue';
 import IdentityFields from './IdentityFields.vue';
 import OrganizationsEditor from './OrganizationsEditor.vue';
 import SaveBar from './SaveBar.vue';
@@ -94,6 +95,11 @@ async function submit() {
           v-model="draft.organizationIds"
           :organizations="profile.organizations"
           :error="fieldErrors.organizations"
+        />
+        <DefaultsFields
+          v-model:language-id="draft.languageId"
+          v-model:timezone="draft.timezone"
+          :errors="fieldErrors"
         />
         <SaveBar
           :dirty="dirty"

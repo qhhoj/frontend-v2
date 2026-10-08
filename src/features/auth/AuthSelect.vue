@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
-import { useId } from 'vue';
+import { computed, useId } from 'vue';
 import AuthFieldError from './AuthFieldError.vue';
 
-/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages). `optional` adds "(tuỳ chọn)" to the label. Extra attributes go to the select. */
+/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages, and the profile defaults). `optional` adds "(tuỳ chọn)" to the label. `placeholder` is the empty option; leave it out when the field always has a value. Extra attributes go to the select. */
 defineOptions({ inheritAttrs: false });
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label: string;
     name: string;
-    placeholder: string;
+    placeholder?: string;
+    hint?: string;
     error?: string;
     optional?: boolean;
   }>(),
-  { error: undefined, optional: true },
+  { placeholder: undefined, hint: undefined, error: undefined, optional: true },
 );
 const model = defineModel<string>({ required: true });
 const selectId = useId();
 const errorId = `${selectId}-error`;
+const hintId = `${selectId}-hint`;
+const describedIds = computed(
+  () => [props.error && errorId, props.hint && hintId].filter(Boolean).join(' ') || undefined,
+);
 </script>
 
 <template>
@@ -35,11 +40,11 @@ const errorId = `${selectId}-error`;
         v-model="model"
         :name="name"
         :aria-invalid="error ? 'true' : undefined"
-        :aria-describedby="error ? errorId : undefined"
+        :aria-describedby="describedIds"
         class="h-12 w-full min-w-0 appearance-none rounded-row border bg-surface-solid pr-10 pl-3.5 text-[15px] text-content"
         :class="error ? 'border-negative' : 'border-line-strong'"
       >
-        <option value="">{{ placeholder }}</option>
+        <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
         <slot />
       </select>
       <ChevronDown
@@ -47,6 +52,7 @@ const errorId = `${selectId}-error`;
         class="pointer-events-none absolute top-1/2 right-3.5 size-[18px] -translate-y-1/2 text-muted"
       />
     </span>
+    <p v-if="hint" :id="hintId" class="text-[13px] leading-normal text-muted">{{ hint }}</p>
     <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

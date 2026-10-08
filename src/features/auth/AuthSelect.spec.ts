@@ -27,4 +27,30 @@ describe('AuthSelect', () => {
     await flushPromises();
     expect(wrapper.get('label').text()).toBe('Ngôn ngữ');
   });
+
+  it('leaves the empty option out when there is no placeholder', async () => {
+    const wrapper = mountSelect({ placeholder: undefined, modelValue: 'cpp' });
+    await flushPromises();
+    expect(wrapper.findAll('option').map((option) => option.text())).toEqual(['C++17']);
+  });
+
+  it('shows the placeholder as the empty option when given', async () => {
+    const wrapper = mountSelect();
+    await flushPromises();
+    expect(wrapper.findAll('option').map((option) => option.text())).toEqual([
+      'Chưa chọn',
+      'C++17',
+    ]);
+  });
+
+  it('links the error and the hint to the select', async () => {
+    const wrapper = mountSelect({ hint: 'Chọn sẵn ở trang nộp bài.', error: 'Không hợp lệ.' });
+    await flushPromises();
+    const described = wrapper
+      .get('select')
+      .attributes('aria-describedby')!
+      .split(' ')
+      .map((id) => wrapper.get(`[id="${id}"]`).text());
+    expect(described).toEqual(['Không hợp lệ.', 'Chọn sẵn ở trang nộp bài.']);
+  });
 });

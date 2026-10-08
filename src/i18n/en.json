@@ -313,6 +313,17 @@
       "security": "Security",
       "data": "Data"
     },
+    "defaults": {
+      "title": "Defaults and display",
+      "lead": "Used on the submit page and for times.",
+      "languageHint": "Preselected on the submit page.",
+      "noLanguage": "Not chosen",
+      "timezoneHint": "Used for contest start times and submission times.",
+      "interfaceLanguage": "Interface language",
+      "deviceOnly": "Saved on this device",
+      "deviceOnlyNote": "The interface language applies to this browser only and is not saved to the account."
+    },
+    "locales": { "vi": "Tiếng Việt", "en": "English" },
     "organizations": {
       "title": "Organizations",
       "lead": "Reorder or leave the organizations you belong to. The first one shows beside your name (usually your school). To join more, open the organization pages.",
