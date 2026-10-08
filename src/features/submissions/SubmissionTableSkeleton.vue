@@ -62,6 +62,10 @@ const columns = computed(() =>
                 <SkeletonBlock text :class="column.cell" />
                 <div class="font-mono text-xs"><SkeletonBlock text class="w-16" /></div>
               </template>
+              <span v-else-if="column.key === 'user'" class="flex items-center gap-2">
+                <SkeletonBlock class="size-6 shrink-0" />
+                <SkeletonBlock text :class="column.cell" />
+              </span>
               <SkeletonBlock v-else text :class="column.cell" />
             </td>
           </tr>

@@ -3,6 +3,7 @@ import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
 import {
   formatCumtime,
@@ -82,7 +83,10 @@ const LEGEND = [
         >
           <td class="px-5 py-2.5 text-left">{{ row.rank ?? '—' }}</td>
           <th scope="row" class="px-2.5 py-2.5 text-left font-body">
-            <UserName :username="row.user.username" />
+            <span class="inline-flex items-center gap-2 align-middle">
+              <UserAvatar :username="row.user.username" :size="24" />
+              <UserName :username="row.user.username" />
+            </span>
             <span
               v-if="row.user.id === viewerId"
               class="ml-1.5 rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"

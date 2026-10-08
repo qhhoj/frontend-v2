@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLogout } from '@/features/auth/use-logout';
 import { translate } from '@/i18n';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useSessionStore } from '@/stores/session.store';
 
 const session = useSessionStore();
@@ -35,7 +36,7 @@ const items = computed<MenuItem[]>(() => [
       @click="menu?.toggle($event)"
     >
       {{ session.user.username }}
-      <span aria-hidden="true" class="bg-gradient-accent size-8 rounded-full" />
+      <UserAvatar :username="session.user.username" :size="28" />
     </button>
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false" />
   </template>

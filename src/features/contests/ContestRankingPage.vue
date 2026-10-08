@@ -214,7 +214,10 @@ const VIEW_MODES = [
               class="flex items-center gap-4 border-t border-line px-5 py-3 font-mono text-sm"
             >
               <SkeletonBlock text class="w-8" />
-              <span class="flex-1"><SkeletonBlock text class="w-40 max-w-full" /></span>
+              <span class="flex min-w-0 flex-1 items-center gap-2">
+                <SkeletonBlock class="size-6 shrink-0" />
+                <SkeletonBlock text class="w-40 max-w-full" />
+              </span>
               <SkeletonBlock text class="hidden w-64 sm:inline-block" />
             </div>
           </div>

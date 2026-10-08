@@ -4,6 +4,7 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import { FINISHED_STATUSES } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import {
   formatCaseMemory,
@@ -133,7 +134,10 @@ const formatScore = (value: number) =>
               <template v-else>{{ NO_VALUE }}</template>
             </td>
             <td :class="BODY_CELL_CLASSES">
-              <UserName v-if="row.user" :username="row.user.username" />
+              <span v-if="row.user" class="flex items-center gap-2">
+                <UserAvatar :username="row.user.username" :size="24" />
+                <UserName :username="row.user.username" />
+              </span>
               <template v-else>{{ NO_VALUE }}</template>
             </td>
             <td :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']">

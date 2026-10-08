@@ -65,14 +65,14 @@ const HEADGEAR: Record<BitHeadgear, readonly string[]> = {
 };
 
 /** Rows 6-10: highlight, body, side nubs with eyes, body, shade. */
-const BODY = [
+export const BODY = [
   '...HBBBBBBBBB...',
   '...BBBBBBBBB....',
   '..BBBEBBBEBBB...',
   '...BBEBBBEBB....',
   '...SSSSSSSSS....',
 ];
-const LEGS_STAND = '...O.O...O.O....';
+export const LEGS_STAND = '...O.O...O.O....';
 const LEGS_STEP = '....O.O.O.O.....';
 
 export interface BitPose {

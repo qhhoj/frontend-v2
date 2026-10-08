@@ -174,6 +174,10 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
 
+## Avatars
+
+- Every user's avatar is a Bit hashed from the username (scheme C, 24 576 looks), not uploads: no storage, moderation or image pipeline, and the same name shows the same face everywhere.
+
 ## Known gaps (later sub-projects)
 
 - Reloading `/activate/done` shows the invalid-link page — 8b polish.

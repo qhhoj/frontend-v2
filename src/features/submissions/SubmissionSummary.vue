@@ -5,6 +5,7 @@ import type { SubmissionDetail } from '@/api/types/submissions';
 import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -137,10 +138,11 @@ const facts = computed(() => [
         </dd>
         <dt class="text-[13px] text-muted">{{ $t('submission.facts.user') }}</dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
-          <UserName v-if="submission.user" :username="submission.user.username" /><template
-            v-else
-            >{{ NO_VALUE }}</template
-          >
+          <span v-if="submission.user" class="flex items-center gap-2.5">
+            <UserAvatar :username="submission.user.username" :size="32" />
+            <UserName :username="submission.user.username" />
+          </span>
+          <template v-else>{{ NO_VALUE }}</template>
         </dd>
         <dt class="text-[13px] text-muted">{{ $t('submission.facts.submitted') }}</dt>
         <dd class="min-w-0">
