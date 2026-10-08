@@ -54,6 +54,7 @@
       "underMinute": "dưới 1 phút"
     },
     "participants": "{count} thí sinh",
+    "virtualExtra": "+{count} ảo",
     "rated": "Tính rating",
     "private": "Riêng tư",
     "organizationPrivate": "Nội bộ",

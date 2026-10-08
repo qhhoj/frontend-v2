@@ -54,6 +54,7 @@
       "underMinute": "under a minute"
     },
     "participants": "{count} contestant | {count} contestants",
+    "virtualExtra": "+{count} virtual",
     "rated": "Rated",
     "private": "Private",
     "organizationPrivate": "Organization only",
