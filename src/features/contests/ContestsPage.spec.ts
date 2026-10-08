@@ -142,6 +142,7 @@ describe('contest list', () => {
       phase: 'upcoming',
       startTime: '2026-10-10T18:00:00Z',
       endTime: '2026-10-10T20:30:00Z',
+      registrationEnd: '2026-10-10T17:00:00Z',
     });
     mockApi({ ...anonymousViewer, ...contestListRoutes({ upcoming: [upcoming] }) });
     const { wrapper } = await mountApp('/contests');
@@ -277,6 +278,7 @@ describe('contest list', () => {
     expect(ended.text()).not.toContain('Chưa có kỳ thi nào kết thúc');
     expect(ended.get('a[href="/contests?phase=ended"]').text()).toContain('Về trang 1');
   });
+
   it('shows the viewer in their current contest with a way back, and a lock on coded contests', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const current = contestItem({
@@ -315,5 +317,19 @@ describe('contest list', () => {
         ?.attributes('href'),
     ).toBe('/contests/r44');
     expect(row.text()).not.toContain('Xem & đăng ký');
+  });
+
+  it("styles a visitor's upcoming and ended rows as plain buttons, like a signed-in viewer", async () => {
+    const upcoming = contestItem({
+      key: 'r45',
+      phase: 'upcoming',
+      startTime: '2026-10-10T08:00:00Z',
+      endTime: '2026-10-10T10:00:00Z',
+      registrationEnd: '2026-10-10T07:00:00Z',
+    });
+    mockApi({ ...anonymousViewer, ...contestListRoutes({ upcoming: [upcoming] }) });
+    const { wrapper } = await mountApp('/contests');
+    const link = wrapper.get('[data-testid="upcoming-contest"] a[href="/contests/r45"].border');
+    expect(link.classes()).not.toContain('bg-gradient-accent');
   });
 });

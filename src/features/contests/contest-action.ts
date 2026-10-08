@@ -131,24 +131,23 @@ const LIST_LABELS: Record<ContestActionKind, string> = {
   registrationClosed: 'contests.list.view',
   virtualDisallowed: 'contests.list.view',
 };
-/** A signed-out visitor gets the phase's own verb: enter, register or take it as a virtual run. */
-const VISITOR_LABELS: Record<ContestPhase, string> = {
-  running: LIST_LABELS.join,
-  upcoming: LIST_LABELS.register,
-  ended: LIST_LABELS.virtual,
-};
 const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
   leave: 'contests.list.badges.inContest',
   registered: 'contests.list.badges.registered',
   finished: 'contests.list.badges.finished',
 };
-const PRIMARY_KINDS: readonly ContestActionKind[] = ['signIn', 'join', 'rejoin', 'leave'];
+/** Only the actions that take the viewer into the contest (or back into it) are primary on a row. */
+const PRIMARY_KINDS: readonly ContestActionKind[] = ['join', 'rejoin', 'leave'];
 
-/** A list row's button: the detail's action as a link to the detail (a row never joins by itself). */
+/**
+ * A list row's button: the detail's action for the same facts, as a link to the detail (a row never joins by itself).
+ * A visitor gets the signed-in label: the detail asks them to sign in where the action needs it.
+ * `canSpectate` is false because the list does not carry the editor or tester role.
+ */
 export function listCallToAction(item: ContestListItem, now: number): ListCallToAction {
   const { kind } = contestAction({
-    isSignedIn: item.viewer !== null,
-    phase: item.phase,
+    isSignedIn: true,
+    phase: phaseAt(item, now),
     liveStatus: item.viewer?.liveStatus ?? null,
     isCurrent: item.viewer?.isCurrent ?? false,
     canSpectate: false,
@@ -158,7 +157,7 @@ export function listCallToAction(item: ContestListItem, now: number): ListCallTo
     disallowVirtual: item.disallowVirtual,
   });
   return {
-    labelKey: kind === 'signIn' ? VISITOR_LABELS[item.phase] : LIST_LABELS[kind],
+    labelKey: LIST_LABELS[kind],
     isPrimary: PRIMARY_KINDS.includes(kind),
     badgeKey: LIST_BADGES[kind] ?? null,
   };

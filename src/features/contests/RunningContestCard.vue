@@ -35,8 +35,8 @@ const perParticipation = computed(() =>
   <GlassCard as="article" data-testid="running-contest" class="flex flex-col gap-3 p-5">
     <div class="flex flex-wrap items-center gap-1.5">
       <PhasePill phase="running" />
-      <ViewerBadge :call="call" />
       <ContestChips :contest="contest" with-code-needed />
+      <ViewerBadge :badge-key="call.badgeKey" />
     </div>
     <div>
       <h3 class="font-display text-xl font-semibold">
@@ -84,7 +84,12 @@ const perParticipation = computed(() =>
           }}</span
         >
       </p>
-      <ContestCallLink :contest="contest" :call="call" />
+      <ContestCallLink
+        :contest-key="contest.key"
+        :contest-name="contest.name"
+        :label-key="call.labelKey"
+        :is-primary="call.isPrimary"
+      />
     </div>
   </GlassCard>
 </template>

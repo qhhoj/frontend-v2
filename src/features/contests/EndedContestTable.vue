@@ -2,7 +2,6 @@
 import type { ContestListItem } from '@/api/types/contests';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatShortDate } from '@/lib/format';
-import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
@@ -13,9 +12,8 @@ import ViewerBadge from './ViewerBadge.vue';
 defineProps<{ contests: ContestListItem[] }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
-/** Minutes are enough: a viewer's state changes at registration and contest boundaries. */
-const now = useNow(60_000);
-const callOf = (contest: ContestListItem) => listCallToAction(contest, now.value);
+/** Ended rows do not change with the clock, so each render reads it once. */
+const callOf = (contest: ContestListItem) => listCallToAction(contest, Date.now());
 /** The start date and the length, in one cell: `04/10 · 4 giờ`. */
 const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
@@ -59,7 +57,6 @@ const whenText = (contest: ContestListItem) => {
       <tbody>
         <tr v-for="contest in contests" :key="contest.key" class="border-t border-line">
           <th scope="row" class="px-5 py-3 text-left font-normal">
-            <ViewerBadge :call="callOf(contest)" />
             <RouterLink
               :to="{ name: 'contest', params: { key: contest.key } }"
               class="font-semibold hover:text-accent-text"
@@ -69,9 +66,10 @@ const whenText = (contest: ContestListItem) => {
           </th>
           <td class="px-3 py-3 whitespace-nowrap">{{ whenText(contest) }}</td>
           <td class="px-3 py-3">
-            <span class="flex flex-wrap gap-1.5"
-              ><ContestChips :contest="contest" with-code-needed
-            /></span>
+            <span class="flex flex-wrap gap-1.5">
+              <ContestChips :contest="contest" with-code-needed />
+              <ViewerBadge :badge-key="callOf(contest).badgeKey" />
+            </span>
           </td>
           <td class="px-3 py-3 text-right font-mono tabular-nums">
             {{ formatNumber(contest.userCount, locale.locale) }}
@@ -82,7 +80,12 @@ const whenText = (contest: ContestListItem) => {
             }}</span>
           </td>
           <td class="px-5 py-3 text-right">
-            <ContestCallLink :contest="contest" :call="callOf(contest)" />
+            <ContestCallLink
+              :contest-key="contest.key"
+              :contest-name="contest.name"
+              :label-key="callOf(contest).labelKey"
+              :is-primary="callOf(contest).isPrimary"
+            />
           </td>
         </tr>
       </tbody>
