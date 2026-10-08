@@ -104,9 +104,10 @@ describe('contest instants in the viewer time zone', () => {
     vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
     // 18:00Z on Oct 10 is 01:00 on Oct 11 in Vietnam.
     expect(formatClock('2026-10-10T18:00:00Z', 'vi')).toBe('01:00');
-    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi')).toEqual({ day: '11', month: 'Tháng 10' });
+    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi')).toEqual({ day: '11', month: 'thg 10' });
     expect(formatDayMonth('2026-10-10T18:00:00Z', 'en')).toEqual({ day: '11', month: 'Oct' });
     expect(formatShortDate('2026-10-10T18:00:00Z', 'vi')).toBe('11/10');
+    expect(formatShortDate('2026-10-10T18:00:00Z', 'en')).toBe('10/11');
     vi.stubEnv('TZ', 'UTC');
     expect(formatClock('2026-10-10T18:00:00Z', 'vi')).toBe('18:00');
     expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi').day).toBe('10');

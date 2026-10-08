@@ -98,11 +98,13 @@ export const formatClock = (date: string, locale: Locale) =>
 
 /** The list's date chip: day number and short month (`11` / `thg 10`). */
 export function formatDayMonth(date: string, locale: Locale): { day: string; month: string } {
-  const instant = new Date(date);
-  return {
-    day: new Intl.DateTimeFormat(INTL_LOCALES[locale], { day: 'numeric' }).format(instant),
-    month: new Intl.DateTimeFormat(INTL_LOCALES[locale], { month: 'short' }).format(instant),
-  };
+  // One formatter for both parts: the combined pattern gives the short month its chip form (`thg 10`).
+  const parts = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    day: 'numeric',
+    month: 'short',
+  }).formatToParts(new Date(date));
+  const valueOf = (type: 'day' | 'month') => parts.find((part) => part.type === type)?.value ?? '';
+  return { day: valueOf('day'), month: valueOf('month') };
 }
 
 /** `04/10` (vi) or `10/04` (en): the day and month parts joined with a slash, whatever separator ICU picks. */
