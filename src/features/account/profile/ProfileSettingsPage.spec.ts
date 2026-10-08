@@ -234,10 +234,47 @@ describe('Settings › Profile', () => {
     });
     expect(alertText(wrapper)).toContain('quản trị viên');
     expect(alertText(wrapper)).toContain('vừa thay đổi');
+    expect(alertText(wrapper)).toContain('kể cả tổ chức bạn vừa bỏ');
+    expect(alertText(wrapper)).not.toContain('lựa chọn của bạn');
     expect(wrapper.findAll('li strong').map((name) => name.text())).toEqual([first.name]);
     expect(nameInput(wrapper).element.value).toBe('Minh Thư');
     await saveButton(wrapper).trigger('submit');
     await flushPromises();
     expect(patches(calls).at(-1)).toEqual({ firstName: 'Minh Thư' });
+  });
+
+  it('a removal the server still lists comes back after the conflict, with the message saying so', async () => {
+    const first = profileOrganization();
+    const second = profileOrganization({ id: 'org-hcm', name: 'Đội tuyển Tin học TP.HCM' });
+    mockApi({
+      ...settingsRoutes({}, { organizations: [first, second] }),
+      'PATCH /profile': fail(409, 'conflict'),
+    });
+    const { wrapper } = await mountApp('/settings');
+    await wrapper
+      .get('button[aria-label="Rời THPT Chuyên Lê Hồng Phong khỏi danh sách"]')
+      .trigger('click');
+    expect(wrapper.findAll('li strong').map((name) => name.text())).toEqual([second.name]);
+    await saveButton(wrapper).trigger('submit');
+    await flushPromises();
+    // The returned organization is appended after the viewer's own order, as the rebase rule says.
+    expect(wrapper.findAll('li strong').map((name) => name.text())).toEqual([
+      second.name,
+      first.name,
+    ]);
+    expect(alertText(wrapper)).toContain('kể cả tổ chức bạn vừa bỏ');
+  });
+
+  it('the summary link to the about text switches to the write tab, then focuses the text', async () => {
+    const { wrapper } = await openProfile();
+    await wrapper.get('textarea').setValue('x'.repeat(65_537));
+    await saveButton(wrapper).trigger('submit');
+    await flushPromises();
+    await wrapper.findAll('[role="tab"]')[1]!.trigger('click');
+    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Bản đã lưu');
+    await wrapper.get('#main [role="alert"] a[href="#profile-about"]').trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Soạn thảo');
+    expect(document.activeElement).toBe(wrapper.get('textarea').element);
   });
 });

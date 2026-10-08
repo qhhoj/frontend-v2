@@ -1,6 +1,6 @@
 import type { Profile, ProfilePatch } from '@/api/types/profile';
 
-/** backend `FIRST_NAME_MAX_LENGTH` and `ABOUT_MAX_LENGTH`; both count UTF-16 units, like class-validator's `MaxLength`. */
+/** backend `FIRST_NAME_MAX_LENGTH` and `ABOUT_MAX_LENGTH`; both are checked with `storedLength`, like the backend's `@MaxLength`. */
 export const FIRST_NAME_MAX_LENGTH = 30;
 export const ABOUT_MAX_LENGTH = 65_536;
 
@@ -27,8 +27,21 @@ const same = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.st
 
 /** The text as the backend stores it: NFC, so an accented letter is one unit whichever way the keyboard typed it. */
 export const toNfc = (text: string): string => text.normalize('NFC');
-/** The length the backend's `.length` sees: UTF-16 units of the NFC text. */
-export const storedLength = (text: string): number => toNfc(text).length;
+// The rule of validator's `isLength`, which class-validator's `@MaxLength` calls (backend-v2 node_modules/validator/lib/
+// isLength.js; the DTO is apps/api/src/modules/users/profile/dto/profile.dto.ts): a surrogate pair counts 1, and so does a
+// character followed by a variation selector (U+FE0E or U+FE0F), so an emoji counts 1.
+const PRESENTATION_SEQUENCE = /[^\uFE0F\uFE0E][\uFE0F\uFE0E]/g;
+const SURROGATE_PAIR = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+
+/** The length the backend's `@MaxLength` measures, of the NFC text the browser sends. */
+export function storedLength(text: string): number {
+  const nfc = toNfc(text);
+  return (
+    nfc.length -
+    (nfc.match(PRESENTATION_SEQUENCE)?.length ?? 0) -
+    (nfc.match(SURROGATE_PAIR)?.length ?? 0)
+  );
+}
 
 export const draftOf = (profile: Profile): ProfileDraft => ({
   firstName: profile.firstName,

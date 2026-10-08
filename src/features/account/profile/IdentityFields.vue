@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AuthField from '@/features/auth/AuthField.vue';
+import { ref } from 'vue';
 import AboutEditor from './AboutEditor.vue';
 import LengthCounter from './LengthCounter.vue';
 import { profileFieldId } from './profile-field-ids';
@@ -9,6 +10,8 @@ import { FIRST_NAME_MAX_LENGTH, storedLength } from './profile-draft';
 defineProps<{ username: string; savedAboutHtml: string; errors: Record<string, string> }>();
 const firstName = defineModel<string>('firstName', { required: true });
 const about = defineModel<string>('about', { required: true });
+const aboutEditor = ref<{ showWriteTab: () => void } | null>(null);
+defineExpose({ showAboutWriteTab: () => aboutEditor.value?.showWriteTab() });
 </script>
 
 <template>
@@ -26,5 +29,10 @@ const about = defineModel<string>('about', { required: true });
       <LengthCounter :used="storedLength(firstName)" :max="FIRST_NAME_MAX_LENGTH" />
     </template>
   </AuthField>
-  <AboutEditor v-model="about" :saved-html="savedAboutHtml" :error="errors.about" />
+  <AboutEditor
+    ref="aboutEditor"
+    v-model="about"
+    :saved-html="savedAboutHtml"
+    :error="errors.about"
+  />
 </template>

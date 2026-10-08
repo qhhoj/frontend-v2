@@ -127,7 +127,9 @@ function leave(organization: ProfileOrganization) {
     <p v-else class="text-sm text-muted">{{ $t('settings.organizations.empty') }}</p>
     <p v-if="error" class="text-[13px] text-negative" role="alert">{{ error }}</p>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
+    <!-- With no row the anchor sits on this link, so the error summary's link to the organizations always has a target. -->
     <RouterLink
+      :id="rows.length ? undefined : profileFieldId('organizations')"
       ref="browseLink"
       :to="{ name: 'organizations' }"
       class="inline-flex min-h-11 items-center self-start font-semibold text-accent-text"

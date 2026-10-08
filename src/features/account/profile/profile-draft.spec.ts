@@ -7,6 +7,7 @@ import {
   settleAfterSave,
   withOrganizationsOf,
   rebaseOrganizationIds,
+  storedLength,
 } from './profile-draft';
 import type { ProfileDraft } from './profile-draft';
 
@@ -60,10 +61,30 @@ describe('lengthProblems', () => {
     ]);
   });
 
-  it('counts like the backend: an emoji is two units', () => {
-    expect(lengthProblems({ ...base, firstName: '🙂'.repeat(16) })).toEqual([
-      { field: 'firstName', used: 32, max: 30 },
+  it('counts like the backend: an emoji is one, so 20 emoji fit a 30 limit', () => {
+    expect(lengthProblems({ ...base, firstName: '🙂'.repeat(20) })).toEqual([]);
+    expect(lengthProblems({ ...base, firstName: '🙂'.repeat(31) })).toEqual([
+      { field: 'firstName', used: 31, max: 30 },
     ]);
+  });
+
+  it('accepts a string exactly at the limit and refuses the same string plus one emoji', () => {
+    const atLimit = 'x'.repeat(29) + '🙂';
+    expect(storedLength(atLimit)).toBe(30);
+    expect(lengthProblems({ ...base, firstName: atLimit })).toEqual([]);
+    expect(lengthProblems({ ...base, firstName: atLimit + '🙂' })).toEqual([
+      { field: 'firstName', used: 31, max: 30 },
+    ]);
+  });
+
+  it('counts an emoji with a variation selector as one', () => {
+    expect(storedLength('🙂\uFE0F')).toBe(1);
+    expect(storedLength('❤\uFE0F')).toBe(1);
+  });
+
+  it('counts a decomposed Vietnamese word as its composed form', () => {
+    expect(storedLength('Việt'.normalize('NFD'))).toBe(4);
+    expect(storedLength('Việt')).toBe(4);
   });
 });
 
@@ -128,7 +149,7 @@ describe('rebaseOrganizationIds', () => {
       [ORG_A, ORG_B, ORG_C],
     ],
     ['the server dropped one: it is gone', [ORG_A, ORG_B], [ORG_A], [ORG_A]],
-    ['the viewer removed one and the server agrees: it stays gone', [ORG_A], [ORG_A], [ORG_A]],
+    ["the server agrees with the viewer's removal: it stays gone", [ORG_A], [ORG_A], [ORG_A]],
     [
       'the viewer reordered: the viewer order is kept',
       [ORG_B, ORG_A],
@@ -136,7 +157,7 @@ describe('rebaseOrganizationIds', () => {
       [ORG_B, ORG_A],
     ],
     [
-      'an admin-leave refusal: the still-listed organization comes back',
+      'the viewer removed one the server still lists (a refused removal, for instance an admin-leave): it comes back',
       [ORG_B],
       [ORG_A, ORG_B],
       [ORG_B, ORG_A],

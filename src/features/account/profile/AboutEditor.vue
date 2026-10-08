@@ -13,6 +13,11 @@ const props = withDefaults(defineProps<{ savedHtml: string; error?: string }>(),
 });
 const about = defineModel<string>({ required: true });
 const tab = ref<AboutTab>('write');
+/** The error summary's link to this field: the text must be on screen before it can take the focus. */
+function showWriteTab() {
+  tab.value = 'write';
+}
+defineExpose({ showWriteTab });
 const tabButtons = ref<HTMLButtonElement[]>([]);
 const baseId = useId();
 const TEXT_ID = profileFieldId('about');

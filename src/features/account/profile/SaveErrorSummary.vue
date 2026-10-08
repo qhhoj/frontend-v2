@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, useId } from 'vue';
+import { nextTick, ref, useId } from 'vue';
 import InlineBit from '@/components/InlineBit.vue';
 
 /** One invalid field: `fieldId` is the control's DOM id, `text` what is wrong with it. */
 export interface SummaryItem {
   fieldId: string;
   text: string;
+  /** Brings the control on screen (an inactive tab) before it takes the focus. */
+  reveal?: () => void;
 }
 
 defineProps<{ title: string; items: SummaryItem[] }>();
@@ -19,10 +21,12 @@ function focus() {
 defineExpose({ focus });
 
 /** The link focuses its control; the fragment alone does not move focus in every browser. */
-function focusField(event: MouseEvent, fieldId: string) {
-  const control = document.getElementById(fieldId);
+async function focusField(event: MouseEvent, item: SummaryItem) {
+  const control = document.getElementById(item.fieldId);
   if (!control) return;
   event.preventDefault();
+  item.reveal?.();
+  await nextTick();
   control.focus();
 }
 </script>
@@ -43,7 +47,7 @@ function focusField(event: MouseEvent, fieldId: string) {
           <a
             :href="`#${item.fieldId}`"
             class="font-semibold underline"
-            @click="focusField($event, item.fieldId)"
+            @click="focusField($event, item)"
             >{{ item.text }}</a
           >
         </li>

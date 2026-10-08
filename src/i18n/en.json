@@ -373,7 +373,7 @@
       },
       "invalidSummary": "Not saved. Fix {count} field(s): {names}. Your other changes are still on this page.",
       "locked": "The name or about text cannot be saved: the account must solve more problems before editing its profile, or the official contest locks profiles.",
-      "organizationsChanged": "The organization list was not saved. Either you are an admin of an organization you tried to leave, or your organizations changed meanwhile. The list was reloaded and your choice is still here; check it and save again.",
+      "organizationsChanged": "The organization list was not saved. Either you are an admin of an organization you tried to leave, or your organizations changed meanwhile. The list was reloaded from the server: every organization it still lists is shown again, including any you removed. Check the organizations, redo your changes if needed, and save again.",
       "offline": "Connection lost. The changes were not sent; check the network and try again."
     },
     "data": {

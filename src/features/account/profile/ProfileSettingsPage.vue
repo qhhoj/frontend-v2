@@ -27,6 +27,8 @@ const { query, draft, dirty, problems, pending, error, attempted, justSaved, sav
 const { data: profile, isPending, error: loadError, refetch } = query;
 /** The summary exposes only `focus()`. */
 const summaryNotice = ref<{ focus: () => void } | null>(null);
+const identityFields = ref<{ showAboutWriteTab: () => void } | null>(null);
+const revealAbout = () => identityFields.value?.showAboutWriteTab();
 
 /** The viewer's live count wins over an older server message for the same field. */
 const fieldErrors = computed(() => ({
@@ -43,6 +45,7 @@ const fieldSummary = computed(() => {
     title: invalidSummary(invalidFields.value, locale.locale),
     items: invalidFields.value.map((field) => ({
       fieldId: profileFieldId(field),
+      reveal: field === 'about' ? revealAbout : undefined,
       text: `${translate(`settings.profile.fieldName.${field}`)}: ${fieldErrors.value[field]}`,
     })),
   };
@@ -97,6 +100,7 @@ async function submit() {
             </template>
           </SettingsNotice>
           <IdentityFields
+            ref="identityFields"
             v-model:first-name="draft.firstName"
             v-model:about="draft.about"
             :username="session.user?.username ?? ''"

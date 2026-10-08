@@ -373,7 +373,7 @@
       },
       "invalidSummary": "Chưa lưu được. Có {count} mục cần sửa: {names}. Các thay đổi khác của bạn vẫn còn trên trang.",
       "locked": "Chưa lưu được tên hoặc phần giới thiệu: tài khoản cần giải thêm bài trước khi sửa hồ sơ, hoặc kỳ thi chính thức đang khoá hồ sơ.",
-      "organizationsChanged": "Chưa lưu được danh sách tổ chức. Có thể bạn là quản trị viên của tổ chức bạn muốn rời, hoặc danh sách tổ chức vừa thay đổi. Trang đã tải lại danh sách; lựa chọn của bạn vẫn còn, hãy kiểm tra rồi bấm Lưu lại.",
+      "organizationsChanged": "Chưa lưu được danh sách tổ chức. Có thể bạn là quản trị viên của tổ chức bạn muốn rời, hoặc danh sách tổ chức vừa thay đổi. Trang đã tải lại danh sách từ máy chủ: mọi tổ chức máy chủ còn ghi nhận đều hiện lại, kể cả tổ chức bạn vừa bỏ. Hãy kiểm tra các tổ chức, làm lại thay đổi nếu cần, rồi bấm Lưu lại.",
       "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại."
     },
     "data": {

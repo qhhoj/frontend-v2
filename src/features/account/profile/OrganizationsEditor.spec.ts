@@ -95,4 +95,13 @@ describe('OrganizationsEditor', () => {
     expect(wrapper.find('ul').exists()).toBe(false);
     expect(document.activeElement).toBe(wrapper.get('a').element);
   });
+
+  it('keeps the organizations anchor on one element whether or not a row renders', () => {
+    const empty = mountEditor([]);
+    expect(empty.findAll('[id="profile-organizations"]')).toHaveLength(1);
+    expect(empty.get('[id="profile-organizations"]').element.tagName).toBe('A');
+    const filled = mountEditor();
+    expect(filled.findAll('[id="profile-organizations"]')).toHaveLength(1);
+    expect(filled.get('[id="profile-organizations"]').element.tagName).toBe('UL');
+  });
 });
