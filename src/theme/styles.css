@@ -312,3 +312,45 @@
     animation: none;
   }
 }
+
+/* Code editor: the CodeMirror host and the textarea fallback share one box, font and line height, so the swap does not jump. */
+.code-editor {
+  font-family: var(--qh-font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--qh-text);
+  max-height: 40dvh;
+  overflow: auto;
+}
+.code-editor-host {
+  min-height: calc(var(--min-lines) * 1.65em);
+}
+.code-editor-fallback {
+  display: flex;
+  min-height: calc(var(--min-lines) * 1.65em);
+}
+.code-editor-gutter {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding-inline: 0.5rem;
+  text-align: right;
+  color: var(--qh-text-muted);
+  user-select: none;
+}
+.code-editor-textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 0 0.5rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  resize: none;
+  overflow-y: hidden;
+  white-space: pre;
+  &:focus-visible {
+    outline: 2px solid var(--qh-focus-ring);
+    outline-offset: 2px;
+  }
+}
