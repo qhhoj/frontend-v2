@@ -1,0 +1,110 @@
+<script setup lang="ts">
+import { computed, toRef } from 'vue';
+import { useRoute } from 'vue-router';
+import { ApiError } from '@/api/client';
+import GlassCard from '@/components/GlassCard.vue';
+import QueryState from '@/components/QueryState.vue';
+import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import { useProblemQuery } from '@/features/problems/problems.queries';
+import { verdictOf } from '@/lib/verdicts';
+import { useLocaleStore } from '@/stores/locale.store';
+import CasesTable from './CasesTable.vue';
+import CasesTableSkeleton from './CasesTableSkeleton.vue';
+import SourceView from './SourceView.vue';
+import SubmissionSummary from './SubmissionSummary.vue';
+import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
+import { forbiddenMessageKey } from './forbidden-reason';
+import { useLiveSubmission } from './use-live-submission';
+
+/** Ids are long uuids: the first and last characters tell them apart. Shorter ids are shown whole. */
+const ID_HEAD_LENGTH = 6;
+const ID_TAIL_LENGTH = 3;
+const route = useRoute();
+const locale = useLocaleStore();
+const id = computed(() => String(route.params.id));
+const { submission: query, live, isLive } = useLiveSubmission(id);
+const row = query.data;
+const shortId = computed(() =>
+  id.value.length <= ID_HEAD_LENGTH + ID_TAIL_LENGTH
+    ? `#${id.value}`
+    : `#${id.value.slice(0, ID_HEAD_LENGTH)}…${id.value.slice(-ID_TAIL_LENGTH)}`,
+);
+
+// The problem gives the points and the name; it may be unreadable for this viewer, then the row's own name stands in.
+const problemCode = computed(() => row.value?.problem?.code ?? null);
+const problemQuery = useProblemQuery(
+  computed(() => problemCode.value ?? ''),
+  toRef(locale, 'locale'),
+  computed(() => problemCode.value !== null),
+);
+const isWaiting = computed(() => query.isPending.value || problemQuery.isLoading.value);
+
+const isNotFound = computed(
+  () => query.error.value instanceof ApiError && query.error.value.code === 'not_found',
+);
+const forbiddenKey = computed(() => forbiddenMessageKey(query.error.value));
+
+/** Between stream events the stream's status leads; once it is gone the stored row is the truth. */
+const verdict = computed(() => {
+  if (!row.value) return null;
+  const leading = live.status ? live : row.value;
+  return verdictOf({ status: leading.status ?? row.value.status, result: leading.result });
+});
+</script>
+
+<template>
+  <NotFoundPage v-if="isNotFound" />
+  <div v-else class="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 py-6 sm:px-8">
+    <nav :aria-label="$t('submission.breadcrumbLabel')" class="flex items-center gap-2 text-sm">
+      <RouterLink :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
+        $t('pages.submissions')
+      }}</RouterLink>
+      <span aria-hidden="true" class="text-muted">/</span>
+      <h1 class="font-mono font-semibold">{{ shortId }}</h1>
+    </nav>
+    <p role="status" aria-live="polite" class="sr-only">
+      {{ verdict ? $t(verdict.labelKey) : '' }}
+    </p>
+    <GlassCard v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
+      <p role="alert">{{ $t(forbiddenKey) }}</p>
+    </GlassCard>
+    <QueryState v-else :loading="isWaiting" :error="query.error.value" @retry="query.refetch()">
+      <template #skeleton>
+        <SubmissionSummarySkeleton />
+        <CasesTableSkeleton />
+      </template>
+      <template v-if="row && verdict">
+        <p
+          v-if="live.stale"
+          data-testid="stale-reload"
+          class="flex flex-wrap items-center gap-3 text-sm text-muted"
+        >
+          {{ $t('submission.staleReload') }}
+          <button
+            type="button"
+            class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
+            @click="query.refetch()"
+          >
+            {{ $t('submission.reload') }}
+          </button>
+        </p>
+        <SubmissionSummary
+          :submission="row"
+          :verdict="verdict"
+          :problem-name="problemQuery.data.value?.name ?? null"
+          :problem-points="problemQuery.data.value?.points ?? null"
+          :is-live="isLive"
+        />
+        <CasesTable
+          :cases="row.cases"
+          :batches="row.batches"
+          :total-cases="row.totalCases"
+          :running="isLive"
+          :live="isLive"
+          :compile-error="row.status === 'CE' ? row.error : null"
+        />
+        <SourceView :id="row.id" :problem-code="problemCode" />
+      </template>
+    </QueryState>
+  </div>
+</template>

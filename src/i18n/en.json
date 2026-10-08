@@ -362,5 +362,50 @@
       "fileRejected": "The file was rejected.",
       "sourceLength": "The source is longer than {max} characters."
     }
+  },
+  "submission": {
+    "breadcrumbLabel": "Breadcrumb",
+    "ringLabel": "Graded {graded} of {total} tests",
+    "ringLabelPoints": "{percent}% of the points earned",
+    "provisional": "provisional score",
+    "liveUpdates": "Live updates",
+    "staleReload": "The connection stopped; reload to see the latest status",
+    "reload": "Reload",
+    "facts": {
+      "problem": "Problem",
+      "user": "Author",
+      "language": "Language",
+      "runtime": "Run time",
+      "judge": "Judge"
+    },
+    "pretest": "This submission was graded on the pretests only.",
+    "cases": {
+      "title": "Results per test",
+      "scrollRegion": "Results per test, scrolls sideways",
+      "none": "No test results yet",
+      "test": "Test",
+      "result": "Result",
+      "time": "Time",
+      "memory": "Memory",
+      "points": "Points",
+      "pending": "Waiting",
+      "batch": "Batch {number}",
+      "compileLog": "Compiler message",
+      "feedback": "Feedback",
+      "extendedFeedback": "Detailed feedback",
+      "output": "Output"
+    },
+    "source": {
+      "title": "Source code",
+      "copy": "Copy the source code",
+      "resubmit": "Resubmit"
+    },
+    "forbidden": {
+      "solve_first": "Solve this problem first to see the submission",
+      "contest_running": "The contest is running, other people's submissions are not visible yet",
+      "hidden": "You are not allowed to see this submission"
+    },
+    "casesHidden": "Viewers cannot see the results of individual tests",
+    "sourceHidden": "You cannot see the source code of this submission."
   }
 }

@@ -362,5 +362,50 @@
       "fileRejected": "Tệp bị từ chối.",
       "sourceLength": "Mã nguồn vượt quá {max} ký tự."
     }
+  },
+  "submission": {
+    "breadcrumbLabel": "Đường dẫn",
+    "ringLabel": "Đã chấm {graded} trên {total} test",
+    "ringLabelPoints": "Đã được {percent}% điểm",
+    "provisional": "điểm tạm tính",
+    "liveUpdates": "Cập nhật trực tiếp",
+    "staleReload": "Kết nối đã dừng; tải lại để xem trạng thái mới nhất",
+    "reload": "Tải lại",
+    "facts": {
+      "problem": "Bài",
+      "user": "Người nộp",
+      "language": "Ngôn ngữ",
+      "runtime": "Thời gian chạy",
+      "judge": "Máy chấm"
+    },
+    "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
+    "cases": {
+      "title": "Kết quả từng test",
+      "scrollRegion": "Kết quả từng test, cuộn ngang",
+      "none": "Chưa có kết quả từng test",
+      "test": "Test",
+      "result": "Kết quả",
+      "time": "Thời gian",
+      "memory": "Bộ nhớ",
+      "points": "Điểm",
+      "pending": "Chờ chấm",
+      "batch": "Nhóm {number}",
+      "compileLog": "Thông báo biên dịch",
+      "feedback": "Phản hồi",
+      "extendedFeedback": "Phản hồi chi tiết",
+      "output": "Đầu ra"
+    },
+    "source": {
+      "title": "Mã nguồn",
+      "copy": "Sao chép mã nguồn",
+      "resubmit": "Nộp lại"
+    },
+    "forbidden": {
+      "solve_first": "Giải bài này trước để xem bài nộp",
+      "contest_running": "Kỳ thi đang diễn ra, chưa thể xem bài nộp của người khác",
+      "hidden": "Bạn không có quyền xem bài nộp này"
+    },
+    "casesHidden": "Người xem không được xem kết quả từng test",
+    "sourceHidden": "Bạn không xem được mã nguồn của bài nộp này."
   }
 }

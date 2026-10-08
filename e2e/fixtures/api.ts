@@ -12,6 +12,7 @@ import {
   ranking,
   ratingHistory,
   sessionResponse,
+  submissionDetail,
   submissionItem,
   TYPE_DP_ID,
   userPage,
@@ -78,6 +79,8 @@ export class FakeApi {
     'GET /users/user_01': ok(userPage()),
     'GET /users/user_01/ratings': ok(ratingHistory()),
     'GET /submissions': list([submissionItem()]),
+    'GET /submissions/sub-1': ok(submissionDetail()),
+    'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
   };
 
   /** Delays every answer to `key` ("GET /problems") until the returned function is called; teardown releases whatever is left. */

@@ -1,9 +1,9 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-query';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
-import { useSessionStore } from '@/stores/session.store';
+import { useViewerId } from '@/stores/use-viewer-id';
 import type { ProblemFilters } from './use-problem-filters';
 
 /** Types, groups and languages change rarely. */
@@ -29,14 +29,8 @@ export const useProblemListQuery = (filters: Ref<ProblemFilters>, lang: Ref<Stat
       meta.page * meta.pageSize < (meta.total ?? 0) ? meta.page + 1 : undefined,
   });
 
-const ANONYMOUS = 'anonymous';
 const VIEWER_KEY_INDEX = 2;
 const CODE_KEY_INDEX = 3;
-
-const useViewerId = () => {
-  const session = useSessionStore();
-  return computed(() => session.user?.id ?? ANONYMOUS);
-};
 
 /**
  * Keeps the previous answer on screen only while the viewer and the problem stay the same: another problem
@@ -57,10 +51,16 @@ const keepForSameProblem = <Data>(
  * One problem in one statement language, per viewer (the detail carries the viewer's own status and contest).
  * A language switch keeps the old statement on screen while the other loads; another problem or another
  * viewer never does, so one problem's header never sits under another problem's address.
+ * `enabled` lets a page that only knows the code later (a submission's problem) wait for it.
  */
-export const useProblemQuery = (code: Ref<string>, lang: Ref<StatementLanguage>) => {
+export const useProblemQuery = (
+  code: Ref<string>,
+  lang: Ref<StatementLanguage>,
+  enabled: Ref<boolean> = ref(true),
+) => {
   const viewerId = useViewerId();
   return useQuery({
+    enabled,
     queryKey: computed(() => ['problems', 'detail', viewerId.value, code.value, lang.value]),
     queryFn: () => fetchProblem(code.value, lang.value),
     placeholderData: (previous, previousQuery) =>

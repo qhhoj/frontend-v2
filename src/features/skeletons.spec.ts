@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { contestDetail, problemEditorial, signedIn, signedOut } from '@/test/fixtures';
 import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer, problemPageRoutes } from '@/test/problem-routes';
+import {
+  anonymousViewer,
+  problemPageRoutes,
+  signedInViewer,
+  submissionPageRoutes,
+} from '@/test/problem-routes';
 
 const regionsIn = (root: ParentNode, region: string) =>
   root.querySelectorAll(`[data-skeleton-region="${region}"]`).length;
@@ -122,5 +127,37 @@ describe('the editorial tab loads with a statement-shaped skeleton', () => {
       expect(panel.find('[data-skeleton-region="statement"]').exists()).toBe(true),
     );
     expectInert(panel.get('[data-testid="query-skeleton"]').element, 'editorial skeleton');
+  });
+});
+
+describe('the submission page loads with skeletons shaped like its cards', () => {
+  it('shows the ring, score, line, facts and case rows inert while the detail is on its way', async () => {
+    mockApi({ ...signedInViewer() });
+    hangRequestsExcept(['/auth/me', '/profile']);
+    const { wrapper } = await mountApp('/submissions/sub-1');
+    for (const region of ['ring', 'score', 'line', 'facts'])
+      expect(regionsIn(wrapper.element, region), region).toBe(1);
+    expect(regionsIn(wrapper.element, 'fact')).toBe(5);
+    expect(regionsIn(wrapper.element, 'case-row')).toBe(6);
+    expect(wrapper.findAll('table[aria-hidden="true"] thead th')).toHaveLength(5);
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {
+      expect(skeleton.attributes('aria-hidden')).toBe('true');
+      expectInert(skeleton.element, 'submission skeleton');
+    }
+  });
+
+  it('shows only the source lines while the source is on its way', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
+    const served = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/source') ? new Promise<Response>(() => {}) : served(input, init),
+    );
+    const { wrapper } = await mountApp('/submissions/sub-1');
+    await vi.waitFor(() => expect(regionsIn(wrapper.element, 'source-line')).toBe(10));
+    expect(regionsIn(wrapper.element, 'ring')).toBe(0);
+    expect(wrapper.find('[data-testid="score"]').exists()).toBe(true);
+    const skeletons = wrapper.findAll('[data-testid="query-skeleton"]');
+    expect(skeletons).toHaveLength(1);
+    expectInert(skeletons[0]!.element, 'source skeleton');
   });
 });
