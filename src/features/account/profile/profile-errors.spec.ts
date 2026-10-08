@@ -77,7 +77,7 @@ describe('lengthErrors', () => {
 describe('saveErrorText', () => {
   it.each([
     ['forbidden', 403, 'Chưa lưu được tên hoặc phần giới thiệu'],
-    ['conflict', 409, 'Danh sách tổ chức của bạn vừa thay đổi'],
+    ['conflict', 409, 'Chưa lưu được danh sách tổ chức'],
     ['network_error', 0, 'Mất kết nối'],
     ['rate_limited', 429, 'Bạn thao tác quá nhanh'],
     ['teapot', 418, 'Đã có lỗi xảy ra'],

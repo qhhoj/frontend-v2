@@ -155,7 +155,9 @@ describe('useProfileUpdate', () => {
       'PATCH /profile': sequence(ok(profile({ firstName: 'Thư' })), fail(500, 'http_error')),
     });
     const { update, saveProfile, queryClient } = mountSavers();
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
     await Promise.all([update({ firstName: 'Thư' }), saveProfile({ siteTheme: 'clay-dark' })]);
-    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
+    // The older answer was dropped and the newer save failed: the cache must be refetched, not kept stale.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: profileKey(sessionUser().id) });
   });
 });

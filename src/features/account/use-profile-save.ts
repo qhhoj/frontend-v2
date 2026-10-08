@@ -17,11 +17,17 @@ export function useProfileUpdate() {
   return async (patch: ProfilePatch): Promise<Profile> => {
     const userId = session.user?.id;
     const request = ++latestRequest;
-    const saved = await updateProfile(patch);
-    // A newer save, or a different account, already moved on: this answer is stale.
-    if (request === latestRequest && session.user?.id === userId)
-      queryClient.setQueryData(profileKey(userId), saved);
-    return saved;
+    try {
+      const saved = await updateProfile(patch);
+      // A newer save, or a different account, already moved on: this answer is stale.
+      if (request === latestRequest && session.user?.id === userId)
+        queryClient.setQueryData(profileKey(userId), saved);
+      return saved;
+    } catch (error) {
+      // An older answer may have been dropped above while this save failed: the server is the source, so refetch.
+      void queryClient.invalidateQueries({ queryKey: profileKey(userId) });
+      throw error;
+    }
   };
 }
 

@@ -303,6 +303,30 @@
       "appearance": "Giao diện",
       "security": "Bảo mật",
       "data": "Dữ liệu"
+    },
+    "profile": {
+      "fieldName": {
+        "firstName": "Tên hiển thị",
+        "about": "Giới thiệu bản thân",
+        "organizations": "Tổ chức",
+        "languageId": "Ngôn ngữ lập trình mặc định",
+        "timezone": "Múi giờ"
+      },
+      "invalid": {
+        "firstName": "Tên hiển thị chưa hợp lệ.",
+        "about": "Phần giới thiệu chưa hợp lệ.",
+        "organizations": "Chỉ sắp xếp hoặc rời các tổ chức bạn đang tham gia. Muốn tham gia thêm, vào trang tổ chức.",
+        "languageId": "Ngôn ngữ này không còn trên trang. Hãy chọn ngôn ngữ khác.",
+        "timezone": "Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh)."
+      },
+      "tooLong": {
+        "firstName": "Tên hiển thị tối đa {max} ký tự (đang dùng {used}).",
+        "about": "Phần giới thiệu dài quá {max} ký tự. Hãy xoá bớt {over} ký tự."
+      },
+      "invalidSummary": "Chưa lưu được. Có {count} mục cần sửa: {names}. Các thay đổi khác của bạn vẫn còn trên trang.",
+      "locked": "Chưa lưu được tên hoặc phần giới thiệu: tài khoản cần giải thêm bài trước khi sửa hồ sơ, hoặc kỳ thi chính thức đang khoá hồ sơ.",
+      "organizationsChanged": "Chưa lưu được danh sách tổ chức. Có thể bạn là quản trị viên của tổ chức bạn muốn rời, hoặc danh sách tổ chức vừa thay đổi. Trang đã tải lại danh sách; lựa chọn của bạn vẫn còn, hãy kiểm tra rồi bấm Lưu lại.",
+      "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại."
     }
   },
   "appearance": {
@@ -936,31 +960,5 @@
   },
   "flatpage": {
     "title": "Trang"
-  },
-  "settings": {
-    "profile": {
-      "fieldName": {
-        "firstName": "Tên hiển thị",
-        "about": "Giới thiệu bản thân",
-        "organizations": "Tổ chức",
-        "languageId": "Ngôn ngữ lập trình mặc định",
-        "timezone": "Múi giờ"
-      },
-      "invalid": {
-        "firstName": "Tên hiển thị chưa hợp lệ.",
-        "about": "Phần giới thiệu chưa hợp lệ.",
-        "organizations": "Chỉ sắp xếp hoặc rời các tổ chức bạn đang tham gia. Muốn tham gia thêm, vào trang tổ chức.",
-        "languageId": "Ngôn ngữ này không còn trên trang. Hãy chọn ngôn ngữ khác.",
-        "timezone": "Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh)."
-      },
-      "tooLong": {
-        "firstName": "Tên hiển thị tối đa {max} ký tự (đang dùng {used}).",
-        "about": "Phần giới thiệu dài quá {max} ký tự. Hãy xoá bớt {over} ký tự."
-      },
-      "invalidSummary": "Chưa lưu được. Có {count} mục cần sửa: {names}. Các thay đổi khác của bạn vẫn còn trên trang.",
-      "locked": "Chưa lưu được tên hoặc phần giới thiệu: tài khoản cần giải thêm bài trước khi sửa hồ sơ, hoặc kỳ thi chính thức đang khoá hồ sơ.",
-      "organizationsChanged": "Danh sách tổ chức của bạn vừa thay đổi. Trang đã tải lại danh sách; hãy kiểm tra rồi bấm Lưu lại.",
-      "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại."
-    }
   }
 }

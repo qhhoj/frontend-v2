@@ -7,6 +7,7 @@ import { profile, profileOrganization, signedIn } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, ok, sequence } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
+import { saveErrorText } from './profile-errors';
 import { useProfileDraft } from './use-profile-draft';
 
 const LHP = profileOrganization();
@@ -130,8 +131,30 @@ describe('useProfileDraft', () => {
     form.draft.value!.firstName = 'Minh Thư';
     form.draft.value!.organizationIds = [HCM.id, LHP.id];
     await form.save();
-    expect(form.draft.value).toMatchObject({ firstName: 'Minh Thư', organizationIds: [HCM.id] });
+    expect(form.draft.value).toMatchObject({
+      firstName: 'Minh Thư',
+      organizationIds: [HCM.id, LHP.id],
+    });
     expect(form.saved.value!.organizationIds).toEqual([HCM.id]);
+    expect(form.dirty.value).toBe(true);
+  });
+
+  it('after an admin cannot leave, keeps the selection, names both causes and lets the viewer retry', async () => {
+    const { form, calls } = await mountDraft({
+      'GET /profile': ok(profile({ firstName: 'Thư', organizations: [LHP, HCM] })),
+      'PATCH /profile': sequence(
+        fail(409, 'conflict'),
+        ok(profile({ firstName: 'Thư', organizations: [HCM] })),
+      ),
+    });
+    form.draft.value!.organizationIds = [HCM.id];
+    await expect(form.save()).resolves.toBe(false);
+    expect(form.draft.value!.organizationIds).toEqual([HCM.id]);
+    expect(form.saved.value!.organizationIds).toEqual([LHP.id, HCM.id]);
+    expect(saveErrorText(form.error.value)).toMatch(/quản trị viên/);
+    expect(saveErrorText(form.error.value)).toMatch(/vừa thay đổi/);
+    await expect(form.save()).resolves.toBe(true);
+    expect(patches(calls)).toEqual([{ organizations: [HCM.id] }, { organizations: [HCM.id] }]);
   });
 
   it('undo returns to the last saved values and clears the failure', async () => {

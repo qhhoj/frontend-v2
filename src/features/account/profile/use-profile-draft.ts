@@ -13,7 +13,10 @@ import {
 } from './profile-draft';
 import type { ProfileDraft } from './profile-draft';
 
-/** The draft and what it differs in; only the first profile answer starts it, so refetches never replace typing. */
+/**
+ * The draft and what it differs in. Only the first profile answer starts it, so refetches never replace typing; a stale
+ * cached answer (staleTime 5 min) therefore never moves `saved` on its own.
+ */
 function useDraftState(source: () => Profile | undefined) {
   const draft = ref<ProfileDraft | null>(null);
   const saved = ref<ProfileDraft | null>(null);
@@ -39,12 +42,14 @@ function useDraftState(source: () => Profile | undefined) {
 type DraftState = ReturnType<typeof useDraftState>;
 type Refetch = () => Promise<{ data: Profile | undefined }>;
 
-/** A 409: memberships changed elsewhere; the list starts again from the server, the other edits stay. */
+/**
+ * A 409 has two causes: an admin tried to leave an organization, or the memberships changed elsewhere. Either way the
+ * server's list becomes the baseline, and the viewer's selection stays in the draft so a retry still sends it.
+ */
 async function reloadOrganizations(form: DraftState, refetch: Refetch) {
   const { data } = await refetch();
-  if (!data || !form.draft.value || !form.saved.value) return;
+  if (!data || !form.saved.value) return;
   form.saved.value = withOrganizationsOf(form.saved.value, data);
-  form.draft.value = withOrganizationsOf(form.draft.value, data);
 }
 
 /** All-or-nothing saves of the changed keys; over-long texts never leave the browser. */
@@ -56,10 +61,11 @@ function useDraftSaving(form: DraftState, refetch: Refetch) {
   const succeeded = ref(false);
 
   async function save(): Promise<boolean> {
-    attempted.value = true;
-    succeeded.value = false;
     const current = form.draft.value;
-    if (!current || form.problems.value.length || !form.dirty.value || pending.value) return false;
+    if (!current || !form.dirty.value || pending.value) return false;
+    attempted.value = true;
+    if (form.problems.value.length) return false;
+    succeeded.value = false;
     const sent = copyDraft(current);
     pending.value = true;
     error.value = null;
