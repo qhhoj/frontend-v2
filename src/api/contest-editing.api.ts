@@ -1,7 +1,11 @@
-import { ApiError, apiPage, apiRequest } from './client';
+import { API_BASE, ApiError, apiPage, apiRequest } from './client';
 import type {
   Announcement,
+  ContestActions,
   ContestBody,
+  ContestDataStatus,
+  Participation,
+  ParticipationSummary,
   ContestPatch,
   EditableContest,
   OfficialRanking,
@@ -59,3 +63,37 @@ export const updateRankingLink = (key: string, patch: RankingLinkPatch) =>
   apiRequest<RankingLink>(`${contestPath(key)}/ranking-link`, { method: 'PATCH', body: patch });
 export const regenerateRankingLink = (key: string) =>
   apiRequest<RankingLink>(`${contestPath(key)}/ranking-link/regenerate`, { method: 'POST' });
+
+type Queued = { queued: true };
+export const rescoreContest = (key: string) =>
+  apiRequest<Queued>(`${contestPath(key)}/rescore`, { method: 'POST' });
+export const judgeFinal = (key: string) =>
+  apiRequest<Queued>(`${contestPath(key)}/judge-final`, { method: 'POST' });
+export const rateContest = (key: string) =>
+  apiRequest<Queued>(`${contestPath(key)}/rate`, { method: 'POST' });
+export const fetchContestActions = (key: string) =>
+  apiRequest<ContestActions>(`${contestPath(key)}/actions`);
+
+export const fetchContestData = (key: string) =>
+  apiRequest<ContestDataStatus>(`${contestPath(key)}/data`);
+export const prepareContestData = (
+  key: string,
+  body: { problemGlob?: string; results?: string[] },
+) => apiRequest<Queued>(`${contestPath(key)}/data`, { method: 'POST', body });
+/** A plain link: the zip downloads with the session cookie, no envelope. */
+export const contestDataDownloadUrl = (key: string) =>
+  `${API_BASE}${contestPath(key)}/data/download`;
+
+export const PARTICIPATIONS_PAGE_SIZE = 50;
+export const fetchParticipations = (key: string, query: { page: number; user: string }) =>
+  apiPage<Participation>(`${contestPath(key)}/participations`, {
+    query: { ...query, pageSize: PARTICIPATIONS_PAGE_SIZE },
+  });
+export const setDisqualified = (key: string, id: string, disqualified: boolean) =>
+  apiRequest<ParticipationSummary>(
+    `${contestPath(key)}/participations/${encodeURIComponent(id)}/disqualify`,
+    {
+      method: 'POST',
+      body: { disqualified },
+    },
+  );

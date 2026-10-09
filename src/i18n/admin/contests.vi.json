@@ -248,5 +248,94 @@
         "D": "Hết hạn sau {amount} ngày kể từ lúc lưu, tức {date}."
       }
     }
+  },
+  "actions": {
+    "rescore": {
+      "title": "Tính lại điểm",
+      "description": "Tính lại điểm và hạng của mọi lượt tham gia từ các bài nộp hiện có. Chạy nền.",
+      "button": "Tính lại điểm",
+      "confirmTitle": "Tính lại điểm kỳ thi?",
+      "confirmBody": "Điểm và hạng của {count} lượt tham gia sẽ được tính lại từ bài nộp. Bảng xếp hạng có thể thay đổi trong lúc chạy.",
+      "confirm": "Tính lại"
+    },
+    "judgeFinal": {
+      "title": "Chấm lần cuối",
+      "description": "Dành cho thể thức lần nộp cuối: xếp các bài nộp đang chờ vào hàng chấm khi kỳ thi kết thúc. Chạy nền.",
+      "button": "Chấm lần cuối",
+      "confirmTitle": "Chấm lần cuối?",
+      "confirmBodyEarly": "Kỳ thi chưa kết thúc (còn {left}). Các bài nộp đang chờ sẽ bị chấm sớm.",
+      "confirmBodyEnded": "Các bài nộp đang chờ sẽ được xếp vào hàng chấm.",
+      "confirmEarly": "Vẫn chấm",
+      "confirmEnded": "Chấm"
+    },
+    "rate": {
+      "title": "Tính rating",
+      "description": "Cập nhật rating của thí sinh theo kết quả kỳ thi. Chạy nền.",
+      "button": "Tính rating",
+      "confirmTitle": "Tính rating?",
+      "confirmBody": "Rating của thí sinh tham gia kỳ thi này sẽ được cập nhật. Chỉ nên làm sau khi bảng xếp hạng đã chốt và bảng chính thức đã được tải lên.",
+      "confirm": "Tính rating"
+    },
+    "status": {
+      "queued": "Đang chờ trong hàng chạy nền.",
+      "running": "Đang chạy."
+    },
+    "data": {
+      "title": "Xuất dữ liệu bài nộp",
+      "description": "Đóng gói mã nguồn bài nộp thành tệp zip.",
+      "ready": "Sẵn sàng · {size}",
+      "readyDetail": "Tạo lúc {readyAt}; có thể chuẩn bị lại sau {nextPrepareAt}.",
+      "preparing": "Đang chuẩn bị…",
+      "none": "Chưa có tệp xuất.",
+      "prepare": "Chuẩn bị",
+      "download": "Tải về",
+      "waitUntil": "Có thể chuẩn bị lại sau {time}.",
+      "prepareTitle": "Chuẩn bị dữ liệu bài nộp",
+      "globLabel": "Mã bài (có ký tự đại diện)",
+      "globHint": "* thay cho một chuỗi, ? thay cho một ký tự.",
+      "resultsLegend": "Kết quả",
+      "resultsHint": "Để trống là lấy mọi kết quả.",
+      "prepareConfirm": "Chuẩn bị",
+      "prepared": "Đã gửi yêu cầu chuẩn bị."
+    },
+    "clone": {
+      "title": "Nhân bản kỳ thi",
+      "description": "Tạo kỳ thi mới với cùng bài và cấu hình, không có thí sinh.",
+      "button": "Nhân bản",
+      "confirmTitle": "Nhân bản kỳ thi",
+      "keyLabel": "Khóa kỳ thi mới",
+      "confirm": "Nhân bản",
+      "done": "Đã tạo {key}.",
+      "open": "Mở kỳ thi vừa tạo"
+    }
+  },
+  "participants": {
+    "kinds": {
+      "live": "Trực tiếp",
+      "spectate": "Theo dõi",
+      "virtual": "Thi ảo #{number}"
+    },
+    "penalty": "{hours} giờ {minutes} phút",
+    "countLine": "{total} lượt tham gia · 50 mỗi trang",
+    "userLabel": "Tên đăng nhập…",
+    "columns": {
+      "user": "Người dùng",
+      "kind": "Loại tham gia",
+      "score": "Điểm",
+      "penalty": "Thời gian phạt",
+      "start": "Bắt đầu",
+      "status": "Trạng thái"
+    },
+    "valid": "Hợp lệ",
+    "disqualified": "Bị loại",
+    "disqualify": "Loại khỏi bảng",
+    "restore": "Khôi phục",
+    "disqualifyTitle": "Loại {username} khỏi bảng xếp hạng?",
+    "disqualifyBody": "{kind} lúc {time} sẽ bị đánh dấu loại và gỡ khỏi bảng. Có thể khôi phục lại bất cứ lúc nào.",
+    "empty": "Không có lượt tham gia nào khớp.",
+    "footnote": "Người bị loại vẫn thấy bài nộp của mình nhưng bị gỡ khỏi bảng xếp hạng.",
+    "previous": "Trang trước",
+    "next": "Trang sau",
+    "pager": "Trang {page} của {pages}"
   }
 }

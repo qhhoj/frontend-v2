@@ -248,5 +248,94 @@
         "D": "Expires {amount} days after saving, that is {date}."
       }
     }
+  },
+  "actions": {
+    "rescore": {
+      "title": "Rescore",
+      "description": "Recalculate the score and rank of every participation from the existing submissions. Runs in the background.",
+      "button": "Rescore",
+      "confirmTitle": "Rescore the contest?",
+      "confirmBody": "The score and rank of {count} participations will be recalculated from the submissions. The ranking may change while it runs.",
+      "confirm": "Rescore"
+    },
+    "judgeFinal": {
+      "title": "Final judging",
+      "description": "For the final-submission format: queue the pending submissions for judging when the contest ends. Runs in the background.",
+      "button": "Final judging",
+      "confirmTitle": "Judge the final submissions?",
+      "confirmBodyEarly": "The contest has not ended yet ({left} left). Pending submissions will be judged early.",
+      "confirmBodyEnded": "The pending submissions will be queued for judging.",
+      "confirmEarly": "Judge anyway",
+      "confirmEnded": "Judge"
+    },
+    "rate": {
+      "title": "Rating",
+      "description": "Update the participants' ratings from the contest result. Runs in the background.",
+      "button": "Calculate rating",
+      "confirmTitle": "Calculate the rating?",
+      "confirmBody": "The ratings of the participants in this contest will be updated. Only do this once the ranking is settled and the official ranking is uploaded.",
+      "confirm": "Calculate rating"
+    },
+    "status": {
+      "queued": "Waiting in the background queue.",
+      "running": "Running."
+    },
+    "data": {
+      "title": "Export submissions",
+      "description": "Pack the submitted source code into a zip file.",
+      "ready": "Ready · {size}",
+      "readyDetail": "Created at {readyAt}; it can be prepared again after {nextPrepareAt}.",
+      "preparing": "Preparing…",
+      "none": "No export yet.",
+      "prepare": "Prepare",
+      "download": "Download",
+      "waitUntil": "It can be prepared again after {time}.",
+      "prepareTitle": "Prepare the submissions export",
+      "globLabel": "Problem code (wildcards allowed)",
+      "globHint": "* stands for any run of characters, ? for one character.",
+      "resultsLegend": "Results",
+      "resultsHint": "Leave empty for every result.",
+      "prepareConfirm": "Prepare",
+      "prepared": "The export was requested."
+    },
+    "clone": {
+      "title": "Clone the contest",
+      "description": "Create a new contest with the same problems and settings, without participants.",
+      "button": "Clone",
+      "confirmTitle": "Clone the contest",
+      "keyLabel": "New contest key",
+      "confirm": "Clone",
+      "done": "Created {key}.",
+      "open": "Open the new contest"
+    }
+  },
+  "participants": {
+    "kinds": {
+      "live": "Live",
+      "spectate": "Spectating",
+      "virtual": "Virtual #{number}"
+    },
+    "penalty": "{hours} h {minutes} min",
+    "countLine": "{total} participations · 50 per page",
+    "userLabel": "Username…",
+    "columns": {
+      "user": "User",
+      "kind": "Kind",
+      "score": "Score",
+      "penalty": "Penalty time",
+      "start": "Started",
+      "status": "Status"
+    },
+    "valid": "Valid",
+    "disqualified": "Disqualified",
+    "disqualify": "Remove from the board",
+    "restore": "Restore",
+    "disqualifyTitle": "Remove {username} from the ranking?",
+    "disqualifyBody": "{kind} at {time} will be marked disqualified and taken off the ranking. It can be restored at any time.",
+    "empty": "No participations match.",
+    "footnote": "Disqualified users still see their own submissions, but are taken off the ranking.",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pager": "Page {page} of {pages}"
   }
 }

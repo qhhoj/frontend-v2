@@ -1,10 +1,13 @@
 // Relative type-only imports and no test helpers: the e2e tsconfig has no `@/` alias, and Playwright loads this file too.
 import type {
   Announcement,
+  ContestActions,
+  ContestDataStatus,
   ContestSettings,
   EditableContest,
   EditableContestProblem,
   OfficialRanking,
+  Participation,
   RankingLink,
 } from '../../api/types/contest-editing';
 
@@ -147,5 +150,38 @@ export const rankingLink = (overrides: Partial<RankingLink> = {}): RankingLink =
   expiresAt: null,
   regeneratedAt: '2026-10-06T02:12:00.000Z',
   isValid: true,
+  ...overrides,
+});
+
+export const contestActions = (overrides: Partial<ContestActions> = {}): ContestActions => ({
+  rescore: 'idle',
+  judgeFinal: 'idle',
+  rate: 'idle',
+  ...overrides,
+});
+
+export const contestDataStatus = (
+  overrides: Partial<ContestDataStatus> = {},
+): ContestDataStatus => ({
+  state: 'ready',
+  preparedAt: '2026-10-08T08:30:00.000Z',
+  readyAt: '2026-10-08T08:40:00.000Z',
+  size: 50_541_363,
+  nextPrepareAt: '2026-10-08T09:40:00.000Z',
+  ...overrides,
+});
+
+export const participation = (overrides: Partial<Participation> = {}): Participation => ({
+  id: 'p-1',
+  virtual: 0,
+  isRegistered: true,
+  isDisqualified: false,
+  realStart: '2026-10-08T06:00:00.000Z',
+  endTime: '2026-10-08T10:00:00.000Z',
+  user: { id: 'id-ngocanh', username: 'ngocanh' },
+  score: 5,
+  cumtime: 15120,
+  tiebreaker: 0,
+  cells: {},
   ...overrides,
 });

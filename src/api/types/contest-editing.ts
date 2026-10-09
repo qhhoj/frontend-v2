@@ -199,3 +199,42 @@ export interface RankingLinkPatch {
   expiryAmount?: number;
   expiresAt?: string;
 }
+
+/** backend: libs/contests `ContestActionState`: `queued` waits for the worker, `running` is being worked on now. */
+export type ContestActionState = 'idle' | 'queued' | 'running';
+
+/** backend: `ContestActionsResponse`. */
+export interface ContestActions {
+  rescore: ContestActionState;
+  judgeFinal: ContestActionState;
+  rate: ContestActionState;
+}
+
+/** backend: `ContestDataStatusResponse`: the submissions export (a zip) and when it may be prepared again. */
+export interface ContestDataStatus {
+  state: 'none' | 'preparing' | 'ready';
+  preparedAt: string | null;
+  readyAt: string | null;
+  size: number | null;
+  nextPrepareAt: string | null;
+}
+
+/** backend: `ParticipationSummaryResponse`: what a disqualify answers (no user, no score). */
+export interface ParticipationSummary {
+  id: string;
+  /** 0 live, -1 spectate, n ≥ 1 virtual. */
+  virtual: number;
+  isRegistered: boolean;
+  isDisqualified: boolean;
+  realStart: string;
+  endTime: string;
+}
+
+/** backend: `ParticipationResponse`: one row of the participations list. */
+export interface Participation extends ParticipationSummary {
+  user: { id: string; username: string };
+  score: number;
+  cumtime: number;
+  tiebreaker: number;
+  cells: Record<string, unknown>;
+}
