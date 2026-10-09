@@ -48,6 +48,20 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.contest' },
   },
   {
+    // Balloon volunteers in `balloonStaff` may be non-staff: no `staffOnly`, the server answers 403/404.
+    path: '/contests/:key/balloons',
+    name: 'contest-balloons',
+    component: () => import('@/features/contests/balloons/BalloonsPage.vue'),
+    meta: { titleKey: 'pages.contestBalloons', requiresAuth: true },
+  },
+  {
+    // The runners' sheet prints without the site header (`layout: 'auth'` draws no top bar).
+    path: '/contests/:key/balloons/print',
+    name: 'contest-balloons-print',
+    component: () => import('@/features/contests/balloons/BalloonsPrintPage.vue'),
+    meta: { titleKey: 'pages.contestBalloonsPrint', requiresAuth: true, layout: 'auth' },
+  },
+  {
     path: '/contests/:key/announcements',
     name: 'contest-announcements',
     component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),

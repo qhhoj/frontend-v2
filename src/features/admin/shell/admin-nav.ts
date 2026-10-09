@@ -72,7 +72,11 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('types', Tags),
     screenItem('posts', Newspaper),
   ]),
-  group('contests', [screenItem('contests', Trophy), screenItem('similarity', GitCompare)]),
+  group('contests', [
+    screenItem('contests', Trophy),
+    screenItem('contestTags', Tags),
+    screenItem('similarity', GitCompare),
+  ]),
   group('users', [
     screenItem('users', Users),
     screenItem('organizations', Building2),

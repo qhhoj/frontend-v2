@@ -36,6 +36,20 @@ describe('participation requests', () => {
       { accessCode: 'opensesame' },
     ]);
   });
+  it('sends acceptRules only when the viewer ticked the rules', async () => {
+    const calls = mockApi({
+      'POST /contests/r42/join': ok(participationSummary()),
+      'POST /contests/r42/register': ok(participationSummary({ isRegistered: true })),
+    });
+    await joinContest('r42', undefined, true);
+    await registerContest('r42', 'code', true);
+    await joinContest('r42', undefined, false);
+    expect(calls.map((call) => call.body)).toEqual([
+      { acceptRules: true },
+      { accessCode: 'code', acceptRules: true },
+      {},
+    ]);
+  });
   it('leaves with an empty 204', async () => {
     mockApi({ 'POST /contests/r42/leave': noContent() });
     await expect(leaveContest('r42')).resolves.toBeUndefined();

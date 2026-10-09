@@ -14,6 +14,13 @@ const everyPermission = [
 ];
 
 describe('admin nav', () => {
+  it('offers the contest tag catalogue only to holders of judge.change_contest_tag', () => {
+    expect(idsOf(visibleNav(ADMIN_NAV, staff(['judge.change_contest_tag'])))).toEqual([
+      'contestTags',
+    ]);
+    expect(idsOf(visibleNav(ADMIN_NAV, staff(['judge.add_contest'])))).not.toContain('contestTags');
+  });
+
   it('shows an item exactly when the account may open its screen, for every single permission, none and a superuser', () => {
     const holders = [
       staff([]),
@@ -29,7 +36,9 @@ describe('admin nav', () => {
       }
     }
   });
+});
 
+describe('admin nav per permission', () => {
   it('keeps only items the account may open and drops groups left empty', () => {
     const groups = visibleNav(ADMIN_NAV, staff(['judge.moss_contest']));
     expect(groups.map((group) => group.items.map((item) => item.id))).toEqual([['similarity']]);
@@ -57,7 +66,9 @@ describe('admin nav', () => {
     expect(idsOf(visibleNav(ADMIN_NAV, staff(['judge.change_language'])))).toEqual(['languages']);
     expect(idsOf(visibleNav(ADMIN_NAV, staff(['judge.add_language'])))).toEqual(['languages']);
   });
+});
 
+describe('admin nav current section and dashboard', () => {
   it('marks a section current on its own sub-pages but not on a sibling that shares a prefix', () => {
     expect(isCurrentNav('/admin/problems', '/admin/problems/aplusb/data')).toBe(true);
     expect(isCurrentNav('/admin/problems', '/admin/problems')).toBe(true);

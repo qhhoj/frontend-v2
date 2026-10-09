@@ -35,6 +35,7 @@ export const ADMIN_SCREENS = {
   types: { path: '/admin/types', permission: 'judge.add_tagproblem' },
   contests: { path: '/admin/contests', permission: ['judge.add_contest', ...CONTEST_EDIT] },
   contestNew: { path: '/admin/contests/new', permission: 'judge.add_contest' },
+  contestTags: { path: '/admin/contest-tags', permission: 'judge.change_contest_tag' },
   contestGeneral: contestTab('general'),
   contestProblems: contestTab('problems'),
   contestAnnouncements: contestTab('announcements'),
@@ -42,6 +43,7 @@ export const ADMIN_SCREENS = {
   contestActions: contestTab('actions'),
   contestParticipants: contestTab('participants'),
   contestGhosts: contestTab('ghosts'),
+  contestData: contestTab('data'),
   similarity: { path: '/admin/similarity', permission: 'judge.moss_contest' },
   similarityPairs: {
     path: '/admin/similarity/runs/:runId/pairs',

@@ -60,6 +60,8 @@
     "problemFiles": "Sửa bài: tệp và tải lên",
     "types": "Loại bài và thẻ",
     "contests": "Kỳ thi",
+    "contestTags": "Thẻ kỳ thi",
+    "contestData": "Dữ liệu kỳ thi",
     "contestNew": "Tạo kỳ thi",
     "contestGeneral": "Sửa kỳ thi: thông tin",
     "contestProblems": "Sửa kỳ thi: bài trong kỳ thi",

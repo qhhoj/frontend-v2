@@ -5,7 +5,8 @@
     "announcements": "Announcements",
     "ranking": "Ranking",
     "actions": "Actions",
-    "participants": "Participants"
+    "participants": "Participants",
+    "data": "Data"
   },
   "leads": {
     "general": "Contest details, time, format, viewing and ranking access, rating.",
@@ -13,7 +14,8 @@
     "announcements": "Post, resend and delete announcements.",
     "ranking": "The official ranking and the public ranking link.",
     "actions": "Rescore, final judging, rating, data export, clone.",
-    "participants": "Participations and disqualification."
+    "participants": "Participations and disqualification.",
+    "data": "Submission export and the event-feed key for resolver tools."
   },
   "view": "View contest",
   "tabsLabel": "Parts of the contest",

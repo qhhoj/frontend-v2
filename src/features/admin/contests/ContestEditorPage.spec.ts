@@ -17,9 +17,16 @@ describe('ContestEditorPage', () => {
     expect(wrapper.text()).toContain('214 thí sinh');
     const tabs = '[aria-label="Các phần của kỳ thi"]';
     expect(wrapper.findAll(`${tabs} a`).map((tab) => tab.attributes('href'))).toEqual(
-      ['general', 'problems', 'announcements', 'ranking', 'actions', 'participants', 'ghosts'].map(
-        (tab) => `/admin/contests/hcmus-w41/${tab}`,
-      ),
+      [
+        'general',
+        'problems',
+        'announcements',
+        'ranking',
+        'actions',
+        'participants',
+        'ghosts',
+        'data',
+      ].map((tab) => `/admin/contests/hcmus-w41/${tab}`),
     );
     expect(wrapper.find(`${tabs} [aria-current="page"]`).attributes('href')).toBe(
       '/admin/contests/hcmus-w41/general',

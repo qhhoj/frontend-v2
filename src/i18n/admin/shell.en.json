@@ -60,6 +60,8 @@
     "problemFiles": "Edit problem: files",
     "types": "Problem types and tags",
     "contests": "Contests",
+    "contestTags": "Contest tags",
+    "contestData": "Contest data",
     "contestNew": "New contest",
     "contestGeneral": "Edit contest: details",
     "contestProblems": "Edit contest: problems",

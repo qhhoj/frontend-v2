@@ -5,7 +5,8 @@
     "announcements": "Thông báo",
     "ranking": "Bảng xếp hạng",
     "actions": "Thao tác",
-    "participants": "Thí sinh"
+    "participants": "Thí sinh",
+    "data": "Dữ liệu"
   },
   "leads": {
     "general": "Thông tin kỳ thi, thời gian, thể thức, quyền xem, rating.",
@@ -13,7 +14,8 @@
     "announcements": "Đăng, gửi lại và xóa thông báo.",
     "ranking": "Bảng chính thức và liên kết công khai.",
     "actions": "Tính lại điểm, chấm lần cuối, rating, xuất dữ liệu, nhân bản.",
-    "participants": "Lượt tham gia và loại khỏi bảng."
+    "participants": "Lượt tham gia và loại khỏi bảng.",
+    "data": "Xuất bài nộp và khóa nguồn sự kiện cho công cụ công bố kết quả."
   },
   "view": "Xem kỳ thi",
   "tabsLabel": "Các phần của kỳ thi",

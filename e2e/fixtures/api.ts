@@ -1,5 +1,5 @@
 import { test as base, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Page, Request } from '@playwright/test';
 import {
   announcement,
   contestDetail,
@@ -64,6 +64,9 @@ const UNAUTHORIZED: Reply = {
 };
 
 /** A small stateful stand-in for /api/internal: signed out until POST /auth/login, signed out again after POST /auth/logout. */
+/** A route that matched a request: its handler and the `:param` values. */
+type Found = { handler: Handler; params: Record<string, string> };
+
 export class FakeApi {
   signedIn = false;
   readonly unmatched: string[] = [];
@@ -205,6 +208,7 @@ export class FakeApi {
       );
     },
     'GET /contests/current': ok(null),
+    'GET /contest-tags': list([]),
     'GET /contests/r42': ok(
       contestDetail({ problems: [contestProblem(0), contestProblem(1), contestProblem(2)] }),
     ),
@@ -271,35 +275,39 @@ export class FakeApi {
         return route.fulfill({ status: 501, json: { error: { code: 'unmocked', message: key } } });
       }
       await this.gates.get(key);
-      let body: unknown;
-      try {
-        body = request.postDataJSON();
-      } catch {
-        body = undefined; // multipart
-      }
-      const headers = request.headers();
-      const postData = request.postDataBuffer();
-      const reply =
-        typeof found.handler === 'function'
-          ? found.handler({ url, body, postData, headers, params: found.params })
-          : found.handler;
-      const contentType = reply.contentType ?? 'application/json';
-      const status = reply.status ?? 200;
-      this.requests.push({
-        key,
-        url,
-        headers,
-        postData,
-        replyStatus: status,
-        replyContentType: contentType,
-      });
+      const reply = this.replyTo(request, url, found);
       await route.fulfill({
-        status,
+        status: reply.status ?? 200,
         headers: reply.headers,
-        contentType,
+        contentType: reply.contentType ?? 'application/json',
         body: reply.raw ?? (reply.body === undefined ? '' : JSON.stringify(reply.body)),
       });
     });
+  }
+
+  /** Answers one matched request and records it. */
+  private replyTo(request: Request, url: URL, found: Found) {
+    let body: unknown;
+    try {
+      body = request.postDataJSON();
+    } catch {
+      body = undefined; // multipart
+    }
+    const headers = request.headers();
+    const postData = request.postDataBuffer();
+    const reply =
+      typeof found.handler === 'function'
+        ? found.handler({ url, body, postData, headers, params: found.params })
+        : found.handler;
+    this.requests.push({
+      key: `${request.method()} ${url.pathname.replace('/api/internal', '')}`,
+      url,
+      headers,
+      postData,
+      replyStatus: reply.status ?? 200,
+      replyContentType: reply.contentType ?? 'application/json',
+    });
+    return reply;
   }
 
   requestsTo(key: string) {

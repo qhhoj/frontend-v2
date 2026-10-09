@@ -358,3 +358,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - The freeze rule (`isBoardFrozen`) lives in `src/lib/board-freeze.ts`; the admin actions module re-exports it: the public replay needs it and must not import admin code.
 - Refusal texts: `errorMessageKey` names a 403 `forbidden` by its first issue code when `errors.<code>` exists (`board_frozen`, `board_hidden`) and a 413 by its status (`payload_too_large`): the server's body-limit refusal has no stable code. Ghost CSV row codes are worded in `admin.ghosts.import.rowCodes.*`.
+
+## Contest extras (VNOI F3)
+
+- Contest tag colours are theme tokens `tag-1`..`tag-8` (`--qh-tag-N` text, `--qh-tag-N-bg` tint) in every theme file, checked at 4.5:1 by `themes.spec.ts`; the backend stores only the key, so a theme change never touches data.

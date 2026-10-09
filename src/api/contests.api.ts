@@ -6,18 +6,27 @@ import type { Announcement, ContestListQuery } from './types/contests';
 export const ANNOUNCEMENT_PAGE_SIZE = 20;
 export const ANNOUNCEMENT_FIRST_PAGE = 1;
 
-/** The code goes only when the viewer typed one: the backend treats an empty string as a wrong code. */
-const codeBody = (accessCode?: string) => (accessCode ? { accessCode } : {});
+/** The code goes only when the viewer typed one (an empty string is a wrong code); `acceptRules` only when the box was ticked. */
+const joinBody = (accessCode?: string, acceptRules?: boolean) => ({
+  ...(accessCode ? { accessCode } : {}),
+  ...(acceptRules ? { acceptRules: true } : {}),
+});
 
 export const fetchContests = (query: ContestListQuery) => apiGetPage('/contests', { query });
 export const fetchContest = (key: string) => apiGet('/contests/{key}', { path: { key } });
 export const fetchRanking = (key: string, withVirtual: boolean) =>
   apiGet('/contests/{key}/ranking', { path: { key }, query: { virtual: withVirtual } });
 
-export const joinContest = (key: string, accessCode?: string) =>
-  apiSend('post', '/contests/{key}/join', { path: { key }, body: codeBody(accessCode) });
-export const registerContest = (key: string, accessCode?: string) =>
-  apiSend('post', '/contests/{key}/register', { path: { key }, body: codeBody(accessCode) });
+export const joinContest = (key: string, accessCode?: string, acceptRules?: boolean) =>
+  apiSend('post', '/contests/{key}/join', {
+    path: { key },
+    body: joinBody(accessCode, acceptRules),
+  });
+export const registerContest = (key: string, accessCode?: string, acceptRules?: boolean) =>
+  apiSend('post', '/contests/{key}/register', {
+    path: { key },
+    body: joinBody(accessCode, acceptRules),
+  });
 export const leaveContest = (key: string) =>
   apiSend('post', '/contests/{key}/leave', { path: { key } });
 export const fetchCurrentParticipation = () => apiGet('/contests/current');

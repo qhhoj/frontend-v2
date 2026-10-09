@@ -48,7 +48,9 @@
     "ticket": "Chi tiết phiếu",
     "flatpage": "Trang",
     "notifications": "Thông báo",
-    "contestReplay": "Phát lại"
+    "contestReplay": "Phát lại",
+    "contestBalloons": "Bóng bay",
+    "contestBalloonsPrint": "Phiếu bóng bay"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -816,7 +818,15 @@
     "board_hidden": "Bạn không xem được bảng của kỳ thi này.",
     "ghost_import_invalid": "Tệp ghost có dòng không hợp lệ.",
     "ghost_unsupported_format": "Không hỗ trợ ghost cho thể thức nộp bài cuối.",
-    "payload_too_large": "Nội dung gửi lên quá lớn (tối đa 1 MiB)."
+    "payload_too_large": "Nội dung gửi lên quá lớn (tối đa 1 MiB).",
+    "rules_not_accepted": "Hãy chọn ô đồng ý rồi thử lại.",
+    "unknown_tag": "Có thẻ chưa có trong danh mục thẻ kỳ thi.",
+    "tag_limit": "Danh mục thẻ đã đủ 100 thẻ.",
+    "already_delivered": "Quả bóng này đã được giao.",
+    "not_delivered": "Quả bóng này chưa được giao.",
+    "balloon_not_found": "Đội này không còn lời giải đúng cho bài này.",
+    "not_frozen": "Bảng xếp hạng không đóng băng: chỉ mở được khi đang đóng băng.",
+    "no_active_feed_key": "Chưa có khóa nguồn sự kiện còn hiệu lực."
   },
   "common": {
     "retry": "Thử lại",
@@ -1707,5 +1717,17 @@
   },
   "replay": {
     "title": "Phát lại"
+  },
+  "contestTags": {
+    "title": "Thẻ kỳ thi"
+  },
+  "joinRules": {
+    "title": "Quy định"
+  },
+  "problemSwitcher": {
+    "title": "Bài trong kỳ thi"
+  },
+  "balloons": {
+    "title": "Bóng bay"
   }
 }

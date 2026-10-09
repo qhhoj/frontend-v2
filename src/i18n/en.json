@@ -48,7 +48,9 @@
     "ticket": "Ticket",
     "flatpage": "Page",
     "notifications": "Notifications",
-    "contestReplay": "Replay"
+    "contestReplay": "Replay",
+    "contestBalloons": "Balloons",
+    "contestBalloonsPrint": "Balloon run sheet"
   },
   "contests": {
     "title": "Contests",
@@ -816,7 +818,15 @@
     "board_hidden": "You cannot view the board of this contest.",
     "ghost_import_invalid": "The ghost file has invalid rows.",
     "ghost_unsupported_format": "Ghosts are not supported for final-submission contests.",
-    "payload_too_large": "The request is too large (1 MiB at most)."
+    "payload_too_large": "The request is too large (1 MiB at most).",
+    "rules_not_accepted": "Tick the box to accept the contest rules, then try again.",
+    "unknown_tag": "Some tags are not in the contest tag catalogue.",
+    "tag_limit": "The tag catalogue is full (100 tags).",
+    "already_delivered": "This balloon was already delivered.",
+    "not_delivered": "This balloon was not delivered.",
+    "balloon_not_found": "This team no longer has a solve for this problem.",
+    "not_frozen": "The ranking is not frozen; a release applies only during a freeze.",
+    "no_active_feed_key": "There is no active feed key."
   },
   "common": {
     "retry": "Retry",
@@ -1707,5 +1717,17 @@
   },
   "replay": {
     "title": "Replay"
+  },
+  "contestTags": {
+    "title": "Contest tags"
+  },
+  "joinRules": {
+    "title": "Rules"
+  },
+  "problemSwitcher": {
+    "title": "Contest problems"
+  },
+  "balloons": {
+    "title": "Balloons"
   }
 }

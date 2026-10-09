@@ -2,7 +2,14 @@ import { defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
 
 export type ContestTabId =
-  'general' | 'problems' | 'announcements' | 'ranking' | 'actions' | 'participants' | 'ghosts';
+  | 'general'
+  | 'problems'
+  | 'announcements'
+  | 'ranking'
+  | 'actions'
+  | 'participants'
+  | 'ghosts'
+  | 'data';
 export interface ContestTab {
   id: ContestTabId;
   routeName: string;
@@ -54,6 +61,12 @@ export const CONTEST_TABS: ContestTab[] = [
     labelKey: 'admin.ghosts.tab',
     leadKey: 'admin.ghosts.lead',
   },
+  {
+    id: 'data',
+    routeName: 'admin-contestData',
+    labelKey: 'admin.contests.tabs.data',
+    leadKey: 'admin.contests.leads.data',
+  },
 ];
 
 const TAB_COMPONENTS: Record<ContestTabId, Component | null> = {
@@ -64,6 +77,7 @@ const TAB_COMPONENTS: Record<ContestTabId, Component | null> = {
   actions: defineAsyncComponent(() => import('./actions/ContestActionsTab.vue')),
   participants: defineAsyncComponent(() => import('./participants/ContestParticipantsTab.vue')),
   ghosts: defineAsyncComponent(() => import('./ghosts/ContestGhostsTab.vue')),
+  data: null,
 };
 
 /** The tab a route name belongs to, or null for a route that is not one of the editor's tabs. */

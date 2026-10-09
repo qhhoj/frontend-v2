@@ -21,6 +21,7 @@ export const contestPageRoutes = (
 export const contestListRoutes = (
   groups: Partial<Record<ContestPhase, ContestListItem[]>>,
 ): Record<string, MockHandler> => ({
+  'GET /contest-tags': page([]),
   'GET /contests': (call: ApiCall) => {
     const phase = call.query.get('phase') as ContestPhase | null;
     const rows = phase ? (groups[phase] ?? []) : Object.values(groups).flat();
