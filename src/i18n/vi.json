@@ -1924,6 +1924,34 @@
     "title": "Bài trong kỳ thi"
   },
   "balloons": {
+    "tab": "Bóng bay",
+    "printLink": "In 10 quả tiếp theo",
+    "printTitle": "Bóng bay cần giao · {contest}",
+    "print": "In",
+    "back": "Về hàng đợi",
+    "states": {
+      "pending": "Chờ giao",
+      "delivered": "Đã giao",
+      "all": "Tất cả"
+    },
+    "pendingCount": "{count} quả bóng chờ giao",
+    "first": "Lời giải đầu tiên",
+    "deliver": "Giao xong",
+    "undo": "Hoàn tác",
+    "rowName": "bài {label}, đội {team}",
+    "deliveredBy": "{name} giao lúc {time}",
+    "frozenNote": "Bảng đang đóng băng: thời gian giải và số lượng được ẩn với tình nguyện viên.",
+    "allDelivered": "Đã giao hết bóng. Chờ lời giải mới.",
+    "empty": {
+      "pending": "Chưa có bóng nào cần giao.",
+      "delivered": "Chưa giao quả nào.",
+      "all": "Chưa có lời giải đúng nào."
+    },
+    "missingTitle": "Kỳ thi này không bật bóng bay",
+    "missingBody": "Ban tổ chức có thể bật trong phần Vận hành của kỳ thi.",
+    "forbiddenTitle": "Bạn không dùng được màn hình bóng bay",
+    "forbiddenBody": "Chỉ tình nguyện viên bóng bay và người sửa kỳ thi dùng được, và không dùng được khi đang thi.",
+    "retryAfter": "Thử lại sau {seconds} giây.",
     "title": "Bóng bay"
   }
 }

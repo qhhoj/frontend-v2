@@ -3,6 +3,7 @@ import { computed, toRef } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
 import AnnouncementLiveRegion from './AnnouncementLiveRegion.vue';
 import { useUnreadAnnouncementCount } from './announcement-seen';
+import { useContestQuery } from './contests.queries';
 
 const props = defineProps<{ contestKey: string; phase?: ContestPhase }>();
 interface ContestTab {
@@ -26,6 +27,9 @@ const visibleTabs = computed(() =>
 const LINK =
   'inline-flex min-h-11 items-center gap-2 rounded-pill border border-transparent px-4 text-sm font-medium whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
 const unread = useUnreadAnnouncementCount(toRef(props, 'contestKey'));
+/** Balloon volunteers and editors of a contest with balloons on get the queue's tab; read from the cached contest answer. */
+const { data: contest } = useContestQuery(() => props.contestKey);
+const canViewBalloons = computed(() => contest.value?.viewer.canViewBalloons ?? false);
 /** The announcements stream runs while the contest can still get announcements; it waits until the phase is known. */
 const isStreaming = computed(() => props.phase !== undefined && props.phase !== 'ended');
 </script>
@@ -49,6 +53,12 @@ const isStreaming = computed(() => props.phase !== undefined && props.phase !== 
         }}</span>
       </span>
     </RouterLink>
+    <RouterLink
+      v-if="canViewBalloons"
+      :to="{ name: 'contest-balloons', params: { key: contestKey } }"
+      :class="LINK"
+      >{{ $t('balloons.tab') }}</RouterLink
+    >
   </nav>
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>
