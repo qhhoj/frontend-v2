@@ -1,3 +1,44 @@
 {
+  "lead": "Liên kết ngắn dẫn tới bài tập, kỳ thi, bài viết, người dùng và tổ chức. Mọi người tự tạo liên kết tự động; ở đây bạn chọn mã, đặt hạn và xóa.",
+  "form": {
+    "title": "Tạo liên kết",
+    "path": "Đường dẫn trong trang",
+    "pathHint": "Ví dụ /contests/hsg26 hoặc /problems/aplusb, không có tham số truy vấn.",
+    "code": "Mã tùy chọn",
+    "codeHint": "3–32 ký tự: chữ thường, số, dấu gạch ngang. Để trống để tạo mã ngẫu nhiên.",
+    "expires": "Hết hạn",
+    "expiresHint": "Để trống nếu không hết hạn.",
+    "submit": "Tạo liên kết",
+    "created": "Đã tạo /s/{code}",
+    "copy": "Sao chép liên kết vừa tạo",
+    "codeTaken": "Mã này đã có người dùng.",
+    "pathRefused": "Chỉ rút gọn được trang bài tập, kỳ thi, bài viết, người dùng, tổ chức của trang này.",
+    "codeReserved": "Mã này được dành riêng."
+  },
+  "table": {
+    "caption": "Mọi liên kết ngắn",
+    "region": "Bảng liên kết ngắn",
+    "code": "Mã",
+    "path": "Dẫn tới",
+    "kind": "Loại",
+    "hits": "Lượt mở",
+    "lastHit": "Mở gần nhất",
+    "expires": "Hết hạn",
+    "actions": "Thao tác",
+    "auto": "Tự động",
+    "chosen": "Chọn tay",
+    "never": "Không",
+    "expired": "Đã hết hạn",
+    "delete": "Xóa",
+    "deleteLabel": "Xóa liên kết {code}",
+    "empty": "Chưa có liên kết ngắn nào.",
+    "pager": "Trang liên kết ngắn"
+  },
+  "confirm": {
+    "title": "Xóa liên kết /s/{code}?",
+    "body": "Người mở liên kết này sẽ thấy trang không tìm thấy. Không hoàn tác được.",
+    "confirm": "Xóa liên kết"
+  },
+  "deleted": "Đã xóa /s/{code}",
   "title": "Liên kết ngắn"
 }

@@ -1,3 +1,44 @@
 {
+  "lead": "Short links lead to problems, contests, posts, users and organizations. Anyone makes automatic links; here you choose codes, set expiry and delete.",
+  "form": {
+    "title": "Create a link",
+    "path": "Path on this site",
+    "pathHint": "For example /contests/hsg26 or /problems/aplusb, without a query string.",
+    "code": "Custom code",
+    "codeHint": "3–32 characters: lower-case letters, digits, hyphens. Leave empty for a random code.",
+    "expires": "Expires",
+    "expiresHint": "Leave empty for no expiry.",
+    "submit": "Create link",
+    "created": "Created /s/{code}",
+    "copy": "Copy the new link",
+    "codeTaken": "This code is already taken.",
+    "pathRefused": "Only problem, contest, post, user and organization pages of this site can be shortened.",
+    "codeReserved": "This code is reserved."
+  },
+  "table": {
+    "caption": "Every short link",
+    "region": "Short-link table",
+    "code": "Code",
+    "path": "Leads to",
+    "kind": "Kind",
+    "hits": "Visits",
+    "lastHit": "Last visit",
+    "expires": "Expires",
+    "actions": "Actions",
+    "auto": "Automatic",
+    "chosen": "Chosen",
+    "never": "Never",
+    "expired": "Expired",
+    "delete": "Delete",
+    "deleteLabel": "Delete link {code}",
+    "empty": "No short links yet.",
+    "pager": "Short-link pages"
+  },
+  "confirm": {
+    "title": "Delete the link /s/{code}?",
+    "body": "Visitors of this link will see the not-found page. This cannot be undone.",
+    "confirm": "Delete link"
+  },
+  "deleted": "Deleted /s/{code}",
   "title": "Short links"
 }
