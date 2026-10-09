@@ -101,3 +101,22 @@ for (const viewport of AUDIT_VIEWPORTS)
     expect(JSON.parse(sent[0].postData!.toString())).toEqual({ value: '' });
     expect(await axeViolationsIn(page)).toEqual([]);
   });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`change log at ${viewport.name}: the key in the URL shows its revisions and is accessible`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, ['judge.change_settings']);
+    api.routes['GET /admin/settings/pdf.renderTimeoutMs/revisions'] = adminList(
+      [settingRevision(30000, 45000), settingRevision(20000, 30000)],
+      { pageSize: 20 },
+    );
+    await page.goto('/admin/log?key=pdf.renderTimeoutMs');
+    await expect(
+      page.getByRole('heading', { name: 'Nhật ký thay đổi', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId('revision')).toHaveCount(2);
+    expect(await axeViolationsIn(page)).toEqual([]);
+  });

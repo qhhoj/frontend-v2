@@ -209,5 +209,22 @@
       "providerOff": "Đăng nhập bằng nhà cung cấp này bị tắt cùng lúc, vì máy chủ không nhận nhà cung cấp đã bật mà thiếu bí mật.",
       "clientIdKept": "Mã khách OAuth không đổi."
     }
+  },
+  "log": {
+    "crumbs": {
+      "site": "Trang web",
+      "log": "Nhật ký"
+    },
+    "title": "Nhật ký thay đổi",
+    "lead": "Nhật ký đọc theo từng khoá, mới nhất trước.",
+    "keyLabel": "Khoá cài đặt",
+    "gap": {
+      "title": "Mới có một nguồn",
+      "body": "Chỉ có nhật ký cài đặt trang: trước và sau (bí mật chỉ hiện đã đặt hay chưa), các trường đổi, người sửa, thời điểm. Các thay đổi khác (trang tĩnh, bài tập, tổ chức) đã được ghi vào bảng bản sửa nhưng chưa có API đọc; chưa có nhật ký chung theo người sửa hoặc theo loại. “Khôi phục” do máy chủ đặt lại giá trị cũ và ghi thành một bản mới."
+    },
+    "secrets": {
+      "title": "Bí mật không bao giờ trong nhật ký",
+      "body": "Bản sửa của khoá có bí mật chỉ ghi “đã đặt / chưa đặt”, nên không khôi phục được giá trị bí mật."
+    }
   }
 }

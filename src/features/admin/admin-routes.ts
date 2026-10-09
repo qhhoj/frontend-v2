@@ -41,7 +41,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   config: () => import('./site/MiscConfigPage.vue'),
   nav: () => import('./site/NavBarPage.vue'),
   pages: () => import('./pages/FlatpagesPage.vue'),
-  log: placeholder,
+  log: () => import('./settings/AdminLogPage.vue'),
 };
 
 const ADMIN_META = { requiresAuth: true, staffOnly: true, layout: 'admin' } as const;

@@ -209,5 +209,22 @@
       "providerOff": "Sign-in with this provider is switched off at the same time, because the server refuses an enabled provider without a secret.",
       "clientIdKept": "The OAuth client id stays the same."
     }
+  },
+  "log": {
+    "crumbs": {
+      "site": "Site",
+      "log": "Change log"
+    },
+    "title": "Change log",
+    "lead": "The history of each setting key, newest first.",
+    "keyLabel": "Setting key",
+    "gap": {
+      "title": "One source so far",
+      "body": "Only the settings history: before and after (a secret shows only set or not set), the changed fields, the editor and the time. Other changes (static pages, problems, organizations) are written to the revision table but have no read API yet; there is no shared log by editor or by type. A restore is set back by the server as a new revision."
+    },
+    "secrets": {
+      "title": "Secrets never appear in the log",
+      "body": "A revision of a key with a secret records only “set / not set”, so a secret value cannot be restored."
+    }
   }
 }
