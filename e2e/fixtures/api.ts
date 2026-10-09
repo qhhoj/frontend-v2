@@ -27,6 +27,7 @@ import {
 } from '../../src/test/fixtures';
 import { homeResponse } from '../../src/test/community-fixtures';
 import { communityRoutes } from './community-api';
+import { replayRoutes } from './replay-api';
 import { matchPattern } from '../../src/test/route-match';
 import { list, ok } from './reply';
 import type { Handler, Reply } from './reply';
@@ -94,6 +95,7 @@ export class FakeApi {
 
   readonly routes: Record<string, Handler> = {
     ...communityRoutes(),
+    ...replayRoutes(),
     'GET /auth/me': () => (this.signedIn ? ok(this.session()) : UNAUTHORIZED),
     'POST /auth/password/change': { status: 204 },
     'POST /auth/2fa/totp/enroll': ok({
