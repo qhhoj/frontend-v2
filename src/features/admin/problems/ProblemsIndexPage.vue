@@ -6,6 +6,7 @@ import ExactLookup from '../ui/ExactLookup.vue';
 import ProblemSearchList from '../search/ProblemSearchList.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { ADMIN_SCREENS } from '../admin-screens';
+import ProblemsIndexTabs from './lifecycle/ProblemsIndexTabs.vue';
 
 const router = useRouter();
 const { canAny } = usePermissions();
@@ -34,6 +35,7 @@ const open = (code: string) => router.push({ name: 'admin-problemGeneral', param
         >
       </template>
     </AdminPageHeader>
+    <ProblemsIndexTabs />
     <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
       <section class="glass rounded-panel p-5">
         <ExactLookup

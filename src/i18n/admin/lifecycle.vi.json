@@ -1,0 +1,44 @@
+{
+  "tabs": {
+    "label": "Danh sách bài",
+    "all": "Tất cả bài",
+    "deleted": "Đã xóa"
+  },
+  "deletedLead": "Bài đã xóa bị ẩn khỏi mọi trang. Khôi phục được trong thời hạn; sau đó dữ liệu nặng bị xóa hẳn, bài nộp vẫn được giữ.",
+  "tableCaption": "Bài đã xóa",
+  "columns": {
+    "code": "Mã",
+    "name": "Tên bài",
+    "deletedAt": "Xóa lúc",
+    "deletedBy": "Người xóa",
+    "grace": "Thời hạn",
+    "actions": "Thao tác"
+  },
+  "grace": {
+    "left": "Còn {count} ngày",
+    "due": "Đến hạn xóa hẳn",
+    "purged": "Đã xóa hẳn"
+  },
+  "restore": "Khôi phục",
+  "restoreLabel": "Khôi phục {code}",
+  "restored": "Đã khôi phục {code}. Bài hiện lại ngay.",
+  "openEditor": "Mở trang sửa {code}",
+  "purgeNow": "Xóa hẳn ngay",
+  "purgeNowLabel": "Xóa hẳn {code} ngay",
+  "purgeTitle": "Xóa hẳn {code}?",
+  "purgeBody": "Dữ liệu chấm, đề, bản dịch và bình luận bị xóa vĩnh viễn. Bài nộp và lịch sử kỳ thi vẫn được giữ. Không hoàn tác được.",
+  "purgeConfirm": "Xóa hẳn",
+  "purgeQueued": "Đã xếp lịch xóa hẳn {code}. Máy chủ xử lý trong ít phút.",
+  "typeCode": "Gõ mã bài {code} để xác nhận",
+  "empty": "Không có bài nào đã xóa.",
+  "pager": "Trang bài đã xóa",
+  "danger": {
+    "title": "Vùng nguy hiểm",
+    "lead": "Xóa bài ẩn bài khỏi mọi trang ngay lập tức. Mã bài vẫn được giữ.",
+    "body": "Bài khôi phục được trong thời hạn (mặc định 30 ngày) ở mục “Đã xóa”. Bài đang nằm trong kỳ thi thì không xóa được.",
+    "open": "Xóa bài…",
+    "title2": "Xóa bài {code}?",
+    "dialogBody": "Bài biến mất khỏi danh sách, trang bài và kết quả tìm kiếm. Bài nộp của mọi người vẫn được giữ.",
+    "confirm": "Xóa bài"
+  }
+}

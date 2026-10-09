@@ -1,0 +1,44 @@
+{
+  "tabs": {
+    "label": "Problem lists",
+    "all": "All problems",
+    "deleted": "Deleted"
+  },
+  "deletedLead": "Deleted problems are hidden everywhere. They can be restored during the grace period; after it the heavy data is purged and submissions stay.",
+  "tableCaption": "Deleted problems",
+  "columns": {
+    "code": "Code",
+    "name": "Name",
+    "deletedAt": "Deleted at",
+    "deletedBy": "Deleted by",
+    "grace": "Grace period",
+    "actions": "Actions"
+  },
+  "grace": {
+    "left": "{count} day left | {count} days left",
+    "due": "Purge due",
+    "purged": "Purged"
+  },
+  "restore": "Restore",
+  "restoreLabel": "Restore {code}",
+  "restored": "{code} was restored. It is visible again.",
+  "openEditor": "Open the editor of {code}",
+  "purgeNow": "Purge now",
+  "purgeNowLabel": "Purge {code} now",
+  "purgeTitle": "Purge {code}?",
+  "purgeBody": "Test data, statements, translations and comments are removed for good. Submissions and contest history stay. This cannot be undone.",
+  "purgeConfirm": "Purge",
+  "purgeQueued": "{code} is queued for purging. The server handles it in a few minutes.",
+  "typeCode": "Type the problem code {code} to confirm",
+  "empty": "No deleted problems.",
+  "pager": "Deleted problem pages",
+  "danger": {
+    "title": "Danger zone",
+    "lead": "Deleting hides the problem everywhere at once. Its code stays reserved.",
+    "body": "It can be restored during the grace period (30 days by default) under “Deleted”. A problem that is in a contest cannot be deleted.",
+    "open": "Delete problem…",
+    "title2": "Delete {code}?",
+    "dialogBody": "The problem disappears from lists, its page and search. Everyone’s submissions stay.",
+    "confirm": "Delete problem"
+  }
+}
