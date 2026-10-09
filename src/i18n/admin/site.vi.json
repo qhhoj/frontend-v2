@@ -42,5 +42,63 @@
       "tooLong": "Tối đa 20 000 ký tự.",
       "url": "Khoá liên kết chỉ nhận http hoặc https."
     }
+  },
+  "nav": {
+    "crumbs": "Trang web",
+    "title": "Thanh điều hướng",
+    "add": "Thêm mục",
+    "treeNote": "Mục cha ở đầu bảng, mục con thụt vào. Mục có con không xoá được; xoá các mục con trước (409).",
+    "infoTitle": "Cách thanh điều hướng đọc dữ liệu",
+    "info": "Mục có cha không tồn tại hoặc vòng lặp được coi là cấp cao nhất khi hiển thị; máy chủ không duyệt cây khi lưu nên dữ liệu cũ vẫn có thể lệch. Thay đổi hiện ngay trên máy xử lý này, các máy khác cập nhật sau ít giây.",
+    "columns": {
+      "item": "Mục · đường dẫn",
+      "regex": "Regex đang xem",
+      "order": "Thứ tự",
+      "actions": "Thao tác"
+    },
+    "childOf": "mục con của {parent}",
+    "hidden": "Ẩn",
+    "noRegex": "—",
+    "regexBroken": "Regex lỗi: {message}. Mục vẫn hiện nhưng không bao giờ được đánh dấu đang xem.",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "deleteTitle": "Xoá mục “{label}”?",
+    "deleteBody": "Mục biến mất khỏi thanh điều hướng ngay.",
+    "deleteConfirm": "Xoá",
+    "hasChildren": "Mục có con không xoá được; xoá các mục con trước.",
+    "saved": "Đã lưu {label}.",
+    "deleted": "Đã xoá {label}.",
+    "dialog": {
+      "addTitle": "Thêm mục",
+      "editTitle": "Sửa mục “{label}”",
+      "save": "Lưu",
+      "keyLabel": "Khoá",
+      "keyHint": "Duy nhất, 1–10 ký tự.",
+      "labelLabel": "Nhãn",
+      "labelHint": "1–20 ký tự.",
+      "pathLabel": "Đường dẫn",
+      "pathHint": "Đường dẫn trong trang hoặc URL http(s).",
+      "regexLabel": "Regex (JavaScript)",
+      "parentLabel": "Mục cha",
+      "parentTop": "Cấp cao nhất",
+      "parentHint": "Một mục không thể nằm dưới chính nó hoặc mục con của nó.",
+      "orderLabel": "Thứ tự (0–1 000 000)",
+      "hiddenLabel": "Ẩn mục này"
+    },
+    "regexInvalid": "Không phải biểu thức chính quy hợp lệ. {message}",
+    "errors": {
+      "key": "Khoá dài 1–10 ký tự.",
+      "label": "Nhãn dài 1–20 ký tự.",
+      "path": "Dùng đường dẫn trong trang (bắt đầu bằng /) hoặc URL http(s).",
+      "regexTooLong": "Regex quá dài (tối đa 500 ký tự).",
+      "order": "Thứ tự từ 0 đến 1 000 000."
+    },
+    "issues": {
+      "parent_cycle": "Một mục không thể nằm dưới chính nó hoặc mục con của nó.",
+      "parent_unknown": "Mục cha không tồn tại.",
+      "invalid_regex": "Không phải biểu thức chính quy hợp lệ.",
+      "invalid_path": "Dùng đường dẫn trong trang hoặc URL http(s).",
+      "keyTaken": "Khoá đã có."
+    }
   }
 }

@@ -74,3 +74,35 @@ for (const viewport of AUDIT_VIEWPORTS)
     await expect(page.getByRole('button', { name: 'contact_email' })).toHaveCount(0);
     expect(api.requestsTo('DELETE /admin/site/config/contact_email')).toHaveLength(1);
   });
+
+const NAV_PERMS = ['judge.change_navigationbar'];
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`navigation bar at ${viewport.name}: the edit dialog refuses a bad regex and Escape returns focus to its row`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, NAV_PERMS);
+    api.routes['GET /site'] = adminOk(siteData());
+
+    await page.goto('/admin/nav');
+    await expect(page.getByRole('button', { name: 'Sửa' }).first()).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+
+    const editButton = page
+      .getByRole('row')
+      .filter({ hasText: 'blog' })
+      .first()
+      .getByRole('button', { name: 'Sửa' });
+    await editButton.click();
+    await page.locator('#nav-regex').fill('(');
+    await confirmInDialog(page, 'Lưu');
+    await expect(page.locator('#nav-regex')).toHaveAttribute('aria-invalid', 'true');
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(api.requestsTo('PATCH /admin/site/navigation/nav-blog')).toHaveLength(0);
+
+    await page.keyboard.press('Escape');
+    await expect(dialogOf(page)).toBeHidden();
+    await expect(editButton).toBeFocused();
+  });

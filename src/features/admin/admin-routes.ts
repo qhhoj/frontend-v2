@@ -39,7 +39,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   activity: () => import('./activity/UserActivityPage.vue'),
   settings: placeholder,
   config: () => import('./site/MiscConfigPage.vue'),
-  nav: placeholder,
+  nav: () => import('./site/NavBarPage.vue'),
   pages: placeholder,
   log: placeholder,
 };
