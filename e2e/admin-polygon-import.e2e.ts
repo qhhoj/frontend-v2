@@ -29,7 +29,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     api,
   }) => {
     await page.setViewportSize(viewport);
-    signInAsStaff(api, [PERMISSION]);
+    signInAsStaff(api, [PERMISSION, 'judge.add_problem']);
     api.routes['GET /problems/meta'] = adminOk(META);
     api.routes['POST /problems/imports'] = { status: 202, body: { data: { jobId: 'job-1' } } };
     let polls = 0;

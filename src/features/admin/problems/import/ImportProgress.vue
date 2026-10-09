@@ -4,13 +4,14 @@ import type { ImportJob } from '@/api/types/problem-imports';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import type { ImportPhase } from './import-job';
+import type { ImportPhase, PollStop } from './import-job';
 
 const props = defineProps<{
   code: string;
   phase: ImportPhase | null;
   job: ImportJob | null;
   pollFailure: unknown;
+  stop: PollStop | null;
 }>();
 
 /** Step indexes: 0 received, 1 queued, 2 running, 3 done. A failed job has no current step. */
@@ -79,7 +80,8 @@ const failedText = computed(() => props.job?.error || '');
       kind="refused"
       :text="failedText || $t('admin.polygon.progress.failed')"
     />
-    <p v-if="pollFailure" class="text-sm text-negative">
+    <AdminStatus v-if="stop" kind="refused" :text="$t(`admin.polygon.progress.stopped.${stop}`)" />
+    <p v-else-if="pollFailure" class="text-sm text-negative">
       {{ $t('admin.polygon.progress.pollFailed') }} {{ failureTextOf(pollFailure) }}
     </p>
   </section>

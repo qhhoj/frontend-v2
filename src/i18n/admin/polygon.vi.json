@@ -32,7 +32,9 @@
     "ignoreCases": "Bỏ qua test 0 điểm",
     "appendSolution": "Thêm lời giải chính vào bài",
     "submit": "Bắt đầu nhập",
-    "submitNeedsFile": "Chọn gói .zip để bắt đầu."
+    "submitNeedsFile": "Chọn gói .zip để bắt đầu.",
+    "pointsRange": "Điểm từ {min} đến {max}, hoặc để trống.",
+    "languageTooLong": "Tối đa {max} ký tự."
   },
   "progress": {
     "board": "Tiến trình",
@@ -46,6 +48,12 @@
     "doneText": "Nhập xong. Bài đã tạo, mở để chỉnh tiếp.",
     "open": "Mở {code}",
     "failed": "Không nhập được. Hệ thống không cho biết thêm lý do.",
-    "pollFailed": "Chưa lấy được trạng thái. Trang sẽ thử lại."
+    "pollFailed": "Chưa lấy được trạng thái. Trang sẽ thử lại.",
+    "stopped": {
+      "notFound": "Không tìm thấy lượt nhập này. Lượt nhập hết hạn sau 24 giờ.",
+      "forbidden": "Bạn không được xem lượt nhập này.",
+      "unknown": "Hàng đợi không còn biết lượt nhập này.",
+      "gaveUp": "Không lấy được trạng thái sau nhiều lần thử. Tải lại trang để thử lại."
+    }
   }
 }

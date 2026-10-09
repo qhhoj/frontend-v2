@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { formatFileSize } from '@/lib/format';
 import { translate } from '@/i18n';
+import { usePermissions } from '@/stores/use-permissions';
 import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import AdminField from '../../ui/AdminField.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
@@ -11,8 +12,14 @@ import UsernameChips from '../../ui/UsernameChips.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { UPLOAD_LIMITS, tooLargeFor } from '../../ui/upload-limits';
-import { emptyImportForm, importFormErrors, toImportOptions } from './import-form';
-import type { ImportForm } from './import-form';
+import {
+  IMPORT_MODES,
+  IMPORT_MODE_PERMISSION,
+  emptyImportForm,
+  importFormErrors,
+  toImportOptions,
+} from './import-form';
+import type { ImportForm, ImportMode } from './import-form';
 
 const props = defineProps<{ isPending: boolean; serverErrors: FieldErrors }>();
 const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File }] }>();
@@ -24,6 +31,10 @@ const groups = computed(() => meta.value?.groups ?? []);
 const types = computed(() => meta.value?.types ?? []);
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isSubmitBlocked = computed(() => props.isPending || !form.value.file);
+const { canAny } = usePermissions();
+const canUseMode = (mode: ImportMode) => canAny(IMPORT_MODE_PERMISSION[mode]);
+/** A viewer who may only update starts on update, so the default never refuses itself. */
+if (!canUseMode('create') && canUseMode('update')) form.value.mode = 'update';
 
 function chooseFile(file: File) {
   localErrors.value = {};
@@ -43,7 +54,7 @@ function onDrop(event: DragEvent) {
 
 function submit() {
   if (props.isPending) return;
-  localErrors.value = importFormErrors(form.value);
+  localErrors.value = importFormErrors(form.value, canUseMode);
   const { file } = form.value;
   if (!file || Object.keys(localErrors.value).length > 0) return;
   emit('start', { options: toImportOptions(form.value), file });
@@ -107,14 +118,24 @@ function submit() {
         <legend class="mb-1.5 text-sm font-semibold">
           {{ $t('admin.polygon.form.mode.label') }}
         </legend>
-        <label class="flex min-h-11 items-center gap-2">
-          <input v-model="form.mode" type="radio" name="import-mode" value="create" />
-          {{ $t('admin.polygon.form.mode.create') }}
+        <label
+          v-for="mode in IMPORT_MODES"
+          :key="mode"
+          class="flex min-h-11 flex-wrap items-center gap-2"
+        >
+          <input
+            v-model="form.mode"
+            type="radio"
+            name="import-mode"
+            :value="mode"
+            :disabled="!canUseMode(mode)"
+          />
+          {{ $t(`admin.polygon.form.mode.${mode}`) }}
+          <span v-if="!canUseMode(mode)" class="basis-full pl-6 text-sm text-muted">
+            {{ $t('admin.ui.needsPermission', { permission: IMPORT_MODE_PERMISSION[mode] }) }}
+          </span>
         </label>
-        <label class="flex min-h-11 items-center gap-2">
-          <input v-model="form.mode" type="radio" name="import-mode" value="update" />
-          {{ $t('admin.polygon.form.mode.update') }}
-        </label>
+        <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>
       </fieldset>
 
       <AdminField

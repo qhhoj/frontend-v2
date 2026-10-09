@@ -20,7 +20,7 @@ interface ImportSubmission {
 
 const jobId = ref<string | null>(null);
 const submittedCode = ref('');
-const { job, phase, failure: pollFailure } = useImportJob(jobId);
+const { job, phase, failure: pollFailure, stop } = useImportJob(jobId);
 
 const { run, isPending, fieldErrors, failure } = useAdminMutation({
   mutate: ({ options, file }: ImportSubmission) => startPolygonImport(options, file),
@@ -63,6 +63,7 @@ const refusal = computed(() =>
         :phase="phase"
         :job="job"
         :poll-failure="pollFailure"
+        :stop="stop"
       />
     </div>
     <div v-if="refusal" class="flex items-start gap-3">

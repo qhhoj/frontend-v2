@@ -5,7 +5,7 @@ import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 
-const PERMS = ['judge.import_polygon_package'];
+const PERMS = ['judge.import_polygon_package', 'judge.add_problem'];
 const job = (state: string, extra = {}) =>
   ok({ id: 'job-1', state, result: null, error: null, ...extra });
 
@@ -91,6 +91,59 @@ describe('PolygonImportPage', () => {
     await flushPromises();
     const polls = calls.filter((call) => call.path === '/problems/imports/job-1').length;
     await vi.advanceTimersByTimeAsync(6000);
+    expect(calls.filter((call) => call.path === '/problems/imports/job-1')).toHaveLength(polls);
+  });
+
+  it('disables a mode the viewer may not use, says which permission it needs, and sends nothing', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.import_polygon_package']),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
+    });
+    const { wrapper } = await mountApp('/admin/problems/import');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="polygon-file"] input').exists()).toBe(true),
+    );
+    const radios = wrapper.findAll('input[name="import-mode"]');
+    expect(radios.map((radio) => (radio.element as HTMLInputElement).disabled)).toEqual([
+      true,
+      true,
+    ]);
+    expect(wrapper.text()).toContain('Cần quyền judge.add_problem');
+    expect(wrapper.text()).toContain('Cần quyền judge.edit_own_problem');
+    await start(wrapper);
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
+  });
+
+  it('starts on update for a viewer who may only edit, and leaves create disabled', async () => {
+    mockApi({
+      ...staffViewer(['judge.import_polygon_package', 'judge.edit_own_problem']),
+      'GET /problems/meta': ok(problemEditingMeta()),
+    });
+    const { wrapper } = await mountApp('/admin/problems/import');
+    await vi.waitFor(() => expect(wrapper.find('input[name="import-mode"]').exists()).toBe(true));
+    const [create, update] = wrapper
+      .findAll('input[name="import-mode"]')
+      .map((radio) => radio.element as HTMLInputElement);
+    expect(create!.disabled).toBe(true);
+    expect(update!.checked).toBe(true);
+  });
+
+  it('stops polling on a 404 and says the import was not found', async () => {
+    const calls = mockApi({
+      ...staffViewer(PERMS),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
+      'GET /problems/imports/job-1': {
+        status: 404,
+        body: { error: { code: 'not_found', message: 'No such import' } },
+      },
+    });
+    const { wrapper } = await mountApp('/admin/problems/import');
+    await start(wrapper);
+    expect(wrapper.get('[role="alert"]').text()).toContain('Không tìm thấy lượt nhập này.');
+    const polls = calls.filter((call) => call.path === '/problems/imports/job-1').length;
+    await vi.advanceTimersByTimeAsync(10000);
     expect(calls.filter((call) => call.path === '/problems/imports/job-1')).toHaveLength(polls);
   });
 });

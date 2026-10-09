@@ -6,11 +6,23 @@ import { parseLanguageMap } from './import-job';
 
 /** Backend `PROBLEM_CODE_PATTERN` (libs/database); the problem editor's copy arrives with its own task. */
 export const IMPORT_CODE_PATTERN = /^[a-z0-9_]{1,32}$/;
+/** Backend `PROBLEM_LIMITS.points` and the `MaxLength(30)` of the two language names in `PolygonImportQueryDto`. */
+export const POINTS_MIN = 800;
+export const POINTS_MAX = 3500;
+export const LANGUAGE_NAME_MAX = 30;
+
+export const IMPORT_MODES = ['create', 'update'] as const;
+export type ImportMode = (typeof IMPORT_MODES)[number];
+/** Backend `ProblemImportsService.resolveJob`: create needs `judge.add_problem`; update needs the edit rule (`canEdit`, `edit_own_problem`). */
+export const IMPORT_MODE_PERMISSION: Record<ImportMode, string> = {
+  create: 'judge.add_problem',
+  update: 'judge.edit_own_problem',
+};
 
 export interface ImportForm {
   file: File | null;
   code: string;
-  mode: 'create' | 'update';
+  mode: ImportMode;
   groupId: string;
   typeIds: string[];
   points: string;
@@ -41,18 +53,63 @@ export const emptyImportForm = (): ImportForm => ({
   appendMainSolution: false,
 });
 
-/** Local checks only: the server's own refusals arrive as field errors after sending. */
-export function importFormErrors(form: ImportForm): FieldErrors {
+const isPointsInRange = (text: string) => {
+  if (!/^\d+$/.test(text)) return false;
+  const points = Number(text);
+  return points >= POINTS_MIN && points <= POINTS_MAX;
+};
+
+function fileAndCodeErrors(form: ImportForm): FieldErrors {
   const errors: FieldErrors = {};
   if (!form.file) errors.file = translate('admin.polygon.form.submitNeedsFile');
   if (!IMPORT_CODE_PATTERN.test(form.code))
     errors.code = translate('admin.polygon.form.codeInvalid');
+  return errors;
+}
+
+function modeAndPointsErrors(
+  form: ImportForm,
+  canUseMode: (mode: ImportMode) => boolean,
+): FieldErrors {
+  const errors: FieldErrors = {};
+  if (!canUseMode(form.mode))
+    errors.mode = translate('admin.ui.needsPermission', {
+      permission: IMPORT_MODE_PERMISSION[form.mode],
+    });
+  const points = form.points.trim();
+  if (points && !isPointsInRange(points))
+    errors.points = translate('admin.polygon.form.pointsRange', {
+      min: POINTS_MIN,
+      max: POINTS_MAX,
+    });
+  return errors;
+}
+
+const isTooLong = (text: string) => text.trim().length > LANGUAGE_NAME_MAX;
+
+function languageErrors(form: ImportForm): FieldErrors {
+  const errors: FieldErrors = {};
+  const tooLong = translate('admin.polygon.form.languageTooLong', { max: LANGUAGE_NAME_MAX });
+  if (isTooLong(form.mainStatementLanguage)) errors.mainStatementLanguage = tooLong;
+  if (isTooLong(form.tutorialLanguage)) errors.tutorialLanguage = tooLong;
   const { invalid } = parseLanguageMap(form.languageMapText);
   if (invalid.length > 0)
     errors.statementLanguages = translate('admin.polygon.form.languageMapInvalid', {
       pairs: invalid.join(', '),
     });
   return errors;
+}
+
+/** Local checks, the same ones the backend DTO and the permission check make; the server's own refusals arrive as field errors. */
+export function importFormErrors(
+  form: ImportForm,
+  canUseMode: (mode: ImportMode) => boolean,
+): FieldErrors {
+  return {
+    ...fileAndCodeErrors(form),
+    ...modeAndPointsErrors(form, canUseMode),
+    ...languageErrors(form),
+  };
 }
 
 const optionalText = (text: string) => text.trim() || undefined;

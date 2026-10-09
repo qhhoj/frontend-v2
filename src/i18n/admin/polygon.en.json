@@ -32,7 +32,9 @@
     "ignoreCases": "Ignore zero-point tests",
     "appendSolution": "Append the main solution to the problem",
     "submit": "Start import",
-    "submitNeedsFile": "Choose a .zip package to start."
+    "submitNeedsFile": "Choose a .zip package to start.",
+    "pointsRange": "Points from {min} to {max}, or leave empty.",
+    "languageTooLong": "At most {max} characters."
   },
   "progress": {
     "board": "Progress",
@@ -46,6 +48,12 @@
     "doneText": "Import finished. The problem is created; open it to keep editing.",
     "open": "Open {code}",
     "failed": "The import failed. The system gives no further reason.",
-    "pollFailed": "Could not fetch the status yet. The page will try again."
+    "pollFailed": "Could not fetch the status yet. The page will try again.",
+    "stopped": {
+      "notFound": "This import was not found. Imports expire after 24 hours.",
+      "forbidden": "You may not view this import.",
+      "unknown": "The queue no longer knows this import.",
+      "gaveUp": "The status could not be fetched after several tries. Reload the page to try again."
+    }
   }
 }
