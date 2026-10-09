@@ -46,7 +46,8 @@
     "tickets": "Phiếu hỗ trợ",
     "ticketNew": "Tạo phiếu mới",
     "ticket": "Chi tiết phiếu",
-    "flatpage": "Trang"
+    "flatpage": "Trang",
+    "notifications": "Thông báo"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -322,7 +323,10 @@
       "deviceOnly": "Lưu trên thiết bị này",
       "deviceOnlyNote": "Ngôn ngữ giao diện chỉ áp dụng cho trình duyệt đang dùng, không lưu vào tài khoản."
     },
-    "locales": { "vi": "Tiếng Việt", "en": "English" },
+    "locales": {
+      "vi": "Tiếng Việt",
+      "en": "English"
+    },
     "organizations": {
       "title": "Tổ chức",
       "lead": "Sắp xếp lại hoặc rời khỏi các tổ chức bạn đang tham gia. Tổ chức đầu tiên hiện cạnh tên bạn (thường là trường). Muốn tham gia thêm, vào trang tổ chức.",
@@ -343,7 +347,10 @@
       "saved": "Đã lưu hồ sơ.",
       "firstNameHint": "Hiện trên trang cá nhân, bảng xếp hạng và bình luận. Tên đăng nhập {username} không đổi được.",
       "aboutViews": "Cách xem phần giới thiệu",
-      "aboutTab": { "write": "Soạn thảo", "saved": "Bản đã lưu" },
+      "aboutTab": {
+        "write": "Soạn thảo",
+        "saved": "Bản đã lưu"
+      },
       "aboutHelp": "Hỗ trợ Markdown. Máy chủ hiển thị bản đã lưu, nên tab “Bản đã lưu” chỉ cập nhật sau khi bạn bấm Lưu.",
       "aboutEmpty": "Chưa có phần giới thiệu.",
       "noChanges": "Không có thay đổi chưa lưu.",
@@ -373,7 +380,8 @@
       "invalidSummary": "Chưa lưu được. Có {count} mục cần sửa: {names}. Các thay đổi khác của bạn vẫn còn trên trang.",
       "locked": "Chưa lưu được tên hoặc phần giới thiệu: tài khoản cần giải thêm bài trước khi sửa hồ sơ, hoặc kỳ thi chính thức đang khoá hồ sơ.",
       "organizationsChanged": "Chưa lưu được danh sách tổ chức. Có thể bạn là quản trị viên của tổ chức bạn muốn rời, hoặc danh sách tổ chức vừa thay đổi. Trang đã tải lại danh sách từ máy chủ: mọi tổ chức máy chủ còn ghi nhận đều hiện lại, kể cả tổ chức bạn vừa bỏ. Hãy kiểm tra các tổ chức, làm lại thay đổi nếu cần, rồi bấm Lưu lại.",
-      "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại."
+      "offline": "Mất kết nối. Không gửi được thay đổi, kiểm tra mạng rồi thử lại.",
+      "lockedOfficial": "Chưa lưu được: kỳ thi chính thức đang khóa thứ tự tổ chức và việc rời tổ chức."
     },
     "data": {
       "title": "Xuất dữ liệu cá nhân",
@@ -793,7 +801,8 @@
     "not_registered": "Bạn chưa đăng ký kỳ thi này.",
     "access_code_required": "Cần mã tham gia. Nhập mã do ban tổ chức cung cấp rồi thử lại.",
     "wrong_access_code": "Mã tham gia chưa đúng. Kiểm tra lại mã với ban tổ chức rồi nhập lại.",
-    "not_in_contest": "Bạn không ở trong kỳ thi này."
+    "not_in_contest": "Bạn không ở trong kỳ thi này.",
+    "locked_in_official_contest": "Thao tác này bị khóa trong kỳ thi chính thức."
   },
   "common": {
     "retry": "Thử lại",
@@ -1575,5 +1584,111 @@
     "signInBody": "Trang này chỉ mở cho thành viên đã đăng nhập.",
     "signIn": "Đăng nhập",
     "title": "Trang"
+  },
+  "notifications": {
+    "bell": "Thông báo",
+    "bellWithCount": "Thông báo, {count} chưa đọc",
+    "drawerTitle": "Thông báo",
+    "unreadCount": "{count} chưa đọc",
+    "readAll": "Đọc hết",
+    "readAllLong": "Đánh dấu tất cả đã đọc",
+    "markRead": "Đánh dấu đã đọc: {title}",
+    "seeAll": "Xem tất cả thông báo",
+    "today": "Hôm nay",
+    "earlier": "Trước đó",
+    "important": "Quan trọng",
+    "merged": "{count} tin mới",
+    "unread": "Chưa đọc",
+    "staleTitle": "Thông báo cũ",
+    "staleBody": "Nội dung này không còn mở cho bạn.",
+    "staleOpened": "Thông báo này trỏ tới nội dung bạn không còn mở được, nên đã được đánh dấu là đã đọc.",
+    "empty": "Chưa có thông báo nào.",
+    "emptyBody": "Bạn đã xem hết mọi thứ.",
+    "lead": "Phiếu hỗ trợ, kỳ thi và tổ chức báo tin cho bạn ở đây. Thông báo được giữ 90 ngày.",
+    "statusLabel": "Trạng thái",
+    "filters": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "read": "Đã đọc"
+    },
+    "filteredEmpty": {
+      "unread": "Không có thông báo chưa đọc.",
+      "read": "Chưa có thông báo đã đọc.",
+      "kind": "Không có thông báo loại “{kind}”{state}"
+    },
+    "filteredHint": "Đổi bộ lọc để xem các thông báo khác.",
+    "clearFilters": "Bỏ bộ lọc",
+    "kindLabel": "Loại",
+    "kinds": {
+      "ticket": "Phiếu hỗ trợ",
+      "contest": "Kỳ thi",
+      "organization": "Tổ chức",
+      "other": "Khác"
+    },
+    "stateSuffix": {
+      "all": "",
+      "unread": " chưa đọc",
+      "read": " đã đọc"
+    },
+    "loadFailed": "Không tải được thông báo",
+    "impersonating": "Đang xem dưới tên người khác: thông báo không được đánh dấu đã đọc.",
+    "readAllDone": "Đã đánh dấu tất cả là đã đọc.",
+    "pager": "Các trang thông báo",
+    "arrived": "{count} thông báo mới",
+    "banner": {
+      "region": "Thông báo quan trọng",
+      "label": "Quan trọng · chưa đọc",
+      "open": "Xem",
+      "openTicket": "Xem phiếu",
+      "markRead": "Đánh dấu đã đọc"
+    },
+    "title": "Thông báo"
+  },
+  "officialMode": {
+    "pill": "Thi chính thức",
+    "region": "Chế độ thi chính thức",
+    "bannerTitle": "Chế độ thi chính thức đang bật.",
+    "bannerUntil": "Chế độ thi chính thức đến {until}",
+    "bannerBody": "Huy hiệu, tên hiển thị và tổ chức tạm khóa; phiếu hỗ trợ vẫn dùng được.",
+    "remaining": "còn {time}",
+    "today": "hôm nay",
+    "lockedUntil": "Bị khóa trong kỳ thi chính thức đến {until}.",
+    "exempt": "Tài khoản của bạn là quản trị viên tối cao nên không bị khóa.",
+    "locked": "Bị khóa trong kỳ thi chính thức.",
+    "lockedTitle": "Đang trong kỳ thi chính thức",
+    "lockedBody": "Thao tác này tạm khóa cho đến khi kỳ thi chính thức kết thúc. Phiếu hỗ trợ vẫn dùng được.",
+    "profileNote": "Trong kỳ thi chính thức, tên, phần giới thiệu và thứ tự tổ chức tạm khóa; các mục khác vẫn lưu được."
+  },
+  "ticketTimeline": {
+    "counts": "{messages} tin nhắn · {events} sự kiện",
+    "types": {
+      "closed": "{actor} đã đóng phiếu",
+      "reopened": "{actor} đã mở lại phiếu",
+      "assigned": "{actor} đã giao phiếu cho {target}",
+      "unassigned": "{actor} đã bỏ giao phiếu cho {target}",
+      "markedGood": "{actor} đã đánh dấu đóng góp tốt",
+      "unmarkedGood": "{actor} đã bỏ đánh dấu đóng góp tốt"
+    },
+    "group": "{count} sự kiện",
+    "range": "{from} – {to}",
+    "capTitle": "Chỉ hiện 200 sự kiện gần nhất",
+    "capBody": "Phiếu này có nhiều thay đổi; các sự kiện cũ hơn được lưu nhưng không hiện ở đây.",
+    "noMessagesAfterClose": "Phiếu không có tin nhắn mới sau khi đóng."
+  },
+  "cannedPicker": {
+    "open": "Mẫu trả lời",
+    "hint": "{'{'}tên{'}'} thành tên người tạo phiếu, {'{'}bài{'}'} thành tên bài.",
+    "empty": "Chưa có mẫu trả lời nào.",
+    "manage": "Quản lý mẫu trả lời",
+    "inserted": "Đã chèn mẫu “{title}”.",
+    "title": "Chọn mẫu trả lời"
+  },
+  "ticketAlerts": {
+    "region": "Phiếu cần xử lý",
+    "assignedOpen": "{count} phiếu đang mở giao cho bạn",
+    "awaitingStaff": "{count} phiếu đang chờ nhân viên trả lời",
+    "clear": "Không có phiếu nào đang chờ bạn.",
+    "viewAssigned": "Xem phiếu được giao",
+    "viewAwaiting": "Mở hàng đợi phiếu"
   }
 }

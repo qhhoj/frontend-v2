@@ -3,7 +3,7 @@ import { nextTick } from 'vue';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { announcement, contestDetail, contestStats, problemMeta } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { FakeEventSource, latestEventSource } from '@/test/fake-event-source';
+import { latestEventSource, pageStreams } from '@/test/fake-event-source';
 import { mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
@@ -99,7 +99,7 @@ describe('contest announcements', () => {
     );
     await wrapper.get('[data-testid="announcements-paused"] button').trigger('click');
     await flushPromises();
-    expect(FakeEventSource.instances).toHaveLength(2);
+    expect(pageStreams()).toHaveLength(2);
     expect(latestEventSource().closed).toBe(false);
     expect(wrapper.find('[data-testid="announcements-paused"]').exists()).toBe(false);
     expect(announcementCalls(calls)).toHaveLength(2);
@@ -116,7 +116,7 @@ describe('contest announcements', () => {
         'GET /problems/meta': ok(problemMeta()),
       });
       const { wrapper } = await mountApp(`/contests/r42/${tab}`);
-      expect(FakeEventSource.instances).toHaveLength(1);
+      expect(pageStreams()).toHaveLength(1);
       latestEventSource().fail();
       await flushPromises();
       expect(wrapper.get('[data-testid="announcements-paused"]').text()).toContain(
@@ -128,7 +128,7 @@ describe('contest announcements', () => {
   it('opens no stream for an ended contest', async () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail({ phase: 'ended' })) });
     await mountApp('/contests/r42');
-    expect(FakeEventSource.instances).toHaveLength(0);
+    expect(pageStreams()).toHaveLength(0);
   });
 
   it('reads a second announcement with the same title again', async () => {
@@ -190,7 +190,7 @@ describe('contest announcements', () => {
     await queryClient.invalidateQueries({ queryKey: ['contests', 'detail'] });
     await flushPromises();
     expect(stream.closed).toBe(true);
-    expect(FakeEventSource.instances).toHaveLength(1);
+    expect(pageStreams()).toHaveLength(1);
   });
 
   it('shows the announcements of the contest now open, with its own marks, when the key changes', async () => {

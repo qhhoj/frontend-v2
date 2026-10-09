@@ -226,6 +226,12 @@ export class FakeApi {
     'GET /submissions/:id/source': ({ params }) => ok({ id: params.id, source: 'int main() {}\n' }),
     'GET /events/submissions/:id': eventStream(),
     'GET /events/submissions': eventStream(),
+    // Plan F1: the shell's own reads on every signed-in public page; specs replace single keys.
+    'GET /site': ok({ navigation: [], config: {}, officialMode: false, officialModeEndsAt: null }),
+    'GET /notifications/unread-count': ok({ count: 0 }),
+    'GET /notifications': list([]),
+    'GET /events/user': eventStream(),
+    'GET /tickets/summary': ok({ assignedOpen: 0, awaitingStaff: 0 }),
   };
 
   /** Delays every answer to `key` ("GET /problems") until the returned function is called; teardown releases whatever is left. */

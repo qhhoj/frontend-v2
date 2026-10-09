@@ -42,4 +42,11 @@ export function installFakeEventSource() {
   vi.stubGlobal('EventSource', FakeEventSource);
 }
 
-export const latestEventSource = () => FakeEventSource.instances.at(-1)!;
+const USER_STREAM_SUFFIX = '/events/user';
+const isUserStream = (source: FakeEventSource) => source.url.endsWith(USER_STREAM_SUFFIX);
+/** Every stream but the bell's per-user one, which each signed-in public page holds: page tests count these. */
+export const pageStreams = () =>
+  FakeEventSource.instances.filter((source) => !isUserStream(source));
+/** The bell's newest `/events/user` stream, if one opened. */
+export const userStream = () => FakeEventSource.instances.filter(isUserStream).at(-1);
+export const latestEventSource = () => pageStreams().at(-1)!;

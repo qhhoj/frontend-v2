@@ -1,11 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from '@/stores/session.store';
-import {
-  FakeEventSource,
-  installFakeEventSource,
-  latestEventSource,
-} from '@/test/fake-event-source';
+import { installFakeEventSource, latestEventSource, pageStreams } from '@/test/fake-event-source';
 import { sessionUser, submissionCase, submissionDetail } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
@@ -155,7 +151,7 @@ describe('submission page', () => {
       ...problemPageRoutes(),
     });
     await openSubmission('sub-1');
-    expect(FakeEventSource.instances).toHaveLength(0);
+    expect(pageStreams()).toHaveLength(0);
     const pending = submissionDetail({
       status: 'PD',
       result: null,
@@ -165,7 +161,7 @@ describe('submission page', () => {
     });
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(pending), ...problemPageRoutes() });
     const { wrapper } = await openSubmission('sub-1');
-    expect(FakeEventSource.instances).toHaveLength(0);
+    expect(pageStreams()).toHaveLength(0);
     expect(wrapper.text()).toContain('Chờ chấm cuối kỳ thi');
     expect(wrapper.find('[data-testid="grading-line"]').exists()).toBe(false);
   });
@@ -337,7 +333,7 @@ describe('submission page', () => {
       expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(true),
     );
     await wrapper.get('[data-testid="stale-reload"] button').trigger('click');
-    await vi.waitFor(() => expect(FakeEventSource.instances).toHaveLength(2));
+    await vi.waitFor(() => expect(pageStreams()).toHaveLength(2));
     await vi.waitFor(() =>
       expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false),
     );
@@ -425,7 +421,7 @@ describe('submission page', () => {
     expect(firstStream.closed).toBe(true);
     expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
-    expect(FakeEventSource.instances).toHaveLength(1);
+    expect(pageStreams()).toHaveLength(1);
   });
 
   it('shows the verdict before the problem arrives and a skeleton in the points cell only', async () => {

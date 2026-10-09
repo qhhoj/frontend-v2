@@ -65,6 +65,7 @@ export const ADMIN_SCREENS = {
   },
   posts: { path: '/admin/posts', permission: 'judge.edit_all_post' },
   tickets: { path: '/admin/tickets', permission: 'judge.change_ticket' },
+  cannedReplies: { path: '/admin/tickets/canned', permission: 'judge.change_ticket' },
   activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },
   settings: { path: '/admin/settings', permission: 'judge.change_settings' },
   config: { path: '/admin/config', permission: 'judge.change_miscconfig' },

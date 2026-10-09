@@ -16,10 +16,12 @@ import type {
   OrganizationSummary,
 } from '../api/types/organizations';
 import type {
+  CannedReply,
   TicketDetail,
   TicketListItem,
   TicketMessage,
   TicketTimelineEntry,
+  TicketTimelineEvent,
 } from '../api/types/tickets';
 import type { ActivityResponse, PpEntry, SolvedResponse } from '../api/types/users';
 import { HOME_COUNTS, sessionUser } from './fixtures';
@@ -209,6 +211,33 @@ export const ticketDetail = (overrides: Partial<TicketDetail> = {}): TicketDetai
     ...overrides,
   };
 };
+
+export const timelineEvent = (
+  overrides: Partial<TicketTimelineEvent> = {},
+): TicketTimelineEvent => ({
+  id: communityId(821),
+  type: 'closed',
+  actor: ADMIN_USER,
+  target: null,
+  at: '2026-10-08T14:22:00Z',
+  ...overrides,
+});
+/** One event as a row of the thread's timeline. */
+export const eventEntry = (event: TicketTimelineEvent = timelineEvent()): TicketTimelineEntry => ({
+  kind: 'event',
+  at: event.at,
+  message: null,
+  event,
+});
+export const cannedReply = (overrides: Partial<CannedReply> = {}): CannedReply => ({
+  id: communityId(831),
+  title: 'Đã nhận phiếu',
+  body: 'Chào {tên}, cảm ơn bạn đã báo lỗi ở bài {bài}. Mình đang kiểm tra lại.',
+  order: 0,
+  createdAt: '2026-10-08T01:00:00Z',
+  updatedAt: '2026-10-08T01:00:00Z',
+  ...overrides,
+});
 
 export const homeResponse = (overrides: Partial<HomeResponse> = {}): HomeResponse => ({
   recentComments: [recentComment()],

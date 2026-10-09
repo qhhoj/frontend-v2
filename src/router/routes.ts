@@ -188,6 +188,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.ticket', requiresAuth: true },
   },
   {
+    path: '/notifications',
+    name: 'notifications',
+    component: PlaceholderPage,
+    meta: { titleKey: 'pages.notifications', requiresAuth: true },
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/features/auth/LoginPage.vue'),

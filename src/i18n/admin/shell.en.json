@@ -86,6 +86,7 @@
     "log": "Change log",
     "submissions": "Submissions",
     "languageNew": "Add language",
-    "languageEdit": "Edit language"
+    "languageEdit": "Edit language",
+    "cannedReplies": "Ticket reply templates"
   }
 }

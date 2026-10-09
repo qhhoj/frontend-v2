@@ -46,7 +46,8 @@
     "tickets": "Support tickets",
     "ticketNew": "New ticket",
     "ticket": "Ticket",
-    "flatpage": "Page"
+    "flatpage": "Page",
+    "notifications": "Notifications"
   },
   "contests": {
     "title": "Contests",
@@ -322,7 +323,10 @@
       "deviceOnly": "Saved on this device",
       "deviceOnlyNote": "The interface language applies to this browser only and is not saved to the account."
     },
-    "locales": { "vi": "Tiếng Việt", "en": "English" },
+    "locales": {
+      "vi": "Tiếng Việt",
+      "en": "English"
+    },
     "organizations": {
       "title": "Organizations",
       "lead": "Reorder or leave the organizations you belong to. The first one shows beside your name (usually your school). To join more, open the organization pages.",
@@ -343,7 +347,10 @@
       "saved": "Profile saved.",
       "firstNameHint": "Shown on your profile page, the rankings and comments. The username {username} cannot change.",
       "aboutViews": "About text views",
-      "aboutTab": { "write": "Write", "saved": "Saved version" },
+      "aboutTab": {
+        "write": "Write",
+        "saved": "Saved version"
+      },
       "aboutHelp": "Markdown is supported. The server renders the saved text, so “Saved version” changes only after you save.",
       "aboutEmpty": "No about text yet.",
       "noChanges": "No unsaved changes.",
@@ -373,7 +380,8 @@
       "invalidSummary": "Not saved. Fix {count} field(s): {names}. Your other changes are still on this page.",
       "locked": "The name or about text cannot be saved: the account must solve more problems before editing its profile, or the official contest locks profiles.",
       "organizationsChanged": "The organization list was not saved. Either you are an admin of an organization you tried to leave, or your organizations changed meanwhile. The list was reloaded from the server: every organization it still lists is shown again, including any you removed. Check the organizations, redo your changes if needed, and save again.",
-      "offline": "Connection lost. The changes were not sent; check the network and try again."
+      "offline": "Connection lost. The changes were not sent; check the network and try again.",
+      "lockedOfficial": "Not saved: the official contest locks organization order and leaving."
     },
     "data": {
       "title": "Export your data",
@@ -793,7 +801,8 @@
     "not_registered": "You are not registered for this contest.",
     "access_code_required": "An access code is required. Enter the organizers' code and try again.",
     "wrong_access_code": "Wrong access code. Check it with the organizers and try again.",
-    "not_in_contest": "You are not in this contest."
+    "not_in_contest": "You are not in this contest.",
+    "locked_in_official_contest": "This action is locked during the official contest."
   },
   "common": {
     "retry": "Retry",
@@ -1575,5 +1584,111 @@
     "signInBody": "This page is for signed-in members.",
     "signIn": "Sign in",
     "title": "Page"
+  },
+  "notifications": {
+    "bell": "Notifications",
+    "bellWithCount": "Notifications, {count} unread",
+    "drawerTitle": "Notifications",
+    "unreadCount": "{count} unread",
+    "readAll": "Read all",
+    "readAllLong": "Mark all as read",
+    "markRead": "Mark as read: {title}",
+    "seeAll": "See all notifications",
+    "today": "Today",
+    "earlier": "Earlier",
+    "important": "Important",
+    "merged": "{count} new",
+    "unread": "Unread",
+    "staleTitle": "Old notification",
+    "staleBody": "This content is no longer open to you.",
+    "staleOpened": "This notification points to content you can no longer open, so it was marked as read.",
+    "empty": "No notifications yet.",
+    "emptyBody": "You are all caught up.",
+    "lead": "Tickets, contests and organizations tell you about news here. Notifications are kept for 90 days.",
+    "statusLabel": "Status",
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "filteredEmpty": {
+      "unread": "No unread notifications.",
+      "read": "No read notifications yet.",
+      "kind": "No “{kind}” notifications{state}"
+    },
+    "filteredHint": "Change the filter to see other notifications.",
+    "clearFilters": "Clear filters",
+    "kindLabel": "Type",
+    "kinds": {
+      "ticket": "Tickets",
+      "contest": "Contests",
+      "organization": "Organizations",
+      "other": "Other"
+    },
+    "stateSuffix": {
+      "all": "",
+      "unread": " unread",
+      "read": " read"
+    },
+    "loadFailed": "Could not load notifications",
+    "impersonating": "Viewing as another user: notifications are not marked as read.",
+    "readAllDone": "Everything is marked as read.",
+    "pager": "Notification pages",
+    "arrived": "{count} new notifications",
+    "banner": {
+      "region": "Important notification",
+      "label": "Important · unread",
+      "open": "Open",
+      "openTicket": "Open ticket",
+      "markRead": "Mark as read"
+    },
+    "title": "Notifications"
+  },
+  "officialMode": {
+    "pill": "Official contest",
+    "region": "Official contest mode",
+    "bannerTitle": "Official contest mode is on.",
+    "bannerUntil": "Official contest mode until {until}",
+    "bannerBody": "Badges, display names and organizations are locked; tickets still work.",
+    "remaining": "{time} left",
+    "today": "today",
+    "lockedUntil": "Locked during the official contest until {until}.",
+    "exempt": "Your account is a superuser, so nothing is locked for you.",
+    "locked": "Locked during the official contest.",
+    "lockedTitle": "Official contest in progress",
+    "lockedBody": "This action is locked until the official contest ends. Tickets still work.",
+    "profileNote": "During the official contest your name, about text and organization order are locked; everything else still saves."
+  },
+  "ticketTimeline": {
+    "counts": "{messages} messages · {events} events",
+    "types": {
+      "closed": "{actor} closed the ticket",
+      "reopened": "{actor} reopened the ticket",
+      "assigned": "{actor} assigned the ticket to {target}",
+      "unassigned": "{actor} unassigned {target}",
+      "markedGood": "{actor} marked it a good contribution",
+      "unmarkedGood": "{actor} unmarked it as a good contribution"
+    },
+    "group": "{count} events",
+    "range": "{from} – {to}",
+    "capTitle": "Only the latest 200 events are shown",
+    "capBody": "This ticket changed many times; older events are stored but not shown here.",
+    "noMessagesAfterClose": "No new messages since the ticket was closed."
+  },
+  "cannedPicker": {
+    "open": "Reply templates",
+    "hint": "{'{'}tên{'}'} becomes the ticket author's name, {'{'}bài{'}'} the problem name.",
+    "empty": "No reply templates yet.",
+    "manage": "Manage reply templates",
+    "inserted": "Inserted the template “{title}”.",
+    "title": "Choose a reply template"
+  },
+  "ticketAlerts": {
+    "region": "Tickets that need you",
+    "assignedOpen": "{count} open tickets assigned to you",
+    "awaitingStaff": "{count} tickets waiting for a staff reply",
+    "clear": "No ticket is waiting for you.",
+    "viewAssigned": "See assigned tickets",
+    "viewAwaiting": "Open the ticket queue"
   }
 }

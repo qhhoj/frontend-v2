@@ -15,6 +15,25 @@ export interface ApiCall {
 }
 export type MockHandler = MockResponse | ((call: ApiCall) => MockResponse);
 
+/**
+ * The shell's own reads on every signed-in page (bell, high-priority banner, official mode, ticket alerts). A test that does
+ * not route them gets these answers, and the calls are not recorded, so `calls` stays the page's own; route one to test it.
+ */
+export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
+  'GET /site': {
+    body: { data: { navigation: [], config: {}, officialMode: false, officialModeEndsAt: null } },
+  },
+  'GET /notifications/unread-count': { body: { data: { count: 0 } } },
+  'GET /notifications': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
+  'GET /tickets/summary': { body: { data: { assignedOpen: 0, awaitingStaff: 0 } } },
+};
+
+const responseOf = ({ status = 200, body, headers }: MockResponse) =>
+  new Response(body === undefined ? null : JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...headers },
+  });
+
 let unmatched: string[] = [];
 /** Requests no route answered since the last call; `setup.ts` fails the test when any exist. */
 export const takeUnmatchedRequests = () => {
@@ -42,8 +61,11 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
               : undefined,
         headers: new Headers(init.headers),
       };
+      const key = `${call.method} ${call.path}`;
+      const shellDefault = routes[key] ? undefined : SHELL_DEFAULTS[key];
+      if (shellDefault) return Promise.resolve(responseOf(shellDefault));
       calls.push(call);
-      const handler = routes[`${call.method} ${call.path}`];
+      const handler = routes[key];
       if (!handler) {
         unmatched.push(`${call.method} ${url.pathname}${url.search}`);
         return Promise.resolve(
@@ -52,17 +74,7 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
           }),
         );
       }
-      const {
-        status = 200,
-        body,
-        headers,
-      } = typeof handler === 'function' ? handler(call) : handler;
-      return Promise.resolve(
-        new Response(body === undefined ? null : JSON.stringify(body), {
-          status,
-          headers: { 'Content-Type': 'application/json', ...headers },
-        }),
-      );
+      return Promise.resolve(responseOf(typeof handler === 'function' ? handler(call) : handler));
     }),
   );
   return calls;
