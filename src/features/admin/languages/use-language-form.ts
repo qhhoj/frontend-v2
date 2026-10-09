@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { createLanguage, updateLanguage } from '@/api/languages-admin.api';
 import type { LanguageAdmin } from '@/api/types/languages-admin';
 import { translate } from '@/i18n';
+import { isConflict } from '../ui/admin-errors';
 import type { FieldErrors } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { languagesAdminKey } from './languages.queries';
@@ -40,7 +41,7 @@ type LanguageSave = ReturnType<typeof useLanguageSave>;
 
 /** A taken key is the only 409 this form can get: say it in the SPA's words, under the key box. */
 function serverErrorsOf(save: LanguageSave): FieldErrors {
-  if (save.failure.value?.code !== 'conflict') return save.fieldErrors.value;
+  if (!isConflict(save.failure.value)) return save.fieldErrors.value;
   return { ...save.fieldErrors.value, key: translate('admin.languages.form.errors.keyTaken') };
 }
 

@@ -7,7 +7,7 @@ import { banUser } from '@/api/users.api';
 import { unbanUser } from '@/api/users-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import { failureTextOf } from '../ui/admin-errors';
+import { failureTextOf, isConflict } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -43,14 +43,12 @@ const reasonError = computed(
 const banRefusal = computed(() => {
   const error = ban.failure.value;
   if (error === null || Object.keys(ban.fieldErrors.value).length > 0) return null;
-  return error.code === 'conflict'
-    ? t('admin.users.moderation.alreadyBanned')
-    : failureTextOf(error);
+  return isConflict(error) ? t('admin.users.moderation.alreadyBanned') : failureTextOf(error);
 });
 const unbanRefusal = computed(() => {
   const error = unban.failure.value;
   if (error === null) return null;
-  return error.code === 'conflict' ? t('admin.users.moderation.notBanned') : failureTextOf(error);
+  return isConflict(error) ? t('admin.users.moderation.notBanned') : failureTextOf(error);
 });
 
 const banReasonText = (problem: 'required' | 'tooLong') =>

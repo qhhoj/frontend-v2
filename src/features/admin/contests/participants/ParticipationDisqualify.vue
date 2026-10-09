@@ -31,10 +31,12 @@ const invalidate = (): AdminQueryKey[] => [
   ['contests', 'ranking'],
 ];
 
+const statusCell = () => document.getElementById(`participation-status-${props.participation.id}`);
+
 /** After a row changes, focus moves to its status cell: the button that had focus is gone by then. */
 async function focusStatusCell() {
   await nextTick();
-  document.getElementById(`participation-status-${props.participation.id}`)?.focus();
+  statusCell()?.focus();
 }
 
 const disqualify = useAdminMutation({
@@ -42,7 +44,6 @@ const disqualify = useAdminMutation({
   invalidates: invalidate,
   onDone: () => {
     isOpen.value = false;
-    void focusStatusCell();
   },
 });
 const restore = useAdminMutation({
@@ -74,6 +75,7 @@ const restore = useAdminMutation({
 
     <ConfirmDialog
       v-model:visible="isOpen"
+      :return-focus-to="statusCell"
       :title="
         $t('admin.contests.participants.disqualifyTitle', { username: participation.user.username })
       "

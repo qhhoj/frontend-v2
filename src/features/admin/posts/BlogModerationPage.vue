@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
-import { computed, nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { PostListItem } from '@/api/types/blog';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
@@ -30,10 +30,11 @@ const TAB =
   'inline-flex min-h-11 items-center gap-2 rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
 const feedNav = ref<HTMLElement | null>(null);
 
-/** A moderated post leaves its row (the dialog's opener); the open feed's tab is the stable place left. */
-function focusCurrentFeed() {
-  void nextTick(() => feedNav.value?.querySelector<HTMLElement>('[aria-current="page"]')?.focus());
-}
+/** A moderated post leaves its row (the dialog's opener); the open feed's tab is the stable place left. A refused change keeps its row and the usual return. */
+const focusCurrentFeed = () =>
+  lastChange.value === null
+    ? null
+    : feedNav.value?.querySelector<HTMLElement>('[aria-current="page"]');
 
 const visibility = usePostVisibility();
 /** The hidden queue's total, on every tab: the same cache entry as the list when that tab is open. */
@@ -77,7 +78,6 @@ async function confirmHide() {
   isHideOpen.value = false;
   if (done !== undefined) {
     lastChange.value = 'hidden';
-    focusCurrentFeed();
     return;
   }
   rowFailure.value = visibility.failure.value && {
@@ -94,7 +94,6 @@ async function confirmUnhide() {
   if (done === undefined) return;
   isUnhideOpen.value = false;
   lastChange.value = 'shown';
-  focusCurrentFeed();
 }
 </script>
 
@@ -161,6 +160,7 @@ async function confirmUnhide() {
 
     <ConfirmDialog
       v-model:visible="isHideOpen"
+      :return-focus-to="focusCurrentFeed"
       tone="danger"
       :title="$t('admin.posts.hide.title', { title: hidingPost?.title ?? '' })"
       :body="$t('admin.posts.hide.body')"
@@ -171,6 +171,7 @@ async function confirmUnhide() {
     <UnhideDialog
       v-if="unhidingPost"
       v-model:visible="isUnhideOpen"
+      :return-focus-to="focusCurrentFeed"
       :post="unhidingPost"
       :busy="visibility.pendingId.value === unhidingPost.id"
       :failure="unhideFailureText"

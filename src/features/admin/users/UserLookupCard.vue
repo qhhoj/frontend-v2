@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { ApiError } from '@/api/client';
 import CopyButton from '@/components/CopyButton.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatDate } from '@/lib/format';
@@ -13,15 +12,14 @@ import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import ImpersonateDialog from './ImpersonateDialog.vue';
 import UserModerationPanel from './UserModerationPanel.vue';
 import { canImpersonate } from './users-list';
+import { isNotFound } from '../ui/admin-errors';
 
 const props = defineProps<{ username: string }>();
 const locale = useLocaleStore();
 const { can, isSuperuser } = usePermissions();
 const query = useUserPageQuery(() => props.username);
 const user = computed(() => query.data.value);
-const isNotFound = computed(
-  () => query.error.value instanceof ApiError && query.error.value.status === 404,
-);
+const isMissing = computed(() => isNotFound(query.error.value));
 /** Moderation needs the backend permission and the staff facts it sends only to its holders. */
 const canModerate = computed(() => can('judge.ban_user') && Boolean(user.value?.staff));
 const showImpersonate = computed(
@@ -32,7 +30,7 @@ const isImpersonateOpen = ref(false);
 
 <template>
   <section
-    v-if="isNotFound"
+    v-if="isMissing"
     class="glass rounded-panel p-5"
     :aria-label="$t('admin.users.card.label')"
   >

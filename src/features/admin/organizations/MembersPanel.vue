@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -25,6 +25,8 @@ const members = useMembersQuery(
 
 const isDialogOpen = ref(false);
 const section = ref<HTMLElement | null>(null);
+/** The kicked member's row held the opener; the panel is the stable place left. */
+const focusPanel = () => section.value;
 const target = ref<OrganizationMember | null>(null);
 const kick = useOrganizationWrite<OrganizationMember, void>({
   mutate: (member) => kickMember(props.slug, member.id),
@@ -48,8 +50,6 @@ async function confirmKick() {
   const isKicked = await kick.run(target.value);
   if (!isKicked) return;
   isDialogOpen.value = false;
-  // The kicked member's row held the opener; the panel is the stable place left.
-  void nextTick(() => section.value?.focus());
 }
 </script>
 
@@ -96,6 +96,7 @@ async function confirmKick() {
     </SettingsCard>
     <ConfirmDialog
       v-model:visible="isDialogOpen"
+      :return-focus-to="focusPanel"
       :title="
         $t('admin.organizations.members.kickTitle', {
           username: target?.username ?? '',

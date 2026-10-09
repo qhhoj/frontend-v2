@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="Chip extends { id: string }">
 import { computed, ref, useId } from 'vue';
-import { ApiError } from '@/api/client';
-import { failureTextOf } from './admin-errors';
+import { failureTextOf, isNotFound } from './admin-errors';
 import { X } from 'lucide-vue-next';
 import { ADMIN_INPUT_CLASS } from './classes';
 
@@ -23,7 +22,7 @@ const id = useId();
 
 /** Only a real `not_found` says the account or organization does not exist; a network drop or a 429 says its own thing. */
 function lookupFailureText(error: unknown, typed: string): string {
-  if (error instanceof ApiError && error.code === 'not_found') return props.noSuchText(typed);
+  if (isNotFound(error)) return props.noSuchText(typed);
   return failureTextOf(error);
 }
 const typed = ref('');

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { failureTextOf, fieldErrorsOf } from './admin-errors';
+import { failureTextOf, fieldErrorsOf, isConflict, isNotFound } from './admin-errors';
 
 describe('fieldErrorsOf', () => {
   it('turns issues into one text per field, with the SPA text when it has one', () => {
@@ -54,4 +54,34 @@ describe('fieldErrorsOf', () => {
       expect(fieldErrorsOf(error).x).not.toBe('x must be something');
     },
   );
+});
+
+describe('isNotFound', () => {
+  it('is true for the backend not_found code, which every record 404 carries', () => {
+    expect(isNotFound(new ApiError('not_found', 404, 'No such problem'))).toBe(true);
+  });
+
+  it('is false for a 404 that is not a missing record, for other statuses and for non-API errors', () => {
+    expect(isNotFound(new ApiError('not_in_contest', 404, 'You are not in this contest.'))).toBe(
+      false,
+    );
+    expect(isNotFound(new ApiError('forbidden', 403, 'No'))).toBe(false);
+    expect(isNotFound(new ApiError('network_error', 0, 'Network error'))).toBe(false);
+    expect(isNotFound(new Error('not_found'))).toBe(false);
+    expect(isNotFound(null)).toBe(false);
+  });
+});
+
+describe('isConflict', () => {
+  it('is true for a 409 whatever its code, since participation refusals use their own codes', () => {
+    expect(isConflict(new ApiError('conflict', 409, 'A page with this url exists'))).toBe(true);
+    expect(isConflict(new ApiError('already_registered', 409, 'Registered'))).toBe(true);
+  });
+
+  it('is false for other statuses and for non-API errors', () => {
+    expect(isConflict(new ApiError('not_found', 404, 'No'))).toBe(false);
+    expect(isConflict(new ApiError('conflict', 400, 'Odd'))).toBe(false);
+    expect(isConflict(new Error('409'))).toBe(false);
+    expect(isConflict(undefined)).toBe(false);
+  });
 });

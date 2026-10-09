@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
-import { ApiError } from '@/api/client';
 import { deleteNavItem } from '@/api/site-admin.api';
 import type { NavigationItem } from '@/api/types/site-admin';
 import { translate } from '@/i18n';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { failureTextOf } from '../ui/admin-errors';
+import { failureTextOf, isConflict } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import NavItemDialog from './NavItemDialog.vue';
@@ -38,9 +37,7 @@ const remove = useAdminMutation({
 
 /** A refused delete of an entry with children says why; any other failure reads as usual. */
 const refusalText = (error: unknown) =>
-  error instanceof ApiError && error.code === 'conflict'
-    ? translate('admin.site.nav.hasChildren')
-    : failureTextOf(error);
+  isConflict(error) ? translate('admin.site.nav.hasChildren') : failureTextOf(error);
 
 function openEditor(item: NavigationItem | null) {
   editingItem.value = item;
@@ -54,6 +51,9 @@ function askDelete(item: NavigationItem) {
   isDeleteOpen.value = true;
 }
 
+/** A deleted row held the opener, so the add button is the stable place left; a refused delete keeps its row and the usual return. */
+const focusAfterDelete = () => (refusedId.value === null ? addButton.value : null);
+
 async function confirmDelete() {
   const target = deleteTarget.value;
   if (!target) return;
@@ -62,8 +62,6 @@ async function confirmDelete() {
   if (remove.failure.value) refusedId.value = target.id;
   else {
     savedText.value = translate('admin.site.nav.deleted', { label: target.label });
-    // The deleted row held the opener; the add button is the stable place left.
-    void nextTick(() => addButton.value?.focus());
   }
 }
 
@@ -193,6 +191,7 @@ const parentLabelOf = (item: NavigationItem) =>
 
     <ConfirmDialog
       v-model:visible="isDeleteOpen"
+      :return-focus-to="focusAfterDelete"
       tone="danger"
       :title="$t('admin.site.nav.deleteTitle', { label: deleteTarget?.label ?? '' })"
       :body="$t('admin.site.nav.deleteBody')"

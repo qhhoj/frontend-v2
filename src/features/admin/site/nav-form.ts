@@ -1,7 +1,7 @@
 import { ApiError } from '@/api/client';
 import type { NavigationBody, NavigationItem } from '@/api/types/site-admin';
 import { translate } from '@/i18n';
-import { adminIssueText, fieldErrorsOf } from '../ui/admin-errors';
+import { adminIssueText, fieldErrorsOf, isConflict } from '../ui/admin-errors';
 import type { FieldErrors } from '../ui/admin-errors';
 import { isSafePath, regexProblem } from './nav-tree';
 
@@ -118,7 +118,7 @@ const ISSUE_FIELDS: Record<string, { field: keyof NavForm; message: string }> = 
 /** A refused save as field texts: issue codes by lookup, a duplicate key (409 `fields.key`) as "Khoá đã có.". */
 export function navIssueTexts(error: unknown): FieldErrors {
   if (!(error instanceof ApiError)) return {};
-  if (error.status === 409 && 'key' in error.fields)
+  if (isConflict(error) && 'key' in error.fields)
     return { key: translate('admin.site.nav.issues.keyTaken') };
   if (error.issues.length > 0) {
     const texts: FieldErrors = {};

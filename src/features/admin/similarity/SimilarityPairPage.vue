@@ -12,8 +12,8 @@ import { shortId } from '../ui/short-id';
 import FragmentList from './FragmentList.vue';
 import PairSourcePane from './PairSourcePane.vue';
 import { fragmentOfLine, lineIdOf, percentText } from './similarity-pairs';
-import { isNotFound } from './similarity-runs';
 import { useSimilarityPairQuery } from './similarity.queries';
+import { isNotFound } from '../ui/admin-errors';
 
 const route = useRoute();
 const locale = useLocaleStore();

@@ -37,3 +37,14 @@ export function failureTextOf(error: unknown): string {
   if (seconds === null) return text;
   return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds })}`;
 }
+
+/**
+ * The record does not exist. Every backend 404 carries code `not_found` (AppError and the filter's HttpException map)
+ * except the participation refusal `not_in_contest`, which is not a missing record; so the code decides, not the status.
+ */
+export const isNotFound = (error: unknown): error is ApiError =>
+  error instanceof ApiError && error.code === 'not_found';
+
+/** The write clashes with the stored state. Every backend 409 is a conflict, whatever its own code, so the status decides. */
+export const isConflict = (error: unknown): error is ApiError =>
+  error instanceof ApiError && error.status === 409;

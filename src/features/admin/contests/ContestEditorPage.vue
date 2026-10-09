@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
@@ -12,14 +11,13 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import { useEditableContestQuery } from './contest-editing.queries';
 import { CONTEST_TABS, contestTabComponent, contestTabOf } from './contest-tabs';
+import { isNotFound } from '../ui/admin-errors';
 
 const route = useRoute();
 const locale = useLocaleStore();
 const key = computed(() => String(route.params.key));
 const { data: contest, error, isPending, refetch } = useEditableContestQuery(key);
-const isNotFound = computed(
-  () => error.value instanceof ApiError && error.value.code === 'not_found',
-);
+const isMissing = computed(() => isNotFound(error.value));
 const isEditable = computed(() =>
   Boolean(contest.value?.viewer.canEdit && contest.value.settings !== null),
 );
@@ -41,7 +39,7 @@ const summaryLine = computed(() => {
 </script>
 
 <template>
-  <QueryState :loading="isPending" :error="isNotFound ? null : error" @retry="refetch()">
+  <QueryState :loading="isPending" :error="isMissing ? null : error" @retry="refetch()">
     <template #skeleton>
       <div class="flex flex-col gap-4 px-4 py-6 sm:px-8">
         <SkeletonBlock
@@ -51,7 +49,7 @@ const summaryLine = computed(() => {
         <SkeletonBlock data-skeleton-region="contest-editor-body" class="h-64 w-full" />
       </div>
     </template>
-    <p v-if="isNotFound" class="px-4 py-6 sm:px-8">{{ $t('admin.contests.notFound', { key }) }}</p>
+    <p v-if="isMissing" class="px-4 py-6 sm:px-8">{{ $t('admin.contests.notFound', { key }) }}</p>
     <div v-else-if="contest" class="flex flex-col gap-6 px-4 py-6 sm:px-8">
       <AdminPageHeader
         :crumbs="[

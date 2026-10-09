@@ -222,6 +222,42 @@ describe('BlogModerationPage unhide', () => {
     );
   });
 
+  it('moves focus to the open feed tab after a post is hidden', async () => {
+    mockApi({
+      ...staffViewer(PERMS),
+      'GET /posts': page([postItem({ id: 'p-2', title: 'Bán tài khoản VIP' })]),
+      'GET /admin/posts': page([]),
+      'PATCH /posts/p-2': ok({}),
+    });
+    const { wrapper } = await mountModeration('/admin/posts');
+    await rowButton(wrapper, 'Ẩn bài').trigger('click');
+    await flushPromises();
+    await confirmDialog('Ẩn bài');
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(
+        wrapper.get('nav[aria-label="Danh sách bài viết"] a[aria-current="page"]').element,
+      ),
+    );
+  });
+
+  it('does not pull focus to the feed tab when the hide is refused and the row stays', async () => {
+    mockApi({
+      ...staffViewer(PERMS),
+      'GET /posts': page([postItem({ id: 'p-2', title: 'Bán tài khoản VIP' })]),
+      'GET /admin/posts': page([]),
+      'PATCH /posts/p-2': fail(403, 'forbidden'),
+    });
+    const { wrapper } = await mountModeration('/admin/posts');
+    await rowButton(wrapper, 'Ẩn bài').trigger('click');
+    await flushPromises();
+    await confirmDialog('Ẩn bài');
+    await flushPromises();
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền làm việc này.'));
+    expect(document.activeElement).not.toBe(
+      wrapper.get('nav[aria-label="Danh sách bài viết"] a[aria-current="page"]').element,
+    );
+  });
+
   it('cancelling the confirm sends nothing', async () => {
     const calls = mockApi(hiddenRoutes());
     const { wrapper } = await mountModeration('/admin/posts?feed=hidden');

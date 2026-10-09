@@ -1,16 +1,14 @@
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchProblem } from '@/api/problems.api';
-import { ApiError } from '@/api/client';
 import type { ProblemDetail } from '@/api/types/problems';
 import { translate } from '@/i18n';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureTextOf, isNotFound } from '../../ui/admin-errors';
 import { MAX_CONTEST_PROBLEMS, newProblemRow } from './contest-problems';
 import type { ProblemRow } from './contest-problems';
 
 function lookupFailureText(error: unknown, code: string): string {
-  if (error instanceof ApiError && error.code === 'not_found')
-    return translate('admin.contests.problems.notFound', { code });
+  if (isNotFound(error)) return translate('admin.contests.problems.notFound', { code });
   return failureTextOf(error);
 }
 

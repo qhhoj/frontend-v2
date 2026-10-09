@@ -1,5 +1,4 @@
 import type { LocationQuery, LocationQueryValue } from 'vue-router';
-import { ApiError } from '@/api/client';
 import type {
   SimilarityGroup,
   SimilarityRun,
@@ -55,9 +54,6 @@ export const activeRunOf = (runs: SimilarityRun[]): SimilarityRun | null =>
 
 export const truncatedGroups = (run: SimilarityRun): SimilarityGroup[] =>
   run.groups.filter((group) => group.truncated);
-
-export const isNotFound = (error: unknown): boolean =>
-  error instanceof ApiError && error.status === 404;
 
 export type WaitUnit = 'seconds' | 'minutes' | 'hours';
 

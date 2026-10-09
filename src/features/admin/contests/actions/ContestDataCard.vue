@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
-import { ApiError } from '@/api/client';
 import { contestDataDownloadUrl, fetchContestData } from '@/api/contest-editing.api';
 import QueryState from '@/components/QueryState.vue';
 import { formatDateTime, formatFileSize } from '@/lib/format';
@@ -11,6 +10,7 @@ import AdminBit from '../../shell/AdminBit.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { canPrepareAgain } from './contest-actions';
 import PrepareDataDialog from './PrepareDataDialog.vue';
+import { isNotFound } from '../../ui/admin-errors';
 
 const props = defineProps<{ contestKey: string; isEnded: boolean }>();
 const locale = useLocaleStore();
@@ -34,9 +34,7 @@ const mayPrepare = computed(() =>
   status.value ? canPrepareAgain(status.value, now.value) : false,
 );
 /** A 404 means this install has no export root. */
-const isNotConfigured = computed(
-  () => error.value instanceof ApiError && error.value.status === 404,
-);
+const isNotConfigured = computed(() => isNotFound(error.value));
 const isReady = computed(() => status.value?.state === 'ready');
 </script>
 

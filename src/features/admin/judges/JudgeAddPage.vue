@@ -3,12 +3,11 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { createJudge } from '@/api/judges-admin.api';
 import type { Judge } from '@/api/types/judges-admin';
-import { ApiError } from '@/api/client';
 import { useI18n } from 'vue-i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { failureTextOf } from '../ui/admin-errors';
+import { failureTextOf, isConflict } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import JudgeKeyDialog from './JudgeKeyDialog.vue';
@@ -35,7 +34,7 @@ const create = useAdminMutation<
 /** The backend answers a taken name with 409 `conflict` and `fields.name`; the page names it in the SPA's words. */
 const isNameTaken = computed(() => {
   const failure = create.failure.value;
-  return failure instanceof ApiError && failure.code === 'conflict' && 'name' in failure.fields;
+  return isConflict(failure) && 'name' in failure.fields;
 });
 const nameError = computed(() => {
   if (clientNameError.value) return clientNameError.value;

@@ -13,13 +13,8 @@ import SimilarityScopeForm from './SimilarityScopeForm.vue';
 import SimilarityStartResult from './SimilarityStartResult.vue';
 import { useStartSimilarityRun } from './similarity.mutations';
 import { useSimilarityRunQuery, useSimilarityRunsQuery } from './similarity.queries';
-import {
-  activeRunOf,
-  isNotFound,
-  runIdFromQuery,
-  scopeFromQuery,
-  scopeQuery,
-} from './similarity-runs';
+import { activeRunOf, runIdFromQuery, scopeFromQuery, scopeQuery } from './similarity-runs';
+import { isNotFound } from '../ui/admin-errors';
 
 const route = useRoute();
 const router = useRouter();

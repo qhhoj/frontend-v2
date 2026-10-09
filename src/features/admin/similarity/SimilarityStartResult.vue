@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import type { ApiError } from '@/api/client';
-import { failureTextOf } from '../ui/admin-errors';
+import { failureTextOf, isConflict } from '../ui/admin-errors';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { waitParts } from './similarity-runs';
 
@@ -16,7 +16,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const isConflict = computed(() => props.failure?.status === 409);
+const isRefused = computed(() => isConflict(props.failure));
 const isRateLimited = computed(() => props.failure?.status === 429);
 
 /** The wait the server named in `Retry-After`; without the header no countdown is invented. */
@@ -35,7 +35,7 @@ const rateLimitText = computed(() => {
 
 <template>
   <AdminStatus v-if="isDone" kind="queued" :text="$t('admin.similarity.start.queued')" />
-  <AdminStatus v-else-if="isConflict" kind="refused" :text="$t('admin.similarity.start.conflict')">
+  <AdminStatus v-else-if="isRefused" kind="refused" :text="$t('admin.similarity.start.conflict')">
     <RouterLink v-if="runningTo" :to="runningTo" class="min-h-11 font-semibold underline">
       {{ $t('admin.similarity.start.openRunning') }}
     </RouterLink>

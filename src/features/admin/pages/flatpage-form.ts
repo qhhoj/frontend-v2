@@ -1,6 +1,7 @@
 import type { FlatpageBody } from '@/api/types/flatpages-admin';
 import { ApiError } from '@/api/client';
 import { translate } from '@/i18n';
+import { isConflict } from '../ui/admin-errors';
 import type { FieldErrors } from '../ui/admin-errors';
 
 const URL_CHARSET = /^[-\p{L}\p{N}_/.~]+$/u;
@@ -45,8 +46,7 @@ export function changedFlatpageFields(
 /** The URL's own refusals from the server, under the URL box: a taken URL (409 `fields.url`) or the `invalid_url` issue. */
 export function serverUrlError(error: unknown, url: string): string | null {
   if (!(error instanceof ApiError)) return null;
-  if (error.status === 409 && error.fields.url)
-    return translate('admin.pages.errors.taken', { url });
+  if (isConflict(error) && error.fields.url) return translate('admin.pages.errors.taken', { url });
   if (error.issues.some((issue) => issue.field === 'url' && issue.code === 'invalid_url'))
     return translate('admin.pages.errors.url');
   return null;

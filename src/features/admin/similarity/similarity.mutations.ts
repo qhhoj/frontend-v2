@@ -3,10 +3,9 @@ import { toValue, watch } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { startSimilarityRun } from '@/api/similarity.api';
 import type { SimilarityScope } from '@/api/types/similarity';
+import { isConflict } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { similarityRunsKey } from './similarity.queries';
-
-const HTTP_CONFLICT = 409;
 
 /**
  * Starts a run of the scope the URL names. A started run refreshes that scope's list; a 409 refreshes it too, because the
@@ -24,7 +23,7 @@ export const useStartSimilarityRun = (scope: MaybeRefOrGetter<SimilarityScope | 
     const target = toValue(scope);
     if (!target) return undefined;
     const result = await start.run(target);
-    if (start.failure.value?.status === HTTP_CONFLICT) {
+    if (isConflict(start.failure.value)) {
       await queryClient.invalidateQueries({ queryKey: similarityRunsKey(target) });
     }
     return result;
