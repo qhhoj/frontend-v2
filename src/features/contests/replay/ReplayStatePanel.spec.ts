@@ -13,7 +13,7 @@ const panel = async (state: ReplayPanelState) => {
 describe('ReplayStatePanel', () => {
   it.each([
     ['building', 'judging', 'Đang dựng bản phát lại…', 'status'],
-    ['notReady', 'asleep', 'Bản phát lại chưa sẵn sàng', undefined],
+    ['notReady', 'asleep', 'Bản phát lại chưa sẵn sàng', 'status'],
     ['notEnded', 'contest', 'Kỳ thi chưa kết thúc', undefined],
     ['unsupported', 'sweat', 'Không hỗ trợ cho định dạng này', undefined],
     ['frozen', 'security', 'Bảng đang đóng băng', 'alert'],
@@ -30,12 +30,18 @@ describe('ReplayStatePanel', () => {
     },
   );
 
-  it('offers a retry on an error and nowhere else', async () => {
-    const wrapper = await panel('error');
+  it.each(['error', 'notReady'] as const)('offers a retry on %s', async (state) => {
+    const wrapper = await panel(state);
     await wrapper.get('button').trigger('click');
     expect(wrapper.emitted('retry')).toHaveLength(1);
-    expect((await panel('building')).find('button').exists()).toBe(false);
   });
+
+  it.each(['building', 'notEnded', 'unsupported', 'frozen', 'forbidden', 'empty'] as const)(
+    'offers no retry on %s',
+    async (state) => {
+      expect((await panel(state)).find('button').exists()).toBe(false);
+    },
+  );
 
   it('links back to the ranking when the replay cannot be shown but the contest can', async () => {
     const wrapper = await panel('frozen');

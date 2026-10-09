@@ -12,14 +12,19 @@ const props = withDefaults(
 defineEmits<{ retry: [] }>();
 
 const ALERT_STATES: ReplayPanelState[] = ['error', 'forbidden', 'frozen'];
+/** States that change to the board by themselves (the page polls them): announced politely. */
+const STATUS_STATES: ReplayPanelState[] = ['building', 'notReady'];
+/** A failed or not-yet-queued read: asking again now may help. */
+const RETRY_STATES: ReplayPanelState[] = ['error', 'notReady'];
 /** The contest is there, only its replay is not: the ranking still helps. */
 const RANKING_LINK_STATES: ReplayPanelState[] = ['frozen', 'forbidden', 'unsupported', 'notEnded'];
 const bit = computed(() => REPLAY_BITS[props.state]);
-/** Building is announced politely (it changes to the board by itself); refusals are alerts. */
+/** Refusals are alerts. */
 const role = computed(() => {
   if (ALERT_STATES.includes(props.state)) return 'alert';
-  return props.state === 'building' ? 'status' : undefined;
+  return STATUS_STATES.includes(props.state) ? 'status' : undefined;
 });
+const hasRetry = computed(() => RETRY_STATES.includes(props.state));
 const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state));
 </script>
 
@@ -41,7 +46,7 @@ const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state))
     </h2>
     <p class="max-w-md text-muted">{{ $t(`replay.states.${state}.body`) }}</p>
     <button
-      v-if="state === 'error'"
+      v-if="hasRetry"
       type="button"
       class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
       @click="$emit('retry')"

@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, issue, mockApi, ok, sequence } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
@@ -71,7 +71,7 @@ describe('contest replay page', () => {
   });
 
   it('plays at the chosen speed and writes the second when paused', async () => {
-    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
     mockApi(routes());
     const { wrapper, router } = await mountApp('/contests/r41/replay');
     await buttonNamed(wrapper, 'x60').trigger('click');
@@ -124,6 +124,34 @@ describe('contest replay page', () => {
     expect(wrapper.get('[data-testid="replay-state"] h2').text()).toBe('Bảng đang đóng băng');
     expect(wrapper.find('tbody').exists()).toBe(false);
     expect(replayCalls(calls)).toBe(1);
+  });
+
+  it.each([
+    ['board_hidden', 'forbidden'],
+    ['board_frozen', 'frozen'],
+  ] as const)(
+    'drops a loaded board at once when a later read is refused with %s',
+    async (reason, state) => {
+      const refused = fail(403, 'forbidden', undefined, [issue('board', reason, 'x')]);
+      mockApi(routes({ [REPLAY]: sequence(ok(replayChunk()), refused) }));
+      const { wrapper, queryClient } = await mountApp('/contests/r41/replay?t=600');
+      expect(rowIds(wrapper)).toHaveLength(6);
+      await queryClient.refetchQueries({ queryKey: ['contests', 'replay'] });
+      await flushPromises();
+      expect(panel(wrapper).attributes('data-state')).toBe(state);
+      expect(wrapper.find('tbody').exists()).toBe(false);
+      expect(wrapper.find('input[type="range"]').exists()).toBe(false);
+    },
+  );
+
+  it('offers a retry on a replay the server could not queue yet, and draws the board when it answers', async () => {
+    mockApi(routes({ [REPLAY]: sequence(fail(404, 'replay_not_ready'), ok(replayChunk())) }));
+    const { wrapper } = await mountApp('/contests/r41/replay');
+    expect(panel(wrapper).attributes('data-state')).toBe('notReady');
+    await buttonNamed(wrapper, 'Thử lại').trigger('click');
+    await flushPromises();
+    expect(panel(wrapper).exists()).toBe(false);
+    expect(rowIds(wrapper)).toHaveLength(6);
   });
 
   it('shows the contest-not-found state, not a retry panel, when the contest is missing', async () => {

@@ -1880,7 +1880,7 @@
       },
       "notReady": {
         "title": "Bản phát lại chưa sẵn sàng",
-        "body": "Kỳ thi vừa kết thúc. Bản phát lại được dựng sau khi chấm xong."
+        "body": "Chưa xếp được việc dựng bản phát lại. Trang tự hỏi lại sau ít giây, hoặc bạn thử lại ngay."
       },
       "notEnded": {
         "title": "Kỳ thi chưa kết thúc",
@@ -1915,7 +1915,8 @@
       "scrub": "Thời điểm phát lại",
       "marksLegend": "Chấm xanh: lần giải đầu của từng bài",
       "myRow": "Về hàng của tôi",
-      "finished": "Đã phát đến cuối."
+      "finished": "Đã phát đến cuối.",
+      "speedOption": "x{speed} (tốc độ nhân {speed})"
     },
     "feed": {
       "title": "Vừa xảy ra",

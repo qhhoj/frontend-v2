@@ -450,3 +450,5 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Quota meter: a limit of 0 under enforce reads as blocked (used >= limit, or the server's `isOver`), whatever the near/over flags say.
 - The deleted-problem tombstone Bit is decorative (no `bitLabel`); the unused `openEditor`, `columns.select` and `bitLabel` keys are removed.
 - A bulk selection belongs to its page and organization; a list that loses the focused control moves focus to its container (`useFocusFallback`).
+- Replay: any 4xx refusal on a refetch drops the loaded board (staff hid or re-froze it); only network and 5xx failures keep it. `replay_not_ready` polls 5 s doubling to 60 s and offers a retry.
+- Replay table: rows slide (FLIP) only up to 100 rows, since FLIP measures every row each tick; bigger boards jump. Row cells are memoised by the row's last applied event (`revision`), and the replay query is `shallow` so ticks read plain tuples.

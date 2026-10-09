@@ -35,6 +35,17 @@ describe('useReplayPlayer', () => {
     scope.stop();
   });
 
+  it('keeps real-time speed when a tick comes late (a slow frame or a throttled tab)', () => {
+    vi.useFakeTimers();
+    const { scope, player } = start(10_800);
+    player.setSpeed(60);
+    player.play();
+    vi.setSystemTime(Date.now() + 1750);
+    vi.advanceTimersByTime(PLAYER_TICK_MS);
+    expect(player.seconds.value).toBe(120);
+    scope.stop();
+  });
+
   it('stops exactly at the end and starts over when played again', () => {
     vi.useFakeTimers();
     const { scope, player } = start(100, 90);

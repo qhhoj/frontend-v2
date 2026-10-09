@@ -52,6 +52,29 @@ describe('ReplayPlayerBar', () => {
     expect(wrapper.emitted('speed')).toEqual([[300]]);
   });
 
+  it('speaks each speed as a factor, keeping the visible text in the name', () => {
+    const wrapper = mountComponent(ReplayPlayerBar, { props: props() });
+    expect(speedButtons(wrapper).map((button) => button.attributes('aria-label'))).toEqual([
+      'x1 (tốc độ nhân 1)',
+      'x10 (tốc độ nhân 10)',
+      'x60 (tốc độ nhân 60)',
+      'x300 (tốc độ nhân 300)',
+    ]);
+  });
+
+  it('keeps a held thumb where it was dragged while the clock runs, and follows the clock again on release', async () => {
+    const wrapper = mountComponent(ReplayPlayerBar, { props: props({ isPlaying: true }) });
+    const range = wrapper.get<HTMLInputElement>('input[type="range"]');
+    await range.trigger('pointerdown');
+    range.element.value = '600';
+    await range.trigger('input');
+    await wrapper.setProps({ seconds: 675 } as never);
+    expect(range.element.value).toBe('600');
+    await range.trigger('pointerup');
+    expect(range.element.value).toBe('675');
+    expect(wrapper.emitted('seek')).toEqual([[600]]);
+  });
+
   it('emits the scrubbed second', async () => {
     const wrapper = mountComponent(ReplayPlayerBar, { props: props() });
     await wrapper.get('input[type="range"]').setValue('600');

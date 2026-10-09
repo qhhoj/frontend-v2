@@ -5,7 +5,7 @@ export const REPLAY_SPEEDS = [1, 10, 60, 300] as const;
 export type ReplaySpeed = (typeof REPLAY_SPEEDS)[number];
 /** The speed M2B shows pressed. */
 export const DEFAULT_REPLAY_SPEED: ReplaySpeed = 10;
-/** Four board updates a second are enough even at x300. */
+/** Four board updates a second are enough even at x300. The clock moves by the real time between ticks, not by this. */
 export const PLAYER_TICK_MS = 250;
 
 export interface ReplayPlayer {
@@ -22,13 +22,17 @@ export interface ReplayPlayer {
 const clamp = (seconds: number, durationSeconds: number) =>
   Math.min(Math.max(seconds, 0), durationSeconds);
 
-/** The replay clock (seconds from each participation's start). It runs under reduced motion too: only movement is cut. */
+/**
+ * The replay clock (seconds from each participation's start). Each tick adds `speed` × the wall time since the last one, so
+ * a slow frame or a throttled background tab never slows playback. It runs under reduced motion too: only movement is cut.
+ */
 export function useReplayPlayer(durationSeconds: Ref<number>, startSeconds: number): ReplayPlayer {
   const seconds = ref(clamp(startSeconds, durationSeconds.value));
   const speed = ref<ReplaySpeed>(DEFAULT_REPLAY_SPEED);
   const isPlaying = ref(false);
   const isFinished = computed(() => seconds.value >= durationSeconds.value);
   let timer: ReturnType<typeof setInterval> | null = null;
+  let lastTickAt = 0;
 
   function pause() {
     if (timer !== null) clearInterval(timer);
@@ -36,10 +40,10 @@ export function useReplayPlayer(durationSeconds: Ref<number>, startSeconds: numb
     isPlaying.value = false;
   }
   function tick() {
-    seconds.value = clamp(
-      seconds.value + speed.value * (PLAYER_TICK_MS / 1000),
-      durationSeconds.value,
-    );
+    const now = Date.now();
+    const elapsedMs = Math.max(now - lastTickAt, 0);
+    lastTickAt = now;
+    seconds.value = clamp(seconds.value + (speed.value * elapsedMs) / 1000, durationSeconds.value);
     if (isFinished.value) pause();
   }
   /** At the end, play starts over; a second play while playing changes nothing. */
@@ -47,6 +51,7 @@ export function useReplayPlayer(durationSeconds: Ref<number>, startSeconds: numb
     if (isPlaying.value) return;
     if (isFinished.value) seconds.value = 0;
     isPlaying.value = true;
+    lastTickAt = Date.now();
     timer = setInterval(tick, PLAYER_TICK_MS);
   }
   const seek = (target: number) => {

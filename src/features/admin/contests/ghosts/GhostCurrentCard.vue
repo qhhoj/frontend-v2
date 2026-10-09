@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { deleteGhosts, ghostsCsvUrl } from '@/api/contest-ghosts.api';
 import type { Ghost } from '@/api/types/contest-ghosts';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -19,6 +19,13 @@ const viewerId = useViewerId();
 const isDeleteOpen = ref(false);
 const isDeleted = ref(false);
 const csvUrl = computed(() => ghostsCsvUrl(props.contestKey));
+/** "Deleted" describes the empty set only: a newly stored set clears it. */
+watch(
+  () => props.ghosts.length,
+  (count) => {
+    if (count > 0) isDeleted.value = false;
+  },
+);
 const removing = useAdminMutation({
   mutate: () => deleteGhosts(props.contestKey),
   invalidates: () => [ghostsKey(viewerId.value, props.contestKey), ['contests', 'replay']],

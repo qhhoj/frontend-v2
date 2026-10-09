@@ -1880,7 +1880,7 @@
       },
       "notReady": {
         "title": "The replay is not ready yet",
-        "body": "The contest has just ended. The replay is built once judging is done."
+        "body": "The replay build could not be queued yet. This page asks again in a few seconds, or you can try now."
       },
       "notEnded": {
         "title": "The contest has not ended",
@@ -1915,7 +1915,8 @@
       "scrub": "Replay time",
       "marksLegend": "Green dot: first solve of each problem",
       "myRow": "Go to my row",
-      "finished": "Reached the end."
+      "finished": "Reached the end.",
+      "speedOption": "x{speed} (speed times {speed})"
     },
     "feed": {
       "title": "Just happened",

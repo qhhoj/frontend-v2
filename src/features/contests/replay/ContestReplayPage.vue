@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LocateFixed } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import GlassCard from '@/components/GlassCard.vue';
@@ -38,6 +38,8 @@ const player = useReplayPlayer(durationSeconds, 0);
 const { seconds, speed, isPlaying, isFinished } = player;
 const { seek } = useReplayLink(player, durationSeconds);
 const table = ref<{ focusRow(rowId: string): boolean } | null>(null);
+/** A board that goes away (refused refetch) stops its clock too. */
+watch(state, (next) => next !== 'ready' && player.pause());
 
 const second = computed(() => Math.floor(seconds.value));
 const board = computed(() =>

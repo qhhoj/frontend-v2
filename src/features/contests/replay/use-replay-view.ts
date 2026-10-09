@@ -51,7 +51,6 @@ export function useReplayView(key: Ref<string>, contest: Ref<ContestDetail | und
     contest.value
       ? replayViewState({
           contest: contest.value,
-          isPending: query.isPending.value,
           error: query.error.value,
           load: query.data.value,
         })
@@ -59,8 +58,11 @@ export function useReplayView(key: Ref<string>, contest: Ref<ContestDetail | und
   );
   const wasBuilding = useWasBuilding(state);
   const load = query.data;
+  /** Only a board the page may show is indexed: a refused refetch drops it, so nothing stale is drawn or scrubbed. */
   const index = computed(() =>
-    load.value?.state === 'ready' ? indexReplay(load.value.replay) : null,
+    state.value === 'ready' && load.value?.state === 'ready'
+      ? indexReplay(load.value.replay)
+      : null,
   );
   const timeline = computed(() => (index.value ? timelineOf(index.value) : []));
   const durationSeconds = computed(() =>

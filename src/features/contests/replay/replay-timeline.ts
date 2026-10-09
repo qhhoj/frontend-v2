@@ -2,8 +2,8 @@ import type { ProblemCell } from '@/api/types/contests';
 import type { ReplayEvent, ReplayProblem } from '@/api/types/replay';
 import { isPenaltyFormat, rankingCell } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
-import { isSolvedCell } from './replay-board';
 import type { BoardRowIdentity, ReplayIndex, ReplayTrack } from './replay-board';
+import { asRankingProblem, isSolvedCell } from './replay-cells';
 
 export interface TimelineEntry {
   event: ReplayEvent;
@@ -112,7 +112,7 @@ export function feedTextOf(
   problem: ReplayProblem,
   context: RankingContext,
 ): FeedText {
-  const view = rankingCell(cell, { ...problem, firstSolve: null, acceptedCount: 0 }, '', context);
+  const view = rankingCell(cell, asRankingProblem(problem), '', context);
   const label = problem.label;
   if (view.kind === 'solved' || view.kind === 'first-solve')
     return { key: 'replay.feed.solved', params: { problem: label } };

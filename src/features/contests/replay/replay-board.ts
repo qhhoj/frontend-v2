@@ -1,7 +1,7 @@
 import type { ProblemCell, RankingProblem, RankingRow } from '@/api/types/contests';
 import type { LoadedReplay, ReplayEvent, ReplayProblem } from '@/api/types/replay';
-import { rankingCell } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
+import { isSolvedCell } from './replay-cells';
 import { firstSolvesUntil } from './replay-timeline';
 
 export type BoardRowKind = 'real' | 'virtual' | 'ghost';
@@ -30,6 +30,11 @@ export interface BoardRow extends BoardRowIdentity {
   tiebreaker: number;
   /** Keyed by problem id. */
   cells: Record<string, ProblemCell>;
+  /**
+   * Compared by identity: the same object while the row's cells and totals are unchanged (the last event applied, the track
+   * before any, the ranking row of a virtual row). Lets the table skip redrawing a row that did not move.
+   */
+  revision: object;
 }
 /** A row and its own events, sorted by seconds. */
 export interface ReplayTrack {
@@ -93,13 +98,15 @@ export function rowAt(
 ): BoardRow {
   const cells: Record<string, ProblemCell> = {};
   let totals = { score: 0, cumtime: 0, tiebreaker: 0 };
+  let revision: object = track;
   for (const event of track.events) {
     if (event[0] > seconds) break;
     const problem = problems[event[2]];
     if (problem) cells[problem.problemId] = event[3];
     totals = { score: event[4], cumtime: event[5], tiebreaker: event[6] };
+    revision = event;
   }
-  return { ...track.identity, rank: null, ...totals, cells };
+  return { ...track.identity, rank: null, ...totals, cells, revision };
 }
 
 /** Backend `compareStandings` (score desc, cumtime asc, tiebreaker asc), unranked last, then the class and position. */
@@ -126,22 +133,6 @@ export function rankRows(rows: readonly BoardRow[]): BoardRow[] {
     ranked.push({ ...row, rank });
   });
   return ranked;
-}
-
-const asRankingProblem = (problem: ReplayProblem): RankingProblem => ({
-  ...problem,
-  firstSolve: null,
-  acceptedCount: 0,
-});
-
-/** Full points for the format (the ranking's own cell rules decide). */
-export function isSolvedCell(
-  cell: ProblemCell | undefined,
-  problem: ReplayProblem,
-  context: RankingContext,
-): boolean {
-  const { kind } = rankingCell(cell, asRankingProblem(problem), '', context);
-  return kind === 'solved' || kind === 'first-solve';
 }
 
 function problemsAt(
@@ -189,4 +180,5 @@ export const virtualRowOf = (row: RankingRow): BoardRow => ({
   cumtime: row.cumtime,
   tiebreaker: row.tiebreaker,
   cells: row.cells,
+  revision: row,
 });

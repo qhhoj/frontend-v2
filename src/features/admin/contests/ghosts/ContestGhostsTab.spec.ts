@@ -2,7 +2,7 @@ import { baseCompile } from '@intlify/message-compiler';
 
 import { flushPromises } from '@vue/test-utils';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { confirmDialog, staffViewer, switchNamed } from '@/test/admin-routes';
+import { cancelDialog, confirmDialog, staffViewer, switchNamed } from '@/test/admin-routes';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { ghost, GHOST_CSV, unrankedGhost } from '@/test/admin-fixtures/ghosts';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
@@ -180,6 +180,49 @@ describe('ContestGhostsTab', () => {
     expect(alert.findAll('li').map((item) => item.text())).toEqual(rows);
     expect(alert.find('[data-placement="refused"]').exists()).toBe(true);
     expect(wrapper.get('[data-testid="ghost-current"]').text()).toContain('2 ghost');
+  });
+
+  it('shows a refused replace once (in the dialog, then on the card), and drops it when the next preview works', async () => {
+    mockApi(
+      routes({
+        [PUT]: (call) =>
+          (call.body as { dryRun: boolean }).dryRun
+            ? ok({ stored: false, ghosts: [ghost({ label: 'Cy' })] })
+            : fail(503, 'service_unavailable'),
+      }),
+    );
+    const { wrapper } = await mountAndWaitFor(PATH, 'Nhập ghost từ CSV');
+    const cardAlerts = () => wrapper.get('[data-testid="ghost-import"]').findAll('[role="alert"]');
+    await pickCsv(wrapper);
+    await click(wrapper, 'Xem trước');
+    await click(wrapper, 'Thay thế bộ ghost');
+    await confirmDialog('Thay thế');
+    expect(document.body.querySelector('[role="dialog"] [role="alert"]')).not.toBeNull();
+    expect(cardAlerts()).toHaveLength(0);
+    await cancelDialog();
+    expect(cardAlerts()).toHaveLength(1);
+    await click(wrapper, 'Xem trước');
+    expect(cardAlerts()).toHaveLength(0);
+  });
+
+  it('drops the "deleted" note once a new set is stored', async () => {
+    mockApi(
+      routes({
+        [LIST]: sequence(ok({ ghosts: [ghost()] }), ok({ ghosts: [] }), ok({ ghosts: [ghost()] })),
+        'DELETE /contests/hcmus-w41/ghosts': noContent(),
+        [PUT]: (call) =>
+          ok({ stored: !(call.body as { dryRun: boolean }).dryRun, ghosts: [ghost()] }),
+      }),
+    );
+    const { wrapper } = await mountAndWaitFor(PATH, 'Bộ ghost hiện tại');
+    await click(wrapper, 'Xóa bộ ghost');
+    await confirmDialog('Xóa');
+    expect(wrapper.text()).toContain('Đã xóa bộ ghost.');
+    await pickCsv(wrapper);
+    await click(wrapper, 'Xem trước');
+    await click(wrapper, 'Thay thế bộ ghost');
+    expect(wrapper.get('[data-testid="ghost-current"]').text()).toContain('1 ghost');
+    expect(wrapper.text()).not.toContain('Đã xóa bộ ghost.');
   });
 
   it('deletes the set only after confirming', async () => {

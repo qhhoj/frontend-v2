@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import { Ghost } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, toRef, TransitionGroup } from 'vue';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
-import { formatNumber } from '@/lib/format';
-import {
-  formatCumtime,
-  isPenaltyFormat,
-  rankingCell,
-  showsCumtime,
-  solvedCount,
-} from '@/lib/ranking-cells';
+import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import RankingCell from '../RankingCell.vue';
 import type { BoardRow, ReplayBoard } from './replay-board';
+import { useReplayRowCells } from './use-replay-row-cells';
 
 /**
- * The board at one second. Rows move with a FLIP transition (`TransitionGroup` move class) only while motion is allowed;
- * ghosts are muted by colour, an icon and a chip (never opacity); unranked ghosts show "—".
+ * The board at one second. Rows move with a FLIP transition (`TransitionGroup` move class) only while motion is allowed and
+ * the board is small enough: FLIP measures every row on every tick, so bigger boards and reduced motion or low-power get a
+ * plain `tbody`. There a row is redrawn only when its rank, its cells (`useReplayRowCells`) or the viewer mark change
+ * (`v-memo`; `TransitionGroup` re-creates its children, so small animated boards redraw rows but keep their cell views).
+ * Ghosts are muted by colour, an icon and a chip (never opacity); unranked ghosts show "—".
  */
 const props = defineProps<{
   board: ReplayBoard;
@@ -28,6 +25,12 @@ const props = defineProps<{
 }>();
 const isMotionAllowed = useMotionAllowed();
 const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-out';
+/** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every tick). */
+const FLIP_MAX_ROWS = 100;
+const isAnimated = computed(
+  () => isMotionAllowed.value && props.board.rows.length <= FLIP_MAX_ROWS,
+);
+const rowCells = useReplayRowCells(toRef(props, 'board'), toRef(props, 'context'));
 const root = ref<HTMLElement | null>(null);
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const hasCombinedScore = computed(
@@ -39,19 +42,6 @@ const scoreHeaderKey = computed(() => {
   return hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score';
 });
 
-const cellsOf = (row: BoardRow) =>
-  props.board.problems.map((problem) => ({
-    problemId: problem.problemId,
-    view: rankingCell(row.cells[problem.problemId], problem, row.id, props.context),
-  }));
-const scoreOf = (row: BoardRow) =>
-  penalty.value
-    ? solvedCount(
-        { cells: row.cells, participationId: row.id },
-        props.board.problems,
-        props.context,
-      )
-    : formatNumber(row.score, props.context.locale, props.context.pointsPrecision);
 const isViewerRow = (row: BoardRow) =>
   row.kind !== 'ghost' && row.userId !== null && row.userId === props.viewerId;
 
@@ -103,15 +93,16 @@ defineExpose({ focusRow });
           </th>
         </tr>
       </thead>
-      <TransitionGroup
-        tag="tbody"
-        :move-class="isMotionAllowed ? MOVE_CLASS : 'replay-row-still'"
-        :data-motion="isMotionAllowed ? 'on' : 'off'"
+      <component
+        :is="isAnimated ? TransitionGroup : 'tbody'"
+        v-bind="isAnimated ? { tag: 'tbody', moveClass: MOVE_CLASS } : {}"
+        :data-motion="isAnimated ? 'on' : 'off'"
         class="font-mono text-sm tabular-nums"
       >
         <tr
           v-for="row in board.rows"
           :key="row.id"
+          v-memo="[row.rank, rowCells.get(row.id), isViewerRow(row)]"
           :data-row-id="row.id"
           :data-kind="row.kind"
           class="border-t border-line text-center"
@@ -144,19 +135,23 @@ defineExpose({ focusRow });
             </span>
           </th>
           <td class="font-bold">
-            {{ row.isUnranked ? '—' : scoreOf(row) }}
+            {{ row.isUnranked ? '—' : rowCells.get(row.id)!.score }}
             <small
               v-if="hasCombinedScore && !row.isUnranked"
               class="block text-[11px] font-medium text-muted"
-              >{{ formatCumtime(context.formatName, row.cumtime) }}</small
+              >{{ rowCells.get(row.id)!.cumtime }}</small
             >
           </td>
           <td v-if="hasTimeColumn">
-            {{ row.isUnranked ? '—' : formatCumtime(context.formatName, row.cumtime) }}
+            {{ row.isUnranked ? '—' : rowCells.get(row.id)!.cumtime }}
           </td>
-          <RankingCell v-for="cell in cellsOf(row)" :key="cell.problemId" :view="cell.view" />
+          <RankingCell
+            v-for="cell in rowCells.get(row.id)!.cells"
+            :key="cell.problemId"
+            :view="cell.view"
+          />
         </tr>
-      </TransitionGroup>
+      </component>
     </table>
   </div>
 </template>

@@ -8,7 +8,6 @@ import type { ReplayStateInput } from './replay-state';
 const ready: ReplayLoad = { state: 'ready', replay: loadedReplay() };
 const input = (overrides: Partial<ReplayStateInput> = {}): ReplayStateInput => ({
   contest: endedContest(),
-  isPending: false,
   error: null,
   load: ready,
   ...overrides,
@@ -24,7 +23,7 @@ const refused = (status: number, code: string, issueCode?: string) =>
 describe('replayViewState', () => {
   it.each([
     ['ready', input()],
-    ['loading', input({ isPending: true, load: undefined })],
+    ['loading', input({ load: undefined })],
     ['building', input({ load: { state: 'building' } })],
     [
       'empty',
@@ -82,7 +81,22 @@ describe('replayViewState', () => {
     expect(replayViewState(given)).toBe(expected);
   });
 
-  it('keeps showing the last ready board when a background read fails', () => {
+  it('keeps showing the last ready board when a background read fails on the network or the server', () => {
     expect(replayViewState(input({ error: refused(500, 'generic') }))).toBe('ready');
+    expect(replayViewState(input({ error: new Error('offline') }))).toBe('ready');
+  });
+
+  it.each([
+    ['frozen', 'board_frozen'],
+    ['forbidden', 'board_hidden'],
+  ] as const)(
+    'drops a loaded board for the %s panel when a later read is refused with %s',
+    (expected, reason) => {
+      expect(replayViewState(input({ error: refused(403, 'forbidden', reason) }))).toBe(expected);
+    },
+  );
+
+  it('drops a loaded board for any other refusal of the gate too', () => {
+    expect(replayViewState(input({ error: refused(404, 'replay_not_ready') }))).toBe('notReady');
   });
 });

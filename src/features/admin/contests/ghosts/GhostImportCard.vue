@@ -57,7 +57,10 @@ const replacing = useAdminMutation({
   },
 });
 const isBusy = computed(() => previewing.isPending.value || replacing.isPending.value);
-const failure = computed(() => replacing.failure.value ?? previewing.failure.value);
+/** A refused replace is shown by the confirm dialog while it is open, and here once it closes; a new preview clears it. */
+const failure = computed(
+  () => (isConfirmOpen.value ? null : replacing.failure.value) ?? previewing.failure.value,
+);
 const refusedRows = computed(() => refusedRowsOf(failure.value));
 const failureText = computed(() =>
   failure.value && !refusedRows.value ? failureTextOf(failure.value) : '',
@@ -69,6 +72,10 @@ async function onPicked(file: File) {
   pickedFile.value = file;
   storedCount.value = null;
   csv.value = await file.text();
+}
+function startPreview() {
+  replacing.reset();
+  void previewing.run(undefined);
 }
 function startReplace() {
   if (!preview.value) return; // aria-disabled keeps the button focusable, so the click is refused here
@@ -104,7 +111,7 @@ function startReplace() {
         type="button"
         :class="ADMIN_BUTTON_CLASS"
         :disabled="!csv || isBusy"
-        @click="previewing.run(undefined)"
+        @click="startPreview"
       >
         {{ $t('admin.ghosts.import.preview') }}
       </button>

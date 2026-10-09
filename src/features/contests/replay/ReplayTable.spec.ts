@@ -65,6 +65,42 @@ describe('ReplayTable', () => {
     expect(leader.findAll('td').at(2)!.text()).toBe('40');
   });
 
+  it('redraws a row when the clock brings it new cells or the first-solve star, and keeps the others right', async () => {
+    stubMatchMedia().setReducedMotion(true);
+    const wrapper = table(600);
+    const rowOf = (username: string) =>
+      wrapper.findAll('tbody tr').find((row) => row.text().includes(username))!;
+    const cellsOf = (username: string) =>
+      rowOf(username)
+        .findAll('td span[aria-hidden="true"]')
+        .map((cell) => cell.text());
+    const starsOf = (username: string) => rowOf(username).findAll('td svg').length;
+    const rankOf = (username: string) => rowOf(username).get('td').text();
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09'], 1]);
+    expect(rankOf('user_03')).toBe('3');
+    await wrapper.setProps({ board: boardAt(index, REPLAY_END, ICPC) } as never);
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09', '+ 0:31'], 2]);
+    expect(cellsOf('user_12')).toEqual(['+1 0:12']);
+    expect(rankOf('user_03')).toBe('5');
+    await wrapper.setProps({ board: boardAt(index, 600, ICPC) } as never);
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09'], 1]);
+    expect(cellsOf('user_12')).toEqual(['−1']);
+  });
+
+  it('moves the viewer highlight when the viewer changes on the same board, rows still or sliding', async () => {
+    const media = stubMatchMedia();
+    media.setReducedMotion(true);
+    const wrapper = table(600);
+    const highlighted = () =>
+      wrapper.findAll('tbody tr.bg-surface-hover').map((row) => row.attributes('data-row-id'));
+    expect(highlighted()).toEqual(['part-01']);
+    await wrapper.setProps({ viewerId: null } as never);
+    expect(highlighted()).toEqual([]);
+    media.setReducedMotion(false);
+    await wrapper.setProps({ viewerId: sessionUser().id } as never);
+    expect(highlighted()).toEqual(['part-01']);
+  });
+
   it("marks the viewer's live virtual row and highlights it", () => {
     stubMatchMedia();
     const virtual = virtualRowOf({

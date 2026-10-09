@@ -39,6 +39,13 @@ describe('ghost import rules', () => {
     expect(refusedRowsOf(new Error('offline'))).toBeNull();
   });
 
+  it.each(KNOWN_CODES)('names the row code %s by its own line, never the fallback', (code) => {
+    const issues = [{ field: 'csv', code, message: 'x', row: 2 }];
+    const [line] = refusedRowsOf(new ApiError('ghost_import_invalid', 400, 'x', { issues }))!;
+    expect(line).toMatch(/^Dòng 2: /);
+    expect(line).not.toBe('Dòng 2: Dòng không hợp lệ.');
+  });
+
   it.each(KNOWN_CODES)('has a Vietnamese and an English text for the row code %s', (code) => {
     const key = `admin.ghosts.import.rowCodes.${code}`;
     expect(i18n.global.te(key, 'vi')).toBe(true);
