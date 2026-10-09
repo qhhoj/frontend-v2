@@ -32,14 +32,23 @@ export function seedQueueQuery(query: LocationQuery): LocationQuery {
   return hasFilter ? query : { ...query, scope: 'all', open: '1' };
 }
 
-/** The queue's URL for `filters` with the open ticket kept: 8e's list format plus `?ticket=`. */
+/**
+ * The queue's URL for `filters` with the open ticket kept. When 8e's format writes no filter key (own tickets with both
+ * states, or a bare page), `open=all` is written: 8e reads any value but 1 and 0 as both states, and the seed then leaves
+ * the URL alone on reload.
+ */
 export const queueLocation = (
   filters: TicketListQuery,
   ticketId: string | null,
-): LocationQueryRaw => ({
-  ...routeQueryFromFilters(filters),
-  ...(ticketId ? { ticket: ticketId } : {}),
-});
+): LocationQueryRaw => {
+  const filterQuery = routeQueryFromFilters(filters);
+  const hasFilter = FILTER_KEYS.some((key) => key in filterQuery);
+  return {
+    ...filterQuery,
+    ...(hasFilter ? {} : { open: 'all' }),
+    ...(ticketId ? { ticket: ticketId } : {}),
+  };
+};
 
 /** The ticket shown beside the list: `?ticket=` is the only key that picks one. */
 export const ticketIdOf = (query: LocationQuery): string | null => {

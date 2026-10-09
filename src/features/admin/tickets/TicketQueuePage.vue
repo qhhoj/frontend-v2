@@ -6,6 +6,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { ticketQueryFromRoute } from '@/features/tickets/ticket-filters';
 import { useTicketsQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
+import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import TicketQueueDetail from './TicketQueueDetail.vue';
@@ -19,9 +20,12 @@ const router = useRouter();
 const seeded = seedQueueQuery(route.query);
 if (seeded !== route.query) void router.replace({ query: seeded });
 const filters = shallowRef(ticketQueryFromRoute(seeded));
+/** Follows the URL only while this screen is the current route: leaving it clears the query and must not refetch. */
 watch(
   () => route.query,
-  (query) => (filters.value = ticketQueryFromRoute(query)),
+  (query) => {
+    if (route.name === adminRouteName('tickets')) filters.value = ticketQueryFromRoute(query);
+  },
 );
 const ticketId = computed(() => ticketIdOf(route.query));
 const { data, error, isPending, refetch } = useTicketsQuery(filters);
