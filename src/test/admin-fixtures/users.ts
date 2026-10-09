@@ -13,3 +13,14 @@ export const staffUser = (overrides: Partial<StaffUser> = {}): StaffUser => ({
   lastAccess: '2026-10-08T07:00:00.000Z',
   ...overrides,
 });
+
+/** `count` distinct users `user_01…`, for list and pager specs. */
+export const staffUsers = (count: number): StaffUser[] =>
+  Array.from({ length: count }, (_unused, index) => {
+    const name = `user_${String(index + 1).padStart(2, '0')}`;
+    return staffUser({
+      id: `0192a000-0000-7000-8000-00000000d${String(index).padStart(3, '0')}`,
+      username: name,
+      displayName: name,
+    });
+  });

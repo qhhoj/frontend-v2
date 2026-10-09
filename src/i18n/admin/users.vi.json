@@ -8,12 +8,43 @@
   "list": {
     "region": "Danh sách người dùng",
     "empty": "Không có người dùng nào.",
+    "emptySearch": "Không có người dùng nào khớp “{search}”.",
+    "tabs": {
+      "label": "Trạng thái",
+      "all": "Tất cả",
+      "active": "Chưa cấm",
+      "banned": "Đã cấm"
+    },
+    "search": {
+      "label": "Tìm người dùng",
+      "placeholder": "Tìm tên đăng nhập…",
+      "clear": "Xóa ô tìm",
+      "hint": "Khớp phần đầu tên đăng nhập, không phân biệt hoa thường."
+    },
     "columns": {
       "user": "Người dùng",
-      "rank": "Hạng hiển thị",
-      "joined": "Tham gia"
+      "rank": "Hạng · trạng thái",
+      "joined": "Tham gia",
+      "banReason": "Lý do cấm",
+      "lastAccess": "Truy cập gần nhất",
+      "open": "Mở"
     },
-    "banReason": "Lý do cấm: {reason}",
+    "openUser": "Mở {username}",
+    "status": {
+      "banned": "Đã cấm",
+      "inactive": "Chưa kích hoạt",
+      "superuser": "Siêu quản trị",
+      "staff": "Nhân viên"
+    },
+    "reasonNone": "Không có lý do được ghi.",
+    "neverAccessed": "Chưa từng truy cập",
+    "count": {
+      "all": "{total} người · {pageSize} người mỗi trang",
+      "active": "{total} người chưa bị cấm · {pageSize} người mỗi trang",
+      "banned": "{total} người bị cấm · {pageSize} người mỗi trang",
+      "match": "{total} người khớp “{search}” · {pageSize} người mỗi trang"
+    },
+    "order": "Khi có tìm kiếm, danh sách theo tên đăng nhập; nếu không, tài khoản mới nhất trước. Chưa sắp xếp được theo lần truy cập gần nhất.",
     "pager": "Trang danh sách người dùng",
     "previous": "Trước",
     "next": "Sau",
@@ -69,5 +100,8 @@
       "lastLogin": "Không đổi lần đăng nhập gần nhất của người này.",
       "confirm": "Bắt đầu đóng vai"
     }
+  },
+  "ranks": {
+    "user": "Thành viên"
   }
 }

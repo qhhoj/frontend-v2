@@ -1,6 +1,9 @@
+import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import { BAN_REASON_MAX_LENGTH } from '@/api/types/users';
 import type { UserPage } from '@/api/types/users';
+import type { StaffUser, StaffUserQuery } from '@/api/types/users-admin';
 import { STAFF_USERS_PAGE_SIZE } from '@/api/users-admin.api';
+import { pageFromQuery } from '@/lib/paging';
 
 export { BAN_REASON_MAX_LENGTH };
 /** The backend refuses deeper pages (skipping is linear in the page number). */
@@ -25,4 +28,62 @@ export const banReasonProblem = (reason: string): 'required' | 'tooLong' | null 
   const text = reason.trim();
   if (text === '') return 'required';
   return text.length > BAN_REASON_MAX_LENGTH ? 'tooLong' : null;
+};
+
+export const USERS_TABS = ['all', 'active', 'banned'] as const;
+export type UsersTab = (typeof USERS_TABS)[number];
+/** The backend's `Length(1, 64)` on `search`. */
+export const USER_SEARCH_MAX_LENGTH = 64;
+
+export interface UsersListView {
+  tab: UsersTab;
+  search: string;
+  page: number;
+}
+
+const BANNED_OF_TAB: Record<UsersTab, boolean | undefined> = {
+  all: undefined,
+  active: false,
+  banned: true,
+};
+
+const singleText = (value: unknown): string => {
+  const single = Array.isArray(value) ? value[0] : value;
+  return typeof single === 'string' ? single : '';
+};
+
+export function usersViewFromQuery(query: LocationQuery): UsersListView {
+  const tab = singleText(query.tab);
+  return {
+    tab: USERS_TABS.find((candidate) => candidate === tab) ?? 'all',
+    search: singleText(query.q).trim().slice(0, USER_SEARCH_MAX_LENGTH),
+    page: Math.min(pageFromQuery(query.page), STAFF_USERS_MAX_PAGE),
+  };
+}
+
+/** Defaults are left out so the plain list keeps the plain URL; `user` (the opened card) is not a filter and survives. */
+export function usersViewToQuery(view: UsersListView, current: LocationQuery): LocationQueryRaw {
+  const query: LocationQueryRaw = {};
+  const user = singleText(current.user);
+  if (user) query.user = user;
+  if (view.tab !== 'all') query.tab = view.tab;
+  if (view.search) query.q = view.search;
+  if (view.page > 1) query.page = String(view.page);
+  return query;
+}
+
+export function staffUsersQueryOf(view: UsersListView): StaffUserQuery {
+  const query: StaffUserQuery = { page: view.page };
+  const banned = BANNED_OF_TAB[view.tab];
+  if (banned !== undefined) query.banned = banned;
+  if (view.search.trim()) query.search = view.search.trim();
+  return query;
+}
+
+export type UserStatus = 'banned' | 'inactive' | 'active';
+
+/** Banned wins over inactive: a ban also deactivates, and the tab filter reads `banReason`. */
+export const userStatusOf = (user: Pick<StaffUser, 'banReason' | 'isActive'>): UserStatus => {
+  if (user.banReason !== null) return 'banned';
+  return user.isActive ? 'active' : 'inactive';
 };

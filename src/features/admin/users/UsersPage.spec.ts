@@ -1,11 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer, superuserViewer } from '@/test/admin-routes';
 import { ratingHistory, sessionResponse, sessionUser, userPage } from '@/test/fixtures';
 import { homeRoutes } from '@/test/home-routes';
-import { staffUser } from '@/test/admin-fixtures/users';
+import { staffUser, staffUsers } from '@/test/admin-fixtures/users';
+import { TEXT_DEBOUNCE_MS } from '@/lib/use-debounced-text';
 import { useSessionStore } from '@/stores/session.store';
 
 const target = userPage({
@@ -41,18 +42,6 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
 };
 
 describe('UsersPage', () => {
-  it('lists the staff users, banned ones included, and opens a row in the card', async () => {
-    mockApi(routes());
-    const { wrapper, router } = await mountUsers('/admin/users');
-    expect(wrapper.text()).toContain('spammer');
-    await wrapper
-      .findAll('[data-testid="user-row"] button')
-      .find((button) => button.text().includes('tuan_k'))!
-      .trigger('click');
-    await flushPromises();
-    expect(router.currentRoute.value.query.user).toBe('tuan_k');
-  });
-
   it('opens a user from the exact lookup and shows the id and rank', async () => {
     mockApi(routes());
     const { wrapper, router } = await mountUsers('/admin/users');
@@ -177,5 +166,132 @@ describe('UsersPage', () => {
     expect(document.body.textContent).toContain(
       'Không đóng vai được siêu quản trị khác hoặc tài khoản đã khoá.',
     );
+  });
+});
+
+const PAGE_OF_TWO = page(
+  [
+    staffUser(),
+    staffUser({
+      id: 'u-2',
+      username: 'spammer',
+      displayRank: 'banned',
+      isActive: false,
+      banReason: 'Spam blog',
+    }),
+  ],
+  { total: 2 },
+);
+const usersRequests = (calls: ReturnType<typeof mockApi>) =>
+  calls.filter((call) => call.path === '/admin/users');
+
+describe('UsersPage list', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('lists banned accounts too, opens one with "Mở" and keeps the filter in the URL', async () => {
+    mockApi(routes());
+    const { wrapper, router } = await mountUsers('/admin/users?q=tu');
+    expect(wrapper.text()).toContain('spammer');
+    await wrapper.findAll('[data-testid="user-row"]')[0]!.get('button').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toMatchObject({ user: 'tuan_k', q: 'tu' });
+  });
+
+  it.each([
+    ['', null],
+    ['?tab=active', 'false'],
+    ['?tab=banned', 'true'],
+  ])('on %s asks the backend for banned=%s', async (search, banned) => {
+    const calls = mockApi(routes());
+    await mountUsers(`/admin/users${search}`);
+    expect(usersRequests(calls).at(-1)!.query.get('banned')).toBe(banned);
+  });
+
+  it('shows the ban reason instead of the join date on the "Đã cấm" tab', async () => {
+    mockApi(routes(undefined, { 'GET /admin/users': PAGE_OF_TWO }));
+    const { wrapper } = await mountUsers('/admin/users?tab=banned');
+    const headers = wrapper.findAll('th').map((cell) => cell.text());
+    expect(headers).toContain('Lý do cấm');
+    expect(headers).not.toContain('Tham gia');
+    expect(wrapper.findAll('[data-testid="user-row"]')[1]!.text()).toContain('Spam blog');
+    expect(wrapper.get('[data-testid="tab-banned"]').attributes('aria-current')).toBe('page');
+  });
+
+  it('sends the typed prefix once, trimmed, from page 1, and writes it to the URL', async () => {
+    const calls = mockApi(routes());
+    const { wrapper, router } = await mountUsers('/admin/users?page=3');
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    await wrapper.get('input[type="search"]').setValue('  tuan ');
+    await vi.advanceTimersByTimeAsync(TEXT_DEBOUNCE_MS);
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ q: 'tuan' });
+    const last = usersRequests(calls).at(-1)!;
+    expect([last.query.get('search'), last.query.get('page')]).toEqual(['tuan', '1']);
+  });
+
+  it('shows the last access as a relative time over the exact time, and says when there was none', async () => {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60_000).toISOString();
+    mockApi(
+      routes(undefined, {
+        'GET /admin/users': page(
+          [
+            staffUser({ lastAccess: fiveMinutesAgo }),
+            staffUser({ id: 'u-3', username: 'moi_dk', lastAccess: null }),
+          ],
+          { total: 2 },
+        ),
+      }),
+    );
+    const { wrapper } = await mountUsers('/admin/users');
+    const [seen, never] = wrapper.findAll('[data-testid="user-row"]');
+    expect(seen!.text()).toContain('5 phút trước');
+    expect(never!.text()).toContain('Chưa từng truy cập');
+  });
+
+  it('marks a banned account and an account that was never activated, and only those', async () => {
+    mockApi(
+      routes(undefined, {
+        'GET /admin/users': page(
+          [
+            staffUser({ username: 'a_ok' }),
+            staffUser({ id: 'u-2', username: 'b_ban', banReason: 'Spam', isActive: false }),
+            staffUser({ id: 'u-3', username: 'c_new', isActive: false }),
+          ],
+          { total: 3 },
+        ),
+      }),
+    );
+    const { wrapper } = await mountUsers('/admin/users');
+    const rows = wrapper.findAll('[data-testid="user-row"]').map((row) => row.text());
+    expect(rows.map((text) => text.includes('Đã cấm'))).toEqual([false, true, false]);
+    expect(rows.map((text) => text.includes('Chưa kích hoạt'))).toEqual([false, false, true]);
+  });
+
+  it('names a known rank in Vietnamese and keeps an unknown rank as the server sent it', async () => {
+    mockApi(
+      routes(undefined, {
+        'GET /admin/users': page(
+          [staffUser(), staffUser({ id: 'u-2', username: 'mod_x', displayRank: 'moderator' })],
+          { total: 2 },
+        ),
+      }),
+    );
+    const { wrapper } = await mountUsers('/admin/users');
+    const rows = wrapper.findAll('[data-testid="user-row"]');
+    expect(rows[0]!.text()).toContain('Thành viên');
+    expect(rows[1]!.text()).toContain('moderator');
+  });
+
+  it('says what an empty search found, and never offers a page the backend refuses', async () => {
+    mockApi(routes(undefined, { 'GET /admin/users': page([], { total: 0 }) }));
+    const { wrapper } = await mountUsers('/admin/users?q=zzz');
+    expect(wrapper.text()).toContain('Không có người dùng nào khớp “zzz”.');
+    mockApi(
+      routes(undefined, {
+        'GET /admin/users': page(staffUsers(50), { total: 50 * 900, page: 499 }),
+      }),
+    );
+    const deep = await mountUsers('/admin/users?page=499');
+    expect(deep.wrapper.text()).toContain('Trang 499 / 500');
   });
 });

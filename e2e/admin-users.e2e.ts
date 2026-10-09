@@ -86,3 +86,46 @@ test('a superuser views as a user: the bar shows on the home page and its stop b
   await expect(bar).toBeHidden();
   expect(api.requestsTo('POST /auth/impersonate/stop')).toHaveLength(1);
 });
+
+test('the staff list filters by the banned tab and a username prefix, and its table is keyboard-scrollable at each width', async ({
+  page,
+  api,
+}) => {
+  signInAsStaff(api, ['judge.ban_user']);
+  const members = [
+    staffUser(),
+    staffUser({
+      id: 'u-2',
+      username: 'spammer',
+      displayRank: 'banned',
+      banReason: 'Spam blog',
+    }),
+    staffUser({ id: 'u-3', username: 'moi_dk', isActive: false }),
+  ];
+  api.routes['GET /admin/users'] = ({ url }) => {
+    const banned = url.searchParams.get('banned');
+    const prefix = (url.searchParams.get('search') ?? '').toLowerCase();
+    const items = members
+      .filter((user) => banned === null || String(user.banReason !== null) === banned)
+      .filter((user) => user.username.startsWith(prefix));
+    return adminList(items, { total: items.length });
+  };
+  await page.goto('/admin/users');
+  await expect(page.getByTestId('user-row')).toHaveCount(3);
+  await page.getByTestId('tab-banned').click();
+  await expect(page.getByTestId('user-row')).toHaveCount(1);
+  await expect(page.getByRole('columnheader', { name: 'Lý do cấm' })).toBeVisible();
+  await page.getByTestId('tab-all').click();
+  await page.getByLabel('Tìm người dùng').fill('mo');
+  await expect(page).toHaveURL(/q=mo/);
+  await expect(page.getByTestId('user-row')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Xóa ô tìm' }).click();
+  await expect(page.getByTestId('user-row')).toHaveCount(3);
+  for (const viewport of AUDIT_VIEWPORTS) {
+    await page.setViewportSize(viewport);
+    const region = page.getByRole('region', { name: 'Danh sách người dùng' });
+    await region.focus();
+    await expect(region).toBeFocused();
+    expect(await axeViolationsIn(page)).toEqual([]);
+  }
+});

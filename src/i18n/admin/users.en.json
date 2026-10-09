@@ -8,12 +8,43 @@
   "list": {
     "region": "User list",
     "empty": "No users.",
+    "emptySearch": "No users match “{search}”.",
+    "tabs": {
+      "label": "Status",
+      "all": "All",
+      "active": "Not banned",
+      "banned": "Banned"
+    },
+    "search": {
+      "label": "Search users",
+      "placeholder": "Search usernames…",
+      "clear": "Clear search",
+      "hint": "Matches the start of the username, case-insensitive."
+    },
     "columns": {
       "user": "User",
-      "rank": "Display rank",
-      "joined": "Joined"
+      "rank": "Rank · status",
+      "joined": "Joined",
+      "banReason": "Ban reason",
+      "lastAccess": "Last access",
+      "open": "Open"
     },
-    "banReason": "Ban reason: {reason}",
+    "openUser": "Open {username}",
+    "status": {
+      "banned": "Banned",
+      "inactive": "Not activated",
+      "superuser": "Superuser",
+      "staff": "Staff"
+    },
+    "reasonNone": "No reason recorded.",
+    "neverAccessed": "Never accessed",
+    "count": {
+      "all": "{total} users · {pageSize} per page",
+      "active": "{total} users not banned · {pageSize} per page",
+      "banned": "{total} banned users · {pageSize} per page",
+      "match": "{total} users match “{search}” · {pageSize} per page"
+    },
+    "order": "With a search, the list is ordered by username; otherwise, newest accounts first. It cannot be sorted by last access yet.",
     "pager": "User list pages",
     "previous": "Previous",
     "next": "Next",
@@ -69,5 +100,8 @@
       "lastLogin": "This person's last sign-in time is not changed.",
       "confirm": "Start viewing"
     }
+  },
+  "ranks": {
+    "user": "Member"
   }
 }
