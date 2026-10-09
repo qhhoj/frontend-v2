@@ -46,7 +46,7 @@ describe('apiGetPage', () => {
   it('resolves items and meta of a paginated route', async () => {
     const calls = mockApi({ 'GET /problems': page([{ code: 'aplusb' }], { total: 1 }) });
     const result = await apiGetPage('/problems', {
-      query: { page: 2, search: 'sum', visibility: 'public' },
+      query: { page: 2, search: 'sum' },
     });
     expect(result).toEqual({
       items: [{ code: 'aplusb' }],

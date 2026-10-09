@@ -9266,10 +9266,10 @@ export interface operations {
     };
     OrganizationsController_members: {
         parameters: {
-            query: {
+            query?: {
                 page?: number;
                 pageSize?: number;
-                sort: "performancePoints" | "points" | "problemCount" | "rating";
+                sort?: "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path: {
@@ -9738,7 +9738,7 @@ export interface operations {
     };
     ProblemsController_list: {
         parameters: {
-            query: {
+            query?: {
                 groupId?: string;
                 hasEditorial?: boolean;
                 lang?: components["schemas"]["StatementLanguage"];
@@ -9753,7 +9753,7 @@ export interface operations {
                 solved?: boolean;
                 sort?: components["schemas"]["ProblemSort"];
                 typeIds?: string[];
-                visibility: "all" | "private" | "public";
+                visibility?: "all" | "private" | "public";
             };
             header?: never;
             path?: never;
@@ -10575,7 +10575,7 @@ export interface operations {
                 ignoreZeroPointBatches?: boolean;
                 ignoreZeroPointCases?: boolean;
                 mainStatementLanguage?: string;
-                mode: "create" | "update";
+                mode?: "create" | "update";
                 points?: number;
                 statementLanguages?: string[];
                 tutorialLanguage?: string;
@@ -11832,10 +11832,10 @@ export interface operations {
     };
     LeaderboardsController_users: {
         parameters: {
-            query: {
+            query?: {
                 page?: number;
                 pageSize?: number;
-                sort: "performancePoints" | "points" | "problemCount" | "rating";
+                sort?: "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path?: never;
@@ -12085,8 +12085,8 @@ export interface operations {
     };
     LeaderboardsController_rank: {
         parameters: {
-            query: {
-                sort: "contributionPoints" | "performancePoints" | "points" | "problemCount" | "rating";
+            query?: {
+                sort?: "contributionPoints" | "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path: {
