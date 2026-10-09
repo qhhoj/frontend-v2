@@ -1782,6 +1782,12 @@
       "submitted": "submitted {problem}",
       "empty": "Nothing has happened yet."
     },
+    "table": {
+      "caption": "Replay ranking",
+      "ghost": "Ghost",
+      "unranked": "Not enough data",
+      "virtual": "(virtual)"
+    },
     "title": "Replay"
   },
   "contestTags": {

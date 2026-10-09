@@ -1782,6 +1782,12 @@
       "submitted": "nộp bài {problem}",
       "empty": "Chưa có sự kiện nào."
     },
+    "table": {
+      "caption": "Bảng xếp hạng phát lại",
+      "ghost": "Ghost",
+      "unranked": "Không đủ dữ liệu",
+      "virtual": "(ảo)"
+    },
     "title": "Phát lại"
   },
   "contestTags": {
