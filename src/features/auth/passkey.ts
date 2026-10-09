@@ -38,6 +38,8 @@ export async function signInWithPasskey(): Promise<PasskeyOutcome> {
     throw error;
   }
   if (!credential) return 'cancelled';
-  await webauthnLoginVerify((credential as unknown as { toJSON(): object }).toJSON());
+  await webauthnLoginVerify(
+    (credential as unknown as { toJSON(): Record<string, unknown> }).toJSON(),
+  );
   return 'verified';
 }

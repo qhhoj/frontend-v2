@@ -1,59 +1,44 @@
-import { apiRequest } from './client';
+import { apiGet, apiSend } from './typed';
 import type {
   ChangePasswordBody,
   LoginBody,
-  PasskeyRequestOptions,
   PasswordResetBody,
   RegisterBody,
-  SessionResponse,
   SocialCompleteBody,
-  SocialProvidersResponse,
-  UsernameAvailableResponse,
 } from './types/auth';
 
-export const fetchSession = () => apiRequest<SessionResponse>('/auth/me');
-export const login = (body: LoginBody) =>
-  apiRequest<SessionResponse>('/auth/login', { method: 'POST', body });
-export const logout = () => apiRequest<void>('/auth/logout', { method: 'POST' });
+export const fetchSession = () => apiGet('/auth/me');
+export const login = (body: LoginBody) => apiSend('post', '/auth/login', { body });
+export const logout = () => apiSend('post', '/auth/logout');
 /** Ends every session of the account, this one included; the server clears the cookie. The backend refuses it while impersonating (`@NoImpersonation()`); the UI also locks it then (Decision 16). */
-export const logoutAllSessions = () => apiRequest<void>('/auth/logout-all', { method: 'POST' });
+export const logoutAllSessions = () => apiSend('post', '/auth/logout-all');
 /** Superuser only (backend U2); the answer is the new session and the response sets its cookie. 403 for a superuser target or while already impersonating. */
 export const startImpersonation = (userId: string) =>
-  apiRequest<SessionResponse>(`/auth/impersonate/${encodeURIComponent(userId)}`, {
-    method: 'POST',
-  });
+  apiSend('post', '/auth/impersonate/{userId}', { path: { userId } });
 /** Back to the staff account that started viewing as this user. */
-export const stopImpersonation = () =>
-  apiRequest<SessionResponse>('/auth/impersonate/stop', { method: 'POST' });
-export const register = (body: RegisterBody) =>
-  apiRequest<void>('/auth/register', { method: 'POST', body });
-export const activate = (token: string) =>
-  apiRequest<void>('/auth/activate', { method: 'POST', body: { token } });
+export const stopImpersonation = () => apiSend('post', '/auth/impersonate/stop');
+export const register = (body: RegisterBody) => apiSend('post', '/auth/register', { body });
+export const activate = (token: string) => apiSend('post', '/auth/activate', { body: { token } });
 /** 204 whatever the email: nothing says whether the address has an account. */
 export const resendActivation = (email: string) =>
-  apiRequest<void>('/auth/activate/resend', { method: 'POST', body: { email } });
+  apiSend('post', '/auth/activate/resend', { body: { email } });
 export const fetchUsernameAvailable = (username: string, signal?: AbortSignal) =>
-  apiRequest<UsernameAvailableResponse>('/auth/username-available', {
-    query: { username },
-    signal,
-  });
+  apiGet('/auth/username-available', { query: { username }, signal });
 
 /** A TOTP code or a scratch code; the backend tells them apart. */
 export const verifyTotp = (code: string) =>
-  apiRequest<void>('/auth/2fa/totp/verify', { method: 'POST', body: { code } });
+  apiSend('post', '/auth/2fa/totp/verify', { body: { code } });
 /** `null` when the session no longer needs a second factor. */
-export const webauthnLoginOptions = () =>
-  apiRequest<PasskeyRequestOptions | null>('/auth/2fa/webauthn/login/options', { method: 'POST' });
-export const webauthnLoginVerify = (response: object) =>
-  apiRequest<void>('/auth/2fa/webauthn/login/verify', { method: 'POST', body: { response } });
+export const webauthnLoginOptions = () => apiSend('post', '/auth/2fa/webauthn/login/options');
+export const webauthnLoginVerify = (response: Record<string, unknown>) =>
+  apiSend('post', '/auth/2fa/webauthn/login/verify', { body: { response } });
 
 export const requestPasswordReset = (email: string) =>
-  apiRequest<void>('/auth/password/reset', { method: 'POST', body: { email } });
+  apiSend('post', '/auth/password/reset', { body: { email } });
 export const confirmPasswordReset = (body: PasswordResetBody) =>
-  apiRequest<void>('/auth/password/reset/confirm', { method: 'POST', body });
+  apiSend('post', '/auth/password/reset/confirm', { body });
 export const changePassword = (body: ChangePasswordBody) =>
-  apiRequest<void>('/auth/password/change', { method: 'POST', body });
+  apiSend('post', '/auth/password/change', { body });
 export const completeSocialSignup = (body: SocialCompleteBody) =>
-  apiRequest<SessionResponse>('/auth/social/complete', { method: 'POST', body });
-export const fetchSocialProviders = () =>
-  apiRequest<SocialProvidersResponse>('/auth/social/providers');
+  apiSend('post', '/auth/social/complete', { body });
+export const fetchSocialProviders = () => apiGet('/auth/social/providers');
