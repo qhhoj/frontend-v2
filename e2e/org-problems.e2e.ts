@@ -53,7 +53,7 @@ test('filters by tag and archive state in the URL; an empty organization shows t
 }) => {
   installOrgProblems(api, { canAdminister: true });
   await page.goto(TAB);
-  await page.getByRole('button', { name: 'Đồ thị' }).click();
+  await page.getByTestId('org-problem-list').getByRole('button', { name: 'Đồ thị' }).click();
   await expect(page).toHaveURL(/tag=dt/);
   await page.getByRole('button', { name: 'Đã lưu trữ' }).click();
   await expect(page).toHaveURL(/archived=true/);
@@ -87,3 +87,22 @@ defineShiftTests([
     viewports: [PHONE, DESKTOP],
   },
 ]);
+
+test('an admin adds a tag in the catalogue', async ({ page, api }) => {
+  installOrgProblems(api, { canAdminister: true });
+  api.routes['POST /organizations/lhp/problem-tags'] = {
+    status: 201,
+    body: { data: { id: 'tag-new', slug: 'ds', name: 'Cấu trúc dữ liệu', color: 'tag-5' } },
+  };
+  await page.goto(TAB);
+  const catalogue = page.getByTestId('org-tag-catalogue');
+  await expect(catalogue.getByText('3 / 100')).toBeVisible();
+  await catalogue.getByRole('button', { name: 'Thêm thẻ' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Mã thẻ').fill('ds');
+  await dialog.getByLabel('Tên thẻ').fill('Cấu trúc dữ liệu');
+  await dialog.getByLabel('Màu 5').check();
+  expect(await axeViolationsIn(page)).toEqual([]);
+  await dialog.getByRole('button', { name: 'Lưu thẻ', exact: true }).click();
+  await expect(dialog).toBeHidden();
+});

@@ -2037,6 +2037,30 @@
       "unknownTag": "Thẻ đã chọn không còn trong danh mục của tổ chức. Tải lại trang rồi chọn lại.",
       "slugTaken": "Mã thẻ này đã có trong tổ chức."
     },
+    "tags": {
+      "title": "Thẻ của tổ chức",
+      "count": "{count} / {max}",
+      "empty": "Chưa có thẻ nào. Thêm thẻ để nhóm bài.",
+      "add": "Thêm thẻ",
+      "editLabel": "Sửa thẻ {name}",
+      "deleteLabel": "Xóa thẻ {name}",
+      "createTitle": "Thêm thẻ",
+      "editTitle": "Sửa thẻ {name}",
+      "slug": "Mã thẻ",
+      "slugHint": "Chữ thường, số và dấu gạch ngang, tối đa 20 ký tự. Không đổi được sau khi tạo.",
+      "slugFixed": "Mã thẻ: {slug} (không đổi được)",
+      "name": "Tên thẻ",
+      "color": "Màu",
+      "colorName": "Màu {number}",
+      "save": "Lưu thẻ",
+      "deleteTitle": "Xóa thẻ {name}?",
+      "deleteBody": "Thẻ bị gỡ khỏi mọi bài của tổ chức. Không hoàn tác được.",
+      "deleteConfirm": "Xóa thẻ",
+      "errors": {
+        "slug": "Mã thẻ gồm chữ thường, số và dấu gạch ngang, 1-20 ký tự.",
+        "name": "Tên thẻ dài từ 1 đến 40 ký tự."
+      }
+    },
     "title": "Bài tập của tổ chức"
   },
   "orgQuota": {

@@ -2037,6 +2037,30 @@
       "unknownTag": "A chosen tag is no longer in the organization’s catalogue. Reload and pick again.",
       "slugTaken": "This tag code already exists in the organization."
     },
+    "tags": {
+      "title": "Organization tags",
+      "count": "{count} / {max}",
+      "empty": "No tags yet. Add tags to group problems.",
+      "add": "Add tag",
+      "editLabel": "Edit tag {name}",
+      "deleteLabel": "Delete tag {name}",
+      "createTitle": "Add tag",
+      "editTitle": "Edit tag {name}",
+      "slug": "Tag code",
+      "slugHint": "Lowercase letters, digits and hyphens, at most 20. It cannot change later.",
+      "slugFixed": "Tag code: {slug} (cannot change)",
+      "name": "Tag name",
+      "color": "Colour",
+      "colorName": "Colour {number}",
+      "save": "Save tag",
+      "deleteTitle": "Delete tag {name}?",
+      "deleteBody": "The tag is removed from every problem of the organization. This cannot be undone.",
+      "deleteConfirm": "Delete tag",
+      "errors": {
+        "slug": "A tag code is 1-20 lowercase letters, digits and hyphens.",
+        "name": "A tag name is 1 to 40 characters long."
+      }
+    },
     "title": "Organization problems"
   },
   "orgQuota": {

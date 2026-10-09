@@ -18,6 +18,7 @@ import OrgProblemFiltersBar from './OrgProblemFilters.vue';
 import OrgProblemTable from './OrgProblemTable.vue';
 import OrgProblemTableSkeleton from './OrgProblemTableSkeleton.vue';
 import OrgProblemTagsDialog from './OrgProblemTagsDialog.vue';
+import OrgTagCatalogue from './OrgTagCatalogue.vue';
 import { useOrgProblemActions } from './use-org-problem-actions';
 
 const route = useRoute();
@@ -153,7 +154,14 @@ function saveTags(tagIds: string[]) {
           {{ actions.failureText.value }}
         </p>
       </GlassCard>
-      <!-- catalogue -->
+      <OrgTagCatalogue
+        v-if="isAdmin"
+        :slug="slug"
+        :tags="tagList"
+        :is-loading="tags.isLoading.value"
+        :error="tags.error.value"
+        @retry="tags.refetch()"
+      />
     </div>
     <!-- bulk -->
     <OrgProblemTagsDialog
