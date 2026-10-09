@@ -1,3 +1,57 @@
 {
+  "lead": "Khoá cho hệ thống bên ngoài tạo kỳ thi riêng tư, đặt thí sinh và đọc bảng điểm. Khoá chỉ tạo được từ phiên đăng nhập trên trình duyệt, không qua mã API hay khi đang đóng vai.",
+  "impersonating": "Bạn đang xem dưới tên người khác: không tạo hay thu hồi khoá được.",
+  "form": {
+    "title": "Tạo khoá mới",
+    "name": "Tên hệ thống",
+    "scopes": "Quyền của khoá",
+    "scope": {
+      "contestsWrite": "Tạo và sửa kỳ thi, đặt thí sinh",
+      "contestsRead": "Đọc kỳ thi và bảng điểm"
+    },
+    "cidrs": "Địa chỉ được gọi (CIDR)",
+    "cidrsHint": "Mỗi dòng một khối, ví dụ 10.0.0.0/8 hoặc 203.0.113.7/32.",
+    "actsAsRefused": "Người dùng này không tồn tại, bị khóa hoặc thiếu quyền tạo kỳ thi riêng tư.",
+    "cidrRefused": "Khối địa chỉ không hợp lệ.",
+    "actsAs": "Hành động dưới tên",
+    "actsAsHint": "Tên người dùng có quyền tạo kỳ thi riêng tư; kỳ thi tạo ra mang tên người này.",
+    "expires": "Hết hạn",
+    "expiresHint": "Phải sau thời điểm hiện tại. Để trống nếu khoá dùng đến khi bị thu hồi.",
+    "submit": "Tạo khoá"
+  },
+  "key": {
+    "title": "Khoá của {name}",
+    "warning": "Khoá chỉ hiển thị một lần — hệ thống chỉ lưu giá trị băm. Sao chép khoá vào hệ thống bên ngoài trước khi đóng.",
+    "label": "Khoá tích hợp",
+    "saved": "Tôi đã lưu khoá này",
+    "close": "Đóng",
+    "copy": "Sao chép khoá"
+  },
+  "table": {
+    "caption": "Các hệ thống ngoài",
+    "region": "Bảng hệ thống ngoài",
+    "name": "Tên",
+    "key": "Khoá",
+    "scopes": "Quyền",
+    "cidrs": "Địa chỉ",
+    "actsAs": "Dưới tên",
+    "lastUsed": "Dùng gần nhất",
+    "expires": "Hết hạn",
+    "state": "Trạng thái",
+    "active": "Đang dùng",
+    "revokedAt": "Đã thu hồi {date}",
+    "never": "Chưa dùng",
+    "noExpiry": "Không",
+    "revoke": "Thu hồi",
+    "revokeLabel": "Thu hồi khoá của {name}",
+    "empty": "Chưa có hệ thống ngoài nào.",
+    "pager": "Trang hệ thống ngoài"
+  },
+  "confirm": {
+    "title": "Thu hồi khoá của {name}?",
+    "body": "Khoá ngừng hoạt động ngay ở lần gọi kế tiếp. Không hoàn tác được; muốn dùng lại phải tạo khoá mới.",
+    "confirm": "Thu hồi khoá"
+  },
+  "revoked": "Đã thu hồi khoá của {name}",
   "title": "Hệ thống ngoài"
 }

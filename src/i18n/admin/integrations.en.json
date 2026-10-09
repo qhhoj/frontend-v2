@@ -1,3 +1,57 @@
 {
+  "lead": "Keys that let an external system create private contests, set participants and read standings. Keys are minted only from a browser session, never with an API token or while impersonating.",
+  "impersonating": "You are viewing as another user: keys cannot be created or revoked.",
+  "form": {
+    "title": "Create a key",
+    "name": "System name",
+    "scopes": "Key permissions",
+    "scope": {
+      "contestsWrite": "Create and edit contests, set participants",
+      "contestsRead": "Read contests and standings"
+    },
+    "cidrs": "Allowed addresses (CIDR)",
+    "cidrsHint": "One block per line, for example 10.0.0.0/8 or 203.0.113.7/32.",
+    "actsAsRefused": "This user does not exist, is locked or lacks the right to create private contests.",
+    "cidrRefused": "Not a valid address block.",
+    "actsAs": "Acts as",
+    "actsAsHint": "A username allowed to create private contests; created contests carry this author.",
+    "expires": "Expires",
+    "expiresHint": "Must be in the future. Leave empty for a key that works until revoked.",
+    "submit": "Create key"
+  },
+  "key": {
+    "title": "Key of {name}",
+    "warning": "The key is shown once — only its hash is stored. Copy it into the external system before closing.",
+    "label": "Integration key",
+    "saved": "I have saved this key",
+    "close": "Close",
+    "copy": "Copy key"
+  },
+  "table": {
+    "caption": "External systems",
+    "region": "External systems table",
+    "name": "Name",
+    "key": "Key",
+    "scopes": "Permissions",
+    "cidrs": "Addresses",
+    "actsAs": "Acts as",
+    "lastUsed": "Last used",
+    "expires": "Expires",
+    "state": "State",
+    "active": "Active",
+    "revokedAt": "Revoked {date}",
+    "never": "Never",
+    "noExpiry": "None",
+    "revoke": "Revoke",
+    "revokeLabel": "Revoke the key of {name}",
+    "empty": "No external systems yet.",
+    "pager": "External system pages"
+  },
+  "confirm": {
+    "title": "Revoke the key of {name}?",
+    "body": "The key stops working on its next request. This cannot be undone; a new key must be created.",
+    "confirm": "Revoke key"
+  },
+  "revoked": "Revoked the key of {name}",
   "title": "External systems"
 }
