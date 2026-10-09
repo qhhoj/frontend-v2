@@ -18,8 +18,14 @@ import OrgProblemFiltersBar from './OrgProblemFilters.vue';
 import OrgProblemTable from './OrgProblemTable.vue';
 import OrgProblemTableSkeleton from './OrgProblemTableSkeleton.vue';
 import OrgProblemTagsDialog from './OrgProblemTagsDialog.vue';
+import InlineBit from '@/components/InlineBit.vue';
+import OrgBulkBar from './OrgBulkBar.vue';
+import OrgBulkResult from './OrgBulkResult.vue';
+import OrgBulkTagDialog from './OrgBulkTagDialog.vue';
 import OrgTagCatalogue from './OrgTagCatalogue.vue';
 import { useOrgProblemActions } from './use-org-problem-actions';
+import { useOrgBulk } from './use-org-bulk';
+import type { BulkCommand } from './use-org-bulk';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +47,12 @@ const filteredTagName = computed(
 /** Codes the admin ticked on the current page (Task 8's bulk bar acts on them). */
 const selected = ref<string[]>([]);
 const actions = useOrgProblemActions(slug);
+const bulk = useOrgBulk(slug, selected);
+const isBulkTagOpen = ref(false);
+function runTagBulk(command: BulkCommand) {
+  isBulkTagOpen.value = false;
+  bulk.run(command);
+}
 const editing = ref<OrganizationProblem | null>(null);
 const isTagsOpen = computed({
   get: () => editing.value !== null,
@@ -163,7 +175,35 @@ function saveTags(tagIds: string[]) {
         @retry="tags.refetch()"
       />
     </div>
-    <!-- bulk -->
+    <OrgBulkResult
+      v-if="bulk.result.value && bulk.action.value"
+      :result="bulk.result.value"
+      :action="bulk.action.value"
+    />
+    <p
+      v-if="bulk.failureText.value"
+      role="alert"
+      data-testid="org-bulk-failure"
+      class="flex items-center gap-2 text-sm text-negative"
+    >
+      <InlineBit :kind="ORG_BITS.bulkRefused" />{{ bulk.failureText.value }}
+    </p>
+    <OrgBulkBar
+      v-if="isAdmin && selected.length > 0"
+      :count="selected.length"
+      :is-pending="bulk.isPending.value"
+      @archive="bulk.run({ action: 'archive' })"
+      @unarchive="bulk.run({ action: 'unarchive' })"
+      @tag="isBulkTagOpen = true"
+      @clear="selected = []"
+    />
+    <OrgBulkTagDialog
+      v-model:visible="isBulkTagOpen"
+      :tags="tagList"
+      :busy="bulk.isPending.value"
+      :count="selected.length"
+      @confirm="runTagBulk"
+    />
     <OrgProblemTagsDialog
       v-model:visible="isTagsOpen"
       :problem="editing"

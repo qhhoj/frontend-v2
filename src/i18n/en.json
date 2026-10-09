@@ -2061,6 +2061,31 @@
         "name": "A tag name is 1 to 40 characters long."
       }
     },
+    "bulk": {
+      "label": "Bulk actions",
+      "selected": "{count} problem selected | {count} problems selected",
+      "tag": "Tag…",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "clear": "Clear selection",
+      "tagTitle": "Add or remove a tag on {count} problem | Add or remove a tag on {count} problems",
+      "modeLegend": "Action",
+      "addTag": "Add tag",
+      "removeTag": "Remove tag",
+      "tagLegend": "Tag",
+      "apply": "Apply",
+      "resultTitle": "Result of {action} on {count} problem | Result of {action} on {count} problems",
+      "actions": {
+        "archive": "archive",
+        "unarchive": "unarchive",
+        "add-tag": "add tag",
+        "remove-tag": "remove tag"
+      },
+      "rowDone": "{code} done",
+      "rowNotFound": "{code} no longer belongs to this organization",
+      "rowSkipped": "{code} skipped",
+      "summary": "{done}/{total} succeeded. At most 100 problems per action, 20 actions an hour."
+    },
     "title": "Organization problems"
   },
   "orgQuota": {

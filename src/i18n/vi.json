@@ -2061,6 +2061,31 @@
         "name": "Tên thẻ dài từ 1 đến 40 ký tự."
       }
     },
+    "bulk": {
+      "label": "Thao tác hàng loạt",
+      "selected": "Đã chọn {count} bài",
+      "tag": "Gắn thẻ…",
+      "archive": "Lưu trữ",
+      "unarchive": "Bỏ lưu trữ",
+      "clear": "Bỏ chọn",
+      "tagTitle": "Gắn hoặc gỡ thẻ cho {count} bài",
+      "modeLegend": "Thao tác",
+      "addTag": "Gắn thẻ",
+      "removeTag": "Gỡ thẻ",
+      "tagLegend": "Thẻ",
+      "apply": "Áp dụng",
+      "resultTitle": "Kết quả {action} {count} bài",
+      "actions": {
+        "archive": "lưu trữ",
+        "unarchive": "bỏ lưu trữ",
+        "add-tag": "gắn thẻ",
+        "remove-tag": "gỡ thẻ"
+      },
+      "rowDone": "{code} xong",
+      "rowNotFound": "{code} không còn thuộc tổ chức này",
+      "rowSkipped": "{code} bị bỏ qua",
+      "summary": "{done}/{total} thành công. Giới hạn 100 bài mỗi lần, 20 lần mỗi giờ."
+    },
     "title": "Bài tập của tổ chức"
   },
   "orgQuota": {
