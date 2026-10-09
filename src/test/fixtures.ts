@@ -371,6 +371,7 @@ export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDe
   formatConfig: {},
   problems: null,
   viewer: contestViewer(),
+  settings: null,
   ...overrides,
 });
 
@@ -438,6 +439,8 @@ export const rankingRow = (
   user: {
     id: username === 'user_01' ? sessionUser().id : `${participationId}-user`,
     username,
+    organization: null,
+    rating: null,
   },
   virtual: 0,
   isDisqualified: false,

@@ -27,6 +27,8 @@ export const contestProblem = (
   partial: true,
   isPretested: false,
   maxSubmissions: null,
+  solverCount: null,
+  viewerResult: null,
   ...extra,
 });
 
@@ -56,6 +58,8 @@ export const contestSettings = (overrides: Partial<ContestSettings> = {}): Conte
 });
 
 const contestBasics = (): Omit<EditableContest, 'problems' | 'viewer' | 'settings'> => ({
+  virtualCount: 0,
+  descriptionHtml: '<p>Mỗi bài có đủ test ẩn.</p>',
   key: 'hcmus-w41',
   name: 'Chọn đội tuyển HCMUS · Tuần 41',
   summary: 'Vòng tuần cho đội tuyển lớp 10–12.',
@@ -95,7 +99,15 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
     contestProblem('B', 'hcmus41b', 'Trò chơi trên cây'),
     contestProblem('C', 'hcmus41c', 'Đường đi ngắn nhất có ràng buộc', { maxSubmissions: 20 }),
   ],
-  viewer: { canEdit: true, isEditor: true, isTester: false, inContest: false },
+  viewer: {
+    canEdit: true,
+    isEditor: true,
+    isTester: false,
+    inContest: false,
+    isCurrent: false,
+    liveStatus: null,
+    liveParticipation: null,
+  },
   settings: contestSettings(),
   ...overrides,
 });

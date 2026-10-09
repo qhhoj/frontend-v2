@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import { contestViewer } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import { staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
@@ -32,7 +33,7 @@ describe('ContestEditorPage', () => {
       ...contestEditorRoutes(
         editableContest({
           settings: null,
-          viewer: { canEdit: false, isEditor: false, isTester: false, inContest: false },
+          viewer: contestViewer(),
         }),
       ),
     });

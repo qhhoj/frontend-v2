@@ -1,9 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { announcement, participationSummary } from '@/test/fixtures';
+import {
+  announcement,
+  contestDetail,
+  contestItem,
+  contestStats,
+  participationSummary,
+  ranking,
+} from '@/test/fixtures';
 import { mockApi, noContent, ok, page } from '@/test/mock-api';
 import {
+  fetchContest,
   fetchContestAnnouncements,
+  fetchContests,
+  fetchContestStats,
   fetchContestSubmissions,
+  fetchCurrentParticipation,
+  fetchRanking,
   joinContest,
   leaveContest,
   registerContest,
@@ -42,5 +54,37 @@ describe('contest lists', () => {
     const calls = mockApi({ 'GET /contests/r42/submissions': page([]) });
     await fetchContestSubmissions('r42', { status: ['QU', 'P', 'G'], page: 1 });
     expect(calls[0]!.query.getAll('status')).toEqual(['QU', 'P', 'G']);
+  });
+});
+
+describe('contest reads', () => {
+  it('lists contests with the filters as query parameters', async () => {
+    const calls = mockApi({ 'GET /contests': page([contestItem()]) });
+    await fetchContests({ phase: 'running', rated: true, search: 'w4', page: 2 });
+    expect(calls[0]!.query.get('phase')).toBe('running');
+    expect(calls[0]!.query.get('rated')).toBe('true');
+    expect(calls[0]!.query.get('search')).toBe('w4');
+    expect(calls[0]!.query.get('page')).toBe('2');
+  });
+  it('reads one contest by its encoded key', async () => {
+    const calls = mockApi({ 'GET /contests/a%2Fb': ok(contestDetail()) });
+    await fetchContest('a/b');
+    expect(calls[0]!.path).toBe('/contests/a%2Fb');
+  });
+  it('asks the ranking with or without the virtual runs', async () => {
+    const calls = mockApi({ 'GET /contests/r42/ranking': ok(ranking()) });
+    await fetchRanking('r42', true);
+    await fetchRanking('r42', false);
+    expect(calls.map((call) => call.query.get('virtual'))).toEqual(['true', 'false']);
+  });
+  it('reads the current participation, which may be null', async () => {
+    const calls = mockApi({ 'GET /contests/current': ok(null) });
+    await expect(fetchCurrentParticipation()).resolves.toBeNull();
+    expect(calls[0]!.method).toBe('GET');
+  });
+  it('reads the stats of the encoded key', async () => {
+    const calls = mockApi({ 'GET /contests/r%2F42/stats': ok(contestStats()) });
+    await fetchContestStats('r/42');
+    expect(calls[0]!.path).toBe('/contests/r%2F42/stats');
   });
 });

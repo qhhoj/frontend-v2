@@ -1,45 +1,31 @@
-import { API_BASE, ApiError, apiPage, apiRequest } from './client';
+import { ApiError } from './client';
+import { apiGet, apiGetPage, apiSend, apiUrl } from './typed';
 import type {
-  Announcement,
-  ContestActions,
   ContestBody,
-  ContestDataStatus,
-  Participation,
-  ParticipationSummary,
   ContestPatch,
-  EditableContest,
-  OfficialRanking,
-  RankingLink,
+  PrepareDataBody,
   RankingLinkPatch,
 } from './types/contest-editing';
 
-export const contestPath = (key: string) => `/contests/${encodeURIComponent(key)}`;
-
-export const fetchEditableContest = (key: string) => apiRequest<EditableContest>(contestPath(key));
-export const createContest = (body: ContestBody) =>
-  apiRequest<EditableContest>('/contests', { method: 'POST', body });
+export const fetchEditableContest = (key: string) => apiGet('/contests/{key}', { path: { key } });
+export const createContest = (body: ContestBody) => apiSend('post', '/contests', { body });
 export const updateContest = (key: string, patch: ContestPatch) =>
-  apiRequest<EditableContest>(contestPath(key), { method: 'PATCH', body: patch });
+  apiSend('patch', '/contests/{key}', { path: { key }, body: patch });
 export const cloneContest = (key: string, newKey: string) =>
-  apiRequest<EditableContest>(`${contestPath(key)}/clone`, {
-    method: 'POST',
-    body: { key: newKey },
-  });
+  apiSend('post', '/contests/{key}/clone', { path: { key }, body: { key: newKey } });
 
-const announcementsPath = (key: string) => `${contestPath(key)}/announcements`;
 export const ANNOUNCEMENTS_PAGE_SIZE = 20;
 export const fetchAnnouncements = (key: string, page: number) =>
-  apiPage<Announcement>(announcementsPath(key), {
+  apiGetPage('/contests/{key}/announcements', {
+    path: { key },
     query: { page, pageSize: ANNOUNCEMENTS_PAGE_SIZE },
   });
 export const postAnnouncement = (key: string, body: { title: string; description: string }) =>
-  apiRequest<Announcement>(announcementsPath(key), { method: 'POST', body });
+  apiSend('post', '/contests/{key}/announcements', { path: { key }, body });
 export const resendAnnouncement = (key: string, id: string) =>
-  apiRequest<void>(`${announcementsPath(key)}/${encodeURIComponent(id)}/resend`, {
-    method: 'POST',
-  });
+  apiSend('post', '/contests/{key}/announcements/{id}/resend', { path: { key, id } });
 export const deleteAnnouncement = (key: string, id: string) =>
-  apiRequest<void>(`${announcementsPath(key)}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  apiSend('delete', '/contests/{key}/announcements/{id}', { path: { key, id } });
 
 /** A 404 is a state here (no table, no link yet), not an error. */
 const nullOn404 = <Result>(promise: Promise<Result>) =>
@@ -49,51 +35,45 @@ const nullOn404 = <Result>(promise: Promise<Result>) =>
   });
 
 export const fetchOfficialRanking = (key: string) =>
-  nullOn404(apiRequest<OfficialRanking>(`${contestPath(key)}/official-ranking`));
+  nullOn404(apiGet('/contests/{key}/official-ranking', { path: { key } }));
 export const putOfficialRanking = (key: string, body: { csv: string } | { url: string }) =>
-  apiRequest<OfficialRanking>(`${contestPath(key)}/official-ranking`, { method: 'PUT', body });
+  apiSend('put', '/contests/{key}/official-ranking', { path: { key }, body });
 export const deleteOfficialRanking = (key: string) =>
-  apiRequest<void>(`${contestPath(key)}/official-ranking`, { method: 'DELETE' });
+  apiSend('delete', '/contests/{key}/official-ranking', { path: { key } });
 
 export const fetchRankingLink = (key: string) =>
-  nullOn404(apiRequest<RankingLink>(`${contestPath(key)}/ranking-link`));
+  nullOn404(apiGet('/contests/{key}/ranking-link', { path: { key } }));
 export const createRankingLink = (key: string) =>
-  apiRequest<RankingLink>(`${contestPath(key)}/ranking-link`, { method: 'POST' });
+  apiSend('post', '/contests/{key}/ranking-link', { path: { key } });
 export const updateRankingLink = (key: string, patch: RankingLinkPatch) =>
-  apiRequest<RankingLink>(`${contestPath(key)}/ranking-link`, { method: 'PATCH', body: patch });
+  apiSend('patch', '/contests/{key}/ranking-link', { path: { key }, body: patch });
 export const regenerateRankingLink = (key: string) =>
-  apiRequest<RankingLink>(`${contestPath(key)}/ranking-link/regenerate`, { method: 'POST' });
+  apiSend('post', '/contests/{key}/ranking-link/regenerate', { path: { key } });
 
-type Queued = { queued: true };
 export const rescoreContest = (key: string) =>
-  apiRequest<Queued>(`${contestPath(key)}/rescore`, { method: 'POST' });
+  apiSend('post', '/contests/{key}/rescore', { path: { key } });
 export const judgeFinal = (key: string) =>
-  apiRequest<Queued>(`${contestPath(key)}/judge-final`, { method: 'POST' });
+  apiSend('post', '/contests/{key}/judge-final', { path: { key } });
 export const rateContest = (key: string) =>
-  apiRequest<Queued>(`${contestPath(key)}/rate`, { method: 'POST' });
+  apiSend('post', '/contests/{key}/rate', { path: { key } });
 export const fetchContestActions = (key: string) =>
-  apiRequest<ContestActions>(`${contestPath(key)}/actions`);
+  apiGet('/contests/{key}/actions', { path: { key } });
 
-export const fetchContestData = (key: string) =>
-  apiRequest<ContestDataStatus>(`${contestPath(key)}/data`);
-export const prepareContestData = (
-  key: string,
-  body: { problemGlob?: string; results?: string[] },
-) => apiRequest<Queued>(`${contestPath(key)}/data`, { method: 'POST', body });
+export const fetchContestData = (key: string) => apiGet('/contests/{key}/data', { path: { key } });
+export const prepareContestData = (key: string, body: PrepareDataBody) =>
+  apiSend('post', '/contests/{key}/data', { path: { key }, body });
 /** A plain link: the zip downloads with the session cookie, no envelope. */
 export const contestDataDownloadUrl = (key: string) =>
-  `${API_BASE}${contestPath(key)}/data/download`;
+  apiUrl('/contests/{key}/data/download', { path: { key } });
 
 export const PARTICIPATIONS_PAGE_SIZE = 50;
 export const fetchParticipations = (key: string, query: { page: number; user: string }) =>
-  apiPage<Participation>(`${contestPath(key)}/participations`, {
+  apiGetPage('/contests/{key}/participations', {
+    path: { key },
     query: { ...query, pageSize: PARTICIPATIONS_PAGE_SIZE },
   });
 export const setDisqualified = (key: string, id: string, disqualified: boolean) =>
-  apiRequest<ParticipationSummary>(
-    `${contestPath(key)}/participations/${encodeURIComponent(id)}/disqualify`,
-    {
-      method: 'POST',
-      body: { disqualified },
-    },
-  );
+  apiSend('post', '/contests/{key}/participations/{id}/disqualify', {
+    path: { key, id },
+    body: { disqualified },
+  });

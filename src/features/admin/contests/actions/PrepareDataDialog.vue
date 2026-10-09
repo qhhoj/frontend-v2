@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { prepareContestData } from '@/api/contest-editing.api';
+import type { PrepareDataBody } from '@/api/types/contest-editing';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
+import type { SubmissionResult } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_INPUT_CLASS } from '../../ui/classes';
@@ -11,11 +13,10 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 const props = defineProps<{ contestKey: string }>();
 const visible = defineModel<boolean>('visible', { required: true });
 const glob = ref('');
-const results = ref<string[]>([]);
+const results = ref<SubmissionResult[]>([]);
 
 const mutation = useAdminMutation({
-  mutate: (body: { problemGlob?: string; results?: string[] }) =>
-    prepareContestData(props.contestKey, body),
+  mutate: (body: PrepareDataBody) => prepareContestData(props.contestKey, body),
   invalidates: () => [['admin', 'contest-data', props.contestKey]],
   onDone: () => {
     visible.value = false;
