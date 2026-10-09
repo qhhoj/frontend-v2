@@ -8,6 +8,8 @@ import { hasPermission } from '@/lib/permissions';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
 import { useLocaleStore } from '@/stores/locale.store';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { useSessionStore } from '@/stores/session.store';
 import BanUserDialog from './BanUserDialog.vue';
 import { RATING_BOX_CLASSES } from './profile-geometry';
@@ -29,6 +31,7 @@ const canBan = computed(
     !props.user.staff?.isSuperuser &&
     !banReason.value,
 );
+const isSignedIn = computed(() => session.status === 'authenticated');
 const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, locale.locale));
 </script>
 
@@ -74,7 +77,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
           </ul>
         </div>
       </div>
-      <div v-if="isOwn || canBan" class="flex flex-wrap gap-2.5">
+      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap gap-2.5">
         <template v-if="isOwn">
           <RouterLink
             to="/settings"
@@ -89,7 +92,8 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
             {{ $t('profile.write') }}
           </RouterLink>
         </template>
-        <BanUserDialog v-else :key="user.username" :username="user.username" />
+        <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
+        <ShortLinkButton :path="shortLinkPath({ kind: 'user', username: user.username })" />
       </div>
       <p v-if="banReason" data-testid="ban-status" class="text-sm text-negative">
         {{ $t('profile.ban.bannedWithReason', { reason: banReason }) }}

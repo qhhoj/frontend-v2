@@ -1740,6 +1740,7 @@
     "title": "Low-power mode"
   },
   "shortLink": {
+    "notFoundHint": "You may not have permission to view this page.",
     "copy": "Copy short link",
     "creating": "Creating link…",
     "copied": "Copied",

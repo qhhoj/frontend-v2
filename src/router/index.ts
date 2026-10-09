@@ -12,6 +12,7 @@ import { useLoadingStore } from '@/stores/loading.store';
 import { useSessionStore } from '@/stores/session.store';
 import { focusMain } from './focus-main';
 import { resolveNavigation } from './guards';
+import { trackFirstPage } from '@/lib/arrived-by-redirect';
 import { pageTitle } from './page-title';
 import { routes } from './routes';
 
@@ -74,6 +75,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
   const router = createRouter({ history, routes, scrollBehavior: scrollOnNavigation });
   installNavigationLoading(router);
   installGateSync(router);
+  trackFirstPage(router);
   const titleDocument = () => {
     const title =
       pageTitle.value ?? translate(router.currentRoute.value.meta.titleKey ?? 'app.name');

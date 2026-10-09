@@ -5,7 +5,7 @@ const DOCK_HEIGHT_PROPERTY = '--dock-height';
 
 /**
  * Publishes the height of the element the page must leave room for as `--dock-height` on the page root, so
- * `ProblemPage` can reserve it. Follows the element as it comes and goes: while there is none (the phone sheet is
+ * the footer (`AppFooter`) can clear it. Follows the element as it comes and goes: while there is none (the phone sheet is
  * open and overlays the page), the last height stays.
  */
 export function useDockHeight(dock: Ref<HTMLElement | null>) {

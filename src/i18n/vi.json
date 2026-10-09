@@ -1740,6 +1740,7 @@
     "title": "Chế độ tiết kiệm"
   },
   "shortLink": {
+    "notFoundHint": "Bạn có thể không có quyền xem trang này.",
     "copy": "Sao chép liên kết ngắn",
     "creating": "Đang tạo liên kết…",
     "copied": "Đã sao chép",

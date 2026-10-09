@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import CryingBit from '@/components/CryingBit.vue';
+import ShortLinkNotFoundHint from '@/components/ShortLinkNotFoundHint.vue';
 
 const route = useRoute();
 /** Pixel font for the giant 404; X is a filled block. */
@@ -43,6 +44,7 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
       {{ $t('notFound.title') }}
     </h1>
     <p class="max-w-md text-base leading-relaxed text-muted">{{ $t('notFound.body') }}</p>
+    <ShortLinkNotFoundHint />
     <div class="flex flex-wrap justify-center gap-2.5">
       <RouterLink
         to="/"

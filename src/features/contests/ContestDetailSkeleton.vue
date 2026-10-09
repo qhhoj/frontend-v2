@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { useSessionStore } from '@/stores/session.store';
+
+const session = useSessionStore();
+/** Signed-in viewers get the short-link button under the countdown. */
+const hasActionRow = computed(() => session.status === 'authenticated');
 </script>
 
 <template>
@@ -26,16 +32,21 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
       </div>
       <p class="hidden text-sm md:block"><SkeletonBlock text class="w-80" /></p>
     </div>
-    <div data-skeleton-region="countdown" class="flex items-center gap-4">
-      <!-- The stopwatch Bit box: 32 rows of 3 px on a phone, 4 px from md up (ContestCountdown). -->
-      <SkeletonBlock round class="size-24 shrink-0 md:size-32" />
-      <div class="flex min-w-0 flex-1 flex-col">
-        <p class="text-[12px]"><SkeletonBlock text class="w-20" /></p>
-        <p class="font-mono text-3xl leading-tight md:text-5xl">
-          <SkeletonBlock text class="w-48" />
-        </p>
-        <p class="text-sm"><SkeletonBlock text class="w-40" /></p>
+    <div class="flex flex-col gap-4">
+      <div data-skeleton-region="countdown" class="flex items-center gap-4">
+        <!-- The stopwatch Bit box: 32 rows of 3 px on a phone; from md up a running contest's notice-size Bit and timer (98 px), an upcoming contest's 4 px Bit is 30 px taller. -->
+        <SkeletonBlock round class="size-24 shrink-0 md:size-[98px]" />
+        <div class="flex min-w-0 flex-1 flex-col">
+          <p class="text-[12px]"><SkeletonBlock text class="w-20" /></p>
+          <p class="font-mono text-3xl leading-tight md:text-5xl">
+            <SkeletonBlock text class="w-48" />
+          </p>
+          <p class="text-sm"><SkeletonBlock text class="w-40" /></p>
+        </div>
       </div>
+      <!-- ContestActions is static from md (below md it is a fixed bar and takes no row), then the short-link row. -->
+      <SkeletonBlock pill class="hidden h-11 w-full md:block" />
+      <SkeletonBlock v-if="hasActionRow" pill class="h-11 w-full" />
     </div>
   </div>
   <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { formatNumber, formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import MembershipPanel from './MembershipPanel.vue';
@@ -37,6 +39,10 @@ const performancePoints = computed(() =>
         {{ $t('orgs.ppLong', { pp: performancePoints }) }}
       </p>
       <p class="text-sm font-semibold">{{ $t(places.key, places.params ?? {}) }}</p>
+      <ShortLinkButton
+        class="sm:self-start"
+        :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
+      />
     </div>
     <MembershipPanel :organization="organization" />
   </section>

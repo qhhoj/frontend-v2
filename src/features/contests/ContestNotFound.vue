@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BitSprite from '@/components/BitSprite.vue';
+import ShortLinkNotFoundHint from '@/components/ShortLinkNotFoundHint.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 </script>
 
@@ -13,6 +14,7 @@ import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
     </div>
     <h1 class="font-display text-3xl font-bold">{{ $t('contests.detail.notFoundTitle') }}</h1>
     <p class="text-muted">{{ $t('contests.detail.notFoundBody') }}</p>
+    <ShortLinkNotFoundHint />
     <RouterLink
       :to="{ name: 'contests' }"
       class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"

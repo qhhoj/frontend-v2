@@ -9,6 +9,7 @@ import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
+import { stubMatchMedia } from '@/test/match-media';
 import { PARTICIPATION_REFUSALS } from './participation-refusal';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
@@ -627,5 +628,41 @@ describe('virtual run rules dialog: previous acceptance', () => {
   it('shows no previous line when the live run accepted nothing', async () => {
     await open(ended(participationSummary()));
     expect(dialog()!.textContent).not.toContain('Lượt trước của bạn');
+  });
+});
+
+describe('contest actions: the phone bar tells the footer how tall it is', () => {
+  const stubBarHeight = (blockSize: number) =>
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(private readonly callback: (entries: unknown[]) => void) {}
+        observe() {
+          this.callback([{ borderBoxSize: [{ blockSize }], contentRect: { height: 0 } }]);
+        }
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+  const dockHeight = () => document.documentElement.style.getPropertyValue('--dock-height');
+
+  it('publishes the bar height on a phone and removes it when the page goes', async () => {
+    stubMatchMedia().setQuery('(max-width: 767.98px)', true);
+    stubBarHeight(96);
+    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
+    const { wrapper } = await mountApp('/contests/r42');
+    await flushPromises();
+    expect(dockHeight()).toBe('96px');
+    wrapper.unmount();
+    expect(dockHeight()).toBe('');
+  });
+
+  it('publishes nothing from md up, where the actions are part of the page', async () => {
+    stubMatchMedia();
+    stubBarHeight(96);
+    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
+    await mountApp('/contests/r42');
+    await flushPromises();
+    expect(dockHeight()).toBe('');
   });
 });

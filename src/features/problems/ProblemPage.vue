@@ -10,6 +10,8 @@ import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.v
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import EditorialTab from './EditorialTab.vue';
@@ -86,7 +88,6 @@ watch(
         ? 'max-w-[1240px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-6'
         : 'max-w-[960px]',
     ]"
-    :style="{ paddingBottom: 'calc(1.5rem + var(--dock-height, 0px))' }"
   >
     <ContestProblemSwitcher
       v-if="contestKey && contest && railEntries"
@@ -112,10 +113,13 @@ watch(
           <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
           <ProblemHeader :problem="problem"
             ><template #actions
-              ><PdfButton
-                v-if="problem.pdfStatementUrl"
-                :code="problem.code"
-                :lang="locale.locale" /></template
+              ><div class="flex flex-wrap items-center gap-2">
+                <ShortLinkButton :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
+                <PdfButton
+                  v-if="problem.pdfStatementUrl"
+                  :code="problem.code"
+                  :lang="locale.locale"
+                /></div></template
           ></ProblemHeader>
           <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
           <div

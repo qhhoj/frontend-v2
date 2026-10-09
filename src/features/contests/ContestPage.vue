@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
 import { usePageTitle } from '@/router/page-title';
 import ContestActions from './ContestActions.vue';
@@ -44,19 +46,16 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>
 
 <template>
-  <!-- A loaded contest shows the phone action bar, fixed to the bottom below md: keep the last row clear of it. -->
-  <div
-    :class="[
-      'mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-5 sm:px-8',
-      contest ? 'pb-36 md:pb-5' : 'pb-5',
-    ]"
-  >
+  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-5 pb-5 sm:px-8">
     <ContestNotFound v-if="isMissing" />
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestDetailSkeleton /></template>
       <template v-if="contest">
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
-          <template #actions><ContestActions :contest="contest" /></template>
+          <template #actions
+            ><ContestActions :contest="contest" /><ShortLinkButton
+              :path="shortLinkPath({ kind: 'contest', key: contest.key })"
+          /></template>
         </ContestHeaderCard>
         <ContestTabs :contest-key="key" :phase="contest.phase" />
         <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">

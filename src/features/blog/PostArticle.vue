@@ -4,6 +4,8 @@ import { computed } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import UserName from '@/components/UserName.vue';
 import VoteControl from '@/components/VoteControl.vue';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import type { PostDetail } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
@@ -81,6 +83,7 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
       >
         {{ $t('blogPost.comments', { count: post.commentCount }) }}
       </RouterLink>
+      <ShortLinkButton class="sm:ml-auto" :path="shortLinkPath({ kind: 'post', id: post.id })" />
     </footer>
   </article>
 </template>

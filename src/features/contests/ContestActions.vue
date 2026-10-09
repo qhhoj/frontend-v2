@@ -8,6 +8,7 @@ import InlineBit from '@/components/InlineBit.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { spanMessage } from '@/lib/contest-time';
+import { useDockHeight } from '@/features/problems/use-dock-height';
 import { formatClock } from '@/lib/format';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useNow } from '@/lib/use-now';
@@ -69,6 +70,12 @@ const { data: current } = useCurrentParticipationQuery(
 );
 const { run, isPending, error, reset } = useParticipation(computed(() => props.contest.key));
 const root = ref<HTMLElement | null>(null);
+/** The phone bar is fixed to the bottom: publish its height so the footer clears it. */
+const phoneBar = computed(() => (isPhone.value ? root.value : null));
+useDockHeight(phoneBar);
+watch(isPhone, (isNow) => {
+  if (!isNow) document.documentElement.style.removeProperty('--dock-height');
+});
 const isDialogOpen = ref(false);
 const participationStatus = ref('');
 const startClock = computed(() => formatClock(props.contest.startTime, locale.locale));

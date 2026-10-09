@@ -387,6 +387,8 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - `diff` 9.0.0 is pinned exactly (BSD-3-Clause, bundled types, no dependencies) for the submission source diff.
 - Unit and e2e tests run as a strong device (8 cores, 8 GB) so low-power `auto` stays off unless a spec passes weak hints.
+- The short-link button sits in the problem, contest, post, profile and organization headers for signed-in viewers; the profile and organization skeletons do not reserve its row (a signed-in header grows by one 44 px row when its data arrives, accepted), the problem and contest skeletons do.
+- The not-found hint for short-link visitors needs a same-origin redirect on the first navigation, the router still on that path, and no completed navigation after the first (`trackFirstPage`); the footer clears the fixed contest action bar and submit dock through `--dock-height`.
 
 ## VNOI ports: notifications, tickets, official mode (plan F1)
 

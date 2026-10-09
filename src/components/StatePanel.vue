@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import ShortLinkNotFoundHint from '@/components/ShortLinkNotFoundHint.vue';
 import StateBit from '@/components/StateBit.vue';
 import { STATE_BITS } from '@/mascot/state-bits';
 import type { StateKind } from '@/mascot/state-bits';
@@ -29,6 +30,7 @@ const isAlert = computed(() => ALERT_KINDS.includes(props.kind));
       {{ title }}
     </component>
     <p v-if="body" class="max-w-md text-muted">{{ body }}</p>
+    <ShortLinkNotFoundHint v-if="kind === 'notFound'" />
     <div v-if="$slots.default" class="flex flex-wrap justify-center gap-2.5"><slot /></div>
   </section>
 </template>
