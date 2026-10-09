@@ -15,7 +15,12 @@ import type {
   OrganizationMember,
   OrganizationSummary,
 } from '../api/types/organizations';
-import type { TicketDetail, TicketListItem, TicketMessage } from '../api/types/tickets';
+import type {
+  TicketDetail,
+  TicketListItem,
+  TicketMessage,
+  TicketTimelineEntry,
+} from '../api/types/tickets';
 import type { ActivityResponse, PpEntry, SolvedResponse } from '../api/types/users';
 import { HOME_COUNTS, sessionUser } from './fixtures';
 
@@ -185,13 +190,25 @@ export const ticketMessage = (overrides: Partial<TicketMessage> = {}): TicketMes
   createdAt: '2026-10-08T13:12:00Z',
   ...overrides,
 });
-export const ticketDetail = (overrides: Partial<TicketDetail> = {}): TicketDetail => ({
-  ...ticketItem(),
-  notes: '',
-  messages: [ticketMessage()],
-  can: { editNotes: false, markGood: false, assign: false },
-  ...overrides,
+/** One message as a row of the thread's timeline. */
+export const messageEntry = (message: TicketMessage = ticketMessage()): TicketTimelineEntry => ({
+  kind: 'message',
+  at: message.createdAt,
+  message,
+  event: null,
 });
+/** The timeline follows `messages` unless a test gives its own. */
+export const ticketDetail = (overrides: Partial<TicketDetail> = {}): TicketDetail => {
+  const messages = overrides.messages ?? [ticketMessage()];
+  return {
+    ...ticketItem(),
+    notes: '',
+    messages,
+    timeline: messages.map(messageEntry),
+    can: { editNotes: false, markGood: false, assign: false },
+    ...overrides,
+  };
+};
 
 export const homeResponse = (overrides: Partial<HomeResponse> = {}): HomeResponse => ({
   recentComments: [recentComment()],

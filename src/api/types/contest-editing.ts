@@ -51,8 +51,16 @@ export type RankingLinkPatch = JsonBodyOf<'/contests/{key}/ranking-link', 'patch
 /** backend: libs/contests `ContestActionState`: `queued` waits for the worker, `running` is being worked on now. */
 export type ContestActionState = Schemas['ContestActionState'];
 
-/** backend: `ContestActionsResponse`. */
+/** backend: `ContestActionsResponse`: one state per action and the last automatic publish (null before the first). */
 export type ContestActions = Schemas['ContestActionsResponse'];
+/** The actions that carry a state (the response holds `autoPublish` besides). */
+export type ContestActionName = 'rescore' | 'judgeFinal' | 'publish' | 'rate';
+export const CONTEST_ACTION_NAMES: readonly ContestActionName[] = [
+  'rescore',
+  'judgeFinal',
+  'publish',
+  'rate',
+];
 
 /** backend: `ContestDataStatusResponse`: the submissions export (a zip) and when it may be prepared again. */
 export type ContestDataStatus = Schemas['ContestDataStatusResponse'];

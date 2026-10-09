@@ -14,7 +14,7 @@ describe('the problem Submissions tab', () => {
       ...signedInViewer(),
       ...problemPageRoutes(),
       'GET /submissions': page([
-        submissionItem({ problem: { code: 'duongdi', name: 'Đường đi' } }),
+        submissionItem({ problem: { code: 'duongdi', name: 'Đường đi', isDeleted: false } }),
       ]),
     });
     const { wrapper } = await mountApp(TAB_PATH);

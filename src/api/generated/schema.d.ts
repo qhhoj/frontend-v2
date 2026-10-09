@@ -964,6 +964,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/contest-tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContestTagsController_list"];
+        put?: never;
+        post: operations["ContestTagsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contest-tags/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ContestTagsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ContestTagsController_update"];
+        trace?: never;
+    };
     "/api/internal/contests": {
         parameters: {
             query?: never;
@@ -1060,6 +1092,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/contests/{key}/balloons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BalloonsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/balloons/{participation}/{problem}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["BalloonsController_deliver"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/balloons/{participation}/{problem}/undeliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["BalloonsController_undeliver"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/contests/{key}/clone": {
         parameters: {
             query?: never;
@@ -1101,6 +1181,121 @@ export interface paths {
         };
         /** Always an attachment with `nosniff`; the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
         get: operations["ContestDataController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContestExportController_status"];
+        put?: never;
+        post: operations["ContestExportController_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/export/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Always an attachment with `nosniff`; the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
+        get: operations["ContestExportController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** HTTP Basic with the contest's feed key, no session: resolver tools only speak Basic. NDJSON, one event per line. */
+        get: operations["FeedController_snapshot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/feed-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FeedKeysController_status"];
+        put?: never;
+        post: operations["FeedKeysController_mint"];
+        delete: operations["FeedKeysController_revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/feed-key/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["FeedKeysController_release"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/ghosts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GhostsController_list"];
+        /** The whole request body is capped at `GHOST_CSV_MAX_BYTES` (Fastify answers 413 beyond it). */
+        put: operations["GhostsController_importCsv"];
+        post?: never;
+        delete: operations["GhostsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/ghosts/csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GhostsController_csv"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1205,6 +1400,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/contests/{key}/publish-problems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ContestPublishController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/contests/{key}/ranking": {
         parameters: {
             query?: never;
@@ -1279,6 +1490,39 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ContestParticipationController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/replay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** `private`: the body depends on who asks (freeze), so no shared cache may keep it. A `building` answer is 202 and never cached. */
+        get: operations["ReplayController_replay"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/replay/rebuild": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReplayController_rebuild"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1450,6 +1694,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/events/user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** `notification` (`{ id }`: a row of the viewer's inbox was created or merged) and `resync` after a lost subscription. */
+        get: operations["UserStreamsController_open"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/feeds/{kind}/{format}": {
         parameters: {
             query?: never;
@@ -1477,6 +1738,38 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/integration-clients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["IntegrationClientsController_list"];
+        put?: never;
+        post: operations["IntegrationClientsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/integration-clients/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["IntegrationClientsController_revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1540,6 +1833,71 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["JudgesController_rotateKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_readAll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The bell polls this every 60 s and on window focus. */
+        get: operations["NotificationsController_unreadCount"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1797,7 +2155,7 @@ export interface paths {
         get: operations["ProblemsController_detail"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["ProblemLifecycleController_remove"];
         options?: never;
         head?: never;
         patch: operations["ProblemEditingController_edit"];
@@ -1932,6 +2290,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/problems/{code}/package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 200 the zip (attachment), 202 while building, 404 `package_not_built`, 409 `package_too_large`, 503 `package_unavailable`. */
+        get: operations["ProblemPackageController_download"];
+        put?: never;
+        /** 200 `{data: {status: 'ready', key}}` when the current package is cached, 202 `{data: {status: 'building', key}}` when a build is queued or running. Plain `@Res()` because the status depends on the answer. */
+        post: operations["ProblemPackageController_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/problems/{code}/pdf": {
         parameters: {
             query?: never;
@@ -1947,6 +2323,38 @@ export interface paths {
         get: operations["ProblemPdfController_pdf"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/purge-now": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProblemLifecycleController_purgeNow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ProblemLifecycleController_restore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2027,6 +2435,22 @@ export interface paths {
         };
         get?: never;
         put: operations["ProblemEditingController_putTranslation"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/deleted": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProblemLifecycleController_list"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -2190,6 +2614,38 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/short-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ShortLinksController_list"];
+        put?: never;
+        post: operations["ShortLinksController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/short-links/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ShortLinksController_remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2469,6 +2925,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/ticket-canned-replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CannedRepliesController_list"];
+        put?: never;
+        post: operations["CannedRepliesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/ticket-canned-replies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CannedRepliesController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["CannedRepliesController_update"];
+        trace?: never;
+    };
     "/api/internal/tickets": {
         parameters: {
             query?: never;
@@ -2527,6 +3015,23 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["TicketCreationController_general"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/tickets/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The ticket badge; the browser may reuse it for 15 seconds. */
+        get: operations["TicketSummaryController_summary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2709,6 +3214,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sync/v1/contests/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SyncContestsController_read"];
+        put: operations["SyncContestsController_put"];
+        post?: never;
+        delete: operations["SyncContestsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sync/v1/contests/{key}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SyncContestsController_setParticipants"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sync/v1/contests/{key}/standings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SyncContestsController_getStandings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/healthz": {
         parameters: {
             query?: never;
@@ -2725,13 +3278,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/s/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A `@Res()` handler returns no body: the 302 is documented by hand. The error envelope is the global `default` response, nothing per route. This route is not added to `UNDOCUMENTED_BODY`. */
+        get: operations["ShortLinkRedirectController_go"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AccessCodeDto: {
-            accessCode?: string;
-        };
         ActivityCountResponse: {
             count: number;
             value: string;
@@ -2805,6 +3372,33 @@ export interface components {
         AssignTagsDto: {
             tagCodes: string[];
         };
+        BalloonPageMetaResponse: {
+            deliveredTotal: number | null;
+            page: number;
+            pageSize: number;
+            pendingTotal: number | null;
+            total: number;
+        };
+        BalloonResponse: {
+            /** Format: date-time */
+            deliveredAt: string | null;
+            /** @description Username of the volunteer who delivered it. */
+            deliveredBy: string | null;
+            isFirst: boolean;
+            participationId: string;
+            problemCode: string;
+            problemId: string;
+            problemLabel: string;
+            /** @description Seconds from the team's start; null when the format keeps no solve time, and for a reader who cannot edit while the contest is frozen. */
+            solvedAt: number | null;
+            team: components["schemas"]["BalloonTeamResponse"];
+        };
+        /** @enum {string} */
+        BalloonState: "all" | "delivered" | "pending";
+        BalloonTeamResponse: {
+            userId: string;
+            username: string;
+        };
         BanDto: {
             reason: string;
         };
@@ -2830,6 +3424,17 @@ export interface components {
             allowed: boolean;
             count: number;
             dryRun: boolean;
+        };
+        CannedReplyResponse: {
+            /** @description With `{tên}` / `{bài}` still in it. */
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            id: string;
+            order: number;
+            title: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         CatalogItemResponse: {
             fullName: string;
@@ -2928,8 +3533,13 @@ export interface components {
             score: number;
             voter: components["schemas"]["UserSummaryResponse"] | null;
         };
+        ConfirmCodeDto: {
+            confirmCode: string;
+        };
         ContestActionsResponse: {
+            autoPublish: components["schemas"]["ContestAutoPublishResponse"] | null;
             judgeFinal: components["schemas"]["ContestActionState"];
+            publish: components["schemas"]["ContestActionState"];
             rate: components["schemas"]["ContestActionState"];
             rescore: components["schemas"]["ContestActionState"];
         };
@@ -2944,6 +3554,17 @@ export interface components {
             /** @enum {string} */
             event: "announcement";
         };
+        ContestAutoPublishResponse: {
+            /** Format: date-time */
+            at: string;
+            published: number;
+            /** @description Empty on success; `no_permission` or `actor_unavailable` on a failure. */
+            reason: string;
+            skipped: number;
+            status: components["schemas"]["ContestAutoPublishStatus"];
+        };
+        /** @enum {string} */
+        ContestAutoPublishStatus: "failed" | "published";
         ContestDataStatusResponse: {
             /** @description Null when a prepare is allowed now. */
             nextPrepareAt: string | null;
@@ -2990,6 +3611,9 @@ export interface components {
             requiresAccessCode: boolean;
             /** @description The public ranking links ask for a ranking access code. */
             requiresRankingAccessCode: boolean;
+            rules: string;
+            rulesHtml: string;
+            rulesRevision: number;
             runPretestsOnly: boolean;
             scoreboardVisibility: components["schemas"]["ScoreboardVisibility"];
             settings: components["schemas"]["ContestSettingsResponse"] | null;
@@ -3004,6 +3628,15 @@ export interface components {
             userCount: number;
             viewer: components["schemas"]["ContestViewerResponse"];
             virtualCount: number;
+        };
+        ContestExportStatusResponse: {
+            /** @description When another request is allowed; null: now. */
+            nextPrepareAt: string | null;
+            preparedAt: string | null;
+            readyAt: string | null;
+            size: number | null;
+            /** @enum {string} */
+            state: "none" | "preparing" | "ready";
         };
         /** @enum {string} */
         ContestFormatName: "default" | "final_submission" | "icpc" | "ioi" | "ioi16" | "ultimate" | "vnoj";
@@ -3078,12 +3711,16 @@ export interface components {
             isPretested: boolean;
             label: string;
             maxSubmissions: number | null;
+            /** @description KiB; null when the viewer cannot see the problem. */
+            memoryLimit: number | null;
             name: string;
             partial: boolean;
             points: number;
             problemId: string;
             /** @description Live participants whose cell is worth the problem's full points (the ranking's `acceptedCount`), frozen for non-editors during a freeze; null unless the viewer may see the full ranking. Up to 30 s old. */
             solverCount: number | null;
+            /** @description Seconds; null when the viewer cannot see the problem. */
+            timeLimit: number | null;
             /** @description Null when signed out, without a scoring participation (live or virtual) in the contest, or when the board is hidden from the viewer. */
             viewerResult: components["schemas"]["ContestProblemViewerResultResponse"] | null;
         };
@@ -3120,6 +3757,8 @@ export interface components {
             isSolved: boolean;
         };
         ContestSettingsResponse: {
+            balloons: boolean;
+            balloonStaff: string[];
             bannedJudges: string[];
             bannedUsers: string[];
             curators: string[];
@@ -3133,6 +3772,9 @@ export interface components {
             organizations: string[];
             privateContestants: string[];
             problemOutputPrefixes: components["schemas"]["ContestProblemOutputPrefixResponse"][];
+            publishAfterEnd: boolean;
+            /** @description The editor whose rights the automatic publish re-checks at the end. */
+            publishAfterEndBy: string | null;
             pushAnnouncements: boolean;
             rateAll: boolean;
             rateExclude: string[];
@@ -3149,8 +3791,23 @@ export interface components {
             languages: components["schemas"]["ContestLanguageStatsResponse"][];
             problems: components["schemas"]["ContestProblemStatsResponse"][];
         };
+        /**
+         * @description A theme token key (`tag-1`..`tag-8`), never a hex.
+         * @enum {string}
+         */
+        ContestTagColor: "tag-1" | "tag-2" | "tag-3" | "tag-4" | "tag-5" | "tag-6" | "tag-7" | "tag-8";
+        ContestTagResponse: {
+            /** @description A theme token key (`tag-1`..`tag-8`), never a hex. */
+            color: components["schemas"]["ContestTagColor"];
+            description: string;
+            name: string;
+            order: number;
+            slug: string;
+        };
         ContestViewerResponse: {
             canEdit: boolean;
+            /** @description The balloon screen is on for this contest and the viewer may use it (editors, listed volunteers). */
+            canViewBalloons: boolean;
             inContest: boolean;
             /** @description Their current contest (`GET /contests/current`) is this one, and that participation has not ended. */
             isCurrent: boolean;
@@ -3167,10 +3824,19 @@ export interface components {
             description: string;
             title: string;
         };
+        CreateCannedReplyDto: {
+            /** @description May hold `{tên}` and `{bài}`; the SPA fills them in. */
+            body: string;
+            /** @description Default: after the last one. */
+            order?: number;
+            title: string;
+        };
         CreateContestDto: {
             /** @description Stored hashed; an empty string removes it. */
             accessCode?: string;
             authors?: string[];
+            balloons?: boolean;
+            balloonStaff?: string[];
             bannedJudges?: string[];
             bannedUsers?: string[];
             curators?: string[];
@@ -3197,6 +3863,7 @@ export interface components {
             pointsPrecision?: number;
             privateContestants?: string[];
             problems?: components["schemas"]["ContestProblemDto"][];
+            publishAfterEnd?: boolean;
             pushAnnouncements?: boolean;
             /** @description Stored hashed; an empty string removes it. */
             rankingAccessCode?: string;
@@ -3206,6 +3873,8 @@ export interface components {
             ratingFloor?: number | null;
             registrationEnd?: string | null;
             registrationStart?: string | null;
+            /** @description Markdown, trimmed at save; empty or whitespace: no rules. */
+            rules?: string;
             runPretestsOnly?: boolean;
             /** @description Seconds; 0 disables the ranking cache. */
             scoreboardCacheTimeout?: number;
@@ -3220,6 +3889,37 @@ export interface components {
             timeLimit?: number | null;
             viewContestScoreboard?: string[];
         };
+        CreateContestTagDto: {
+            /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
+            color: components["schemas"]["ContestTagColor"];
+            description?: string;
+            name: string;
+            order?: number;
+            slug: string;
+        };
+        CreatedIntegrationClientResponse: {
+            /** @description The user whose permissions bound the client. */
+            actsAs: components["schemas"]["IntegrationClientActingUserResponse"];
+            allowedCidrs: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description The key stops working at this instant; null when it never expires.
+             */
+            expiresAt: string | null;
+            id: string;
+            /** @description Shown once; only its hash is stored. */
+            key: string;
+            /** @description First characters of the key, to recognise it in this list. */
+            keyPrefix: string;
+            /** Format: date-time */
+            lastUsedAt: string | null;
+            name: string;
+            /** Format: date-time */
+            revokedAt: string | null;
+            scopes: components["schemas"]["IntegrationScope"][];
+        };
         CreatedJudgeResponse: {
             /** @description Shown once; only its sha256 is stored. */
             authKey: string;
@@ -3232,6 +3932,16 @@ export interface components {
             title: string;
             /** @description Canonicalised on save (`about/` becomes `/about`). */
             url: string;
+        };
+        CreateIntegrationClientDto: {
+            /** @description Username of the user the client acts as. */
+            actsAs: string;
+            /** @description CIDR blocks the client may call from; each is parsed by the service. */
+            allowedCidrs: string[];
+            /** @description When the key stops working; omitted, it works until revoked. Must be in the future. */
+            expiresAt?: string;
+            name: string;
+            scopes: components["schemas"]["IntegrationScope"][];
         };
         CreateJudgeDto: {
             description?: string;
@@ -3333,6 +4043,14 @@ export interface components {
             timeLimit: number;
             typeIds: string[];
         };
+        CreateShortLinkDto: {
+            /** @description Staff only. */
+            code?: string;
+            /** @description Staff only. */
+            expiresAt?: string;
+            /** @description Checked against the same-site allow-list by the service (a 400 `path` issue), not by a pattern here. */
+            path: string;
+        };
         CreateTagProblemDto: {
             /** Format: uri */
             link: string;
@@ -3362,6 +4080,17 @@ export interface components {
             /** @enum {string} */
             state: "A" | "R";
         };
+        DeletedProblemResponse: {
+            code: string;
+            /** @description Whole days before the purge job may take it; 0 once the grace period is over. */
+            daysLeft: number;
+            /** Format: date-time */
+            deletedAt: string;
+            deletedBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description The heavy data is gone; only the tombstone (code and name) stays and it cannot be restored. */
+            isPurged: boolean;
+            name: string;
+        };
         DisconnectJudgeDto: {
             /** @default false */
             force: boolean;
@@ -3369,6 +4098,11 @@ export interface components {
         DisqualifyDto: {
             disqualified: boolean;
         };
+        /**
+         * @description Null when editorials were not requested.
+         * @enum {string}
+         */
+        EditorialOutcome: "none" | "published" | "skipped" | "unchanged";
         EditorialResponse: {
             authors: components["schemas"]["UserSummaryResponse"][];
             canEdit: boolean;
@@ -3393,6 +4127,16 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
         };
+        /** @enum {string} */
+        FeedKeyMode: "frozen-until-release" | "live";
+        FeedKeyStatusResponse: {
+            /** @description Username of the editor the key is bound to. */
+            createdBy: string | null;
+            expiresAt: string | null;
+            isActive: boolean;
+            mode: components["schemas"]["FeedKeyMode"] | null;
+            releasedAt: string | null;
+        };
         FieldChangeResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             after: unknown;
@@ -3404,6 +4148,8 @@ export interface components {
             code: string;
             field: string;
             message: string;
+            /** @description 1-based row of a CSV import (the header is row 1); absent for issues that belong to no row. */
+            row?: number;
         };
         FlatpageAdminListItemResponse: {
             id: string;
@@ -3459,6 +4205,34 @@ export interface components {
             editor: components["schemas"]["UserSummaryResponse"] | null;
             id: string;
         };
+        GhostCellResponse: {
+            minute: number;
+            points: number | null;
+            problemCode: string;
+            rejectedBefore: number | null;
+        };
+        /**
+         * @description R3: `GhostGap` is a union alias, which the plugin drops without an explicit enum.
+         * @enum {string}
+         */
+        GhostGap: "points" | "rejectedBefore";
+        GhostImportResponse: {
+            ghosts: components["schemas"]["GhostResponse"][];
+            /** @description False for a `dryRun`. */
+            stored: boolean;
+        };
+        GhostListResponse: {
+            ghosts: components["schemas"]["GhostResponse"][];
+        };
+        GhostResponse: {
+            caption: string;
+            cells: components["schemas"]["GhostCellResponse"][];
+            /** @description R3: `GhostGap` is a union alias, which the plugin drops without an explicit enum. */
+            gap: components["schemas"]["GhostGap"] | null;
+            /** @description Derived from the contest's format on every read; unranked ghosts are shown last. */
+            isUnranked: boolean;
+            label: string;
+        };
         HasMorePageMetaResponse: {
             hasMore: boolean;
             page: number;
@@ -3501,6 +4275,13 @@ export interface components {
             rating: number | null;
             username: string;
         };
+        ImportGhostsDto: {
+            /** @description Replace every label by "Ghost 001", ...: labels may be real students' names. */
+            anonymize?: boolean;
+            csv: string;
+            /** @description Validate and preview without storing. */
+            dryRun?: boolean;
+        };
         ImportJobResponse: {
             /** @description Only an import error written for the requester; any other failure is "Import failed". */
             error: string | null;
@@ -3515,6 +4296,37 @@ export interface components {
         ImportResultResponse: {
             code: string;
             problemId: string;
+        };
+        IntegrationClientActingUserResponse: {
+            id: string;
+            username: string;
+        };
+        IntegrationClientResponse: {
+            /** @description The user whose permissions bound the client. */
+            actsAs: components["schemas"]["IntegrationClientActingUserResponse"];
+            allowedCidrs: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description The key stops working at this instant; null when it never expires.
+             */
+            expiresAt: string | null;
+            id: string;
+            /** @description First characters of the key, to recognise it in this list. */
+            keyPrefix: string;
+            /** Format: date-time */
+            lastUsedAt: string | null;
+            name: string;
+            /** Format: date-time */
+            revokedAt: string | null;
+            scopes: components["schemas"]["IntegrationScope"][];
+        };
+        /** @enum {string} */
+        IntegrationScope: "contests:read" | "contests:write";
+        JoinBodyDto: {
+            acceptRules?: boolean;
+            accessCode?: string;
         };
         JudgeKeyResponse: {
             authKey: string;
@@ -3643,6 +4455,18 @@ export interface components {
             rating: number | null;
             username: string;
         };
+        MintedFeedKeyResponse: {
+            expiresAt: string;
+            key: string;
+            mode: components["schemas"]["FeedKeyMode"];
+            /** @description The Basic user name, always `feed`. */
+            username: string;
+        };
+        MintFeedKeyDto: {
+            expiresInDays?: number;
+            /** @description Default `frozen-until-release`; `live` is an explicit opt-in. */
+            mode?: components["schemas"]["FeedKeyMode"];
+        };
         MiscConfigResponse: {
             key: string;
             value: string;
@@ -3679,6 +4503,42 @@ export interface components {
         NewTicketMessageDto: {
             body: string;
         };
+        NotificationEventResponse: {
+            id: string;
+        };
+        NotificationFrame: {
+            data: components["schemas"]["NotificationEventResponse"];
+            /** @enum {string} */
+            event: "notification";
+        };
+        /** @enum {string} */
+        NotificationKind: "contest-announcement" | "organization-request-decided" | "ticket-message" | "ticket-new" | "ticket-status";
+        /** @enum {string} */
+        NotificationPriority: "high" | "normal";
+        NotificationResponse: {
+            /** @description Plain text. */
+            body: string;
+            /** @description Events merged into this row. */
+            count: number;
+            /** Format: date-time */
+            createdAt: string;
+            id: string;
+            kind: components["schemas"]["NotificationKind"];
+            /**
+             * Format: date-time
+             * @description The list is ordered by this.
+             */
+            lastActivityAt: string;
+            /** @description Internal SPA path. */
+            path: string;
+            priority: components["schemas"]["NotificationPriority"];
+            /** Format: date-time */
+            readAt: string | null;
+            title: string;
+            unread: boolean;
+        };
+        /** @enum {string} */
+        NotificationState: "all" | "read" | "unread";
         OfficialRankingResponse: {
             problems: string[];
             rows: components["schemas"]["OfficialRankingRowResponse"][];
@@ -3749,6 +4609,16 @@ export interface components {
             /** @description The viewer's pending join request (Task 6), else null. */
             pendingRequestId: string | null;
         };
+        PackageBuildingResponse: {
+            /** @enum {string} */
+            status: "building";
+        };
+        PackageStatusResponse: {
+            /** @description `<dataVersion>.<contentHash>` of what the build is (or was) for. */
+            key: string;
+            /** @enum {string} */
+            status: "building" | "ready";
+        };
         PageMetaResponse: {
             page: number;
             pageSize: number;
@@ -3768,6 +4638,13 @@ export interface components {
             isRegistered: boolean;
             /** Format: date-time */
             realStart: string;
+            /**
+             * Format: date-time
+             * @description When this participation accepted the contest rules; null when the contest had no rules then (or the row predates rules).
+             */
+            rulesAcceptedAt: string | null;
+            /** @description The rules revision accepted: it may be older than the contest's current `rulesRevision`. */
+            rulesAcceptedRevision: number | null;
             score: number;
             tiebreaker: number;
             user: components["schemas"]["UserSummaryResponse"];
@@ -3782,6 +4659,13 @@ export interface components {
             isRegistered: boolean;
             /** Format: date-time */
             realStart: string;
+            /**
+             * Format: date-time
+             * @description When this participation accepted the contest rules; null when the contest had no rules then (or the row predates rules).
+             */
+            rulesAcceptedAt: string | null;
+            /** @description The rules revision accepted: it may be older than the contest's current `rulesRevision`. */
+            rulesAcceptedRevision: number | null;
             /** @description 0 live, -1 spectate, n ≥ 1 virtual. */
             virtual: number;
         };
@@ -4037,6 +4921,36 @@ export interface components {
             contest: components["schemas"]["PublicRankingContestResponse"];
             ranking: components["schemas"]["RankingResponse"];
         };
+        PublishedProblemResponse: {
+            /** @description Null when the problem document is gone. */
+            code: string | null;
+            /** @description Null when editorials were not requested. */
+            editorial: components["schemas"]["EditorialOutcome"] | null;
+            /** @description In a dry run, `published` means "would be published". */
+            outcome: components["schemas"]["PublishOutcome"];
+            problemId: string;
+            reason: components["schemas"]["PublishSkipReason"] | null;
+        };
+        /**
+         * @description In a dry run, `published` means "would be published".
+         * @enum {string}
+         */
+        PublishOutcome: "published" | "skipped" | "unchanged";
+        PublishProblemsDto: {
+            /** @description Report what would happen and write nothing; default false. */
+            dryRun?: boolean;
+            /** @description Also release the editorials; default false. */
+            editorials?: boolean;
+        };
+        PublishProblemsResponse: {
+            dryRun: boolean;
+            items: components["schemas"]["PublishedProblemResponse"][];
+        };
+        /** @enum {string} */
+        PublishSkipReason: "no_permission" | "not_found" | "organization_private";
+        PurgeQueuedResponse: {
+            queued: boolean;
+        };
         PutEditorialDto: {
             /** @default [] */
             authors: string[];
@@ -4196,6 +5110,52 @@ export interface components {
         RenderPreviewResponse: {
             html: string;
         };
+        ReplayGhostResponse: {
+            caption: string;
+            events: (number | {
+                [key: string]: unknown;
+            })[][];
+            /** @description Same named enum as `GhostResponse.gap`; R3: an alias of a union needs the explicit decorator. */
+            gap: components["schemas"]["GhostGap"] | null;
+            isUnranked: boolean;
+            label: string;
+        };
+        ReplayParticipantResponse: {
+            participationId: string;
+            user: components["schemas"]["ReplayUserResponse"];
+        };
+        ReplayProblemResponse: {
+            code: string;
+            label: string;
+            points: number;
+            problemId: string;
+        };
+        ReplayResponse: {
+            /** @description The build every later chunk request must send as `build`; null while building. */
+            buildId: string | null;
+            builtAt: string | null;
+            chunk: number;
+            chunkCount: number;
+            /** @description Seconds from the participation's own start; see `REPLAY_EVENTS_SCHEMA` for the tuple. */
+            events: (number | {
+                [key: string]: unknown;
+            })[][];
+            ghosts: components["schemas"]["ReplayGhostResponse"][] | null;
+            /** @description Chunk 0 only; explicit, so the plugin does not lose the element class behind `| null`. */
+            participants: components["schemas"]["ReplayParticipantResponse"][] | null;
+            problems: components["schemas"]["ReplayProblemResponse"][] | null;
+            /**
+             * @description `building`: a build is queued or running; retry in a few seconds.
+             * @enum {string}
+             */
+            state: "building" | "ready";
+        };
+        ReplayUserResponse: {
+            id: string;
+            organization: string | null;
+            rating: number | null;
+            username: string;
+        };
         ResendActivationDto: {
             email: string;
         };
@@ -4235,7 +5195,7 @@ export interface components {
             url?: string;
         };
         /** @enum {string} */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "problem.deleteGraceDays" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -4262,6 +5222,21 @@ export interface components {
             createdAt: string;
             id: string;
         };
+        ShortLinkResponse: {
+            code: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            expiresAt: string | null;
+            hits: number;
+            /** @description Made for anyone by path (idempotent) rather than chosen by staff. */
+            isAuto: boolean;
+            /** Format: date-time */
+            lastHitAt: string | null;
+            path: string;
+        };
+        /** @enum {string} */
+        ShortLinkScope: "all" | "own";
         SimilarityFragmentResponse: {
             leftEnd: number;
             /** @description 1-based, inclusive, in the left source. */
@@ -4380,6 +5355,13 @@ export interface components {
                 [key: string]: string;
             };
             navigation: components["schemas"]["NavigationItemResponse"][];
+            /** @description Official contest mode is on right now (the flag and its end time). The response is cached `private, max-age=60`, so the shell may show the banner up to a minute after the mode ends. */
+            officialMode: boolean;
+            /**
+             * Format: date-time
+             * @description The ISO 8601 UTC instant the mode switches itself off, or `null` when the mode is off or has no end time. Same cache as `officialMode`.
+             */
+            officialModeEndsAt: string | null;
         };
         SocialCompleteDto: {
             /**
@@ -4530,6 +5512,8 @@ export interface components {
         };
         SubmissionProblemResponse: {
             code: string;
+            /** @description The problem was deleted or purged; its name is kept. */
+            isDeleted: boolean;
             name: string;
         };
         SubmissionProgressEventResponse: {
@@ -4599,6 +5583,71 @@ export interface components {
         };
         SubmitResponse: {
             id: string;
+        };
+        SyncContestDto: {
+            description?: string;
+            endTime: string;
+            /** @description Free-form JSON: the keys depend on the format. */
+            formatConfig?: {
+                [key: string]: unknown;
+            };
+            formatName?: components["schemas"]["ContestFormatName"];
+            frozenLastMinutes?: number;
+            name: string;
+            /** @description In contest order. */
+            problems: components["schemas"]["SyncProblemDto"][];
+            startTime: string;
+            /** @description Seconds a participant has once started; omitted, the whole window. */
+            timeLimit?: number;
+        };
+        SyncContestResponse: {
+            /** Format: date-time */
+            endTime: string;
+            /** @description False until a person publishes it; the sync API cannot change it. */
+            isVisible: boolean;
+            key: string;
+            name: string;
+            /** @description Users on the contestant list. */
+            participantCount: number;
+            /** Format: date-time */
+            startTime: string;
+        };
+        SyncParticipantsDto: {
+            /** @description Usernames of existing, active users; sync never creates a user. */
+            usernames: string[];
+        };
+        SyncParticipantsResponse: {
+            /** @description Users now on the contestant list. */
+            applied: number;
+            /** @description Usernames that matched no active user, as the client sent them. */
+            unknown: string[];
+        };
+        SyncProblemDto: {
+            code: string;
+            /** @description Partial scoring; true when omitted. */
+            partial?: boolean;
+            points: number;
+        };
+        /**
+         * @description What the request did, or on a dry run what it would do.
+         * @enum {string}
+         */
+        SyncUpsertAction: "created" | "unchanged" | "updated";
+        SyncUpsertResponse: {
+            /** @description What the request did, or on a dry run what it would do. */
+            action: components["schemas"]["SyncUpsertAction"];
+            /** @description True when nothing was written (`?dryRun=true`). */
+            dryRun: boolean;
+            /** Format: date-time */
+            endTime: string;
+            /** @description False until a person publishes it; the sync API cannot change it. */
+            isVisible: boolean;
+            key: string;
+            name: string;
+            /** @description Users on the contestant list. */
+            participantCount: number;
+            /** Format: date-time */
+            startTime: string;
         };
         TagAssignmentResponse: {
             assigner: components["schemas"]["UserSummaryResponse"] | null;
@@ -4702,6 +5751,8 @@ export interface components {
             messages: components["schemas"]["TicketMessageResponse"][];
             /** @description Every reader sees it; `can.editNotes` says who may change it. */
             notes: string;
+            /** @description Messages and state changes by time (equal instants: message first). */
+            timeline: components["schemas"]["TicketTimelineEntryResponse"][];
             title: string;
         };
         TicketEventFrame: {
@@ -4754,6 +5805,31 @@ export interface components {
             editNotes: boolean;
             markGood: boolean;
         };
+        TicketSummaryResponse: {
+            /** @description Open tickets the viewer is assigned to. */
+            assignedOpen: number;
+            /** @description Open tickets whose newest message is not from staff; 0 unless the viewer holds `judge.change_ticket`. */
+            awaitingStaff: number;
+        };
+        TicketTimelineEntryResponse: {
+            /** Format: date-time */
+            at: string;
+            event: components["schemas"]["TicketTimelineEventResponse"] | null;
+            /** @enum {string} */
+            kind: "event" | "message";
+            message: components["schemas"]["TicketMessageResponse"] | null;
+        };
+        TicketTimelineEventResponse: {
+            actor: components["schemas"]["UserSummaryResponse"];
+            /** Format: date-time */
+            at: string;
+            id: string;
+            /** @description The assignee of `assigned` / `unassigned`, else null. */
+            target: components["schemas"]["UserSummaryResponse"] | null;
+            type: components["schemas"]["TicketTimelineType"];
+        };
+        /** @enum {string} */
+        TicketTimelineType: "assigned" | "closed" | "marked-good" | "reopened" | "unassigned" | "unmarked-good";
         TokenDto: {
             token: string;
         };
@@ -4765,10 +5841,20 @@ export interface components {
             methods: ("totp" | "webauthn")[];
             username: string;
         };
+        UnreadCountResponse: {
+            count: number;
+        };
+        UpdateCannedReplyDto: {
+            body?: string;
+            order?: number;
+            title?: string;
+        };
         UpdateContestDto: {
             /** @description Stored hashed; an empty string removes it. */
             accessCode?: string;
             authors?: string[];
+            balloons?: boolean;
+            balloonStaff?: string[];
             bannedJudges?: string[];
             bannedUsers?: string[];
             curators?: string[];
@@ -4794,6 +5880,7 @@ export interface components {
             pointsPrecision?: number;
             privateContestants?: string[];
             problems?: components["schemas"]["ContestProblemDto"][];
+            publishAfterEnd?: boolean;
             pushAnnouncements?: boolean;
             /** @description Stored hashed; an empty string removes it. */
             rankingAccessCode?: string;
@@ -4803,6 +5890,8 @@ export interface components {
             ratingFloor?: number | null;
             registrationEnd?: string | null;
             registrationStart?: string | null;
+            /** @description Markdown, trimmed at save; empty or whitespace: no rules. */
+            rules?: string;
             runPretestsOnly?: boolean;
             /** @description Seconds; 0 disables the ranking cache. */
             scoreboardCacheTimeout?: number;
@@ -4816,6 +5905,13 @@ export interface components {
             /** @description Seconds. */
             timeLimit?: number | null;
             viewContestScoreboard?: string[];
+        };
+        UpdateContestTagDto: {
+            /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
+            color?: components["schemas"]["ContestTagColor"];
+            description?: string;
+            name?: string;
+            order?: number;
         };
         UpdateFlatpageDto: {
             /** @description Markdown, rendered and sanitised on save in the `blog` style. */
@@ -7460,6 +8556,146 @@ export interface operations {
             };
         };
     };
+    ContestTagsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContestTagResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestTagsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContestTagDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContestTagResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestTagsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestTagsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContestTagDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContestTagResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestsController_list: {
         parameters: {
             query?: {
@@ -7784,6 +9020,109 @@ export interface operations {
             };
         };
     };
+    BalloonsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                state?: components["schemas"]["BalloonState"];
+            };
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BalloonResponse"][];
+                        meta: components["schemas"]["BalloonPageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BalloonsController_deliver: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                participation: string;
+                problem: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BalloonsController_undeliver: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+                participation: string;
+                problem: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestEditingController_clone: {
         parameters: {
             query?: never;
@@ -7927,6 +9266,407 @@ export interface operations {
             };
         };
     };
+    ContestExportController_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContestExportStatusResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestExportController_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["QueuedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestExportController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedController_snapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/x-ndjson": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedKeysController_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FeedKeyStatusResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedKeysController_mint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MintFeedKeyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MintedFeedKeyResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedKeysController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedKeysController_release: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    GhostsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["GhostListResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    GhostsController_importCsv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportGhostsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["GhostImportResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    GhostsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    GhostsController_csv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestParticipationController_join: {
         parameters: {
             query?: never;
@@ -7938,7 +9678,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AccessCodeDto"];
+                "application/json": components["schemas"]["JoinBodyDto"];
             };
         };
         responses: {
@@ -8210,6 +9950,44 @@ export interface operations {
             };
         };
     };
+    ContestPublishController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishProblemsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PublishProblemsResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestRankingController_ranking: {
         parameters: {
             query?: {
@@ -8434,7 +10212,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AccessCodeDto"];
+                "application/json": components["schemas"]["JoinBodyDto"];
             };
         };
         responses: {
@@ -8445,6 +10223,79 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ParticipationSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReplayController_replay: {
+        parameters: {
+            query?: {
+                /** @description The `buildId` chunk 0 returned; required for `chunk > 0`, so a reader never mixes builds. */
+                build?: string;
+                /** @description Chunk index, 0 first (it also carries participants, problems and ghosts). */
+                chunk?: number;
+            };
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ReplayResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReplayController_rebuild: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["QueuedResponse"];
                     };
                 };
             };
@@ -8805,6 +10656,37 @@ export interface operations {
             };
         };
     };
+    UserStreamsController_open: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stream of frames; `event` names each one. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["NotificationFrame"] | components["schemas"]["ResyncFrame"];
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     FeedsController_feed: {
         parameters: {
             query?: never;
@@ -8857,6 +10739,108 @@ export interface operations {
                         data: components["schemas"]["HomeResponse"];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    IntegrationClientsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IntegrationClientResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    IntegrationClientsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateIntegrationClientDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CreatedIntegrationClientResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    IntegrationClientsController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -9029,6 +11013,136 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["JudgeKeyResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsController_list: {
+        parameters: {
+            query?: {
+                /** @description Repeat the parameter (`kind=ticket-new&kind=ticket-message`); the inbox "Loại" chips send the kinds of their group. */
+                kind?: components["schemas"]["NotificationKind"][];
+                page?: number;
+                /** @description The banner asks for `state=unread&priority=high`. */
+                priority?: components["schemas"]["NotificationPriority"];
+                state?: components["schemas"]["NotificationState"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsController_readAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsController_unreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UnreadCountResponse"];
                     };
                 };
             };
@@ -9881,6 +11995,40 @@ export interface operations {
             };
         };
     };
+    ProblemLifecycleController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmCodeDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ProblemEditingController_edit: {
         parameters: {
             query?: never;
@@ -10324,6 +12472,96 @@ export interface operations {
             };
         };
     };
+    ProblemPackageController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+            /** @description Still building (see Retry-After). */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PackageBuildingResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemPackageController_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current package is cached. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PackageStatusResponse"];
+                    };
+                };
+            };
+            /** @description A build is queued or running; poll `GET` on the same path. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PackageStatusResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ProblemPdfController_pdf: {
         parameters: {
             query?: {
@@ -10365,6 +12603,74 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemLifecycleController_purgeNow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmCodeDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PurgeQueuedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemLifecycleController_restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -10602,6 +12908,42 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemLifecycleController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeletedProblemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -11030,6 +13372,110 @@ export interface operations {
                         data: components["schemas"]["PublicRankingResponse"];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShortLinksController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description `ShortLinkScope` is an alias of a union, so the plugin would drop it: spelled out (SDK R3). */
+                scope?: components["schemas"]["ShortLinkScope"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShortLinkResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShortLinksController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateShortLinkDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShortLinkResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShortLinksController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -11711,6 +14157,145 @@ export interface operations {
             };
         };
     };
+    CannedRepliesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CannedReplyResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CannedRepliesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCannedReplyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CannedReplyResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CannedRepliesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CannedRepliesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCannedReplyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CannedReplyResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     TicketsController_list: {
         parameters: {
             query?: {
@@ -11880,6 +14465,38 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["TicketDetailResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    TicketSummaryController_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TicketSummaryResponse"];
                     };
                 };
             };
@@ -12283,6 +14900,183 @@ export interface operations {
             };
         };
     };
+    SyncContestsController_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SyncContestResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SyncContestsController_put: {
+        parameters: {
+            query?: {
+                /** @description `true` validates everything and writes nothing. */
+                dryRun?: "false" | "true";
+            };
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncContestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SyncUpsertResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SyncContestsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SyncContestsController_setParticipants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncParticipantsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SyncParticipantsResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SyncContestsController_getStandings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RankingResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     HealthController_check: {
         parameters: {
             query?: never;
@@ -12301,6 +15095,37 @@ export interface operations {
                         data: components["schemas"]["HealthResponse"];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShortLinkRedirectController_go: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to the stored site path */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {

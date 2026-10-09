@@ -7,7 +7,8 @@ import {
   rateContest,
   rescoreContest,
 } from '@/api/contest-editing.api';
-import type { ContestActions, EditableContest } from '@/api/types/contest-editing';
+import { CONTEST_ACTION_NAMES } from '@/api/types/contest-editing';
+import type { ContestActionName, EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
@@ -37,9 +38,12 @@ const {
 } = useQuery({
   queryKey: computed(() => actionsKey()),
   queryFn: () => fetchContestActions(props.contest.key),
-  refetchInterval: (query) => (Object.values(query.state.data ?? {}).some(isBusy) ? 5000 : false),
+  refetchInterval: (query) => {
+    const states = query.state.data;
+    return states && CONTEST_ACTION_NAMES.some((name) => isBusy(states[name])) ? 5000 : false;
+  },
 });
-const stateOf = (name: keyof ContestActions) => actions.value?.[name] ?? 'idle';
+const stateOf = (name: ContestActionName) => actions.value?.[name] ?? 'idle';
 
 /** Starts the action, then re-reads the states: the card shows what the status endpoint now says. */
 async function runAction(start: (key: string) => Promise<unknown>) {

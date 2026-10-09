@@ -1,15 +1,6 @@
 {
   "components": {
     "schemas": {
-      "AccessCodeDto": {
-        "properties": {
-          "accessCode": {
-            "maxLength": 255,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "ActivityCountResponse": {
         "properties": {
           "count": {
@@ -295,6 +286,107 @@
         ],
         "type": "object"
       },
+      "BalloonPageMetaResponse": {
+        "properties": {
+          "deliveredTotal": {
+            "nullable": true,
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "pendingTotal": {
+            "nullable": true,
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pendingTotal",
+          "deliveredTotal",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object"
+      },
+      "BalloonResponse": {
+        "properties": {
+          "deliveredAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "deliveredBy": {
+            "description": "Username of the volunteer who delivered it.",
+            "nullable": true,
+            "type": "string"
+          },
+          "isFirst": {
+            "type": "boolean"
+          },
+          "participationId": {
+            "type": "string"
+          },
+          "problemCode": {
+            "type": "string"
+          },
+          "problemId": {
+            "type": "string"
+          },
+          "problemLabel": {
+            "type": "string"
+          },
+          "solvedAt": {
+            "description": "Seconds from the team's start; null when the format keeps no solve time, and for a reader who cannot edit while the contest is frozen.",
+            "nullable": true,
+            "type": "number"
+          },
+          "team": {
+            "$ref": "#/components/schemas/BalloonTeamResponse"
+          }
+        },
+        "required": [
+          "solvedAt",
+          "deliveredAt",
+          "deliveredBy",
+          "participationId",
+          "problemId",
+          "problemCode",
+          "problemLabel",
+          "team",
+          "isFirst"
+        ],
+        "type": "object"
+      },
+      "BalloonState": {
+        "enum": [
+          "all",
+          "delivered",
+          "pending"
+        ],
+        "type": "string"
+      },
+      "BalloonTeamResponse": {
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "username"
+        ],
+        "type": "object"
+      },
       "BanDto": {
         "properties": {
           "reason": {
@@ -372,6 +464,40 @@
         ],
         "type": "object"
       },
+      "CannedReplyResponse": {
+        "properties": {
+          "body": {
+            "description": "With `{tên}` / `{bài}` still in it.",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "order",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
       "CatalogItemResponse": {
         "properties": {
           "fullName": {
@@ -424,6 +550,7 @@
       "CloneProblemDto": {
         "properties": {
           "code": {
+            "pattern": "^[a-z0-9_]{1,32}$",
             "type": "string"
           }
         },
@@ -756,6 +883,17 @@
         ],
         "type": "object"
       },
+      "ConfirmCodeDto": {
+        "properties": {
+          "confirmCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirmCode"
+        ],
+        "type": "object"
+      },
       "ContestActionState": {
         "enum": [
           "idle",
@@ -766,7 +904,23 @@
       },
       "ContestActionsResponse": {
         "properties": {
+          "autoPublish": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestAutoPublishResponse"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          },
           "judgeFinal": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestActionState"
+              }
+            ]
+          },
+          "publish": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ContestActionState"
@@ -791,7 +945,9 @@
         "required": [
           "rescore",
           "judgeFinal",
-          "rate"
+          "rate",
+          "publish",
+          "autoPublish"
         ],
         "type": "object"
       },
@@ -827,6 +983,46 @@
           "data"
         ],
         "type": "object"
+      },
+      "ContestAutoPublishResponse": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "published": {
+            "type": "number"
+          },
+          "reason": {
+            "description": "Empty on success; `no_permission` or `actor_unavailable` on a failure.",
+            "type": "string"
+          },
+          "skipped": {
+            "type": "number"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestAutoPublishStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "at",
+          "reason",
+          "published",
+          "skipped"
+        ],
+        "type": "object"
+      },
+      "ContestAutoPublishStatus": {
+        "enum": [
+          "failed",
+          "published"
+        ],
+        "type": "string"
       },
       "ContestDataStatusResponse": {
         "properties": {
@@ -976,6 +1172,15 @@
             "description": "The public ranking links ask for a ranking access code.",
             "type": "boolean"
           },
+          "rules": {
+            "type": "string"
+          },
+          "rulesHtml": {
+            "type": "string"
+          },
+          "rulesRevision": {
+            "type": "number"
+          },
           "runPretestsOnly": {
             "type": "boolean"
           },
@@ -1037,6 +1242,9 @@
           "formatConfig",
           "description",
           "descriptionHtml",
+          "rules",
+          "rulesHtml",
+          "rulesRevision",
           "authors",
           "frozenLastMinutes",
           "showSubmissionList",
@@ -1065,6 +1273,43 @@
           "disallowVirtual",
           "registrationStart",
           "registrationEnd"
+        ],
+        "type": "object"
+      },
+      "ContestExportStatusResponse": {
+        "properties": {
+          "nextPrepareAt": {
+            "description": "When another request is allowed; null: now.",
+            "nullable": true,
+            "type": "string"
+          },
+          "preparedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "readyAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "size": {
+            "nullable": true,
+            "type": "number"
+          },
+          "state": {
+            "enum": [
+              "none",
+              "preparing",
+              "ready"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "preparedAt",
+          "readyAt",
+          "size",
+          "nextPrepareAt"
         ],
         "type": "object"
       },
@@ -1323,6 +1568,11 @@
             "nullable": true,
             "type": "number"
           },
+          "memoryLimit": {
+            "description": "KiB; null when the viewer cannot see the problem.",
+            "nullable": true,
+            "type": "number"
+          },
           "name": {
             "type": "string"
           },
@@ -1337,6 +1587,11 @@
           },
           "solverCount": {
             "description": "Live participants whose cell is worth the problem's full points (the ranking's `acceptedCount`), frozen for non-editors during a freeze; null unless the viewer may see the full ranking. Up to 30 s old.",
+            "nullable": true,
+            "type": "number"
+          },
+          "timeLimit": {
+            "description": "Seconds; null when the viewer cannot see the problem.",
             "nullable": true,
             "type": "number"
           },
@@ -1360,6 +1615,8 @@
           "partial",
           "isPretested",
           "maxSubmissions",
+          "timeLimit",
+          "memoryLimit",
           "solverCount",
           "viewerResult"
         ],
@@ -1475,6 +1732,15 @@
       },
       "ContestSettingsResponse": {
         "properties": {
+          "balloonStaff": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "balloons": {
+            "type": "boolean"
+          },
           "bannedJudges": {
             "items": {
               "type": "string"
@@ -1528,6 +1794,14 @@
               "$ref": "#/components/schemas/ContestProblemOutputPrefixResponse"
             },
             "type": "array"
+          },
+          "publishAfterEnd": {
+            "type": "boolean"
+          },
+          "publishAfterEndBy": {
+            "description": "The editor whose rights the automatic publish re-checks at the end.",
+            "nullable": true,
+            "type": "string"
           },
           "pushAnnouncements": {
             "type": "boolean"
@@ -1590,6 +1864,10 @@
           "ratingFloor",
           "ratingCeiling",
           "pushAnnouncements",
+          "balloons",
+          "balloonStaff",
+          "publishAfterEnd",
+          "publishAfterEndBy",
           "hasRankingAccessCode",
           "problemOutputPrefixes",
           "users"
@@ -1618,9 +1896,59 @@
         ],
         "type": "object"
       },
+      "ContestTagColor": {
+        "description": "A theme token key (`tag-1`..`tag-8`), never a hex.",
+        "enum": [
+          "tag-1",
+          "tag-2",
+          "tag-3",
+          "tag-4",
+          "tag-5",
+          "tag-6",
+          "tag-7",
+          "tag-8"
+        ],
+        "type": "string"
+      },
+      "ContestTagResponse": {
+        "properties": {
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestTagColor"
+              }
+            ],
+            "description": "A theme token key (`tag-1`..`tag-8`), never a hex."
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "color",
+          "slug",
+          "name",
+          "description",
+          "order"
+        ],
+        "type": "object"
+      },
       "ContestViewerResponse": {
         "properties": {
           "canEdit": {
+            "type": "boolean"
+          },
+          "canViewBalloons": {
+            "description": "The balloon screen is on for this contest and the viewer may use it (editors, listed volunteers).",
             "type": "boolean"
           },
           "inContest": {
@@ -1663,6 +1991,7 @@
           "isTester",
           "inContest",
           "liveParticipation",
+          "canViewBalloons",
           "isCurrent"
         ],
         "type": "object"
@@ -1685,6 +2014,32 @@
         ],
         "type": "object"
       },
+      "CreateCannedReplyDto": {
+        "properties": {
+          "body": {
+            "description": "May hold `{tên}` and `{bài}`; the SPA fills them in.",
+            "maxLength": 8192,
+            "minLength": 1,
+            "type": "string"
+          },
+          "order": {
+            "description": "Default: after the last one.",
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "type": "object"
+      },
       "CreateContestDto": {
         "properties": {
           "accessCode": {
@@ -1698,6 +2053,16 @@
               "type": "string"
             },
             "type": "array"
+          },
+          "balloonStaff": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "balloons": {
+            "type": "boolean"
           },
           "bannedJudges": {
             "items": {
@@ -1807,6 +2172,9 @@
             },
             "type": "array"
           },
+          "publishAfterEnd": {
+            "type": "boolean"
+          },
           "pushAnnouncements": {
             "type": "boolean"
           },
@@ -1839,6 +2207,11 @@
           },
           "registrationStart": {
             "nullable": true,
+            "type": "string"
+          },
+          "rules": {
+            "description": "Markdown, trimmed at save; empty or whitespace: no rules.",
+            "maxLength": 8192,
             "type": "string"
           },
           "runPretestsOnly": {
@@ -1906,6 +2279,41 @@
         ],
         "type": "object"
       },
+      "CreateContestTagDto": {
+        "properties": {
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestTagColor"
+              }
+            ],
+            "description": "A union alias: the plugin drops it without the explicit decorator (R3)."
+          },
+          "description": {
+            "maxLength": 200,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string"
+          },
+          "order": {
+            "maximum": 1000,
+            "minimum": -1000,
+            "type": "number"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "color",
+          "slug",
+          "name"
+        ],
+        "type": "object"
+      },
       "CreateFlatpageDto": {
         "properties": {
           "content": {
@@ -1931,6 +2339,51 @@
           "url",
           "title",
           "content"
+        ],
+        "type": "object"
+      },
+      "CreateIntegrationClientDto": {
+        "properties": {
+          "actsAs": {
+            "description": "Username of the user the client acts as.",
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          },
+          "allowedCidrs": {
+            "description": "CIDR blocks the client may call from; each is parsed by the service.",
+            "items": {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          },
+          "expiresAt": {
+            "description": "When the key stops working; omitted, it works until revoked. Must be in the future.",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationScope"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "scopes",
+          "name",
+          "allowedCidrs",
+          "actsAs"
         ],
         "type": "object"
       },
@@ -2202,6 +2655,7 @@
             "type": "array"
           },
           "code": {
+            "pattern": "^[a-z0-9_]{1,32}$",
             "type": "string"
           },
           "curators": {
@@ -2338,6 +2792,27 @@
         ],
         "type": "object"
       },
+      "CreateShortLinkDto": {
+        "properties": {
+          "code": {
+            "description": "Staff only.",
+            "type": "string"
+          },
+          "expiresAt": {
+            "description": "Staff only.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Checked against the same-site allow-list by the service (a 400 `path` issue), not by a pattern here.",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
       "CreateTagProblemDto": {
         "properties": {
           "link": {
@@ -2355,6 +2830,78 @@
         "required": [
           "link",
           "name"
+        ],
+        "type": "object"
+      },
+      "CreatedIntegrationClientResponse": {
+        "properties": {
+          "actsAs": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationClientActingUserResponse"
+              }
+            ],
+            "description": "The user whose permissions bound the client."
+          },
+          "allowedCidrs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "description": "The key stops working at this instant; null when it never expires.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "description": "Shown once; only its hash is stored.",
+            "type": "string"
+          },
+          "keyPrefix": {
+            "description": "First characters of the key, to recognise it in this list.",
+            "type": "string"
+          },
+          "lastUsedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationScope"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "scopes",
+          "id",
+          "name",
+          "keyPrefix",
+          "allowedCidrs",
+          "actsAs",
+          "lastUsedAt",
+          "revokedAt",
+          "expiresAt",
+          "createdAt",
+          "key"
         ],
         "type": "object"
       },
@@ -2458,6 +3005,46 @@
         ],
         "type": "object"
       },
+      "DeletedProblemResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "daysLeft": {
+            "description": "Whole days before the purge job may take it; 0 once the grace period is over.",
+            "type": "number"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedBy": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSummaryResponse"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          },
+          "isPurged": {
+            "description": "The heavy data is gone; only the tombstone (code and name) stays and it cannot be restored.",
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "deletedAt",
+          "deletedBy",
+          "daysLeft",
+          "isPurged"
+        ],
+        "type": "object"
+      },
       "DisconnectJudgeDto": {
         "properties": {
           "force": {
@@ -2477,6 +3064,16 @@
           "disqualified"
         ],
         "type": "object"
+      },
+      "EditorialOutcome": {
+        "description": "Null when editorials were not requested.",
+        "enum": [
+          "none",
+          "published",
+          "skipped",
+          "unchanged"
+        ],
+        "type": "string"
       },
       "EditorialResponse": {
         "properties": {
@@ -2557,6 +3154,49 @@
         ],
         "type": "object"
       },
+      "FeedKeyMode": {
+        "enum": [
+          "frozen-until-release",
+          "live"
+        ],
+        "type": "string"
+      },
+      "FeedKeyStatusResponse": {
+        "properties": {
+          "createdBy": {
+            "description": "Username of the editor the key is bound to.",
+            "nullable": true,
+            "type": "string"
+          },
+          "expiresAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FeedKeyMode"
+              }
+            ],
+            "nullable": true
+          },
+          "releasedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "isActive",
+          "expiresAt",
+          "releasedAt",
+          "createdBy"
+        ],
+        "type": "object"
+      },
       "FieldChangeResponse": {
         "properties": {
           "after": {
@@ -2585,6 +3225,10 @@
           },
           "message": {
             "type": "string"
+          },
+          "row": {
+            "description": "1-based row of a CSV import (the header is row 1); absent for issues that belong to no row.",
+            "type": "number"
           }
         },
         "required": [
@@ -2768,6 +3412,109 @@
         ],
         "type": "object"
       },
+      "GhostCellResponse": {
+        "properties": {
+          "minute": {
+            "type": "number"
+          },
+          "points": {
+            "nullable": true,
+            "type": "number"
+          },
+          "problemCode": {
+            "type": "string"
+          },
+          "rejectedBefore": {
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "problemCode",
+          "minute",
+          "rejectedBefore",
+          "points"
+        ],
+        "type": "object"
+      },
+      "GhostGap": {
+        "description": "R3: `GhostGap` is a union alias, which the plugin drops without an explicit enum.",
+        "enum": [
+          "points",
+          "rejectedBefore"
+        ],
+        "type": "string"
+      },
+      "GhostImportResponse": {
+        "properties": {
+          "ghosts": {
+            "items": {
+              "$ref": "#/components/schemas/GhostResponse"
+            },
+            "type": "array"
+          },
+          "stored": {
+            "description": "False for a `dryRun`.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "stored",
+          "ghosts"
+        ],
+        "type": "object"
+      },
+      "GhostListResponse": {
+        "properties": {
+          "ghosts": {
+            "items": {
+              "$ref": "#/components/schemas/GhostResponse"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ghosts"
+        ],
+        "type": "object"
+      },
+      "GhostResponse": {
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/GhostCellResponse"
+            },
+            "type": "array"
+          },
+          "gap": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GhostGap"
+              }
+            ],
+            "description": "R3: `GhostGap` is a union alias, which the plugin drops without an explicit enum.",
+            "nullable": true
+          },
+          "isUnranked": {
+            "description": "Derived from the contest's format on every read; unranked ghosts are shown last.",
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "gap",
+          "label",
+          "caption",
+          "isUnranked",
+          "cells"
+        ],
+        "type": "object"
+      },
       "HasMorePageMetaResponse": {
         "properties": {
           "hasMore": {
@@ -2939,6 +3686,26 @@
         ],
         "type": "object"
       },
+      "ImportGhostsDto": {
+        "properties": {
+          "anonymize": {
+            "description": "Replace every label by \"Ghost 001\", ...: labels may be real students' names.",
+            "type": "boolean"
+          },
+          "csv": {
+            "maxLength": 1048576,
+            "type": "string"
+          },
+          "dryRun": {
+            "description": "Validate and preview without storing.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "csv"
+        ],
+        "type": "object"
+      },
       "ImportJobResponse": {
         "properties": {
           "error": {
@@ -2995,6 +3762,107 @@
           "problemId",
           "code"
         ],
+        "type": "object"
+      },
+      "IntegrationClientActingUserResponse": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username"
+        ],
+        "type": "object"
+      },
+      "IntegrationClientResponse": {
+        "properties": {
+          "actsAs": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IntegrationClientActingUserResponse"
+              }
+            ],
+            "description": "The user whose permissions bound the client."
+          },
+          "allowedCidrs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "description": "The key stops working at this instant; null when it never expires.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "keyPrefix": {
+            "description": "First characters of the key, to recognise it in this list.",
+            "type": "string"
+          },
+          "lastUsedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationScope"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "scopes",
+          "id",
+          "name",
+          "keyPrefix",
+          "allowedCidrs",
+          "actsAs",
+          "lastUsedAt",
+          "revokedAt",
+          "expiresAt",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "IntegrationScope": {
+        "enum": [
+          "contests:read",
+          "contests:write"
+        ],
+        "type": "string"
+      },
+      "JoinBodyDto": {
+        "properties": {
+          "acceptRules": {
+            "type": "boolean"
+          },
+          "accessCode": {
+            "maxLength": 255,
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "JudgeKeyResponse": {
@@ -3492,6 +4360,52 @@
         ],
         "type": "object"
       },
+      "MintFeedKeyDto": {
+        "properties": {
+          "expiresInDays": {
+            "maximum": 30,
+            "minimum": 1,
+            "type": "number"
+          },
+          "mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FeedKeyMode"
+              }
+            ],
+            "description": "Default `frozen-until-release`; `live` is an explicit opt-in."
+          }
+        },
+        "type": "object"
+      },
+      "MintedFeedKeyResponse": {
+        "properties": {
+          "expiresAt": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "mode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FeedKeyMode"
+              }
+            ]
+          },
+          "username": {
+            "description": "The Basic user name, always `feed`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "username",
+          "key",
+          "expiresAt"
+        ],
+        "type": "object"
+      },
       "MiscConfigResponse": {
         "properties": {
           "key": {
@@ -3623,6 +4537,127 @@
           "body"
         ],
         "type": "object"
+      },
+      "NotificationEventResponse": {
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "NotificationFrame": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/NotificationEventResponse"
+          },
+          "event": {
+            "enum": [
+              "notification"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "event",
+          "data"
+        ],
+        "type": "object"
+      },
+      "NotificationKind": {
+        "enum": [
+          "contest-announcement",
+          "organization-request-decided",
+          "ticket-message",
+          "ticket-new",
+          "ticket-status"
+        ],
+        "type": "string"
+      },
+      "NotificationPriority": {
+        "enum": [
+          "high",
+          "normal"
+        ],
+        "type": "string"
+      },
+      "NotificationResponse": {
+        "properties": {
+          "body": {
+            "description": "Plain text.",
+            "type": "string"
+          },
+          "count": {
+            "description": "Events merged into this row.",
+            "type": "number"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationKind"
+              }
+            ]
+          },
+          "lastActivityAt": {
+            "description": "The list is ordered by this.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "path": {
+            "description": "Internal SPA path.",
+            "type": "string"
+          },
+          "priority": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NotificationPriority"
+              }
+            ]
+          },
+          "readAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "unread": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "priority",
+          "readAt",
+          "id",
+          "title",
+          "body",
+          "path",
+          "count",
+          "unread",
+          "createdAt",
+          "lastActivityAt"
+        ],
+        "type": "object"
+      },
+      "NotificationState": {
+        "enum": [
+          "all",
+          "read",
+          "unread"
+        ],
+        "type": "string"
       },
       "OfficialRankingResponse": {
         "properties": {
@@ -3907,6 +4942,40 @@
         ],
         "type": "object"
       },
+      "PackageBuildingResponse": {
+        "properties": {
+          "status": {
+            "enum": [
+              "building"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "PackageStatusResponse": {
+        "properties": {
+          "key": {
+            "description": "`<dataVersion>.<contentHash>` of what the build is (or was) for.",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "building",
+              "ready"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "key"
+        ],
+        "type": "object"
+      },
       "PageMetaResponse": {
         "properties": {
           "page": {
@@ -3965,6 +5034,17 @@
             "format": "date-time",
             "type": "string"
           },
+          "rulesAcceptedAt": {
+            "description": "When this participation accepted the contest rules; null when the contest had no rules then (or the row predates rules).",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "rulesAcceptedRevision": {
+            "description": "The rules revision accepted: it may be older than the contest's current `rulesRevision`.",
+            "nullable": true,
+            "type": "number"
+          },
           "score": {
             "type": "number"
           },
@@ -3980,6 +5060,8 @@
           }
         },
         "required": [
+          "rulesAcceptedAt",
+          "rulesAcceptedRevision",
           "cells",
           "user",
           "score",
@@ -4013,12 +5095,25 @@
             "format": "date-time",
             "type": "string"
           },
+          "rulesAcceptedAt": {
+            "description": "When this participation accepted the contest rules; null when the contest had no rules then (or the row predates rules).",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "rulesAcceptedRevision": {
+            "description": "The rules revision accepted: it may be older than the contest's current `rulesRevision`.",
+            "nullable": true,
+            "type": "number"
+          },
           "virtual": {
             "description": "0 live, -1 spectate, n ≥ 1 virtual.",
             "type": "number"
           }
         },
         "required": [
+          "rulesAcceptedAt",
+          "rulesAcceptedRevision",
           "id",
           "virtual",
           "isRegistered",
@@ -5131,6 +6226,110 @@
         ],
         "type": "object"
       },
+      "PublishOutcome": {
+        "description": "In a dry run, `published` means \"would be published\".",
+        "enum": [
+          "published",
+          "skipped",
+          "unchanged"
+        ],
+        "type": "string"
+      },
+      "PublishProblemsDto": {
+        "properties": {
+          "dryRun": {
+            "description": "Report what would happen and write nothing; default false.",
+            "type": "boolean"
+          },
+          "editorials": {
+            "description": "Also release the editorials; default false.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "PublishProblemsResponse": {
+        "properties": {
+          "dryRun": {
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PublishedProblemResponse"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "dryRun",
+          "items"
+        ],
+        "type": "object"
+      },
+      "PublishSkipReason": {
+        "enum": [
+          "no_permission",
+          "not_found",
+          "organization_private"
+        ],
+        "type": "string"
+      },
+      "PublishedProblemResponse": {
+        "properties": {
+          "code": {
+            "description": "Null when the problem document is gone.",
+            "nullable": true,
+            "type": "string"
+          },
+          "editorial": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EditorialOutcome"
+              }
+            ],
+            "description": "Null when editorials were not requested.",
+            "nullable": true
+          },
+          "outcome": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishOutcome"
+              }
+            ],
+            "description": "In a dry run, `published` means \"would be published\"."
+          },
+          "problemId": {
+            "type": "string"
+          },
+          "reason": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublishSkipReason"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "outcome",
+          "reason",
+          "editorial",
+          "problemId",
+          "code"
+        ],
+        "type": "object"
+      },
+      "PurgeQueuedResponse": {
+        "properties": {
+          "queued": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "queued"
+        ],
+        "type": "object"
+      },
       "PutEditorialDto": {
         "properties": {
           "authors": {
@@ -5696,6 +6895,195 @@
         ],
         "type": "object"
       },
+      "ReplayGhostResponse": {
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "gap": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GhostGap"
+              }
+            ],
+            "description": "Same named enum as `GhostResponse.gap`; R3: an alias of a union needs the explicit decorator.",
+            "nullable": true
+          },
+          "isUnranked": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "gap",
+          "events",
+          "label",
+          "caption",
+          "isUnranked"
+        ],
+        "type": "object"
+      },
+      "ReplayParticipantResponse": {
+        "properties": {
+          "participationId": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/ReplayUserResponse"
+          }
+        },
+        "required": [
+          "participationId",
+          "user"
+        ],
+        "type": "object"
+      },
+      "ReplayProblemResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          },
+          "problemId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "problemId",
+          "code",
+          "label",
+          "points"
+        ],
+        "type": "object"
+      },
+      "ReplayResponse": {
+        "properties": {
+          "buildId": {
+            "description": "The build every later chunk request must send as `build`; null while building.",
+            "nullable": true,
+            "type": "string"
+          },
+          "builtAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "chunk": {
+            "type": "number"
+          },
+          "chunkCount": {
+            "type": "number"
+          },
+          "events": {
+            "description": "Seconds from the participation's own start; see `REPLAY_EVENTS_SCHEMA` for the tuple.",
+            "items": {
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "ghosts": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayGhostResponse"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "participants": {
+            "description": "Chunk 0 only; explicit, so the plugin does not lose the element class behind `| null`.",
+            "items": {
+              "$ref": "#/components/schemas/ReplayParticipantResponse"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayProblemResponse"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "state": {
+            "description": "`building`: a build is queued or running; retry in a few seconds.",
+            "enum": [
+              "building",
+              "ready"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "participants",
+          "problems",
+          "ghosts",
+          "events",
+          "state",
+          "buildId",
+          "builtAt",
+          "chunk",
+          "chunkCount"
+        ],
+        "type": "object"
+      },
+      "ReplayUserResponse": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organization": {
+            "nullable": true,
+            "type": "string"
+          },
+          "rating": {
+            "nullable": true,
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "rating",
+          "organization"
+        ],
+        "type": "object"
+      },
       "ResendActivationDto": {
         "properties": {
           "email": {
@@ -5842,11 +7230,13 @@
           "auth.pwnedApiUrl",
           "contest.banAfterDisqualifications",
           "contest.officialMode",
+          "contest.officialModeEndsAt",
           "discord.webhooks",
           "mail.from",
           "mail.smtpUrl",
           "pdf.maxBytes",
           "pdf.renderTimeoutMs",
+          "problem.deleteGraceDays",
           "similarity.maxPairs",
           "similarity.maxSubmissions",
           "similarity.minPercent",
@@ -5941,6 +7331,54 @@
           "createdAt"
         ],
         "type": "object"
+      },
+      "ShortLinkResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "hits": {
+            "type": "number"
+          },
+          "isAuto": {
+            "description": "Made for anyone by path (idempotent) rather than chosen by staff.",
+            "type": "boolean"
+          },
+          "lastHitAt": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "path",
+          "isAuto",
+          "hits",
+          "lastHitAt",
+          "expiresAt",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "ShortLinkScope": {
+        "enum": [
+          "all",
+          "own"
+        ],
+        "type": "string"
       },
       "SimilarityFragmentResponse": {
         "properties": {
@@ -6339,11 +7777,23 @@
               "$ref": "#/components/schemas/NavigationItemResponse"
             },
             "type": "array"
+          },
+          "officialMode": {
+            "description": "Official contest mode is on right now (the flag and its end time). The response is cached `private, max-age=60`, so the shell may show the banner up to a minute after the mode ends.",
+            "type": "boolean"
+          },
+          "officialModeEndsAt": {
+            "description": "The ISO 8601 UTC instant the mode switches itself off, or `null` when the mode is off or has no end time. Same cache as `officialMode`.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
           }
         },
         "required": [
+          "officialModeEndsAt",
           "navigation",
-          "config"
+          "config",
+          "officialMode"
         ],
         "type": "object"
       },
@@ -6949,13 +8399,18 @@
           "code": {
             "type": "string"
           },
+          "isDeleted": {
+            "description": "The problem was deleted or purged; its name is kept.",
+            "type": "boolean"
+          },
           "name": {
             "type": "string"
           }
         },
         "required": [
           "code",
-          "name"
+          "name",
+          "isDeleted"
         ],
         "type": "object"
       },
@@ -7219,6 +8674,213 @@
         },
         "required": [
           "id"
+        ],
+        "type": "object"
+      },
+      "SyncContestDto": {
+        "properties": {
+          "description": {
+            "maxLength": 200000,
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "formatConfig": {
+            "additionalProperties": true,
+            "description": "Free-form JSON: the keys depend on the format.",
+            "type": "object"
+          },
+          "formatName": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestFormatName"
+              }
+            ]
+          },
+          "frozenLastMinutes": {
+            "minimum": 0,
+            "type": "number"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "problems": {
+            "description": "In contest order.",
+            "items": {
+              "$ref": "#/components/schemas/SyncProblemDto"
+            },
+            "type": "array"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "timeLimit": {
+            "description": "Seconds a participant has once started; omitted, the whole window.",
+            "minimum": 1,
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "startTime",
+          "endTime",
+          "problems"
+        ],
+        "type": "object"
+      },
+      "SyncContestResponse": {
+        "properties": {
+          "endTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isVisible": {
+            "description": "False until a person publishes it; the sync API cannot change it.",
+            "type": "boolean"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "participantCount": {
+            "description": "Users on the contestant list.",
+            "type": "number"
+          },
+          "startTime": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "startTime",
+          "endTime",
+          "isVisible",
+          "participantCount"
+        ],
+        "type": "object"
+      },
+      "SyncParticipantsDto": {
+        "properties": {
+          "usernames": {
+            "description": "Usernames of existing, active users; sync never creates a user.",
+            "items": {
+              "maxLength": 150,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 2000,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "usernames"
+        ],
+        "type": "object"
+      },
+      "SyncParticipantsResponse": {
+        "properties": {
+          "applied": {
+            "description": "Users now on the contestant list.",
+            "type": "number"
+          },
+          "unknown": {
+            "description": "Usernames that matched no active user, as the client sent them.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "applied",
+          "unknown"
+        ],
+        "type": "object"
+      },
+      "SyncProblemDto": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "partial": {
+            "description": "Partial scoring; true when omitted.",
+            "type": "boolean"
+          },
+          "points": {
+            "maximum": 3500,
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "points"
+        ],
+        "type": "object"
+      },
+      "SyncUpsertAction": {
+        "description": "What the request did, or on a dry run what it would do.",
+        "enum": [
+          "created",
+          "unchanged",
+          "updated"
+        ],
+        "type": "string"
+      },
+      "SyncUpsertResponse": {
+        "properties": {
+          "action": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SyncUpsertAction"
+              }
+            ],
+            "description": "What the request did, or on a dry run what it would do."
+          },
+          "dryRun": {
+            "description": "True when nothing was written (`?dryRun=true`).",
+            "type": "boolean"
+          },
+          "endTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isVisible": {
+            "description": "False until a person publishes it; the sync API cannot change it.",
+            "type": "boolean"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "participantCount": {
+            "description": "Users on the contestant list.",
+            "type": "number"
+          },
+          "startTime": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "dryRun",
+          "key",
+          "name",
+          "startTime",
+          "endTime",
+          "isVisible",
+          "participantCount"
         ],
         "type": "object"
       },
@@ -7582,6 +9244,13 @@
             "description": "Every reader sees it; `can.editNotes` says who may change it.",
             "type": "string"
           },
+          "timeline": {
+            "description": "Messages and state changes by time (equal instants: message first).",
+            "items": {
+              "$ref": "#/components/schemas/TicketTimelineEntryResponse"
+            },
+            "type": "array"
+          },
           "title": {
             "type": "string"
           }
@@ -7599,6 +9268,7 @@
           "lastMessageAt",
           "notes",
           "messages",
+          "timeline",
           "can"
         ],
         "type": "object"
@@ -7777,6 +9447,113 @@
         ],
         "type": "object"
       },
+      "TicketSummaryResponse": {
+        "properties": {
+          "assignedOpen": {
+            "description": "Open tickets the viewer is assigned to.",
+            "type": "number"
+          },
+          "awaitingStaff": {
+            "description": "Open tickets whose newest message is not from staff; 0 unless the viewer holds `judge.change_ticket`.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "assignedOpen",
+          "awaitingStaff"
+        ],
+        "type": "object"
+      },
+      "TicketTimelineEntryResponse": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "event": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketTimelineEventResponse"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          },
+          "kind": {
+            "enum": [
+              "event",
+              "message"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketMessageResponse"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "at",
+          "message",
+          "event"
+        ],
+        "type": "object"
+      },
+      "TicketTimelineEventResponse": {
+        "properties": {
+          "actor": {
+            "$ref": "#/components/schemas/UserSummaryResponse"
+          },
+          "at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "target": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserSummaryResponse"
+              }
+            ],
+            "description": "The assignee of `assigned` / `unassigned`, else null.",
+            "nullable": true,
+            "type": "object"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketTimelineType"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "actor",
+          "target",
+          "at"
+        ],
+        "type": "object"
+      },
+      "TicketTimelineType": {
+        "enum": [
+          "assigned",
+          "closed",
+          "marked-good",
+          "reopened",
+          "unassigned",
+          "unmarked-good"
+        ],
+        "type": "string"
+      },
       "TokenDto": {
         "properties": {
           "token": {
@@ -7827,6 +9604,37 @@
         ],
         "type": "object"
       },
+      "UnreadCountResponse": {
+        "properties": {
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "type": "object"
+      },
+      "UpdateCannedReplyDto": {
+        "properties": {
+          "body": {
+            "maxLength": 8192,
+            "minLength": 1,
+            "type": "string"
+          },
+          "order": {
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": {
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "UpdateContestDto": {
         "properties": {
           "accessCode": {
@@ -7840,6 +9648,16 @@
               "type": "string"
             },
             "type": "array"
+          },
+          "balloonStaff": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "balloons": {
+            "type": "boolean"
           },
           "bannedJudges": {
             "items": {
@@ -7946,6 +9764,9 @@
             },
             "type": "array"
           },
+          "publishAfterEnd": {
+            "type": "boolean"
+          },
           "pushAnnouncements": {
             "type": "boolean"
           },
@@ -7978,6 +9799,11 @@
           },
           "registrationStart": {
             "nullable": true,
+            "type": "string"
+          },
+          "rules": {
+            "description": "Markdown, trimmed at save; empty or whitespace: no rules.",
+            "maxLength": 8192,
             "type": "string"
           },
           "runPretestsOnly": {
@@ -8035,6 +9861,33 @@
               "type": "string"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateContestTagDto": {
+        "properties": {
+          "color": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestTagColor"
+              }
+            ],
+            "description": "A union alias: the plugin drops it without the explicit decorator (R3)."
+          },
+          "description": {
+            "maxLength": 200,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string"
+          },
+          "order": {
+            "maximum": 1000,
+            "minimum": -1000,
+            "type": "number"
           }
         },
         "type": "object"
@@ -8297,6 +10150,7 @@
             "type": "array"
           },
           "code": {
+            "pattern": "^[a-z0-9_]{1,32}$",
             "type": "string"
           },
           "curators": {
@@ -13022,6 +14876,248 @@
         ]
       }
     },
+    "/api/internal/contest-tags": {
+      "get": {
+        "operationId": "ContestTagsController_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ContestTagResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestTags"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "operationId": "ContestTagsController_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContestTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ContestTagResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestTags"
+        ]
+      }
+    },
+    "/api/internal/contest-tags/{slug}": {
+      "delete": {
+        "operationId": "ContestTagsController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestTags"
+        ]
+      },
+      "patch": {
+        "operationId": "ContestTagsController_update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContestTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ContestTagResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestTags"
+        ]
+      }
+    },
     "/api/internal/contests": {
       "get": {
         "operationId": "ContestsController_list",
@@ -13698,6 +15794,221 @@
         ]
       }
     },
+    "/api/internal/contests/{key}/balloons": {
+      "get": {
+        "operationId": "BalloonsController_list",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/BalloonState"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/BalloonResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/BalloonPageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Balloons"
+        ],
+        "x-enveloped": true
+      }
+    },
+    "/api/internal/contests/{key}/balloons/{participation}/{problem}/deliver": {
+      "post": {
+        "operationId": "BalloonsController_deliver",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "participation",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "problem",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Balloons"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/balloons/{participation}/{problem}/undeliver": {
+      "post": {
+        "operationId": "BalloonsController_undeliver",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "participation",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "problem",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Balloons"
+        ]
+      }
+    },
     "/api/internal/contests/{key}/clone": {
       "post": {
         "operationId": "ContestEditingController_clone",
@@ -13939,6 +16250,640 @@
         "x-raw": true
       }
     },
+    "/api/internal/contests/{key}/export": {
+      "get": {
+        "operationId": "ContestExportController_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ContestExportStatusResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestExport"
+        ]
+      },
+      "post": {
+        "operationId": "ContestExportController_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/QueuedResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestExport"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/export/download": {
+      "get": {
+        "operationId": "ContestExportController_download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The file, as an attachment."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Always an attachment with `nosniff`; the file name is the contest key (`[a-z0-9_]`), nothing to escape.",
+        "tags": [
+          "ContestExport"
+        ],
+        "x-raw": true
+      }
+    },
+    "/api/internal/contests/{key}/feed": {
+      "get": {
+        "operationId": "FeedController_snapshot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The file, as an attachment."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "HTTP Basic with the contest's feed key, no session: resolver tools only speak Basic. NDJSON, one event per line.",
+        "tags": [
+          "Feed"
+        ],
+        "x-raw": true
+      }
+    },
+    "/api/internal/contests/{key}/feed-key": {
+      "delete": {
+        "operationId": "FeedKeysController_revoke",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "FeedKeys"
+        ]
+      },
+      "get": {
+        "operationId": "FeedKeysController_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FeedKeyStatusResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "FeedKeys"
+        ]
+      },
+      "post": {
+        "operationId": "FeedKeysController_mint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MintFeedKeyDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MintedFeedKeyResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "FeedKeys"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/feed-key/release": {
+      "post": {
+        "operationId": "FeedKeysController_release",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "FeedKeys"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/ghosts": {
+      "delete": {
+        "operationId": "GhostsController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ghosts"
+        ]
+      },
+      "get": {
+        "operationId": "GhostsController_list",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GhostListResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ghosts"
+        ]
+      },
+      "put": {
+        "operationId": "GhostsController_importCsv",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportGhostsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GhostImportResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "The whole request body is capped at `GHOST_CSV_MAX_BYTES` (Fastify answers 413 beyond it).",
+        "tags": [
+          "Ghosts"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/ghosts/csv": {
+      "get": {
+        "operationId": "GhostsController_csv",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The file, as an attachment."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Ghosts"
+        ],
+        "x-raw": true
+      }
+    },
     "/api/internal/contests/{key}/join": {
       "post": {
         "operationId": "ContestParticipationController_join",
@@ -13956,7 +16901,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccessCodeDto"
+                "$ref": "#/components/schemas/JoinBodyDto"
               }
             }
           },
@@ -14439,6 +17384,73 @@
         ]
       }
     },
+    "/api/internal/contests/{key}/publish-problems": {
+      "post": {
+        "operationId": "ContestPublishController_publish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishProblemsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PublishProblemsResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ContestPublish"
+        ]
+      }
+    },
     "/api/internal/contests/{key}/ranking": {
       "get": {
         "operationId": "ContestRankingController_ranking",
@@ -14824,7 +17836,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AccessCodeDto"
+                "$ref": "#/components/schemas/JoinBodyDto"
               }
             }
           },
@@ -14871,6 +17883,143 @@
         },
         "tags": [
           "ContestParticipation"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/replay": {
+      "get": {
+        "operationId": "ReplayController_replay",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Chunk index, 0 first (it also carries participants, problems and ghosts).",
+            "in": "query",
+            "name": "chunk",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 100000,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "description": "The `buildId` chunk 0 returned; required for `chunk > 0`, so a reader never mixes builds.",
+            "in": "query",
+            "name": "build",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReplayResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "`private`: the body depends on who asks (freeze), so no shared cache may keep it. A `building` answer is 202 and never cached.",
+        "tags": [
+          "Replay"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/replay/rebuild": {
+      "post": {
+        "operationId": "ReplayController_rebuild",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/QueuedResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Replay"
         ]
       }
     },
@@ -15480,6 +18629,54 @@
         ]
       }
     },
+    "/api/internal/events/user": {
+      "get": {
+        "operationId": "UserStreamsController_open",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NotificationFrame"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ResyncFrame"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "A stream of frames; `event` names each one."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "`notification` (`{ id }`: a row of the viewer's inbox was created or merged) and `resync` after a lost subscription.",
+        "tags": [
+          "UserStreams"
+        ]
+      }
+    },
     "/api/internal/feeds/{kind}/{format}": {
       "get": {
         "operationId": "FeedsController_feed",
@@ -15597,6 +18794,183 @@
         },
         "tags": [
           "Home"
+        ]
+      }
+    },
+    "/api/internal/integration-clients": {
+      "get": {
+        "operationId": "IntegrationClientsController_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationClientResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "IntegrationClients"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "operationId": "IntegrationClientsController_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationClientDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CreatedIntegrationClientResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "IntegrationClients"
+        ]
+      }
+    },
+    "/api/internal/integration-clients/{id}": {
+      "delete": {
+        "operationId": "IntegrationClientsController_revoke",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "IntegrationClients"
         ]
       }
     },
@@ -15880,6 +19254,227 @@
         },
         "tags": [
           "Judges"
+        ]
+      }
+    },
+    "/api/internal/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/NotificationState"
+            }
+          },
+          {
+            "description": "The banner asks for `state=unread&priority=high`.",
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/NotificationPriority"
+            }
+          },
+          {
+            "description": "Repeat the parameter (`kind=ticket-new&kind=ticket-message`); the inbox \"Loại\" chips send the kinds of their group.",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "items": {
+                "$ref": "#/components/schemas/NotificationKind"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/NotificationResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Notifications"
+        ],
+        "x-enveloped": true
+      }
+    },
+    "/api/internal/notifications/read-all": {
+      "post": {
+        "operationId": "NotificationsController_readAll",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/internal/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_unreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UnreadCountResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "The bell polls this every 60 s and on window focus.",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/internal/notifications/{id}/read": {
+      "post": {
+        "operationId": "NotificationsController_read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Notifications"
         ]
       }
     },
@@ -17416,10 +21011,98 @@
         ]
       }
     },
+    "/api/internal/problems/deleted": {
+      "get": {
+        "operationId": "ProblemLifecycleController_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/DeletedProblemResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ProblemLifecycle"
+        ],
+        "x-enveloped": true
+      }
+    },
     "/api/internal/problems/imports": {
       "post": {
         "operationId": "ProblemImportsController_start",
         "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "pattern": "^[a-z0-9_]{1,32}$",
+              "type": "string"
+            }
+          },
           {
             "in": "query",
             "name": "mode",
@@ -17458,14 +21141,6 @@
             "schema": {
               "default": false,
               "type": "boolean"
-            }
-          },
-          {
-            "in": "query",
-            "name": "code",
-            "required": true,
-            "schema": {
-              "type": "string"
             }
           },
           {
@@ -17906,6 +21581,56 @@
       }
     },
     "/api/internal/problems/{code}": {
+      "delete": {
+        "operationId": "ProblemLifecycleController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ProblemLifecycle"
+        ]
+      },
       "get": {
         "operationId": "ProblemsController_detail",
         "parameters": [
@@ -18762,6 +22487,151 @@
         ]
       }
     },
+    "/api/internal/problems/{code}/package": {
+      "get": {
+        "operationId": "ProblemPackageController_download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The file, as an attachment."
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PackageBuildingResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Still building (see Retry-After)."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "200 the zip (attachment), 202 while building, 404 `package_not_built`, 409 `package_too_large`, 503 `package_unavailable`.",
+        "tags": [
+          "ProblemPackage"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "operationId": "ProblemPackageController_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PackageStatusResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The current package is cached."
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PackageStatusResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A build is queued or running; poll `GET` on the same path."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "200 `{data: {status: 'ready', key}}` when the current package is cached, 202 `{data: {status: 'building', key}}` when a build is queued or running. Plain `@Res()` because the status depends on the answer.",
+        "tags": [
+          "ProblemPackage"
+        ],
+        "x-enveloped": true
+      }
+    },
     "/api/internal/problems/{code}/pdf": {
       "get": {
         "operationId": "ProblemPdfController_pdf",
@@ -18848,6 +22718,115 @@
           "ProblemPdf"
         ],
         "x-enveloped": true
+      }
+    },
+    "/api/internal/problems/{code}/purge-now": {
+      "post": {
+        "operationId": "ProblemLifecycleController_purgeNow",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmCodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PurgeQueuedResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ProblemLifecycle"
+        ]
+      }
+    },
+    "/api/internal/problems/{code}/restore": {
+      "post": {
+        "operationId": "ProblemLifecycleController_restore",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ProblemLifecycle"
+        ]
       }
     },
     "/api/internal/problems/{code}/statement": {
@@ -19577,6 +23556,192 @@
         },
         "tags": [
           "RankingLinks"
+        ]
+      }
+    },
+    "/api/internal/short-links": {
+      "get": {
+        "operationId": "ShortLinksController_list",
+        "parameters": [
+          {
+            "description": "`ShortLinkScope` is an alias of a union, so the plugin would drop it: spelled out (SDK R3).",
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ShortLinkScope"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ShortLinkResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ShortLinks"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "operationId": "ShortLinksController_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShortLinkDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ShortLinkResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ShortLinks"
+        ]
+      }
+    },
+    "/api/internal/short-links/{code}": {
+      "delete": {
+        "operationId": "ShortLinksController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "ShortLinks"
         ]
       }
     },
@@ -20813,6 +24978,237 @@
         ]
       }
     },
+    "/api/internal/ticket-canned-replies": {
+      "get": {
+        "operationId": "CannedRepliesController_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/CannedReplyResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "CannedReplies"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "operationId": "CannedRepliesController_create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCannedReplyDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CannedReplyResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "CannedReplies"
+        ]
+      }
+    },
+    "/api/internal/ticket-canned-replies/{id}": {
+      "delete": {
+        "operationId": "CannedRepliesController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "CannedReplies"
+        ]
+      },
+      "patch": {
+        "operationId": "CannedRepliesController_update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCannedReplyDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CannedReplyResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "CannedReplies"
+        ]
+      }
+    },
     "/api/internal/tickets": {
       "get": {
         "operationId": "TicketsController_list",
@@ -20976,6 +25372,55 @@
         },
         "tags": [
           "TicketCreation"
+        ]
+      }
+    },
+    "/api/internal/tickets/summary": {
+      "get": {
+        "operationId": "TicketSummaryController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TicketSummaryResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "The ticket badge; the browser may reuse it for 15 seconds.",
+        "tags": [
+          "TicketSummary"
         ]
       }
     },
@@ -21905,6 +26350,305 @@
         ]
       }
     },
+    "/api/sync/v1/contests/{key}": {
+      "delete": {
+        "operationId": "SyncContestsController_remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "SyncContests"
+        ]
+      },
+      "get": {
+        "operationId": "SyncContestsController_read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SyncContestResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "SyncContests"
+        ]
+      },
+      "put": {
+        "operationId": "SyncContestsController_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "`true` validates everything and writes nothing.",
+            "in": "query",
+            "name": "dryRun",
+            "required": false,
+            "schema": {
+              "enum": [
+                "false",
+                "true"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncContestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SyncUpsertResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "SyncContests"
+        ]
+      }
+    },
+    "/api/sync/v1/contests/{key}/participants": {
+      "put": {
+        "operationId": "SyncContestsController_setParticipants",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncParticipantsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SyncParticipantsResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "SyncContests"
+        ]
+      }
+    },
+    "/api/sync/v1/contests/{key}/standings": {
+      "get": {
+        "operationId": "SyncContestsController_getStandings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RankingResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "SyncContests"
+        ]
+      }
+    },
     "/healthz": {
       "get": {
         "operationId": "HealthController_check",
@@ -21950,6 +26694,49 @@
         },
         "tags": [
           "Health"
+        ]
+      }
+    },
+    "/s/{code}": {
+      "get": {
+        "operationId": "ShortLinkRedirectController_go",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to the stored site path"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "A `@Res()` handler returns no body: the 302 is documented by hand. The error envelope is the global `default` response, nothing per route. This route is not added to `UNDOCUMENTED_BODY`.",
+        "tags": [
+          "ShortLinkRedirect"
         ]
       }
     }

@@ -18,6 +18,8 @@ export const navItem = (overrides: Partial<NavigationItem> = {}): NavigationItem
 
 /** The board's site: five misc config keys and the navigation bar (a hidden blog child with a broken regex). */
 export const siteData = (): SiteData => ({
+  officialMode: false,
+  officialModeEndsAt: null,
   config: {
     announcement: '<p>Bảo trì lúc 13:00</p>',
     footer: '<small>© QHHOJ</small>',

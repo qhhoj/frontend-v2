@@ -214,7 +214,7 @@ export const submissionItem = (
 ): SubmissionListItem => ({
   id: 'sub-1',
   user: { id: sessionUser().id, username: 'user_01' },
-  problem: { code: 'aplusb', name: 'Tổng hai số' },
+  problem: { code: 'aplusb', name: 'Tổng hai số', isDeleted: false },
   language: { id: CPP17_ID, key: 'CPP17', name: 'C++17' },
   date: '2026-10-08T09:58:00Z',
   status: 'D',
@@ -311,6 +311,8 @@ export const contestProblem = (
   partial: false,
   isPretested: false,
   maxSubmissions: null,
+  timeLimit: null,
+  memoryLimit: null,
   solverCount: null,
   viewerResult: null,
   ...overrides,
@@ -335,6 +337,8 @@ export const participationSummary = (
   isDisqualified: false,
   realStart: '2026-10-08T08:00:00Z',
   endTime: '2026-10-08T11:24:37Z',
+  rulesAcceptedAt: null,
+  rulesAcceptedRevision: null,
   ...overrides,
 });
 
@@ -350,6 +354,7 @@ export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestVi
   isEditor: false,
   isTester: false,
   inContest: false,
+  canViewBalloons: false,
   liveParticipation: null,
   ...overrides,
 });
@@ -358,6 +363,9 @@ export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDe
   ...contestItem(),
   description: '',
   descriptionHtml: '<p>Vòng tuần cho đội tuyển, xếp hạng kiểu ICPC.</p>',
+  rules: '',
+  rulesHtml: '',
+  rulesRevision: 0,
   authors: [{ id: '0192a000-0000-7000-8000-0000000003a1', username: 'thayhung' }],
   frozenLastMinutes: 60,
   scoreboardVisibility: 'V',
@@ -589,7 +597,7 @@ export const submissionCase = (overrides: Partial<SubmissionCase> = {}): Submiss
 export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): SubmissionDetail => ({
   ...submissionItem({
     id: 'sub-1',
-    problem: { code: 'duongdi', name: 'Đường đi ngắn nhất' },
+    problem: { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: false },
     status: 'D',
     result: 'WA',
     points: 560,

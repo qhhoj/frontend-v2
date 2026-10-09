@@ -38,7 +38,7 @@ const signedInRoutes = (
     submissionItem(),
     submissionItem({
       id: 'sub-2',
-      problem: { code: 'sp', name: 'Đường đi ngắn nhất' },
+      problem: { code: 'sp', name: 'Đường đi ngắn nhất', isDeleted: false },
       result: 'TLE',
       time: null,
     }),

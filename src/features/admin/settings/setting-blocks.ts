@@ -14,7 +14,9 @@ export type SettingKind =
 export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'site.timeZone': { kind: 'timeZone' },
   'contest.officialMode': { kind: 'boolean' },
+  'contest.officialModeEndsAt': { kind: 'text' },
   'contest.banAfterDisqualifications': { kind: 'integer', min: 0, max: 1000 },
+  'problem.deleteGraceDays': { kind: 'integer', min: 1, max: 365 },
   'discord.webhooks': { kind: 'webhooks' },
   'mail.from': { kind: 'text' },
   'mail.smtpUrl': { kind: 'secretText' },

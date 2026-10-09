@@ -40,7 +40,7 @@ describe('contest submissions tab', () => {
       ...anonymousViewer,
       ...contestPageRoutes(open),
       'GET /contests/r42/submissions': page([
-        submissionItem({ problem: { code: 'r42a', name: 'Dãy số đẹp' } }),
+        submissionItem({ problem: { code: 'r42a', name: 'Dãy số đẹp', isDeleted: false } }),
       ]),
       'GET /problems/meta': ok(problemMeta()),
     });
