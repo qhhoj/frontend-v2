@@ -14,5 +14,5 @@ test('signing in from a protected page returns there; signing out leaves it', as
   await page.getByRole('button', { name: 'Tài khoản của user_01' }).click();
   await page.getByRole('menuitem', { name: 'Đăng xuất' }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('link', { name: 'Đăng nhập' })).toBeVisible();
+  await expect(page.getByRole('banner').getByRole('link', { name: 'Đăng nhập' })).toBeVisible();
 });
