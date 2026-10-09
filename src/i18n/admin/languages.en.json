@@ -1,0 +1,27 @@
+{
+  "crumbs": { "group": "Judging", "languages": "Languages" },
+  "title": "Programming languages",
+  "lead": "The languages submissions can use, and the judges that run them.",
+  "stats": {
+    "count": "{count} languages",
+    "online": "{online} judges online",
+    "single": "{single} run on one judge only"
+  },
+  "single": {
+    "title": "{key} runs on one judge only",
+    "body": "Submissions in {key} wait if judge {judge} is turned off or blocked."
+  },
+  "table": {
+    "key": "Key",
+    "name": "Name",
+    "extension": "Extension",
+    "inProblem": "In new problems",
+    "coverage": "Judges running it",
+    "judgesCount": "{count} / {total}",
+    "showJudges": "Show judges",
+    "fileOnly": "file upload only",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "empty": "No languages yet."
+}

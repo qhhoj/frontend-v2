@@ -31,7 +31,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   rejudge: () => import('./rejudge/BulkRejudgePage.vue'),
   judges: () => import('./judges/JudgesPage.vue'),
   judgeNew: () => import('./judges/JudgeAddPage.vue'),
-  languages: placeholder,
+  languages: () => import('./languages/LanguagesPage.vue'),
   users: () => import('./users/UsersPage.vue'),
   organizations: () => import('./organizations/OrganizationsPage.vue'),
   posts: () => import('./posts/BlogModerationPage.vue'),

@@ -1,0 +1,27 @@
+{
+  "crumbs": { "group": "Chấm bài", "languages": "Ngôn ngữ" },
+  "title": "Ngôn ngữ lập trình",
+  "lead": "Danh sách ngôn ngữ nộp bài và những máy chấm đang chạy chúng.",
+  "stats": {
+    "count": "{count} ngôn ngữ",
+    "online": "{online} máy chấm trực tuyến",
+    "single": "{single} chỉ có trên một máy"
+  },
+  "single": {
+    "title": "{key} chỉ chạy trên một máy",
+    "body": "Bài nộp {key} sẽ chờ nếu máy {judge} tắt hoặc bị chặn."
+  },
+  "table": {
+    "key": "Mã",
+    "name": "Tên",
+    "extension": "Đuôi tệp",
+    "inProblem": "Có trong bài mới",
+    "coverage": "Máy chấm hỗ trợ",
+    "judgesCount": "{count} / {total}",
+    "showJudges": "Xem máy",
+    "fileOnly": "chỉ nhận tệp",
+    "yes": "Có",
+    "no": "Không"
+  },
+  "empty": "Chưa có ngôn ngữ nào."
+}
