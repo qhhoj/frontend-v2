@@ -44,11 +44,19 @@ const signLabelKey = (row: DiffRow, side: Side) =>
       ? 'sourceDiff.sign.removed'
       : 'sourceDiff.sign.added'
     : null;
+/** Word diffs per changed row, once per `rows` (a render, such as opening a fold, must not redo them). */
+const wordSegmentsCache = computed(() => new WeakMap<DiffRow, Record<Side, Segment[]>>());
+function wordSegmentsOf(row: DiffRow, before: string, after: string) {
+  const cache = wordSegmentsCache.value;
+  const cached = cache.get(row) ?? wordSegments(before, after);
+  cache.set(row, cached);
+  return cached;
+}
 function segmentsOf(row: DiffRow, side: Side): Segment[] {
   const line = row[side];
   if (line === null) return [];
   if (row.kind === 'changed' && row.left && row.right)
-    return wordSegments(row.left.text, row.right.text)[side];
+    return wordSegmentsOf(row, row.left.text, row.right.text)[side];
   return [{ text: line.text, isChanged: false }];
 }
 const rowKey = (row: DiffRow) => `${row.left?.number ?? '-'}:${row.right?.number ?? '-'}`;
@@ -95,19 +103,19 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
     <ul data-testid="diff-summary" class="flex flex-wrap gap-2 px-5 py-4 text-sm sm:px-6">
       <li class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-semibold text-verdict-ac">
         <SummaryPill
-          :full="$t('sourceDiff.summary.added', { count: summary.added })"
+          :full="$t('sourceDiff.summary.added', { count: summary.added }, summary.added)"
           :short="$t('sourceDiff.summary.addedShort', { count: summary.added })"
         />
       </li>
       <li class="rounded-pill bg-verdict-wa-bg px-3 py-1 font-semibold text-verdict-wa">
         <SummaryPill
-          :full="$t('sourceDiff.summary.removed', { count: summary.removed })"
+          :full="$t('sourceDiff.summary.removed', { count: summary.removed }, summary.removed)"
           :short="$t('sourceDiff.summary.removedShort', { count: summary.removed })"
         />
       </li>
       <li class="rounded-pill bg-surface-strong px-3 py-1 text-muted">
         <SummaryPill
-          :full="$t('sourceDiff.summary.same', { count: summary.same })"
+          :full="$t('sourceDiff.summary.same', { count: summary.same }, summary.same)"
           :short="$t('sourceDiff.summary.sameShort', { count: summary.same })"
         />
       </li>

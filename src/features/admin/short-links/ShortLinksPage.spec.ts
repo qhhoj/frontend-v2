@@ -65,12 +65,12 @@ describe('ShortLinksPage', () => {
     const form = wrapper.get('[data-testid="short-link-form"]');
     await form.get('#short-link-path').setValue('/contests/r42');
     await form.get('#short-link-code').setValue('thi-thu');
-    await form.get('#short-link-expires').setValue('2026-12-31T23:30');
+    await form.get('#short-link-expires').setValue('2099-12-31T23:30');
     await form.trigger('submit');
     await flushPromises();
     const body = calls.find((call) => call.method === 'POST')!.body as Record<string, string>;
     expect(body).toMatchObject({ path: '/contests/r42', code: 'thi-thu' });
-    expect(new Date(body.expiresAt!).getTime()).toBe(new Date('2026-12-31T23:30').getTime());
+    expect(new Date(body.expiresAt!).getTime()).toBe(new Date('2099-12-31T23:30').getTime());
     expect(wrapper.get('[data-testid="short-link-created"]').text()).toContain('Đã tạo /s/thi-thu');
     expect(
       calls.filter((call) => call.path === '/short-links' && call.method === 'GET'),
@@ -135,6 +135,50 @@ describe('ShortLinksPage', () => {
     ).toBe(true);
     expect(wrapper.find('tr[data-code="hsg-2026"]').exists()).toBe(false);
     expect(wrapper.text()).toContain('Đã xóa /s/hsg-2026');
+  });
+
+  it('refuses an expiry in the past without sending anything', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await openPage();
+    const form = wrapper.get('[data-testid="short-link-form"]');
+    await form.get('#short-link-path').setValue('/contests/r42');
+    await form.get('#short-link-expires').setValue('2020-01-01T00:00');
+    await form.trigger('submit');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'POST')).toBe(false);
+    expect(form.get('#short-link-expires').attributes('aria-invalid')).toBe('true');
+    expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
+  });
+
+  it('marks an expired link beside its code, so the narrow table shows it too', async () => {
+    const lapsed = shortLink({
+      code: 'cu',
+      path: '/contests/old',
+      expiresAt: '2020-01-01T00:00:00.000Z',
+    });
+    mockApi(routes({ 'GET /short-links': page([lapsed, ...LINKS]) }));
+    const { wrapper } = await openPage();
+    expect(rowOf(wrapper, 'cu').find('[data-testid="expired-chip"]').exists()).toBe(true);
+    expect(rowOf(wrapper, 'hsg-2026').find('[data-testid="expired-chip"]').exists()).toBe(false);
+  });
+
+  it('drops the cached automatic short links when a link is deleted', async () => {
+    mockApi(
+      routes({
+        'GET /short-links': sequence(page(LINKS), page([LINKS[0]])),
+        'DELETE /short-links/hsg-2026': noContent(),
+      }),
+    );
+    const { wrapper, queryClient } = await openPage();
+    const autoKey = ['shortLinks', 'auto', 'u1', '/contests/hsg26'];
+    queryClient.setQueryData(autoKey, LINKS[1]);
+    await rowOf(wrapper, 'hsg-2026')
+      .get('button[aria-label="Xóa liên kết hsg-2026"]')
+      .trigger('click');
+    await flushPromises();
+    await confirmDialog('Xóa liên kết');
+    await flushPromises();
+    expect(queryClient.getQueryData(autoKey)).toBeUndefined();
   });
 
   it('shows the empty state with Bit', async () => {

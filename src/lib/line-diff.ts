@@ -2,6 +2,10 @@ import { diffArrays, diffWordsWithSpace } from 'diff';
 
 /** Either side above this many lines is refused before any diff runs (board M6C). */
 export const MAX_DIFF_LINES = 5000;
+/** Edit distance (added plus removed lines) beyond which the diff gives up: the work grows with size times this, so it stays under about 100 ms. */
+export const MAX_EDIT_LINES = 1000;
+/** A line with fewer non-space characters (`}`, `else {`) is never reported as moved: it repeats everywhere. */
+export const MIN_MOVED_LINE_CHARS = 4;
 /** Equal lines kept visible on each side of a change when a run is folded. */
 export const FOLD_CONTEXT_LINES = 2;
 /** A fold hides at least this many equal lines; a shorter run stays open. */
@@ -93,12 +97,15 @@ function hunkRows(removed: string[], added: string[], cursor: Cursor): DiffRow[]
   return rows;
 }
 
+const NON_SPACE = /\S/g;
+const isMovable = (text: string) => (text.match(NON_SPACE)?.length ?? 0) >= MIN_MOVED_LINE_CHARS;
+
 const unpairedTexts = (rows: DiffRow[], kind: 'removed' | 'added') =>
   new Set(
     rows
       .filter((row) => row.kind === kind)
       .map((row) => (row.left ?? row.right)!.text.trim())
-      .filter((text) => text !== ''),
+      .filter((text) => isMovable(text)),
   );
 
 /** `diff` has no move detection: an unpaired removed line whose trimmed text was added elsewhere (or the reverse) is a move. */
@@ -114,9 +121,12 @@ function markMoves(rows: DiffRow[]): DiffRow[] {
   });
 }
 
-/** Side-by-side rows of two sources: equal lines, changed pairs, lone removals and additions, moves flagged. */
-export function lineDiff(left: string, right: string): DiffRow[] {
-  const changes = diffArrays(splitSourceLines(left), splitSourceLines(right));
+/** Side-by-side rows of two sources: equal lines, changed pairs, lone removals and additions, moves flagged. Null when the sources differ by more than `MAX_EDIT_LINES` lines. */
+export function lineDiff(left: string, right: string): DiffRow[] | null {
+  const changes = diffArrays(splitSourceLines(left), splitSourceLines(right), {
+    maxEditLength: MAX_EDIT_LINES,
+  });
+  if (changes === undefined) return null;
   const cursor: Cursor = { left: 0, right: 0 };
   const rows: DiffRow[] = [];
   for (let index = 0; index < changes.length; index += 1) {

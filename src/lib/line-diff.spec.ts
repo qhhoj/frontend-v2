@@ -4,12 +4,14 @@ import {
   foldSameRuns,
   isIdentical,
   lineCountOf,
-  lineDiff,
+  lineDiff as boundedLineDiff,
   splitSourceLines,
   wordSegments,
 } from './line-diff';
 import type { DiffRow } from './line-diff';
 
+/** The rows of a pair that is within the edit budget. */
+const lineDiff = (left: string, right: string): DiffRow[] => boundedLineDiff(left, right)!;
 /** [kind, left line number, right line number] per row: the shape a reader sees. */
 const shape = (rows: DiffRow[]) =>
   rows.map((row) => [row.kind, row.left?.number ?? null, row.right?.number ?? null]);
@@ -82,7 +84,7 @@ describe('lineDiff', () => {
   });
 
   it('reports a moved line as one removed and one added row, both flagged as moved', () => {
-    const rows = lineDiff('a\nb\nc', 'b\nc\na');
+    const rows = lineDiff('alpha();\nb\nc', 'b\nc\nalpha();');
     expect(shape(rows)).toEqual([
       ['removed', 1, null],
       ['same', 2, 1],
@@ -95,6 +97,28 @@ describe('lineDiff', () => {
   it('matches a moved line by its trimmed text, so a re-indented move is still a move', () => {
     const rows = lineDiff('x\nfoo();\ny', 'x\ny\n    foo();');
     expect(rows.filter((row) => row.isMoved)).toHaveLength(2);
+  });
+
+  it('never flags short lines such as a closing brace as moved', () => {
+    const rows = lineDiff('x\n}\ny\nelse {', 'x\ny\nelse {\n}');
+    expect(rows.some((row) => row.isMoved)).toBe(false);
+    const [removed] = lineDiff('abcd();\nx', 'x\nabcd();');
+    expect(removed!.isMoved).toBe(true);
+  });
+
+  it('gives up with null, and promptly, on two large unrelated sources', () => {
+    const left = lines(5000, 'left');
+    const right = lines(5000, 'right');
+    const started = performance.now();
+    expect(boundedLineDiff(left, right)).toBeNull();
+    expect(performance.now() - started).toBeLessThan(1500);
+  });
+
+  it('still diffs a large source with few edits', () => {
+    const base = lines(5000);
+    const rows = boundedLineDiff(base, base.replace('line 2500', 'edited 2500'));
+    expect(rows).not.toBeNull();
+    expect(rows!.filter((row) => row.kind !== 'same')).toHaveLength(1);
   });
 
   it('never flags blank lines as moved', () => {

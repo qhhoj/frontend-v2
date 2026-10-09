@@ -10,6 +10,13 @@ const locale = useLocaleStore();
 const CELL = 'px-3 py-2 align-middle';
 const WIDE = 'hidden md:table-cell';
 const dateOf = (value: string) => formatDateTime(value, locale.locale);
+/** Revoked wins over expired: both end the key, but revoking is the staff's act. */
+const stateOf = (client: IntegrationClient): 'revoked' | 'expired' | 'active' => {
+  if (client.revokedAt) return 'revoked';
+  return client.expiresAt && new Date(client.expiresAt).getTime() <= Date.now()
+    ? 'expired'
+    : 'active';
+};
 </script>
 
 <template>
@@ -69,8 +76,11 @@ const dateOf = (value: string) => formatDateTime(value, locale.locale);
             }}
           </td>
           <td :class="[CELL, 'whitespace-nowrap']">
-            <span v-if="client.revokedAt" class="font-semibold text-negative">{{
-              $t('admin.integrations.table.revokedAt', { date: dateOf(client.revokedAt) })
+            <span v-if="stateOf(client) === 'revoked'" class="font-semibold text-negative">{{
+              $t('admin.integrations.table.revokedAt', { date: dateOf(client.revokedAt!) })
+            }}</span>
+            <span v-else-if="stateOf(client) === 'expired'" class="font-semibold text-negative">{{
+              $t('admin.integrations.table.expiredAt', { date: dateOf(client.expiresAt!) })
             }}</span>
             <span v-else class="font-semibold text-positive">{{
               $t('admin.integrations.table.active')

@@ -13,6 +13,9 @@ export type AdminQueryKey = readonly ['admin' | PublicQueryRoot, ...unknown[]];
 interface AdminMutationOptions<Vars, Result> {
   mutate: (vars: Vars) => Promise<Result>;
   invalidates?: (vars: Vars) => AdminQueryKey[];
+  /** Runs the moment the write succeeds, before the cache refresh (a one-time secret must not wait for a refetch). */
+  onSuccess?: (result: Result, vars: Vars) => void;
+  /** Runs after the cache refresh. */
   onDone?: (result: Result, vars: Vars) => void;
 }
 
@@ -32,6 +35,7 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
 
   async function settle(result: Result, vars: Vars) {
     isDone.value = true;
+    options.onSuccess?.(result, vars);
     await Promise.all(
       (options.invalidates?.(vars) ?? []).map((queryKey) =>
         queryClient.invalidateQueries({ queryKey }),

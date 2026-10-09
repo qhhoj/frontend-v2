@@ -1636,12 +1636,12 @@
       "needTwo": "Pick 2 submissions"
     },
     "summary": {
-      "added": "+{count} lines",
-      "removed": "−{count} lines",
+      "added": "+{count} line | +{count} lines",
+      "removed": "−{count} line | −{count} lines",
       "addedShort": "+{count}",
       "removedShort": "−{count}",
       "sameShort": "{count} identical",
-      "same": "{count} identical lines"
+      "same": "{count} identical line | {count} identical lines"
     },
     "regionLabel": "Both sources, side by side",
     "caption": "Line by line: the first submission on the left, the second on the right",
@@ -1657,7 +1657,7 @@
       "sign": "Change",
       "code": "Code"
     },
-    "foldShow": "Show {count} folded identical lines",
+    "foldShow": "Show {count} folded identical line | Show {count} folded identical lines",
     "sign": {
       "added": "Added",
       "removed": "Removed"
@@ -1682,6 +1682,8 @@
     "identicalBody": "No line differs (CRLF line endings were ignored).",
     "tooLongTitle": "The source is too long to compare",
     "tooLongBody": "One side has {count} lines, over the {limit}-line limit.",
+    "tooDifferentTitle": "The sources differ too much to compare",
+    "tooDifferentBody": "They differ by more than {limit} lines, so the comparison was skipped. Open each submission to read it.",
     "viewLeft": "Open the left submission",
     "viewRight": "Open the right submission",
     "pickTitle": "Pick two submissions to compare",

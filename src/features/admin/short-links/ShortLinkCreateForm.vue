@@ -19,6 +19,7 @@ const path = ref('');
 const code = ref('');
 const expires = ref('');
 const created = ref<ShortLink | null>(null);
+const isExpiryPast = ref(false);
 const create = useAdminMutation<void, ShortLink>({
   mutate: () =>
     createShortLink({
@@ -53,10 +54,21 @@ const pageFailure = computed(() => {
   const hasFieldError = Object.keys(create.fieldErrors.value).length > 0;
   return failure && !isConflict(failure) && !hasFieldError ? failureTextOf(failure) : null;
 });
+/** A link that is dead on arrival is a slip: refused here (the backend accepts it, see docs/api-mismatches/short-links.md). */
+function isPast(local: string): boolean {
+  const instant = fromLocalInput(local);
+  return instant !== null && new Date(instant).getTime() <= Date.now();
+}
 function submit() {
   created.value = null;
-  void create.run();
+  isExpiryPast.value = isPast(expires.value);
+  if (!isExpiryPast.value) void create.run();
 }
+const expiresError = computed(() =>
+  isExpiryPast.value
+    ? translate('admin.shortlinks.form.expiresPast')
+    : create.fieldErrors.value.expiresAt,
+);
 </script>
 
 <template>
@@ -109,7 +121,7 @@ function submit() {
           input-id="short-link-expires"
           :label="$t('admin.shortlinks.form.expires')"
           :hint="$t('admin.shortlinks.form.expiresHint')"
-          :error="create.fieldErrors.value.expiresAt"
+          :error="expiresError"
         >
           <input
             :id="id"

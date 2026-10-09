@@ -8,6 +8,7 @@
     "codeHint": "3–32 characters: lower-case letters, digits, hyphens. Leave empty for a random code.",
     "expires": "Expires",
     "expiresHint": "Leave empty for no expiry.",
+    "expiresPast": "The expiry must be after now.",
     "submit": "Create link",
     "created": "Created /s/{code}",
     "copy": "Copy the new link",

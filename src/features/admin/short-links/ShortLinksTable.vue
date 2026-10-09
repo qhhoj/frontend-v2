@@ -52,7 +52,15 @@ const dateOrDash = (value: string | null) => (value ? formatDateTime(value, loca
           :data-code="link.code"
           class="border-t border-line"
         >
-          <td :class="[CELL, 'font-mono font-semibold']">/s/{{ link.code }}</td>
+          <td :class="[CELL, 'font-mono font-semibold']">
+            /s/{{ link.code }}
+            <span
+              v-if="isExpired(link)"
+              data-testid="expired-chip"
+              class="ml-2 rounded-pill border border-line px-2 font-body text-xs font-semibold text-negative md:hidden"
+              >{{ $t('admin.shortlinks.table.expired') }}</span
+            >
+          </td>
           <td :class="[CELL, 'max-w-48 truncate font-mono']">
             <RouterLink :to="link.path" class="text-accent-text hover:underline">{{
               link.path

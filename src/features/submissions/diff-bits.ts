@@ -9,6 +9,7 @@ export const DIFF_STATE_PANELS = {
   notFound: 'notFound',
   error: 'error',
   tooLong: 'error',
+  tooDifferent: 'error',
   identical: 'success',
 } as const satisfies Record<string, StateKind>;
 

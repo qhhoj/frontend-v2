@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { indentAt, outdentLineAt } from './tab-indent';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { indentAt, outdentLineAt, writeEdit } from './tab-indent';
 
 const at = (text: string, selectionStart: number, selectionEnd = selectionStart) => ({
   text,
@@ -27,5 +27,45 @@ describe('outdentLineAt', () => {
     ['reads the first line when the caret is at 0', at('\n    x', 0), at('\n    x', 0)],
   ])('%s', (_name, edit, expected) => {
     expect(outdentLineAt(edit)).toEqual(expected);
+  });
+});
+
+describe('writeEdit', () => {
+  const fieldWith = (value: string) => {
+    const field = document.createElement('textarea');
+    field.value = value;
+    return field;
+  };
+  afterEach(() => Reflect.deleteProperty(document, 'execCommand'));
+
+  it('types only the changed span through execCommand so the browser keeps undo', () => {
+    const typed: unknown[][] = [];
+    document.execCommand = vi.fn((...args: unknown[]) => {
+      typed.push(args);
+      return false;
+    });
+    const field = fieldWith('aa');
+    writeEdit(field, indentAt(at('aa', 1)));
+    expect(typed).toEqual([['insertText', false, '    ']]);
+    expect(field.value).toBe('a    a');
+    expect([field.selectionStart, field.selectionEnd]).toEqual([5, 5]);
+  });
+
+  it('deletes through execCommand when the edit only removes text', () => {
+    const commands: unknown[][] = [];
+    document.execCommand = vi.fn((...args: unknown[]) => {
+      commands.push(args);
+      return true;
+    });
+    const field = fieldWith('x\n    y');
+    writeEdit(field, outdentLineAt(at('x\n    y', 7)));
+    expect(commands).toEqual([['delete']]);
+  });
+
+  it('falls back to setting the value where execCommand is missing', () => {
+    const field = fieldWith('ab');
+    writeEdit(field, indentAt(at('ab', 1)));
+    expect(field.value).toBe('a    b');
+    expect([field.selectionStart, field.selectionEnd]).toEqual([5, 5]);
   });
 });

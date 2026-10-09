@@ -8,6 +8,7 @@
     "codeHint": "3–32 ký tự: chữ thường, số, dấu gạch ngang. Để trống để tạo mã ngẫu nhiên.",
     "expires": "Hết hạn",
     "expiresHint": "Để trống nếu không hết hạn.",
+    "expiresPast": "Thời điểm hết hạn phải sau hiện tại.",
     "submit": "Tạo liên kết",
     "created": "Đã tạo /s/{code}",
     "copy": "Sao chép liên kết vừa tạo",

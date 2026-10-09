@@ -7,7 +7,7 @@ import SourceDiffSkeleton from '@/components/SourceDiffSkeleton.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { isIdentical, lineDiff, MAX_DIFF_LINES } from '@/lib/line-diff';
+import { isIdentical, lineDiff, MAX_DIFF_LINES, MAX_EDIT_LINES } from '@/lib/line-diff';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import DiffSideHeader from './DiffSideHeader.vue';
@@ -29,10 +29,14 @@ const sides = {
 const state = computed(() =>
   diffViewState({ left: sides.left.input.value, right: sides.right.input.value }),
 );
+/** Null while not ready, and when the two sources differ by more than the diff's edit budget. */
 const rows = computed(() =>
   state.value.kind === 'ready' ? lineDiff(state.value.leftSource, state.value.rightSource) : [],
 );
-const isSame = computed(() => state.value.kind === 'ready' && isIdentical(rows.value));
+const isTooDifferent = computed(() => rows.value === null);
+const isSame = computed(
+  () => rows.value !== null && state.value.kind === 'ready' && isIdentical(rows.value),
+);
 const otherSide = (side: DiffSide): DiffSide => (side === 'left' ? 'right' : 'left');
 const sideWord = (side: DiffSide) => translate(`sourceDiff.side.${side}`).toLowerCase();
 /** The problem side's id, and its author when the detail was readable (the named forbidden state). */
@@ -134,6 +138,20 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
       >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</RouterLink
     >
   </StatePanel>
+  <StatePanel
+    v-else-if="isTooDifferent"
+    :kind="DIFF_STATE_PANELS.tooDifferent"
+    :title="$t('sourceDiff.tooDifferentTitle')"
+    :body="$t('sourceDiff.tooDifferentBody', { limit: format(MAX_EDIT_LINES) })"
+  >
+    <RouterLink
+      v-for="side in SIDES"
+      :key="side"
+      :to="{ name: 'submission', params: { id: pair[side] } }"
+      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
+      >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</RouterLink
+    >
+  </StatePanel>
   <QueryState v-else :loading="state.kind === 'loading'" :error="null">
     <template #skeleton><SourceDiffSkeleton /></template>
     <StatePanel
@@ -155,7 +173,7 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
           {{ $t('sourceDiff.languagesBody', languages) }}</span
         >
       </p>
-      <SourceDiff :rows="rows" />
+      <SourceDiff :rows="rows!" />
     </template>
   </QueryState>
 </template>

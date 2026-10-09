@@ -119,6 +119,41 @@ describe('IntegrationClientsPage', () => {
     expect(form.text()).not.toContain('This user needs judge.create_private_contest.');
   });
 
+  it('shows the SPA text, not the backend English, for a past expiry', async () => {
+    mockApi(
+      routes({
+        'POST /integration-clients': invalid(
+          issue('expiresAt', 'invalid', 'The expiry must be in the future.'),
+        ),
+      }),
+    );
+    const { wrapper } = await openPage();
+    const form = await fillForm(wrapper);
+    await form.trigger('submit');
+    await flushPromises();
+    expect(form.get('#integration-expires').attributes('aria-invalid')).toBe('true');
+    expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
+    expect(form.text()).not.toContain('The expiry must be in the future.');
+  });
+
+  it('marks a key past its expiry as expired, not active, while a future one stays active', async () => {
+    const lapsed = integrationClient({
+      id: '0192a000-0000-7000-8000-0000000f0003',
+      name: 'Khóa hết hạn',
+      expiresAt: '2020-01-01T00:00:00.000Z',
+    });
+    const future = integrationClient({
+      id: '0192a000-0000-7000-8000-0000000f0004',
+      name: 'Khóa còn hạn',
+      expiresAt: '2999-01-01T00:00:00.000Z',
+    });
+    mockApi(routes({ 'GET /integration-clients': page([lapsed, future]) }));
+    const { wrapper } = await openPage();
+    expect(rowOf(wrapper, 'Khóa hết hạn').text()).toContain('Đã hết hạn');
+    expect(rowOf(wrapper, 'Khóa hết hạn').text()).not.toContain('Đang dùng');
+    expect(rowOf(wrapper, 'Khóa còn hạn').text()).toContain('Đang dùng');
+  });
+
   it('shows a refusal line for a 403 (user API token, impersonation)', async () => {
     mockApi(routes({ 'POST /integration-clients': fail(403, 'forbidden') }));
     const { wrapper } = await openPage();

@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import type { EditorHandle } from './code-editor-cm';
 import { loadLanguagePack } from './code-languages';
 import { useLowPowerPainted } from '@/lib/use-low-power-painted';
-import { indentAt, outdentLineAt } from './tab-indent';
+import { indentAt, outdentLineAt, writeEdit } from './tab-indent';
 
 const props = withDefaults(
   defineProps<{
@@ -134,9 +134,8 @@ function onTextareaKeydown(event: KeyboardEvent) {
     selectionEnd: field.selectionEnd,
   };
   const next = event.shiftKey ? outdentLineAt(edit) : indentAt(edit);
-  source.value = next.text;
-  field.value = next.text;
-  field.setSelectionRange(next.selectionStart, next.selectionEnd);
+  writeEdit(field, next);
+  source.value = field.value;
 }
 
 onMounted(() => {

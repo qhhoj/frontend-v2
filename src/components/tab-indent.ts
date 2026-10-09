@@ -29,3 +29,33 @@ export function outdentLineAt({ text, selectionStart, selectionEnd }: TextEdit):
     selectionEnd: shift(selectionEnd),
   };
 }
+
+/** The smallest span of `before` that `after` rewrites: shared head and tail are kept. */
+function changedSpan(before: string, after: string) {
+  let head = 0;
+  while (head < before.length && head < after.length && before[head] === after[head]) head += 1;
+  let tail = 0;
+  const room = Math.min(before.length, after.length) - head;
+  while (tail < room && before.at(-1 - tail) === after.at(-1 - tail)) tail += 1;
+  return {
+    start: head,
+    end: before.length - tail,
+    inserted: after.slice(head, after.length - tail),
+  };
+}
+
+/**
+ * Puts `next` into the textarea. Typing through `execCommand` keeps the browser's undo stack, so Ctrl+Z
+ * undoes an indent; where it is missing or refuses, the value is set directly (undo then restarts).
+ */
+export function writeEdit(field: HTMLTextAreaElement, next: TextEdit): void {
+  const { start, end, inserted } = changedSpan(field.value, next.text);
+  field.setSelectionRange(start, end);
+  const isNative =
+    typeof document.execCommand === 'function' &&
+    (inserted === ''
+      ? document.execCommand('delete')
+      : document.execCommand('insertText', false, inserted));
+  if (!isNative || field.value !== next.text) field.value = next.text;
+  field.setSelectionRange(next.selectionStart, next.selectionEnd);
+}

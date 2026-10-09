@@ -1682,6 +1682,8 @@
     "identicalBody": "Không có dòng nào khác biệt (đã bỏ qua khác biệt xuống dòng CRLF).",
     "tooLongTitle": "Mã nguồn quá dài để so sánh",
     "tooLongBody": "Một bên có {count} dòng, vượt giới hạn {limit} dòng.",
+    "tooDifferentTitle": "Hai mã nguồn khác nhau quá nhiều để so sánh",
+    "tooDifferentBody": "Hai bên khác nhau hơn {limit} dòng nên không so sánh. Hãy mở từng bài nộp để xem.",
     "viewLeft": "Xem bài bên trái",
     "viewRight": "Xem bài bên phải",
     "pickTitle": "Chọn hai bài nộp để so sánh",

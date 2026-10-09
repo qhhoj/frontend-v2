@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { i18n } from '@/i18n';
 import { lineDiff } from '@/lib/line-diff';
 import { mountComponent } from '@/test/mount';
 import SourceDiff from './SourceDiff.vue';
@@ -11,7 +12,7 @@ const wide = (wrapper: ReturnType<typeof mountDiff>) =>
 const narrow = (wrapper: ReturnType<typeof mountDiff>) =>
   wrapper.get('[data-testid="diff-table-narrow"]');
 const mountDiff = (left: string, right: string) =>
-  mountComponent(SourceDiff, { props: { rows: lineDiff(left, right) } });
+  mountComponent(SourceDiff, { props: { rows: lineDiff(left, right)! } });
 
 describe('SourceDiff', () => {
   it('summarises added, removed and identical lines', () => {
@@ -21,6 +22,17 @@ describe('SourceDiff', () => {
       '+2 dòng',
       '−1 dòng',
       '2 dòng giống nhau',
+    ]);
+  });
+
+  it('uses singular English wording for one line', () => {
+    i18n.global.locale.value = 'en';
+    const wrapper = mountDiff('a\nb', 'a\nB');
+    const pills = wrapper.get('[data-testid="diff-summary"]').findAll('li');
+    expect(pills.map((item) => item.get('[data-full]').text())).toEqual([
+      '+1 line',
+      '−1 line',
+      '1 identical line',
     ]);
   });
 
@@ -44,8 +56,10 @@ describe('SourceDiff', () => {
   });
 
   it('labels moved and whitespace-only rows in words, not only colour', () => {
-    expect(wide(mountDiff('a\nb\nc', 'b\nc\na')).findAll('[data-moved]')).toHaveLength(2);
-    expect(mountDiff('a\nb\nc', 'b\nc\na').text()).toContain('Đã chuyển chỗ');
+    expect(
+      wide(mountDiff('alpha();\nb\nc', 'b\nc\nalpha();')).findAll('[data-moved]'),
+    ).toHaveLength(2);
+    expect(mountDiff('alpha();\nb\nc', 'b\nc\nalpha();').text()).toContain('Đã chuyển chỗ');
     expect(mountDiff('int x;', 'int  x;').text()).toContain('Chỉ khác khoảng trắng');
   });
 

@@ -123,7 +123,7 @@ function goToPage(page: number) {
             @toggle-pick="picks.toggle"
           />
           <DiffSelectionBar
-            v-if="picks.picked.value.length > 0"
+            v-if="isSignedIn && picks.picked.value.length > 0"
             class="mt-3"
             :picked="picks.picked.value"
             @clear="picks.clear()"

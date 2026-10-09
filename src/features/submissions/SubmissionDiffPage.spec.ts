@@ -122,6 +122,17 @@ describe('SubmissionDiffPage', () => {
     expect(panel(wrapper).text()).toContain('Một bên có 6.240 dòng, vượt giới hạn 5.000 dòng.');
   });
 
+  it('answers promptly with a notice when two large sources share almost nothing', async () => {
+    const source = (prefix: string) =>
+      Array.from({ length: 4000 }, (_unused, index) => `${prefix}${index}`).join('\n');
+    mockApi({ ...signedInViewer(), ...side(LEFT, source('p')), ...side(RIGHT, source('q')) });
+    const started = performance.now();
+    const { wrapper } = await openDiff();
+    expect(performance.now() - started).toBeLessThan(3000);
+    expect(panel(wrapper).text()).toContain('khác nhau hơn 1.000 dòng');
+    expect(wrapper.find('[data-testid="source-diff"]').exists()).toBe(false);
+  });
+
   it('retries a failed side', async () => {
     let attempts = 0;
     mockApi({

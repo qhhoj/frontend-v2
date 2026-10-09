@@ -28,6 +28,34 @@ const host = (
 };
 
 describe('useAdminMutation', () => {
+  it('reports success before a slow cache refresh finishes', async () => {
+    const order: string[] = [];
+    let finishRefresh!: () => void;
+    let api!: ReturnType<typeof useAdminMutation<string, string>>;
+    mountComponent(
+      defineComponent({
+        setup() {
+          vi.spyOn(useQueryClient(), 'invalidateQueries').mockImplementation(
+            () => new Promise<void>((resolve) => (finishRefresh = resolve)),
+          );
+          api = useAdminMutation({
+            mutate: (name: string) => Promise.resolve(name),
+            invalidates: () => [['admin', 'thing']],
+            onSuccess: () => order.push('success'),
+            onDone: () => order.push('done'),
+          });
+          return () => h('div');
+        },
+      }),
+    );
+    const running = api.run('a');
+    await flushPromises();
+    expect(order).toEqual(['success']);
+    finishRefresh();
+    await running;
+    expect(order).toEqual(['success', 'done']);
+  });
+
   it('marks done and invalidates exactly the keys it names', async () => {
     const { api, invalidate } = host((vars) => Promise.resolve(vars.name));
     await expect(api().run({ name: 'a' })).resolves.toBe('a');

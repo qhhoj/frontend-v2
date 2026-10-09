@@ -38,13 +38,15 @@ const create = useAdminMutation<void, CreatedIntegrationClient>({
       expiresAt: fromLocalInput(expires.value) ?? undefined,
     }),
   invalidates: () => [integrationClientsKey],
-  onDone: (client) => {
+  onSuccess: (client) => {
+    emit('created', client);
+  },
+  onDone: () => {
     name.value = '';
     scopes.value = [];
     cidrs.value = '';
     actsAs.value = '';
     expires.value = '';
-    emit('created', client);
   },
 });
 /** The backend raises `invalid` with an English message: the SPA text by (field, code); other codes go through `adminIssueText` (`fieldErrors`). */
@@ -151,7 +153,7 @@ function submit() {
         input-id="integration-expires"
         :label="$t('admin.integrations.form.expires')"
         :hint="$t('admin.integrations.form.expiresHint')"
-        :error="create.fieldErrors.value.expiresAt"
+        :error="refusedText('expiresAt', 'admin.integrations.form.expiresRefused')"
       >
         <input
           :id="id"

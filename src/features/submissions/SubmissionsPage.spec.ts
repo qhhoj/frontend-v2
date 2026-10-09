@@ -1,5 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useSessionStore } from '@/stores/session.store';
 import { submissionItem } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -247,6 +248,16 @@ describe('picking two submissions to compare', () => {
       '/submissions/diff?left=s-2&right=s-3',
     );
     await wrapper.get('[data-testid="diff-clear"]').trigger('click');
+    expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
+  });
+
+  it('drops the compare bar when the viewer signs out with picks made', async () => {
+    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
+    const { wrapper } = await openList();
+    await boxOf(wrapper, 's-1').trigger('click');
+    expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(true);
+    useSessionStore().status = 'anonymous';
+    await flushPromises();
     expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
   });
 

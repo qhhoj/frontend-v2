@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useQueryClient } from '@tanstack/vue-query';
 import { useRoute } from 'vue-router';
 import { deleteShortLink } from '@/api/short-links.api';
 import type { ShortLink } from '@/api/types/short-links';
@@ -23,10 +24,13 @@ const links = computed(() => data.value?.items ?? []);
 /** The link waiting for "Xóa liên kết"; null closes the dialog. */
 const pending = ref<ShortLink | null>(null);
 const deletedCode = ref<string | null>(null);
+const queryClient = useQueryClient();
 const remove = useAdminMutation<string, void>({
   mutate: deleteShortLink,
   invalidates: () => [shortLinksKey],
   onDone: (_result, code) => {
+    // The copy button caches the automatic code of a page: a deleted one must not be offered again.
+    queryClient.removeQueries({ queryKey: ['shortLinks'] });
     pending.value = null;
     deletedCode.value = code;
   },
