@@ -30,9 +30,11 @@ function forbiddenState(error: ApiError, contest: ReplayStateInput['contest']): 
   return named ?? (isBoardFrozen(contest) ? 'frozen' : 'forbidden');
 }
 
-/** 4xx: the gate answered (frozen, hidden, not ready, not ended). Asking again repeats it, and it outranks a kept board. */
+/** The statuses the replay gate answers with (frozen or hidden, not ready, not ended or unsupported). */
+const GATE_STATUSES = [403, 404, 409];
+/** The gate answered: asking again repeats it, and it outranks a kept board. 401, 408 or 429 are not gate answers. */
 export const isReplayRefusal = (error: unknown): error is ApiError =>
-  error instanceof ApiError && error.status >= 400 && error.status < 500;
+  error instanceof ApiError && GATE_STATUSES.includes(error.status);
 
 function refusalState(error: unknown, contest: ReplayStateInput['contest']): ReplayPanelState {
   if (!(error instanceof ApiError)) return 'error';
@@ -52,7 +54,8 @@ export function replayViewState(input: ReplayStateInput): ReplayViewState {
     const { participants, ghosts } = input.load.replay;
     return participants.length + ghosts.length === 0 ? 'empty' : 'ready';
   }
-  if (input.error) return refusalState(input.error, input.contest);
+  // A build in progress outlives a passing network or server failure: the page keeps polling it.
   if (input.load?.state === 'building') return 'building';
+  if (input.error) return refusalState(input.error, input.contest);
   return 'loading';
 }

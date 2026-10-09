@@ -201,6 +201,9 @@ describe('ContestGhostsTab', () => {
     expect(cardAlerts()).toHaveLength(0);
     await cancelDialog();
     expect(cardAlerts()).toHaveLength(1);
+    await click(wrapper, 'Thay thế bộ ghost');
+    expect(document.body.querySelector('[role="dialog"] [role="alert"]')).toBeNull();
+    await cancelDialog();
     await click(wrapper, 'Xem trước');
     expect(cardAlerts()).toHaveLength(0);
   });

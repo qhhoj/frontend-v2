@@ -115,6 +115,22 @@ describe('useReplayQuery', () => {
     ]);
   });
 
+  it('keeps polling a building replay through a read that is not a gate answer (429)', async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    const calls = mockApi({
+      'GET /auth/me': signedOut,
+      [ROUTE]: sequence(building, fail(429, 'rate_limited'), ready),
+    });
+    const probe = mountProbe();
+    await flushPromises();
+    vi.advanceTimersByTime(REPLAY_POLL_MS);
+    await flushPromises();
+    vi.advanceTimersByTime(REPLAY_POLL_MS);
+    await flushPromises();
+    expect(replayCalls(calls)).toBe(3);
+    expect(probe.state()).toBe('ready');
+  });
+
   it('stops polling when a building replay is refused on a later read', async () => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     const calls = mockApi({

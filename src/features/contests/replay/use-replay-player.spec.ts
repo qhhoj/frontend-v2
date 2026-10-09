@@ -22,7 +22,7 @@ describe('useReplayPlayer', () => {
   });
 
   it('moves the clock by speed times the elapsed time while playing, and holds it on pause', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(10_800);
     player.setSpeed(60);
     player.play();
@@ -36,18 +36,20 @@ describe('useReplayPlayer', () => {
   });
 
   it('keeps real-time speed when a tick comes late (a slow frame or a throttled tab)', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    const now = vi.spyOn(performance, 'now').mockReturnValue(10_000);
     const { scope, player } = start(10_800);
     player.setSpeed(60);
     player.play();
-    vi.setSystemTime(Date.now() + 1750);
+    now.mockReturnValue(12_000);
     vi.advanceTimersByTime(PLAYER_TICK_MS);
     expect(player.seconds.value).toBe(120);
+    now.mockRestore();
     scope.stop();
   });
 
   it('stops exactly at the end and starts over when played again', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(100, 90);
     player.setSpeed(300);
     player.play();
@@ -64,7 +66,7 @@ describe('useReplayPlayer', () => {
   });
 
   it('clamps a seek into the replay and keeps playing through it', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(100);
     player.play();
     player.seek(-20);
@@ -77,7 +79,7 @@ describe('useReplayPlayer', () => {
   });
 
   it('a second play while playing starts no second clock', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(10_800);
     player.play();
     player.play();
@@ -87,7 +89,7 @@ describe('useReplayPlayer', () => {
   });
 
   it('stops ticking when the page goes away', () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(10_800);
     player.play();
     scope.stop();

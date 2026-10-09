@@ -40,7 +40,7 @@ export function useReplayPlayer(durationSeconds: Ref<number>, startSeconds: numb
     isPlaying.value = false;
   }
   function tick() {
-    const now = Date.now();
+    const now = performance.now();
     const elapsedMs = Math.max(now - lastTickAt, 0);
     lastTickAt = now;
     seconds.value = clamp(seconds.value + (speed.value * elapsedMs) / 1000, durationSeconds.value);
@@ -51,7 +51,7 @@ export function useReplayPlayer(durationSeconds: Ref<number>, startSeconds: numb
     if (isPlaying.value) return;
     if (isFinished.value) seconds.value = 0;
     isPlaying.value = true;
-    lastTickAt = Date.now();
+    lastTickAt = performance.now();
     timer = setInterval(tick, PLAYER_TICK_MS);
   }
   const seek = (target: number) => {

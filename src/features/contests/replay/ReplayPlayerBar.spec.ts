@@ -75,6 +75,15 @@ describe('ReplayPlayerBar', () => {
     expect(wrapper.emitted('seek')).toEqual([[600]]);
   });
 
+  it('lets go of the thumb when the pointer is released outside the slider', async () => {
+    const wrapper = mountComponent(ReplayPlayerBar, { props: props({ isPlaying: true }) });
+    const range = wrapper.get<HTMLInputElement>('input[type="range"]');
+    await range.trigger('pointerdown');
+    window.dispatchEvent(new Event('pointerup'));
+    await wrapper.setProps({ seconds: 675 } as never);
+    expect(range.element.value).toBe('675');
+  });
+
   it('emits the scrubbed second', async () => {
     const wrapper = mountComponent(ReplayPlayerBar, { props: props() });
     await wrapper.get('input[type="range"]').setValue('600');

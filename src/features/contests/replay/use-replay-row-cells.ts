@@ -12,7 +12,7 @@ export interface ReplayRowCells {
   score: string;
   cumtime: string;
   /**
-   * What the cells were built from, compared by identity. The first-solve star needs no key of its own: whether a row holds
+   * What the cells were built from: the revision by identity, the context by value. The first-solve star needs no key of its own: whether a row holds
    * it at a second depends only on when that row solved (anyone earlier is already on the board), so it changes with the
    * row's own `revision`.
    */
@@ -38,8 +38,15 @@ function buildRowCells(
   };
 }
 
+/** By value: a contest refetch makes a new context object with the same rules. */
+const isSameContext = (left: RankingContext, right: RankingContext) =>
+  left.formatName === right.formatName &&
+  left.locale === right.locale &&
+  left.pointsPrecision === right.pointsPrecision &&
+  left.showsTime === right.showsTime;
+
 const isSameSource = (kept: ReplayRowCells['source'], row: BoardRow, context: RankingContext) =>
-  kept.revision === row.revision && kept.context === context;
+  kept.revision === row.revision && isSameContext(kept.context, context);
 
 /**
  * Each row's printed cells, by row id. A tick on a big board changes a few rows: every other row keeps its object, so the

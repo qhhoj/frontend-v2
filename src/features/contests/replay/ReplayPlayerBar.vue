@@ -30,8 +30,13 @@ const togglePlay = () => (props.isPlaying ? emit('pause') : emit('play'));
 /** While the thumb is held, it stays where the hand put it: the running clock must not drag it away (x300 moves 75 s a tick). */
 const heldSecond = ref<number | null>(null);
 const thumbSecond = computed(() => heldSecond.value ?? Math.floor(props.seconds));
-const hold = () => (heldSecond.value = Math.floor(props.seconds));
 const release = () => (heldSecond.value = null);
+/** The release may land outside the slider, so it is heard on the window. */
+function hold() {
+  heldSecond.value = Math.floor(props.seconds);
+  window.addEventListener('pointerup', release, { once: true });
+  window.addEventListener('pointercancel', release, { once: true });
+}
 function onScrub(event: Event) {
   const second = Number((event.target as HTMLInputElement).value);
   if (heldSecond.value !== null) heldSecond.value = second;
@@ -101,8 +106,6 @@ function onScrub(event: Event) {
         :aria-valuetext="clock"
         class="mt-2 h-11 w-full accent-accent"
         @pointerdown="hold"
-        @pointerup="release"
-        @pointercancel="release"
         @change="release"
         @input="onScrub"
       />

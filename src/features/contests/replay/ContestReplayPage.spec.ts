@@ -71,7 +71,7 @@ describe('contest replay page', () => {
   });
 
   it('plays at the chosen speed and writes the second when paused', async () => {
-    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+    vi.useFakeTimers({ toFake: ['performance', 'setInterval', 'clearInterval'] });
     mockApi(routes());
     const { wrapper, router } = await mountApp('/contests/r41/replay');
     await buttonNamed(wrapper, 'x60').trigger('click');

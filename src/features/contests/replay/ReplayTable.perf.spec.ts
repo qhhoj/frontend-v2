@@ -73,6 +73,16 @@ describe(`ReplayTable at ${LARGE_REPLAY.rows} rows × ${LARGE_REPLAY.problems} p
     }
   });
 
+  it('rebuilds no cell when a refetched contest brings an equal context', async () => {
+    stubMatchMedia();
+    const wrapper = mountComponent(ReplayTable, {
+      props: { board: boardAt(index, START, ICPC), context: ICPC, viewerId: null, label: 'Bảng' },
+    });
+    const before = cellCalls();
+    await wrapper.setProps({ context: { ...ICPC } } as never);
+    expect(cellCalls() - before).toBe(0);
+  });
+
   it('rebuilds no cell when the same second is drawn again', async () => {
     const { setBoard } = mountBoard(START);
     const board = boardAt(index, START, ICPC);

@@ -84,6 +84,11 @@ describe('replayViewState', () => {
   it('keeps showing the last ready board when a background read fails on the network or the server', () => {
     expect(replayViewState(input({ error: refused(500, 'generic') }))).toBe('ready');
     expect(replayViewState(input({ error: new Error('offline') }))).toBe('ready');
+    expect(replayViewState(input({ error: refused(429, 'rate_limited') }))).toBe('ready');
+    expect(replayViewState(input({ error: refused(401, 'unauthorized') }))).toBe('ready');
+    expect(
+      replayViewState(input({ error: refused(429, 'rate_limited'), load: { state: 'building' } })),
+    ).toBe('building');
   });
 
   it.each([

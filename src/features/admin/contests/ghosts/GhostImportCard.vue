@@ -79,6 +79,7 @@ function startPreview() {
 }
 function startReplace() {
   if (!preview.value) return; // aria-disabled keeps the button focusable, so the click is refused here
+  replacing.reset();
   if (props.currentCount > 0) isConfirmOpen.value = true;
   else void replacing.run(undefined);
 }
