@@ -101,6 +101,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - SSE: `installFakeEventSource()` and `latestEventSource().emit(type, data)`
 - E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310` (or the port in `E2E_PORT`, for parallel runs), then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
 - E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
+- Replay and ghost e2e (`replay`, `replay-overlay`, `admin-ghosts`, `admin-replay-rebuild`) run one worker on their own port; a 403 replay fixture carries `issues: [{ code: 'board_frozen' | 'board_hidden' }]`
 - Playwright never kills processes by name; stop only the servers you started
 - The shell reads `/site`, `/notifications`, `/notifications/unread-count` and `/tickets/summary` on signed-in pages: unit tests get `SHELL_DEFAULTS` (unrecorded) unless they route them, e2e gets the `FakeApi` defaults; count page streams with `pageStreams()`, the bell's stream with `userStream()`
 

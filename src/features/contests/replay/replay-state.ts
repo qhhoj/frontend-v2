@@ -19,10 +19,21 @@ const PANEL_OF_CODE: Record<string, ReplayPanelState> = {
   replay_unsupported: 'unsupported',
 };
 
-/** A 403 is the board gate: a freezing board says so, any other hidden board is plainly forbidden. */
+/** The 403 reasons the backend names in `issues[0].code`. */
+const PANEL_OF_FORBIDDEN_REASON: Record<string, ReplayPanelState> = {
+  board_frozen: 'frozen',
+  board_hidden: 'forbidden',
+};
+
+/** A 403 names its reason; without one, a freezing board reads as frozen and any other as hidden. */
+function forbiddenState(error: ApiError, contest: ReplayStateInput['contest']): ReplayPanelState {
+  const named = PANEL_OF_FORBIDDEN_REASON[error.issues[0]?.code ?? ''];
+  return named ?? (isBoardFrozen(contest) ? 'frozen' : 'forbidden');
+}
+
 function refusalState(error: unknown, contest: ReplayStateInput['contest']): ReplayPanelState {
   if (!(error instanceof ApiError)) return 'error';
-  if (error.status === 403) return isBoardFrozen(contest) ? 'frozen' : 'forbidden';
+  if (error.status === 403) return forbiddenState(error, contest);
   return PANEL_OF_CODE[error.code] ?? 'error';
 }
 

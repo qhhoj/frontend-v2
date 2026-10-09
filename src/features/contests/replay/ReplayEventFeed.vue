@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Ghost } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ReplayProblem } from '@/api/types/replay';
 import EmptyState from '@/components/EmptyState.vue';
 import { formatDuration } from '@/lib/format';
@@ -15,6 +16,10 @@ const props = defineProps<{
   context: RankingContext;
 }>();
 const headingId = useId();
+const { t } = useI18n();
+/** A ghost label often already says "Ghost · ..."; the screen-reader prefix is only added when it does not. */
+const needsGhostPrefix = (name: string) =>
+  !name.toLocaleLowerCase().includes(t('replay.table.ghost').toLocaleLowerCase());
 const lines = computed(() =>
   props.entries.flatMap(({ event, identity }) => {
     const problem = props.problems[event[2]];
@@ -25,6 +30,7 @@ const lines = computed(() =>
         clock: formatDuration(event[0]),
         name: identity.name,
         isGhost: identity.kind === 'ghost',
+        announceGhost: identity.kind === 'ghost' && needsGhostPrefix(identity.name),
         text: feedTextOf(event[3], problem, props.context),
       },
     ];
@@ -47,7 +53,7 @@ const lines = computed(() =>
         <span class="font-mono text-xs text-muted tabular-nums">{{ line.clock }}</span>
         <span class="flex flex-wrap items-center gap-1.5" :class="line.isGhost && 'text-muted'">
           <Ghost v-if="line.isGhost" class="size-3.5 shrink-0" aria-hidden="true" />
-          <span v-if="line.isGhost" class="sr-only">{{ $t('replay.table.ghost') }}</span>
+          <span v-if="line.announceGhost" class="sr-only">{{ $t('replay.table.ghost') }}</span>
           <strong class="font-semibold">{{ line.name }}</strong>
           {{ $t(line.text.key, line.text.params) }}
         </span>

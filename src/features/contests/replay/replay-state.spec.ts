@@ -13,7 +13,13 @@ const input = (overrides: Partial<ReplayStateInput> = {}): ReplayStateInput => (
   load: ready,
   ...overrides,
 });
-const refused = (status: number, code: string) => new ApiError(code, status, code);
+const refused = (status: number, code: string, issueCode?: string) =>
+  new ApiError(
+    code,
+    status,
+    code,
+    issueCode ? { issues: [{ field: 'board', code: issueCode, message: 'x' }] } : {},
+  );
 
 describe('replayViewState', () => {
   it.each([
@@ -48,6 +54,22 @@ describe('replayViewState', () => {
       input({
         contest: endedContest({ formatName: 'ioi', frozenLastMinutes: 60 }),
         error: refused(403, 'forbidden'),
+        load: undefined,
+      }),
+    ],
+    [
+      'frozen',
+      input({
+        contest: endedContest({ formatName: 'ioi' }),
+        error: refused(403, 'forbidden', 'board_frozen'),
+        load: undefined,
+      }),
+    ],
+    [
+      'forbidden',
+      input({
+        contest: endedContest({ frozenLastMinutes: 60 }),
+        error: refused(403, 'forbidden', 'board_hidden'),
         load: undefined,
       }),
     ],

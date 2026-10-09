@@ -28,12 +28,28 @@ describe('ReplayEventFeed', () => {
     });
     expect(lines).toEqual([
       ['00:09:00', 'user_07 giải A'],
-      // The ghost's name is preceded by its sr-only "Ghost" prefix (screen readers only).
-      ['00:06:40', 'GhostGhost · HSG 2024 #1 giải A'],
+      ['00:06:40', 'Ghost · HSG 2024 #1 giải A'],
       ['00:05:00', 'user_12 sai A (-1)'],
     ]);
     expect(items[1]!.find('svg').exists()).toBe(true);
     expect(items[0]!.find('svg').exists()).toBe(false);
+  });
+
+  it('says "Ghost" once for a ghost whose label already says it, and adds the screen-reader prefix when it does not', () => {
+    const named = (label: string) => {
+      const replay = loadedReplay();
+      const ghosts = replay.ghosts.map((ghost, index) =>
+        index === 0 ? { ...ghost, label } : ghost,
+      );
+      const tl = timelineOf(indexReplay({ ...replay, ghosts }));
+      return mountComponent(ReplayEventFeed, {
+        props: { entries: recentEvents(tl, 540), problems: REPLAY_PROBLEMS, context: ICPC },
+      });
+    };
+    const ghostLine = (wrapper: ReturnType<typeof named>) =>
+      wrapper.findAll('li')[1]!.findAll('span')[1]!.text().replace(/\s+/g, ' ');
+    expect(ghostLine(named('Ghost · HSG 2024 #1'))).toBe('Ghost · HSG 2024 #1 giải A');
+    expect(ghostLine(named('HSG 2024 #1'))).toBe('GhostHSG 2024 #1 giải A');
   });
 
   it('says nothing has happened before the first event, with Bit asleep', () => {

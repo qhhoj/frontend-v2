@@ -358,6 +358,20 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - The freeze rule (`isBoardFrozen`) lives in `src/lib/board-freeze.ts`; the admin actions module re-exports it: the public replay needs it and must not import admin code.
 - Refusal texts: `errorMessageKey` names a 403 `forbidden` by its first issue code when `errors.<code>` exists (`board_frozen`, `board_hidden`) and a 413 by its status (`payload_too_large`): the server's body-limit refusal has no stable code. Ghost CSV row codes are worded in `admin.ghosts.import.rowCodes.*`.
+- The replay page shows real and ghost rows; the viewer's running virtual row appears only in the ranking page's "So với bảng thật" overlay: a virtual run has no replay events, only a live row at `now − realStart`.
+- Replay ties: equal (score, cumtime, tiebreaker) share a rank (1, 1, 3); inside a tie real rows come first, then the virtual row, then ghosts; unranked ghosts are last with rank "—".
+- All replay chunks load before the first board, every later chunk pinned to chunk 0's `buildId`; one restart on `409 replay_changed`, then the error.
+- A `202 replay_building` is a success body, polled every 5 s while the page is open; 4xx answers are never retried (they are states: frozen, not ready, not ended, unsupported).
+- `final_submission` shows "unsupported" without a request, and the "Phát lại" tab appears only after the end: the server answers 409 for both.
+- A 403 on the replay reads its reason from `error.issues[0].code` (`board_frozen` frozen, `board_hidden` hidden); only without an issue does it fall back to the freeze rule (format freezes and the window is set). No unfreeze time is shown because the API does not know it.
+- The player clock ticks every 250 ms and keeps running under reduced motion and low-power; only row movement stops.
+- `?t=` holds whole seconds, written with `router.replace` on pause, end and a paused seek, never while playing; unreadable values mean 0, too large ones the end.
+- The "Vừa xảy ra" feed is not a live region. A ghost event says "Ghost" once: the screen-reader prefix is added only when the ghost's label does not already contain the word.
+- First solves on the scrub track count real rows only; ghosts never take a first-solve star.
+- Ghost import always previews (`dryRun`) before replacing; replacing a non-empty set confirms with the current CSV download in the dialog; a new file or anonymise choice drops the preview.
+- A refused ghost CSV lists one Vietnamese line per row from `issues[].code`/`issues[].row`; no English backend text is shown.
+- Ghost and rebuild strings live in their own admin files (`admin.ghosts.*`, `admin.replay.*`); the replay rebuild is a fourth `ContestActionCard`.
+- `cannot_edit_contest` (auto-publish outcome) already has vi and en lines in `admin.contestPublish.auto.reasons`.
 
 ## Contest extras (VNOI F3)
 
