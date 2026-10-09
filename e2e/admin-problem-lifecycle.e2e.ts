@@ -1,8 +1,9 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
+import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installDeletedProblems } from './fixtures/f4-api';
 import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
+import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { deletedProblem } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
 
@@ -80,3 +81,45 @@ defineShiftTests([
     viewports: [PHONE, DESKTOP],
   },
 ]);
+
+test('the danger zone deletes after the code is typed and lands on the deleted list', async ({
+  page,
+  api,
+}) => {
+  signInAsStaff(api, DELETE);
+  api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
+  api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
+  api.routes['DELETE /problems/hcmus41c'] = { status: 204 };
+  installDeletedProblems(api, [deletedProblem({ code: 'hcmus41c', daysLeft: 30 })]);
+  await page.goto('/admin/problems/hcmus41c/general');
+  await expect(page.getByRole('heading', { name: 'Vùng nguy hiểm' })).toBeVisible();
+  await expect(page.locator('[data-testid="admin-bit"][data-placement="security"]')).toBeVisible();
+  await page.getByRole('button', { name: 'Xóa bài…' }).click();
+  await expect(
+    dialogOf(page).getByRole('button', { name: 'Xóa bài', exact: true }),
+  ).toHaveAttribute('aria-disabled', 'true');
+  await dialogOf(page).getByLabel('Gõ mã bài hcmus41c để xác nhận').fill('hcmus41c');
+  await confirmInDialog(page, 'Xóa bài');
+  await expect(page).toHaveURL(/\/admin\/problems\/deleted$/);
+  await expect(page.getByText('Còn 30 ngày')).toBeVisible();
+});
+
+for (const viewport of AUDIT_VIEWPORTS)
+  for (const theme of THEMES)
+    test(`the delete dialog is accessible in ${theme.id} at ${viewport.name}`, async ({
+      page,
+      api,
+    }) => {
+      await page.setViewportSize(viewport);
+      signInAsStaff(api, DELETE);
+      await applyTheme(page, api, theme);
+      api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
+      api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
+      await page.goto('/admin/problems/hcmus41c/general');
+      await page.getByRole('button', { name: 'Xóa bài…' }).click();
+      await expect(dialogOf(page)).toBeVisible();
+      expect(await axeViolationsIn(page)).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+    });

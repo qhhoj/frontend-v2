@@ -8,6 +8,7 @@ import ProblemCloneSection from './ProblemCloneSection.vue';
 import ProblemAttachmentsSection from '../files/ProblemAttachmentsSection.vue';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { useProblemForm } from './use-problem-form';
+import ProblemDangerZone from '../lifecycle/ProblemDangerZone.vue';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { form, save, errors, mutation, isDirty } = useProblemForm(
@@ -42,5 +43,6 @@ const { can } = usePermissions();
     </form>
     <ProblemAttachmentsSection :problem="problem" />
     <ProblemCloneSection v-if="can('judge.clone_problem')" :code="problem.code" />
+    <ProblemDangerZone v-if="can('judge.delete_problem')" :code="problem.code" />
   </div>
 </template>
