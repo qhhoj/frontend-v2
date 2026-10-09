@@ -82,7 +82,10 @@ function onDeleted(key: string) {
       </template>
     </AdminPageHeader>
 
-    <p role="status" class="text-sm font-semibold text-positive empty:hidden">{{ deletedText }}</p>
+    <p role="status" class="sr-only">{{ deletedText }}</p>
+    <p v-if="deletedText" aria-hidden="true" class="text-sm font-semibold text-positive">
+      {{ deletedText }}
+    </p>
 
     <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.security">
       {{ $t('admin.site.config.warning') }}
