@@ -31,6 +31,8 @@ const locale = useLocaleStore();
 const isTicked = ref(false);
 const boxId = useId();
 const SKELETON_LINES = 4;
+/** M3A draws the rules dialog 520 px wide. */
+const RULES_DIALOG_WIDTH = 520;
 const isLoading = computed(() => props.rulesHtml === '');
 const canAccept = computed(() => isTicked.value && !isLoading.value);
 const isNotRecorded = computed(
@@ -51,6 +53,7 @@ function accept() {
     :title="isVirtual ? $t('joinRules.dialogTitleVirtual') : $t('joinRules.dialogTitle')"
     :confirm-label="actionLabel"
     :busy="isPending"
+    :width="RULES_DIALOG_WIDTH"
     :can-confirm="canAccept"
     @confirm="accept"
   >

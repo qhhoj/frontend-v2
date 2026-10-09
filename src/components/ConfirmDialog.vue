@@ -13,6 +13,7 @@ import { computed, nextTick, onBeforeUnmount, useId, watch } from 'vue';
  * `returnFocusTo` names where focus lands when the dialog closes after a confirm (not after Cancel, Escape or the close button):
  * pass it when the opener row disappears with the confirmed action, so PrimeVue has nothing to return focus to.
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
+ * `width` (px) widens the dialog past the preset's 448 px; it never exceeds the viewport minus 2 rem.
  * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */
 const props = withDefaults(
@@ -23,6 +24,7 @@ const props = withDefaults(
     cancelLabel?: string;
     tone?: 'neutral' | 'danger';
     busy?: boolean;
+    width?: number;
     canConfirm?: boolean;
     returnFocusTo?: () => HTMLElement | null | undefined;
   }>(),
@@ -31,6 +33,7 @@ const props = withDefaults(
     cancelLabel: undefined,
     tone: 'neutral',
     busy: false,
+    width: undefined,
     canConfirm: true,
     returnFocusTo: undefined,
   },
@@ -38,6 +41,9 @@ const props = withDefaults(
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [] }>();
 const bodyId = useId();
+const dialogStyle = computed(() =>
+  props.width ? { width: `${props.width}px`, maxWidth: 'calc(100vw - 2rem)' } : undefined,
+);
 const cannotConfirm = computed(() => props.busy || !props.canConfirm);
 
 let isConfirmed = false;
@@ -73,6 +79,7 @@ onBeforeUnmount(returnFocus);
     modal
     :header="title"
     :draggable="false"
+    :style="dialogStyle"
     :closable="!busy"
     :close-on-escape="!busy"
     :close-button-props="{ 'aria-label': $t('common.close') }"

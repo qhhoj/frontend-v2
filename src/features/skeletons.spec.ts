@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { staffViewer } from '@/test/admin-routes';
+import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { problemEditorial, signedIn, signedOut } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { settingsRoutes } from '@/test/account-routes';
@@ -317,5 +319,66 @@ describe('the notifications page shows rows shaped like the inbox', () => {
       1, 8, 1,
     ]);
     expectInert(skeleton, 'replay');
+  });
+});
+
+/** Holds every request whose URL contains one of `fragments`; the rest answer from the mock. */
+function holdRequestsWith(fragments: string[]) {
+  const answer = globalThis.fetch;
+  vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+    fragments.some((fragment) => String(input).includes(fragment))
+      ? new Promise<Response>(() => {})
+      : answer(input, init),
+  );
+}
+
+describe('F3 contest extras load with blocks shaped like their content', () => {
+  it('the contest list draws five inert tag chips while the catalogue loads', async () => {
+    mockApi({ 'GET /auth/me': signedOut });
+    hangRequestsExcept(['/auth/me']);
+    const { wrapper } = await mountApp('/contests');
+    expect(regionsIn(wrapper.element, 'tag-chip')).toBe(5);
+    expect(wrapper.get('[data-testid="tag-filter"]').findAll('button')).toHaveLength(0);
+  });
+
+  it('the balloon screen draws six inert rows and the print sheet ten', async () => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
+    holdRequestsWith(['/balloons']);
+    const screen = await mountApp('/contests/r42/balloons');
+    expect(regionsIn(screen.wrapper.element, 'balloon-row')).toBe(6);
+    for (const skeleton of screen.wrapper.findAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton.element, 'balloon skeleton');
+    screen.wrapper.unmount();
+    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
+    holdRequestsWith(['/balloons']);
+    const sheet = await mountApp('/contests/r42/balloons/print');
+    expect(regionsIn(sheet.wrapper.element, 'print-row')).toBe(10);
+  });
+
+  it('the admin tag catalogue draws four inert rows', async () => {
+    mockApi({ ...staffViewer(['judge.change_contest_tag']) });
+    holdRequestsWith(['/contest-tags']);
+    const { wrapper } = await mountApp('/admin/contest-tags');
+    await vi.waitFor(() => expect(regionsIn(wrapper.element, 'tag-row')).toBe(4), {
+      timeout: 5000,
+    });
+  });
+
+  it('the contest Data tab draws the export and feed blocks while both load', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...contestEditorRoutes(editableContest({ phase: 'ended' })),
+    });
+    holdRequestsWith(['/feed-key', '/export']);
+    const { wrapper } = await mountApp('/admin/contests/hcmus-w41/data');
+    await vi.waitFor(
+      () => {
+        expect(regionsIn(wrapper.element, 'feed-status')).toBe(1);
+        expect(regionsIn(wrapper.element, 'export-status')).toBe(1);
+      },
+      { timeout: 5000 },
+    );
+    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton.element, 'data tab skeleton');
   });
 });

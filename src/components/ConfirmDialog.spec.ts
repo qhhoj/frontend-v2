@@ -28,6 +28,18 @@ describe('ConfirmDialog', () => {
     expect(buttonNamed('Hủy')).toBeDefined();
   });
 
+  it('keeps the preset width unless a width is given, and caps a given one to the viewport', async () => {
+    const plain = mountDialog({ ...ASK, visible: true });
+    await flushPromises();
+    expect(dialog().style.width).toBe('');
+    plain.unmount();
+    await flushPromises();
+    mountDialog({ ...ASK, visible: true, width: 520 });
+    await flushPromises();
+    expect(dialog().style.width).toBe('520px');
+    expect(dialog().style.maxWidth).toBe('calc(100vw - 2rem)');
+  });
+
   it('uses the cancel label it is given', async () => {
     mountComponent(ConfirmDialog, { props: { ...ASK, cancelLabel: 'Ở lại', visible: true } });
     await flushPromises();

@@ -362,6 +362,13 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Contest extras (VNOI F3)
 
 - Contest tag colours are theme tokens `tag-1`..`tag-8` (`--qh-tag-N` text, `--qh-tag-N-bg` tint) in every theme file, checked at 4.5:1 by `themes.spec.ts`; the backend stores only the key, so a theme change never touches data.
+- Contest tags: an unknown `?tag=` is not sent (the list shows all contests with a notice); while the catalogue cannot be read the tag is sent as is and the row shows its notice; a slug without a catalogue entry is a neutral chip. `ContestChips` reads the catalogue from the cache only, so screens that do not need colours never fetch it.
+- Rules acceptance: the dialog opens for registration, a first live join and every virtual join of a contest with non-blank rules; the code dialog follows the rules dialog when both are needed and both go in one request. A `rules_not_accepted` refusal reopens the dialog and re-reads the contest. The dialog is 520 px (M3A), through an optional `width` prop on `ConfirmDialog` (other callers keep the preset 448 px). `previousAcceptance` comes only from `viewer.liveParticipation`; virtual runs hide it.
+- Contest problem limits are one "Giới hạn" column (M5B), `1 s · 256 MB`; a problem hidden from the viewer shows "—".
+- Deviation from the plan, balloon 409s: `already_delivered` and `not_delivered` are told apart by `error.issues[].code`, not by status or message; both refetch the queue and show the row's real state.
+- Deviation from the plan, publish: the card makes the editor run a dry run first and offers the real run only for the same `editorials` choice, because publishing has no undo; `contest_not_ended` and 429 map to text.
+- Deviation from the plan, Data tab: the "Dữ liệu" tab owns the event-feed key and the submissions export (not the Actions tab). The minted key lives only in the reveal dialog and is forgotten when it closes; mint, revoke and release are not offered while impersonating; release is offered only for a frozen-until-release key during a freeze.
+- Balloon screen: public-layout route with `requiresAuth` and no `staffOnly` (volunteers may be non-staff; the server answers 403/404); 10 s polling through vue-query's interval (paused in a background tab); the "next 10" sheet is its own route without the site header.
 ## VNOI ports: standalone (F5)
 
 - `diff` 9.0.0 is pinned exactly (BSD-3-Clause, bundled types, no dependencies) for the submission source diff.

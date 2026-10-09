@@ -74,6 +74,12 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | Security actions                                             | one component each in `src/features/account/security/`; destructive ones confirm in `ConfirmDialog`                                                                                      |
 | Data export states and polling                               | `src/features/account/data/data-export.ts`                                                                                                                                               |
 | Bit in settings                                              | `SettingsNotice`'s `bit` prop, `EmptyState`'s `kind` and `InlineBit` (one word per placement)                                                                                            |
+| Contest tag colours                                          | `src/theme/themes/<id>.css` (`--qh-tag-1..8`, `-bg`), classes in `src/features/contests/tag-colors.ts`                                                                                   |
+| Contest tag filter and chips                                 | `src/features/contests/tag-chips.ts`, `ContestTagFilter.vue`; catalogue admin in `src/features/admin/contest-tags/`                                                                      |
+| Which joins ask for the contest rules                        | `src/features/contests/join-rules.ts`                                                                                                                                                    |
+| Balloon queue, print sheet                                   | `src/features/contests/balloons/`                                                                                                                                                        |
+| Publish card, Data tab (export, feed key)                    | `src/features/admin/contests/actions/ContestPublishCard.vue`, `src/features/admin/contests/data/`                                                                                        |
+| Bit on the contest extras screens                            | `src/features/contests/contest-extras-bits.ts`                                                                                                                                           |
 
 ## Auth screens
 

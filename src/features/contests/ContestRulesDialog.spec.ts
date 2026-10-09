@@ -45,6 +45,12 @@ describe('contest rules dialog', () => {
     expect(wrapper.emitted('accept')).toHaveLength(1);
   });
 
+  it('is drawn 520 px wide, as the mock-up has it', async () => {
+    mountDialog();
+    await flushPromises();
+    expect(dialog().style.width).toBe('520px');
+  });
+
   it('says every virtual run asks again', async () => {
     mountDialog({ isVirtual: true, actionLabel: 'Bắt đầu lượt ảo' });
     await flushPromises();
