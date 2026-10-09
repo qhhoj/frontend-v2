@@ -5,18 +5,26 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { unhidePlanOf } from './post-visibility';
 import type { ModerationFeed, RowFailure } from './moderation';
 
-/** `rowFailure`: the text of a failed write, shown in the row of the post it was for. */
-defineProps<{
-  posts: PostListItem[];
-  feed: ModerationFeed;
-  rowFailure: RowFailure | null;
-}>();
-defineEmits<{ hide: [post: PostListItem] }>();
+const props = withDefaults(
+  defineProps<{
+    posts: PostListItem[];
+    feed: ModerationFeed;
+    rowFailure: RowFailure | null;
+    /** The post whose show write is running: its row action reads "Đang hiện lại" and is busy. */
+    pendingPostId?: string | null;
+  }>(),
+  { pendingPostId: null },
+);
+defineEmits<{ hide: [post: PostListItem]; show: [post: PostListItem] }>();
 const locale = useLocaleStore();
 const CELL = 'px-3 py-3 align-top';
 const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold';
+
+const isAheadOfTime = (post: PostListItem) => unhidePlanOf(post, Date.now()).scheduled;
+const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
 </script>
 
 <template>
@@ -69,6 +77,9 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
               <span v-if="feed === 'hidden'" :class="CHIP">{{
                 $t('admin.posts.chips.hidden')
               }}</span>
+              <span v-if="feed === 'hidden' && isAheadOfTime(post)" :class="CHIP">
+                {{ $t('admin.posts.chips.aheadOfTime') }}
+              </span>
             </div>
           </td>
           <td :class="CELL">
@@ -93,6 +104,18 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
               @click="$emit('hide', post)"
             >
               {{ $t('admin.posts.hide.action') }}
+            </button>
+            <button
+              v-else
+              type="button"
+              :class="ADMIN_BUTTON_CLASS"
+              :disabled="isRowPending(post)"
+              :aria-busy="isRowPending(post) || undefined"
+              @click="$emit('show', post)"
+            >
+              {{
+                isRowPending(post) ? $t('admin.posts.row.unhiding') : $t('admin.posts.row.unhide')
+              }}
             </button>
             <AdminStatus
               v-if="rowFailure?.postId === post.id"

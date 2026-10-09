@@ -1,5 +1,8 @@
 {
-  "crumbs": { "content": "Nội dung", "blog": "Blog" },
+  "crumbs": {
+    "content": "Nội dung",
+    "blog": "Blog"
+  },
   "title": "Kiểm duyệt blog",
   "feeds": {
     "label": "Danh sách bài viết",
@@ -24,7 +27,8 @@
     "global": "Toàn trang",
     "personal": "Cá nhân",
     "negativeScore": "Điểm âm",
-    "hidden": "Ẩn"
+    "hidden": "Ẩn",
+    "aheadOfTime": "Giờ đăng ở tương lai"
   },
   "hide": {
     "action": "Ẩn bài",
@@ -36,5 +40,19 @@
   "gap": "Chưa có API — Hàng đợi báo cáo vi phạm (chưa có mô hình báo cáo), tìm kiếm và thao tác hàng loạt. Bài cần sửa nội dung mở bằng đường dẫn rồi dùng màn sửa bài.",
   "empty": "Không có bài nào.",
   "footer": "{shown} / {total} bài",
-  "pager": "Trang bài viết"
+  "pager": "Trang bài viết",
+  "unhide": {
+    "title": "Hiện lại bài viết?",
+    "facts": "Tác giả {authors} · giờ đăng {time} · điểm {score} · bình luận {comments}",
+    "now": "Bài hiện ngay ở bảng tin và các danh sách công khai.",
+    "ahead": "Giờ đăng ở tương lai. Bài chuyển sang tab Hẹn giờ và chỉ hiện ở bảng tin từ {time}, không hiện ngay.",
+    "confirm": "Hiện lại",
+    "confirmScheduled": "Hiện lại, hẹn giờ",
+    "done": "Đã hiện lại bài."
+  },
+  "row": {
+    "unhide": "Hiện lại",
+    "unhiding": "Đang hiện lại"
+  },
+  "hiddenNote": "Bài ẩn không hiện ở bảng tin; chỉ tác giả và nhân viên mở được."
 }

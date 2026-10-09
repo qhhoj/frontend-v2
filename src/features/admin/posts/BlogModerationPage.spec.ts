@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { fail, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer } from '@/test/admin-routes';
-import { postItem } from '@/test/community-fixtures';
+import { cancelDialog, confirmDialog, staffViewer } from '@/test/admin-routes';
+import { communityId, postItem } from '@/test/community-fixtures';
 
 const PERMS = ['judge.edit_all_post'];
 /** The screen is a lazy route: the tabs are there once its chunk has loaded. */
@@ -21,6 +21,7 @@ describe('BlogModerationPage', () => {
         postItem({ sticky: true, globalPost: true }),
         postItem({ id: 'p-2', score: -7 }),
       ]),
+      'GET /admin/posts': page([]),
     });
     const { wrapper } = await mountModeration('/admin/posts');
     expect(calls.find((call) => call.path === '/posts')!.query.get('feed')).toBe('all');
@@ -35,7 +36,7 @@ describe('BlogModerationPage', () => {
       'GET /admin/posts': page([]),
       'PATCH /posts/p-2': ok({}),
     });
-    const { wrapper, router, queryClient } = await mountModeration('/admin/posts?feed=hidden');
+    const { wrapper, router } = await mountModeration('/admin/posts?feed=hidden');
     await router.replace({ query: {} });
     await flushPromises();
     await wrapper
@@ -50,9 +51,8 @@ describe('BlogModerationPage', () => {
     await confirmDialog('Ẩn bài');
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ visible: false });
     expect(calls.filter((call) => call.path === '/posts')).toHaveLength(2);
-    // The hidden queue was loaded before and is inactive now: hiding a post must mark it stale.
-    const hiddenLists = queryClient.getQueryCache().findAll({ queryKey: ['admin', 'posts'] });
-    expect(hiddenLists.some((query) => query.state.isInvalidated)).toBe(true);
+    // The hidden queue is on every tab (its count), so hiding a post refetches it: it shows the post gone.
+    expect(calls.filter((call) => call.path === '/admin/posts')).toHaveLength(2);
   });
 
   it('shows the hidden and the scheduled queues from the moderation endpoint', async () => {
@@ -86,5 +86,101 @@ describe('BlogModerationPage', () => {
         .at(-1)!
         .query.get('state'),
     ).toBe('scheduled');
+  });
+});
+
+const hiddenPost = (overrides = {}) =>
+  postItem({
+    id: 'h-1',
+    title: 'Lời giải bài Cây khung nhỏ nhất',
+    visible: false,
+    authors: [{ id: communityId(910), username: 'bao_ly' }],
+    publishOn: '2026-10-06T22:10:00Z',
+    score: 2,
+    commentCount: 0,
+    ...overrides,
+  });
+const hiddenRoutes = (post = hiddenPost(), extra = {}) => ({
+  ...staffViewer(PERMS),
+  'GET /posts': page([]),
+  'GET /admin/posts': page([post], { total: 3 }),
+  ...extra,
+});
+/** A public list the page does not show on this tab: it must still be marked stale. */
+const PUBLIC_LIST_KEY = ['posts', 'list', 'all', 1, 'anonymous'];
+type Mounted = Awaited<ReturnType<typeof mountApp>>;
+const rowButton = (wrapper: Mounted['wrapper'], label: string) =>
+  wrapper.findAll('button').find((button) => button.text() === label)!;
+
+describe('BlogModerationPage unhide', () => {
+  it('offers "Hiện lại" on the hidden queue only, and "Ẩn bài" only on the visible lists', async () => {
+    mockApi(hiddenRoutes());
+    const hidden = await mountModeration('/admin/posts?feed=hidden');
+    const hiddenLabels = hidden.wrapper.findAll('button').map((button) => button.text());
+    expect(hiddenLabels).toContain('Hiện lại');
+    expect(hiddenLabels).not.toContain('Ẩn bài');
+    mockApi({ ...hiddenRoutes(), 'GET /posts': page([postItem()]) });
+    const visible = await mountModeration('/admin/posts');
+    const visibleLabels = visible.wrapper.findAll('button').map((button) => button.text());
+    expect(visibleLabels).not.toContain('Hiện lại');
+  });
+
+  it('names the post in the confirm, sends nothing before it, then shows the post and refreshes both lists', async () => {
+    const calls = mockApi(hiddenRoutes(hiddenPost(), { 'PATCH /posts/h-1': ok({}) }));
+    const { wrapper, queryClient } = await mountModeration('/admin/posts?feed=hidden');
+    queryClient.setQueryData(PUBLIC_LIST_KEY, { items: [], meta: { page: 1, pageSize: 10 } });
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    const dialog = document.body.querySelector('[role="dialog"]')!.textContent;
+    expect(dialog).toContain('Hiện lại bài viết?');
+    expect(dialog).toContain('Lời giải bài Cây khung nhỏ nhất');
+    expect(dialog).toContain('bao_ly');
+    expect(dialog).toContain('Bài hiện ngay ở bảng tin và các danh sách công khai.');
+    expect(dialog).not.toContain('Hẹn giờ');
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+    await confirmDialog('Hiện lại');
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ visible: true });
+    expect(calls.filter((call) => call.path === '/admin/posts')).toHaveLength(2);
+    expect(queryClient.getQueryState(PUBLIC_LIST_KEY)?.isInvalidated).toBe(true);
+  });
+
+  it('warns when the publish time is still ahead and relabels the confirm', async () => {
+    const scheduled = hiddenPost({ title: 'Đề thi thử vòng 2', publishOn: '2099-01-01T08:00:00Z' });
+    const calls = mockApi(hiddenRoutes(scheduled, { 'PATCH /posts/h-1': ok({}) }));
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    expect(document.body.querySelector('[role="dialog"]')!.textContent).toContain(
+      'Bài chuyển sang tab Hẹn giờ',
+    );
+    await confirmDialog('Hiện lại, hẹn giờ');
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ visible: true });
+  });
+
+  it('keeps the dialog open with the reason when the backend refuses, and the post stays hidden', async () => {
+    mockApi(hiddenRoutes(hiddenPost(), { 'PATCH /posts/h-1': fail(403, 'forbidden') }));
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Hiện lại');
+    expect(document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent).toContain(
+      'Bạn không có quyền làm việc này.',
+    );
+    expect(wrapper.text()).toContain('Lời giải bài Cây khung nhỏ nhất');
+  });
+
+  it('cancelling the confirm sends nothing', async () => {
+    const calls = mockApi(hiddenRoutes());
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    await cancelDialog();
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
+
+  it('shows how many posts are hidden on the "Đã ẩn" tab, also while another tab is open', async () => {
+    mockApi({ ...hiddenRoutes(), 'GET /posts': page([postItem()]) });
+    const { wrapper } = await mountModeration('/admin/posts');
+    expect(wrapper.get('[data-testid="hidden-count"]').text()).toBe('3');
   });
 });

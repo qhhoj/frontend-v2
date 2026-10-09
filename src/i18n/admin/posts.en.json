@@ -1,5 +1,8 @@
 {
-  "crumbs": { "content": "Content", "blog": "Blog" },
+  "crumbs": {
+    "content": "Content",
+    "blog": "Blog"
+  },
   "title": "Blog moderation",
   "feeds": {
     "label": "Post lists",
@@ -24,7 +27,8 @@
     "global": "Global",
     "personal": "Personal",
     "negativeScore": "Negative score",
-    "hidden": "Hidden"
+    "hidden": "Hidden",
+    "aheadOfTime": "Publish time ahead"
   },
   "hide": {
     "action": "Hide post",
@@ -36,5 +40,19 @@
   "gap": "No API yet — the abuse-report queue (there is no report model yet), search and bulk actions. A post whose content needs fixing opens by its link, then the edit screen.",
   "empty": "No posts.",
   "footer": "{shown} / {total} posts",
-  "pager": "Post pages"
+  "pager": "Post pages",
+  "unhide": {
+    "title": "Show this post again?",
+    "facts": "Author {authors} · published {time} · score {score} · comments {comments}",
+    "now": "The post shows at once in the feed and in the public lists.",
+    "ahead": "The publish time is still ahead. The post moves to the Scheduled tab and shows in the feed only from {time}, not at once.",
+    "confirm": "Show again",
+    "confirmScheduled": "Show again, scheduled",
+    "done": "Post shown again."
+  },
+  "row": {
+    "unhide": "Show again",
+    "unhiding": "Showing again…"
+  },
+  "hiddenNote": "Hidden posts are not in the feed; only their authors and staff can open them."
 }

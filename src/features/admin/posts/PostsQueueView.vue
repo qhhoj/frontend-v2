@@ -10,15 +10,19 @@ import PostsTable from './PostsTable.vue';
 import type { ModerationFeed, RowFailure } from './moderation';
 
 /** The list of one tab: the loading, error and empty states, the table, and the pager. */
-defineProps<{
-  feed: ModerationFeed;
-  posts: PostListItem[];
-  meta: PageMeta | undefined;
-  isPending: boolean;
-  error: unknown;
-  rowFailure: RowFailure | null;
-}>();
-defineEmits<{ retry: []; hide: [post: PostListItem] }>();
+withDefaults(
+  defineProps<{
+    feed: ModerationFeed;
+    posts: PostListItem[];
+    meta: PageMeta | undefined;
+    isPending: boolean;
+    error: unknown;
+    rowFailure: RowFailure | null;
+    pendingPostId?: string | null;
+  }>(),
+  { pendingPostId: null },
+);
+defineEmits<{ retry: []; hide: [post: PostListItem]; show: [post: PostListItem] }>();
 </script>
 
 <template>
@@ -31,7 +35,9 @@ defineEmits<{ retry: []; hide: [post: PostListItem] }>();
         :posts="posts"
         :feed="feed"
         :row-failure="rowFailure"
+        :pending-post-id="pendingPostId"
         @hide="$emit('hide', $event)"
+        @show="$emit('show', $event)"
       />
       <div v-if="meta" class="flex flex-wrap items-center justify-between gap-3 p-4">
         <p class="text-sm text-muted">
