@@ -23,6 +23,7 @@ import { BIT_MOODS } from '@/mascot/bit-moods';
 import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import VerdictRing from './VerdictRing.vue';
+import DeletedProblemChip from './DeletedProblemChip.vue';
 
 /** Two decimals like the problem header; no digit grouping, scores are read as plain numbers. */
 const SCORE_FRACTION_DIGITS = 2;
@@ -138,8 +139,11 @@ const facts = computed(() => [
           {{ $t('submission.facts.problem') }}
         </dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
+          <span v-if="submission.problem?.isDeleted" class="font-semibold"
+            >{{ submission.problem.name }} <DeletedProblemChip
+          /></span>
           <RouterLink
-            v-if="submission.problem"
+            v-else-if="submission.problem"
             :to="{ name: 'problem', params: { code: submission.problem.code } }"
             class="font-semibold hover:underline"
             >{{ problemName ?? submission.problem.name }}</RouterLink

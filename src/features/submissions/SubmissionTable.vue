@@ -24,6 +24,7 @@ import {
   HEADER_CELL_CLASSES,
 } from './submission-table-cells';
 import type { ColumnKey } from './submission-table-cells';
+import DeletedProblemChip from './DeletedProblemChip.vue';
 
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
@@ -151,7 +152,11 @@ const formatScore = (value: number) =>
                   class="mr-1.5 font-display font-bold"
                   >{{ problemLabels[row.problem.code] }}</span
                 >
+                <span v-if="row.problem.isDeleted" class="font-semibold text-content"
+                  >{{ row.problem.name }} <DeletedProblemChip
+                /></span>
                 <RouterLink
+                  v-else
                   :to="{ name: 'problem', params: { code: row.problem.code } }"
                   class="font-semibold text-content hover:underline"
                   >{{ row.problem.name }}</RouterLink

@@ -2029,6 +2029,10 @@
     "title": "Archived problem"
   },
   "deletedProblem": {
+    "chip": "Deleted",
+    "noticeTitle": "Problem deleted",
+    "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone.",
+    "bitLabel": "Bit asleep in a nightcap",
     "title": "Deleted problem"
   }
 }

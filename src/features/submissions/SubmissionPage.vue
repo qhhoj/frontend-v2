@@ -21,6 +21,8 @@ import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
+import DeletedProblemNotice from './DeletedProblemNotice.vue';
+import { isProblemDeleted } from './deleted-problem';
 
 /** Ids are long uuids: the first and last characters tell them apart. Shorter ids are shown whole. */
 const ID_HEAD_LENGTH = 6;
@@ -42,10 +44,12 @@ usePageTitle(() => translate('pages.submissionTitle', { id: shortId.value }));
 const viewerId = useViewerId();
 const isOwn = computed(() => row.value?.user?.id === viewerId.value);
 const problemCode = computed(() => row.value?.problem?.code ?? null);
+/** A deleted problem answers 404: never ask for it, never offer to resubmit to it. */
+const isDeletedProblem = computed(() => isProblemDeleted(row.value));
 const problemQuery = useProblemQuery(
   computed(() => problemCode.value ?? ''),
   toRef(locale, 'locale'),
-  computed(() => problemCode.value !== null),
+  computed(() => problemCode.value !== null && !isDeletedProblem.value),
 );
 
 const isNotFound = computed(
@@ -116,14 +120,20 @@ const verdict = computed(() => {
           :is-live="isLive"
         />
         <SubmissionStaffPanel :submission="row" />
+        <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
         <CasesTable
+          v-else
           :cases="row.cases"
           :batches="row.batches"
           :total-cases="row.totalCases"
           :running="isLive"
           :compile-error="row.status === 'CE' ? row.error : null"
         />
-        <SourceView :id="row.id" :problem-code="problemCode" :is-own="isOwn" />
+        <SourceView
+          :id="row.id"
+          :problem-code="isDeletedProblem ? null : problemCode"
+          :is-own="isOwn"
+        />
       </template>
     </QueryState>
   </div>

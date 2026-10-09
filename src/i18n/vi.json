@@ -2029,6 +2029,10 @@
     "title": "Bài đã lưu trữ"
   },
   "deletedProblem": {
+    "chip": "Đã xóa",
+    "noticeTitle": "Bài đã bị xóa",
+    "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test.",
+    "bitLabel": "Bit ngủ trong mũ ngủ",
     "title": "Bài đã bị xóa"
   }
 }
