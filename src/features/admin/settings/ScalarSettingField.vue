@@ -64,6 +64,17 @@ const timeZones = computed(() =>
           :aria-describedby="describedBy"
           :class="ADMIN_INPUT_CLASS"
         />
+        <select
+          v-else-if="kind.kind === 'choice'"
+          :id="id"
+          v-model="value"
+          :aria-describedby="describedBy"
+          :class="ADMIN_INPUT_CLASS"
+        >
+          <option v-for="option in kind.options" :key="option" :value="option">
+            {{ $t(`admin.settings.options.${setting.key}.${option}`) }}
+          </option>
+        </select>
         <template v-else-if="kind.kind === 'timeZone'">
           <input
             :id="id"

@@ -180,6 +180,8 @@ export const contestActions = (overrides: Partial<ContestActions> = {}): Contest
   judgeFinal: 'idle',
   rate: 'idle',
   publish: 'idle',
+  export: 'idle',
+  replay: 'idle',
   autoPublish: null,
   ...overrides,
 });

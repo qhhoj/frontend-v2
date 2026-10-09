@@ -1626,6 +1626,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/events/contests/{key}/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The feed as a stream: the snapshot, then new events. HTTP Basic like the snapshot URL. */
+        get: operations["FeedStreamController_feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/events/submissions": {
         parameters: {
             query?: never;
@@ -3538,9 +3555,11 @@ export interface components {
         };
         ContestActionsResponse: {
             autoPublish: components["schemas"]["ContestAutoPublishResponse"] | null;
+            export: components["schemas"]["ContestActionState"];
             judgeFinal: components["schemas"]["ContestActionState"];
             publish: components["schemas"]["ContestActionState"];
             rate: components["schemas"]["ContestActionState"];
+            replay: components["schemas"]["ContestActionState"];
             rescore: components["schemas"]["ContestActionState"];
         };
         /** @enum {string} */
@@ -4118,7 +4137,7 @@ export interface components {
             fields?: {
                 [key: string]: string[];
             };
-            /** @description Present on validation errors: the same failures with machine codes. */
+            /** @description Present on every 4xx: validation failures with machine codes, or one request-level issue (`field` empty) named after the refusal (`unauthenticated`, `forbidden`, `rate_limited`, ...). */
             issues?: components["schemas"]["FieldIssueResponse"][];
             message: string;
         } & {
@@ -4126,6 +4145,11 @@ export interface components {
         };
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
+        };
+        FeedEventFrame: {
+            data: components["schemas"]["FeedLineResponse"];
+            /** @enum {string} */
+            event: "contest" | "groups" | "judgement-types" | "judgements" | "languages" | "problems" | "state" | "submissions" | "teams";
         };
         /** @enum {string} */
         FeedKeyMode: "frozen-until-release" | "live";
@@ -4136,6 +4160,15 @@ export interface components {
             isActive: boolean;
             mode: components["schemas"]["FeedKeyMode"] | null;
             releasedAt: string | null;
+        };
+        FeedLineResponse: {
+            data: {
+                [key: string]: unknown;
+            };
+            id: string | null;
+            token: string;
+            /** @enum {string} */
+            type: "contest" | "groups" | "judgement-types" | "judgements" | "languages" | "problems" | "state" | "submissions" | "teams";
         };
         FieldChangeResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
@@ -4947,7 +4980,7 @@ export interface components {
             items: components["schemas"]["PublishedProblemResponse"][];
         };
         /** @enum {string} */
-        PublishSkipReason: "no_permission" | "not_found" | "organization_private";
+        PublishSkipReason: "deleted" | "no_permission" | "not_found" | "organization_private";
         PurgeQueuedResponse: {
             queued: boolean;
         };
@@ -5195,7 +5228,7 @@ export interface components {
             url?: string;
         };
         /** @enum {string} */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "problem.deleteGraceDays" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -10513,6 +10546,39 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": components["schemas"]["ContestAnnouncementFrame"] | components["schemas"]["ResyncFrame"];
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedStreamController_feed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stream of frames; `event` names each one. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["FeedEventFrame"];
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */

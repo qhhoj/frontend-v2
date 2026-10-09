@@ -913,6 +913,13 @@
             "nullable": true,
             "type": "object"
           },
+          "export": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestActionState"
+              }
+            ]
+          },
           "judgeFinal": {
             "allOf": [
               {
@@ -934,6 +941,13 @@
               }
             ]
           },
+          "replay": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestActionState"
+              }
+            ]
+          },
           "rescore": {
             "allOf": [
               {
@@ -947,6 +961,8 @@
           "judgeFinal",
           "rate",
           "publish",
+          "replay",
+          "export",
           "autoPublish"
         ],
         "type": "object"
@@ -2558,12 +2574,13 @@
           },
           "slug": {
             "maxLength": 128,
+            "pattern": "^[A-Za-z][-A-Za-z0-9_]*$",
             "type": "string"
           }
         },
         "required": [
-          "name",
-          "slug"
+          "slug",
+          "name"
         ],
         "type": "object"
       },
@@ -3127,7 +3144,7 @@
             "type": "object"
           },
           "issues": {
-            "description": "Present on validation errors: the same failures with machine codes.",
+            "description": "Present on every 4xx: validation failures with machine codes, or one request-level issue (`field` empty) named after the refusal (`unauthenticated`, `forbidden`, `rate_limited`, ...).",
             "items": {
               "$ref": "#/components/schemas/FieldIssueResponse"
             },
@@ -3151,6 +3168,32 @@
         },
         "required": [
           "error"
+        ],
+        "type": "object"
+      },
+      "FeedEventFrame": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FeedLineResponse"
+          },
+          "event": {
+            "enum": [
+              "contest",
+              "groups",
+              "judgement-types",
+              "judgements",
+              "languages",
+              "problems",
+              "state",
+              "submissions",
+              "teams"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "event",
+          "data"
         ],
         "type": "object"
       },
@@ -3194,6 +3237,42 @@
           "expiresAt",
           "releasedAt",
           "createdBy"
+        ],
+        "type": "object"
+      },
+      "FeedLineResponse": {
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "contest",
+              "groups",
+              "judgement-types",
+              "judgements",
+              "languages",
+              "problems",
+              "state",
+              "submissions",
+              "teams"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "data",
+          "token"
         ],
         "type": "object"
       },
@@ -6268,6 +6347,7 @@
       },
       "PublishSkipReason": {
         "enum": [
+          "deleted",
           "no_permission",
           "not_found",
           "organization_private"
@@ -7237,6 +7317,12 @@
           "pdf.maxBytes",
           "pdf.renderTimeoutMs",
           "problem.deleteGraceDays",
+          "quota.cost.contest",
+          "quota.cost.dataPer10MiB",
+          "quota.cost.problem",
+          "quota.defaultMonthlyCredits",
+          "quota.defaultStorageBytes",
+          "quota.enforce",
           "similarity.maxPairs",
           "similarity.maxSubmissions",
           "similarity.minPercent",
@@ -10069,6 +10155,7 @@
           },
           "slug": {
             "maxLength": 128,
+            "pattern": "^[A-Za-z][-A-Za-z0-9_]*$",
             "type": "string"
           }
         },
@@ -18413,6 +18500,60 @@
         "summary": "Contest announcements as ids (`announcement`), for anyone who sees the contest; `resync` after a lost subscription.",
         "tags": [
           "ContestStreams"
+        ]
+      }
+    },
+    "/api/internal/events/contests/{key}/feed": {
+      "get": {
+        "operationId": "FeedStreamController_feed",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/FeedEventFrame"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "A stream of frames; `event` names each one."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "The feed as a stream: the snapshot, then new events. HTTP Basic like the snapshot URL.",
+        "tags": [
+          "FeedStream"
         ]
       }
     },

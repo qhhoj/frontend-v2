@@ -5,6 +5,7 @@ export type SettingKind =
   | { kind: 'boolean' }
   | { kind: 'integer'; min: number; max: number }
   | { kind: 'text' }
+  | { kind: 'choice'; options: readonly string[] }
   | { kind: 'url' }
   | { kind: 'secretText' }
   | { kind: 'oauth' }
@@ -29,6 +30,12 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'similarity.minPercent': { kind: 'integer', min: 1, max: 100 },
   'similarity.maxPairs': { kind: 'integer', min: 1, max: 20_000 },
   'similarity.maxSubmissions': { kind: 'integer', min: 2, max: 10_000 },
+  'quota.enforce': { kind: 'choice', options: ['warn', 'enforce'] },
+  'quota.defaultMonthlyCredits': { kind: 'integer', min: 0, max: 1_000_000 },
+  'quota.defaultStorageBytes': { kind: 'integer', min: 0, max: 1_099_511_627_776 },
+  'quota.cost.problem': { kind: 'integer', min: 0, max: 1000 },
+  'quota.cost.contest': { kind: 'integer', min: 0, max: 1000 },
+  'quota.cost.dataPer10MiB': { kind: 'integer', min: 0, max: 1000 },
 };
 
 export const WEBHOOK_EVENTS = [
@@ -42,7 +49,8 @@ export const WEBHOOK_EVENTS = [
 ] as const;
 export const MAX_WEBHOOKS = 20;
 
-export type SettingGroup = 'site' | 'contest' | 'mail' | 'auth' | 'notify' | 'pdf' | 'similarity';
+export type SettingGroup =
+  'site' | 'contest' | 'mail' | 'auth' | 'notify' | 'pdf' | 'similarity' | 'quota';
 /** The page's group strip and sections, in this order. */
 export const SETTING_GROUPS: SettingGroup[] = [
   'site',
@@ -52,6 +60,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
   'notify',
   'pdf',
   'similarity',
+  'quota',
 ];
 
 export interface SettingBlockSpec {
@@ -77,6 +86,18 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
     id: 'similarity',
     group: 'similarity',
     keys: ['similarity.minPercent', 'similarity.maxPairs', 'similarity.maxSubmissions'],
+  },
+  {
+    id: 'quota',
+    group: 'quota',
+    keys: [
+      'quota.enforce',
+      'quota.defaultMonthlyCredits',
+      'quota.defaultStorageBytes',
+      'quota.cost.problem',
+      'quota.cost.contest',
+      'quota.cost.dataPer10MiB',
+    ],
   },
 ];
 
