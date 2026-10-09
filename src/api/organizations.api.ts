@@ -21,9 +21,10 @@ export interface MemberQuery {
   pageSize: number;
 }
 
-export const fetchOrganizations = (page: number) =>
+/** `search` is a literal, case-insensitive substring over name, short name and slug; blank (after trimming) sends nothing. */
+export const fetchOrganizations = (page: number, search?: string) =>
   apiPage<OrganizationListItem>('/organizations', {
-    query: { page, pageSize: ORGANIZATION_PAGE_SIZE },
+    query: { page, pageSize: ORGANIZATION_PAGE_SIZE, search: search?.trim() },
   });
 export const fetchOrganization = (slug: string) =>
   apiRequest<OrganizationDetail>(organizationPath(slug));

@@ -1,0 +1,71 @@
+{
+  "title": "Tổ chức",
+  "lead": "Danh sách tổ chức, sửa thông tin, yêu cầu tham gia và thành viên.",
+  "crumbs": {
+    "people": "Người dùng"
+  },
+  "actions": {
+    "create": "Tạo tổ chức"
+  },
+  "list": {
+    "label": "Danh sách tổ chức",
+    "name": "Tổ chức",
+    "state": "Trạng thái",
+    "members": "Thành viên",
+    "points": "PP",
+    "open": "Mở",
+    "closed": "Đóng",
+    "hidden": "Ẩn",
+    "footer": "{shown} / {total} tổ chức",
+    "pager": "Trang tổ chức"
+  },
+  "editor": {
+    "createTitle": "Tạo tổ chức",
+    "editTitle": "Sửa tổ chức",
+    "name": "Tên",
+    "slug": "Địa chỉ (slug)",
+    "slugHint": "Bắt đầu bằng chữ; chữ, số, - và _.",
+    "shortName": "Tên ngắn",
+    "shortNameCreateHint": "Để trống: lấy từ địa chỉ.",
+    "slots": "Số suất",
+    "slotsHint": "Để trống: không giới hạn",
+    "about": "Giới thiệu (Markdown)",
+    "logo": "Ảnh đại diện (URL hoặc đường dẫn)",
+    "admins": "Quản trị viên (tối đa {max})",
+    "open": "Mở: ai cũng vào được",
+    "unlisted": "Ẩn khỏi danh sách (nhân viên)",
+    "staffOnly": "Ẩn và số suất chỉ dành cho nhân viên có quyền sửa mọi tổ chức.",
+    "createSubmit": "Tạo tổ chức mới",
+    "save": "Lưu thay đổi",
+    "reset": "Huỷ"
+  },
+  "errors": {
+    "name": "Tên từ 1 đến 128 ký tự.",
+    "slug": "Địa chỉ phải bắt đầu bằng chữ; chỉ gồm chữ, số, - và _, tối đa 128 ký tự.",
+    "shortName": "Tên ngắn từ 1 đến 20 ký tự.",
+    "logo": "Ảnh phải là URL http(s) hoặc đường dẫn trên trang.",
+    "admins": "Tối đa 20 quản trị viên."
+  },
+  "requests": {
+    "title": "Yêu cầu tham gia",
+    "note": "Danh sách theo từng tổ chức.",
+    "pending": "Chờ duyệt",
+    "accepted": "Đã chấp nhận",
+    "refused": "Đã từ chối",
+    "pendingCount": "{count} chờ duyệt",
+    "refuse": "Từ chối",
+    "accept": "Chấp nhận",
+    "decidedBy": "duyệt bởi {id}",
+    "empty": "Không có yêu cầu nào.",
+    "full": "Tổ chức đã đủ chỗ.",
+    "pager": "Trang yêu cầu"
+  },
+  "members": {
+    "title": "Thành viên",
+    "count": "{count} người · sắp theo điểm hiệu suất",
+    "kick": "Đuổi",
+    "kickTitle": "Đuổi {username} khỏi {organization}?",
+    "kickBody": "Người này rời tổ chức ngay; có thể xin vào lại.",
+    "pager": "Trang thành viên"
+  }
+}

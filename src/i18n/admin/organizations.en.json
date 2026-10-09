@@ -1,0 +1,71 @@
+{
+  "title": "Organizations",
+  "lead": "The organization list, edits, join requests and members.",
+  "crumbs": {
+    "people": "Users"
+  },
+  "actions": {
+    "create": "Create organization"
+  },
+  "list": {
+    "label": "Organization list",
+    "name": "Organization",
+    "state": "State",
+    "members": "Members",
+    "points": "PP",
+    "open": "Open",
+    "closed": "Closed",
+    "hidden": "Hidden",
+    "footer": "{shown} / {total} organizations",
+    "pager": "Organization pages"
+  },
+  "editor": {
+    "createTitle": "Create organization",
+    "editTitle": "Edit organization",
+    "name": "Name",
+    "slug": "Address (slug)",
+    "slugHint": "Starts with a letter; letters, digits, - and _.",
+    "shortName": "Short name",
+    "shortNameCreateHint": "Leave empty: taken from the address.",
+    "slots": "Seats",
+    "slotsHint": "Empty: no limit",
+    "about": "About (Markdown)",
+    "logo": "Avatar (URL or path)",
+    "admins": "Administrators (up to {max})",
+    "open": "Open: anyone may join",
+    "unlisted": "Hidden from the list (staff)",
+    "staffOnly": "Hidden and seats are for staff who may edit every organization.",
+    "createSubmit": "Create organization",
+    "save": "Save changes",
+    "reset": "Reset"
+  },
+  "errors": {
+    "name": "Name is 1 to 128 characters.",
+    "slug": "The address starts with a letter and holds only letters, digits, - and _, up to 128 characters.",
+    "shortName": "Short name is 1 to 20 characters.",
+    "logo": "The image must be an http(s) URL or a site path.",
+    "admins": "Up to 20 administrators."
+  },
+  "requests": {
+    "title": "Join requests",
+    "note": "Listed per organization.",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "refused": "Refused",
+    "pendingCount": "{count} pending",
+    "refuse": "Refuse",
+    "accept": "Accept",
+    "decidedBy": "decided by {id}",
+    "empty": "No requests.",
+    "full": "The organization is full.",
+    "pager": "Request pages"
+  },
+  "members": {
+    "title": "Members",
+    "count": "{count} people · sorted by performance points",
+    "kick": "Remove",
+    "kickTitle": "Remove {username} from {organization}?",
+    "kickBody": "They leave the organization at once; they may ask to join again.",
+    "pager": "Member pages"
+  }
+}

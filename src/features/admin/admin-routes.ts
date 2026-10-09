@@ -33,7 +33,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   judgeNew: placeholder,
   languages: placeholder,
   users: () => import('./users/UsersPage.vue'),
-  organizations: placeholder,
+  organizations: () => import('./organizations/OrganizationsPage.vue'),
   posts: () => import('./posts/BlogModerationPage.vue'),
   tickets: placeholder,
   activity: () => import('./activity/UserActivityPage.vue'),
