@@ -11,6 +11,7 @@ import {
   submissionListRoutes,
   submissionPageRoutes,
 } from '@/test/problem-routes';
+import { endedContest } from '@/test/replay-fixtures';
 
 const regionsIn = (root: ParentNode, region: string) =>
   root.querySelectorAll(`[data-skeleton-region="${region}"]`).length;
@@ -300,5 +301,21 @@ describe('the notifications page shows rows shaped like the inbox', () => {
     expect(regionsIn(card, 'notification-day')).toBe(1);
     for (const skeleton of card.querySelectorAll('[data-testid="query-skeleton"]'))
       expectInert(skeleton, 'notification skeleton');
+  });
+
+  it('the replay page shows the player, board rows and feed skeletons while the replay loads', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(endedContest()) });
+    const answer = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+      String(input).includes('/replay') ? new Promise<Response>(() => {}) : answer(input, init),
+    );
+    const { wrapper } = await mountApp('/contests/r41/replay');
+    const skeleton = [...wrapper.element.querySelectorAll('[data-testid="query-skeleton"]')].at(
+      -1,
+    )!;
+    expect(['player', 'board-row', 'feed'].map((region) => regionsIn(skeleton, region))).toEqual([
+      1, 8, 1,
+    ]);
+    expectInert(skeleton, 'replay');
   });
 });
