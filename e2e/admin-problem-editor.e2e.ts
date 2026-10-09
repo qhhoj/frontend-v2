@@ -30,3 +30,18 @@ test('the people chips and switches are reachable by keyboard', async ({ page, a
   await page.getByRole('switch', { name: 'Công khai' }).focus();
   await expect(page.getByRole('switch', { name: 'Công khai' })).toBeFocused();
 });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`statements tab with a live preview is accessible at ${viewport.name}`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    api.routes['POST /problems/render-preview'] = adminOk({ html: '<p>Cho đồ thị</p>' });
+    await openEditor(page, api, 'statements');
+    await expect(page.getByText('Cho đồ thị', { exact: true })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });

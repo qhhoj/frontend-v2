@@ -130,5 +130,39 @@
     "submit": "Nhân bản",
     "done": "Đã nhân bản.",
     "open": "Mở {code}"
+  },
+  "statements": {
+    "title": "Đề bài theo ngôn ngữ",
+    "lead": "Mỗi ngôn ngữ lưu riêng bằng PUT /translations/:lang.",
+    "slotsLabel": "Ngôn ngữ đề",
+    "slots": {
+      "vi": "Tiếng Việt",
+      "en": "English",
+      "original": "Mô tả gốc"
+    },
+    "missing": "chưa có",
+    "nameLabel": "Tên bài ({language})",
+    "nameHint": "Tối đa 100 ký tự.",
+    "contentLabel": "Nội dung (Markdown)",
+    "imageButton": "Chèn ảnh",
+    "imageHint": "Ảnh tải lên qua /problems/uploads/image, URL được chèn vào văn bản.",
+    "fullMarkupNote": "Bài này dùng markup đầy đủ: xem trước theo kiểu thường vì bạn không có quyền judge.problem_full_markup.",
+    "discard": "Hủy thay đổi",
+    "save": {
+      "vi": "Lưu bản dịch tiếng Việt",
+      "en": "Lưu bản dịch tiếng Anh",
+      "original": "Lưu mô tả gốc"
+    }
+  },
+  "editorial": {
+    "title": "Lời giải",
+    "lead": "Lời giải, công khai và tác giả.",
+    "public": "Công khai lời giải",
+    "publicHint": "Khi tắt, chỉ nhân viên và tác giả thấy.",
+    "publishOn": "Công khai từ",
+    "publishOnHint": "Lời giải mở cho mọi người khi đến giờ này (nếu đã bật công khai).",
+    "authors": "Tác giả lời giải",
+    "content": "Nội dung (Markdown)",
+    "save": "Lưu lời giải"
   }
 }

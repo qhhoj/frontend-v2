@@ -130,5 +130,39 @@
     "submit": "Clone",
     "done": "Cloned.",
     "open": "Open {code}"
+  },
+  "statements": {
+    "title": "Statements by language",
+    "lead": "Each language is saved on its own with PUT /translations/:lang.",
+    "slotsLabel": "Statement language",
+    "slots": {
+      "vi": "Tiếng Việt",
+      "en": "English",
+      "original": "Original description"
+    },
+    "missing": "missing",
+    "nameLabel": "Name ({language})",
+    "nameHint": "Up to 100 characters.",
+    "contentLabel": "Content (Markdown)",
+    "imageButton": "Insert image",
+    "imageHint": "Images upload through /problems/uploads/image; the URL goes into the text.",
+    "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack judge.problem_full_markup.",
+    "discard": "Discard changes",
+    "save": {
+      "vi": "Save Vietnamese translation",
+      "en": "Save English translation",
+      "original": "Save original description"
+    }
+  },
+  "editorial": {
+    "title": "Editorial",
+    "lead": "The editorial, its publication and authors.",
+    "public": "Publish the editorial",
+    "publicHint": "When off, only staff and the authors see it.",
+    "publishOn": "Publish from",
+    "publishOnHint": "The editorial opens to everyone at this time (when publishing is on).",
+    "authors": "Editorial authors",
+    "content": "Content (Markdown)",
+    "save": "Save editorial"
   }
 }
