@@ -1988,6 +1988,41 @@
     "title": "Organization problems"
   },
   "orgQuota": {
+    "credits": "Credits, {month}",
+    "creditsValue": "{used} / {limit} credits",
+    "creditsDetail": "Resets by itself when the month changes (site time zone)",
+    "storage": "Data storage",
+    "storageValue": "{used} / {limit}",
+    "storageDetail": "{left} left",
+    "meterLabel": "{label}: {percent}% used",
+    "meters": {
+      "credits": "credits",
+      "storage": "storage"
+    },
+    "healthy": "Every quota has room left.",
+    "near": "You have used {percent}% of the {meter} for {month}",
+    "blocked": "The {meter} quota is used up.",
+    "warnMode": "Warning mode: going over is still allowed but logged. Organization administrators get one notification a month.",
+    "enforceMode": "Blocking mode: once a quota is used up, creating problems or contests and uploading data are refused.",
+    "blockedCredits": "Blocking mode: no new problems or contests until {date}.",
+    "blockedStorage": "Blocking mode: no more data uploads until space is freed or the quota is raised.",
+    "ledger": "Credit ledger, {month}",
+    "ledgerEmpty": "No entries this month yet.",
+    "columns": {
+      "at": "At",
+      "reason": "Reason",
+      "amount": "Credits",
+      "actor": "By"
+    },
+    "reasons": {
+      "problem": "Problem created or cloned",
+      "contest": "Contest created or cloned",
+      "upload": "Data upload",
+      "refund": "Credit refund",
+      "other": "Other"
+    },
+    "forbiddenTitle": "Only organization administrators can see the quota",
+    "forbiddenBody": "Ask an administrator of {name} if you need to know more.",
     "title": "Quota"
   },
   "problemArchive": {

@@ -1988,6 +1988,41 @@
     "title": "Bài tập của tổ chức"
   },
   "orgQuota": {
+    "credits": "Tín dụng {month}",
+    "creditsValue": "{used} / {limit} tín dụng",
+    "creditsDetail": "Đặt lại tự động khi sang tháng (múi giờ site)",
+    "storage": "Dung lượng dữ liệu",
+    "storageValue": "{used} / {limit}",
+    "storageDetail": "Còn {left}",
+    "meterLabel": "{label}: đã dùng {percent}%",
+    "meters": {
+      "credits": "tín dụng",
+      "storage": "dung lượng"
+    },
+    "healthy": "Hạn mức còn dư.",
+    "near": "Bạn đã dùng {percent}% {meter} {month}",
+    "blocked": "Đã hết hạn mức {meter}.",
+    "warnMode": "Hiện ở chế độ cảnh báo: vượt hạn mức vẫn được phép nhưng sẽ được ghi lại. Quản trị tổ chức nhận thông báo một lần mỗi tháng.",
+    "enforceMode": "Chế độ chặn đang bật: khi hết hạn mức, tạo bài tập, kỳ thi và tải dữ liệu bị từ chối.",
+    "blockedCredits": "Chế độ chặn đang bật: không thể tạo bài tập hoặc kỳ thi mới cho đến {date}.",
+    "blockedStorage": "Chế độ chặn đang bật: không tải thêm dữ liệu được cho đến khi giải phóng dung lượng hoặc được tăng hạn mức.",
+    "ledger": "Sổ tín dụng {month}",
+    "ledgerEmpty": "Chưa có giao dịch nào tháng này.",
+    "columns": {
+      "at": "Lúc",
+      "reason": "Lý do",
+      "amount": "Tín dụng",
+      "actor": "Người"
+    },
+    "reasons": {
+      "problem": "Tạo hoặc nhân bản bài",
+      "contest": "Tạo hoặc nhân bản kỳ thi",
+      "upload": "Tải dữ liệu",
+      "refund": "Hoàn tín dụng",
+      "other": "Khác"
+    },
+    "forbiddenTitle": "Chỉ quản trị tổ chức xem được hạn mức",
+    "forbiddenBody": "Liên hệ quản trị của {name} nếu cần biết thêm.",
     "title": "Hạn mức"
   },
   "problemArchive": {
