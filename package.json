@@ -16,7 +16,8 @@
     "check": "npm run api:check && npm run lint && npm run typecheck && npm test",
     "changeset": "changeset",
     "version": "changeset version",
-    "release:tag": "changeset tag"
+    "release:version": "changeset version && npm install --package-lock-only",
+    "release:tag": "node scripts/release/tag-release.mjs"
   },
   "private": true,
   "type": "module",

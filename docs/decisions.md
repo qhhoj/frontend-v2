@@ -352,3 +352,4 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - **Backend refusals by code**: the SPA matches `error.issues[].code` (join-request `request_already_decided`/`organization_full`, `busy`, file refusals, taken keys/codes), never the English message; texts live in `admin.ui.issues.<code>`, unknown codes fall back to `failureTextOf`. Still on message or field shape because the backend sends no code: the blog official-contest lock 403, and the nav/flatpage/judge/language 409 `fields`. Refusal texts carry no file or extension name (codes have no params).
 - **Impersonation**: "Đóng vai" also needs `staff.isActive`.
+- **Release bot**: `changesets/action` (`.github/workflows/release.yml`) opens the Version Packages PR on every push to `main`; merging it runs `scripts/release/tag-release.mjs` (idempotent `v<version>` tag, no npm publish) because the app is private and the tag is the release.
