@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MockInstance } from 'vitest';
+import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { mountComponent } from '@/test/mount';
 import CodeEditor from './CodeEditor.vue';
 
@@ -217,5 +218,67 @@ describe('CodeEditor', () => {
       expect(handle().setLanguage).toHaveBeenLastCalledWith(null);
       expect(warn).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('CodeEditor in low-power mode', () => {
+  const turnLowPowerOn = async () => {
+    document.documentElement.dataset.lowPower = '';
+    await vi.waitFor(() => expect(useLowPowerPainted().value).toBe(true));
+  };
+  const keydown = (wrapper: ReturnType<typeof mountEditor>, init: KeyboardEventInit) => {
+    const event = new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true });
+    wrapper.get('textarea').element.dispatchEvent(event);
+    return event;
+  };
+
+  it('keeps the textarea and never loads the editor', async () => {
+    await turnLowPowerOn();
+    const before = fake.createdCount;
+    const wrapper = mountEditor();
+    await flushPromises();
+    expect(fake.createdCount).toBe(before);
+    expect(wrapper.find('textarea').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="editor-tab-hint"]').text()).toContain('Esc rồi Tab');
+    expect(wrapper.get('textarea').attributes('aria-describedby')).toBe(
+      wrapper.get('[data-testid="editor-tab-hint"]').attributes('id'),
+    );
+  });
+
+  it('indents with Tab, and lets Tab leave after Escape', async () => {
+    await turnLowPowerOn();
+    const wrapper = mountEditor();
+    await flushPromises();
+    const field = wrapper.get('textarea').element as HTMLTextAreaElement;
+    field.setSelectionRange(3, 3);
+    expect(keydown(wrapper, { key: 'Tab' }).defaultPrevented).toBe(true);
+    expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual(['int     main() {}']);
+    keydown(wrapper, { key: 'Escape' });
+    expect(keydown(wrapper, { key: 'Tab' }).defaultPrevented).toBe(false);
+    expect(keydown(wrapper, { key: 'Tab' }).defaultPrevented).toBe(true);
+  });
+
+  it('keeps the Escape release through a modifier key (Shift+Tab still leaves)', async () => {
+    await turnLowPowerOn();
+    const wrapper = mountEditor();
+    await flushPromises();
+    keydown(wrapper, { key: 'Escape' });
+    keydown(wrapper, { key: 'Shift' });
+    expect(keydown(wrapper, { key: 'Tab', shiftKey: true }).defaultPrevented).toBe(false);
+  });
+
+  it('swaps to the textarea when low-power turns on, keeping the text', async () => {
+    const wrapper = mountEditor();
+    await flushPromises();
+    const created = handle();
+    await turnLowPowerOn();
+    await flushPromises();
+    expect(created.destroy).toHaveBeenCalled();
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('int main() {}');
+  });
+
+  it('does not touch Tab when low-power is off', () => {
+    const wrapper = mountEditor();
+    expect(keydown(wrapper, { key: 'Tab' }).defaultPrevented).toBe(false);
   });
 });

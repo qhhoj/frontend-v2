@@ -1606,6 +1606,7 @@
     "title": "So sánh bài nộp"
   },
   "lowPower": {
+    "editorHint": "Tab: thụt lề · Shift+Tab: lùi lề · Esc rồi Tab: rời ô soạn mã",
     "title": "Chế độ tiết kiệm"
   },
   "flatpage": {

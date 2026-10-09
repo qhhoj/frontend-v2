@@ -1606,6 +1606,7 @@
     "title": "Compare submissions"
   },
   "lowPower": {
+    "editorHint": "Tab: indent · Shift+Tab: outdent · Esc then Tab: leave the editor",
     "title": "Low-power mode"
   },
   "flatpage": {

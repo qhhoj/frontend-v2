@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import type { EditorHandle } from './code-editor-cm';
 import { loadLanguagePack } from './code-languages';
+import { useLowPowerPainted } from '@/lib/use-low-power-painted';
+import { indentAt, outdentLineAt } from './tab-indent';
 
 const props = withDefaults(
   defineProps<{
@@ -28,6 +30,11 @@ let isUnmounted = false;
 let languageRequestCount = 0;
 // setDoc fires the editor's change listener; without this guard an external value would be echoed back.
 let isApplyingExternalValue = false;
+/** Low-power keeps the plain textarea (no CodeMirror chunk); there Tab indents, and Escape then Tab leaves (no keyboard trap). */
+const isLowPower = useLowPowerPainted();
+const hintId = useId();
+let isTabReleased = false;
+const MODIFIER_KEYS = new Set(['Shift', 'Control', 'Alt', 'Meta']);
 
 // Same count as CodeMirror's gutter (its width follows the widest number), so the swap keeps the column width.
 const lineCount = computed(() => source.value.split('\n').length);
@@ -64,7 +71,7 @@ async function applyLanguage() {
 
 async function loadEditor() {
   const editorModule = await importEditorModule();
-  if (!editorModule || isUnmounted) return;
+  if (!editorModule || isUnmounted || isLowPower.value) return;
   const selection = readTextareaFocus();
   // Create the editor only once its host is visible, so CodeMirror measures real sizes.
   isEditorReady.value = true;
@@ -105,7 +112,38 @@ watch(
 
 watch(() => props.language, applyLanguage);
 
-onMounted(loadEditor);
+function unloadEditor() {
+  editor?.destroy();
+  editor = undefined;
+  isEditorReady.value = false;
+}
+
+function onTextareaKeydown(event: KeyboardEvent) {
+  if (!isLowPower.value) return;
+  if (MODIFIER_KEYS.has(event.key)) return; // Escape, then Shift, then Shift+Tab must still leave (WCAG 2.1.2)
+  const isPlainTab = event.key === 'Tab' && !event.altKey && !event.ctrlKey && !event.metaKey;
+  if (!isPlainTab || isTabReleased) {
+    isTabReleased = event.key === 'Escape';
+    return;
+  }
+  event.preventDefault();
+  const field = event.target as HTMLTextAreaElement;
+  const edit = {
+    text: field.value,
+    selectionStart: field.selectionStart,
+    selectionEnd: field.selectionEnd,
+  };
+  const next = event.shiftKey ? outdentLineAt(edit) : indentAt(edit);
+  source.value = next.text;
+  field.value = next.text;
+  field.setSelectionRange(next.selectionStart, next.selectionEnd);
+}
+
+onMounted(() => {
+  if (!isLowPower.value) void loadEditor();
+});
+/** Low-power switched with the editor open: the textarea takes over (the text lives in v-model), or the editor comes back. */
+watch(isLowPower, (isOn) => (isOn ? unloadEditor() : void loadEditor()));
 onBeforeUnmount(() => {
   isUnmounted = true;
   editor?.destroy();
@@ -131,8 +169,19 @@ onBeforeUnmount(() => {
         wrap="off"
         spellcheck="false"
         autocapitalize="off"
+        :aria-describedby="isLowPower ? hintId : undefined"
         class="code-editor-textarea"
+        @keydown="onTextareaKeydown"
+        @blur="isTabReleased = false"
       ></textarea>
     </div>
+    <p
+      v-if="isLowPower && !isEditorReady"
+      :id="hintId"
+      data-testid="editor-tab-hint"
+      class="border-t border-line px-3 py-2 font-body text-xs text-muted"
+    >
+      {{ $t('lowPower.editorHint') }}
+    </p>
   </div>
 </template>
