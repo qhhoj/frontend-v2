@@ -1,7 +1,6 @@
 import type { ContestTag } from '../api/types/contest-tags';
 import type {
   Balloon,
-  BalloonPage,
   ContestExportStatus,
   FeedKeyStatus,
   MintedFeedKey,
@@ -49,16 +48,6 @@ export const balloon = (index: number, overrides: Partial<Balloon> = {}): Balloo
   isFirst: index < PROBLEM_IDS.length,
   deliveredAt: null,
   deliveredBy: null,
-  ...overrides,
-});
-
-export const balloonPage = (
-  items: Balloon[],
-  overrides: Partial<BalloonPage> = {},
-): BalloonPage => ({
-  items,
-  total: items.length,
-  counts: { pendingTotal: items.length, deliveredTotal: 0 },
   ...overrides,
 });
 

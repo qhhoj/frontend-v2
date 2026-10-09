@@ -288,7 +288,6 @@ export const problemItem = (overrides: Partial<ProblemListItem> = {}): ProblemLi
   ...overrides,
 });
 
-export const PARTICIPATION_IDS = ['part-07', 'part-12', 'part-03', 'part-01'] as const;
 export const RANKING_PROBLEM_IDS = ['prob-a', 'prob-b', 'prob-c'] as const;
 const [PROBLEM_A, PROBLEM_B, PROBLEM_C] = RANKING_PROBLEM_IDS;
 
