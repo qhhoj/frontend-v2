@@ -1,5 +1,6 @@
 import type { Language } from '@/api/types/problems';
 import type { RejudgeBody } from '@/api/types/submission-actions';
+import type { SubmissionResult } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
 import { shortId } from '../ui/short-id';
@@ -12,7 +13,7 @@ export interface RejudgeFilter {
   idFrom: string;
   idTo: string;
   languageIds: string[];
-  results: string[];
+  results: SubmissionResult[];
   force: boolean;
 }
 

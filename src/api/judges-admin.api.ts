@@ -1,14 +1,13 @@
-import { apiRequest } from './client';
-import type { Judge, JudgePatch } from './types/judges-admin';
+import { apiGet, apiSend } from './typed';
+import type { JsonBodyOf } from './typed';
+import type { JudgePatch } from './types/judges-admin';
 
-const judgePath = (name: string) => `/judges/${encodeURIComponent(name)}`;
-
-export const fetchJudges = () => apiRequest<Judge[]>('/judges');
-export const createJudge = (body: { name: string; description?: string }) =>
-  apiRequest<{ judge: Judge; authKey: string }>('/judges', { method: 'POST', body });
+export const fetchJudges = () => apiGet('/judges');
+export const createJudge = (body: JsonBodyOf<'/judges', 'post'>) =>
+  apiSend('post', '/judges', { body });
 export const updateJudge = (name: string, patch: JudgePatch) =>
-  apiRequest<Judge>(judgePath(name), { method: 'PATCH', body: patch });
+  apiSend('patch', '/judges/{name}', { path: { name }, body: patch });
 export const rotateJudgeKey = (name: string) =>
-  apiRequest<{ authKey: string }>(`${judgePath(name)}/key`, { method: 'POST' });
+  apiSend('post', '/judges/{name}/key', { path: { name } });
 export const disconnectJudge = (name: string, force: boolean) =>
-  apiRequest<void>(`${judgePath(name)}/disconnect`, { method: 'POST', body: { force } });
+  apiSend('post', '/judges/{name}/disconnect', { path: { name }, body: { force } });

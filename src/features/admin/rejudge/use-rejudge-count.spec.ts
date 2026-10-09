@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '@/api/client';
 import { rejudgeSubmissions } from '@/api/submission-actions.api';
-import type { RejudgeResult } from '@/api/types/submission-actions';
+import type { RejudgeBody, RejudgeResult } from '@/api/types/submission-actions';
 import { canConfirmRejudge, useRejudgeCount } from './use-rejudge-count';
 import type { RejudgeCountState } from './use-rejudge-count';
 
 vi.mock('@/api/submission-actions.api', () => ({ rejudgeSubmissions: vi.fn() }));
 
-const BODY = { problem: 'hcmus41c', results: ['WA'] };
+const BODY: RejudgeBody = { problem: 'hcmus41c', results: ['WA'] };
 const NOW = new Date('2026-10-09T07:52:31.000Z');
 const answer = (count: number, allowed = true): RejudgeResult => ({ count, dryRun: true, allowed });
 /** A request the spec settles by hand, so two counts can overlap. */
