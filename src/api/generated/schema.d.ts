@@ -3325,13 +3325,10 @@ export interface components {
             partial?: boolean;
             points: number;
             source?: string;
-            /** @enum {string} */
-            submissionSourceVisibility?: "A" | "F" | "O" | "S";
+            submissionSourceVisibility?: components["schemas"]["SubmissionSourceVisibility"];
             summary?: string;
-            /** @enum {string} */
-            testcaseResultVisibility?: "A" | "B" | "S";
-            /** @enum {string} */
-            testcaseVisibility?: "A" | "C" | "O";
+            testcaseResultVisibility?: components["schemas"]["TestcaseResultVisibility"];
+            testcaseVisibility?: components["schemas"]["TestcaseVisibility"];
             testers?: string[];
             timeLimit: number;
             typeIds: string[];
@@ -3392,6 +3389,12 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
         };
+        FieldChangeResponse: {
+            /** @description Any JSON value; its shape is the setting definition. */
+            after: unknown;
+            /** @description Any JSON value; its shape is the setting definition. */
+            before: unknown;
+        };
         FieldIssueResponse: {
             /** @description Machine code, snake_case. */
             code: string;
@@ -3444,8 +3447,9 @@ export interface components {
             action: "create" | "delete" | "edit";
             /** Format: date-time */
             at: string;
+            /** @description Per changed field, its value before and after. */
             changes: {
-                [key: string]: unknown;
+                [key: string]: components["schemas"]["FieldChangeResponse"];
             };
             /** @description Null when the editor's account is gone. */
             editor: components["schemas"]["UserSummaryResponse"] | null;
@@ -3916,10 +3920,10 @@ export interface components {
             pdfStatementUrl: string | null;
             points: number;
             source: string;
-            submissionSourceVisibility: string;
+            submissionSourceVisibility: components["schemas"]["SubmissionSourceVisibility"];
             summary: string;
-            testcaseResultVisibility: string;
-            testcaseVisibility: string;
+            testcaseResultVisibility: components["schemas"]["TestcaseResultVisibility"];
+            testcaseVisibility: components["schemas"]["TestcaseVisibility"];
             timeLimit: number;
             translated: boolean;
             types: components["schemas"]["CatalogItemResponse"][];
@@ -4220,6 +4224,8 @@ export interface components {
             /** Format: uri */
             url?: string;
         };
+        /** @enum {string} */
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -4228,7 +4234,7 @@ export interface components {
             hasSecret: boolean;
             /** @description True while the value equals the registry default (also after a patch back to it). */
             isDefault: boolean;
-            key: string;
+            key: components["schemas"]["SettingKey"];
             /** Format: date-time */
             updatedAt: string | null;
             updatedBy: string | null;
@@ -4540,6 +4546,8 @@ export interface components {
             id: string;
             source: string;
         };
+        /** @enum {string} */
+        SubmissionSourceVisibility: "A" | "F" | "O" | "S";
         SubmissionStateEventResponse: {
             casePoints: number;
             caseTotal: number;
@@ -4664,6 +4672,10 @@ export interface components {
             /** @enum {string} */
             type: "C" | "E" | "S";
         };
+        /** @enum {string} */
+        TestcaseResultVisibility: "A" | "B" | "S";
+        /** @enum {string} */
+        TestcaseVisibility: "A" | "C" | "O";
         TicketDetailResponse: {
             assignees: components["schemas"]["UserSummaryResponse"][];
             can: components["schemas"]["TicketPermissionsResponse"];
@@ -4891,13 +4903,10 @@ export interface components {
             partial?: boolean;
             points?: number;
             source?: string;
-            /** @enum {string} */
-            submissionSourceVisibility?: "A" | "F" | "O" | "S";
+            submissionSourceVisibility?: components["schemas"]["SubmissionSourceVisibility"];
             summary?: string;
-            /** @enum {string} */
-            testcaseResultVisibility?: "A" | "B" | "S";
-            /** @enum {string} */
-            testcaseVisibility?: "A" | "C" | "O";
+            testcaseResultVisibility?: components["schemas"]["TestcaseResultVisibility"];
+            testcaseVisibility?: components["schemas"]["TestcaseVisibility"];
             testers?: string[];
             timeLimit?: number;
             typeIds?: string[];
@@ -5013,6 +5022,7 @@ export interface components {
         };
         VoteResponse: {
             score: number;
+            viewerVote: components["schemas"]["VoteScore"];
         };
         /** @enum {number} */
         VoteScore: -1 | 0 | 1;
@@ -9496,7 +9506,10 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /** @description Everything after /pages/ */
+                path: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -10014,7 +10027,14 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -10049,7 +10069,14 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -10254,7 +10281,14 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -10343,7 +10377,14 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -10585,7 +10626,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             202: {
                 headers: {
@@ -10755,7 +10803,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
