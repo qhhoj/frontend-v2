@@ -13,13 +13,31 @@ export const LANG_PY3 = '0192a000-0000-7000-8000-0000000000b3';
 export const TYPE_GRAPH = '0192a000-0000-7000-8000-0000000007a1';
 export const GROUP_GRAPH = '0192a000-0000-7000-8000-0000000006a1';
 
+const editingLanguage = (
+  id: string,
+  key: string,
+  name: string,
+): ProblemEditingMeta['languages'][number] => ({
+  id,
+  key,
+  name,
+  shortName: null,
+  commonName: name,
+  ace: 'text',
+  extension: 'txt',
+  template: '',
+  fileOnly: false,
+  fileSizeLimit: 0,
+  includeInProblem: true,
+});
+
 export const problemEditingMeta = (): ProblemEditingMeta => ({
   types: [{ id: TYPE_GRAPH, name: 'shortest', fullName: 'Đường đi ngắn nhất' }],
   groups: [{ id: GROUP_GRAPH, name: 'graph', fullName: 'Đồ thị' }],
   licenses: [],
   languages: [
-    { id: LANG_CPP20, key: 'CPP20', name: 'C++20' },
-    { id: LANG_PY3, key: 'PY3', name: 'Python 3' },
+    editingLanguage(LANG_CPP20, 'CPP20', 'C++20'),
+    editingLanguage(LANG_PY3, 'PY3', 'Python 3'),
   ],
 });
 
@@ -69,6 +87,20 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
   testcaseResultVisibility: 'B',
   allowViewFeedback: true,
   canEdit: true,
+  acRate: 0,
+  userCount: 0,
+  hasEditorial: false,
+  viewerStatus: null,
+  contest: null,
+  language: 'vi',
+  translated: true,
+  descriptionHtml: '',
+  types: [],
+  group: null,
+  allowedLanguages: [],
+  availableTranslations: ['vi'],
+  license: null,
+  organizations: [],
   editor: problemEditor(),
   ...overrides,
 });

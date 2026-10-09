@@ -18,6 +18,9 @@ export const useProblemListQuery = (filters: Ref<ProblemFilters>, lang: Ref<Stat
     queryFn: ({ pageParam }) =>
       fetchProblems({
         ...filters.value,
+        pointsMin: filters.value.pointsMin ?? undefined,
+        pointsMax: filters.value.pointsMax ?? undefined,
+        sort: filters.value.sort ?? undefined,
         lang: lang.value,
         page: pageParam,
         pageSize: PROBLEM_PAGE_SIZE,

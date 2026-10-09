@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { mockApi } from '@/test/mock-api';
-import { startPolygonImport } from './problem-imports.api';
+import { mockApi, ok } from '@/test/mock-api';
+import { fetchImportJob, startPolygonImport } from './problem-imports.api';
 
 describe('startPolygonImport', () => {
   it('puts the options in the query string and only the file in the body', async () => {
@@ -28,5 +28,16 @@ describe('startPolygonImport', () => {
     expect(call.query.get('ignoreZeroPointBatches')).toBe('true');
     expect(call.query.has('curators')).toBe(false);
     expect([...(call.body as FormData).keys()]).toEqual(['file']);
+  });
+});
+
+describe('fetchImportJob', () => {
+  it('asks for the job by its encoded id', async () => {
+    const calls = mockApi({
+      'GET /problems/imports/j%2F1': ok({ id: 'j/1', state: 'active', result: null, error: null }),
+    });
+    const job = await fetchImportJob('j/1');
+    expect(calls[0]!.path).toBe('/problems/imports/j%2F1');
+    expect(job.state).toBe('active');
   });
 });
