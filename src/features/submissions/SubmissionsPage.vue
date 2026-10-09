@@ -21,8 +21,15 @@ import {
 import { FIRST_PAGE } from './live-passes';
 import { useLiveSubmissionList } from './use-live-submission-list';
 import { useSubmissionFilters } from './use-submission-filters';
+import { useSessionStore } from '@/stores/session.store';
+import DiffSelectionBar from './DiffSelectionBar.vue';
+import { useDiffPicks } from './use-diff-picks';
 
 const { filters, update, reset } = useSubmissionFilters();
+const session = useSessionStore();
+/** The diff page needs a signed-in viewer, so only they pick rows. */
+const isSignedIn = computed(() => session.status === 'authenticated');
+const picks = useDiffPicks();
 const { data: meta } = useProblemMetaQuery();
 const { data: stats, isPending: isStatsPending } = useSubmissionStatsQuery();
 const {
@@ -104,11 +111,23 @@ function goToPage(page: number) {
           </button>
         </div>
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
-          <template #skeleton><SubmissionTableSkeleton /></template>
+          <template #skeleton><SubmissionTableSkeleton :has-pick-column="isSignedIn" /></template>
           <GlassCard v-if="!submissions.length" as="div">
             <EmptyState>{{ emptyText }}</EmptyState>
           </GlassCard>
-          <SubmissionTable v-else :submissions="submissions" :highlight-ids="live.addedIds.value" />
+          <SubmissionTable
+            v-else
+            :submissions="submissions"
+            :highlight-ids="live.addedIds.value"
+            :picked-ids="isSignedIn ? picks.picked.value : undefined"
+            @toggle-pick="picks.toggle"
+          />
+          <DiffSelectionBar
+            v-if="picks.picked.value.length > 0"
+            class="mt-3"
+            :picked="picks.picked.value"
+            @clear="picks.clear()"
+          />
           <SubmissionPager
             :page="filters.page"
             :page-size="SUBMISSION_PAGE_SIZE"

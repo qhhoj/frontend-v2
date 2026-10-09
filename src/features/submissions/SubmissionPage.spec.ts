@@ -485,4 +485,36 @@ describe('submission page', () => {
     expect(ring.text()).not.toContain('%');
     expect(ring.attributes('style')).not.toContain('--qh-positive');
   });
+
+  it('compares with another submission given by id or link, this one on the right', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(),
+      ...problemPageRoutes(),
+      ...submissionPageRoutes(submissionDetail({ id: 'sub-2' })),
+    });
+    const { wrapper, router } = await openSubmission('sub-1');
+    const form = wrapper.get('[data-testid="compare-form"]');
+    await form.get('input').setValue('https://qhhoj.vn/submissions/sub-2');
+    await form.trigger('submit');
+    await vi.waitFor(() =>
+      expect(router.currentRoute.value.fullPath).toBe('/submissions/diff?left=sub-2&right=sub-1'),
+    );
+  });
+
+  it('refuses an unreadable or identical id in the compare form, with the reason', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
+    const { wrapper, router } = await openSubmission('sub-1');
+    const form = wrapper.get('[data-testid="compare-form"]');
+    await form.get('input').setValue('not an id!');
+    await form.trigger('submit');
+    expect(form.get('[role="alert"]').text()).toBe(
+      'Nhập mã bài nộp hoặc dán liên kết của một bài nộp.',
+    );
+    await form.get('input').setValue('sub-1');
+    await form.trigger('submit');
+    expect(form.get('[role="alert"]').text()).toBe('Hãy chọn một bài nộp khác bài này.');
+    expect(form.get('input').attributes('aria-invalid')).toBe('true');
+    expect(router.currentRoute.value.name).toBe('submission');
+  });
 });

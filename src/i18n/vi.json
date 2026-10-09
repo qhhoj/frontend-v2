@@ -1618,6 +1618,23 @@
     "liveFooter": " · tin nhắn mới tự hiện nhờ luồng trực tiếp"
   },
   "sourceDiff": {
+    "compare": {
+      "title": "So sánh với bài khác",
+      "label": "Mã bài nộp hoặc liên kết để so sánh",
+      "submit": "So sánh",
+      "hint": "Hoặc chọn hai bài trong danh sách bài nộp. Bạn chỉ so sánh được bài mình có quyền xem.",
+      "invalid": "Nhập mã bài nộp hoặc dán liên kết của một bài nộp.",
+      "same": "Hãy chọn một bài nộp khác bài này."
+    },
+    "select": {
+      "column": "Chọn",
+      "label": "Chọn bài nộp {id} để so sánh",
+      "picked": "Đã chọn {first} và {second}",
+      "pickedOne": "Đã chọn 1 / 2 bài",
+      "clear": "Bỏ chọn",
+      "compare": "So sánh 2 bài đã chọn",
+      "needTwo": "Chọn đủ 2 bài"
+    },
     "summary": {
       "added": "+{count} dòng",
       "removed": "−{count} dòng",

@@ -12,8 +12,13 @@ import type { ColumnKey } from './submission-table-cells';
 /** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
 const ROW_COUNT = 10;
 const props = withDefaults(
-  defineProps<{ showProblem?: boolean; columnKeys?: readonly ColumnKey[] }>(),
-  { showProblem: true, columnKeys: undefined },
+  defineProps<{
+    showProblem?: boolean;
+    columnKeys?: readonly ColumnKey[];
+    /** The signed-in list page's "Chọn" column (a 44 px cell, so rows are taller). */
+    hasPickColumn?: boolean;
+  }>(),
+  { showProblem: true, columnKeys: undefined, hasPickColumn: false },
 );
 /** Header cell width, then the cell's own width, per column in the table's order. */
 const COLUMNS = [
@@ -45,6 +50,9 @@ const columns = computed(() =>
       >
         <thead>
           <tr class="text-left text-[13px] text-muted">
+            <th v-if="hasPickColumn" scope="col" :class="HEADER_CELL_CLASSES">
+              <SkeletonBlock text class="w-10" />
+            </th>
             <th
               v-for="column in columns"
               :key="column.key"
@@ -62,6 +70,9 @@ const columns = computed(() =>
             data-skeleton-region="row"
             class="border-t border-line"
           >
+            <td v-if="hasPickColumn" :class="BODY_CELL_CLASSES">
+              <SkeletonBlock round class="size-11" />
+            </td>
             <td
               v-for="column in columns"
               :key="column.key"

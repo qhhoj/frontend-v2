@@ -1618,6 +1618,23 @@
     "liveFooter": " · new messages appear live"
   },
   "sourceDiff": {
+    "compare": {
+      "title": "Compare with another",
+      "label": "Submission id or link to compare with",
+      "submit": "Compare",
+      "hint": "Or tick two rows in the submission list. You can only compare submissions you may view.",
+      "invalid": "Enter a submission id or paste a submission link.",
+      "same": "Pick a submission other than this one."
+    },
+    "select": {
+      "column": "Pick",
+      "label": "Pick submission {id} to compare",
+      "picked": "Picked {first} and {second}",
+      "pickedOne": "Picked 1 of 2",
+      "clear": "Clear",
+      "compare": "Compare the 2 picked",
+      "needTwo": "Pick 2 submissions"
+    },
     "summary": {
       "added": "+{count} lines",
       "removed": "−{count} lines",

@@ -25,6 +25,8 @@ import {
 } from './submission-table-cells';
 import type { ColumnKey } from './submission-table-cells';
 import DeletedProblemChip from './DeletedProblemChip.vue';
+import { MAX_DIFF_PICKS } from './diff-picks';
+import { submissionShortId } from './submission-short-id';
 
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
@@ -37,15 +39,28 @@ const props = withDefaults(
     highlightIds?: ReadonlySet<string>;
     /** Problem code to the contest letter, shown before the name (contest lists only). */
     problemLabels?: Record<string, string>;
+    /** Rows picked for the diff, in pick order; given only to signed-in viewers of the list page (shows the "Chọn" column). */
+    pickedIds?: readonly string[];
   }>(),
   {
     showProblem: true,
     highlightIds: () => new Set<string>(),
     problemLabels: () => ({}),
     columnKeys: undefined,
+    pickedIds: undefined,
   },
 );
 const locale = useLocaleStore();
+const emit = defineEmits<{ togglePick: [id: string] }>();
+const isPicking = computed(() => props.pickedIds !== undefined);
+const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
+/** A third box is refused (`aria-disabled`): the click is cancelled so the box does not tick. */
+const isPickBlocked = (id: string) =>
+  (props.pickedIds?.length ?? 0) >= MAX_DIFF_PICKS && pickOrder(id) === 0;
+function onPickClick(event: MouseEvent, id: string) {
+  if (isPickBlocked(id)) event.preventDefault();
+  else emit('togglePick', id);
+}
 /** "2 minutes ago" does not need a tick every second. */
 const RELATIVE_REFRESH_MS = 15_000;
 const now = useNow(RELATIVE_REFRESH_MS);
@@ -112,6 +127,9 @@ const formatScore = (value: number) =>
         </caption>
         <thead>
           <tr class="text-left text-[13px] text-muted">
+            <th v-if="isPicking" scope="col" :class="HEADER_CELL_CLASSES">
+              {{ $t('sourceDiff.select.column') }}
+            </th>
             <th
               v-for="column in columns"
               :key="column.key"
@@ -130,6 +148,25 @@ const formatScore = (value: number) =>
             class="border-t border-line"
             :class="{ 'row-added': highlightIds.has(row.id) }"
           >
+            <td v-if="isPicking" :class="BODY_CELL_CLASSES">
+              <label class="relative inline-flex size-11 items-center justify-center">
+                <input
+                  type="checkbox"
+                  class="size-5"
+                  :checked="pickOrder(row.id) > 0"
+                  :aria-disabled="isPickBlocked(row.id) || undefined"
+                  :aria-label="$t('sourceDiff.select.label', { id: submissionShortId(row.id) })"
+                  @click="onPickClick($event, row.id)"
+                />
+                <span
+                  v-if="pickOrder(row.id) > 0"
+                  data-testid="pick-order"
+                  aria-hidden="true"
+                  class="absolute -top-0.5 -right-0.5 flex size-5 items-center justify-center rounded-pill bg-gradient-accent text-[11px] font-bold text-on-accent"
+                  >{{ pickOrder(row.id) }}</span
+                >
+              </label>
+            </td>
             <td :class="BODY_CELL_CLASSES">
               <RouterLink
                 :to="{ name: 'submission', params: { id: row.id } }"

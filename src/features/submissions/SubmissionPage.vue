@@ -23,20 +23,15 @@ import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
 import DeletedProblemNotice from './DeletedProblemNotice.vue';
 import { isProblemDeleted } from './deleted-problem';
+import CompareWithForm from './CompareWithForm.vue';
+import { submissionShortId } from './submission-short-id';
 
-/** Ids are long uuids: the first and last characters tell them apart. Shorter ids are shown whole. */
-const ID_HEAD_LENGTH = 6;
-const ID_TAIL_LENGTH = 3;
 const route = useRoute();
 const locale = useLocaleStore();
 const id = computed(() => String(route.params.id));
 const { submission: query, live, isLive, refollow } = useLiveSubmission(id);
 const row = query.data;
-const shortId = computed(() =>
-  id.value.length <= ID_HEAD_LENGTH + ID_TAIL_LENGTH
-    ? `#${id.value}`
-    : `#${id.value.slice(0, ID_HEAD_LENGTH)}…${id.value.slice(-ID_TAIL_LENGTH)}`,
-);
+const shortId = computed(() => submissionShortId(id.value));
 usePageTitle(() => translate('pages.submissionTitle', { id: shortId.value }));
 
 // The problem gives the points and the name; it may be unreadable for this viewer, then the row's own name stands in.
@@ -134,6 +129,7 @@ const verdict = computed(() => {
           :problem-code="isDeletedProblem ? null : problemCode"
           :is-own="isOwn"
         />
+        <CompareWithForm :current-id="row.id" />
       </template>
     </QueryState>
   </div>

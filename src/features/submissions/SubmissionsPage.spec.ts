@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { submissionItem } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer, submissionListRoutes } from '@/test/problem-routes';
+import { anonymousViewer, signedInViewer, submissionListRoutes } from '@/test/problem-routes';
 
 async function openList(path = '/submissions') {
   const mounted = await mountApp(path);
@@ -204,5 +204,55 @@ describe('the submission list page', () => {
     await vi.waitFor(() => expect(router.currentRoute.value.query.live).toBe('0'));
     await flushPromises();
     expect(calls.filter((call) => call.path === '/submissions')).toHaveLength(1);
+  });
+});
+
+describe('picking two submissions to compare', () => {
+  const threeRows = page([
+    submissionItem({ id: 's-1' }),
+    submissionItem({ id: 's-2' }),
+    submissionItem({ id: 's-3' }),
+  ]);
+  const boxOf = (wrapper: Awaited<ReturnType<typeof openList>>['wrapper'], id: string) =>
+    wrapper.get(`tbody tr[data-id="${id}"] input[type="checkbox"]`);
+
+  it('picks in order, left then right, and links to the diff', async () => {
+    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
+    const { wrapper } = await openList();
+    expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
+    await boxOf(wrapper, 's-2').trigger('click');
+    expect(wrapper.get('[data-testid="diff-selection"]').text()).toContain('Đã chọn 1 / 2 bài');
+    expect(wrapper.get('[data-testid="diff-selection"] [aria-disabled="true"]').text()).toBe(
+      'Chọn đủ 2 bài',
+    );
+    await boxOf(wrapper, 's-1').trigger('click');
+    expect(wrapper.get('tbody tr[data-id="s-2"] [data-testid="pick-order"]').text()).toBe('1');
+    expect(wrapper.get('tbody tr[data-id="s-1"] [data-testid="pick-order"]').text()).toBe('2');
+    expect(wrapper.get('[data-testid="diff-compare"]').attributes('href')).toBe(
+      '/submissions/diff?left=s-2&right=s-1',
+    );
+  });
+
+  it('ignores a third tick and frees a slot on untick', async () => {
+    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
+    const { wrapper } = await openList();
+    await boxOf(wrapper, 's-1').trigger('click');
+    await boxOf(wrapper, 's-2').trigger('click');
+    expect(boxOf(wrapper, 's-3').attributes('aria-disabled')).toBe('true');
+    await boxOf(wrapper, 's-3').trigger('click');
+    expect((boxOf(wrapper, 's-3').element as HTMLInputElement).checked).toBe(false);
+    await boxOf(wrapper, 's-1').trigger('click');
+    await boxOf(wrapper, 's-3').trigger('click');
+    expect(wrapper.get('[data-testid="diff-compare"]').attributes('href')).toBe(
+      '/submissions/diff?left=s-2&right=s-3',
+    );
+    await wrapper.get('[data-testid="diff-clear"]').trigger('click');
+    expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
+  });
+
+  it('shows no pick boxes to a signed-out viewer', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes, 'GET /submissions': threeRows });
+    const { wrapper } = await openList();
+    expect(wrapper.find('tbody input[type="checkbox"]').exists()).toBe(false);
   });
 });
