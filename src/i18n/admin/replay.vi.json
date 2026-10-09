@@ -1,3 +1,12 @@
 {
+  "rebuild": {
+    "title": "Dựng lại bản phát lại",
+    "description": "Dựng lại bản phát lại từ bài nộp và bộ ghost hiện tại. Người xem vẫn thấy bản cũ đến khi bản mới xong. Chạy nền.",
+    "button": "Dựng lại bản phát lại",
+    "confirmTitle": "Dựng lại bản phát lại?",
+    "confirmBody": "Mỗi người được dựng lại tối đa 3 lần mỗi giờ cho một kỳ thi.",
+    "confirm": "Dựng lại",
+    "unavailable": "Chỉ dựng lại sau khi kỳ thi kết thúc, và không dùng cho thể thức nộp bài cuối."
+  },
   "title": "Phát lại"
 }

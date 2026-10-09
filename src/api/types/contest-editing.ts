@@ -60,6 +60,7 @@ export const CONTEST_ACTION_NAMES: readonly ContestActionName[] = [
   'judgeFinal',
   'publish',
   'rate',
+  'replay',
 ];
 
 /** backend: `ContestDataStatusResponse`: the submissions export (a zip) and when it may be prepared again. */

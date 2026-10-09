@@ -7,6 +7,7 @@ import {
   rateContest,
   rescoreContest,
 } from '@/api/contest-editing.api';
+import { rebuildReplay } from '@/api/replay.api';
 import { CONTEST_ACTION_NAMES } from '@/api/types/contest-editing';
 import type { ContestActionName, EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
@@ -67,6 +68,12 @@ const rateLock = computed(() =>
     ? undefined
     : translate('admin.contests.actions.rate.unavailable'),
 );
+/** The server refuses a rebuild before the end (409) and has no replay for final-submission contests. */
+const replayLock = computed(() =>
+  hasEnded.value && props.contest.formatName !== 'final_submission'
+    ? undefined
+    : translate('admin.replay.rebuild.unavailable'),
+);
 const rescoreBody = computed(() =>
   translate('admin.contests.actions.rescore.confirmBody', {
     count: formatNumber(props.contest.userCount, locale.locale),
@@ -75,6 +82,7 @@ const rescoreBody = computed(() =>
 const runRescore = () => runAction(rescoreContest);
 const runJudgeFinal = () => runAction(judgeFinal);
 const runRate = () => runAction(rateContest);
+const runReplayRebuild = () => runAction(rebuildReplay);
 </script>
 
 <template>
@@ -131,6 +139,21 @@ const runRate = () => runAction(rateContest);
         >
           <template #confirm-body>
             <p class="text-muted">{{ $t('admin.contests.actions.rate.confirmBody') }}</p>
+          </template>
+        </ContestActionCard>
+        <ContestActionCard
+          id="replay"
+          :title="$t('admin.replay.rebuild.title')"
+          :description="$t('admin.replay.rebuild.description')"
+          :button-label="$t('admin.replay.rebuild.button')"
+          :confirm-title="$t('admin.replay.rebuild.confirmTitle')"
+          :confirm-label="$t('admin.replay.rebuild.confirm')"
+          :unavailable="replayLock"
+          :state="stateOf('replay')"
+          :run="runReplayRebuild"
+        >
+          <template #confirm-body>
+            <p class="text-muted">{{ $t('admin.replay.rebuild.confirmBody') }}</p>
           </template>
         </ContestActionCard>
       </div>

@@ -1,3 +1,12 @@
 {
+  "rebuild": {
+    "title": "Rebuild the replay",
+    "description": "Rebuild the replay from the submissions and the current ghost set. Viewers keep the old replay until the new one is done. Runs in the background.",
+    "button": "Rebuild the replay",
+    "confirmTitle": "Rebuild the replay?",
+    "confirmBody": "Each person can rebuild a contest's replay at most 3 times an hour.",
+    "confirm": "Rebuild",
+    "unavailable": "Rebuild only after the contest has ended, and never for final-submission contests."
+  },
   "title": "Replay"
 }

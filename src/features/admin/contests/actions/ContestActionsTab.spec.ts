@@ -299,3 +299,86 @@ describe('rating by format and freeze window', () => {
     expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
   });
 });
+
+describe('replay rebuild card', () => {
+  const rebuildCalls = (calls: { path: string }[]) =>
+    calls.filter((call) => call.path.endsWith('/replay/rebuild'));
+  const mountEnded = (extra = {}) => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...routes({ ...contestEditorRoutes(editableContest({ phase: 'ended' })), ...extra }),
+    });
+    return { calls, mounted: mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT) };
+  };
+
+  it('rebuilds the replay of an ended contest after confirming, then shows the queued state', async () => {
+    const { calls, mounted } = mountEnded({
+      'POST /contests/hcmus-w41/replay/rebuild': { status: 202, body: { data: { queued: true } } },
+      'GET /contests/hcmus-w41/actions': sequence(
+        ok(contestActions()),
+        ok(contestActions({ replay: 'queued' })),
+      ),
+    });
+    const { wrapper } = await mounted;
+    await click(wrapper, 'Dựng lại bản phát lại');
+    expect(rebuildCalls(calls)).toHaveLength(0);
+    await confirmDialog('Dựng lại');
+    expect(rebuildCalls(calls)).toHaveLength(1);
+    const card = wrapper.get('[data-testid="action-replay"]');
+    expect(card.get('[role="status"]').text()).toContain('Đang chờ trong hàng chạy nền');
+    expect(card.find('[data-placement="queued"]').exists()).toBe(true);
+  });
+
+  it.each([
+    ['a running contest', editableContest()],
+    [
+      'a final-submission contest',
+      editableContest({ phase: 'ended', formatName: 'final_submission' }),
+    ],
+  ])('does not offer the rebuild for %s, and names the rule', async (_name, contest) => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...routes(contestEditorRoutes(contest)),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+    const card = wrapper.get('[data-testid="action-replay"]');
+    expect(card.find('button').exists()).toBe(false);
+    expect(card.text()).toContain('Chỉ dựng lại sau khi kỳ thi kết thúc');
+  });
+
+  it('does not start a second rebuild while one is queued', async () => {
+    const { calls, mounted } = mountEnded({
+      'GET /contests/hcmus-w41/actions': ok(contestActions({ replay: 'queued' })),
+    });
+    const { wrapper } = await mounted;
+    await click(wrapper, 'Dựng lại bản phát lại');
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+    expect(rebuildCalls(calls)).toHaveLength(0);
+  });
+
+  it('shows the wait from Retry-After when rebuilds are rate-limited, inside the dialog', async () => {
+    const { mounted } = mountEnded({
+      'POST /contests/hcmus-w41/replay/rebuild': {
+        ...fail(429, 'rate_limited'),
+        headers: { 'Retry-After': '1200' },
+      },
+    });
+    const { wrapper } = await mounted;
+    await click(wrapper, 'Dựng lại bản phát lại');
+    await confirmDialog('Dựng lại');
+    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain('1200');
+  });
+
+  it.each([
+    [503, 'replay_unavailable', 'Bản phát lại tạm thời không dùng được'],
+    [409, 'contest_not_ended', 'Kỳ thi chưa kết thúc'],
+  ])('shows the %i refusal %s in the dialog, which stays open', async (status, code, text) => {
+    const { mounted } = mountEnded({
+      'POST /contests/hcmus-w41/replay/rebuild': fail(status, code),
+    });
+    const { wrapper } = await mounted;
+    await click(wrapper, 'Dựng lại bản phát lại');
+    await confirmDialog('Dựng lại');
+    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain(text);
+  });
+});
