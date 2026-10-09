@@ -106,6 +106,13 @@ const TEXT_TOKENS = [
   'tier-grandmaster',
   ...SYNTAX_TOKENS,
 ];
+/** Contest tag chips (backend `ContestTagColor`): text token on its own tint, eight of them. */
+const TAG_COUNT = 8;
+const TAG_PAIRS: ReadonlyArray<readonly [string, string]> = Array.from(
+  { length: TAG_COUNT },
+  (_unused, index) => [`tag-${index + 1}`, `tag-${index + 1}-bg`] as const,
+);
+
 /** Text token and the tint it sits on. */
 const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['verdict-ac', 'verdict-ac-bg'],
@@ -123,6 +130,7 @@ const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['first-solve-text', 'first-solve-bg-2'],
   ['positive', 'verdict-ac-bg'],
   ['negative', 'verdict-wa-bg'],
+  ...TAG_PAIRS,
 ];
 
 /** Verdict and accent tints with their dedicated text colour, plus plain body text on each tint. */
@@ -268,6 +276,14 @@ describe.each(themes)('theme $id', ({ id, css, tokens, presets }) => {
   it('gives the six syntax tokens six different colours', () => {
     const values = SYNTAX_TOKENS.map((name) => tokens.get(name));
     expect(new Set(values).size).toBe(SYNTAX_TOKENS.length);
+  });
+
+  it('gives the eight tag chips eight different text colours and eight different tints', () => {
+    const texts = TAG_PAIRS.map(([text]) => tokens.get(text));
+    const tints = TAG_PAIRS.map(([, tint]) => tokens.get(tint));
+    expect(texts.every(Boolean) && tints.every(Boolean)).toBe(true);
+    expect(new Set(texts).size).toBe(TAG_COUNT);
+    expect(new Set(tints).size).toBe(TAG_COUNT);
   });
 
   it('is flat or frosted exactly as its registry entry says', () => {
