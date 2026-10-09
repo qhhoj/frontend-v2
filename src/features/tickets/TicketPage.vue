@@ -11,6 +11,7 @@ import TicketMessages from './TicketMessages.vue';
 import TicketNotes from './TicketNotes.vue';
 import TicketPageSkeleton from './TicketPageSkeleton.vue';
 import TicketReply from './TicketReply.vue';
+import { cannedContextOf } from './canned/canned-text';
 import TicketSidePanel from './TicketSidePanel.vue';
 import TicketStaffActions from './TicketStaffActions.vue';
 import { useTicketQuery } from './tickets.queries';
@@ -26,6 +27,10 @@ const { isLive, announcement } = useTicketStream(id);
 const justSent = takeSentFlag(router);
 const status = computed(() => (error.value instanceof ApiError ? error.value.status : null));
 usePageTitle(() => ticket.value?.title);
+/** Handlers (`can.assign`, the backend's `judge.change_ticket` answer) get the canned-reply picker. */
+const cannedContext = computed(() =>
+  ticket.value?.can.assign ? cannedContextOf(ticket.value) : null,
+);
 
 /** The new-ticket page opens this ticket with `ticketSent`. The flag is read once and cleared, so a reload does not greet again. */
 function takeSentFlag(current: Router): boolean {
@@ -70,7 +75,7 @@ function takeSentFlag(current: Router): boolean {
           <div class="flex min-w-0 flex-col gap-5">
             <TicketHeader :ticket="ticket" />
             <TicketMessages :ticket="ticket" :is-live="isLive" />
-            <TicketReply :ticket-id="ticket.id" />
+            <TicketReply :ticket-id="ticket.id" :canned-context="cannedContext" />
           </div>
           <div class="flex min-w-0 flex-col gap-5">
             <TicketSidePanel :ticket="ticket" />

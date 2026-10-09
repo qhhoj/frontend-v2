@@ -7,6 +7,7 @@ import TicketLinkChip from '@/features/tickets/TicketLinkChip.vue';
 import TicketMessages from '@/features/tickets/TicketMessages.vue';
 import TicketNotes from '@/features/tickets/TicketNotes.vue';
 import TicketReply from '@/features/tickets/TicketReply.vue';
+import { cannedContextOf } from '@/features/tickets/canned/canned-text';
 import TicketStaffActions from '@/features/tickets/TicketStaffActions.vue';
 import TicketStatusPill from '@/features/tickets/TicketStatusPill.vue';
 import { useTicketPatch } from '@/features/tickets/use-ticket-patch';
@@ -75,7 +76,11 @@ const toggleOpen = () => {
           <input id="close-after-reply" v-model="closeAfterReply" type="checkbox" class="size-5" />
           {{ $t('admin.tickets.detail.closeAfterReply') }}
         </label>
-        <TicketReply :ticket-id="ticket.id" @sent="onSent" />
+        <TicketReply
+          :ticket-id="ticket.id"
+          :canned-context="ticket.can.assign ? cannedContextOf(ticket) : null"
+          @sent="onSent"
+        />
         <TicketStaffActions v-if="ticket.can.markGood || ticket.can.assign" :ticket="ticket" />
         <TicketNotes :ticket="ticket" />
         <p class="sr-only" aria-live="polite">{{ announcement }}</p>
