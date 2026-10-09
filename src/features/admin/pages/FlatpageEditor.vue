@@ -48,6 +48,10 @@ const loadedNote = computed(() =>
     : '',
 );
 watch(
+  () => props.pageId,
+  () => (loadedAt.value = null),
+);
+watch(
   () => writer.isDone.value,
   (isDone) => {
     if (isDone) loadedAt.value = null;

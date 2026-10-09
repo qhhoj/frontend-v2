@@ -17,6 +17,29 @@ describe('flatpage form', () => {
     expect(canonicalUrl(`/${'x'.repeat(200)}`)).toBeNull();
   });
 
+  // The backend's `normalizeFlatpageUrl` rows (libs/community/src/flatpages.ts): same input, same answer.
+  it.each([
+    ['', null],
+    ['/', null],
+    ['//', null],
+    ['/a/', '/a'],
+    ['/a//b', '/a/b'],
+    [' /a', '/ /a'],
+    ['/a ', '/a '],
+    ['..', null],
+    ['/a/..', null],
+    ['/../a', null],
+    ['/a/./b', null],
+    ['/a/.b', '/a/.b'],
+    ['/a\nb', null],
+    ['/a\u007fb', null],
+    [`/${'x'.repeat(199)}`, `/${'x'.repeat(199)}`],
+    [`/${'x'.repeat(200)}`, null],
+    ['tài-liệu/1', '/tài-liệu/1'],
+  ])('canonicalUrl(%j) is %j', (raw, expected) => {
+    expect(canonicalUrl(raw)).toBe(expected);
+  });
+
   it('does not trim: a stray space is a charset error the user must see', () => {
     expect(checkFlatpageForm({ url: ' /rules ', title: 'T', content: '' }).url).toBeDefined();
     expect(checkFlatpageForm({ url: '/', title: 'T', content: '' }).url).toBeDefined();

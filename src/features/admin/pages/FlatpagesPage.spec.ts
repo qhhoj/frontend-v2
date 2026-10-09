@@ -78,6 +78,50 @@ describe('FlatpagesPage', () => {
     expect(wrapper.text()).toContain('Đã lưu trang.');
   });
 
+  it('after a create, the page is opened at its id and the next save is an update, never a second create', async () => {
+    const created = flatpage({ id: 'fp-3', url: '/faq', title: 'Câu hỏi thường gặp' });
+    const calls = mockApi(
+      routes({
+        'POST /admin/site/pages': ok(created),
+        'GET /admin/site/pages/fp-3': ok(created),
+        'GET /admin/site/pages/fp-3/revisions': page([]),
+        'PATCH /admin/site/pages/fp-3': ok({ ...created, title: 'Câu hỏi mới' }),
+      }),
+    );
+    const { wrapper, router } = await mountPages('/admin/pages');
+    await click(wrapper, 'Trang mới');
+    await wrapper.get('#page-url').setValue('faq/');
+    await wrapper.get('#page-title').setValue('Câu hỏi thường gặp');
+    await click(wrapper, 'Lưu trang');
+    expect(router.currentRoute.value.query.page).toBe('fp-3');
+    await wrapper.get('#page-title').setValue('Câu hỏi mới');
+    await click(wrapper, 'Lưu trang');
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
+    const patches = calls.filter((call) => call.method === 'PATCH');
+    expect(patches.map((call) => call.path)).toEqual(['/admin/site/pages/fp-3']);
+    expect(patches[0]?.body).toEqual({ title: 'Câu hỏi mới' });
+  });
+
+  it('a save made while the route change to the created page is still pending updates that page', async () => {
+    const created = flatpage({ id: 'fp-3', url: '/faq', title: 'Câu hỏi thường gặp' });
+    const calls = mockApi(
+      routes({
+        'POST /admin/site/pages': ok(created),
+        'PATCH /admin/site/pages/fp-3': ok({ ...created, title: 'Câu hỏi mới' }),
+      }),
+    );
+    const { wrapper, router } = await mountPages('/admin/pages');
+    vi.spyOn(router, 'replace').mockImplementation(() => new Promise<never>(() => {}));
+    await click(wrapper, 'Trang mới');
+    await wrapper.get('#page-url').setValue('faq/');
+    await wrapper.get('#page-title').setValue('Câu hỏi thường gặp');
+    await click(wrapper, 'Lưu trang');
+    await wrapper.get('#page-title').setValue('Câu hỏi mới');
+    await click(wrapper, 'Lưu trang');
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
+    expect(calls.find((call) => call.method === 'PATCH')?.path).toBe('/admin/site/pages/fp-3');
+  });
+
   it('refuses a URL made of slashes only before sending, and shows the backend’s invalid_url under the box', async () => {
     const calls = mockApi(
       routes({

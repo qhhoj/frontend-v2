@@ -5,6 +5,7 @@ import { createFlatpage, deleteFlatpage, updateFlatpage } from '@/api/flatpages-
 import type { FlatpageAdmin, FlatpageBody } from '@/api/types/flatpages-admin';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
+import type { AdminQueryKey } from '../ui/use-admin-mutation';
 import type { FieldErrors } from '../ui/admin-errors';
 import {
   canonicalUrl,
@@ -47,15 +48,32 @@ function useFollowingForm(pageId: () => string | null, page: Ref<FlatpageAdmin |
   return form;
 }
 
+/**
+ * The page this editor has just created. It is set before the route replace resolves, so a save in that window
+ * updates the new page instead of creating a second one. It is dropped once the page on screen changes.
+ */
+function useCreatedPage(pageId: () => string | null) {
+  const createdPage = ref<FlatpageAdmin | null>(null);
+  watch(pageId, () => (createdPage.value = null));
+  return createdPage;
+}
+
 interface WriteOptions {
   pageId: () => string | null;
   saved: Ref<FlatpageAdmin | null>;
+  createdPage: Ref<FlatpageAdmin | null>;
   form: FlatpageBody;
   onCreated: (id: string) => void;
 }
 
+/** A save changes the list, and an edit also changes the page's history. */
+function keysToRefreshAfterSave(id: string | null): AdminQueryKey[] {
+  const listKey: AdminQueryKey = ['admin', 'flatpages'];
+  return id === null ? [listKey] : [listKey, ['admin', 'flatpage-revisions', id]];
+}
+
 /** The save: a new page is created, a saved one gets only its changed fields; the URL is sent canonical. */
-function useFlatpageSave({ pageId, saved, form, onCreated }: WriteOptions) {
+function useFlatpageSave({ pageId, saved, createdPage, form, onCreated }: WriteOptions) {
   const queryClient = useQueryClient();
   const viewer = useViewerId();
   const clientErrors = ref<FieldErrors>({});
@@ -64,33 +82,35 @@ function useFlatpageSave({ pageId, saved, form, onCreated }: WriteOptions) {
   const writer = useAdminMutation<SaveRequest, FlatpageAdmin>({
     mutate: ({ id, body, patch }) =>
       id === null ? createFlatpage(body) : updateFlatpage(id, patch),
-    invalidates: ({ id }) =>
-      id === null
-        ? [['admin', 'flatpages']]
-        : [
-            ['admin', 'flatpages'],
-            ['admin', 'flatpage-revisions', id],
-          ],
+    invalidates: ({ id }) => keysToRefreshAfterSave(id),
     onDone: (page, { id }) => {
       queryClient.setQueryData(flatpageKey(page.id, viewer.value), page);
       isNothingToSave.value = false;
-      if (id === null) onCreated(page.id);
+      if (id === null) {
+        createdPage.value = page;
+        onCreated(page.id);
+      }
     },
   });
+
+  /** What a save sends, or null when a saved page has no changed field. */
+  function requestOf(): SaveRequest | null {
+    const id = pageId() ?? createdPage.value?.id ?? null;
+    const body = { ...form, url: canonicalUrl(form.url) ?? form.url };
+    if (id === null) return { id, body, patch: body };
+    const baseline = saved.value ?? createdPage.value;
+    const patch = baseline ? changedFlatpageFields(bodyOf(baseline), form) : {};
+    return Object.keys(patch).length > 0 ? { id, body, patch } : null;
+  }
 
   function save() {
     writer.reset();
     isNothingToSave.value = false;
     clientErrors.value = checkFlatpageForm(form);
     if (Object.keys(clientErrors.value).length > 0) return;
-    const id = pageId();
-    const body = { ...form, url: canonicalUrl(form.url) ?? form.url };
-    const patch = saved.value ? changedFlatpageFields(bodyOf(saved.value), form) : {};
-    if (id !== null && Object.keys(patch).length === 0) {
-      isNothingToSave.value = true;
-      return;
-    }
-    void writer.run({ id, body, patch: id === null ? body : patch });
+    const request = requestOf();
+    if (request) void writer.run(request);
+    else isNothingToSave.value = true;
   }
 
   return { writer, clientErrors, isNothingToSave, save };
@@ -110,11 +130,17 @@ export function useFlatpageEditor({ pageId, onCreated, onDeleted }: EditorOption
     pageId,
     computed(() => pageQuery.data.value),
   );
-  const save = useFlatpageSave({ pageId, saved, form, onCreated });
+  const createdPage = useCreatedPage(pageId);
+  const save = useFlatpageSave({ pageId, saved, createdPage, form, onCreated });
+  const queryClient = useQueryClient();
+  const viewer = useViewerId();
   const remover = useAdminMutation<string, void>({
     mutate: (id) => deleteFlatpage(id),
     invalidates: () => [['admin', 'flatpages']],
-    onDone: () => onDeleted(),
+    onDone: (_result, id) => {
+      queryClient.removeQueries({ queryKey: flatpageKey(id, viewer.value) });
+      onDeleted();
+    },
   });
 
   function discard() {
