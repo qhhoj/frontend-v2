@@ -89,7 +89,14 @@ type HasMeta<Body> = [Body] extends [never]
   : [Body] extends [{ meta: unknown }]
     ? true
     : false;
-/** The GET routes whose success body carries `meta` (28 today): read them with `apiGetPage`. */
+/** The `meta` of a paginated route, as the backend documents it. */
+export type MetaOf<Path extends PagedPath> =
+  SuccessBody<Operation<Path, GetOf<Path>>> extends {
+    meta: infer Meta;
+  }
+    ? Meta
+    : never;
+/** The GET routes whose success body carries `meta` (29 today): read them with `apiGetPage`. */
 export type PagedPath = {
   [Path in ApiPath]: 'get' extends MethodOf<Path>
     ? HasMeta<SuccessBody<Operation<Path, GetOf<Path>>>> extends true
@@ -138,9 +145,9 @@ export const apiGet = <Path extends PlainGetPath>(
 export const apiGetPage = <Path extends PagedPath>(
   path: Path,
   ...[options]: OptionsArg<Path, GetOf<Path>>
-): Promise<Page<ItemOf<Path>>> => {
+): Promise<Page<ItemOf<Path>, MetaOf<Path>>> => {
   const loose = options as LooseOptions | undefined;
-  return apiPage(fillPath(path, loose?.path), requestOf('GET', loose));
+  return apiPage<ItemOf<Path>, MetaOf<Path>>(fillPath(path, loose?.path), requestOf('GET', loose));
 };
 
 /** POST, PUT, PATCH or DELETE with a typed body and `data`. */
@@ -164,6 +171,11 @@ export type QueryOf<Path extends ApiPath, Method extends MethodOf<Path> = GetOf<
 /** The JSON body of a route (`JsonBodyOf<'/auth/login', 'post'>`). */
 export type JsonBodyOf<Path extends ApiPath, Method extends MethodOf<Path>> = JsonBody<
   Operation<Path, Method>
+>;
+/** The members of a body a caller must always supply: building it as this type fails typecheck when the backend adds one. */
+export type RequiredPart<Body> = Pick<
+  Body,
+  { [Key in keyof Body]-?: object extends Pick<Body, Key> ? never : Key }[keyof Body]
 >;
 type StreamFrame<Path extends ApiPath> =
   Operation<Path, GetOf<Path>> extends {

@@ -36,12 +36,18 @@ export interface ListWarning {
 let nextKey = 1;
 const keyed = (testCase: TestCase): KeyedCase => ({ ...testCase, key: nextKey++ });
 /** The row as the backend sees it: the local key is not part of a test. */
-/** The row as the backend sees it: the local key is not part of a test. */
-export const caseBody = (row: KeyedCase): TestCase => {
-  const testCase: Partial<KeyedCase> = { ...row };
-  delete testCase.key;
-  return testCase as TestCase;
-};
+export const caseBody = (row: KeyedCase): TestCase => ({
+  type: row.type,
+  input: row.input,
+  output: row.output,
+  points: row.points,
+  isPretest: row.isPretest,
+  generatorArgs: row.generatorArgs,
+  checker: row.checker,
+  checkerArgs: row.checkerArgs,
+  outputPrefix: row.outputPrefix,
+  outputLimit: row.outputLimit,
+});
 /** A JSON box's text for a stored object: empty for null. */
 export const argsText = (args: JsonObject | null) => (args === null ? '' : JSON.stringify(args));
 /** A number box's value: empty is null. */

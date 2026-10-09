@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import type { PageMeta } from '@/api/client';
+import type { NumberedPageMeta } from '@/api/client';
 import type { OrganizationListItem } from '@/api/types/organizations';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -12,7 +12,7 @@ import IndexSearchBox from '../search/IndexSearchBox.vue';
 
 const props = defineProps<{
   items: OrganizationListItem[];
-  meta: PageMeta;
+  meta: NumberedPageMeta;
   selected: string | null;
   search: string;
 }>();
@@ -22,7 +22,7 @@ const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
-const total = computed(() => props.meta.total ?? props.items.length);
+const total = computed(() => ('total' in props.meta ? props.meta.total : props.items.length));
 const footer = computed(() =>
   props.search
     ? t('admin.organizations.list.countMatch', {

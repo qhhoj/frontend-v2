@@ -2,18 +2,15 @@ import type { Schemas } from './schemas';
 
 export const API_BASE = '/api/internal';
 
-/** `total` is sent by /problems, /contests, /submissions and /users; only pp-breakdown sends `hasMore` instead. */
-export interface PageMeta {
-  page: number;
-  pageSize: number;
-  total?: number;
-  hasMore?: boolean;
-  /** Keyset lists (a user's comments): the cursor of the next page, null at the end. */
-  nextBefore?: string | null;
-}
-export interface Page<Item> {
+/** A numbered list with a `total` (problems, contests, submissions, users, ...): the default `Page` meta. */
+export type TotalPageMeta = Schemas['PageMetaResponse'];
+/** Numbered lists: `total` (problems, contests, submissions, users) or `hasMore` instead (pp-breakdown, the admin activity logs). */
+export type NumberedPageMeta = TotalPageMeta | Schemas['HasMorePageMetaResponse'];
+/** Every `meta` the backend sends; the keyset list of a user's comments has a cursor instead of a page number. */
+export type PageMeta = TotalPageMeta | Schemas['CursorPageMetaResponse'];
+export interface Page<Item, Meta = TotalPageMeta> {
   items: Item[];
-  meta: PageMeta;
+  meta: Meta;
 }
 
 /** One failed validation, the machine-readable twin of a `fields` message (the backend's `FieldIssueResponse`). */
@@ -201,11 +198,11 @@ export const apiRequest = async <Result>(
 ): Promise<Result> => (await request(path, options))?.data as Result;
 
 /** A list (`{ data, meta }`). */
-export async function apiPage<Item>(
+export async function apiPage<Item, Meta = TotalPageMeta>(
   path: string,
   options: RequestOptions = {},
-): Promise<Page<Item>> {
+): Promise<Page<Item, Meta>> {
   const envelope = await request(path, options);
   if (!envelope?.meta) throw new ApiError('invalid_response', 200, 'Missing page metadata');
-  return { items: (envelope.data ?? []) as Item[], meta: envelope.meta };
+  return { items: (envelope.data ?? []) as Item[], meta: envelope.meta as Meta };
 }

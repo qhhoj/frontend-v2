@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PageMeta } from '@/api/client';
+import type { TotalPageMeta } from '@/api/client';
 import type { PostListItem } from '@/api/types/blog';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
@@ -14,7 +14,7 @@ withDefaults(
   defineProps<{
     feed: ModerationFeed;
     posts: PostListItem[];
-    meta: PageMeta | undefined;
+    meta: TotalPageMeta | undefined;
     isPending: boolean;
     error: unknown;
     rowFailure: RowFailure | null;

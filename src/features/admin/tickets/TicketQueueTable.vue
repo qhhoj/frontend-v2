@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import type { PageMeta } from '@/api/client';
+import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -12,13 +12,13 @@ import { queueLocation } from './ticket-queue';
 /** The rows as the server returned them: the status is the server's filter, so nothing is filtered here. */
 const props = defineProps<{
   items: TicketListItem[];
-  meta: PageMeta;
+  meta: NumberedPageMeta;
   filters: TicketListQuery;
   ticketId: string | null;
 }>();
 const router = useRouter();
 const locale = useLocaleStore();
-const total = computed(() => props.meta.total ?? props.items.length);
+const total = computed(() => ('total' in props.meta ? props.meta.total : props.items.length));
 const hasNext = computed(() => props.filters.page * props.meta.pageSize < total.value);
 const CELL = 'px-3 py-3 align-top';
 const HEAD = 'px-3 py-3 text-left text-[13px] font-medium text-muted';

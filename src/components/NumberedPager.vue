@@ -2,13 +2,16 @@
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import type { PageMeta } from '@/api/client';
+import type { NumberedPageMeta } from '@/api/client';
 import { lastPageOf, pageWindow } from '@/lib/paging';
 
 /** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. */
-const props = withDefaults(defineProps<{ meta: PageMeta; label: string; queryKey?: string }>(), {
-  queryKey: 'page',
-});
+const props = withDefaults(
+  defineProps<{ meta: NumberedPageMeta; label: string; queryKey?: string }>(),
+  {
+    queryKey: 'page',
+  },
+);
 const route = useRoute();
 const last = computed(() => lastPageOf(props.meta));
 const slots = computed(() => pageWindow(props.meta.page, last.value));

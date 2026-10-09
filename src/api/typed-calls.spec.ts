@@ -7,13 +7,14 @@ const sources = import.meta.glob<string>('/src/**/*.{ts,vue}', {
 });
 /** The two files allowed to import the untyped request functions: the client itself and its typed wrapper. */
 const ALLOWED = ['/src/api/client.ts', '/src/api/typed.ts'];
-const UNTYPED_IMPORT = /import\s*(?:type\s*)?\{[^}]*\bapi(?:Request|Page)\b[^}]*\}\s*from/;
+/** Any mention of the names: a named, namespace, re-exported or dynamic import all have to spell one to use it. */
+const UNTYPED_NAME = /\bapi(?:Request|Page)\b/;
 
 describe('typed API calls', () => {
-  it('imports apiRequest or apiPage only in client.ts and typed.ts (specs excluded)', () => {
+  it('mentions apiRequest or apiPage only in client.ts and typed.ts (specs excluded)', () => {
     const offenders = Object.entries(sources)
       .filter(([file]) => !file.endsWith('.spec.ts') && !ALLOWED.includes(file))
-      .filter(([, source]) => UNTYPED_IMPORT.test(source))
+      .filter(([, source]) => UNTYPED_NAME.test(source))
       .map(([file]) => file);
     expect(offenders).toEqual([]);
   });

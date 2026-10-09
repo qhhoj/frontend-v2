@@ -1,3 +1,4 @@
+import type { RequiredPart } from '@/api/typed';
 import type { OrganizationChip, UserChip } from '@/api/types/admin-common';
 import type {
   EditableProblem,
@@ -241,14 +242,25 @@ export function toProblemBody(
   canEditAll: boolean,
   defaults: ProblemForm,
 ): ProblemBody {
-  const body: ProblemBody = {} as ProblemBody;
+  const optional: Record<string, unknown> = {};
   for (const key of Object.keys(form) as (keyof ProblemForm)[]) {
     if (!isSentOnCreate(key, form, defaults, canEditAll)) continue;
     const sent = toSent(key, form[key]);
-    if (!isEmptyValue(sent) || key === 'typeIds') Object.assign(body, { [key]: sent });
+    if (!isEmptyValue(sent) || key === 'typeIds') optional[key] = sent;
   }
-  return body;
+  return { ...optional, ...requiredProblemFields(form) };
 }
+
+/** Typed from the generated body: a required member the backend adds is a compile error here until it is listed. */
+const requiredProblemFields = (form: ProblemForm): RequiredPart<ProblemBody> => ({
+  code: form.code,
+  groupId: form.groupId,
+  memoryLimit: form.memoryLimit,
+  name: form.name,
+  points: form.points,
+  timeLimit: form.timeLimit,
+  typeIds: form.typeIds,
+});
 
 const outOf = (value: number, range: { min: number; max: number }) =>
   value < range.min || value > range.max;

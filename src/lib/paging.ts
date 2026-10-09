@@ -1,4 +1,4 @@
-import type { PageMeta } from '@/api/client';
+import type { NumberedPageMeta } from '@/api/client';
 
 export type PageSlot = number | 'gap';
 const MAX_PAGE = 10_000;
@@ -17,10 +17,10 @@ export function pageWindow(current: number, last: number): PageSlot[] {
 }
 
 /** The last page: from the total, or one past the current page while `hasMore` (lists without a total). */
-export const lastPageOf = (meta: PageMeta): number =>
-  meta.total === undefined
-    ? meta.page + (meta.hasMore ? 1 : 0)
-    : Math.max(1, Math.ceil(meta.total / meta.pageSize));
+export const lastPageOf = (meta: NumberedPageMeta): number =>
+  'total' in meta
+    ? Math.max(1, Math.ceil(meta.total / meta.pageSize))
+    : meta.page + (meta.hasMore ? 1 : 0);
 
 /** `?page=` as the API accepts it (1..10000), else 1. */
 export function pageFromQuery(value: unknown): number {

@@ -1,3 +1,4 @@
+import type { RequiredPart } from '@/api/typed';
 import type { OrganizationChip, UserChip } from '@/api/types/admin-common';
 import type {
   ContestBody,
@@ -450,14 +451,18 @@ export function toContestBody(
   form: ContestForm,
   can: (permission: string) => boolean,
 ): ContestBody {
-  const body = {
-    ...specialFields(emptyContestForm(), form),
-    ...filledFields(form, can),
-    key: form.key,
-  } as ContestBody;
-  if (!can('judge.contest_access_code')) delete body.accessCode;
-  return body;
+  const optional = { ...specialFields(emptyContestForm(), form), ...filledFields(form, can) };
+  if (!can('judge.contest_access_code')) delete optional.accessCode;
+  return { ...optional, ...requiredContestFields(form) };
 }
+
+/** Typed from the generated body: a required member the backend adds is a compile error here until it is listed. */
+const requiredContestFields = (form: ContestForm): RequiredPart<ContestBody> => ({
+  key: form.key,
+  name: form.name,
+  startTime: fromLocalInput(form.startTime) ?? '',
+  endTime: fromLocalInput(form.endTime) ?? '',
+});
 
 /** A whole number in range; a cleared number box is '' or NaN, and neither may reach the server. */
 const isWholeIn = (value: unknown, min: number, max: number) =>
