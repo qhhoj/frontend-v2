@@ -1739,6 +1739,9 @@
     "footerChangeLabel": "Change low-power mode",
     "title": "Low-power mode"
   },
+  "shortLink": {
+    "title": "Short link"
+  },
   "flatpage": {
     "breadcrumb": "Breadcrumb",
     "home": "Home",

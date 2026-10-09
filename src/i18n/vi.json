@@ -1739,6 +1739,9 @@
     "footerChangeLabel": "Đổi chế độ tiết kiệm",
     "title": "Chế độ tiết kiệm"
   },
+  "shortLink": {
+    "title": "Liên kết ngắn"
+  },
   "flatpage": {
     "breadcrumb": "Đường dẫn",
     "home": "Trang chủ",
