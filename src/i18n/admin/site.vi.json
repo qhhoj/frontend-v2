@@ -1,0 +1,46 @@
+{
+  "config": {
+    "crumbs": "Trang web",
+    "title": "Cấu hình thô",
+    "warning": "Cấu hình thô: HTML của nhân viên, quyền ở mức vận hành — Mọi giá trị đều công khai (trả về cho mọi người ở GET /site) nên tuyệt đối không đặt bí mật ở đây; bí mật dùng trang Cài đặt. Thông báo và chân trang là HTML do nhân viên viết và được làm sạch trước khi hiện; mã theo dõi chỉ chấp nhận đúng đoạn mẫu của nhà vận hành. Chỉ người có quyền “Sửa cấu hình thô”.",
+    "listNote": "Danh sách lấy từ GET /site; trang quản trị đọc với cache: no-cache.",
+    "columns": {
+      "key": "Khoá",
+      "value": "Giá trị",
+      "kind": "Loại",
+      "length": "Ký tự"
+    },
+    "kinds": {
+      "html": "HTML",
+      "url": "URL",
+      "tracking": "Mã theo dõi",
+      "text": "Văn bản"
+    },
+    "add": "Thêm khoá",
+    "newHeading": "Khoá mới",
+    "editHeading": "Sửa {key}",
+    "keyLabel": "Khoá",
+    "keyHint": "1–30 ký tự, không có ký tự điều khiển.",
+    "valueLabel": "Giá trị (tối đa 20 000 ký tự)",
+    "valueHint": "Có thể để trống.",
+    "counter": "{length} / 20 000",
+    "previewTitle": "Xem trước giá trị HTML",
+    "previewLabel": "Xem trước trong khung cách ly (không chạy mã)",
+    "previewNote": "Thẻ script, sự kiện on…, iframe và liên kết javascript: không chạy trong khung xem trước; trang thật làm sạch khi hiện.",
+    "urlNote": "Khoá liên kết chỉ nhận http hoặc https.",
+    "trackingNote": "Chỉ đoạn mẫu theo dõi do nhà vận hành quy định được dùng; máy chủ hiện chưa kiểm tra đoạn này.",
+    "save": "Lưu",
+    "close": "Huỷ",
+    "delete": "Xoá khoá",
+    "deleteTitle": "Xoá khoá {key}?",
+    "deleteBody": "Mọi trang ngừng dùng giá trị này ngay.",
+    "saved": "Đã lưu {key}.",
+    "deleted": "Đã xoá {key}.",
+    "errors": {
+      "keyPattern": "Khoá phải có 1–30 ký tự, không có ký tự điều khiển.",
+      "keyTaken": "Khoá đã có.",
+      "tooLong": "Tối đa 20 000 ký tự.",
+      "url": "Khoá liên kết chỉ nhận http hoặc https."
+    }
+  }
+}

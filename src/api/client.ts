@@ -61,6 +61,8 @@ export interface RequestOptions {
   query?: Record<string, QueryValue>;
   body?: unknown;
   signal?: AbortSignal;
+  /** fetch's cache mode; admin reads of public, briefly cached endpoints pass 'no-cache'. */
+  cache?: RequestCache;
 }
 interface Envelope {
   data?: unknown;
@@ -106,7 +108,7 @@ export function buildUrl(path: string, query: Record<string, QueryValue> = {}): 
 
 async function send(
   path: string,
-  { method = 'GET', query, body, signal }: RequestOptions,
+  { method = 'GET', query, body, signal, cache }: RequestOptions,
 ): Promise<Response> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   const isForm = body instanceof FormData;
@@ -119,6 +121,7 @@ async function send(
       credentials: 'same-origin',
       body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
       signal,
+      cache,
     });
   } catch (error) {
     if ((error as { name?: string }).name === 'AbortError') throw error;

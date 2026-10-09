@@ -284,3 +284,17 @@ it('sends a raw text request through the session hooks: a 401 reaches onUnauthor
     onUnauthorized(null);
   }
 });
+
+it('passes a cache mode to fetch when asked', async () => {
+  const seen: RequestInit[] = [];
+  vi.stubGlobal(
+    'fetch',
+    vi.fn((_input: string, init: RequestInit) => {
+      seen.push(init);
+      return Promise.resolve(new Response(JSON.stringify({ data: 1 }), { status: 200 }));
+    }),
+  );
+  await apiRequest('/site', { cache: 'no-cache' });
+  await apiRequest('/site');
+  expect(seen.map((init) => init.cache)).toEqual(['no-cache', undefined]);
+});

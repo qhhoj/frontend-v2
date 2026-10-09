@@ -1,0 +1,46 @@
+{
+  "config": {
+    "crumbs": "Website",
+    "title": "Raw config",
+    "warning": "Raw config: staff-written HTML, operator-level permission — Every value is public (GET /site returns it to everyone), so never put a secret here; secrets go on the Settings page. The announcement and footer are staff-written HTML, cleaned before they show; tracking code accepts only the operator's own pattern. Only those with \"Edit raw config\" permission.",
+    "listNote": "The list comes from GET /site; the admin page reads it with cache: no-cache.",
+    "columns": {
+      "key": "Key",
+      "value": "Value",
+      "kind": "Kind",
+      "length": "Characters"
+    },
+    "kinds": {
+      "html": "HTML",
+      "url": "URL",
+      "tracking": "Tracking code",
+      "text": "Text"
+    },
+    "add": "Add key",
+    "newHeading": "New key",
+    "editHeading": "Edit {key}",
+    "keyLabel": "Key",
+    "keyHint": "1–30 characters, no control characters.",
+    "valueLabel": "Value (up to 20 000 characters)",
+    "valueHint": "May be empty.",
+    "counter": "{length} / 20 000",
+    "previewTitle": "HTML value preview",
+    "previewLabel": "Preview in an isolated frame (runs no code)",
+    "previewNote": "Script tags, on… event attributes, iframes and javascript: links do not run in the preview; the live page cleans the value when it shows.",
+    "urlNote": "A link key accepts only http or https.",
+    "trackingNote": "Only the operator's own tracking snippet may be used; the server does not check this text yet.",
+    "save": "Save",
+    "close": "Cancel",
+    "delete": "Delete key",
+    "deleteTitle": "Delete key {key}?",
+    "deleteBody": "Every page stops using this value at once.",
+    "saved": "Saved {key}.",
+    "deleted": "Deleted {key}.",
+    "errors": {
+      "keyPattern": "The key needs 1–30 characters, no control characters.",
+      "keyTaken": "This key is taken.",
+      "tooLong": "Up to 20 000 characters.",
+      "url": "A link key accepts only http or https."
+    }
+  }
+}
