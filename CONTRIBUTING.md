@@ -128,6 +128,13 @@ Resetting between runs: a queued row counts toward the unfinished-submission lim
 
 The `API drift` workflow checks out `qhhoj/backend-v2` `main` and runs the same `--backend` comparison on pull requests, pushes to `main`, daily and on demand. It needs the repository secret `BACKEND_READ_TOKEN`: a fine-grained token with read-only Contents access to `qhhoj/backend-v2` (Settings > Secrets and variables > Actions). Without the secret (or on fork PRs) the job logs a notice and skips; it is not a required check on pull requests. When it fails: pull the backend, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
 
+## Versioning and changelog
+
+The app follows Semantic Versioning (`package.json` `version`, starting at 2.0.0): major = breaking API, protocol or DB migration; minor = feature; patch = fix.
+
+- Every PR that changes behaviour adds a changeset: `npm run changeset` (pick the bump, write one line) and commit the `.changeset/*.md` file. CI runs `npx changeset status --since=origin/main` on pull requests; pushes to `main` are not checked.
+- Cutting a release: `npm run version` (bumps `package.json`, updates `CHANGELOG.md`, deletes the consumed changesets), commit, then `npm run release:tag` (creates the `v<version>` git tag locally).
+
 ## Commits
 
 - One-line conventional subject: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`

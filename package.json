@@ -1,6 +1,6 @@
 {
   "name": "qhhoj-frontend-v2",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build",
@@ -13,7 +13,10 @@
     "e2e": "playwright test",
     "api:gen": "node scripts/api-gen.mjs",
     "api:check": "node scripts/api-gen.mjs --check",
-    "check": "npm run api:check && npm run lint && npm run typecheck && npm test"
+    "check": "npm run api:check && npm run lint && npm run typecheck && npm test",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release:tag": "changeset tag"
   },
   "private": true,
   "type": "module",
