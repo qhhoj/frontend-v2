@@ -1887,6 +1887,14 @@
       "unranked": "Không đủ dữ liệu",
       "virtual": "(ảo)"
     },
+    "overlay": {
+      "label": "So sánh lượt ảo với bảng thật",
+      "toggle": "So với bảng thật",
+      "summary": "Bạn xếp thứ {rank} · bảng thật xếp thứ {realRank}",
+      "noRow": "Chưa thấy hàng của bạn trên bảng ảo.",
+      "realBoard": "Bảng thật · {time}",
+      "yourBoard": "Lượt ảo của bạn · {time}"
+    },
     "title": "Phát lại"
   },
   "contestTags": {

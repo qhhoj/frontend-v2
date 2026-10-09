@@ -17,7 +17,9 @@ import { useSessionStore } from '@/stores/session.store';
 import ContestTabs from './ContestTabs.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
-import { useContestQuery, useRankingQuery } from './contests.queries';
+import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
+import VirtualOverlay from './replay/VirtualOverlay.vue';
+import { virtualRunOf } from './replay/virtual-run';
 
 const route = useRoute();
 const router = useRouter();
@@ -31,6 +33,17 @@ const {
   refetch: refetchContest,
 } = useContestQuery(key);
 const now = useNow();
+const isSignedIn = computed(() => session.user !== null);
+/** Only an ended contest can have a virtual run to compare with, so a running contest never asks. */
+const needsCurrent = computed(() => isSignedIn.value && contest.value?.phase === 'ended');
+const { data: current } = useCurrentParticipationQuery(needsCurrent);
+/** The viewer's running virtual run of this ended contest: the only case the real-board comparison exists. */
+const virtualRun = computed(() =>
+  contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
+);
+const isComparing = computed(() => route.query.compare === '1' && virtualRun.value !== null);
+const setComparing = (value: boolean) =>
+  void router.replace({ query: { ...route.query, compare: value ? '1' : undefined } });
 /** Also true once a contest that was still upcoming when loaded has started, so polling begins without a reload. */
 const running = computed(
   () =>
@@ -146,6 +159,20 @@ const VIEW_MODES = [
                 {{ $t(mode.labelKey) }}
               </button>
             </div>
+            <button
+              v-if="virtualRun"
+              type="button"
+              :aria-pressed="isComparing"
+              class="glass min-h-11 rounded-pill px-4 text-sm"
+              :class="
+                isComparing
+                  ? 'bg-gradient-accent font-bold text-on-accent'
+                  : 'text-content hover:bg-surface-hover'
+              "
+              @click="setComparing(!isComparing)"
+            >
+              {{ $t('replay.overlay.toggle') }}
+            </button>
             <label class="glass flex h-12 items-center gap-2 rounded-pill px-4 text-muted">
               <span class="sr-only">{{ $t('ranking.searchLabel') }}</span>
               <Search class="size-4 shrink-0" aria-hidden="true" />
@@ -177,7 +204,7 @@ const VIEW_MODES = [
       </template>
     </QueryState>
     <QueryState
-      v-if="contest"
+      v-if="contest && !isComparing"
       :loading="rankingPending"
       :error="ranking ? null : rankingError"
       @retry="refetchRanking()"
@@ -257,5 +284,10 @@ const VIEW_MODES = [
         </GlassCard>
       </div>
     </QueryState>
+    <VirtualOverlay
+      v-else-if="contest && virtualRun"
+      :contest="contest"
+      :participation="virtualRun"
+    />
   </div>
 </template>

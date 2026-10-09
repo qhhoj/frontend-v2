@@ -19,6 +19,7 @@ const routes = (overrides: Record<string, MockHandler> = {}): Record<string, Moc
   'GET /auth/me': signedOut,
   ...contestPageRoutes(),
   'GET /contests/r42/ranking': ok(ranking()),
+  'GET /contests/current': ok(null),
   ...overrides,
 });
 const rowOf = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], username: string) =>
