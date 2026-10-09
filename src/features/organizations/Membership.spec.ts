@@ -1,4 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { joinRequest, organizationDetail } from '@/test/community-fixtures';
 import { organizationRoutes } from '@/test/community-routes';
@@ -108,6 +109,74 @@ describe('membership panel: private membership', () => {
     const { wrapper } = await mountApp('/organizations/hcmus');
     expect(wrapper.get('[data-testid="membership-panel"]').text()).toContain(
       'muốn vào lại phải gửi yêu cầu mới',
+    );
+  });
+});
+
+describe('membership panel: official contest', () => {
+  const officialSite = { 'GET /site': ok({ navigation: [], config: {}, officialMode: true }) };
+  const panelButton = (wrapper: Pick<VueWrapper, 'get'>, name: string) =>
+    wrapper
+      .get('[data-testid="membership-panel"]')
+      .findAll('button')
+      .find((button) => button.text() === name)!;
+
+  it('locks joining an open organization, says why and sends nothing', async () => {
+    const lhp = organizationDetail({
+      viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
+    });
+    const calls = mockApi({ ...signedInViewer(), ...organizationRoutes(lhp), ...officialSite });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    const panel = wrapper.get('[data-testid="membership-panel"]');
+    const join = panelButton(wrapper, 'Tham gia tổ chức');
+    const note = panel.get('[data-testid="official-lock-note"]');
+    expect(join.attributes('aria-disabled')).toBe('true');
+    expect(join.attributes('aria-describedby')).toBe(note.attributes('id'));
+    await join.trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'POST')).toBe(false);
+  });
+
+  it('replaces the join request form with the reason', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        hcmus({ isMember: false, canAdminister: false, pendingRequestId: null }),
+      ),
+      ...officialSite,
+    });
+    const { wrapper } = await mountApp('/organizations/hcmus');
+    const panel = wrapper.get('[data-testid="membership-panel"]');
+    expect(panel.find('form').exists()).toBe(false);
+    expect(panel.text()).toContain('Bị khóa trong kỳ thi chính thức.');
+  });
+
+  it('locks leaving for a member', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        hcmus({ isMember: true, canAdminister: false, pendingRequestId: null }),
+      ),
+      ...officialSite,
+    });
+    const { wrapper } = await mountApp('/organizations/hcmus');
+    expect(panelButton(wrapper, 'Rời tổ chức').attributes('aria-disabled')).toBe('true');
+  });
+
+  it('explains a lock the server reports while the site record still said off', async () => {
+    const lhp = organizationDetail({
+      viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(lhp),
+      'POST /organizations/lhp/join': fail(403, 'locked_in_official_contest'),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    await panelButton(wrapper, 'Tham gia tổ chức').trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="membership-panel"]').text()).toContain(
+      'Đang trong kỳ thi chính thức',
     );
   });
 });

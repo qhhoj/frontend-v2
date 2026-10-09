@@ -16,8 +16,15 @@ const CONFLICT_COPY: Partial<Record<MembershipAction, MembershipErrorCopy>> = {
   reject: { title: 'orgMembership.decidedTitle', body: 'orgMembership.decidedBody' },
 };
 
+/** Official contest: the `/site` record can lag up to a minute, so the server's refusal gets the same words as the lock. */
+const LOCKED_COPY: MembershipErrorCopy = {
+  title: 'officialMode.lockedTitle',
+  body: 'officialMode.lockedBody',
+};
+
 /** Translation keys for the card that explains a failed membership action. */
 export function membershipErrorCopy(action: MembershipAction, error: unknown): MembershipErrorCopy {
+  if (error instanceof ApiError && error.code === 'locked_in_official_contest') return LOCKED_COPY;
   if (hasIssueCode(error, 'busy')) {
     return { title: 'orgMembership.failedTitle', body: 'admin.ui.issues.busy' };
   }

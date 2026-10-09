@@ -3,6 +3,8 @@ import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { NOTIFICATION_BITS } from '@/features/notifications/notification-bits';
+import { useOfficialMode } from '@/features/official-mode/official-mode.queries';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -22,6 +24,7 @@ import { useProfileDraft } from './use-profile-draft';
 const PROFILE_FIELD_ORDER = ['firstName', 'about', 'organizations', 'languageId', 'timezone'];
 const locale = useLocaleStore();
 const session = useSessionStore();
+const officialMode = useOfficialMode();
 const { query, draft, dirty, problems, pending, error, attempted, justSaved, save, undo } =
   useProfileDraft();
 const { data: profile, isPending, error: loadError, refetch } = query;
@@ -98,6 +101,13 @@ async function submit() {
                 {{ $t('common.retry') }}
               </button>
             </template>
+          </SettingsNotice>
+          <SettingsNotice
+            v-if="officialMode.isLocked.value"
+            tone="warning"
+            :bit="NOTIFICATION_BITS.locked"
+          >
+            {{ $t('officialMode.profileNote') }}
           </SettingsNotice>
           <IdentityFields
             ref="identityFields"

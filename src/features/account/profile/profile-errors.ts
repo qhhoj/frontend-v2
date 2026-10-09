@@ -38,6 +38,7 @@ export const lengthErrors = (
 /** Failures with a reason of their own; anything else is the shared error text. */
 const SAVE_ERROR_KEYS: Readonly<Record<string, string>> = {
   forbidden: 'settings.profile.locked',
+  locked_in_official_contest: 'settings.profile.lockedOfficial',
   conflict: 'settings.profile.organizationsChanged',
   network_error: 'settings.profile.offline',
 };

@@ -77,6 +77,7 @@ describe('lengthErrors', () => {
 describe('saveErrorText', () => {
   it.each([
     ['forbidden', 403, 'Chưa lưu được tên hoặc phần giới thiệu'],
+    ['locked_in_official_contest', 403, 'Chưa lưu được: kỳ thi chính thức'],
     ['conflict', 409, 'Chưa lưu được danh sách tổ chức'],
     ['network_error', 0, 'Mất kết nối'],
     ['rate_limited', 429, 'Bạn thao tác quá nhanh'],

@@ -5,6 +5,8 @@ import { useRoute } from 'vue-router';
 import { MAX_OPEN_ORGANIZATIONS } from '@/api/types/organizations';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import StatePanel from '@/components/StatePanel.vue';
+import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
+import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
 import JoinRequestForm from './JoinRequestForm.vue';
@@ -18,6 +20,8 @@ const props = defineProps<{ organization: OrganizationDetail }>();
 const route = useRoute();
 const session = useSessionStore();
 const membership = useMembership(() => props.organization.slug);
+/** Official contest: join, request and leave answer `locked_in_official_contest`, so they are locked here with the reason. */
+const lock = useOfficialLock();
 const reason = ref('');
 const panel = ref<HTMLElement>();
 const state = computed(() => membershipState(props.organization, session.user !== null));
@@ -88,17 +92,21 @@ const retry = () => {
       </p>
       <button
         type="button"
+        v-bind="lock.lockAttrs.value"
         :aria-busy="membership.isPending.value"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill bg-accent px-5 font-semibold text-on-accent"
-        @click="membership.join()"
+        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill bg-accent px-5 font-semibold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
+        @click="lock.isLocked.value || membership.join()"
       >
         {{ $t('orgMembership.join') }}
       </button>
+      <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
     </template>
 
     <template v-else-if="state === 'canRequest'">
       <h2 class="font-display text-lg font-semibold">{{ $t('orgMembership.requestTitle') }}</h2>
+      <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
       <JoinRequestForm
+        v-else
         v-model="reason"
         :busy="membership.isPending.value"
         @submit="membership.request(reason)"
@@ -121,12 +129,14 @@ const retry = () => {
       </p>
       <button
         type="button"
+        v-bind="lock.lockAttrs.value"
         :aria-busy="membership.isPending.value"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-        @click="membership.leave()"
+        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent"
+        @click="lock.isLocked.value || membership.leave()"
       >
         {{ $t('orgMembership.leave') }}
       </button>
+      <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
     </template>
 
     <template v-else-if="state === 'administrator'">

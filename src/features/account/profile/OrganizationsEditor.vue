@@ -3,6 +3,8 @@ import { ArrowDown, ArrowUp, Building2, X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ProfileOrganization } from '@/api/types/profile';
 import { translate } from '@/i18n';
+import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
+import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import SettingsCard from '../settings/SettingsCard.vue';
 import { moveItem, withoutItem } from './organization-order';
 import { profileFieldId } from './profile-field-ids';
@@ -19,6 +21,9 @@ const list = ref<HTMLElement | null>(null);
 /** The browse link never leaves, so it is where focus goes when the list has no row left to hold it. */
 const browseLink = ref<{ $el: HTMLElement } | null>(null);
 const announcement = ref('');
+/** Official contest: the order and the leave buttons are locked (B8 locks organization order and leave). */
+const lock = useOfficialLock();
+const describedBy = computed(() => (lock.isLocked.value ? lock.noteId : undefined));
 /** Rows follow the chosen id order; an id the server no longer lists (after a reload) shows no row. */
 const rows = computed(() =>
   ids.value.flatMap((id) => props.organizations.filter((organization) => organization.id === id)),
@@ -28,6 +33,7 @@ const ICON_BUTTON =
 
 /** Acts on the id, not the row index, so a row the list does not show can never be moved by mistake. */
 function move(organization: ProfileOrganization, offset: -1 | 1) {
+  if (lock.isLocked.value) return;
   const position = ids.value.indexOf(organization.id);
   const target = position + offset;
   if (target < 0 || target >= ids.value.length) return;
@@ -39,6 +45,7 @@ function move(organization: ProfileOrganization, offset: -1 | 1) {
 }
 
 function leave(organization: ProfileOrganization) {
+  if (lock.isLocked.value) return;
   const remaining = withoutItem(ids.value, ids.value.indexOf(organization.id));
   ids.value = remaining;
   announcement.value = translate('settings.organizations.left', { name: organization.name });
@@ -95,7 +102,8 @@ function leave(organization: ProfileOrganization) {
             type="button"
             :class="ICON_BUTTON"
             :aria-label="$t('settings.organizations.up', { name: organization.name })"
-            :aria-disabled="index === 0"
+            :aria-disabled="lock.isLocked.value || index === 0"
+            :aria-describedby="describedBy"
             @click="move(organization, -1)"
           >
             <ArrowUp aria-hidden="true" class="size-[18px]" />
@@ -104,7 +112,8 @@ function leave(organization: ProfileOrganization) {
             type="button"
             :class="ICON_BUTTON"
             :aria-label="$t('settings.organizations.down', { name: organization.name })"
-            :aria-disabled="index === rows.length - 1"
+            :aria-disabled="lock.isLocked.value || index === rows.length - 1"
+            :aria-describedby="describedBy"
             @click="move(organization, 1)"
           >
             <ArrowDown aria-hidden="true" class="size-[18px]" />
@@ -114,6 +123,7 @@ function leave(organization: ProfileOrganization) {
             type="button"
             :class="[ICON_BUTTON, 'text-negative']"
             :aria-label="$t('settings.organizations.leave', { name: organization.name })"
+            v-bind="lock.lockAttrs.value"
             @click="leave(organization)"
           >
             <X aria-hidden="true" class="size-[18px]" />
@@ -125,6 +135,7 @@ function leave(organization: ProfileOrganization) {
       </li>
     </ul>
     <p v-else class="text-sm text-muted">{{ $t('settings.organizations.empty') }}</p>
+    <OfficialLockNote v-if="lock.isLocked.value && rows.length" :id="lock.noteId" />
     <p v-if="error" class="text-[13px] text-negative" role="alert">{{ error }}</p>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     <!-- With no row the anchor sits on this link, so the error summary's link to the organizations always has a target. -->
