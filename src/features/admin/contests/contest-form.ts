@@ -12,7 +12,7 @@ import type {
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
 import { fromLocalInput, toLocalInput } from '../ui/datetime';
-import { configFor } from './format-config';
+import { configFor, FORMAT_FIELDS } from './format-config';
 
 export interface ContestForm {
   key: string;
@@ -459,6 +459,10 @@ export function toContestBody(
   return body;
 }
 
+/** A whole number in range; a cleared number box is '' or NaN, and neither may reach the server. */
+const isWholeIn = (value: unknown, min: number, max: number) =>
+  typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max;
+
 type Message = (key: string) => string;
 const isBadCount = (value: number, max = Number.POSITIVE_INFINITY) =>
   Number.isNaN(value) || value < 0 || value > max;
@@ -478,6 +482,7 @@ function checkNumbers(form: ContestForm, message: Message): FieldErrors {
     errors.scoreboardCacheTimeout = message('cacheTimeout');
   if (isBadCount(form.frozenLastMinutes)) errors.frozenLastMinutes = message('frozen');
   if (form.tags.length > 20) errors.tags = message('tags');
+  if (!isWholeIn(form.pointsPrecision, 0, 10)) errors.pointsPrecision = message('pointsPrecision');
   return errors;
 }
 
@@ -488,11 +493,25 @@ function checkRating(form: ContestForm, message: Message): FieldErrors {
     : {};
 }
 
+/** Each minutes field of the chosen format must be a whole, non-negative number (`formatConfig.<name>`). */
+function checkFormatConfig(form: ContestForm, message: Message): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const field of FORMAT_FIELDS[form.formatName]) {
+    if (
+      field.kind === 'minutes' &&
+      !isWholeIn(form.formatConfig[field.name], 0, Number.MAX_SAFE_INTEGER)
+    )
+      errors[`formatConfig.${field.name}`] = message('penalty');
+  }
+  return errors;
+}
+
 export function checkContestForm(form: ContestForm): FieldErrors {
   const message: Message = (key) => translate(`admin.contests.general.errors.${key}`);
   return {
     ...checkWindow(form, message),
     ...checkNumbers(form, message),
     ...checkRating(form, message),
+    ...checkFormatConfig(form, message),
   };
 }

@@ -163,4 +163,18 @@ describe('contest form', () => {
     ).not.toHaveProperty('isRated');
     expect(emptyContestForm().rateAll).toBe(false);
   });
+
+  it('refuses a cleared points precision and a cleared penalty, so neither reaches the server as null', () => {
+    const cleared = {
+      ...seeded(),
+      pointsPrecision: Number.NaN,
+      formatConfig: { penalty: Number.NaN },
+    };
+    expect(Object.keys(checkContestForm(cleared)).sort()).toEqual([
+      'formatConfig.penalty',
+      'pointsPrecision',
+    ]);
+    const emptyBox = { ...seeded(), pointsPrecision: '' as unknown as number };
+    expect(Object.keys(checkContestForm(emptyBox))).toEqual(['pointsPrecision']);
+  });
 });

@@ -112,4 +112,21 @@ describe('ContestProblemsTab', () => {
       wrapper.findAll('tbody tr').map((row) => row.find('[data-testid="code"]').text()),
     ).toEqual(['hcmus41a', 'hcmus41c', 'hcmus41b']);
   });
+
+  it('refuses a cleared points box beside its row, and sends nothing', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
+    await wrapper.get('input[aria-label="Điểm của hcmus41a"]').setValue('');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu bài trong kỳ thi')!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+    expect(wrapper.text()).toContain('Điểm từ 0 đến 3500, là số nguyên.');
+  });
 });

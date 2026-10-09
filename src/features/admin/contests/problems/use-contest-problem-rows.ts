@@ -2,14 +2,28 @@ import { computed, ref, watch } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
 import type { EditableContest } from '@/api/types/contest-editing';
+import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { editableContestKey } from '../contest-editing.queries';
-import { moveRow, toProblemRows, toProblemsBody } from './contest-problems';
+import { isPointsValid, moveRow, toProblemRows, toProblemsBody } from './contest-problems';
 import type { ProblemRow } from './contest-problems';
 import { useAddProblem } from './use-add-problem';
 
 const bodyJson = (rows: ProblemRow[]) => JSON.stringify(toProblemsBody(rows));
+
+/** A row's own refusal first (points cleared or out of range), then the first server message about that row (`problems.<index>.<field>`). */
+function rowIssueOf(
+  rows: ProblemRow[],
+  serverErrors: Record<string, string>,
+  index: number,
+): string | undefined {
+  const row = rows[index];
+  if (row && !isPointsValid(row.points)) return translate('admin.contests.problems.pointsRange');
+  return Object.entries(serverErrors).find(([field]) =>
+    field.startsWith(`problems.${index}.`),
+  )?.[1];
+}
 
 /** The contest's ordered problem list as an editor works on it: add by code, reorder, remove, then one PATCH of the whole list. */
 export function useContestProblemRows(contest: () => EditableContest) {
@@ -34,11 +48,11 @@ export function useContestProblemRows(contest: () => EditableContest) {
     },
   });
 
-  /** The first server message about a row (`problems.<index>.<field>`), shown under that row. */
-  const issueFor = (index: number): string | undefined =>
-    Object.entries(mutation.fieldErrors.value).find(([field]) =>
-      field.startsWith(`problems.${index}.`),
-    )?.[1];
+  const issueOf = (index: number) => rowIssueOf(rows.value, mutation.fieldErrors.value, index);
+
+  /** Nothing is sent while a row's points are not a whole number in range. */
+  const hasInvalidPoints = computed(() => rows.value.some((row) => !isPointsValid(row.points)));
+  const save = () => (hasInvalidPoints.value ? undefined : mutation.run(rows.value));
 
   watch(contest, (next) => {
     if (!isDirty.value) reseed(next);
@@ -49,10 +63,10 @@ export function useContestProblemRows(contest: () => EditableContest) {
     ...adding,
     isDirty,
     mutation,
-    issueFor,
+    issueFor: issueOf,
     move: (index: number, delta: -1 | 1) => (rows.value = moveRow(rows.value, index, delta)),
     remove: (index: number) =>
       (rows.value = rows.value.filter((_row, position) => position !== index)),
-    save: () => mutation.run(rows.value),
+    save,
   };
 }

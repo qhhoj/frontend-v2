@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
-import { mockApi, ok } from '@/test/mock-api';
+import { invalid, issue, mockApi, ok } from '@/test/mock-api';
 import { staffViewer, switchNamed } from '@/test/admin-routes';
 import {
   contestEditorRoutes,
@@ -167,5 +167,21 @@ describe('ContestGeneralTab', () => {
     ])
       expect(body, field).not.toHaveProperty(field);
     expect(router.currentRoute.value.fullPath).toBe('/admin/contests/w42/general');
+  });
+
+  it('shows a server field error next to its own field', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': invalid(issue('endTime', 'is_timestamp', 'bad')),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      'Thông tin kỳ thi',
+    );
+    await wrapper.get('#contest-name').setValue('Tuần 41');
+    await save(wrapper);
+    expect(wrapper.get('#contest-endTime').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.text()).toContain('Thời điểm không hợp lệ.');
   });
 });

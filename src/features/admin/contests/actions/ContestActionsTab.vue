@@ -8,25 +8,33 @@ import {
   rescoreContest,
 } from '@/api/contest-editing.api';
 import type { ContestActions, EditableContest } from '@/api/types/contest-editing';
+import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { translate } from '@/i18n';
 import ContestActionCard from './ContestActionCard.vue';
 import ContestCloneCard from './ContestCloneCard.vue';
 import ContestDataCard from './ContestDataCard.vue';
-import { isBusy, timeLeftText } from './contest-actions';
+import { isBusy } from './contest-actions';
 
 const props = defineProps<{ contest: EditableContest }>();
 const queryClient = useQueryClient();
 const viewer = useViewerId();
 const locale = useLocaleStore();
-const now = useNow();
 const actionsKey = () => ['admin', 'contest-actions', props.contest.key, viewer.value] as const;
 
-/** While an action is queued or running the states are polled every 5 s, so the card moves on by itself. */
-const { data: actions } = useQuery({
+/**
+ * The action states from the status endpoint. Until they have answered the buttons are not offered at all: an "idle" guess
+ * could queue a second job. While an action is queued or running the states are polled every 5 s.
+ */
+const {
+  data: actions,
+  error,
+  isPending,
+  refetch,
+} = useQuery({
   queryKey: computed(() => actionsKey()),
   queryFn: () => fetchContestActions(props.contest.key),
   refetchInterval: (query) => (Object.values(query.state.data ?? {}).some(isBusy) ? 5000 : false),
@@ -40,71 +48,89 @@ async function runAction(start: (key: string) => Promise<unknown>) {
   return result;
 }
 
-const timeLeft = computed(() => timeLeftText(props.contest.endTime, now.value));
-const judgeFinalBody = computed(() =>
-  timeLeft.value
-    ? translate('admin.contests.actions.judgeFinal.confirmBodyEarly', { left: timeLeft.value })
-    : translate('admin.contests.actions.judgeFinal.confirmBodyEnded'),
+/**
+ * The server's own refusal rules, which the status endpoint does not report: final judging is for final-submission
+ * contests that have ended (`ContestActionsService`), and rating needs an ended contest whose ranking is not frozen.
+ */
+const hasEnded = computed(() => props.contest.phase === 'ended');
+const judgeFinalLock = computed(() =>
+  props.contest.formatName === 'final_submission' && hasEnded.value
+    ? undefined
+    : translate('admin.contests.actions.judgeFinal.unavailable'),
 );
-const judgeFinalConfirm = computed(() =>
-  timeLeft.value
-    ? translate('admin.contests.actions.judgeFinal.confirmEarly')
-    : translate('admin.contests.actions.judgeFinal.confirmEnded'),
+const rateLock = computed(() =>
+  hasEnded.value && props.contest.frozenLastMinutes === 0
+    ? undefined
+    : translate('admin.contests.actions.rate.unavailable'),
 );
 const rescoreBody = computed(() =>
   translate('admin.contests.actions.rescore.confirmBody', {
     count: formatNumber(props.contest.userCount, locale.locale),
   }),
 );
+const runRescore = () => runAction(rescoreContest);
+const runJudgeFinal = () => runAction(judgeFinal);
+const runRate = () => runAction(rateContest);
 </script>
 
 <template>
   <div class="flex flex-col gap-6">
-    <div class="grid gap-5 lg:grid-cols-2">
-      <ContestActionCard
-        id="rescore"
-        :title="$t('admin.contests.actions.rescore.title')"
-        :description="$t('admin.contests.actions.rescore.description')"
-        :button-label="$t('admin.contests.actions.rescore.button')"
-        :confirm-title="$t('admin.contests.actions.rescore.confirmTitle')"
-        :confirm-label="$t('admin.contests.actions.rescore.confirm')"
-        :state="stateOf('rescore')"
-        :run="() => runAction(rescoreContest)"
-      >
-        <template #confirm-body>
-          <p class="text-muted">{{ rescoreBody }}</p>
-        </template>
-      </ContestActionCard>
-      <ContestActionCard
-        id="judgeFinal"
-        :title="$t('admin.contests.actions.judgeFinal.title')"
-        :description="$t('admin.contests.actions.judgeFinal.description')"
-        :button-label="$t('admin.contests.actions.judgeFinal.button')"
-        :confirm-title="$t('admin.contests.actions.judgeFinal.confirmTitle')"
-        :confirm-label="judgeFinalConfirm"
-        :state="stateOf('judgeFinal')"
-        :run="() => runAction(judgeFinal)"
-      >
-        <template #confirm-body>
-          <p class="text-muted">{{ judgeFinalBody }}</p>
-        </template>
-      </ContestActionCard>
-      <ContestActionCard
-        id="rate"
-        permission="judge.contest_rating"
-        :title="$t('admin.contests.actions.rate.title')"
-        :description="$t('admin.contests.actions.rate.description')"
-        :button-label="$t('admin.contests.actions.rate.button')"
-        :confirm-title="$t('admin.contests.actions.rate.confirmTitle')"
-        :confirm-label="$t('admin.contests.actions.rate.confirm')"
-        :state="stateOf('rate')"
-        :run="() => runAction(rateContest)"
-      >
-        <template #confirm-body>
-          <p class="text-muted">{{ $t('admin.contests.actions.rate.confirmBody') }}</p>
-        </template>
-      </ContestActionCard>
-    </div>
+    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton>
+        <div class="grid gap-5 lg:grid-cols-2">
+          <SkeletonBlock class="h-48 w-full" />
+          <SkeletonBlock class="h-48 w-full" />
+          <SkeletonBlock class="h-48 w-full" />
+        </div>
+      </template>
+      <div class="grid gap-5 lg:grid-cols-2">
+        <ContestActionCard
+          id="rescore"
+          :title="$t('admin.contests.actions.rescore.title')"
+          :description="$t('admin.contests.actions.rescore.description')"
+          :button-label="$t('admin.contests.actions.rescore.button')"
+          :confirm-title="$t('admin.contests.actions.rescore.confirmTitle')"
+          :confirm-label="$t('admin.contests.actions.rescore.confirm')"
+          :state="stateOf('rescore')"
+          :run="runRescore"
+        >
+          <template #confirm-body>
+            <p class="text-muted">{{ rescoreBody }}</p>
+          </template>
+        </ContestActionCard>
+        <ContestActionCard
+          id="judgeFinal"
+          :title="$t('admin.contests.actions.judgeFinal.title')"
+          :description="$t('admin.contests.actions.judgeFinal.description')"
+          :button-label="$t('admin.contests.actions.judgeFinal.button')"
+          :confirm-title="$t('admin.contests.actions.judgeFinal.confirmTitle')"
+          :confirm-label="$t('admin.contests.actions.judgeFinal.confirm')"
+          :unavailable="judgeFinalLock"
+          :state="stateOf('judgeFinal')"
+          :run="runJudgeFinal"
+        >
+          <template #confirm-body>
+            <p class="text-muted">{{ $t('admin.contests.actions.judgeFinal.confirmBody') }}</p>
+          </template>
+        </ContestActionCard>
+        <ContestActionCard
+          id="rate"
+          permission="judge.contest_rating"
+          :title="$t('admin.contests.actions.rate.title')"
+          :description="$t('admin.contests.actions.rate.description')"
+          :button-label="$t('admin.contests.actions.rate.button')"
+          :confirm-title="$t('admin.contests.actions.rate.confirmTitle')"
+          :confirm-label="$t('admin.contests.actions.rate.confirm')"
+          :unavailable="rateLock"
+          :state="stateOf('rate')"
+          :run="runRate"
+        >
+          <template #confirm-body>
+            <p class="text-muted">{{ $t('admin.contests.actions.rate.confirmBody') }}</p>
+          </template>
+        </ContestActionCard>
+      </div>
+    </QueryState>
     <ContestDataCard :contest-key="contest.key" />
     <ContestCloneCard :contest-key="contest.key" />
   </div>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ContestActionState } from '@/api/types/contest-editing';
-import { translate } from '@/i18n';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -11,7 +11,10 @@ import { ADMIN_DANGER_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { isBusy } from './contest-actions';
 
-/** One background action of the contest: its button, the confirm that guards it, and its live state from the status endpoint. */
+/**
+ * One background action of the contest: its button, the confirm that guards it, and its live state from the status endpoint.
+ * `unavailable` names why the server would refuse the action now; the button is then not offered at all.
+ */
 const props = defineProps<{
   id: string;
   title: string;
@@ -20,6 +23,7 @@ const props = defineProps<{
   confirmTitle: string;
   confirmLabel: string;
   permission?: string;
+  unavailable?: string;
   state: ContestActionState;
   run: () => Promise<unknown>;
 }>();
@@ -27,7 +31,11 @@ const { can } = usePermissions();
 const isOpen = ref(false);
 const isBusyNow = computed(() => isBusy(props.state));
 const isLocked = computed(() => Boolean(props.permission && !can(props.permission)));
-const statusText = computed(() => translateState(props.state));
+const statusText = computed(() =>
+  props.state === 'running'
+    ? translate('admin.contests.actions.status.running')
+    : translate('admin.contests.actions.status.queued'),
+);
 const mutation = useAdminMutation({
   mutate: () => props.run(),
   onDone: () => {
@@ -35,15 +43,11 @@ const mutation = useAdminMutation({
   },
 });
 
-function translateState(state: ContestActionState): string {
-  return state === 'running'
-    ? translate('admin.contests.actions.status.running')
-    : translate('admin.contests.actions.status.queued');
-}
-
-/** A busy action opens nothing: the backend would queue a second job for the same contest. */
+/** A busy action opens nothing: the backend would queue a second job for the same contest. A refusal from an earlier try is cleared. */
 function open() {
-  if (!isBusyNow.value) isOpen.value = true;
+  if (isBusyNow.value) return;
+  mutation.reset();
+  isOpen.value = true;
 }
 </script>
 
@@ -54,6 +58,7 @@ function open() {
     <p v-if="isLocked" class="text-sm text-muted">
       {{ $t('admin.ui.needsPermission', { permission }) }}
     </p>
+    <p v-else-if="unavailable" class="text-sm text-muted">{{ unavailable }}</p>
     <button
       v-else
       type="button"
@@ -67,11 +72,6 @@ function open() {
     <AdminStatus v-if="isBusyNow" kind="queued" :text="statusText">
       <AdminBit placement="queued" />
     </AdminStatus>
-    <AdminStatus
-      v-if="mutation.failure.value"
-      kind="refused"
-      :text="failureTextOf(mutation.failure.value)"
-    />
 
     <ConfirmDialog
       v-model:visible="isOpen"
@@ -82,6 +82,11 @@ function open() {
       @confirm="mutation.run(undefined)"
     >
       <slot name="confirm-body" />
+      <template #error>
+        <p v-if="mutation.failure.value" role="alert" class="text-sm text-negative">
+          {{ failureTextOf(mutation.failure.value) }}
+        </p>
+      </template>
     </ConfirmDialog>
   </article>
 </template>

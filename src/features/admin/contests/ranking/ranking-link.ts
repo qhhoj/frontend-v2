@@ -36,9 +36,10 @@ export function toLinkPatch(form: LinkForm): RankingLinkPatch | { error: string 
 }
 
 const pad = (value: number) => String(value).padStart(2, '0');
-/** dd/mm/yyyy of the UTC calendar day: the same text in every locale, so the preview reads the same everywhere. */
-const dayMonthYear = (instant: Date) =>
-  `${pad(instant.getUTCDate())}/${pad(instant.getUTCMonth() + 1)}/${instant.getUTCFullYear()}`;
+/** The viewer's own calendar day and clock time: the zone the expiry was typed in and is shown in everywhere else. */
+const localDay = (instant: Date) =>
+  `${pad(instant.getDate())}/${pad(instant.getMonth() + 1)}/${instant.getFullYear()}`;
+const localClock = (instant: Date) => `${pad(instant.getHours())}:${pad(instant.getMinutes())}`;
 
 const MINUTE_MS = 60_000;
 const DAY_MS = 86_400_000;
@@ -49,9 +50,6 @@ export function expiryPreview(form: LinkForm, now: Date, locale: Locale): string
     return null;
   const step = form.expiryMode === 'M' ? MINUTE_MS : DAY_MS;
   const until = new Date(now.getTime() + form.expiryAmount * step);
-  return translate(
-    `admin.contests.ranking.link.preview.${form.expiryMode}`,
-    { amount: form.expiryAmount, date: dayMonthYear(until) },
-    { locale },
-  );
+  const when = { amount: form.expiryAmount, date: localDay(until), time: localClock(until) };
+  return translate(`admin.contests.ranking.link.preview.${form.expiryMode}`, when, { locale });
 }

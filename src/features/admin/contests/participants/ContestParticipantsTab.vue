@@ -133,7 +133,11 @@ const goToPage = (target: number) =>
                 <td class="hidden px-2 py-3 md:table-cell">
                   {{ formatDateTime(row.realStart, locale.locale) }}
                 </td>
-                <td class="px-2 py-3 font-semibold">
+                <td
+                  :id="`participation-status-${row.id}`"
+                  tabindex="-1"
+                  class="px-2 py-3 font-semibold"
+                >
                   {{
                     row.isDisqualified
                       ? $t('admin.contests.participants.disqualified')

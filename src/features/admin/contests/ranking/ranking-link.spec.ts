@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { expiryPreview, MAX_EXPIRY_AMOUNT, publicRankingUrl, toLinkPatch } from './ranking-link';
 
 describe('ranking link form', () => {
@@ -77,5 +77,31 @@ describe('ranking link form', () => {
         'vi',
       ),
     ).toBeNull();
+  });
+});
+
+describe('expiry preview in the viewer’s zone', () => {
+  it('names the viewer’s own day and clock, so a save at 00:30 local shows the local expiry day', () => {
+    vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
+    try {
+      // 17:30 UTC on 08/10 is 00:30 on 09/10 in Ho Chi Minh City.
+      const savedAt = new Date('2026-10-08T17:30:00.000Z');
+      expect(
+        expiryPreview(
+          { status: 'public', expiryMode: 'D', expiryAmount: 7, expiresAt: '' },
+          savedAt,
+          'vi',
+        ),
+      ).toBe('Hết hạn sau 7 ngày kể từ lúc lưu, tức 16/10/2026.');
+      expect(
+        expiryPreview(
+          { status: 'public', expiryMode: 'M', expiryAmount: 90, expiresAt: '' },
+          savedAt,
+          'vi',
+        ),
+      ).toBe('Hết hạn sau 90 phút kể từ lúc lưu, tức 09/10/2026 lúc 02:00.');
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

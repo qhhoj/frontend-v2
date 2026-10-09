@@ -109,6 +109,7 @@ function chooseFormat(event: Event) {
           v-if="field.kind === 'minutes'"
           :input-id="`contest-format-${field.name}`"
           :label="$t(field.labelKey)"
+          :error="errors[`formatConfig.${field.name}`]"
         >
           <template #default="{ id, describedBy }">
             <input

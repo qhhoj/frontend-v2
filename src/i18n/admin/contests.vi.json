@@ -45,7 +45,9 @@
       "cacheTimeout": "Từ 0 đến 86400 giây.",
       "frozen": "Không được âm.",
       "ratingRange": "Rating tối đa phải không nhỏ hơn tối thiểu.",
-      "tags": "Tối đa 20 thẻ."
+      "tags": "Tối đa 20 thẻ.",
+      "pointsPrecision": "Từ 0 đến 10.",
+      "penalty": "Nhập một số nguyên, không âm."
     },
     "sections": {
       "info": "Thông tin kỳ thi",
@@ -171,7 +173,8 @@
     "maxFor": "Số lần nộp tối đa cho {code}",
     "moveUp": "Chuyển {code} lên",
     "moveDown": "Chuyển {code} xuống",
-    "remove": "Bỏ {code} khỏi kỳ thi"
+    "remove": "Bỏ {code} khỏi kỳ thi",
+    "pointsRange": "Điểm từ 0 đến 3500, là số nguyên."
   },
   "announcements": {
     "composeTitle": "Đăng thông báo",
@@ -244,7 +247,7 @@
       "needsDate": "Chọn thời điểm hết hạn.",
       "needsAmount": "Nhập một số nguyên từ 1 đến 1 000 000.",
       "preview": {
-        "M": "Hết hạn sau {amount} phút kể từ lúc lưu, tức {date}.",
+        "M": "Hết hạn sau {amount} phút kể từ lúc lưu, tức {date} lúc {time}.",
         "D": "Hết hạn sau {amount} ngày kể từ lúc lưu, tức {date}."
       }
     }
@@ -262,11 +265,10 @@
       "title": "Chấm lần cuối",
       "description": "Dành cho thể thức lần nộp cuối: xếp các bài nộp đang chờ vào hàng chấm khi kỳ thi kết thúc. Chạy nền.",
       "button": "Chấm lần cuối",
-      "confirmTitle": "Chấm lần cuối?",
-      "confirmBodyEarly": "Kỳ thi chưa kết thúc (còn {left}). Các bài nộp đang chờ sẽ bị chấm sớm.",
-      "confirmBodyEnded": "Các bài nộp đang chờ sẽ được xếp vào hàng chấm.",
-      "confirmEarly": "Vẫn chấm",
-      "confirmEnded": "Chấm"
+      "unavailable": "Chỉ dùng cho thể thức lần nộp cuối, sau khi kỳ thi kết thúc.",
+      "confirmBody": "Các bài nộp đang chờ sẽ được xếp vào hàng chấm.",
+      "confirm": "Chấm",
+      "confirmTitle": "Chấm lần cuối?"
     },
     "rate": {
       "title": "Tính rating",
@@ -274,7 +276,8 @@
       "button": "Tính rating",
       "confirmTitle": "Tính rating?",
       "confirmBody": "Rating của thí sinh tham gia kỳ thi này sẽ được cập nhật. Chỉ nên làm sau khi bảng xếp hạng đã chốt và bảng chính thức đã được tải lên.",
-      "confirm": "Tính rating"
+      "confirm": "Tính rating",
+      "unavailable": "Chỉ tính rating sau khi kỳ thi kết thúc và bảng xếp hạng không còn đóng băng."
     },
     "status": {
       "queued": "Đang chờ trong hàng chạy nền.",

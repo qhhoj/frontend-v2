@@ -45,7 +45,9 @@
       "cacheTimeout": "From 0 to 86400 seconds.",
       "frozen": "Cannot be negative.",
       "ratingRange": "The maximum rating cannot be below the minimum.",
-      "tags": "At most 20 tags."
+      "tags": "At most 20 tags.",
+      "pointsPrecision": "From 0 to 10.",
+      "penalty": "Enter a whole number, not negative."
     },
     "sections": {
       "info": "Contest information",
@@ -171,7 +173,8 @@
     "maxFor": "Maximum submissions for {code}",
     "moveUp": "Move {code} up",
     "moveDown": "Move {code} down",
-    "remove": "Remove {code} from the contest"
+    "remove": "Remove {code} from the contest",
+    "pointsRange": "Points from 0 to 3500, a whole number."
   },
   "announcements": {
     "composeTitle": "Post an announcement",
@@ -244,7 +247,7 @@
       "needsDate": "Pick an expiry time.",
       "needsAmount": "Enter a whole number from 1 to 1 000 000.",
       "preview": {
-        "M": "Expires {amount} minutes after saving, that is {date}.",
+        "M": "Expires {amount} minutes after saving, that is {date} at {time}.",
         "D": "Expires {amount} days after saving, that is {date}."
       }
     }
@@ -262,11 +265,10 @@
       "title": "Final judging",
       "description": "For the final-submission format: queue the pending submissions for judging when the contest ends. Runs in the background.",
       "button": "Final judging",
-      "confirmTitle": "Judge the final submissions?",
-      "confirmBodyEarly": "The contest has not ended yet ({left} left). Pending submissions will be judged early.",
-      "confirmBodyEnded": "The pending submissions will be queued for judging.",
-      "confirmEarly": "Judge anyway",
-      "confirmEnded": "Judge"
+      "unavailable": "Only for the final-submission format, after the contest has ended.",
+      "confirmBody": "The pending submissions will be queued for judging.",
+      "confirm": "Judge",
+      "confirmTitle": "Judge the final submissions?"
     },
     "rate": {
       "title": "Rating",
@@ -274,7 +276,8 @@
       "button": "Calculate rating",
       "confirmTitle": "Calculate the rating?",
       "confirmBody": "The ratings of the participants in this contest will be updated. Only do this once the ranking is settled and the official ranking is uploaded.",
-      "confirm": "Calculate rating"
+      "confirm": "Calculate rating",
+      "unavailable": "Rating is calculated only after the contest ends and the ranking is no longer frozen."
     },
     "status": {
       "queued": "Waiting in the background queue.",

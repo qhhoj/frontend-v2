@@ -69,4 +69,44 @@ describe('ContestParticipantsTab', () => {
     ).toBe('tuan');
     expect(wrapper.text()).toContain('Không có lượt tham gia nào khớp.');
   });
+
+  const disqualifyRoutes = () => ({
+    ...staffViewer(['judge.edit_own_contest']),
+    ...contestEditorRoutes(),
+    'GET /contests/hcmus-w41/participations': page([participation()], { pageSize: 50, total: 214 }),
+    'POST /contests/hcmus-w41/participations/p-1/disqualify': ok({
+      id: 'p-1',
+      virtual: 0,
+      isRegistered: true,
+      isDisqualified: true,
+      realStart: '2026-10-08T06:00:00.000Z',
+      endTime: '2026-10-08T10:00:00.000Z',
+    }),
+  });
+  const COUNT_LINE = '214 lượt tham gia · 50 mỗi trang';
+  const disqualifyButton = (wrapper: {
+    findAll: (
+      selector: string,
+    ) => { text: () => string; trigger: (event: string) => Promise<unknown> }[];
+  }) => wrapper.findAll('button').find((button) => button.text() === 'Loại khỏi bảng')!;
+
+  it('refetches the contest settings after a disqualify, so a later General save cannot un-ban the user', async () => {
+    const calls = mockApi(disqualifyRoutes());
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', COUNT_LINE);
+    const contestReads = () =>
+      calls.filter((call) => call.method === 'GET' && call.path === '/contests/hcmus-w41').length;
+    const before = contestReads();
+    await disqualifyButton(wrapper).trigger('click');
+    await confirmDialog('Loại khỏi bảng');
+    await flushPromises();
+    expect(contestReads()).toBeGreaterThan(before);
+  });
+
+  it('moves focus to the row’s status once the disqualify has landed, not to the body', async () => {
+    mockApi(disqualifyRoutes());
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', COUNT_LINE);
+    await disqualifyButton(wrapper).trigger('click');
+    await confirmDialog('Loại khỏi bảng');
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('participation-status-p-1'));
+  });
 });

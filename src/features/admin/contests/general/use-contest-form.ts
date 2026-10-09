@@ -19,7 +19,8 @@ export function useContestForm(contest: () => EditableContest) {
   const queryClient = useQueryClient();
   const seed = ref<ContestForm>(toContestForm(contest()));
   const form = ref<ContestForm>(toContestForm(contest()));
-  const errors = computed(() => checkContestForm(form.value));
+  /** Local checks gate the save; the server's field errors are shown beside their fields and cleared by the next save. */
+  const localErrors = computed(() => checkContestForm(form.value));
   const isDirty = computed(() => hasKeys(changedContestFields(seed.value, form.value)));
 
   function reseed(saved: EditableContest) {
@@ -36,7 +37,7 @@ export function useContestForm(contest: () => EditableContest) {
   });
 
   async function save() {
-    if (hasKeys(errors.value)) return;
+    if (hasKeys(localErrors.value)) return;
     const patch = changedContestFields(seed.value, form.value);
     if (hasKeys(patch)) await mutation.run(patch);
   }
@@ -44,6 +45,8 @@ export function useContestForm(contest: () => EditableContest) {
   watch(contest, (next) => {
     if (!isDirty.value) reseed(next);
   });
+
+  const errors = computed(() => ({ ...localErrors.value, ...mutation.fieldErrors.value }));
 
   return { form, errors, isDirty, save, mutation };
 }

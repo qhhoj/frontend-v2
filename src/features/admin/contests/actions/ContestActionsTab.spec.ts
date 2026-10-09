@@ -69,19 +69,71 @@ describe('ContestActionsTab', () => {
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
   });
 
-  it('warns that final judging runs early while the contest is still on', async () => {
+  it('does not offer final judging while the contest runs, and names the rule', async () => {
+    mockApi({ ...staffViewer(['judge.edit_own_contest']), ...routes() });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+    expect(wrapper.get('[data-testid="action-judgeFinal"]').text()).toContain(
+      'Chỉ dùng cho thể thức lần nộp cuối',
+    );
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Chấm lần cuối')).toBe(
+      false,
+    );
+  });
+
+  it('offers final judging for a final-submission contest that has ended', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_contest']),
       ...routes({
         'GET /contests/hcmus-w41': ok(
-          editableContest({ endTime: new Date(Date.now() + 3_600_000).toISOString() }),
+          editableContest({ formatName: 'final_submission', phase: 'ended' }),
         ),
       }),
     });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
     await click(wrapper, 'Chấm lần cuối');
-    expect(openDialog().textContent).toContain('Kỳ thi chưa kết thúc');
-    expect(submitLabel()).toBe('Vẫn chấm');
+    expect(openDialog().textContent).toContain('Các bài nộp đang chờ sẽ được xếp vào hàng chấm.');
+    expect(submitLabel()).toBe('Chấm');
+  });
+
+  it('offers rating only for an ended contest whose ranking is not frozen', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest', 'judge.contest_rating']),
+      ...routes({
+        'GET /contests/hcmus-w41': ok(editableContest({ phase: 'ended', frozenLastMinutes: 60 })),
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+    expect(wrapper.get('[data-testid="action-rate"]').text()).toContain(
+      'Chỉ tính rating sau khi kỳ thi kết thúc',
+    );
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Tính rating')).toBe(false);
+  });
+
+  it('shows the refusal inside the confirm dialog, which stays open for another try', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest', 'judge.contest_rating']),
+      ...routes({
+        'GET /contests/hcmus-w41': ok(editableContest({ phase: 'ended', frozenLastMinutes: 0 })),
+        'POST /contests/hcmus-w41/rate': fail(409, 'conflict'),
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+    await click(wrapper, 'Tính rating');
+    await confirmDialog('Tính rating');
+    expect(openDialog().querySelector('[role="alert"]')).not.toBeNull();
+    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
+  });
+
+  it('offers no action buttons when the status endpoint fails, and says so', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...routes({ 'GET /contests/hcmus-w41/actions': fail(500, 'internal_error') }),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', 'Thử lại');
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Tính lại điểm')).toBe(
+      false,
+    );
   });
 
   it('hides rating and clone without their permissions', async () => {
@@ -155,5 +207,19 @@ describe('ContestActionsTab', () => {
     document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
     await confirmDialog('Nhân bản');
     expect(openDialog().textContent).toContain('That key is taken.');
+  });
+
+  it('refuses an empty clone key in the dialog, without sending a request', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
+      ...routes(),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+    await click(wrapper, 'Nhân bản');
+    await confirmDialog('Nhân bản');
+    expect(calls.some((call) => call.method === 'POST' && call.path.endsWith('/clone'))).toBe(
+      false,
+    );
+    expect(openDialog().textContent).toContain('Cần điền.');
   });
 });

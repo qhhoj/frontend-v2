@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
 import { ANNOUNCEMENTS_PAGE_SIZE, fetchAnnouncements } from '@/api/contest-editing.api';
@@ -35,6 +35,13 @@ const items = computed<Announcement[]>(() => data.value?.items ?? []);
 
 const goToPage = (target: number) =>
   router.push({ query: { ...route.query, page: String(target) } });
+
+/** A delete that empties a later page sends the list back one page: an empty page never shows without its pager. */
+watch(data, (answer) => {
+  if (answer && answer.items.length === 0 && (answer.meta.total ?? 0) > 0 && page.value > 1) {
+    void goToPage(page.value - 1);
+  }
+});
 </script>
 
 <template>

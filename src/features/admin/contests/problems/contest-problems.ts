@@ -2,6 +2,15 @@ import type { ContestProblemBody, EditableContest, LabelStyle } from '@/api/type
 
 export const MAX_CONTEST_PROBLEMS = 100;
 export const DEFAULT_PROBLEM_POINTS = 100;
+/** backend `PROBLEM_LIMITS.points.max`: a row's points are a whole number in 0 to this. */
+export const MAX_PROBLEM_POINTS = 3500;
+
+/** A cleared box is '' (`v-model.number` keeps the text), which is not a number: it is refused here, never sent. */
+export const isPointsValid = (points: unknown): boolean =>
+  typeof points === 'number' &&
+  Number.isInteger(points) &&
+  points >= 0 &&
+  points <= MAX_PROBLEM_POINTS;
 
 export interface ProblemRow {
   problemId: string;
