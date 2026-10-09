@@ -1,6 +1,6 @@
-import { apiRequest } from './client';
+import { apiGet, apiSend } from './typed';
 import type { Profile, ProfilePatch } from './types/profile';
 
-export const fetchProfile = () => apiRequest<Profile>('/profile');
-export const updateProfile = (patch: ProfilePatch) =>
-  apiRequest<Profile>('/profile', { method: 'PATCH', body: patch });
+export const fetchProfile = (): Promise<Profile> => apiGet('/profile');
+export const updateProfile = (patch: ProfilePatch): Promise<Profile> =>
+  apiSend('patch', '/profile', { body: patch });

@@ -1,4 +1,5 @@
-import { apiPage, apiRequest } from './client';
+import type { Page } from './client';
+import { apiGet, apiGetPage, apiSend } from './typed';
 import type { PostListItem } from './types/blog';
 import type { RecentComment } from './types/comments';
 import { LEADERBOARD_PAGE_SIZE } from './types/users';
@@ -14,27 +15,29 @@ import type {
   UserPage,
 } from './types/users';
 
-const userPath = (username: string) => `/users/${encodeURIComponent(username)}`;
-
-export const fetchUserPage = (username: string) => apiRequest<UserPage>(userPath(username));
-export const fetchRatingHistory = (username: string) =>
-  apiRequest<RatingHistoryEntry[]>(`${userPath(username)}/ratings`);
-export const fetchLeaderboard = (query: LeaderboardQuery) =>
-  apiPage<LeaderboardEntry>('/users', { query: { ...query } });
-export const fetchContributors = (page: number) =>
-  apiPage<LeaderboardEntry>('/contributors', { query: { page, pageSize: LEADERBOARD_PAGE_SIZE } });
-export const fetchRank = (username: string, field: RankField) =>
-  apiRequest<RankResponse>(`${userPath(username)}/rank`, { query: { sort: field } });
-export const fetchSolved = (username: string) =>
-  apiRequest<SolvedResponse>(`${userPath(username)}/solved`);
-export const fetchPpBreakdown = (username: string, page: number) =>
-  apiPage<PpEntry>(`${userPath(username)}/pp-breakdown`, { query: { page } });
-export const fetchActivity = (username: string, timezone: string) =>
-  apiRequest<ActivityResponse>(`${userPath(username)}/activity`, { query: { timezone } });
-export const fetchUserPosts = (username: string, page: number) =>
-  apiPage<PostListItem>(`${userPath(username)}/blog`, { query: { page } });
+export const fetchUserPage = (username: string): Promise<UserPage> =>
+  apiGet('/users/{username}', { path: { username } });
+export const fetchRatingHistory = (username: string): Promise<RatingHistoryEntry[]> =>
+  apiGet('/users/{username}/ratings', { path: { username } });
+export const fetchLeaderboard = (query: LeaderboardQuery): Promise<Page<LeaderboardEntry>> =>
+  apiGetPage('/users', { query });
+export const fetchContributors = (page: number): Promise<Page<LeaderboardEntry>> =>
+  apiGetPage('/contributors', { query: { page, pageSize: LEADERBOARD_PAGE_SIZE } });
+export const fetchRank = (username: string, field: RankField): Promise<RankResponse> =>
+  apiGet('/users/{username}/rank', { path: { username }, query: { sort: field } });
+export const fetchSolved = (username: string): Promise<SolvedResponse> =>
+  apiGet('/users/{username}/solved', { path: { username } });
+export const fetchPpBreakdown = (username: string, page: number): Promise<Page<PpEntry>> =>
+  apiGetPage('/users/{username}/pp-breakdown', { path: { username }, query: { page } });
+export const fetchActivity = (username: string, timezone: string): Promise<ActivityResponse> =>
+  apiGet('/users/{username}/activity', { path: { username }, query: { timezone } });
+export const fetchUserPosts = (username: string, page: number): Promise<Page<PostListItem>> =>
+  apiGetPage('/users/{username}/blog', { path: { username }, query: { page } });
 /** Keyset: `before` is the last comment id of the previous page. */
-export const fetchUserComments = (username: string, before?: string) =>
-  apiPage<RecentComment>(`${userPath(username)}/comments`, { query: { before } });
-export const banUser = (username: string, reason: string) =>
-  apiRequest<void>(`${userPath(username)}/ban`, { method: 'POST', body: { reason } });
+export const fetchUserComments = (
+  username: string,
+  before?: string,
+): Promise<Page<RecentComment>> =>
+  apiGetPage('/users/{username}/comments', { path: { username }, query: { before } });
+export const banUser = (username: string, reason: string): Promise<void> =>
+  apiSend('post', '/users/{username}/ban', { path: { username }, body: { reason } });

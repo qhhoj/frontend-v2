@@ -28,5 +28,8 @@ export async function addSecurityKey(
     throw error;
   }
   if (!credential) return null;
-  return verifySecurityKey(name, (credential as unknown as { toJSON(): object }).toJSON());
+  return verifySecurityKey(
+    name,
+    (credential as unknown as { toJSON(): Record<string, unknown> }).toJSON(),
+  );
 }

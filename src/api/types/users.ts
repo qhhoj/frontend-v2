@@ -1,132 +1,51 @@
-import type { OrganizationSummary } from './organizations';
+import type { Schemas } from '../schemas';
+import type { QueryOf } from '../typed';
 
-/** backend: apps/api/src/modules/users/pages/dto/user-page.response.ts (UserPageResponse, fields the SPA reads) */
-export interface UserPage {
-  id: string;
-  username: string;
-  displayName: string;
-  points: number;
-  performancePoints: number;
-  problemCount: number;
-  rating: number | null;
-  /** Among listed, active users by performance points. */
-  rank: number;
-  ratingRank: number | null;
-  displayRank: string;
-  aboutHtml: string;
-  contributionPoints: number;
-  ratingSummary: RatingSummary | null;
-  organizations: OrganizationSummary[];
-  dateJoined: string;
-  /** Only for viewers who hold `judge.ban_user`; null for everyone else. */
-  staff: UserPageStaff | null;
-}
+/** backend: apps/api/src/modules/users/pages/dto/user-page.response.ts (UserPageResponse) */
+export type UserPage = Schemas['UserPageResponse'];
 
 /** backend: apps/api/src/modules/users/moderation/dto/ban.dto.ts (BAN_REASON_MAX_LENGTH) */
 export const BAN_REASON_MAX_LENGTH = 4096;
 
 /** backend: user-page.response.ts (UserPageStaffResponse) */
-export interface UserPageStaff {
-  isSuperuser: boolean;
-  /** False for a never-activated or banned account; the backend refuses to impersonate it. */
-  isActive: boolean;
-  banReason: string | null;
-}
+export type UserPageStaff = Schemas['UserPageStaffResponse'];
 
+export type LeaderboardSort = NonNullable<QueryOf<'/users'>['sort']>;
 /** backend: users/leaderboards/dto/leaderboard.dto.ts USER_SORTS */
-export const LEADERBOARD_SORTS = ['rating', 'performancePoints', 'points', 'problemCount'] as const;
-export type LeaderboardSort = (typeof LEADERBOARD_SORTS)[number];
+export const LEADERBOARD_SORTS = [
+  'rating',
+  'performancePoints',
+  'points',
+  'problemCount',
+] as const satisfies readonly LeaderboardSort[];
 /** Rows per board page; the backend's default and maximum. The board query and its skeleton both read it. */
 export const LEADERBOARD_PAGE_SIZE = 100;
 /** The leaderboard tabs: the four `/users` sorts and `/contributors`. */
 export const BOARD_SORTS = [...LEADERBOARD_SORTS, 'contributors'] as const;
 export type BoardSort = (typeof BOARD_SORTS)[number];
 /** backend: libs/database LEADERBOARD_FIELDS (the `sort` of `/users/:username/rank`). */
-export type RankField = LeaderboardSort | 'contributionPoints';
+export type RankField = NonNullable<QueryOf<'/users/{username}/rank'>['sort']>;
 /** backend: leaderboard.response.ts (RankResponse); `page` counts pages of `pageSize` (100). */
-export interface RankResponse {
-  rank: number;
-  page: number;
-  pageSize: number;
-}
+export type RankResponse = Schemas['RankResponse'];
 /** backend: users/pages/dto/user-page.response.ts (RatingSummaryResponse) */
-export interface RatingSummary {
-  min: number;
-  max: number;
-  contests: number;
-}
+export type RatingSummary = Schemas['RatingSummaryResponse'];
 
 /** backend: user-page.response.ts (RatingHistoryEntryResponse) */
-export interface RatingHistoryEntry {
-  contestKey: string | null;
-  contestName: string | null;
-  endTime: string;
-  rating: number | null;
-  rank: number | null;
-  performance: number | null;
-}
+export type RatingHistoryEntry = Schemas['RatingHistoryEntryResponse'];
 
-/** backend: users/leaderboards/dto/leaderboard.response.ts (LeaderboardEntryResponse, fields the SPA reads) */
-export interface LeaderboardEntry {
-  rank: number;
-  id: string;
-  username: string;
-  displayName: string;
-  displayRank: string;
-  points: number;
-  performancePoints: number;
-  problemCount: number;
-  rating: number | null;
-  contributionPoints: number;
-  /** The user's first listed organization. */
-  organization: OrganizationSummary | null;
-}
+/** backend: users/leaderboards/dto/leaderboard.response.ts (LeaderboardEntryResponse) */
+export type LeaderboardEntry = Schemas['LeaderboardEntryResponse'];
 
 /** backend: users/leaderboards/dto/leaderboard.dto.ts */
-export interface LeaderboardQuery {
-  sort?: LeaderboardSort;
-  page?: number;
-  pageSize?: number;
-}
+export type LeaderboardQuery = QueryOf<'/users'>;
 
 /** backend: user-page.response.ts (SolvedProblemResponse): `points` earned of `total`. */
-export interface SolvedProblem {
-  code: string;
-  name: string;
-  points: number;
-  total: number;
-}
-export interface SolvedGroup {
-  name: string;
-  points: number;
-  problems: SolvedProblem[];
-}
-export interface SolvedResponse {
-  groups: SolvedGroup[];
-}
+export type SolvedProblem = Schemas['SolvedProblemResponse'];
+export type SolvedGroup = Schemas['SolvedGroupResponse'];
+export type SolvedResponse = Schemas['SolvedResponse'];
 /** backend: user-page.response.ts (PpSubmissionResponse) */
-export interface PpSubmission {
-  id: string;
-  date: string;
-  casePoints: number;
-  caseTotal: number;
-  result: string | null;
-  language: string;
-}
+export type PpSubmission = Schemas['PpSubmissionResponse'];
 /** backend: user-page.response.ts (PpEntryResponse) */
-export interface PpEntry {
-  rank: number;
-  /** Percent of the points counted, 100 for the best problem. */
-  weight: number;
-  points: number;
-  scaledPoints: number;
-  problem: { code: string; name: string };
-  submission: PpSubmission;
-}
+export type PpEntry = Schemas['PpEntryResponse'];
 /** backend: user-page.response.ts (ActivityResponse) */
-export interface ActivityResponse {
-  timezone: string;
-  since: string;
-  /** `YYYY-MM-DD` in `timezone` → submissions that day. */
-  days: Record<string, number>;
-}
+export type ActivityResponse = Schemas['ActivityResponse'];
