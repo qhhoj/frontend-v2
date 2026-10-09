@@ -20,7 +20,7 @@ const problems = [
   contestProblem(2, { viewerResult: viewerResult(), timeLimit: null, memoryLimit: null }),
 ];
 const contest = contestDetail({ problems });
-// The statement keeps problemDetail's default title, which wraps to two lines on a phone as the header skeleton assumes.
+// A title of two phone lines, as the header skeleton draws; the default one fits a single line now that the short-link button leaves the title the full row.
 function inContest(api: FakeApi) {
   api.signedIn = true;
   api.routes['GET /contests/r42'] = ok(contest);
@@ -28,6 +28,7 @@ function inContest(api: FakeApi) {
     api.routes[`GET /problems/${problem.code}`] = ok(
       problemDetail({
         code: problem.code,
+        name: 'Đường đi qua mê cung',
         contest: { contestKey: 'r42', attemptsLeft: null },
       }),
     );

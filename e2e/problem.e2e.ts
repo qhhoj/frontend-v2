@@ -91,7 +91,7 @@ test('the PDF button turns into an Open PDF link, announces it once and the last
         }
       : pdfReady;
   await page.goto('/problems/duongdi');
-  await page.locator('#main [data-testid="header-actions"] button').click();
+  await page.getByTestId('pdf-button').click();
   await expect(page.locator('#main button[aria-busy="true"]')).toBeVisible();
   const link = page.getByRole('link', { name: 'Mở PDF' });
   await expect(link).toBeVisible({ timeout: PDF_READY_TIMEOUT_MS });

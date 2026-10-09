@@ -92,6 +92,7 @@ watch(
       v-else
       ref="button"
       type="button"
+      data-testid="pdf-button"
       :aria-busy="busy ? 'true' : undefined"
       :aria-disabled="unavailable"
       :class="buttonClass"

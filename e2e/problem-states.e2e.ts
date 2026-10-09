@@ -30,7 +30,7 @@ const withPdf = (api: FakeApi) => {
     body: { data: problemDetail({ pdfStatementUrl: PDF_ADDRESS }) },
   };
 };
-const pdfButton = (page: Page) => page.locator('#main [data-testid="header-actions"] button');
+const pdfButton = (page: Page) => page.getByTestId('pdf-button');
 const openProblem = async (page: Page, api: FakeApi) => {
   api.signedIn = true;
   await page.goto('/problems/duongdi');

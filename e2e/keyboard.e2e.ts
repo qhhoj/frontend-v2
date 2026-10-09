@@ -134,15 +134,21 @@ test.describe('focus rings on the problem page', () => {
       });
     });
     await page.goto('/problems/duongdi');
-    const pdfButton = page.locator('#main [data-testid="header-actions"] button');
+    const pdfButton = page.getByTestId('pdf-button');
+    const shortLinkButton = page.getByTestId('short-link-button');
     for (const target of [
       page.getByRole('tab', { name: 'Đề bài' }),
       page.locator('.statement button.copy-block').first(),
+      shortLinkButton,
       pdfButton,
     ]) {
       await target.focus();
       await expectFocusRing(target);
     }
+    // Header actions in DOM order: the short-link button comes right before the PDF button.
+    await shortLinkButton.focus();
+    await page.keyboard.press('Tab');
+    await expect(pdfButton).toBeFocused();
     await pdfButton.click();
     const link = page.getByRole('link', { name: 'Mở PDF' });
     await expect(link).toBeFocused();

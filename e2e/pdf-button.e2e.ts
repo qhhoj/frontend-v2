@@ -25,7 +25,7 @@ const UNAVAILABLE = {
 };
 
 /** The problem page's header button, reached with Tab as a keyboard user would. */
-const headerButton = (page: Page) => page.locator('#main [data-testid="header-actions"] button');
+const headerButton = (page: Page) => page.getByTestId('pdf-button');
 async function focusByTab(page: Page, target: Locator) {
   for (let step = 0; step < 80; step++) {
     if (await target.evaluate((element) => element === document.activeElement)) return;
