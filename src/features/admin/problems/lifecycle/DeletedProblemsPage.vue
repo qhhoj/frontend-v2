@@ -5,6 +5,7 @@ import type { DeletedProblem } from '@/api/types/problem-lifecycle';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { actorName } from '@/lib/actor';
 import { formatNumericDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
@@ -27,7 +28,7 @@ const locale = useLocaleStore();
 const page = computed(() => pageFromQuery(route.query.page));
 const { data, isPending, error, refetch } = useDeletedProblemsQuery(page);
 const { isSuperuser } = usePermissions();
-const { restore, purge, outcome, restoreRow, openPurgeFor } = useDeletedActions();
+const { restore, purge, outcome, restoreRow, purgeRow, openPurgeFor } = useDeletedActions();
 const purging = ref<DeletedProblem | null>(null);
 const isPurgeOpen = computed({
   get: () => purging.value !== null,
@@ -45,9 +46,15 @@ function openPurge(row: DeletedProblem) {
 }
 async function confirmPurge(typed: string) {
   if (!purging.value) return;
-  const result = await purge.run({ code: purging.value.code, confirmCode: typed });
+  const result = await purgeRow({ code: purging.value.code, confirmCode: typed });
   if (result) purging.value = null;
 }
+const listSection = ref<HTMLElement | null>(null);
+/** A restored row leaves the list: focus goes to the list, not to the page top. */
+useFocusFallback(
+  () => data.value?.items.length,
+  () => listSection.value,
+);
 const CELL = 'py-2 pr-3 align-middle';
 const HEAD = 'whitespace-nowrap py-2 pr-3 align-middle';
 </script>
@@ -64,7 +71,12 @@ const HEAD = 'whitespace-nowrap py-2 pr-3 align-middle';
     />
     <ProblemsIndexTabs />
     <AdminStatus v-if="outcome" :kind="outcome.kind" :text="outcome.text" />
-    <section data-testid="deleted-problems" class="glass flex flex-col gap-4 rounded-panel p-5">
+    <section
+      ref="listSection"
+      tabindex="-1"
+      data-testid="deleted-problems"
+      class="glass flex flex-col gap-4 rounded-panel p-5"
+    >
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <table data-skeleton-region="deleted-table" class="w-full text-left text-sm">

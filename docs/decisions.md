@@ -431,3 +431,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - The staff quota overview is `/admin/organizations/quotas` (`judge.edit_all_organization`); its editor reads the organization's usage for the current overrides, because overview rows carry resolved limits only.
 - The archive-filter tabs show the total only on the active one (one request per filter); the archive notice asks `/problems/:code/archived-in` only for a signed-in viewer and a problem that lists an organization.
 - The lifecycle screens (deleted list, danger zone, package download) were built without a mock-up, from the existing admin patterns; they need a mock-up round if the user wants a different look. M7A has no phone board either: org tables keep code, name and actions under 768 px, the bulk bar wraps, meters stack.
+- An import (or any form) refusal whose issues name no field the form renders (`quota_exceeded` on `storage`) shows the code's text on the page line, as the F1 profile save does; quota fixtures carry the backend's `issues[]` plus `details`.
+- Quota meter: a limit of 0 under enforce reads as blocked (used >= limit, or the server's `isOver`), whatever the near/over flags say.
+- The deleted-problem tombstone Bit is decorative (no `bitLabel`); the unused `openEditor`, `columns.select` and `bitLabel` keys are removed.
+- A bulk selection belongs to its page and organization; a list that loses the focused control moves focus to its container (`useFocusFallback`).

@@ -3,6 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, noContent, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
 import { deletedListRoutes } from '@/test/f4-routes';
 
@@ -64,6 +65,23 @@ describe('ProblemDangerZone', () => {
     expect(deletes).toHaveLength(1);
     expect(deletes[0]!.body).toEqual({ confirmCode: 'hcmus41c' });
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('admin-problemsDeleted'));
+  });
+
+  it('marks cached submission pages stale, as they still say the problem exists', async () => {
+    mockApi({
+      ...staffViewer(DELETE),
+      ...problemEditorRoutes(),
+      ...deletedListRoutes(),
+      'DELETE /problems/hcmus41c': noContent(),
+    });
+    const { wrapper, queryClient } = await mountGeneral();
+    const keys = [['submissions', 'detail', 'probe']];
+    seedCache(queryClient, keys);
+    await openButton(wrapper)!.trigger('click');
+    await typeCode('hcmus41c');
+    await confirmDialog('Xóa bài');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
   });
 
   it('keeps the dialog open with the typed code when the problem is in a contest', async () => {

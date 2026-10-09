@@ -135,6 +135,20 @@ export const failWithCode = (status: number, field: string, code: string): MockR
   fail(status, status === 409 ? 'conflict' : 'validation_failed', undefined, [
     issue(field, code, `English message of ${code}`),
   ]);
+/** A 403 `quota_exceeded` exactly as the backend's `quotaExceeded()` sends it: `details` plus one issue on the meter's name. */
+export const quotaExceeded = (details: {
+  meter: 'credits' | 'storage';
+  limit: number;
+  used: number;
+  needed: number;
+}): MockResponse =>
+  fail(
+    403,
+    'quota_exceeded',
+    undefined,
+    [issue(details.meter, 'quota_exceeded', `The organization has no ${details.meter} left`)],
+    { details },
+  );
 export const noContent = (): MockResponse => ({ status: 204 });
 
 /** A 429 `rate_limited` carrying `Retry-After` (whole seconds), as the backend's rate limiter sends it. */

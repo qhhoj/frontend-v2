@@ -47,13 +47,15 @@ const ACTION =
       <thead class="text-muted">
         <tr>
           <th v-if="isAdmin" scope="col" class="w-11 py-2 pr-3">
-            <input
-              type="checkbox"
-              class="block size-5"
-              :checked="isAllSelected"
-              :aria-label="$t('orgProblems.selectAll')"
-              @change="toggleAll"
-            />
+            <label class="inline-flex size-11 items-center justify-center">
+              <input
+                type="checkbox"
+                class="size-5"
+                :checked="isAllSelected"
+                :aria-label="$t('orgProblems.selectAll')"
+                @change="toggleAll"
+              />
+            </label>
           </th>
           <th scope="col" :class="CELL">{{ $t('orgProblems.columns.code') }}</th>
           <th scope="col" :class="CELL">{{ $t('orgProblems.columns.name') }}</th>

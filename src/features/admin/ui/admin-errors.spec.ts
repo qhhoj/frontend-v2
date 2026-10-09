@@ -94,6 +94,13 @@ describe('isConflict', () => {
 describe('quota_exceeded', () => {
   const refusal = (details: unknown) =>
     new ApiError('quota_exceeded', 403, 'The organization has no credits left', {
+      issues: [
+        {
+          field: 'credits',
+          code: 'quota_exceeded',
+          message: 'The organization has no credits left',
+        },
+      ],
       extra: { details },
     });
   const GENERIC = 'Tổ chức đã hết hạn mức. Liên hệ quản trị để tăng hạn mức.';

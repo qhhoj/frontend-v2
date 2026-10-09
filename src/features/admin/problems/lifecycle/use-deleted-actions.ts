@@ -5,7 +5,7 @@ import { translate } from '@/i18n';
 import { failureTextOf, isConflict } from '../../ui/admin-errors';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
-import { DELETED_PROBLEMS_KEY } from './lifecycle.queries';
+import { DELETED_PROBLEMS_KEY, SUBMISSIONS_KEY } from './lifecycle.queries';
 
 export interface DeletedOutcome {
   kind: 'done' | 'queued' | 'refused';
@@ -15,7 +15,6 @@ interface PurgeCommand {
   code: string;
   confirmCode: string;
 }
-const SUBMISSIONS_KEY = ['submissions'] as const;
 
 /** Restore and purge-now for the deleted list, and the one result line the page shows. */
 export function useDeletedActions() {
@@ -44,15 +43,26 @@ export function useDeletedActions() {
     },
   });
 
-  /** A conflict (already purged, or a purge has claimed it) means the row is stale: say why and reload the list. */
+  /** A conflict (already purged, restored, or claimed by a purge) means the row is stale: reload the list. */
+  const reloadWhenStale = async (failure: unknown) => {
+    if (isConflict(failure))
+      await queryClient.invalidateQueries({ queryKey: DELETED_PROBLEMS_KEY });
+  };
+
   async function restoreRow(code: string) {
     outcome.value = null;
     await restore.run(code);
     const failure = restore.failure.value;
     if (!failure) return;
     outcome.value = { kind: 'refused', text: failureTextOf(failure) };
-    if (isConflict(failure))
-      await queryClient.invalidateQueries({ queryKey: DELETED_PROBLEMS_KEY });
+    await reloadWhenStale(failure);
+  }
+
+  /** Purge-now: a refusal stays in the dialog (page decides), and a stale-row conflict reloads the list behind it. */
+  async function purgeRow(command: PurgeCommand) {
+    const result = await purge.run(command);
+    await reloadWhenStale(purge.failure.value);
+    return result;
   }
 
   /** Clears an earlier dialog refusal before the dialog opens for another row. */
@@ -61,5 +71,5 @@ export function useDeletedActions() {
     outcome.value = null;
   }
 
-  return { restore, purge, outcome, restoreRow, openPurgeFor };
+  return { restore, purge, outcome, restoreRow, purgeRow, openPurgeFor };
 }

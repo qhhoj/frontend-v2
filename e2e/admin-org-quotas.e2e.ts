@@ -81,7 +81,14 @@ test('a clone refused by the quota names the credits with the sweating Bit', asy
     body: {
       error: {
         code: 'quota_exceeded',
-        message: 'no credits',
+        message: 'The organization has no credits left',
+        issues: [
+          {
+            field: 'credits',
+            code: 'quota_exceeded',
+            message: 'The organization has no credits left',
+          },
+        ],
         details: { meter: 'credits', limit: 200, used: 194, needed: 10 },
       },
     },

@@ -72,6 +72,20 @@ describe('DeletedProblemsPage', () => {
     expect(listCalls(calls)).toHaveLength(2);
   });
 
+  it('moves focus to the list when the restored row, which held it, leaves', async () => {
+    mockApi({
+      ...staffViewer(DELETE),
+      'GET /problems/deleted': sequence(page([deletedProblem()]), page([])),
+      'POST /problems/cuvui/restore': noContent(),
+    });
+    const { wrapper } = await mountDeleted();
+    const restore = buttonNamed(wrapper, 'Khôi phục cuvui')!;
+    restore.element.focus();
+    await restore.trigger('click');
+    await flushPromises();
+    expect(document.activeElement).toBe(wrapper.get('[data-testid="deleted-problems"]').element);
+  });
+
   it('shows a 409 purged from a stale row and refetches the list', async () => {
     const calls = mockApi({
       ...staffViewer(DELETE),
@@ -81,7 +95,7 @@ describe('DeletedProblemsPage', () => {
     const { wrapper } = await mountDeleted();
     await buttonNamed(wrapper, 'Khôi phục cuvui')!.trigger('click');
     await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).toContain('không khôi phục được nữa');
+    expect(wrapper.get('[role="alert"]').text()).toContain('Bài đã bị xóa hẳn.');
     expect(listCalls(calls)).toHaveLength(2);
   });
 
@@ -115,6 +129,33 @@ describe('DeletedProblemsPage', () => {
     await typeInDialog('cuvui');
     await confirmDialog('Xóa hẳn');
     expect(openDialog().textContent).toContain('Bài này chưa bị xóa.');
+  });
+
+  it('reloads the list when a purge hits a stale row, and keeps the refusal in the dialog', async () => {
+    const calls = mockApi({
+      ...staffViewer(DELETE, { isSuperuser: true }),
+      'GET /problems/deleted': page([deletedProblem()]),
+      'POST /problems/cuvui/purge-now': fail(409, 'purged'),
+    });
+    const { wrapper } = await mountDeleted();
+    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
+    await typeInDialog('cuvui');
+    await confirmDialog('Xóa hẳn');
+    expect(openDialog().textContent).toContain('Bài đã bị xóa hẳn.');
+    expect(listCalls(calls)).toHaveLength(2);
+  });
+
+  it('does not reload the list when a purge is refused for another reason', async () => {
+    const calls = mockApi({
+      ...staffViewer(DELETE, { isSuperuser: true }),
+      'GET /problems/deleted': page([deletedProblem()]),
+      'POST /problems/cuvui/purge-now': fail(403, 'forbidden'),
+    });
+    const { wrapper } = await mountDeleted();
+    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
+    await typeInDialog('cuvui');
+    await confirmDialog('Xóa hẳn');
+    expect(listCalls(calls)).toHaveLength(1);
   });
 
   it('shows the empty state with the staff Bit', async () => {

@@ -830,7 +830,7 @@
     "no_active_feed_key": "Chưa có khóa nguồn sự kiện còn hiệu lực.",
     "problem_in_contest": "Bài đang nằm trong một kỳ thi nên chưa xóa được. Gỡ bài khỏi kỳ thi trước.",
     "not_deleted": "Bài này chưa bị xóa.",
-    "purged": "Bài đã bị xóa hẳn, không khôi phục được nữa.",
+    "purged": "Bài đã bị xóa hẳn.",
     "problem_deleted": "Bài của bài nộp này đã bị xóa nên không chấm lại hay từ chối được.",
     "package_too_large": "Gói đề lớn hơn 512 MiB nên không tạo được.",
     "package_unavailable": "Chưa tạo được gói đề. Thử lại sau ít phút.",
@@ -2016,7 +2016,6 @@
     "searchSubmit": "Tìm",
     "tableCaption": "Bài tập của tổ chức",
     "columns": {
-      "select": "Chọn",
       "code": "Mã",
       "name": "Tên bài",
       "tags": "Thẻ",
@@ -2151,7 +2150,6 @@
     "chip": "Đã xóa",
     "noticeTitle": "Bài đã bị xóa",
     "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test.",
-    "bitLabel": "Bit ngủ trong mũ ngủ",
     "title": "Bài đã bị xóa"
   }
 }

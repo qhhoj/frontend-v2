@@ -22,7 +22,6 @@
   "restore": "Restore",
   "restoreLabel": "Restore {code}",
   "restored": "{code} was restored. It is visible again.",
-  "openEditor": "Open the editor of {code}",
   "purgeNow": "Purge now",
   "purgeNowLabel": "Purge {code} now",
   "purgeTitle": "Purge {code}?",

@@ -35,6 +35,21 @@ export interface ImportForm {
   appendMainSolution: boolean;
 }
 
+/** The fields `ImportOptionsForm` renders an error under; an issue on any other field (`storage` of a quota refusal) needs the page line. */
+export const IMPORT_FORM_FIELDS = [
+  'file',
+  'code',
+  'mode',
+  'groupId',
+  'typeIds',
+  'points',
+  'authors',
+  'curators',
+  'mainStatementLanguage',
+  'tutorialLanguage',
+  'statementLanguages',
+];
+
 export const emptyImportForm = (): ImportForm => ({
   file: null,
   code: '',

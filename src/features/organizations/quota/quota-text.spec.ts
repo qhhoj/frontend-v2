@@ -40,6 +40,38 @@ describe('quota notice', () => {
     expect(quotaNoticeOf(organizationUsage({ ...full, enforcing: false })).kind).toBe('near');
   });
 
+  it('blocks a limit of 0 in enforce mode, used or not, even when the meter flags lag', () => {
+    const zero = (used: number) => ({ credits: quotaMeter(used, 0), storage: quotaMeter(0, MIB) });
+    for (const used of [0, 5]) {
+      const lagging = { ...zero(used).credits, isOver: false, isNearLimit: false };
+      expect(
+        quotaNoticeOf(
+          organizationUsage({ credits: lagging, storage: zero(used).storage, enforcing: true }),
+        ),
+      ).toMatchObject({ kind: 'blocked', meter: 'credits' });
+    }
+  });
+
+  it('shows a limit of 0 as blocked from the server flags alone, and not at all in warn mode with no flags', () => {
+    const flagged = { used: 0, limit: 0, isOver: true, isNearLimit: true };
+    expect(
+      quotaNoticeOf(
+        organizationUsage({ credits: flagged, storage: quotaMeter(0, MIB), enforcing: true }),
+      ),
+    ).toMatchObject({ kind: 'blocked', meter: 'credits' });
+    expect(
+      quotaNoticeOf(
+        organizationUsage({ credits: flagged, storage: quotaMeter(0, MIB), enforcing: false }),
+      ).kind,
+    ).toBe('near');
+    const quietZero = { used: 0, limit: 0, isOver: false, isNearLimit: false };
+    expect(
+      quotaNoticeOf(
+        organizationUsage({ credits: quietZero, storage: quotaMeter(0, MIB), enforcing: false }),
+      ).kind,
+    ).toBe('healthy');
+  });
+
   it('writes a spend as minus and a refund as plus, with a true minus sign', () => {
     expect(ledgerAmountText(10, 'vi')).toBe('−10');
     expect(ledgerAmountText(-10, 'vi')).toBe('+10');

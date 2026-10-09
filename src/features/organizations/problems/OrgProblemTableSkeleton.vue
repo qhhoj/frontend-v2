@@ -11,6 +11,7 @@ const CELL = 'py-2 pr-3 align-middle';
   <table data-skeleton-region="org-problem-table" class="w-full text-left text-sm">
     <thead class="text-muted">
       <tr>
+        <th v-if="isAdmin" class="w-11 py-2 pr-3"><SkeletonBlock class="size-11" /></th>
         <th v-for="index in 3" :key="index" :class="CELL"><SkeletonBlock text class="w-12" /></th>
       </tr>
     </thead>

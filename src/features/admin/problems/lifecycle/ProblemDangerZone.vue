@@ -8,7 +8,7 @@ import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_DANGER_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
-import { DELETED_PROBLEMS_KEY } from './lifecycle.queries';
+import { DELETED_PROBLEMS_KEY, SUBMISSIONS_KEY } from './lifecycle.queries';
 import TypedCodeDialog from './TypedCodeDialog.vue';
 
 /** The last card of the General tab: delete the problem after typing its code; the editor then shows the deleted list. */
@@ -17,7 +17,12 @@ const router = useRouter();
 const isOpen = ref(false);
 const remove = useAdminMutation({
   mutate: (confirmCode: string) => deleteProblem(props.code, confirmCode),
-  invalidates: () => [DELETED_PROBLEMS_KEY, PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY],
+  invalidates: () => [
+    DELETED_PROBLEMS_KEY,
+    PROBLEM_INDEX_KEY,
+    PUBLIC_PROBLEMS_KEY,
+    SUBMISSIONS_KEY,
+  ],
   onDone: () => {
     isOpen.value = false;
     void router.push({ name: 'admin-problemsDeleted' });

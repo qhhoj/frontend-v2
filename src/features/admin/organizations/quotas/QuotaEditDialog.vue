@@ -29,7 +29,12 @@ const original = computed<QuotaForm>(() =>
 );
 const form = ref<QuotaForm>({ credits: '', storageMib: '' });
 const errors = ref<{ credits?: string; storageMib?: string }>({});
-watch([visible, () => detail.data.value], ([isOpen]) => {
+const isLoaded = computed(() => detail.data.value !== undefined);
+/**
+ * The form starts from the stored values when the dialog opens, for another organization, or when the first data of one arrives.
+ * A refetch of the same data (window focus brings new live counters) must not wipe what staff typed.
+ */
+watch([visible, () => props.slug, isLoaded], ([isOpen]) => {
   if (isOpen) form.value = { ...original.value };
   errors.value = {};
 });
@@ -68,7 +73,7 @@ function submit() {
     :title="$t('admin.quota.editTitle', { name })"
     :confirm-label="$t('admin.quota.save')"
     :busy="save.isPending.value"
-    :can-confirm="detail.data.value !== undefined"
+    :can-confirm="isLoaded"
     @confirm="submit"
   >
     <AdminField
@@ -81,6 +86,7 @@ function submit() {
       <input
         :id="id"
         v-model="form.credits"
+        :disabled="!isLoaded"
         inputmode="numeric"
         :class="ADMIN_INPUT_CLASS"
         :aria-describedby="describedBy"
@@ -96,6 +102,7 @@ function submit() {
       <input
         :id="id"
         v-model="form.storageMib"
+        :disabled="!isLoaded"
         inputmode="numeric"
         :class="ADMIN_INPUT_CLASS"
         :aria-describedby="describedBy"

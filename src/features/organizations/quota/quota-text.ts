@@ -15,10 +15,13 @@ const KNOWN_REASONS = ['problem', 'contest', 'upload', 'refund'];
 const firstMeter = (usage: OrganizationUsage, isHit: (meter: QuotaMeter) => boolean) =>
   METERS.find((name) => isHit(usage[name])) ?? null;
 
-/** Blocked: enforce mode and a meter over; near: any meter at 80 % or more (over included in warn mode). */
+/** A meter that takes nothing more: over by the server flag, or used up to its limit (a limit of 0 is full from the start, whatever the flags say). */
+const isExhausted = (meter: QuotaMeter): boolean => meter.isOver || meter.used >= meter.limit;
+
+/** Blocked: enforce mode and a meter exhausted (limit 0 included); near: any meter at 80 % or more (over included in warn mode). */
 export function quotaNoticeOf(usage: OrganizationUsage): QuotaNoticeState {
   const over = firstMeter(usage, (meter) => meter.isOver);
-  const full = firstMeter(usage, (meter) => meter.limit > 0 && meter.used >= meter.limit);
+  const full = firstMeter(usage, isExhausted);
   if (usage.enforcing && full)
     return { kind: 'blocked', meter: full, percent: meterPercent(usage[full]).percent };
   const near = over ?? firstMeter(usage, (meter) => meter.isNearLimit);

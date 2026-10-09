@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
 import EmptyState from '@/components/EmptyState.vue';
@@ -8,6 +8,7 @@ import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { ORG_BITS } from '../org-bits';
 import { useOrganization } from '../use-organization';
 import { orgFailureText } from './org-problem-errors';
@@ -48,6 +49,12 @@ const filteredTagName = computed(
 const selected = ref<string[]>([]);
 const actions = useOrgProblemActions(slug);
 const bulk = useOrgBulk(slug, selected);
+/** A selection belongs to the page and organization it was ticked on: neither a pager link nor a move to another organization keeps it. */
+watch([slug, filters], () => (selected.value = []));
+const listCard = ref<{ $el: HTMLElement } | null>(null);
+const listElement = () => listCard.value?.$el;
+useFocusFallback(() => selected.value.length, listElement);
+useFocusFallback(() => problems.data.value?.items.length, listElement);
 const isBulkTagOpen = ref(false);
 function runTagBulk(command: BulkCommand) {
   isBulkTagOpen.value = false;
@@ -65,7 +72,6 @@ const tagsFailure = computed(() =>
 );
 
 function applyFilters(change: Partial<Omit<OrgProblemFilters, 'page'>>) {
-  selected.value = [];
   void router.replace({ query: routeQueryOf(withFilter(filters.value, change)) });
 }
 function openTags(row: OrganizationProblem) {
@@ -99,7 +105,9 @@ function saveTags(tagIds: string[]) {
     </SettingsNotice>
     <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
       <GlassCard
+        ref="listCard"
         as="div"
+        tabindex="-1"
         data-testid="org-problem-list"
         class="flex min-w-0 flex-col gap-4 rounded-panel p-5"
       >

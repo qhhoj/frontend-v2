@@ -11,6 +11,7 @@ import { failureTextOf } from '../../ui/admin-errors';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportOptionsForm from './ImportOptionsForm.vue';
 import ImportProgress from './ImportProgress.vue';
+import { IMPORT_FORM_FIELDS } from './import-form';
 import { useImportJob } from './use-import-job';
 
 interface ImportSubmission {
@@ -40,9 +41,9 @@ function refusalTextOf(error: ApiError): string {
   return `${translate('admin.polygon.rateLimited')}${wait}`;
 }
 
-/** Field problems are shown under their fields; a refusal of the whole request gets the page line. */
+/** Field problems are shown under their fields; a refusal no form field explains (`quota_exceeded` on `storage`) gets the page line. */
 const refusal = computed(() =>
-  failure.value && Object.keys(fieldErrors.value).length === 0
+  failure.value && !IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)
     ? refusalTextOf(failure.value)
     : null,
 );

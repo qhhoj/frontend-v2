@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { mockApi, ok, page, sequence } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -53,6 +53,30 @@ describe('QuotaOverviewPage', () => {
     await flushPromises();
     expect(router.currentRoute.value.query.sort).toBe('credits');
     expect(overviewCalls(calls).at(-1)!.query.get('sort')).toBe('credits');
+  });
+
+  it('keeps typed values when the usage refetches under the open dialog', async () => {
+    const quota = { monthlyCredits: 300, storageBytes: null };
+    const calls = mockApi({
+      ...routes(),
+      'GET /organizations/lhp/usage': sequence(
+        ok(organizationUsage({ quota })),
+        ok(
+          organizationUsage({
+            quota,
+            credits: { used: 180, limit: 300, isOver: false, isNearLimit: true },
+          }),
+        ),
+      ),
+    });
+    const { wrapper, queryClient } = await mountOverview();
+    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
+    await flushPromises();
+    await fill('#quota-credits', '450');
+    await queryClient.invalidateQueries({ queryKey: ['admin'] });
+    await flushPromises();
+    expect(calls.filter((call) => call.path === '/organizations/lhp/usage')).toHaveLength(2);
+    expect(openDialog().querySelector<HTMLInputElement>('#quota-credits')!.value).toBe('450');
   });
 
   it('prefills the overrides and PATCHes only what changed', async () => {
