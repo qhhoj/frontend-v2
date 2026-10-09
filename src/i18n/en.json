@@ -1603,6 +1603,59 @@
     "liveFooter": " · new messages appear live"
   },
   "sourceDiff": {
+    "summary": {
+      "added": "+{count} lines",
+      "removed": "−{count} lines",
+      "addedShort": "+{count}",
+      "removedShort": "−{count}",
+      "sameShort": "{count} identical",
+      "same": "{count} identical lines"
+    },
+    "regionLabel": "Both sources, side by side",
+    "caption": "Line by line: the first submission on the left, the second on the right",
+    "columns": {
+      "leftNumber": "Left line",
+      "leftSign": "Left change",
+      "leftCode": "Left code",
+      "rightNumber": "Right line",
+      "rightSign": "Right change",
+      "rightCode": "Right code",
+      "oldNumber": "Old line",
+      "newNumber": "New line",
+      "sign": "Change",
+      "code": "Code"
+    },
+    "foldShow": "Show {count} folded identical lines",
+    "sign": {
+      "added": "Added",
+      "removed": "Removed"
+    },
+    "moved": "Moved",
+    "whitespaceOnly": "Whitespace only",
+    "side": {
+      "left": "Left",
+      "right": "Right"
+    },
+    "forbiddenTitle": "You cannot view submission {id}",
+    "forbiddenTitleNamed": "You cannot view submission {id} by {user}",
+    "forbiddenBody": "You may not see this source (the {side} side). The other side is still readable.",
+    "pickOther": "Pick another submission for the {side} side",
+    "notFoundTitle": "Submission {id} not found",
+    "notFoundBody": "The {side} submission does not exist or was deleted.",
+    "errorTitle": "Could not load the source",
+    "errorBody": "The server did not answer for submission {id}.",
+    "languagesTitle": "The two submissions use different languages",
+    "languagesBody": "Left {left}, right {right}. Lines are still compared, but the result means less.",
+    "identicalTitle": "The two sources are identical",
+    "identicalBody": "No line differs (CRLF line endings were ignored).",
+    "tooLongTitle": "The source is too long to compare",
+    "tooLongBody": "One side has {count} lines, over the {limit}-line limit.",
+    "viewLeft": "Open the left submission",
+    "viewRight": "Open the right submission",
+    "pickTitle": "Pick two submissions to compare",
+    "pickBody": "Open a submission and press “Compare with another”, or tick two rows in the submission list.",
+    "toList": "Go to submissions",
+    "forbiddenBodyOwn": "You may not see this source (the {side} side). The {otherSide} side, {otherId}, is still yours.",
     "title": "Compare submissions"
   },
   "lowPower": {

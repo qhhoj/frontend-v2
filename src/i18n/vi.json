@@ -1603,6 +1603,59 @@
     "liveFooter": " · tin nhắn mới tự hiện nhờ luồng trực tiếp"
   },
   "sourceDiff": {
+    "summary": {
+      "added": "+{count} dòng",
+      "removed": "−{count} dòng",
+      "addedShort": "+{count}",
+      "removedShort": "−{count}",
+      "sameShort": "{count} giống nhau",
+      "same": "{count} dòng giống nhau"
+    },
+    "regionLabel": "Mã nguồn hai bài, cạnh nhau",
+    "caption": "So sánh từng dòng: trái là bài thứ nhất, phải là bài thứ hai",
+    "columns": {
+      "leftNumber": "Dòng bên trái",
+      "leftSign": "Thay đổi bên trái",
+      "leftCode": "Mã bên trái",
+      "rightNumber": "Dòng bên phải",
+      "rightSign": "Thay đổi bên phải",
+      "rightCode": "Mã bên phải",
+      "oldNumber": "Dòng cũ",
+      "newNumber": "Dòng mới",
+      "sign": "Thay đổi",
+      "code": "Mã"
+    },
+    "foldShow": "Hiện {count} dòng giống nhau đã gập",
+    "sign": {
+      "added": "Thêm",
+      "removed": "Xóa"
+    },
+    "moved": "Đã chuyển chỗ",
+    "whitespaceOnly": "Chỉ khác khoảng trắng",
+    "side": {
+      "left": "Trái",
+      "right": "Phải"
+    },
+    "forbiddenTitle": "Không xem được bài nộp {id}",
+    "forbiddenTitleNamed": "Không xem được bài nộp {id} của {user}",
+    "forbiddenBody": "Bạn không có quyền xem mã nguồn của bài này (cạnh {side}). Cạnh còn lại vẫn xem được.",
+    "pickOther": "Chọn bài khác cho cạnh {side}",
+    "notFoundTitle": "Không tìm thấy bài nộp {id}",
+    "notFoundBody": "Bài nộp ở cạnh {side} không tồn tại hoặc đã bị xóa.",
+    "errorTitle": "Không tải được mã nguồn",
+    "errorBody": "Máy chủ không trả lời cho bài nộp {id}.",
+    "languagesTitle": "Hai bài dùng ngôn ngữ khác nhau",
+    "languagesBody": "Trái {left}, phải {right}. Vẫn so sánh theo từng dòng nhưng kết quả ít có ý nghĩa.",
+    "identicalTitle": "Hai mã nguồn giống hệt nhau",
+    "identicalBody": "Không có dòng nào khác biệt (đã bỏ qua khác biệt xuống dòng CRLF).",
+    "tooLongTitle": "Mã nguồn quá dài để so sánh",
+    "tooLongBody": "Một bên có {count} dòng, vượt giới hạn {limit} dòng.",
+    "viewLeft": "Xem bài bên trái",
+    "viewRight": "Xem bài bên phải",
+    "pickTitle": "Chọn hai bài nộp để so sánh",
+    "pickBody": "Mở một bài nộp rồi bấm “So sánh với bài khác”, hoặc chọn hai bài trong danh sách bài nộp.",
+    "toList": "Đến danh sách bài nộp",
+    "forbiddenBodyOwn": "Bạn không có quyền xem mã nguồn của bài này (cạnh {side}). Bên {otherSide} {otherId} vẫn là của bạn.",
     "title": "So sánh bài nộp"
   },
   "lowPower": {
