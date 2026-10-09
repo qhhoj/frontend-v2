@@ -1,0 +1,40 @@
+{
+  "title": "Phiếu hỗ trợ",
+  "lead": "Phiếu do người dùng gửi: xem, trả lời, giao người phụ trách và ghi chú nội bộ.",
+  "live": "Trực tiếp — Phiếu mới và tin nhắn mới tự hiện",
+  "filters": {
+    "heading": "Bộ lọc",
+    "reset": "Đặt lại",
+    "status": "Trạng thái",
+    "open": "Đang mở",
+    "closed": "Đã đóng",
+    "all": "Tất cả",
+    "own": "Chỉ phiếu của tôi",
+    "creator": "Người gửi",
+    "assignee": "Người phụ trách",
+    "peopleHint": "Nhiều tên cách nhau bằng dấu phẩy, áp dụng khi nhấn Enter hoặc rời ô.",
+    "untaggedNote": "Chưa lọc theo nhãn hoặc độ ưu tiên: phiếu không có các trường đó."
+  },
+  "table": {
+    "caption": "Danh sách phiếu",
+    "status": "Trạng thái",
+    "ticket": "Phiếu",
+    "assignees": "Phụ trách",
+    "messages": "Tin",
+    "updated": "Gần nhất",
+    "open": "Mở",
+    "closed": "Đã đóng",
+    "unassigned": "Chưa giao",
+    "contributive": "đóng góp tốt",
+    "empty": "Không có phiếu nào khớp bộ lọc.",
+    "footer": "{shown} / {total} phiếu",
+    "previous": "Trước",
+    "next": "Sau"
+  },
+  "detail": {
+    "byline": "{creator} · mở {date}",
+    "close": "Đóng phiếu",
+    "reopen": "Mở lại phiếu",
+    "closeAfterReply": "Đóng phiếu sau khi gửi"
+  }
+}

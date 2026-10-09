@@ -1,0 +1,40 @@
+{
+  "title": "Support tickets",
+  "lead": "Tickets sent by users: read, reply, assign and keep internal notes.",
+  "live": "Live — new tickets and messages appear by themselves",
+  "filters": {
+    "heading": "Filters",
+    "reset": "Reset",
+    "status": "Status",
+    "open": "Open",
+    "closed": "Closed",
+    "all": "All",
+    "own": "Only my tickets",
+    "creator": "Sender",
+    "assignee": "Assignee",
+    "peopleHint": "Separate several names with commas. Applied on Enter or when you leave the box.",
+    "untaggedNote": "Not filtered by label or priority: tickets without those fields are not matched by them."
+  },
+  "table": {
+    "caption": "Ticket list",
+    "status": "Status",
+    "ticket": "Ticket",
+    "assignees": "Assignees",
+    "messages": "Messages",
+    "updated": "Latest",
+    "open": "Open",
+    "closed": "Closed",
+    "unassigned": "Unassigned",
+    "contributive": "good contribution",
+    "empty": "No ticket matches the filters.",
+    "footer": "{shown} / {total} tickets",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "detail": {
+    "byline": "{creator} · opened {date}",
+    "close": "Close ticket",
+    "reopen": "Reopen ticket",
+    "closeAfterReply": "Close the ticket after sending"
+  }
+}

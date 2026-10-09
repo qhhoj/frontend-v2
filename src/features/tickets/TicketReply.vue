@@ -9,6 +9,7 @@ import { errorMessageKey } from '@/i18n/error-message';
 /** Same limit as the backend's `NewTicketMessageDto`: 8192 characters, counted as code points. */
 const MESSAGE_MAX_CODE_POINTS = 8192;
 const props = defineProps<{ ticketId: string }>();
+const emit = defineEmits<{ sent: [] }>();
 const client = useQueryClient();
 const draft = ref('');
 const text = computed(() => draft.value.trim());
@@ -19,6 +20,7 @@ const { isPending, error, mutate } = useMutation({
   mutationFn: (body: string) => postTicketMessage(props.ticketId, body),
   onSuccess: () => {
     draft.value = '';
+    emit('sent');
     return client.invalidateQueries({ queryKey: ['tickets'] });
   },
 });
