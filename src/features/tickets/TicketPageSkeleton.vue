@@ -29,6 +29,9 @@ const MESSAGE_ROWS = [0, 1, 2];
         </div>
       </GlassCard>
       <section class="flex flex-col gap-4">
+        <p data-skeleton-region="thread-counts" class="text-[13px]">
+          <SkeletonBlock text class="w-40" />
+        </p>
         <div
           v-for="row in MESSAGE_ROWS"
           :key="row"
