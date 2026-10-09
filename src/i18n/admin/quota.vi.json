@@ -1,0 +1,23 @@
+{
+  "lead": "Tín dụng tháng này và dung lượng dữ liệu của từng tổ chức. Để trống một hạn mức để dùng mặc định của site.",
+  "tableCaption": "Hạn mức các tổ chức",
+  "sortLabel": "Sắp xếp",
+  "sortName": "Tên tổ chức",
+  "sortCredits": "Tín dụng đã dùng",
+  "columns": { "organization": "Tổ chức", "credits": "Tín dụng tháng", "storage": "Dung lượng" },
+  "percent": "{percent}%",
+  "edit": "Sửa",
+  "editLabel": "Sửa hạn mức {name}",
+  "editTitle": "Hạn mức của {name}",
+  "credits": "Tín dụng mỗi tháng",
+  "storage": "Dung lượng (MiB)",
+  "defaultHint": "Để trống: dùng mặc định của site. Hiện áp dụng: {current}.",
+  "save": "Lưu hạn mức",
+  "saved": "Đã lưu hạn mức của {name}.",
+  "empty": "Chưa có tổ chức nào.",
+  "pager": "Trang hạn mức",
+  "errors": {
+    "credits": "Nhập số nguyên từ 0 đến 1.000.000, hoặc để trống.",
+    "storage": "Nhập số nguyên MiB từ 0 đến 1.048.576, hoặc để trống."
+  }
+}

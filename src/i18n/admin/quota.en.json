@@ -1,0 +1,23 @@
+{
+  "lead": "This month's credits and the data storage of every organization. Leave a quota empty to use the site default.",
+  "tableCaption": "Organization quotas",
+  "sortLabel": "Sort",
+  "sortName": "Organization name",
+  "sortCredits": "Credits used",
+  "columns": { "organization": "Organization", "credits": "Monthly credits", "storage": "Storage" },
+  "percent": "{percent}%",
+  "edit": "Edit",
+  "editLabel": "Edit the quota of {name}",
+  "editTitle": "Quota of {name}",
+  "credits": "Credits per month",
+  "storage": "Storage (MiB)",
+  "defaultHint": "Empty: the site default. Now in force: {current}.",
+  "save": "Save quota",
+  "saved": "The quota of {name} was saved.",
+  "empty": "No organizations yet.",
+  "pager": "Quota pages",
+  "errors": {
+    "credits": "Enter a whole number from 0 to 1,000,000, or leave it empty.",
+    "storage": "Enter whole MiB from 0 to 1,048,576, or leave it empty."
+  }
+}

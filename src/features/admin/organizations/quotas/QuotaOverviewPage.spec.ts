@@ -1,0 +1,100 @@
+import { describe, expect, it, vi } from 'vitest';
+import { flushPromises } from '@vue/test-utils';
+import { mockApi, ok, page } from '@/test/mock-api';
+import type { ApiCall } from '@/test/mock-api';
+import { mountApp } from '@/test/mount';
+import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
+import { MIB, organizationUsage, usageRow } from '@/test/f4-fixtures';
+
+const EDIT = ['judge.edit_all_organization'];
+const OVERVIEW = '/organizations/usage';
+type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
+const overviewCalls = (calls: ApiCall[]) => calls.filter((call) => call.path === OVERVIEW);
+async function mountOverview(path = '/admin/organizations/quotas') {
+  const mounted = await mountApp(path);
+  await vi.waitFor(
+    () => {
+      const section = mounted.wrapper.find('[data-testid="quota-overview"]');
+      if (!section.exists() || section.find('[data-testid="query-skeleton"]').exists())
+        throw new Error('not yet');
+    },
+    { timeout: 5000 },
+  );
+  await flushPromises();
+  return mounted;
+}
+const buttonNamed = (wrapper: Wrapper, name: string) =>
+  wrapper.findAll('button').find((button) => button.attributes('aria-label') === name)!;
+async function fill(selector: string, value: string) {
+  const input = openDialog().querySelector<HTMLInputElement>(selector)!;
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
+  await flushPromises();
+}
+const routes = () => ({
+  ...staffViewer(EDIT),
+  [`GET ${OVERVIEW}`]: page([usageRow(), usageRow({ slug: 'ntt', name: 'NTT', creditsUsed: 10 })]),
+  'GET /organizations/lhp/usage': ok(
+    organizationUsage({ quota: { monthlyCredits: 300, storageBytes: null } }),
+  ),
+});
+
+describe('QuotaOverviewPage', () => {
+  it('lists every organization with both meters and sorts by credits through the URL', async () => {
+    const calls = mockApi(routes());
+    const { wrapper, router } = await mountOverview();
+    expect(wrapper.text()).toContain('164 / 200');
+    expect(wrapper.text()).toContain('410 MiB / 512 MiB');
+    expect(overviewCalls(calls).at(-1)!.query.get('sort')).toBe('name');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Tín dụng đã dùng')!
+      .trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.sort).toBe('credits');
+    expect(overviewCalls(calls).at(-1)!.query.get('sort')).toBe('credits');
+  });
+
+  it('prefills the overrides and PATCHes only what changed', async () => {
+    const calls = mockApi({
+      ...routes(),
+      'PATCH /organizations/lhp/quota': ok(organizationUsage()),
+    });
+    const { wrapper } = await mountOverview();
+    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
+    await flushPromises();
+    expect(openDialog().querySelector<HTMLInputElement>('#quota-credits')!.value).toBe('300');
+    expect(openDialog().querySelector<HTMLInputElement>('#quota-storage')!.value).toBe('');
+    await fill('#quota-credits', '');
+    await fill('#quota-storage', '1024');
+    await confirmDialog('Lưu hạn mức');
+    expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({
+      quotaMonthlyCredits: null,
+      quotaStorageBytes: 1024 * MIB,
+    });
+    expect(wrapper.get('[role="status"]').text()).toContain(
+      'Đã lưu hạn mức của THPT chuyên Lê Hồng Phong',
+    );
+    expect(overviewCalls(calls).length).toBeGreaterThan(1);
+  });
+
+  it('sends nothing for a malformed number or an unchanged form', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountOverview();
+    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
+    await flushPromises();
+    await fill('#quota-credits', '-5');
+    await confirmDialog('Lưu hạn mức');
+    expect(openDialog().textContent).toContain('số nguyên');
+    await fill('#quota-credits', '300');
+    await confirmDialog('Lưu hạn mức');
+    await vi.waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeNull());
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
+
+  it('shows the staff Bit when there is no organization', async () => {
+    mockApi({ ...staffViewer(EDIT), [`GET ${OVERVIEW}`]: page([]) });
+    const { wrapper } = await mountOverview();
+    expect(wrapper.find('[data-testid="admin-bit"][data-placement="empty"]').exists()).toBe(true);
+  });
+});
