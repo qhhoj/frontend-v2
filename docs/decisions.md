@@ -373,3 +373,29 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - `diff` 9.0.0 is pinned exactly (BSD-3-Clause, bundled types, no dependencies) for the submission source diff.
 - Unit and e2e tests run as a strong device (8 cores, 8 GB) so low-power `auto` stays off unless a spec passes weak hints.
+
+## VNOI ports: notifications, tickets, official mode (plan F1)
+
+- The bell's drawer is PrimeVue `Drawer` (430 px, full screen under 640 px) styled by `pt` in `NotificationBell.vue`; focus goes back to the bell by hand because `Drawer` does not restore it.
+- The drawer shows the first 5 rows of `GET /notifications?state=all&page=1` and reads them only when it opens; the page's first "all" page shares the key.
+- `/notifications` filters by state and by kind chip through repeated `kind` query params (`kind=a&kind=b`); a client-side filter of one page would lie about emptiness. The "Khác" chip stays hidden until the backend adds `quota-warning` (`docs/api-mismatches/notifications.md` N1-01).
+- Rows are grouped "Hôm nay" / "Trước đó" by the viewer's local day of `lastActivityAt`, because a merge moves a row to today.
+- "Thông báo cũ" is client-side: a click probes `/tickets/{id}`, `/contests/{key}` or `/organizations/{slug}` from the row's path; 403/404 marks it read and relabels it, anything else navigates.
+- One `/events/user` stream per signed-in public tab, owned by the bell; a burst of `notification` frames invalidates `['notifications', viewer]` once per second; a refused stream stays closed and the 60 s poll (also on window focus) carries on.
+- Under impersonation the SPA sends no read or read-all request and says so once: the backend answers 204 and changes nothing.
+- The badge shows `99+` above 99; the button's name carries the exact count; a polite region says "N thông báo mới" only when the count rises.
+- The high-priority banner shows the newest unread `high` row on public layouts, with "Xem phiếu" (ticket kinds) or "Xem" and "Đánh dấu đã đọc".
+- Official mode is read from a public `GET /site` query (`['site']`, stale 60 s) only for signed-in viewers; `officialMode: false` from `/site` wins over a cached `officialModeEndsAt`.
+- The pill, banner and lock note read `SiteResponse.officialModeEndsAt` and fall back to plain copy when it is null.
+- Locked controls: organization join, request and leave (`MembershipPanel`), organization order and leave in settings (`OrganizationsEditor`), plus one note on the profile card. Other surfaces (display badge, username override, comments, blog writes, votes) have no user UI yet and get the pattern when built.
+- Name and about stay editable during official mode with a note on the card; a save is refused with `settings.profile.lockedOfficial`.
+- A server `locked_in_official_contest` maps to the lock copy in `membership-errors.ts` and `profile-errors.ts`, because the `/site` cache can lag a minute.
+- Superusers see the pill and the banner with an "exempt" line and no disabled control.
+- The ticket thread renders `timeline` inside `TicketMessages.vue` (shared with the admin queue detail): runs of 2+ events fold into a `<details>` row, a lone event is a divider row. `marked-good`/`unmarked-good` rows are hidden when `can.markGood` is false; the cap notice shows at 200 stored events.
+- A ticket PATCH refused with 409 `conflict` refetches the ticket and says it was reloaded (`ticket.conflictReloaded`), not "reload and try again".
+- The canned picker shows for `can.assign` viewers; a pick appends to the draft; `{tên}` is the creator's username, `{bài}` the problem name, literal on a general ticket. The picker and the canned list share `['tickets', 'canned', viewer]`.
+- Ticket summary alerts are one strip on `/tickets` and on the admin queue, polling 60 s.
+- The canned-reply admin screen is `/admin/tickets/canned` (permission `judge.change_ticket`), reached from the ticket queue header.
+- Admin settings now show `contest.officialModeEndsAt` (in the contest block) and `problem.deleteGraceDays` (new "Bài tập" group and block).
+- The contest announcement "resend" button reads "Gửi lại cho những người chưa nhận được": the backend notifies only users the announcement has not reached.
+- The shell's own reads answer from `SHELL_DEFAULTS` in `src/test/mock-api.ts` (unrecorded) and from `FakeApi` defaults in e2e.

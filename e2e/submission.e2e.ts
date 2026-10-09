@@ -77,7 +77,7 @@ test.describe('submission page', () => {
         body: { error: { code: reason, message: 'x' } },
       };
       await page.goto('/submissions/sub-1');
-      await expect(page.getByRole('alert')).toHaveText(text);
+      await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toHaveText(text);
     });
 
   test('a hidden source keeps the summary and explains itself', async ({ page, api }) => {

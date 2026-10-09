@@ -20,7 +20,9 @@ describe('ticket patch conflict', () => {
     expect(
       calls.filter((call) => call.method === 'GET' && call.path === `/tickets/${stale.id}`),
     ).toHaveLength(2);
-    expect(wrapper.get('[role="alert"]').text()).toContain('Hãy tải lại');
+    expect(wrapper.findAll('[role="alert"]').map((alert) => alert.text())).toContain(
+      'Phiếu đã thay đổi sau khi trang được tải. Phiếu đã được tải lại; hãy xem nội dung mới nhất rồi thử lại.',
+    );
     expect(wrapper.get('[data-testid="mark-good"]').attributes('aria-pressed')).toBe('true');
   });
 

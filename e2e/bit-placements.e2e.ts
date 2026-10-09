@@ -116,3 +116,23 @@ test('a hidden submission shows a sweating Bit beside the reason, not a verdict 
   await expect(reason).toBeVisible();
   await expect(page.getByTestId('inline-bit')).toBeVisible();
 });
+
+test('the notification envelope Bit and the lock Bit stand still under reduced motion', async ({
+  page,
+  api,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  api.signedIn = true;
+  api.routes['GET /site'] = { body: { data: { navigation: [], config: {}, officialMode: true } } };
+  await page.goto('/notifications');
+  const envelope = page.locator('main [data-testid="inline-bit"]').first();
+  const lock = page
+    .getByRole('region', { name: 'Chế độ thi chính thức' })
+    .locator('[data-testid="inline-bit"]');
+  await expect(envelope).toBeVisible();
+  await expect(lock).toBeVisible();
+  const before = [await envelope.screenshot(), await lock.screenshot()];
+  await page.waitForTimeout(1200);
+  expect(await envelope.screenshot()).toEqual(before[0]);
+  expect(await lock.screenshot()).toEqual(before[1]);
+});

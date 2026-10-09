@@ -32,6 +32,8 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Error text: `$t(errorMessageKey(error))`; add a message to `errors.<code>` in both locale files for a new backend code
 - Realtime: `openEventStream` (`src/api/events.ts`); follow a submission with `useSubmissionStatus`
 - Redirects from the URL (`?redirect=`) pass through `safeRedirect` (`src/router/safe-redirect.ts`) before any navigation
+- Official contest mode is read only through `useOfficialMode()` (`src/features/official-mode/official-mode.queries.ts`). A control whose backend route answers `locked_in_official_contest` (or one of the older official-mode `forbidden` locks) calls `useOfficialLock()` once, binds `v-bind="lock.lockAttrs.value"`, guards its click with `lock.isLocked.value || action()` and renders `<OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />`
+- Notification reads live under `['notifications', viewer]`; the bell owns the one `/events/user` stream of a tab, so no other component opens it
 
 ## Loading states
 
@@ -100,6 +102,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310` (or the port in `E2E_PORT`, for parallel runs), then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
 - E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
 - Playwright never kills processes by name; stop only the servers you started
+- The shell reads `/site`, `/notifications`, `/notifications/unread-count` and `/tickets/summary` on signed-in pages: unit tests get `SHELL_DEFAULTS` (unrecorded) unless they route them, e2e gets the `FakeApi` defaults; count page streams with `pageStreams()`, the bell's stream with `userStream()`
 
 ## Real-backend e2e
 

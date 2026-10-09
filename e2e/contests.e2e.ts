@@ -216,7 +216,7 @@ test('a refused join shows its own text beside Bit', async ({ page, api }) => {
   };
   await page.goto('/contests/r42');
   await page.getByRole('button', { name: 'Vào thi' }).click();
-  await expect(page.getByRole('alert')).toHaveText(
+  await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toHaveText(
     'Kỳ thi chưa bắt đầu. Hãy quay lại khi kỳ thi mở.',
   );
   await expectNoAxeViolations(page);

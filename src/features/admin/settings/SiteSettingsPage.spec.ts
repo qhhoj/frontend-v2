@@ -182,6 +182,19 @@ describe('SiteSettingsPage', () => {
   });
 });
 
+describe('keys that were hidden', () => {
+  it('shows the official mode end time and the problem grace days with their labels', async () => {
+    mockApi(routes({ 'GET /admin/settings': ok(ALL_SETTINGS) }));
+    const { wrapper } = await mountSettings();
+    expect(wrapper.get('[data-block="contest"]').text()).toContain(
+      'Thời điểm tự tắt chế độ thi chính thức',
+    );
+    expect(wrapper.get('[data-block="problem"]').text()).toContain(
+      'Số ngày có thể khôi phục bài đã xóa',
+    );
+  });
+});
+
 const withMinPercent = (stored: number) =>
   ALL_SETTINGS.map((entry) =>
     entry.key === 'similarity.minPercent'

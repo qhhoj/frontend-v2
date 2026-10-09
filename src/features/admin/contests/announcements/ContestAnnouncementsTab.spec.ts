@@ -71,10 +71,10 @@ describe('ContestAnnouncementsTab', () => {
       'POST /contests/hcmus-w41/announcements/a-1/resend': { status: 204 },
     });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/announcements', LIST_TEXT);
-    await button(wrapper, 'Gửi lại').trigger('click');
+    await button(wrapper, 'Gửi lại cho những người chưa nhận được').trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.path.endsWith('/resend'))).toBe(true);
-    expect(wrapper.text()).toContain('Đã gửi lại thông báo.');
+    expect(wrapper.text()).toContain('Đã gửi lại cho những người chưa nhận được.');
     await button(wrapper, 'Xóa').trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
@@ -168,8 +168,10 @@ describe('ContestAnnouncementsTab', () => {
   it('offers no resend while announcements are not pushed live', async () => {
     mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(), ...list() });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/announcements', LIST_TEXT);
-    expect(wrapper.findAll('button').some((candidate) => candidate.text() === 'Gửi lại')).toBe(
-      false,
-    );
+    expect(
+      wrapper
+        .findAll('button')
+        .some((candidate) => candidate.text() === 'Gửi lại cho những người chưa nhận được'),
+    ).toBe(false);
   });
 });

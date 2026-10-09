@@ -50,11 +50,12 @@ export const WEBHOOK_EVENTS = [
 export const MAX_WEBHOOKS = 20;
 
 export type SettingGroup =
-  'site' | 'contest' | 'mail' | 'auth' | 'notify' | 'pdf' | 'similarity' | 'quota';
+  'site' | 'contest' | 'problem' | 'mail' | 'auth' | 'notify' | 'pdf' | 'similarity' | 'quota';
 /** The page's group strip and sections, in this order. */
 export const SETTING_GROUPS: SettingGroup[] = [
   'site',
   'contest',
+  'problem',
   'mail',
   'auth',
   'notify',
@@ -73,8 +74,13 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
   {
     id: 'contest',
     group: 'contest',
-    keys: ['contest.officialMode', 'contest.banAfterDisqualifications'],
+    keys: [
+      'contest.officialMode',
+      'contest.officialModeEndsAt',
+      'contest.banAfterDisqualifications',
+    ],
   },
+  { id: 'problem', group: 'problem', keys: ['problem.deleteGraceDays'] },
   { id: 'mail', group: 'mail', keys: ['mail.from', 'mail.smtpUrl'] },
   { id: 'google', group: 'auth', keys: ['auth.google'] },
   { id: 'github', group: 'auth', keys: ['auth.github'] },

@@ -22,6 +22,7 @@ test("the canned-reply screen is reached from the ticket queue header (moved her
   api,
 }) => {
   asHandler(api, 0, 0);
+  api.routes['GET /ticket-canned-replies'] = list([]);
   await page.goto('/admin/tickets');
   await page.getByRole('link', { name: 'Mẫu trả lời' }).click();
   await expect(page).toHaveURL(/\/admin\/tickets\/canned$/);

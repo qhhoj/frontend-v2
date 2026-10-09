@@ -1583,6 +1583,7 @@
     "replyPlaceholder": "Write a message (up to 8192 characters; HTML is escaped)",
     "send": "Send message",
     "messageCap": "This ticket reached its 500-message limit.",
+    "conflictReloaded": "The ticket changed after this page loaded. It has been reloaded; check the latest content and try again.",
     "muted": "Muted users cannot open or answer tickets.",
     "link": "Link",
     "creator": "Creator",

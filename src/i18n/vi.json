@@ -1583,6 +1583,7 @@
     "replyPlaceholder": "Viết tin nhắn (tối đa 8192 ký tự; HTML được thoát)",
     "send": "Gửi tin nhắn",
     "messageCap": "Phiếu đã đạt giới hạn 500 tin nhắn.",
+    "conflictReloaded": "Phiếu đã thay đổi sau khi trang được tải. Phiếu đã được tải lại; hãy xem nội dung mới nhất rồi thử lại.",
     "muted": "Người dùng bị tắt tiếng không thể mở hoặc trả lời phiếu.",
     "link": "Liên kết",
     "creator": "Người tạo",

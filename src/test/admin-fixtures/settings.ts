@@ -27,11 +27,13 @@ export function setting(
   };
 }
 
-/** The 15 registry keys with the board's values (the pdf and similarity numbers are the board's). */
+/** The 17 registry keys with the board's values (the pdf and similarity numbers are the board's). */
 export const ALL_SETTINGS: Setting[] = [
   setting('site.timeZone', 'Asia/Ho_Chi_Minh'),
   setting('contest.officialMode', false),
+  setting('contest.officialModeEndsAt', ''),
   setting('contest.banAfterDisqualifications', 0),
+  setting('problem.deleteGraceDays', 30),
   setting('discord.webhooks', { set: true }, { default: { set: false } }),
   setting('mail.from', 'QHHOJ <no-reply@qhhoj.example>'),
   setting('mail.smtpUrl', { set: true }, { default: { set: false } }),

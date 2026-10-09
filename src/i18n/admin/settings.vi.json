@@ -14,7 +14,8 @@
     "notify": "Thông báo",
     "pdf": "Xuất PDF",
     "similarity": "Giống nhau",
-    "quota": "Hạn mức"
+    "quota": "Hạn mức",
+    "problem": "Bài tập"
   },
   "infoCard": "Giá trị được kiểm tra khi lưu. Lỗi hiện ngay dưới khối sai; không có gì bị lưu một phần trong một khoá. Chỉ người có quyền “Sửa cài đặt” mới thấy trang này.",
   "blocks": {
@@ -61,6 +62,10 @@
     "quota": {
       "title": "Hạn mức tổ chức",
       "help": "Tín chỉ hằng tháng và dung lượng dữ liệu test mà một tổ chức được dùng khi nhân viên chưa đặt giới hạn riêng. “Chỉ cảnh báo” chỉ ghi nhận và hiển thị phần vượt; “Bắt buộc” từ chối phần vượt, chỉ có hiệu lực sau khi hoàn tất việc tính lại dung lượng dữ liệu bài."
+    },
+    "problem": {
+      "title": "Xóa bài tập",
+      "help": "Số ngày một bài đã xóa còn khôi phục được; sau đó dữ liệu bị xóa hẳn và chỉ còn lại mã và tên bài. Các bài nộp không bao giờ bị xóa."
     }
   },
   "fields": {
@@ -69,7 +74,8 @@
     },
     "contest": {
       "officialMode": "Bật chế độ kỳ thi chính thức",
-      "banAfterDisqualifications": "Số lần bị loại trước khi bị cấm"
+      "banAfterDisqualifications": "Số lần bị loại trước khi bị cấm",
+      "officialModeEndsAt": "Thời điểm tự tắt chế độ thi chính thức"
     },
     "mail": {
       "from": "Người gửi",
@@ -99,6 +105,9 @@
         "contest": "Tín chỉ để tạo hoặc nhân bản kỳ thi",
         "dataPer10MiB": "Tín chỉ cho mỗi 10 MiB dữ liệu tải lên"
       }
+    },
+    "problem": {
+      "deleteGraceDays": "Số ngày có thể khôi phục bài đã xóa"
     }
   },
   "hints": {
@@ -106,7 +115,8 @@
       "timeZone": "Ví dụ: Asia/Ho_Chi_Minh."
     },
     "contest": {
-      "banAfterDisqualifications": "Số nguyên từ 0 đến 1000; 0 là tắt. Chỉ tính kỳ thi không riêng của tổ chức."
+      "banAfterDisqualifications": "Số nguyên từ 0 đến 1000; 0 là tắt. Chỉ tính kỳ thi không riêng của tổ chức.",
+      "officialModeEndsAt": "Thời điểm ISO 8601 có múi giờ, ví dụ 2026-10-10T17:00:00+07:00. Để trống thì chỉ công tắc quyết định."
     },
     "mail": {
       "from": "Địa chỉ hoặc “Tên <địa chỉ>”, không xuống dòng.",
@@ -132,6 +142,9 @@
         "contest": "Từ 0 đến 1000.",
         "dataPer10MiB": "Từ 0 đến 1000; mỗi 10 MiB bắt đầu được tính một lần."
       }
+    },
+    "problem": {
+      "deleteGraceDays": "Số nguyên từ 1 đến 365."
     }
   },
   "chip": {

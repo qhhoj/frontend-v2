@@ -14,7 +14,8 @@
     "notify": "Notifications",
     "pdf": "PDF export",
     "similarity": "Similarity",
-    "quota": "Quota"
+    "quota": "Quota",
+    "problem": "Problems"
   },
   "infoCard": "Values are checked when saved. An error shows right under the wrong block; nothing is saved part-way through a key. Only people with the “Change settings” permission see this page.",
   "blocks": {
@@ -61,6 +62,10 @@
     "quota": {
       "title": "Organization quota",
       "help": "The monthly credits and test-data bytes an organization may use when staff set no limit of its own. “Warn only” records and shows overages; “Enforce” refuses them, and only takes effect once the problem data size backfill has finished."
+    },
+    "problem": {
+      "title": "Deleting problems",
+      "help": "Days a deleted problem can be restored; after that its data is purged and only the code and name stay. Submissions are never deleted."
     }
   },
   "fields": {
@@ -69,7 +74,8 @@
     },
     "contest": {
       "officialMode": "Turn on official contest mode",
-      "banAfterDisqualifications": "Disqualifications before a ban"
+      "banAfterDisqualifications": "Disqualifications before a ban",
+      "officialModeEndsAt": "When official contest mode switches itself off"
     },
     "mail": {
       "from": "Sender",
@@ -99,6 +105,9 @@
         "contest": "Credits to create or clone a contest",
         "dataPer10MiB": "Credits per 10 MiB of uploaded data"
       }
+    },
+    "problem": {
+      "deleteGraceDays": "Days a deleted problem can be restored"
     }
   },
   "hints": {
@@ -106,7 +115,8 @@
       "timeZone": "For example: Asia/Ho_Chi_Minh."
     },
     "contest": {
-      "banAfterDisqualifications": "An integer from 0 to 1000; 0 turns it off. Counts only contests that are not organization-only."
+      "banAfterDisqualifications": "An integer from 0 to 1000; 0 turns it off. Counts only contests that are not organization-only.",
+      "officialModeEndsAt": "An ISO 8601 instant with an offset, for example 2026-10-10T17:00:00+07:00. Empty: only the switch decides."
     },
     "mail": {
       "from": "An address or “Name <address>”, on one line.",
@@ -132,6 +142,9 @@
         "contest": "From 0 to 1000.",
         "dataPer10MiB": "From 0 to 1000; each started 10 MiB counts once."
       }
+    },
+    "problem": {
+      "deleteGraceDays": "An integer from 1 to 365."
     }
   },
   "chip": {
