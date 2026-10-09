@@ -1,10 +1,23 @@
 <script setup lang="ts">
 import { Lock, TrendingUp } from 'lucide-vue-next';
+import { computed } from 'vue';
 import type { ContestSummary } from '@/api/types/contests';
+import { useContestTagsCache } from './contest-extras.queries';
+import { catalogueBySlug, tagChipOf } from './tag-chips';
 
-defineProps<{ contest: ContestSummary; withTags?: boolean; withCodeNeeded?: boolean }>();
+const props = defineProps<{
+  contest: ContestSummary;
+  withTags?: boolean;
+  withCodeNeeded?: boolean;
+}>();
 const CHIP =
   'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-[12.5px] font-medium whitespace-nowrap';
+/** Read from the cache only: the list and the contest header fetch the catalogue; elsewhere tags stay neutral. */
+const { data: catalogue } = useContestTagsCache();
+const tagChips = computed(() => {
+  const bySlug = catalogueBySlug(catalogue.value ?? []);
+  return props.contest.tags.map((slug) => tagChipOf(slug, bySlug));
+});
 </script>
 
 <template>
@@ -25,6 +38,12 @@ const CHIP =
     $t('contests.organizationPrivate')
   }}</span>
   <template v-if="withTags">
-    <span v-for="tag in contest.tags" :key="tag" :class="[CHIP, 'text-muted']">{{ tag }}</span>
+    <span
+      v-for="chip in tagChips"
+      :key="chip.slug"
+      :data-tag-color="chip.color ?? 'neutral'"
+      :class="[CHIP, chip.colorClass]"
+      >{{ chip.label }}</span
+    >
   </template>
 </template>

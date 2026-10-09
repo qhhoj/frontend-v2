@@ -19,7 +19,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   types: placeholder,
   contests: () => import('./contests/ContestsIndexPage.vue'),
   contestNew: () => import('./contests/general/ContestCreatePage.vue'),
-  contestTags: placeholder,
+  contestTags: () => import('./contest-tags/ContestTagsPage.vue'),
   contestGeneral: () => import('./contests/ContestEditorPage.vue'),
   contestProblems: () => import('./contests/ContestEditorPage.vue'),
   contestAnnouncements: () => import('./contests/ContestEditorPage.vue'),

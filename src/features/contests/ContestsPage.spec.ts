@@ -2,7 +2,8 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestItem, listViewer } from '@/test/fixtures';
 import { contestListRoutes } from '@/test/contest-routes';
-import { mockApi } from '@/test/mock-api';
+import { TAG_CATALOGUE } from '@/test/contest-extras-fixtures';
+import { fail, mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
@@ -95,6 +96,7 @@ describe('contest list', () => {
     let runningRequests = 0;
     const calls = mockApi({
       ...anonymousViewer,
+      'GET /contest-tags': page([]),
       'GET /contests': (call) => {
         if (call.query.get('phase') !== 'running')
           return { body: { data: [], meta: { page: 1, pageSize: 3, total: 0 } } };
@@ -331,5 +333,82 @@ describe('contest list', () => {
     const { wrapper } = await mountApp('/contests');
     const link = wrapper.get('[data-testid="upcoming-contest"] a[href="/contests/r45"].border');
     expect(link.classes()).not.toContain('bg-gradient-accent');
+  });
+});
+
+describe('contest list tag filter', () => {
+  afterEach(() => vi.useRealTimers());
+  const tagged = contestItem({ tags: ['quoc-gia', 'tin-hoc-tre-2019'] });
+  const withCatalogue = { 'GET /contest-tags': page(TAG_CATALOGUE) };
+
+  it('sends the chosen tag with every group and colours the row chips from the catalogue', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestListRoutes({ running: [tagged] }),
+      ...withCatalogue,
+    });
+    const { wrapper } = await mountApp('/contests?tag=quoc-gia');
+    await flushPromises();
+    expect(groupCalls(calls).map((query) => query.tag)).toEqual([
+      'quoc-gia',
+      'quoc-gia',
+      'quoc-gia',
+    ]);
+    const chips = wrapper.get('[data-testid="running-contest"]').findAll('[data-tag-color]');
+    expect(chips.map((chip) => [chip.text(), chip.attributes('data-tag-color')])).toEqual([
+      ['Quốc gia', 'tag-5'],
+      ['tin-hoc-tre-2019', 'neutral'],
+    ]);
+  });
+
+  it('writes a chosen chip to the URL and starts again at page 1', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({}), ...withCatalogue });
+    const { wrapper, router } = await mountApp('/contests?phase=ended&page=3');
+    await flushPromises();
+    const chip = wrapper
+      .findAll('[data-testid="tag-filter"] button')
+      .find((button) => button.text() === 'ICPC')!;
+    await chip.trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({ phase: 'ended', tag: 'icpc' });
+  });
+
+  it('lists every contest for a tag the catalogue does not hold, and says so', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...contestListRoutes({}), ...withCatalogue });
+    const { wrapper } = await mountApp('/contests?tag=abc-xyz');
+    await flushPromises();
+    const lastRound = groupCalls(calls).slice(-3);
+    expect(lastRound.every((query) => query.tag === undefined)).toBe(true);
+    expect(wrapper.get('[data-testid="tag-unknown"]').text()).toContain('abc-xyz');
+  });
+
+  it('never sends a malformed tag', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...contestListRoutes({}), ...withCatalogue });
+    await mountApp('/contests?tag=Not%20A%20Slug');
+    expect(groupCalls(calls).every((query) => query.tag === undefined)).toBe(true);
+  });
+
+  it('keeps the list working when the catalogue fails, and still filters by the address tag', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...contestListRoutes({ running: [tagged] }),
+      'GET /contest-tags': fail(500, 'generic'),
+    });
+    const { wrapper } = await mountApp('/contests?tag=quoc-gia');
+    await flushPromises();
+    expect(wrapper.find('[data-testid="tag-failed"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="running-contest"]').exists()).toBe(true);
+    expect(groupCalls(calls)[0]!.tag).toBe('quoc-gia');
+  });
+
+  it('says no contest has the tag and offers to clear it when a tagged group is empty', async () => {
+    mockApi({ ...anonymousViewer, ...contestListRoutes({}), ...withCatalogue });
+    const { wrapper } = await mountApp('/contests?tag=dac-biet&phase=ended');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Chưa có kỳ thi với thẻ “Đặc biệt”.');
+    const clear = wrapper.findAll('a').find((link) => link.text() === 'Bỏ lọc')!;
+    expect(clear.attributes('href')).toBe('/contests?phase=ended');
   });
 });

@@ -14,6 +14,7 @@ describe('contest list filters', () => {
       isRatedOnly: true,
       phase: 'ended',
       page: 3,
+      tag: null,
     });
     expect(
       parseContestListFilters({ search: 'x'.repeat(150), rated: 'yes', phase: 'past', page: '0' }),
@@ -22,22 +23,23 @@ describe('contest list filters', () => {
       isRatedOnly: false,
       phase: null,
       page: 1,
+      tag: null,
     });
   });
 
   it('leaves defaults out of the URL', () => {
-    expect(toContestListLocation({ search: '', isRatedOnly: false, phase: null, page: 1 })).toEqual(
-      {
-        search: undefined,
-        rated: undefined,
-        phase: undefined,
-        page: undefined,
-      },
-    );
+    expect(
+      toContestListLocation({ search: '', isRatedOnly: false, phase: null, page: 1, tag: null }),
+    ).toEqual({
+      search: undefined,
+      rated: undefined,
+      phase: undefined,
+      page: undefined,
+    });
   });
 
   it('asks each overview group for its own page size and always its first page', () => {
-    const filters = { search: 'qhh', isRatedOnly: true, phase: null, page: 4 };
+    const filters = { search: 'qhh', isRatedOnly: true, phase: null, page: 4, tag: null };
     expect(groupQuery(filters, 'running')).toEqual({
       phase: 'running',
       search: 'qhh',
@@ -51,7 +53,7 @@ describe('contest list filters', () => {
 
   it('pages through one group when the URL names it, and never sends rated=false', () => {
     expect(
-      groupQuery({ search: '', isRatedOnly: false, phase: 'ended', page: 4 }, 'ended'),
+      groupQuery({ search: '', isRatedOnly: false, phase: 'ended', page: 4, tag: null }, 'ended'),
     ).toEqual({
       phase: 'ended',
       search: undefined,
@@ -59,6 +61,20 @@ describe('contest list filters', () => {
       page: 4,
       pageSize: 20,
     });
+  });
+
+  it('reads a well-formed tag from the URL and drops a malformed one', () => {
+    expect(parseContestListFilters({ tag: 'quoc-gia' }).tag).toBe('quoc-gia');
+    expect(parseContestListFilters({ tag: 'Quốc gia' }).tag).toBeNull();
+    expect(parseContestListFilters({}).tag).toBeNull();
+  });
+
+  it('writes the tag to the URL and sends it with every group', () => {
+    const filters = { search: '', isRatedOnly: false, phase: null, page: 1, tag: 'icpc' };
+    expect(toContestListLocation(filters).tag).toBe('icpc');
+    expect(toContestListLocation({ ...filters, tag: null }).tag).toBeUndefined();
+    expect(groupQuery(filters, 'ended').tag).toBe('icpc');
+    expect(groupQuery({ ...filters, tag: null }, 'ended').tag).toBeUndefined();
   });
 
   it('caps the search at 100 code points, so a cut never splits a surrogate pair', () => {

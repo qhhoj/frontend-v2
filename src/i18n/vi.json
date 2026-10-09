@@ -1726,6 +1726,15 @@
     "title": "Phát lại"
   },
   "contestTags": {
+    "filterLabel": "Lọc kỳ thi theo thẻ",
+    "all": "Tất cả",
+    "failedTitle": "Không tải được danh sách thẻ.",
+    "failedBody": "Bộ lọc thẻ tạm ẩn, danh sách kỳ thi vẫn dùng bình thường.",
+    "unknownTitle": "Thẻ “{slug}” không tồn tại.",
+    "unknownBody": "Địa chỉ có ?tag={slug} nhưng danh mục không có thẻ này. Đang hiện toàn bộ kỳ thi.",
+    "emptyTitle": "Chưa có kỳ thi với thẻ “{name}”.",
+    "emptyHint": "Thử bỏ thẻ hoặc chọn thẻ khác.",
+    "clear": "Bỏ lọc",
     "title": "Thẻ kỳ thi"
   },
   "joinRules": {

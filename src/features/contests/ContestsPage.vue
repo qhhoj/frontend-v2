@@ -2,7 +2,10 @@
 import { Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useDebouncedText } from '@/lib/use-debounced-text';
+import { useContestTagsQuery } from './contest-extras.queries';
 import ContestGroup from './ContestGroup.vue';
+import ContestTagFilter from './ContestTagFilter.vue';
+import { catalogueBySlug, tagFilterState } from './tag-chips';
 import { PHASE_ORDER, useContestListFilters } from './use-contest-list-filters';
 
 const { filters, update } = useContestListFilters();
@@ -15,6 +18,17 @@ const shownPhases = computed(() => (filters.value.phase ? [filters.value.phase] 
 const ratedChoice = computed({
   get: () => (filters.value.isRatedOnly ? 'rated' : 'any'),
   set: (choice: string) => update({ isRatedOnly: choice === 'rated' }),
+});
+const { data: tags, isPending: isTagsPending, isError: hasTagsFailed } = useContestTagsQuery();
+const catalogue = computed(() => (tags.value ? catalogueBySlug(tags.value) : undefined));
+const tagState = computed(() => tagFilterState(filters.value.tag, catalogue.value));
+/** An unknown tag is not sent: the groups list every contest and the row says why (M4A). */
+const listFilters = computed(() =>
+  tagState.value === 'unknown' ? { ...filters.value, tag: null } : filters.value,
+);
+const tagName = computed(() => {
+  const slug = listFilters.value.tag;
+  return slug === null ? null : (catalogue.value?.get(slug)?.name ?? slug);
 });
 </script>
 
@@ -48,11 +62,20 @@ const ratedChoice = computed({
         </label>
       </div>
     </header>
+    <ContestTagFilter
+      :tags="tags ?? []"
+      :selected="filters.tag"
+      :state="tagState"
+      :is-loading="isTagsPending"
+      :has-failed="hasTagsFailed"
+      @select="(tag) => update({ tag })"
+    />
     <ContestGroup
       v-for="phase in shownPhases"
       :key="phase"
       :phase="phase"
-      :filters="filters"
+      :filters="listFilters"
+      :tag-name="tagName"
       @page="(page) => update({ page })"
     />
   </div>

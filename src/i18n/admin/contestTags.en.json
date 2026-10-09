@@ -1,0 +1,46 @@
+{
+  "crumb": "Contests",
+  "title": "Contest tags",
+  "lead": "The tag catalogue shown on the contest list. A colour is a theme token key, not a colour code.",
+  "caption": "Contest tag catalogue",
+  "createTitle": "Add a tag",
+  "editTitle": "Edit tag “{name}”",
+  "full": "The catalogue holds 100 tags. Delete one to add another.",
+  "sample": "Sample tag",
+  "fields": {
+    "slug": "Tag key",
+    "name": "Display name",
+    "description": "Description",
+    "order": "Order",
+    "color": "Colour"
+  },
+  "hints": {
+    "slug": "Lowercase letters, digits and hyphens, at most 20. It cannot change once created.",
+    "slugFixed": "The key cannot change: contests store tags by it.",
+    "order": "Lower numbers come first; ties sort by key."
+  },
+  "errors": {
+    "slug": "Lowercase letters, digits and hyphens, 1 to 20 characters.",
+    "name": "The name has 1 to 40 characters.",
+    "description": "At most 200 characters.",
+    "order": "A whole number from -1000 to 1000."
+  },
+  "create": "Add tag",
+  "save": "Save tag",
+  "cancel": "Stop editing",
+  "created": "Tag added.",
+  "saved": "Tag saved.",
+  "empty": "No tags yet. Add the first one above.",
+  "columns": {
+    "tag": "Tag",
+    "slug": "Key",
+    "order": "Order",
+    "description": "Description",
+    "actions": "Actions"
+  },
+  "edit": "Edit",
+  "remove": "Delete",
+  "removeTitle": "Delete tag “{name}”?",
+  "removeBody": "Contests tagged {slug} keep the tag and show it as a neutral chip.",
+  "removeConfirm": "Delete tag"
+}

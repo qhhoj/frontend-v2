@@ -18,7 +18,12 @@ import UpcomingContestRow from './UpcomingContestRow.vue';
 import { PHASE_PAGE_SIZE, groupQuery, toContestListLocation } from './use-contest-list-filters';
 import type { ContestListFilters } from './use-contest-list-filters';
 
-const props = defineProps<{ phase: ContestPhase; filters: ContestListFilters }>();
+const props = defineProps<{
+  phase: ContestPhase;
+  filters: ContestListFilters;
+  /** The filtering tag's display name, for the empty text. */
+  tagName?: string | null;
+}>();
 const emit = defineEmits<{ page: [page: number] }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
@@ -28,7 +33,7 @@ const contests = computed(() => list.value?.items ?? []);
 const total = computed(() => list.value?.meta.total ?? 0);
 const isSingleGroup = computed(() => props.filters.phase === props.phase);
 const isFiltered = computed(() =>
-  Boolean(props.filters.search.trim() || props.filters.isRatedOnly),
+  Boolean(props.filters.search.trim() || props.filters.isRatedOnly || props.filters.tag),
 );
 const now = useNow(15_000);
 /** A running contest leaves the list the moment its end passes, before the server answers. */
@@ -77,6 +82,10 @@ const firstPageTarget = computed(() => ({
   name: 'contests',
   query: toContestListLocation({ ...props.filters, page: 1 }),
 }));
+const clearTagTarget = computed(() => ({
+  name: 'contests',
+  query: toContestListLocation({ ...props.filters, tag: null, page: 1 }),
+}));
 </script>
 
 <template>
@@ -105,6 +114,8 @@ const firstPageTarget = computed(() => ({
         :is-filtered="isFiltered"
         :is-past-last-page="isPastLastPage"
         :first-page-target="firstPageTarget"
+        :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
+        :clear-tag-target="clearTagTarget"
       />
       <div v-else-if="phase === 'running'" class="grid gap-4 lg:grid-cols-2">
         <RunningContestCard

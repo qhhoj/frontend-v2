@@ -1,0 +1,46 @@
+{
+  "crumb": "Kỳ thi",
+  "title": "Thẻ kỳ thi",
+  "lead": "Danh mục thẻ hiện trên danh sách kỳ thi. Màu là khóa token của giao diện, không phải mã màu.",
+  "caption": "Danh mục thẻ kỳ thi",
+  "createTitle": "Thêm thẻ",
+  "editTitle": "Sửa thẻ “{name}”",
+  "full": "Danh mục đã đủ 100 thẻ. Xóa bớt thẻ để thêm thẻ mới.",
+  "sample": "Thẻ mẫu",
+  "fields": {
+    "slug": "Mã thẻ",
+    "name": "Tên hiển thị",
+    "description": "Mô tả",
+    "order": "Thứ tự",
+    "color": "Màu"
+  },
+  "hints": {
+    "slug": "Chữ thường, số và dấu gạch ngang, tối đa 20 ký tự. Không đổi được sau khi tạo.",
+    "slugFixed": "Mã thẻ không đổi được: kỳ thi lưu thẻ theo mã này.",
+    "order": "Số nhỏ đứng trước; cùng thứ tự thì xếp theo mã."
+  },
+  "errors": {
+    "slug": "Chỉ chữ thường, số và dấu gạch ngang, 1 đến 20 ký tự.",
+    "name": "Tên có từ 1 đến 40 ký tự.",
+    "description": "Mô tả tối đa 200 ký tự.",
+    "order": "Thứ tự là số nguyên từ -1000 đến 1000."
+  },
+  "create": "Thêm thẻ",
+  "save": "Lưu thẻ",
+  "cancel": "Thôi sửa",
+  "created": "Đã thêm thẻ.",
+  "saved": "Đã lưu thẻ.",
+  "empty": "Chưa có thẻ nào. Thêm thẻ đầu tiên ở trên.",
+  "columns": {
+    "tag": "Thẻ",
+    "slug": "Mã",
+    "order": "Thứ tự",
+    "description": "Mô tả",
+    "actions": "Thao tác"
+  },
+  "edit": "Sửa",
+  "remove": "Xóa",
+  "removeTitle": "Xóa thẻ “{name}”?",
+  "removeBody": "Các kỳ thi đang gắn thẻ {slug} vẫn giữ thẻ đó và hiện nó bằng chip màu trung tính.",
+  "removeConfirm": "Xóa thẻ"
+}

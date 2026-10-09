@@ -1726,6 +1726,15 @@
     "title": "Replay"
   },
   "contestTags": {
+    "filterLabel": "Filter contests by tag",
+    "all": "All",
+    "failedTitle": "The tag list could not be loaded.",
+    "failedBody": "The tag filter is hidden for now; the contest list works as usual.",
+    "unknownTitle": "There is no tag “{slug}”.",
+    "unknownBody": "The address has ?tag={slug} but the catalogue has no such tag. Showing every contest.",
+    "emptyTitle": "No contest has the tag “{name}” yet.",
+    "emptyHint": "Try removing the tag or picking another one.",
+    "clear": "Clear filter",
     "title": "Contest tags"
   },
   "joinRules": {

@@ -38,6 +38,16 @@ describe('contest chips', () => {
     expect(chipsOf(contest, true)).toEqual(['ICPC', 'dp', 'graphs']);
   });
 
+  it('draws a tag neutral, by its slug, while no catalogue is cached', () => {
+    const wrapper = mountComponent(ContestChips, {
+      props: { contest: contestItem({ ...PLAIN, tags: ['olympic'] }), withTags: true },
+    });
+    const chip = wrapper.get('[data-tag-color]');
+    expect(chip.attributes('data-tag-color')).toBe('neutral');
+    expect(chip.text()).toBe('olympic');
+    expect(chip.classes()).toContain('text-muted');
+  });
+
   it('shows the code-needed chip only where the list asks for it', () => {
     const coded = contestItem({ ...PLAIN, requiresAccessCode: true });
     expect(chipsOf(coded)).toEqual(['ICPC']);

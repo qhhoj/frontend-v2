@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import type { ContestListQuery, ContestPhase } from '@/api/types/contests';
 import { valuesOf } from '@/features/problems/use-problem-filters';
+import { isTagSlug } from './tag-chips';
 
 export interface ContestListFilters {
   /** Key or name, as typed; the API trims nothing, so neither do we. */
@@ -11,6 +12,8 @@ export interface ContestListFilters {
   /** One group on its own (paged), or null for the overview of all three. */
   phase: ContestPhase | null;
   page: number;
+  /** One catalogue slug, or null; a malformed value in the URL is dropped. */
+  tag: string | null;
 }
 
 export const PHASE_ORDER: readonly ContestPhase[] = ['running', 'upcoming', 'ended'];
@@ -36,6 +39,11 @@ function pageOf(query: LocationQuery): number {
   return page >= 1 && page <= MAX_PAGE ? page : 1;
 }
 
+function tagOf(query: LocationQuery): string | null {
+  const text = valuesOf(query.tag)[0] ?? '';
+  return isTagSlug(text) ? text : null;
+}
+
 export function parseContestListFilters(query: LocationQuery): ContestListFilters {
   const phase = valuesOf(query.phase)[0];
   return {
@@ -43,6 +51,7 @@ export function parseContestListFilters(query: LocationQuery): ContestListFilter
     isRatedOnly: valuesOf(query.rated)[0] === RATED_ONLY,
     phase: isPhase(phase) ? phase : null,
     page: pageOf(query),
+    tag: tagOf(query),
   };
 }
 
@@ -51,6 +60,7 @@ export const toContestListLocation = (filters: ContestListFilters): LocationQuer
   rated: filters.isRatedOnly ? RATED_ONLY : undefined,
   phase: filters.phase ?? undefined,
   page: filters.page > 1 ? String(filters.page) : undefined,
+  tag: filters.tag ?? undefined,
 });
 
 /** What one group asks: the overview shows the first page of each, a single group pages. */
@@ -60,6 +70,7 @@ export function groupQuery(filters: ContestListFilters, phase: ContestPhase): Co
     phase,
     search: filters.search.trim() || undefined,
     rated: filters.isRatedOnly ? true : undefined,
+    tag: filters.tag ?? undefined,
     page: isSingleGroup ? filters.page : 1,
     pageSize: isSingleGroup ? PHASE_PAGE_SIZE : OVERVIEW_PAGE_SIZE[phase],
   };

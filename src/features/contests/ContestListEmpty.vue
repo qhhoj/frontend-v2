@@ -4,6 +4,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { ContestPhase } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
+import { translate } from '@/i18n';
 
 const props = defineProps<{
   phase: ContestPhase;
@@ -11,11 +12,19 @@ const props = defineProps<{
   /** A page number the list does not reach: the text says so and the link goes back to page 1. */
   isPastLastPage: boolean;
   firstPageTarget: RouteLocationRaw;
+  /** The name (or slug) of the tag the list is filtered by, or null. */
+  tagName?: string | null;
+  /** The same list without the tag. */
+  clearTagTarget?: RouteLocationRaw;
 }>();
+const isTagEmpty = computed(() => Boolean(props.tagName) && !props.isPastLastPage);
 /** With a filter set, the empty text says the filter is the reason, not that the phase is empty. */
-const messageKey = computed(() => {
-  if (props.isPastLastPage) return 'contests.list.empty.pastLastPage';
-  return props.isFiltered ? 'contests.list.empty.noMatch' : `contests.list.empty.${props.phase}`;
+const messageText = computed(() => {
+  if (props.isPastLastPage) return translate('contests.list.empty.pastLastPage');
+  if (isTagEmpty.value) return translate('contestTags.emptyTitle', { name: props.tagName });
+  return translate(
+    props.isFiltered ? 'contests.list.empty.noMatch' : `contests.list.empty.${props.phase}`,
+  );
 });
 const showsUpcomingHint = computed(
   () => props.phase === 'upcoming' && !props.isFiltered && !props.isPastLastPage,
@@ -25,6 +34,8 @@ const ENDED_TARGET = { name: 'contests', query: { phase: 'ended' } };
 const action = computed(() => {
   if (props.isPastLastPage)
     return { to: props.firstPageTarget, labelKey: 'contests.list.empty.backToFirstPage' };
+  if (isTagEmpty.value && props.clearTagTarget)
+    return { to: props.clearTagTarget, labelKey: 'contestTags.clear' };
   if (showsUpcomingHint.value)
     return { to: ENDED_TARGET, labelKey: 'contests.list.empty.seeEnded' };
   return null;
@@ -34,10 +45,11 @@ const action = computed(() => {
 <template>
   <GlassCard as="div">
     <EmptyState>
-      <span class="block font-semibold text-content">{{ $t(messageKey) }}</span>
+      <span class="block font-semibold text-content">{{ messageText }}</span>
       <span v-if="showsUpcomingHint" class="block">{{
         $t('contests.list.empty.upcomingHint')
       }}</span>
+      <span v-if="isTagEmpty" class="block">{{ $t('contestTags.emptyHint') }}</span>
       <RouterLink
         v-if="action"
         :to="action.to"

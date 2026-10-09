@@ -55,7 +55,7 @@ const startsInText = computed(() =>
       </h3>
       <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
       <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-        <ContestChips :contest="contest" with-code-needed />
+        <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
         <span class="font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
       </div>

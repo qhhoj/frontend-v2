@@ -8,11 +8,14 @@ import { formatClock, formatNumber, formatShortDate, formatWeekdayDate } from '@
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestChips from './ContestChips.vue';
+import { useContestTagsQuery } from './contest-extras.queries';
 import ContestCountdown from './ContestCountdown.vue';
 import ContestTimeBar from './ContestTimeBar.vue';
 import PhasePill from './PhasePill.vue';
 
 const props = defineProps<{ contest: ContestDetail }>();
+/** The header colours its tags: read the catalogue only when the contest has tags. */
+useContestTagsQuery(() => props.contest.tags.length > 0);
 const emit = defineEmits<{ elapsed: [] }>();
 const locale = useLocaleStore();
 /** One clock for the card: the pill, the bar and the countdown switch on the same second. */
