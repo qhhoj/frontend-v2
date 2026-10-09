@@ -107,6 +107,28 @@ describe('ProblemStatementsTab', () => {
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
   });
 
+  it('locks a changed translation description of a full-markup problem without judge.problem_full_markup, but not a name-only change', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(editableProblem({ isFullMarkup: true })),
+      ...PREVIEW,
+      'PUT /problems/hcmus41c/translations/vi': { status: 204 },
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('textarea').setValue('Mô tả mới');
+    const save = buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt');
+    expect(save.attributes('aria-disabled')).toBe('true');
+    expect(wrapper.text()).toContain('Cần quyền judge.problem_full_markup');
+    await save.trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+    await buttonLabelled(wrapper, 'Hủy thay đổi').trigger('click');
+    await wrapper.get('#statement-name').setValue('Tên mới');
+    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({ name: 'Tên mới' });
+  });
+
   it('uploads an image and inserts its URL into the text', async () => {
     mockApi({
       ...staffViewer(EDIT),

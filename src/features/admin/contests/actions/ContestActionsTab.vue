@@ -131,7 +131,7 @@ const runRate = () => runAction(rateContest);
         </ContestActionCard>
       </div>
     </QueryState>
-    <ContestDataCard :contest-key="contest.key" />
+    <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
     <ContestCloneCard :contest-key="contest.key" />
   </div>
 </template>

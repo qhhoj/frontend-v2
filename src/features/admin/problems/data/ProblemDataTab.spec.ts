@@ -39,7 +39,7 @@ const saveConfig = async (wrapper: Mounted['wrapper']) => {
 describe('ProblemDataTab', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('lists the archive, links each file for download and shows the last init.yml failure line by line', async () => {
+  it('lists the archive as one download link, its members as plain text, and shows the last init.yml failure line by line', async () => {
     mockApi({
       ...staffViewer(EDIT),
       ...problemEditorRoutes(),
@@ -49,9 +49,11 @@ describe('ProblemDataTab', () => {
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
     expect(wrapper.text()).toContain('hcmus41c.zip');
-    expect(wrapper.find('a[href="/api/internal/problems/hcmus41c/data/files/1.in"]').exists()).toBe(
-      true,
-    );
+    expect(
+      wrapper.find('a[href="/api/internal/problems/hcmus41c/data/files/hcmus41c.zip"]').exists(),
+    ).toBe(true);
+    expect(wrapper.text()).toContain('1.in');
+    expect(wrapper.find('a[href$="/data/files/1.in"]').exists()).toBe(false);
     const feedback = wrapper.get('[data-testid="data-feedback"]');
     expect(feedback.attributes('role')).toBe('alert');
     expect(feedback.findAll('li').map((line) => line.text())).toEqual([

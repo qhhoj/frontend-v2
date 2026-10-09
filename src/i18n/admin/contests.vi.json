@@ -247,8 +247,8 @@
       "needsDate": "Chọn thời điểm hết hạn.",
       "needsAmount": "Nhập một số nguyên từ 1 đến 1 000 000.",
       "preview": {
-        "M": "Hết hạn sau {amount} phút kể từ lúc lưu, tức {date} lúc {time}.",
-        "D": "Hết hạn sau {amount} ngày kể từ lúc lưu, tức {date}."
+        "M": "Hết hạn sau {amount} phút kể từ lần tạo lại liên kết gần nhất, tức {date} lúc {time}.",
+        "D": "Hết hạn sau {amount} ngày kể từ lần tạo lại liên kết gần nhất, tức {date}."
       }
     }
   },
@@ -289,6 +289,8 @@
       "ready": "Sẵn sàng · {size}",
       "readyDetail": "Tạo lúc {readyAt}; có thể chuẩn bị lại sau {nextPrepareAt}.",
       "preparing": "Đang chuẩn bị…",
+      "notEnded": "Xuất dữ liệu có sau khi kỳ thi kết thúc.",
+      "notConfigured": "Máy chủ này chưa bật xuất dữ liệu kỳ thi.",
       "none": "Chưa có tệp xuất.",
       "prepare": "Chuẩn bị",
       "download": "Tải về",

@@ -154,6 +154,7 @@ describe('ContestActionsTab', () => {
     const calls = mockApi({
       ...staffViewer(['judge.edit_own_contest']),
       ...routes({
+        ...contestEditorRoutes(editableContest({ phase: 'ended' })),
         'GET /contests/hcmus-w41/data': ok(
           contestDataStatus({ state: 'none', size: null, nextPrepareAt: null }),
         ),
@@ -190,6 +191,31 @@ describe('ContestActionsTab', () => {
     expect(
       calls.find((call) => call.method === 'POST' && call.path.endsWith('/data'))?.body,
     ).toEqual({ problemGlob: 'hcmus41*', results: ['AC'] });
+  });
+
+  it('does not ask for the export before the contest has ended, and says why', async () => {
+    const calls = mockApi({ ...staffViewer(['judge.edit_own_contest']), ...routes() });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/actions',
+      'Xuất dữ liệu có sau khi kỳ thi kết thúc.',
+    );
+    expect(calls.some((call) => call.path === '/contests/hcmus-w41/data')).toBe(false);
+    expect(wrapper.text()).not.toContain('Thử lại');
+  });
+
+  it('shows a not-configured note, not a retry error, when the install has no export root', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...routes({
+        ...contestEditorRoutes(editableContest({ phase: 'ended' })),
+        'GET /contests/hcmus-w41/data': fail(404, 'not_found', {}),
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/actions',
+      'Máy chủ này chưa bật xuất dữ liệu kỳ thi.',
+    );
+    expect(wrapper.text()).not.toContain('Thử lại');
   });
 
   it('shows a taken clone key under the box, inside the dialog that stays open', async () => {

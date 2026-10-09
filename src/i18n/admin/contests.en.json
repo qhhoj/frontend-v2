@@ -247,8 +247,8 @@
       "needsDate": "Pick an expiry time.",
       "needsAmount": "Enter a whole number from 1 to 1 000 000.",
       "preview": {
-        "M": "Expires {amount} minutes after saving, that is {date} at {time}.",
-        "D": "Expires {amount} days after saving, that is {date}."
+        "M": "Expires {amount} minutes after the last regeneration, that is {date} at {time}.",
+        "D": "Expires {amount} days after the last regeneration, that is {date}."
       }
     }
   },
@@ -289,6 +289,8 @@
       "ready": "Ready · {size}",
       "readyDetail": "Created at {readyAt}; it can be prepared again after {nextPrepareAt}.",
       "preparing": "Preparing…",
+      "notEnded": "The export is available after the contest ends.",
+      "notConfigured": "Contest data export is not configured on this server.",
       "none": "No export yet.",
       "prepare": "Prepare",
       "download": "Download",

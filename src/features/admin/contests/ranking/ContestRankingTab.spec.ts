@@ -109,4 +109,26 @@ describe('ContestRankingTab', () => {
     expect(calls.some((call) => call.path.endsWith('/regenerate'))).toBe(true);
     expect(wrapper.text()).toContain('newToken');
   });
+
+  it('previews the expiry from the link’s last regeneration, not from now', async () => {
+    mockApi(
+      base(
+        ok(officialRanking()),
+        ok(
+          rankingLink({
+            expiryMode: 'D',
+            expiryAmount: 2,
+            regeneratedAt: '2026-01-10T12:00:00.000Z',
+          }),
+        ),
+      ),
+    );
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/ranking',
+      'q7Hk2xVn9aTzP4mR',
+    );
+    expect(wrapper.text()).toContain(
+      'Hết hạn sau 2 ngày kể từ lần tạo lại liên kết gần nhất, tức 12/01/2026.',
+    );
+  });
 });

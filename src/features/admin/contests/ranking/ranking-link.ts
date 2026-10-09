@@ -44,12 +44,12 @@ const localClock = (instant: Date) => `${pad(instant.getHours())}:${pad(instant.
 const MINUTE_MS = 60_000;
 const DAY_MS = 86_400_000;
 
-/** What the link will expire at, counted from the save time, in words; null for the modes without an amount. */
-export function expiryPreview(form: LinkForm, now: Date, locale: Locale): string | null {
+/** What the link will expire at, counted from the link's last regeneration (as the backend does), in words; null for the modes without an amount. */
+export function expiryPreview(form: LinkForm, regeneratedAt: Date, locale: Locale): string | null {
   if ((form.expiryMode !== 'M' && form.expiryMode !== 'D') || !isWholeAmount(form.expiryAmount))
     return null;
   const step = form.expiryMode === 'M' ? MINUTE_MS : DAY_MS;
-  const until = new Date(now.getTime() + form.expiryAmount * step);
+  const until = new Date(regeneratedAt.getTime() + form.expiryAmount * step);
   const when = { amount: form.expiryAmount, date: localDay(until), time: localClock(until) };
   return translate(`admin.contests.ranking.link.preview.${form.expiryMode}`, when, { locale });
 }

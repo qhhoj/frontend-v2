@@ -61,7 +61,7 @@ describe('ranking link form', () => {
     ).toHaveProperty('error');
   });
 
-  it('previews the expiry date from the save time', () => {
+  it('previews the expiry date from the last regeneration', () => {
     const now = new Date('2026-10-08T03:00:00.000Z');
     expect(
       expiryPreview(
@@ -69,7 +69,7 @@ describe('ranking link form', () => {
         now,
         'vi',
       ),
-    ).toBe('Hết hạn sau 7 ngày kể từ lúc lưu, tức 15/10/2026.');
+    ).toBe('Hết hạn sau 7 ngày kể từ lần tạo lại liên kết gần nhất, tức 15/10/2026.');
     expect(
       expiryPreview(
         { status: 'public', expiryMode: 'U', expiryAmount: null, expiresAt: '' },
@@ -81,25 +81,25 @@ describe('ranking link form', () => {
 });
 
 describe('expiry preview in the viewer’s zone', () => {
-  it('names the viewer’s own day and clock, so a save at 00:30 local shows the local expiry day', () => {
+  it('names the viewer’s own day and clock, so a regeneration at 00:30 local shows the local expiry day', () => {
     vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
     try {
       // 17:30 UTC on 08/10 is 00:30 on 09/10 in Ho Chi Minh City.
-      const savedAt = new Date('2026-10-08T17:30:00.000Z');
+      const regeneratedAt = new Date('2026-10-08T17:30:00.000Z');
       expect(
         expiryPreview(
           { status: 'public', expiryMode: 'D', expiryAmount: 7, expiresAt: '' },
-          savedAt,
+          regeneratedAt,
           'vi',
         ),
-      ).toBe('Hết hạn sau 7 ngày kể từ lúc lưu, tức 16/10/2026.');
+      ).toBe('Hết hạn sau 7 ngày kể từ lần tạo lại liên kết gần nhất, tức 16/10/2026.');
       expect(
         expiryPreview(
           { status: 'public', expiryMode: 'M', expiryAmount: 90, expiresAt: '' },
-          savedAt,
+          regeneratedAt,
           'vi',
         ),
-      ).toBe('Hết hạn sau 90 phút kể từ lúc lưu, tức 09/10/2026 lúc 02:00.');
+      ).toBe('Hết hạn sau 90 phút kể từ lần tạo lại liên kết gần nhất, tức 09/10/2026 lúc 02:00.');
     } finally {
       vi.unstubAllEnvs();
     }

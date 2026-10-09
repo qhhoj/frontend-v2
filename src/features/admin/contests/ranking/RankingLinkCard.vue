@@ -12,7 +12,6 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatDateTime } from '@/lib/format';
-import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -60,8 +59,9 @@ watch(link, (next) => (form.value = formOf(next)));
 const url = computed(() =>
   link.value ? publicRankingUrl(link.value.token, globalThis.location.origin) : '',
 );
-const now = useNow();
-const preview = computed(() => expiryPreview(form.value, new Date(now.value), locale.locale));
+const preview = computed(() =>
+  link.value ? expiryPreview(form.value, new Date(link.value.regeneratedAt), locale.locale) : null,
+);
 const queryClient = useQueryClient();
 /** Every write answers the link as it now is, so the answer is stored as is (a refetch could read it back stale). */
 const storeLink = (saved: RankingLink) => queryClient.setQueryData(linkKey(), saved);

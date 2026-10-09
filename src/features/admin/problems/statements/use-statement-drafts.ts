@@ -35,6 +35,15 @@ const sameText = (left: StatementDraft, right: StatementDraft) =>
 const hasUnsaved = (drafts: Drafts, saved: Drafts) =>
   STATEMENT_SLOTS.some((item) => !sameText(drafts[item], saved[item]));
 
+/**
+ * Whether saving the slot would write its description: the original always does (it is the description), a translation does
+ * when the text changed or the translation is new. A full-markup problem's description needs the full-markup permission.
+ */
+const isDescriptionWrite = (target: StatementSlot, drafts: Drafts, saved: Drafts) =>
+  target === 'original' ||
+  !saved[target].exists ||
+  drafts[target].description !== saved[target].description;
+
 /** After a save the slot's saved text is what was just written, and it is no longer missing. */
 function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementSlot) {
   drafts.value[target].exists = true;
@@ -50,7 +59,9 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   const current = computed(() => drafts.value[slot.value]);
   const canFullMarkup = computed(() => can(FULL_MARKUP_PERMISSION));
   const isLocked = computed(
-    () => slot.value === 'original' && isOriginalLocked(problem(), canFullMarkup.value),
+    () =>
+      isOriginalLocked(problem(), canFullMarkup.value) &&
+      isDescriptionWrite(slot.value, drafts.value, saved.value),
   );
   const previewStyle = computed(() => previewStyleFor(problem(), canFullMarkup.value));
   const errors = computed(() => checkStatementDraft(current.value, slot.value));

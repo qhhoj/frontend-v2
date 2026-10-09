@@ -19,9 +19,13 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
     :lead="$t('admin.problems.data.archive.lead')"
   >
     <div class="flex flex-col gap-1 text-sm">
-      <p class="font-mono font-semibold">
-        {{ data.archive ?? $t('admin.problems.data.archive.none') }}
-      </p>
+      <a
+        v-if="data.archive"
+        :href="problemDataFileUrl(code, data.archive)"
+        class="inline-flex min-h-11 items-center font-mono font-semibold text-accent-text underline"
+        >{{ data.archive }}</a
+      >
+      <p v-else class="font-mono font-semibold">{{ $t('admin.problems.data.archive.none') }}</p>
       <p class="text-muted">
         {{
           data.hasInit
@@ -32,11 +36,7 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
     </div>
     <ul class="flex flex-wrap gap-x-4 gap-y-1">
       <li v-for="file in previewFiles" :key="file">
-        <a
-          :href="problemDataFileUrl(code, file)"
-          class="inline-flex min-h-11 items-center font-mono text-sm text-accent-text underline"
-          >{{ file }}</a
-        >
+        <span class="font-mono text-sm">{{ file }}</span>
       </li>
     </ul>
     <p v-if="hiddenCount > 0" class="text-sm text-muted">
