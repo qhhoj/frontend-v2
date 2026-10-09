@@ -1,0 +1,74 @@
+{
+  "export": {
+    "title": "Submissions export",
+    "description": "A zip with submissions.csv and the source of each official submission (no virtual or spectating runs). One export per day.",
+    "notEnded": "Available after the contest ends.",
+    "notConfigured": "This server has no contest data folder configured.",
+    "preparing": "Preparing the export…",
+    "ready": "The export is ready: {size}, made at {readyAt}.",
+    "none": "No export yet.",
+    "prepare": "Prepare export",
+    "download": "Download",
+    "waitUntil": "You can prepare it again after {time}."
+  },
+  "feed": {
+    "title": "Event feed for resolver tools",
+    "description": "One key per contest, used with HTTP Basic and the user name feed. The key is bound to you and stops working when you lose edit rights on the contest.",
+    "none": "There is no active key.",
+    "status": {
+      "mode": "Mode",
+      "expiresAt": "Expires",
+      "createdBy": "Created by",
+      "releasedAt": "Released at"
+    },
+    "modeLabel": "Mode of a new key",
+    "modes": { "frozen-until-release": "Frozen until released", "live": "Live" },
+    "modeHints": {
+      "frozen-until-release": "During a freeze the feed holds only results from before the freeze until you release it to the resolver.",
+      "live": "The feed holds results during the freeze too. Choose it only when the key holder may see the real results."
+    },
+    "days": "Days valid (1 to {max})",
+    "mint": "Create key",
+    "mintAgain": "Create a new key",
+    "revoke": "Revoke key",
+    "release": "Release to resolver",
+    "released": "Released: the feed now holds the results during the freeze.",
+    "impersonating": "You are viewing as someone else: keys cannot be created, revoked or released. Use your own session.",
+    "confirm": {
+      "mint": {
+        "title": "Create an event feed key?",
+        "body": "The key is shown once. An earlier key is revoked at once.",
+        "label": "Create key"
+      },
+      "revoke": {
+        "title": "Revoke the key?",
+        "body": "Tools using this key are refused at once.",
+        "label": "Revoke"
+      },
+      "release": {
+        "title": "Release results to the resolver?",
+        "body": "The feed will hold the results of the current freeze. This cannot be undone for this freeze.",
+        "label": "Release"
+      }
+    },
+    "reveal": {
+      "title": "Event feed key",
+      "once": "Copy the key now: it is shown once and cannot be viewed again.",
+      "rows": {
+        "username": "User name",
+        "key": "Key",
+        "snapshot": "Feed address",
+        "stream": "Stream address"
+      },
+      "copy": {
+        "username": "Copy the user name",
+        "key": "Copy the key",
+        "snapshot": "Copy the feed address",
+        "stream": "Copy the stream address"
+      },
+      "meta": "Mode: {mode}. Expires: {expiresAt}.",
+      "done": "I have saved the key",
+      "close": "Close"
+    }
+  }
+}

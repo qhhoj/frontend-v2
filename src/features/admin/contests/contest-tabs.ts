@@ -77,7 +77,7 @@ const TAB_COMPONENTS: Record<ContestTabId, Component | null> = {
   actions: defineAsyncComponent(() => import('./actions/ContestActionsTab.vue')),
   participants: defineAsyncComponent(() => import('./participants/ContestParticipantsTab.vue')),
   ghosts: defineAsyncComponent(() => import('./ghosts/ContestGhostsTab.vue')),
-  data: null,
+  data: defineAsyncComponent(() => import('./data/ContestDataTab.vue')),
 };
 
 /** The tab a route name belongs to, or null for a route that is not one of the editor's tabs. */

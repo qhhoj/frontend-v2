@@ -1,0 +1,74 @@
+{
+  "export": {
+    "title": "Xuất bài nộp",
+    "description": "Tệp zip gồm submissions.csv và mã nguồn từng bài nộp chính thức (không gồm thi ảo, xem bài). Mỗi ngày tạo được một lần.",
+    "notEnded": "Xuất được sau khi kỳ thi kết thúc.",
+    "notConfigured": "Máy chủ này chưa cấu hình thư mục lưu dữ liệu kỳ thi.",
+    "preparing": "Đang tạo bản xuất…",
+    "ready": "Bản xuất sẵn sàng: {size}, tạo lúc {readyAt}.",
+    "none": "Chưa có bản xuất.",
+    "prepare": "Tạo bản xuất",
+    "download": "Tải về",
+    "waitUntil": "Tạo lại được sau {time}."
+  },
+  "feed": {
+    "title": "Nguồn sự kiện cho công cụ công bố kết quả",
+    "description": "Một khóa cho mỗi kỳ thi, dùng HTTP Basic với tên đăng nhập feed. Khóa gắn với bạn và mất hiệu lực khi bạn mất quyền sửa kỳ thi.",
+    "none": "Chưa có khóa còn hiệu lực.",
+    "status": {
+      "mode": "Chế độ",
+      "expiresAt": "Hết hạn",
+      "createdBy": "Người tạo",
+      "releasedAt": "Đã mở khóa lúc"
+    },
+    "modeLabel": "Chế độ của khóa mới",
+    "modes": { "frozen-until-release": "Đóng băng tới khi mở", "live": "Trực tiếp" },
+    "modeHints": {
+      "frozen-until-release": "Trong lúc đóng băng, nguồn chỉ có kết quả trước khi đóng băng cho tới khi bạn bấm mở cho công cụ công bố.",
+      "live": "Nguồn có cả kết quả trong lúc đóng băng. Chỉ chọn khi người dùng khóa được xem kết quả thật."
+    },
+    "days": "Số ngày hiệu lực (1 đến {max})",
+    "mint": "Tạo khóa",
+    "mintAgain": "Tạo khóa mới",
+    "revoke": "Thu hồi khóa",
+    "release": "Mở cho công cụ công bố",
+    "released": "Đã mở: nguồn có cả kết quả trong lúc đóng băng.",
+    "impersonating": "Đang xem với tư cách người khác: không tạo, thu hồi hay mở khóa được. Hãy dùng phiên của chính bạn.",
+    "confirm": {
+      "mint": {
+        "title": "Tạo khóa nguồn sự kiện?",
+        "body": "Khóa chỉ hiện một lần. Khóa cũ (nếu có) bị thu hồi ngay.",
+        "label": "Tạo khóa"
+      },
+      "revoke": {
+        "title": "Thu hồi khóa?",
+        "body": "Công cụ đang dùng khóa này sẽ bị từ chối ngay.",
+        "label": "Thu hồi"
+      },
+      "release": {
+        "title": "Mở kết quả cho công cụ công bố?",
+        "body": "Nguồn sẽ có cả kết quả trong lúc đóng băng hiện tại. Không đóng lại được cho lần đóng băng này.",
+        "label": "Mở"
+      }
+    },
+    "reveal": {
+      "title": "Khóa nguồn sự kiện",
+      "once": "Sao chép khóa ngay: khóa chỉ hiện một lần và không xem lại được.",
+      "rows": {
+        "username": "Tên đăng nhập",
+        "key": "Khóa",
+        "snapshot": "Địa chỉ nguồn",
+        "stream": "Địa chỉ luồng"
+      },
+      "copy": {
+        "username": "Sao chép tên đăng nhập",
+        "key": "Sao chép khóa",
+        "snapshot": "Sao chép địa chỉ nguồn",
+        "stream": "Sao chép địa chỉ luồng"
+      },
+      "meta": "Chế độ: {mode}. Hết hạn: {expiresAt}.",
+      "done": "Tôi đã lưu khóa",
+      "close": "Đóng"
+    }
+  }
+}
