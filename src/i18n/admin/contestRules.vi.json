@@ -1,0 +1,18 @@
+{
+  "section": "Vận hành",
+  "fields": {
+    "rules": "Quy định kỳ thi",
+    "balloons": "Bật màn hình bóng bay",
+    "balloonStaff": "Tình nguyện viên bóng bay"
+  },
+  "hints": {
+    "rules": "Markdown. Để trống nếu kỳ thi không có quy định. Mỗi lần sửa nội dung tăng phiên bản; người đã đồng ý giữ phiên bản họ đã đồng ý.",
+    "balloons": "Hàng đợi bóng bay cho thi tại chỗ: mỗi lời giải đúng đầu tiên của một đội cho một bài.",
+    "balloonStaff": "Tình nguyện viên dùng được màn hình bóng bay nhưng không sửa được kỳ thi. Người đang thi không dùng được màn hình này."
+  },
+  "errors": {
+    "rules": "Quy định tối đa {max} ký tự."
+  },
+  "column": "Quy định",
+  "accepted": "bản {revision} · {time}"
+}

@@ -8,6 +8,7 @@ import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
 import { PARTICIPATION_REFUSALS } from './participation-refusal';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
@@ -444,5 +445,172 @@ describe('contest refusals', () => {
 
   it.each(PARTICIPATION_REFUSALS)('gives %s its own text rather than the generic one', (code) => {
     expect(errorMessageKey(new ApiError(code, 409, 'x'))).toBe(`errors.${code}`);
+  });
+});
+
+describe('contest actions with rules', () => {
+  afterEach(() => vi.useRealTimers());
+  const ruled = (overrides: Parameters<typeof contestDetail>[0] = {}) =>
+    contestDetail({ rules: RULES_MARKDOWN, rulesHtml: RULES_HTML, rulesRevision: 3, ...overrides });
+  const tickAndConfirm = async () => {
+    dialog()!.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+    await flushPromises();
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+  };
+  const joinBodies = (calls: ReturnType<typeof mockApi>) =>
+    calls.filter((call) => call.path === '/contests/r42/join').map((call) => call.body);
+
+  it('asks for the rules before a first live join and sends the acceptance', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ruled()),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(joinBodies(calls)).toEqual([]);
+    expect(dialog()!.textContent).toContain('Quy định kỳ thi');
+    await tickAndConfirm();
+    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
+  });
+
+  it('asks again for every virtual run', async () => {
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(
+        ruled({ phase: 'ended', viewer: contestViewer({ liveStatus: 'finished' }) }),
+      ),
+      'POST /contests/r42/join': ok(participationSummary({ virtual: 2 })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Bắt đầu thi ảo').trigger('click');
+    await flushPromises();
+    expect(dialog()!.textContent).toContain('Mỗi lượt thi ảo cần đồng ý lại');
+    await tickAndConfirm();
+    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
+  });
+
+  it('asks nothing of a registered contestant who joins, nor when the rules are blank', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ruled({ viewer: contestViewer({ liveStatus: 'registered' }) })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()).toBeNull();
+    expect(joinBodies(calls)).toEqual([{}]);
+    wrapper.unmount();
+    const second = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ rules: '   ' })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const mounted = await mountApp('/contests/r42');
+    await buttonNamed(mounted.wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(joinBodies(second)).toEqual([{}]);
+  });
+
+  it('asks the rules first, then the code, and sends both in one request', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ruled({ requiresAccessCode: true })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    await tickAndConfirm();
+    // The rules dialog leaves before the code dialog is the only one: `dialog()` must find the code dialog.
+    await vi.waitFor(() =>
+      expect(document.body.querySelectorAll('[role="dialog"]')).toHaveLength(1),
+    );
+    await typeCode('opensesame');
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(joinBodies(calls)).toEqual([{ accessCode: 'opensesame', acceptRules: true }]);
+  });
+
+  it('opens the rules when the server refuses for rules the page did not know, and re-reads the contest', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'GET /contests/r42': sequence(ok(contestDetail()), ok(ruled())),
+      'POST /contests/r42/join': sequence(
+        fail(400, 'rules_not_accepted'),
+        ok(participationSummary()),
+      ),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()!.querySelector('[role="alert"]')!.textContent).toContain('Hãy chọn ô đồng ý');
+    expect(
+      calls.filter((call) => call.path === '/contests/r42' && call.method === 'GET').length,
+    ).toBeGreaterThanOrEqual(2);
+    await tickAndConfirm();
+    expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
+  });
+
+  it('sends one request for a double confirm', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ruled()),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    dialog()!.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+    await flushPromises();
+    const form = dialog()!.querySelector('form')!;
+    form.dispatchEvent(new Event('submit'));
+    await nextTick();
+    form.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(joinBodies(calls)).toHaveLength(1);
+  });
+});
+
+describe('virtual run rules dialog: previous acceptance', () => {
+  const ended = (liveParticipation: ReturnType<typeof participationSummary> | null) =>
+    contestDetail({
+      phase: 'ended',
+      rules: RULES_MARKDOWN,
+      rulesHtml: RULES_HTML,
+      rulesRevision: 3,
+      viewer: contestViewer({ liveStatus: 'finished', liveParticipation }),
+    });
+  const open = async (detail: ReturnType<typeof contestDetail>) => {
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(detail) });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Bắt đầu thi ảo').trigger('click');
+    await flushPromises();
+  };
+
+  it('shows the revision the live run accepted', async () => {
+    await open(
+      ended(
+        participationSummary({
+          rulesAcceptedAt: '2026-10-08T05:58:00.000Z',
+          rulesAcceptedRevision: 2,
+        }),
+      ),
+    );
+    expect(dialog()!.textContent).toContain('Lượt trước của bạn đã đồng ý bản 2 lúc');
+  });
+
+  it('shows no previous line when the live run accepted nothing', async () => {
+    await open(ended(participationSummary()));
+    expect(dialog()!.textContent).not.toContain('Lượt trước của bạn');
   });
 });

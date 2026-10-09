@@ -63,6 +63,11 @@ export interface ContestForm {
   rateExclude: UserChip[];
   ratingFloor: number | null;
   ratingCeiling: number | null;
+  /** Markdown; '' means the contest has no rules (the backend trims). */
+  rules: string;
+  balloons: boolean;
+  /** Balloon volunteers (`balloonStaff`): may use the balloon screen without editing the contest. */
+  balloonStaff: UserChip[];
 }
 
 type Part<Keys extends keyof ContestForm> = Pick<ContestForm, Keys>;
@@ -108,6 +113,7 @@ const CHIP_FIELDS = [
   'bannedUsers',
   'rateExclude',
   'organizations',
+  'balloonStaff',
 ] as const;
 /** Handled by `specialFields`, never compared plainly. */
 const SPECIAL = [
@@ -262,6 +268,17 @@ function ratingOf(
   };
 }
 
+function operationsOf(
+  contest: EditableContest,
+  settings: ContestSettings,
+): Part<'rules' | 'balloons' | 'balloonStaff'> {
+  return {
+    rules: contest.rules,
+    balloons: settings.balloons,
+    balloonStaff: chipsFrom(settings.balloonStaff, settings.users),
+  };
+}
+
 export function toContestForm(contest: EditableContest): ContestForm {
   const settings = requireSettings(contest);
   return {
@@ -271,6 +288,7 @@ export function toContestForm(contest: EditableContest): ContestForm {
     ...accessOf(contest, settings),
     ...visibilityOf(contest, settings),
     ...ratingOf(contest, settings),
+    ...operationsOf(contest, settings),
   };
 }
 
@@ -374,6 +392,12 @@ const emptyRating = (): Part<
   ratingCeiling: null,
 });
 
+const emptyOperations = (): Part<'rules' | 'balloons' | 'balloonStaff'> => ({
+  rules: '',
+  balloons: false,
+  balloonStaff: [],
+});
+
 export const emptyContestForm = (): ContestForm => ({
   ...emptyIdentity(),
   ...emptyTimes(),
@@ -381,6 +405,7 @@ export const emptyContestForm = (): ContestForm => ({
   ...emptyAccess(),
   ...emptyVisibility(),
   ...emptyRating(),
+  ...emptyOperations(),
 });
 
 const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
@@ -511,6 +536,15 @@ function checkFormatConfig(form: ContestForm, message: Message): FieldErrors {
   return errors;
 }
 
+/** backend `CONTEST_RULES_MAX`. */
+export const RULES_MAX_LENGTH = 8192;
+
+function checkOperations(form: ContestForm): FieldErrors {
+  return form.rules.length > RULES_MAX_LENGTH
+    ? { rules: translate('admin.contestRules.errors.rules', { max: RULES_MAX_LENGTH }) }
+    : {};
+}
+
 export function checkContestForm(form: ContestForm): FieldErrors {
   const message: Message = (key) => translate(`admin.contests.general.errors.${key}`);
   return {
@@ -518,5 +552,6 @@ export function checkContestForm(form: ContestForm): FieldErrors {
     ...checkNumbers(form, message),
     ...checkRating(form, message),
     ...checkFormatConfig(form, message),
+    ...checkOperations(form),
   };
 }

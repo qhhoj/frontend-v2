@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -17,12 +18,16 @@ import AccessCodeDialog from './AccessCodeDialog.vue';
 import { actionFactsOf, commandOf, contestAction } from './contest-action';
 import type { ContestActionKind } from './contest-action';
 import { useCurrentParticipationQuery } from './contests.queries';
+import ContestRulesDialog from './ContestRulesDialog.vue';
 import InContestStatus from './InContestStatus.vue';
+import { acceptanceOf, hasRules, needsRulesAcceptance } from './join-rules';
 import type { ParticipationRefusal } from './participation-refusal';
 import { useParticipation } from './use-participation';
 
 /** The list or a stale detail may not know the contest needs a code: the backend's answer opens the dialog instead. */
 const ACCESS_CODE_REQUIRED: ParticipationRefusal = 'access_code_required';
+/** A stale detail may not know the contest has rules now: the backend's refusal opens the rules dialog instead. */
+const RULES_NOT_ACCEPTED: ParticipationRefusal = 'rules_not_accepted';
 /** The text each kind shows: a button label, or the notice itself when the kind has no request. Exhaustive, so a new kind fails to compile here. */
 const TEXT_KEYS: Record<ContestActionKind, string> = {
   signIn: 'contests.actions.signIn',
@@ -80,35 +85,83 @@ const actionLabel = computed(() =>
 const isLocked = computed(() => LOCKED_KINDS.includes(chosen.value.kind));
 const hasButton = computed(() => isLocked.value || commandOf(chosen.value.kind) !== null);
 
-function isAccessCodeRequired(failure: unknown): boolean {
-  return failure instanceof ApiError && failure.code === ACCESS_CODE_REQUIRED;
+const queryClient = useQueryClient();
+const isRulesOpen = ref(false);
+/** The viewer ticked the rules in this attempt; sent with the request and dropped when a new attempt starts. */
+const hasAcceptedRules = ref(false);
+const needsRules = computed(
+  () =>
+    hasRules(props.contest.rules) &&
+    needsRulesAcceptance(chosen.value.kind, props.contest.viewer.liveStatus),
+);
+/** Only the live participation carries the acceptance a virtual run is compared with; virtual runs never feed it. */
+const previousAcceptance = computed(() => acceptanceOf(props.contest.viewer.liveParticipation));
+
+const isRefusedWith = (failure: unknown, code: ParticipationRefusal) =>
+  failure instanceof ApiError && failure.code === code;
+
+/** A refusal one of the dialogs answers (the code, or the rules the page did not know about); anything else stays in the bar. */
+function openDialogFor(failure: unknown): boolean {
+  if (isRefusedWith(failure, ACCESS_CODE_REQUIRED)) {
+    reset();
+    isRulesOpen.value = false;
+    isDialogOpen.value = true;
+    return true;
+  }
+  if (!isRefusedWith(failure, RULES_NOT_ACCEPTED)) return false;
+  hasAcceptedRules.value = false;
+  isDialogOpen.value = false;
+  isRulesOpen.value = true;
+  void queryClient.invalidateQueries({ queryKey: ['contests', 'detail'] });
+  return true;
+}
+function closeDialogs() {
+  isDialogOpen.value = false;
+  isRulesOpen.value = false;
+  hasAcceptedRules.value = false;
 }
 /** Runs the request behind the chosen action; the access code is passed through and never kept. */
 async function perform(accessCode?: string) {
   const command = commandOf(chosen.value.kind);
   if (!command || isPending.value) return;
   try {
-    await run(command, accessCode);
+    await run(command, { accessCode, acceptRules: hasAcceptedRules.value });
   } catch (failure: unknown) {
-    if (!isAccessCodeRequired(failure)) throw failure;
-    reset();
-    isDialogOpen.value = true;
+    if (!openDialogFor(failure)) throw failure;
     return;
   }
-  isDialogOpen.value = false;
+  closeDialogs();
   participationStatus.value = translate(`contests.actions.done.${command}`);
   await nextTick();
   root.value?.focus();
 }
-function start() {
-  if (isPending.value || commandOf(chosen.value.kind) === null) return;
-  reset();
+function askCodeOrPerform() {
   if (chosen.value.needsAccessCode) isDialogOpen.value = true;
   else void perform().catch(() => undefined);
 }
-/** Closing the dialog (Cancel, Escape, a successful join) drops the last error, so it does not reappear in the bar. */
+function start() {
+  if (isPending.value || commandOf(chosen.value.kind) === null) return;
+  reset();
+  hasAcceptedRules.value = false;
+  if (needsRules.value) isRulesOpen.value = true;
+  else askCodeOrPerform();
+}
+/** Ticked and confirmed: the code dialog follows when the action needs a code, else the request goes now. */
+function acceptRules() {
+  hasAcceptedRules.value = true;
+  if (!chosen.value.needsAccessCode) {
+    void perform().catch(() => undefined);
+    return;
+  }
+  isRulesOpen.value = false;
+  isDialogOpen.value = true;
+}
+/** Closing a dialog (Cancel, Escape, success) drops the last error, unless the other dialog takes over. */
 watch(isDialogOpen, (isOpen) => {
-  if (!isOpen) reset();
+  if (!isOpen && !isRulesOpen.value) reset();
+});
+watch(isRulesOpen, (isOpen) => {
+  if (!isOpen && !isDialogOpen.value) reset();
 });
 </script>
 
@@ -170,7 +223,7 @@ watch(isDialogOpen, (isOpen) => {
         </p>
       </template>
       <p
-        v-if="error && !isDialogOpen"
+        v-if="error && !isDialogOpen && !isRulesOpen"
         role="alert"
         class="flex items-center gap-2.5 text-verdict-wa"
       >
@@ -184,6 +237,18 @@ watch(isDialogOpen, (isOpen) => {
         :is-pending="isPending"
         :error="error"
         @submit="(code) => perform(code).catch(() => undefined)"
+      />
+      <ContestRulesDialog
+        v-model:visible="isRulesOpen"
+        :contest-name="contest.name"
+        :revision="contest.rulesRevision"
+        :rules-html="contest.rulesHtml"
+        :action-label="actionLabel"
+        :is-virtual="chosen.kind === 'virtual'"
+        :is-pending="isPending"
+        :error="error"
+        :previous-acceptance="chosen.kind === 'virtual' ? previousAcceptance : null"
+        @accept="acceptRules"
       />
     </div>
   </Teleport>

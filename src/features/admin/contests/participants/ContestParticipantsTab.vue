@@ -14,7 +14,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import AdminUserLabel from '../../ui/AdminUserLabel.vue';
 import { ADMIN_INPUT_CLASS } from '../../ui/classes';
 import ParticipationDisqualify from './ParticipationDisqualify.vue';
-import { formatPenalty, participationKindKey } from './participations';
+import { formatPenalty, participationKindKey, rulesAcceptanceText } from './participations';
 
 const props = defineProps<{ contest: EditableContest }>();
 const route = useRoute();
@@ -103,6 +103,9 @@ const goToPage = (target: number) =>
                 <th scope="col" class="hidden px-2 py-2 md:table-cell">
                   {{ $t('admin.contests.participants.columns.start') }}
                 </th>
+                <th scope="col" class="hidden px-2 py-2 lg:table-cell">
+                  {{ $t('admin.contestRules.column') }}
+                </th>
                 <th scope="col" class="px-2 py-2">
                   {{ $t('admin.contests.participants.columns.status') }}
                 </th>
@@ -132,6 +135,9 @@ const goToPage = (target: number) =>
                 </td>
                 <td class="hidden px-2 py-3 md:table-cell">
                   {{ formatDateTime(row.realStart, locale.locale) }}
+                </td>
+                <td class="hidden px-2 py-3 lg:table-cell">
+                  {{ rulesAcceptanceText(row, locale.locale) }}
                 </td>
                 <td
                   :id="`participation-status-${row.id}`"

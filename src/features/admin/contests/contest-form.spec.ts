@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { contestSettings, CURATOR_ID, editableContest } from '@/test/admin-fixtures/contests';
+import { RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
 import {
   changedContestFields,
   checkContestForm,
@@ -176,5 +177,43 @@ describe('contest form', () => {
     ]);
     const emptyBox = { ...seeded(), pointsPrecision: '' as unknown as number };
     expect(Object.keys(checkContestForm(emptyBox))).toEqual(['pointsPrecision']);
+  });
+});
+
+describe('contest form operations fields', () => {
+  const VOLUNTEER = '0192a000-0000-7000-8000-00000000b001';
+  const OTHER = '0192a000-0000-7000-8000-00000000b002';
+  const settings = contestSettings({ balloons: true, balloonStaff: [VOLUNTEER] });
+
+  it('reads rules, the balloon switch and the volunteers from the contest', () => {
+    const form = toContestForm(editableContest({ rules: RULES_MARKDOWN, settings }));
+    expect(form.rules).toBe(RULES_MARKDOWN);
+    expect(form.balloons).toBe(true);
+    expect(form.balloonStaff.map((chip) => chip.id)).toEqual([VOLUNTEER]);
+  });
+
+  it('sends changed rules and volunteers as ids, and nothing for untouched ones', () => {
+    const before = toContestForm(editableContest({ settings }));
+    const after = {
+      ...before,
+      rules: 'Tự làm bài.',
+      balloonStaff: [...before.balloonStaff, { id: OTHER, username: 'tnv2' }],
+    };
+    expect(changedContestFields(before, after)).toEqual({
+      rules: 'Tự làm bài.',
+      balloonStaff: [VOLUNTEER, OTHER],
+    });
+    expect(changedContestFields(before, { ...before })).toEqual({});
+  });
+
+  it('sends cleared rules as an empty string (no rules), never null', () => {
+    const before = toContestForm(editableContest({ rules: 'Cũ', settings }));
+    expect(changedContestFields(before, { ...before, rules: '' })).toEqual({ rules: '' });
+  });
+
+  it('refuses rules longer than the backend allows', () => {
+    const form = { ...newContest(), rules: 'x'.repeat(8193) };
+    expect(checkContestForm(form)).toHaveProperty('rules');
+    expect(checkContestForm({ ...form, rules: 'x'.repeat(8192) })).not.toHaveProperty('rules');
   });
 });

@@ -124,4 +124,20 @@ describe('ContestParticipantsTab', () => {
     await flushPromises();
     expect(invalidatedKeys(queryClient, ranking)).toHaveLength(1);
   });
+
+  it('shows which rules revision each row accepted', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...contestEditorRoutes(),
+      'GET /contests/hcmus-w41/participations': page([
+        participation({ rulesAcceptedAt: '2026-10-08T05:58:00.000Z', rulesAcceptedRevision: 3 }),
+        participation({ id: 'p-2' }),
+      ]),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', 'ngocanh');
+    const RULES_CELL = 5;
+    const cells = wrapper.findAll('tbody tr').map((row) => row.findAll('td')[RULES_CELL]!.text());
+    expect(cells[0]).toContain('bản 3');
+    expect(cells[1]).toBe('—');
+  });
 });

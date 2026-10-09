@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
-import { invalid, issue, mockApi, ok } from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer, switchNamed } from '@/test/admin-routes';
 import {
@@ -220,5 +220,41 @@ describe('ContestGeneralTab', () => {
       .trigger('click');
     await flushPromises();
     expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
+  });
+
+  it('saves the rules text and the balloon switch from the operations section', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      'Thông tin kỳ thi',
+    );
+    await wrapper.get('#contest-rules').setValue('Tự làm bài.');
+    await switchNamed(wrapper, 'Bật màn hình bóng bay').trigger('click');
+    await save(wrapper);
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({
+      rules: 'Tự làm bài.',
+      balloons: true,
+    });
+  });
+
+  it('shows the refusal for a tag that is not in the catalogue', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': fail(400, 'unknown_tag', undefined, undefined, {
+        details: { tags: ['moi'] },
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      'Thông tin kỳ thi',
+    );
+    await wrapper.get('#contest-rules').setValue('x');
+    await save(wrapper);
+    expect(wrapper.text()).toContain('Có thẻ chưa có trong danh mục thẻ kỳ thi.');
   });
 });

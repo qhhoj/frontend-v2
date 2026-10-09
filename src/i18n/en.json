@@ -1738,6 +1738,22 @@
     "title": "Contest tags"
   },
   "joinRules": {
+    "dialogTitle": "Contest rules",
+    "dialogTitleVirtual": "Contest rules · new virtual run",
+    "dialogLead": "{name} · rules revision {revision}",
+    "virtualAgain": "Every virtual run asks again.",
+    "previous": "Your previous run accepted revision {revision} at {time}.",
+    "textLabel": "Rules text",
+    "agree": "I have read the rules of this contest and agree to follow them.",
+    "tickHint": "Tick the box to enable the button.",
+    "refusedTitle": "Could not register",
+    "notRecordedTitle": "Your agreement was not recorded",
+    "cardTitle": "Rules",
+    "revision": "revision {revision}",
+    "read": "Read the rules",
+    "hide": "Collapse",
+    "cardNote": "You will be asked to accept them when you register or take a virtual run.",
+    "accepted": "Accepted revision {revision} at {time}",
     "title": "Rules"
   },
   "problemSwitcher": {

@@ -1,0 +1,18 @@
+{
+  "section": "Operations",
+  "fields": {
+    "rules": "Contest rules",
+    "balloons": "Turn on the balloon screen",
+    "balloonStaff": "Balloon volunteers"
+  },
+  "hints": {
+    "rules": "Markdown. Leave empty when the contest has no rules. Each edit of the text raises the revision; people who accepted keep the revision they accepted.",
+    "balloons": "A balloon queue for on-site contests: each team's first correct solve of each problem.",
+    "balloonStaff": "Volunteers can use the balloon screen but cannot edit the contest. Contestants cannot use it."
+  },
+  "errors": {
+    "rules": "Rules are at most {max} characters."
+  },
+  "column": "Rules",
+  "accepted": "revision {revision} · {time}"
+}

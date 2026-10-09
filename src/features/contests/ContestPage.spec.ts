@@ -1,6 +1,13 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { contestDetail, contestProblem, viewerResult } from '@/test/fixtures';
+import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
+import {
+  contestDetail,
+  contestProblem,
+  contestViewer,
+  participationSummary,
+  viewerResult,
+} from '@/test/fixtures';
 import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, hangRequestsExcept, mockApi, ok, sequence } from '@/test/mock-api';
@@ -429,5 +436,33 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     const phoneRows = wrapper.findAll('[data-testid="contest-problems"] ul li');
     expect(phoneRows[0]!.text()).toContain('188 người giải');
     expect(phoneRows[2]!.text()).toContain('6 người giải');
+  });
+});
+
+describe('contest page rules card', () => {
+  const ruled = (overrides: Parameters<typeof contestDetail>[0] = {}) =>
+    contestDetail({ rules: RULES_MARKDOWN, rulesHtml: RULES_HTML, rulesRevision: 2, ...overrides });
+
+  it('shows the "Quy định" card in the aside only for a contest with rules', async () => {
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(ruled()) });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.get('aside [data-testid="join-rules-card"]').text()).toContain('bản 2');
+    wrapper.unmount();
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail()) });
+    const second = await mountApp('/contests/r42');
+    expect(second.wrapper.find('[data-testid="join-rules-card"]').exists()).toBe(false);
+  });
+
+  it('says which revision the live participation accepted', async () => {
+    const viewer = contestViewer({
+      liveStatus: 'participating',
+      liveParticipation: participationSummary({
+        rulesAcceptedAt: '2026-10-08T05:58:00.000Z',
+        rulesAcceptedRevision: 1,
+      }),
+    });
+    mockApi({ ...signedInViewer(), ...contestPageRoutes(ruled({ viewer })) });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.get('[data-testid="join-rules-card"]').text()).toContain('Đã đồng ý bản 1 lúc');
   });
 });

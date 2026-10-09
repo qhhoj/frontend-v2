@@ -1738,6 +1738,22 @@
     "title": "Thẻ kỳ thi"
   },
   "joinRules": {
+    "dialogTitle": "Quy định kỳ thi",
+    "dialogTitleVirtual": "Quy định kỳ thi · lượt thi ảo mới",
+    "dialogLead": "{name} · phiên bản quy định {revision}",
+    "virtualAgain": "Mỗi lượt thi ảo cần đồng ý lại.",
+    "previous": "Lượt trước của bạn đã đồng ý bản {revision} lúc {time}.",
+    "textLabel": "Nội dung quy định",
+    "agree": "Tôi đã đọc và đồng ý tuân thủ quy định của kỳ thi này.",
+    "tickHint": "Chọn ô đồng ý để bật nút.",
+    "refusedTitle": "Không đăng ký được",
+    "notRecordedTitle": "Chưa ghi nhận việc đồng ý",
+    "cardTitle": "Quy định",
+    "revision": "bản {revision}",
+    "read": "Đọc quy định",
+    "hide": "Thu gọn",
+    "cardNote": "Bạn sẽ được hỏi đồng ý khi đăng ký hoặc tham gia ảo.",
+    "accepted": "Đã đồng ý bản {revision} lúc {time}",
     "title": "Quy định"
   },
   "problemSwitcher": {

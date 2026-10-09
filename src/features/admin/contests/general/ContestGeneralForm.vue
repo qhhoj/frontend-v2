@@ -4,6 +4,7 @@ import type { ContestForm } from '../contest-form';
 import ContestAccessSection from './ContestAccessSection.vue';
 import ContestFormatSection from './ContestFormatSection.vue';
 import ContestInfoSection from './ContestInfoSection.vue';
+import ContestOperationsSection from './ContestOperationsSection.vue';
 import ContestRatingSection from './ContestRatingSection.vue';
 import ContestTimeSection from './ContestTimeSection.vue';
 
@@ -23,5 +24,6 @@ defineProps<{
     <ContestFormatSection v-model="form" :errors="errors" />
     <ContestAccessSection v-model="form" :errors="errors" :has-codes="hasCodes" />
     <ContestRatingSection v-model="form" />
+    <ContestOperationsSection v-model="form" :errors="errors" />
   </div>
 </template>

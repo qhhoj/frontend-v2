@@ -10,10 +10,12 @@ import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
 import ContestHeaderCard from './ContestHeaderCard.vue';
 import ContestIntroCard from './ContestIntroCard.vue';
+import ContestJoinRulesCard from './ContestJoinRulesCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestProblemsTable from './ContestProblemsTable.vue';
 import ContestRulesCard from './ContestRulesCard.vue';
 import ContestTabs from './ContestTabs.vue';
+import { acceptanceOf } from './join-rules';
 import { useContestQuery } from './contests.queries';
 
 /** The countdown can fire up to a second before the server's clock agrees with it: one later refetch closes that gap. */
@@ -65,6 +67,10 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
           <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-5">
             <ContestRulesCard :contest="contest" />
             <ContestAnnouncementsRail :contest="contest" />
+            <ContestJoinRulesCard
+              :contest="contest"
+              :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
+            />
           </aside>
         </div>
       </template>
