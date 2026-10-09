@@ -1,0 +1,84 @@
+<script setup lang="ts">
+import { ChevronDown, ChevronRight } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { formatDateTime } from '@/lib/format';
+import type { FlatpageRevision } from '@/api/types/flatpages-admin';
+import { useLocaleStore } from '@/stores/locale.store';
+import AdminUserLabel from '../ui/AdminUserLabel.vue';
+import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import ChangeLines from './ChangeLines.vue';
+import { canLoadOldValues, changeLinesOf, fieldLabelKey } from './flatpage-history';
+
+const props = defineProps<{ revision: FlatpageRevision; isOpen: boolean }>();
+const emit = defineEmits<{ toggle: []; load: [] }>();
+const { t } = useI18n();
+const localeStore = useLocaleStore();
+const ACTION_CLASS = {
+  create: 'bg-verdict-ac-bg text-verdict-ac',
+  edit: 'bg-accent-soft text-accent-soft-text',
+  delete: 'bg-verdict-wa-bg text-verdict-wa',
+} as const;
+const fields = computed(() => Object.keys(props.revision.changes));
+const lines = computed(() => changeLinesOf(props.revision.changes));
+</script>
+
+<template>
+  <tbody data-testid="revision" class="contents">
+    <tr class="border-t border-line align-top">
+      <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">
+        {{ formatDateTime(revision.at, localeStore.locale) }}
+      </td>
+      <td class="px-3 py-2">
+        <span
+          class="rounded-pill px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap"
+          :class="ACTION_CLASS[revision.action]"
+          >{{ t(`admin.pages.history.actions.${revision.action}`) }}</span
+        >
+      </td>
+      <td class="px-3 py-2">
+        <AdminUserLabel v-if="revision.editor" :username="revision.editor.username" />
+        <span v-else class="text-muted">{{ t('admin.pages.history.deletedEditor') }}</span>
+      </td>
+      <td class="px-3 py-2">
+        <ul class="flex flex-wrap gap-1">
+          <li
+            v-for="field in fields"
+            :key="field"
+            class="rounded-pill border border-line px-2 text-xs"
+          >
+            {{ t(fieldLabelKey(field)) }}
+          </li>
+        </ul>
+      </td>
+      <td class="px-3 py-2">
+        <div class="flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            class="min-h-11 rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover"
+            :aria-expanded="isOpen"
+            :aria-label="t('admin.pages.history.showChanges')"
+            @click="emit('toggle')"
+          >
+            <component
+              :is="isOpen ? ChevronDown : ChevronRight"
+              aria-hidden="true"
+              class="size-4"
+            />
+          </button>
+          <button
+            v-if="canLoadOldValues(revision)"
+            type="button"
+            :class="ADMIN_BUTTON_CLASS"
+            @click="emit('load')"
+          >
+            {{ t('admin.pages.history.load') }}
+          </button>
+        </div>
+      </td>
+    </tr>
+    <tr v-if="isOpen">
+      <td colspan="5" class="px-3 pb-4"><ChangeLines :lines="lines" /></td>
+    </tr>
+  </tbody>
+</template>

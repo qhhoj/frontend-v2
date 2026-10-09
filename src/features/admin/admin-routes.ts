@@ -40,7 +40,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   settings: placeholder,
   config: () => import('./site/MiscConfigPage.vue'),
   nav: () => import('./site/NavBarPage.vue'),
-  pages: placeholder,
+  pages: () => import('./pages/FlatpagesPage.vue'),
   log: placeholder,
 };
 

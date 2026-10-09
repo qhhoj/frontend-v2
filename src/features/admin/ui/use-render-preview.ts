@@ -11,6 +11,10 @@ function createPreviewState() {
   const isRateLimited = ref(false);
   const retryAfterSeconds = ref<number | null>(null);
   const failure = ref<unknown>(null);
+  /** True from the keystroke until the answer (or refusal) for the newest text arrives. */
+  const isUpdating = ref(false);
+  /** When the last answer arrived; null before the first one. */
+  const updatedAt = ref<Date | null>(null);
   /** Epoch ms until which the server asked us to wait (its `Retry-After`); no request is sent before it. */
   let pausedUntilMs = 0;
 
@@ -19,6 +23,8 @@ function createPreviewState() {
     isRateLimited.value = false;
     retryAfterSeconds.value = null;
     failure.value = null;
+    updatedAt.value = new Date();
+    isUpdating.value = false;
   }
 
   function showFailure(error: unknown) {
@@ -27,10 +33,21 @@ function createPreviewState() {
     retryAfterSeconds.value = limit?.retryAfterSeconds ?? null;
     if (limit?.retryAfterSeconds) pausedUntilMs = Date.now() + limit.retryAfterSeconds * 1000;
     failure.value = limit ? null : error;
+    isUpdating.value = false;
   }
 
   const isPaused = () => Date.now() < pausedUntilMs;
-  return { html, isRateLimited, retryAfterSeconds, failure, showAnswer, showFailure, isPaused };
+  return {
+    html,
+    isRateLimited,
+    retryAfterSeconds,
+    failure,
+    isUpdating,
+    updatedAt,
+    showAnswer,
+    showFailure,
+    isPaused,
+  };
 }
 
 /** Board B: the preview follows the text 0.5 s after the last key; the newest request wins; a 429 keeps the last preview and pauses until its wait ends. */
@@ -52,11 +69,12 @@ export function useRenderPreview(markdown: () => string, source: () => PreviewSo
     clearTimeout(timer);
     const request = ++latest;
     const text = markdown();
-    if (state.isPaused()) return;
-    if (text.trim() === '') {
-      state.html.value = '';
+    if (state.isPaused() || text.trim() === '') {
+      if (text.trim() === '') state.html.value = '';
+      state.isUpdating.value = false;
       return;
     }
+    state.isUpdating.value = true;
     timer = setTimeout(() => void render(text, request), PREVIEW_DELAY_MS);
   }
 
@@ -67,5 +85,7 @@ export function useRenderPreview(markdown: () => string, source: () => PreviewSo
     isRateLimited: state.isRateLimited,
     retryAfterSeconds: state.retryAfterSeconds,
     failure: state.failure,
+    isUpdating: state.isUpdating,
+    updatedAt: state.updatedAt,
   };
 }
