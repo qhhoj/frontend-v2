@@ -10,6 +10,8 @@ export default defineConfig({
   testDir: 'e2e',
   testMatch: '**/*.e2e.ts',
   fullyParallel: true,
+  /** The real-backend journeys share one server, one user and the judge's gates, so files run one at a time. */
+  workers: REAL_API ? 1 : undefined,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
