@@ -5,7 +5,7 @@ import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { contestExportStatus, feedKeyStatus, mintedFeedKey } from '@/test/contest-extras-fixtures';
 import { profile, sessionUser, signedIn } from '@/test/fixtures';
-import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
+import { fail, issue, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 
 const EDIT = ['judge.edit_own_contest'];
 const TITLE = 'Nguồn sự kiện cho công cụ công bố kết quả';
@@ -150,9 +150,33 @@ describe('contest data tab', () => {
       calls.filter((call) => call.method === 'POST' && call.path.endsWith('/export')),
     ).toHaveLength(1);
     wrapper.unmount();
-    mockApi(routes({ 'GET /contests/hcmus-w41/export': fail(404, 'not_found') }));
+    mockApi(
+      routes({
+        'GET /contests/hcmus-w41/export': fail(404, 'not_found', undefined, [
+          issue('export', 'export_not_configured', 'x'),
+        ]),
+      }),
+    );
     const second = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
     expect(second.wrapper.get('[data-testid="export-card"]').text()).toContain('chưa cấu hình');
+  });
+
+  it('names an export refusal by its issue code, not by the generic conflict text', async () => {
+    mockApi(
+      routes({
+        'GET /contests/hcmus-w41/export': ok(
+          contestExportStatus({ state: 'none', size: null, readyAt: null, nextPrepareAt: null }),
+        ),
+        'POST /contests/hcmus-w41/export': fail(409, 'conflict', undefined, [
+          issue('export', 'export_in_progress', 'The export is being prepared'),
+        ]),
+      }),
+    );
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
+    await press(wrapper, 'Tạo bản xuất');
+    const card = wrapper.get('[data-testid="export-card"]').text();
+    expect(card).toContain('Bản xuất đang được tạo');
+    expect(card).not.toContain('Hãy tải lại và thử lại.');
   });
 
   it('keeps the export card quiet before the end and asks nothing', async () => {

@@ -1,10 +1,8 @@
-import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { contestDetail, contestProblem, viewerResult } from '@/test/fixtures';
-import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
-import { anonymousViewer } from '@/test/problem-routes';
 import ContestProblemSwitcher from './ContestProblemSwitcher.vue';
+import { switcherEntries } from './problem-switcher';
 
 const contest = contestDetail({
   problems: [
@@ -13,18 +11,18 @@ const contest = contestDetail({
     contestProblem(2, { viewerResult: viewerResult() }),
   ],
 });
-const mountSwitcher = async (currentCode: string) => {
-  const wrapper = mountComponent(ContestProblemSwitcher, {
-    props: { contestKey: 'r42', currentCode },
+const mountSwitcher = (currentCode: string) =>
+  mountComponent(ContestProblemSwitcher, {
+    props: {
+      contestKey: 'r42',
+      contestName: contest.name,
+      entries: switcherEntries(contest.problems, currentCode) ?? [],
+    },
   });
-  await flushPromises();
-  return wrapper;
-};
 
 describe('contest problem switcher', () => {
-  it('links every contest problem in order and marks the open one as the current page', async () => {
-    mockApi({ ...anonymousViewer, 'GET /contests/r42': ok(contest) });
-    const wrapper = await mountSwitcher('r42b');
+  it('links every contest problem in order and marks the open one as the current page', () => {
+    const wrapper = mountSwitcher('r42b');
     const links = wrapper.findAll('nav li a');
     expect(links.map((link) => link.attributes('href'))).toEqual([
       '/problems/r42a',
@@ -40,12 +38,6 @@ describe('contest problem switcher', () => {
     expect(links[1]!.text()).toContain('Đã nộp, chưa đúng');
     expect(links[2]!.text()).toContain('Chưa nộp');
     expect(wrapper.get('nav').attributes('aria-label')).toBe('Bài trong kỳ thi');
-  });
-
-  it('draws nothing when the contest does not list the problem, and nothing on an error', async () => {
-    mockApi({ ...anonymousViewer, 'GET /contests/r42': ok(contest) });
-    expect((await mountSwitcher('other')).find('nav').exists()).toBe(false);
-    mockApi({ ...anonymousViewer, 'GET /contests/r42': fail(500, 'generic') });
-    expect((await mountSwitcher('r42a')).find('nav').exists()).toBe(false);
+    expect(wrapper.get('nav a').text()).toBe(contest.name);
   });
 });

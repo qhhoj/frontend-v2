@@ -18,6 +18,8 @@ const props = defineProps<{
   contestName: string;
   revision: number;
   rulesHtml: string;
+  /** The contest detail is being read again: an empty `rulesHtml` is then only stale, not final. */
+  isRefreshing: boolean;
   actionLabel: string;
   isVirtual: boolean;
   isPending: boolean;
@@ -33,7 +35,8 @@ const boxId = useId();
 const SKELETON_LINES = 4;
 /** M3A draws the rules dialog 520 px wide. */
 const RULES_DIALOG_WIDTH = 520;
-const isLoading = computed(() => props.rulesHtml === '');
+/** Rules whose rendered text is empty for good (everything sanitised away) must not block accepting forever. */
+const isLoading = computed(() => props.rulesHtml === '' && props.isRefreshing);
 const canAccept = computed(() => isTicked.value && !isLoading.value);
 const isNotRecorded = computed(
   () => props.error instanceof ApiError && props.error.code === 'rules_not_accepted',

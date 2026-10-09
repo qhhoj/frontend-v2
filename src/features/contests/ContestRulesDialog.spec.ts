@@ -24,6 +24,7 @@ const mountDialog = (props: Record<string, unknown> = {}) =>
       actionLabel: 'Đăng ký tham gia',
       isVirtual: false,
       isPending: false,
+      isRefreshing: false,
       error: null,
       ...props,
     },
@@ -82,12 +83,22 @@ describe('contest rules dialog', () => {
   });
 
   it('shows inert lines and refuses to confirm while the rules text is not loaded', async () => {
-    mountDialog({ rulesHtml: '' });
+    mountDialog({ rulesHtml: '', isRefreshing: true });
     await flushPromises();
     expect(dialog().querySelectorAll('[data-skeleton-region="rules-line"]')).toHaveLength(4);
     box().click();
     await flushPromises();
     expect(confirmButton().getAttribute('aria-disabled')).toBe('true');
+  });
+
+  it('lets the viewer accept when the final rendered rules text is empty', async () => {
+    const wrapper = mountDialog({ rulesHtml: '', isRefreshing: false });
+    await flushPromises();
+    expect(dialog().querySelectorAll('[data-skeleton-region="rules-line"]')).toHaveLength(0);
+    box().click();
+    await flushPromises();
+    await submit();
+    expect(wrapper.emitted('accept')).toHaveLength(1);
   });
 
   it('sends nothing more while the request runs', async () => {

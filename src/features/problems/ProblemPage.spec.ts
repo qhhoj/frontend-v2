@@ -10,7 +10,7 @@ import {
   problemEditorial,
   sessionUser,
 } from '@/test/fixtures';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, holdRequestsTo, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -278,6 +278,46 @@ describe('problem page inside a contest', () => {
     );
     const current = wrapper.get('[data-testid="problem-switcher"] [aria-current="page"]');
     expect(current.attributes('href')).toBe('/problems/r42b');
+  });
+
+  const TWO_COLUMNS = 'lg:grid-cols-[240px_minmax(0,1fr)]';
+  const layoutOf = (wrapper: Awaited<ReturnType<typeof openProblem>>['wrapper']) =>
+    wrapper.get('#main > div').classes().join(' ');
+
+  it('keeps the statement full width while the contest loads, then makes room for the rail', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(inContest),
+      'GET /contests/r42': ok(contest),
+    });
+    holdRequestsTo('/contests/r42');
+    const { wrapper } = await openProblem('/problems/r42b');
+    expect(layoutOf(wrapper)).not.toContain(TWO_COLUMNS);
+    expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(false);
+  });
+
+  it('opens the two-column layout once the contest has loaded', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(inContest),
+      'GET /contests/r42': ok(contest),
+    });
+    const { wrapper } = await openProblem('/problems/r42b');
+    await vi.waitFor(() => expect(layoutOf(wrapper)).toContain(TWO_COLUMNS));
+    expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(true);
+  });
+
+  it('keeps the statement full width for good when the contest request fails', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(inContest),
+      'GET /contests/r42': fail(500, 'generic'),
+    });
+    const { wrapper } = await openProblem('/problems/r42b');
+    await flushPromises();
+    expect(layoutOf(wrapper)).not.toContain(TWO_COLUMNS);
+    expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="statement-card"]').exists()).toBe(true);
   });
 
   it('has no rail outside a contest and asks for no contest', async () => {

@@ -36,9 +36,13 @@ export const useContestListQuery = (query: Ref<ContestListQuery>) => {
 };
 
 /** The detail carries a `viewer` block, so one viewer's answer never shows to another. */
-export const useContestQuery = (key: MaybeRefOrGetter<string>) => {
+export const useContestQuery = (
+  key: MaybeRefOrGetter<string>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewerId = useViewerId();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => ['contests', 'detail', viewerId.value, toValue(key)]),
     queryFn: () => fetchContest(toValue(key)),
   });

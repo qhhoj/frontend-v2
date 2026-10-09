@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { ApiError } from '@/api/client';
 import { contestExportDownloadUrl, prepareContestExport } from '@/api/contest-ops.api';
 import type { EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { translate } from '@/i18n';
 import { formatDateTime, formatFileSize } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { failureTextOf, isNotFound } from '../../ui/admin-errors';
+import { failureTextOf, hasIssueCode } from '../../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { canPrepareAgain } from '../actions/contest-actions';
@@ -36,8 +38,16 @@ const prepare = useAdminMutation({
 const mayPrepare = computed(() =>
   status.value ? canPrepareAgain(status.value, now.value) : false,
 );
-/** A 404 means this install has no export root (same as the contest data download). */
-const isNotConfigured = computed(() => isNotFound(error.value));
+/** The issue code `export_not_configured` means this install has no export root (same as the contest data download). */
+const isNotConfigured = computed(() => hasIssueCode(error.value, 'export_not_configured'));
+const EXPORT_REFUSALS = ['export_in_progress', 'export_rate_limited', 'export_not_prepared'];
+/** The refusal's own text by issue code, else the generic text of its status. */
+function prepareFailureText(failure: ApiError): string {
+  const refusal = failure.issues.find((issue) => EXPORT_REFUSALS.includes(issue.code));
+  return refusal
+    ? translate(`admin.contestData.export.errors.${refusal.code}`)
+    : failureTextOf(failure);
+}
 const isReady = computed(() => status.value?.state === 'ready');
 </script>
 
@@ -100,7 +110,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         <AdminStatus
           v-if="prepare.failure.value"
           kind="refused"
-          :text="failureTextOf(prepare.failure.value)"
+          :text="prepareFailureText(prepare.failure.value)"
         />
       </div>
     </QueryState>

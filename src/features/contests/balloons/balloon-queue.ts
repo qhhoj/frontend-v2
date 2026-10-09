@@ -4,8 +4,6 @@ import { formatElapsedSeconds } from '@/lib/format';
 import { errorMessageKey } from '@/i18n/error-message';
 import { NEUTRAL_TAG_CLASS, TAG_COLOR_CLASSES, tagColorAt } from '../tag-colors';
 
-const CONFLICT_STATUS = 409;
-
 export const BALLOON_STATES: readonly BalloonState[] = ['pending', 'delivered', 'all'];
 
 export const balloonStateOf = (value: unknown): BalloonState =>
@@ -40,12 +38,12 @@ export const isDelivered = (balloon: Balloon): boolean => balloon.deliveredAt !=
 export const balloonRowId = (balloon: BalloonRef): string =>
   `${balloon.participationId}:${balloon.problemId}`;
 
-const DELIVERY_CONFLICTS = ['already_delivered', 'not_delivered'];
+const DELIVERY_REFUSALS = ['already_delivered', 'not_delivered', 'balloon_not_found'];
 
-/** The `errors.*` text of a refused write: a 409 `conflict` is told apart by its issue code, not its English message. */
+/** The `errors.*` text of a refused write: told apart by the issue code (any status), not by the English message. */
 export function deliveryFailureKey(error: unknown): string {
-  if (error instanceof ApiError && error.status === CONFLICT_STATUS) {
-    const issueCode = error.issues.find((issue) => DELIVERY_CONFLICTS.includes(issue.code))?.code;
+  if (error instanceof ApiError) {
+    const issueCode = error.issues.find((issue) => DELIVERY_REFUSALS.includes(issue.code))?.code;
     if (issueCode) return `errors.${issueCode}`;
   }
   return errorMessageKey(error);

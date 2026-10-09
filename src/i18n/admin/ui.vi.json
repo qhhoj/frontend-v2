@@ -32,6 +32,7 @@
     "is_boolean": "Phải là đúng hoặc sai.",
     "is_url": "Địa chỉ không hợp lệ.",
     "is_object": "Giá trị không hợp lệ.",
+    "unknown_tag": "Thẻ này chưa có trong danh mục thẻ kỳ thi.",
     "busy": "Đang có thao tác khác chạy; hãy chờ xong rồi thử lại.",
     "request_already_decided": "Yêu cầu này đã được người khác xử lý.",
     "organization_full": "Tổ chức đã đủ chỗ.",

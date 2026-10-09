@@ -50,6 +50,14 @@ describe('balloon queue helpers', () => {
     expect(isDelivered(balloon(0, { deliveredAt: '2026-10-08T09:00:00.000Z' }))).toBe(true);
   });
 
+  it('maps a 404 balloon_not_found by its issue code, like the backend sends it', () => {
+    const missing = new ApiError('not_found', 404, 'x', {
+      issues: [{ field: 'problemId', code: 'balloon_not_found', message: 'English text' }],
+    });
+    expect(deliveryFailureKey(missing)).toBe('errors.balloon_not_found');
+    expect(deliveryFailureKey(new ApiError('not_found', 404, 'x'))).toBe('errors.not_found');
+  });
+
   it('tells the two delivery conflicts apart by issue code and falls back to the status code text', () => {
     const conflict = (code: string) =>
       new ApiError('conflict', 409, 'x', { issues: [{ field: 'balloon', code, message: 'x' }] });

@@ -60,7 +60,9 @@ describe('contest tag catalogue screen', () => {
     await wrapper.get('#contest-tag-slug').setValue('quoc-gia');
     await submit(wrapper);
     await flushPromises();
-    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+    expect(wrapper.get('#contest-tag-slug').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.text()).toContain('Mã thẻ này đã có.');
+    expect(wrapper.text()).not.toContain('Hãy tải lại và thử lại.');
   });
 
   it('edits only the changed fields of an existing tag, slug read-only', async () => {

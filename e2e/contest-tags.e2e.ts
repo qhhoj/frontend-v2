@@ -147,6 +147,18 @@ defineShiftTests([
     clockAt: CONTEST_FIXTURE_NOW,
   },
   {
+    name: 'contest tag row, empty catalogue',
+    path: '/contests',
+    signedIn: false,
+    hold: 'GET /contest-tags',
+    answer: (api) => {
+      api.routes['GET /contest-tags'] = list([]);
+    },
+    parts: (page) => ({ row: page.getByTestId('tag-filter') }),
+    viewports: PHONE_AND_DESKTOP,
+    clockAt: CONTEST_FIXTURE_NOW,
+  },
+  {
     name: 'admin tag catalogue',
     path: '/admin/contest-tags',
     signedIn: true,

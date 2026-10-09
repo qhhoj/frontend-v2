@@ -9,7 +9,12 @@
     "none": "No export yet.",
     "prepare": "Prepare export",
     "download": "Download",
-    "waitUntil": "You can prepare it again after {time}."
+    "waitUntil": "You can prepare it again after {time}.",
+    "errors": {
+      "export_in_progress": "The export is already being prepared; wait for it to finish.",
+      "export_rate_limited": "An export can be prepared once a day; try again later.",
+      "export_not_prepared": "There is no export to download; prepare one first."
+    }
   },
   "feed": {
     "title": "Event feed for resolver tools",
@@ -22,7 +27,10 @@
       "releasedAt": "Released at"
     },
     "modeLabel": "Mode of a new key",
-    "modes": { "frozen-until-release": "Frozen until released", "live": "Live" },
+    "modes": {
+      "frozen-until-release": "Frozen until released",
+      "live": "Live"
+    },
     "modeHints": {
       "frozen-until-release": "During a freeze the feed holds only results from before the freeze until you release it to the resolver.",
       "live": "The feed holds results during the freeze too. Choose it only when the key holder may see the real results."

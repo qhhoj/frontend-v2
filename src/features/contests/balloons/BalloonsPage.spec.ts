@@ -6,6 +6,7 @@ import { contestDetail, contestViewer } from '@/test/fixtures';
 import {
   fail,
   failWithCode,
+  issue,
   mockApi,
   noContent,
   page,
@@ -78,6 +79,64 @@ describe('balloon screen', () => {
       'Quả bóng này đã được giao.',
     );
     expect(wrapper.text()).toContain('Đã giao hết bóng.');
+  });
+
+  it('shows the rescore refusal with its own text, read from the issue code of a 404', async () => {
+    const item = balloon(0);
+    mockApi({
+      ...base(page([item], { pendingTotal: 1 })),
+      [`POST /contests/r42/balloons/${item.participationId}/${item.problemId}/deliver`]: fail(
+        404,
+        'not_found',
+        undefined,
+        [issue('problemId', 'balloon_not_found', 'No solve for this team.')],
+      ),
+    });
+    const { wrapper } = await mountApp(PATH);
+    await wrapper.get('[data-testid="balloon-row"] button').trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="balloon-failure"]').text()).toContain(
+      'Đội này không còn lời giải đúng cho bài này.',
+    );
+  });
+
+  it('moves focus to the next row when delivering removes the focused one', async () => {
+    const [first, second] = [balloon(0), balloon(1)];
+    mockApi({
+      ...base(
+        sequence(page([first, second], { pendingTotal: 2 }), page([second], { pendingTotal: 1 })),
+      ),
+      [`POST /contests/r42/balloons/${first.participationId}/${first.problemId}/deliver`]:
+        noContent(),
+    });
+    const { wrapper } = await mountApp(PATH);
+    const button = wrapper.get('[data-testid="balloon-row"] button');
+    (button.element as HTMLElement).focus();
+    await button.trigger('click');
+    await flushPromises();
+    const rows = wrapper.findAll('[data-testid="balloon-row"]');
+    expect(rows).toHaveLength(1);
+    expect(document.activeElement).toBe(rows[0]!.get('button').element);
+  });
+
+  it('moves focus to the state filter when the last pending balloon is delivered', async () => {
+    const item = balloon(0);
+    mockApi({
+      ...base(
+        sequence(
+          page([item], { pendingTotal: 1 }),
+          page([], { pendingTotal: 0, deliveredTotal: 1 }),
+        ),
+      ),
+      [`POST /contests/r42/balloons/${item.participationId}/${item.problemId}/deliver`]:
+        noContent(),
+    });
+    const { wrapper } = await mountApp(PATH);
+    const button = wrapper.get('[data-testid="balloon-row"] button');
+    (button.element as HTMLElement).focus();
+    await button.trigger('click');
+    await flushPromises();
+    expect(document.activeElement?.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('says how long to wait when the server rate-limits a delivery', async () => {

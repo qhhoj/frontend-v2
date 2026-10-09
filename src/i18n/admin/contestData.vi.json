@@ -9,7 +9,12 @@
     "none": "Chưa có bản xuất.",
     "prepare": "Tạo bản xuất",
     "download": "Tải về",
-    "waitUntil": "Tạo lại được sau {time}."
+    "waitUntil": "Tạo lại được sau {time}.",
+    "errors": {
+      "export_in_progress": "Bản xuất đang được tạo; hãy chờ xong.",
+      "export_rate_limited": "Mỗi ngày chỉ tạo được một bản xuất; hãy thử lại sau.",
+      "export_not_prepared": "Chưa có bản xuất để tải; hãy tạo bản xuất."
+    }
   },
   "feed": {
     "title": "Nguồn sự kiện cho công cụ công bố kết quả",
@@ -22,7 +27,10 @@
       "releasedAt": "Đã mở khóa lúc"
     },
     "modeLabel": "Chế độ của khóa mới",
-    "modes": { "frozen-until-release": "Đóng băng tới khi mở", "live": "Trực tiếp" },
+    "modes": {
+      "frozen-until-release": "Đóng băng tới khi mở",
+      "live": "Trực tiếp"
+    },
     "modeHints": {
       "frozen-until-release": "Trong lúc đóng băng, nguồn chỉ có kết quả trước khi đóng băng cho tới khi bạn bấm mở cho công cụ công bố.",
       "live": "Nguồn có cả kết quả trong lúc đóng băng. Chỉ chọn khi người dùng khóa được xem kết quả thật."

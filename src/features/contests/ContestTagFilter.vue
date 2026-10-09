@@ -81,6 +81,8 @@ const SKELETON_CHIPS = 5;
         </li>
       </ul>
     </nav>
+    <!-- An empty catalogue keeps the loading row's box, so the groups below do not jump up when the chips fail to come. -->
+    <div v-else-if="!hasFailed" aria-hidden="true" class="h-13" />
     <p
       v-if="state === 'unknown'"
       data-testid="tag-unknown"

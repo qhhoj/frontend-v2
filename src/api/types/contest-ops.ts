@@ -20,8 +20,6 @@ export type PublishProblemsResult = Schemas['PublishProblemsResponse'];
 export type PublishedProblem = Schemas['PublishedProblemResponse'];
 /** backend: contests/publish/dto/publish-problems.dto.ts (PublishProblemsDto), both choices always sent. */
 export type PublishOptions = Required<JsonBodyOf<'/contests/{key}/publish-problems', 'post'>>;
-/** backend: contests/editing/dto/contest-actions.response.ts (ContestAutoPublishResponse) */
-export type ContestAutoPublish = Schemas['ContestAutoPublishResponse'];
 
 /** backend: contests/feed/dto/feed-key.dto.ts (FeedKeyStatusResponse) */
 export type FeedKeyStatus = Schemas['FeedKeyStatusResponse'];

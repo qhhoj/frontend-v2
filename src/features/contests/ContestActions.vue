@@ -87,6 +87,8 @@ const hasButton = computed(() => isLocked.value || commandOf(chosen.value.kind) 
 
 const queryClient = useQueryClient();
 const isRulesOpen = ref(false);
+/** The detail is being read again after `rules_not_accepted`: its rules text may still be the old, empty one. */
+const isRulesRefreshing = ref(false);
 /** The viewer ticked the rules in this attempt; sent with the request and dropped when a new attempt starts. */
 const hasAcceptedRules = ref(false);
 const needsRules = computed(
@@ -112,7 +114,10 @@ function openDialogFor(failure: unknown): boolean {
   hasAcceptedRules.value = false;
   isDialogOpen.value = false;
   isRulesOpen.value = true;
-  void queryClient.invalidateQueries({ queryKey: ['contests', 'detail'] });
+  isRulesRefreshing.value = true;
+  void queryClient
+    .invalidateQueries({ queryKey: ['contests', 'detail'] })
+    .finally(() => (isRulesRefreshing.value = false));
   return true;
 }
 function closeDialogs() {
@@ -243,6 +248,7 @@ watch(isRulesOpen, (isOpen) => {
         :contest-name="contest.name"
         :revision="contest.rulesRevision"
         :rules-html="contest.rulesHtml"
+        :is-refreshing="isRulesRefreshing"
         :action-label="actionLabel"
         :is-virtual="chosen.kind === 'virtual'"
         :is-pending="isPending"

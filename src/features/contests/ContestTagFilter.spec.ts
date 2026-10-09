@@ -45,6 +45,14 @@ describe('contest tag filter row', () => {
     expect(pressedTexts(wrapper)).toEqual(['Tất cả']);
   });
 
+  it('keeps a blank, inert row of the loading height when the catalogue is empty', () => {
+    const wrapper = mountFilter({ tags: [] });
+    const filter = wrapper.get('[data-testid="tag-filter"]');
+    expect(filter.findAll('button')).toHaveLength(0);
+    expect(filter.find('nav').exists()).toBe(false);
+    expect(filter.get('div[aria-hidden="true"]').classes()).toContain('h-13');
+  });
+
   it('replaces the row with a notice when the catalogue cannot be read', () => {
     const wrapper = mountFilter({ tags: [], hasFailed: true });
     expect(wrapper.findAll('button')).toHaveLength(0);

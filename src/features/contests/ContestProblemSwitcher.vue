@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useContestQuery } from './contests.queries';
-import { switcherEntries } from './problem-switcher';
-import type { SwitcherStatus } from './problem-switcher';
+import type { SwitcherEntry, SwitcherStatus } from './problem-switcher';
 
-/** M5B: the contest's problems beside the statement, while the viewer's participation holds this one. Silent while loading or on an error. */
-const props = defineProps<{ contestKey: string; currentCode: string }>();
-const { data: contest } = useContestQuery(() => props.contestKey);
-const entries = computed(() =>
-  contest.value ? switcherEntries(contest.value.problems, props.currentCode) : null,
-);
+/** M5B: the contest's problems beside the statement, while the viewer's participation holds this one. The page decides when it is ready (`useProblemRail`). */
+defineProps<{ contestKey: string; contestName: string; entries: SwitcherEntry[] }>();
 const STATUS_CLASSES: Record<SwitcherStatus, string> = {
   solved: 'text-verdict-ac',
   tried: 'text-verdict-wa',
@@ -22,7 +15,6 @@ const LINK =
 
 <template>
   <nav
-    v-if="contest && entries"
     data-testid="problem-switcher"
     :aria-label="$t('problemSwitcher.title')"
     class="glass min-w-0 rounded-panel p-2 lg:sticky lg:top-20"
@@ -30,7 +22,7 @@ const LINK =
     <RouterLink
       :to="{ name: 'contest', params: { key: contestKey } }"
       class="flex min-h-11 items-center px-3 font-display text-sm font-semibold hover:text-accent-text"
-      >{{ contest.name }}</RouterLink
+      >{{ contestName }}</RouterLink
     >
     <ul class="m-0 flex list-none gap-1 overflow-x-auto p-0 lg:flex-col lg:overflow-visible">
       <li v-for="entry in entries" :key="entry.code" class="shrink-0">

@@ -23,7 +23,8 @@
     "slug": "Chỉ chữ thường, số và dấu gạch ngang, 1 đến 20 ký tự.",
     "name": "Tên có từ 1 đến 40 ký tự.",
     "description": "Mô tả tối đa 200 ký tự.",
-    "order": "Thứ tự là số nguyên từ -1000 đến 1000."
+    "order": "Thứ tự là số nguyên từ -1000 đến 1000.",
+    "slugTaken": "Mã thẻ này đã có. Hãy chọn mã khác."
   },
   "create": "Thêm thẻ",
   "save": "Lưu thẻ",

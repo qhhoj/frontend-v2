@@ -23,7 +23,8 @@
     "slug": "Lowercase letters, digits and hyphens, 1 to 20 characters.",
     "name": "The name has 1 to 40 characters.",
     "description": "At most 200 characters.",
-    "order": "A whole number from -1000 to 1000."
+    "order": "A whole number from -1000 to 1000.",
+    "slugTaken": "This key is already taken. Choose another."
   },
   "create": "Add tag",
   "save": "Save tag",

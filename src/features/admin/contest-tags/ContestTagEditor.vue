@@ -6,7 +6,8 @@ import { CONTEST_TAGS_KEY } from '@/features/contests/contest-extras.queries';
 import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { failureTextOf } from '../ui/admin-errors';
+import { failureTextOf, isConflict } from '../ui/admin-errors';
+import type { FieldErrors } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import ColorTokenPicker from './ColorTokenPicker.vue';
@@ -42,7 +43,16 @@ const mutation = useAdminMutation({
     emit('done');
   },
 });
-const errors = computed(() => ({ ...localErrors.value, ...mutation.fieldErrors.value }));
+/** Creating a tag whose key exists answers a bare 409 `conflict` (no issue): the key is taken. */
+const isSlugTaken = computed(() => {
+  const failure = mutation.failure.value;
+  return isCreate.value && isConflict(failure) && failure.issues.length === 0;
+});
+const errors = computed<FieldErrors>(() => ({
+  ...localErrors.value,
+  ...mutation.fieldErrors.value,
+  ...(isSlugTaken.value ? { slug: translate('admin.contestTags.errors.slugTaken') } : {}),
+}));
 const doneText = computed(() =>
   translate(isCreate.value ? 'admin.contestTags.created' : 'admin.contestTags.saved'),
 );
@@ -160,7 +170,7 @@ async function save() {
     </form>
     <AdminStatus v-if="mutation.isDone.value" kind="done" :text="doneText" />
     <AdminStatus
-      v-if="mutation.failure.value"
+      v-if="mutation.failure.value && !isSlugTaken"
       kind="refused"
       :text="failureTextOf(mutation.failure.value)"
     />

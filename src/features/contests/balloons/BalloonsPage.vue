@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { BALLOON_PAGE_SIZE } from '@/api/balloons.api';
 import { ApiError } from '@/api/client';
+import type { Balloon } from '@/api/types/contest-ops';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
@@ -60,12 +61,25 @@ const pendingAnnouncement = computed(() =>
         counts.value.pendingTotal,
       ),
 );
+
+const root = ref<HTMLElement | null>(null);
+/** Delivering drops the row from the pending list, taking the focused button with it: focus the row that took its place. */
+async function toggleKeepingFocus(item: Balloon) {
+  const index =
+    queue.value?.items.findIndex((row) => balloonRowId(row) === balloonRowId(item)) ?? 0;
+  await delivery.toggle(item);
+  await nextTick();
+  if (document.activeElement && document.activeElement !== document.body) return;
+  const buttons = root.value?.querySelectorAll<HTMLElement>('[data-testid="balloon-row"] button');
+  const target = buttons?.[Math.min(index, (buttons?.length ?? 1) - 1)];
+  (target ?? root.value?.querySelector<HTMLElement>('[aria-pressed="true"]'))?.focus();
+}
 const go = (patch: Record<string, string | undefined>) =>
   void router.replace({ query: { ...route.query, page: undefined, ...patch } });
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6 sm:px-8">
+  <div ref="root" class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6 sm:px-8">
     <StatePanel
       v-if="isMissing"
       kind="notFound"
@@ -168,7 +182,7 @@ const go = (patch: Record<string, string | undefined>) =>
               :key="balloonRowId(item)"
               :balloon="item"
               :is-busy="delivery.busyId.value === balloonRowId(item)"
-              @toggle="delivery.toggle(item)"
+              @toggle="toggleKeepingFocus(item)"
             />
           </ul>
         </GlassCard>

@@ -152,3 +152,11 @@ export function hangRequestsExcept(allowed: string[]) {
       : new Promise<Response>(() => {}),
   );
 }
+
+/** After `mockApi`: requests whose URL contains `fragment` never answer; every other request is answered as routed. */
+export function holdRequestsTo(fragment: string) {
+  const answer = globalThis.fetch;
+  vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+    String(input).includes(fragment) ? new Promise<Response>(() => {}) : answer(input, init),
+  );
+}

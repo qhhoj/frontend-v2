@@ -560,6 +560,21 @@ describe('contest actions with rules', () => {
     expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
   });
 
+  it('lets the viewer accept rules whose rendered text is empty for good', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ruled({ rulesHtml: '' })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()!.querySelectorAll('[data-skeleton-region="rules-line"]')).toHaveLength(0);
+    await tickAndConfirm();
+    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
+  });
+
   it('sends one request for a double confirm', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const calls = mockApi({

@@ -245,9 +245,9 @@ describe('ContestGeneralTab', () => {
     mockApi({
       ...staffViewer(EDIT),
       ...contestEditorRoutes(),
-      'PATCH /contests/hcmus-w41': fail(400, 'unknown_tag', undefined, undefined, {
-        details: { tags: ['moi'] },
-      }),
+      'PATCH /contests/hcmus-w41': fail(400, 'unknown_tag', undefined, [
+        issue('tags', 'unknown_tag', 'Unknown tag moi.'),
+      ]),
     });
     const { wrapper } = await mountAndWaitFor(
       '/admin/contests/hcmus-w41/general',
@@ -256,5 +256,7 @@ describe('ContestGeneralTab', () => {
     await wrapper.get('#contest-rules').setValue('x');
     await save(wrapper);
     expect(wrapper.text()).toContain('Có thẻ chưa có trong danh mục thẻ kỳ thi.');
+    expect(wrapper.text()).toContain('Thẻ này chưa có trong danh mục thẻ kỳ thi.');
+    expect(wrapper.text()).not.toContain('Unknown tag moi.');
   });
 });

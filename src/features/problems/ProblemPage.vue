@@ -7,6 +7,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
+import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -31,6 +32,8 @@ const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef
 
 /** The viewer's current participation holds this problem: the page gains the contest's problem rail (M5B). */
 const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
+/** Two columns only once the rail has its rows; while the contest loads or fails the statement keeps the full width. */
+const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);
 
 usePageTitle(() => problem.value?.name);
 
@@ -78,16 +81,17 @@ watch(
     v-else
     :class="[
       'mx-auto flex flex-col gap-5 px-4 py-6 sm:px-8',
-      contestKey
+      contest && railEntries
         ? 'max-w-[1240px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-6'
         : 'max-w-[960px]',
     ]"
     :style="{ paddingBottom: 'calc(1.5rem + var(--dock-height, 0px))' }"
   >
     <ContestProblemSwitcher
-      v-if="contestKey && problem"
+      v-if="contestKey && contest && railEntries"
       :contest-key="contestKey"
-      :current-code="problem.code"
+      :contest-name="contest.name"
+      :entries="railEntries"
     />
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
