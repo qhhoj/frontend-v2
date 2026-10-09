@@ -68,6 +68,21 @@ describe('useReplayQuery', () => {
     expect(replayCalls(calls)).toBe(1);
   });
 
+  it('asks again at once after a rebuild during the read (409 replay_changed)', async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] });
+    const changed = fail(409, 'replay_changed');
+    const calls = mockApi({
+      'GET /auth/me': signedOut,
+      [ROUTE]: sequence(changed, changed, ready),
+    });
+    const probe = mountProbe();
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(2000);
+    await flushPromises();
+    expect(replayCalls(calls)).toBe(3);
+    expect(probe.state()).toBe('ready');
+  });
+
   it('never retries a refusal of the gate', async () => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     const calls = mockApi({ 'GET /auth/me': signedOut, [ROUTE]: fail(403, 'forbidden') });

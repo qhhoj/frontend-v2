@@ -86,6 +86,7 @@ describe('replayViewState', () => {
     expect(replayViewState(input({ error: new Error('offline') }))).toBe('ready');
     expect(replayViewState(input({ error: refused(429, 'rate_limited') }))).toBe('ready');
     expect(replayViewState(input({ error: refused(401, 'unauthorized') }))).toBe('ready');
+    expect(replayViewState(input({ error: refused(409, 'replay_changed') }))).toBe('ready');
     expect(
       replayViewState(input({ error: refused(429, 'rate_limited'), load: { state: 'building' } })),
     ).toBe('building');

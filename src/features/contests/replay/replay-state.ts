@@ -30,9 +30,13 @@ function forbiddenState(error: ApiError, contest: ReplayStateInput['contest']): 
   return named ?? (isBoardFrozen(contest) ? 'frozen' : 'forbidden');
 }
 
-/** The statuses the replay gate answers with (frozen or hidden, not ready, not ended or unsupported). */
-const GATE_STATUSES = [403, 404, 409];
-/** The gate answered: asking again repeats it, and it outranks a kept board. 401, 408 or 429 are not gate answers. */
+/**
+ * The answers that take a shown board away: 403 (frozen or hidden) and 404 (not ready). A 409 (`replay_changed`, a rebuild
+ * during the read) is transient and keeps the board; 409 `contest_not_ended`/`replay_unsupported` cannot follow a ready
+ * board. 401, 408, 429 and 5xx keep it too.
+ */
+const GATE_STATUSES = [403, 404];
+/** The gate refused this viewer: it outranks a kept board, and polling stops (except for not-ready). */
 export const isReplayRefusal = (error: unknown): error is ApiError =>
   error instanceof ApiError && GATE_STATUSES.includes(error.status);
 

@@ -11,9 +11,12 @@ import { isReplayRefusal } from './replay-state';
 export const REPLAY_POLL_MS = 5000;
 /** `replay_not_ready` (the build could not be queued) is asked again after 5 s, 10 s, 20 s… up to this. */
 export const NOT_READY_MAX_POLL_MS = 60_000;
-/** 4xx answers are not retried at once (asking again repeats them); polling decides what is asked again. */
-const isClientError = (error: unknown) =>
-  error instanceof ApiError && error.status >= 400 && error.status < 500;
+/** 4xx answers are not retried at once (asking again repeats them), except a rebuild during the read; polling decides the rest. */
+const isRepeatedAnswer = (error: unknown) =>
+  error instanceof ApiError &&
+  error.status >= 400 &&
+  error.status < 500 &&
+  error.code !== 'replay_changed';
 /** The server sends `Cache-Control: private, max-age=60` for a ready replay. */
 const REPLAY_STALE_MS = 60_000;
 const MAX_NETWORK_RETRIES = 2;
@@ -56,7 +59,7 @@ export const useReplayQuery = (key: Ref<string>, isEnabled: Ref<boolean>) => {
     queryKey,
     queryFn: read,
     staleTime: REPLAY_STALE_MS,
-    retry: (failures, error) => !isClientError(error) && failures < MAX_NETWORK_RETRIES,
+    retry: (failures, error) => !isRepeatedAnswer(error) && failures < MAX_NETWORK_RETRIES,
     refetchInterval: (query) => nextPollMs(query.state.error, query.state.data, notReadyStreak),
     refetchIntervalInBackground: false,
     /** Thousands of event tuples are read on every tick: plain objects, not deep reactive proxies. */

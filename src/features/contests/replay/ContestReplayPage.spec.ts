@@ -178,7 +178,7 @@ describe('contest replay page', () => {
   it.each([
     ['empty', ok(replayChunk({ participants: [], ghosts: [], events: [] }))],
     ['notReady', fail(404, 'replay_not_ready')],
-    ['error', fail(409, 'replay_changed')],
+    ['error', fail(400, 'validation_failed')],
   ] as const)('shows the %s state', async (state, reply) => {
     mockApi(routes({ [REPLAY]: reply }));
     const { wrapper } = await mountApp('/contests/r41/replay');
