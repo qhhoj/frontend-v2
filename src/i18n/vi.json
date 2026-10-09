@@ -47,7 +47,8 @@
     "ticketNew": "Tạo phiếu mới",
     "ticket": "Chi tiết phiếu",
     "flatpage": "Trang",
-    "notifications": "Thông báo"
+    "notifications": "Thông báo",
+    "contestReplay": "Phát lại"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -74,7 +75,8 @@
       "announcements": "Thông báo",
       "submissions": "Bài nộp",
       "stats": "Thống kê",
-      "ranking": "Bảng xếp hạng"
+      "ranking": "Bảng xếp hạng",
+      "replay": "Phát lại"
     },
     "submissions": {
       "statusTitle": "Trạng thái chấm",
@@ -802,7 +804,19 @@
     "access_code_required": "Cần mã tham gia. Nhập mã do ban tổ chức cung cấp rồi thử lại.",
     "wrong_access_code": "Mã tham gia chưa đúng. Kiểm tra lại mã với ban tổ chức rồi nhập lại.",
     "not_in_contest": "Bạn không ở trong kỳ thi này.",
-    "locked_in_official_contest": "Thao tác này bị khóa trong kỳ thi chính thức."
+    "locked_in_official_contest": "Thao tác này bị khóa trong kỳ thi chính thức.",
+    "contest_not_ended": "Kỳ thi chưa kết thúc.",
+    "replay_unsupported": "Không hỗ trợ phát lại cho định dạng này.",
+    "replay_not_ready": "Bản phát lại chưa sẵn sàng.",
+    "replay_unavailable": "Bản phát lại tạm thời không dùng được. Hãy thử lại sau.",
+    "replay_chunk_not_found": "Không tìm thấy một phần của bản phát lại.",
+    "replay_changed": "Bản phát lại vừa được dựng lại. Hãy tải lại.",
+    "replay_build_required": "Thiếu mã bản dựng của bản phát lại.",
+    "board_frozen": "Bảng đang đóng băng nên chưa phát lại được.",
+    "board_hidden": "Bạn không xem được bảng của kỳ thi này.",
+    "ghost_import_invalid": "Tệp ghost có dòng không hợp lệ.",
+    "ghost_unsupported_format": "Không hỗ trợ ghost cho thể thức nộp bài cuối.",
+    "payload_too_large": "Nội dung gửi lên quá lớn (tối đa 1 MiB)."
   },
   "common": {
     "retry": "Thử lại",
@@ -1690,5 +1704,8 @@
     "clear": "Không có phiếu nào đang chờ bạn.",
     "viewAssigned": "Xem phiếu được giao",
     "viewAwaiting": "Mở hàng đợi phiếu"
+  },
+  "replay": {
+    "title": "Phát lại"
   }
 }

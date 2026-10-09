@@ -1,0 +1,22 @@
+{
+  "tab": "Ghost",
+  "lead": "Thứ hạng lịch sử của một kỳ thi thật, hiện như dòng ghost trong phát lại và bảng ảo.",
+  "import": {
+    "rowCodes": {
+      "label_missing": "Thiếu nhãn.",
+      "label_formula": "Nhãn bắt đầu bằng = + - hoặc @.",
+      "label_repeats": "Nhãn bị lặp.",
+      "label_invalid": "Nhãn quá dài (tối đa 64 ký tự).",
+      "caption_invalid": "Chú thích quá dài (tối đa 64 ký tự).",
+      "caption_formula": "Chú thích bắt đầu bằng = + - hoặc @.",
+      "control_character": "Dòng có ký tự điều khiển.",
+      "cell_invalid": "Ô điểm không đúng cú pháp.",
+      "columns_mismatch": "Số cột không khớp với dòng tiêu đề.",
+      "header_invalid": "Dòng tiêu đề không hợp lệ.",
+      "csv_invalid": "Tệp không phải CSV hợp lệ.",
+      "too_many_ghosts": "Quá nhiều ghost (tối đa 2000).",
+      "other": "Dòng không hợp lệ."
+    }
+  },
+  "title": "Ghost"
+}

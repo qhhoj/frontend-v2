@@ -4,6 +4,7 @@ import { contestPageRoutes } from '@/test/contest-routes';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
+import { endedContest } from '@/test/replay-fixtures';
 
 describe('contest tabs', () => {
   it('links every section of the contest and marks the open one', async () => {
@@ -25,6 +26,20 @@ describe('contest tabs', () => {
     expect(
       links.filter((link) => link.attributes('aria-current') === 'page').map((link) => link.text()),
     ).toEqual(['Bảng xếp hạng']);
+  });
+
+  it('adds the replay tab only once the contest has ended', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(endedContest()),
+      'GET /contests/r41/ranking': ok(ranking({ frozen: false })),
+    });
+    const { wrapper } = await mountApp('/contests/r41/ranking');
+    const links = wrapper.get('nav[aria-label="Mục kỳ thi"]').findAll('a');
+    expect(links.map((link) => [link.text(), link.attributes('href')]).at(-1)).toEqual([
+      'Phát lại',
+      '/contests/r41/replay',
+    ]);
   });
 
   it('encodes a key that needs it', async () => {

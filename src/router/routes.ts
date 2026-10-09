@@ -72,6 +72,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.ranking' },
   },
   {
+    path: '/contests/:key/replay',
+    name: 'contest-replay',
+    component: () => import('@/features/contests/replay/ContestReplayPage.vue'),
+    meta: { titleKey: 'pages.contestReplay' },
+  },
+  {
     path: '/users',
     name: 'users',
     component: () => import('@/features/leaderboard/LeaderboardPage.vue'),

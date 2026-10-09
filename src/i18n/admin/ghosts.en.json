@@ -1,0 +1,22 @@
+{
+  "tab": "Ghosts",
+  "lead": "Historical standings of a real contest, shown as ghost rows in the replay and the virtual board.",
+  "import": {
+    "rowCodes": {
+      "label_missing": "The label is missing.",
+      "label_formula": "The label starts with = + - or @.",
+      "label_repeats": "The label is repeated.",
+      "label_invalid": "The label is too long (64 characters at most).",
+      "caption_invalid": "The caption is too long (64 characters at most).",
+      "caption_formula": "The caption starts with = + - or @.",
+      "control_character": "The row has a control character.",
+      "cell_invalid": "A score cell has the wrong syntax.",
+      "columns_mismatch": "The column count differs from the header.",
+      "header_invalid": "The header row is invalid.",
+      "csv_invalid": "The file is not valid CSV.",
+      "too_many_ghosts": "Too many ghosts (2000 at most).",
+      "other": "Invalid row."
+    }
+  },
+  "title": "Ghosts"
+}

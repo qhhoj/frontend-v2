@@ -47,7 +47,8 @@
     "ticketNew": "New ticket",
     "ticket": "Ticket",
     "flatpage": "Page",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "contestReplay": "Replay"
   },
   "contests": {
     "title": "Contests",
@@ -74,7 +75,8 @@
       "announcements": "Announcements",
       "submissions": "Submissions",
       "stats": "Statistics",
-      "ranking": "Ranking"
+      "ranking": "Ranking",
+      "replay": "Replay"
     },
     "submissions": {
       "statusTitle": "Judging state",
@@ -802,7 +804,19 @@
     "access_code_required": "An access code is required. Enter the organizers' code and try again.",
     "wrong_access_code": "Wrong access code. Check it with the organizers and try again.",
     "not_in_contest": "You are not in this contest.",
-    "locked_in_official_contest": "This action is locked during the official contest."
+    "locked_in_official_contest": "This action is locked during the official contest.",
+    "contest_not_ended": "The contest has not ended yet.",
+    "replay_unsupported": "Replay is not available for this format.",
+    "replay_not_ready": "The replay is not ready yet.",
+    "replay_unavailable": "The replay is temporarily unavailable. Try again later.",
+    "replay_chunk_not_found": "Part of the replay is missing.",
+    "replay_changed": "The replay was just rebuilt. Load it again.",
+    "replay_build_required": "The replay build id is missing.",
+    "board_frozen": "The board is frozen, so it cannot be replayed yet.",
+    "board_hidden": "You cannot view the board of this contest.",
+    "ghost_import_invalid": "The ghost file has invalid rows.",
+    "ghost_unsupported_format": "Ghosts are not supported for final-submission contests.",
+    "payload_too_large": "The request is too large (1 MiB at most)."
   },
   "common": {
     "retry": "Retry",
@@ -1690,5 +1704,8 @@
     "clear": "No ticket is waiting for you.",
     "viewAssigned": "See assigned tickets",
     "viewAwaiting": "Open the ticket queue"
+  },
+  "replay": {
+    "title": "Replay"
   }
 }

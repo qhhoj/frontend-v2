@@ -17,7 +17,7 @@ describe('ContestEditorPage', () => {
     expect(wrapper.text()).toContain('214 thí sinh');
     const tabs = '[aria-label="Các phần của kỳ thi"]';
     expect(wrapper.findAll(`${tabs} a`).map((tab) => tab.attributes('href'))).toEqual(
-      ['general', 'problems', 'announcements', 'ranking', 'actions', 'participants'].map(
+      ['general', 'problems', 'announcements', 'ranking', 'actions', 'participants', 'ghosts'].map(
         (tab) => `/admin/contests/hcmus-w41/${tab}`,
       ),
     );

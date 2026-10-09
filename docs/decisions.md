@@ -353,3 +353,8 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Backend refusals by code**: the SPA matches `error.issues[].code` (join-request `request_already_decided`/`organization_full`, `busy`, file refusals, taken keys/codes), never the English message; texts live in `admin.ui.issues.<code>`, unknown codes fall back to `failureTextOf`. Still on message or field shape because the backend sends no code: the blog official-contest lock 403, and the nav/flatpage/judge/language 409 `fields`. Refusal texts carry no file or extension name (codes have no params).
 - **Impersonation**: "Đóng vai" also needs `staff.isActive`.
 - **Release bot**: `changesets/action` (`.github/workflows/release.yml`) opens the Version Packages PR on every push to `main`; merging it runs `scripts/release/tag-release.mjs` (idempotent `v<version>` tag, no npm publish) because the app is private and the tag is the release.
+
+## Replay and ghosts (VNOI F2)
+
+- The freeze rule (`isBoardFrozen`) lives in `src/lib/board-freeze.ts`; the admin actions module re-exports it: the public replay needs it and must not import admin code.
+- Refusal texts: `errorMessageKey` names a 403 `forbidden` by its first issue code when `errors.<code>` exists (`board_frozen`, `board_hidden`) and a 413 by its status (`payload_too_large`): the server's body-limit refusal has no stable code. Ghost CSV row codes are worded in `admin.ghosts.import.rowCodes.*`.

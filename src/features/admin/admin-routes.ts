@@ -25,6 +25,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   contestRanking: () => import('./contests/ContestEditorPage.vue'),
   contestActions: () => import('./contests/ContestEditorPage.vue'),
   contestParticipants: () => import('./contests/ContestEditorPage.vue'),
+  contestGhosts: () => import('./contests/ContestEditorPage.vue'),
   similarity: () => import('./similarity/SimilarityRunsPage.vue'),
   similarityPairs: () => import('./similarity/SimilarityPairsPage.vue'),
   similarityPair: () => import('./similarity/SimilarityPairPage.vue'),

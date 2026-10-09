@@ -41,6 +41,7 @@ export const ADMIN_SCREENS = {
   contestRanking: contestTab('ranking'),
   contestActions: contestTab('actions'),
   contestParticipants: contestTab('participants'),
+  contestGhosts: contestTab('ghosts'),
   similarity: { path: '/admin/similarity', permission: 'judge.moss_contest' },
   similarityPairs: {
     path: '/admin/similarity/runs/:runId/pairs',

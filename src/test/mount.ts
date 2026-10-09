@@ -27,8 +27,11 @@ export async function mountApp(path: string, history: RouterHistory = createMemo
   await router.push(path);
   const wrapper = mount(App, {
     attachTo: document.body,
-    // Real transitions: PrimeVue overlays emit show/hide from transition hooks.
-    global: { plugins: appPlugins({ pinia, router, queryClient }), stubs: { transition: false } },
+    // Real transitions: PrimeVue overlays emit show/hide from transition hooks; a stubbed TransitionGroup renders no `tag` element.
+    global: {
+      plugins: appPlugins({ pinia, router, queryClient }),
+      stubs: { transition: false, 'transition-group': false },
+    },
   });
   await flushPromises();
   return { wrapper, router, queryClient };
@@ -49,7 +52,10 @@ export function mountComponent(
   const wrapper = mount(component, {
     ...options,
     attachTo: document.body,
-    global: { plugins: appPlugins({ pinia, router, queryClient }), stubs: { transition: false } },
+    global: {
+      plugins: appPlugins({ pinia, router, queryClient }),
+      stubs: { transition: false, 'transition-group': false },
+    },
   });
   mounted.push(wrapper);
   return wrapper;
