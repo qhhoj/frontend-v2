@@ -1,14 +1,27 @@
 {
   "tab": "Ghost",
   "lead": "Thứ hạng lịch sử của một kỳ thi thật, hiện như dòng ghost trong phát lại và bảng ảo.",
+  "unsupported": "Thể thức nộp bài cuối không hỗ trợ ghost: điểm chỉ có sau khi chấm lần cuối.",
   "import": {
+    "title": "Nhập ghost từ CSV",
+    "lead": "Cột: label, caption, rồi một cột cho mỗi mã bài. Ô: trống, phút, phút+số lần sai, điểm{'@'}phút hoặc điểm{'@'}phút+số lần sai. Tệp tối đa 1 MiB.",
+    "chooseFile": "Chọn tệp CSV",
+    "anonymize": "Ẩn danh tên",
+    "anonymizeHint": "Đổi nhãn thành Ghost 001, Ghost 002…: nhãn có thể là tên thật của học sinh và hiện với mọi người xem bảng.",
+    "preview": "Xem trước",
+    "replace": "Thay thế bộ ghost",
+    "needsPreview": "Xem trước tệp trước khi thay thế.",
+    "refusedTitle": "Tệp chưa được nhập",
+    "refusedRows": "Các dòng lỗi (chưa có gì được lưu):",
+    "refusedTruncated": "Chỉ hiện {count} lỗi đầu tiên.",
+    "rowLine": "Dòng {row}: {reason}",
     "rowCodes": {
       "label_missing": "Thiếu nhãn.",
-      "label_formula": "Nhãn bắt đầu bằng = + - hoặc @.",
+      "label_formula": "Nhãn bắt đầu bằng = + - hoặc {'@'}.",
       "label_repeats": "Nhãn bị lặp.",
       "label_invalid": "Nhãn quá dài (tối đa 64 ký tự).",
       "caption_invalid": "Chú thích quá dài (tối đa 64 ký tự).",
-      "caption_formula": "Chú thích bắt đầu bằng = + - hoặc @.",
+      "caption_formula": "Chú thích bắt đầu bằng = + - hoặc {'@'}.",
       "control_character": "Dòng có ký tự điều khiển.",
       "cell_invalid": "Ô điểm không đúng cú pháp.",
       "columns_mismatch": "Số cột không khớp với dòng tiêu đề.",
@@ -16,7 +29,39 @@
       "csv_invalid": "Tệp không phải CSV hợp lệ.",
       "too_many_ghosts": "Quá nhiều ghost (tối đa 2000).",
       "other": "Dòng không hợp lệ."
+    },
+    "stored": "Đã lưu {count} ghost. Bản phát lại sẽ được dựng lại.",
+    "confirmTitle": "Thay thế {count} ghost hiện có?",
+    "confirmBody": "Bộ hiện tại sẽ bị thay bằng {next} ghost trong tệp. Tải CSV hiện tại trước nếu cần giữ lại.",
+    "confirm": "Thay thế",
+    "download": "Tải CSV hiện tại"
+  },
+  "preview": {
+    "title": "Xem trước · {count} ghost",
+    "unranked": "{count} dòng không đủ dữ liệu, sẽ xếp cuối:",
+    "more": "Hiện {shown} / {count} dòng.",
+    "ranked": "Xếp hạng",
+    "columns": {
+      "label": "Nhãn",
+      "caption": "Chú thích",
+      "cells": "Số ô",
+      "status": "Trạng thái"
+    },
+    "gap": {
+      "points": "Không đủ dữ liệu: thiếu điểm từng bài",
+      "rejectedBefore": "Không đủ dữ liệu: thiếu số lần sai"
     }
+  },
+  "current": {
+    "title": "Bộ ghost hiện tại",
+    "count": "{count} ghost",
+    "empty": "Chưa có ghost nào.",
+    "download": "Tải CSV",
+    "delete": "Xóa bộ ghost",
+    "deleteTitle": "Xóa {count} ghost?",
+    "deleteBody": "Ghost biến mất khỏi phát lại sau khi dựng lại. Tải CSV trước nếu cần giữ lại.",
+    "deleteConfirm": "Xóa",
+    "deleted": "Đã xóa bộ ghost."
   },
   "title": "Ghost"
 }

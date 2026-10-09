@@ -1,14 +1,27 @@
 {
   "tab": "Ghosts",
   "lead": "Historical standings of a real contest, shown as ghost rows in the replay and the virtual board.",
+  "unsupported": "Final-submission contests do not support ghosts: scores exist only after the final judging.",
   "import": {
+    "title": "Import ghosts from CSV",
+    "lead": "Columns: label, caption, then one column per problem code. A cell is empty, minute, minute+wrong tries, points{'@'}minute or points{'@'}minute+wrong tries. The file is 1 MiB at most.",
+    "chooseFile": "Choose a CSV file",
+    "anonymize": "Anonymise names",
+    "anonymizeHint": "Rename labels to Ghost 001, Ghost 002…: labels may be real students' names and everyone who sees the board sees them.",
+    "preview": "Preview",
+    "replace": "Replace the ghost set",
+    "needsPreview": "Preview the file before replacing.",
+    "refusedTitle": "The file was not imported",
+    "refusedRows": "Rows with errors (nothing was stored):",
+    "refusedTruncated": "Only the first {count} errors are shown.",
+    "rowLine": "Row {row}: {reason}",
     "rowCodes": {
       "label_missing": "The label is missing.",
-      "label_formula": "The label starts with = + - or @.",
+      "label_formula": "The label starts with = + - or {'@'}.",
       "label_repeats": "The label is repeated.",
       "label_invalid": "The label is too long (64 characters at most).",
       "caption_invalid": "The caption is too long (64 characters at most).",
-      "caption_formula": "The caption starts with = + - or @.",
+      "caption_formula": "The caption starts with = + - or {'@'}.",
       "control_character": "The row has a control character.",
       "cell_invalid": "A score cell has the wrong syntax.",
       "columns_mismatch": "The column count differs from the header.",
@@ -16,7 +29,39 @@
       "csv_invalid": "The file is not valid CSV.",
       "too_many_ghosts": "Too many ghosts (2000 at most).",
       "other": "Invalid row."
+    },
+    "stored": "Stored {count} ghosts. The replay will be rebuilt.",
+    "confirmTitle": "Replace the {count} current ghosts?",
+    "confirmBody": "The current set will be replaced by the {next} ghosts in the file. Download the current CSV first to keep it.",
+    "confirm": "Replace",
+    "download": "Download the current CSV"
+  },
+  "preview": {
+    "title": "Preview · {count} ghosts",
+    "unranked": "{count} rows lack data and will be listed last:",
+    "more": "Showing {shown} of {count} rows.",
+    "ranked": "Ranked",
+    "columns": {
+      "label": "Label",
+      "caption": "Caption",
+      "cells": "Cells",
+      "status": "Status"
+    },
+    "gap": {
+      "points": "Not enough data: points per problem missing",
+      "rejectedBefore": "Not enough data: wrong-try counts missing"
     }
+  },
+  "current": {
+    "title": "Current ghost set",
+    "count": "{count} ghosts",
+    "empty": "No ghosts yet.",
+    "download": "Download CSV",
+    "delete": "Delete the ghost set",
+    "deleteTitle": "Delete {count} ghosts?",
+    "deleteBody": "Ghosts leave the replay once it is rebuilt. Download the CSV first to keep it.",
+    "deleteConfirm": "Delete",
+    "deleted": "The ghost set was deleted."
   },
   "title": "Ghosts"
 }
