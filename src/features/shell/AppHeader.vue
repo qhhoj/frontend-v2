@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
+import NotificationBell from '@/features/notifications/NotificationBell.vue';
 import LocaleToggle from './LocaleToggle.vue';
 import UserMenu from './UserMenu.vue';
 
@@ -97,6 +98,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', readClipping));
     <div class="ml-auto flex items-center gap-2">
       <LocaleToggle />
       <AppearancePanel />
+      <NotificationBell />
       <UserMenu />
     </div>
   </header>

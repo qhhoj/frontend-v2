@@ -1,4 +1,4 @@
-import type { NotificationItem } from '@/api/types/notifications';
+import type { NotificationItem } from '../api/types/notifications';
 import { communityId } from './community-fixtures';
 
 /** The clock of every notification test: 9 Oct 2026, 10:00 UTC (17:00 in Hanoi). */
