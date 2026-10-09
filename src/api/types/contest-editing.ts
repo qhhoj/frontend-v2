@@ -54,7 +54,7 @@ export type ContestActionState = Schemas['ContestActionState'];
 /** backend: `ContestActionsResponse`: one state per action and the last automatic publish (null before the first). */
 export type ContestActions = Schemas['ContestActionsResponse'];
 /** The actions that carry a state (the response holds `autoPublish` besides). */
-export type ContestActionName = 'rescore' | 'judgeFinal' | 'publish' | 'rate';
+export type ContestActionName = Exclude<keyof ContestActions, 'autoPublish'>;
 export const CONTEST_ACTION_NAMES: readonly ContestActionName[] = [
   'rescore',
   'judgeFinal',

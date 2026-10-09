@@ -210,6 +210,27 @@ describe('api client', () => {
     });
   });
 
+  it('reads issue codes (with the optional CSV row) from the top level of error, never from error.details', async () => {
+    mockApi({
+      'POST /x': {
+        status: 400,
+        body: {
+          error: {
+            code: 'validation_failed',
+            message: 'x',
+            issues: [{ field: 'csv', code: 'label_missing', message: 'm', row: 3 }],
+            details: { issues: [{ field: 'csv', code: 'cell_invalid', message: 'm' }] },
+          },
+        },
+      },
+    });
+    const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
+    expect(error).toMatchObject({
+      issues: [{ field: 'csv', code: 'label_missing', row: 3 }],
+    });
+    expect((error as ApiError).issues.map((entry) => entry.code)).not.toContain('cell_invalid');
+  });
+
   it('has no issues and no extra members when the answer carries none', async () => {
     mockApi({ 'POST /x': fail(429, 'rate_limited') });
     const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
