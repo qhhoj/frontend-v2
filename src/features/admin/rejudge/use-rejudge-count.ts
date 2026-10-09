@@ -38,9 +38,9 @@ export function useRejudgeCount(now: () => Date = () => new Date()) {
         countedAt: now().toISOString(),
       };
     } catch (error) {
-      // Anything but an ApiError is a bug and must not turn into a line of text.
-      if (!(error instanceof ApiError)) throw error;
       if (mine === latest) state.value = { kind: 'failed', text: failureTextOf(error) };
+      // Anything but an ApiError is a bug: the dialog leaves "counting", and the error still reaches the error handler.
+      if (!(error instanceof ApiError)) throw error;
     }
   }
 
