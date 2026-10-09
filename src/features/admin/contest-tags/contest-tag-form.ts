@@ -1,9 +1,5 @@
-import type {
-  ContestTag,
-  ContestTagBody,
-  TagColor,
-  ContestTagPatch,
-} from '@/api/types/contest-tags';
+import type { ContestTag, ContestTagBody, ContestTagPatch } from '@/api/types/contest-tags';
+import type { TagColor } from '@/api/types/tag-color';
 import { isTagSlug } from '@/features/contests/tag-chips';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';

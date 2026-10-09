@@ -827,7 +827,19 @@
     "not_delivered": "This balloon was not delivered.",
     "balloon_not_found": "This team no longer has a solve for this problem.",
     "not_frozen": "The ranking is not frozen; a release applies only during a freeze.",
-    "no_active_feed_key": "There is no active feed key."
+    "no_active_feed_key": "There is no active feed key.",
+    "problem_in_contest": "The problem is in a contest, so it cannot be deleted. Remove it from the contest first.",
+    "not_deleted": "This problem is not deleted.",
+    "purged": "The problem was purged and can no longer be restored.",
+    "problem_deleted": "The problem of this submission was deleted, so it cannot be rejudged or rejected.",
+    "package_too_large": "The package is larger than 512 MiB, so it cannot be built.",
+    "package_unavailable": "The package could not be built. Try again in a few minutes.",
+    "package_not_built": "No package was requested yet. Press “Download package” again.",
+    "tag_limit_reached": "The organization already has 100 problem tags.",
+    "unexpected_tag": "Only adding or removing a tag takes a tag.",
+    "quota_exceeded": "The organization has used up its quota. Ask an administrator to raise it.",
+    "quotaExceededCredits": "Over the organization’s credit quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it.",
+    "quotaExceededStorage": "Over the organization’s storage quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it."
   },
   "common": {
     "retry": "Retry",
@@ -1364,7 +1376,9 @@
       "about": "About",
       "members": "Members",
       "posts": "Posts",
-      "requests": "Join requests"
+      "requests": "Join requests",
+      "problems": "Problems",
+      "quota": "Quota"
     },
     "noAbout": "No description yet.",
     "posts": "Organization posts",
@@ -1968,5 +1982,17 @@
     "forbiddenBody": "Only balloon volunteers and contest editors can, and not while taking part.",
     "retryAfter": "Try again in {seconds} s.",
     "title": "Balloons"
+  },
+  "orgProblems": {
+    "title": "Organization problems"
+  },
+  "orgQuota": {
+    "title": "Quota"
+  },
+  "problemArchive": {
+    "title": "Archived problem"
+  },
+  "deletedProblem": {
+    "title": "Deleted problem"
   }
 }

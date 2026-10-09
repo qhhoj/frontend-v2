@@ -7,6 +7,7 @@ import {
   Download,
   FileText,
   Files,
+  Gauge,
   GitCompare,
   History,
   LifeBuoy,
@@ -80,6 +81,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   group('users', [
     screenItem('users', Users),
     screenItem('organizations', Building2),
+    screenItem('organizationQuotas', Gauge),
     screenItem('tickets', LifeBuoy),
     screenItem('activity', Activity),
   ]),

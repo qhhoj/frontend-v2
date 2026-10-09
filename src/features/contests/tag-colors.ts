@@ -1,4 +1,4 @@
-import type { TagColor } from '@/api/types/contest-tags';
+import type { TagColor } from '@/api/types/tag-color';
 
 /** Literal class strings (Tailwind only generates classes it can read): text and tint of each tag token. */
 export const TAG_COLOR_CLASSES: Record<TagColor, string> = {

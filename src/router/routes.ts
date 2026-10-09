@@ -175,6 +175,18 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/features/organizations/JoinRequestsPage.vue'),
         meta: { titleKey: 'pages.joinRequests', requiresAuth: true },
       },
+      {
+        path: 'problems',
+        name: 'organization-problems',
+        component: () => import('@/features/organizations/problems/OrgProblemsPage.vue'),
+        meta: { titleKey: 'pages.organization', requiresAuth: true },
+      },
+      {
+        path: 'quota',
+        name: 'organization-quota',
+        component: () => import('@/features/organizations/quota/OrgQuotaPage.vue'),
+        meta: { titleKey: 'pages.organization', requiresAuth: true },
+      },
     ],
   },
   {

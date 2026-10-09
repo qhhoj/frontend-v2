@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useId } from 'vue';
-import type { TagColor } from '@/api/types/contest-tags';
+import type { TagColor } from '@/api/types/tag-color';
 import { TAG_COLOR_CLASSES, TAG_COLORS } from '@/features/contests/tag-colors';
 
 /** One radio per colour token, each drawn as the chip it would make (the sample text in that colour). */

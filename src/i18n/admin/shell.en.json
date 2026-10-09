@@ -90,6 +90,8 @@
     "submissions": "Submissions",
     "languageNew": "Add language",
     "languageEdit": "Edit language",
+    "problemsDeleted": "Deleted problems",
+    "organizationQuotas": "Organization quotas",
     "cannedReplies": "Ticket reply templates"
   }
 }

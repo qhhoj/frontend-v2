@@ -20,11 +20,14 @@ const tabs = computed<OrganizationTab[]>(() => {
     count: formatNumber(props.organization.memberCount, locale.locale),
   };
   const posts = { routeName: 'organization-posts', labelKey: 'orgs.tabs.posts' };
-  // Only administrators see the join requests (the API refuses the rest).
+  // Only administrators see the join requests and the quota; members also see the problems (the API refuses the rest).
   const requests = { routeName: 'organization-requests', labelKey: 'orgs.tabs.requests' };
-  return props.organization.viewer?.canAdminister
-    ? [about, members, posts, requests]
-    : [about, members, posts];
+  const problems = { routeName: 'organization-problems', labelKey: 'orgs.tabs.problems' };
+  const quota = { routeName: 'organization-quota', labelKey: 'orgs.tabs.quota' };
+  const viewer = props.organization.viewer;
+  if (viewer?.canAdminister) return [about, members, posts, problems, requests, quota];
+  if (viewer?.isMember) return [about, members, posts, problems];
+  return [about, members, posts];
 });
 </script>
 

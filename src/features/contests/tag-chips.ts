@@ -1,4 +1,5 @@
-import type { ContestTag, TagColor } from '@/api/types/contest-tags';
+import type { ContestTag } from '@/api/types/contest-tags';
+import type { TagColor } from '@/api/types/tag-color';
 import { NEUTRAL_TAG_CLASS, TAG_COLOR_CLASSES } from './tag-colors';
 
 /** backend `CONTEST_TAG_PATTERN` (contest.schema.ts): a malformed `?tag=` would be a 400, so it is never sent. */

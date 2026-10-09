@@ -75,6 +75,11 @@ export const ADMIN_SCREENS = {
   nav: { path: '/admin/nav', permission: 'judge.change_navigationbar' },
   pages: { path: '/admin/pages', permission: 'flatpages.change_flatpage' },
   log: { path: '/admin/log', permission: 'judge.change_settings' },
+  problemsDeleted: { path: '/admin/problems/deleted', permission: 'judge.delete_problem' },
+  organizationQuotas: {
+    path: '/admin/organizations/quotas',
+    permission: 'judge.edit_all_organization',
+  },
 } as const satisfies Record<string, AdminScreen>;
 
 export type AdminScreenId = keyof typeof ADMIN_SCREENS;

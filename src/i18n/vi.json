@@ -827,7 +827,19 @@
     "not_delivered": "Quả bóng này chưa được giao.",
     "balloon_not_found": "Đội này không còn lời giải đúng cho bài này.",
     "not_frozen": "Bảng xếp hạng không đóng băng: chỉ mở được khi đang đóng băng.",
-    "no_active_feed_key": "Chưa có khóa nguồn sự kiện còn hiệu lực."
+    "no_active_feed_key": "Chưa có khóa nguồn sự kiện còn hiệu lực.",
+    "problem_in_contest": "Bài đang nằm trong một kỳ thi nên chưa xóa được. Gỡ bài khỏi kỳ thi trước.",
+    "not_deleted": "Bài này chưa bị xóa.",
+    "purged": "Bài đã bị xóa hẳn, không khôi phục được nữa.",
+    "problem_deleted": "Bài của bài nộp này đã bị xóa nên không chấm lại hay từ chối được.",
+    "package_too_large": "Gói đề lớn hơn 512 MiB nên không tạo được.",
+    "package_unavailable": "Chưa tạo được gói đề. Thử lại sau ít phút.",
+    "package_not_built": "Gói đề chưa được yêu cầu. Bấm “Tải gói đề” lần nữa.",
+    "tag_limit_reached": "Tổ chức đã đủ 100 thẻ bài tập.",
+    "unexpected_tag": "Chỉ thao tác gắn hoặc gỡ thẻ mới cần chọn thẻ.",
+    "quota_exceeded": "Tổ chức đã hết hạn mức. Liên hệ quản trị để tăng hạn mức.",
+    "quotaExceededCredits": "Vượt hạn mức tín dụng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức.",
+    "quotaExceededStorage": "Vượt hạn mức dung lượng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức."
   },
   "common": {
     "retry": "Thử lại",
@@ -1364,7 +1376,9 @@
       "about": "Giới thiệu",
       "members": "Thành viên",
       "posts": "Bài viết",
-      "requests": "Yêu cầu tham gia"
+      "requests": "Yêu cầu tham gia",
+      "problems": "Bài tập",
+      "quota": "Hạn mức"
     },
     "noAbout": "Tổ chức chưa có giới thiệu.",
     "posts": "Bài viết của tổ chức",
@@ -1968,5 +1982,17 @@
     "forbiddenBody": "Chỉ tình nguyện viên bóng bay và người sửa kỳ thi dùng được, và không dùng được khi đang thi.",
     "retryAfter": "Thử lại sau {seconds} giây.",
     "title": "Bóng bay"
+  },
+  "orgProblems": {
+    "title": "Bài tập của tổ chức"
+  },
+  "orgQuota": {
+    "title": "Hạn mức"
+  },
+  "problemArchive": {
+    "title": "Bài đã lưu trữ"
+  },
+  "deletedProblem": {
+    "title": "Bài đã bị xóa"
   }
 }

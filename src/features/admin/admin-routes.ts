@@ -48,6 +48,8 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   nav: () => import('./site/NavBarPage.vue'),
   pages: () => import('./pages/FlatpagesPage.vue'),
   log: () => import('./settings/AdminLogPage.vue'),
+  problemsDeleted: () => import('./problems/lifecycle/DeletedProblemsPage.vue'),
+  organizationQuotas: () => import('./organizations/quotas/QuotaOverviewPage.vue'),
 };
 
 const ADMIN_META = { requiresAuth: true, staffOnly: true, layout: 'admin' } as const;

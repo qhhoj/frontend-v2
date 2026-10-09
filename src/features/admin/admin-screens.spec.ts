@@ -28,3 +28,17 @@ describe('language form screens', () => {
     expect(allowsAny(adder, ADMIN_SCREENS.languageEdit.permission)).toBe(false);
   });
 });
+
+describe('VNOI F4 screens', () => {
+  it('open the deleted list for delete_problem holders only', () => {
+    const permission = ADMIN_SCREENS.problemsDeleted.permission;
+    expect(allowsAny(staff(['judge.delete_problem']), permission)).toBe(true);
+    expect(allowsAny(staff(['judge.edit_own_problem']), permission)).toBe(false);
+  });
+
+  it('open the quota overview for edit_all_organization holders only', () => {
+    const permission = ADMIN_SCREENS.organizationQuotas.permission;
+    expect(allowsAny(staff(['judge.edit_all_organization']), permission)).toBe(true);
+    expect(allowsAny(staff(['judge.add_organization']), permission)).toBe(false);
+  });
+});
