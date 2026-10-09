@@ -2127,6 +2127,7 @@
     "title": "Hạn mức"
   },
   "problemArchive": {
+    "notice": "Bài này đã được lưu trữ bởi tổ chức {names}. Bạn vẫn xem và nộp bài được như trước. Bài chỉ bị ẩn khỏi danh sách mặc định của tổ chức.",
     "title": "Bài đã lưu trữ"
   },
   "deletedProblem": {

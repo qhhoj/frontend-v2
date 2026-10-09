@@ -4,7 +4,8 @@ import { installOrgProblems } from './fixtures/f4-api';
 import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { list } from './fixtures/reply';
 import { organizationDetail } from '../src/test/community-fixtures';
-import { ORG_PROBLEMS } from '../src/test/f4-fixtures';
+import { problemDetail } from '../src/test/fixtures';
+import { ORG_PROBLEMS, f4Id } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
 
 const TAB = '/organizations/lhp/problems';
@@ -142,4 +143,18 @@ test('the bulk bar fits a phone without a sideways scroll', async ({ page, api }
   await page.getByRole('checkbox', { name: 'Chọn tất cả bài trên trang' }).check();
   await expect(page.getByTestId('org-bulk-bar')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('the problem page shows the archive notice with Bit to a member', async ({ page, api }) => {
+  api.signedIn = true;
+  const problem = problemDetail({ code: 'caitui', name: 'Cái túi', organizations: [f4Id(301)] });
+  api.routes['GET /problems/caitui'] = { body: { data: problem } };
+  api.routes['GET /problems/caitui/archived-in'] = {
+    body: { data: { organizations: [{ slug: 'lhp', name: 'LHP' }] } },
+  };
+  await page.goto('/problems/caitui');
+  const notice = page.getByTestId('archived-notice');
+  await expect(notice).toContainText('Bài này đã được lưu trữ bởi tổ chức LHP');
+  await expect(notice.getByTestId('inline-bit')).toBeVisible();
+  expect(await axeViolationsIn(page)).toEqual([]);
 });

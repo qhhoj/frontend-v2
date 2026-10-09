@@ -2127,6 +2127,7 @@
     "title": "Quota"
   },
   "problemArchive": {
+    "notice": "This problem was archived by {names}. You can still read it and submit as before. It is only hidden from the organization’s default list.",
     "title": "Archived problem"
   },
   "deletedProblem": {

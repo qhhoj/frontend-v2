@@ -9,6 +9,7 @@ import UserName from '@/components/UserName.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import EditorialTab from './EditorialTab.vue';
@@ -108,6 +109,7 @@ watch(
           <StatementSkeleton />
         </template>
         <template v-if="problem">
+          <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
           <ProblemHeader :problem="problem"
             ><template #actions
               ><PdfButton
