@@ -1,7 +1,10 @@
 {
   "title": "Site settings",
   "lead": "Typed settings: each key has a default, a kind and a description. Secrets are sealed and never shown again.",
-  "crumbs": { "site": "Site", "settings": "Settings" },
+  "crumbs": {
+    "site": "Site",
+    "settings": "Settings"
+  },
   "groupsLabel": "Setting groups",
   "groups": {
     "site": "Site",
@@ -56,13 +59,20 @@
     }
   },
   "fields": {
-    "site": { "timeZone": "IANA time zone name" },
+    "site": {
+      "timeZone": "IANA time zone name"
+    },
     "contest": {
       "officialMode": "Turn on official contest mode",
       "banAfterDisqualifications": "Disqualifications before a ban"
     },
-    "mail": { "from": "Sender", "smtpUrl": "SMTP URL" },
-    "auth": { "pwnedApiUrl": "API URL" },
+    "mail": {
+      "from": "Sender",
+      "smtpUrl": "SMTP URL"
+    },
+    "auth": {
+      "pwnedApiUrl": "API URL"
+    },
     "pdf": {
       "renderTimeoutMs": "Maximum render time (ms)",
       "maxBytes": "Maximum size (bytes)"
@@ -72,10 +82,14 @@
       "maxPairs": "Maximum pairs per run",
       "maxSubmissions": "Maximum submissions per group"
     },
-    "discord": { "webhooks": "Webhook list" }
+    "discord": {
+      "webhooks": "Webhook list"
+    }
   },
   "hints": {
-    "site": { "timeZone": "For example: Asia/Ho_Chi_Minh." },
+    "site": {
+      "timeZone": "For example: Asia/Ho_Chi_Minh."
+    },
     "contest": {
       "banAfterDisqualifications": "An integer from 0 to 1000; 0 turns it off. Counts only contests that are not organization-only."
     },
@@ -96,7 +110,10 @@
       "maxSubmissions": "From 2 to 10 000."
     }
   },
-  "chip": { "set": "Set", "unset": "Not set" },
+  "chip": {
+    "set": "Set",
+    "unset": "Not set"
+  },
   "secret": {
     "replace": "Replace",
     "set": "Set value",
@@ -121,7 +138,11 @@
     "removeRow": "Remove row",
     "addRow": "+ Add event"
   },
-  "values": { "set": "set", "unset": "not set", "default": "(default)" },
+  "values": {
+    "set": "set",
+    "unset": "not set",
+    "default": "(default)"
+  },
   "errors": {
     "integer": "Must be a whole number from {min} to {max}.",
     "httpsOnly": "Only https addresses are accepted.",
@@ -149,5 +170,15 @@
     "restoreField": "Restore non-secret fields",
     "confirmTitle": "Restore the previous value?",
     "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept."
+  },
+  "reset": {
+    "label": "Reset to default {value}",
+    "hint": "Default",
+    "filled": "Default filled in, not saved yet. Stored value: {stored}.",
+    "isDefault": "Default",
+    "notDefault": "Not default",
+    "on": "on",
+    "off": "off",
+    "empty": "(empty)"
   }
 }

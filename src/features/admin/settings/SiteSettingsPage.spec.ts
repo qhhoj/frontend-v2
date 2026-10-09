@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import { confirmDialog, staffViewer, switchNamed } from '@/test/admin-routes';
 import { ALL_SETTINGS, setting, settingRevision } from '@/test/admin-fixtures/settings';
 
 const PERMS = ['judge.change_settings'];
@@ -169,5 +169,94 @@ describe('SiteSettingsPage', () => {
     const { wrapper } = await mountSettings();
     expect(wrapper.get('a[href="#settings-auth"]').text()).toContain('2');
     expect(wrapper.findAll('#settings-auth [data-block]')).toHaveLength(2);
+  });
+});
+
+const withMinPercent = (stored: number) =>
+  ALL_SETTINGS.map((entry) =>
+    entry.key === 'similarity.minPercent'
+      ? setting('similarity.minPercent', stored, { default: 50, isDefault: stored === 50 })
+      : entry,
+  );
+const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) =>
+  wrapper.get(`[data-key="${key}"]`);
+
+describe('defaults', () => {
+  it('fills the default into the box and sends nothing until "Lưu"', async () => {
+    const calls = mockApi(
+      routes({
+        'GET /admin/settings': ok(withMinPercent(65)),
+        'PATCH /admin/settings/similarity.minPercent': ok(
+          setting('similarity.minPercent', 50, { default: 50, isDefault: true }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const row = keyRow(wrapper, 'similarity.minPercent');
+    await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
+    expect((row.get('input').element as HTMLInputElement).value).toBe('50');
+    expect(row.text()).toContain('Đã điền giá trị mặc định, chưa lưu. Giá trị đang lưu: 65.');
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+    await clickIn(block(wrapper, 'similarity'), 'Lưu');
+    expect(
+      calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]),
+    ).toEqual([['/admin/settings/similarity.minPercent', { value: 50 }]]);
+  });
+
+  it('disables the control while the box holds the default, and enables it after an edit', async () => {
+    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(50)) }));
+    const { wrapper } = await mountSettings();
+    const row = keyRow(wrapper, 'similarity.minPercent');
+    const button = row.get('button[aria-label="Về mặc định 50"]');
+    expect(button.attributes('aria-disabled')).toBe('true');
+    await row.get('input').setValue('70');
+    expect(button.attributes('aria-disabled')).toBeUndefined();
+  });
+
+  it('"Đặt lại" still discards the filled default and shows the stored value again', async () => {
+    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
+    const { wrapper } = await mountSettings();
+    const row = keyRow(wrapper, 'similarity.minPercent');
+    await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
+    await clickIn(block(wrapper, 'similarity'), 'Đặt lại');
+    expect((row.get('input').element as HTMLInputElement).value).toBe('65');
+    expect(row.text()).not.toContain('Đã điền giá trị mặc định');
+  });
+
+  it('resets a switch to its default too', async () => {
+    mockApi(
+      routes({
+        'GET /admin/settings': ok(
+          ALL_SETTINGS.map((entry) =>
+            entry.key === 'contest.officialMode'
+              ? setting('contest.officialMode', true, { default: false, isDefault: false })
+              : entry,
+          ),
+        ),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const row = keyRow(wrapper, 'contest.officialMode');
+    await row.get('button[aria-label="Về mặc định tắt"]').trigger('click');
+    expect(switchNamed(row, 'Bật chế độ kỳ thi chính thức').attributes('aria-checked')).toBe(
+      'false',
+    );
+  });
+
+  it('shows "Mặc định" or "Khác mặc định" per key, from the stored value', async () => {
+    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
+    const { wrapper } = await mountSettings();
+    const chip = (key: string) => keyRow(wrapper, key).get('[data-testid="default-chip"]').text();
+    expect(chip('similarity.minPercent')).toBe('Khác mặc định');
+    expect(chip('similarity.maxPairs')).toBe('Mặc định');
+  });
+
+  it('offers no reset on a key with a sealed part', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountSettings();
+    for (const key of ['mail.smtpUrl', 'auth.google', 'discord.webhooks'])
+      expect(keyRow(wrapper, key).find('button[aria-label^="Về mặc định"]').exists(), key).toBe(
+        false,
+      );
   });
 });

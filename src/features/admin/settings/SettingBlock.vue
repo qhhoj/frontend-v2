@@ -89,6 +89,21 @@ function historyLabel(key: SettingKey): string {
       >
         <div class="flex flex-wrap items-center gap-2">
           <code class="font-mono text-xs text-muted">{{ setting.key }}</code>
+          <span
+            data-testid="default-chip"
+            class="rounded-pill px-2 text-xs"
+            :class="
+              setting.isDefault
+                ? 'border border-line text-muted'
+                : 'bg-accent-soft text-accent-soft-text'
+            "
+          >
+            {{
+              setting.isDefault
+                ? t('admin.settings.reset.isDefault')
+                : t('admin.settings.reset.notDefault')
+            }}
+          </span>
           <button
             type="button"
             class="ml-auto"
