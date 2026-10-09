@@ -389,6 +389,19 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Unit and e2e tests run as a strong device (8 cores, 8 GB) so low-power `auto` stays off unless a spec passes weak hints.
 - The short-link button sits in the problem, contest, post, profile and organization headers for signed-in viewers; the profile and organization skeletons do not reserve its row (a signed-in header grows by one 44 px row when its data arrives, accepted), the problem and contest skeletons do.
 - The not-found hint for short-link visitors needs a same-origin redirect on the first navigation, the router still on that path, and no completed navigation after the first (`trackFirstPage`); the footer clears the fixed contest action bar and submit dock through `--dock-height`.
+- Two foundations (now for diff and low-power, after VNOI B8 for short links and integration clients), so features 11 and 19 do not wait for the backend.
+- `diff` is imported only by `src/lib/line-diff.ts`, so it stays in the diff route's chunk.
+- The diff page reads detail and source per side (four existing GETs, keyed by viewer): the source has no language, author or problem, which the header, the language notice and the named forbidden state need.
+- Diff rows are pure (`lineDiff`): CRLF and a final newline normalised; whitespace-only changes flagged; moves are an unpaired removal and addition with the same trimmed text (blank lines excluded); above 5 000 lines a side is refused before diffing.
+- Submission ids are typed or pasted as links (UUIDs, not M6C's numbers); list picks are two, in order, left then right; signed-out viewers get no pick boxes.
+- Low-power: device-local `auto|on|off` in `qhhoj.lowPower`; `auto` is on for <= 2 GB memory, <= 2 cores or Save-Data, counting numbers only (`null <= 2` is true in JS).
+- The contract is the `data-low-power` attribute on `<html>`, written only by `low-power.store.ts` and the pre-paint script; CSS and code read the attribute (`useLowPowerPainted`), never the store, because Bit is mounted without Pinia; F2's replay reads it too.
+- Low-power turns off every animation and transition with one rule, blur 0 and blobs hidden above the theme files (`[data-theme]` in the selector), Bit at frame 0 (`useMotionOff`), the ranking poll to 60 s and the code editor to a textarea where Tab indents and Escape then Tab leaves.
+- M10C's three cards sit on `/settings/appearance#low-power`; the popover has a compact three-way switch; a new footer shows the state and links there (no terms page exists, so no "Điều khoản" link).
+- The short-link button is shown only to signed-in viewers, builds the raw canonical path itself, caches the code per viewer and path, and locks on the daily 429; on a phone it is full width except in the problem header, whose skeleton reserves its row for signed-in viewers.
+- The not-found hint renders in `StatePanel` (notFound), `NotFoundPage` and `ContestNotFound`.
+- `JudgeKeyDialog` wraps the new `admin/ui/RevealKeyDialog.vue`, which the integration screen reuses: one reveal-once behaviour.
+- The integration screen locks create and revoke while impersonating; the backend refuses anyway (`@SessionOnly()`, `@NoImpersonation()`).
 
 ## VNOI ports: notifications, tickets, official mode (plan F1)
 

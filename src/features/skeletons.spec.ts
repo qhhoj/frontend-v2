@@ -427,3 +427,42 @@ describe('VNOI F4 screens show inert skeletons shaped like their content', () =>
       expectInert(skeleton, region);
   });
 });
+
+describe('the F5 screens show inert blocks shaped like their content', () => {
+  const LEFT = '0192a000-0000-7000-8000-00000000d001';
+  const RIGHT = '0192a000-0000-7000-8000-00000000d002';
+  const cases = [
+    {
+      name: 'submission diff',
+      path: `/submissions/diff?left=${LEFT}&right=${RIGHT}`,
+      routes: signedInViewer(),
+      regions: { 'diff-summary': 1, 'diff-line': 12 },
+    },
+    {
+      name: 'staff short links',
+      path: '/admin/short-links',
+      routes: staffViewer(['judge.manage_short_link']),
+      regions: { 'short-link-row': 6 },
+    },
+    {
+      name: 'integration clients',
+      path: '/admin/integrations',
+      routes: staffViewer(['judge.manage_integration']),
+      regions: { 'integration-row': 3 },
+    },
+  ];
+
+  for (const { name, path, routes, regions } of cases)
+    it(`the ${name} screen`, async () => {
+      mockApi(routes);
+      hangRequestsExcept(['/auth/me', '/profile']);
+      const { wrapper } = await mountApp(path);
+      await vi.waitFor(() =>
+        expect(wrapper.find('[data-testid="query-skeleton"]').exists()).toBe(true),
+      );
+      const skeleton = wrapper.get('[data-testid="query-skeleton"]');
+      for (const [region, count] of Object.entries(regions))
+        expect(regionsIn(skeleton.element, region), `${name} ${region}`).toBe(count);
+      expectInert(skeleton.element, name);
+    });
+});
