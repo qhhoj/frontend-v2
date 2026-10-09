@@ -13,7 +13,7 @@ describe('kindIcon', () => {
     expect(kindIcon('organization-request-decided')).toBe(Building2);
   });
 
-  it('draws the bell for a kind added after this build (quota-warning)', () => {
+  it('draws the bell for the quota warning and for a kind added after this build', () => {
     expect(kindIcon('quota-warning')).toBe(Bell);
     expect(kindIcon('')).toBe(Bell);
   });
@@ -24,6 +24,7 @@ describe('kind groups (the "Loại" chips; the lists feed the `kind` query, requ
     expect(kindsOfGroup('ticket')).toEqual(['ticket-new', 'ticket-message', 'ticket-status']);
     expect(kindsOfGroup('contest')).toEqual(['contest-announcement']);
     expect(kindsOfGroup('organization')).toEqual(['organization-request-decided']);
+    expect(kindsOfGroup('other')).toEqual(['quota-warning']);
     const all = (['ticket', 'contest', 'organization', 'other'] as const).flatMap(kindsOfGroup);
     expect(new Set(all).size).toBe(all.length);
   });

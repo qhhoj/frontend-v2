@@ -102,6 +102,17 @@ describe('NotificationsPage', () => {
     expect(listCalls(calls)[0]!.query.getAll('kind')).toHaveLength(3);
   });
 
+  it('offers the "Khác" chip and asks for the quota warning kind only', async () => {
+    const calls = mockApi(routesWith());
+    const { wrapper } = await mountApp('/notifications?kind=other');
+    expect(listCalls(calls)[0]!.query.getAll('kind')).toEqual(['quota-warning']);
+    expect(
+      main(wrapper)
+        .findAll('a')
+        .some((link) => link.text().startsWith('Khác')),
+    ).toBe(true);
+  });
+
   it('counts every status in the rail: all, unread and read = all - unread', async () => {
     mockApi(routesWith({ 'GET /notifications': page(inboxSample(), { pageSize: 20, total: 6 }) }));
     const { wrapper } = await mountApp('/notifications');

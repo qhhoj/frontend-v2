@@ -28,8 +28,7 @@ describe('notification filters', () => {
   it('reads the kind chip from the address and ignores anything else', () => {
     expect(kindGroupFromQuery('contest')).toBe('contest');
     expect(kindGroupFromQuery(['ticket', 'other'])).toBe('ticket');
-    // The "other" chip has no backend kind yet (N1-01): it is no filter, not "everything".
-    expect(kindGroupFromQuery('other')).toBeNull();
+    expect(kindGroupFromQuery('other')).toBe('other');
     expect(kindGroupFromQuery('quota-warning')).toBeNull();
     expect(kindGroupFromQuery(undefined)).toBeNull();
   });

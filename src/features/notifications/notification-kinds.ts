@@ -12,7 +12,7 @@ const KIND_ICONS: Readonly<Record<string, Component>> = {
   'organization-request-decided': Building2,
 };
 
-/** The row icon of a notification kind; a kind added after this build (B7's `quota-warning`) draws the bell. */
+/** The row icon of a notification kind; a kind added after this build draws the bell. */
 export const kindIcon = (kind: string): Component =>
   Object.hasOwn(KIND_ICONS, kind) ? KIND_ICONS[kind]! : Bell;
 
@@ -23,12 +23,11 @@ const GROUP_KINDS: Readonly<Record<KindGroup, readonly NotificationKind[]>> = {
   ticket: ['ticket-new', 'ticket-message', 'ticket-status'],
   contest: ['contest-announcement'],
   organization: ['organization-request-decided'],
-  /** Empty until the backend's `NotificationKind` lists `quota-warning` (docs/api-mismatches/notifications.md N1-01): the chip stays hidden. */
-  other: [],
+  other: ['quota-warning'],
 };
 /** The value of the `kind` query (requires VNOI backend B1 ask: repeatable `kind` on `GET /notifications`). */
 export const kindsOfGroup = (group: KindGroup): NotificationKind[] => [...GROUP_KINDS[group]];
 export const isTicketKind = (kind: string): boolean =>
   GROUP_KINDS.ticket.some((ticketKind) => ticketKind === kind);
-/** Chips with at least one kind to ask for: a chip with none would list every row. */
+/** Chips with at least one kind to ask for: a chip with none would list every row (a `kind` filter left empty lists everything). */
 export const AVAILABLE_KIND_GROUPS = KIND_GROUPS.filter((group) => GROUP_KINDS[group].length > 0);
