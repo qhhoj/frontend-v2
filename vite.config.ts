@@ -30,7 +30,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
-    include: ['src/**/*.spec.ts'],
+    include: ['src/**/*.spec.ts', 'scripts/**/*.spec.ts'],
     // Vitest returns '' for CSS ids by default; themes.spec reads the theme files with `?raw`.
     css: { include: /\.css\?raw$/ },
     // Greetings and relative dates depend on the local hour.
