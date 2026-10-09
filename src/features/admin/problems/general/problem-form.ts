@@ -190,8 +190,11 @@ const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSO
 export function changedProblemFields(before: ProblemForm, after: ProblemForm): ProblemPatch {
   const patch: ProblemPatch = {};
   for (const key of Object.keys(after) as (keyof ProblemForm)[]) {
-    if (!sameJson(before[key], after[key]))
-      Object.assign(patch, { [key]: toSent(key, after[key]) });
+    if (sameJson(before[key], after[key])) continue;
+    const sent = toSent(key, after[key]);
+    // The backend refuses `null` for every field but the license: a cleared date is left unchanged, not sent.
+    if (key === 'date' && sent === null) continue;
+    Object.assign(patch, { [key]: sent });
   }
   return patch;
 }
@@ -262,6 +265,19 @@ function timeLimitError(
   return undefined;
 }
 
+/** A per-language limit above the plain-editor cap needs the same permission as the main one (the backend checks both). */
+function languageTimeErrors(form: ProblemForm, can: (permission: string) => boolean): FieldErrors {
+  if (can('judge.high_problem_timelimit')) return {};
+  const errors: FieldErrors = {};
+  form.languageLimits.forEach((limit, index) => {
+    if (limit.timeLimit > PROBLEM_LIMITS.timeLimit.highAbove)
+      errors[`languageLimits.${index}.timeLimit`] = translate(
+        'admin.problems.general.errors.highTime',
+      );
+  });
+  return errors;
+}
+
 /** Checks a form before any request: the messages the page shows under each field. */
 export function checkProblemForm(
   form: ProblemForm,
@@ -272,6 +288,7 @@ export function checkProblemForm(
     errors.code = translate('admin.problems.general.errors.code');
   const timeError = timeLimitError(form, can);
   if (timeError) errors.timeLimit = timeError;
+  Object.assign(errors, languageTimeErrors(form, can));
   if (outOf(form.memoryLimit, PROBLEM_LIMITS.memoryLimit))
     errors.memoryLimit = translate('admin.problems.general.errors.memory');
   if (outOf(form.points, PROBLEM_LIMITS.points))

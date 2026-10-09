@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { staffViewer } from '@/test/admin-routes';
 import {
@@ -128,5 +129,32 @@ describe('ContestProblemsTab', () => {
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
     expect(wrapper.text()).toContain('Điểm từ 0 đến 3500, là số nguyên.');
+  });
+
+  it('marks the public contest pages stale after saving the problem list', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'GET /problems/hcmus41d': ok({
+        id: 'id-d',
+        code: 'hcmus41d',
+        name: 'Xâu con chung dài nhất',
+      }),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper, queryClient } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/problems',
+      WARNING,
+    );
+    seedCache(queryClient, [['contests', 'detail', 'probe']]);
+    await wrapper.get('#contest-add-problem').setValue('hcmus41d');
+    await wrapper.get('#contest-add-problem').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu bài trong kỳ thi')!
+      .trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, [['contests', 'detail', 'probe']])).toHaveLength(1);
   });
 });

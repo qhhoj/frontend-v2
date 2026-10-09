@@ -17,6 +17,7 @@ import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { toLocalInput } from '../../ui/datetime';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { publishOnToSend } from './editorial-draft';
 import { markdownError } from '../statements/statement-drafts';
@@ -48,7 +49,7 @@ const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
 
 const mutation = useAdminMutation({
   mutate: (draft: EditorialDraftBody) => putEditorial(props.problem.code, draft),
-  invalidates: () => [['admin', 'problem', props.problem.code]],
+  invalidates: () => [['admin', 'problem', props.problem.code], PUBLIC_PROBLEMS_KEY],
   onDone: () => {
     savedSnapshot.value = sentSnapshot;
   },

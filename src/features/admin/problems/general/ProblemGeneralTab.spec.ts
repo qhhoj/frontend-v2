@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { invalid, issue, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
 import {
   editableProblem,
@@ -11,6 +12,10 @@ import {
 } from '@/test/admin-fixtures/problems';
 
 const EDIT = ['judge.edit_own_problem'];
+const STALE_AFTER_WRITE = [
+  ['problems', 'list', 'probe'],
+  ['admin', 'index', 'problems', 'probe'],
+];
 const ALL = [...EDIT, 'judge.edit_all_problem'];
 
 /** The shell, the editor and the tab load lazily: wait until the form field the test uses is on the page. */
@@ -158,5 +163,35 @@ describe('ProblemGeneralTab', () => {
     ])
       expect(body, field).not.toHaveProperty(field);
     expect(wrapper.text()).toContain('Đã gửi đề xuất newp.');
+  });
+
+  it('marks the public problem pages and the admin index stale after a save and after a create', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'PATCH /problems/hcmus41c': ok(editableProblem({ points: 1500 })),
+    });
+    const saved = await mountAdmin('/admin/problems/hcmus41c/general');
+    seedCache(saved.queryClient, STALE_AFTER_WRITE);
+    await saved.wrapper.get('#problem-points').setValue('1500');
+    await buttonLabelled(saved.wrapper, 'Lưu thay đổi').trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(saved.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
+    saved.wrapper.unmount();
+
+    mockApi({
+      ...staffViewer(['judge.add_problem']),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /problems': ok(editableProblem({ code: 'newp' })),
+    });
+    const created = await mountAdmin('/admin/problems/new');
+    seedCache(created.queryClient, STALE_AFTER_WRITE);
+    await created.wrapper.get('#problem-code').setValue('newp');
+    await created.wrapper.get('#problem-name').setValue('New');
+    await created.wrapper.get('#problem-type-pick').setValue(TYPE_GRAPH);
+    await buttonLabelled(created.wrapper, 'Thêm loại').trigger('click');
+    await buttonLabelled(created.wrapper, 'Tạo bài').trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
   });
 });

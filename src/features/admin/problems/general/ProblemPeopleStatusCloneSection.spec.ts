@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer, switchNamed } from '@/test/admin-routes';
 import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
@@ -157,5 +158,23 @@ describe('problem people, status and clone', () => {
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({
       organizations: ['org-a'],
     });
+  });
+
+  it('marks the public problem pages and the admin index stale after a clone', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem', 'judge.clone_problem']),
+      ...problemEditorRoutes(),
+      'POST /problems/hcmus41c/clone': ok(editableProblem({ code: 'hcmus41c_copy' })),
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/general');
+    const keys = [
+      ['problems', 'list', 'probe'],
+      ['admin', 'index', 'problems', 'probe'],
+    ];
+    seedCache(queryClient, keys);
+    await wrapper.get('#problem-clone-code').setValue('hcmus41c_copy');
+    await buttonLabelled(wrapper, 'Nhân bản').trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
   });
 });

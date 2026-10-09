@@ -3,6 +3,8 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
+
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import {
   FLATPAGE_HISTORY,
@@ -286,5 +288,28 @@ describe('history', () => {
     await click(wrapper, 'Lưu trang');
     expect(calls.filter((call) => call.path.endsWith('/revisions')).length).toBeGreaterThan(1);
     expect(wrapper.get('a[href*="tab=history"]').text()).toContain('4');
+  });
+
+  it('marks the public flatpage cache stale after a save and after a delete, and drops the deleted page’s history', async () => {
+    mockApi(
+      routes({
+        'PATCH /admin/site/pages/fp-1': ok(flatpage({ title: 'Giới thiệu mới' })),
+        'DELETE /admin/site/pages/fp-1': { status: 204 },
+      }),
+    );
+    const { wrapper, queryClient } = await mountPages('/admin/pages?page=fp-1');
+    const publicKey = [['flatpages', '/about', 'probe']];
+    seedCache(queryClient, publicKey);
+    await wrapper.get('#page-title').setValue('Giới thiệu mới');
+    await click(wrapper, 'Lưu trang');
+    expect(invalidatedKeys(queryClient, publicKey)).toEqual(publicKey);
+    queryClient.setQueryData(['flatpages', '/about', 'probe'], { seeded: true });
+    seedCache(queryClient, [['admin', 'flatpage-revisions', 'fp-1', 'probe']]);
+    await click(wrapper, 'Xoá trang');
+    await confirmDialog('Xoá trang');
+    expect(invalidatedKeys(queryClient, publicKey)).toEqual(publicKey);
+    expect(
+      queryClient.getQueryState(['admin', 'flatpage-revisions', 'fp-1', 'probe']),
+    ).toBeUndefined();
   });
 });

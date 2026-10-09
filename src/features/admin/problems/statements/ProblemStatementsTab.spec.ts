@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { editableProblem, problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
@@ -212,5 +213,23 @@ describe('ProblemStatementsTab', () => {
     await flushPromises();
     await confirmDialog('Rời trang');
     await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/admin/problems'));
+  });
+
+  it('marks the public problem pages stale after saving a translation', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+      'PUT /problems/hcmus41c/translations/en': { status: 204 },
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    seedCache(queryClient, [['problems', 'detail', 'probe']]);
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    await wrapper.get('#statement-name').setValue('Path');
+    await wrapper.get('textarea').setValue('Given a graph.');
+    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 });

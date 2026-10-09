@@ -10,6 +10,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 
 const props = defineProps<{ contestKey: string }>();
 const { can } = usePermissions();
@@ -29,6 +30,7 @@ function confirmClone() {
 
 const mutation = useAdminMutation({
   mutate: () => cloneContest(props.contestKey, newKey.value.trim()),
+  invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
   onDone: (copy: EditableContest) => {
     copyKey.value = copy.key;
     isOpen.value = false;

@@ -7,7 +7,11 @@ import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { editableProblemKey } from '../problem-editing.queries';
+import {
+  editableProblemKey,
+  PROBLEM_INDEX_KEY,
+  PUBLIC_PROBLEMS_KEY,
+} from '../problem-editing.queries';
 import { changedProblemFields, checkProblemForm, cloneForm, toProblemForm } from './problem-form';
 import type { ProblemForm } from './problem-form';
 
@@ -39,6 +43,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
 
   const mutation = useAdminMutation({
     mutate: (code: string) => updateProblem(code, changedProblemFields(seed.value, form.value)),
+    invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
     onDone: (saved: EditableProblem, code: string) => {
       queryClient.setQueryData(editableProblemKey(saved.code, viewer.value), saved);
       seed.value = toProblemForm(saved, meta());

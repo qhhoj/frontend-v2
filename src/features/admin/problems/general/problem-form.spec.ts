@@ -38,6 +38,26 @@ describe('problem form', () => {
     expect(patch.date).toMatch(/^2026-10-0\dT\d\d:00:00\.000Z$/);
   });
 
+  it('leaves a cleared date out of the patch, since the backend refuses null for it', () => {
+    const before = { ...seeded(), date: '2026-10-08T13:00' };
+    expect(changedProblemFields(before, { ...before, date: '', points: 1500 })).toEqual({
+      points: 1500,
+    });
+  });
+
+  it('refuses a per-language time limit above 5 s without judge.high_problem_timelimit, beside its row', () => {
+    const form = seeded();
+    form.languageLimits = [{ ...form.languageLimits[0]!, timeLimit: 6 }];
+    expect(checkProblemForm(form, nobodyCan)['languageLimits.0.timeLimit']).toBe(
+      'Trên 5 giây cần quyền judge.high_problem_timelimit.',
+    );
+    expect(
+      checkProblemForm(form, (permission) => permission === 'judge.high_problem_timelimit')[
+        'languageLimits.0.timeLimit'
+      ],
+    ).toBeUndefined();
+  });
+
   it('compares lists by value, so reordering a type list is a change and an equal copy is not', () => {
     const before = { ...seeded(), typeIds: ['a', 'b'] };
     expect(changedProblemFields(before, { ...before, typeIds: ['a', 'b'] })).toEqual({});

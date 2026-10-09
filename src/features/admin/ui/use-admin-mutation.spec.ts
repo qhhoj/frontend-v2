@@ -5,15 +5,21 @@ import { defineComponent, h } from 'vue';
 import { ApiError } from '@/api/client';
 import { mountComponent } from '@/test/mount';
 import { useAdminMutation } from './use-admin-mutation';
+import type { AdminQueryKey } from './use-admin-mutation';
 
-const host = (mutate: (vars: { name: string }) => Promise<string>) => {
+const host = (
+  mutate: (vars: { name: string }) => Promise<string>,
+  invalidates: (vars: { name: string }) => AdminQueryKey[] = (vars) => [
+    ['admin', 'thing', vars.name],
+  ],
+) => {
   let api!: ReturnType<typeof useAdminMutation<{ name: string }, string>>;
   let invalidate!: ReturnType<typeof vi.spyOn>;
   mountComponent(
     defineComponent({
       setup() {
         invalidate = vi.spyOn(useQueryClient(), 'invalidateQueries');
-        api = useAdminMutation({ mutate, invalidates: (vars) => [['admin', 'thing', vars.name]] });
+        api = useAdminMutation({ mutate, invalidates });
         return () => h('div');
       },
     }),
@@ -80,22 +86,12 @@ describe('useAdminMutation', () => {
 
 describe('useAdminMutation with a public key', () => {
   it('invalidates a public cache prefix', async () => {
-    let api!: ReturnType<typeof useAdminMutation<undefined, string>>;
-    let invalidate!: ReturnType<typeof vi.spyOn>;
-    mountComponent(
-      defineComponent({
-        setup() {
-          invalidate = vi.spyOn(useQueryClient(), 'invalidateQueries');
-          api = useAdminMutation({
-            mutate: () => Promise.resolve('ok'),
-            invalidates: () => [['problems'], ['contests', 'ranking']],
-          });
-          return () => h('div');
-        },
-      }),
+    const { api, invalidate } = host(
+      (vars) => Promise.resolve(vars.name),
+      () => [['problems'], ['contests', 'ranking']],
     );
-    await api.run(undefined);
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['problems'] });
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['contests', 'ranking'] });
+    await api().run({ name: 'a' });
+    expect(invalidate()).toHaveBeenCalledWith({ queryKey: ['problems'] });
+    expect(invalidate()).toHaveBeenCalledWith({ queryKey: ['contests', 'ranking'] });
   });
 });

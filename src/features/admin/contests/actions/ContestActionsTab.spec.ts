@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import {
@@ -276,4 +277,25 @@ describe('rating by format and freeze window', () => {
       expect(card.text().includes('Chỉ tính rating sau khi kỳ thi kết thúc')).toBe(!offered);
     },
   );
+
+  it('marks the public contest pages and the admin index stale after a clone', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
+      ...routes({ 'POST /contests/hcmus-w41/clone': ok(editableContest({ key: 'w42' })) }),
+    });
+    const { wrapper, queryClient } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/actions',
+      TAB_TEXT,
+    );
+    const keys = [
+      ['contests', 'list', 'probe'],
+      ['admin', 'index', 'contests', 'probe'],
+    ];
+    seedCache(queryClient, keys);
+    await click(wrapper, 'Nhân bản');
+    (document.body.querySelector('#clone-key') as HTMLInputElement).value = 'w42';
+    document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
+    await confirmDialog('Nhân bản');
+    expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
+  });
 });

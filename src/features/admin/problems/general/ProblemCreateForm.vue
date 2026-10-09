@@ -10,6 +10,7 @@ import type { FieldErrors } from '../../ui/admin-errors';
 import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { EDIT_ALL_PROBLEM } from './field-lock';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { checkProblemForm, cloneForm, emptyProblemForm, toProblemBody } from './problem-form';
@@ -25,6 +26,7 @@ const suggestedCode = ref('');
 
 const createMutation = useAdminMutation({
   mutate: (body: ProblemBody) => createProblem(body),
+  invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
   onDone: (created: EditableProblem) => {
     void router.push({ name: 'admin-problemGeneral', params: { code: created.code } });
   },

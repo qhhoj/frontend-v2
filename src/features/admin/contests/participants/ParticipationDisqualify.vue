@@ -28,6 +28,7 @@ const kindText = computed(() => {
 const invalidate = (): AdminQueryKey[] => [
   ['admin', 'participations', props.contestKey],
   ['admin', 'contest', props.contestKey],
+  ['contests', 'ranking'],
 ];
 
 /** After a row changes, focus moves to its status cell: the button that had focus is gone by then. */

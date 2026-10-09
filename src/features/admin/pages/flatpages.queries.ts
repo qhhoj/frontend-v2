@@ -26,3 +26,6 @@ export function useFlatpageQuery(id: MaybeRefOrGetter<string | null>) {
     enabled: computed(() => toValue(id) !== null),
   });
 }
+
+/** The public flatpage cache (`['flatpages', path, viewer]`), stale after any admin save or delete. */
+export const PUBLIC_FLATPAGES_KEY = ['flatpages'] as const;

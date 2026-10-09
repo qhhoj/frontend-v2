@@ -13,7 +13,7 @@ import {
   checkFlatpageForm,
   serverUrlError,
 } from './flatpage-form';
-import { flatpageKey, useFlatpageQuery } from './flatpages.queries';
+import { flatpageKey, PUBLIC_FLATPAGES_KEY, useFlatpageQuery } from './flatpages.queries';
 
 const BLANK_FORM: FlatpageBody = { url: '', title: '', content: '', registrationRequired: false };
 export const bodyOf = (page: FlatpageAdmin): FlatpageBody => ({
@@ -66,10 +66,10 @@ interface WriteOptions {
   onCreated: (id: string) => void;
 }
 
-/** A save changes the list, and an edit also changes the page's history. */
+/** A save changes the admin list and the public pages, and an edit also changes the page's history. */
 function keysToRefreshAfterSave(id: string | null): AdminQueryKey[] {
-  const listKey: AdminQueryKey = ['admin', 'flatpages'];
-  return id === null ? [listKey] : [listKey, ['admin', 'flatpage-revisions', id]];
+  const keys: AdminQueryKey[] = [['admin', 'flatpages'], PUBLIC_FLATPAGES_KEY];
+  return id === null ? keys : [...keys, ['admin', 'flatpage-revisions', id]];
 }
 
 /** The save: a new page is created, a saved one gets only its changed fields; the URL is sent canonical. */
@@ -136,9 +136,10 @@ export function useFlatpageEditor({ pageId, onCreated, onDeleted }: EditorOption
   const viewer = useViewerId();
   const remover = useAdminMutation<string, void>({
     mutate: (id) => deleteFlatpage(id),
-    invalidates: () => [['admin', 'flatpages']],
+    invalidates: () => [['admin', 'flatpages'], PUBLIC_FLATPAGES_KEY],
     onDone: (_result, id) => {
       queryClient.removeQueries({ queryKey: flatpageKey(id, viewer.value) });
+      queryClient.removeQueries({ queryKey: ['admin', 'flatpage-revisions', id] });
       onDeleted();
     },
   });

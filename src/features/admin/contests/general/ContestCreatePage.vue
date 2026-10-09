@@ -8,6 +8,7 @@ import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import { checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestGeneralForm from './ContestGeneralForm.vue';
@@ -18,6 +19,7 @@ const form = ref(emptyContestForm());
 const localErrors = computed(() => checkContestForm(form.value));
 const mutation = useAdminMutation({
   mutate: (body: ContestBody) => createContest(body),
+  invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
   onDone: (created: EditableContest) => {
     void router.push({ name: 'admin-contestGeneral', params: { key: created.key } });
   },

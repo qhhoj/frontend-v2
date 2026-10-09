@@ -6,7 +6,11 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { changedContestFields, checkContestForm, toContestForm } from '../contest-form';
 import type { ContestForm } from '../contest-form';
-import { editableContestKey } from '../contest-editing.queries';
+import {
+  CONTEST_INDEX_KEY,
+  editableContestKey,
+  PUBLIC_CONTESTS_KEY,
+} from '../contest-editing.queries';
 
 const hasKeys = (object: object) => Object.keys(object).length > 0;
 
@@ -30,6 +34,7 @@ export function useContestForm(contest: () => EditableContest) {
 
   const mutation = useAdminMutation({
     mutate: (patch: ContestPatch) => updateContest(contest().key, patch),
+    invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
     onDone: (saved: EditableContest) => {
       queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved);
       reseed(saved);

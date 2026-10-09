@@ -70,6 +70,7 @@ watch(data, (answer) => {
             :contest-key="contest.key"
             :announcement="item"
             :is-just-posted="item.id === justPostedId"
+            :is-pushed-live="isPushedLive"
           />
           <footer class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
             <span>{{

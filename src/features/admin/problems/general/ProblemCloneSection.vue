@@ -7,6 +7,7 @@ import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { PROBLEM_CODE_PATTERN } from '../problem-code';
 
 const props = defineProps<{ code: string }>();
@@ -14,6 +15,7 @@ const newCode = ref('');
 const createdCode = ref('');
 const clone = useAdminMutation({
   mutate: (target: string) => cloneProblem(props.code, target),
+  invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
   onDone: (result) => {
     createdCode.value = result.code;
   },

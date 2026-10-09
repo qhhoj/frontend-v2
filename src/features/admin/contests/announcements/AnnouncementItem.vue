@@ -18,6 +18,8 @@ const props = defineProps<{
   contestKey: string;
   announcement: Announcement;
   isJustPosted: boolean;
+  /** Resend only publishes to the live channel: with it off the backend sends nothing and still answers 204. */
+  isPushedLive: boolean;
 }>();
 const locale = useLocaleStore();
 const isConfirmOpen = ref(false);
@@ -57,7 +59,7 @@ async function resendNow() {
     </header>
     <UserContent :html="announcement.descriptionHtml" />
     <div class="flex flex-wrap items-center gap-3">
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="resendNow">
+      <button v-if="isPushedLive" type="button" :class="ADMIN_BUTTON_CLASS" @click="resendNow">
         {{ $t('admin.contests.announcements.resend') }}
       </button>
       <button type="button" :class="ADMIN_DANGER_CLASS" @click="isConfirmOpen = true">

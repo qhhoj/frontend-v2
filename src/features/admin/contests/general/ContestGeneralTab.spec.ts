@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
 import { invalid, issue, mockApi, ok } from '@/test/mock-api';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer, switchNamed } from '@/test/admin-routes';
 import {
   contestEditorRoutes,
@@ -11,6 +12,10 @@ import {
 import { mountAndWaitFor } from '../contest-spec-helpers';
 
 const EDIT = ['judge.edit_own_contest'];
+const STALE_AFTER_WRITE = [
+  ['contests', 'list', 'probe'],
+  ['admin', 'index', 'contests', 'probe'],
+];
 const save = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
   await wrapper
     .findAll('button')
@@ -183,5 +188,37 @@ describe('ContestGeneralTab', () => {
     await save(wrapper);
     expect(wrapper.get('#contest-endTime').attributes('aria-invalid')).toBe('true');
     expect(wrapper.text()).toContain('Thời điểm không hợp lệ.');
+  });
+
+  it('marks the public contest pages and the admin index stale after a save and after a create', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(editableContest({ timeLimit: 3600 })),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const saved = await mountAndWaitFor('/admin/contests/hcmus-w41/general', 'Thông tin kỳ thi');
+    seedCache(saved.queryClient, STALE_AFTER_WRITE);
+    await saved.wrapper.get('#contest-timeLimit').setValue('');
+    await save(saved.wrapper);
+    expect(invalidatedKeys(saved.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
+    saved.wrapper.unmount();
+
+    mockApi({
+      ...staffViewer(['judge.add_contest']),
+      'POST /contests': ok(editableContest({ key: 'w42' })),
+      'GET /contests/w42': ok(editableContest({ key: 'w42' })),
+    });
+    const created = await mountAndWaitFor('/admin/contests/new', 'Tạo kỳ thi');
+    seedCache(created.queryClient, STALE_AFTER_WRITE);
+    await created.wrapper.get('#contest-key').setValue('w42');
+    await created.wrapper.get('#contest-name').setValue('W42');
+    await created.wrapper.get('#contest-startTime').setValue('2026-10-15T13:00');
+    await created.wrapper.get('#contest-endTime').setValue('2026-10-15T17:00');
+    await created.wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Tạo kỳ thi')!
+      .trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
   });
 });

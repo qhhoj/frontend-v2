@@ -63,7 +63,9 @@ describe('ContestAnnouncementsTab', () => {
   it('deletes only after confirming, and resends without asking', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
-      ...contestEditorRoutes(),
+      ...contestEditorRoutes(
+        editableContest({ settings: contestSettings({ pushAnnouncements: true }) }),
+      ),
       ...list(),
       'DELETE /contests/hcmus-w41/announcements/a-1': { status: 204 },
       'POST /contests/hcmus-w41/announcements/a-1/resend': { status: 204 },
@@ -161,5 +163,13 @@ describe('ContestAnnouncementsTab', () => {
     expect(wrapper.text()).toContain('20 thông báo · trang 1 của 1');
     expect(wrapper.text()).toContain('Làm rõ đề bài C');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
+  });
+
+  it('offers no resend while announcements are not pushed live', async () => {
+    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(), ...list() });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/announcements', LIST_TEXT);
+    expect(wrapper.findAll('button').some((candidate) => candidate.text() === 'Gửi lại')).toBe(
+      false,
+    );
   });
 });

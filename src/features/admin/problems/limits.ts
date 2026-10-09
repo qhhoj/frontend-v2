@@ -14,7 +14,6 @@ export const FILE_NAME_MAX_LENGTH = 100;
 export const GENERATOR_ARGS_MAX_LENGTH = 1000;
 export const STATEMENT_NAME_MAX_LENGTH = 100;
 export const MARKDOWN_MAX_LENGTH = 200_000;
-export const MAX_SAFE_COUNT = Number.MAX_SAFE_INTEGER;
 
 /** Legacy typographic characters a statement may not contain (backend `DISALLOWED_STATEMENT_CHARACTERS`). */
 export const DISALLOWED_STATEMENT_CHARACTERS: readonly string[] = [

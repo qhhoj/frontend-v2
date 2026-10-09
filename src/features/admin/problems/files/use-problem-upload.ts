@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { uploadMaterial, uploadProblemImage, uploadStatementPdf } from '@/api/problem-editing.api';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import type { AdminQueryKey } from '../../ui/use-admin-mutation';
 
 export type ProblemUploadKind = 'image' | 'pdf' | 'material';
@@ -19,7 +20,8 @@ export function useProblemUpload(kind: ProblemUploadKind, code: () => string) {
   const url = ref('');
   const mutation = useAdminMutation({
     mutate: (file: File) => UPLOADERS[kind](code(), file),
-    invalidates: (): AdminQueryKey[] => (kind === 'image' ? [] : [['admin', 'problem', code()]]),
+    invalidates: (): AdminQueryKey[] =>
+      kind === 'image' ? [] : [['admin', 'problem', code()], PUBLIC_PROBLEMS_KEY],
     onDone: (uploaded: string) => {
       url.value = uploaded;
     },

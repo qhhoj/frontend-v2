@@ -4,6 +4,7 @@ import { putTranslation, updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import { usePermissions } from '@/stores/use-permissions';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import {
   checkStatementDraft,
   isOriginalLocked,
@@ -69,7 +70,7 @@ export function useStatementDrafts(problem: () => EditableProblem) {
 
   const saveMutation = useAdminMutation({
     mutate: (target: StatementSlot) => saveSlot(problem().code, target, drafts.value[target]),
-    invalidates: () => [['admin', 'problem', problem().code]],
+    invalidates: () => [['admin', 'problem', problem().code], PUBLIC_PROBLEMS_KEY],
     onDone: (_saved: unknown, target: StatementSlot) => recordSaved(drafts, saved, target),
   });
 

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok, page } from '@/test/mock-api';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, participation } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '../contest-spec-helpers';
@@ -108,5 +109,19 @@ describe('ContestParticipantsTab', () => {
     await disqualifyButton(wrapper).trigger('click');
     await confirmDialog('Loại khỏi bảng');
     await vi.waitFor(() => expect(document.activeElement?.id).toBe('participation-status-p-1'));
+  });
+
+  it('marks the public ranking stale after a disqualify', async () => {
+    mockApi(disqualifyRoutes());
+    const { wrapper, queryClient } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/participants',
+      COUNT_LINE,
+    );
+    const ranking = [['contests', 'ranking', 'probe', 'hcmus-w41']];
+    seedCache(queryClient, ranking);
+    await disqualifyButton(wrapper).trigger('click');
+    await confirmDialog('Loại khỏi bảng');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, ranking)).toHaveLength(1);
   });
 });

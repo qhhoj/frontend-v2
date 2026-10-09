@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { confirmDialog, openDialog, staffViewer, switchNamed } from '@/test/admin-routes';
 import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
@@ -80,5 +81,23 @@ describe('ProblemEditorialTab', () => {
     await flushPromises();
     expect(calls.some((call) => call.method === 'PUT')).toBe(false);
     expect(wrapper.text()).toContain('Nội dung tối đa 200000 ký tự.');
+  });
+
+  it('marks the public problem pages stale after saving the editorial', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      ...problemEditorRoutes(),
+      'POST /problems/render-preview': ok({ html: '' }),
+      'PUT /problems/hcmus41c/editorial': { status: 204 },
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/editorial');
+    seedCache(queryClient, [['problems', 'editorial', 'probe']]);
+    await wrapper.get('textarea').setValue('Lời giải mới');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu lời giải')!
+      .trigger('click');
+    await flushPromises();
+    expect(invalidatedKeys(queryClient, [['problems', 'editorial', 'probe']])).toHaveLength(1);
   });
 });

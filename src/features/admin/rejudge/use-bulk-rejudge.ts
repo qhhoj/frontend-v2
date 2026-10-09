@@ -14,7 +14,10 @@ export interface RejudgeOutcome {
 /** One bulk rejudge: the request, and the line the page shows for its answer. Never throws; the filter is never cleared here. */
 export function useBulkRejudge() {
   const outcome = ref<RejudgeOutcome | null>(null);
-  const mutation = useAdminMutation<RejudgeBody, RejudgeResult>({ mutate: rejudgeSubmissions });
+  const mutation = useAdminMutation<RejudgeBody, RejudgeResult>({
+    mutate: rejudgeSubmissions,
+    invalidates: () => [['submissions']],
+  });
 
   async function rejudge(body: RejudgeBody): Promise<void> {
     try {

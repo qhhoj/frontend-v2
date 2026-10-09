@@ -5,7 +5,7 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { editableContestKey } from '../contest-editing.queries';
+import { editableContestKey, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import { isPointsValid, moveRow, toProblemRows, toProblemsBody } from './contest-problems';
 import type { ProblemRow } from './contest-problems';
 import { useAddProblem } from './use-add-problem';
@@ -42,6 +42,7 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const mutation = useAdminMutation({
     mutate: (listed: ProblemRow[]) =>
       updateContest(contest().key, { problems: toProblemsBody(listed) }),
+    invalidates: () => [PUBLIC_CONTESTS_KEY],
     onDone: (saved: EditableContest) => {
       queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved);
       reseed(saved);

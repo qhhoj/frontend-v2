@@ -41,8 +41,9 @@ describe('flatpage form', () => {
   });
 
   it('does not trim: a stray space is a charset error the user must see', () => {
-    expect(checkFlatpageForm({ url: ' /rules ', title: 'T', content: '' }).url).toBeDefined();
-    expect(checkFlatpageForm({ url: '/', title: 'T', content: '' }).url).toBeDefined();
+    const URL_ERROR = 'Ký tự ngoài chữ, số, “-”, “_”, “.”, “~” và “/”, hoặc đường dẫn rỗng.';
+    expect(checkFlatpageForm({ url: ' /rules ', title: 'T', content: '' }).url).toBe(URL_ERROR);
+    expect(checkFlatpageForm({ url: '/', title: 'T', content: '' }).url).toBe(URL_ERROR);
   });
 
   it('refuses characters outside the legacy charset and an empty title', () => {

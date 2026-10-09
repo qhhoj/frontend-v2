@@ -21,3 +21,7 @@ export const useProblemEditingMetaQuery = () =>
     queryFn: fetchProblemEditingMeta,
     staleTime: Infinity,
   });
+
+/** The caches a problem write makes stale: the public problem pages, and the admin index the editor returns to. */
+export const PUBLIC_PROBLEMS_KEY = ['problems'] as const;
+export const PROBLEM_INDEX_KEY = ['admin', 'index', 'problems'] as const;

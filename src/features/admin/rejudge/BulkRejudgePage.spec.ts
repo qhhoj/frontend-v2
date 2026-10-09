@@ -3,6 +3,8 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
+
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { problemMeta } from '@/test/fixtures';
 
@@ -162,5 +164,15 @@ describe('BulkRejudgePage', () => {
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
     expect(wrapper.get('#rejudge-problem').attributes('aria-invalid')).toBe('true');
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
+  });
+
+  it('marks the submission lists stale after queueing a rejudge', async () => {
+    mockApi(routes(answer(counted(3), queued(3))));
+    const { wrapper, queryClient } = await mountRejudge();
+    const lists = [['submissions', 'list', 'probe']];
+    seedCache(queryClient, lists);
+    await openConfirm(wrapper);
+    await confirmDialog('Chấm lại 3 bài nộp');
+    expect(invalidatedKeys(queryClient, lists)).toEqual(lists);
   });
 });

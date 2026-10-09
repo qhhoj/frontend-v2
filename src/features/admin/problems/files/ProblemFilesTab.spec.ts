@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
@@ -99,5 +100,17 @@ describe('ProblemFilesTab', () => {
     expect(wrapper.get('[data-testid="upload-image"] [role="alert"]').text()).toContain(
       'Chỉ nhận ảnh JPG, PNG, GIF hoặc SVG.',
     );
+  });
+
+  it('marks the public problem pages stale after a PDF upload', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem', 'judge.upload_file_statement']),
+      ...problemEditorRoutes(),
+      'POST /problems/hcmus41c/statement': ok({ url: '/media/pdf/hcmus41c-v2.pdf' }),
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/files');
+    seedCache(queryClient, [['problems', 'detail', 'probe']]);
+    await pick(wrapper, 'upload-pdf', new File(['%PDF'], 'new.pdf'));
+    expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 });

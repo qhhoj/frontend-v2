@@ -15,3 +15,7 @@ export const useEditableContestQuery = (key: MaybeRefOrGetter<string>) => {
     queryFn: () => fetchEditableContest(toValue(key)),
   });
 };
+
+/** The caches a contest write makes stale: the public contest pages, and the admin index the editor returns to. */
+export const PUBLIC_CONTESTS_KEY = ['contests'] as const;
+export const CONTEST_INDEX_KEY = ['admin', 'index', 'contests'] as const;
