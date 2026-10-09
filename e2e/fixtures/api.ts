@@ -32,6 +32,17 @@ import { matchPattern } from '../../src/test/route-match';
 import { list, ok } from './reply';
 import type { Handler, Reply } from './reply';
 
+// A strong device by default, so low-power `auto` stays off; low-power tests add their own init script after this one.
+async function stubStrongDevice(page: Page) {
+  await page.addInitScript(() => {
+    for (const [name, value] of [
+      ['hardwareConcurrency', 8],
+      ['deviceMemory', 8],
+    ] as const)
+      Object.defineProperty(navigator, name, { get: () => value, configurable: true });
+  });
+}
+
 export { list } from './reply';
 export type { Handler, Reply } from './reply';
 
@@ -318,6 +329,7 @@ export class FakeApi {
 export const test = base.extend<{ api: FakeApi }>({
   api: async ({ page }, use) => {
     const api = new FakeApi();
+    await stubStrongDevice(page);
     await api.install(page);
     await use(api);
     api.releaseAll();

@@ -30,6 +30,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.submissions' },
   },
   {
+    path: '/submissions/diff',
+    name: 'submission-diff',
+    component: () => import('@/features/submissions/SubmissionDiffPage.vue'),
+    meta: { titleKey: 'pages.submissionDiff', requiresAuth: true },
+  },
+  {
     path: '/submissions/:id',
     name: 'submission',
     component: () => import('@/features/submissions/SubmissionPage.vue'),

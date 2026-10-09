@@ -8,6 +8,9 @@ import { takeUnmatchedRequests } from './mock-api';
 beforeEach(() => {
   installFakeEventSource(); // jsdom has no EventSource; pages with a live feed open one on mount
   stubMatchMedia();
+  // A strong device by default: low-power `auto` must stay off unless a spec passes weak hints (src/theme/low-power.ts).
+  Object.defineProperty(navigator, 'hardwareConcurrency', { value: 8, configurable: true });
+  Object.defineProperty(navigator, 'deviceMemory', { value: 8, configurable: true });
   vi.stubGlobal('scrollTo', vi.fn()); // jsdom does not implement it; the router scrolls on every navigation
   vi.stubGlobal(
     'ResizeObserver',
@@ -24,6 +27,7 @@ afterEach(() => {
   localStorage.clear();
   delete document.documentElement.dataset.theme;
   delete document.documentElement.dataset.accent;
+  delete document.documentElement.dataset.lowPower;
   document.documentElement.style.removeProperty('--qh-glass-level');
   document.documentElement.style.removeProperty('--qh-blob-strength');
   document.documentElement.style.colorScheme = '';

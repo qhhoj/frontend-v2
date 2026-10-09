@@ -15,6 +15,7 @@
   "pages": {
     "submissions": "Submissions",
     "submission": "Submission",
+    "submissionDiff": "Compare submissions",
     "submissionTitle": "Submission {id}",
     "contest": "Contest",
     "ranking": "Ranking",
@@ -1600,6 +1601,12 @@
       "reopened": "The ticket was reopened"
     },
     "liveFooter": " · new messages appear live"
+  },
+  "sourceDiff": {
+    "title": "Compare submissions"
+  },
+  "lowPower": {
+    "title": "Low-power mode"
   },
   "flatpage": {
     "breadcrumb": "Breadcrumb",

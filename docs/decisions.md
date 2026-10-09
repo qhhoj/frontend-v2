@@ -362,3 +362,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Contest extras (VNOI F3)
 
 - Contest tag colours are theme tokens `tag-1`..`tag-8` (`--qh-tag-N` text, `--qh-tag-N-bg` tint) in every theme file, checked at 4.5:1 by `themes.spec.ts`; the backend stores only the key, so a theme change never touches data.
+## VNOI ports: standalone (F5)
+
+- `diff` 9.0.0 is pinned exactly (BSD-3-Clause, bundled types, no dependencies) for the submission source diff.
+- Unit and e2e tests run as a strong device (8 cores, 8 GB) so low-power `auto` stays off unless a spec passes weak hints.

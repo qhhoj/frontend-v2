@@ -15,6 +15,7 @@
   "pages": {
     "submissions": "Bài nộp",
     "submission": "Chi tiết bài nộp",
+    "submissionDiff": "So sánh bài nộp",
     "submissionTitle": "Bài nộp {id}",
     "contest": "Kỳ thi",
     "ranking": "Bảng xếp hạng",
@@ -1600,6 +1601,12 @@
       "reopened": "Phiếu đã mở lại"
     },
     "liveFooter": " · tin nhắn mới tự hiện nhờ luồng trực tiếp"
+  },
+  "sourceDiff": {
+    "title": "So sánh bài nộp"
+  },
+  "lowPower": {
+    "title": "Chế độ tiết kiệm"
   },
   "flatpage": {
     "breadcrumb": "Đường dẫn",
