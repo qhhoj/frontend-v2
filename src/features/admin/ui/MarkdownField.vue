@@ -13,7 +13,6 @@ const props = defineProps<{
   previewStyle: PreviewSource;
   hint?: string;
   error?: string;
-  rows?: number;
 }>();
 const id = useId();
 const preview = useRenderPreview(
@@ -33,7 +32,7 @@ const describedBy = computed(() =>
       <textarea
         :id="id"
         v-model="text"
-        :rows="rows ?? 14"
+        :rows="14"
         :class="[ADMIN_INPUT_CLASS, 'py-2 font-mono text-sm']"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"

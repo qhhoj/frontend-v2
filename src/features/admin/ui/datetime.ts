@@ -13,7 +13,3 @@ export function fromLocalInput(value: string): string | null {
   const date = new Date(value);
   return value && !Number.isNaN(date.getTime()) ? date.toISOString() : null;
 }
-
-/** Whether the box's value is the same minute as a stored instant: a compare that every page's dirty check needs. */
-export const isSameMinute = (localValue: string, iso: string | null): boolean =>
-  toLocalInput(iso) === localValue;

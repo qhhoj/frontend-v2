@@ -5,7 +5,7 @@ import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, officialRanking, rankingLink } from '@/test/admin-fixtures/contests';
-import { mountAndWaitFor } from '../contest-spec-helpers';
+import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 /** Some jsdom versions have no `Blob.text()`; the component uses the real API, so the spec supplies the FileReader route. */
 function readBlobAsText(this: Blob): Promise<string> {

@@ -112,10 +112,6 @@
     "countAbove": "{count} cặp, độ tương đồng từ {percent}%",
     "sortNote": "Sắp xếp theo độ tương đồng giảm dần",
     "columns": {
-      "similarity": "Tương đồng",
-      "users": "Hai bài nộp",
-      "problem": "Bài",
-      "language": "Ngôn ngữ",
       "longest": "Dài nhất",
       "overlap": "Trùng",
       "fragments": "Đoạn"
@@ -133,7 +129,6 @@
     "resetFilters": "Đặt lại bộ lọc"
   },
   "pair": {
-    "title": "Cặp tương đồng",
     "lead": "Cặp tương đồng · {problemCode} · lượt chạy {runId}",
     "crumbPair": "Cặp",
     "backToList": "Về danh sách cặp",

@@ -300,8 +300,7 @@
       "globHint": "* stands for any run of characters, ? for one character.",
       "resultsLegend": "Results",
       "resultsHint": "Leave empty for every result.",
-      "prepareConfirm": "Prepare",
-      "prepared": "The export was requested."
+      "prepareConfirm": "Prepare"
     },
     "clone": {
       "title": "Clone the contest",

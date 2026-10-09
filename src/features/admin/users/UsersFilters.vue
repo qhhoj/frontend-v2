@@ -4,7 +4,7 @@ import IndexSearchBox from '../search/IndexSearchBox.vue';
 import { USERS_TABS, usersViewToQuery } from './users-list';
 import type { UsersListView, UsersTab } from './users-list';
 
-const props = defineProps<{ view: UsersListView }>();
+const props = defineProps<{ view: UsersListView; status: string }>();
 const emit = defineEmits<{ change: [patch: Partial<UsersListView>] }>();
 const route = useRoute();
 
@@ -40,6 +40,7 @@ const tabLocation = (tab: UsersTab) => ({
         :placeholder="$t('admin.users.list.search.placeholder')"
         :clear-label="$t('admin.users.list.search.clear')"
         :hint="$t('admin.users.list.search.hint')"
+        :status="status"
         @commit="(search) => emit('change', { search, page: 1 })"
       />
     </div>

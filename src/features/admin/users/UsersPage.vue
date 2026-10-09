@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { STAFF_USERS_PAGE_SIZE } from '@/api/users-admin.api';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -22,6 +23,7 @@ import {
 import type { UsersListView } from './users-list';
 import { useStaffUsersQuery } from './users.queries';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const view = computed(() => usersViewFromQuery(route.query));
@@ -31,6 +33,13 @@ const total = computed(() => list.data.value?.meta.total ?? 0);
 const last = computed(() => lastStaffPage(total.value));
 const showReason = computed(() => view.value.tab === 'banned');
 const countKind = computed(() => (view.value.search ? 'match' : view.value.tab));
+const countText = computed(() =>
+  t(`admin.users.list.count.${countKind.value}`, {
+    total: total.value,
+    pageSize: STAFF_USERS_PAGE_SIZE,
+    search: view.value.search,
+  }),
+);
 const opened = computed(() => {
   const value = route.query.user;
   return typeof value === 'string' && value !== '' ? value : null;
@@ -65,7 +74,7 @@ const openUser = (username: string) =>
       />
     </section>
     <section class="glass flex flex-col gap-4 rounded-panel p-5">
-      <UsersFilters :view="view" @change="setView" />
+      <UsersFilters :view="view" :status="list.data.value ? countText : ''" @change="setView" />
       <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
         <template #skeleton
           ><SkeletonBlock data-skeleton-region="users-list" class="h-[19rem] w-full"
@@ -108,15 +117,7 @@ const openUser = (username: string) =>
               {{ $t('admin.users.list.next') }}
             </button>
           </nav>
-          <p class="text-sm text-muted">
-            {{
-              $t(`admin.users.list.count.${countKind}`, {
-                total,
-                pageSize: STAFF_USERS_PAGE_SIZE,
-                search: view.search,
-              })
-            }}
-          </p>
+          <p class="text-sm text-muted">{{ countText }}</p>
         </div>
         <p class="text-xs text-muted">{{ $t('admin.users.list.order') }}</p>
       </div>

@@ -4,7 +4,7 @@ import { mockApi, ok, page } from '@/test/mock-api';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, participation } from '@/test/admin-fixtures/contests';
-import { mountAndWaitFor } from '../contest-spec-helpers';
+import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 describe('ContestParticipantsTab', () => {
   afterEach(() => vi.useRealTimers());

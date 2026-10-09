@@ -102,6 +102,10 @@
     }
   },
   "ranks": {
-    "user": "Member"
+    "user": "Member",
+    "setter": "Problem setter",
+    "staff": "Staff",
+    "admin": "Administrator",
+    "banned": "Banned"
   }
 }

@@ -152,7 +152,6 @@
   },
   "save": "Lưu",
   "discard": "Đặt lại",
-  "saving": "Đang lưu…",
   "saved": "Đã lưu.",
   "saveFailed": "Không lưu được {key}: {message}",
   "history": "Lịch sử",

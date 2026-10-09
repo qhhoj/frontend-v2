@@ -300,8 +300,7 @@
       "globHint": "* thay cho một chuỗi, ? thay cho một ký tự.",
       "resultsLegend": "Kết quả",
       "resultsHint": "Để trống là lấy mọi kết quả.",
-      "prepareConfirm": "Chuẩn bị",
-      "prepared": "Đã gửi yêu cầu chuẩn bị."
+      "prepareConfirm": "Chuẩn bị"
     },
     "clone": {
       "title": "Nhân bản kỳ thi",

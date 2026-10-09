@@ -7,7 +7,6 @@
   "list": {
     "total": "{total} trang",
     "loginChip": "Cần đăng nhập",
-    "empty": "Chưa có trang nào.",
     "pager": "Phân trang trang tĩnh"
   },
   "pick": "Chọn một trang hoặc tạo trang mới.",

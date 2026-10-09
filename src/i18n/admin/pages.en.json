@@ -7,7 +7,6 @@
   "list": {
     "total": "{total} pages",
     "loginChip": "Login required",
-    "empty": "No pages yet.",
     "pager": "Static pages pager"
   },
   "pick": "Pick a page or create a new one.",

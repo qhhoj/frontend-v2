@@ -76,8 +76,7 @@
       "types": "Problem types (at least 1)",
       "pickType": "Pick a type",
       "addType": "Add type",
-      "allowedLanguages": "Allowed languages",
-      "allowedLanguagesHint": "Languages contestants may submit in."
+      "allowedLanguages": "Allowed languages"
     },
     "visibility": {
       "source": "Show submission source",

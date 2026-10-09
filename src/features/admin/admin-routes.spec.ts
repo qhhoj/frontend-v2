@@ -18,6 +18,31 @@ describe('admin routes', () => {
     }
   });
 
+  it('guards representative screens with the permission the backend checks, written out literally', () => {
+    const permissionOf = (name: string) =>
+      adminRoutes.find((route) => route.name === name)?.meta?.permission ?? null;
+    expect(permissionOf('admin-dashboard')).toBeNull();
+    expect(permissionOf('admin-users')).toBe('judge.ban_user');
+    expect(permissionOf('admin-problemData')).toBe('judge.edit_own_problem');
+    expect(permissionOf('admin-contestGeneral')).toEqual([
+      'judge.edit_own_contest',
+      'judge.edit_all_contest',
+    ]);
+    expect(permissionOf('admin-languages')).toEqual([
+      'judge.change_language',
+      'judge.add_language',
+    ]);
+    expect(permissionOf('admin-pages')).toBe('flatpages.change_flatpage');
+  });
+
+  it('names only backend permission namespaces in every screen rule', () => {
+    const names = Object.values(ADMIN_SCREENS)
+      .flatMap((screen) => [screen.permission ?? []].flat())
+      .map(String);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.every((name) => /^(judge|flatpages)\.[a-z_]+$/.test(name))).toBe(true);
+  });
+
   it('keeps every screen path under /admin and unique', () => {
     const paths = Object.values(ADMIN_SCREENS).map((screen) => screen.path);
     expect(paths.every((path) => path === '/admin' || path.startsWith('/admin/'))).toBe(true);

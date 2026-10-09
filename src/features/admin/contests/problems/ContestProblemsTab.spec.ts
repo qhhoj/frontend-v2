@@ -8,7 +8,7 @@ import {
   contestSettings,
   editableContest,
 } from '@/test/admin-fixtures/contests';
-import { mountAndWaitFor } from '../contest-spec-helpers';
+import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 const EDIT = ['judge.edit_own_contest'];
 const WARNING = 'Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.';

@@ -42,6 +42,14 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
 };
 
 describe('UsersPage', () => {
+  it('names a rank in words and announces the result count in the search box live region', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountUsers('/admin/users');
+    expect(wrapper.get('table').text()).toContain('Bị cấm');
+    expect(wrapper.get('table').text()).not.toContain('banned');
+    expect(wrapper.get('[aria-live="polite"]').text()).toContain('2 người');
+  });
+
   it('opens a user from the exact lookup and shows the id and rank', async () => {
     mockApi(routes());
     const { wrapper, router } = await mountUsers('/admin/users');

@@ -112,10 +112,6 @@
     "countAbove": "{count} pairs, similarity from {percent}%",
     "sortNote": "Sorted by similarity, highest first",
     "columns": {
-      "similarity": "Similarity",
-      "users": "Two submissions",
-      "problem": "Problem",
-      "language": "Language",
       "longest": "Longest",
       "overlap": "Overlap",
       "fragments": "Fragments"
@@ -133,7 +129,6 @@
     "resetFilters": "Reset filters"
   },
   "pair": {
-    "title": "Similar pair",
     "lead": "Similar pair · {problemCode} · run {runId}",
     "crumbPair": "Pair",
     "backToList": "Back to the pairs",

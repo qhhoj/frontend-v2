@@ -10,7 +10,7 @@ import {
   contestEditorRoutes,
   editableContest,
 } from '@/test/admin-fixtures/contests';
-import { mountAndWaitFor } from '../contest-spec-helpers';
+import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 const routes = (extra = {}) => ({
   ...contestEditorRoutes(),

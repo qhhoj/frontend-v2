@@ -76,8 +76,7 @@
       "types": "Loại bài (ít nhất 1)",
       "pickType": "Chọn loại bài",
       "addType": "Thêm loại",
-      "allowedLanguages": "Ngôn ngữ được phép",
-      "allowedLanguagesHint": "Ngôn ngữ thí sinh được nộp bài."
+      "allowedLanguages": "Ngôn ngữ được phép"
     },
     "visibility": {
       "source": "Hiển thị mã nguồn bài nộp",

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fromLocalInput, isSameMinute, toLocalInput } from './datetime';
+import { fromLocalInput, toLocalInput } from './datetime';
 
 beforeEach(() => vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh'));
 afterEach(() => vi.unstubAllEnvs());
@@ -31,11 +31,5 @@ describe('datetime-local helpers (Asia/Ho_Chi_Minh)', () => {
 
   it('treats a malformed box value as empty instead of throwing', () => {
     expect(fromLocalInput('not a time')).toBeNull();
-  });
-
-  it('matches a stored instant to the box by its minute, not its seconds', () => {
-    expect(isSameMinute('2026-10-08T13:00', '2026-10-08T06:00:30.000Z')).toBe(true);
-    expect(isSameMinute('2026-10-08T13:01', '2026-10-08T06:00:30.000Z')).toBe(false);
-    expect(isSameMinute('', null)).toBe(true);
   });
 });

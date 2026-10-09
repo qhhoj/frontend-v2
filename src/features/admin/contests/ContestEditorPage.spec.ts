@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { mockApi } from '@/test/mock-api';
 import { staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
-import { mountAndWaitFor } from './contest-spec-helpers';
+import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 const EDIT = ['judge.edit_own_contest'];
 

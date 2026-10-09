@@ -102,6 +102,10 @@
     }
   },
   "ranks": {
-    "user": "Thành viên"
+    "user": "Thành viên",
+    "setter": "Người ra đề",
+    "staff": "Nhân viên",
+    "admin": "Quản trị viên",
+    "banned": "Bị cấm"
   }
 }

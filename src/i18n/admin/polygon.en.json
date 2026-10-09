@@ -37,7 +37,6 @@
     "languageTooLong": "At most {max} characters."
   },
   "progress": {
-    "board": "Progress",
     "title": "Importing {code}",
     "state": "State",
     "received": "Package received",

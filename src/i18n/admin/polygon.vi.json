@@ -37,7 +37,6 @@
     "languageTooLong": "Tối đa {max} ký tự."
   },
   "progress": {
-    "board": "Tiến trình",
     "title": "Đang nhập {code}",
     "state": "Trạng thái",
     "received": "Đã nhận gói",

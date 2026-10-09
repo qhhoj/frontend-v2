@@ -152,7 +152,6 @@
   },
   "save": "Save",
   "discard": "Discard edits",
-  "saving": "Saving…",
   "saved": "Saved.",
   "saveFailed": "Could not save {key}: {message}",
   "history": "History",
