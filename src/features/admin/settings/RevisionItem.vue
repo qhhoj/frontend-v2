@@ -6,7 +6,7 @@ import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { shortId } from '../ui/short-id';
-import { diffLines } from './revisions';
+import { diffLines, hasSealedPart } from './revisions';
 
 const props = defineProps<{
   revision: SettingRevision;
@@ -20,9 +20,7 @@ const locale = useLocaleStore();
 
 const lines = computed(() => diffLines(props.revision));
 const hasSealedSide = computed(() =>
-  [props.revision.before, props.revision.after].some(
-    (side) => typeof side === 'object' && side !== null && 'set' in side,
-  ),
+  [props.revision.before, props.revision.after].some(hasSealedPart),
 );
 /** A scalar key's only field is its value: its line reads as the value alone. */
 const lineText = (field: string, text: string) => (field === 'value' ? text : `${field}: ${text}`);

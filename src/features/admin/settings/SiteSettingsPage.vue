@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -21,6 +21,21 @@ const groups = computed(() =>
   })).filter((entry) => entry.blocks.length > 0),
 );
 const historyKey = ref<SettingKey | null>(null);
+const panel = ref<{ revealPanel: () => void } | null>(null);
+
+/** Opens a key's history and brings it into view: on a phone the panel sits below every block. */
+async function openHistory(key: SettingKey) {
+  historyKey.value = key;
+  await nextTick();
+  panel.value?.revealPanel();
+}
+
+/** Closes the panel and returns focus to the "Lịch sử" button that opened it. */
+function closeHistory() {
+  const openerId = `history-${historyKey.value}`;
+  historyKey.value = null;
+  document.getElementById(openerId)?.focus();
+}
 </script>
 
 <template>
@@ -61,12 +76,18 @@ const historyKey = ref<SettingKey | null>(null);
             v-for="block in entry.blocks"
             :key="block.id"
             :block="block"
-            @history="historyKey = $event"
+            @history="openHistory"
           />
         </section>
       </div>
       <aside v-if="historyKey" class="lg:sticky lg:top-4">
-        <RevisionsPanel :setting-key="historyKey" :can-restore="true" />
+        <RevisionsPanel
+          ref="panel"
+          :setting-key="historyKey"
+          :can-restore="true"
+          closable
+          @close="closeHistory"
+        />
       </aside>
     </div>
   </QueryState>

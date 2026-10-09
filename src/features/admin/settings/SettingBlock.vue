@@ -57,15 +57,28 @@ async function save() {
   const problem = checkBlock(props.block.settings, drafts);
   if (problem) return showRefusal(problem.key, problem.problem);
   isSaving.value = true;
+  const answers = new Map<SettingKey, Setting>();
   const outcome = await sendKeysInOrder(props.block.settings, { ...drafts }, async (key, value) => {
     const answer = await updateSetting(key, value);
     storeAnswer(answer);
+    answers.set(key, answer);
     return answer;
   });
   isSaving.value = false;
+  rebuildDraftsFrom(answers);
   if ('failedKey' in outcome) return showRefusal(outcome.failedKey, refusalMessage(outcome.error));
   notice.value =
-    outcome.saved.length > 0 ? { tone: 'done', text: t('admin.settings.saved') } : null;
+    outcome.saved.length > 0
+      ? { tone: 'done', text: t('admin.settings.saved') }
+      : { tone: 'done', text: t('admin.settings.noChanges') };
+}
+
+/**
+ * A saved key takes its answer as its draft, whatever the stored value was: a replaced secret leaves its replace mode
+ * and its typed box, so a later "Lưu" cannot send the plaintext again.
+ */
+function rebuildDraftsFrom(answers: Map<SettingKey, Setting>) {
+  for (const [key, answer] of answers) drafts[key] = draftOf(answer);
 }
 
 /** A cleared secret is the answer of its own write: only that key's draft is rebuilt, the others keep their edits. */
@@ -115,6 +128,7 @@ function historyLabel(key: SettingKey): string {
             }}
           </span>
           <button
+            :id="`history-${setting.key}`"
             type="button"
             class="ml-auto"
             :class="ADMIN_BUTTON_CLASS"

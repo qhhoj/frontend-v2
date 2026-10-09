@@ -21,6 +21,12 @@ for (const viewport of AUDIT_VIEWPORTS)
 
     await page.getByRole('button', { name: 'Lịch sử · pdf.renderTimeoutMs', exact: true }).click();
     await expect(page.getByTestId('revisions')).toContainText('− 30000');
+    const panelHeading = page.getByRole('heading', {
+      name: 'Lịch sử · pdf.renderTimeoutMs',
+      exact: true,
+    });
+    await expect(panelHeading).toBeInViewport();
+    await expect(panelHeading).toBeFocused();
     expect(await axeViolationsIn(page)).toEqual([]);
   });
 

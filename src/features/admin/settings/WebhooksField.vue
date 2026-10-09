@@ -14,9 +14,18 @@ const startReplacing = () =>
   (draft.value = { ...draft.value, isReplacing: true, rows: [{ event: 'default', url: '' }] });
 const cancelReplacing = () => (draft.value = { ...draft.value, isReplacing: false, rows: [] });
 const setRows = (rows: WebhookRow[]) => (draft.value = { ...draft.value, rows });
-const addRow = () => setRows([...draft.value.rows, { event: 'default', url: '' }]);
+/** The backend takes one URL per event, so a new row starts on an event no other row uses. */
+const isEventUsed = (event: string) => draft.value.rows.some((row) => row.event === event);
+const addRow = () =>
+  setRows([
+    ...draft.value.rows,
+    { event: WEBHOOK_EVENTS.find((event) => !isEventUsed(event)) ?? 'default', url: '' },
+  ]);
+/** The events a row may pick: its own, and those no other row uses. */
+const eventChoicesFor = (index: number) =>
+  WEBHOOK_EVENTS.filter((event) => event === draft.value.rows[index]?.event || !isEventUsed(event));
 const removeRow = (index: number) =>
-  setRows(draft.value.rows.filter((row, position) => row !== undefined && position !== index));
+  setRows(draft.value.rows.filter((_row, position) => position !== index));
 const patchRow = (index: number, patch: Partial<WebhookRow>) =>
   setRows(
     draft.value.rows.map((row, position) => (position === index ? { ...row, ...patch } : row)),
@@ -65,7 +74,9 @@ const patchRow = (index: number, patch: Partial<WebhookRow>) =>
             :class="ADMIN_INPUT_CLASS"
             @change="patchRow(index, { event: ($event.target as HTMLSelectElement).value })"
           >
-            <option v-for="event in WEBHOOK_EVENTS" :key="event" :value="event">{{ event }}</option>
+            <option v-for="event in eventChoicesFor(index)" :key="event" :value="event">
+              {{ event }}
+            </option>
           </select>
         </AdminField>
         <AdminField v-slot="{ id, describedBy }" :label="t('admin.settings.webhooks.url')">

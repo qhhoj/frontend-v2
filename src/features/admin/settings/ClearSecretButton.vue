@@ -9,7 +9,6 @@ import { failureTextOf } from '../ui/admin-errors';
 import { ADMIN_DANGER_CLASS } from '../ui/classes';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { clearConsequences, clearValueOf } from './setting-clear';
-import { settingRevisionsPrefix } from './settings.queries';
 
 /** The only way to empty a sealed setting: a button of its own, and a confirm that names what stops. */
 const props = defineProps<{ setting: Setting }>();
@@ -20,7 +19,6 @@ const name = computed(() => t(`admin.settings.clear.names.${props.setting.key}`)
 
 const clearing = useAdminMutation<void, Setting>({
   mutate: () => updateSetting(props.setting.key, clearValueOf(props.setting)),
-  invalidates: () => [settingRevisionsPrefix(props.setting.key)],
   onDone: (answer) => {
     isOpen.value = false;
     emit('cleared', answer);

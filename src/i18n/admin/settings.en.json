@@ -132,7 +132,7 @@
   "webhooks": {
     "title": "Webhook list",
     "replace": "Replace",
-    "note": "Up to 20 addresses, https only. An empty list turns notifications off.",
+    "note": "Up to 20 addresses, one per event, https only.",
     "event": "Event",
     "url": "https address",
     "removeRow": "Remove row",
@@ -147,7 +147,8 @@
     "integer": "Must be a whole number from {min} to {max}.",
     "httpsOnly": "Only https addresses are accepted.",
     "httpsOrEmpty": "Leave empty or use https.",
-    "tooManyHooks": "At most 20 webhooks."
+    "tooManyHooks": "At most 20 webhooks.",
+    "oneUrlPerEvent": "Each event takes one address."
   },
   "save": "Save",
   "discard": "Discard edits",
@@ -169,7 +170,8 @@
     "restore": "Restore",
     "restoreField": "Restore non-secret fields",
     "confirmTitle": "Restore the previous value?",
-    "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept."
+    "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept.",
+    "close": "Close"
   },
   "reset": {
     "label": "Reset to default {value}",
@@ -226,5 +228,6 @@
       "title": "Secrets never appear in the log",
       "body": "A revision of a key with a secret records only “set / not set”, so a secret value cannot be restored."
     }
-  }
+  },
+  "noChanges": "Nothing to save."
 }

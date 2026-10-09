@@ -132,7 +132,7 @@
   "webhooks": {
     "title": "Danh sách webhook",
     "replace": "Thay thế",
-    "note": "Tối đa 20 địa chỉ, chỉ https. Danh sách rỗng là tắt thông báo.",
+    "note": "Tối đa 20 địa chỉ, mỗi sự kiện một địa chỉ, chỉ https.",
     "event": "Sự kiện",
     "url": "Địa chỉ https",
     "removeRow": "Bỏ dòng",
@@ -147,7 +147,8 @@
     "integer": "Phải là số nguyên từ {min} đến {max}.",
     "httpsOnly": "Chỉ nhận địa chỉ https.",
     "httpsOrEmpty": "Để trống hoặc dùng https.",
-    "tooManyHooks": "Tối đa 20 webhook."
+    "tooManyHooks": "Tối đa 20 webhook.",
+    "oneUrlPerEvent": "Mỗi sự kiện chỉ nhận một địa chỉ."
   },
   "save": "Lưu",
   "discard": "Đặt lại",
@@ -169,7 +170,8 @@
     "restore": "Khôi phục",
     "restoreField": "Khôi phục trường không bí mật",
     "confirmTitle": "Khôi phục giá trị trước?",
-    "confirmBody": "Máy chủ đặt lại giá trị cũ và ghi thành một bản mới; bí mật đang lưu được giữ nguyên."
+    "confirmBody": "Máy chủ đặt lại giá trị cũ và ghi thành một bản mới; bí mật đang lưu được giữ nguyên.",
+    "close": "Đóng"
   },
   "reset": {
     "label": "Về mặc định {value}",
@@ -226,5 +228,6 @@
       "title": "Bí mật không bao giờ trong nhật ký",
       "body": "Bản sửa của khoá có bí mật chỉ ghi “đã đặt / chưa đặt”, nên không khôi phục được giá trị bí mật."
     }
-  }
+  },
+  "noChanges": "Không có thay đổi."
 }

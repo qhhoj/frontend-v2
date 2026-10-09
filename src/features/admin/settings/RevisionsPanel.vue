@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -19,9 +19,25 @@ import {
 } from './settings.queries';
 
 /** One key's history, newest first. Restoring asks first; the server does the restoring and writes a new revision. */
-const props = defineProps<{ settingKey: SettingKey; canRestore: boolean }>();
+/** `closable`: the settings page shows a Đóng button that hands focus back to the "Lịch sử" button that opened it. */
+const props = defineProps<{ settingKey: SettingKey; canRestore: boolean; closable?: boolean }>();
+const emit = defineEmits<{ close: [] }>();
+const root = ref<HTMLElement | null>(null);
+const heading = ref<HTMLElement | null>(null);
 const { t } = useI18n();
 const page = ref(1);
+/** A different key starts its own history on its first page. */
+watch(
+  () => props.settingKey,
+  () => (page.value = 1),
+);
+
+/** Brings the panel into view and moves focus to its heading, so a phone user sees it open and a screen reader hears it. */
+function revealPanel() {
+  root.value?.scrollIntoView({ block: 'start' });
+  heading.value?.focus();
+}
+defineExpose({ revealPanel });
 const revisions = useSettingRevisionsQuery(() => props.settingKey, page);
 const storeAnswer = useStoreSettingAnswer();
 const restoreTarget = ref<SettingRevision | null>(null);
@@ -69,14 +85,24 @@ function restoreFailureText(failure: ApiError): string {
 
 <template>
   <section
+    ref="root"
     data-testid="revisions"
     class="flex flex-col gap-4 rounded-row border border-line-strong bg-surface-solid p-4"
   >
-    <header class="flex flex-col gap-1">
-      <h2 class="font-display text-lg font-semibold">
-        {{ t('admin.settings.revisions.title', { key: settingKey }) }}
-      </h2>
-      <p class="text-sm text-muted">{{ t('admin.settings.revisions.subtitle') }}</p>
+    <header class="flex flex-wrap items-start justify-between gap-2">
+      <div class="flex flex-col gap-1">
+        <h2
+          ref="heading"
+          tabindex="-1"
+          class="font-display text-lg font-semibold focus-visible:outline-none"
+        >
+          {{ t('admin.settings.revisions.title', { key: settingKey }) }}
+        </h2>
+        <p class="text-sm text-muted">{{ t('admin.settings.revisions.subtitle') }}</p>
+      </div>
+      <button v-if="closable" type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('close')">
+        {{ t('admin.settings.revisions.close') }}
+      </button>
     </header>
     <QueryState
       :loading="revisions.isPending.value"

@@ -2,7 +2,7 @@ import type { SettingRevision } from '@/api/types/settings-admin';
 import { translate } from '@/i18n';
 import type { SettingKind } from './setting-blocks';
 
-const isSealed = (value: unknown): value is { set: boolean } =>
+export const isSealed = (value: unknown): value is { set: boolean } =>
   typeof value === 'object' && value !== null && Object.keys(value).length === 1 && 'set' in value;
 
 /** A sealed side says only whether a value was set; a missing side (the first revision) reads as the default. */
@@ -14,8 +14,14 @@ function showValue(value: unknown): string {
 }
 
 /** A scalar key keeps its one value under `value`; a multi-field key keeps a map of its fields. */
+/** A sealed side has no fields to show: its one `set` answers every field, such as the event names of webhooks. */
 const fieldOf = (side: unknown, field: string) =>
-  field === 'value' ? side : (side as Record<string, unknown> | null)?.[field];
+  isSealed(side) || field === 'value' ? side : (side as Record<string, unknown> | null)?.[field];
+
+/** True when the side holds a sealed part, at the top or in one of its fields (an OAuth client's secret). */
+export const hasSealedPart = (side: unknown): boolean =>
+  isSealed(side) ||
+  (typeof side === 'object' && side !== null && Object.values(side).some(isSealed));
 
 export const diffLines = (revision: SettingRevision) =>
   revision.changedFields.map((field) => ({

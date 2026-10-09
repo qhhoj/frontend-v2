@@ -11,6 +11,10 @@ import {
 } from '@/test/admin-routes';
 import { ALL_SETTINGS, setting, settingRevision } from '@/test/admin-fixtures/settings';
 
+/** jsdom has no layout: the history panel's scroll is recorded, not performed. */
+const scrollIntoView = vi.fn();
+Element.prototype.scrollIntoView = scrollIntoView;
+
 const PERMS = ['judge.change_settings'];
 const routes = (extra = {}) => ({
   ...staffViewer(PERMS),
@@ -364,5 +368,92 @@ describe('clearing a secret', () => {
     await confirmDialog('Xoá URL SMTP');
     expect((mail.get('input').element as HTMLInputElement).value).toBe('QHHOJ <ops@qhhoj.example>');
     expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
+  });
+});
+
+describe('webhooks', () => {
+  const patchesOf = (calls: { method: string; path: string; body: unknown }[]) =>
+    calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]);
+
+  it('saves one https URL per event, the shape the backend parses', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/discord.webhooks': ok(setting('discord.webhooks', { set: true })),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const discord = block(wrapper, 'discord');
+    await clickIn(discord, 'Thay thế');
+    await discord.get('input[type="url"]').setValue('https://discord.example/1');
+    await clickIn(discord, 'Lưu');
+    expect(patchesOf(calls)).toEqual([
+      ['/admin/settings/discord.webhooks', { value: { default: 'https://discord.example/1' } }],
+    ]);
+  });
+
+  it('"Thay thế" with an empty URL sends nothing, so the stored list is kept', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountSettings();
+    const discord = block(wrapper, 'discord');
+    await clickIn(discord, 'Thay thế');
+    await clickIn(discord, 'Lưu');
+    expect(patchesOf(calls)).toEqual([]);
+  });
+});
+
+describe('saving a replaced secret', () => {
+  it('closes the replace box after a saved replacement, so a later "Lưu" never sends it again', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/mail.smtpUrl': ok(setting('mail.smtpUrl', { set: true })),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const mail = block(wrapper, 'mail');
+    await clickIn(mail, 'Thay thế');
+    await mail.get('input[type="password"]').setValue('smtps://u:p@h');
+    await clickIn(mail, 'Lưu');
+    expect(mail.find('input[type="password"]').exists()).toBe(false);
+    expect(mail.text()).toContain('Đã lưu.');
+    await clickIn(mail, 'Lưu');
+    expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(1);
+  });
+
+  it('says so when "Lưu" has nothing to save', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountSettings();
+    await clickIn(block(wrapper, 'site'), 'Lưu');
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+    expect(block(wrapper, 'site').text()).toContain('Không có thay đổi.');
+  });
+});
+
+describe('history panel', () => {
+  const pdfHistoryButton = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+    block(wrapper, 'pdf')
+      .findAll('button')
+      .find((button) => button.text() === 'Lịch sử · pdf.renderTimeoutMs')!;
+
+  it('opening a key scrolls the panel into view and focuses its heading; Đóng gives focus back to its button', async () => {
+    mockApi(
+      routes({
+        'GET /admin/settings/pdf.renderTimeoutMs/revisions': page([settingRevision(30000, 45000)], {
+          pageSize: 20,
+        }),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    await pdfHistoryButton(wrapper).trigger('click');
+    await flushPromises();
+    const panel = wrapper.get('[data-testid="revisions"]');
+    expect(document.activeElement).toBe(panel.get('h2').element);
+    expect(scrollIntoView).toHaveBeenCalled();
+    await panel
+      .findAll('button')
+      .find((button) => button.text() === 'Đóng')!
+      .trigger('click');
+    await flushPromises();
+    expect(wrapper.find('[data-testid="revisions"]').exists()).toBe(false);
+    expect(document.activeElement).toBe(pdfHistoryButton(wrapper).element);
   });
 });

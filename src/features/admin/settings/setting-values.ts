@@ -57,15 +57,17 @@ function oauthToSend(setting: Setting, draft: OAuthDraft) {
   const value: Record<string, unknown> = {};
   if (draft.enabled !== stored.enabled || draft.clientId !== stored.clientId)
     Object.assign(value, { enabled: draft.enabled, clientId: draft.clientId });
-  if (draft.isReplacing && draft.secret !== '') value.clientSecret = draft.secret;
+  const typedSecret = draft.secret.trim();
+  if (draft.isReplacing && typedSecret !== '') value.clientSecret = typedSecret;
   return Object.keys(value).length > 0 ? { value } : null;
 }
 
 const filledRows = (rows: WebhookRow[]) => rows.filter((row) => row.url.trim() !== '');
 
-function webhooksValue(rows: WebhookRow[]) {
-  const map: Record<string, string[]> = {};
-  for (const { event, url } of filledRows(rows)) (map[event] ??= []).push(url.trim());
+/** The backend takes one https URL per event name (`default` or `on_<event>`), so a row is one entry of the map. */
+function webhooksValue(rows: WebhookRow[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const { event, url } of filledRows(rows)) map[event] = url.trim();
   return map;
 }
 
@@ -104,9 +106,11 @@ function integerProblem(value: unknown, min: number, max: number) {
 }
 
 function webhooksProblem(draft: WebhooksDraft) {
-  const urls = filledRows(draft.rows);
-  if (urls.length > MAX_WEBHOOKS) return translate('admin.settings.errors.tooManyHooks');
-  return urls.every((row) => row.url.trim().startsWith('https://'))
+  const rows = filledRows(draft.rows);
+  if (rows.length > MAX_WEBHOOKS) return translate('admin.settings.errors.tooManyHooks');
+  if (new Set(rows.map((row) => row.event)).size < rows.length)
+    return translate('admin.settings.errors.oneUrlPerEvent');
+  return rows.every((row) => row.url.trim().startsWith('https://'))
     ? null
     : translate('admin.settings.errors.httpsOnly');
 }
