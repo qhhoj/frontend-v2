@@ -17,7 +17,7 @@ export function checkConfigValue(kind: ConfigKind, value: string): string | null
   return null;
 }
 
-const PREVIEW_POLICY = "default-src 'none'; style-src 'unsafe-inline'; img-src https: data:";
+const PREVIEW_POLICY = "default-src 'none'; style-src 'unsafe-inline'; img-src data:";
 
 /** For `<iframe sandbox="" srcdoc>`: no scripts, no forms, no navigation, no remote loads besides https images. */
 export const previewDocument = (html: string) =>

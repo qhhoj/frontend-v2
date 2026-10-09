@@ -50,5 +50,6 @@ describe('nav tree', () => {
   it('accepts site paths and http(s) URLs only', () => {
     expect(['/problems', 'https://help.qhhoj.vn'].every(isSafePath)).toBe(true);
     expect(['javascript:alert(1)', '//evil.example', 'problems'].some(isSafePath)).toBe(false);
+    expect(['/\\evil', '/a b'].some(isSafePath)).toBe(false);
   });
 });

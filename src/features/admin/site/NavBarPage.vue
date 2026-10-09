@@ -126,14 +126,17 @@ const parentLabelOf = (item: NavigationItem) =>
                   <span v-if="row.depth > 0" class="sr-only">
                     {{ $t('admin.site.nav.childOf', { parent: parentLabelOf(row.item) }) }}
                   </span>
+                  <span
+                    v-if="row.regexError"
+                    class="flex flex-wrap items-start gap-2 text-negative"
+                  >
+                    <AdminBit placement="refused" />
+                    {{ $t('admin.site.nav.regexBroken', { message: row.regexError }) }}
+                  </span>
                 </div>
               </td>
               <td class="hidden px-2 py-2 font-mono text-xs sm:table-cell">
-                <span v-if="row.regexError" class="flex flex-wrap items-start gap-2 text-negative">
-                  <AdminBit placement="refused" />
-                  {{ $t('admin.site.nav.regexBroken', { message: row.regexError }) }}
-                </span>
-                <span v-else>{{ row.item.regex || $t('admin.site.nav.noRegex') }}</span>
+                {{ row.item.regex || $t('admin.site.nav.noRegex') }}
               </td>
               <td class="hidden px-2 py-2 tabular-nums sm:table-cell">{{ row.item.order }}</td>
               <td class="px-2 py-2">

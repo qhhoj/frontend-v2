@@ -35,7 +35,10 @@ describe('NavBarPage', () => {
     mockApi({ ...staffViewer(PERMS), 'GET /site': ok(siteData()) });
     const wrapper = await mountNav();
     const row = rowWith(wrapper, 'b-old');
-    expect(row.text()).toContain('Regex lỗi');
+    const [firstCell, ...otherCells] = row.findAll('td');
+    expect(firstCell!.text()).toContain('Regex lỗi');
+    expect(firstCell!.classes()).not.toContain('hidden');
+    expect(otherCells.some((cell) => cell.text().includes('Regex lỗi'))).toBe(false);
     expect(row.text()).toContain('Ẩn');
   });
 

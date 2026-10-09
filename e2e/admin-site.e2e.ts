@@ -106,3 +106,17 @@ for (const viewport of AUDIT_VIEWPORTS)
     await expect(dialogOf(page)).toBeHidden();
     await expect(editButton).toBeFocused();
   });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`navigation bar at ${viewport.name}: a broken regex shows on its row`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, NAV_PERMS);
+    api.routes['GET /site'] = adminOk(siteData());
+
+    await page.goto('/admin/nav');
+    const brokenRow = page.getByRole('row').filter({ hasText: 'b-old' });
+    await expect(brokenRow.getByText('Regex lỗi')).toBeVisible();
+  });

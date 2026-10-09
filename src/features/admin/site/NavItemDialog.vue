@@ -77,7 +77,7 @@ const depthById = computed(
 const parentOptions = computed(() =>
   parentChoices(props.items, props.item?.id ?? null).map((choice) => ({
     id: choice.id,
-    label: `${'  '.repeat(depthById.value.get(choice.id) ?? 0)}${choice.label} · ${choice.key}`,
+    label: `${'— '.repeat(depthById.value.get(choice.id) ?? 0)}${choice.label} · ${choice.key}`,
   })),
 );
 </script>

@@ -17,8 +17,8 @@ export function regexProblem(source: string): string | null {
   }
 }
 
-/** A site path (`/problems`, never `//host`) or an http(s) URL. */
-export const isSafePath = (path: string) => /^\/(?!\/)/.test(path) || /^https?:\/\/\S+$/.test(path);
+/** Mirrors the backend's `isSafeNavigationPath`: a site path (never `//host` or `/\\`) or an http(s) URL, no spaces. */
+export const isSafePath = (path: string) => /^(\/(?![/\\])|https?:\/\/)\S*$/.test(path);
 
 export const hasChildren = (items: NavigationItem[], id: string) =>
   items.some((item) => item.parentId === id);
