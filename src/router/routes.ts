@@ -190,7 +190,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/notifications',
     name: 'notifications',
-    component: PlaceholderPage,
+    component: () => import('@/features/notifications/NotificationsPage.vue'),
     meta: { titleKey: 'pages.notifications', requiresAuth: true },
   },
   {

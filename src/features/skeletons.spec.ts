@@ -289,3 +289,16 @@ describe('the profile settings page shows blocks shaped like its first card', ()
     expectInert(skeleton.element, 'profile skeleton');
   });
 });
+
+describe('the notifications page shows rows shaped like the inbox', () => {
+  it('fills the card with six inert rows while the list loads', async () => {
+    mockApi({ ...signedInViewer() });
+    hangRequestsExcept(['/auth/me', '/profile']);
+    const { wrapper } = await mountApp('/notifications');
+    const card = wrapper.get('[data-testid="notifications-card"]').element;
+    expect(regionsIn(card, 'notification-row')).toBe(6);
+    expect(regionsIn(card, 'notification-day')).toBe(1);
+    for (const skeleton of card.querySelectorAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton, 'notification skeleton');
+  });
+});
