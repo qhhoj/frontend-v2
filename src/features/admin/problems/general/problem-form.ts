@@ -12,9 +12,9 @@ import type {
 } from '@/api/types/problem-editing';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { PROBLEM_CODE_PATTERN } from '../problem-code';
 import { fromLocalInput, toLocalInput } from '../../ui/datetime';
 
-export const PROBLEM_CODE_PATTERN = /^[a-z0-9_]{1,32}$/;
 export const PROBLEM_LIMITS = {
   timeLimit: { min: 0.01, max: 60, highAbove: 5 },
   memoryLimit: { min: 0, max: 1_048_576 },

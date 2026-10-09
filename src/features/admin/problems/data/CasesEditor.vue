@@ -15,9 +15,10 @@ import {
   removeCase,
 } from './test-cases';
 import type { KeyedCase, ListWarning } from './test-cases';
+import type { FieldErrors } from '../../ui/admin-errors';
 
 const cases = defineModel<KeyedCase[]>({ required: true });
-const props = defineProps<{ data: ProblemData }>();
+const props = defineProps<{ data: ProblemData; errors: FieldErrors }>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
 
 const warnings = computed(() => listWarnings({ cases: cases.value }, props.data));
@@ -39,8 +40,17 @@ function warningTextOf(warning: ListWarning): string {
     return translate('admin.problems.data.cases.warnings.unclosedBatch');
   return translate('admin.problems.data.cases.warnings.strayEnd');
 }
-const messagesAt = (index: number) =>
-  warnings.value.filter((warning) => warning.index === index).map(warningTextOf);
+/** A row's messages: its list warnings, then the refusals its fields would get from the backend. */
+const messagesAt = (index: number) => {
+  const prefix = `cases.${index}.`;
+  const rowErrors = Object.entries(props.errors)
+    .filter(([key]) => key.startsWith(prefix))
+    .map(([, text]) => text);
+  return [
+    ...warnings.value.filter((warning) => warning.index === index).map(warningTextOf),
+    ...rowErrors,
+  ];
+};
 
 function move(index: number, offset: -1 | 1) {
   cases.value = moveCase(cases.value, index, offset);
@@ -60,6 +70,7 @@ function remove(index: number) {
       <p v-if="isOverMax" role="alert" class="text-negative">
         {{ $t('admin.problems.data.cases.overMax', { max: data.limits.maxCases }) }}
       </p>
+      <p v-if="errors.cases" role="alert" class="text-negative">{{ errors.cases }}</p>
       <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-xs text-muted">
         {{ $t('admin.problems.data.cases.hardLimit', { max: MASS_TESTCASE_LIMIT }) }}
       </p>

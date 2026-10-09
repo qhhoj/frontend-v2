@@ -3,13 +3,15 @@ import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-ed
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureReasonOf } from '../failure-reason';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import CasesEditor from './CasesEditor.vue';
 import CheckerSection from './CheckerSection.vue';
 import DataArchiveCard from './DataArchiveCard.vue';
 import DataFeedback from './DataFeedback.vue';
 import { useDataForm } from './use-data-form';
+import { useDraftLeaveGuard } from '../drafts/use-draft-leave-guard';
+import DraftLeaveDialog from '../drafts/DraftLeaveDialog.vue';
 import DataSourceFiles from './DataSourceFiles.vue';
 import { useKeepDataAnswer } from './problem-data.queries';
 import { uploadDataArchive } from '@/api/problem-data.api';
@@ -18,10 +20,11 @@ import UploadButton from '../../ui/UploadButton.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
-const { query, form, errors, badRowNumbers, markInvalid, save, mutation } = useDataForm(
+const { query, form, errors, isDirty, badRowNumbers, markInvalid, save, mutation } = useDataForm(
   () => props.problem.code,
 );
 const keepAnswer = useKeepDataAnswer(() => props.problem.code);
+const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
 const archive = useAdminMutation({
   mutate: (file: File) => uploadDataArchive(props.problem.code, file),
   onDone: keepAnswer,
@@ -59,7 +62,7 @@ const archive = useAdminMutation({
       <AdminStatus
         v-if="archive.failure.value"
         kind="refused"
-        :text="failureTextOf(archive.failure.value)"
+        :text="failureReasonOf(archive.failure.value)"
       />
       <DataSourceFiles :code="problem.code" :data="query.data.value" />
       <DataFeedback :feedback="query.data.value.feedback" />
@@ -68,7 +71,12 @@ const archive = useAdminMutation({
         :errors="errors"
         :has-custom-checker="query.data.value.customChecker !== null"
       />
-      <CasesEditor v-model="form.cases" :data="query.data.value" @invalid="markInvalid" />
+      <CasesEditor
+        v-model="form.cases"
+        :data="query.data.value"
+        :errors="errors"
+        @invalid="markInvalid"
+      />
       <div
         class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
       >
@@ -78,7 +86,7 @@ const archive = useAdminMutation({
         <AdminStatus
           v-else-if="mutation.failure.value"
           kind="refused"
-          :text="failureTextOf(mutation.failure.value)"
+          :text="failureReasonOf(mutation.failure.value)"
         />
         <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
         <button
@@ -92,4 +100,5 @@ const archive = useAdminMutation({
       </div>
     </form>
   </QueryState>
+  <DraftLeaveDialog v-model:visible="isLeaveOpen" @leave="leaveAnyway" />
 </template>

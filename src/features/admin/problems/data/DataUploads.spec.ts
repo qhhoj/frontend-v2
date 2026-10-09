@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, rateLimited } from '@/test/mock-api';
+import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
@@ -75,5 +75,41 @@ describe('test data uploads', () => {
     const alert = wrapper.get('[data-testid="source-generator"] [role="alert"]').text();
     expect(alert).toContain('Bạn thao tác quá nhanh');
     expect(alert).toContain('Thử lại sau 1800 giây.');
+  });
+
+  it('refuses a source file over 1 MiB on this side, without sending it', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await pick(
+      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
+      new File([new Uint8Array(1024 * 1024 + 1)], 'gen.cpp'),
+    );
+    expect(calls.some((call) => call.path.includes('/files/generator'))).toBe(false);
+    expect(wrapper.get('[data-testid="source-generator"]').text()).toContain(
+      'Tệp quá lớn (tối đa 1.0 MB).',
+    );
+  });
+
+  it('shows the backend reason when a source file is refused for its content', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+      'POST /problems/hcmus41c/data/files/generator': fail(400, 'validation_failed', {
+        file: ['This file type is not allowed as problem material'],
+      }),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await pick(
+      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
+      new File(['x'], 'gen.exe'),
+    );
+    expect(wrapper.get('[data-testid="source-generator"] [role="alert"]').text()).toContain(
+      'This file type is not allowed as problem material',
+    );
   });
 });

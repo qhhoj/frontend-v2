@@ -4,7 +4,8 @@ import { deleteDataFile, problemDataFileUrl, uploadDataSource } from '@/api/prob
 import type { ProblemData, SourceFileKind } from '@/api/types/problem-data';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureReasonOf } from '../failure-reason';
+import { SOURCE_MAX_BYTES } from '../limits';
 import { ADMIN_DANGER_CLASS } from '../../ui/classes';
 import UploadButton from '../../ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -57,6 +58,7 @@ const remove = useAdminMutation({
             : $t('admin.problems.uploads.sources.upload')
         "
         :is-pending="upload.isPending.value"
+        :max-bytes="SOURCE_MAX_BYTES"
         @picked="upload.run"
       />
       <button
@@ -72,7 +74,7 @@ const remove = useAdminMutation({
     <AdminStatus
       v-if="upload.failure.value"
       kind="refused"
-      :text="failureTextOf(upload.failure.value)"
+      :text="failureReasonOf(upload.failure.value)"
     />
     <ConfirmDialog
       v-model:visible="isConfirmShown"
@@ -87,7 +89,7 @@ const remove = useAdminMutation({
         <AdminStatus
           v-if="remove.failure.value"
           kind="refused"
-          :text="failureTextOf(remove.failure.value)"
+          :text="failureReasonOf(remove.failure.value)"
         />
       </template>
     </ConfirmDialog>

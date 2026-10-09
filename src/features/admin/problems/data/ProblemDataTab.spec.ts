@@ -2,7 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { staffViewer, switchNamed } from '@/test/admin-routes';
+import {
+  cancelDialog,
+  confirmDialog,
+  openDialog,
+  staffViewer,
+  switchNamed,
+} from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
@@ -150,5 +156,38 @@ describe('ProblemDataTab', () => {
     expect(wrapper.text()).toContain(
       'Giới hạn cứng 9999 test cần quyền judge.create_mass_testcases',
     );
+  });
+
+  it('refuses a name over 100 characters on this side, sends nothing, and marks the row', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+      'PUT /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await wrapper.get('#case-0-input').setValue('x'.repeat(101));
+    await saveConfig(wrapper);
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+    expect(wrapper.text()).toContain('Tên tệp tối đa 100 ký tự và không chứa ký tự NUL.');
+  });
+
+  it('asks before a route leave with unsaved configuration, and Stay keeps it', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await switchNamed(wrapper, 'Chấp nhận Unicode').trigger('click');
+    await router.push('/admin/problems');
+    await flushPromises();
+    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
+    await cancelDialog('Ở lại');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
+    await router.push('/admin/problems');
+    await flushPromises();
+    await confirmDialog('Rời trang');
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/admin/problems'));
   });
 });

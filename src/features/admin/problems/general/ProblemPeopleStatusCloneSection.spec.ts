@@ -98,6 +98,20 @@ describe('problem people, status and clone', () => {
     expect(wrapper.text()).toContain('That code is taken.');
   });
 
+  it('refuses a clone code the backend would refuse, sends nothing, and says why under the box', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_problem', 'judge.clone_problem']),
+      ...problemEditorRoutes(),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+    await wrapper.get('#problem-clone-code').setValue('Bad Code');
+    await buttonLabelled(wrapper, 'Nhân bản').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.path.endsWith('/clone'))).toBe(false);
+    expect(wrapper.get('#problem-clone-code').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.text()).toContain('Chữ thường, số, gạch dưới, 1 đến 32 ký tự.');
+  });
+
   it('hides clone without judge.clone_problem', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_problem']), ...problemEditorRoutes() });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
@@ -113,6 +127,18 @@ describe('problem people, status and clone', () => {
     expect(wrapper.get('#problem-clone-code').element.closest('form')).toBeNull();
     await wrapper.get('#problem-clone-code').trigger('keydown', { key: 'Enter' });
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
+
+  it('sends a status switch that was turned on as true in the PATCH body', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_problem', 'judge.change_public_visibility']),
+      ...problemEditorRoutes(),
+      'PATCH /problems/hcmus41c': ok(editableProblem()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+    await switchNamed(wrapper, 'Công khai').trigger('click');
+    await save(wrapper);
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
   });
 
   it('adds an organization by exact slug for a viewer who may edit every problem', async () => {

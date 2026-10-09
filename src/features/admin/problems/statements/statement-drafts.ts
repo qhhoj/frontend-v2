@@ -1,4 +1,11 @@
 import type { PreviewStyle } from '@/api/types/admin-common';
+import { translate } from '@/i18n';
+import type { FieldErrors } from '../../ui/admin-errors';
+import {
+  DISALLOWED_STATEMENT_CHARACTERS,
+  MARKDOWN_MAX_LENGTH,
+  STATEMENT_NAME_MAX_LENGTH,
+} from '../limits';
 import type { EditableProblem } from '@/api/types/problem-editing';
 
 export type StatementSlot = 'vi' | 'en' | 'original';
@@ -37,4 +44,31 @@ export function insertImage(text: string, url: string, selectionEnd: number) {
     text: text.slice(0, selectionEnd) + snippet + text.slice(selectionEnd),
     caret: selectionEnd + snippet.length,
   };
+}
+
+/** The text message for a markdown body the backend would refuse (length, legacy typographic characters), or undefined. */
+export function markdownError(text: string): string | undefined {
+  if (text.length > MARKDOWN_MAX_LENGTH)
+    return translate('admin.problems.statements.errors.descriptionLength', {
+      max: MARKDOWN_MAX_LENGTH,
+    });
+  const character = DISALLOWED_STATEMENT_CHARACTERS.find((candidate) => text.includes(candidate));
+  return character
+    ? translate('admin.problems.statements.errors.character', { character })
+    : undefined;
+}
+
+/** A translation's name is 1 to 100 characters; the description follows `markdownError`. The original description has no name. */
+export function checkStatementDraft(draft: StatementDraft, slot: StatementSlot): FieldErrors {
+  const errors: FieldErrors = {};
+  if (
+    slot !== 'original' &&
+    (draft.name.length < 1 || draft.name.length > STATEMENT_NAME_MAX_LENGTH)
+  )
+    errors.name = translate('admin.problems.statements.errors.nameLength', {
+      max: STATEMENT_NAME_MAX_LENGTH,
+    });
+  const descriptionError = markdownError(draft.description);
+  if (descriptionError) errors.description = descriptionError;
+  return errors;
 }

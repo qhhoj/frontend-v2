@@ -18,8 +18,11 @@ function useFormSeed(problem: () => EditableProblem, meta: () => ProblemEditingM
   const isDirty = computed(
     () => Object.keys(changedProblemFields(seed.value, form.value)).length > 0,
   );
+  // A clean form follows the server: the seed and the form move together, so a later save never sends the old values back.
   watch(problem, (next) => {
-    if (!isDirty.value) seed.value = toProblemForm(next, meta());
+    if (isDirty.value) return;
+    seed.value = toProblemForm(next, meta());
+    form.value = cloneForm(seed.value);
   });
   return { seed, form, isDirty };
 }

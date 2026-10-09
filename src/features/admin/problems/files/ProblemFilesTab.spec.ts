@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
@@ -71,5 +71,33 @@ describe('ProblemFilesTab', () => {
     expect(
       calls.filter((call) => call.method === 'GET' && call.path === '/problems/hcmus41c'),
     ).toHaveLength(2);
+  });
+
+  it('refuses an image over 5 MiB on this side, without sending it', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      ...problemEditorRoutes(),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
+    await pick(wrapper, 'upload-image', new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'big.png'));
+    expect(calls.some((call) => call.path === '/problems/uploads/image')).toBe(false);
+    expect(wrapper.get('[data-testid="upload-image"]').text()).toContain(
+      'Tệp quá lớn (tối đa 5.0 MB).',
+    );
+  });
+
+  it('shows the reason the backend gives for a refused file type, not only the generic line', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      ...problemEditorRoutes(),
+      'POST /problems/uploads/image': fail(400, 'validation_failed', {
+        file: ['Only JPG, PNG, GIF and SVG images are accepted.'],
+      }),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
+    await pick(wrapper, 'upload-image', new File(['x'], 'b.bmp', { type: 'image/bmp' }));
+    expect(wrapper.get('[data-testid="upload-image"] [role="alert"]').text()).toContain(
+      'Only JPG, PNG, GIF and SVG images are accepted.',
+    );
   });
 });

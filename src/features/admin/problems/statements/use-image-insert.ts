@@ -3,30 +3,43 @@ import type { Ref } from 'vue';
 import { uploadProblemImage } from '@/api/problem-editing.api';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { insertImage } from './statement-drafts';
-import type { StatementDraft } from './statement-drafts';
+import type { StatementDraft, StatementSlot } from './statement-drafts';
 
-/** Uploads a picked image and puts its URL into the text at the caret of the markdown box (the kit owns that box). */
+interface ImageUpload {
+  file: File;
+  /** The language the upload started in: the URL goes there, even if the viewer switches language meanwhile. */
+  target: StatementSlot;
+}
+
+/** Uploads a picked image and puts its URL into the draft it was picked for (the markdown box is the kit's, so the caret is read from its textarea). */
 export function useImageInsert(
-  draft: Ref<StatementDraft>,
+  drafts: Ref<Record<StatementSlot, StatementDraft>>,
+  slot: Ref<StatementSlot>,
   textareaOf: () => HTMLTextAreaElement | undefined,
 ) {
-  async function insertAtCaret(url: string) {
-    const textarea = textareaOf();
-    const caretAtEnd = draft.value.description.length;
-    const { text, caret } = insertImage(
-      draft.value.description,
-      url,
-      textarea?.selectionEnd ?? caretAtEnd,
-    );
-    draft.value.description = text;
+  async function insertInto(target: StatementSlot, url: string) {
+    const draft = drafts.value[target];
+    const isShown = slot.value === target;
+    const caret = isShown
+      ? (textareaOf()?.selectionEnd ?? draft.description.length)
+      : draft.description.length;
+    const inserted = insertImage(draft.description, url, caret);
+    draft.description = inserted.text;
+    if (!isShown) return;
     await nextTick();
-    textareaOf()?.setSelectionRange(caret, caret);
+    textareaOf()?.setSelectionRange(inserted.caret, inserted.caret);
   }
 
-  return useAdminMutation({
-    mutate: (file: File) => uploadProblemImage(file),
-    onDone: (url: string) => {
-      void insertAtCaret(url);
+  const mutation = useAdminMutation({
+    mutate: ({ file }: ImageUpload) => uploadProblemImage(file),
+    onDone: (url: string, { target }: ImageUpload) => {
+      void insertInto(target, url);
     },
   });
+
+  return {
+    isPending: mutation.isPending,
+    failure: mutation.failure,
+    upload: (file: File) => mutation.run({ file, target: slot.value }),
+  };
 }

@@ -4,6 +4,7 @@ import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-ed
 import { usePermissions } from '@/stores/use-permissions';
 import { permissionLock } from '../general/field-lock';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
+import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
 import ProblemUploadCard from './ProblemUploadCard.vue';
 
 defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
@@ -21,7 +22,8 @@ const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_ma
       :title="$t('admin.problems.files.image.title')"
       :lead="$t('admin.problems.files.image.lead')"
       :button-label="$t('admin.problems.files.image.button')"
-      accept="image/*"
+      :accept="IMAGE_ACCEPT"
+      :max-bytes="IMAGE_MAX_BYTES"
       endpoint="/problems/uploads/image"
     />
     <ProblemUploadCard

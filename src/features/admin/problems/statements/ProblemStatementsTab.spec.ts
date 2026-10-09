@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { staffViewer } from '@/test/admin-routes';
-import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
+import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
+import { editableProblem, problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 const EDIT = ['judge.edit_own_problem'];
 const PREVIEW = { 'POST /problems/render-preview': ok({ html: '<p>x</p>' }) };
@@ -131,5 +131,59 @@ describe('ProblemStatementsTab', () => {
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
     await chooseFile(wrapper);
     expect(wrapper.get('[role="alert"]').text()).toContain('Thử lại sau 30 giây.');
+  });
+
+  it('refuses a name over 100 characters on this side, sends nothing, and says why under the box', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+      'PUT /problems/hcmus41c/translations/en': { status: 204 },
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    await wrapper.get('#statement-name').setValue('x'.repeat(101));
+    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+    expect(wrapper.get('#statement-name').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.text()).toContain('Tên từ 1 đến 100 ký tự.');
+  });
+
+  it('asks before a tab switch with an unsaved statement; Stay keeps the draft, Leave goes', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('textarea').setValue('Đang sửa');
+    const toData = () => wrapper.get('a[href="/admin/problems/hcmus41c/data"]');
+    await toData().trigger('click');
+    await flushPromises();
+    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
+    await cancelDialog('Ở lại');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/statements');
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('Đang sửa');
+    await toData().trigger('click');
+    await flushPromises();
+    await confirmDialog('Rời trang');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
+  });
+
+  it('asks before a route leave with an unsaved statement', async () => {
+    mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes(), ...PREVIEW });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('textarea').setValue('Đang sửa');
+    await router.push('/admin/problems');
+    await flushPromises();
+    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
+    await cancelDialog('Ở lại');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/statements');
+    await router.push('/admin/problems');
+    await flushPromises();
+    await confirmDialog('Rời trang');
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/admin/problems'));
   });
 });

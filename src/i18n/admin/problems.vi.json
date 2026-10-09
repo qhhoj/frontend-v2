@@ -152,6 +152,11 @@
       "vi": "Lưu bản dịch tiếng Việt",
       "en": "Lưu bản dịch tiếng Anh",
       "original": "Lưu mô tả gốc"
+    },
+    "errors": {
+      "nameLength": "Tên từ 1 đến {max} ký tự.",
+      "descriptionLength": "Nội dung tối đa {max} ký tự.",
+      "character": "Không dùng ký tự {character}; hãy thay bằng ký tự thường."
     }
   },
   "editorial": {
@@ -249,6 +254,12 @@
       },
       "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
       "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm."
+    },
+    "errors": {
+      "fileName": "Tên tệp tối đa 100 ký tự và không chứa ký tự NUL.",
+      "generatorArgs": "Tham số generator tối đa 1000 ký tự.",
+      "count": "Phải là số nguyên không âm.",
+      "argsTotal": "Tổng tham số của các test quá 1 MiB; hãy rút ngắn."
     }
   },
   "uploads": {
@@ -298,5 +309,11 @@
     "open": "Mở",
     "copy": "Sao chép địa chỉ",
     "footer": "Mỗi lần tải lên trả về một URL; hệ thống không có danh sách tệp đã tải, nên URL cần được lưu vào đề hoặc vào hai trường PDF và tài liệu của bài."
+  },
+  "drafts": {
+    "leaveTitle": "Rời khỏi bản nháp chưa lưu?",
+    "leaveBody": "Thay đổi chưa lưu trong phần này sẽ mất.",
+    "leave": "Rời trang",
+    "stay": "Ở lại"
   }
 }

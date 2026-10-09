@@ -91,6 +91,31 @@ describe('ProblemGeneralTab', () => {
     expect(wrapper.text()).not.toContain('Từ 800 đến 3500.');
   });
 
+  it('follows a refetch while the form is clean, and keeps the typed value once the viewer has edited', async () => {
+    let points = 1200;
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c': () => ok(editableProblem({ points })),
+      'PATCH /problems/hcmus41c': ok(editableProblem()),
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/general');
+    const pointsBox = () => (wrapper.get('#problem-points').element as HTMLInputElement).value;
+    points = 1500;
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'problem', 'hcmus41c'] });
+    await flushPromises();
+    expect(pointsBox()).toBe('1500');
+    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+
+    await wrapper.get('#problem-points').setValue('900');
+    points = 1700;
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'problem', 'hcmus41c'] });
+    await flushPromises();
+    expect(pointsBox()).toBe('900');
+  });
+
   it('moves to the new address after the code changes', async () => {
     mockApi({
       ...staffViewer(EDIT),

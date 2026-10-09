@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { problemData } from '@/test/admin-fixtures/problems';
 import {
   addBatch,
+  checkDataForm,
   addCase,
   caseCount,
   listWarnings,
@@ -126,5 +127,43 @@ describe('test data form', () => {
       },
     ];
     expect(listWarnings(form, data)).toEqual([]);
+  });
+
+  it('refuses what the backend would refuse, per row, before any request', () => {
+    const form = toDataForm(problemData());
+    form.cases[0]!.input = 'x'.repeat(101);
+    form.cases[2]!.points = 1.5;
+    form.cases[3]!.generatorArgs = 'g'.repeat(1001);
+    const errors = checkDataForm(form);
+    expect(Object.keys(errors).sort()).toEqual([
+      'cases.0.input',
+      'cases.2.points',
+      'cases.3.generatorArgs',
+    ]);
+    expect(errors['cases.2.points']).toBe('Phải là số nguyên không âm.');
+  });
+
+  it('refuses a file name with a NUL character and a count that is negative or not safe', () => {
+    const form = toDataForm(problemData());
+    form.cases[1]!.output = 'a\0b';
+    form.cases[1]!.outputLimit = -1;
+    expect(Object.keys(checkDataForm(form)).sort()).toEqual([
+      'cases.1.output',
+      'cases.1.outputLimit',
+    ]);
+  });
+
+  it('refuses all case arguments together over 1 MiB, counting a null checker as its four characters', () => {
+    const form = toDataForm(problemData());
+    form.cases = Array.from({ length: 1100 }, (_row, index) => ({
+      ...form.cases[0]!,
+      key: index + 1,
+      generatorArgs: 'g'.repeat(1000),
+    }));
+    expect(checkDataForm(form).cases).toBe('Tổng tham số của các test quá 1 MiB; hãy rút ngắn.');
+  });
+
+  it('accepts the stored configuration as it is: nothing is refused for a valid form', () => {
+    expect(checkDataForm(toDataForm(problemData()))).toEqual({});
   });
 });

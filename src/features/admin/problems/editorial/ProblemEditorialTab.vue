@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { putEditorial } from '@/api/problem-editing.api';
 import type { UserChip } from '@/api/types/admin-common';
 import type {
@@ -12,13 +12,16 @@ import AdminBit from '../../shell/AdminBit.vue';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureReasonOf } from '../failure-reason';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { toLocalInput } from '../../ui/datetime';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { publishOnToSend } from './editorial-draft';
+import { markdownError } from '../statements/statement-drafts';
+import { useDraftLeaveGuard } from '../drafts/use-draft-leave-guard';
+import DraftLeaveDialog from '../drafts/DraftLeaveDialog.vue';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const stored = props.problem.editor!.solution;
@@ -29,12 +32,31 @@ const authors = ref<UserChip[]>(
 );
 const content = ref(stored?.content ?? '');
 
+/** What the viewer sees now, as text: compared with the last saved answer for the unsaved-change guard. */
+const snapshot = () =>
+  JSON.stringify({
+    isPublic: isPublic.value,
+    publishOn: publishOnBox.value,
+    authors: authors.value.map((chip) => chip.id),
+    content: content.value,
+  });
+const savedSnapshot = ref(snapshot());
+const isDirty = computed(() => snapshot() !== savedSnapshot.value);
+const contentError = computed(() => markdownError(content.value));
+let sentSnapshot = '';
+const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
+
 const mutation = useAdminMutation({
   mutate: (draft: EditorialDraftBody) => putEditorial(props.problem.code, draft),
   invalidates: () => [['admin', 'problem', props.problem.code]],
+  onDone: () => {
+    savedSnapshot.value = sentSnapshot;
+  },
 });
 
 function save() {
+  if (contentError.value) return;
+  sentSnapshot = snapshot();
   void mutation.run({
     isPublic: isPublic.value,
     publishOn: publishOnToSend(publishOnBox.value, stored?.publishOn ?? null, new Date()),
@@ -76,12 +98,13 @@ function save() {
       v-model="content"
       :label="$t('admin.problems.editorial.content')"
       preview-style="solution"
+      :error="contentError"
     />
     <div class="flex flex-wrap items-center gap-3">
       <AdminStatus
         v-if="mutation.failure.value"
         kind="refused"
-        :text="failureTextOf(mutation.failure.value)"
+        :text="failureReasonOf(mutation.failure.value)"
       />
       <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
       <button
@@ -94,5 +117,6 @@ function save() {
         {{ $t('admin.problems.editorial.save') }}
       </button>
     </div>
+    <DraftLeaveDialog v-model:visible="isLeaveOpen" @leave="leaveAnyway" />
   </SettingsCard>
 </template>

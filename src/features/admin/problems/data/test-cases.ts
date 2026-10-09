@@ -6,6 +6,7 @@ import type {
   TestCase,
 } from '@/api/types/problem-data';
 import { translate } from '@/i18n';
+import { FILE_NAME_MAX_LENGTH, GENERATOR_ARGS_MAX_LENGTH, MAX_CASE_ARGS_BYTES } from '../limits';
 import type { FieldErrors } from '../../ui/admin-errors';
 
 export const ARCHIVE_PREVIEW_COUNT = 10;
@@ -35,7 +36,8 @@ export interface ListWarning {
 let nextKey = 1;
 const keyed = (testCase: TestCase): KeyedCase => ({ ...testCase, key: nextKey++ });
 /** The row as the backend sees it: the local key is not part of a test. */
-const withoutKey = (row: KeyedCase): TestCase => {
+/** The row as the backend sees it: the local key is not part of a test. */
+export const caseBody = (row: KeyedCase): TestCase => {
   const testCase: Partial<KeyedCase> = { ...row };
   delete testCase.key;
   return testCase as TestCase;
@@ -57,6 +59,35 @@ const blankCase = (type: CaseType): TestCase => ({
   outputPrefix: null,
   outputLimit: null,
 });
+
+const isCount = (value: number | null) =>
+  value === null || (Number.isSafeInteger(value) && value >= 0);
+const fileNameOk = (name: string) => name.length <= FILE_NAME_MAX_LENGTH && !name.includes('\0');
+
+/** The byte count the backend sums over every row: generator arguments and the JSON of the checker arguments (`null` is 4). */
+export const argsBytes = (cases: KeyedCase[]) =>
+  cases.reduce(
+    (total, row) =>
+      total + row.generatorArgs.length + JSON.stringify(row.checkerArgs ?? null).length,
+    0,
+  );
+
+function caseErrors(row: KeyedCase, index: number): FieldErrors {
+  const prefix = `cases.${index}`;
+  const message = (key: string) => translate(`admin.problems.data.errors.${key}`);
+  const errors: FieldErrors = {};
+  if (!fileNameOk(row.input)) errors[`${prefix}.input`] = message('fileName');
+  if (!fileNameOk(row.output)) errors[`${prefix}.output`] = message('fileName');
+  if (row.generatorArgs.length > GENERATOR_ARGS_MAX_LENGTH)
+    errors[`${prefix}.generatorArgs`] = message('generatorArgs');
+  for (const field of ['points', 'outputPrefix', 'outputLimit'] as const)
+    if (!isCount(row[field])) errors[`${prefix}.${field}`] = message('count');
+  return errors;
+}
+
+/** The unsaved-change snapshot of a form: what a save would send, row keys left out. */
+export const dataSnapshot = (form: DataForm) =>
+  JSON.stringify({ ...form, cases: form.cases.map(caseBody) });
 
 export function toDataForm(data: ProblemData): DataForm {
   return {
@@ -87,23 +118,35 @@ export function parseArgs(text: string): JsonObject | null | undefined {
 }
 
 /** The PUT body, or the per-field refusals when a configuration box does not hold a JSON object. */
-export function toDataBody(form: DataForm): { body: ProblemDataBody } | { errors: FieldErrors } {
-  const checkerArgs = parseArgs(form.checkerArgsText);
-  const graderArgs = parseArgs(form.graderArgsText);
+/** Every refusal the backend would give for this form, keyed by field (`cases.<row>.<field>` for a test row). Shown live. */
+export function checkDataForm(form: DataForm): FieldErrors {
   const errors: FieldErrors = {};
-  if (checkerArgs === undefined) errors.checkerArgs = translate('admin.problems.data.badJson');
-  if (graderArgs === undefined) errors.graderArgs = translate('admin.problems.data.badJson');
+  if (parseArgs(form.checkerArgsText) === undefined)
+    errors.checkerArgs = translate('admin.problems.data.badJson');
+  if (parseArgs(form.graderArgsText) === undefined)
+    errors.graderArgs = translate('admin.problems.data.badJson');
+  form.cases.forEach((row, index) => Object.assign(errors, caseErrors(row, index)));
+  if (argsBytes(form.cases) > MAX_CASE_ARGS_BYTES)
+    errors.cases = translate('admin.problems.data.errors.argsTotal');
+  return errors;
+}
+
+/** The request body for a form that passes `checkDataForm`; otherwise the same refusals. */
+export function toDataBody(form: DataForm): { body: ProblemDataBody } | { errors: FieldErrors } {
+  const errors = checkDataForm(form);
   if (Object.keys(errors).length > 0) return { errors };
+  const checkerArgs = parseArgs(form.checkerArgsText) ?? null;
+  const graderArgs = parseArgs(form.graderArgsText) ?? null;
   const body: ProblemDataBody = {
     checker: form.checker,
-    checkerArgs: checkerArgs ?? null,
+    checkerArgs,
     grader: form.grader,
-    graderArgs: graderArgs ?? null,
+    graderArgs,
     outputPrefix: form.outputPrefix,
     outputLimit: form.outputLimit,
     unicode: form.unicode,
     nobigmath: form.nobigmath,
-    cases: form.cases.map(withoutKey),
+    cases: form.cases.map(caseBody),
   };
   return { body };
 }

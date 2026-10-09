@@ -1,11 +1,10 @@
+import { PROBLEM_CODE_PATTERN } from '../problem-code';
 import type { UserChip } from '@/api/types/admin-common';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { parseLanguageMap } from './import-job';
 
-/** Backend `PROBLEM_CODE_PATTERN` (libs/database); the problem editor's copy arrives with its own task. */
-export const IMPORT_CODE_PATTERN = /^[a-z0-9_]{1,32}$/;
 /** Backend `PROBLEM_LIMITS.points` and the `MaxLength(30)` of the two language names in `PolygonImportQueryDto`. */
 export const POINTS_MIN = 800;
 export const POINTS_MAX = 3500;
@@ -62,7 +61,7 @@ const isPointsInRange = (text: string) => {
 function fileAndCodeErrors(form: ImportForm): FieldErrors {
   const errors: FieldErrors = {};
   if (!form.file) errors.file = translate('admin.polygon.form.submitNeedsFile');
-  if (!IMPORT_CODE_PATTERN.test(form.code))
+  if (!PROBLEM_CODE_PATTERN.test(form.code))
     errors.code = translate('admin.polygon.form.codeInvalid');
   return errors;
 }

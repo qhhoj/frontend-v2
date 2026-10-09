@@ -152,6 +152,11 @@
       "vi": "Save Vietnamese translation",
       "en": "Save English translation",
       "original": "Save original description"
+    },
+    "errors": {
+      "nameLength": "Name is 1 to {max} characters.",
+      "descriptionLength": "Content is at most {max} characters.",
+      "character": "Do not use the character {character}; use a plain one instead."
     }
   },
   "editorial": {
@@ -249,6 +254,12 @@
       },
       "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
       "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups."
+    },
+    "errors": {
+      "fileName": "A file name is at most 100 characters and holds no NUL character.",
+      "generatorArgs": "Generator arguments are at most 1000 characters.",
+      "count": "Must be a whole number, zero or more.",
+      "argsTotal": "All test arguments together are over 1 MiB; shorten them."
     }
   },
   "uploads": {
@@ -298,5 +309,11 @@
     "open": "Open",
     "copy": "Copy address",
     "footer": "Each upload returns one address; the system keeps no list of uploads, so save the address in the statement or in the problem's PDF and material fields."
+  },
+  "drafts": {
+    "leaveTitle": "Leave with unsaved changes?",
+    "leaveBody": "Unsaved changes in this part will be lost.",
+    "leave": "Leave page",
+    "stay": "Stay"
   }
 }

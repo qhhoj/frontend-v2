@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { translate } from '@/i18n';
 import { cloneProblem } from '@/api/problem-editing.api';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { PROBLEM_CODE_PATTERN } from '../problem-code';
 
 const props = defineProps<{ code: string }>();
 const newCode = ref('');
@@ -16,11 +18,23 @@ const clone = useAdminMutation({
     createdCode.value = result.code;
   },
 });
-const codeError = computed(() => clone.fieldErrors.value.code);
+const localCodeError = ref('');
+const codeError = computed(() => localCodeError.value || clone.fieldErrors.value.code);
 
-/** Cloning is its own action, outside the save form: Enter in the box clones, it never saves the problem. */
+/** A typed code retires the last answer and its message: the box describes what is typed now. */
+watch(newCode, () => {
+  localCodeError.value = '';
+  clone.reset();
+});
+
+/** Cloning is its own action, outside the save form: Enter in the box clones, it never saves the problem. A code the backend would refuse is never sent. */
 function submit() {
-  if (newCode.value) void clone.run(newCode.value);
+  if (!newCode.value) return;
+  if (!PROBLEM_CODE_PATTERN.test(newCode.value)) {
+    localCodeError.value = translate('admin.problems.general.errors.code');
+    return;
+  }
+  void clone.run(newCode.value);
 }
 </script>
 

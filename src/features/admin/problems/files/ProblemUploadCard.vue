@@ -2,7 +2,7 @@
 import CopyButton from '@/components/CopyButton.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureReasonOf } from '../failure-reason';
 import UploadButton from '../../ui/UploadButton.vue';
 import { useProblemUpload } from './use-problem-upload';
 import type { ProblemUploadKind } from './use-problem-upload';
@@ -57,7 +57,7 @@ const upload = useProblemUpload(props.kind, () => props.code);
     <AdminStatus
       v-if="upload.mutation.failure.value"
       kind="refused"
-      :text="failureTextOf(upload.mutation.failure.value)"
+      :text="failureReasonOf(upload.mutation.failure.value)"
     />
     <AdminStatus
       v-else-if="upload.url.value"

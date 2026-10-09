@@ -1,9 +1,11 @@
 import { computed, ref } from 'vue';
+import type { Ref } from 'vue';
 import { putTranslation, updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import { usePermissions } from '@/stores/use-permissions';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {
+  checkStatementDraft,
   isOriginalLocked,
   previewStyleFor,
   STATEMENT_SLOTS,
@@ -13,39 +15,56 @@ import type { StatementDraft, StatementSlot } from './statement-drafts';
 
 export const FULL_MARKUP_PERMISSION = 'judge.problem_full_markup';
 
-const seedDrafts = (problem: EditableProblem) =>
+type Drafts = Record<StatementSlot, StatementDraft>;
+
+const seedDrafts = (problem: EditableProblem): Drafts =>
   Object.fromEntries(
     STATEMENT_SLOTS.map((slot) => [slot, statementDraftOf(problem, slot)]),
-  ) as Record<StatementSlot, StatementDraft>;
+  ) as Drafts;
 
-/** A translation is saved with PUT; the original description with PATCH on the problem. */
+/** The text a slot is saved with: a translation goes to PUT, the original description to PATCH on the problem. */
 function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): Promise<unknown> {
   if (target === 'original') return updateProblem(code, { description: draft.description });
   return putTranslation(code, target, { name: draft.name, description: draft.description });
 }
 
-/** The statements tab: one draft per slot for the page's life, saved one slot at a time. */
+const sameText = (left: StatementDraft, right: StatementDraft) =>
+  left.name === right.name && left.description === right.description;
+
+/** Whether any slot's text differs from what was last saved (the exists flag does not count). */
+const hasUnsaved = (drafts: Drafts, saved: Drafts) =>
+  STATEMENT_SLOTS.some((item) => !sameText(drafts[item], saved[item]));
+
+/** After a save the slot's saved text is what was just written, and it is no longer missing. */
+function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementSlot) {
+  drafts.value[target].exists = true;
+  saved.value[target] = { ...drafts.value[target] };
+}
+
+/** The statements tab: one draft per slot for the page's life, saved one slot at a time, with the last saved text as the baseline. */
 export function useStatementDrafts(problem: () => EditableProblem) {
   const { can } = usePermissions();
   const slot = ref<StatementSlot>('vi');
-  const drafts = ref(seedDrafts(problem()));
+  const drafts = ref<Drafts>(seedDrafts(problem()));
+  const saved = ref<Drafts>(seedDrafts(problem()));
   const current = computed(() => drafts.value[slot.value]);
   const canFullMarkup = computed(() => can(FULL_MARKUP_PERMISSION));
   const isLocked = computed(
     () => slot.value === 'original' && isOriginalLocked(problem(), canFullMarkup.value),
   );
   const previewStyle = computed(() => previewStyleFor(problem(), canFullMarkup.value));
+  const errors = computed(() => checkStatementDraft(current.value, slot.value));
+  const isDirty = computed(() => hasUnsaved(drafts.value, saved.value));
 
   const saveMutation = useAdminMutation({
     mutate: (target: StatementSlot) => saveSlot(problem().code, target, drafts.value[target]),
     invalidates: () => [['admin', 'problem', problem().code]],
-    onDone: (_saved: unknown, target: StatementSlot) => {
-      drafts.value[target].exists = true;
-    },
+    onDone: (_saved: unknown, target: StatementSlot) => recordSaved(drafts, saved, target),
   });
 
   async function save() {
-    if (!isLocked.value) await saveMutation.run(slot.value);
+    if (isLocked.value || Object.keys(errors.value).length > 0) return;
+    await saveMutation.run(slot.value);
   }
 
   function discard() {
@@ -57,8 +76,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     drafts,
     current,
     isLocked,
+    isDirty,
     previewStyle,
     canFullMarkup,
+    errors,
     save,
     discard,
     saveMutation,
