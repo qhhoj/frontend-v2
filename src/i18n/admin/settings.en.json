@@ -1,0 +1,153 @@
+{
+  "title": "Site settings",
+  "lead": "Typed settings: each key has a default, a kind and a description. Secrets are sealed and never shown again.",
+  "crumbs": { "site": "Site", "settings": "Settings" },
+  "groupsLabel": "Setting groups",
+  "groups": {
+    "site": "Site",
+    "contest": "Contests",
+    "mail": "Email",
+    "auth": "Sign-in",
+    "notify": "Notifications",
+    "pdf": "PDF export",
+    "similarity": "Similarity"
+  },
+  "infoCard": "Values are checked when saved. An error shows right under the wrong block; nothing is saved part-way through a key. Only people with the “Change settings” permission see this page.",
+  "blocks": {
+    "site": {
+      "title": "Time zone",
+      "help": "“Today” in the statistics starts at midnight in this time zone."
+    },
+    "contest": {
+      "title": "Official contests",
+      "help": "Official contest mode: people who are not superusers cannot edit introductions or names, read or write comments, vote or post on the blog."
+    },
+    "mail": {
+      "title": "Email",
+      "help": "The sender address and the SMTP server. An empty SMTP URL means email is not configured."
+    },
+    "google": {
+      "title": "Sign in with Google",
+      "help": "Turns on social sign-in: both a client id and a client secret are needed."
+    },
+    "github": {
+      "title": "Sign in with GitHub",
+      "help": "Turns on social sign-in: both a client id and a client secret are needed."
+    },
+    "facebook": {
+      "title": "Sign in with Facebook",
+      "help": "Turns on social sign-in: both a client id and a client secret are needed."
+    },
+    "pwned": {
+      "title": "Leaked password check",
+      "help": "The Have I Been Pwned range API address. Leave empty to turn the check off."
+    },
+    "discord": {
+      "title": "Discord webhooks",
+      "help": "The whole list is a secret: written, never read back. Saving replaces the whole list."
+    },
+    "pdf": {
+      "title": "PDF export",
+      "help": "The time and size limits of each problem statement PDF render."
+    },
+    "similarity": {
+      "title": "Similarity detection",
+      "help": "Each run keeps the pairs above these thresholds; it compares at most the newest submissions per problem and language family."
+    }
+  },
+  "fields": {
+    "site": { "timeZone": "IANA time zone name" },
+    "contest": {
+      "officialMode": "Turn on official contest mode",
+      "banAfterDisqualifications": "Disqualifications before a ban"
+    },
+    "mail": { "from": "Sender", "smtpUrl": "SMTP URL" },
+    "auth": { "pwnedApiUrl": "API URL" },
+    "pdf": {
+      "renderTimeoutMs": "Maximum render time (ms)",
+      "maxBytes": "Maximum size (bytes)"
+    },
+    "similarity": {
+      "minPercent": "Minimum similarity (%)",
+      "maxPairs": "Maximum pairs per run",
+      "maxSubmissions": "Maximum submissions per group"
+    },
+    "discord": { "webhooks": "Webhook list" }
+  },
+  "hints": {
+    "site": { "timeZone": "For example: Asia/Ho_Chi_Minh." },
+    "contest": {
+      "banAfterDisqualifications": "An integer from 0 to 1000; 0 turns it off. Counts only contests that are not organization-only."
+    },
+    "mail": {
+      "from": "An address or “Name <address>”, on one line.",
+      "smtpUrl": "smtp:// or smtps://, credentials percent-encoded. Never shown again."
+    },
+    "auth": {
+      "pwnedApiUrl": "Empty or https. The live server does not accept internal addresses."
+    },
+    "pdf": {
+      "renderTimeoutMs": "From 100 to 600 000.",
+      "maxBytes": "From 1 to 1 073 741 824."
+    },
+    "similarity": {
+      "minPercent": "From 1 to 100.",
+      "maxPairs": "From 1 to 20 000.",
+      "maxSubmissions": "From 2 to 10 000."
+    }
+  },
+  "chip": { "set": "Set", "unset": "Not set" },
+  "secret": {
+    "replace": "Replace",
+    "set": "Set value",
+    "cancelReplace": "Cancel replacement",
+    "masked": "••••••••",
+    "neverShown": "Never shown again.",
+    "emptyKeeps": "An empty box on save keeps the stored secret. To remove it, use “Clear secret”, not an empty box."
+  },
+  "oauth": {
+    "enable": "Enable {provider}",
+    "clientId": "OAuth client id",
+    "clientSecret": "Client secret",
+    "needsClientId": "A client id is needed while enabled.",
+    "secretHint": "The value is encrypted on save and never shown again. Leave empty to keep it."
+  },
+  "webhooks": {
+    "title": "Webhook list",
+    "replace": "Replace",
+    "note": "Up to 20 addresses, https only. An empty list turns notifications off.",
+    "event": "Event",
+    "url": "https address",
+    "removeRow": "Remove row",
+    "addRow": "+ Add event"
+  },
+  "values": { "set": "set", "unset": "not set", "default": "(default)" },
+  "errors": {
+    "integer": "Must be a whole number from {min} to {max}.",
+    "httpsOnly": "Only https addresses are accepted.",
+    "httpsOrEmpty": "Leave empty or use https.",
+    "tooManyHooks": "At most 20 webhooks."
+  },
+  "save": "Save",
+  "discard": "Discard edits",
+  "saving": "Saving…",
+  "saved": "Saved.",
+  "saveFailed": "Could not save {key}: {message}",
+  "history": "History",
+  "historyWithKey": "History · {key}",
+  "revisions": {
+    "title": "History · {key}",
+    "subtitle": "Newest first · 20 per page",
+    "empty": "No changes yet.",
+    "total": "{total} revisions",
+    "previous": "Previous",
+    "next": "Next",
+    "footnote": "A restore is written as a new revision in the history.",
+    "secretNote": "A secret shows only “set” or “not set”, never a value.",
+    "notRestorable": "A secret value cannot be restored.",
+    "restore": "Restore",
+    "restoreField": "Restore non-secret fields",
+    "confirmTitle": "Restore the previous value?",
+    "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept."
+  }
+}

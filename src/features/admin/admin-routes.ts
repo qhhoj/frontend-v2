@@ -37,7 +37,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   posts: () => import('./posts/BlogModerationPage.vue'),
   tickets: () => import('./tickets/TicketQueuePage.vue'),
   activity: () => import('./activity/UserActivityPage.vue'),
-  settings: placeholder,
+  settings: () => import('./settings/SiteSettingsPage.vue'),
   config: () => import('./site/MiscConfigPage.vue'),
   nav: () => import('./site/NavBarPage.vue'),
   pages: () => import('./pages/FlatpagesPage.vue'),

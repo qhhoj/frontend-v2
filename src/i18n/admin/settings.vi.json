@@ -1,0 +1,151 @@
+{
+  "title": "Cài đặt trang",
+  "lead": "Các cài đặt có kiểu cố định: mỗi khoá có giá trị mặc định, kiểu và mô tả. Bí mật được niêm phong, không hiện lại.",
+  "crumbs": { "site": "Trang web", "settings": "Cài đặt" },
+  "groupsLabel": "Nhóm cài đặt",
+  "groups": {
+    "site": "Trang web",
+    "contest": "Kỳ thi",
+    "mail": "Thư điện tử",
+    "auth": "Đăng nhập",
+    "notify": "Thông báo",
+    "pdf": "Xuất PDF",
+    "similarity": "Giống nhau"
+  },
+  "infoCard": "Giá trị được kiểm tra khi lưu. Lỗi hiện ngay dưới khối sai; không có gì bị lưu một phần trong một khoá. Chỉ người có quyền “Sửa cài đặt” mới thấy trang này.",
+  "blocks": {
+    "site": {
+      "title": "Múi giờ",
+      "help": "Ngày “hôm nay” trong thống kê tính từ nửa đêm của múi giờ này."
+    },
+    "contest": {
+      "title": "Kỳ thi chính thức",
+      "help": "Chế độ kỳ thi chính thức: người không phải siêu quản trị không sửa giới thiệu hay tên, không đọc hoặc viết bình luận, không bỏ phiếu và không đăng blog."
+    },
+    "mail": {
+      "title": "Thư điện tử",
+      "help": "Địa chỉ gửi đi và máy chủ SMTP. Để trống URL SMTP là chưa cấu hình thư."
+    },
+    "google": {
+      "title": "Đăng nhập bằng Google",
+      "help": "Bật đăng nhập mạng xã hội: cần cả mã khách và bí mật khách."
+    },
+    "github": {
+      "title": "Đăng nhập bằng GitHub",
+      "help": "Bật đăng nhập mạng xã hội: cần cả mã khách và bí mật khách."
+    },
+    "facebook": {
+      "title": "Đăng nhập bằng Facebook",
+      "help": "Bật đăng nhập mạng xã hội: cần cả mã khách và bí mật khách."
+    },
+    "pwned": {
+      "title": "Kiểm tra mật khẩu bị lộ",
+      "help": "Địa chỉ API dải của Have I Been Pwned. Để trống để tắt kiểm tra."
+    },
+    "discord": {
+      "title": "Webhook Discord",
+      "help": "Toàn bộ danh sách là bí mật: chỉ ghi, không đọc lại. Lưu sẽ thay thế cả danh sách."
+    },
+    "pdf": {
+      "title": "Xuất PDF",
+      "help": "Giới hạn thời gian và dung lượng của mỗi lần dựng PDF đề bài."
+    },
+    "similarity": {
+      "title": "Phát hiện giống nhau",
+      "help": "Mỗi lần chạy lưu các cặp từ ngưỡng này; so tối đa số bài nộp mới nhất cho mỗi bài và họ ngôn ngữ."
+    }
+  },
+  "fields": {
+    "site": { "timeZone": "Tên múi giờ IANA" },
+    "contest": {
+      "officialMode": "Bật chế độ kỳ thi chính thức",
+      "banAfterDisqualifications": "Số lần bị loại trước khi bị cấm"
+    },
+    "mail": { "from": "Người gửi", "smtpUrl": "URL SMTP" },
+    "auth": { "pwnedApiUrl": "URL API" },
+    "pdf": {
+      "renderTimeoutMs": "Thời gian dựng tối đa (ms)",
+      "maxBytes": "Dung lượng tối đa (byte)"
+    },
+    "similarity": {
+      "minPercent": "Ngưỡng tương đồng tối thiểu (%)",
+      "maxPairs": "Số cặp tối đa mỗi lần chạy",
+      "maxSubmissions": "Số bài nộp tối đa mỗi nhóm"
+    },
+    "discord": { "webhooks": "Danh sách webhook" }
+  },
+  "hints": {
+    "site": { "timeZone": "Ví dụ: Asia/Ho_Chi_Minh." },
+    "contest": {
+      "banAfterDisqualifications": "Số nguyên từ 0 đến 1000; 0 là tắt. Chỉ tính kỳ thi không riêng của tổ chức."
+    },
+    "mail": {
+      "from": "Địa chỉ hoặc “Tên <địa chỉ>”, không xuống dòng.",
+      "smtpUrl": "smtp:// hoặc smtps://, thông tin đăng nhập mã hoá phần trăm. Không bao giờ hiện lại."
+    },
+    "auth": { "pwnedApiUrl": "Để trống hoặc https. Máy chủ thật không nhận địa chỉ nội bộ." },
+    "pdf": {
+      "renderTimeoutMs": "Từ 100 đến 600 000.",
+      "maxBytes": "Từ 1 đến 1 073 741 824."
+    },
+    "similarity": {
+      "minPercent": "Từ 1 đến 100.",
+      "maxPairs": "Từ 1 đến 20 000.",
+      "maxSubmissions": "Từ 2 đến 10 000."
+    }
+  },
+  "chip": { "set": "Đã đặt", "unset": "Chưa đặt" },
+  "secret": {
+    "replace": "Thay thế",
+    "set": "Đặt giá trị",
+    "cancelReplace": "Huỷ thay thế",
+    "masked": "••••••••",
+    "neverShown": "Không bao giờ hiện lại.",
+    "emptyKeeps": "Ô trống khi lưu nghĩa là giữ bí mật đang lưu. Muốn bỏ hẳn, dùng “Xoá bí mật”, không phải ô trống."
+  },
+  "oauth": {
+    "enable": "Bật {provider}",
+    "clientId": "Mã khách OAuth",
+    "clientSecret": "Bí mật máy khách",
+    "needsClientId": "Cần mã khách khi đã bật.",
+    "secretHint": "Giá trị được mã hoá khi lưu và không bao giờ hiện lại. Để trống để giữ nguyên."
+  },
+  "webhooks": {
+    "title": "Danh sách webhook",
+    "replace": "Thay thế",
+    "note": "Tối đa 20 địa chỉ, chỉ https. Danh sách rỗng là tắt thông báo.",
+    "event": "Sự kiện",
+    "url": "Địa chỉ https",
+    "removeRow": "Bỏ dòng",
+    "addRow": "+ Thêm sự kiện"
+  },
+  "values": { "set": "đã đặt", "unset": "chưa đặt", "default": "(mặc định)" },
+  "errors": {
+    "integer": "Phải là số nguyên từ {min} đến {max}.",
+    "httpsOnly": "Chỉ nhận địa chỉ https.",
+    "httpsOrEmpty": "Để trống hoặc dùng https.",
+    "tooManyHooks": "Tối đa 20 webhook."
+  },
+  "save": "Lưu",
+  "discard": "Đặt lại",
+  "saving": "Đang lưu…",
+  "saved": "Đã lưu.",
+  "saveFailed": "Không lưu được {key}: {message}",
+  "history": "Lịch sử",
+  "historyWithKey": "Lịch sử · {key}",
+  "revisions": {
+    "title": "Lịch sử · {key}",
+    "subtitle": "Mới nhất trước · 20 bản mỗi trang",
+    "empty": "Chưa có bản sửa nào.",
+    "total": "{total} bản",
+    "previous": "Trước",
+    "next": "Sau",
+    "footnote": "Khôi phục ghi thành một bản mới trong lịch sử.",
+    "secretNote": "Bí mật chỉ hiện “đã đặt hay chưa”, không có giá trị.",
+    "notRestorable": "Không khôi phục được giá trị bí mật.",
+    "restore": "Khôi phục",
+    "restoreField": "Khôi phục trường không bí mật",
+    "confirmTitle": "Khôi phục giá trị trước?",
+    "confirmBody": "Máy chủ đặt lại giá trị cũ và ghi thành một bản mới; bí mật đang lưu được giữ nguyên."
+  }
+}
