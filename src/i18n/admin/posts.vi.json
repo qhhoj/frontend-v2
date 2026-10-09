@@ -1,0 +1,40 @@
+{
+  "crumbs": { "content": "Nội dung", "blog": "Blog" },
+  "title": "Kiểm duyệt blog",
+  "feeds": {
+    "label": "Danh sách bài viết",
+    "all": "Mọi bài cá nhân",
+    "global": "Bảng tin chung",
+    "hidden": "Đã ẩn",
+    "scheduled": "Hẹn giờ",
+    "note": "Ghim và đánh dấu toàn trang cần quyền riêng."
+  },
+  "table": {
+    "caption": "Bài viết theo danh sách đang chọn",
+    "post": "Bài viết",
+    "author": "Tác giả",
+    "publishedAt": "Đăng lúc",
+    "scheduledAt": "Hẹn lúc",
+    "score": "Điểm",
+    "comments": "Bình luận",
+    "actions": "Thao tác"
+  },
+  "chips": {
+    "sticky": "Ghim",
+    "global": "Toàn trang",
+    "personal": "Cá nhân",
+    "negativeScore": "Điểm âm",
+    "hidden": "Ẩn"
+  },
+  "hide": {
+    "action": "Ẩn bài",
+    "title": "Ẩn “{title}”?",
+    "body": "Bài sẽ biến khỏi bảng tin và danh sách này, chỉ tác giả và nhân viên mở được bằng đường dẫn.",
+    "confirm": "Ẩn bài",
+    "done": "Đã ẩn bài."
+  },
+  "gap": "Chưa có API — Hàng đợi báo cáo vi phạm (chưa có mô hình báo cáo), tìm kiếm và thao tác hàng loạt. Bài cần sửa nội dung mở bằng đường dẫn rồi dùng màn sửa bài.",
+  "empty": "Không có bài nào.",
+  "footer": "{shown} / {total} bài",
+  "pager": "Trang bài viết"
+}
