@@ -1,4 +1,4 @@
-import type { ContestTag } from '@/api/types/contest-tags';
+import type { ContestTag } from '../api/types/contest-tags';
 import type {
   Balloon,
   BalloonPage,
@@ -7,7 +7,7 @@ import type {
   MintedFeedKey,
   PublishedProblem,
   PublishProblemsResult,
-} from '@/api/types/contest-ops';
+} from '../api/types/contest-ops';
 
 export const contestTag = (overrides: Partial<ContestTag> = {}): ContestTag => ({
   slug: 'quoc-gia',
