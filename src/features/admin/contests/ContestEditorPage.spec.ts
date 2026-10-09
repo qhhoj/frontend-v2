@@ -45,7 +45,11 @@ describe('ContestEditorPage', () => {
   });
 
   it('opens a contest typed into the index lookup', async () => {
-    mockApi({ ...staffViewer(['judge.add_contest', ...EDIT]), ...contestEditorRoutes() });
+    mockApi({
+      'GET /contests': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
+      ...staffViewer(['judge.add_contest', ...EDIT]),
+      ...contestEditorRoutes(),
+    });
     const { wrapper, router } = await mountAndWaitFor('/admin/contests', 'Khóa kỳ thi');
     await wrapper.get('input').setValue('hcmus-w41');
     await wrapper.get('form').trigger('submit');

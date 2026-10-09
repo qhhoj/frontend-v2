@@ -1,0 +1,39 @@
+{
+  "clear": "Xóa ô tìm",
+  "edit": "Sửa",
+  "pager": "Trang kết quả",
+  "problems": {
+    "title": "Tìm bài tập",
+    "label": "Tìm bài tập",
+    "placeholder": "Mã hoặc tên bài…",
+    "hint": "Gõ cả từ (từ 3 ký tự trở lên) để tìm; 1–2 ký tự khớp đầu mã hoặc đầu tên.",
+    "columns": { "problem": "Bài", "points": "Điểm" },
+    "private": "Riêng tư",
+    "count": "{shown} / {total} bài",
+    "countFor": "{shown} / {total} bài khớp “{q}”",
+    "empty": "Chưa có bài nào.",
+    "emptyFor": "Không có bài nào khớp “{q}”",
+    "emptyAdvice": "Thử gõ cả từ (từ 3 ký tự trở lên), hoặc mở thẳng theo mã ở bên cạnh.",
+    "emptyShortAdvice": "Từ 1–2 ký tự chỉ khớp đầu mã hoặc đầu tên. Gõ cả từ có từ 3 ký tự trở lên để tìm theo từ."
+  },
+  "contests": {
+    "title": "Tìm kỳ thi",
+    "label": "Tìm kỳ thi",
+    "placeholder": "Khóa hoặc tên kỳ thi…",
+    "hint": "Khớp một phần của khóa hoặc tên.",
+    "phaseLabel": "Giai đoạn",
+    "all": "Tất cả",
+    "rated": "có rating",
+    "columns": {
+      "contest": "Kỳ thi",
+      "time": "Thời gian",
+      "phase": "Giai đoạn",
+      "users": "Thí sinh"
+    },
+    "count": "{shown} / {total} kỳ thi",
+    "countFor": "{shown} / {total} kỳ thi khớp “{q}”",
+    "empty": "Chưa có kỳ thi nào.",
+    "emptyFor": "Không có kỳ thi nào khớp “{q}”",
+    "emptyAdvice": "Thử rút gọn từ khóa, hoặc đổi sang “Tất cả” để thấy mọi giai đoạn."
+  }
+}

@@ -32,10 +32,10 @@
   "cannotEdit": "Tài khoản này không sửa được kỳ thi {key}.",
   "index": {
     "title": "Kỳ thi",
-    "lead": "Mở kỳ thi theo khóa, hoặc tạo kỳ thi mới.",
+    "lead": "Mở nhanh theo khóa hoặc tìm trong danh sách.",
     "lookupLabel": "Khóa kỳ thi",
     "openLabel": "Mở kỳ thi",
-    "lookupHint": "Chưa có danh sách quản trị: nhập đúng khóa kỳ thi.",
+    "lookupHint": "Dán khóa là mở thẳng trình sửa, không qua danh sách.",
     "create": "Tạo kỳ thi"
   },
   "general": {

@@ -115,7 +115,11 @@ describe('ProblemEditorPage', () => {
   });
 
   it('opens a problem typed into the index lookup', async () => {
-    mockApi({ ...staffViewer(['judge.add_problem', ...EDIT]), ...problemEditorRoutes() });
+    mockApi({
+      'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
+      ...staffViewer(['judge.add_problem', ...EDIT]),
+      ...problemEditorRoutes(),
+    });
     const { wrapper, router } = await mountAdmin('/admin/problems');
     await wrapper.get('input').setValue(' hcmus41c ');
     await wrapper.get('form').trigger('submit');

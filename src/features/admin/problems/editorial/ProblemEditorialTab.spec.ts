@@ -50,6 +50,7 @@ describe('ProblemEditorialTab', () => {
 
   it('asks before a route leave with an unsaved editorial, and Leave goes', async () => {
     mockApi({
+      'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
       ...staffViewer(['judge.edit_own_problem']),
       ...problemEditorRoutes(),
       'POST /problems/render-preview': ok({ html: '' }),

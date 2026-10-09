@@ -174,6 +174,7 @@ describe('ProblemDataTab', () => {
 
   it('asks before a route leave with unsaved configuration, and Stay keeps it', async () => {
     mockApi({
+      'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
       ...staffViewer(EDIT),
       ...problemEditorRoutes(),
       'GET /problems/hcmus41c/data': ok(problemData()),

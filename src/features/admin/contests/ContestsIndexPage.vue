@@ -4,6 +4,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS } from '../admin-screens';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import ExactLookup from '../ui/ExactLookup.vue';
+import ContestSearchList from '../search/ContestSearchList.vue';
 
 const router = useRouter();
 const { canAny } = usePermissions();
@@ -27,11 +28,16 @@ const openContest = (key: string) => router.push({ name: 'admin-contestGeneral',
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <ExactLookup
-      :label="$t('admin.contests.index.lookupLabel')"
-      :submit-label="$t('admin.contests.index.openLabel')"
-      :hint="$t('admin.contests.index.lookupHint')"
-      @open="openContest"
-    />
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
+      <section class="glass rounded-panel p-5">
+        <ExactLookup
+          :label="$t('admin.contests.index.lookupLabel')"
+          :submit-label="$t('admin.contests.index.openLabel')"
+          :hint="$t('admin.contests.index.lookupHint')"
+          @open="openContest"
+        />
+      </section>
+      <ContestSearchList />
+    </div>
   </div>
 </template>

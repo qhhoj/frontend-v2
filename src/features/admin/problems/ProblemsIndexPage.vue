@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import ExactLookup from '../ui/ExactLookup.vue';
+import ProblemSearchList from '../search/ProblemSearchList.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { ADMIN_SCREENS } from '../admin-screens';
 
@@ -33,13 +34,16 @@ const open = (code: string) => router.push({ name: 'admin-problemGeneral', param
         >
       </template>
     </AdminPageHeader>
-    <section class="glass rounded-panel p-5">
-      <ExactLookup
-        :label="$t('admin.problems.lookupLabel')"
-        :submit-label="$t('admin.problems.lookupSubmit')"
-        :hint="$t('admin.problems.lookupHint')"
-        @open="open"
-      />
-    </section>
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
+      <section class="glass rounded-panel p-5">
+        <ExactLookup
+          :label="$t('admin.problems.lookupLabel')"
+          :submit-label="$t('admin.problems.lookupSubmit')"
+          :hint="$t('admin.problems.lookupHint')"
+          @open="open"
+        />
+      </section>
+      <ProblemSearchList />
+    </div>
   </div>
 </template>

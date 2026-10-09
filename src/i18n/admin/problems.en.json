@@ -17,10 +17,10 @@
   },
   "notFound": "Problem {code} not found.",
   "cannotEdit": "This account cannot edit problem {code}.",
-  "indexLead": "Open a problem by code to edit its statement, test data and people.",
+  "indexLead": "Open by code or search the list.",
   "lookupLabel": "Problem code",
   "lookupSubmit": "Open",
-  "lookupHint": "No admin list yet: type the exact code.",
+  "lookupHint": "Paste a code to open the editor directly, without the list.",
   "general": {
     "create": {
       "title": "Create problem",

@@ -173,7 +173,12 @@ describe('ProblemStatementsTab', () => {
   });
 
   it('asks before a route leave with an unsaved statement', async () => {
-    mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes(), ...PREVIEW });
+    mockApi({
+      'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+    });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
     await wrapper.get('textarea').setValue('Đang sửa');
     await router.push('/admin/problems');

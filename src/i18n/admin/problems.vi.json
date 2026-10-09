@@ -17,10 +17,10 @@
   },
   "notFound": "Không tìm thấy bài {code}.",
   "cannotEdit": "Tài khoản này không sửa được bài {code}.",
-  "indexLead": "Mở bài theo mã để sửa đề, dữ liệu chấm và người phụ trách.",
+  "indexLead": "Mở thẳng theo mã hoặc tìm trong danh sách bài.",
   "lookupLabel": "Mã bài",
   "lookupSubmit": "Mở bài",
-  "lookupHint": "Chưa có danh sách quản trị: nhập đúng mã bài.",
+  "lookupHint": "Dán mã là mở thẳng trình sửa, không qua danh sách.",
   "general": {
     "create": {
       "title": "Tạo bài tập",

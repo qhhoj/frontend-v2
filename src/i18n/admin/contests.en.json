@@ -32,10 +32,10 @@
   "cannotEdit": "This account cannot edit contest {key}.",
   "index": {
     "title": "Contests",
-    "lead": "Open a contest by its key, or create a new one.",
+    "lead": "Open by key or search the list.",
     "lookupLabel": "Contest key",
     "openLabel": "Open contest",
-    "lookupHint": "No list yet: type the exact contest key.",
+    "lookupHint": "Paste a key to open the editor directly, without the list.",
     "create": "Create contest"
   },
   "general": {
