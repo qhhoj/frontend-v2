@@ -44,6 +44,19 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
 };
 
 describe('FlatpagesPage', () => {
+  it('opens the deleted list at once on a deep link to a deleted page', async () => {
+    mockApi(
+      routes({
+        'GET /admin/site/pages/deleted': page([
+          { id: 'fp-9', url: '/old-rules', deletedAt: '2026-09-30T10:00:00.000Z' },
+        ]),
+        'GET /admin/site/pages/fp-9/revisions': page([flatpageRevision()]),
+      }),
+    );
+    const { wrapper } = await mountPages('/admin/pages?deleted=fp-9');
+    await vi.waitFor(() => expect(wrapper.text()).toContain('/old-rules'));
+  });
+
   it('lists deleted pages only once asked, and opens one as a read-only history', async () => {
     const calls = mockApi(
       routes({

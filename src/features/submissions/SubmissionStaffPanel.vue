@@ -8,7 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminBit from '@/features/admin/shell/AdminBit.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { ADMIN_DANGER_CLASS } from '@/features/admin/ui/classes';
-import { failureTextOf } from '@/features/admin/ui/admin-errors';
+import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { hasPermission } from '@/lib/permissions';
 import { formatDateTime } from '@/lib/format';
@@ -132,9 +132,10 @@ const dialogCopy = computed(() => {
   };
 });
 
-/** A 409 is the lock or a judge holding the submission; the flags should have stopped the click, so the text says what to do. */
+/** A 409 is a judge holding the submission; the flags should have stopped the click, so the text says what to do. */
 function refusalTextOf(error: unknown): string {
-  const isConflict = error instanceof ApiError && error.code === 'conflict';
+  const isConflict =
+    error instanceof ApiError && error.code === 'conflict' && !hasIssueCode(error, 'busy');
   return isConflict ? translate('admin.staff.conflict') : failureTextOf(error);
 }
 

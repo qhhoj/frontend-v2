@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import { positivePageOf } from './flatpage-route';
 import { useDeletedFlatpagesQuery } from './flatpages.queries';
 
-defineProps<{ openedId: string | null }>();
+const props = defineProps<{ openedId: string | null }>();
 const emit = defineEmits<{ open: [id: string] }>();
 const route = useRoute();
 const locale = useLocaleStore();
-/** Closed until asked for: most staff never look for a deleted page, so the list is not fetched on every visit. */
-const isShown = ref(false);
+/** Closed until asked for (open at once on a deep link to a deleted page or its list page): most staff never look for a deleted page, so the list is not fetched on every visit. */
+const isShown = ref(props.openedId !== null || route.query.dp !== undefined);
 const query = useDeletedFlatpagesQuery(
   computed(() => positivePageOf(route.query.dp)),
   isShown,
@@ -37,9 +39,9 @@ const items = computed(() => query.data.value?.items ?? []);
       :error="query.error.value"
       @retry="query.refetch()"
     >
-      <p v-if="items.length === 0" class="text-sm text-muted">
+      <EmptyState v-if="items.length === 0" compact :kind="ADMIN_BIT_KINDS.empty">
         {{ $t('admin.pages.deleted.empty') }}
-      </p>
+      </EmptyState>
       <ul v-else class="flex flex-col gap-2">
         <li v-for="item in items" :key="item.id">
           <button

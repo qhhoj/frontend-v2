@@ -3,6 +3,7 @@ import { UserRoundPlus } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
+import { hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { translate } from '@/i18n';
 import { usernameProblem } from '@/lib/username';
 import { focusMain } from '@/router/focus-main';
@@ -69,7 +70,7 @@ const emailTaken = () =>
 /** A refused token and a linked identity are final (the token is spent); so is the provider's address, which this page cannot change. */
 const endReason = computed<EndReason | null>(() => {
   if (!token || failedWith('invalid_token')) return 'token';
-  if (failedWith('conflict')) return 'linked';
+  if (failedWith('conflict') && !hasIssueCode(error.value, 'busy')) return 'linked';
   if (emailTaken()) return 'email';
   return null;
 });

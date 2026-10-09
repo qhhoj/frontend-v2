@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, failWithCode, mockApi, ok } from '@/test/mock-api';
 import { FakeEventSource, installFakeEventSource } from '@/test/fake-event-source';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -64,6 +64,21 @@ describe('SubmissionStaffPanel', () => {
     expect(wrapper.get('[data-testid="staff-panel"] [role="alert"]').text()).toContain(
       'Bài nộp bị khóa, đang chờ chấm cuối kỳ thi hoặc đang được chấm',
     );
+  });
+
+  it('reads the busy-lock 409 as a retry, not as a locked submission', async () => {
+    mockApi({
+      ...staffViewer(['judge.rejudge_submission']),
+      ...pageRoutes(),
+      [`POST /submissions/${finished.id}/rejudge`]: failWithCode(409, 'lock', 'busy'),
+    });
+    const { wrapper } = await mountApp(`/submissions/${finished.id}`);
+    await panelButton(wrapper, 'Chấm lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Chấm lại');
+    const text = wrapper.get('[data-testid="staff-panel"] [role="alert"]').text();
+    expect(text).toContain('hãy chờ xong rồi thử lại');
+    expect(text).not.toContain('Bài nộp bị khóa');
   });
 
   it('turns a 403 (no edit rights on this problem) into text', async () => {

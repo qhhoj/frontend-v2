@@ -50,6 +50,17 @@ describe('membershipErrorCopy', () => {
     expect(membershipErrorCopy('join', conflict).title).toBe('orgMembership.joinFailedTitle');
     expect(membershipErrorCopy('approve', conflict).title).toBe('orgMembership.fullTitle');
   });
+  it('says to retry for the busy lock, whichever action it hit', () => {
+    const busy = new ApiError('conflict', 409, 'x', {
+      issues: [{ field: 'lock', code: 'busy', message: 'x' }],
+    });
+    for (const action of ['join', 'approve', 'reject'] as const) {
+      expect(membershipErrorCopy(action, busy)).toEqual({
+        title: 'orgMembership.failedTitle',
+        body: 'admin.ui.issues.busy',
+      });
+    }
+  });
   it('falls back to the code’s message for anything else', () => {
     expect(membershipErrorCopy('request', new ApiError('rate_limited', 429, 'x'))).toEqual({
       title: 'orgMembership.failedTitle',
