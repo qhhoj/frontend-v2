@@ -266,6 +266,22 @@
   }
 }
 
+/* Low-power mode (src/theme/low-power.store.ts and the pre-paint script write `data-low-power` on <html>; F2's replay reads it too):
+   no blur, no blobs, no motion. `[data-theme]` keeps this above the theme files' own `--qh-blur` and `--qh-blob-display`. */
+:root[data-low-power],
+:root[data-low-power][data-theme] {
+  --qh-blur: 0px;
+  --qh-blob-display: none;
+  --qh-duration-fast: 0ms;
+  --qh-duration: 0ms;
+}
+:root[data-low-power] *,
+:root[data-low-power] *::before,
+:root[data-low-power] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Container for backend-sanitized user HTML (UserContent.vue): nothing inside may paint, size or stack outside it. */
 @utility user-content {
   overflow: clip;

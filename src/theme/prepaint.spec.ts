@@ -5,6 +5,16 @@ import { stubMatchMedia } from '@/test/match-media';
 import { ACCENTS, appearanceVariables } from './appearance';
 import { useAppearanceStore } from './appearance.store';
 import { useThemeStore } from './theme.store';
+import {
+  isLowPowerPreference,
+  LOW_POWER_STORAGE_KEY,
+  readDeviceHints,
+  resolveLowPower,
+  WEAK_CPU_CORES,
+  WEAK_DEVICE_MEMORY_GB,
+} from './low-power';
+import type { HintSource } from './low-power';
+import { useLowPowerStore } from './low-power.store';
 import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 
 const script = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)![1]!;
@@ -42,6 +52,8 @@ function prepaint({
   preference = null as string | null,
   painted = null as string | null,
   dark = false,
+  lowPower = null as string | null,
+  device = {} as HintSource,
   storageThrows = false,
   mediaThrows = false,
 }) {
@@ -60,6 +72,7 @@ function prepaint({
       if (key === 'qhhoj.resolvedTheme') return stored;
       if (key === 'qhhoj.resolvedBy') return resolvedBy;
       if (key === 'qhhoj.paintedAppearance') return painted;
+      if (key === 'qhhoj.lowPower') return lowPower;
       return key === 'qhhoj.theme' ? preference : null;
     },
   };
@@ -69,15 +82,17 @@ function prepaint({
   };
   // The script is the page's own source under test, so evaluating it here is the point.
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  new Function('document', 'localStorage', 'matchMedia', script)(
+  new Function('document', 'localStorage', 'matchMedia', 'navigator', script)(
     { documentElement: root, querySelector: () => themeColor },
     localStorageStub,
     matchMediaStub,
+    device,
   );
   return {
     theme: root.dataset.theme,
     themeColor: themeColor.content,
     accent: root.dataset.accent,
+    lowPower: root.dataset.lowPower !== undefined,
     properties,
   };
 }
@@ -245,5 +260,65 @@ describe('pre-paint script: personal look', () => {
           : {},
       );
     }
+  });
+});
+
+describe('pre-paint script: low-power mode', () => {
+  const DEVICES: HintSource[] = [
+    {},
+    { deviceMemory: 8, hardwareConcurrency: 8 },
+    { deviceMemory: 2 },
+    { deviceMemory: 4, hardwareConcurrency: 2 },
+    { hardwareConcurrency: 4, connection: { saveData: true } },
+    { deviceMemory: null, hardwareConcurrency: null },
+    { connection: null },
+  ];
+  const STORED = [null, 'auto', 'on', 'off', 'turbo'];
+
+  it('paints exactly what resolveLowPower decides for every stored value and device', () => {
+    for (const lowPower of STORED)
+      for (const device of DEVICES)
+        expect(
+          prepaint({ lowPower, device }).lowPower,
+          `${lowPower} ${JSON.stringify(device)}`,
+        ).toBe(
+          resolveLowPower(
+            isLowPowerPreference(lowPower) ? lowPower : 'auto',
+            readDeviceHints(device),
+          ),
+        );
+  });
+
+  it('paints what the store starts with', () => {
+    for (const lowPower of STORED)
+      for (const device of DEVICES) {
+        localStorage.clear();
+        if (lowPower !== null) localStorage.setItem(LOW_POWER_STORAGE_KEY, lowPower);
+        for (const name of ['deviceMemory', 'hardwareConcurrency', 'connection'] as const)
+          Object.defineProperty(navigator, name, { value: device[name], configurable: true });
+        setActivePinia(createPinia());
+        expect(
+          prepaint({ lowPower, device }).lowPower,
+          `${lowPower} ${JSON.stringify(device)}`,
+        ).toBe(useLowPowerStore().isOn);
+      }
+  });
+
+  it('drift guard: the pre-paint script names the same storage key and thresholds as src/theme/low-power.ts', () => {
+    expect(script).toContain(`localStorage.getItem('${LOW_POWER_STORAGE_KEY}')`);
+    expect(script).toContain(`isAtMost(navigator.deviceMemory, ${WEAK_DEVICE_MEMORY_GB})`);
+    expect(script).toContain(`isAtMost(navigator.hardwareConcurrency, ${WEAK_CPU_CORES})`);
+  });
+
+  it('paints no low-power when storage is blocked on a strong device', () => {
+    expect(prepaint({ storageThrows: true, device: { hardwareConcurrency: 8 } }).lowPower).toBe(
+      false,
+    );
+  });
+
+  it('still turns low-power on for a weak device when storage is blocked', () => {
+    expect(prepaint({ storageThrows: true, device: { hardwareConcurrency: 2 } }).lowPower).toBe(
+      true,
+    );
   });
 });

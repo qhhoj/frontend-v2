@@ -59,6 +59,29 @@
         document.documentElement.style.setProperty('--qh-glass-level', String(look.glass));
         document.documentElement.style.setProperty('--qh-blob-strength', String(look.glow / 100));
       }
+      // Low-power mode: `auto` turns on for <= 2 GB memory, <= 2 cores or Save-Data. The key, the values and the thresholds
+      // must match src/theme/low-power.ts (prepaint.spec.ts enforces it). `data-low-power` is the contract every reader uses.
+      var lowPowerPreference = null;
+      try {
+        lowPowerPreference = localStorage.getItem('qhhoj.lowPower');
+      } catch {
+        // Blocked storage: decide by the device.
+      }
+      var isAtMost = function (value, limit) {
+        return typeof value === 'number' && value <= limit;
+      };
+      var isWeakDevice = false;
+      try {
+        isWeakDevice =
+          isAtMost(navigator.deviceMemory, 2) ||
+          isAtMost(navigator.hardwareConcurrency, 2) ||
+          (navigator.connection != null && navigator.connection.saveData === true);
+      } catch {
+        // No navigator hints: a strong device.
+      }
+      if (lowPowerPreference === 'on' || (lowPowerPreference !== 'off' && isWeakDevice)) {
+        document.documentElement.dataset.lowPower = '';
+      }
     </script>
   </head>
   <body>
