@@ -72,7 +72,10 @@ async function disconnect(force: boolean) {
             : $t('admin.judges.row.ping', { ms: pingMsValue })
         }}
       </span>
-      <span>{{ $t('admin.judges.row.problems', { count: judge.problemCount }) }}</span>
+      <span>{{ $t('admin.judges.row.slots', { busy: judge.busy, slots: judge.slots }) }}</span>
+      <span v-if="judge.build" class="font-mono">{{
+        $t('admin.judges.row.build', { build: judge.build })
+      }}</span>
       <span>{{ $t('admin.judges.row.languages', { count: judge.runtimes.length }) }}</span>
       <span v-if="judge.lastIp" class="font-mono">{{ judge.lastIp }}</span>
     </p>

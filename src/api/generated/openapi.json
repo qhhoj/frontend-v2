@@ -3010,8 +3010,21 @@
       },
       "JudgeResponse": {
         "properties": {
+          "build": {
+            "type": "string"
+          },
+          "busy": {
+            "description": "Slots in use at its last pong; 0 while offline.",
+            "type": "number"
+          },
           "description": {
             "type": "string"
+          },
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "id": {
             "type": "string"
@@ -3041,7 +3054,7 @@
             "nullable": true,
             "type": "number"
           },
-          "problemCount": {
+          "protocolMinor": {
             "type": "number"
           },
           "runtimes": {
@@ -3049,6 +3062,10 @@
               "$ref": "#/components/schemas/JudgeRuntimeResponse"
             },
             "type": "array"
+          },
+          "slots": {
+            "description": "Assignments it runs at once.",
+            "type": "number"
           },
           "startTime": {
             "format": "date-time",
@@ -3067,8 +3084,12 @@
           "ping",
           "load",
           "lastIp",
-          "problemCount",
-          "runtimes"
+          "runtimes",
+          "slots",
+          "busy",
+          "build",
+          "protocolMinor",
+          "features"
         ],
         "type": "object"
       },

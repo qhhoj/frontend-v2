@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { failureTextOf, isConflict } from '../ui/admin-errors';
+import { failureTextOf, hasIssueCode } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import JudgeKeyDialog from './JudgeKeyDialog.vue';
@@ -31,11 +31,8 @@ const create = useAdminMutation<
   onDone: ({ judge }) => cache.add(judge),
 });
 
-/** The backend answers a taken name with 409 `conflict` and `fields.name`; the page names it in the SPA's words. */
-const isNameTaken = computed(() => {
-  const failure = create.failure.value;
-  return isConflict(failure) && 'name' in failure.fields;
-});
+/** The backend answers a taken name with 409 and issue code `name_taken`; the page names it in the SPA's words. */
+const isNameTaken = computed(() => hasIssueCode(create.failure.value, 'name_taken'));
 const nameError = computed(() => {
   if (clientNameError.value) return clientNameError.value;
   return isNameTaken.value ? t('admin.judges.add.nameTaken') : null;

@@ -3520,7 +3520,11 @@ export interface components {
             authKey: string;
         };
         JudgeResponse: {
+            build: string;
+            /** @description Slots in use at its last pong; 0 while offline. */
+            busy: number;
             description: string;
+            features: string[];
             id: string;
             isBlocked: boolean;
             isDisabled: boolean;
@@ -3530,8 +3534,10 @@ export interface components {
             online: boolean;
             /** @description Seconds, mean of the last 6 pings. */
             ping: number | null;
-            problemCount: number;
+            protocolMinor: number;
             runtimes: components["schemas"]["JudgeRuntimeResponse"][];
+            /** @description Assignments it runs at once. */
+            slots: number;
             /** Format: date-time */
             startTime: string | null;
         };

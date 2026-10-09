@@ -35,6 +35,15 @@ describe('JudgesPage', () => {
     expect(rowOf(wrapper, 'qhh-judge-04').text()).toContain('Đã tắt');
   });
 
+  it('shows busy of slots and the build of each judge, and no build when it reports none', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountJudges();
+    expect(rowOf(wrapper, 'qhh-judge-03').text()).toContain('3/4 ô đang chấm');
+    expect(rowOf(wrapper, 'qhh-judge-03').text()).toContain('bản dựng 1.4.2');
+    expect(rowOf(wrapper, 'thu-nghiem').text()).toContain('0/2 ô đang chấm');
+    expect(rowOf(wrapper, 'thu-nghiem').text()).not.toContain('bản dựng');
+  });
+
   it('blocks a judge with PATCH and shows the answer', async () => {
     const calls = mockApi(
       routes({

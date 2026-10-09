@@ -30,7 +30,8 @@
   "row": {
     "ping": "{ms} ms",
     "languages": "{count} languages",
-    "problems": "{count} problems judged",
+    "slots": "{busy}/{slots} slots busy",
+    "build": "build {build}",
     "disable": "Disable",
     "enable": "Enable again",
     "block": "Block",

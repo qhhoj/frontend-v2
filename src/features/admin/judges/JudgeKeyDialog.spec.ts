@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { failWithCode, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { openDialog, staffViewer } from '@/test/admin-routes';
 import { judge } from '@/test/admin-fixtures/judges';
@@ -80,10 +80,10 @@ describe('judge key reveal', () => {
   });
 
   it('refuses a malformed name before sending and shows a taken name from the backend', async () => {
-    // The backend answers a taken name with 409 `conflict` and `fields.name` (judges.service.ts), not with an issue.
+    // The backend answers a taken name with 409 `conflict` and issue code `name_taken` (judges.service.ts).
     const calls = mockApi({
       ...staffViewer(['judge.change_judge']),
-      'POST /judges': fail(409, 'conflict', { name: ['This name is taken.'] }),
+      'POST /judges': failWithCode(409, 'name', 'name_taken'),
     });
     const { wrapper } = await mountAddPage();
     await wrapper.get('#judge-name').setValue('bad name');

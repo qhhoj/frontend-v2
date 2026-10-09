@@ -30,7 +30,8 @@
   "row": {
     "ping": "{ms} ms",
     "languages": "{count} ngôn ngữ",
-    "problems": "{count} bài đã chấm",
+    "slots": "{busy}/{slots} ô đang chấm",
+    "build": "bản dựng {build}",
     "disable": "Tắt",
     "enable": "Bật lại",
     "block": "Chặn",
