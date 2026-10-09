@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
+import { adminList, adminOk, dialogOf, signInAsStaff } from './fixtures/admin';
 import { ALL_SETTINGS, setting, settingRevision } from '../src/test/admin-fixtures/settings';
 
 for (const viewport of AUDIT_VIEWPORTS)
@@ -71,4 +71,33 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.keyboard.press('Enter');
     await expect(page.getByRole('status').filter({ hasText: 'Đã lưu.' })).toBeVisible();
     expect(api.requestsTo('PATCH /admin/settings/similarity.minPercent')).toHaveLength(1);
+  });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`site settings at ${viewport.name}: clearing the SMTP URL is confirmed from the keyboard and sends one empty value`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    signInAsStaff(api, ['judge.change_settings']);
+    api.routes['GET /admin/settings'] = adminOk(ALL_SETTINGS);
+    api.routes['PATCH /admin/settings/mail.smtpUrl'] = adminOk(
+      setting('mail.smtpUrl', { set: false }),
+    );
+    await page.goto('/admin/settings');
+    const mailBlock = page.locator('[data-block="mail"]');
+    await mailBlock.getByRole('button', { name: 'Xoá bí mật', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await expect(dialogOf(page)).toContainText('Xoá URL SMTP?');
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(api.requestsTo('PATCH /admin/settings/mail.smtpUrl')).toHaveLength(0);
+
+    await dialogOf(page).getByRole('button', { name: 'Xoá URL SMTP', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await expect(mailBlock).toContainText('Đã xoá URL SMTP.');
+    await expect(dialogOf(page)).toBeHidden();
+    const sent = api.requestsTo('PATCH /admin/settings/mail.smtpUrl');
+    expect(sent).toHaveLength(1);
+    expect(JSON.parse(sent[0].postData!.toString())).toEqual({ value: '' });
+    expect(await axeViolationsIn(page)).toEqual([]);
   });

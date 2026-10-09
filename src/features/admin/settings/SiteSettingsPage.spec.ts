@@ -1,8 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { invalid, issue, mockApi, ok, page } from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer, switchNamed } from '@/test/admin-routes';
+import {
+  cancelDialog,
+  confirmDialog,
+  openDialog,
+  staffViewer,
+  switchNamed,
+} from '@/test/admin-routes';
 import { ALL_SETTINGS, setting, settingRevision } from '@/test/admin-fixtures/settings';
 
 const PERMS = ['judge.change_settings'];
@@ -258,5 +264,105 @@ describe('defaults', () => {
       expect(keyRow(wrapper, key).find('button[aria-label^="Về mặc định"]').exists(), key).toBe(
         false,
       );
+  });
+});
+
+describe('clearing a secret', () => {
+  const patches = (calls: { method: string; path: string; body: unknown }[]) =>
+    calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]);
+
+  it('sends nothing until the dialog is confirmed, then PATCHes an empty value and shows the secret as unset', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/mail.smtpUrl': ok(setting('mail.smtpUrl', { set: false })),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const mail = block(wrapper, 'mail');
+    await clickIn(mail, 'Xoá bí mật');
+    expect(openDialog().textContent).toContain('Xoá URL SMTP?');
+    expect(openDialog().textContent).toContain('không khôi phục được');
+    expect(openDialog().textContent).toContain('Người gửi (mail.from) không đổi.');
+    expect(patches(calls)).toEqual([]);
+    await confirmDialog('Xoá URL SMTP');
+    expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
+    expect(mail.text()).toContain('Chưa đặt');
+    expect(mail.text()).toContain('Đã xoá URL SMTP.');
+    expect(mail.findAll('button').some((button) => button.text() === 'Xoá bí mật')).toBe(false);
+  });
+
+  it('sends nothing when the dialog is cancelled', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountSettings();
+    await clickIn(block(wrapper, 'mail'), 'Xoá bí mật');
+    await cancelDialog();
+    expect(patches(calls)).toEqual([]);
+  });
+
+  it('switches an enabled social login off together with its secret', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/auth.google': ok(
+          setting('auth.google', {
+            enabled: false,
+            clientId: '1048',
+            clientSecret: { set: false },
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    await clickIn(block(wrapper, 'google'), 'Xoá bí mật');
+    expect(openDialog().textContent).toContain('bị tắt cùng lúc');
+    await confirmDialog('Xoá bí mật máy khách Google');
+    expect(patches(calls)).toEqual([
+      ['/admin/settings/auth.google', { value: { enabled: false, clientSecret: '' } }],
+    ]);
+  });
+
+  it('empties the webhook list', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/discord.webhooks': ok(setting('discord.webhooks', { set: false })),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    await clickIn(block(wrapper, 'discord'), 'Xoá bí mật');
+    await confirmDialog('Xoá danh sách webhook Discord');
+    expect(patches(calls)).toEqual([['/admin/settings/discord.webhooks', { value: {} }]]);
+  });
+
+  it('offers no clear for a secret that is not set', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountSettings();
+    expect(
+      block(wrapper, 'github')
+        .findAll('button')
+        .some((button) => button.text() === 'Xoá bí mật'),
+    ).toBe(false);
+  });
+
+  it('keeps the dialog open and says why when the server refuses', async () => {
+    mockApi(routes({ 'PATCH /admin/settings/mail.smtpUrl': fail(403, 'forbidden') }));
+    const { wrapper } = await mountSettings();
+    await clickIn(block(wrapper, 'mail'), 'Xoá bí mật');
+    await confirmDialog('Xoá URL SMTP');
+    expect(openDialog().textContent).toContain('Bạn không có quyền làm việc này.');
+    expect(block(wrapper, 'mail').text()).not.toContain('Đã xoá URL SMTP.');
+  });
+
+  it('leaves an unsaved edit of another key in the block alone', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/mail.smtpUrl': ok(setting('mail.smtpUrl', { set: false })),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const mail = block(wrapper, 'mail');
+    await mail.get('input').setValue('QHHOJ <ops@qhhoj.example>');
+    await clickIn(mail, 'Xoá bí mật');
+    await confirmDialog('Xoá URL SMTP');
+    expect((mail.get('input').element as HTMLInputElement).value).toBe('QHHOJ <ops@qhhoj.example>');
+    expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
   });
 });

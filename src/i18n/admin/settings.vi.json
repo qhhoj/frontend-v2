@@ -180,5 +180,34 @@
     "on": "bật",
     "off": "tắt",
     "empty": "(trống)"
+  },
+  "clear": {
+    "button": "Xoá bí mật",
+    "title": "Xoá {name}?",
+    "lead": "Xoá bí mật {key} đang lưu?",
+    "confirm": "Xoá {name}",
+    "clearing": "Đang xoá",
+    "done": "Đã xoá {name}.",
+    "names": {
+      "mail": {
+        "smtpUrl": "URL SMTP"
+      },
+      "discord": {
+        "webhooks": "danh sách webhook Discord"
+      },
+      "auth": {
+        "google": "bí mật máy khách Google",
+        "github": "bí mật máy khách GitHub",
+        "facebook": "bí mật máy khách Facebook"
+      }
+    },
+    "consequences": {
+      "mailOff": "Thư điện tử trở về “chưa cấu hình” (URL rỗng).",
+      "notRestorable": "Giá trị cũ không được lưu trong lịch sử: không khôi phục được.",
+      "senderKept": "Người gửi (mail.from) không đổi.",
+      "notificationsOff": "Thông báo Discord tắt cho mọi sự kiện (danh sách rỗng).",
+      "providerOff": "Đăng nhập bằng nhà cung cấp này bị tắt cùng lúc, vì máy chủ không nhận nhà cung cấp đã bật mà thiếu bí mật.",
+      "clientIdKept": "Mã khách OAuth không đổi."
+    }
   }
 }

@@ -68,6 +68,16 @@ async function save() {
     outcome.saved.length > 0 ? { tone: 'done', text: t('admin.settings.saved') } : null;
 }
 
+/** A cleared secret is the answer of its own write: only that key's draft is rebuilt, the others keep their edits. */
+function onCleared(answer: Setting) {
+  storeAnswer(answer);
+  drafts[answer.key] = draftOf(answer);
+  notice.value = {
+    tone: 'done',
+    text: t('admin.settings.clear.done', { name: t(`admin.settings.clear.names.${answer.key}`) }),
+  };
+}
+
 function historyLabel(key: SettingKey): string {
   return props.block.keys.length > 1
     ? t('admin.settings.historyWithKey', { key })
@@ -118,6 +128,7 @@ function historyLabel(key: SettingKey): string {
           :setting="setting"
           :model-value="drafts[setting.key]!"
           @update:model-value="drafts[setting.key] = $event"
+          @cleared="onCleared"
         />
       </div>
       <AdminStatus

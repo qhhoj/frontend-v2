@@ -47,9 +47,12 @@ const patchRow = (index: number, patch: Partial<WebhookRow>) =>
       <button v-else type="button" :class="ADMIN_BUTTON_CLASS" @click="cancelReplacing">
         {{ t('admin.settings.secret.cancelReplace') }}
       </button>
+      <slot name="actions" />
     </div>
     <template v-if="draft.isReplacing">
-      <p class="text-xs text-muted">{{ t('admin.settings.webhooks.note') }}</p>
+      <p class="text-xs text-muted">
+        {{ t('admin.settings.webhooks.note') }} {{ t('admin.settings.secret.emptyKeeps') }}
+      </p>
       <div
         v-for="(row, index) in draft.rows"
         :key="index"

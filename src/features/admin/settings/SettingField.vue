@@ -6,7 +6,9 @@ import ScalarSettingField from './ScalarSettingField.vue';
 import SecretField from './SecretField.vue';
 import OAuthClientField from './OAuthClientField.vue';
 import WebhooksField from './WebhooksField.vue';
+import ClearSecretButton from './ClearSecretButton.vue';
 import { SETTING_KINDS } from './setting-blocks';
+import { isClearable } from './setting-clear';
 import type {
   OAuthDraft,
   ScalarDraft,
@@ -18,6 +20,7 @@ import type {
 /** Picks the control for a key's kind; each control owns its own draft shape. */
 const props = defineProps<{ setting: Setting }>();
 const draft = defineModel<SettingDraft>({ required: true });
+const emit = defineEmits<{ cleared: [answer: Setting] }>();
 const { t } = useI18n();
 
 const kind = computed(() => SETTING_KINDS[props.setting.key].kind);
@@ -26,6 +29,11 @@ const providerLabel = computed(
   () => providerName.value.charAt(0).toUpperCase() + providerName.value.slice(1),
 );
 const secretHint = computed(() => t(`admin.settings.hints.${props.setting.key}`));
+/** Clearing is offered for a sealed value that is set and not being replaced (replacing has its own box). */
+const canClear = computed(
+  () => isClearable(props.setting) && !('isReplacing' in draft.value && draft.value.isReplacing),
+);
+const onCleared = (answer: Setting) => emit('cleared', answer);
 </script>
 
 <template>
@@ -47,16 +55,24 @@ const secretHint = computed(() => t(`admin.settings.hints.${props.setting.key}`)
     :label="t(`admin.settings.fields.${setting.key}`)"
     :hint="secretHint"
     @update:model-value="draft = $event"
-  />
+  >
+    <template #actions>
+      <ClearSecretButton v-if="canClear" :setting="setting" @cleared="onCleared" />
+    </template>
+  </SecretField>
   <OAuthClientField
     v-else-if="kind === 'oauth'"
     :model-value="draft as OAuthDraft"
     :provider="providerLabel"
     @update:model-value="draft = $event"
-  />
-  <WebhooksField
-    v-else
-    :model-value="draft as WebhooksDraft"
-    @update:model-value="draft = $event"
-  />
+  >
+    <template #actions>
+      <ClearSecretButton v-if="canClear" :setting="setting" @cleared="onCleared" />
+    </template>
+  </OAuthClientField>
+  <WebhooksField v-else :model-value="draft as WebhooksDraft" @update:model-value="draft = $event">
+    <template #actions>
+      <ClearSecretButton v-if="canClear" :setting="setting" @cleared="onCleared" />
+    </template>
+  </WebhooksField>
 </template>

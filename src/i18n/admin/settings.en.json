@@ -180,5 +180,34 @@
     "on": "on",
     "off": "off",
     "empty": "(empty)"
+  },
+  "clear": {
+    "button": "Clear secret",
+    "title": "Clear {name}?",
+    "lead": "Clear the stored secret {key}?",
+    "confirm": "Clear {name}",
+    "clearing": "Clearing",
+    "done": "{name} cleared.",
+    "names": {
+      "mail": {
+        "smtpUrl": "SMTP URL"
+      },
+      "discord": {
+        "webhooks": "Discord webhook list"
+      },
+      "auth": {
+        "google": "Google client secret",
+        "github": "GitHub client secret",
+        "facebook": "Facebook client secret"
+      }
+    },
+    "consequences": {
+      "mailOff": "Email goes back to “not configured” (empty URL).",
+      "notRestorable": "The old value is not kept in the history: it cannot be restored.",
+      "senderKept": "The sender (mail.from) stays the same.",
+      "notificationsOff": "Discord notifications are off for every event (empty list).",
+      "providerOff": "Sign-in with this provider is switched off at the same time, because the server refuses an enabled provider without a secret.",
+      "clientIdKept": "The OAuth client id stays the same."
+    }
   }
 }

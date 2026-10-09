@@ -55,6 +55,8 @@ const secret = computed<SecretDraft>({
       v-model="secret"
       :label="t('admin.settings.oauth.clientSecret')"
       :hint="t('admin.settings.oauth.secretHint')"
-    />
+    >
+      <template #actions><slot name="actions" /></template>
+    </SecretField>
   </div>
 </template>
