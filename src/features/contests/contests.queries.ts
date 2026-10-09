@@ -11,6 +11,7 @@ import {
   fetchRanking,
 } from '@/api/contests.api';
 import type { ContestListQuery } from '@/api/types/contests';
+import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { keepPreviousForSameViewer } from './keep-previous-for-viewer';
 
@@ -19,6 +20,10 @@ const VIEWER_KEY_INDEX = 2;
 
 /** No ranking event exists yet (backend ask B4): a running board is re-read on this interval. */
 export const RANKING_POLL_MS = 30_000;
+/** Low-power mode (`data-low-power` on <html>) re-reads half as often. */
+export const LOW_POWER_RANKING_POLL_MS = 60_000;
+export const rankingPollMs = (isLowPower: boolean) =>
+  isLowPower ? LOW_POWER_RANKING_POLL_MS : RANKING_POLL_MS;
 
 /** A page of contests per viewer: after backend 4c every row carries the viewer's own state. */
 export const useContestListQuery = (query: Ref<ContestListQuery>) => {
@@ -93,12 +98,13 @@ export const useRankingQuery = (
   running: Ref<boolean>,
 ) => {
   const viewerId = useViewerId();
+  const isLowPower = useLowPowerPainted();
   return useQuery({
     queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
     /** Switching the virtual toggle keeps the old board on screen (never another contest's or viewer's). */
     placeholderData: computed(() => keepBoardOfContest(viewerId.value, toValue(key))),
-    refetchInterval: computed(() => (running.value ? RANKING_POLL_MS : false)),
+    refetchInterval: computed(() => (running.value ? rankingPollMs(isLowPower.value) : false)),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
     refetchIntervalInBackground: false,
   });

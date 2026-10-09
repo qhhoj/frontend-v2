@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import BitSprite from '@/components/BitSprite.vue';
-import { useReducedMotion } from '@/lib/use-reduced-motion';
+import { useMotionOff } from '@/lib/use-motion-off';
 import { BIT_LOOKS } from '@/mascot/bit-sprite';
 import {
   LOADING_BIT_SIZE,
@@ -25,7 +25,7 @@ import type { LoadingPhase } from './use-loading-phase';
 const props = defineProps<{ phase: LoadingPhase }>();
 const BLINK_MS = 160;
 
-const reducedMotion = useReducedMotion();
+const reducedMotion = useMotionOff();
 // Measured without the scrollbar, which the fixed layer does not cover.
 const viewport = () => ({
   width: document.documentElement.clientWidth,

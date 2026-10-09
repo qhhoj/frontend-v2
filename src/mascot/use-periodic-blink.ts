@@ -1,6 +1,6 @@
 import { onBeforeUnmount, ref, watch } from 'vue';
 import type { WatchSource } from 'vue';
-import { useReducedMotion } from '@/lib/use-reduced-motion';
+import { useMotionOff } from '@/lib/use-motion-off';
 
 export const BLINK_EVERY_MS = 4000;
 export const BLINK_LENGTH_MS = 160;
@@ -8,7 +8,7 @@ export const BLINK_LENGTH_MS = 160;
 /** True for a moment every few seconds, so a still Bit looks alive. Never true under `prefers-reduced-motion`; no timer runs while `isEnabled` is false. */
 export function usePeriodicBlink(isEnabled: WatchSource<boolean>) {
   const isBlinking = ref(false);
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useMotionOff();
   let intervalId: ReturnType<typeof setInterval> | undefined;
   let reopenId: ReturnType<typeof setTimeout> | undefined;
 

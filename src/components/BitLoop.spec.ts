@@ -2,6 +2,7 @@ import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { BIT_LOOPS } from '@/mascot/bit-frames';
 import type { BitKind } from '@/mascot/bit-frames';
 import { BIT_PALETTES, PODIUM_COLOUR } from '@/mascot/bit-sprite';
@@ -106,6 +107,15 @@ describe('BitLoop', () => {
     await vi.advanceTimersByTimeAsync(BIT_LOOPS.contest.frameMs.reduce((sum, ms) => sum + ms, 0));
     expect(frameOf(bit)).toBe('0');
     expect(colourAt(bit, 2, 7)).toBe(toRgb(TERRACOTTA.A));
+  });
+
+  it('shows frame 0 only in low-power mode, and runs no timer', async () => {
+    document.documentElement.dataset.lowPower = '';
+    await vi.waitFor(() => expect(useLowPowerPainted().value).toBe(true));
+    const bit = mountLoop('contest');
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(BIT_LOOPS.contest.frameMs.reduce((sum, ms) => sum + ms, 0));
+    expect(frameOf(bit)).toBe('0');
   });
 
   it('stops while off screen and resumes when back on screen', async () => {

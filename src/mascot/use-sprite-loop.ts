@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import { useReducedMotion } from '@/lib/use-reduced-motion';
+import { useMotionOff } from '@/lib/use-motion-off';
 import type { BitLoop } from './bit-frames';
 
 type VisibilityListener = (visible: boolean) => void;
@@ -27,13 +27,13 @@ const unwatchVisibility = (element: Element) => {
 
 /**
  * Steps a Bit through its loop frames and returns the frame index. One timer at a time, and only while the element is mounted,
- * on screen (one shared IntersectionObserver where it exists), in a visible tab and not under `prefers-reduced-motion`. Otherwise
+ * on screen (one shared IntersectionObserver where it exists), in a visible tab and not under `prefers-reduced-motion` or low-power. Otherwise
  * the timer stops: under reduced motion the index is frame 0, off screen or in a hidden tab it holds the frame it stopped on.
  * Each frame lasts its own `frameMs`; a new loop (the Bit's kind changed) starts again at frame 0.
  */
 export function useSpriteLoop(loop: () => BitLoop, target: Ref<Element | null>) {
   const frameIndex = ref(0);
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useMotionOff();
   const onScreen = ref(true);
   const tabVisible = ref(typeof document === 'undefined' || document.visibilityState !== 'hidden');
   const isRunning = computed(() => !reducedMotion.value && onScreen.value && tabVisible.value);
