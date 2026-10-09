@@ -27,6 +27,15 @@ describe('official mode in the shell', () => {
     expect(officialBanner()!.textContent).not.toContain('quản trị viên tối cao');
   });
 
+  it('sits in a polite status region that exists before the mode is on', async () => {
+    mockApi({ ...signedInViewer(), ...site(false) });
+    await mountApp(START);
+    expect(document.body.querySelector('header + [role="status"]')?.textContent).toBe('');
+    mockApi({ ...signedInViewer(), ...site(true) });
+    await mountApp(START);
+    expect(officialBanner()!.parentElement!.getAttribute('role')).toBe('status');
+  });
+
   it('tells a superuser they are exempt', async () => {
     mockApi({ ...superuserViewer(), ...site(true) });
     await mountApp(START);

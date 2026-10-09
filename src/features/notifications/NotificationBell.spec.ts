@@ -205,6 +205,40 @@ describe('NotificationBell', () => {
     expect(wrapper.get('[data-testid="notification-arrived"]').text()).toBe('2 thông báo mới');
   });
 
+  it('re-announces a second rise of the same size (the region empties between them)', async () => {
+    mockApi(
+      routesWith({
+        'GET /notifications/unread-count': sequence(
+          ok({ count: 3 }),
+          ok({ count: 4 }),
+          ok({ count: 5 }),
+        ),
+      }),
+    );
+    const { wrapper, queryClient } = await mountApp(START);
+    const region = wrapper.get('[data-testid="notification-arrived"]').element;
+    const seen: string[] = [];
+    new MutationObserver(() => seen.push(region.textContent ?? '')).observe(region, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+    const refetch = () =>
+      queryClient.refetchQueries({
+        queryKey: [...notificationsKey(useViewerId().value), 'unread-count'],
+      });
+    await refetch();
+    await vi.waitFor(() => expect(region.textContent).toBe('1 thông báo mới'));
+    await refetch();
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="notification-badge"]').text()).toBe('5'),
+    );
+    await flushPromises();
+    expect(region.textContent).toBe('1 thông báo mới');
+    expect(seen.filter((text) => text === '')).not.toHaveLength(0);
+    expect(seen.filter((text) => text === '1 thông báo mới')).toHaveLength(2);
+  });
+
   it('keeps the same stream across session.refresh()', async () => {
     mockApi(routesWith());
     await mountApp(START);

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session.store';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { NOTIFICATION_BITS } from '@/features/notifications/notification-bits';
 import { computed } from 'vue';
@@ -14,22 +15,26 @@ const now = useNow(60_000);
 const until = computed(() =>
   mode.endsAt.value === null ? '' : untilText(mode.endsAt.value, now.value, locale.locale),
 );
+const session = useSessionStore();
 </script>
 
 <template>
-  <section
-    v-if="mode.isActive.value"
-    role="region"
-    data-testid="official-banner"
-    :aria-label="$t('officialMode.region')"
-    class="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-8"
-  >
-    <SettingsNotice tone="warning" :bit="NOTIFICATION_BITS.locked">
-      <strong class="block">{{
-        until ? $t('officialMode.bannerUntil', { until }) : $t('officialMode.bannerTitle')
-      }}</strong>
-      {{ $t('officialMode.bannerBody') }}
-      <template v-if="mode.isExempt.value">{{ ' ' }}{{ $t('officialMode.exempt') }}</template>
-    </SettingsNotice>
-  </section>
+  <!-- Always mounted, so a mode switched on while the page is open is announced politely. -->
+  <div v-if="session.user" role="status">
+    <section
+      v-if="mode.isActive.value"
+      role="region"
+      data-testid="official-banner"
+      :aria-label="$t('officialMode.region')"
+      class="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-8"
+    >
+      <SettingsNotice tone="warning" :bit="NOTIFICATION_BITS.locked">
+        <strong class="block">{{
+          until ? $t('officialMode.bannerUntil', { until }) : $t('officialMode.bannerTitle')
+        }}</strong>
+        {{ $t('officialMode.bannerBody') }}
+        <template v-if="mode.isExempt.value">{{ ' ' }}{{ $t('officialMode.exempt') }}</template>
+      </SettingsNotice>
+    </section>
+  </div>
 </template>

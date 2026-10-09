@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Bell } from 'lucide-vue-next';
 import Drawer from 'primevue/drawer';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -47,13 +47,19 @@ const badge = computed(() => {
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
 /** Polite, counts only: said when the count rises, never per row. */
 const arrivedText = ref('');
+/** Cleared first, so two identical rises ("1 thông báo mới" twice) still change the region and are read again. */
+function announceArrivals(gained: number) {
+  arrivedText.value = '';
+  if (gained > 0)
+    void nextTick(
+      () => (arrivedText.value = translate('notifications.arrived', { count: gained })),
+    );
+}
 watch(
   () => countQuery.data.value?.count,
   (count, before) => {
     const hasRisen = count !== undefined && before !== undefined && count > before;
-    arrivedText.value = hasRisen
-      ? translate('notifications.arrived', { count: count - before })
-      : '';
+    announceArrivals(hasRisen ? count - before : 0);
     // Contest announcements are `high` and send no nudge (B1): only the polled count tells the banner and the lists.
     if (hasRisen) void invalidateLists();
   },

@@ -33,6 +33,19 @@ describe('HighPriorityBanner', () => {
     expect(banner()!.getAttribute('aria-label')).toBe('Thông báo quan trọng');
   });
 
+  it('sits in an always-mounted alert region so a late arrival is announced', async () => {
+    mockApi({ ...signedInViewer(), 'GET /notifications': inbox(() => false) });
+    await mountApp(START);
+    expect(banner()!.parentElement!.getAttribute('role')).toBe('alert');
+  });
+
+  it('keeps the alert region even when nothing is important', async () => {
+    mockApi({ ...signedInViewer(), 'GET /notifications': () => page([], { pageSize: 20 }) });
+    await mountApp(START);
+    expect(banner()).toBeNull();
+    expect(document.body.querySelector('[role="alert"]')).not.toBeNull();
+  });
+
   it('goes away once marked read', async () => {
     let isRead = false;
     const calls = mockApi({
