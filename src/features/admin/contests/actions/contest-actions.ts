@@ -1,8 +1,12 @@
-import type { ContestActionState, ContestDataStatus } from '@/api/types/contest-editing';
+import type { ContestActionState } from '@/api/types/contest-editing';
 
 export { isBoardFrozen } from '@/lib/board-freeze';
 
-export function canPrepareAgain(status: ContestDataStatus, now: number): boolean {
+/** The prepare-again rule of both data cards (contest data, submissions export): they share these two members. */
+export function canPrepareAgain<T extends { state: string; nextPrepareAt: string | null }>(
+  status: T,
+  now: number,
+): boolean {
   if (status.state === 'preparing') return false;
   return status.nextPrepareAt === null || new Date(status.nextPrepareAt).getTime() <= now;
 }

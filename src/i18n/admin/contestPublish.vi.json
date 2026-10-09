@@ -1,0 +1,45 @@
+{
+  "title": "Công khai bài sau kỳ thi",
+  "description": "Đưa các bài của kỳ thi (và lời giải) ra kho bài công khai. Mỗi bài cần quyền sửa bài và quyền đổi trạng thái công khai; bài thuộc tổ chức riêng được bỏ qua.",
+  "autoLabel": "Tự công khai khi kỳ thi kết thúc",
+  "autoHint": "Ghi nhận bạn là người bật. Lúc kết thúc, hệ thống kiểm tra lại quyền của bạn trước khi công khai.",
+  "notEnded": "Chỉ công khai được sau khi kỳ thi kết thúc. Bạn vẫn có thể bật tự công khai ở trên.",
+  "withEditorials": "Công khai cả lời giải",
+  "dryRun": "Chạy thử",
+  "publish": "Công khai",
+  "dryRunFirst": "Chạy thử trước với đúng lựa chọn này để xem bài nào sẽ được công khai. Chạy thử không giới hạn; mỗi người chỉ công khai thật tối đa 5 lần mỗi giờ.",
+  "running": "Đang xử lý…",
+  "done": "Đã công khai {published} bài, bỏ qua {skipped}. Điểm và bảng xếp hạng bài tập sẽ được tính lại.",
+  "summary": "Sẽ công khai {published} bài, giữ nguyên {unchanged}, bỏ qua {skipped}.",
+  "noProblems": "Kỳ thi không có bài nào.",
+  "tableCaption": "Kết quả theo từng bài",
+  "columns": { "problem": "Bài", "outcome": "Kết quả", "editorial": "Lời giải" },
+  "privateProblem": "(bài riêng)",
+  "outcomes": { "published": "Công khai", "unchanged": "Đã công khai sẵn", "skipped": "Bỏ qua" },
+  "reasons": {
+    "no_permission": "Bạn không có quyền sửa bài này.",
+    "organization_private": "Bài riêng của tổ chức.",
+    "not_found": "Bài không còn tồn tại.",
+    "deleted": "Bài đã bị xóa.",
+    "other": "Bị bỏ qua."
+  },
+  "editorials": {
+    "published": "Công khai",
+    "unchanged": "Đã công khai sẵn",
+    "none": "Không có",
+    "skipped": "Bỏ qua"
+  },
+  "confirmTitle": "Công khai bài của kỳ thi?",
+  "confirmBody": "{count} bài sẽ ra kho bài công khai. Không có nút hoàn tác; mỗi thay đổi được ghi lịch sử bài.",
+  "auto": {
+    "scheduled": "Đã hẹn tự công khai lúc kỳ thi kết thúc.",
+    "published": "Tự công khai lúc {at}: {published} bài, bỏ qua {skipped}.",
+    "failed": "Tự công khai lúc {at} không chạy: {reason}.",
+    "reasons": {
+      "actor_unavailable": "người bật tính năng không còn dùng được tài khoản",
+      "no_permission": "người bật tính năng không còn quyền công khai",
+      "cannot_edit_contest": "người bật tính năng không còn quyền sửa kỳ thi",
+      "other": "lý do không rõ"
+    }
+  }
+}

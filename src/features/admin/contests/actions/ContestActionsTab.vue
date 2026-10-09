@@ -16,16 +16,25 @@ import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { contestActionsKey } from '../contest-ops.queries';
 import ContestActionCard from './ContestActionCard.vue';
 import ContestCloneCard from './ContestCloneCard.vue';
 import ContestDataCard from './ContestDataCard.vue';
+import ContestPublishCard from './ContestPublishCard.vue';
 import { isBoardFrozen, isBusy } from './contest-actions';
 
 const props = defineProps<{ contest: EditableContest }>();
+/** One block per action card, as tall as the loaded card (from `lg` all four are 178 px) so the cards below do not move. */
+const SKELETON_HEIGHTS = [
+  'h-[178px]',
+  'h-[194px] lg:h-[178px]',
+  'h-[154px] lg:h-[178px]',
+  'h-[198px] lg:h-[178px]',
+];
 const queryClient = useQueryClient();
 const viewer = useViewerId();
 const locale = useLocaleStore();
-const actionsKey = () => ['admin', 'contest-actions', props.contest.key, viewer.value] as const;
+const actionsKey = () => contestActionsKey(props.contest.key, viewer.value);
 
 /**
  * The action states from the status endpoint. Until they have answered the buttons are not offered at all: an "idle" guess
@@ -90,9 +99,12 @@ const runReplayRebuild = () => runAction(rebuildReplay);
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="grid gap-5 lg:grid-cols-2">
-          <SkeletonBlock class="h-48 w-full" />
-          <SkeletonBlock class="h-48 w-full" />
-          <SkeletonBlock class="h-48 w-full" />
+          <SkeletonBlock
+            v-for="height in SKELETON_HEIGHTS"
+            :key="height"
+            :class="height"
+            class="w-full"
+          />
         </div>
       </template>
       <div class="grid gap-5 lg:grid-cols-2">
@@ -158,6 +170,7 @@ const runReplayRebuild = () => runAction(rebuildReplay);
         </ContestActionCard>
       </div>
     </QueryState>
+    <ContestPublishCard :contest="contest" :actions="actions" />
     <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
     <ContestCloneCard :contest-key="contest.key" />
   </div>

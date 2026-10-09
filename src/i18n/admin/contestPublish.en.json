@@ -1,0 +1,45 @@
+{
+  "title": "Publish problems after the contest",
+  "description": "Move the contest's problems (and editorials) to the public problem set. Each problem needs edit rights and the public-visibility permission; organization-private problems are skipped.",
+  "autoLabel": "Publish automatically when the contest ends",
+  "autoHint": "You are recorded as the one who turned it on. At the end your rights are checked again before anything is published.",
+  "notEnded": "Problems can be published only after the contest ends. You can still turn on automatic publishing above.",
+  "withEditorials": "Publish the editorials too",
+  "dryRun": "Dry run",
+  "publish": "Publish",
+  "dryRunFirst": "Run a dry run with this exact choice first to see which problems would be published. Dry runs are unlimited; each person can publish for real at most 5 times an hour.",
+  "running": "Working…",
+  "done": "Published {published} problems, skipped {skipped}. Problem points and rankings will be recalculated.",
+  "summary": "Would publish {published}, keep {unchanged}, skip {skipped}.",
+  "noProblems": "The contest has no problems.",
+  "tableCaption": "Result per problem",
+  "columns": { "problem": "Problem", "outcome": "Result", "editorial": "Editorial" },
+  "privateProblem": "(private problem)",
+  "outcomes": { "published": "Publish", "unchanged": "Already public", "skipped": "Skip" },
+  "reasons": {
+    "no_permission": "You cannot edit this problem.",
+    "organization_private": "An organization's private problem.",
+    "not_found": "The problem no longer exists.",
+    "deleted": "The problem was deleted.",
+    "other": "Skipped."
+  },
+  "editorials": {
+    "published": "Publish",
+    "unchanged": "Already public",
+    "none": "None",
+    "skipped": "Skip"
+  },
+  "confirmTitle": "Publish the contest's problems?",
+  "confirmBody": "{count} problems will go to the public problem set. There is no undo; every change is recorded in the problem history.",
+  "auto": {
+    "scheduled": "Automatic publishing is scheduled for the contest end.",
+    "published": "Published automatically at {at}: {published} problems, {skipped} skipped.",
+    "failed": "Automatic publishing at {at} did not run: {reason}.",
+    "reasons": {
+      "actor_unavailable": "the user who turned it on can no longer act",
+      "no_permission": "the user who turned it on no longer has the right to publish",
+      "cannot_edit_contest": "the user who turned it on can no longer edit the contest",
+      "other": "unknown reason"
+    }
+  }
+}
