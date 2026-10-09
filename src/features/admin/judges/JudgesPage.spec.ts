@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import { cancelDialog, confirmDialog, staffViewer } from '@/test/admin-routes';
 import { JUDGE_FLEET, judge } from '@/test/admin-fixtures/judges';
 
 /** The screen is a lazy route: the board is there once its chunk and its list have loaded. */
@@ -87,9 +87,7 @@ describe('JudgesPage', () => {
     );
     expect(calls.some((call) => call.path.endsWith('/key'))).toBe(false);
     await confirmDialog('Cấp khoá mới');
-    expect(document.body.querySelector('[role="dialog"]')?.textContent).toContain(
-      'rotated-key-value',
-    );
+    expect(document.body.textContent).toContain('rotated-key-value');
   });
 
   it('saves a description from the expanded row', async () => {
@@ -105,5 +103,56 @@ describe('JudgesPage', () => {
       .trigger('click');
     await flushPromises();
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ description: 'Mới' });
+  });
+
+  it('returns focus to the Chặn button when its dialog is cancelled', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountJudges();
+    const block = rowOf(wrapper, 'qhh-judge-02')
+      .findAll('button')
+      .find((button) => button.text() === 'Chặn')!;
+    (block.element as HTMLButtonElement).focus();
+    await block.trigger('click');
+    await flushPromises();
+    // Focus moves into the dialog, as it does on open in a browser (jsdom never runs the enter hook that does it).
+    (document.body.querySelector('[role="dialog"] button') as HTMLButtonElement).focus();
+    await cancelDialog('Hủy');
+    expect(document.activeElement).toBe(block.element);
+  });
+
+  it('keeps the rotated key on screen when a refetch fails', async () => {
+    mockApi(
+      routes({
+        'GET /judges': sequence(ok(JUDGE_FLEET), fail(500, 'generic')),
+        'POST /judges/qhh-judge-02/key': ok({ authKey: 'rotated-key-value' }),
+      }),
+    );
+    const { wrapper, queryClient } = await mountJudges();
+    await rowOf(wrapper, 'qhh-judge-02')
+      .findAll('button')
+      .find((button) => button.text() === 'Khoá')!
+      .trigger('click');
+    await flushPromises();
+    await confirmDialog('Cấp khoá mới');
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'judges'] });
+    await flushPromises();
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+    expect(document.body.textContent).toContain('rotated-key-value');
+  });
+
+  it('drops the rotated key once it is saved and closed', async () => {
+    mockApi(routes({ 'POST /judges/qhh-judge-02/key': ok({ authKey: 'rotated-key-value' }) }));
+    const { wrapper } = await mountJudges();
+    await rowOf(wrapper, 'qhh-judge-02')
+      .findAll('button')
+      .find((button) => button.text() === 'Khoá')!
+      .trigger('click');
+    await flushPromises();
+    await confirmDialog('Cấp khoá mới');
+    (document.body.querySelector('#key-saved') as HTMLInputElement).click();
+    await flushPromises();
+    (document.body.querySelector('[data-testid="key-close"]') as HTMLButtonElement).click();
+    await flushPromises();
+    await vi.waitFor(() => expect(document.body.textContent).not.toContain('rotated-key-value'));
   });
 });

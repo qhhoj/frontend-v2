@@ -6,7 +6,10 @@ import { openDialog, staffViewer } from '@/test/admin-routes';
 import { judge } from '@/test/admin-fixtures/judges';
 
 const KEY = 'k7Qm2xV9aR4tLw0ZpB8sNf3YcHu5JdEe6GiTo1XvMqA=';
-const dialogOpen = () => document.body.querySelector('[role="dialog"]') !== null;
+/** Lets a hidden dialog's leave transition finish (it runs on animation frames, so flushing promises is not enough). */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+/** The key is on screen. A closed PrimeVue dialog can linger in jsdom (its leave transition never finishes there), so the key's text is the test. */
+const keyShown = () => document.body.textContent?.includes(KEY) ?? false;
 const storedValues = (storage: Storage) =>
   Array.from({ length: storage.length }, (_item, index) =>
     storage.getItem(storage.key(index)!),
@@ -46,19 +49,22 @@ describe('judge key reveal', () => {
     // Nothing dismisses it before the acknowledgement: Escape, the Close button, and the mask.
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape' }));
     await flushPromises();
-    expect(dialogOpen()).toBe(true);
+    await settle();
+    expect(keyShown()).toBe(true);
     close.click();
     await flushPromises();
-    expect(dialogOpen()).toBe(true);
+    await settle();
+    expect(keyShown()).toBe(true);
     await clickMask();
-    expect(dialogOpen()).toBe(true);
+    await settle();
+    expect(keyShown()).toBe(true);
 
     (openDialog().querySelector('#key-saved') as HTMLInputElement).click();
     await flushPromises();
     expect(close.getAttribute('aria-disabled')).toBeNull();
     close.click();
     await flushPromises();
-    expect(dialogOpen()).toBe(false);
+    await vi.waitFor(() => expect(keyShown()).toBe(false));
 
     expect(
       JSON.stringify(

@@ -1,6 +1,10 @@
 import type { Judge } from '@/api/types/judges-admin';
 
 export const JUDGE_NAME_PATTERN = /^[\w.-]{1,50}$/;
+/** The backend's `MaxLength(10000)` on a judge description (create and update). */
+export const JUDGE_DESCRIPTION_MAX = 10_000;
+/** Stored and sent trimmed, so a description reads the same from the add page and from the row. */
+export const trimmedDescription = (text: string) => text.trim();
 export type JudgeStatus = 'online' | 'offline' | 'disabled' | 'blocked';
 
 /** Blocked wins over disabled, disabled over online: a blocked judge may also be connected. */

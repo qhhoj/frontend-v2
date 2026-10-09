@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import JudgeKeyDialog from './JudgeKeyDialog.vue';
 import JudgeRow from './JudgeRow.vue';
 import JudgeStats from './JudgeStats.vue';
 import { judgeStats } from './judge-stats';
@@ -13,6 +15,14 @@ import { useJudgesQuery } from './judges.queries';
 const { data, isPending, error, refetch } = useJudgesQuery();
 const judges = computed(() => data.value ?? []);
 const stats = computed(() => judgeStats(judges.value));
+/**
+ * The key shown once after a rotation. It lives here, outside QueryState, so a failed refetch cannot unmount it; it is dropped on
+ * close, on route leave, and with this page.
+ */
+const revealed = ref<{ judgeName: string; authKey: string } | null>(null);
+onBeforeRouteLeave(() => {
+  revealed.value = null;
+});
 </script>
 
 <template>
@@ -43,7 +53,10 @@ const stats = computed(() => judgeStats(judges.value));
       <p class="text-sm text-muted">{{ $t('admin.judges.notes.rotate') }}</p>
       <ul v-if="judges.length > 0" class="flex flex-col gap-3">
         <li v-for="judge in judges" :key="judge.name">
-          <JudgeRow :judge="judge" />
+          <JudgeRow
+            :judge="judge"
+            @rotated="(judgeName, authKey) => (revealed = { judgeName, authKey })"
+          />
         </li>
       </ul>
       <section v-else class="glass flex flex-col items-center gap-3 rounded-panel p-6 text-center">
@@ -54,5 +67,11 @@ const stats = computed(() => judgeStats(judges.value));
         </RouterLink>
       </section>
     </QueryState>
+    <JudgeKeyDialog
+      :visible="revealed !== null"
+      :header="$t('admin.judges.key.rotatedTitle', { name: revealed?.judgeName ?? '' })"
+      :auth-key="revealed?.authKey ?? ''"
+      @close="revealed = null"
+    />
   </div>
 </template>

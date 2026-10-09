@@ -1,16 +1,27 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
 import type { Judge } from '@/api/types/judges-admin';
 import JudgeRuntimes from './JudgeRuntimes.vue';
+import { JUDGE_DESCRIPTION_MAX, trimmedDescription } from './judge-stats';
 
 const props = defineProps<{ judge: Judge; isSaving: boolean }>();
 const emit = defineEmits<{ saveDescription: [description: string] }>();
 const locale = useLocaleStore();
+const { t } = useI18n();
 const draft = ref(props.judge.description);
+const isTooLong = computed(() => draft.value.length > JUDGE_DESCRIPTION_MAX);
+const tooLongText = computed(() =>
+  isTooLong.value ? t('admin.judges.add.descriptionTooLong') : undefined,
+);
+/** A description over the limit is never sent: the field says why, and the save stays with the user. */
+function save() {
+  if (!isTooLong.value) emit('saveDescription', trimmedDescription(draft.value));
+}
 </script>
 
 <template>
@@ -23,11 +34,12 @@ const draft = ref(props.judge.description);
       }}
     </p>
     <JudgeRuntimes :runtimes="judge.runtimes" />
-    <form class="flex flex-col gap-3" @submit.prevent="emit('saveDescription', draft)">
+    <form class="flex flex-col gap-3" @submit.prevent="save">
       <AdminField
         v-slot="{ id, describedBy }"
         :label="$t('admin.judges.row.descriptionLabel')"
         :input-id="`judge-description-${judge.name}`"
+        :error="tooLongText"
       >
         <textarea
           :id="id"

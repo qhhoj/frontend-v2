@@ -26,7 +26,7 @@ const pageFailure = computed(() =>
     <LanguageContentSection v-model:form="form" :errors="errors" />
     <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
     <AdminStatus
-      v-if="saved && mode === 'edit'"
+      v-if="saved && mode === 'edit' && changeCount === 0"
       kind="done"
       :text="$t('admin.languages.form.saved')"
     />

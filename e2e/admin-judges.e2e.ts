@@ -7,6 +7,9 @@ import { JUDGE_FLEET } from '../src/test/admin-fixtures/judges';
 const PERMISSIONS = ['judge.change_judge'];
 const KEY = 'k7Qm2xV9aR4tLw0ZpB8sNf3YcHu5JdEe6GiTo1XvMqA=';
 
+/** The key dialog, found by the key it shows: the rotation's confirm dialog may still be leaving beside it. */
+const keyDialog = (page: Page) => page.getByRole('dialog').filter({ hasText: KEY });
+
 const fitsWidth = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
@@ -59,14 +62,29 @@ test('a rotated key stays up until it is saved: Escape does not close it, Tab re
     .getByRole('button', { name: 'Khoá', exact: true })
     .click();
   await confirmInDialog(page, 'Cấp khoá mới');
-  await expect(dialogOf(page)).toContainText(KEY);
+  // The rotation's own confirm is still leaving, so the key dialog is found by its key.
+  await expect(keyDialog(page)).toContainText(KEY);
 
   await page.keyboard.press('Escape');
-  await expect(dialogOf(page)).toContainText(KEY);
+  await expect(keyDialog(page)).toContainText(KEY);
   await tabUntil(page, () => document.activeElement?.id === 'key-saved');
   await page.keyboard.press('Space');
   await tabUntil(page, () => document.activeElement?.textContent?.trim() === 'Đóng');
   await page.keyboard.press('Enter');
-  await expect(dialogOf(page)).toBeHidden();
+  await expect(keyDialog(page)).toBeHidden();
   expect(await axeViolationsIn(page)).toEqual([]);
+});
+
+test('cancelling the block dialog returns focus to the Chặn button', async ({ page, api }) => {
+  signInAsStaff(api, PERMISSIONS);
+  api.routes['GET /judges'] = adminOk(JUDGE_FLEET);
+  await page.goto('/admin/judges');
+  const block = page
+    .getByTestId('judge-row')
+    .filter({ hasText: 'qhh-judge-02' })
+    .getByRole('button', { name: 'Chặn', exact: true });
+  await block.click();
+  await dialogOf(page).getByRole('button', { name: 'Hủy', exact: true }).click();
+  await expect(dialogOf(page)).toBeHidden();
+  await expect(block).toBeFocused();
 });

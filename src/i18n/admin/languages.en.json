@@ -83,5 +83,6 @@
   },
   "actions": {
     "add": "Add language"
-  }
+  },
+  "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown."
 }

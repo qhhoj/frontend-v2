@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 
@@ -7,6 +7,10 @@ defineProps<{ judgeName: string; isBusy: boolean; failureText: string | null }>(
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [force: boolean] }>();
 const isForced = ref(false);
+/** Each opening starts unforced: the box is not remembered from an earlier disconnect. */
+watch(visible, (isVisible) => {
+  if (isVisible) isForced.value = false;
+});
 </script>
 
 <template>

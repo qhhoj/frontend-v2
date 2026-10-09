@@ -12,7 +12,7 @@ import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import JudgeKeyDialog from './JudgeKeyDialog.vue';
-import { JUDGE_NAME_PATTERN } from './judge-stats';
+import { JUDGE_DESCRIPTION_MAX, JUDGE_NAME_PATTERN, trimmedDescription } from './judge-stats';
 import { useJudgesCache } from './judges.queries';
 
 const { t } = useI18n();
@@ -21,6 +21,7 @@ const cache = useJudgesCache();
 const name = ref('');
 const description = ref('');
 const clientNameError = ref<string | null>(null);
+const clientDescriptionError = ref<string | null>(null);
 const revealedKey = ref<string | null>(null);
 
 const create = useAdminMutation<
@@ -48,10 +49,14 @@ async function submit() {
   clientNameError.value = JUDGE_NAME_PATTERN.test(name.value)
     ? null
     : t('admin.judges.add.nameInvalid');
-  if (clientNameError.value) return;
+  clientDescriptionError.value =
+    description.value.length > JUDGE_DESCRIPTION_MAX
+      ? t('admin.judges.add.descriptionTooLong')
+      : null;
+  if (clientNameError.value || clientDescriptionError.value) return;
   const result = await create.run({
     name: name.value,
-    description: description.value.trim() || undefined,
+    description: trimmedDescription(description.value) || undefined,
   });
   if (result) revealedKey.value = result.authKey;
 }
@@ -95,6 +100,7 @@ function leaveAfterKey() {
         :label="$t('admin.judges.add.descriptionLabel')"
         input-id="judge-description"
         :hint="$t('admin.judges.add.descriptionHint')"
+        :error="clientDescriptionError ?? undefined"
       >
         <textarea
           :id="id"
@@ -119,7 +125,7 @@ function leaveAfterKey() {
       </div>
     </form>
     <JudgeKeyDialog
-      v-if="revealedKey !== null"
+      :visible="revealedKey !== null"
       :header="$t('admin.judges.key.createdTitle')"
       :auth-key="revealedKey ?? ''"
       @close="leaveAfterKey"

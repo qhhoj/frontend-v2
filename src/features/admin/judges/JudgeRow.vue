@@ -9,26 +9,31 @@ import { failureTextOf } from '../ui/admin-errors';
 import DisconnectDialog from './DisconnectDialog.vue';
 import JudgeActions from './JudgeActions.vue';
 import JudgeDetails from './JudgeDetails.vue';
-import JudgeKeyDialog from './JudgeKeyDialog.vue';
 import { judgeStatus, pingMs } from './judge-stats';
 import { useJudgeWrites } from './judges.mutations';
 
 const props = defineProps<{ judge: Judge }>();
+const emit = defineEmits<{ rotated: [judgeName: string, authKey: string] }>();
 const locale = useLocaleStore();
 const writes = useJudgeWrites();
 const isDetailsOpen = ref(false);
 const isBlockDialogOpen = ref(false);
 const isRotateDialogOpen = ref(false);
 const isDisconnectDialogOpen = ref(false);
-const revealedKey = ref<string | null>(null);
 const status = computed(() => judgeStatus(props.judge));
 const pingMsValue = computed(() => pingMs(props.judge.ping));
 const loadText = computed(() =>
   props.judge.load === null ? null : formatNumber(props.judge.load, locale.locale, 2),
 );
+const detailsId = computed(() => `judge-details-${props.judge.name}`);
 
 function patchJudge(changes: JudgePatch) {
   return writes.patch.run({ name: props.judge.name, patch: changes });
+}
+/** A dialog opens on a clean slate: a refusal from an earlier action must not repeat inside it. */
+function openBlockDialog() {
+  writes.patch.reset();
+  isBlockDialogOpen.value = true;
 }
 async function setBlocked(isBlocked: boolean) {
   await patchJudge({ isBlocked });
@@ -38,7 +43,7 @@ async function rotateKey() {
   const result = await writes.rotate.run(props.judge.name);
   if (!result) return;
   isRotateDialogOpen.value = false;
-  revealedKey.value = result.authKey;
+  emit('rotated', props.judge.name, result.authKey);
 }
 async function disconnect(force: boolean) {
   await writes.disconnect.run({ name: props.judge.name, force });
@@ -73,9 +78,10 @@ async function disconnect(force: boolean) {
     </p>
     <JudgeActions
       :judge="judge"
+      :is-busy="writes.patch.isPending.value"
       @toggle-disabled="patchJudge({ isDisabled: !judge.isDisabled })"
       @unblock="setBlocked(false)"
-      @ask-block="isBlockDialogOpen = true"
+      @ask-block="openBlockDialog"
       @ask-rotate="isRotateDialogOpen = true"
       @ask-disconnect="isDisconnectDialogOpen = true"
     />
@@ -87,7 +93,7 @@ async function disconnect(force: boolean) {
     <button
       type="button"
       class="self-start text-sm font-semibold text-accent-text underline"
-      aria-controls="judge-details"
+      :aria-controls="detailsId"
       :aria-expanded="isDetailsOpen"
       @click="isDetailsOpen = !isDetailsOpen"
     >
@@ -95,14 +101,14 @@ async function disconnect(force: boolean) {
     </button>
     <JudgeDetails
       v-if="isDetailsOpen"
-      id="judge-details"
+      :id="detailsId"
       :judge="judge"
       :is-saving="writes.patch.isPending.value"
       @save-description="(description) => patchJudge({ description })"
     />
 
+    <!-- Kept mounted: PrimeVue returns focus to the opener in its leave hook, which a v-if unmount would skip. -->
     <ConfirmDialog
-      v-if="isBlockDialogOpen"
       v-model:visible="isBlockDialogOpen"
       tone="danger"
       :title="$t('admin.judges.block.title', { name: judge.name })"
@@ -116,7 +122,6 @@ async function disconnect(force: boolean) {
       </template>
     </ConfirmDialog>
     <ConfirmDialog
-      v-if="isRotateDialogOpen"
       v-model:visible="isRotateDialogOpen"
       tone="danger"
       :title="$t('admin.judges.rotate.title', { name: judge.name })"
@@ -130,7 +135,6 @@ async function disconnect(force: boolean) {
       </template>
     </ConfirmDialog>
     <DisconnectDialog
-      v-if="isDisconnectDialogOpen"
       v-model:visible="isDisconnectDialogOpen"
       :judge-name="judge.name"
       :is-busy="writes.disconnect.isPending.value"
@@ -138,12 +142,6 @@ async function disconnect(force: boolean) {
         writes.disconnect.failure.value ? failureTextOf(writes.disconnect.failure.value) : null
       "
       @confirm="disconnect"
-    />
-    <JudgeKeyDialog
-      v-if="revealedKey !== null"
-      :header="$t('admin.judges.key.rotatedTitle', { name: judge.name })"
-      :auth-key="revealedKey ?? ''"
-      @close="revealedKey = null"
     />
   </article>
 </template>

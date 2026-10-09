@@ -83,5 +83,6 @@
   },
   "actions": {
     "add": "Thêm ngôn ngữ"
-  }
+  },
+  "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ."
 }

@@ -84,6 +84,7 @@
     "descriptionLabel": "Mô tả",
     "descriptionHint": "Tối đa 10 000 ký tự.",
     "cancel": "Huỷ",
-    "submit": "Tạo và lấy khoá"
+    "submit": "Tạo và lấy khoá",
+    "descriptionTooLong": "Tối đa 10 000 ký tự."
   }
 }

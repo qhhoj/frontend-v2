@@ -13,13 +13,15 @@ import { singleJudgeLanguages, withCoverage } from './languages';
 import { useLanguagesAdminQuery } from './languages.queries';
 
 const { can } = usePermissions();
-const canSeeJudges = can('judge.change_judge');
-const canAdd = can('judge.add_language');
-const canEdit = can('judge.change_language');
+const canSeeJudges = computed(() => can('judge.change_judge'));
+const canAdd = computed(() => can('judge.add_language'));
+const canEdit = computed(() => can('judge.change_language'));
 const { data, isPending, error, refetch } = useLanguagesAdminQuery();
 const judgesQuery = useJudgesQuery({ enabled: canSeeJudges });
 /** Coverage is shown only once the judges have loaded for a viewer who may read them. */
-const judges = computed(() => (canSeeJudges ? (judgesQuery.data.value ?? null) : null));
+const judges = computed(() => (canSeeJudges.value ? (judgesQuery.data.value ?? null) : null));
+/** A failed judges request is said out loud: the coverage column then vanishes, which would otherwise look like a missing permission. */
+const hasJudgesError = computed(() => judgesQuery.isError.value);
 const rows = computed(() => withCoverage(data.value ?? [], judges.value));
 const singles = computed(() => singleJudgeLanguages(rows.value));
 const onlineJudgeCount = computed(() => judges.value?.filter((judge) => judge.online).length ?? 0);
@@ -61,6 +63,9 @@ const percentOf = (count: number) =>
           <p>{{ $t('admin.languages.stats.single', { single: singles.length }) }}</p>
         </template>
       </section>
+      <SettingsNotice v-if="hasJudgesError" tone="warning">{{
+        $t('admin.languages.judgesUnavailable')
+      }}</SettingsNotice>
       <div v-for="single in singles" :key="single.key">
         <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.refused">
           <p class="font-semibold">{{ $t('admin.languages.single.title', { key: single.key }) }}</p>

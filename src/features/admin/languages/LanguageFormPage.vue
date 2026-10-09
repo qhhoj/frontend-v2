@@ -11,7 +11,7 @@ import { useLanguagesAdminQuery } from './languages.queries';
 const route = useRoute();
 const isNew = computed(() => route.name === 'admin-languageNew');
 const routeKey = computed(() => String(route.params.key ?? ''));
-const { data, isPending, error, refetch } = useLanguagesAdminQuery();
+const { data, isPending, error, refetch } = useLanguagesAdminQuery({ enabled: () => !isNew.value });
 const language = computed(() => data.value?.find((entry) => entry.key === routeKey.value) ?? null);
 </script>
 

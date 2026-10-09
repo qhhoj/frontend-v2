@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
 import { ADMIN_INPUT_CLASS } from '../ui/classes';
-import { LANGUAGE_LIMITS } from './language-form';
+import { LANGUAGE_LIMITS, codePointsOf } from './language-form';
 import type { LanguageForm } from './language-form';
 
 defineProps<{ errors: FieldErrors }>();
 const form = defineModel<LanguageForm>('form', { required: true });
 const locale = useLocaleStore();
-const textLimitText = formatNumber(LANGUAGE_LIMITS.text, locale.locale);
-const countOf = (text: string) => formatNumber(text.length, locale.locale);
+const textLimitText = computed(() => formatNumber(LANGUAGE_LIMITS.text, locale.locale));
+const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale);
 </script>
 
 <template>

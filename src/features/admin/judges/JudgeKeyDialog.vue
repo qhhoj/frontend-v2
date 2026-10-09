@@ -1,26 +1,40 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 import CopyButton from '@/components/CopyButton.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 
 /**
- * Shows an auth key once. Nothing dismisses it (Escape, the mask, the close button) until "saved" is checked. The parent mounts it
- * only while a key is held (`v-if`), so closing unmounts the dialog and the key leaves every ref with the component.
+ * Shows an auth key once. Nothing dismisses it (Escape, the mask, the close button) until "saved" is checked. The dialog stays
+ * mounted so PrimeVue returns focus to the opener when it hides; the parent keeps the key only while `visible`.
  */
-defineProps<{ header: string; authKey: string }>();
+const props = defineProps<{ visible: boolean; header: string; authKey: string }>();
 const emit = defineEmits<{ close: [] }>();
-const isOpen = ref(true);
 const isSaved = ref(false);
+/** Escape and the mask would also reach this setter; the Dialog switches them off, so only the close button gets here. */
+const isOpen = computed({
+  get: () => props.visible,
+  set: (open: boolean) => {
+    if (!open) emit('close');
+  },
+});
 
-/** Only the saved check and the close button lead here; Escape and the mask are switched off on the Dialog. */
+watch(
+  () => props.visible,
+  (isVisible) => {
+    if (isVisible) isSaved.value = false;
+  },
+);
+
+/** Focus starts on the saved box, so the key is read and acknowledged before the close button is reached. */
+function focusSavedBox() {
+  document.getElementById('key-saved')?.focus();
+}
+
 function close() {
   if (isSaved.value) isOpen.value = false;
 }
-watch(isOpen, (open) => {
-  if (!open) emit('close');
-});
 </script>
 
 <template>
@@ -32,6 +46,7 @@ watch(isOpen, (open) => {
     :closable="false"
     :close-on-escape="false"
     :dismissable-mask="false"
+    @show="focusSavedBox"
   >
     <div class="flex flex-col gap-4">
       <AdminStatus kind="security" :text="$t('admin.judges.key.warning')" />

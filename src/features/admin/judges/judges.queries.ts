@@ -1,14 +1,23 @@
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { MaybeRefOrGetter } from 'vue';
+import { computed, toValue } from 'vue';
 import { fetchJudges } from '@/api/judges-admin.api';
 import type { Judge } from '@/api/types/judges-admin';
+import { useViewerId } from '@/stores/use-viewer-id';
 
-/** Shared with the languages coverage (Task 2). Staff-only data, so no viewer id in the key. */
+/** The base of the judges key; the viewer id follows, as for every admin key. */
 export const judgesKey = ['admin', 'judges'] as const;
+const judgesKeyOf = (viewer: string) => [...judgesKey, viewer] as const;
 
 /** `enabled` lets a page without `judge.change_judge` skip the request (the languages page shows no coverage then). */
-export const useJudgesQuery = (options: { enabled?: MaybeRefOrGetter<boolean> } = {}) =>
-  useQuery({ queryKey: judgesKey, queryFn: fetchJudges, enabled: options.enabled });
+export function useJudgesQuery(options: { enabled?: MaybeRefOrGetter<boolean> } = {}) {
+  const viewer = useViewerId();
+  return useQuery({
+    queryKey: computed(() => judgesKeyOf(viewer.value)),
+    queryFn: fetchJudges,
+    enabled: options.enabled,
+  });
+}
 
 /**
  * Writes put the server's judge into the list the board already holds, so no refetch is needed. A list that is not cached yet
@@ -16,8 +25,9 @@ export const useJudgesQuery = (options: { enabled?: MaybeRefOrGetter<boolean> } 
  */
 export function useJudgesCache() {
   const queryClient = useQueryClient();
+  const viewer = useViewerId();
   const writeList = (update: (list: Judge[]) => Judge[]) =>
-    queryClient.setQueryData<Judge[]>(judgesKey, (list) => list && update(list));
+    queryClient.setQueryData<Judge[]>(judgesKeyOf(toValue(viewer)), (list) => list && update(list));
   return {
     replace: (judge: Judge) =>
       writeList((list) => list.map((item) => (item.name === judge.name ? judge : item))),

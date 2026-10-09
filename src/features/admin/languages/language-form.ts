@@ -67,8 +67,10 @@ export const formOf = (language: LanguageAdmin): LanguageForm => ({
 });
 
 const isFileSize = (text: string) => /^\d+$/.test(text) && Number(text) <= LANGUAGE_LIMITS.fileSize;
+/** Lengths count code points, as the backend's validator does: an emoji is one character, not two UTF-16 units. */
+export const codePointsOf = (text: string) => [...text].length;
 const isOutside = (text: string, min: number, max: number) =>
-  text.length < min || text.length > max;
+  codePointsOf(text) < min || codePointsOf(text) > max;
 
 /** Each rule: the field, whether it is wrong, and the message id under `admin.languages.form.errors`. */
 function rulesFor(
@@ -85,9 +87,9 @@ function rulesFor(
     ['pygments', isOutside(form.pygments, 1, editor), 'editor'],
     ['extension', !LANGUAGE_LIMITS.extensionPattern.test(form.extension), 'extension'],
     ['fileSizeLimit', !isFileSize(form.fileSizeLimit), 'fileSize'],
-    ['template', form.template.length > text, 'text'],
-    ['info', form.info.length > text, 'text'],
-    ['description', form.description.length > text, 'text'],
+    ['template', codePointsOf(form.template) > text, 'text'],
+    ['info', codePointsOf(form.info) > text, 'text'],
+    ['description', codePointsOf(form.description) > text, 'text'],
   ];
 }
 
