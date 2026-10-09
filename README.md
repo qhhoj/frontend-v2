@@ -119,6 +119,8 @@ Admin screens live in `src/features/admin/<area>/` (one folder per area: problem
 
 The site screens (plan 8f-2) are judges, languages, users, organizations, blog moderation, site settings, raw config, navigation bar, static pages, the staff ticket queue, user activity and the change log, one folder each in `src/features/admin/`. Shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages (organizations, posts, tickets, `GET /site`) come from the community API files. Loading parity for the site screens is in `e2e/admin-site-loading.e2e.ts`. The canned ticket replies screen (`/admin/tickets/canned`, `src/features/admin/canned-replies/`) is reached from the ticket queue's header.
 
+Plan VNOI F4 adds `problems/lifecycle/` (the "Đã xóa" tab and the danger-zone delete), `problems/package/` (the full package download on the Data tab) and `organizations/quotas/` (the staff quota overview) under `src/features/admin/`; the public organization tabs "Bài tập" and "Hạn mức" live in `src/features/organizations/problems/` and `src/features/organizations/quota/`, their Bit placements in `src/features/organizations/org-bits.ts`.
+
 To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content plus a case in `e2e/admin-loading.e2e.ts` (or `e2e/admin-site-loading.e2e.ts` for a site screen).
 
 ## More

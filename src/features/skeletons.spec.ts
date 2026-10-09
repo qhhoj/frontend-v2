@@ -4,7 +4,9 @@ import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/cont
 import { problemEditorial, signedIn, signedOut } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { settingsRoutes } from '@/test/account-routes';
-import { hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
+import { hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
+import { deletedListRoutes, orgProblemRoutes, orgUsageRoutes } from '@/test/f4-routes';
+import { usageRow } from '@/test/f4-fixtures';
 import { mountApp } from '@/test/mount';
 import {
   anonymousViewer,
@@ -380,5 +382,48 @@ describe('F3 contest extras load with blocks shaped like their content', () => {
     );
     for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]'))
       expectInert(skeleton.element, 'data tab skeleton');
+  });
+});
+
+describe('VNOI F4 screens show inert skeletons shaped like their content', () => {
+  it.each([
+    {
+      name: 'deleted problems',
+      path: '/admin/problems/deleted',
+      routes: () => ({ ...staffViewer(['judge.delete_problem']), ...deletedListRoutes() }),
+      hold: '/problems/deleted',
+      region: 'deleted-table',
+    },
+    {
+      name: 'organization problems',
+      path: '/organizations/lhp/problems',
+      routes: () => ({ ...signedInViewer(), ...orgProblemRoutes() }),
+      hold: '/organizations/lhp/problems?',
+      region: 'org-problem-table',
+    },
+    {
+      name: 'organization quota',
+      path: '/organizations/lhp/quota',
+      routes: () => ({ ...signedInViewer(), ...orgUsageRoutes() }),
+      hold: '/organizations/lhp/usage',
+      region: 'quota-meters',
+    },
+    {
+      name: 'staff quota overview',
+      path: '/admin/organizations/quotas',
+      routes: () => ({
+        ...staffViewer(['judge.edit_all_organization']),
+        'GET /organizations/usage': page([usageRow()]),
+      }),
+      hold: '/organizations/usage',
+      region: 'quota-table',
+    },
+  ])('$name', async ({ path, routes, hold, region }) => {
+    mockApi(routes());
+    holdRequestsWith([hold]);
+    const { wrapper } = await mountApp(path);
+    await vi.waitFor(() => expect(regionsIn(wrapper.element, region)).toBe(1), { timeout: 5000 });
+    for (const skeleton of wrapper.element.querySelectorAll('[data-testid="query-skeleton"]'))
+      expectInert(skeleton, region);
   });
 });

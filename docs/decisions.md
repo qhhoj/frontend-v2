@@ -413,3 +413,21 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Admin settings now show `contest.officialModeEndsAt` (in the contest block) and `problem.deleteGraceDays` (new "Bài tập" group and block).
 - The contest announcement "resend" button reads "Gửi lại cho những người chưa nhận được": the backend notifies only users the announcement has not reached.
 - The shell's own reads answer from `SHELL_DEFAULTS` in `src/test/mock-api.ts` (unrecorded) and from `FakeApi` defaults in e2e.
+
+## Problem lifecycle and organizations (VNOI F4)
+
+- Deleted problems are a screen of their own, `/admin/problems/deleted`, shown as the "Đã xóa" tab of the Problems index (`judge.delete_problem`): `deleted` is a reserved code, so the static path never meets a problem.
+- Delete and purge-now confirm with the typed problem code (`TypedCodeDialog`, exact match); restore has no confirm because it is reversible.
+- The danger-zone card is the last card of the General tab; after a delete the editor opens the deleted list, since the problem's own page now answers 404.
+- "Tải gói đề" POSTs once and then polls `GET` with a probe that cancels the body (the `probePdf` pattern); POST is the rate-limited call, so polling never repeats it. A ready package is a download link, not an automatic navigation: keyboard and screen readers reach it and pop-up blockers never interfere.
+- A submission of a deleted problem shows the name with a "Đã xóa" chip and no link, and a tombstone notice in place of the cases: history stays, no test detail pretends to exist.
+- The organization tabs "Bài tập" (members and admins) and "Hạn mức" (admins) are child routes of the organization layout and require sign-in; the API refuses everyone else. Problem filters live in the URL (`tag`, `archived`, `q`, `page`); a filter change returns to page 1.
+- The org problem table's last column is "Cập nhật", read from `updatedAt` (formatted date); it replaces the "Điểm" column. The credit ledger has a "Người" column from `actorName`: a null actor renders a dash.
+- `ContestTagColor` is renamed `TagColor` (`src/api/types/tag-color.ts`): the backend shares the token keys `tag-1`..`tag-8` between contest tags and organization problem tags, drawn through one chip map and one dot map (`org-tag-classes.ts`).
+- Organization-problem write errors (tag and bulk) are matched by `error.issues[].code`, never by status or English text; the generic refusal text is the fallback.
+- Quota meters: a meter exactly at its limit is blocked under enforce and near under warn, so a full organization is never called healthy and warn mode never claims a block.
+- A quota edit sends only the changed fields; a null clears an override (site default). Unchanged boxes are not sent.
+- `quota_exceeded` text is built once in `failureTextOf` from `ApiError.extra.details`, so every admin create, clone, upload and import form names the meter.
+- The staff quota overview is `/admin/organizations/quotas` (`judge.edit_all_organization`); its editor reads the organization's usage for the current overrides, because overview rows carry resolved limits only.
+- The archive-filter tabs show the total only on the active one (one request per filter); the archive notice asks `/problems/:code/archived-in` only for a signed-in viewer and a problem that lists an organization.
+- The lifecycle screens (deleted list, danger zone, package download) were built without a mock-up, from the existing admin patterns; they need a mock-up round if the user wants a different look. M7A has no phone board either: org tables keep code, name and actions under 768 px, the bulk bar wraps, meters stack.
