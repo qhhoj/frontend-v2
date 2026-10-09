@@ -16,6 +16,9 @@ const NOT_FOUND = { status: 404, body: { error: { code: 'not_found', message: 'N
 // Nowrap cells: wrapping text would shrink the table to fit the box and never overflow.
 const WIDE_TABLE = `<table><tr>${'<td style="white-space:nowrap">Bảng rất rộng</td>'.repeat(14)}</tr></table>`;
 
+/** The typed client sends the nested path as one encoded segment: `/about/rules` -> `GET /pages/about%2Frules`. */
+const pageRoute = (path: string) => `GET /pages/${encodeURIComponent(path.slice(1))}`;
+
 const noPageScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 
@@ -30,7 +33,7 @@ test('a members-only page asks a signed-out reader to sign in and comes back to 
   page,
   api,
 }) => {
-  api.routes[`GET /pages${MEMBERS_ONLY}`] = UNAUTHORIZED;
+  api.routes[pageRoute(MEMBERS_ONLY)] = UNAUTHORIZED;
   await page.goto(MEMBERS_ONLY);
   await expect(
     page.getByRole('heading', { level: 1, name: 'Đăng nhập để đọc trang này' }),
@@ -42,7 +45,7 @@ test('a members-only page asks a signed-out reader to sign in and comes back to 
 });
 
 test('an unknown path shows the 404 page with the requested path', async ({ page, api }) => {
-  api.routes[`GET /pages${UNKNOWN}`] = NOT_FOUND;
+  api.routes[pageRoute(UNKNOWN)] = NOT_FOUND;
   await page.goto(UNKNOWN);
   await expect(page.getByRole('heading', { level: 1, name: 'Không tìm thấy trang' })).toBeVisible();
   await expect(page.getByTestId('requested-path')).toHaveText(UNKNOWN);
@@ -50,7 +53,7 @@ test('an unknown path shows the 404 page with the requested path', async ({ page
 
 test('a wide table in a stored page scrolls inside its box on a phone', async ({ page, api }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  api.routes[`GET /pages${PAGE}`] = ok(flatpage({ contentHtml: WIDE_TABLE }));
+  api.routes[pageRoute(PAGE)] = ok(flatpage({ contentHtml: WIDE_TABLE }));
   await page.goto(PAGE);
   // user-content makes each table a horizontal scroller (display block, overflow-x auto); the page never scrolls.
   const table = page.locator('.user-content table');
@@ -90,7 +93,7 @@ for (const theme of THEMES)
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await page.emulateMedia({ colorScheme: theme.scheme });
         await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
-        api.routes[`GET /pages${state.path}`] = state.route;
+        api.routes[pageRoute(state.path)] = state.route;
         await page.goto(state.path);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
         await expect(page.getByRole('heading', { level: 1, name: state.heading })).toBeVisible();
