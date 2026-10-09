@@ -12,4 +12,4 @@
 - Route: `POST /short-links`, field `expiresAt`.
 - Document: the backend accepts a past `expiresAt`, so a link can be created already dead.
 - Code does: the create form refuses an expiry that is not after now (`ShortLinkCreateForm.vue`), so staff cannot slip.
-- Verdict: backend ask. Refuse a past `expiresAt` with `invalid` on `expiresAt` (as integration clients do); the form already maps `invalid` per field only for `path` and `code`, so add the mapping when this lands.
+- Verdict: resolved. The backend refuses an expiry not in the future (400, `invalid` on `expiresAt`); the form maps it to its own text.

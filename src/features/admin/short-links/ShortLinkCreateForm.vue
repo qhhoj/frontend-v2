@@ -54,7 +54,7 @@ const pageFailure = computed(() => {
   const hasFieldError = Object.keys(create.fieldErrors.value).length > 0;
   return failure && !isConflict(failure) && !hasFieldError ? failureTextOf(failure) : null;
 });
-/** A link that is dead on arrival is a slip: refused here (the backend accepts it, see docs/api-mismatches/short-links.md). */
+/** A link that is dead on arrival is a slip: refused here before sending; the backend refuses it too (`invalid` on `expiresAt`). */
 function isPast(local: string): boolean {
   const instant = fromLocalInput(local);
   return instant !== null && new Date(instant).getTime() <= Date.now();
@@ -67,7 +67,7 @@ function submit() {
 const expiresError = computed(() =>
   isExpiryPast.value
     ? translate('admin.shortlinks.form.expiresPast')
-    : create.fieldErrors.value.expiresAt,
+    : refusedText('expiresAt', 'admin.shortlinks.form.expiresPast'),
 );
 </script>
 

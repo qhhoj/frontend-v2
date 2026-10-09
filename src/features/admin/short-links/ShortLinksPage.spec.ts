@@ -150,6 +150,25 @@ describe('ShortLinksPage', () => {
     expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
   });
 
+  it('shows the backend refusal of a past expiry (a clock ahead of the browser) in Vietnamese', async () => {
+    mockApi(
+      routes({
+        'POST /short-links': invalid(
+          issue('expiresAt', 'invalid', 'The expiry must be in the future.'),
+        ),
+      }),
+    );
+    const { wrapper } = await openPage();
+    const form = wrapper.get('[data-testid="short-link-form"]');
+    await form.get('#short-link-path').setValue('/contests/r42');
+    await form.get('#short-link-expires').setValue('2099-01-01T00:00');
+    await form.trigger('submit');
+    await flushPromises();
+    expect(form.get('#short-link-expires').attributes('aria-invalid')).toBe('true');
+    expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
+    expect(form.text()).not.toContain('The expiry must be in the future.');
+  });
+
   it('marks an expired link beside its code, so the narrow table shows it too', async () => {
     const lapsed = shortLink({
       code: 'cu',
