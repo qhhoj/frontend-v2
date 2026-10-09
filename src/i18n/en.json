@@ -1723,6 +1723,65 @@
     "viewAwaiting": "Open the ticket queue"
   },
   "replay": {
+    "bits": {
+      "judging": "Bit judging",
+      "contest": "Bit holding the contest flag"
+    },
+    "states": {
+      "ready": "The replay is ready.",
+      "retry": "Try again",
+      "backToRanking": "View the ranking",
+      "building": {
+        "title": "Building the replay…",
+        "body": "An older replay stays available during a rebuild. The first build can take a few minutes."
+      },
+      "notReady": {
+        "title": "The replay is not ready yet",
+        "body": "The contest has just ended. The replay is built once judging is done."
+      },
+      "notEnded": {
+        "title": "The contest has not ended",
+        "body": "The replay opens after the contest ends."
+      },
+      "unsupported": {
+        "title": "Not available for this format",
+        "body": "Final-submission contests only have scores after the final judging, so a replay would be a single jump."
+      },
+      "frozen": {
+        "title": "The board is frozen",
+        "body": "You can watch the replay once the board is unfrozen."
+      },
+      "forbidden": {
+        "title": "You cannot see this board",
+        "body": "This contest's ranking is hidden from you."
+      },
+      "error": {
+        "title": "Could not load the replay",
+        "body": "Something went wrong while loading."
+      },
+      "empty": {
+        "title": "No participants",
+        "body": "The contest ended with nobody taking part."
+      }
+    },
+    "player": {
+      "label": "Replay player",
+      "play": "Play",
+      "pause": "Pause",
+      "speed": "Speed",
+      "scrub": "Replay time",
+      "marksLegend": "Green dot: first solve of each problem",
+      "myRow": "Go to my row",
+      "finished": "Reached the end."
+    },
+    "feed": {
+      "title": "Just happened",
+      "solved": "solved {problem}",
+      "failed": "wrong on {problem} (-{tries})",
+      "points": "{points} points on {problem}",
+      "submitted": "submitted {problem}",
+      "empty": "Nothing has happened yet."
+    },
     "title": "Replay"
   },
   "contestTags": {

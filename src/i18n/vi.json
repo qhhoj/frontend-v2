@@ -1723,6 +1723,65 @@
     "viewAwaiting": "Mở hàng đợi phiếu"
   },
   "replay": {
+    "bits": {
+      "judging": "Bit đang chấm bài",
+      "contest": "Bit cầm cờ kỳ thi"
+    },
+    "states": {
+      "ready": "Bản phát lại đã sẵn sàng.",
+      "retry": "Thử lại",
+      "backToRanking": "Xem bảng xếp hạng",
+      "building": {
+        "title": "Đang dựng bản phát lại…",
+        "body": "Bản cũ vẫn dùng được khi dựng lại. Lần đầu có thể mất vài phút."
+      },
+      "notReady": {
+        "title": "Bản phát lại chưa sẵn sàng",
+        "body": "Kỳ thi vừa kết thúc. Bản phát lại được dựng sau khi chấm xong."
+      },
+      "notEnded": {
+        "title": "Kỳ thi chưa kết thúc",
+        "body": "Bản phát lại mở sau khi kỳ thi kết thúc."
+      },
+      "unsupported": {
+        "title": "Không hỗ trợ cho định dạng này",
+        "body": "Kỳ thi nộp bài cuối chỉ có điểm sau khi chấm lần cuối, nên phát lại chỉ là một bước nhảy."
+      },
+      "frozen": {
+        "title": "Bảng đang đóng băng",
+        "body": "Bạn xem được phát lại khi bảng điểm được mở lại."
+      },
+      "forbidden": {
+        "title": "Bạn không xem được bảng này",
+        "body": "Bảng xếp hạng của kỳ thi đang ẩn với bạn."
+      },
+      "error": {
+        "title": "Không tải được bản phát lại",
+        "body": "Đã có lỗi khi tải dữ liệu."
+      },
+      "empty": {
+        "title": "Chưa có thí sinh",
+        "body": "Kỳ thi kết thúc mà không có ai tham gia."
+      }
+    },
+    "player": {
+      "label": "Trình phát lại",
+      "play": "Phát",
+      "pause": "Tạm dừng",
+      "speed": "Tốc độ",
+      "scrub": "Thời điểm phát lại",
+      "marksLegend": "Chấm xanh: lần giải đầu của từng bài",
+      "myRow": "Về hàng của tôi",
+      "finished": "Đã phát đến cuối."
+    },
+    "feed": {
+      "title": "Vừa xảy ra",
+      "solved": "giải {problem}",
+      "failed": "sai {problem} (-{tries})",
+      "points": "{points} điểm bài {problem}",
+      "submitted": "nộp bài {problem}",
+      "empty": "Chưa có sự kiện nào."
+    },
     "title": "Phát lại"
   },
   "contestTags": {
