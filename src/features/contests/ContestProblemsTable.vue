@@ -10,6 +10,7 @@ import { showsCellTime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
+import { limitsText } from './contest-limits';
 import { attemptsLeftUnderCap, solvedSummary } from './own-result';
 
 const props = defineProps<{ contest: ContestDetail }>();
@@ -84,6 +85,9 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             <th scope="col" class="px-3 py-3 font-semibold">
               {{ $t('contests.problems.columns.name') }}
             </th>
+            <th scope="col" class="px-3 py-3 font-semibold whitespace-nowrap">
+              {{ $t('problemSwitcher.limitsColumn') }}
+            </th>
             <th scope="col" class="px-3 py-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
@@ -124,6 +128,9 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
                   }}</template
                 >
               </span>
+            </td>
+            <td class="px-3 py-3 font-mono text-[13px] whitespace-nowrap tabular-nums">
+              {{ limitsText(problem) }}
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
             <td v-if="hasSolverCounts" class="px-3 py-3 text-right font-mono tabular-nums">
@@ -166,6 +173,7 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
               }}<template v-if="problem.maxSubmissions">
                 · {{ capText(problem.maxSubmissions) }}</template
               >
+              · {{ limitsText(problem) }}
               ·
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
               <template v-if="problem.solverCount !== null">

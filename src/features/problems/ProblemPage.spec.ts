@@ -3,7 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { contestListRoutes } from '@/test/contest-routes';
-import { problemDetail, problemEditorial, sessionUser } from '@/test/fixtures';
+import {
+  contestDetail,
+  contestProblem,
+  problemDetail,
+  problemEditorial,
+  sessionUser,
+} from '@/test/fixtures';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
@@ -246,5 +252,39 @@ describe('problem page editorial tab', () => {
     expect(wrapper.find('.statement').exists()).toBe(true);
     expect(replace).toHaveBeenCalled();
     expect(push).not.toHaveBeenCalled();
+  });
+});
+
+describe('problem page inside a contest', () => {
+  const inContest = problemDetail({
+    code: 'r42b',
+    contest: { contestKey: 'r42', attemptsLeft: null },
+  });
+  const contest = contestDetail({
+    problems: [contestProblem(0), contestProblem(1), contestProblem(2)],
+  });
+
+  it('shows the contest problem rail with the open problem current', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(inContest),
+      'GET /contests/r42': ok(contest),
+    });
+    const { wrapper } = await openProblem('/problems/r42b');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="problem-switcher"] [aria-current="page"]').exists()).toBe(
+        true,
+      ),
+    );
+    const current = wrapper.get('[data-testid="problem-switcher"] [aria-current="page"]');
+    expect(current.attributes('href')).toBe('/problems/r42b');
+  });
+
+  it('has no rail outside a contest and asks for no contest', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { wrapper } = await openProblem();
+    await flushPromises();
+    expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(false);
+    expect(calls.some((call) => call.path.startsWith('/contests/'))).toBe(false);
   });
 });

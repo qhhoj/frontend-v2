@@ -1921,6 +1921,13 @@
     "title": "Rules"
   },
   "problemSwitcher": {
+    "limitsColumn": "Limits",
+    "status": {
+      "solved": "Solved",
+      "tried": "Tried, not solved",
+      "untried": "Not tried",
+      "unknown": "No result"
+    },
     "title": "Contest problems"
   },
   "balloons": {

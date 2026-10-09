@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PY3_ID, SCRATCH_ID, problemDetail, sessionUser } from '@/test/fixtures';
+import { PY3_ID, SCRATCH_ID, contestDetail, problemDetail, sessionUser } from '@/test/fixtures';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { useLocaleStore } from '@/stores/locale.store';
 import { mountApp } from '@/test/mount';
@@ -166,22 +166,32 @@ describe('submitting', () => {
 });
 
 describe('contest problem', () => {
+  const contestRoute = { 'GET /contests/r42': ok(contestDetail()) };
   it('shows the contest and the attempts left, or says none are left', async () => {
-    mockApi(signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 2 } })));
+    mockApi({
+      ...signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 2 } })),
+      ...contestRoute,
+    });
     const open = await openProblem();
     const line = dockOf(open.wrapper).get('[data-testid="submit-contest"]');
     expect(line.text()).toContain('Kỳ thi r42');
     expect(line.text()).toContain('Còn 2 lượt nộp');
     expect(line.get('a').attributes('href')).toBe('/contests/r42');
     open.wrapper.unmount();
-    mockApi(signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 0 } })));
+    mockApi({
+      ...signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 0 } })),
+      ...contestRoute,
+    });
     const spent = await openProblem();
     expect(dockOf(spent.wrapper).text()).toContain('Đã hết lượt nộp cho bài này.');
     await dockOf(spent.wrapper).get('textarea').setValue('x');
     expect(submitButton(spent.wrapper).attributes('aria-disabled')).toBe('true');
   });
   it('shows only the contest line when the contest has no cap', async () => {
-    mockApi(signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: null } })));
+    mockApi({
+      ...signedInRoutes(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: null } })),
+      ...contestRoute,
+    });
     const { wrapper } = await openProblem();
     const text = dockOf(wrapper).get('[data-testid="submit-contest"]').text();
     expect(text).toBe('Kỳ thi r42');

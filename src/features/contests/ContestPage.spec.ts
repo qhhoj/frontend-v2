@@ -265,8 +265,8 @@ describe('contest detail problems and rules', () => {
     const items = wrapper.findAll('[data-testid="contest-problems"] ul > li');
     expect(items).toHaveLength(3);
     expect(items[1]!.get('a[href="/problems/r42b"]').text()).toBe('B. Trò chơi trên cây');
-    expect(items[1]!.text()).toContain('r42b · Tối đa 20 lượt · 100 điểm');
-    expect(items[0]!.text()).toContain('r42a · 100 điểm');
+    expect(items[1]!.text()).toContain('r42b · Tối đa 20 lượt · — · 100 điểm');
+    expect(items[0]!.text()).toContain('r42a · — · 100 điểm');
     expect(items[0]!.text()).not.toContain('Tối đa');
   });
 
@@ -424,8 +424,8 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     mockApi({ ...signedInViewer(), ...contestPageRoutes(mixed) });
     const { wrapper } = await mountApp('/contests/r42');
     const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
-    // Cells: name, points, solvers, own result, open. The own chip also draws a dash, so read the solver cell alone.
-    const SOLVERS_CELL = 2;
+    // Cells: name, limits, points, solvers, own result, open. The own chip also draws a dash, so read the solver cell alone.
+    const SOLVERS_CELL = 3;
     expect(rows[0]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('—');
     expect(rows[1]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('6');
   });

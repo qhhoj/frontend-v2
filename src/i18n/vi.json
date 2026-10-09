@@ -1921,6 +1921,13 @@
     "title": "Quy định"
   },
   "problemSwitcher": {
+    "limitsColumn": "Giới hạn",
+    "status": {
+      "solved": "Đã giải",
+      "tried": "Đã nộp, chưa đúng",
+      "untried": "Chưa nộp",
+      "unknown": "Chưa có kết quả"
+    },
     "title": "Bài trong kỳ thi"
   },
   "balloons": {

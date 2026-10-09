@@ -6,6 +6,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
+import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -27,6 +28,9 @@ const router = useRouter();
 const locale = useLocaleStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
+
+/** The viewer's current participation holds this problem: the page gains the contest's problem rail (M5B). */
+const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
 
 usePageTitle(() => problem.value?.name);
 
@@ -72,66 +76,83 @@ watch(
   <NotFoundPage v-if="isNotFound" />
   <div
     v-else
-    class="mx-auto flex max-w-[960px] flex-col gap-5 px-4 py-6 sm:px-8"
+    :class="[
+      'mx-auto flex flex-col gap-5 px-4 py-6 sm:px-8',
+      contestKey
+        ? 'max-w-[1240px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-6'
+        : 'max-w-[960px]',
+    ]"
     :style="{ paddingBottom: 'calc(1.5rem + var(--dock-height, 0px))' }"
   >
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton>
-        <ProblemHeaderSkeleton />
-        <div data-skeleton-region="tabs" class="flex flex-wrap gap-2">
-          <SkeletonBlock v-for="index in SKELETON_TAB_COUNT" :key="index" pill class="h-11 w-24" />
-        </div>
-        <StatementSkeleton />
-      </template>
-      <template v-if="problem">
-        <ProblemHeader :problem="problem"
-          ><template #actions
-            ><PdfButton
-              v-if="problem.pdfStatementUrl"
-              :code="problem.code"
-              :lang="locale.locale" /></template
-        ></ProblemHeader>
-        <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
-        <div
-          v-for="panel in tabs"
-          :id="`problem-panel-${panel.id}`"
-          :key="panel.id"
-          role="tabpanel"
-          :aria-labelledby="`problem-tab-${panel.id}`"
-          :hidden="panel.id !== tab"
-          :tabindex="panel.id === tab ? 0 : undefined"
-        >
-          <GlassCard
-            v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
-            as="div"
-            data-testid="statement-card"
-            class="rounded-panel p-6 text-[15px] sm:p-8"
+    <ContestProblemSwitcher
+      v-if="contestKey && problem"
+      :contest-key="contestKey"
+      :current-code="problem.code"
+    />
+    <div class="flex min-w-0 flex-col gap-5">
+      <QueryState :loading="isPending" :error="error" @retry="refetch()">
+        <template #skeleton>
+          <ProblemHeaderSkeleton />
+          <div data-skeleton-region="tabs" class="flex flex-wrap gap-2">
+            <SkeletonBlock
+              v-for="index in SKELETON_TAB_COUNT"
+              :key="index"
+              pill
+              class="h-11 w-24"
+            />
+          </div>
+          <StatementSkeleton />
+        </template>
+        <template v-if="problem">
+          <ProblemHeader :problem="problem"
+            ><template #actions
+              ><PdfButton
+                v-if="problem.pdfStatementUrl"
+                :code="problem.code"
+                :lang="locale.locale" /></template
+          ></ProblemHeader>
+          <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
+          <div
+            v-for="panel in tabs"
+            :id="`problem-panel-${panel.id}`"
+            :key="panel.id"
+            role="tabpanel"
+            :aria-labelledby="`problem-tab-${panel.id}`"
+            :hidden="panel.id !== tab"
+            :tabindex="panel.id === tab ? 0 : undefined"
           >
-            <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
-              {{ $t('problem.untranslated') }}
-            </p>
-            <StatementBody :html="problem.descriptionHtml" />
-            <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
-              {{ $t('problem.authors') }}
-              <template v-for="(author, index) in problem.authors" :key="author.id"
-                ><template v-if="index">, </template><UserName :username="author.username"
-              /></template>
-            </p>
-          </GlassCard>
-          <!-- Mounted only while selected, so the editorial request is lazy. -->
-          <EditorialTab
-            v-if="panel.id === 'editorial' && tab === 'editorial'"
-            :code="code"
-            @gone="editorialGone = true"
-          />
-          <ProblemSubmissionsTab
-            v-if="panel.id === 'submissions' && tab === 'submissions'"
-            :code="code"
-          />
-        </div>
-        <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
-        <SubmitDock :key="problem.code" :problem="problem" />
-      </template>
-    </QueryState>
+            <GlassCard
+              v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
+              as="div"
+              data-testid="statement-card"
+              class="rounded-panel p-6 text-[15px] sm:p-8"
+            >
+              <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
+                {{ $t('problem.untranslated') }}
+              </p>
+              <StatementBody :html="problem.descriptionHtml" />
+              <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
+                {{ $t('problem.authors') }}
+                <template v-for="(author, index) in problem.authors" :key="author.id"
+                  ><template v-if="index">, </template><UserName :username="author.username"
+                /></template>
+              </p>
+            </GlassCard>
+            <!-- Mounted only while selected, so the editorial request is lazy. -->
+            <EditorialTab
+              v-if="panel.id === 'editorial' && tab === 'editorial'"
+              :code="code"
+              @gone="editorialGone = true"
+            />
+            <ProblemSubmissionsTab
+              v-if="panel.id === 'submissions' && tab === 'submissions'"
+              :code="code"
+            />
+          </div>
+          <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
+          <SubmitDock :key="problem.code" :problem="problem" />
+        </template>
+      </QueryState>
+    </div>
   </div>
 </template>
