@@ -95,11 +95,12 @@ test.describe('J6 admin', () => {
     await expect
       .poll(
         async () => {
-          const s = await getData<{ status: string; judgedDate: string | null }>(
+          const submission = await getData<{ status: string; judgedDate: string | null }>(
             page,
             `/submissions/${id}`,
           );
-          return s.status === 'D' && s.judgedDate !== null && Date.parse(s.judgedDate) > clickedAt;
+          const { status, judgedDate } = submission;
+          return status === 'D' && judgedDate !== null && Date.parse(judgedDate) > clickedAt;
         },
         { timeout: 60_000 },
       )
