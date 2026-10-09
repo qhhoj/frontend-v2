@@ -31,7 +31,7 @@ const editedSlug = computed(() =>
 );
 const page = computed(() => pageFromQuery(route.query.page));
 const search = computed(() => organizationSearchOf(route.query));
-const organizations = useOrganizationsQuery(page, search);
+const organizations = useOrganizationsQuery(page, search, () => view.value === 'organizations');
 const pending = useAllJoinRequestsQuery('P', 1);
 const pendingTotal = computed(() => pending.data.value?.meta.total ?? 0);
 const canAdd = computed(() => can('judge.add_organization'));

@@ -13,8 +13,9 @@ interface OrganizationWriteOptions<Vars, Result> {
   onDone?: (result: Result, vars: Vars) => unknown;
 }
 
-// TODO(K-1): remove this wrapper once `useAdminMutation` accepts public query keys.
 /**
+ * TODO(K-1): remove this wrapper once `useAdminMutation` accepts public query keys.
+ *
  * One organization write: a pending flag that blocks a second call while the first is in flight, the failure and its field
  * texts, and the refresh of the public organization queries. Resolves to whether the write succeeded.
  */

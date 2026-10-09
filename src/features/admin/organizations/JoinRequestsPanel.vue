@@ -16,7 +16,11 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { shortId } from '../ui/short-id';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
-import { decisionFailureText, invalidateAfterDecision } from './join-request-decision';
+import {
+  decisionFailureText,
+  invalidateAfterDecision,
+  isAlreadyDecided,
+} from './join-request-decision';
 import { useOrganizationWrite } from './organization-write';
 
 const STATE_TABS: { state: JoinRequestState; labelKey: string }[] = [
@@ -43,8 +47,11 @@ const rows = computed(() => requests.data.value?.items ?? []);
 const pendingTotal = computed(() => pendingCount.data.value?.meta.total ?? 0);
 
 async function decide(request: JoinRequest, next: 'A' | 'R') {
+  if (decision.isPending.value) return;
   failedRequestId.value = request.id;
-  await decision.run({ request, next });
+  const done = await decision.run({ request, next });
+  if (!done && isAlreadyDecided(decision.failure.value))
+    await invalidateAfterDecision(queryClient, props.slug);
 }
 </script>
 

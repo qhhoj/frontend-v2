@@ -111,6 +111,7 @@
     },
     "empty": "Không có yêu cầu nào.",
     "pager": "Trang yêu cầu",
-    "full": "Tổ chức đã đủ chỗ."
+    "full": "Tổ chức đã đủ chỗ.",
+    "alreadyDecided": "Yêu cầu này đã được người khác xử lý."
   }
 }

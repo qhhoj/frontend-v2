@@ -100,7 +100,7 @@ describe('OrganizationsPage', () => {
   it('shows a full organization as a refusal inside that request', async () => {
     mockApi(
       routes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: fail(409, 'conflict'),
+        [`POST /organizations/lhp/requests/${request.id}/decide`]: conflictWith(FULL_MESSAGE),
       }),
     );
     const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
@@ -108,6 +108,22 @@ describe('OrganizationsPage', () => {
     expect(wrapper.get('[data-testid="join-requests"] [role="alert"]').text()).toContain(
       'Tổ chức đã đủ chỗ.',
     );
+  });
+
+  it('reads an already decided request as taken by someone else and reloads the requests', async () => {
+    const calls = mockApi(
+      routes({
+        [`POST /organizations/lhp/requests/${request.id}/decide`]: conflictWith(DECIDED_MESSAGE),
+      }),
+    );
+    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
+    const requestLoads = () => calls.filter((call) => call.path === '/organizations/lhp/requests');
+    const before = requestLoads().length;
+    await click(wrapper, 'Chấp nhận');
+    expect(wrapper.get('[data-testid="join-requests"] [role="alert"]').text()).toContain(
+      'đã được người khác xử lý',
+    );
+    expect(requestLoads().length).toBeGreaterThan(before);
   });
 
   it('kicks a member only after confirming', async () => {
@@ -207,6 +223,24 @@ const queueRoutes = (extra = {}) =>
   });
 const queueCalls = (calls: ReturnType<typeof mockApi>) =>
   calls.filter((call) => call.path === QUEUE);
+const FULL_MESSAGE = 'The organization is full';
+const DECIDED_MESSAGE = 'This request has already been decided';
+const conflictWith = (message: string) => fail(409, 'conflict', undefined, undefined, { message });
+const decideCalls = (calls: ReturnType<typeof mockApi>) =>
+  calls.filter((call) => call.path.endsWith('/decide'));
+
+/** Wraps the mocked fetch so every decision stays in flight until the returned function is called. */
+function holdDecisions(): () => void {
+  const answer = globalThis.fetch;
+  let release = () => {};
+  const gate = new Promise<void>((resolve) => (release = resolve));
+  vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
+    input.includes('/decide') ? gate.then(() => answer(input, init)) : answer(input, init),
+  );
+  return release;
+}
+const acceptButtonOf = (row: ReturnType<Mounted['wrapper']['find']>) =>
+  row.findAll('button').find((button) => button.text() === 'Chấp nhận')!;
 
 describe('OrganizationsPage search', () => {
   afterEach(() => vi.useRealTimers());
@@ -236,6 +270,19 @@ describe('OrganizationsPage search', () => {
     ).toBe('cl');
     expect(wrapper.get('[data-testid="org-list"] mark').text()).toBe('CL');
     expect(wrapper.text()).toContain('1 / 4 tổ chức khớp “cl”');
+  });
+
+  it('returns to the first page when the search term changes', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountList('/admin/organizations?page=3');
+    const listCalls = () => calls.filter((call) => call.path === '/organizations');
+    expect(listCalls().at(-1)!.query.get('page')).toBe('3');
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    await wrapper.get('input[type="search"]').setValue('cl');
+    await vi.advanceTimersByTimeAsync(TEXT_DEBOUNCE_MS);
+    await flushPromises();
+    expect(listCalls().at(-1)!.query.get('search')).toBe('cl');
+    expect(listCalls().at(-1)!.query.get('page')).toBe('1');
   });
 
   it('says what an empty search found', async () => {
@@ -316,7 +363,8 @@ describe('OrganizationsPage request queue', () => {
   it('refuses a full organization inside that row only', async () => {
     mockApi(
       queueRoutes({
-        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]: fail(409, 'conflict'),
+        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]:
+          conflictWith(FULL_MESSAGE),
       }),
     );
     const { wrapper } = await mountScreen(
@@ -371,5 +419,69 @@ describe('OrganizationsPage request queue', () => {
     const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Từ chối');
     await click(wrapper, 'Từ chối');
     expect(queueCalls(calls).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('says an already decided request was taken by someone else and refreshes the queue', async () => {
+    const calls = mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(DECIDED_MESSAGE),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    await acceptButtonOf(wrapper.findAll('[data-testid="queue-row"]')[0]!).trigger('click');
+    await flushPromises();
+    const alert = wrapper.get('[data-testid="queue-row"] [role="alert"]').text();
+    expect(alert).toContain('đã được người khác xử lý');
+    expect(alert).not.toContain('đủ chỗ');
+    expect(queueCalls(calls)).toHaveLength(2);
+  });
+
+  it('keeps a full organization out of the refresh', async () => {
+    const calls = mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(FULL_MESSAGE),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    await acceptButtonOf(wrapper.findAll('[data-testid="queue-row"]')[0]!).trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="queue-row"] [role="alert"]').text()).toContain('đủ chỗ');
+    expect(queueCalls(calls)).toHaveLength(1);
+  });
+
+  it('ignores a click on another row while a decision is in flight', async () => {
+    const calls = mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(FULL_MESSAGE),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    const release = holdDecisions();
+    const rows = wrapper.findAll('[data-testid="queue-row"]');
+    await acceptButtonOf(rows[0]!).trigger('click');
+    await acceptButtonOf(rows[1]!).trigger('click');
+    release();
+    await flushPromises();
+    expect(decideCalls(calls)).toHaveLength(1);
+    expect(rows[0]!.get('[role="alert"]').text()).toContain('đủ chỗ');
+    expect(rows[1]!.find('[role="alert"]').exists()).toBe(false);
+  });
+
+  it('does not list organizations while the queue tab is showing', async () => {
+    const calls = mockApi(queueRoutes());
+    await mountScreen(
+      '/admin/organizations?view=requests&q=cl',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    expect(calls.filter((call) => call.path === '/organizations')).toHaveLength(0);
   });
 });

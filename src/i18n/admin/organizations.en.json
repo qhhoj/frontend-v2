@@ -111,6 +111,7 @@
     },
     "empty": "No requests.",
     "pager": "Request pages",
-    "full": "The organization is full."
+    "full": "The organization is full.",
+    "alreadyDecided": "Another staff member already decided this request."
   }
 }

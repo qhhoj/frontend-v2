@@ -16,7 +16,11 @@ import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
-import { decisionFailureText, invalidateAfterDecision } from './join-request-decision';
+import {
+  decisionFailureText,
+  invalidateAfterDecision,
+  isAlreadyDecided,
+} from './join-request-decision';
 import { useAllJoinRequestsQuery } from './join-requests.queries';
 import { requestStateOf } from './organization-search';
 import { useOrganizationWrite } from './organization-write';
@@ -37,9 +41,12 @@ const decision = useOrganizationWrite<{ request: JoinRequest; next: 'A' | 'R' },
   onDone: (_result, { request }) => invalidateAfterDecision(queryClient, request.organizationSlug),
 });
 
-function decide(request: JoinRequest, next: 'A' | 'R') {
+async function decide(request: JoinRequest, next: 'A' | 'R') {
+  if (decision.isPending.value) return;
   decidingId.value = request.id;
-  return decision.run({ request, next });
+  const done = await decision.run({ request, next });
+  if (!done && isAlreadyDecided(decision.failure.value))
+    await invalidateAfterDecision(queryClient, request.organizationSlug);
 }
 
 function decidedText(request: JoinRequest): string {

@@ -16,6 +16,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 export const useOrganizationsQuery = (
   page: MaybeRefOrGetter<number>,
   search?: MaybeRefOrGetter<string | undefined>,
+  enabled: MaybeRefOrGetter<boolean> = true,
 ) => {
   const viewer = useViewerId();
   const term = () => (search === undefined ? '' : (toValue(search) ?? '').trim());
@@ -29,6 +30,7 @@ export const useOrganizationsQuery = (
     ]),
     queryFn: () => fetchOrganizations(toValue(page), term()),
     placeholderData: keepPreviousData,
+    enabled: () => toValue(enabled),
   });
 };
 
