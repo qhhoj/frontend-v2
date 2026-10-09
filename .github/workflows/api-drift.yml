@@ -1,0 +1,46 @@
+name: API drift
+
+# The snapshot in src/api/generated must be the document backend main serves. Red here means:
+# pull the backend, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
+# Needs the repository secret BACKEND_READ_TOKEN (see CONTRIBUTING.md); without it the job skips with a notice.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    env:
+      BACKEND_READ_TOKEN: ${{ secrets.BACKEND_READ_TOKEN }}
+    steps:
+      - name: secret present?
+        if: env.BACKEND_READ_TOKEN == ''
+        run: echo "::notice title=API drift check skipped::Repository secret BACKEND_READ_TOKEN is not set (read-only contents access to qhhoj/backend-v2). See CONTRIBUTING.md, 'API drift check'."
+      - uses: actions/checkout@v4
+        if: env.BACKEND_READ_TOKEN != ''
+      - uses: actions/checkout@v4
+        if: env.BACKEND_READ_TOKEN != ''
+        with:
+          repository: qhhoj/backend-v2
+          ref: main
+          path: backend
+          token: ${{ secrets.BACKEND_READ_TOKEN }}
+      - uses: actions/setup-node@v4
+        if: env.BACKEND_READ_TOKEN != ''
+        with:
+          node-version: 22
+          cache: npm
+      - if: env.BACKEND_READ_TOKEN != ''
+        run: npm ci
+      - name: backend checkout has the contract
+        if: env.BACKEND_READ_TOKEN != ''
+        run: test -f backend/openapi.json
+      - name: snapshot equals backend main
+        if: env.BACKEND_READ_TOKEN != ''
+        run: |
+          echo "snapshot taken from backend $(cat src/api/generated/openapi.source); backend main is now $(git -C backend rev-parse HEAD)"
+          OPENAPI_SPEC=backend/openapi.json npm run api:check -- --backend

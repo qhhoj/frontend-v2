@@ -10,6 +10,7 @@ export default defineConfigWithVueTs(
       'playwright-report/',
       'test-results/',
       'docs/',
+      'src/api/generated/',
       '.superpowers/',
     ],
   },

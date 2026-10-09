@@ -11,7 +11,9 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "e2e": "playwright test",
-    "check": "npm run lint && npm run typecheck && npm test"
+    "api:gen": "node scripts/api-gen.mjs",
+    "api:check": "node scripts/api-gen.mjs --check",
+    "check": "npm run api:check && npm run lint && npm run typecheck && npm test"
   },
   "private": true,
   "type": "module",
@@ -56,6 +58,7 @@
     "eslint": "10.12.0",
     "eslint-plugin-vue": "10.11.1",
     "jsdom": "29.0.0",
+    "openapi-typescript": "7.13.0",
     "prettier": "3.9.9",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",

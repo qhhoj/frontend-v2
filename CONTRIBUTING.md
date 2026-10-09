@@ -118,6 +118,12 @@ Resetting between runs: a queued row counts toward the unfinished-submission lim
 
 `e2e_sum` has no archive and no `pdfStatementUrl`: never use it for data-editing tests; the PDF endpoint is probed directly.
 
+## API types and drift check
+
+`src/api/generated/` is machine-written from the backend's `openapi.json` (never edit it): `npm run api:gen` copies the backend document (`OPENAPI_SPEC`, default `../backend-v2/openapi.json`), records the backend commit in `openapi.source` and regenerates `schema.d.ts`. `npm run api:check` (part of CI and `npm run check`) fails when `schema.d.ts` is not what the snapshot generates; `npm run api:check -- --backend` also compares the snapshot with the sibling backend checkout and skips when there is none.
+
+The `API drift` workflow checks out `qhhoj/backend-v2` `main` and runs the same `--backend` comparison on pull requests, pushes to `main`, daily and on demand. It needs the repository secret `BACKEND_READ_TOKEN`: a fine-grained token with read-only Contents access to `qhhoj/backend-v2` (Settings > Secrets and variables > Actions). Without the secret (or on fork PRs) the job logs a notice and skips; it is not a required check on pull requests. When it fails: pull the backend, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
+
 ## Commits
 
 - One-line conventional subject: `feat: ...`, `fix: ...`, `test: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
