@@ -42,7 +42,7 @@ const retry = () => {
       <template #skeleton>
         <SkeletonBlock
           data-skeleton-region="problem-editor-header"
-          class="h-20 w-full rounded-panel"
+          class="h-[7.75rem] w-full rounded-panel sm:h-[4.75rem]"
         />
         <SkeletonBlock
           data-skeleton-region="problem-editor-body"

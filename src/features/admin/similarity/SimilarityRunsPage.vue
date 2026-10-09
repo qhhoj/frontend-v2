@@ -54,7 +54,9 @@ const viewScope = (next: SimilarityScope) =>
   <template v-else-if="scope">
     <SimilarityStartResult :is-done="isDone" :failure="failure" :running-to="runningTo" />
     <QueryState :loading="runs.isPending.value" :error="runs.error.value" @retry="runs.refetch()">
-      <template #skeleton><SkeletonBlock class="h-40 w-full" /></template>
+      <template #skeleton
+        ><SkeletonBlock data-skeleton-region="similarity-runs" class="h-24 w-full"
+      /></template>
       <SimilarityRunsTable :runs="runList" :scope="scope" />
     </QueryState>
     <QueryState

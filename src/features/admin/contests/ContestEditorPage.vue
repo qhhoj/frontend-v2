@@ -44,9 +44,11 @@ const summaryLine = computed(() => {
   <QueryState :loading="isPending" :error="isNotFound ? null : error" @retry="refetch()">
     <template #skeleton>
       <div class="flex flex-col gap-4 px-4 py-6 sm:px-8">
-        <SkeletonBlock class="h-10 w-2/3" />
-        <SkeletonBlock class="h-5 w-1/2" />
-        <SkeletonBlock class="h-64 w-full" />
+        <SkeletonBlock
+          data-skeleton-region="contest-editor-header"
+          class="h-36 w-full sm:h-[4.75rem]"
+        />
+        <SkeletonBlock data-skeleton-region="contest-editor-body" class="h-64 w-full" />
       </div>
     </template>
     <p v-if="isNotFound" class="px-4 py-6 sm:px-8">{{ $t('admin.contests.notFound', { key }) }}</p>

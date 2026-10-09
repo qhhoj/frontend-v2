@@ -95,6 +95,12 @@ Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activa
 | Query parameters the login screen reads                          | `redirect` (a safe in-app path), `error` (OAuth callback codes), `notice` (`password-reset`)                                                   |
 | Auth e2e                                                         | `e2e/auth.e2e.ts`, `e2e/auth-accessibility.e2e.ts`; `installAuth` and its scoped `GET /organizations` in `e2e/fixtures/auth.ts`                |
 
+## Admin
+
+Admin screens live in `src/features/admin/<area>/` (one folder per area: problems, contests, users, similarity, rejudge, search, ...), inside the shared `AdminShell`. `ADMIN_SCREENS` in `src/features/admin/admin-screens.ts` lists every screen once (id, path, permission); `admin-routes.ts` turns it into routes and maps each id to its page in `SCREEN_COMPONENTS`. Texts are per area in `src/i18n/admin/<area>.vi.json` and `.en.json`, merged by `src/i18n/index.ts`. Fixtures for specs and e2e are in `src/test/admin-fixtures/`, e2e helpers (`signInAsStaff`, `adminOk`, `adminList`, `confirmInDialog`) in `e2e/fixtures/admin.ts`. Which Bit mascot each admin placement shows is decided in one place, `ADMIN-BIT-HOOK` in `src/features/admin/shell/admin-bit.ts`.
+
+To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content plus a case in `e2e/admin-loading.e2e.ts`.
+
 ## More
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): conventions, styling and theme rules, testing

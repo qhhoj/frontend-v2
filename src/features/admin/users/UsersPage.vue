@@ -67,7 +67,9 @@ const openUser = (username: string) =>
     <section class="glass flex flex-col gap-4 rounded-panel p-5">
       <UsersFilters :view="view" @change="setView" />
       <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
-        <template #skeleton><SkeletonBlock class="h-64 w-full" /></template>
+        <template #skeleton
+          ><SkeletonBlock data-skeleton-region="users-list" class="h-[19rem] w-full"
+        /></template>
         <EmptyState v-if="users.length === 0" compact :kind="ADMIN_BIT_KINDS.empty">
           {{
             view.search

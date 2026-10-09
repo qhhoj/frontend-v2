@@ -135,6 +135,10 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | A1 | `email_invalid` issue code on the reset email (`PasswordResetRequestDto.email` sends the bare `email.matches`) | the reset address text without the alias in `ISSUE_ALIASES` |
 | A2 | `open` filter on `GET /organizations` (the signup list reads every page and filters here) | server-side filtering of the school picker |
 | A3 | Provider name and email on the social completion screen (the client never learns them) | the provider line and the email on `/register/social` |
+| B-8f6 | Data version on `ProblemDataResponse`; a listing of uploaded statement images; structured `feedback` (case index + code) | problem data tab version, image picker, per-case feedback |
+| B-8f8 | The base name on `ProblemEditorResponse` (`name` follows the requested language) | editor without the `lang=en` read |
+| B-8f9 | Issue codes on field refusals that arrive only in `fields` in English (clone key taken, contest window, time limit above 5) | Vietnamese wording of those refusals |
+| B-8f10 | Substring (or prefix-per-word) search on `GET /problems?search=` (the text index matches whole words from 3 characters) | typing "hcmus4" finds `hcmus41c` |
 
 ## Loading states
 
@@ -267,7 +271,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Layout**: `meta.layout: 'admin'` makes AppShell render AdminShell instead of AppHeader — the board draws its own top bar; the auth pages keep theirs.
 - **Permission gate**: `meta.permission` is a permission or any-of list; staff without it see AdminForbidden in place with the URL kept — existence of `/admin` is hidden from non-staff only.
 - **Placeholder screens**: `/admin/types` renders AdminPlaceholder (it is drawn in the nav, has no board) — no invented visuals.
-- **Problem and contest indexes**: open by code or key plus "Tạo …" links, reusing the Users exact-lookup pattern — flagged for a mock-up round.
+- **Problem and contest indexes**: open-by-key plus "Tạo …" links, reusing the Users exact-lookup pattern; the search card beside them is under "Admin indexes" below.
 - **Bài nộp nav item**: links to the public `/submissions` list — no admin submission list was drawn; staff controls live on the submission page.
 - **Problem editor tabs**: `/admin/problems/:code/{general,statements,editorial,data,files}` — shareable URLs, one job per page.
 - **Live preview**: `POST /problems/render-preview` 500 ms after the last key, latest answer wins — the board's debounce; a static-page editor lacks problem permissions, hence `flatpage` source later.
@@ -276,11 +280,21 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Contest user lists**: ids with `settings.users` naming them — chips show usernames, a short id only for a deleted account.
 - **Similarity 429**: the countdown comes from `ApiError.retryAfterSeconds` — the backend sends Retry-After on every rate-limit refusal.
 - **Similarity layout**: `/admin/similarity?contest=` lists runs and the summary below with `&run=` — the board shows list and summary on one screen.
-- **Bulk rejudge**: no count before confirm — a pre-confirm count is a new visual; after a 403 a dry run words the refusal by `allowed`.
+- **Bulk rejudge count**: the confirm runs a `dryRun` as it opens and shows the count, the permission and the counting/failed states inside it (pick 1B, 2026-10-09); its confirm button opens only for `allowed` and a count above 0, so a 403 on the real request is the plain refusal. The clock reads hours and minutes only.
 - **Submission staff panel**: staff only, buttons follow `viewer.canRejudge/canReject/canAbort` — the server decides, the 409 stays as the stale-page fallback.
 - **Downloads**: raw endpoints are plain `<a href>` to the API URL — they are not `{data}` envelopes.
-- **Confirm dialogs**: one shared `ConfirmDialog.vue`, driven in specs and e2e by its confirm button's label — no second dialog implementation.
+- **One dialog**: every confirm uses `src/components/ConfirmDialog.vue`; specs drive it through `confirmDialog(label)`, e2e through `confirmInDialog(page, label)`; no second dialog implementation.
 - **Superuser without the staff flag**: `/admin` stays not-found for them (the router checks `isStaff`), although every permission check passes superusers — existence of the area follows the staff flag, the screens follow the permissions.
+- **Save bar per tab**: each editor tab has its own sticky "Lưu thay đổi" bar (the header belongs to the shared frame) — one save per tab, as "Mỗi tab lưu riêng".
+- **Original description**: edited in the Statements tab as a third slot "Mô tả gốc" (PATCH `description`, locked for a full-markup problem without `judge.problem_full_markup`); board B points to Thông tin chung, which has no such field drawn.
+- **Problem name**: the editor reads the problem with `lang=en` and PATCHes `name` only when edited, because the detail's `name` is the English translation when one exists (backend ask B-8f8: the base name).
+- **No data version**: board C's "Phiên bản dữ liệu 7" is not shown; the API has no version (B-8f6).
+- **Contest texts without preview**: contest description and announcements are plain Markdown boxes; `render-preview` needs problem permissions a contest editor may lack.
+- **Ordering without drag**: contest problems and test cases move with labelled up/down buttons; the boards' drag handles are pointer-only.
+- **Access codes**: hashed, so a blank box keeps the code and a "Bỏ mã" checkbox removes it (the board says "xóa trắng để bỏ mã"); `hasRankingAccessCode` and `requiresAccessCode` say whether one is set.
+- **Create bodies**: a create sends no staff-only field (problem `STAFF_ONLY_FIELDS`, contest `GATED_CONTEST_FIELDS` incl. `rateAll`) unless the account holds its permission and the value was changed.
+- **Admin indexes**: open-by-key stays on `/admin/problems` and `/admin/contests`, and a search card beside it lists `GET /problems?search=&visibility=all` and `GET /contests?search=&phase=` (pick 2B, 2026-10-09); the state is in the URL (`q`, `phase`, `page`); the search box is local to `features/admin/search/` (`useDebouncedText`), and the users list (and plan 8f-2's organizations list) reuse its `IndexSearchBox` and `HighlightedText`. The problems search is whole-word from 3 characters (B-8f10), so the box says what it matches.
+- **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box (editor headers, runs table, users list, index search card); skeleton heights are sized to a typical loaded screen (a one-run table, five user rows), so a very different row count still moves the content below.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
 
 ## Settings (8h)
