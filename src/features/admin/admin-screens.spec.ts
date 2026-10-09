@@ -17,3 +17,14 @@ describe('problem editor screens', () => {
     expect(allowsAny(holder, ADMIN_SCREENS.problemData.permission)).toBe(true);
   });
 });
+
+describe('language form screens', () => {
+  it('open "new" for add_language only and "edit" for change_language only', () => {
+    const adder = staff(['judge.add_language']);
+    const changer = staff(['judge.change_language']);
+    expect(allowsAny(adder, ADMIN_SCREENS.languageNew.permission)).toBe(true);
+    expect(allowsAny(changer, ADMIN_SCREENS.languageNew.permission)).toBe(false);
+    expect(allowsAny(changer, ADMIN_SCREENS.languageEdit.permission)).toBe(true);
+    expect(allowsAny(adder, ADMIN_SCREENS.languageEdit.permission)).toBe(false);
+  });
+});

@@ -49,4 +49,17 @@ describe('LanguagesPage', () => {
     expect(wrapper.text()).toContain('Bạn không có quyền làm việc này.');
     expect(wrapper.text()).not.toContain('Chưa có ngôn ngữ nào.');
   });
+
+  it('offers "Thêm ngôn ngữ" only with add_language, and links each key to its edit page', async () => {
+    mockApi({
+      ...staffViewer(['judge.change_language', 'judge.add_language']),
+      'GET /admin/languages': ok(LANGUAGES),
+    });
+    const both = await mountLanguages();
+    expect(both.wrapper.get('a[href="/admin/languages/new"]').text()).toContain('Thêm ngôn ngữ');
+    expect(both.wrapper.get('a[href="/admin/languages/CPP20"]').text()).toBe('CPP20');
+    mockApi({ ...staffViewer(['judge.change_language']), 'GET /admin/languages': ok(LANGUAGES) });
+    const changeOnly = await mountLanguages();
+    expect(changeOnly.wrapper.find('a[href="/admin/languages/new"]').exists()).toBe(false);
+  });
 });

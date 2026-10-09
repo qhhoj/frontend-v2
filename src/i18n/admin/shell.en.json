@@ -84,6 +84,8 @@
     "nav": "Navigation bar",
     "pages": "Static pages",
     "log": "Change log",
-    "submissions": "Submissions"
+    "submissions": "Submissions",
+    "languageNew": "Add language",
+    "languageEdit": "Edit language"
   }
 }

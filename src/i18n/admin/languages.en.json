@@ -1,5 +1,8 @@
 {
-  "crumbs": { "group": "Judging", "languages": "Languages" },
+  "crumbs": {
+    "group": "Judging",
+    "languages": "Languages"
+  },
   "title": "Programming languages",
   "lead": "The languages submissions can use, and the judges that run them.",
   "stats": {
@@ -23,5 +26,62 @@
     "yes": "Yes",
     "no": "No"
   },
-  "empty": "No languages yet."
+  "empty": "No languages yet.",
+  "form": {
+    "addTitle": "Add language",
+    "editTitle": "Edit {key}",
+    "notFound": "There is no language “{key}”.",
+    "back": "Back to the list",
+    "groups": {
+      "identity": "Identity",
+      "editor": "Editor and files",
+      "content": "Shown to users"
+    },
+    "labels": {
+      "key": "Key *",
+      "name": "Name *",
+      "shortName": "Short name",
+      "commonName": "Common name *",
+      "ace": "Ace mode *",
+      "pygments": "Pygments *",
+      "extension": "File extension *",
+      "fileSize": "File size limit (bytes)",
+      "fileOnly": "Accept file uploads only",
+      "includeInProblem": "Included in new problems",
+      "template": "Template code",
+      "info": "Info",
+      "description": "Description"
+    },
+    "hints": {
+      "key": "Required, 1–10 characters: letters, digits and _ + # . -",
+      "sealed": "Cannot change after creation.",
+      "name": "Required, 1–20 characters.",
+      "shortName": "Optional, 1–20 characters.",
+      "shortNameEdit": "Optional. Clear it to remove the short name.",
+      "editor": "Required, 1–50 characters.",
+      "extension": "Lowercase letters and digits, 1–10 characters.",
+      "fileSize": "0 to 1,073,741,824",
+      "fileSizeMb": "about {megabytes} MB",
+      "template": "Pre-filled into the submit box."
+    },
+    "sealed": "Fixed",
+    "required": "Fields marked * are required. The key cannot change after creation.",
+    "create": "Create language",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "saved": "Saved.",
+    "errors": {
+      "key": "1–10 characters: letters, digits and _ + # . -",
+      "keyTaken": "Another language already uses this key.",
+      "name": "Required, 1–20 characters.",
+      "shortName": "1–20 characters, or leave empty.",
+      "editor": "Required, 1–50 characters.",
+      "extension": "Lowercase letters and digits, 1–10 characters.",
+      "fileSize": "A whole number from 0 to 1,073,741,824.",
+      "text": "At most 65,536 characters."
+    }
+  },
+  "actions": {
+    "add": "Add language"
+  }
 }

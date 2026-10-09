@@ -4,6 +4,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { usePermissions } from '@/stores/use-permissions';
+import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import AdminBit from '../shell/AdminBit.vue';
@@ -13,6 +14,8 @@ import { useLanguagesAdminQuery } from './languages.queries';
 
 const { can } = usePermissions();
 const canSeeJudges = can('judge.change_judge');
+const canAdd = can('judge.add_language');
+const canEdit = can('judge.change_language');
 const { data, isPending, error, refetch } = useLanguagesAdminQuery();
 const judgesQuery = useJudgesQuery({ enabled: canSeeJudges });
 /** Coverage is shown only once the judges have loaded for a viewer who may read them. */
@@ -34,7 +37,13 @@ const percentOf = (count: number) =>
       ]"
       :title="$t('admin.languages.title')"
       :lead="$t('admin.languages.lead')"
-    />
+    >
+      <template #actions>
+        <RouterLink v-if="canAdd" :to="{ name: 'admin-languageNew' }" :class="ADMIN_PRIMARY_CLASS">
+          {{ $t('admin.languages.actions.add') }}
+        </RouterLink>
+      </template>
+    </AdminPageHeader>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-4">
@@ -88,7 +97,15 @@ const percentOf = (count: number) =>
           </thead>
           <tbody>
             <tr v-for="row in rows" :key="row.key" class="border-b border-line align-top">
-              <td class="py-3 pr-4 font-mono">{{ row.key }}</td>
+              <td class="py-3 pr-4">
+                <RouterLink
+                  v-if="canEdit"
+                  :to="{ name: 'admin-languageEdit', params: { key: row.key } }"
+                  class="font-mono underline-offset-2 hover:underline"
+                  >{{ row.key }}</RouterLink
+                >
+                <span v-else class="font-mono">{{ row.key }}</span>
+              </td>
               <td class="py-3 pr-4">
                 {{ row.name }}
                 <span
@@ -139,6 +156,9 @@ const percentOf = (count: number) =>
       <section v-else class="glass flex flex-col items-center gap-3 rounded-panel p-6 text-center">
         <AdminBit placement="empty" />
         <p>{{ $t('admin.languages.empty') }}</p>
+        <RouterLink v-if="canAdd" :to="{ name: 'admin-languageNew' }" :class="ADMIN_PRIMARY_CLASS">
+          {{ $t('admin.languages.actions.add') }}
+        </RouterLink>
       </section>
     </QueryState>
   </div>

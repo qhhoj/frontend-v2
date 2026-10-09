@@ -56,6 +56,8 @@ export const ADMIN_SCREENS = {
     path: '/admin/languages',
     permission: ['judge.change_language', 'judge.add_language'],
   },
+  languageNew: { path: '/admin/languages/new', permission: 'judge.add_language' },
+  languageEdit: { path: '/admin/languages/:key', permission: 'judge.change_language' },
   users: { path: '/admin/users', permission: 'judge.ban_user' },
   organizations: {
     path: '/admin/organizations',
