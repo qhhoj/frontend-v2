@@ -8,6 +8,8 @@ import { translate } from '@/i18n';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
+import { LOW_POWER_PREFERENCES } from '@/theme/low-power';
+import { useLowPowerStore } from '@/theme/low-power.store';
 import { useThemeStore } from '@/theme/theme.store';
 import AccentChoice from './AccentChoice.vue';
 import ModeChoice from './ModeChoice.vue';
@@ -27,6 +29,10 @@ const glassOptions = computed(() =>
   GLASS_STOPS.map((stop) => ({ value: stop.value, label: translate(stop.labelKey) })),
 );
 const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
+const lowPower = useLowPowerStore();
+const lowPowerOptions = computed(() =>
+  LOW_POWER_PREFERENCES.map((value) => ({ value, label: translate(`lowPower.short.${value}`) })),
+);
 </script>
 
 <template>
@@ -80,6 +86,17 @@ const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
         <p v-else-if="reducedTransparency" class="mt-2 text-[13px] text-muted">
           {{ $t('appearance.solidByDevice') }}
         </p>
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+          {{ $t('lowPower.title') }}
+        </p>
+        <SegmentedChoice
+          :label="$t('lowPower.title')"
+          :options="lowPowerOptions"
+          :selected="lowPower.preference"
+          @pick="(preference) => lowPower.choose(preference)"
+        />
       </div>
       <div class="flex items-center justify-between gap-3 border-t border-line pt-3">
         <button

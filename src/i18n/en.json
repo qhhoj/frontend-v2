@@ -1607,6 +1607,51 @@
   },
   "lowPower": {
     "editorHint": "Tab: indent · Shift+Tab: outdent · Esc then Tab: leave the editor",
+    "lead": "Pick one. The preview inside each card shows the difference.",
+    "option": {
+      "auto": {
+        "title": "Automatic",
+        "body": "On when the device has ≤ 2 GB of memory, ≤ 2 CPU cores or data saver on."
+      },
+      "on": {
+        "title": "Always on",
+        "body": "Fewer effects; text and colours stay.",
+        "preview": "Still Bit · no blur"
+      },
+      "off": {
+        "title": "Always off",
+        "body": "Every effect, even on a weak device.",
+        "preview": "Moving Bit · frosted glass"
+      }
+    },
+    "machineOn": "This device: on",
+    "machineOff": "This device: off",
+    "effectsTitle": "When on",
+    "effects": {
+      "blur": "No background blur (frosted glass)",
+      "blobs": "Background colour blobs hidden",
+      "motion": "No motion effects",
+      "bit": "Bit is a still picture",
+      "replay": "Ranking replay without moving rows",
+      "ranking": "Ranking refreshes every 60 seconds (instead of 30)",
+      "editor": "Code editor is a plain text box, Tab indents"
+    },
+    "saved": "Saved on this device",
+    "savedNote": "Kept in this browser only, not synced with your account. The server is not affected.",
+    "short": {
+      "auto": "Auto",
+      "on": "On",
+      "off": "Off"
+    },
+    "footer": "Low-power mode: {state}",
+    "footerState": {
+      "on": "On",
+      "off": "Off",
+      "autoOn": "Auto (on)",
+      "autoOff": "Auto (off)"
+    },
+    "footerChange": "Change",
+    "footerChangeLabel": "Change low-power mode",
     "title": "Low-power mode"
   },
   "flatpage": {

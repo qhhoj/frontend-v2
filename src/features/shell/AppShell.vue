@@ -2,6 +2,7 @@
 import { defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
+import AppFooter from './AppFooter.vue';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue';
@@ -46,6 +47,7 @@ const route = useRoute();
       <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
         <slot />
       </main>
+      <AppFooter v-if="route.meta.layout !== 'auth'" />
     </template>
     <LoadingLayer />
   </div>

@@ -12,6 +12,7 @@ import { useThemeStore } from '@/theme/theme.store';
 import AccentChoice from './AccentChoice.vue';
 import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
+import LowPowerChoice from './LowPowerChoice.vue';
 import ModeChoice from './ModeChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
@@ -133,5 +134,6 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         <p role="status" class="text-[13px] text-muted">{{ $t(saveNoteKey) }}</p>
       </section>
     </div>
+    <LowPowerChoice />
   </SettingsLayout>
 </template>

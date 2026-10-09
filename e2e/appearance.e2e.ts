@@ -76,10 +76,11 @@ test('"use site default" clears the look and puts the mode back to Clay, automat
   await expect(
     panel.getByRole('group', { name: 'Kiểu' }).getByRole('button', { name: 'Clay', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
-  await expect(panel.getByRole('button', { name: 'Tự động', exact: true })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await expect(
+    panel
+      .getByRole('group', { name: 'Chế độ', exact: true })
+      .getByRole('button', { name: 'Tự động' }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('picking a mode in the panel changes the theme and leaves the look off', async ({

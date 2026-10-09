@@ -115,6 +115,20 @@ describe('appearance panel', () => {
     expect(buttonNamed('Tự động').getAttribute('aria-pressed')).toBe('true');
   });
 
+  it('switches low-power from the popover', async () => {
+    await openPanel();
+    const group = panel().querySelector<HTMLElement>(
+      '[role="group"][aria-label="Chế độ tiết kiệm"]',
+    )!;
+    const on = [...group.querySelectorAll('button')].find(
+      (button) => button.textContent?.trim() === 'Bật',
+    )!;
+    on.click();
+    await flushPromises();
+    expect(root.hasAttribute('data-low-power')).toBe(true);
+    expect(on.getAttribute('aria-pressed')).toBe('true');
+  });
+
   it('links to the settings page', async () => {
     await openPanel();
     const link = [...panel().querySelectorAll('a')].find((anchor) =>

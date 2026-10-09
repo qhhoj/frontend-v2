@@ -1607,6 +1607,51 @@
   },
   "lowPower": {
     "editorHint": "Tab: thụt lề · Shift+Tab: lùi lề · Esc rồi Tab: rời ô soạn mã",
+    "lead": "Chọn một. Bản xem trước bên trong thẻ cho thấy khác biệt.",
+    "option": {
+      "auto": {
+        "title": "Tự động",
+        "body": "Bật nếu máy ≤ 2 GB bộ nhớ, ≤ 2 nhân CPU hoặc bật tiết kiệm dữ liệu."
+      },
+      "on": {
+        "title": "Luôn bật",
+        "body": "Ít hiệu ứng, chữ và màu giữ nguyên.",
+        "preview": "Bit tĩnh · không làm mờ"
+      },
+      "off": {
+        "title": "Luôn tắt",
+        "body": "Đủ hiệu ứng, kể cả khi máy yếu.",
+        "preview": "Bit chuyển động · kính mờ"
+      }
+    },
+    "machineOn": "Máy này: đang bật",
+    "machineOff": "Máy này: đang tắt",
+    "effectsTitle": "Khi bật",
+    "effects": {
+      "blur": "Tắt làm mờ nền (kính mờ)",
+      "blobs": "Ẩn các vệt màu nền",
+      "motion": "Bỏ hiệu ứng chuyển động",
+      "bit": "Bit hiển thị hình tĩnh",
+      "replay": "Phát lại bảng điểm không chuyển hàng",
+      "ranking": "Bảng xếp hạng cập nhật 60 giây một lần (thay vì 30)",
+      "editor": "Ô soạn mã dùng khung văn bản đơn giản, Tab để thụt lề"
+    },
+    "saved": "Đã lưu trên thiết bị này",
+    "savedNote": "Lưu trong trình duyệt của máy này, không đồng bộ theo tài khoản. Không ảnh hưởng đến máy chủ.",
+    "short": {
+      "auto": "Tự động",
+      "on": "Bật",
+      "off": "Tắt"
+    },
+    "footer": "Chế độ tiết kiệm: {state}",
+    "footerState": {
+      "on": "Bật",
+      "off": "Tắt",
+      "autoOn": "Tự động (bật)",
+      "autoOff": "Tự động (tắt)"
+    },
+    "footerChange": "Đổi",
+    "footerChangeLabel": "Đổi chế độ tiết kiệm",
     "title": "Chế độ tiết kiệm"
   },
   "flatpage": {

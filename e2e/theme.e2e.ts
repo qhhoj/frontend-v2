@@ -36,10 +36,11 @@ test('Glass automatic follows the system colour scheme live, on Glass, and survi
   await page.getByRole('button', { name: 'Giao diện', exact: true }).click();
   const panel = page.getByRole('dialog', { name: 'Giao diện' });
   // The mode is already automatic, so picking the Glass style stores `glass-auto`.
-  await expect(panel.getByRole('button', { name: 'Tự động', exact: true })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await expect(
+    panel
+      .getByRole('group', { name: 'Chế độ', exact: true })
+      .getByRole('button', { name: 'Tự động' }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await panel.getByRole('button', { name: 'Glass', exact: true }).click();
   await expect(html).toHaveAttribute('data-theme', 'glass-light');
   await page.emulateMedia({ colorScheme: 'dark' });
