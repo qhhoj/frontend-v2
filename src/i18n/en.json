@@ -508,7 +508,6 @@
       "remainingNone": "No backup codes left: regenerate now."
     },
     "codes": {
-      "title": "Save backup codes",
       "warning": "Shown once. Each code works once if you lose your phone. Lose both and you cannot get into the account.",
       "list": "Backup codes",
       "copy": "Copy all backup codes",
@@ -1063,7 +1062,6 @@
       "solved": "Solved",
       "penalty": "Penalty",
       "score": "Score",
-      "time": "Time",
       "scoreTime": "Score · time"
     },
     "legend": {
@@ -1197,15 +1195,13 @@
   },
   "pager": {
     "previous": "Previous page",
-    "next": "Next page",
-    "title": "Pages"
+    "next": "Next page"
   },
   "vote": {
     "up": "Vote up",
     "down": "Vote down",
     "refusedGate": "Solve at least 5 problems to vote.",
-    "refusedRate": "You are voting too fast. Try again in a few seconds.",
-    "title": "Voting"
+    "refusedRate": "You are voting too fast. Try again in a few seconds."
   },
   "leaderboard": {
     "lead": "{total} active users · 100 per page",
@@ -1326,8 +1322,7 @@
       "done": "{username} is banned",
       "doneBody": "The account can no longer sign in and left the leaderboards.",
       "bannedWithReason": "This account is banned. Reason: {reason}"
-    },
-    "title": "Profile"
+    }
   },
   "profileTabs": {
     "groupLine": "{count} problems · {points} points",
@@ -1448,8 +1443,7 @@
     "membersPager": "Member pages",
     "noMembers": "No members yet.",
     "postsPager": "Post pages",
-    "noPosts": "No posts yet.",
-    "title": "Joining"
+    "noPosts": "No posts yet."
   },
   "blog": {
     "lead": "News, guides and stories from the community. Pinned posts stay on top.",
@@ -1485,16 +1479,12 @@
     "noMorePosts": "No other posts yet.",
     "notFoundTitle": "Post not found",
     "notFoundBody": "The post does not exist or is not public yet.",
-    "backToBlog": "Back to the blog",
-    "title": "Post"
+    "backToBlog": "Back to the blog"
   },
   "comments": {
     "deletedAccount": "Deleted account",
     "inPage": "on",
     "title": "Comments"
-  },
-  "commentEditor": {
-    "title": "Your comment"
   },
   "tickets": {
     "lead": "Report statement mistakes, wrong tests or site problems. Staff answer here.",
@@ -1758,8 +1748,7 @@
     "home": "Home",
     "signInTitle": "Sign in to read this page",
     "signInBody": "This page is for signed-in members.",
-    "signIn": "Sign in",
-    "title": "Page"
+    "signIn": "Sign in"
   },
   "notifications": {
     "bell": "Notifications",
@@ -1863,9 +1852,7 @@
     "region": "Tickets that need you",
     "assignedOpen": "{count} open tickets assigned to you",
     "awaitingStaff": "{count} tickets waiting for a staff reply",
-    "clear": "No ticket is waiting for you.",
-    "viewAssigned": "See assigned tickets",
-    "viewAwaiting": "Open the ticket queue"
+    "clear": "No ticket is waiting for you."
   },
   "replay": {
     "bits": {
@@ -1941,8 +1928,7 @@
       "noRow": "Your virtual row is not on the board yet.",
       "realBoard": "Real board · {time}",
       "yourBoard": "Your virtual run · {time}"
-    },
-    "title": "Replay"
+    }
   },
   "contestTags": {
     "filterLabel": "Filter contests by tag",
@@ -1972,8 +1958,7 @@
     "read": "Read the rules",
     "hide": "Collapse",
     "cardNote": "You will be asked to accept them when you register or take a virtual run.",
-    "accepted": "Accepted revision {revision} at {time}",
-    "title": "Rules"
+    "accepted": "Accepted revision {revision} at {time}"
   },
   "problemSwitcher": {
     "limitsColumn": "Limits",
@@ -2116,8 +2101,7 @@
       "rowNotFound": "{code} no longer belongs to this organization",
       "rowSkipped": "{code} skipped",
       "summary": "{done}/{total} succeeded. At most 100 problems per action, 20 actions an hour."
-    },
-    "title": "Organization problems"
+    }
   },
   "orgQuota": {
     "credits": "Credits, {month}",
@@ -2154,17 +2138,14 @@
       "other": "Other"
     },
     "forbiddenTitle": "Only organization administrators can see the quota",
-    "forbiddenBody": "Ask an administrator of {name} if you need to know more.",
-    "title": "Quota"
+    "forbiddenBody": "Ask an administrator of {name} if you need to know more."
   },
   "problemArchive": {
-    "notice": "This problem was archived by {names}. You can still read it and submit as before. It is only hidden from the organization’s default list.",
-    "title": "Archived problem"
+    "notice": "This problem was archived by {names}. You can still read it and submit as before. It is only hidden from the organization’s default list."
   },
   "deletedProblem": {
     "chip": "Deleted",
     "noticeTitle": "Problem deleted",
-    "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone.",
-    "title": "Deleted problem"
+    "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone."
   }
 }

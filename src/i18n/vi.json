@@ -508,7 +508,6 @@
       "remainingNone": "Đã hết mã dự phòng: hãy tạo lại ngay."
     },
     "codes": {
-      "title": "Lưu mã dự phòng",
       "warning": "Chỉ hiện một lần. Mỗi mã dùng được một lần khi bạn mất điện thoại. Nếu mất cả hai, bạn sẽ không vào được tài khoản.",
       "list": "Mã dự phòng",
       "copy": "Sao chép tất cả mã dự phòng",
@@ -1063,7 +1062,6 @@
       "solved": "Giải",
       "penalty": "Phạt",
       "score": "Điểm",
-      "time": "Thời gian",
       "scoreTime": "Điểm · giờ"
     },
     "legend": {
@@ -1197,15 +1195,13 @@
   },
   "pager": {
     "previous": "Trang trước",
-    "next": "Trang sau",
-    "title": "Phân trang"
+    "next": "Trang sau"
   },
   "vote": {
     "up": "Bình chọn lên",
     "down": "Bình chọn xuống",
     "refusedGate": "Cần giải ít nhất 5 bài để bình chọn.",
-    "refusedRate": "Bạn bình chọn quá nhanh. Hãy thử lại sau ít giây.",
-    "title": "Bình chọn"
+    "refusedRate": "Bạn bình chọn quá nhanh. Hãy thử lại sau ít giây."
   },
   "leaderboard": {
     "lead": "{total} người dùng đang hoạt động · 100 người mỗi trang",
@@ -1326,8 +1322,7 @@
       "done": "Đã cấm {username}",
       "doneBody": "Tài khoản không đăng nhập được và đã rời bảng xếp hạng.",
       "bannedWithReason": "Tài khoản đã bị cấm. Lý do: {reason}"
-    },
-    "title": "Hồ sơ"
+    }
   },
   "profileTabs": {
     "groupLine": "{count} bài · {points} điểm",
@@ -1448,8 +1443,7 @@
     "membersPager": "Trang thành viên",
     "noMembers": "Tổ chức chưa có thành viên.",
     "postsPager": "Trang bài viết",
-    "noPosts": "Chưa có bài viết.",
-    "title": "Tham gia tổ chức"
+    "noPosts": "Chưa có bài viết."
   },
   "blog": {
     "lead": "Thông báo, hướng dẫn và chia sẻ từ cộng đồng. Bài ghim luôn nằm đầu bảng tin.",
@@ -1485,16 +1479,12 @@
     "noMorePosts": "Chưa có bài viết khác.",
     "notFoundTitle": "Không tìm thấy bài viết",
     "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
-    "backToBlog": "Về blog",
-    "title": "Bài viết"
+    "backToBlog": "Về blog"
   },
   "comments": {
     "deletedAccount": "Tài khoản đã xóa",
     "inPage": "trong",
     "title": "Bình luận"
-  },
-  "commentEditor": {
-    "title": "Bình luận của bạn"
   },
   "tickets": {
     "lead": "Báo lỗi đề bài, test sai hoặc sự cố trên trang. Quản trị viên sẽ trả lời tại đây.",
@@ -1758,8 +1748,7 @@
     "home": "Trang chủ",
     "signInTitle": "Đăng nhập để đọc trang này",
     "signInBody": "Trang này chỉ mở cho thành viên đã đăng nhập.",
-    "signIn": "Đăng nhập",
-    "title": "Trang"
+    "signIn": "Đăng nhập"
   },
   "notifications": {
     "bell": "Thông báo",
@@ -1863,9 +1852,7 @@
     "region": "Phiếu cần xử lý",
     "assignedOpen": "{count} phiếu đang mở giao cho bạn",
     "awaitingStaff": "{count} phiếu đang chờ nhân viên trả lời",
-    "clear": "Không có phiếu nào đang chờ bạn.",
-    "viewAssigned": "Xem phiếu được giao",
-    "viewAwaiting": "Mở hàng đợi phiếu"
+    "clear": "Không có phiếu nào đang chờ bạn."
   },
   "replay": {
     "bits": {
@@ -1941,8 +1928,7 @@
       "noRow": "Chưa thấy hàng của bạn trên bảng ảo.",
       "realBoard": "Bảng thật · {time}",
       "yourBoard": "Lượt ảo của bạn · {time}"
-    },
-    "title": "Phát lại"
+    }
   },
   "contestTags": {
     "filterLabel": "Lọc kỳ thi theo thẻ",
@@ -1972,8 +1958,7 @@
     "read": "Đọc quy định",
     "hide": "Thu gọn",
     "cardNote": "Bạn sẽ được hỏi đồng ý khi đăng ký hoặc tham gia ảo.",
-    "accepted": "Đã đồng ý bản {revision} lúc {time}",
-    "title": "Quy định"
+    "accepted": "Đã đồng ý bản {revision} lúc {time}"
   },
   "problemSwitcher": {
     "limitsColumn": "Giới hạn",
@@ -2116,8 +2101,7 @@
       "rowNotFound": "{code} không còn thuộc tổ chức này",
       "rowSkipped": "{code} bị bỏ qua",
       "summary": "{done}/{total} thành công. Giới hạn 100 bài mỗi lần, 20 lần mỗi giờ."
-    },
-    "title": "Bài tập của tổ chức"
+    }
   },
   "orgQuota": {
     "credits": "Tín dụng {month}",
@@ -2154,17 +2138,14 @@
       "other": "Khác"
     },
     "forbiddenTitle": "Chỉ quản trị tổ chức xem được hạn mức",
-    "forbiddenBody": "Liên hệ quản trị của {name} nếu cần biết thêm.",
-    "title": "Hạn mức"
+    "forbiddenBody": "Liên hệ quản trị của {name} nếu cần biết thêm."
   },
   "problemArchive": {
-    "notice": "Bài này đã được lưu trữ bởi tổ chức {names}. Bạn vẫn xem và nộp bài được như trước. Bài chỉ bị ẩn khỏi danh sách mặc định của tổ chức.",
-    "title": "Bài đã lưu trữ"
+    "notice": "Bài này đã được lưu trữ bởi tổ chức {names}. Bạn vẫn xem và nộp bài được như trước. Bài chỉ bị ẩn khỏi danh sách mặc định của tổ chức."
   },
   "deletedProblem": {
     "chip": "Đã xóa",
     "noticeTitle": "Bài đã bị xóa",
-    "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test.",
-    "title": "Bài đã bị xóa"
+    "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test."
   }
 }
