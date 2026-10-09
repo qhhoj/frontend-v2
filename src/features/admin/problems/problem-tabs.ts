@@ -40,7 +40,7 @@ const TAB_COMPONENTS: Record<ProblemTabId, Component | null> = {
   general: defineAsyncComponent(() => import('./general/ProblemGeneralTab.vue')),
   statements: defineAsyncComponent(() => import('./statements/ProblemStatementsTab.vue')),
   editorial: defineAsyncComponent(() => import('./editorial/ProblemEditorialTab.vue')),
-  data: null,
+  data: defineAsyncComponent(() => import('./data/ProblemDataTab.vue')),
   files: null,
 };
 

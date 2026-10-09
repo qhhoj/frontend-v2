@@ -164,5 +164,91 @@
     "authors": "Tác giả lời giải",
     "content": "Nội dung (Markdown)",
     "save": "Lưu lời giải"
+  },
+  "data": {
+    "save": "Lưu cấu hình",
+    "badJson": "JSON chưa hợp lệ.",
+    "archive": {
+      "title": "Gói dữ liệu",
+      "lead": "Gói zip, init.yml và các tệp trong gói.",
+      "none": "Chưa có gói dữ liệu",
+      "initMade": "init.yml đã tạo",
+      "initMissing": "Chưa có init.yml",
+      "more": "còn {count} tệp",
+      "viewInit": "Xem init.yml",
+      "note": "Tệp trong gói chỉ để chọn tên test; tải về qua liên kết riêng, không bao giờ hiển thị trực tiếp."
+    },
+    "init": {
+      "title": "init.yml"
+    },
+    "feedback": {
+      "title": "Không tạo được init.yml lần gần nhất"
+    },
+    "checker": {
+      "title": "Checker và grader",
+      "checkerLabel": "Checker",
+      "graderLabel": "Grader",
+      "checkerArgs": "Tham số checker (JSON)",
+      "graderArgs": "Tham số grader (JSON)",
+      "outputLimit": "Giới hạn output",
+      "outputPrefix": "Cắt output (prefix)",
+      "unicode": "Chấp nhận Unicode",
+      "nobigmath": "Tắt số lớn (nobigmath)",
+      "jsonHint": "Để trống nếu không có tham số. Phải là một đối tượng JSON."
+    },
+    "checkers": {
+      "standard": "Chuẩn (so khớp token)",
+      "bridged": "Checker riêng của bài",
+      "floats": "Số thực",
+      "floatsabs": "Số thực, sai số tuyệt đối",
+      "floatsrel": "Số thực, sai số tương đối",
+      "identical": "Giống hệt",
+      "linecount": "Theo số dòng"
+    },
+    "graders": {
+      "standard": "Chuẩn",
+      "interactive": "Tương tác",
+      "signature": "Chữ ký hàm",
+      "output_only": "Chỉ output"
+    },
+    "cases": {
+      "title": "Danh sách test",
+      "count": "{count} test",
+      "countOver": "{count} test, vượt ngưỡng khuyến nghị {soft}.",
+      "hardLimit": "Giới hạn cứng {max} test cần quyền judge.create_mass_testcases; tài khoản này theo giới hạn thường.",
+      "legend": "C: test lẻ · S: mở nhóm có điểm · E: đóng nhóm. Điểm của nhóm là điểm cả nhóm.",
+      "addCase": "Thêm test",
+      "addBatch": "Thêm nhóm",
+      "columns": {
+        "type": "Loại",
+        "input": "Tệp input",
+        "output": "Tệp output",
+        "points": "Điểm",
+        "options": "Tùy chọn",
+        "order": "Thứ tự"
+      },
+      "types": {
+        "C": "C · test lẻ",
+        "S": "S · mở nhóm",
+        "E": "E · đóng nhóm"
+      },
+      "batchLabel": "Nhóm {n}",
+      "pretest": "Pretest",
+      "generatorArgs": "Tham số generator",
+      "caseChecker": "Checker riêng",
+      "caseCheckerInherit": "Theo bài",
+      "caseArgs": "Tham số checker của test (JSON)",
+      "moveUp": "Chuyển test {row} lên",
+      "moveDown": "Chuyển test {row} xuống",
+      "remove": "Bỏ test {row}",
+      "rowLabel": "Test {row}",
+      "warnings": {
+        "missingFile": "thiếu tệp {file}",
+        "unclosedBatch": "nhóm chưa đóng",
+        "strayEnd": "E không có S"
+      },
+      "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
+      "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm."
+    }
   }
 }

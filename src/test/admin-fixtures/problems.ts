@@ -3,6 +3,7 @@ import type {
   ProblemEditingMeta,
   ProblemEditor,
 } from '../../api/types/problem-editing';
+import type { ProblemData, TestCase } from '../../api/types/problem-data';
 
 /** The same shape as mock-api's `ok`; importing mock-api would pull the `@` alias into the e2e project. */
 const ok = (data: unknown) => ({ body: { data } });
@@ -74,4 +75,46 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
 export const problemEditorRoutes = (problem: EditableProblem = editableProblem()) => ({
   [`GET /problems/${problem.code}`]: ok(problem),
   'GET /problems/meta': ok(problemEditingMeta()),
+});
+
+const testCase = (overrides: Partial<TestCase>): TestCase => ({
+  type: 'C',
+  input: '',
+  output: '',
+  points: null,
+  isPretest: false,
+  generatorArgs: '',
+  checker: '',
+  checkerArgs: null,
+  outputPrefix: null,
+  outputLimit: null,
+  ...overrides,
+});
+
+export const problemData = (overrides: Partial<ProblemData> = {}): ProblemData => ({
+  archive: 'hcmus41c.zip',
+  generator: 'gen.cpp',
+  customChecker: null,
+  customGrader: null,
+  customHeader: null,
+  checker: 'standard',
+  checkerArgs: null,
+  grader: 'standard',
+  graderArgs: null,
+  outputPrefix: null,
+  outputLimit: null,
+  unicode: false,
+  nobigmath: false,
+  feedback: '',
+  cases: [
+    testCase({ type: 'C', input: '1.in', output: '1.out', points: 0, isPretest: true }),
+    testCase({ type: 'S', points: 30, checker: 'floatsabs', checkerArgs: { precision: 6 } }),
+    testCase({ type: 'C', input: 'sub1/01.in', output: 'sub1/01.out' }),
+    testCase({ type: 'C', input: 'sub1/02.in', output: 'sub1/02.out' }),
+    testCase({ type: 'E' }),
+  ],
+  archiveFiles: ['1.in', '1.out', 'sub1/01.in', 'sub1/01.out', 'sub1/02.in', 'sub1/02.out'],
+  hasInit: true,
+  limits: { softCases: 50, maxCases: 300 },
+  ...overrides,
 });

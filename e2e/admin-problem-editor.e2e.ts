@@ -3,7 +3,11 @@ import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminOk, signInAsStaff } from './fixtures/admin';
 import type { FakeApi } from './fixtures/api';
 import type { Page } from '@playwright/test';
-import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
+import {
+  editableProblem,
+  problemData,
+  problemEditingMeta,
+} from '../src/test/admin-fixtures/problems';
 
 const openEditor = async (page: Page, api: FakeApi, tab: string) => {
   signInAsStaff(api, ['judge.edit_own_problem']);
@@ -40,6 +44,18 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['POST /problems/render-preview'] = adminOk({ html: '<p>Cho đồ thị</p>' });
     await openEditor(page, api, 'statements');
     await expect(page.getByText('Cho đồ thị', { exact: true })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`data tab lists the tests and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    api.routes['GET /problems/hcmus41c/data'] = adminOk(problemData());
+    await openEditor(page, api, 'data');
+    await expect(page.getByRole('button', { name: 'Chuyển test 2 lên' })).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,

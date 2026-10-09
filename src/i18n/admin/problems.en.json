@@ -164,5 +164,91 @@
     "authors": "Editorial authors",
     "content": "Content (Markdown)",
     "save": "Save editorial"
+  },
+  "data": {
+    "save": "Save configuration",
+    "badJson": "Invalid JSON.",
+    "archive": {
+      "title": "Data archive",
+      "lead": "The zip, init.yml and the files inside it.",
+      "none": "No data archive yet",
+      "initMade": "init.yml generated",
+      "initMissing": "No init.yml yet",
+      "more": "{count} more files",
+      "viewInit": "View init.yml",
+      "note": "Archive files only name the tests; download through their own link, never shown inline."
+    },
+    "init": {
+      "title": "init.yml"
+    },
+    "feedback": {
+      "title": "The last init.yml could not be generated"
+    },
+    "checker": {
+      "title": "Checker and grader",
+      "checkerLabel": "Checker",
+      "graderLabel": "Grader",
+      "checkerArgs": "Checker arguments (JSON)",
+      "graderArgs": "Grader arguments (JSON)",
+      "outputLimit": "Output limit",
+      "outputPrefix": "Output prefix",
+      "unicode": "Accept Unicode",
+      "nobigmath": "Disable big numbers (nobigmath)",
+      "jsonHint": "Leave empty when there are no arguments. Must be a JSON object."
+    },
+    "checkers": {
+      "standard": "Standard (token match)",
+      "bridged": "The problem's own checker",
+      "floats": "Floats",
+      "floatsabs": "Floats, absolute error",
+      "floatsrel": "Floats, relative error",
+      "identical": "Identical",
+      "linecount": "By line count"
+    },
+    "graders": {
+      "standard": "Standard",
+      "interactive": "Interactive",
+      "signature": "Function signature",
+      "output_only": "Output only"
+    },
+    "cases": {
+      "title": "Test list",
+      "count": "{count} tests",
+      "countOver": "{count} tests, over the advised {soft}.",
+      "hardLimit": "Hard limit {max} tests needs judge.create_mass_testcases; this account has the normal limit.",
+      "legend": "C: single test · S: open a scored group · E: close the group. A group's points are the whole group's.",
+      "addCase": "Add test",
+      "addBatch": "Add group",
+      "columns": {
+        "type": "Type",
+        "input": "Input file",
+        "output": "Output file",
+        "points": "Points",
+        "options": "Options",
+        "order": "Order"
+      },
+      "types": {
+        "C": "C · single test",
+        "S": "S · open group",
+        "E": "E · close group"
+      },
+      "batchLabel": "Group {n}",
+      "pretest": "Pretest",
+      "generatorArgs": "Generator arguments",
+      "caseChecker": "Own checker",
+      "caseCheckerInherit": "Problem's",
+      "caseArgs": "Test checker arguments (JSON)",
+      "moveUp": "Move test {row} up",
+      "moveDown": "Move test {row} down",
+      "remove": "Remove test {row}",
+      "rowLabel": "Test {row}",
+      "warnings": {
+        "missingFile": "missing file {file}",
+        "unclosedBatch": "group not closed",
+        "strayEnd": "E without an S"
+      },
+      "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
+      "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups."
+    }
   }
 }
