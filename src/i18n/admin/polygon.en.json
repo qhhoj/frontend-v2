@@ -1,0 +1,51 @@
+{
+  "title": "Import a problem from Polygon",
+  "lead": "The package is processed in the background; the status comes from the job queue.",
+  "rateLimited": "At most 10 imports per hour.",
+  "form": {
+    "board": "Import a Polygon package",
+    "permissionChip": "Permission: {permission}",
+    "drop": "Drop the .zip package here",
+    "pickedFile": "{name} · {size}",
+    "chooseFile": "Choose file",
+    "code": "Problem code",
+    "codeInvalid": "Lowercase letters, digits and underscores only (1 to 32 characters).",
+    "mode": {
+      "label": "Mode",
+      "create": "Create",
+      "update": "Update"
+    },
+    "group": "Group",
+    "groupDefault": "System default",
+    "types": "Types",
+    "points": "Points",
+    "pointsHint": "Leave empty for the default points.",
+    "authors": "Authors",
+    "curators": "Curators",
+    "mainLanguage": "Main statement language",
+    "mainLanguageHint": "The language name on Polygon, for example vietnamese.",
+    "solutionLanguage": "Solution language",
+    "languageMap": "Statement language map (polygon=site)",
+    "languageMapHint": "One pair per line as polygon-name=en or =vi.",
+    "languageMapInvalid": "Not valid: {pairs}",
+    "ignoreBatches": "Ignore zero-point test groups",
+    "ignoreCases": "Ignore zero-point tests",
+    "appendSolution": "Append the main solution to the problem",
+    "submit": "Start import",
+    "submitNeedsFile": "Choose a .zip package to start."
+  },
+  "progress": {
+    "board": "Progress",
+    "title": "Importing {code}",
+    "state": "State",
+    "received": "Package received",
+    "queued": "Waiting in the queue",
+    "running": "Processing",
+    "runningHint": "the page asks again every 2 seconds",
+    "done": "Done",
+    "doneText": "Import finished. The problem is created; open it to keep editing.",
+    "open": "Open {code}",
+    "failed": "The import failed. The system gives no further reason.",
+    "pollFailed": "Could not fetch the status yet. The page will try again."
+  }
+}

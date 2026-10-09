@@ -1,0 +1,51 @@
+{
+  "title": "Nhập bài từ Polygon",
+  "lead": "Gói được xử lý nền; trạng thái lấy từ công việc trong hàng đợi.",
+  "rateLimited": "Tối đa 10 lượt nhập mỗi giờ.",
+  "form": {
+    "board": "Nhập gói Polygon",
+    "permissionChip": "Quyền: {permission}",
+    "drop": "Kéo gói .zip vào đây",
+    "pickedFile": "{name} · {size}",
+    "chooseFile": "Chọn tệp",
+    "code": "Mã bài",
+    "codeInvalid": "Chỉ gồm chữ thường, số và dấu gạch dưới (1 đến 32 ký tự).",
+    "mode": {
+      "label": "Chế độ",
+      "create": "Tạo mới",
+      "update": "Cập nhật"
+    },
+    "group": "Nhóm bài",
+    "groupDefault": "Mặc định của hệ thống",
+    "types": "Dạng bài",
+    "points": "Điểm",
+    "pointsHint": "Để trống để dùng điểm mặc định.",
+    "authors": "Tác giả",
+    "curators": "Người duyệt",
+    "mainLanguage": "Ngôn ngữ đề chính",
+    "mainLanguageHint": "Tên ngôn ngữ trên Polygon, ví dụ vietnamese.",
+    "solutionLanguage": "Ngôn ngữ lời giải",
+    "languageMap": "Ánh xạ ngôn ngữ đề (polygon=site)",
+    "languageMapHint": "Mỗi cặp dạng tên-trên-Polygon=en hoặc =vi.",
+    "languageMapInvalid": "Không hợp lệ: {pairs}",
+    "ignoreBatches": "Bỏ qua nhóm test 0 điểm",
+    "ignoreCases": "Bỏ qua test 0 điểm",
+    "appendSolution": "Thêm lời giải chính vào bài",
+    "submit": "Bắt đầu nhập",
+    "submitNeedsFile": "Chọn gói .zip để bắt đầu."
+  },
+  "progress": {
+    "board": "Tiến trình",
+    "title": "Đang nhập {code}",
+    "state": "Trạng thái",
+    "received": "Đã nhận gói",
+    "queued": "Đang chờ trong hàng đợi",
+    "running": "Đang xử lý",
+    "runningHint": "trang hỏi lại mỗi 2 giây",
+    "done": "Hoàn tất",
+    "doneText": "Nhập xong. Bài đã tạo, mở để chỉnh tiếp.",
+    "open": "Mở {code}",
+    "failed": "Không nhập được. Hệ thống không cho biết thêm lý do.",
+    "pollFailed": "Chưa lấy được trạng thái. Trang sẽ thử lại."
+  }
+}

@@ -10,7 +10,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   dashboard: () => import('./shell/AdminDashboard.vue'),
   problems: () => import('./problems/ProblemsIndexPage.vue'),
   problemNew: placeholder,
-  problemImport: placeholder,
+  problemImport: () => import('./problems/import/PolygonImportPage.vue'),
   problemGeneral: () => import('./problems/ProblemEditorPage.vue'),
   problemStatements: () => import('./problems/ProblemEditorPage.vue'),
   problemEditorial: () => import('./problems/ProblemEditorPage.vue'),
