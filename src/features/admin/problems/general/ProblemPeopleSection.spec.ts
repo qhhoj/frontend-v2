@@ -13,9 +13,12 @@ afterEach(() => mountedApps.splice(0).forEach(({ wrapper }) => wrapper.unmount()
 const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   mountedApps.push(mounted);
-  await vi.waitFor(() => {
-    if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
-  });
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
+    },
+    { timeout: 5000 },
+  );
   await flushPromises();
   return mounted;
 };

@@ -250,5 +250,53 @@
       "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
       "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups."
     }
+  },
+  "uploads": {
+    "archive": {
+      "upload": "Upload a new zip"
+    },
+    "sources": {
+      "title": "Attached source files",
+      "generator": "Test generator",
+      "customChecker": "Custom checker",
+      "customGrader": "Custom grader",
+      "customHeader": "Custom header",
+      "none": "None yet",
+      "upload": "Upload",
+      "replace": "Replace",
+      "remove": "Remove {name}",
+      "removeTitle": "Remove {name}?",
+      "removeBody": "The problem stops using this file until it is uploaded again.",
+      "removeConfirm": "Remove"
+    }
+  },
+  "files": {
+    "image": {
+      "title": "Images in the statement",
+      "lead": "Images pasted into the statement box; the address is returned to insert.",
+      "button": "Choose image"
+    },
+    "pdf": {
+      "title": "Statement PDF",
+      "lead": "One PDF for the whole problem; replaces the old one.",
+      "button": "Choose PDF"
+    },
+    "material": {
+      "title": "Attached material",
+      "lead": "A material pack contestants download.",
+      "button": "Choose material"
+    },
+    "attachments": {
+      "title": "Attachments",
+      "lead": "One file at a time; replaces the old one. Only images for the statement box are accepted there.",
+      "pdfButton": "Upload statement PDF",
+      "materialButton": "Upload material"
+    },
+    "uploaded": "Uploaded: {url}",
+    "current": "Current:",
+    "none": "No file yet",
+    "open": "Open",
+    "copy": "Copy address",
+    "footer": "Each upload returns one address; the system keeps no list of uploads, so save the address in the statement or in the problem's PDF and material fields."
   }
 }

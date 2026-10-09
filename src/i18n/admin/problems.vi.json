@@ -250,5 +250,53 @@
       "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
       "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm."
     }
+  },
+  "uploads": {
+    "archive": {
+      "upload": "Tải zip mới lên"
+    },
+    "sources": {
+      "title": "Tệp nguồn kèm theo",
+      "generator": "Bộ sinh test (generator)",
+      "customChecker": "Checker tùy chỉnh",
+      "customGrader": "Grader tùy chỉnh",
+      "customHeader": "Header tùy chỉnh",
+      "none": "Chưa có",
+      "upload": "Tải lên",
+      "replace": "Tải lại",
+      "remove": "Xóa {name}",
+      "removeTitle": "Xóa {name}?",
+      "removeBody": "Bài sẽ không dùng tệp này nữa cho tới khi tải lại.",
+      "removeConfirm": "Xóa"
+    }
+  },
+  "files": {
+    "image": {
+      "title": "Ảnh trong đề",
+      "lead": "Ảnh dán vào khung viết đề; trả về URL để chèn.",
+      "button": "Chọn ảnh"
+    },
+    "pdf": {
+      "title": "Đề PDF",
+      "lead": "Một tệp PDF cho cả bài, thay tệp cũ.",
+      "button": "Chọn PDF"
+    },
+    "material": {
+      "title": "Tài liệu kèm",
+      "lead": "Gói tài liệu cho thí sinh tải về.",
+      "button": "Chọn tài liệu"
+    },
+    "attachments": {
+      "title": "Tệp đi kèm",
+      "lead": "Chấp nhận một tệp mỗi lần, thay tệp cũ. Chỉ nhận ảnh trong khung viết đề.",
+      "pdfButton": "Tải đề PDF lên",
+      "materialButton": "Tải tài liệu lên"
+    },
+    "uploaded": "Đã tải lên: {url}",
+    "current": "Hiện tại:",
+    "none": "Chưa có tệp",
+    "open": "Mở",
+    "copy": "Sao chép địa chỉ",
+    "footer": "Mỗi lần tải lên trả về một URL; hệ thống không có danh sách tệp đã tải, nên URL cần được lưu vào đề hoặc vào hai trường PDF và tài liệu của bài."
   }
 }

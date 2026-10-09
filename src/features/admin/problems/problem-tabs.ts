@@ -41,7 +41,7 @@ const TAB_COMPONENTS: Record<ProblemTabId, Component | null> = {
   statements: defineAsyncComponent(() => import('./statements/ProblemStatementsTab.vue')),
   editorial: defineAsyncComponent(() => import('./editorial/ProblemEditorialTab.vue')),
   data: defineAsyncComponent(() => import('./data/ProblemDataTab.vue')),
-  files: null,
+  files: defineAsyncComponent(() => import('./files/ProblemFilesTab.vue')),
 };
 
 export const problemTabOf = (routeName: unknown) =>

@@ -61,3 +61,14 @@ for (const viewport of AUDIT_VIEWPORTS)
       true,
     );
   });
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`files tab is accessible and fits at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    await openEditor(page, api, 'files');
+    await expect(page.getByRole('heading', { name: 'Ảnh trong đề' })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });

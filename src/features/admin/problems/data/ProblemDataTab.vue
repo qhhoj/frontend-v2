@@ -10,11 +10,22 @@ import CheckerSection from './CheckerSection.vue';
 import DataArchiveCard from './DataArchiveCard.vue';
 import DataFeedback from './DataFeedback.vue';
 import { useDataForm } from './use-data-form';
+import DataSourceFiles from './DataSourceFiles.vue';
+import { useKeepDataAnswer } from './problem-data.queries';
+import { uploadDataArchive } from '@/api/problem-data.api';
+import { useAdminMutation } from '../../ui/use-admin-mutation';
+import UploadButton from '../../ui/UploadButton.vue';
+import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { query, form, errors, badRowNumbers, markInvalid, save, mutation } = useDataForm(
   () => props.problem.code,
 );
+const keepAnswer = useKeepDataAnswer(() => props.problem.code);
+const archive = useAdminMutation({
+  mutate: (file: File) => uploadDataArchive(props.problem.code, file),
+  onDone: keepAnswer,
+});
 </script>
 
 <template>
@@ -33,7 +44,24 @@ const { query, form, errors, badRowNumbers, markInvalid, save, mutation } = useD
       novalidate
       @submit.prevent="save"
     >
-      <DataArchiveCard :code="problem.code" :data="query.data.value" />
+      <DataArchiveCard :code="problem.code" :data="query.data.value">
+        <template #upload>
+          <UploadButton
+            data-testid="upload-archive"
+            :label="$t('admin.problems.uploads.archive.upload')"
+            accept=".zip"
+            :max-bytes="UPLOAD_LIMITS.archive"
+            :is-pending="archive.isPending.value"
+            @picked="archive.run"
+          />
+        </template>
+      </DataArchiveCard>
+      <AdminStatus
+        v-if="archive.failure.value"
+        kind="refused"
+        :text="failureTextOf(archive.failure.value)"
+      />
+      <DataSourceFiles :code="problem.code" :data="query.data.value" />
       <DataFeedback :feedback="query.data.value.feedback" />
       <CheckerSection
         v-model="form"

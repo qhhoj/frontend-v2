@@ -5,6 +5,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
 import ProblemCloneSection from './ProblemCloneSection.vue';
+import ProblemAttachmentsSection from '../files/ProblemAttachmentsSection.vue';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { useProblemForm } from './use-problem-form';
 
@@ -39,7 +40,7 @@ const { can } = usePermissions();
         </button>
       </div>
     </form>
-    <!-- Task 9 adds ProblemAttachmentsSection here, after the form too. -->
+    <ProblemAttachmentsSection :problem="problem" />
     <ProblemCloneSection v-if="can('judge.clone_problem')" :code="problem.code" />
   </div>
 </template>

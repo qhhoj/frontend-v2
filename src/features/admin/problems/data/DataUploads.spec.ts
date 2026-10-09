@@ -1,0 +1,79 @@
+import { describe, expect, it, vi } from 'vitest';
+import { flushPromises } from '@vue/test-utils';
+import { mockApi, ok, rateLimited } from '@/test/mock-api';
+import { mountApp } from '@/test/mount';
+import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
+
+type Mounted = Awaited<ReturnType<typeof mountApp>>;
+const EDIT = ['judge.edit_own_problem'];
+
+/** The shell and the data tab load lazily: wait until the checker box is on the page. */
+const mountAdmin = async (path: string) => {
+  const mounted = await mountApp(path);
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('#data-checkerArgs').exists()) throw new Error('tab not yet');
+    },
+    { timeout: 5000 },
+  );
+  await flushPromises();
+  return mounted;
+};
+
+const pick = async (input: ReturnType<Mounted['wrapper']['get']>, file: File) => {
+  Object.defineProperty(input.element, 'files', { value: [file], configurable: true });
+  await input.trigger('change');
+  await flushPromises();
+};
+
+describe('test data uploads', () => {
+  it('uploads a new archive and shows the archive the answer names', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+      'POST /problems/hcmus41c/data/archive': ok(problemData({ archive: 'new.zip' })),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await pick(wrapper.get('[data-testid="upload-archive"] input'), new File(['zip'], 'new.zip'));
+    const sent = calls.find((call) => call.path.endsWith('/archive'))!.body as FormData;
+    expect(sent.get('file')).toBeInstanceOf(File);
+    expect(wrapper.text()).toContain('new.zip');
+  });
+
+  it('removes the custom checker only after confirming', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData({ customChecker: 'checker.cpp' })),
+      'DELETE /problems/hcmus41c/data/files/customChecker': ok(
+        problemData({ customChecker: null }),
+      ),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await wrapper.get('button[aria-label="Xóa checker.cpp"]').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
+    await confirmDialog('Xóa');
+    expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
+    expect(wrapper.get('[data-testid="source-customChecker"]').text()).toContain('Chưa có');
+  });
+
+  it('shows the hourly upload limit as text with Bit, not a crash', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+      'POST /problems/hcmus41c/data/files/generator': rateLimited(1800),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await pick(
+      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
+      new File(['x'], 'gen.cpp'),
+    );
+    const alert = wrapper.get('[data-testid="source-generator"] [role="alert"]').text();
+    expect(alert).toContain('Bạn thao tác quá nhanh');
+    expect(alert).toContain('Thử lại sau 1800 giây.');
+  });
+});

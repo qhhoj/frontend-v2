@@ -58,3 +58,8 @@ export interface ProblemDataBody {
   nobigmath: boolean;
   cases: TestCase[];
 }
+
+/** The four stored source files of a problem's data: each one is a single upload. */
+export type SourceFileKind = 'generator' | 'customChecker' | 'customGrader' | 'customHeader';
+/** Anything the data endpoints store: the archive or one of the source files. */
+export type DataFileKind = SourceFileKind | 'archive';

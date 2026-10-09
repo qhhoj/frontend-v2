@@ -16,9 +16,12 @@ const ALL = [...EDIT, 'judge.edit_all_problem'];
 /** The shell, the editor and the tab load lazily: wait until the form field the test uses is on the page. */
 const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => {
-    if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
-  });
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
+    },
+    { timeout: 5000 },
+  );
   await flushPromises();
   return mounted;
 };

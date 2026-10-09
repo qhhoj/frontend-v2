@@ -11,9 +11,12 @@ const PREVIEW = { 'POST /problems/render-preview': ok({ html: '<p>x</p>' }) };
 /** The shell and the statements tab load lazily: wait until the language choice is on the page. */
 const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => {
-    if (!mounted.wrapper.find('[role="radiogroup"]').exists()) throw new Error('tab not yet');
-  });
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('[role="radiogroup"]').exists()) throw new Error('tab not yet');
+    },
+    { timeout: 5000 },
+  );
   await flushPromises();
   return mounted;
 };

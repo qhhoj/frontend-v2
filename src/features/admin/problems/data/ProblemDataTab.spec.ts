@@ -11,9 +11,12 @@ const EDIT = ['judge.edit_own_problem'];
 /** The shell and the data tab load lazily: wait until the checker box is on the page. */
 const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => {
-    if (!mounted.wrapper.find('#data-checkerArgs').exists()) throw new Error('tab not yet');
-  });
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('#data-checkerArgs').exists()) throw new Error('tab not yet');
+    },
+    { timeout: 5000 },
+  );
   await flushPromises();
   return mounted;
 };

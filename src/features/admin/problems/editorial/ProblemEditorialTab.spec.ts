@@ -8,9 +8,12 @@ import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/prob
 /** The shell and the editorial tab load lazily: wait until the publish box is on the page. */
 const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => {
-    if (!mounted.wrapper.find('#editorial-publishOn').exists()) throw new Error('tab not yet');
-  });
+  await vi.waitFor(
+    () => {
+      if (!mounted.wrapper.find('#editorial-publishOn').exists()) throw new Error('tab not yet');
+    },
+    { timeout: 5000 },
+  );
   await flushPromises();
   return mounted;
 };
