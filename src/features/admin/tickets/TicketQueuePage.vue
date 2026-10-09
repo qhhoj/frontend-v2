@@ -3,12 +3,14 @@ import { computed, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import TicketAlertsStrip from '@/features/tickets/TicketAlertsStrip.vue';
 import { ticketQueryFromRoute } from '@/features/tickets/ticket-filters';
 import { useTicketsQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
 import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import TicketQueueDetail from './TicketQueueDetail.vue';
 import TicketQueueFilters from './TicketQueueFilters.vue';
 import TicketQueueTable from './TicketQueueTable.vue';
@@ -42,8 +44,14 @@ const { isLive, announcement } = useTicketStream(null);
       :title="$t('admin.tickets.title')"
       :lead="$t('admin.tickets.lead')"
     >
-      <template #actions><AdminBit placement="people" /></template>
+      <template #actions>
+        <RouterLink :to="{ name: adminRouteName('cannedReplies') }" :class="ADMIN_BUTTON_CLASS">
+          {{ $t('admin.cannedReplies.openFromQueue') }}
+        </RouterLink>
+        <AdminBit placement="people" />
+      </template>
     </AdminPageHeader>
+    <TicketAlertsStrip />
     <p v-if="isLive" class="flex items-center gap-2 text-[13px] text-muted">
       <span aria-hidden="true" class="inline-block size-2 rounded-full bg-accent"></span>
       {{ $t('admin.tickets.live') }}

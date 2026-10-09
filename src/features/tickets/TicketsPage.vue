@@ -10,6 +10,7 @@ import StatePanel from '@/components/StatePanel.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import StaffTicketFilters from './StaffTicketFilters.vue';
+import TicketAlertsStrip from './TicketAlertsStrip.vue';
 import TicketFilterNav from './TicketFilterNav.vue';
 import TicketTable from './TicketTable.vue';
 import TicketTableSkeleton from './TicketTableSkeleton.vue';
@@ -50,6 +51,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
         {{ $t('tickets.newTicket') }}
       </RouterLink>
     </header>
+    <TicketAlertsStrip />
     <TicketFilterNav :filters="filters" :total="data?.meta.total" />
     <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
     <StaffTicketFilters :key="route.fullPath" :filters="filters" />
