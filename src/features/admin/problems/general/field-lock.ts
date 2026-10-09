@@ -13,5 +13,5 @@ export function hintWhenLocked(hint: string, isLocked: boolean): string {
 }
 
 /** The `lockedBy` prop of a switch or chip list: the permission named while locked, nothing when writable. */
-export const lockedByEditAll = (can: (permission: string) => boolean) =>
-  can(EDIT_ALL_PROBLEM) ? undefined : EDIT_ALL_PROBLEM;
+export const permissionLock = (can: (permission: string) => boolean, permission: string) =>
+  can(permission) ? undefined : permission;

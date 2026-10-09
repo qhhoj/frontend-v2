@@ -6,13 +6,13 @@ import AdminField from '../../ui/AdminField.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { ADMIN_INPUT_CLASS } from '../../ui/classes';
-import { lockedByEditAll, lockNotice } from './field-lock';
+import { EDIT_ALL_PROBLEM, lockNotice, permissionLock } from './field-lock';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
 defineProps<{ errors: FieldErrors }>();
 const { can } = usePermissions();
-const lockedBy = computed(() => lockedByEditAll(can));
+const lockedBy = computed(() => permissionLock(can, EDIT_ALL_PROBLEM));
 const isStaffLocked = computed(() => lockedBy.value !== undefined);
 </script>
 

@@ -22,3 +22,11 @@ for (const viewport of AUDIT_VIEWPORTS)
       true,
     );
   });
+
+test('the people chips and switches are reachable by keyboard', async ({ page, api }) => {
+  await openEditor(page, api, 'general');
+  await page.getByLabel('Người thử bài (testers)').focus();
+  await expect(page.getByRole('button', { name: 'Bỏ khoa.tester' })).toBeVisible();
+  await page.getByRole('switch', { name: 'Công khai' }).focus();
+  await expect(page.getByRole('switch', { name: 'Công khai' })).toBeFocused();
+});

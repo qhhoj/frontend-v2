@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
+import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import ProblemCloneSection from './ProblemCloneSection.vue';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { useProblemForm } from './use-problem-form';
 
@@ -11,28 +13,33 @@ const { form, save, errors, mutation, isDirty } = useProblemForm(
   () => props.problem,
   () => props.meta,
 );
+const { can } = usePermissions();
 </script>
 
 <template>
-  <form class="flex flex-col gap-5" novalidate @submit.prevent="save">
-    <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
-    <div
-      class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
-    >
-      <AdminStatus
-        v-if="mutation.failure.value"
-        kind="refused"
-        :text="failureTextOf(mutation.failure.value)"
-      />
-      <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
-      <button
-        type="submit"
-        class="ml-auto"
-        :class="ADMIN_PRIMARY_CLASS"
-        :aria-disabled="!isDirty || mutation.isPending.value ? 'true' : undefined"
+  <div class="flex flex-col gap-5">
+    <form class="flex flex-col gap-5" novalidate @submit.prevent="save">
+      <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
+      <div
+        class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
       >
-        {{ $t('admin.ui.save') }}
-      </button>
-    </div>
-  </form>
+        <AdminStatus
+          v-if="mutation.failure.value"
+          kind="refused"
+          :text="failureTextOf(mutation.failure.value)"
+        />
+        <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
+        <button
+          type="submit"
+          class="ml-auto"
+          :class="ADMIN_PRIMARY_CLASS"
+          :aria-disabled="!isDirty || mutation.isPending.value ? 'true' : undefined"
+        >
+          {{ $t('admin.ui.save') }}
+        </button>
+      </div>
+    </form>
+    <!-- Task 9 adds ProblemAttachmentsSection here, after the form too. -->
+    <ProblemCloneSection v-if="can('judge.clone_problem')" :code="problem.code" />
+  </div>
 </template>

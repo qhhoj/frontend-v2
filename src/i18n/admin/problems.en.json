@@ -105,5 +105,30 @@
       "points": "From 800 to 3500.",
       "types": "At least one problem type is needed."
     }
+  },
+  "people": {
+    "title": "People in charge",
+    "authors": "Authors",
+    "curators": "Curators",
+    "testers": "Testers",
+    "banned": "Banned from submitting",
+    "organizations": "Organizations",
+    "orgPrivate": "Private to organizations",
+    "orgPrivateHint": "Only members of the listed organizations see the problem."
+  },
+  "status": {
+    "title": "Status",
+    "public": "Public",
+    "manual": "Managed manually",
+    "fullMarkup": "Allow full markup",
+    "fullMarkupHint": "HTML is not filtered."
+  },
+  "clone": {
+    "title": "Clone problem",
+    "code": "New problem code",
+    "hint": "Copies the statements, translations and test data.",
+    "submit": "Clone",
+    "done": "Cloned.",
+    "open": "Open {code}"
   }
 }

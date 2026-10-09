@@ -105,5 +105,30 @@
       "points": "Từ 800 đến 3500.",
       "types": "Cần ít nhất một loại bài."
     }
+  },
+  "people": {
+    "title": "Người phụ trách",
+    "authors": "Tác giả",
+    "curators": "Người duyệt (curators)",
+    "testers": "Người thử bài (testers)",
+    "banned": "Bị cấm nộp",
+    "organizations": "Tổ chức",
+    "orgPrivate": "Riêng tư theo tổ chức",
+    "orgPrivateHint": "Chỉ thành viên các tổ chức trên thấy bài."
+  },
+  "status": {
+    "title": "Trạng thái",
+    "public": "Công khai",
+    "manual": "Quản lý thủ công",
+    "fullMarkup": "Cho phép markup đầy đủ",
+    "fullMarkupHint": "HTML không được lọc."
+  },
+  "clone": {
+    "title": "Nhân bản bài",
+    "code": "Mã bài mới",
+    "hint": "Sao chép đề, bản dịch, dữ liệu chấm.",
+    "submit": "Nhân bản",
+    "done": "Đã nhân bản.",
+    "open": "Mở {code}"
   }
 }
