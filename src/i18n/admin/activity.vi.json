@@ -1,0 +1,71 @@
+{
+  "title": "Hoạt động người dùng",
+  "lead": "Nhật ký yêu cầu, người đang truy cập và tóm tắt theo người dùng.",
+  "crumbs": {
+    "users": "Người dùng",
+    "activity": "Hoạt động"
+  },
+  "note": "Xoá nhật ký là thao tác không hoàn tác — “Xoá nhật ký của …” xoá mọi dòng và phiên của người này; “Xoá nhật ký khách” xoá toàn bộ dòng của khách. Nhật ký giữ tối đa 90 ngày; xuất CSV tối đa 100 000 dòng, mới nhất trước.",
+  "anonymousDelete": "Xoá nhật ký khách",
+  "filters": {
+    "user": "Người dùng",
+    "userPlaceholder": "Một phần tên người dùng",
+    "ip": "IP (tiền tố)",
+    "ipPlaceholder": "Ví dụ 27.69",
+    "path": "Đường dẫn chứa",
+    "pathPlaceholder": "Ví dụ /submissions",
+    "days": "Khoảng thời gian",
+    "day7": "7 ngày",
+    "day30": "30 ngày",
+    "day90": "90 ngày (tối đa)",
+    "export": "Xuất CSV"
+  },
+  "table": {
+    "caption": "Nhật ký yêu cầu",
+    "at": "Lúc",
+    "user": "Người dùng",
+    "ip": "IP",
+    "request": "Yêu cầu",
+    "status": "Mã",
+    "guest": "khách",
+    "empty": "Không có dòng nào khớp.",
+    "page": "Trang {page} · 50 dòng mỗi trang; chưa biết tổng số",
+    "previous": "Trước",
+    "next": "Sau"
+  },
+  "live": {
+    "heading": "Đang truy cập",
+    "window": "{minutes} phút",
+    "signedIn": "đăng nhập",
+    "guests": "khách",
+    "bots": "bot",
+    "nextPage": "Trang sau",
+    "empty": "Chưa ai truy cập trong khoảng thời gian này."
+  },
+  "summary": {
+    "heading": "{username} · tóm tắt {days} ngày",
+    "total": "{total} yêu cầu",
+    "chart": "Yêu cầu mỗi ngày (UTC), cao nhất {max}",
+    "chartDay": "Ngày",
+    "chartCount": "Yêu cầu",
+    "topIps": "IP nhiều nhất",
+    "topPaths": "Đường dẫn nhiều nhất",
+    "sessions": "Phiên đăng nhập gần đây (50 mới nhất)",
+    "sessionIp": "IP",
+    "sessionDevice": "Thiết bị",
+    "sessionBrowser": "Trình duyệt · Hệ điều hành",
+    "sessionCreated": "Tạo lúc",
+    "sessionLast": "Hoạt động cuối",
+    "mobile": "Điện thoại",
+    "desktop": "Máy tính",
+    "noSessions": "Chưa có phiên đăng nhập nào.",
+    "delete": "Xoá nhật ký của {username}"
+  },
+  "confirm": {
+    "userTitle": "Xoá nhật ký của {username}?",
+    "userBody": "Mọi dòng và phiên đăng nhập của người này bị xoá vĩnh viễn; thao tác không hoàn tác được.",
+    "anonymousTitle": "Xoá toàn bộ nhật ký khách?",
+    "anonymousBody": "Mọi dòng của khách bị xoá vĩnh viễn; thao tác không hoàn tác được.",
+    "delete": "Xoá"
+  }
+}

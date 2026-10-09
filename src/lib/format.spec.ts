@@ -4,6 +4,7 @@ import {
   formatAgo,
   formatNumericDate,
   formatNumericDateTime,
+  formatNumericDateTimeSeconds,
   formatCaseMemory,
   formatCaseTime,
   formatClock,
@@ -161,5 +162,16 @@ describe('formatAgo', () => {
 describe('signedScore', () => {
   it('writes the sign of a vote score with a real minus', () => {
     expect([signedScore(4), signedScore(-3), signedScore(0)]).toEqual(['+4', '\u22123', '0']);
+  });
+});
+
+describe('formatNumericDateTimeSeconds', () => {
+  it('writes the numeric date and a 24-hour time with seconds, per locale', () => {
+    expect(formatNumericDateTimeSeconds('2026-10-08T08:41:08.000Z', 'vi')).toBe(
+      '08/10/2026 08:41:08',
+    );
+    expect(formatNumericDateTimeSeconds('2026-10-08T20:05:09.000Z', 'en')).toBe(
+      '10/08/2026 20:05:09',
+    );
   });
 });

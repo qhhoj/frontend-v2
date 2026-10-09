@@ -154,6 +154,16 @@ export const formatNumericDateTime = (date: string, locale: Locale) => {
   }).format(new Date(date));
   return `${formatNumericDate(date, locale)} ${time}`;
 };
+/** `08/10/2026 20:12:09`: the numeric date and a 24-hour time with seconds, in the viewer's zone. */
+export const formatNumericDateTimeSeconds = (date: string, locale: Locale) => {
+  const time = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(date));
+  return `${formatNumericDate(date, locale)} ${time}`;
+};
 const WEEK_MS = 7 * 86_400_000;
 /** "2 giờ trước" within a week, the numeric date after. */
 export const formatAgo = (date: string, now: number, locale: Locale) =>

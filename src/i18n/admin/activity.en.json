@@ -1,0 +1,71 @@
+{
+  "title": "User activity",
+  "lead": "Request logs, people online now, and a summary per user.",
+  "crumbs": {
+    "users": "Users",
+    "activity": "Activity"
+  },
+  "note": "Deleting logs cannot be undone: “Delete logs of …” removes every row and session of this person; “Delete guest logs” removes every guest row. Logs are kept for at most 90 days; a CSV export holds at most 100,000 rows, newest first.",
+  "anonymousDelete": "Delete guest logs",
+  "filters": {
+    "user": "User",
+    "userPlaceholder": "Part of a username",
+    "ip": "IP (prefix)",
+    "ipPlaceholder": "For example 27.69",
+    "path": "Path contains",
+    "pathPlaceholder": "For example /submissions",
+    "days": "Time range",
+    "day7": "7 days",
+    "day30": "30 days",
+    "day90": "90 days (maximum)",
+    "export": "Export CSV"
+  },
+  "table": {
+    "caption": "Request log",
+    "at": "At",
+    "user": "User",
+    "ip": "IP",
+    "request": "Request",
+    "status": "Code",
+    "guest": "guest",
+    "empty": "No rows match.",
+    "page": "Page {page} · 50 rows per page; total not known",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "live": {
+    "heading": "Online now",
+    "window": "{minutes} minutes",
+    "signedIn": "signed in",
+    "guests": "guests",
+    "bots": "bots",
+    "nextPage": "Next page",
+    "empty": "Nobody has visited in this window."
+  },
+  "summary": {
+    "heading": "{username} · summary for {days} days",
+    "total": "{total} requests",
+    "chart": "Requests per day (UTC), busiest {max}",
+    "chartDay": "Day",
+    "chartCount": "Requests",
+    "topIps": "Most used IPs",
+    "topPaths": "Most requested paths",
+    "sessions": "Recent sign-in sessions (50 latest)",
+    "sessionIp": "IP",
+    "sessionDevice": "Device",
+    "sessionBrowser": "Browser · OS",
+    "sessionCreated": "Created",
+    "sessionLast": "Last activity",
+    "mobile": "Phone",
+    "desktop": "Computer",
+    "noSessions": "No sign-in sessions yet.",
+    "delete": "Delete logs of {username}"
+  },
+  "confirm": {
+    "userTitle": "Delete the logs of {username}?",
+    "userBody": "Every row and sign-in session of this person is deleted for good; this cannot be undone.",
+    "anonymousTitle": "Delete all guest logs?",
+    "anonymousBody": "Every guest row is deleted for good; this cannot be undone.",
+    "delete": "Delete"
+  }
+}
