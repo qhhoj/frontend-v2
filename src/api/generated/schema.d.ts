@@ -3354,6 +3354,10 @@ export interface components {
         CurrentPasswordDto: {
             currentPassword: string;
         };
+        CursorPageMetaResponse: {
+            nextBefore: string | null;
+            pageSize: number;
+        };
         DecideOrganizationRequestDto: {
             /** @enum {string} */
             state: "A" | "R";
@@ -8812,7 +8816,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/atom+xml": string;
+                    "application/rss+xml": string;
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
@@ -10186,7 +10191,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "text/yaml": string;
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
@@ -12083,7 +12088,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["RecentCommentResponse"][];
-                        meta: components["schemas"]["PageMetaResponse"];
+                        meta: components["schemas"]["CursorPageMetaResponse"];
                     };
                 };
             };
@@ -12121,7 +12126,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["PpEntryResponse"][];
-                        meta: components["schemas"]["PageMetaResponse"];
+                        meta: components["schemas"]["HasMorePageMetaResponse"];
                     };
                 };
             };
