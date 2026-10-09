@@ -1,3 +1,5 @@
+import type { Schemas } from './schemas';
+
 export const API_BASE = '/api/internal';
 
 /** `total` is sent by /problems, /contests, /submissions and /users; only pp-breakdown sends `hasMore` instead. */
@@ -14,12 +16,8 @@ export interface Page<Item> {
   meta: PageMeta;
 }
 
-/** backend: libs/common (`FieldIssue`): one failed validation, the machine-readable twin of a `fields` message (B10). */
-export interface FieldIssue {
-  field: string;
-  code: string;
-  message: string;
-}
+/** One failed validation, the machine-readable twin of a `fields` message (the backend's `FieldIssueResponse`). */
+export type FieldIssue = Schemas['FieldIssueResponse'];
 
 /**
  * A failed request: the backend's `{ error: { code, message, fields?, issues?, ...extra } }`, or `network_error` / `invalid_response`.
