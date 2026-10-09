@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useId } from 'vue';
-import type { ContestTagColor } from '@/api/types/contest-tags';
+import type { TagColor } from '@/api/types/contest-tags';
 import { TAG_COLOR_CLASSES, TAG_COLORS } from '@/features/contests/tag-colors';
 
 /** One radio per colour token, each drawn as the chip it would make (the sample text in that colour). */
-const color = defineModel<ContestTagColor>({ required: true });
+const color = defineModel<TagColor>({ required: true });
 defineProps<{ label: string; sample: string }>();
 const name = useId();
 </script>

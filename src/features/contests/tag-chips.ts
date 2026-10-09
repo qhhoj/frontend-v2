@@ -1,4 +1,4 @@
-import type { ContestTag, ContestTagColor } from '@/api/types/contest-tags';
+import type { ContestTag, TagColor } from '@/api/types/contest-tags';
 import { NEUTRAL_TAG_CLASS, TAG_COLOR_CLASSES } from './tag-colors';
 
 /** backend `CONTEST_TAG_PATTERN` (contest.schema.ts): a malformed `?tag=` would be a 400, so it is never sent. */
@@ -9,7 +9,7 @@ export interface TagChipView {
   slug: string;
   label: string;
   /** Null for a slug the catalogue does not hold. */
-  color: ContestTagColor | null;
+  color: TagColor | null;
   colorClass: string;
 }
 

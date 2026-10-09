@@ -106,7 +106,7 @@ const TEXT_TOKENS = [
   'tier-grandmaster',
   ...SYNTAX_TOKENS,
 ];
-/** Contest tag chips (backend `ContestTagColor`): text token on its own tint, eight of them. */
+/** Contest tag chips (backend `TagColor`): text token on its own tint, eight of them. */
 const TAG_COUNT = 8;
 const TAG_PAIRS: ReadonlyArray<readonly [string, string]> = Array.from(
   { length: TAG_COUNT },

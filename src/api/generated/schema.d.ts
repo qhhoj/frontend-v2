@@ -1212,7 +1212,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Always an attachment with `nosniff`; the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
+        /** Always a `private, no-store` attachment with `nosniff` (the zip holds every contestant's source); the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
         get: operations["ContestExportController_download"];
         put?: never;
         post?: never;
@@ -1633,7 +1633,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The feed as a stream: the snapshot, then new events. HTTP Basic like the snapshot URL. */
+        /** The feed as a stream: the snapshot, then new events, one NDJSON line each. HTTP Basic like the snapshot URL. */
         get: operations["FeedStreamController_feed"];
         put?: never;
         post?: never;
@@ -2033,6 +2033,118 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/organizations/{slug}/problem-tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProblemTagsController_list"];
+        put?: never;
+        post: operations["ProblemTagsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/problem-tags/{tagSlug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["ProblemTagsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ProblemTagsController_update"];
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/problems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationProblemsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/problems/{code}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrganizationProblemsController_archive"];
+        delete: operations["OrganizationProblemsController_unarchive"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/problems/{code}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["OrganizationProblemsController_setTags"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/problems/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrganizationProblemBulkController_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/quota": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["OrganizationUsageController_updateQuota"];
+        trace?: never;
+    };
     "/api/internal/organizations/{slug}/requests": {
         parameters: {
             query?: never;
@@ -2075,6 +2187,39 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["OrganizationRequestsController_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/{slug}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationUsageController_one"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Static `usage` wins over `:slug` (the slug `usage` is reserved). */
+        get: operations["OrganizationUsageController_overview"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2176,6 +2321,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["ProblemEditingController_edit"];
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/archived-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ArchiveNoticeController_archivedIn"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/internal/problems/{code}/clone": {
@@ -3386,6 +3547,13 @@ export interface components {
             glass: number;
             glow: number;
         };
+        ArchivedInOrganizationResponse: {
+            name: string;
+            slug: string;
+        };
+        ArchivedInResponse: {
+            organizations: components["schemas"]["ArchivedInOrganizationResponse"][];
+        };
         AssignTagsDto: {
             tagCodes: string[];
         };
@@ -3419,6 +3587,17 @@ export interface components {
         BanDto: {
             reason: string;
         };
+        BulkProblemsDto: {
+            action: components["schemas"]["OrganizationProblemBulkAction"];
+            codes: string[];
+            /** Format: uuid */
+            tagId?: string;
+        };
+        BulkProblemsResponse: {
+            done: number;
+            results: components["schemas"]["BulkResultResponse"][];
+            skipped: number;
+        };
         BulkRejudgeDto: {
             /** @description Count what would be rejudged and change nothing. */
             dryRun?: boolean;
@@ -3441,6 +3620,13 @@ export interface components {
             allowed: boolean;
             count: number;
             dryRun: boolean;
+        };
+        BulkResultResponse: {
+            code: string;
+            /** @enum {string} */
+            outcome: "done" | "skipped";
+            /** @description Set when skipped: the code is not a live problem of this organization. */
+            reason?: string;
         };
         CannedReplyResponse: {
             /** @description With `{tên}` / `{bài}` still in it. */
@@ -3577,7 +3763,7 @@ export interface components {
             /** Format: date-time */
             at: string;
             published: number;
-            /** @description Empty on success; `no_permission` or `actor_unavailable` on a failure. */
+            /** @description Empty on success; `no_permission`, `actor_unavailable` or `cannot_edit_contest` on a failure. */
             reason: string;
             skipped: number;
             status: components["schemas"]["ContestAutoPublishStatus"];
@@ -3810,14 +3996,9 @@ export interface components {
             languages: components["schemas"]["ContestLanguageStatsResponse"][];
             problems: components["schemas"]["ContestProblemStatsResponse"][];
         };
-        /**
-         * @description A theme token key (`tag-1`..`tag-8`), never a hex.
-         * @enum {string}
-         */
-        ContestTagColor: "tag-1" | "tag-2" | "tag-3" | "tag-4" | "tag-5" | "tag-6" | "tag-7" | "tag-8";
         ContestTagResponse: {
             /** @description A theme token key (`tag-1`..`tag-8`), never a hex. */
-            color: components["schemas"]["ContestTagColor"];
+            color: components["schemas"]["TagColor"];
             description: string;
             name: string;
             order: number;
@@ -3910,7 +4091,7 @@ export interface components {
         };
         CreateContestTagDto: {
             /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
-            color: components["schemas"]["ContestTagColor"];
+            color: components["schemas"]["TagColor"];
             description?: string;
             name: string;
             order?: number;
@@ -3964,7 +4145,7 @@ export interface components {
         };
         CreateJudgeDto: {
             description?: string;
-            /** @description Hostname-style: the judge-server sends it as its handshake `id`. */
+            /** @description Hostname-style: the judge sends it as `x-judge-name` metadata when it opens the judge link. */
             name: string;
         };
         CreateLanguageDto: {
@@ -4062,6 +4243,12 @@ export interface components {
             timeLimit: number;
             typeIds: string[];
         };
+        CreateProblemTagDto: {
+            /** @description The palette token keys, shared with the contest tags (`TagColor`). */
+            color?: components["schemas"]["TagColor"];
+            name: string;
+            slug: string;
+        };
         CreateShortLinkDto: {
             /** @description Staff only. */
             code?: string;
@@ -4075,6 +4262,19 @@ export interface components {
             link: string;
             /** @description Legacy fetched the title from the judge's API; the client supplies it now. */
             name: string;
+        };
+        CreditActorResponse: {
+            id: string;
+            username: string;
+        };
+        CreditEntryResponse: {
+            /** @description The user who spent the credits; null for a system entry or a user that no longer exists. */
+            actor: components["schemas"]["CreditActorResponse"] | null;
+            amount: number;
+            /** Format: date-time */
+            createdAt: string;
+            reason: string;
+            ref: string;
         };
         CurrentContestResponse: {
             /** Format: date-time */
@@ -4145,11 +4345,6 @@ export interface components {
         };
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
-        };
-        FeedEventFrame: {
-            data: components["schemas"]["FeedLineResponse"];
-            /** @enum {string} */
-            event: "contest" | "groups" | "judgement-types" | "judgements" | "languages" | "problems" | "state" | "submissions" | "teams";
         };
         /** @enum {string} */
         FeedKeyMode: "frozen-until-release" | "live";
@@ -4545,7 +4740,7 @@ export interface components {
             event: "notification";
         };
         /** @enum {string} */
-        NotificationKind: "contest-announcement" | "organization-request-decided" | "ticket-message" | "ticket-new" | "ticket-status";
+        NotificationKind: "contest-announcement" | "organization-request-decided" | "quota-warning" | "ticket-message" | "ticket-new" | "ticket-status";
         /** @enum {string} */
         NotificationPriority: "high" | "normal";
         NotificationResponse: {
@@ -4614,6 +4809,23 @@ export interface components {
             shortName: string;
             slug: string;
         };
+        /** @enum {string} */
+        OrganizationProblemArchiveFilter: "all" | "false" | "true";
+        /** @enum {string} */
+        OrganizationProblemBulkAction: "add-tag" | "archive" | "remove-tag" | "unarchive";
+        OrganizationProblemResponse: {
+            code: string;
+            isArchived: boolean;
+            isPublic: boolean;
+            name: string;
+            points: number;
+            tags: components["schemas"]["ProblemTagResponse"][];
+            /**
+             * Format: date-time
+             * @description When the problem document was last written (the "Cập nhật" column), not the link's tag or archive edits.
+             */
+            updatedAt: string;
+        };
         OrganizationRequestResponse: {
             /** Format: date-time */
             createdAt: string;
@@ -4636,6 +4848,18 @@ export interface components {
             shortName: string;
             slug: string;
         };
+        OrganizationUsageResponse: {
+            credits: components["schemas"]["QuotaMeterResponse"];
+            enforcing: boolean;
+            /** @description `YYYY-MM` in the site time zone. */
+            month: string;
+            organization: components["schemas"]["UsageOrganizationResponse"];
+            quota: components["schemas"]["UsageQuotaResponse"];
+            recent: components["schemas"]["CreditEntryResponse"][];
+            storage: components["schemas"]["QuotaMeterResponse"];
+        };
+        /** @enum {string} */
+        OrganizationUsageSort: "credits" | "name";
         OrganizationViewerResponse: {
             canAdminister: boolean;
             isMember: boolean;
@@ -4916,6 +5140,13 @@ export interface components {
         };
         /** @enum {string} */
         ProblemSort: "-acRate" | "-code" | "-date" | "-name" | "-points" | "-userCount" | "acRate" | "code" | "date" | "name" | "points" | "userCount";
+        ProblemTagResponse: {
+            /** @description A colour token key (`tag-1`..`tag-8`), never a hex. */
+            color: components["schemas"]["TagColor"];
+            id: string;
+            name: string;
+            slug: string;
+        };
         ProblemTranslationResponse: {
             description: string;
             language: components["schemas"]["StatementLanguage"];
@@ -5024,6 +5255,12 @@ export interface components {
         };
         QueuedResponse: {
             queued: boolean;
+        };
+        QuotaMeterResponse: {
+            isNearLimit: boolean;
+            isOver: boolean;
+            limit: number;
+            used: number;
         };
         RankingLinkResponse: {
             expiresAt: string | null;
@@ -5226,6 +5463,9 @@ export interface components {
             csv?: string;
             /** Format: uri */
             url?: string;
+        };
+        SetProblemTagsDto: {
+            tagIds: string[];
         };
         /** @enum {string} */
         SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
@@ -5689,6 +5929,11 @@ export interface components {
         TagCatalogResponse: {
             groups: components["schemas"]["TagGroupResponse"][];
         };
+        /**
+         * @description A colour token key (`tag-1`..`tag-8`), never a hex.
+         * @enum {string}
+         */
+        TagColor: "tag-1" | "tag-2" | "tag-3" | "tag-4" | "tag-5" | "tag-6" | "tag-7" | "tag-8";
         TagGroupResponse: {
             code: string;
             id: string;
@@ -5941,7 +6186,7 @@ export interface components {
         };
         UpdateContestTagDto: {
             /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
-            color?: components["schemas"]["ContestTagColor"];
+            color?: components["schemas"]["TagColor"];
             description?: string;
             name?: string;
             order?: number;
@@ -6050,6 +6295,11 @@ export interface components {
             timeLimit?: number;
             typeIds?: string[];
         };
+        UpdateProblemTagDto: {
+            /** @description The palette token keys, shared with the contest tags (`TagColor`). */
+            color?: components["schemas"]["TagColor"];
+            name?: string;
+        };
         UpdateProfileDto: {
             about?: string;
             /** @enum {string} */
@@ -6068,6 +6318,10 @@ export interface components {
             siteTheme?: string;
             timezone?: string;
             userScript?: string;
+        };
+        UpdateQuotaDto: {
+            quotaMonthlyCredits?: number | null;
+            quotaStorageBytes?: number | null;
         };
         UpdateRankingLinkDto: {
             expiresAt?: string;
@@ -6093,6 +6347,23 @@ export interface components {
         };
         UploadedFileResponse: {
             url: string;
+        };
+        UsageOrganizationResponse: {
+            name: string;
+            slug: string;
+        };
+        UsageOverviewRowResponse: {
+            creditsLimit: number;
+            creditsUsed: number;
+            month: string;
+            name: string;
+            slug: string;
+            storageLimit: number;
+            storageUsed: number;
+        };
+        UsageQuotaResponse: {
+            monthlyCredits: number | null;
+            storageBytes: number | null;
         };
         UserDataStatusResponse: {
             /** @description A prepare would be accepted now: no job running, the once-a-day rule met and the three-a-day limit not used up. */
@@ -10572,13 +10843,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stream of frames; `event` names each one. */
+            /** @description A stream of JSON objects, one per line. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "text/event-stream": components["schemas"]["FeedEventFrame"];
+                    "application/x-ndjson": components["schemas"]["FeedLineResponse"];
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
@@ -11541,6 +11812,372 @@ export interface operations {
             };
         };
     };
+    ProblemTagsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemTagResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemTagsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProblemTagDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemTagResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemTagsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                tagSlug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemTagsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                tagSlug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProblemTagDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemTagResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemsController_list: {
+        parameters: {
+            query?: {
+                /** @description Default: archived problems are hidden. */
+                archived?: components["schemas"]["OrganizationProblemArchiveFilter"];
+                page?: number;
+                pageSize?: number;
+                /** @description The `q` query parameter (a longer property name keeps the `id-length` lint rule); `name: 'q'` documents the wire name. */
+                q?: string;
+                tag?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationProblemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemsController_archive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemsController_unarchive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemsController_setTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetProblemTagsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationProblemResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemBulkController_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkProblemsDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BulkProblemsResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationUsageController_updateQuota: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuotaDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationUsageResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     OrganizationRequestsController_list: {
         parameters: {
             query?: {
@@ -11677,6 +12314,77 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationRequestResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationUsageController_one: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationUsageResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationUsageController_overview: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                sort?: components["schemas"]["OrganizationUsageSort"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UsageOverviewRowResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
                     };
                 };
             };
@@ -12117,6 +12825,40 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProblemDetailResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ArchiveNoticeController_archivedIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ArchivedInResponse"];
                     };
                 };
             };

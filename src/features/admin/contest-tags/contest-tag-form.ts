@@ -1,7 +1,7 @@
 import type {
   ContestTag,
   ContestTagBody,
-  ContestTagColor,
+  TagColor,
   ContestTagPatch,
 } from '@/api/types/contest-tags';
 import { isTagSlug } from '@/features/contests/tag-chips';
@@ -12,7 +12,7 @@ import type { FieldErrors } from '../ui/admin-errors';
 export interface ContestTagForm {
   slug: string;
   name: string;
-  color: ContestTagColor;
+  color: TagColor;
   description: string;
   order: number;
 }
