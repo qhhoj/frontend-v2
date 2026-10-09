@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { rankingRow, sessionUser } from '@/test/fixtures';
@@ -34,6 +34,8 @@ const rowTexts = (wrapper: ReturnType<typeof table>) =>
   );
 
 describe('ReplayTable', () => {
+  afterEach(() => document.documentElement.removeAttribute('data-low-power'));
+
   it('draws the board in rank order, ghosts muted with an icon and a chip, unranked last with no score', () => {
     stubMatchMedia();
     const wrapper = table(600);
@@ -74,7 +76,7 @@ describe('ReplayTable', () => {
     expect(row.classes()).toContain('bg-surface-hover');
   });
 
-  it('animates rows only while motion is allowed, and stops at once under reduced motion', async () => {
+  it('animates rows only while motion is allowed, and stops at once under reduced motion or low-power', async () => {
     const media = stubMatchMedia();
     const wrapper = table(600);
     const motion = () => wrapper.get('tbody').attributes('data-motion');
@@ -82,6 +84,11 @@ describe('ReplayTable', () => {
     media.setReducedMotion(true);
     await nextTick();
     expect(motion()).toBe('off');
+    media.setReducedMotion(false);
+    await nextTick();
+    expect(motion()).toBe('on');
+    document.documentElement.setAttribute('data-low-power', '');
+    await vi.waitFor(() => expect(motion()).toBe('off'));
   });
 
   it('moves focus to a row on request and reports a missing one', () => {

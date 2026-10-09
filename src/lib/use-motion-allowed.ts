@@ -1,9 +1,10 @@
 import { computed } from 'vue';
+import { useLowPowerPainted } from './use-low-power-painted';
 import { useReducedMotion } from './use-reduced-motion';
 
-// TODO(F5 Task 9): also return false while `useLowPowerPainted()` is on; vnoi/f5-b has not reached main yet.
-/** True while decorative motion (list moves, scrolling) may run: no `prefers-reduced-motion: reduce`. */
+/** True while decorative motion (list moves, scrolling) may run: no `prefers-reduced-motion: reduce` and no low-power. */
 export function useMotionAllowed() {
   const reduced = useReducedMotion();
-  return computed(() => !reduced.value);
+  const lowPower = useLowPowerPainted();
+  return computed(() => !reduced.value && !lowPower.value);
 }
