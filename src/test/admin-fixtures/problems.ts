@@ -2,8 +2,10 @@ import type {
   EditableProblem,
   ProblemEditingMeta,
   ProblemEditor,
-} from '@/api/types/problem-editing';
-import { ok } from '../mock-api';
+} from '../../api/types/problem-editing';
+
+/** The same shape as mock-api's `ok`; importing mock-api would pull the `@` alias into the e2e project. */
+const ok = (data: unknown) => ({ body: { data } });
 
 export const LANG_CPP20 = '0192a000-0000-7000-8000-00000000c020';
 export const LANG_PY3 = '0192a000-0000-7000-8000-0000000000b3';

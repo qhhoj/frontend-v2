@@ -9,7 +9,7 @@ const placeholder: Loader = () => import('./shell/AdminPlaceholder.vue');
 const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   dashboard: () => import('./shell/AdminDashboard.vue'),
   problems: () => import('./problems/ProblemsIndexPage.vue'),
-  problemNew: placeholder,
+  problemNew: () => import('./problems/general/ProblemCreatePage.vue'),
   problemImport: () => import('./problems/import/PolygonImportPage.vue'),
   problemGeneral: () => import('./problems/ProblemEditorPage.vue'),
   problemStatements: () => import('./problems/ProblemEditorPage.vue'),

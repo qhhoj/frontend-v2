@@ -1,3 +1,4 @@
+import { defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
 
 export const PROBLEM_TABS = [
@@ -36,7 +37,7 @@ export type ProblemTabId = (typeof PROBLEM_TABS)[number]['id'];
 
 /** One line per tab; Tasks 5-9 each replace their own `null`. A `null` tab shows the "not built yet" line. */
 const TAB_COMPONENTS: Record<ProblemTabId, Component | null> = {
-  general: null,
+  general: defineAsyncComponent(() => import('./general/ProblemGeneralTab.vue')),
   statements: null,
   editorial: null,
   data: null,

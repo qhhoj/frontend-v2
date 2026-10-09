@@ -20,5 +20,90 @@
   "indexLead": "Open a problem by code to edit its statement, test data and people.",
   "lookupLabel": "Problem code",
   "lookupSubmit": "Open",
-  "lookupHint": "No admin list yet: type the exact code."
+  "lookupHint": "No admin list yet: type the exact code.",
+  "general": {
+    "create": {
+      "title": "Create problem",
+      "crumb": "Create problem",
+      "lead": "A viewer without the right to add problems sends a suggestion; staff review it later.",
+      "block": "New problem",
+      "createButton": "Create problem",
+      "suggestButton": "Send suggestion",
+      "suggested": "Suggestion for {code} sent."
+    },
+    "sections": {
+      "basics": "Basics",
+      "limits": "Limits and points",
+      "classes": "Classification and languages",
+      "visibility": "Visible to contestants"
+    },
+    "basics": {
+      "code": "Problem code",
+      "codeHint": "Lowercase letters, digits, underscore (1 to 32 characters). Changing the code changes the address.",
+      "name": "Name",
+      "nameHint": "Up to 100 characters. Sent only when you edit it; per-language names live in the Statements tab.",
+      "source": "Source",
+      "date": "Date",
+      "summary": "Summary",
+      "summaryHint": "Shown in the problem list, up to 1000 characters.",
+      "ogImage": "Preview image",
+      "ogImageHint": "Leave empty to keep the current image."
+    },
+    "limits": {
+      "timeLimit": "Time limit (seconds)",
+      "timeLimitHint": "0.01 to 60.",
+      "memoryLimit": "Memory limit (KiB)",
+      "memoryLimitHint": "Up to 1048576.",
+      "points": "Points",
+      "pointsHint": "800 to 3500.",
+      "partial": "Partial scoring",
+      "partialHint": "Score by the number of tests passed, not only when all pass.",
+      "languageTitle": "Limits per language",
+      "languageColumn": "Language",
+      "timeColumn": "Time (seconds)",
+      "memoryColumn": "Memory (KiB)",
+      "pickLanguage": "Pick a language",
+      "addLimit": "Add limit",
+      "removeLimit": "Remove the limit for {language}",
+      "timeFor": "Time for {language}",
+      "memoryFor": "Memory for {language}",
+      "removeColumn": "Remove"
+    },
+    "classes": {
+      "group": "Group",
+      "license": "License",
+      "noLicense": "Not stated",
+      "types": "Problem types (at least 1)",
+      "pickType": "Pick a type",
+      "addType": "Add type",
+      "allowedLanguages": "Allowed languages",
+      "allowedLanguagesHint": "Languages contestants may submit in."
+    },
+    "visibility": {
+      "source": "Show submission source",
+      "sourceHint": "F, A, S, O: site setting, always, after solving, owners only.",
+      "sourceF": "Site setting",
+      "sourceA": "Always",
+      "sourceS": "After solving",
+      "sourceO": "Owners only",
+      "testcases": "Test data visible",
+      "testcasesO": "Owners only",
+      "testcasesC": "Sample tests only",
+      "testcasesA": "All",
+      "results": "Per-test results",
+      "resultsA": "All tests",
+      "resultsB": "By test group",
+      "resultsS": "Summary only",
+      "feedback": "Show judge feedback",
+      "feedbackHint": "The checker's message for each test."
+    },
+    "errors": {
+      "code": "Lowercase letters, digits, underscore, 1 to 32 characters.",
+      "timeLimit": "From 0.01 to 60 seconds.",
+      "highTime": "Over 5 seconds needs judge.high_problem_timelimit.",
+      "memory": "From 0 to 1048576 KiB.",
+      "points": "From 800 to 3500.",
+      "types": "At least one problem type is needed."
+    }
+  }
 }

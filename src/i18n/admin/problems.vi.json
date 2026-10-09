@@ -20,5 +20,90 @@
   "indexLead": "Mở bài theo mã để sửa đề, dữ liệu chấm và người phụ trách.",
   "lookupLabel": "Mã bài",
   "lookupSubmit": "Mở bài",
-  "lookupHint": "Chưa có danh sách quản trị: nhập đúng mã bài."
+  "lookupHint": "Chưa có danh sách quản trị: nhập đúng mã bài.",
+  "general": {
+    "create": {
+      "title": "Tạo bài tập",
+      "crumb": "Tạo bài tập",
+      "lead": "Người không có quyền thêm bài gửi dưới dạng đề xuất; nhân viên duyệt sau.",
+      "block": "Tạo bài mới",
+      "createButton": "Tạo bài",
+      "suggestButton": "Gửi đề xuất bài",
+      "suggested": "Đã gửi đề xuất {code}."
+    },
+    "sections": {
+      "basics": "Thông tin cơ bản",
+      "limits": "Giới hạn và điểm",
+      "classes": "Phân loại và ngôn ngữ",
+      "visibility": "Hiển thị với thí sinh"
+    },
+    "basics": {
+      "code": "Mã bài",
+      "codeHint": "Chữ thường, số, gạch dưới (1 đến 32 ký tự). Đổi mã làm đổi địa chỉ bài.",
+      "name": "Tên bài",
+      "nameHint": "Tối đa 100 ký tự. Chỉ gửi khi bạn sửa; tên theo ngôn ngữ nằm ở tab Đề bài và bản dịch.",
+      "source": "Nguồn",
+      "date": "Ngày đăng",
+      "summary": "Tóm tắt",
+      "summaryHint": "Hiện trong danh sách bài, tối đa 1000 ký tự.",
+      "ogImage": "Ảnh xem trước",
+      "ogImageHint": "Để trống để giữ nguyên."
+    },
+    "limits": {
+      "timeLimit": "Thời gian (giây)",
+      "timeLimitHint": "0,01 đến 60.",
+      "memoryLimit": "Bộ nhớ (KiB)",
+      "memoryLimitHint": "Tối đa 1048576.",
+      "points": "Điểm",
+      "pointsHint": "800 đến 3500.",
+      "partial": "Chấm điểm từng phần",
+      "partialHint": "Cho điểm theo số test đạt, không chỉ khi đạt tất cả.",
+      "languageTitle": "Giới hạn riêng theo ngôn ngữ",
+      "languageColumn": "Ngôn ngữ",
+      "timeColumn": "Thời gian (giây)",
+      "memoryColumn": "Bộ nhớ (KiB)",
+      "pickLanguage": "Chọn ngôn ngữ",
+      "addLimit": "Thêm giới hạn",
+      "removeLimit": "Bỏ giới hạn {language}",
+      "timeFor": "Thời gian cho {language}",
+      "memoryFor": "Bộ nhớ cho {language}",
+      "removeColumn": "Bỏ"
+    },
+    "classes": {
+      "group": "Nhóm bài",
+      "license": "Giấy phép",
+      "noLicense": "Không ghi rõ",
+      "types": "Loại bài (ít nhất 1)",
+      "pickType": "Chọn loại bài",
+      "addType": "Thêm loại",
+      "allowedLanguages": "Ngôn ngữ được phép",
+      "allowedLanguagesHint": "Ngôn ngữ thí sinh được nộp bài."
+    },
+    "visibility": {
+      "source": "Hiển thị mã nguồn bài nộp",
+      "sourceHint": "F, A, S, O: theo cấu hình chung, luôn, sau khi giải, chỉ chủ.",
+      "sourceF": "Theo cấu hình chung",
+      "sourceA": "Luôn",
+      "sourceS": "Sau khi giải",
+      "sourceO": "Chỉ chủ bài nộp",
+      "testcases": "Test được xem",
+      "testcasesO": "Chỉ chủ bài",
+      "testcasesC": "Chỉ test ví dụ",
+      "testcasesA": "Tất cả",
+      "results": "Kết quả từng test",
+      "resultsA": "Tất cả test",
+      "resultsB": "Theo nhóm test",
+      "resultsS": "Chỉ tóm tắt",
+      "feedback": "Cho xem phản hồi của máy chấm",
+      "feedbackHint": "Thông điệp từ checker cho từng test."
+    },
+    "errors": {
+      "code": "Chữ thường, số, gạch dưới, 1 đến 32 ký tự.",
+      "timeLimit": "Từ 0,01 đến 60 giây.",
+      "highTime": "Trên 5 giây cần quyền judge.high_problem_timelimit.",
+      "memory": "Từ 0 đến 1048576 KiB.",
+      "points": "Từ 800 đến 3500.",
+      "types": "Cần ít nhất một loại bài."
+    }
+  }
 }
