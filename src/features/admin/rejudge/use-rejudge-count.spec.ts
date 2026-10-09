@@ -64,7 +64,7 @@ describe('useRejudgeCount', () => {
   it('leaves "counting" for a failed state on an unexpected error, and still rethrows it', async () => {
     vi.mocked(rejudgeSubmissions).mockRejectedValueOnce(new TypeError('boom'));
     const { state, count } = useRejudgeCount();
-    await expect(count({})).rejects.toThrow('boom');
+    await expect(count(BODY)).rejects.toThrow('boom');
     expect(state.value.kind).toBe('failed');
   });
 
