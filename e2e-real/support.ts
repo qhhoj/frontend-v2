@@ -91,9 +91,12 @@ export async function submitSource(page: Page, code: string, source: string): Pr
 /** The user may hold two unfinished submissions; wait for the judge to drain before submitting more. */
 export async function waitForEmptyQueue(page: Page): Promise<void> {
   await expect
-    .poll(async () => (await getData<{ queueLength: number }>(page, '/submissions/stats')).queueLength, {
-      timeout: 60_000,
-    })
+    .poll(
+      async () => (await getData<{ queueLength: number }>(page, '/submissions/stats')).queueLength,
+      {
+        timeout: 60_000,
+      },
+    )
     .toBe(0);
 }
 
