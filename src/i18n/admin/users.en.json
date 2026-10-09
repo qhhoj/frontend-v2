@@ -48,7 +48,13 @@
     "pager": "User list pages",
     "previous": "Previous",
     "next": "Next",
-    "pageOf": "Page {page} / {last}"
+    "pageOf": "Page {page} / {last}",
+    "sort": {
+      "label": "Sort by",
+      "default": "Default order",
+      "lastAccess": "Last access, oldest first",
+      "-lastAccess": "Last access, newest first"
+    }
   },
   "card": {
     "label": "User details",

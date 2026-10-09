@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok, page } from '@/test/mock-api';
+import { fail, failWithCode, mockApi, ok, page } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -100,7 +100,7 @@ describe('OrganizationsPage', () => {
   it('shows a full organization as a refusal inside that request', async () => {
     mockApi(
       routes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: conflictWith(FULL_MESSAGE),
+        [`POST /organizations/lhp/requests/${request.id}/decide`]: FULL_CODE,
       }),
     );
     const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
@@ -113,7 +113,7 @@ describe('OrganizationsPage', () => {
   it('reads an already decided request as taken by someone else and reloads the requests', async () => {
     const calls = mockApi(
       routes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: conflictWith(DECIDED_MESSAGE),
+        [`POST /organizations/lhp/requests/${request.id}/decide`]: DECIDED_CODE,
       }),
     );
     const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
@@ -242,9 +242,8 @@ const queueRoutes = (extra = {}) =>
   });
 const queueCalls = (calls: ReturnType<typeof mockApi>) =>
   calls.filter((call) => call.path === QUEUE);
-const FULL_MESSAGE = 'The organization is full';
-const DECIDED_MESSAGE = 'This request has already been decided';
-const conflictWith = (message: string) => fail(409, 'conflict', undefined, undefined, { message });
+const FULL_CODE = failWithCode(409, 'organization', 'organization_full');
+const DECIDED_CODE = failWithCode(409, 'state', 'request_already_decided');
 const decideCalls = (calls: ReturnType<typeof mockApi>) =>
   calls.filter((call) => call.path.endsWith('/decide'));
 
@@ -382,8 +381,7 @@ describe('OrganizationsPage request queue', () => {
   it('refuses a full organization inside that row only', async () => {
     mockApi(
       queueRoutes({
-        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]:
-          conflictWith(FULL_MESSAGE),
+        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]: FULL_CODE,
       }),
     );
     const { wrapper } = await mountScreen(
@@ -443,7 +441,7 @@ describe('OrganizationsPage request queue', () => {
   it('says an already decided request was taken by someone else and refreshes the queue', async () => {
     const calls = mockApi(
       queueRoutes({
-        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(DECIDED_MESSAGE),
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: DECIDED_CODE,
       }),
     );
     const { wrapper } = await mountScreen(
@@ -461,7 +459,7 @@ describe('OrganizationsPage request queue', () => {
   it('keeps a full organization out of the refresh', async () => {
     const calls = mockApi(
       queueRoutes({
-        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(FULL_MESSAGE),
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: FULL_CODE,
       }),
     );
     const { wrapper } = await mountScreen(
@@ -477,8 +475,10 @@ describe('OrganizationsPage request queue', () => {
   it('reads the busy-lock 409 as a retry, not as a full organization', async () => {
     mockApi(
       queueRoutes({
-        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(
-          'Another decision is being made; try again',
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: failWithCode(
+          409,
+          'lock',
+          'busy',
         ),
       }),
     );
@@ -496,7 +496,7 @@ describe('OrganizationsPage request queue', () => {
   it('ignores a click on another row while a decision is in flight', async () => {
     const calls = mockApi(
       queueRoutes({
-        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(FULL_MESSAGE),
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: FULL_CODE,
       }),
     );
     const { wrapper } = await mountScreen(

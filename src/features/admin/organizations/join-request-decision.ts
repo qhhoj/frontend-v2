@@ -1,12 +1,7 @@
 import type { QueryClient } from '@tanstack/vue-query';
 import { translate } from '@/i18n';
-import { failureTextOf, isConflict } from '../ui/admin-errors';
+import { failureTextOf, hasIssueCode } from '../ui/admin-errors';
 import { allJoinRequestsKey } from './join-requests.queries';
-
-/** backend: organization-requests.service.ts `DECIDED_MESSAGE`; the only other 409 of a decision is a full organization. */
-const DECIDED_MESSAGE = 'This request has already been decided';
-/** backend: organization-requests.service.ts; the busy-lock 409 ("Another decision is being made") is a different refusal. */
-const FULL_MESSAGE = 'The organization is full';
 
 /** A decision moves one request out of the pending queue and may add a member, so both the cross-organization queue and that organization's own lists go stale. */
 export const invalidateAfterDecision = (queryClient: QueryClient, slug: string) =>
@@ -22,12 +17,11 @@ export const invalidateAfterDecision = (queryClient: QueryClient, slug: string) 
 
 /** Another staff member got to the request first: the lists are stale and the decision cannot be retried. */
 export const isAlreadyDecided = (error: unknown): boolean =>
-  isConflict(error) && error.message === DECIDED_MESSAGE;
+  hasIssueCode(error, 'request_already_decided');
 
-/** Only the two known 409 messages have their own text; every other refusal reads as the shared admin text. */
+/** Only the two known 409 codes have their own text; every other refusal reads as the shared admin text. */
 export function decisionFailureText(error: unknown): string {
   if (isAlreadyDecided(error)) return translate('admin.organizations.queue.alreadyDecided');
-  if (isConflict(error) && error.message === FULL_MESSAGE)
-    return translate('admin.organizations.queue.full');
+  if (hasIssueCode(error, 'organization_full')) return translate('admin.organizations.queue.full');
   return failureTextOf(error);
 }

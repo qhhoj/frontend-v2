@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
+import { failWithCode, mockApi, ok, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
@@ -99,9 +99,11 @@ describe('test data uploads', () => {
       ...staffViewer(EDIT),
       ...problemEditorRoutes(),
       'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/data/files/generator': fail(400, 'validation_failed', {
-        file: ['This file type is not allowed as problem material.'],
-      }),
+      'POST /problems/hcmus41c/data/files/generator': failWithCode(
+        400,
+        'file',
+        'material_type_not_allowed',
+      ),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
     await pick(

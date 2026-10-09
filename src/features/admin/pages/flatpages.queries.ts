@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
-import { fetchFlatpage, fetchFlatpages } from '@/api/flatpages-admin.api';
+import { fetchDeletedFlatpages, fetchFlatpage, fetchFlatpages } from '@/api/flatpages-admin.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 
 export const flatpagesKey = (page: number, viewer: string) =>
   ['admin', 'flatpages', page, viewer] as const;
+export const deletedFlatpagesKey = (page: number, viewer: string) =>
+  ['admin', 'flatpages-deleted', page, viewer] as const;
 export const flatpageKey = (id: string, viewer: string) =>
   ['admin', 'flatpage', id, viewer] as const;
 
@@ -14,6 +16,19 @@ export function useFlatpagesQuery(page: MaybeRefOrGetter<number>) {
   return useQuery({
     queryKey: computed(() => flatpagesKey(toValue(page), viewer.value)),
     queryFn: () => fetchFlatpages(toValue(page)),
+  });
+}
+
+/** Deleted pages are listed on demand: `enabled` is false until the section is opened. */
+export function useDeletedFlatpagesQuery(
+  page: MaybeRefOrGetter<number>,
+  enabled: MaybeRefOrGetter<boolean>,
+) {
+  const viewer = useViewerId();
+  return useQuery({
+    queryKey: computed(() => deletedFlatpagesKey(toValue(page), viewer.value)),
+    queryFn: () => fetchDeletedFlatpages(toValue(page)),
+    enabled: computed(() => toValue(enabled)),
   });
 }
 

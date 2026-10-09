@@ -149,7 +149,7 @@ it('shows no ban opener on the viewer’s own profile, even with judge.ban_user'
 it('shows no ban opener for a superuser target, and says nothing about a ban', async () => {
   const superuser = makeUser({
     username: 'thayhung',
-    staff: { isSuperuser: true, banReason: null },
+    staff: { isSuperuser: true, isActive: true, banReason: null },
   });
   mockApi({ ...viewerWith(['judge.ban_user']), ...profileRoutes(superuser) });
   const { wrapper } = await mountApp('/users/thayhung');
@@ -160,7 +160,7 @@ it('shows no ban opener for a superuser target, and says nothing about a ban', a
 it('shows an already-banned target read-only, with its reason and no opener', async () => {
   const banned = makeUser({
     ...other,
-    staff: { isSuperuser: false, banReason: 'Nộp bài giống hệt.' },
+    staff: { isSuperuser: false, isActive: true, banReason: 'Nộp bài giống hệt.' },
   });
   mockApi({ ...viewerWith(['judge.ban_user']), ...profileRoutes(banned) });
   const { wrapper } = await mountApp('/users/ngoc_anh');

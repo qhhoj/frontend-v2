@@ -12,7 +12,7 @@ import { useSessionStore } from '@/stores/session.store';
 const target = userPage({
   username: 'tuan_k',
   displayRank: 'user',
-  staff: { isSuperuser: false, banReason: null },
+  staff: { isSuperuser: false, isActive: true, banReason: null },
 });
 /** The admin shell is an async component: the page is there once its heading renders, and its first list answer after that. */
 const mountUsers = async (path: string) => {
@@ -48,6 +48,20 @@ describe('UsersPage', () => {
     expect(wrapper.get('table').text()).toContain('Bị cấm');
     expect(wrapper.get('table').text()).not.toContain('banned');
     expect(wrapper.get('[aria-live="polite"]').text()).toContain('2 người');
+  });
+
+  it('sorts by last access through the address and asks the server for it', async () => {
+    const calls = mockApi(routes());
+    const { wrapper, router } = await mountUsers('/admin/users');
+    await wrapper.get('[data-testid="users-sort"]').setValue('-lastAccess');
+    await flushPromises();
+    expect(router.currentRoute.value.query.sort).toBe('-lastAccess');
+    expect(
+      calls
+        .filter((call) => call.path === '/admin/users')
+        .at(-1)!
+        .query.get('sort'),
+    ).toBe('-lastAccess');
   });
 
   it('opens a user from the exact lookup and shows the id and rank', async () => {
@@ -95,7 +109,7 @@ describe('UsersPage', () => {
     const banned = userPage({
       username: 'tuan_k',
       displayRank: 'banned',
-      staff: { isSuperuser: false, banReason: 'Spam blog' },
+      staff: { isSuperuser: false, isActive: true, banReason: 'Spam blog' },
     });
     mockApi(
       routes(undefined, {
@@ -124,7 +138,10 @@ describe('UsersPage', () => {
     mockApi(
       routes(superuserViewer(), {
         'GET /users/tuan_k': ok(
-          userPage({ username: 'tuan_k', staff: { isSuperuser: true, banReason: null } }),
+          userPage({
+            username: 'tuan_k',
+            staff: { isSuperuser: true, isActive: true, banReason: null },
+          }),
         ),
       }),
     );

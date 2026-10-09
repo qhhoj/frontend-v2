@@ -26,7 +26,7 @@ describe('ContestSearchList', () => {
     });
     const { wrapper } = await mountIndex('/admin/contests?q=hcmus&phase=running');
     expect(Object.fromEntries(contestCalls(calls)[0]!.query)).toMatchObject({
-      search: 'hcmus',
+      q: 'hcmus',
       phase: 'running',
       page: '1',
       pageSize: '20',

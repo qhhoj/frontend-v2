@@ -118,6 +118,11 @@ export function invalid(...issues: FieldIssue[]): MockResponse {
   for (const { field, message } of issues) (fields[field] ??= []).push(message);
   return fail(400, 'validation_failed', fields, issues);
 }
+/** A refusal shaped like the backend's `conflictIssue`/`badRequestIssue`: one issue carrying a stable code. */
+export const failWithCode = (status: number, field: string, code: string): MockResponse =>
+  fail(status, status === 409 ? 'conflict' : 'validation_failed', undefined, [
+    issue(field, code, `English message of ${code}`),
+  ]);
 export const noContent = (): MockResponse => ({ status: 204 });
 
 /** A 429 `rate_limited` carrying `Retry-After` (whole seconds), as the backend's rate limiter sends it. */

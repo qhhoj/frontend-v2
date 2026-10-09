@@ -11,7 +11,7 @@ const target = userPage({
   username: 'tuan_k',
   displayName: 'tuan_k',
   displayRank: 'user',
-  staff: { isSuperuser: false, banReason: null },
+  staff: { isSuperuser: false, isActive: true, banReason: null },
 });
 
 for (const viewport of AUDIT_VIEWPORTS)

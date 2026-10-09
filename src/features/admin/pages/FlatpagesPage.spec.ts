@@ -44,6 +44,31 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
 };
 
 describe('FlatpagesPage', () => {
+  it('lists deleted pages only once asked, and opens one as a read-only history', async () => {
+    const calls = mockApi(
+      routes({
+        'GET /admin/site/pages/deleted': page([
+          { id: 'fp-9', url: '/old-rules', deletedAt: '2026-09-30T10:00:00.000Z' },
+        ]),
+        'GET /admin/site/pages/fp-9/revisions': page([flatpageRevision()]),
+      }),
+    );
+    const { wrapper, router } = await mountPages('/admin/pages');
+    expect(calls.some((call) => call.path === '/admin/site/pages/deleted')).toBe(false);
+    await click(wrapper, 'Trang đã xoá');
+    await vi.waitFor(() => expect(wrapper.text()).toContain('/old-rules'));
+    await wrapper.get('[data-testid="deleted-pages"] ul button').trigger('click');
+    await vi.waitFor(() => expect(router.currentRoute.value.query.deleted).toBe('fp-9'));
+    await vi.waitFor(() =>
+      expect(calls.some((call) => call.path === '/admin/site/pages/fp-9/revisions')).toBe(true),
+    );
+    await flushPromises();
+    expect(wrapper.find('#page-title').exists()).toBe(false);
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Nạp giá trị cũ')).toBe(
+      false,
+    );
+  });
+
   it('opens a page and previews the saved, sanitised HTML until something is typed', async () => {
     mockApi(routes());
     const { wrapper } = await mountPages('/admin/pages?page=fp-1');

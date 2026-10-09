@@ -7,20 +7,21 @@ import {
   updateProblem,
   uploadStatementPdf,
 } from './problem-editing.api';
-import { editableProblem } from '@/test/admin-fixtures/problems';
+import { editableProblem, problemEditor } from '@/test/admin-fixtures/problems';
 
 describe('problem editing API', () => {
-  it('reads the editable detail with the base-language texts on top, not a translation', async () => {
-    mockApi({
-      'GET /problems/hcmus41c': ({ query }) =>
-        ok(
-          editableProblem({
-            name: query.get('lang') === 'vi' ? 'Bản dịch tiếng Việt' : 'Base name',
-          }),
-        ),
+  it('reads the base-language name from the editor block, whatever language the detail name is in', async () => {
+    const calls = mockApi({
+      'GET /problems/hcmus41c': ok(
+        editableProblem({
+          name: 'Bản dịch tiếng Việt',
+          editor: { ...problemEditor(), baseName: 'Base name' },
+        }),
+      ),
     });
     const problem = await fetchEditableProblem('hcmus41c');
-    expect(problem.name).toBe('Base name');
+    expect(calls[0]!.query.has('lang')).toBe(false);
+    expect(problem.editor?.baseName).toBe('Base name');
     expect(problem.editor?.testers.map((tester) => tester.username)).toEqual(['khoa.tester']);
   });
 

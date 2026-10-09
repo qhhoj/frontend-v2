@@ -18,5 +18,7 @@ export interface StaffUser {
 export interface StaffUserQuery {
   search?: string;
   banned?: boolean;
+  /** `lastAccess` oldest first (never-seen users lead), `-lastAccess` newest first; unset is the server's order. */
+  sort?: 'lastAccess' | '-lastAccess';
   page: number;
 }

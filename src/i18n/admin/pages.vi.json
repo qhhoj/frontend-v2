@@ -86,5 +86,11 @@
     "pausedWait": "Xem trước quá 60 lần mỗi phút nên máy chủ từ chối (429). Giữ nguyên bản cũ; gõ tiếp sau {seconds} giây để cập nhật. Lưu trang vẫn bình thường.",
     "paused": "Xem trước quá 60 lần mỗi phút nên máy chủ từ chối (429). Giữ nguyên bản cũ; gõ tiếp để cập nhật. Lưu trang vẫn bình thường.",
     "hint": "Cập nhật 0,5 giây sau phím cuối, cùng bộ làm sạch với khi lưu."
+  },
+  "deleted": {
+    "toggle": "Trang đã xoá",
+    "empty": "Chưa có trang nào bị xoá.",
+    "at": "Xoá lúc {time}",
+    "pager": "Phân trang các trang đã xoá"
   }
 }

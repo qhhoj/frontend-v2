@@ -6,15 +6,17 @@
     "title": "Tìm bài tập",
     "label": "Tìm bài tập",
     "placeholder": "Mã hoặc tên bài…",
-    "hint": "Gõ cả từ (từ 3 ký tự trở lên) để tìm; 1–2 ký tự khớp đầu mã hoặc đầu tên.",
-    "columns": { "problem": "Bài", "points": "Điểm" },
+    "hint": "Khớp một phần của mã hoặc tên.",
+    "columns": {
+      "problem": "Bài",
+      "points": "Điểm"
+    },
     "private": "Riêng tư",
     "count": "{shown} / {total} bài",
     "countFor": "{shown} / {total} bài khớp “{q}”",
     "empty": "Chưa có bài nào.",
     "emptyFor": "Không có bài nào khớp “{q}”",
-    "emptyAdvice": "Thử gõ cả từ (từ 3 ký tự trở lên), hoặc mở thẳng theo mã ở bên cạnh.",
-    "emptyShortAdvice": "Từ 1–2 ký tự chỉ khớp đầu mã hoặc đầu tên. Gõ cả từ có từ 3 ký tự trở lên để tìm theo từ."
+    "emptyAdvice": "Thử một phần ngắn hơn của mã hoặc tên, hoặc mở theo mã bên cạnh danh sách."
   },
   "contests": {
     "title": "Tìm kỳ thi",

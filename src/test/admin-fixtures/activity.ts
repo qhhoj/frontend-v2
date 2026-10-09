@@ -22,6 +22,7 @@ export const liveActivity = (overrides: Partial<LiveActivity> = {}): LiveActivit
   users: [
     { user: { id: 'id-ngocanh', username: 'ngocanh' }, lastSeenAt: '2026-10-08T08:40:55.000Z' },
   ],
+  hasMore: false,
   ...overrides,
 });
 

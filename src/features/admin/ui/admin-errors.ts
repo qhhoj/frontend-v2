@@ -7,9 +7,16 @@ export type FieldErrors = Record<string, string>;
 
 /** `admin.ui.issues.<code>` when the SPA has a text for the code, else the backend's own message. */
 export function adminIssueText(issue: FieldIssue): string {
-  const key = `admin.ui.issues.${issue.code}`;
-  return i18n.global.te(key, DEFAULT_LOCALE) ? i18n.global.t(key) : issue.message;
+  return hasIssueText(issue.code) ? i18n.global.t(`admin.ui.issues.${issue.code}`) : issue.message;
 }
+
+/** Whether the SPA has a text for this backend issue code. */
+export const hasIssueText = (code: string): boolean =>
+  i18n.global.te(`admin.ui.issues.${code}`, DEFAULT_LOCALE);
+
+/** Whether a refusal carries this issue code (`error.issues[].code`); the codes, not the English messages, name a refusal. */
+export const hasIssueCode = (error: unknown, code: string): error is ApiError =>
+  error instanceof ApiError && error.issues.some((issue) => issue.code === code);
 
 const fromIssues = (issues: FieldIssue[]): FieldErrors => {
   const errors: FieldErrors = {};
@@ -32,7 +39,9 @@ export function fieldErrorsOf(error: unknown): FieldErrors {
 
 /** The page-line text of a failed write: the SPA text of its code, then the wait when the server said how long (`Retry-After`). */
 export function failureTextOf(error: unknown): string {
-  const text = i18n.global.t(errorMessageKey(error));
+  const text = hasIssueCode(error, 'busy')
+    ? i18n.global.t('admin.ui.issues.busy')
+    : i18n.global.t(errorMessageKey(error));
   const seconds = error instanceof ApiError ? error.retryAfterSeconds : null;
   if (seconds === null) return text;
   return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds })}`;
@@ -45,6 +54,9 @@ export function failureTextOf(error: unknown): string {
 export const isNotFound = (error: unknown): error is ApiError =>
   error instanceof ApiError && error.code === 'not_found';
 
-/** The write clashes with the stored state. Every backend 409 is a conflict, whatever its own code, so the status decides. */
+/**
+ * The write clashes with the stored state. Every backend 409 is a conflict, whatever its own code, so the status decides;
+ * the `busy` lock refusal is only "try again", not a clash.
+ */
 export const isConflict = (error: unknown): error is ApiError =>
-  error instanceof ApiError && error.status === 409;
+  error instanceof ApiError && error.status === 409 && !hasIssueCode(error, 'busy');

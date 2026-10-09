@@ -11,7 +11,7 @@ import { positivePageOf } from './flatpage-route';
 import { useFlatpageRevisionsQuery } from './flatpage-revisions.queries';
 import FlatpageRevisionRow from './FlatpageRevisionRow.vue';
 
-const props = defineProps<{ pageId: string }>();
+const props = defineProps<{ pageId: string; readonly?: boolean }>();
 const emit = defineEmits<{ load: [revision: FlatpageRevision] }>();
 const route = useRoute();
 const router = useRouter();
@@ -70,6 +70,7 @@ function goToPage(target: number) {
             :key="revision.id"
             :revision="revision"
             :is-open="openIds.has(revision.id)"
+            :readonly="readonly"
             @toggle="toggle(revision.id)"
             @load="emit('load', revision)"
           />
@@ -96,7 +97,7 @@ function goToPage(target: number) {
           </button>
         </div>
       </footer>
-      <p class="text-xs text-muted">{{ t('admin.pages.history.note') }}</p>
+      <p v-if="!readonly" class="text-xs text-muted">{{ t('admin.pages.history.note') }}</p>
     </QueryState>
   </section>
 </template>

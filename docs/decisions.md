@@ -136,17 +136,11 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | A2 | `open` filter on `GET /organizations` (the signup list reads every page and filters here) | server-side filtering of the school picker |
 | A3 | Provider name and email on the social completion screen (the client never learns them) | the provider line and the email on `/register/social` |
 | B-8f6 | Data version on `ProblemDataResponse`; a listing of uploaded statement images; structured `feedback` (case index + code) | problem data tab version, image picker, per-case feedback |
-| B-8f8 | The base name on `ProblemEditorResponse` (`name` follows the requested language) | editor without the `lang=en` read |
-| B-8f9 | Issue codes on field refusals that arrive only in `fields` in English (clone key taken, contest window, time limit above 5) | Vietnamese wording of those refusals |
-| B-8f10 | Substring (or prefix-per-word) search on `GET /problems?search=` (the text index matches whole words from 3 characters) | typing "hcmus4" finds `hcmus41c` |
 | B-8f2-1b | Per-sub-field issues for object settings (a type error is one issue on `value`) | field-level errors in a settings block |
 | B-8f2-2 | Server-side checks for misc config values (URL keys, analytics snippet) and an admin read with `no-store` | no client-only validation |
 | B-8f2-3b | A global audit read for the change log | `/admin/log` without choosing a key |
 | B-8f2-6b | Organization delete | a delete button on the organization panel |
 | B-8f2-7b | A report queue for blog moderation (no report model) | a reports tab |
-| B-8f2-9 | A listing of deleted flatpages (id, last URL, deleted at), or revisions readable by URL | the board's "Trang đã xoá" and "Tạo lại trang" |
-| B-8f2-10 | (optional) `GET /admin/users` sort by `lastAccess` | users list sorted by last access |
-| B-8f2-11 | An issue code for a join request that is already decided (409; the frontend matches the message text) | no text matching |
 
 ## Loading states
 
@@ -295,18 +289,18 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Superuser without the staff flag**: `/admin` stays not-found for them (the router checks `isStaff`), although every permission check passes superusers — existence of the area follows the staff flag, the screens follow the permissions.
 - **Save bar per tab**: each editor tab has its own sticky "Lưu thay đổi" bar (the header belongs to the shared frame) — one save per tab, as "Mỗi tab lưu riêng".
 - **Original description**: edited in the Statements tab as a third slot "Mô tả gốc" (PATCH `description`, locked for a full-markup problem without `judge.problem_full_markup`); board B points to Thông tin chung, which has no such field drawn.
-- **Problem name**: the editor reads the problem with `lang=en` and PATCHes `name` only when edited, because the detail's `name` is the English translation when one exists (backend ask B-8f8: the base name).
+- **Problem name**: the editor reads the base name from `editor.baseName` (the detail's own `name` follows `lang`) and PATCHes `name` only when edited.
 - **No data version**: board C's "Phiên bản dữ liệu 7" is not shown; the API has no version (B-8f6).
 - **Contest texts without preview**: contest description and announcements are plain Markdown boxes; `render-preview` needs problem permissions a contest editor may lack.
 - **Ordering without drag**: contest problems and test cases move with labelled up/down buttons; the boards' drag handles are pointer-only.
 - **Access codes**: hashed, so a blank box keeps the code and a "Bỏ mã" checkbox removes it (the board says "xóa trắng để bỏ mã"); `hasRankingAccessCode` and `requiresAccessCode` say whether one is set.
 - **Create bodies**: a create sends no staff-only field (problem `STAFF_ONLY_FIELDS`, contest `GATED_CONTEST_FIELDS` incl. `rateAll`) unless the account holds its permission and the value was changed.
-- **Admin indexes**: open-by-key stays and a URL-driven search card (`q`, `phase`, `page`) lists problems and contests beside it (pick 2B, 2026-10-09), its box shared with the users list; whole-word problem search is B-8f10.
+- **Admin indexes**: open-by-key stays and a URL-driven search card (`q`, `phase`, `page`) lists problems and contests beside it (pick 2B, 2026-10-09), its box shared with the users list; search is `q`, a case-insensitive substring of code or title (max 100).
 - **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box; skeleton heights fit a typical screen (one run, five users), so other row counts still move what follows.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
 - **Judge ping and key**: ping shows in ms (the API sends seconds); one `JudgeKeyDialog` serves "Tạo và lấy khoá" and a rotation (after a confirm that the judge disconnects), the key lives in component state only — the board says the key shows once.
 - **Languages**: list from `GET /admin/languages`; judge coverage ("{judges} / {total}", "chỉ có trên một máy") joins `GET /judges` and shows only with `judge.change_judge`; create and edit are own pages with a sticky save bar, the key sealed on edit, PATCH sends changed fields only — no `GET /admin/languages/:id`, so edit finds the language in the list.
-- **Users list**: exact lookup plus `GET /admin/users` with a username-prefix box (`?q=`), tabs Tất cả / Chưa cấm / Đã cấm (`?tab=`), ban reason and last access; no sort by last access (B-8f2-10), the order is the server's.
+- **Users list**: exact lookup plus `GET /admin/users` with a username-prefix box (`?q=`), tabs Tất cả / Chưa cấm / Đã cấm (`?tab=`), ban reason and last access; a sort control (`?sort=`) orders by last access, oldest or newest first, else the server's order.
 - **Impersonation**: "Đóng vai" only for superuser viewers, hidden for a superuser or banned target; `startImpersonation` and `session.startImpersonating` only, the bar and stop are 8h's `ImpersonationBanner` — one path.
 - **Organizations**: list from `GET /organizations`, edit panel on the same page (`?org=`); staff-only fields (`isUnlisted`, `slots`, `shortName`) locked without `judge.edit_all_organization` and left out of a create body (closed, unlisted); search is a literal case-insensitive substring with the match marked; the tab "Yêu cầu tham gia · tất cả tổ chức" reads `GET /admin/organization-requests` and a decision goes through the request's own organization endpoint.
 - **Blog moderation**: tabs all / global / "Đã ẩn" / "Hẹn giờ"; "Ẩn bài" and "Hiện lại" are `PATCH visible` after a confirm, "Hiện lại" warns when `publishOn` is ahead; no delete and no report queue (no model).
@@ -315,9 +309,9 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Change log**: `/admin/log` lists revisions of one chosen setting key — no global audit read (B-8f2-3b).
 - **Raw config**: read from `GET /site` with `cache: 'no-cache'`; writes patch the cached `/site`; HTML values preview in a sandboxed `srcdoc` iframe, never `v-html`; the analytics snippet is not checked by the backend (B-8f2-2).
 - **Navigation bar**: tree from `GET /site` (orphans and cycles at top level as the backend does), edit in a dialog, parent select excludes self and descendants; a stored invalid regex shows "Regex lỗi".
-- **Static pages**: the URL is canonicalised as the backend does (no trim, `/` and dot segments refused); live preview through `useRenderPreview(…, 'flatpage')`, a "Lịch sử" tab with line diff where "Nạp giá trị cũ" fills the form and the normal PATCH saves; no deleted-pages list (B-8f2-9).
+- **Static pages**: the URL is canonicalised as the backend does (no trim, `/` and dot segments refused); live preview through `useRenderPreview(…, 'flatpage')`, a "Lịch sử" tab with line diff where "Nạp giá trị cũ" fills the form and the normal PATCH saves; "Trang đã xoá" lists `GET /admin/site/pages/deleted` and opens a deleted page's history read-only (`?deleted=<id>`); no recreate button.
 - **Tickets queue**: reuses 8e's ticket queries, stream and components and its URL helpers; status Đang mở / Đã đóng / Tất cả is the server's `open` filter and the first visit writes `scope=all&open=1` once.
-- **Activity**: `hasMore` pager (no total), filter in the URL, CSV export as a plain link with the same filter, live visitors refetch every 30 s, summary bars in SVG with a text table; deletes sit behind confirms.
+- **Activity**: `hasMore` pager (no total), filter in the URL, CSV export as a plain link with the same filter, live visitors refetch every 30 s (next page by `hasMore`), summary bars in SVG with a text table; deletes sit behind confirms.
 - **Admin site loading parity**: `e2e/admin-site-loading.e2e.ts` covers judges (stats and rows, offset included), the first settings block and the activity table; skeleton heights are per breakpoint (`sm`) and fit a typical load (5 judges, 3 log rows), so other counts still move what follows.
 - **Admin writes and reads**: shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages use 8e's API files — one query per data, no copy.
 
@@ -351,3 +345,6 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - `uqr` 0.1.3 draws the TOTP QR in the browser: the secret must never reach a QR service, and a hand-written encoder is hundreds of lines.
 - Backend ask still open: A1 (badge names on `/profile`). A2 (issue codes on `/profile`) shipped; the form still maps issues by field name.
 - G1 and G2 are consumed as merged (`{ id, name }[]`, `{ remaining }`); the impersonation banner names the viewed account, not the staff member.
+
+- **Backend refusals by code**: the SPA matches `error.issues[].code` (join-request `request_already_decided`/`organization_full`, `busy`, file refusals, taken keys/codes), never the English message; texts live in `admin.ui.issues.<code>`, unknown codes fall back to `failureTextOf`. Still on message or field shape because the backend sends no code: the blog official-contest lock 403, and the nav/flatpage/judge/language 409 `fields`. Refusal texts carry no file or extension name (codes have no params).
+- **Impersonation**: "Đóng vai" also needs `staff.isActive`.

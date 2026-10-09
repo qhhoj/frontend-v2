@@ -10,7 +10,7 @@ import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import ChangeLines from './ChangeLines.vue';
 import { canLoadOldValues, changeLinesOf, fieldLabelKey } from './flatpage-history';
 
-const props = defineProps<{ revision: FlatpageRevision; isOpen: boolean }>();
+const props = defineProps<{ revision: FlatpageRevision; isOpen: boolean; readonly?: boolean }>();
 const emit = defineEmits<{ toggle: []; load: [] }>();
 const { t } = useI18n();
 const localeStore = useLocaleStore();
@@ -67,7 +67,7 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
             />
           </button>
           <button
-            v-if="canLoadOldValues(revision)"
+            v-if="!readonly && canLoadOldValues(revision)"
             type="button"
             :class="ADMIN_BUTTON_CLASS"
             @click="emit('load')"

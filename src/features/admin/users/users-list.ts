@@ -13,13 +13,14 @@ export const lastStaffPage = (total: number, pageSize: number = STAFF_USERS_PAGE
   Math.min(STAFF_USERS_MAX_PAGE, Math.max(1, Math.ceil(total / pageSize)));
 
 /**
- * Only a superuser may start an impersonation, and never of another superuser or of a banned account. Unknown staff facts
+ * Only a superuser may start an impersonation, and never of another superuser, an inactive (never activated) or a banned account. Unknown staff facts
  * (`staff` null) refuse too: the superuser status of the target is then not known, and the backend refuses it anyway.
  */
 export const canImpersonate = (viewerIsSuperuser: boolean, page: UserPage) =>
   viewerIsSuperuser &&
   page.staff !== null &&
   !page.staff.isSuperuser &&
+  page.staff.isActive &&
   page.staff.banReason === null &&
   page.displayRank !== 'banned';
 
@@ -35,8 +36,12 @@ export type UsersTab = (typeof USERS_TABS)[number];
 /** The backend's `Length(1, 64)` on `search`. */
 export const USER_SEARCH_MAX_LENGTH = 64;
 
+export const USERS_SORTS = ['default', 'lastAccess', '-lastAccess'] as const;
+export type UsersSort = (typeof USERS_SORTS)[number];
+
 export interface UsersListView {
   tab: UsersTab;
+  sort: UsersSort;
   search: string;
   page: number;
 }
@@ -54,8 +59,10 @@ const singleText = (value: unknown): string => {
 
 export function usersViewFromQuery(query: LocationQuery): UsersListView {
   const tab = singleText(query.tab);
+  const sort = singleText(query.sort);
   return {
     tab: USERS_TABS.find((candidate) => candidate === tab) ?? 'all',
+    sort: USERS_SORTS.find((candidate) => candidate === sort) ?? 'default',
     search: singleText(query.q).trim().slice(0, USER_SEARCH_MAX_LENGTH),
     page: Math.min(pageFromQuery(query.page), STAFF_USERS_MAX_PAGE),
   };
@@ -67,6 +74,7 @@ export function usersViewToQuery(view: UsersListView, current: LocationQuery): L
   const user = singleText(current.user);
   if (user) query.user = user;
   if (view.tab !== 'all') query.tab = view.tab;
+  if (view.sort !== 'default') query.sort = view.sort;
   if (view.search) query.q = view.search;
   if (view.page > 1) query.page = String(view.page);
   return query;
@@ -76,6 +84,7 @@ export function staffUsersQueryOf(view: UsersListView): StaffUserQuery {
   const query: StaffUserQuery = { page: view.page };
   const banned = BANNED_OF_TAB[view.tab];
   if (banned !== undefined) query.banned = banned;
+  if (view.sort !== 'default') query.sort = view.sort;
   if (view.search.trim()) query.search = view.search.trim();
   return query;
 }

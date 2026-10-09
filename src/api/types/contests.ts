@@ -178,6 +178,8 @@ export interface ContestListQuery {
   phase?: ContestPhase;
   rated?: boolean;
   search?: string;
+  /** Case-insensitive substring of the key or the name, at most 100 characters (the staff index). */
+  q?: string;
   page?: number;
   pageSize?: number;
 }

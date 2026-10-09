@@ -13,7 +13,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import HighlightedText from './HighlightedText.vue';
 import IndexSearchBox from './IndexSearchBox.vue';
-import { SEARCH_MAX_LENGTH, isShortQuery, searchQueryOf } from './index-search';
+import { SEARCH_MAX_LENGTH, searchQueryOf } from './index-search';
 import { useAdminProblemSearchQuery } from './index-search.queries';
 
 const route = useRoute();
@@ -37,11 +37,6 @@ const countText = computed(() => {
   if (!search.value) return t('admin.search.problems.count', values);
   return t('admin.search.problems.countFor', values);
 });
-const emptyAdvice = computed(() =>
-  isShortQuery(search.value)
-    ? 'admin.search.problems.emptyShortAdvice'
-    : 'admin.search.problems.emptyAdvice',
-);
 </script>
 
 <template>
@@ -76,7 +71,7 @@ const emptyAdvice = computed(() =>
               : $t('admin.search.problems.empty')
           }}
         </strong>
-        <span>{{ $t(emptyAdvice) }}</span>
+        <span>{{ $t('admin.search.problems.emptyAdvice') }}</span>
       </EmptyState>
       <div v-else-if="data" class="overflow-x-auto">
         <table class="w-full text-left text-sm">

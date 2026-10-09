@@ -20,18 +20,29 @@ describe('users list', () => {
   });
 
   it('lets only a superuser impersonate, and neither another superuser nor a banned account', () => {
-    const plain = userPage({ staff: { isSuperuser: false, banReason: null } });
+    const plain = userPage({ staff: { isSuperuser: false, isActive: true, banReason: null } });
     expect(canImpersonate(true, plain)).toBe(true);
     expect(canImpersonate(false, plain)).toBe(false);
-    expect(canImpersonate(true, userPage({ staff: { isSuperuser: true, banReason: null } }))).toBe(
-      false,
-    );
     expect(
       canImpersonate(
         true,
-        userPage({ displayRank: 'banned', staff: { isSuperuser: false, banReason: 'Spam' } }),
+        userPage({ staff: { isSuperuser: true, isActive: true, banReason: null } }),
       ),
     ).toBe(false);
+    expect(
+      canImpersonate(
+        true,
+        userPage({
+          displayRank: 'banned',
+          staff: { isSuperuser: false, isActive: true, banReason: 'Spam' },
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('refuses a never-activated account, which the backend cannot impersonate', () => {
+    const inactive = userPage({ staff: { isSuperuser: false, isActive: false, banReason: null } });
+    expect(canImpersonate(true, inactive)).toBe(false);
   });
 
   it('refuses when the target staff facts are unknown, so a superuser is never guessed', () => {
@@ -41,14 +52,16 @@ describe('users list', () => {
 
 describe('users list view', () => {
   it('reads the tab, the trimmed and capped search and a valid page from the URL, falling back to the defaults', () => {
-    expect(usersViewFromQuery({})).toEqual({ tab: 'all', search: '', page: 1 });
+    expect(usersViewFromQuery({})).toEqual({ tab: 'all', sort: 'default', search: '', page: 1 });
     expect(usersViewFromQuery({ tab: 'banned', q: '  tuan ', page: '3' })).toEqual({
       tab: 'banned',
+      sort: 'default',
       search: 'tuan',
       page: 3,
     });
     expect(usersViewFromQuery({ tab: 'nonsense', page: '0' })).toEqual({
       tab: 'all',
+      sort: 'default',
       search: '',
       page: 1,
     });
@@ -61,15 +74,32 @@ describe('users list view', () => {
     ['active', false],
     ['banned', true],
   ] as const)('maps the %s tab to banned=%s and never sends a blank search', (tab, banned) => {
-    const query = staffUsersQueryOf({ tab, search: '   ', page: 2 });
+    const query = staffUsersQueryOf({ tab, sort: 'default', search: '   ', page: 2 });
     expect(query).toEqual(banned === undefined ? { page: 2 } : { page: 2, banned });
-    expect(staffUsersQueryOf({ tab, search: 'tuan', page: 1 }).search).toBe('tuan');
+    expect(staffUsersQueryOf({ tab, sort: 'default', search: 'tuan', page: 1 }).search).toBe(
+      'tuan',
+    );
+  });
+
+  it('reads the sort from the address, drops unknown values, and sends the server value', () => {
+    expect(usersViewFromQuery({ sort: '-lastAccess' }).sort).toBe('-lastAccess');
+    expect(usersViewFromQuery({ sort: 'username' }).sort).toBe('default');
+    const view = { tab: 'all', search: '', page: 1 } as const;
+    expect(staffUsersQueryOf({ ...view, sort: 'lastAccess' })).toEqual({
+      page: 1,
+      sort: 'lastAccess',
+    });
+    expect(staffUsersQueryOf({ ...view, sort: 'default' })).toEqual({ page: 1 });
+    expect(usersViewToQuery({ ...view, sort: '-lastAccess' }, {})).toEqual({ sort: '-lastAccess' });
   });
 
   it('writes only what differs from the defaults, keeps the opened user, and starts a new filter on page 1', () => {
-    expect(usersViewToQuery({ tab: 'all', search: '', page: 1 }, {})).toEqual({});
+    expect(usersViewToQuery({ tab: 'all', sort: 'default', search: '', page: 1 }, {})).toEqual({});
     expect(
-      usersViewToQuery({ tab: 'banned', search: 'sp', page: 2 }, { user: 'tuan_k', tab: 'all' }),
+      usersViewToQuery(
+        { tab: 'banned', sort: 'default', search: 'sp', page: 2 },
+        { user: 'tuan_k', tab: 'all' },
+      ),
     ).toEqual({
       user: 'tuan_k',
       tab: 'banned',

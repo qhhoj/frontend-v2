@@ -52,6 +52,8 @@ export interface EditorialDraft {
 
 /** backend: problems/core/dto/problem-detail.response.ts (`ProblemEditorResponse`): sent to editors only. */
 export interface ProblemEditor {
+  /** The base-language name; the detail's own `name` follows the requested language. */
+  baseName: string;
   description: string;
   translations: ProblemTranslation[];
   solution: EditorialDraft | null;
@@ -80,7 +82,7 @@ export type TestcaseVisibility = 'O' | 'C' | 'A';
 /** backend: problems/core/dto/problem-detail.response.ts, `testcaseResultVisibility`. */
 export type ResultVisibility = 'A' | 'B' | 'S';
 
-/** backend: problems/core/dto/problem-detail.response.ts (`ProblemDetailResponse`), read with `lang=en`. */
+/** backend: problems/core/dto/problem-detail.response.ts (`ProblemDetailResponse`). The editor block holds the base-language texts. */
 export interface EditableProblem {
   id: string;
   code: string;

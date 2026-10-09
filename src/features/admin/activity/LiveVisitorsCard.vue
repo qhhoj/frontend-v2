@@ -11,7 +11,6 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import { ACTIVITY_PAGE_SIZE } from './activity';
 
 /** Refreshes on its own: a visitor list that is 30 seconds old is still a fair picture of who is online. */
 const LIVE_REFRESH_MS = 30_000;
@@ -31,8 +30,7 @@ const isAnyoneOnline = computed(() => {
   const data = counts.value;
   return data !== undefined && data.authenticatedUsers + data.anonymousVisitors > 0;
 });
-/** The live endpoint sends no page metadata: a full page means there may be another. */
-const mayHaveNextPage = computed(() => users.value.length === ACTIVITY_PAGE_SIZE);
+const mayHaveNextPage = computed(() => counts.value?.hasMore ?? false);
 const numberOf = (value: number) => formatNumber(value, locale.locale);
 </script>
 

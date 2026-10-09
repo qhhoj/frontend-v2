@@ -80,6 +80,11 @@ describe('isConflict', () => {
 
   it('is false for other statuses and for non-API errors', () => {
     expect(isConflict(new ApiError('not_found', 404, 'No'))).toBe(false);
+    const busy = new ApiError('conflict', 409, 'Busy', {
+      issues: [{ field: 'lock', code: 'busy', message: 'Busy' }],
+    });
+    expect(isConflict(busy)).toBe(false);
+    expect(failureTextOf(busy)).toBe('Đang có thao tác khác chạy; hãy chờ xong rồi thử lại.');
     expect(isConflict(new ApiError('conflict', 400, 'Odd'))).toBe(false);
     expect(isConflict(new Error('409'))).toBe(false);
     expect(isConflict(undefined)).toBe(false);

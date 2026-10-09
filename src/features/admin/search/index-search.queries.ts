@@ -27,7 +27,7 @@ export function useAdminProblemSearchQuery(search: Ref<string>, page: Ref<number
         page: page.value,
         pageSize: INDEX_PAGE_SIZE,
         lang: locale.locale,
-        search: search.value,
+        q: search.value,
       }),
     placeholderData: keepPreviousData,
   });
@@ -51,7 +51,7 @@ export function useAdminContestSearchQuery(
     ]),
     queryFn: () =>
       fetchContests({
-        search: search.value || undefined,
+        q: search.value || undefined,
         phase: phase.value ?? undefined,
         page: page.value,
         pageSize: INDEX_PAGE_SIZE,

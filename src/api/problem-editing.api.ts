@@ -17,12 +17,11 @@ const uploadTo = async (path: string, file: File): Promise<string> => {
 };
 
 /**
- * P1: the editor block comes with the detail for editors. `lang=en` is the base language: the detail returns the requested language's
- * translation when one exists, so `lang=vi` would put the Vietnamese name on top and a saved `name` would overwrite the base name.
- * Even so, `name` is the English translation when one exists; the general form therefore sends `name` only when it was edited (Task 5).
+ * The editor block comes with the detail for editors. The detail's `name` follows the requested language, so the forms read the
+ * base-language name from `editor.baseName`; the general form sends `name` only when it was edited.
  */
 export const fetchEditableProblem = (code: string) =>
-  apiRequest<EditableProblem>(problemPath(code), { query: { lang: 'en' } });
+  apiRequest<EditableProblem>(problemPath(code));
 export const fetchProblemEditingMeta = () => apiRequest<ProblemEditingMeta>('/problems/meta');
 export const createProblem = (body: ProblemBody) =>
   apiRequest<EditableProblem>('/problems', { method: 'POST', body });

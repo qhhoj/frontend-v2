@@ -48,7 +48,13 @@
     "pager": "Trang danh sách người dùng",
     "previous": "Trước",
     "next": "Sau",
-    "pageOf": "Trang {page} / {last}"
+    "pageOf": "Trang {page} / {last}",
+    "sort": {
+      "label": "Sắp xếp",
+      "default": "Thứ tự mặc định",
+      "lastAccess": "Truy cập gần nhất, cũ trước",
+      "-lastAccess": "Truy cập gần nhất, mới trước"
+    }
   },
   "card": {
     "label": "Thông tin người dùng",

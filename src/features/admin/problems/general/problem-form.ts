@@ -72,9 +72,9 @@ const limitsWithIds = (problem: EditableProblem, meta: ProblemEditingMeta): Lang
       : [];
   });
 
-const basicsOf = (problem: EditableProblem) => ({
+const basicsOf = (problem: EditableProblem, editor: ProblemEditor) => ({
   code: problem.code,
-  name: problem.name,
+  name: editor.baseName,
   source: problem.source,
   summary: problem.summary,
   date: toLocalInput(problem.date),
@@ -122,7 +122,7 @@ const flagsOf = (problem: EditableProblem) => ({
 export function toProblemForm(problem: EditableProblem, meta: ProblemEditingMeta): ProblemForm {
   const editor = problem.editor!;
   return {
-    ...basicsOf(problem),
+    ...basicsOf(problem, editor),
     ...limitsOf(problem, meta),
     ...classOf(editor),
     ...visibilityOf(problem),

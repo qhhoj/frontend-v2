@@ -9,6 +9,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import DeletedFlatpagesList from './DeletedFlatpagesList.vue';
 import FlatpageEditor from './FlatpageEditor.vue';
 import FlatpageEditorTabs from './FlatpageEditorTabs.vue';
 import FlatpageHistoryPanel from './FlatpageHistoryPanel.vue';
@@ -29,6 +30,10 @@ const editor = ref<FlatpageEditorHandle | null>(null);
 const listPage = computed(() => positivePageOf(route.query.lp));
 const list = useFlatpagesQuery(listPage);
 const pageParam = computed(() => (typeof route.query.page === 'string' ? route.query.page : null));
+/** A deleted page has no editor: `?deleted=<id>` opens only its history, read-only. */
+const deletedId = computed(() =>
+  typeof route.query.deleted === 'string' && route.query.deleted ? route.query.deleted : null,
+);
 const isNewPage = computed(() => pageParam.value === 'new');
 const pageId = computed(() => (pageParam.value && !isNewPage.value ? pageParam.value : null));
 const tab = computed(() => (pageId.value && route.query.tab === 'history' ? 'history' : 'edit'));
@@ -38,8 +43,21 @@ const total = computed(() => list.data.value?.meta.total ?? list.data.value?.ite
 
 /** The list and the editor both read `?page=`; every other key stays, the editor tab and the history page go. */
 function goTo(page: string | null, mode: 'push' | 'replace' = 'push') {
-  const query = { ...route.query, page: page ?? undefined, tab: undefined, hp: undefined };
+  const query = {
+    ...route.query,
+    page: page ?? undefined,
+    deleted: undefined,
+    tab: undefined,
+    hp: undefined,
+  };
   void (mode === 'push' ? router.push({ query }) : router.replace({ query }));
+}
+
+/** A deleted page's history replaces the editor; picking a live page (`goTo`) drops it again. */
+function openDeleted(id: string) {
+  void router.push({
+    query: { ...route.query, page: undefined, deleted: id, tab: undefined, hp: undefined },
+  });
 }
 
 /** "Nạp giá trị cũ": the old values go into the form, then the editor tab is shown; nothing is saved. */
@@ -107,10 +125,12 @@ async function loadRevision(revision: FlatpageRevision) {
             query-key="lp"
           />
         </QueryState>
+        <DeletedFlatpagesList :opened-id="deletedId" @open="openDeleted" />
       </section>
 
       <section class="flex min-w-0 flex-col gap-4">
-        <template v-if="pageParam">
+        <FlatpageHistoryPanel v-if="deletedId" :page-id="deletedId" readonly />
+        <template v-else-if="pageParam">
           <FlatpageEditorTabs
             v-if="pageId"
             :active="tab"

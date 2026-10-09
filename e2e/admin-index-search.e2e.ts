@@ -36,7 +36,7 @@ test('problems index: a typed search reaches the address, and open-by-code still
 }) => {
   signInAsStaff(api, ['judge.edit_own_problem']);
   api.routes['GET /problems'] = ({ url }) =>
-    adminList(url.searchParams.get('search') ? [adminProblemItem()] : []);
+    adminList(url.searchParams.get('q') ? [adminProblemItem()] : []);
   await page.goto('/admin/problems');
   await page.getByRole('searchbox').fill('cây');
   await expect(page).toHaveURL(/q=c%C3%A2y|q=cây/);

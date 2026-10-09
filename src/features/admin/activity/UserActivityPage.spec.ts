@@ -80,6 +80,26 @@ describe('UserActivityPage', () => {
     expect(next()).toBeUndefined();
   }, 60_000);
 
+  it.each([
+    [true, 1],
+    [false, 50],
+  ])(
+    'shows the live next-page button only when hasMore=%s, not by the row count',
+    async (hasMore, rows) => {
+      const users = Array.from({ length: rows }, (_row, index) => ({
+        user: { id: `id-${index}`, username: `user${index}` },
+        lastSeenAt: '2026-10-08T08:40:55.000Z',
+      }));
+      mockApi(routes({ 'GET /admin/user-activity/live': ok(liveActivity({ users, hasMore })) }));
+      const { wrapper } = await mountScreen('/admin/activity', (view) =>
+        view.text().includes('user0'),
+      );
+      const live = wrapper.findAll('section').find((section) => section.text().includes('user0'))!;
+      const hasNext = live.findAll('button').some((button) => button.text() === 'Trang sau');
+      expect(hasNext).toBe(hasMore);
+    },
+  );
+
   it('opens a user summary and deletes their log only after a named confirm', async () => {
     const calls = mockApi(
       routes({

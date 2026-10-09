@@ -6,15 +6,17 @@
     "title": "Search problems",
     "label": "Search problems",
     "placeholder": "Problem code or name…",
-    "hint": "Type a whole word (3 characters or more) to search; 1–2 characters match the start of a code or name.",
-    "columns": { "problem": "Problem", "points": "Points" },
+    "hint": "Matches part of the code or a title.",
+    "columns": {
+      "problem": "Problem",
+      "points": "Points"
+    },
     "private": "Private",
     "count": "{shown} / {total} problems",
     "countFor": "{shown} / {total} problems match “{q}”",
     "empty": "No problems yet.",
     "emptyFor": "No problem matches “{q}”",
-    "emptyAdvice": "Try a whole word (3 characters or more), or open by code beside the list.",
-    "emptyShortAdvice": "1–2 characters match only the start of a code or name. Type a whole word of 3 characters or more to search by word."
+    "emptyAdvice": "Try a shorter part of the code or name, or open by code beside the list."
   },
   "contests": {
     "title": "Search contests",
@@ -24,7 +26,12 @@
     "phaseLabel": "Phase",
     "all": "All",
     "rated": "rated",
-    "columns": { "contest": "Contest", "time": "Time", "phase": "Phase", "users": "Participants" },
+    "columns": {
+      "contest": "Contest",
+      "time": "Time",
+      "phase": "Phase",
+      "users": "Participants"
+    },
     "count": "{shown} / {total} contests",
     "countFor": "{shown} / {total} contests match “{q}”",
     "empty": "No contests yet.",

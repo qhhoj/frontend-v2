@@ -6,7 +6,8 @@ export interface AdminProblemSearch {
   page: number;
   pageSize: number;
   lang: StatementLanguage;
-  search: string;
+  /** Case-insensitive substring of the code or any title, at most 100 characters. */
+  q: string;
 }
 
 /** The staff index of problems: `visibility=all` adds private problems (the backend still limits the list to what the account may see). */

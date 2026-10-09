@@ -45,4 +45,6 @@ export interface LiveActivity {
   anonymousVisitors: number;
   bots: number;
   users: { user: { id: string; username: string }; lastSeenAt: string }[];
+  /** Whether another page of `users` follows. */
+  hasMore: boolean;
 }

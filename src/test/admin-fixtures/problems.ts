@@ -24,6 +24,7 @@ export const problemEditingMeta = (): ProblemEditingMeta => ({
 });
 
 export const problemEditor = (): ProblemEditor => ({
+  baseName: 'Đường đi ngắn nhất có ràng buộc',
   description: 'Cho đồ thị vô hướng gồm $n$ đỉnh.',
   translations: [
     {

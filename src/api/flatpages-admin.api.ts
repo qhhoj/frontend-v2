@@ -1,6 +1,7 @@
 import { apiPage, apiRequest } from './client';
 import type {
   FlatpageAdmin,
+  DeletedFlatpage,
   FlatpageBody,
   FlatpageListItem,
   FlatpageRevision,
@@ -17,6 +18,8 @@ export const updateFlatpage = (id: string, patch: Partial<FlatpageBody>) =>
 export const deleteFlatpage = (id: string) => apiRequest<void>(pagesPath(id), { method: 'DELETE' });
 
 export const FLATPAGE_REVISIONS_PAGE_SIZE = 20;
-/** Readable after the page is deleted; a deleted page's id is only known to someone who kept it (no listing of deleted pages). */
+/** Readable after the page is deleted; `fetchDeletedFlatpages` lists the ids. */
 export const fetchFlatpageRevisions = (id: string, page: number) =>
   apiPage<FlatpageRevision>(`${pagesPath(id)}/revisions`, { query: { page } });
+export const fetchDeletedFlatpages = (page: number) =>
+  apiPage<DeletedFlatpage>(`${pagesPath()}/deleted`, { query: { page } });

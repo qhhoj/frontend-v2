@@ -30,7 +30,7 @@ describe('ProblemSearchList', () => {
     });
     const { wrapper } = await mountIndex('/admin/problems?q=hcmus');
     const query = Object.fromEntries(problemCalls(calls)[0]!.query);
-    expect(query).toMatchObject({ visibility: 'all', search: 'hcmus', page: '1', pageSize: '20' });
+    expect(query).toMatchObject({ visibility: 'all', q: 'hcmus', page: '1', pageSize: '20' });
     expect(wrapper.get('mark').text().toLowerCase()).toBe('hcmus');
     expect(wrapper.get('a[href="/admin/problems/hcmus41c/general"]').text()).toContain('Cây khung');
     expect(wrapper.text()).toContain('1 / 86 bài khớp “hcmus”');
@@ -59,7 +59,8 @@ describe('ProblemSearchList', () => {
     vi.useRealTimers();
     await flushPromises();
     expect(router.currentRoute.value.query).toEqual({ q: 'cây' });
-    expect(problemCalls(calls).at(-1)!.query.get('search')).toBe('cây');
+    expect(problemCalls(calls).at(-1)!.query.get('q')).toBe('cây');
+    expect(problemCalls(calls).at(-1)!.query.has('search')).toBe(false);
   });
 
   it('asks for the page in the address', async () => {
@@ -75,14 +76,7 @@ describe('ProblemSearchList', () => {
     mockApi({ ...staffViewer(PERMS), 'GET /problems': page([]) });
     const { wrapper } = await mountIndex('/admin/problems?q=zzzz');
     expect(wrapper.text()).toContain('Không có bài nào khớp “zzzz”');
-    expect(wrapper.text()).toContain('gõ cả từ');
-  });
-
-  it('advises a whole word of three characters after a one- or two-character search', async () => {
-    mockApi({ ...staffViewer(PERMS), 'GET /problems': page([]) });
-    const { wrapper } = await mountIndex('/admin/problems?q=ab');
-    expect(wrapper.text()).toContain('Không có bài nào khớp “ab”');
-    expect(wrapper.text()).toContain('3 ký tự');
+    expect(wrapper.text()).toContain('phần ngắn hơn');
   });
 
   it('shows a failed list with a retry that asks again', async () => {

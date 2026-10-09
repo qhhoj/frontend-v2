@@ -314,29 +314,5 @@
     "leaveBody": "Thay đổi chưa lưu trong phần này sẽ mất.",
     "leave": "Rời trang",
     "stay": "Ở lại"
-  },
-  "refusals": {
-    "unexpectedField": "Trường hoặc tệp gửi lên không đúng, bị lặp hoặc quá lớn.",
-    "oneFile": "Hãy gửi đúng một tệp trong trường \"file\".",
-    "malformed": "Yêu cầu tải lên không hợp lệ.",
-    "fileRequired": "Cần chọn một tệp.",
-    "emptyFile": "Tệp rỗng; hãy chọn tệp khác.",
-    "svgTooLarge": "Tệp SVG quá lớn hoặc quá phức tạp.",
-    "imageType": "Chỉ nhận ảnh JPG, PNG, GIF hoặc SVG.",
-    "pdfOnly": "Đề bài phải là tệp PDF.",
-    "materialType": "Loại tệp này không được phép làm tài liệu của bài.",
-    "zipOnly": "Tệp phải là .zip.",
-    "noProblemXml": "Gói không có problem.xml ở thư mục gốc.",
-    "zipInconsistent": "Mục lục của tệp zip không nhất quán.",
-    "zipInvalid": "Tệp không phải là zip hợp lệ.",
-    "zipOutside": "Tệp zip tham chiếu ra ngoài chính nó.",
-    "duplicateName": "Tên {name} đã được dùng bởi một tệp dữ liệu khác.",
-    "extensions": "Phần mở rộng cho {kind} chỉ gồm: {list}.",
-    "corruptEntry": "{name} bị hỏng; hãy nén lại tệp.",
-    "sizeMismatch": "{name} không khớp với kích thước đã khai báo.",
-    "tooLargeToRead": "{name} quá lớn để đọc.",
-    "noSuchEntry": "Không có tệp {name} trong gói.",
-    "cannotRead": "Không đọc được {name}.",
-    "unknown": "Tệp không được nhận. Hãy kiểm tra lại tệp rồi thử lại."
   }
 }

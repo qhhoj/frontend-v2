@@ -22,7 +22,7 @@ export interface StatementDraft {
 export function statementDraftOf(problem: EditableProblem, slot: StatementSlot): StatementDraft {
   const editor = problem.editor!;
   if (slot === 'original') {
-    return { name: problem.name, description: editor.description, exists: true };
+    return { name: editor.baseName, description: editor.description, exists: true };
   }
   const translation = editor.translations.find((candidate) => candidate.language === slot);
   if (!translation) return { name: '', description: '', exists: false };

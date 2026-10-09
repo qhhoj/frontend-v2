@@ -16,6 +16,13 @@ export interface FlatpageAdmin extends FlatpageListItem {
   createdAt: string;
 }
 
+/** backend: flatpage-admin.response.ts (`FlatpageDeletedResponse`): a deleted page's last URL; its history is readable by `id`. */
+export interface DeletedFlatpage {
+  id: string;
+  url: string;
+  deletedAt: string;
+}
+
 /** backend: flatpage-admin.dto.ts (the body of a create, and the patch of an update). */
 export interface FlatpageBody {
   url: string;

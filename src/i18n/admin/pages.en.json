@@ -86,5 +86,11 @@
     "pausedWait": "More than 60 previews a minute, so the server refused (429). The last preview stays; type again after {seconds} seconds to update it. Saving the page still works.",
     "paused": "More than 60 previews a minute, so the server refused (429). The last preview stays; type again to update it. Saving the page still works.",
     "hint": "Updates 0.5 seconds after the last key, with the same sanitiser as saving."
+  },
+  "deleted": {
+    "toggle": "Deleted pages",
+    "empty": "No deleted pages.",
+    "at": "Deleted {time}",
+    "pager": "Deleted pages pager"
   }
 }

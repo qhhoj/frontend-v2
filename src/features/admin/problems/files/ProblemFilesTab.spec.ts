@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { failWithCode, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
@@ -87,13 +87,11 @@ describe('ProblemFilesTab', () => {
     );
   });
 
-  it('shows the reason the backend gives for a refused file type, not only the generic line', async () => {
+  it('shows the text of the code the backend gives for a refused file type, not only the generic line', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_problem']),
       ...problemEditorRoutes(),
-      'POST /problems/uploads/image': fail(400, 'validation_failed', {
-        file: ['Only JPG, PNG, GIF and SVG images are accepted.'],
-      }),
+      'POST /problems/uploads/image': failWithCode(400, 'file', 'image_type_not_allowed'),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
     await pick(wrapper, 'upload-image', new File(['x'], 'b.bmp', { type: 'image/bmp' }));

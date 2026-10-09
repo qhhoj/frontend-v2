@@ -71,8 +71,3 @@ export function searchQueryOf(
   }
   return next;
 }
-
-/** The backend matches whole words of this length or more; 1 and 2 characters match only the start of a code or name. */
-export const WHOLE_WORD_MIN_LENGTH = 3;
-
-export const isShortQuery = (text: string): boolean => text.length < WHOLE_WORD_MIN_LENGTH;

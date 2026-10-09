@@ -28,6 +28,8 @@ export const BAN_REASON_MAX_LENGTH = 4096;
 /** backend: user-page.response.ts (UserPageStaffResponse) */
 export interface UserPageStaff {
   isSuperuser: boolean;
+  /** False for a never-activated or banned account; the backend refuses to impersonate it. */
+  isActive: boolean;
   banReason: string | null;
 }
 
