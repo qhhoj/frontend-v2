@@ -59,7 +59,7 @@ const organizationTicketRoutes = (): Record<string, Handler> => ({
   'GET /tickets/:id': ({ params }) => ok(ticketDetail({ id: params.id })),
   'GET /events/tickets': eventStream,
   'GET /events/tickets/:id': eventStream,
-  'GET /pages/about/rules': ok(flatpage()),
+  'GET /pages/about%2Frules': ok(flatpage()),
   'GET /pages/*': NOT_FOUND,
 });
 

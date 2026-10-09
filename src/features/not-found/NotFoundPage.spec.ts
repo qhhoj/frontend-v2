@@ -7,7 +7,7 @@ describe('not found page', () => {
   it('renders for an unknown path with the heading, copy, both links and the requested path', async () => {
     mockApi({
       'GET /auth/me': signedOut,
-      'GET /pages/problems/lsi/oops': fail(404, 'not_found'),
+      'GET /pages/problems%2Flsi%2Foops': fail(404, 'not_found'),
     });
     const { wrapper } = await mountApp('/problems/lsi/oops');
     expect(wrapper.get('h1').text()).toBe('Không tìm thấy trang');
