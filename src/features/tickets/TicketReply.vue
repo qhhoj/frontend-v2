@@ -38,11 +38,16 @@ const { isPending, error, mutate } = useMutation({
 const failureKey = computed(() => (error.value ? replyFailureKey(error.value) : null));
 const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 
-/** 409 is the message cap and 403 a muted account; anything else (429 included) shows its own message. */
+/** `conflict` is the message cap and `forbidden` a muted account (the backend's one `forbidden` here); anything else (429 included) shows its own message. */
+const REPLY_FAILURE_KEYS: Readonly<Record<string, string>> = {
+  conflict: 'ticket.messageCap',
+  forbidden: 'ticket.muted',
+};
 function replyFailureKey(failure: unknown): string {
-  if (failure instanceof ApiError && failure.status === 409) return 'ticket.messageCap';
-  if (failure instanceof ApiError && failure.status === 403) return 'ticket.muted';
-  return errorMessageKey(failure);
+  const code = failure instanceof ApiError ? failure.code : '';
+  return Object.hasOwn(REPLY_FAILURE_KEYS, code)
+    ? REPLY_FAILURE_KEYS[code]!
+    : errorMessageKey(failure);
 }
 const send = () => {
   if (canSend.value && !isPending.value) mutate(text.value);

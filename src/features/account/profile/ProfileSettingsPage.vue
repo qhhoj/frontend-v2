@@ -16,12 +16,16 @@ import IdentityFields from './IdentityFields.vue';
 import OrganizationsEditor from './OrganizationsEditor.vue';
 import SaveBar from './SaveBar.vue';
 import SaveErrorSummary from './SaveErrorSummary.vue';
-import { invalidSummary, lengthErrors, saveErrorText, serverFieldErrors } from './profile-errors';
+import {
+  PROFILE_FIELD_ORDER,
+  invalidSummary,
+  lengthErrors,
+  saveErrorText,
+  serverFieldErrors,
+} from './profile-errors';
 import { profileFieldId } from './profile-field-ids';
 import { useProfileDraft } from './use-profile-draft';
 
-/** Screen order: the summary names the fields in the order the viewer meets them. */
-const PROFILE_FIELD_ORDER = ['firstName', 'about', 'organizations', 'languageId', 'timezone'];
 const locale = useLocaleStore();
 const session = useSessionStore();
 const officialMode = useOfficialMode();

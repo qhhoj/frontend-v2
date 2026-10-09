@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Bell } from 'lucide-vue-next';
 import Drawer from 'primevue/drawer';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, onScopeDispose, ref, watch } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -47,14 +47,20 @@ const badge = computed(() => {
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
 /** Polite, counts only: said when the count rises, never per row. */
 const arrivedText = ref('');
+/** The gap between emptying and refilling the region: shorter than a frame and browsers merge the two, so an identical text goes unread. */
+const REANNOUNCE_GAP_MS = 100;
+let announceTimer: ReturnType<typeof setTimeout> | undefined;
 /** Cleared first, so two identical rises ("1 thông báo mới" twice) still change the region and are read again. */
 function announceArrivals(gained: number) {
+  clearTimeout(announceTimer);
   arrivedText.value = '';
   if (gained > 0)
-    void nextTick(
+    announceTimer = setTimeout(
       () => (arrivedText.value = translate('notifications.arrived', { count: gained })),
+      REANNOUNCE_GAP_MS,
     );
 }
+onScopeDispose(() => clearTimeout(announceTimer));
 watch(
   () => countQuery.data.value?.count,
   (count, before) => {

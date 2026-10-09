@@ -43,9 +43,22 @@ const SAVE_ERROR_KEYS: Readonly<Record<string, string>> = {
   network_error: 'settings.profile.offline',
 };
 
-/** The sentence above the form for a failed save that no field explains; null when the fields do. */
+/** Screen order: the summary names the fields in the order the viewer meets them. */
+export const PROFILE_FIELD_ORDER = [
+  'firstName',
+  'about',
+  'organizations',
+  'languageId',
+  'timezone',
+];
+
+/**
+ * The sentence above the form for a failed save that no field of this form explains; null when one does.
+ * An issue on a field the form does not render (`officialMode` on `locked_in_official_contest`) falls back to the code's text.
+ */
 export function saveErrorText(error: unknown): string | null {
-  if (!error || Object.keys(fieldErrorTexts(error)).length) return null;
+  if (!error) return null;
+  if (PROFILE_FIELD_ORDER.some((field) => field in fieldErrorTexts(error))) return null;
   const code = error instanceof ApiError ? error.code : '';
   const key = Object.hasOwn(SAVE_ERROR_KEYS, code)
     ? SAVE_ERROR_KEYS[code]!

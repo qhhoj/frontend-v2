@@ -77,6 +77,35 @@ describe('ticket page', () => {
     expect(calls.find((call) => call.method === 'POST')!.body).toEqual({ body: 'Cảm ơn ạ.' });
     expect((wrapper.get('textarea[name="reply"]').element as HTMLTextAreaElement).value).toBe('');
   });
+
+  it.each([
+    [409, 'conflict', 'Phiếu đã đạt giới hạn 500 tin nhắn.'],
+    [403, 'forbidden', 'Người dùng bị tắt tiếng không thể mở hoặc trả lời phiếu.'],
+  ])('explains a refused reply by its code (%i %s)', async (status, code, text) => {
+    mockApi({
+      ...signedInViewer(),
+      [`GET /tickets/${id}`]: ok(ticketDetail()),
+      [`POST /tickets/${id}/messages`]: fail(status, code),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    await wrapper.get('textarea[name="reply"]').setValue('Cảm ơn ạ.');
+    await wrapper.get('form[data-testid="ticket-reply"]').trigger('submit');
+    await flushPromises();
+    expect(wrapper.get('form[data-testid="ticket-reply"]').text()).toContain(text);
+  });
+
+  it('does not read a 409 with another code as the message cap', async () => {
+    mockApi({
+      ...signedInViewer(),
+      [`GET /tickets/${id}`]: ok(ticketDetail()),
+      [`POST /tickets/${id}/messages`]: fail(409, 'busy'),
+    });
+    const { wrapper } = await mountApp(`/tickets/${id}`);
+    await wrapper.get('textarea[name="reply"]').setValue('Cảm ơn ạ.');
+    await wrapper.get('form[data-testid="ticket-reply"]').trigger('submit');
+    await flushPromises();
+    expect(wrapper.get('form[data-testid="ticket-reply"]').text()).not.toContain('500 tin nhắn');
+  });
 });
 
 describe('ticket page', () => {

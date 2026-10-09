@@ -86,6 +86,15 @@ describe('saveErrorText', () => {
     expect(saveErrorText(new ApiError(code, status, code))).toMatch(new RegExp(`^${start}`));
   });
 
+  it('shows the lock text for the backend refusal, whose issue sits on a field the form lacks', () => {
+    const refused = new ApiError('locked_in_official_contest', 403, 'Locked', {
+      issues: [
+        issue('officialMode', 'locked_in_official_contest', 'Locked in an official contest'),
+      ],
+    });
+    expect(saveErrorText(refused)).toMatch(/^Chưa lưu được: kỳ thi chính thức/);
+  });
+
   it('is null when the fields explain the failure, and when nothing failed', () => {
     expect(saveErrorText(fieldsError({ timezone: ['x'] }))).toBeNull();
     expect(saveErrorText(null)).toBeNull();

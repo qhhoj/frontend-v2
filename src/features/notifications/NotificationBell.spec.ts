@@ -202,7 +202,9 @@ describe('NotificationBell', () => {
       { timeout: 3000 },
     );
     expect(calls.filter((call) => call.path === '/notifications/unread-count')).toHaveLength(2);
-    expect(wrapper.get('[data-testid="notification-arrived"]').text()).toBe('2 thông báo mới');
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="notification-arrived"]').text()).toBe('2 thông báo mới'),
+    );
   });
 
   it('re-announces a second rise of the same size (the region empties between them)', async () => {
@@ -233,10 +235,11 @@ describe('NotificationBell', () => {
     await vi.waitFor(() =>
       expect(wrapper.get('[data-testid="notification-badge"]').text()).toBe('5'),
     );
-    await flushPromises();
+    await vi.waitFor(() =>
+      expect(seen.filter((text) => text === '1 thông báo mới')).toHaveLength(2),
+    );
     expect(region.textContent).toBe('1 thông báo mới');
     expect(seen.filter((text) => text === '')).not.toHaveLength(0);
-    expect(seen.filter((text) => text === '1 thông báo mới')).toHaveLength(2);
   });
 
   it('keeps the same stream across session.refresh()', async () => {

@@ -190,6 +190,9 @@
   "save": "Save",
   "discard": "Discard edits",
   "saved": "Saved.",
+  "badValue": {
+    "officialModeEndsAt": "Not a valid instant. Use ISO 8601 with an offset, for example 2026-10-10T17:00:00+07:00."
+  },
   "saveFailed": "Could not save {key}: {message}",
   "history": "History",
   "historyWithKey": "History · {key}",

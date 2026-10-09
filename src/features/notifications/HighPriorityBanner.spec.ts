@@ -33,17 +33,18 @@ describe('HighPriorityBanner', () => {
     expect(banner()!.getAttribute('aria-label')).toBe('Thông báo quan trọng');
   });
 
-  it('sits in an always-mounted alert region so a late arrival is announced', async () => {
+  it('sits in an always-mounted assertive live region so a late arrival is announced', async () => {
     mockApi({ ...signedInViewer(), 'GET /notifications': inbox(() => false) });
     await mountApp(START);
-    expect(banner()!.parentElement!.getAttribute('role')).toBe('alert');
+    expect(banner()!.parentElement!.getAttribute('aria-live')).toBe('assertive');
   });
 
-  it('keeps the alert region even when nothing is important', async () => {
+  it('keeps the live region, without an alert role, even when nothing is important', async () => {
     mockApi({ ...signedInViewer(), 'GET /notifications': () => page([], { pageSize: 20 }) });
     await mountApp(START);
     expect(banner()).toBeNull();
-    expect(document.body.querySelector('[role="alert"]')).not.toBeNull();
+    expect(document.body.querySelector('[aria-live="assertive"]')).not.toBeNull();
+    expect(document.body.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('goes away once marked read', async () => {
@@ -65,7 +66,7 @@ describe('HighPriorityBanner', () => {
     expect(banner()).toBeNull();
   });
 
-  it('opens the notification from "Xem phiếu" (a ticket kind) and says plain "Xem" for other kinds', async () => {
+  it('opens the notification page when "Xem phiếu" (a ticket kind) is clicked', async () => {
     mockApi({
       ...signedInViewer(),
       'GET /notifications': inbox(() => false),

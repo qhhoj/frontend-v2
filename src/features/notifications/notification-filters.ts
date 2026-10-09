@@ -1,13 +1,13 @@
 import type { RouteLocationRaw } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
 import type { NotificationState } from '@/api/types/notifications';
-import { AVAILABLE_KIND_GROUPS } from './notification-kinds';
+import { KIND_GROUPS } from './notification-kinds';
 import type { KindGroup } from './notification-kinds';
 
 /** `?kind=` is one of the four chips of the "Loại" rail (requires VNOI backend B1 ask: the `kind` query); anything else is no kind filter. */
 export function kindGroupFromQuery(value: unknown): KindGroup | null {
   const text = Array.isArray(value) ? value[0] : value;
-  return AVAILABLE_KIND_GROUPS.find((group) => group === text) ?? null;
+  return KIND_GROUPS.find((group) => group === text) ?? null;
 }
 
 /** `?state=` as the backend accepts it; anything else lists everything. */

@@ -5,11 +5,12 @@ import { NOTIFICATION_BITS } from '@/features/notifications/notification-bits';
 import { computed } from 'vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useNow } from '@/lib/use-now';
-import { useOfficialMode } from './official-mode.queries';
+import { useOfficialMode, useRefetchWhenOfficialModeEnds } from './official-mode.queries';
 import { untilText } from './official-until';
 
 /** M1B warning card: "Chế độ thi chính thức đến 11:30 hôm nay" (`officialModeEndsAt`, requires VNOI backend B8 ask; plain title when null) and what is locked; a superuser is told they are exempt. */
 const mode = useOfficialMode();
+useRefetchWhenOfficialModeEnds();
 const locale = useLocaleStore();
 const now = useNow(60_000);
 const until = computed(() =>

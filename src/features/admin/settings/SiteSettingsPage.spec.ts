@@ -82,6 +82,26 @@ describe('SiteSettingsPage', () => {
     expect(contest.get('[role="alert"]').text()).toContain('contest.officialMode');
   });
 
+  it('says a bad official-mode end time in Vietnamese, not in the backend English', async () => {
+    mockApi(
+      routes({
+        'PATCH /admin/settings/contest.officialModeEndsAt': invalid(
+          issue('value', 'invalid', 'Must be an ISO 8601 instant with an offset'),
+        ),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    const contest = block(wrapper, 'contest');
+    const label = contest
+      .findAll('label')
+      .find((item) => item.text().startsWith('Thời điểm tự tắt chế độ thi chính thức'))!;
+    await contest.get(`#${label.attributes('for')}`).setValue('tomorrow');
+    await clickIn(contest, 'Lưu');
+    const alert = contest.get('[role="alert"]').text();
+    expect(alert).toContain('Thời điểm chưa hợp lệ');
+    expect(alert).not.toContain('Must be an ISO');
+  });
+
   it('shows the backend refusal under its block and keeps the edit', async () => {
     mockApi(
       routes({

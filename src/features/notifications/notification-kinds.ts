@@ -29,5 +29,3 @@ const GROUP_KINDS: Readonly<Record<KindGroup, readonly NotificationKind[]>> = {
 export const kindsOfGroup = (group: KindGroup): NotificationKind[] => [...GROUP_KINDS[group]];
 export const isTicketKind = (kind: string): boolean =>
   GROUP_KINDS.ticket.some((ticketKind) => ticketKind === kind);
-/** Chips with at least one kind to ask for: a chip with none would list every row (a `kind` filter left empty lists everything). */
-export const AVAILABLE_KIND_GROUPS = KIND_GROUPS.filter((group) => GROUP_KINDS[group].length > 0);

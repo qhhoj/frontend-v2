@@ -190,6 +190,9 @@
   "save": "Lưu",
   "discard": "Đặt lại",
   "saved": "Đã lưu.",
+  "badValue": {
+    "officialModeEndsAt": "Thời điểm chưa hợp lệ. Dùng dạng ISO 8601 có múi giờ, ví dụ 2026-10-10T17:00:00+07:00."
+  },
   "saveFailed": "Không lưu được {key}: {message}",
   "history": "Lịch sử",
   "historyWithKey": "Lịch sử · {key}",

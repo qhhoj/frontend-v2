@@ -23,7 +23,7 @@ const session = useSessionStore();
 
 <template>
   <!-- Always mounted, so a banner that arrives later is announced (assertive: it is the important one). -->
-  <div v-if="session.user" role="alert">
+  <div v-if="session.user" aria-live="assertive">
     <section
       v-if="item"
       role="region"

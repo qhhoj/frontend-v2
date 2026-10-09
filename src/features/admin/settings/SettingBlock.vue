@@ -6,7 +6,7 @@ import { updateSetting } from '@/api/settings-admin.api';
 import type { Setting, SettingKey } from '@/api/types/settings-admin';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
-import { failureTextOf, fieldErrorsOf } from '../ui/admin-errors';
+import { failureTextOf, fieldErrorsOf, hasIssueCode } from '../ui/admin-errors';
 import SettingField from './SettingField.vue';
 import type { ShownBlock } from './setting-blocks';
 import { checkBlock, sendKeysInOrder } from './setting-save';
@@ -20,7 +20,8 @@ import { useStoreSettingAnswer } from './settings.queries';
  */
 const props = defineProps<{ block: ShownBlock }>();
 const emit = defineEmits<{ history: [key: SettingKey] }>();
-const { t } = useI18n();
+const composer = useI18n();
+const { t } = composer;
 const storeAnswer = useStoreSettingAnswer();
 
 const drafts = reactive<Drafts>({});
@@ -48,7 +49,9 @@ function showRefusal(key: SettingKey, message: string) {
 }
 
 /** The block's answer to a refused key: the field's text when the server named one, else the page line of the failure. */
-function refusalMessage(error: unknown): string {
+function refusalMessage(key: SettingKey, error: unknown): string {
+  const ownText = `admin.settings.badValue.${key.split('.').pop()}`;
+  if (hasIssueCode(error, 'invalid') && composer.te(ownText)) return t(ownText);
   return fieldErrorsOf(error).value ?? failureTextOf(error);
 }
 
@@ -66,7 +69,8 @@ async function save() {
   });
   isSaving.value = false;
   rebuildDraftsFrom(answers);
-  if ('failedKey' in outcome) return showRefusal(outcome.failedKey, refusalMessage(outcome.error));
+  if ('failedKey' in outcome)
+    return showRefusal(outcome.failedKey, refusalMessage(outcome.failedKey, outcome.error));
   notice.value =
     outcome.saved.length > 0
       ? { tone: 'done', text: t('admin.settings.saved') }

@@ -17,7 +17,7 @@ import NotificationList from './NotificationList.vue';
 import NotificationsPageSkeleton from './NotificationsPageSkeleton.vue';
 import { NOTIFICATION_BITS } from './notification-bits';
 import { filterLink, kindGroupFromQuery, stateFromQuery } from './notification-filters';
-import { AVAILABLE_KIND_GROUPS, kindsOfGroup } from './notification-kinds';
+import { KIND_GROUPS, kindsOfGroup } from './notification-kinds';
 import NotificationLoadError from './NotificationLoadError.vue';
 import {
   DRAWER_QUERY,
@@ -142,7 +142,7 @@ const FILTER_CLASS =
           {{ $t('notifications.kindLabel') }}
         </p>
         <RouterLink
-          v-for="option in AVAILABLE_KIND_GROUPS"
+          v-for="option in KIND_GROUPS"
           :key="option"
           :to="filterLink(state, option === group ? null : option)"
           :aria-current="option === group ? 'page' : undefined"
