@@ -10,6 +10,7 @@ import { createQueryClient } from '@/api/query-client';
 import { createAppRouter } from '@/router';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useAppearanceStore } from '@/theme/appearance.store';
+import { useLowPowerStore } from '@/theme/low-power.store';
 import { useThemeStore } from '@/theme/theme.store';
 
 /** Mounts the whole app at `path` like main.ts does (memory history unless one is given, no query retries). Mock the API first. */
@@ -23,6 +24,7 @@ export async function mountApp(path: string, history: RouterHistory = createMemo
   });
   useThemeStore();
   useAppearanceStore();
+  useLowPowerStore();
   useLocaleStore();
   await router.push(path);
   const wrapper = mount(App, {
