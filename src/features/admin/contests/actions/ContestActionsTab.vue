@@ -17,7 +17,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import ContestActionCard from './ContestActionCard.vue';
 import ContestCloneCard from './ContestCloneCard.vue';
 import ContestDataCard from './ContestDataCard.vue';
-import { isBusy } from './contest-actions';
+import { isBoardFrozen, isBusy } from './contest-actions';
 
 const props = defineProps<{ contest: EditableContest }>();
 const queryClient = useQueryClient();
@@ -59,7 +59,7 @@ const judgeFinalLock = computed(() =>
     : translate('admin.contests.actions.judgeFinal.unavailable'),
 );
 const rateLock = computed(() =>
-  hasEnded.value && props.contest.frozenLastMinutes === 0
+  hasEnded.value && !isBoardFrozen(props.contest)
     ? undefined
     : translate('admin.contests.actions.rate.unavailable'),
 );

@@ -223,3 +223,31 @@ describe('ContestActionsTab', () => {
     expect(openDialog().textContent).toContain('Cần điền.');
   });
 });
+
+/** Rating follows the backend's freeze rule: only icpc and vnoj freeze, and only with a window set. */
+describe('rating by format and freeze window', () => {
+  it.each([
+    { formatName: 'final_submission', frozenLastMinutes: 60, offered: true },
+    { formatName: 'ioi', frozenLastMinutes: 60, offered: true },
+    { formatName: 'icpc', frozenLastMinutes: 60, offered: false },
+    { formatName: 'icpc', frozenLastMinutes: 0, offered: true },
+  ] as const)(
+    '$formatName with a freeze window of $frozenLastMinutes minutes: rating offered is $offered',
+    async ({ formatName, frozenLastMinutes, offered }) => {
+      mockApi({
+        ...staffViewer(['judge.edit_own_contest', 'judge.contest_rating']),
+        ...routes({
+          'GET /contests/hcmus-w41': ok(
+            editableContest({ formatName, phase: 'ended', frozenLastMinutes }),
+          ),
+        }),
+      });
+      const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
+      const card = wrapper.get('[data-testid="action-rate"]');
+      expect(card.findAll('button').some((button) => button.text() === 'Tính rating')).toBe(
+        offered,
+      );
+      expect(card.text().includes('Chỉ tính rating sau khi kỳ thi kết thúc')).toBe(!offered);
+    },
+  );
+});

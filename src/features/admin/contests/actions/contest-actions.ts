@@ -1,13 +1,20 @@
-import type { ContestActionState, ContestDataStatus } from '@/api/types/contest-editing';
+import type {
+  ContestActionState,
+  ContestDataStatus,
+  ContestFormatName,
+} from '@/api/types/contest-editing';
 
-const pad = (value: number) => String(value).padStart(2, '0');
+/** Mirrors backend `FREEZE_FORMATS` (libs/contests contest-time): only these formats freeze their board. */
+const FREEZE_FORMATS: readonly ContestFormatName[] = ['icpc', 'vnoj'];
 
-/** `hh:mm:ss` until the contest ends; null once it has ended. */
-export function timeLeftText(endTime: string, now: number): string | null {
-  const seconds = Math.floor((new Date(endTime).getTime() - now) / 1000);
-  if (seconds <= 0) return null;
-  return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
-}
+/**
+ * Mirrors backend `frozenTime`/`isFrozen`: a board is frozen only in a freezing format with a freeze window set. The backend
+ * refuses rating while it is frozen, even after the contest has ended, until the window is set to 0.
+ */
+export const isBoardFrozen = (contest: {
+  formatName: ContestFormatName;
+  frozenLastMinutes: number;
+}): boolean => FREEZE_FORMATS.includes(contest.formatName) && contest.frozenLastMinutes > 0;
 
 export function canPrepareAgain(status: ContestDataStatus, now: number): boolean {
   if (status.state === 'preparing') return false;
