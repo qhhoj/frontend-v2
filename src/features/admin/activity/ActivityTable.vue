@@ -50,7 +50,11 @@ const isErrorStatus = (statusCode: number) => statusCode >= 400;
 <template>
   <section data-testid="activity-table" class="flex min-w-0 flex-col gap-3">
     <QueryState :loading="logs.isPending.value" :error="logs.error.value" @retry="logs.refetch()">
-      <template #skeleton><SkeletonBlock class="h-60 w-full" /></template>
+      <template #skeleton
+        ><SkeletonBlock
+          data-skeleton-region="activity-table"
+          class="h-[63rem] w-full sm:h-[13.8rem]"
+      /></template>
       <div
         class="overflow-x-auto rounded-row border border-line"
         role="region"

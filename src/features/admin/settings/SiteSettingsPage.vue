@@ -63,7 +63,11 @@ function closeHistory() {
     :error="settings.error.value"
     @retry="settings.refetch()"
   >
-    <template #skeleton><SkeletonBlock class="h-40 w-full" /></template>
+    <template #skeleton
+      ><SkeletonBlock
+        data-skeleton-region="settings-block"
+        class="h-[24.4rem] w-full sm:h-[23.9rem]"
+    /></template>
     <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
       <div class="flex flex-col gap-8">
         <section

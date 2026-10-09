@@ -99,7 +99,9 @@ Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activa
 
 Admin screens live in `src/features/admin/<area>/` (one folder per area: problems, contests, users, similarity, rejudge, search, ...), inside the shared `AdminShell`. `ADMIN_SCREENS` in `src/features/admin/admin-screens.ts` lists every screen once (id, path, permission); `admin-routes.ts` turns it into routes and maps each id to its page in `SCREEN_COMPONENTS`. Texts are per area in `src/i18n/admin/<area>.vi.json` and `.en.json`, merged by `src/i18n/index.ts`. Fixtures for specs and e2e are in `src/test/admin-fixtures/`, e2e helpers (`signInAsStaff`, `adminOk`, `adminList`, `confirmInDialog`) in `e2e/fixtures/admin.ts`. Which Bit mascot each admin placement shows is decided in one place, `ADMIN-BIT-HOOK` in `src/features/admin/shell/admin-bit.ts`.
 
-To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content plus a case in `e2e/admin-loading.e2e.ts`.
+The site screens (plan 8f-2) are judges, languages, users, organizations, blog moderation, site settings, raw config, navigation bar, static pages, the staff ticket queue, user activity and the change log, one folder each in `src/features/admin/`. Shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages (organizations, posts, tickets, `GET /site`) come from the community API files. Loading parity for the site screens is in `e2e/admin-site-loading.e2e.ts`.
+
+To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content plus a case in `e2e/admin-loading.e2e.ts` (or `e2e/admin-site-loading.e2e.ts` for a site screen).
 
 ## More
 

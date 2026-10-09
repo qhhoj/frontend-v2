@@ -43,9 +43,20 @@ onBeforeRouteLeave(() => {
     </AdminPageHeader>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <div class="flex flex-col gap-4">
-          <SkeletonBlock class="h-24 w-full" />
-          <SkeletonBlock v-for="index in 5" :key="index" class="h-32 w-full" />
+        <div class="flex flex-col gap-5">
+          <SkeletonBlock
+            data-skeleton-region="judge-stats"
+            class="h-[11.875rem] w-full sm:h-[7.625rem]"
+          />
+          <SkeletonBlock v-for="index in 2" :key="index" class="h-10 w-full sm:h-5" />
+          <div class="flex flex-col gap-3">
+            <SkeletonBlock
+              v-for="index in 5"
+              :key="index"
+              data-skeleton-region="judge-row"
+              class="h-[18.375rem] w-full sm:h-[13.625rem]"
+            />
+          </div>
         </div>
       </template>
       <JudgeStats :stats="stats" />

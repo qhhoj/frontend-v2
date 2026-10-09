@@ -139,6 +139,14 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 | B-8f8 | The base name on `ProblemEditorResponse` (`name` follows the requested language) | editor without the `lang=en` read |
 | B-8f9 | Issue codes on field refusals that arrive only in `fields` in English (clone key taken, contest window, time limit above 5) | Vietnamese wording of those refusals |
 | B-8f10 | Substring (or prefix-per-word) search on `GET /problems?search=` (the text index matches whole words from 3 characters) | typing "hcmus4" finds `hcmus41c` |
+| B-8f2-1b | Per-sub-field issues for object settings (a type error is one issue on `value`) | field-level errors in a settings block |
+| B-8f2-2 | Server-side checks for misc config values (URL keys, analytics snippet) and an admin read with `no-store` | no client-only validation |
+| B-8f2-3b | A global audit read for the change log | `/admin/log` without choosing a key |
+| B-8f2-6b | Organization delete | a delete button on the organization panel |
+| B-8f2-7b | A report queue for blog moderation (no report model) | a reports tab |
+| B-8f2-9 | A listing of deleted flatpages (id, last URL, deleted at), or revisions readable by URL | the board's "Trang đã xoá" and "Tạo lại trang" |
+| B-8f2-10 | (optional) `GET /admin/users` sort by `lastAccess` | users list sorted by last access |
+| B-8f2-11 | An issue code for a join request that is already decided (409; the frontend matches the message text) | no text matching |
 
 ## Loading states
 
@@ -296,6 +304,22 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Admin indexes**: open-by-key stays and a URL-driven search card (`q`, `phase`, `page`) lists problems and contests beside it (pick 2B, 2026-10-09), its box shared with the users list; whole-word problem search is B-8f10.
 - **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box; skeleton heights fit a typical screen (one run, five users), so other row counts still move what follows.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
+- **Judge ping and key**: ping shows in ms (the API sends seconds); one `JudgeKeyDialog` serves "Tạo và lấy khoá" and a rotation (after a confirm that the judge disconnects), the key lives in component state only — the board says the key shows once.
+- **Languages**: list from `GET /admin/languages`; judge coverage ("{judges} / {total}", "chỉ có trên một máy") joins `GET /judges` and shows only with `judge.change_judge`; create and edit are own pages with a sticky save bar, the key sealed on edit, PATCH sends changed fields only — no `GET /admin/languages/:id`, so edit finds the language in the list.
+- **Users list**: exact lookup plus `GET /admin/users` with a username-prefix box (`?q=`), tabs Tất cả / Chưa cấm / Đã cấm (`?tab=`), ban reason and last access; no sort by last access (B-8f2-10), the order is the server's.
+- **Impersonation**: "Đóng vai" only for superuser viewers, hidden for a superuser or banned target; `startImpersonation` and `session.startImpersonating` only, the bar and stop are 8h's `ImpersonationBanner` — one path.
+- **Organizations**: list from `GET /organizations`, edit panel on the same page (`?org=`); staff-only fields (`isUnlisted`, `slots`, `shortName`) locked without `judge.edit_all_organization` and left out of a create body (closed, unlisted); search is a literal case-insensitive substring with the match marked; the tab "Yêu cầu tham gia · tất cả tổ chức" reads `GET /admin/organization-requests` and a decision goes through the request's own organization endpoint.
+- **Blog moderation**: tabs all / global / "Đã ẩn" / "Hẹn giờ"; "Ẩn bài" and "Hiện lại" are `PATCH visible` after a confirm, "Hiện lại" warns when `publishOn` is ahead; no delete and no report queue (no model).
+- **Site settings**: blocks follow the board; one "Lưu" PATCHes each changed key in order and stops at the first refusal; "Về mặc định" fills `Setting.default` and the user presses "Lưu"; an empty secret box keeps the stored secret, "Xoá bí mật" (red confirm) is the only way to empty one — a blank replace must never wipe a secret.
+- **Revisions and restore**: "Lịch sử" is a side panel per key (20 per page), "Khôi phục" is `POST …/restore` and writes a new revision; a whole-secret key has no button (server 409); actors show as `shortId` (no name in the API).
+- **Change log**: `/admin/log` lists revisions of one chosen setting key — no global audit read (B-8f2-3b).
+- **Raw config**: read from `GET /site` with `cache: 'no-cache'`; writes patch the cached `/site`; HTML values preview in a sandboxed `srcdoc` iframe, never `v-html`; the analytics snippet is not checked by the backend (B-8f2-2).
+- **Navigation bar**: tree from `GET /site` (orphans and cycles at top level as the backend does), edit in a dialog, parent select excludes self and descendants; a stored invalid regex shows "Regex lỗi".
+- **Static pages**: the URL is canonicalised as the backend does (no trim, `/` and dot segments refused); live preview through `useRenderPreview(…, 'flatpage')`, a "Lịch sử" tab with line diff where "Nạp giá trị cũ" fills the form and the normal PATCH saves; no deleted-pages list (B-8f2-9).
+- **Tickets queue**: reuses 8e's ticket queries, stream and components and its URL helpers; status Đang mở / Đã đóng / Tất cả is the server's `open` filter and the first visit writes `scope=all&open=1` once.
+- **Activity**: `hasMore` pager (no total), filter in the URL, CSV export as a plain link with the same filter, live visitors refetch every 30 s, summary bars in SVG with a text table; deletes sit behind confirms.
+- **Admin site loading parity**: `e2e/admin-site-loading.e2e.ts` covers judges (stats and rows, offset included), the first settings block and the activity table; skeleton heights are per breakpoint (`sm`) and fit a typical load (5 judges, 3 log rows), so other counts still move what follows.
+- **Admin writes and reads**: shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages use 8e's API files — one query per data, no copy.
 
 ## Settings (8h)
 
