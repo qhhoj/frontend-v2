@@ -80,6 +80,27 @@ describe('ContestAnnouncementsTab', () => {
     expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
   });
 
+  it('refreshes the public announcement cache and moves focus to the composer heading after a delete', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      ...list(),
+      'DELETE /contests/hcmus-w41/announcements/a-1': { status: 204 },
+    });
+    const { wrapper, queryClient } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/announcements',
+      LIST_TEXT,
+    );
+    const publicKey = ['contests', 'announcements', 'viewer', 'hcmus-w41', 1];
+    queryClient.setQueryData(publicKey, { items: [] });
+    await button(wrapper, 'Xóa').trigger('click');
+    await confirmDialog('Xóa');
+    await vi.waitFor(() => expect(queryClient.getQueryState(publicKey)?.isInvalidated).toBe(true));
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(document.getElementById('announcement-compose-heading')),
+    );
+  });
+
   it('says whether announcements are also pushed live, from the contest setting', async () => {
     mockApi({
       ...staffViewer(EDIT),

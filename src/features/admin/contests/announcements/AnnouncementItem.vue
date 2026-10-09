@@ -10,6 +10,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import { composeHeading } from './composer-heading';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import type { AdminQueryKey } from '../../ui/use-admin-mutation';
 
@@ -36,7 +37,7 @@ const resend = useAdminMutation({
 });
 const remove = useAdminMutation({
   mutate: () => deleteAnnouncement(props.contestKey, props.announcement.id),
-  invalidates: () => [listKey()],
+  invalidates: () => [listKey(), ['contests', 'announcements']],
   onDone: () => {
     isConfirmOpen.value = false;
   },
@@ -75,6 +76,7 @@ async function resendNow() {
       :body="$t('admin.contests.announcements.deleteBody')"
       :confirm-label="$t('admin.contests.announcements.delete')"
       tone="danger"
+      :return-focus-to="composeHeading"
       :busy="remove.isPending.value"
       @confirm="remove.run(undefined)"
     >

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { computed, useId } from 'vue';
+import { computed, nextTick, onBeforeUnmount, useId, watch } from 'vue';
 
 /**
  * One confirm step for the destructive or irreversible choices, on the shared Dialog preset.
@@ -10,6 +10,8 @@ import { computed, useId } from 'vue';
  * `aria-disabled` (focus is kept) and neither it nor Enter confirms.
  * The body is a `<form>` and the confirm button (in the footer, outside it) submits it by id, so Enter in an input and a click
  * each emit once. Focus returns to the element that opened it (PrimeVue restores it when the dialog hides).
+ * `returnFocusTo` names where focus lands when the dialog closes after a confirm (not after Cancel, Escape or the close button):
+ * pass it when the opener row disappears with the confirmed action, so PrimeVue has nothing to return focus to.
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
  * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */
@@ -22,26 +24,52 @@ const props = withDefaults(
     tone?: 'neutral' | 'danger';
     busy?: boolean;
     canConfirm?: boolean;
+    returnFocusTo?: () => HTMLElement | null | undefined;
   }>(),
-  { body: undefined, cancelLabel: undefined, tone: 'neutral', busy: false, canConfirm: true },
+  {
+    body: undefined,
+    cancelLabel: undefined,
+    tone: 'neutral',
+    busy: false,
+    canConfirm: true,
+    returnFocusTo: undefined,
+  },
 );
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [] }>();
 const bodyId = useId();
 const cannotConfirm = computed(() => props.busy || !props.canConfirm);
 
+let isConfirmed = false;
+
+/** The user closing the dialog without a confirm (Cancel, Escape, the close button) cancels the pending focus return. */
+function dismiss(next: boolean) {
+  visible.value = next;
+  if (!next) isConfirmed = false;
+}
 function cancel() {
-  if (!props.busy) visible.value = false;
+  if (!props.busy) dismiss(false);
 }
 /** The form's submit (Enter, or the confirm button): the one place that emits. */
 function confirm() {
-  if (!cannotConfirm.value) emit('confirm');
+  if (cannotConfirm.value) return;
+  isConfirmed = true;
+  emit('confirm');
 }
+
+/** The consumer closes (or unmounts) the dialog once the confirmed request is done: focus then goes to the named target. */
+function returnFocus() {
+  if (!isConfirmed) return;
+  isConfirmed = false;
+  void nextTick(() => props.returnFocusTo?.()?.focus());
+}
+watch(visible, (isOpen) => !isOpen && returnFocus(), { flush: 'post' });
+onBeforeUnmount(returnFocus);
 </script>
 
 <template>
   <Dialog
-    v-model:visible="visible"
+    :visible="visible"
     modal
     :header="title"
     :draggable="false"
@@ -49,6 +77,7 @@ function confirm() {
     :close-on-escape="!busy"
     :close-button-props="{ 'aria-label': $t('common.close') }"
     :aria-describedby="bodyId"
+    @update:visible="dismiss"
   >
     <form :id="bodyId" class="flex flex-col gap-3" @submit.prevent="confirm">
       <p v-if="body" class="text-muted">{{ body }}</p>

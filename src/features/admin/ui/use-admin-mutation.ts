@@ -4,8 +4,11 @@ import { ApiError } from '@/api/client';
 import { fieldErrorsOf } from './admin-errors';
 import type { FieldErrors } from './admin-errors';
 
-/** Every admin query key starts with `'admin'` (the viewer id follows), so a write can only touch admin data. */
-export type AdminQueryKey = readonly ['admin', ...unknown[]];
+/** The public features whose caches an admin write may refresh (their query keys start with these roots). */
+export type PublicQueryRoot = 'problems' | 'contests' | 'flatpages' | 'submissions';
+
+/** Every key an admin write invalidates: an admin key (`'admin'`, then the viewer id) or a public feature's prefix. */
+export type AdminQueryKey = readonly ['admin' | PublicQueryRoot, ...unknown[]];
 
 interface AdminMutationOptions<Vars, Result> {
   mutate: (vars: Vars) => Promise<Result>;

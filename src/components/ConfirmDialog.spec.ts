@@ -141,3 +141,39 @@ describe('ConfirmDialog with an input in its body', () => {
     opener.remove();
   });
 });
+
+describe('ConfirmDialog returnFocusTo', () => {
+  const setup = async () => {
+    const target = document.createElement('h2');
+    target.tabIndex = -1;
+    document.body.append(target);
+    const wrapper = mountDialog({ ...ASK, visible: true, returnFocusTo: () => target });
+    await flushPromises();
+    return { target, wrapper };
+  };
+
+  it('focuses the target when closed after a confirm', async () => {
+    const { target, wrapper } = await setup();
+    buttonNamed('Rời kỳ thi').click();
+    await flushPromises();
+    await wrapper.setProps({ visible: false });
+    await vi.waitFor(() => expect(document.activeElement).toBe(target));
+  });
+
+  it('focuses the target when unmounted after a confirm', async () => {
+    const { target, wrapper } = await setup();
+    buttonNamed('Rời kỳ thi').click();
+    await flushPromises();
+    wrapper.unmount();
+    await vi.waitFor(() => expect(document.activeElement).toBe(target));
+  });
+
+  it('does not touch focus when closed by Cancel', async () => {
+    const { target, wrapper } = await setup();
+    buttonNamed('Hủy').click();
+    await flushPromises();
+    await wrapper.setProps({ visible: false });
+    await flushPromises();
+    expect(document.activeElement).not.toBe(target);
+  });
+});

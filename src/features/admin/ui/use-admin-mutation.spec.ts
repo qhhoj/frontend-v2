@@ -77,3 +77,25 @@ describe('useAdminMutation', () => {
     expect(api().isPending.value).toBe(false);
   });
 });
+
+describe('useAdminMutation with a public key', () => {
+  it('invalidates a public cache prefix', async () => {
+    let api!: ReturnType<typeof useAdminMutation<undefined, string>>;
+    let invalidate!: ReturnType<typeof vi.spyOn>;
+    mountComponent(
+      defineComponent({
+        setup() {
+          invalidate = vi.spyOn(useQueryClient(), 'invalidateQueries');
+          api = useAdminMutation({
+            mutate: () => Promise.resolve('ok'),
+            invalidates: () => [['problems'], ['contests', 'ranking']],
+          });
+          return () => h('div');
+        },
+      }),
+    );
+    await api.run(undefined);
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['problems'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['contests', 'ranking'] });
+  });
+});

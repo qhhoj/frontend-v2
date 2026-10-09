@@ -7,6 +7,7 @@ import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import { COMPOSE_HEADING_ID } from './composer-heading';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 const props = defineProps<{ contestKey: string; isPushedLive: boolean }>();
@@ -17,7 +18,10 @@ const description = ref('');
 const post = useAdminMutation({
   mutate: (draft: { title: string; description: string }) =>
     postAnnouncement(props.contestKey, draft),
-  invalidates: () => [['admin', 'contest-announcements', props.contestKey]],
+  invalidates: () => [
+    ['admin', 'contest-announcements', props.contestKey],
+    ['contests', 'announcements'],
+  ],
   onDone: (created: Announcement) => {
     title.value = '';
     description.value = '';
@@ -33,7 +37,7 @@ const submit = () => post.run({ title: title.value, description: description.val
   <section class="glass flex flex-col gap-4 rounded-panel p-5">
     <header class="flex items-center gap-3">
       <AdminBit placement="composing" />
-      <h2 class="font-display text-lg font-semibold">
+      <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="font-display text-lg font-semibold">
         {{ $t('admin.contests.announcements.composeTitle') }}
       </h2>
     </header>
