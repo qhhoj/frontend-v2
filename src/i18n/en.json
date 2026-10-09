@@ -1740,6 +1740,14 @@
     "title": "Low-power mode"
   },
   "shortLink": {
+    "copy": "Copy short link",
+    "creating": "Creating link…",
+    "copied": "Copied",
+    "copiedAnnounce": "Copied {url}",
+    "limitTitle": "You have created the maximum of {limit} short links today.",
+    "limitBody": "Try again tomorrow, or use the full link. Links you made earlier can still be copied.",
+    "clipboardBlocked": "The browser blocked copying. Select and copy it yourself:",
+    "manualLabel": "Short link",
     "title": "Short link"
   },
   "flatpage": {

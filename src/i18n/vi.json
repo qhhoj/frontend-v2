@@ -1740,6 +1740,14 @@
     "title": "Chế độ tiết kiệm"
   },
   "shortLink": {
+    "copy": "Sao chép liên kết ngắn",
+    "creating": "Đang tạo liên kết…",
+    "copied": "Đã sao chép",
+    "copiedAnnounce": "Đã sao chép {url}",
+    "limitTitle": "Hôm nay bạn đã tạo tối đa {limit} liên kết ngắn.",
+    "limitBody": "Thử lại vào ngày mai, hoặc dùng liên kết đầy đủ. Liên kết đã tạo trước đó vẫn sao chép được.",
+    "clipboardBlocked": "Trình duyệt chặn sao chép. Chọn và sao chép thủ công:",
+    "manualLabel": "Liên kết ngắn",
     "title": "Liên kết ngắn"
   },
   "flatpage": {
