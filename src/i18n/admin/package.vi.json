@@ -1,0 +1,9 @@
+{
+  "title": "Gói đề đầy đủ",
+  "lead": "Một tệp zip gồm đề, dữ liệu chấm, checker và tệp đính kèm, để sao lưu hoặc chuyển bài. Mỗi bài tạo gói tối đa 3 lần mỗi giờ.",
+  "button": "Tải gói đề",
+  "building": "Đang đóng gói… Trang tự kiểm tra lại, bạn có thể làm việc khác trong lúc chờ.",
+  "ready": "Gói đề đã sẵn sàng.",
+  "download": "Tải {code}.zip",
+  "timeout": "Đóng gói lâu hơn 5 phút. Bấm “Tải gói đề” để kiểm tra lại."
+}

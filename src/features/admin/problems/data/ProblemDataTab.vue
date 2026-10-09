@@ -18,6 +18,7 @@ import { uploadDataArchive } from '@/api/problem-data.api';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UploadButton from '../../ui/UploadButton.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
+import ProblemPackageCard from '../package/ProblemPackageCard.vue';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { query, form, errors, isDirty, badRowNumbers, markInvalid, save, mutation } = useDataForm(
@@ -64,6 +65,7 @@ const archive = useAdminMutation({
         kind="refused"
         :text="failureReasonOf(archive.failure.value)"
       />
+      <ProblemPackageCard :code="problem.code" />
       <DataSourceFiles :code="problem.code" :data="query.data.value" />
       <DataFeedback :feedback="query.data.value.feedback" />
       <CheckerSection

@@ -1,0 +1,9 @@
+{
+  "title": "Full problem package",
+  "lead": "One zip with the statements, test data, checker and attachments, for a backup or a move. Each problem can be packed 3 times an hour.",
+  "button": "Download package",
+  "building": "Packing… The page checks again by itself; you can keep working meanwhile.",
+  "ready": "The package is ready.",
+  "download": "Download {code}.zip",
+  "timeout": "Packing took longer than 5 minutes. Press “Download package” to check again."
+}
