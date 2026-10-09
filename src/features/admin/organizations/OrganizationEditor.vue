@@ -92,6 +92,7 @@ async function submit() {
           input-id="org-slots"
           :label="$t('admin.organizations.editor.slots')"
           :hint="$t('admin.organizations.editor.slotsHint')"
+          :error="errors.slots"
         >
           <template #default="{ id, describedBy, invalid }">
             <input

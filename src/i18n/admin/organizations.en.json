@@ -44,7 +44,8 @@
     "slug": "The address starts with a letter and holds only letters, digits, - and _, up to 128 characters.",
     "shortName": "Short name is 1 to 20 characters.",
     "logo": "The image must be an http(s) URL or a site path.",
-    "admins": "Up to 20 administrators."
+    "admins": "Up to 20 administrators.",
+    "slots": "Seats is a whole number from 0 to 1,000,000."
   },
   "requests": {
     "title": "Join requests",

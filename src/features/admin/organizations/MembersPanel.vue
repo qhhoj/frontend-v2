@@ -37,6 +37,7 @@ const rows = computed(() => members.data.value?.items ?? []);
 const count = computed(() => members.data.value?.meta.total ?? rows.value.length);
 
 function askKick(member: OrganizationMember) {
+  kick.reset();
   target.value = member;
   isDialogOpen.value = true;
 }

@@ -44,7 +44,8 @@
     "slug": "Địa chỉ phải bắt đầu bằng chữ; chỉ gồm chữ, số, - và _, tối đa 128 ký tự.",
     "shortName": "Tên ngắn từ 1 đến 20 ký tự.",
     "logo": "Ảnh phải là URL http(s) hoặc đường dẫn trên trang.",
-    "admins": "Tối đa 20 quản trị viên."
+    "admins": "Tối đa 20 quản trị viên.",
+    "slots": "Số suất là số nguyên từ 0 đến 1.000.000."
   },
   "requests": {
     "title": "Yêu cầu tham gia",

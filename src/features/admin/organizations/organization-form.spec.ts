@@ -73,6 +73,17 @@ describe('organization form', () => {
     expect(Object.keys(checkOrganizationForm(edit, false, false))).toEqual([]);
   });
 
+  it('checks a typed seat count as a whole number from 0 to 1 000 000, for staff only', () => {
+    const base = { ...emptyOrganizationForm(), name: 'Mới', slug: 'moi' };
+    for (const slots of [1.5, -1, 1_000_001]) {
+      expect(Object.keys(checkOrganizationForm({ ...base, slots }, true, true))).toEqual(['slots']);
+    }
+    for (const slots of [0, 1_000_000, null]) {
+      expect(checkOrganizationForm({ ...base, slots }, true, true)).toEqual({});
+    }
+    expect(checkOrganizationForm({ ...base, slots: 1.5 }, false, true)).toEqual({});
+  });
+
   it('checks the slug, the logo and a typed short name that is too long', () => {
     const form = {
       ...emptyOrganizationForm(),

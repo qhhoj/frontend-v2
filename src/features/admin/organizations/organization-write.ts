@@ -12,6 +12,7 @@ interface OrganizationWriteOptions<Vars, Result> {
   onDone?: (result: Result, vars: Vars) => void;
 }
 
+// TODO(K-1): remove this wrapper once `useAdminMutation` accepts public query keys.
 /**
  * One organization write: a pending flag that blocks a second call while the first is in flight, the failure and its field
  * texts, and the refresh of the public organization queries. Resolves to whether the write succeeded.
@@ -51,5 +52,11 @@ export function useOrganizationWrite<Vars, Result>(
     }
   }
 
-  return { run, isPending, failure, fieldErrors };
+  /** Clears the last failure, so a dialog opened for another row never shows the previous row's error. */
+  function reset() {
+    failure.value = null;
+    fieldErrors.value = {};
+  }
+
+  return { run, reset, isPending, failure, fieldErrors };
 }

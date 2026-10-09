@@ -10,6 +10,8 @@ const LOGO_PATTERN = /^(|https?:\/\/[^\s"'<>]+|\/[^\s"'<>]*)$/;
 const STAFF_FIELDS: readonly string[] = ['isUnlisted', 'slots', 'shortName'];
 export const MAX_ORGANIZATION_ADMINS = 20;
 const SHORT_NAME_MAX_LENGTH = 20;
+/** Backend `slots`: a whole number from 0 to 1 000 000 (`null` is no limit). */
+const SLOTS_MAX = 1_000_000;
 
 export interface OrganizationForm {
   name: string;
@@ -93,6 +95,12 @@ function isShortNameWrong(form: OrganizationForm, canEditAll: boolean, isCreate:
   return length < 1 || length > SHORT_NAME_MAX_LENGTH;
 }
 
+/** Staff only: a typed slot count must be a whole number in range (the backend's `IsInt`, `Min(0)`, `Max`). */
+function isSlotsWrong(slots: number | null, canEditAll: boolean): boolean {
+  if (!canEditAll || slots === null) return false;
+  return !Number.isInteger(slots) || slots < 0 || slots > SLOTS_MAX;
+}
+
 export function checkOrganizationForm(
   form: OrganizationForm,
   canEditAll: boolean,
@@ -103,6 +111,7 @@ export function checkOrganizationForm(
   if (form.name.trim().length === 0 || form.name.length > 128) errors.name = messageOf('name');
   if (!ORGANIZATION_SLUG_PATTERN.test(form.slug)) errors.slug = messageOf('slug');
   if (isShortNameWrong(form, canEditAll, isCreate)) errors.shortName = messageOf('shortName');
+  if (isSlotsWrong(form.slots, canEditAll)) errors.slots = messageOf('slots');
   if (!LOGO_PATTERN.test(form.logoOverrideImage)) errors.logoOverrideImage = messageOf('logo');
   if (form.admins.length > MAX_ORGANIZATION_ADMINS) errors.adminIds = messageOf('admins');
   return errors;

@@ -9,8 +9,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
-import JoinRequestsPanel from './JoinRequestsPanel.vue';
-import MembersPanel from './MembersPanel.vue';
+import OrganizationAdminPanels from './OrganizationAdminPanels.vue';
 import OrganizationEditor from './OrganizationEditor.vue';
 import OrganizationList from './OrganizationList.vue';
 
@@ -64,10 +63,7 @@ function startCreate() {
       />
       <section v-if="orgParam !== null" class="flex min-w-0 flex-col gap-6">
         <OrganizationEditor :key="orgParam" :slug="editedSlug" />
-        <template v-if="editedSlug !== null">
-          <JoinRequestsPanel :key="`requests-${editedSlug}`" :slug="editedSlug" />
-          <MembersPanel :key="`members-${editedSlug}`" :slug="editedSlug" />
-        </template>
+        <OrganizationAdminPanels v-if="editedSlug !== null" :key="editedSlug" :slug="editedSlug" />
       </section>
     </div>
   </QueryState>

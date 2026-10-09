@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import {
   joinRequest,
   member,
@@ -157,5 +157,33 @@ describe('OrganizationsPage', () => {
     await click(wrapper, 'Tạo tổ chức mới');
     const body = calls.find((call) => call.method === 'POST')?.body;
     expect(body).toEqual({ name: 'Mới', slug: 'moi', isOpen: false });
+  });
+
+  it('does not show an earlier kick error when the dialog opens for another member', async () => {
+    mockApi(routes({ 'POST /organizations/lhp/kick': fail(409, 'conflict') }));
+    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
+    await click(wrapper, 'Đuổi');
+    await confirmDialog('Đuổi');
+    expect(openDialog().querySelector('[role="alert"]')).not.toBeNull();
+    await cancelDialog('Hủy');
+    await click(wrapper, 'Đuổi');
+    expect(openDialog().querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it('shows no join requests or members to a member who may not administer the organization', async () => {
+    const calls = mockApi(
+      routes({
+        'GET /organizations/lhp': ok({
+          ...detail,
+          viewer: { isMember: true, canAdminister: false, pendingRequestId: null },
+        }),
+      }),
+    );
+    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
+    await flushPromises();
+    expect(wrapper.find('[data-testid="join-requests"]').exists()).toBe(false);
+    expect(
+      calls.some((call) => call.path.endsWith('/requests') || call.path.endsWith('/members')),
+    ).toBe(false);
   });
 });
