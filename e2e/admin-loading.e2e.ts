@@ -9,7 +9,7 @@ import type { ShiftCase } from './fixtures/layout-shift';
 
 const ADMIN_SHIFT_CASES: ShiftCase[] = [
   {
-    name: 'admin problem editor header and body',
+    name: 'admin problem editor header',
     path: '/admin/problems/hcmus41c/general',
     signedIn: true,
     hold: 'GET /problems/hcmus41c',
@@ -56,15 +56,23 @@ const ADMIN_SHIFT_CASES: ShiftCase[] = [
     viewports: PHONE_AND_DESKTOP,
   },
   {
-    name: 'admin problems index search card',
+    name: 'admin problems index search results',
     path: '/admin/problems?q=hcmus',
     signedIn: true,
     hold: 'GET /problems',
     answer: (api) => {
       signInAsStaff(api, ['judge.edit_own_problem']);
-      api.routes['GET /problems'] = adminList([adminProblemItem()]);
+      api.routes['GET /problems'] = adminList(
+        Array.from({ length: 3 }, (_unused, index) =>
+          adminProblemItem({ code: `hcmus4${index}c` }),
+        ),
+      );
     },
-    parts: (page) => ({ box: page.getByRole('searchbox'), lookup: page.getByLabel('Mã bài') }),
+    parts: (page) => ({
+      list: page
+        .locator('[data-skeleton-region="problem-search-table"]')
+        .or(page.locator('#main table')),
+    }),
     viewports: PHONE_AND_DESKTOP,
   },
   {

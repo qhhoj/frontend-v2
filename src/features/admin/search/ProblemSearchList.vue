@@ -65,7 +65,7 @@ const emptyAdvice = computed(() =>
       <template #skeleton>
         <SkeletonBlock
           data-skeleton-region="problem-search-table"
-          class="h-64 w-full rounded-row"
+          class="h-[17.25rem] w-full rounded-row sm:h-[15rem]"
         />
       </template>
       <EmptyState v-if="data && data.items.length === 0" compact>

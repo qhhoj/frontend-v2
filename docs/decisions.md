@@ -280,7 +280,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Contest user lists**: ids with `settings.users` naming them — chips show usernames, a short id only for a deleted account.
 - **Similarity 429**: the countdown comes from `ApiError.retryAfterSeconds` — the backend sends Retry-After on every rate-limit refusal.
 - **Similarity layout**: `/admin/similarity?contest=` lists runs and the summary below with `&run=` — the board shows list and summary on one screen.
-- **Bulk rejudge count**: the confirm runs a `dryRun` as it opens and shows the count, the permission and the counting/failed states inside it (pick 1B, 2026-10-09); its confirm button opens only for `allowed` and a count above 0, so a 403 on the real request is the plain refusal. The clock reads hours and minutes only.
+- **Bulk rejudge count**: the confirm runs a `dryRun` on open and shows the count inside it, enabled only when allowed and above 0 (pick 1B, 2026-10-09), so a 403 stays the plain refusal.
 - **Submission staff panel**: staff only, buttons follow `viewer.canRejudge/canReject/canAbort` — the server decides, the 409 stays as the stale-page fallback.
 - **Downloads**: raw endpoints are plain `<a href>` to the API URL — they are not `{data}` envelopes.
 - **One dialog**: every confirm uses `src/components/ConfirmDialog.vue`; specs drive it through `confirmDialog(label)`, e2e through `confirmInDialog(page, label)`; no second dialog implementation.
@@ -293,8 +293,8 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Ordering without drag**: contest problems and test cases move with labelled up/down buttons; the boards' drag handles are pointer-only.
 - **Access codes**: hashed, so a blank box keeps the code and a "Bỏ mã" checkbox removes it (the board says "xóa trắng để bỏ mã"); `hasRankingAccessCode` and `requiresAccessCode` say whether one is set.
 - **Create bodies**: a create sends no staff-only field (problem `STAFF_ONLY_FIELDS`, contest `GATED_CONTEST_FIELDS` incl. `rateAll`) unless the account holds its permission and the value was changed.
-- **Admin indexes**: open-by-key stays on `/admin/problems` and `/admin/contests`, and a search card beside it lists `GET /problems?search=&visibility=all` and `GET /contests?search=&phase=` (pick 2B, 2026-10-09); the state is in the URL (`q`, `phase`, `page`); the search box is local to `features/admin/search/` (`useDebouncedText`), and the users list (and plan 8f-2's organizations list) reuse its `IndexSearchBox` and `HighlightedText`. The problems search is whole-word from 3 characters (B-8f10), so the box says what it matches.
-- **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box (editor headers, runs table, users list, index search card); skeleton heights are sized to a typical loaded screen (a one-run table, five user rows), so a very different row count still moves the content below.
+- **Admin indexes**: open-by-key stays and a URL-driven search card (`q`, `phase`, `page`) lists problems and contests beside it (pick 2B, 2026-10-09), its box shared with the users list; whole-word problem search is B-8f10.
+- **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box; skeleton heights fit a typical screen (one run, five users), so other row counts still move what follows.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
 
 ## Settings (8h)
