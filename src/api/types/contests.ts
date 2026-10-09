@@ -1,11 +1,11 @@
+import type { Schemas } from '../schemas';
 /** backend: libs/contests/src/contest-time.ts */
-export type ContestPhase = 'upcoming' | 'running' | 'ended';
+export type ContestPhase = Schemas['ContestPhase'];
 /** backend: libs/database contest.schema.ts CONTEST_FORMAT_NAMES */
-export type ContestFormatName =
-  'default' | 'ioi' | 'ioi16' | 'icpc' | 'vnoj' | 'ultimate' | 'final_submission';
+export type ContestFormatName = Schemas['ContestFormatName'];
 /** backend: contest.schema.ts SCOREBOARD_VISIBILITIES: Visible, Hidden, hidden during the Contest, hidden during the Participation. */
-export type ScoreboardVisibility = 'V' | 'H' | 'C' | 'P';
-export type LabelStyle = 'numeric' | 'alpha';
+export type ScoreboardVisibility = Schemas['ScoreboardVisibility'];
+export type LabelStyle = Schemas['ContestLabelStyle'];
 
 /** backend: libs/contests LIVE_STATUSES; the viewer's own live participation in the contest. */
 export type LiveStatus = 'registered' | 'participating' | 'finished';

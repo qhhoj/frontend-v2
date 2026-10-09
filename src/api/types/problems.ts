@@ -1,5 +1,6 @@
+import type { Schemas } from '../schemas';
 /** backend: libs/database STATEMENT_LANGUAGES; equal to the UI locales. */
-export type StatementLanguage = 'vi' | 'en';
+export type StatementLanguage = Schemas['StatementLanguage'];
 
 /** backend: apps/api/src/modules/problems/core/dto/problem-meta.response.ts (CatalogItemResponse) */
 export interface CatalogItem {
@@ -81,10 +82,7 @@ export interface ProblemListQuery {
 }
 
 /** backend: problems/core/dto/user-summary.response.ts */
-export interface UserSummary {
-  id: string;
-  username: string;
-}
+export type UserSummary = Schemas['UserSummaryResponse'];
 /** backend: problem-detail.response.ts ProblemContestResponse (B19) */
 export interface ProblemContest {
   contestKey: string;

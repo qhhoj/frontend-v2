@@ -1,13 +1,8 @@
+import type { Schemas } from '../schemas';
 import type { UserSummary } from './problems';
 
 /** backend: apps/api/src/modules/organizations/core/dto/organization.response.ts (OrganizationSummaryResponse) */
-export interface OrganizationSummary {
-  id: string;
-  slug: string;
-  name: string;
-  shortName: string;
-  isOpen: boolean;
-}
+export type OrganizationSummary = Schemas['OrganizationSummaryResponse'];
 /** backend: organization.response.ts (OrganizationListItemResponse) */
 export interface OrganizationListItem extends OrganizationSummary {
   isUnlisted: boolean;

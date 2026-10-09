@@ -1,3 +1,4 @@
+import type { Schemas } from '../schemas';
 /** backend: libs/database/src/schemas/submission.schema.ts SUBMISSION_STATUSES */
 export type SubmissionStatus = 'QU' | 'P' | 'G' | 'D' | 'IE' | 'CE' | 'AB' | 'PD';
 /** backend: submission.schema.ts SUBMISSION_RESULTS */
@@ -9,22 +10,7 @@ export const IN_PROGRESS_STATUSES: readonly SubmissionStatus[] = ['QU', 'P', 'G'
 export const FINISHED_STATUSES: readonly SubmissionStatus[] = ['D', 'IE', 'CE', 'AB'];
 
 /** backend: apps/api/src/modules/submissions/core/dto/submission-list.response.ts */
-export interface SubmissionListItem {
-  id: string;
-  user: { id: string; username: string } | null;
-  problem: { code: string; name: string } | null;
-  language: { id: string; key: string; name: string } | null;
-  date: string;
-  status: SubmissionStatus;
-  result: SubmissionResult | null;
-  points: number | null;
-  casePoints: number;
-  caseTotal: number;
-  /** Seconds, largest case. */
-  time: number | null;
-  /** KiB, largest case. */
-  memory: number | null;
-}
+export type SubmissionListItem = Schemas['SubmissionListItemResponse'];
 
 /** backend: submissions/core/dto/submission-detail.response.ts (fields the SPA reads in 8a) */
 export interface SubmissionDetail extends SubmissionListItem {
