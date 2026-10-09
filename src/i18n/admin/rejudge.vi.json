@@ -1,5 +1,7 @@
 {
-  "crumbs": { "judging": "Chấm bài" },
+  "crumbs": {
+    "judging": "Chấm bài"
+  },
   "lead": "Đặt lại và chấm lại nhiều bài nộp của một bài theo bộ lọc.",
   "filter": {
     "title": "Bộ lọc bài nộp",
@@ -31,18 +33,29 @@
     "locked": "Bài bị khóa",
     "lockedSkip": "Bỏ qua",
     "lockedRejudge": "Chấm lại",
-    "countNote": "Số bài nộp khớp bộ lọc chỉ biết sau khi chấm lại; hệ thống trả về số đã xếp vào hàng chấm.",
+    "countNote": "Số bài nộp khớp hiện trong hộp xác nhận: bấm “Chấm lại” sẽ đếm trước, chưa đặt lại gì.",
     "lastResult": "Kết quả gần nhất"
   },
   "done": "Đã xếp lại {count} bài nộp. Chấm ở mức ưu tiên hàng loạt, không phát sự kiện từng bài nên bảng bài nộp tự cập nhật khi máy chấm nhận.",
-  "refusedLot": "403 · Cần quyền chấm lại số lượng lớn. Chấm lại hơn 10 bài nộp cần quyền judge.rejudge_submission_lot. Thu hẹp bộ lọc hoặc nhờ người có quyền.",
   "confirm": {
     "title": "Chấm lại bài nộp của {problem}?",
     "body": "Các bài nộp khớp bộ lọc sẽ được đặt lại về trạng thái chờ chấm: kết quả và điểm hiện tại bị xóa cho đến khi chấm xong. Hành động này không hoàn tác được.",
     "line": "Bộ lọc: {problem} · {languages} · {results} · từ mã {from} · {locked}",
     "fromStart": "đầu",
-    "countNote": "Số bài nộp khớp sẽ được báo sau khi xác nhận.",
-    "label": "Xác nhận chấm lại"
+    "labelCount": "Chấm lại {count} bài nộp",
+    "labelCounting": "Đang đếm",
+    "labelPlain": "Chấm lại",
+    "count": {
+      "counting": "Đang đếm",
+      "countingText": "Đang hỏi máy chủ (dryRun). Chưa có gì bị đặt lại.",
+      "allowedChip": "Được phép chạy",
+      "matching": "bài nộp khớp bộ lọc.",
+      "countedAt": "Đếm lúc {time}.",
+      "needsLotChip": "Cần quyền riêng",
+      "needsLot": "bài nộp khớp, vượt giới hạn {limit}. Cần quyền judge.rejudge_submission_lot; thu hẹp bộ lọc hoặc nhờ người có quyền.",
+      "noneChip": "Không khớp",
+      "none": "Không có bài nộp nào khớp bộ lọc."
+    }
   },
   "errors": {
     "problem": "Cần mã bài.",

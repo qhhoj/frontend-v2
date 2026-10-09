@@ -1,5 +1,7 @@
 {
-  "crumbs": { "judging": "Judging" },
+  "crumbs": {
+    "judging": "Judging"
+  },
   "lead": "Reset and rejudge many submissions of one problem by a filter.",
   "filter": {
     "title": "Submission filter",
@@ -31,18 +33,29 @@
     "locked": "Locked submissions",
     "lockedSkip": "Skip",
     "lockedRejudge": "Rejudge",
-    "countNote": "The number of matching submissions is only known after the rejudge; the server reports how many it queued.",
+    "countNote": "The number of matching submissions shows in the confirm: pressing “Rejudge” counts first and resets nothing.",
     "lastResult": "Last result"
   },
   "done": "Queued {count} submissions for rejudging. They run at batch priority and emit no per-submission events, so the submission table updates when a judge picks them up.",
-  "refusedLot": "403 · Rejudging a large number needs a permission. More than 10 submissions need judge.rejudge_submission_lot. Narrow the filter or ask someone who holds it.",
   "confirm": {
     "title": "Rejudge submissions of {problem}?",
     "body": "The submissions that match are reset to waiting: their current result and points are cleared until judging ends. This cannot be undone.",
     "line": "Filter: {problem} · {languages} · {results} · from {from} · {locked}",
     "fromStart": "the start",
-    "countNote": "The number of matching submissions is reported after confirming.",
-    "label": "Confirm rejudge"
+    "labelCount": "Rejudge {count} submissions",
+    "labelCounting": "Counting",
+    "labelPlain": "Rejudge",
+    "count": {
+      "counting": "Counting",
+      "countingText": "Asking the server (dryRun). Nothing has been reset.",
+      "allowedChip": "Allowed to run",
+      "matching": "submissions match the filter.",
+      "countedAt": "Counted at {time}.",
+      "needsLotChip": "Needs a separate permission",
+      "needsLot": "submissions match, over the limit of {limit}. Needs judge.rejudge_submission_lot; narrow the filter or ask someone who holds it.",
+      "noneChip": "No match",
+      "none": "No submission matches the filter."
+    }
   },
   "errors": {
     "problem": "A problem code is required.",

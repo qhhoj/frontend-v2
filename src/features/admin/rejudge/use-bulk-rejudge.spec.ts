@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
+import { ApiError } from '@/api/client';
 import { mountComponent } from '@/test/mount';
 import { useBulkRejudge } from './use-bulk-rejudge';
 import { rejudgeSubmissions } from '@/api/submission-actions.api';
@@ -22,11 +23,24 @@ function mountBulkRejudge() {
   return composable;
 }
 
+beforeEach(() => vi.mocked(rejudgeSubmissions).mockReset());
+
 describe('useBulkRejudge', () => {
   it('reports a failure that is not an ApiError as a line, and never throws out of the confirm', async () => {
     vi.mocked(rejudgeSubmissions).mockRejectedValueOnce(new TypeError('boom'));
     const bulk = mountBulkRejudge();
     await expect(bulk.rejudge(BODY)).resolves.toBeUndefined();
     expect(bulk.outcome.value).toEqual({ kind: 'refused', text: 'Đã có lỗi xảy ra. Hãy thử lại.' });
+  });
+
+  it('words a 403 on the real request as the plain refusal and asks nothing else', async () => {
+    vi.mocked(rejudgeSubmissions).mockRejectedValueOnce(new ApiError('forbidden', 403, 'x'));
+    const bulk = mountBulkRejudge();
+    await bulk.rejudge(BODY);
+    expect(bulk.outcome.value).toEqual({
+      kind: 'refused',
+      text: 'Bạn không có quyền làm việc này.',
+    });
+    expect(rejudgeSubmissions).toHaveBeenCalledTimes(1);
   });
 });

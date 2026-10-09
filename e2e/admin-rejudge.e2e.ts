@@ -3,7 +3,8 @@ import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminOk, dialogOf, signInAsStaff } from './fixtures/admin';
 
-const CONFIRM_LABEL = 'Xác nhận chấm lại';
+const CONFIRM_LABEL = 'Chấm lại 128 bài nộp';
+const isDryRun = (body: unknown) => (body as { dryRun?: boolean }).dryRun === true;
 
 /** Tab until the confirm button has focus (the dialog traps focus, so this is the keyboard route into it). */
 async function tabToConfirm(page: Page) {
@@ -25,12 +26,14 @@ for (const viewport of AUDIT_VIEWPORTS)
   }) => {
     await page.setViewportSize(viewport);
     signInAsStaff(api, ['judge.rejudge_submission']);
-    api.routes['POST /submissions/rejudge'] = adminOk({ count: 128, dryRun: false, allowed: true });
+    api.routes['POST /submissions/rejudge'] = ({ body }) =>
+      adminOk({ count: 128, dryRun: isDryRun(body), allowed: true });
     await page.goto('/admin/rejudge');
     await page.getByLabel('Mã bài').fill('hcmus41c');
     await page.getByRole('checkbox', { name: 'WA' }).check();
     await page.getByRole('button', { name: 'Chấm lại các bài nộp này' }).click();
-    await expect(dialogOf(page)).toContainText('Số bài nộp khớp sẽ được báo sau khi xác nhận.');
+    await expect(dialogOf(page)).toContainText('Được phép chạy');
+    await expect(dialogOf(page).getByRole('button', { name: CONFIRM_LABEL })).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
 
     await tabToConfirm(page);
@@ -40,5 +43,8 @@ for (const viewport of AUDIT_VIEWPORTS)
     ).toBeVisible();
     await expect(dialogOf(page)).toBeHidden();
     expect(await axeViolationsIn(page)).toEqual([]);
-    expect(api.requestsTo('POST /submissions/rejudge')).toHaveLength(1);
+    const sent = api
+      .requestsTo('POST /submissions/rejudge')
+      .map((seen) => JSON.parse(String(seen.postData)));
+    expect(sent.map((body) => isDryRun(body))).toEqual([true, false]);
   });
