@@ -191,6 +191,22 @@ describe('OrganizationsPage', () => {
     expect(openDialog().querySelector('[role="alert"]')).toBeNull();
   });
 
+  it('opens the editor of an organization whose about is hidden (null) as an empty box', async () => {
+    mockApi(routes({ 'GET /organizations/lhp': ok({ ...detail, about: null }) }));
+    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
+    expect((wrapper.get('#org-about').element as HTMLTextAreaElement).value).toBe('');
+  });
+
+  it('moves focus to the members panel after a member is kicked', async () => {
+    mockApi(routes({ 'POST /organizations/lhp/kick': { status: 204 } }));
+    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
+    await click(wrapper, 'Đuổi');
+    await confirmDialog('Đuổi');
+    await vi.waitFor(() =>
+      expect(document.activeElement?.getAttribute('aria-label')).toBe('Thành viên'),
+    );
+  });
+
   it('shows no join requests or members to a member who may not administer the organization', async () => {
     const calls = mockApi(
       routes({
@@ -200,8 +216,11 @@ describe('OrganizationsPage', () => {
         }),
       }),
     );
-    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
+    const { wrapper } = await mountScreen('/admin/organizations?org=lhp', (mounted) =>
+      mounted.text().includes('không quản trị tổ chức này'),
+    );
     await flushPromises();
+    expect(wrapper.find('#org-name').exists()).toBe(false);
     expect(wrapper.find('[data-testid="join-requests"]').exists()).toBe(false);
     expect(
       calls.some((call) => call.path.endsWith('/requests') || call.path.endsWith('/members')),
@@ -453,6 +472,25 @@ describe('OrganizationsPage request queue', () => {
     await flushPromises();
     expect(wrapper.get('[data-testid="queue-row"] [role="alert"]').text()).toContain('đủ chỗ');
     expect(queueCalls(calls)).toHaveLength(1);
+  });
+
+  it('reads the busy-lock 409 as a retry, not as a full organization', async () => {
+    mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: conflictWith(
+          'Another decision is being made; try again',
+        ),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    await acceptButtonOf(wrapper.findAll('[data-testid="queue-row"]')[0]!).trigger('click');
+    await flushPromises();
+    const alert = wrapper.get('[data-testid="queue-row"] [role="alert"]').text();
+    expect(alert).not.toContain('đủ chỗ');
+    expect(alert.length).toBeGreaterThan(0);
   });
 
   it('ignores a click on another row while a decision is in flight', async () => {

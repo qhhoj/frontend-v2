@@ -9,7 +9,11 @@ const PERMS = ['judge.edit_all_post'];
 /** The screen is a lazy route: the tabs are there once its chunk has loaded. */
 async function mountModeration(path: string) {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => expect(mounted.wrapper.find('[role="tablist"]').exists()).toBe(true));
+  await vi.waitFor(() =>
+    expect(
+      mounted.wrapper.find('nav[aria-label="Danh sách bài viết"] a[aria-current]').exists(),
+    ).toBe(true),
+  );
   return mounted;
 }
 
@@ -55,6 +59,16 @@ describe('BlogModerationPage', () => {
     expect(calls.filter((call) => call.path === '/admin/posts')).toHaveLength(2);
   });
 
+  it('reads a repeated ?page= as its first value', async () => {
+    const calls = mockApi({
+      ...staffViewer(PERMS),
+      'GET /posts': page([postItem()]),
+      'GET /admin/posts': page([]),
+    });
+    await mountModeration('/admin/posts?page=2&page=3');
+    expect(calls.find((call) => call.path === '/posts')!.query.get('page')).toBe('2');
+  });
+
   it('shows the hidden and the scheduled queues from the moderation endpoint', async () => {
     const calls = mockApi({
       ...staffViewer(PERMS),
@@ -75,7 +89,7 @@ describe('BlogModerationPage', () => {
     expect(wrapper.text()).toContain('Bản nháp');
     expect(calls.find((call) => call.path === '/admin/posts')!.query.get('state')).toBe('hidden');
     await wrapper
-      .findAll('[role="tab"]')
+      .findAll('nav[aria-label="Danh sách bài viết"] a')
       .find((tab) => tab.text() === 'Hẹn giờ')!
       .trigger('click');
     await flushPromises();
@@ -167,6 +181,45 @@ describe('BlogModerationPage unhide', () => {
       'Bạn không có quyền làm việc này.',
     );
     expect(wrapper.text()).toContain('Lời giải bài Cây khung nhỏ nhất');
+  });
+
+  it('marks the open feed as the current page and not as a tab', async () => {
+    mockApi(hiddenRoutes());
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    expect(wrapper.find('[role="tab"], [role="tablist"]').exists()).toBe(false);
+    const current = wrapper.findAll('nav[aria-label="Danh sách bài viết"] a[aria-current="page"]');
+    expect(current).toHaveLength(1);
+    expect(current[0]!.text()).toContain('Đã ẩn');
+  });
+
+  it('gives the official-contest lock its own text, and keeps the post hidden', async () => {
+    mockApi(
+      hiddenRoutes(hiddenPost(), {
+        'PATCH /posts/h-1': fail(403, 'forbidden', undefined, undefined, {
+          message: 'Blog posts are locked during the official contest',
+        }),
+      }),
+    );
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Hiện lại');
+    const text = document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent;
+    expect(text).toContain('thi chính thức');
+    expect(text).not.toContain('Bạn không có quyền làm việc này.');
+  });
+
+  it('moves focus to the open feed tab after a post is shown again', async () => {
+    mockApi(hiddenRoutes(hiddenPost(), { 'PATCH /posts/h-1': ok({}) }));
+    const { wrapper } = await mountModeration('/admin/posts?feed=hidden');
+    await rowButton(wrapper, 'Hiện lại').trigger('click');
+    await flushPromises();
+    await confirmDialog('Hiện lại');
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(
+        wrapper.get('nav[aria-label="Danh sách bài viết"] a[aria-current="page"]').element,
+      ),
+    );
   });
 
   it('cancelling the confirm sends nothing', async () => {

@@ -97,12 +97,12 @@ export function refusalTextOf(message: string): string {
 export function failureReasonOf(error: unknown): string {
   if (error instanceof ApiError && error.code === 'validation_failed') {
     const [issue] = error.issues;
-    if (issue) {
-      const text = adminIssueText(issue);
-      return text === issue.message ? refusalText('unknown') : text;
-    }
+    // The backend derives an `invalid` issue from every `fields` entry, so a file refusal arrives with both: the field's message wins.
+    const issueText = issue ? adminIssueText(issue) : undefined;
+    if (issue && issueText !== undefined && issueText !== issue.message) return issueText;
     const [message] = Object.values(error.fields).flat();
     if (message !== undefined) return refusalTextOf(message);
+    if (issue) return refusalText('unknown');
   }
   return failureTextOf(error);
 }

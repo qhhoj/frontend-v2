@@ -84,12 +84,27 @@ export const fail = (
   fields?: Record<string, string[]>,
   issues?: FieldIssue[],
   extra: Record<string, unknown> = {},
-): MockResponse => ({
-  status,
-  body: {
-    error: { code, message: code, ...(fields && { fields }), ...(issues && { issues }), ...extra },
-  },
-});
+): MockResponse => {
+  // Like the backend's AppError: `fields` always arrive with `issues` (code `invalid`) unless given.
+  const sent =
+    issues ??
+    (fields &&
+      Object.entries(fields).flatMap(([field, messages]) =>
+        messages.map((message) => ({ field, code: 'invalid', message })),
+      ));
+  return {
+    status,
+    body: {
+      error: {
+        code,
+        message: code,
+        ...(fields && { fields }),
+        ...(sent && { issues: sent }),
+        ...extra,
+      },
+    },
+  };
+};
 
 export const issue = (field: string, code: string, message: string): FieldIssue => ({
   field,

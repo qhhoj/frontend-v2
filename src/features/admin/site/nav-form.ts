@@ -118,6 +118,8 @@ const ISSUE_FIELDS: Record<string, { field: keyof NavForm; message: string }> = 
 /** A refused save as field texts: issue codes by lookup, a duplicate key (409 `fields.key`) as "Khoá đã có.". */
 export function navIssueTexts(error: unknown): FieldErrors {
   if (!(error instanceof ApiError)) return {};
+  if (error.status === 409 && 'key' in error.fields)
+    return { key: translate('admin.site.nav.issues.keyTaken') };
   if (error.issues.length > 0) {
     const texts: FieldErrors = {};
     for (const issue of error.issues) {
@@ -127,7 +129,5 @@ export function navIssueTexts(error: unknown): FieldErrors {
     }
     return texts;
   }
-  if (error.status === 409 && 'key' in error.fields)
-    return { key: translate('admin.site.nav.issues.keyTaken') };
   return fieldErrorsOf(error);
 }

@@ -37,6 +37,7 @@
     "confirm": "Hide post",
     "done": "Post hidden."
   },
+  "contestLocked": "The official contest is running and the blog is locked, so posts cannot be hidden or shown yet.",
   "gap": "No API yet — the abuse-report queue (there is no report model yet), search and bulk actions. A post whose content needs fixing opens by its link, then the edit screen.",
   "empty": "No posts.",
   "footer": "{shown} / {total} posts",

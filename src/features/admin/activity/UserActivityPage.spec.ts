@@ -49,6 +49,37 @@ describe('UserActivityPage', () => {
     expect(wrapper.text()).toContain('chưa biết tổng số');
   });
 
+  it('offers no next page past the last one the backend accepts (page 200)', async () => {
+    const calls = mockApi(
+      routes({
+        'GET /admin/user-activity/logs': ({ query }: { query: URLSearchParams }) => ({
+          body: {
+            data: [activityLog()],
+            meta: { page: Number(query.get('page')), pageSize: 50, hasMore: true },
+          },
+        }),
+      }),
+    );
+    const { wrapper } = await mountScreen('/admin/activity', (view) =>
+      view.find('a[download]').exists(),
+    );
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Sau'));
+    const next = () => wrapper.findAll('button').find((button) => button.text() === 'Sau');
+    for (let step = 1; step < 200; step += 1) {
+      await next()!.trigger('click');
+      await vi.waitFor(() =>
+        expect(
+          calls
+            .filter((call) => call.path.endsWith('/logs'))
+            .at(-1)!
+            .query.get('page'),
+        ).toBe(String(step + 1)),
+      );
+      await flushPromises();
+    }
+    expect(next()).toBeUndefined();
+  }, 60_000);
+
   it('opens a user summary and deletes their log only after a named confirm', async () => {
     const calls = mockApi(
       routes({

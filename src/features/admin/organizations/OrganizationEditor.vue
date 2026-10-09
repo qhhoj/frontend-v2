@@ -12,7 +12,7 @@ import { useOrganizationEditor } from './use-organization-editor';
 
 const props = defineProps<{ slug: string | null }>();
 const editor = useOrganizationEditor(() => props.slug);
-const { form, errors, isCreate, canEditAll, mutation } = editor;
+const { form, errors, isCreate, canEditAll, isReadOnly, mutation } = editor;
 const isSaved = ref(false);
 const staffLock = computed(() => (canEditAll.value ? undefined : 'judge.edit_all_organization'));
 const titleKey = isCreate
@@ -34,7 +34,10 @@ async function submit() {
 </script>
 
 <template>
-  <SettingsCard :title="$t(titleKey)">
+  <SettingsCard v-if="isReadOnly" :title="$t(titleKey)">
+    <p>{{ $t('admin.organizations.editor.notYours') }}</p>
+  </SettingsCard>
+  <SettingsCard v-else :title="$t(titleKey)">
     <form class="flex flex-col gap-5" novalidate @submit.prevent="submit">
       <div class="grid gap-4 md:grid-cols-2">
         <AdminField

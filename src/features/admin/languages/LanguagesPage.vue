@@ -16,7 +16,7 @@ const { can } = usePermissions();
 const canSeeJudges = computed(() => can('judge.change_judge'));
 const canAdd = computed(() => can('judge.add_language'));
 const canEdit = computed(() => can('judge.change_language'));
-const { data, isPending, error, refetch } = useLanguagesAdminQuery();
+const { data, isPending, error, refetch } = useLanguagesAdminQuery({ enabled: canEdit });
 const judgesQuery = useJudgesQuery({ enabled: canSeeJudges });
 /** Coverage is shown only once the judges have loaded for a viewer who may read them. */
 const judges = computed(() => (canSeeJudges.value ? (judgesQuery.data.value ?? null) : null));
@@ -46,7 +46,10 @@ const percentOf = (count: number) =>
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+    <SettingsNotice v-if="!canEdit && canAdd" tone="info">{{
+      $t('admin.languages.addOnly')
+    }}</SettingsNotice>
+    <QueryState v-if="canEdit" :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-4">
           <SkeletonBlock class="h-20 w-full" />

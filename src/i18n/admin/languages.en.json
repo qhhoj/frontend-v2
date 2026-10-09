@@ -84,5 +84,6 @@
   "actions": {
     "add": "Add language"
   },
+  "addOnly": "You can add new languages only; the list of existing languages is not available to you.",
   "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown."
 }

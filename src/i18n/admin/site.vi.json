@@ -62,6 +62,8 @@
     "regexBroken": "Regex lỗi: {message}. Mục vẫn hiện nhưng không bao giờ được đánh dấu đang xem.",
     "edit": "Sửa",
     "delete": "Xoá",
+    "editNamed": "Sửa {label}",
+    "deleteNamed": "Xoá {label}",
     "deleteTitle": "Xoá mục “{label}”?",
     "deleteBody": "Mục biến mất khỏi thanh điều hướng ngay.",
     "deleteConfirm": "Xoá",

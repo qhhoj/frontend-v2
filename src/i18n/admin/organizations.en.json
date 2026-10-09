@@ -37,6 +37,7 @@
     "admins": "Administrators (up to {max})",
     "open": "Open: anyone may join",
     "unlisted": "Hidden from the list (staff)",
+    "notYours": "You do not administer this organization, so you cannot edit it.",
     "staffOnly": "Hidden and seats are for staff who may edit every organization.",
     "createSubmit": "Create organization",
     "save": "Save changes",
@@ -67,6 +68,7 @@
     "title": "Members",
     "count": "{count} people · sorted by performance points",
     "kick": "Remove",
+    "kickNamed": "Remove {username}",
     "kickTitle": "Remove {username} from {organization}?",
     "kickBody": "They leave the organization at once; they may ask to join again.",
     "pager": "Member pages"

@@ -37,6 +37,7 @@
     "admins": "Quản trị viên (tối đa {max})",
     "open": "Mở: ai cũng vào được",
     "unlisted": "Ẩn khỏi danh sách (nhân viên)",
+    "notYours": "Bạn không quản trị tổ chức này nên không sửa được.",
     "staffOnly": "Ẩn và số suất chỉ dành cho nhân viên có quyền sửa mọi tổ chức.",
     "createSubmit": "Tạo tổ chức mới",
     "save": "Lưu thay đổi",
@@ -67,6 +68,7 @@
     "title": "Thành viên",
     "count": "{count} người · sắp theo điểm hiệu suất",
     "kick": "Đuổi",
+    "kickNamed": "Đuổi {username}",
     "kickTitle": "Đuổi {username} khỏi {organization}?",
     "kickBody": "Người này rời tổ chức ngay; có thể xin vào lại.",
     "pager": "Trang thành viên"

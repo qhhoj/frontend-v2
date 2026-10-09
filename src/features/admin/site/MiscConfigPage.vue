@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
@@ -44,9 +44,26 @@ const editorValue = computed(() =>
   editing.value && !editing.value.isNew ? (config.value[editing.value.key] ?? '') : '',
 );
 
-const editRow = (key: string) => (editing.value = { key, isNew: false });
-const addKey = () => (editing.value = { key: '', isNew: true });
+const deletedText = ref('');
+const editRow = (key: string) => {
+  deletedText.value = '';
+  editing.value = { key, isNew: false };
+};
+const addKey = () => {
+  deletedText.value = '';
+  editing.value = { key: '', isNew: true };
+};
 const closeEditor = () => (editing.value = null);
+
+/** The editor and its delete dialog unmount with the deleted key, so the result lives in a standing status region. */
+const addButton = ref<HTMLButtonElement | null>(null);
+
+/** A deleted key leaves no row to return to: say so in the standing region and move focus to the add button. */
+function onDeleted(key: string) {
+  deletedText.value = translate('admin.site.config.deleted', { key });
+  closeEditor();
+  void nextTick(() => addButton.value?.focus());
+}
 </script>
 
 <template>
@@ -59,11 +76,13 @@ const closeEditor = () => (editing.value = null);
       :title="$t('admin.site.config.title')"
     >
       <template #actions>
-        <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey">
+        <button ref="addButton" type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey">
           {{ $t('admin.site.config.add') }}
         </button>
       </template>
     </AdminPageHeader>
+
+    <p role="status" class="text-sm font-semibold text-positive empty:hidden">{{ deletedText }}</p>
 
     <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.security">
       {{ $t('admin.site.config.warning') }}
@@ -125,7 +144,7 @@ const closeEditor = () => (editing.value = null);
             :initial-value="editorValue"
             :taken-keys="takenKeys"
             @close="closeEditor"
-            @deleted="closeEditor"
+            @deleted="onDeleted"
           />
         </SettingsCard>
       </div>

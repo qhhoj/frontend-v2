@@ -99,6 +99,19 @@ describe('NavBarPage', () => {
     expect(dialog().textContent).toContain('Khoá đã có.');
   });
 
+  it('says a deleted item is gone and moves focus to the add button', async () => {
+    mockApi({
+      ...staffViewer(PERMS),
+      'GET /site': ok(siteData()),
+      'DELETE /admin/site/navigation/nav-blog': { status: 204 },
+    });
+    const wrapper = await mountNav();
+    await buttonIn(rowWith(wrapper, 'blog'), 'Xoá').trigger('click');
+    await flushPromises();
+    await confirmDialog('Xoá');
+    await vi.waitFor(() => expect(document.activeElement?.textContent?.trim()).toBe('Thêm mục'));
+  });
+
   it('explains why an item with children cannot be deleted', async () => {
     mockApi({
       ...staffViewer(PERMS),

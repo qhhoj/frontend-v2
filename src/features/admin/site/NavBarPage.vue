@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -29,6 +29,7 @@ const isDeleteOpen = ref(false);
 const deleteTarget = ref<NavigationItem | null>(null);
 const refusedId = ref<string | null>(null);
 const savedText = ref<string | null>(null);
+const addButton = ref<HTMLButtonElement | null>(null);
 
 const remove = useAdminMutation({
   mutate: (id: string) => deleteNavItem(id),
@@ -59,7 +60,11 @@ async function confirmDelete() {
   await remove.run(target.id);
   isDeleteOpen.value = false;
   if (remove.failure.value) refusedId.value = target.id;
-  else savedText.value = translate('admin.site.nav.deleted', { label: target.label });
+  else {
+    savedText.value = translate('admin.site.nav.deleted', { label: target.label });
+    // The deleted row held the opener; the add button is the stable place left.
+    void nextTick(() => addButton.value?.focus());
+  }
 }
 
 const parentLabelOf = (item: NavigationItem) =>
@@ -73,7 +78,12 @@ const parentLabelOf = (item: NavigationItem) =>
       :title="$t('admin.site.nav.title')"
     >
       <template #actions>
-        <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="openEditor(null)">
+        <button
+          ref="addButton"
+          type="button"
+          :class="ADMIN_PRIMARY_CLASS"
+          @click="openEditor(null)"
+        >
           {{ $t('admin.site.nav.add') }}
         </button>
       </template>
@@ -141,10 +151,20 @@ const parentLabelOf = (item: NavigationItem) =>
               <td class="hidden px-2 py-2 tabular-nums sm:table-cell">{{ row.item.order }}</td>
               <td class="px-2 py-2">
                 <div class="flex flex-wrap gap-2">
-                  <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openEditor(row.item)">
+                  <button
+                    type="button"
+                    :class="ADMIN_BUTTON_CLASS"
+                    :aria-label="$t('admin.site.nav.editNamed', { label: row.item.label })"
+                    @click="openEditor(row.item)"
+                  >
                     {{ $t('admin.site.nav.edit') }}
                   </button>
-                  <button type="button" :class="ADMIN_DANGER_CLASS" @click="askDelete(row.item)">
+                  <button
+                    type="button"
+                    :class="ADMIN_DANGER_CLASS"
+                    :aria-label="$t('admin.site.nav.deleteNamed', { label: row.item.label })"
+                    @click="askDelete(row.item)"
+                  >
                     {{ $t('admin.site.nav.delete') }}
                   </button>
                 </div>

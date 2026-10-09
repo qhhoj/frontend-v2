@@ -73,5 +73,9 @@ describe('MiscConfigPage', () => {
     expect(wrapper.findAll('tbody tr').some((row) => row.text().includes('contact_email'))).toBe(
       false,
     );
+    expect(wrapper.get('[role="status"]').text()).toContain('contact_email');
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(buttonNamed(wrapper, 'Thêm khoá').element),
+    );
   });
 });

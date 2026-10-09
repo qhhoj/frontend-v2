@@ -37,6 +37,7 @@
     "confirm": "Ẩn bài",
     "done": "Đã ẩn bài."
   },
+  "contestLocked": "Đang trong chế độ thi chính thức: blog bị khoá, chưa ẩn hay hiện bài được.",
   "gap": "Chưa có API — Hàng đợi báo cáo vi phạm (chưa có mô hình báo cáo), tìm kiếm và thao tác hàng loạt. Bài cần sửa nội dung mở bằng đường dẫn rồi dùng màn sửa bài.",
   "empty": "Không có bài nào.",
   "footer": "{shown} / {total} bài",

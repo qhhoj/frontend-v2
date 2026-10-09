@@ -84,5 +84,6 @@
   "actions": {
     "add": "Thêm ngôn ngữ"
   },
+  "addOnly": "Bạn chỉ được thêm ngôn ngữ mới, không xem hay sửa được danh sách ngôn ngữ hiện có.",
   "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ."
 }

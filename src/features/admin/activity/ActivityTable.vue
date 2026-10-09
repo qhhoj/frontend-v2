@@ -19,6 +19,8 @@ const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
 const viewer = useViewerId();
+/** Backend `@Max(200)` on `page`: a request for page 201 is a 400. */
+const MAX_ACTIVITY_PAGE = 200;
 const page = ref(1);
 
 const request = computed(() => ({ ...toActivityRequest(props.filter), page: page.value }));
@@ -131,7 +133,12 @@ const isErrorStatus = (statusCode: number) => statusCode >= 400;
           >
             {{ $t('admin.activity.table.previous') }}
           </button>
-          <button v-if="meta?.hasMore" type="button" :class="ADMIN_BUTTON_CLASS" @click="page += 1">
+          <button
+            v-if="meta?.hasMore && page < MAX_ACTIVITY_PAGE"
+            type="button"
+            :class="ADMIN_BUTTON_CLASS"
+            @click="page += 1"
+          >
             {{ $t('admin.activity.table.next') }}
           </button>
         </div>

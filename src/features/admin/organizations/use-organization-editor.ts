@@ -20,6 +20,11 @@ export function useOrganizationEditor(slug: () => string | null) {
   const canEditAll = computed(() => can('judge.edit_all_organization'));
   const isCreate = slug() === null;
   const detail = isCreate ? null : useOrganizationQuery(() => slug() ?? '');
+  /** A loaded organization the viewer neither administers nor may edit as staff: the backend refuses every save with 403. */
+  const isReadOnly = computed(() => {
+    const loaded = detail?.data.value;
+    return loaded !== undefined && loaded.viewer?.canAdminister !== true;
+  });
   const { baseline, form, seed } = useOrganizationFormState(() => detail?.data.value);
   const write = useOrganizationSave(seed);
   const clientErrors = ref<FieldErrors>({});
@@ -49,6 +54,7 @@ export function useOrganizationEditor(slug: () => string | null) {
     form,
     isCreate,
     canEditAll,
+    isReadOnly,
     errors: computed<FieldErrors>(() => ({
       ...clientErrors.value,
       ...write.fieldErrors.value,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -24,6 +24,7 @@ const members = useMembersQuery(
 );
 
 const isDialogOpen = ref(false);
+const section = ref<HTMLElement | null>(null);
 const target = ref<OrganizationMember | null>(null);
 const kick = useOrganizationWrite<OrganizationMember, void>({
   mutate: (member) => kickMember(props.slug, member.id),
@@ -45,12 +46,20 @@ function askKick(member: OrganizationMember) {
 async function confirmKick() {
   if (target.value === null) return;
   const isKicked = await kick.run(target.value);
-  if (isKicked) isDialogOpen.value = false;
+  if (!isKicked) return;
+  isDialogOpen.value = false;
+  // The kicked member's row held the opener; the panel is the stable place left.
+  void nextTick(() => section.value?.focus());
 }
 </script>
 
 <template>
-  <section>
+  <section
+    ref="section"
+    tabindex="-1"
+    :aria-label="$t('admin.organizations.members.title')"
+    class="focus-visible:outline-none"
+  >
     <SettingsCard
       :title="$t('admin.organizations.members.title')"
       :lead="$t('admin.organizations.members.count', { count })"
@@ -67,7 +76,12 @@ async function confirmKick() {
           </span>
           <span class="flex items-center gap-3">
             <span class="text-sm text-muted">{{ row.performancePoints }}</span>
-            <button type="button" :class="ADMIN_DANGER_CLASS" @click="askKick(row)">
+            <button
+              type="button"
+              :class="ADMIN_DANGER_CLASS"
+              :aria-label="$t('admin.organizations.members.kickNamed', { username: row.username })"
+              @click="askKick(row)"
+            >
               {{ $t('admin.organizations.members.kick') }}
             </button>
           </span>

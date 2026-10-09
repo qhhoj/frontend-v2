@@ -24,7 +24,7 @@ const props = defineProps<{
   initialValue: string;
   takenKeys: string[];
 }>();
-const emit = defineEmits<{ saved: [key: string]; deleted: [key: string]; close: [] }>();
+const emit = defineEmits<{ deleted: [key: string]; close: [] }>();
 
 const queryClient = useQueryClient();
 const keyName = ref(props.configKey);
@@ -54,7 +54,6 @@ const save = useAdminMutation({
   onDone: (result) => {
     writeConfig(queryClient, result.key, result.value);
     isCreating.value = false;
-    emit('saved', result.key);
   },
 });
 

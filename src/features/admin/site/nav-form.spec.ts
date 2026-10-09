@@ -51,4 +51,12 @@ describe('nav form', () => {
       key: 'Khoá đã có.',
     });
   });
+
+  it('words a duplicate key from the 409 the backend really sends, which carries issues next to fields', () => {
+    const duplicate = new ApiError('conflict', 409, 'x', {
+      fields: { key: ['This key is taken.'] },
+      issues: [{ field: 'key', code: 'invalid', message: 'This key is taken.' }],
+    });
+    expect(navIssueTexts(duplicate)).toEqual({ key: 'Khoá đã có.' });
+  });
 });

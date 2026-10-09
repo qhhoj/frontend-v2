@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { PostListItem } from '@/api/types/blog';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
@@ -8,14 +8,15 @@ import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { failureTextOf } from '../ui/admin-errors';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import ModerationPostsQueue from './ModerationPostsQueue.vue';
 import PublicPostsQueue from './PublicPostsQueue.vue';
 import UnhideDialog from './UnhideDialog.vue';
+import { visibilityFailureText } from './post-visibility';
 import { usePostVisibility } from './use-post-visibility';
 import { useModerationPostsQuery } from './posts.queries';
-import { MODERATION_FEEDS, feedFromQuery, isQueueFeed, pageFromQuery } from './moderation';
+import { pageFromQuery } from '@/lib/paging';
+import { MODERATION_FEEDS, feedFromQuery, isQueueFeed } from './moderation';
 import type { ModerationFeed, RowFailure } from './moderation';
 
 const route = useRoute();
@@ -26,7 +27,13 @@ const TABS: { feed: ModerationFeed; to: RouteLocationRaw }[] = MODERATION_FEEDS.
   to: { name: adminRouteName('posts'), query: tabFeed === 'all' ? {} : { feed: tabFeed } },
 }));
 const TAB =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[selected=true]:bg-accent-soft aria-[selected=true]:text-accent-soft-text';
+  'inline-flex min-h-11 items-center gap-2 rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
+const feedNav = ref<HTMLElement | null>(null);
+
+/** A moderated post leaves its row (the dialog's opener); the open feed's tab is the stable place left. */
+function focusCurrentFeed() {
+  void nextTick(() => feedNav.value?.querySelector<HTMLElement>('[aria-current="page"]')?.focus());
+}
 
 const visibility = usePostVisibility();
 /** The hidden queue's total, on every tab: the same cache entry as the list when that tab is open. */
@@ -40,7 +47,7 @@ const isUnhideOpen = ref(false);
 const rowFailure = ref<RowFailure | null>(null);
 const lastChange = ref<'hidden' | 'shown' | null>(null);
 const unhideFailureText = computed(
-  () => visibility.failure.value && failureTextOf(visibility.failure.value),
+  () => visibility.failure.value && visibilityFailureText(visibility.failure.value),
 );
 
 /** A new action starts with no leftover result, refusal or failure from the last one. */
@@ -70,11 +77,12 @@ async function confirmHide() {
   isHideOpen.value = false;
   if (done !== undefined) {
     lastChange.value = 'hidden';
+    focusCurrentFeed();
     return;
   }
   rowFailure.value = visibility.failure.value && {
     postId: post.id,
-    text: failureTextOf(visibility.failure.value),
+    text: visibilityFailureText(visibility.failure.value),
   };
 }
 
@@ -86,6 +94,7 @@ async function confirmUnhide() {
   if (done === undefined) return;
   isUnhideOpen.value = false;
   lastChange.value = 'shown';
+  focusCurrentFeed();
 }
 </script>
 
@@ -102,8 +111,8 @@ async function confirmUnhide() {
     </AdminPageHeader>
 
     <div class="flex flex-col gap-2">
-      <nav :aria-label="$t('admin.posts.feeds.label')">
-        <div role="tablist" class="glass flex flex-wrap gap-1 rounded-pill p-1">
+      <nav ref="feedNav" :aria-label="$t('admin.posts.feeds.label')">
+        <div class="glass flex flex-wrap gap-1 rounded-pill p-1">
           <RouterLink
             v-for="tab in TABS"
             :key="tab.feed"
@@ -113,8 +122,7 @@ async function confirmUnhide() {
           >
             <a
               :href="href"
-              role="tab"
-              :aria-selected="feed === tab.feed"
+              :aria-current="feed === tab.feed ? 'page' : undefined"
               :class="TAB"
               @click="navigate"
             >

@@ -40,14 +40,17 @@ describe('LanguagesPage', () => {
     expect(wrapper.text()).not.toContain('chỉ chạy trên một máy');
   });
 
-  it('opens for a holder of add_language alone and says the list is refused, not that there is no language', async () => {
-    mockApi({
+  it('opens for a holder of add_language alone without asking for the list, and says it is add only', async () => {
+    const calls = mockApi({
       ...staffViewer(['judge.add_language']),
       'GET /admin/languages': fail(403, 'forbidden'),
     });
     const { wrapper } = await mountLanguages();
-    expect(wrapper.text()).toContain('Bạn không có quyền làm việc này.');
+    expect(calls.some((call) => call.path === '/admin/languages')).toBe(false);
+    expect(wrapper.text()).toContain('chỉ được thêm ngôn ngữ mới');
+    expect(wrapper.text()).not.toContain('Bạn không có quyền làm việc này.');
     expect(wrapper.text()).not.toContain('Chưa có ngôn ngữ nào.');
+    expect(wrapper.get('a[href="/admin/languages/new"]').text()).toContain('Thêm ngôn ngữ');
   });
 
   it('offers "Thêm ngôn ngữ" only with add_language, and links each key to its edit page', async () => {
