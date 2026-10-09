@@ -1,7 +1,11 @@
 import { ApiError } from '@/api/client';
 import type { FieldIssue } from '@/api/client';
-import { DEFAULT_LOCALE, i18n } from '@/i18n';
+import type { QuotaRefusal } from '@/api/types/organization-usage';
+import { DEFAULT_LOCALE, i18n, isLocale } from '@/i18n';
+import type { Locale } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
+import { formatNumber } from '@/lib/format';
+import { formatMebibytes } from '@/lib/quota';
 
 export type FieldErrors = Record<string, string>;
 
@@ -37,11 +41,41 @@ export function fieldErrorsOf(error: unknown): FieldErrors {
   return error.issues.length > 0 ? fromIssues(error.issues) : fromFields(error.fields);
 }
 
+const isQuotaRefusal = (value: unknown): value is QuotaRefusal => {
+  const details = value as Partial<QuotaRefusal> | null | undefined;
+  return (
+    (details?.meter === 'credits' || details?.meter === 'storage') &&
+    [details.limit, details.used, details.needed].every((amount) => typeof amount === 'number')
+  );
+};
+const currentLocale = (): Locale => {
+  const locale = i18n.global.locale.value;
+  return isLocale(locale) ? locale : DEFAULT_LOCALE;
+};
+
+/** A 403 `quota_exceeded` names the meter in `details`: storage in MiB, credits as a count; null without valid details. */
+export function quotaRefusalText(error: unknown): string | null {
+  if (!(error instanceof ApiError) || error.code !== 'quota_exceeded') return null;
+  const details = error.extra.details;
+  if (!isQuotaRefusal(details)) return null;
+  const locale = currentLocale();
+  const amount = (value: number) =>
+    details.meter === 'storage' ? formatMebibytes(value, locale) : formatNumber(value, locale);
+  const key =
+    details.meter === 'storage' ? 'errors.quotaExceededStorage' : 'errors.quotaExceededCredits';
+  return i18n.global.t(key, {
+    needed: amount(details.needed),
+    left: amount(Math.max(0, details.limit - details.used)),
+    used: amount(details.used),
+    limit: amount(details.limit),
+  });
+}
+
 /** The page-line text of a failed write: the SPA text of its code, then the wait when the server said how long (`Retry-After`). */
 export function failureTextOf(error: unknown): string {
   const text = hasIssueCode(error, 'busy')
     ? i18n.global.t('admin.ui.issues.busy')
-    : i18n.global.t(errorMessageKey(error));
+    : (quotaRefusalText(error) ?? i18n.global.t(errorMessageKey(error)));
   const seconds = error instanceof ApiError ? error.retryAfterSeconds : null;
   if (seconds === null) return text;
   return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds })}`;

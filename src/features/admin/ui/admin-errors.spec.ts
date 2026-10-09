@@ -90,3 +90,34 @@ describe('isConflict', () => {
     expect(isConflict(undefined)).toBe(false);
   });
 });
+
+describe('quota_exceeded', () => {
+  const refusal = (details: unknown) =>
+    new ApiError('quota_exceeded', 403, 'The organization has no credits left', {
+      extra: { details },
+    });
+  const GENERIC = 'Tổ chức đã hết hạn mức. Liên hệ quản trị để tăng hạn mức.';
+
+  it('names the credits needed, left and used', () => {
+    expect(failureTextOf(refusal({ meter: 'credits', limit: 200, used: 194, needed: 10 }))).toBe(
+      'Vượt hạn mức tín dụng của tổ chức: cần 10, còn lại 6 (đã dùng 194 / 200). Liên hệ quản trị để tăng hạn mức.',
+    );
+  });
+
+  it('writes storage in MiB and never a negative "left"', () => {
+    const text = failureTextOf(
+      refusal({
+        meter: 'storage',
+        limit: 512 * 1048576,
+        used: 600 * 1048576,
+        needed: 25 * 1048576,
+      }),
+    );
+    expect(text).toContain('cần 25 MiB, còn lại 0 MiB (đã dùng 600 MiB / 512 MiB)');
+  });
+
+  it('falls back to the generic quota text when the details are missing or malformed', () => {
+    expect(failureTextOf(refusal(undefined))).toBe(GENERIC);
+    expect(failureTextOf(refusal({ meter: 'time', limit: 1, used: 1, needed: 1 }))).toBe(GENERIC);
+  });
+});

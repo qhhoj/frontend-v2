@@ -5,6 +5,7 @@ import { cloneProblem } from '@/api/problem-editing.api';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
+import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
@@ -70,7 +71,12 @@ function submit() {
         {{ $t('admin.problems.clone.submit') }}
       </button>
     </div>
-    <AdminStatus v-if="clone.isDone.value" kind="done" :text="$t('admin.problems.clone.done')">
+    <AdminStatus
+      v-if="clone.failure.value && !clone.fieldErrors.value.code"
+      kind="refused"
+      :text="failureTextOf(clone.failure.value)"
+    />
+    <AdminStatus v-else-if="clone.isDone.value" kind="done" :text="$t('admin.problems.clone.done')">
       <RouterLink
         v-if="createdCode"
         :to="{ name: 'admin-problemGeneral', params: { code: createdCode } }"

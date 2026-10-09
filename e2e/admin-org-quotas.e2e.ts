@@ -1,8 +1,9 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
+import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installUsageOverview } from './fixtures/f4-api';
 import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
+import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { usageRow } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
 
@@ -67,3 +68,28 @@ defineShiftTests([
     viewports: [PHONE, DESKTOP],
   },
 ]);
+
+test('a clone refused by the quota names the credits with the sweating Bit', async ({
+  page,
+  api,
+}) => {
+  signInAsStaff(api, ['judge.edit_own_problem', 'judge.clone_problem']);
+  api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
+  api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
+  api.routes['POST /problems/hcmus41c/clone'] = {
+    status: 403,
+    body: {
+      error: {
+        code: 'quota_exceeded',
+        message: 'no credits',
+        details: { meter: 'credits', limit: 200, used: 194, needed: 10 },
+      },
+    },
+  };
+  await page.goto('/admin/problems/hcmus41c/general');
+  await page.locator('#problem-clone-code').fill('hcmus41c_ban_sao');
+  await page.locator('#problem-clone-code').press('Enter');
+  const alert = page.getByRole('alert').filter({ hasText: 'cần 10, còn lại 6' });
+  await expect(alert).toBeVisible();
+  await expect(alert.getByTestId('inline-bit')).toBeVisible();
+});
