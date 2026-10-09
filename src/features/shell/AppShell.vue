@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
+import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue';
+import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
@@ -36,7 +38,11 @@ const route = useRoute();
       <slot />
     </AdminShell>
     <template v-else>
-      <AppHeader v-if="route.meta.layout !== 'auth'" />
+      <template v-if="route.meta.layout !== 'auth'">
+        <AppHeader />
+        <OfficialModeBanner />
+        <HighPriorityBanner />
+      </template>
       <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
         <slot />
       </main>

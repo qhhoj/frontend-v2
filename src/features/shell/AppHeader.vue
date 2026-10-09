@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from
 import { useRoute } from 'vue-router';
 import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import NotificationBell from '@/features/notifications/NotificationBell.vue';
+import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import LocaleToggle from './LocaleToggle.vue';
 import UserMenu from './UserMenu.vue';
 
@@ -73,6 +74,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', readClipping));
       <span aria-hidden="true" class="bg-gradient-accent inline-block size-[30px] rounded-full" />
       {{ $t('app.name') }}
     </RouterLink>
+    <OfficialModePill />
     <nav
       ref="navElement"
       :aria-label="$t('nav.main')"
