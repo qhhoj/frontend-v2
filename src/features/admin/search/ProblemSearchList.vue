@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -12,13 +13,13 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import HighlightedText from './HighlightedText.vue';
 import IndexSearchBox from './IndexSearchBox.vue';
-import { isShortQuery, searchQueryOf } from './index-search';
+import { SEARCH_MAX_LENGTH, isShortQuery, searchQueryOf } from './index-search';
 import { useAdminProblemSearchQuery } from './index-search.queries';
 
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
-const search = computed(() => (valuesOf(route.query.q)[0] ?? '').slice(0, 100));
+const search = computed(() => (valuesOf(route.query.q)[0] ?? '').slice(0, SEARCH_MAX_LENGTH));
 const page = computed(() => pageFromQuery(route.query.page));
 const { data, isPending, error, refetch } = useAdminProblemSearchQuery(search, page);
 const commit = (text: string) =>
@@ -26,6 +27,16 @@ const commit = (text: string) =>
 
 const shownText = computed(() => formatNumber(data.value?.items.length ?? 0, locale.locale));
 const totalText = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
+const { t } = useI18n();
+const countText = computed(() => {
+  const values = {
+    shown: shownText.value,
+    total: totalText.value,
+    q: search.value,
+  };
+  if (!search.value) return t('admin.search.problems.count', values);
+  return t('admin.search.problems.countFor', values);
+});
 const emptyAdvice = computed(() =>
   isShortQuery(search.value)
     ? 'admin.search.problems.emptyShortAdvice'
@@ -47,6 +58,7 @@ const emptyAdvice = computed(() =>
       :placeholder="$t('admin.search.problems.placeholder')"
       :clear-label="$t('admin.search.clear')"
       :hint="$t('admin.search.problems.hint')"
+      :status="data ? countText : ''"
       @commit="commit"
     />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -116,17 +128,7 @@ const emptyAdvice = computed(() =>
           </tbody>
         </table>
         <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
-          <p class="text-sm text-muted">
-            {{
-              search
-                ? $t('admin.search.problems.countFor', {
-                    shown: shownText,
-                    total: totalText,
-                    q: search,
-                  })
-                : $t('admin.search.problems.count', { shown: shownText, total: totalText })
-            }}
-          </p>
+          <p class="text-sm text-muted">{{ countText }}</p>
           <NumberedPager :meta="data.meta" :label="$t('admin.search.pager')" />
         </div>
       </div>

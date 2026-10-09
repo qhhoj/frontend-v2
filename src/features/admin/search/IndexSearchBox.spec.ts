@@ -37,6 +37,15 @@ describe('IndexSearchBox', () => {
     expect(document.activeElement).toBe(wrapper.get('input').element);
   });
 
+  it('announces the result count politely through a live region', async () => {
+    const wrapper = mountComponent(IndexSearchBox, {
+      props: { ...props, status: '1 / 86 bài khớp “hcmus”' },
+    }) as unknown as VueWrapper<{ status: string }>;
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('1 / 86 bài khớp “hcmus”');
+    await wrapper.setProps({ status: '0 / 0 bài khớp “zzzz”' });
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('0 / 0 bài khớp “zzzz”');
+  });
+
   it('names the box for assistive technology', () => {
     const wrapper = mountComponent(IndexSearchBox, { props });
     const input = wrapper.get('input');

@@ -49,3 +49,20 @@ describe('searchQueryOf', () => {
     });
   });
 });
+
+describe('highlightParts on Unicode', () => {
+  it('keeps every position when a case fold would change the length of a character', () => {
+    expect(highlightParts('İx İx', 'x')).toEqual([
+      { text: 'İ', isHit: false },
+      { text: 'x', isHit: true },
+      { text: ' İ', isHit: false },
+      { text: 'x', isHit: true },
+    ]);
+  });
+
+  it('returns composed text, so the parts add up to the NFC text', () => {
+    const parts = highlightParts('Việt'.normalize('NFD'), 'vi');
+    expect(parts.map((part) => part.text).join('')).toBe('Việt');
+    expect(parts[0]).toEqual({ text: 'Vi', isHit: true });
+  });
+});

@@ -54,6 +54,17 @@ describe('useDebouncedText', () => {
     expect(box.commit).not.toHaveBeenCalled();
   });
 
+  it('commits at once when told to, and the pause that was pending does not commit again', async () => {
+    const box = mountBox('hcmus');
+    box.text().value = 'hc';
+    await nextTick();
+    box.text().commitNow('');
+    expect(box.commit.mock.calls).toEqual([['']]);
+    await vi.advanceTimersByTimeAsync(TEXT_DEBOUNCE_MS * 2);
+    expect(box.commit.mock.calls).toEqual([['']]);
+    expect(box.text().value).toBe('');
+  });
+
   it('leaves no timer behind when the component unmounts', async () => {
     const box = mountBox('');
     box.text().value = 'a';

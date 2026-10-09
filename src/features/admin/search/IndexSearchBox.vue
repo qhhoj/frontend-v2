@@ -10,6 +10,8 @@ const props = defineProps<{
   placeholder: string;
   clearLabel: string;
   hint?: string;
+  /** What the list shows for the current text (its result count); announced politely when it changes. */
+  status?: string;
 }>();
 const emit = defineEmits<{ commit: [text: string] }>();
 const id = useId();
@@ -21,8 +23,7 @@ const text = useDebouncedText(
 
 /** Clearing takes effect at once (no pause) and leaves the caret in the box. */
 function clear() {
-  text.value = '';
-  emit('commit', '');
+  text.commitNow('');
   input.value?.focus();
 }
 </script>
@@ -58,5 +59,6 @@ function clear() {
       </button>
     </div>
     <p v-if="hint" :id="`${id}-hint`" class="text-xs text-muted">{{ hint }}</p>
+    <p aria-live="polite" class="sr-only">{{ status }}</p>
   </div>
 </template>
