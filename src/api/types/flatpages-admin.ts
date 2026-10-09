@@ -10,6 +10,4 @@ export type DeletedFlatpage = Schemas['FlatpageDeletedResponse'];
 /** The body of a create, and the patch of an update. */
 export type FlatpageBody = JsonBodyOf<'/admin/site/pages', 'post'>;
 /** One entry of the page's history: `create`, `edit` or `delete`. */
-export type FlatpageRevision = Omit<Schemas['FlatpageRevisionResponse'], 'changes'> & {
-  changes: Record<string, { before: unknown; after: unknown }>;
-};
+export type FlatpageRevision = Schemas['FlatpageRevisionResponse'];

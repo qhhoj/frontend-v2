@@ -1,5 +1,7 @@
 # QHHOJ frontend-v2
 
+[![API drift](https://github.com/qhhoj/frontend-v2/actions/workflows/api-drift.yml/badge.svg)](https://github.com/qhhoj/frontend-v2/actions/workflows/api-drift.yml)
+
 Vue 3 SPA of the QHHOJ online judge, served against `backend-v2` (`/api/internal`).
 
 ## Requirements
@@ -17,6 +19,8 @@ API_ORIGIN=http://localhost:3001 npm run dev
 ```
 
 `API_ORIGIN` defaults to `http://localhost:3000`.
+
+- `npm run api:gen` copies `../backend-v2/openapi.json` (or `OPENAPI_SPEC=/path/to/openapi.json`) to `src/api/generated/openapi.json`, records the backend commit in `openapi.source` and regenerates `schema.d.ts`; commit all three. `npm run api:check` (CI) fails when they disagree; `npm run api:check -- --backend` also fails when the snapshot lags the backend checkout.
 
 | Command             | Purpose                                                                                                                                                  |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -53,23 +57,23 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 
 ## Where to change what
 
-| To change                                                    | Look in                                                                                                                             |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| A colour, radius, blur or font                               | `src/theme/themes/<id>.css`, `src/theme/tokens.css`                                                                                 |
-| Add a theme                                                  | [CONTRIBUTING.md](CONTRIBUTING.md#add-a-theme)                                                                                      |
-| A utility name used by components                            | `src/theme/styles.css` (`@theme inline`)                                                                                            |
-| PrimeVue component styling                                   | `src/theme/primevue-preset.ts`                                                                                                      |
-| A route or who may open it                                   | `src/router/routes.ts`, `src/router/guards.ts`                                                                                      |
-| A backend call or DTO                                        | `src/api/<area>.api.ts`, `src/api/types/<area>.ts`                                                                                  |
-| A text                                                       | `src/i18n/vi.json` and `src/i18n/en.json`                                                                                           |
-| Verdict colours and labels, rating tiers                     | `src/lib/verdicts.ts`, `src/lib/rating-tiers.ts`                                                                                    |
-| Ranking cell rules                                           | `src/lib/ranking-cells.ts`                                                                                                          |
-| Live submission status                                       | `src/api/use-submission-status.ts`                                                                                                  |
-| Settings sections, the frame and its nav                     | `src/features/account/settings/SettingsLayout.vue` (`SECTIONS`)                                                                     |
-| Profile form rules (what is sent, length limits, after-save) | `src/features/account/profile/profile-draft.ts`; save sequence shared with theme/look in `src/features/account/use-profile-save.ts` |
-| Security actions                                             | one component each in `src/features/account/security/`; destructive ones confirm in `ConfirmDialog`                                 |
-| Data export states and polling                               | `src/features/account/data/data-export.ts`                                                                                          |
-| Bit in settings                                              | `SettingsNotice`'s `bit` prop, `EmptyState`'s `kind` and `InlineBit` (one word per placement)                                       |
+| To change                                                    | Look in                                                                                                                                                                                  |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A colour, radius, blur or font                               | `src/theme/themes/<id>.css`, `src/theme/tokens.css`                                                                                                                                      |
+| Add a theme                                                  | [CONTRIBUTING.md](CONTRIBUTING.md#add-a-theme)                                                                                                                                           |
+| A utility name used by components                            | `src/theme/styles.css` (`@theme inline`)                                                                                                                                                 |
+| PrimeVue component styling                                   | `src/theme/primevue-preset.ts`                                                                                                                                                           |
+| A route or who may open it                                   | `src/router/routes.ts`, `src/router/guards.ts`                                                                                                                                           |
+| A backend call or DTO type                                   | `src/api/<area>.api.ts` (typed by route through `src/api/typed.ts`); `src/api/types/<area>.ts` are aliases of `src/api/generated/schema.d.ts`; after a backend change: `npm run api:gen` |
+| A text                                                       | `src/i18n/vi.json` and `src/i18n/en.json`                                                                                                                                                |
+| Verdict colours and labels, rating tiers                     | `src/lib/verdicts.ts`, `src/lib/rating-tiers.ts`                                                                                                                                         |
+| Ranking cell rules                                           | `src/lib/ranking-cells.ts`                                                                                                                                                               |
+| Live submission status                                       | `src/api/use-submission-status.ts`                                                                                                                                                       |
+| Settings sections, the frame and its nav                     | `src/features/account/settings/SettingsLayout.vue` (`SECTIONS`)                                                                                                                          |
+| Profile form rules (what is sent, length limits, after-save) | `src/features/account/profile/profile-draft.ts`; save sequence shared with theme/look in `src/features/account/use-profile-save.ts`                                                      |
+| Security actions                                             | one component each in `src/features/account/security/`; destructive ones confirm in `ConfirmDialog`                                                                                      |
+| Data export states and polling                               | `src/features/account/data/data-export.ts`                                                                                                                                               |
+| Bit in settings                                              | `SettingsNotice`'s `bit` prop, `EmptyState`'s `kind` and `InlineBit` (one word per placement)                                                                                            |
 
 ## Auth screens
 

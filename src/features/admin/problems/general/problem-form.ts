@@ -1,4 +1,3 @@
-import { trustedUntilBackendFixed } from '@/api/backend-ask';
 import type { OrganizationChip, UserChip } from '@/api/types/admin-common';
 import type {
   EditableProblem,
@@ -97,20 +96,10 @@ const classOf = (editor: ProblemEditor) => ({
   allowedLanguages: [...editor.allowedLanguageIds],
 });
 
-/** M2-02: the detail types the three visibility codes as `string`; the create DTO lists the codes. */
 const visibilityOf = (problem: EditableProblem) => ({
-  submissionSourceVisibility: trustedUntilBackendFixed<SourceVisibility>(
-    'M2-02',
-    problem.submissionSourceVisibility,
-  ),
-  testcaseVisibility: trustedUntilBackendFixed<TestcaseVisibility>(
-    'M2-02',
-    problem.testcaseVisibility,
-  ),
-  testcaseResultVisibility: trustedUntilBackendFixed<ResultVisibility>(
-    'M2-02',
-    problem.testcaseResultVisibility,
-  ),
+  submissionSourceVisibility: problem.submissionSourceVisibility,
+  testcaseVisibility: problem.testcaseVisibility,
+  testcaseResultVisibility: problem.testcaseResultVisibility,
   allowViewFeedback: problem.allowViewFeedback,
 });
 

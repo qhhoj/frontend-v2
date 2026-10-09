@@ -2,6 +2,8 @@
 
 ## M5-01
 
+Resolved (backend ba5db96): `VoteResponse.viewerVote` is in the document; the alias and the casts are gone.
+
 Routes: `PUT /posts/{id}/vote`, `PUT /comments/{id}/vote` (both answer `VoteResponse`).
 
 - Document: `VoteResponse` is `{ score: number }`.
@@ -11,6 +13,8 @@ Routes: `PUT /posts/{id}/vote`, `PUT /comments/{id}/vote` (both answer `VoteResp
 - Use sites: `votePost` in `src/api/blog.api.ts`, `voteComment` in `src/api/comments.api.ts`; the `VoteResponse` alias adds `viewerVote`.
 
 ## M5-02
+
+Resolved (backend ba5db96): the `path` parameter is documented; `fetchFlatpage` is typed without a cast.
 
 Route: `GET /pages/{path}` (flatpages).
 

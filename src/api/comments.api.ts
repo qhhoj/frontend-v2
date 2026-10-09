@@ -1,6 +1,5 @@
-import { trustedUntilBackendFixed } from './backend-ask';
 import type { CommentPageType } from './types/comments';
-import type { VoteResponse, VoteScore } from './types/votes';
+import type { VoteScore } from './types/votes';
 import { apiGet, apiSend } from './typed';
 import type { JsonBodyOf } from './typed';
 
@@ -14,11 +13,8 @@ export const postComment = (type: CommentPageType, key: string, draft: CommentDr
 export const editComment = (id: string, body: string) =>
   apiSend('patch', '/comments/{id}', { path: { id }, body: { body } });
 export const fetchRevisions = (id: string) => apiGet('/comments/{id}/revisions', { path: { id } });
-export const voteComment = async (id: string, score: VoteScore) =>
-  trustedUntilBackendFixed<VoteResponse>(
-    'M5-01',
-    await apiSend('put', '/comments/{id}/vote', { path: { id }, body: { score } }),
-  );
+export const voteComment = (id: string, score: VoteScore) =>
+  apiSend('put', '/comments/{id}/vote', { path: { id }, body: { score } });
 export const setCommentHidden = (id: string, hidden: boolean) =>
   apiSend('post', '/comments/{id}/hidden', { path: { id }, body: { hidden } });
 export const fetchCommentVotes = (id: string) => apiGet('/comments/{id}/votes', { path: { id } });

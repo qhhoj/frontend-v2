@@ -4,6 +4,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 
 ## Stack
 
+- API types: `openapi-typescript` 7.13.0 (exact) generates `src/api/generated/schema.d.ts` from the committed backend snapshot
 - Vue 3.5, Vite 8, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`), Vue Router 5, Pinia 4, @tanstack/vue-query 5, vue-i18n 11, Tailwind 4, PrimeVue 4.5.5 (MIT, unstyled), lucide-vue-next, @fontsource fonts
 - Versions are exact in `package.json`. TypeScript stays on 5.9: typescript-eslint 8 supports `<6.1`
 - Tests: Vitest 5 + jsdom + @vue/test-utils; Playwright 1.63 + @axe-core/playwright
@@ -23,8 +24,10 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - vue-query keys: `[area, resource, params]` (`['problems', 'list', filters, lang]`); invalidate by prefix (`['submissions']`)
 - Account-owned queries include the user id in the key (`profileKey(userId)`); `useAccountCacheSync` (in the shell) is the only place that clears the cache, whenever the signed-in user changes: login, logout, expiry or another account taking over
 - Lists and polls keep the previous data while a new key loads (`keepPreviousData`, `placeholderData`), so a filter change or a failed poll does not blank the screen
-- API calls go through `apiRequest` (single value) or `apiPage` (list) in `src/api/client.ts`; it sends `X-CSRF-Token` on unsafe methods, unwraps the envelope and throws `ApiError { code, status, fields }`
-- DTO types are hand-written in `src/api/types/<area>.ts` with a `backend:` pointer to the response class, until the backend OpenAPI carries response schemas; then they are generated
+- API calls go through `apiGet` / `apiGetPage` / `apiSend` / `apiUrl` (`src/api/typed.ts`): the route is a string literal with `{param}` placeholders exactly as in `src/api/generated/schema.d.ts`, `path`, `query` and `body` are checked against the backend document, and the result is the unwrapped `data`. They sit on `client.ts`, which sends `X-CSRF-Token` on unsafe methods, retries once on `csrf_failed`, unwraps the envelope and throws `ApiError { code, status, fields, issues, extra, retryAfterSeconds }`. Only `client.ts` and `typed.ts` import `apiRequest`/`apiPage` (`typed-calls.spec.ts`)
+- Types come from the backend: `src/api/types/<area>.ts` holds aliases of `Schemas[...]` (`src/api/schemas.ts`) and `QueryOf`/`JsonBodyOf` derivations, nothing else; `handwritten-types.spec.ts` fails on a new `interface`, object type or literal union. A shape the backend does not own carries `/** @uiOnly <reason> */`
+- After a backend change (the `api-drift` workflow or `npm run api:check -- --backend` goes red): pull the backend, `npm run api:gen`, `npm run typecheck`, fix every error. An error that is the backend's fault is never cast: `trustedUntilBackendFixed('M<n>-<nn>', value)` plus a section in `docs/api-mismatches/` (see `backend-ask.ts`); the backend ask goes to the "Backend asks" table
+- `src/api/generated/*` is never edited by hand and never merged by a feature branch: it changes only in a `chore: sync api schema` commit that follows `npm run api:gen`
 - Error text: `$t(errorMessageKey(error))`; add a message to `errors.<code>` in both locale files for a new backend code
 - Realtime: `openEventStream` (`src/api/events.ts`); follow a submission with `useSubmissionStatus`
 - Redirects from the URL (`?redirect=`) pass through `safeRedirect` (`src/router/safe-redirect.ts`) before any navigation

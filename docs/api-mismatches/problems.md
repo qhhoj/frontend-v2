@@ -2,6 +2,8 @@
 
 ## M2-01
 
+Resolved (backend ba5db96): the upload routes declare a multipart body; `fileBody()` only builds the `FormData`.
+
 Routes: `POST /problems/uploads/image`, `POST /problems/{code}/statement`, `POST /problems/{code}/material`, `POST /problems/{code}/data/archive`, `POST /problems/{code}/data/files/{kind}`, `POST /problems/imports`.
 
 The document says: `requestBody?: never` (no body at all).
@@ -10,6 +12,8 @@ Verdict: backend ask. `fileBody()` in `src/api/problem-data.api.ts` is the one `
 Backend file to change: the upload handlers of `apps/api/src/modules/problems/` (uploads, data, imports controllers): add `@ApiConsumes('multipart/form-data')` and an `@ApiBody` schema `{ file: binary }` as `SubmissionCreateController.submitFile` does.
 
 ## M2-02
+
+Resolved (backend ba5db96): `ProblemDetailResponse` lists the visibility enums; `visibilityOf` copies the fields.
 
 Route: `GET /problems/{code}` (`ProblemDetailResponse`).
 

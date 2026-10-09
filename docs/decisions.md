@@ -18,7 +18,11 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Data, auth and routing
 
 - Pinia holds client state only (session, theme, locale); server data lives in vue-query — one cache with invalidation, nothing to sync by hand.
-- DTO types are hand-written until the backend OpenAPI carries response schemas (backend ask B1) — the plugin reads only `*.dto.ts` today.
+- API types are generated: `openapi-typescript` 7.13.0 turns the backend's `openapi.json` (committed in the backend, snapshotted in `src/api/generated/openapi.json`) into `src/api/generated/schema.d.ts`; `src/api/typed.ts` types every call by route, so a backend change that breaks a page fails `npm run typecheck`. `src/api/types/*` are aliases only (`@uiOnly` for shapes the backend does not own).
+- The existing client stays instead of `openapi-fetch`: CSRF retry, 401 and gate hooks, `ApiError` with `Retry-After`, the envelope unwrap and 204 live in `client.ts` and its 300-line spec; `openapi-fetch` returns `{ data, error }` instead of throwing and cannot retry, so it would need a wrapper as large as `typed.ts`.
+- CI cannot see the backend repo, so the frontend commits the spec snapshot it generated from (`src/api/generated/openapi.json`, with the backend sha in `openapi.source`); `npm run api:check` (CI) fails when `schema.d.ts` is stale against it, the backend CI fails when its own `openapi.json` is stale, and the `api-drift` workflow (pull request, `main`, daily) fails when the snapshot differs from backend `main`'s `openapi.json`. `npm run api:check -- --backend` is the same comparison against `../backend-v2` locally.
+- A backend mismatch found by the typecheck is never cast away: `trustedUntilBackendFixed('M<n>-<nn>', value)` marks the single use site, `docs/api-mismatches/<lane>.md` records it, `backend-ask.spec.ts` fails when an id has no section. The six asks of the migration (M2-01, M2-02, M5-01, M5-02, M7-01, M7-02) were fixed by backend `ba5db96`; none is open.
+- Guard rails: `typed-calls.spec.ts` allows `apiRequest`/`apiPage` imports only in `client.ts` and `typed.ts`; `handwritten-types.spec.ts` (scanner `findHandWrittenTypes`) fails on an interface, enum, object type or literal union in `src/api/types` unless tagged `@uiOnly <reason>`.
 - `fetch` wrapper, no axios — the needs are the envelope, a CSRF header and one retry.
 - The CSRF token lives in memory only — storage would expose it to any script on the origin.
 - `csrf_failed` reloads the session and retries once — a rotated cookie must not fail a click; parallel failures share one refresh and never loop.
@@ -122,7 +126,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 | # | Ask | Unblocks |
 |---|---|---|
-| B1 | OpenAPI response schemas (`dtoFileNameSuffix` including `.response.ts`, fix circular refs, paginated response helper) | generated DTO types |
+| B1 | OpenAPI response schemas (`dtoFileNameSuffix` including `.response.ts`, fix circular refs, paginated response helper) | done: backend-v2 emits openapi.json (plan 2026-10-09-openapi-generated-sdk); types are generated |
 | B2 | `siteTheme` (and `languageId`) on `GET /auth/me` | one request fewer at boot |
 | B3 | `siteTheme` default `auto` for new users; accept registered theme ids | done in backend-v2 263ec51 (`SITE_THEME_PATTERN`: any `^[a-z][a-z0-9-]{0,31}$`) |
 | B4 | `ranking` event on `contest-events` after a participation recompute | live ranking without polling |

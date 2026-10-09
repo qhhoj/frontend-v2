@@ -1,6 +1,5 @@
 import { fetchText } from './admin-common.api';
 import { apiGet, apiSend, apiUrl, fillPath } from './typed';
-import { trustedUntilBackendFixed } from './backend-ask';
 import type {
   DataFileKind,
   ProblemData,
@@ -22,14 +21,11 @@ export const problemDataFileUrl = (code: string, name: string) =>
 export const fetchInitYaml = (code: string) =>
   fetchText(fillPath('/problems/{code}/data/init', { code }));
 
-/**
- * M2-01: the document lists no multipart body for the file uploads of the problem routes, so the type refuses `body`;
- * spreading this result into the call options is the one place that passes it.
- */
+/** The multipart body of a file upload: one `file` field; spread into the call options. */
 export const fileBody = (file: File) => {
   const body = new FormData();
   body.append('file', file);
-  return trustedUntilBackendFixed<object>('M2-01', { body });
+  return { body };
 };
 
 export const uploadDataArchive = (code: string, file: File): Promise<ProblemData> =>
