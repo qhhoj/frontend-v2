@@ -54,7 +54,7 @@ onBeforeRouteLeave(() => {
               v-for="index in 5"
               :key="index"
               data-skeleton-region="judge-row"
-              class="h-[18.375rem] w-full sm:h-[13.625rem]"
+              class="h-[19.575rem] w-full sm:h-[13.625rem]"
             />
           </div>
         </div>
