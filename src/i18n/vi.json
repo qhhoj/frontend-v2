@@ -1985,6 +1985,58 @@
     "title": "Bóng bay"
   },
   "orgProblems": {
+    "filtersLabel": "Lọc bài tập",
+    "tagFilter": "Lọc theo thẻ",
+    "allTags": "Tất cả",
+    "archiveFilter": "Trạng thái lưu trữ",
+    "archive": {
+      "false": "Đang dùng",
+      "true": "Đã lưu trữ",
+      "all": "Tất cả"
+    },
+    "searchLabel": "Tìm theo mã hoặc tên bài",
+    "searchPlaceholder": "Mã hoặc tên bài",
+    "searchSubmit": "Tìm",
+    "tableCaption": "Bài tập của tổ chức",
+    "columns": {
+      "select": "Chọn",
+      "code": "Mã",
+      "name": "Tên bài",
+      "tags": "Thẻ",
+      "updated": "Cập nhật",
+      "actions": "Thao tác"
+    },
+    "selectAll": "Chọn tất cả bài trên trang",
+    "selectRow": "Chọn {code}",
+    "archivedChip": "Đã lưu trữ",
+    "noTags": "Chưa gắn thẻ",
+    "editTags": "Thẻ",
+    "editTagsLabel": "Sửa thẻ của {code}",
+    "archiveRow": "Lưu trữ",
+    "archiveRowLabel": "Lưu trữ {code}",
+    "unarchiveRow": "Bỏ lưu trữ",
+    "unarchiveRowLabel": "Bỏ lưu trữ {code}",
+    "readOnlyBadge": "Chỉ xem",
+    "memberReadOnly": "Thành viên thường chỉ đọc. Gắn thẻ và lưu trữ dành cho quản trị tổ chức.",
+    "forbiddenTitle": "Chỉ thành viên xem được bài tập của tổ chức",
+    "forbiddenBody": "Tham gia tổ chức để xem danh sách này.",
+    "emptyTitle": "Tổ chức chưa có bài tập nào",
+    "emptyBody": "Bài tập gắn với tổ chức hiện ở đây. Liên hệ người quản lý bài để thêm.",
+    "filteredEmpty": "Không có bài nào khớp bộ lọc.",
+    "filteredEmptyTag": "Không có bài nào với thẻ “{tag}” đang dùng.",
+    "showArchived": "Xem đã lưu trữ",
+    "pager": "Trang bài tập của tổ chức",
+    "tagsDialog": {
+      "title": "Thẻ của {code}",
+      "legend": "Chọn thẻ cho bài",
+      "save": "Lưu thẻ",
+      "limit": "Tối đa 20 thẻ mỗi bài.",
+      "none": "Tổ chức chưa có thẻ nào. Tạo thẻ ở mục “Thẻ của tổ chức”."
+    },
+    "errors": {
+      "unknownTag": "Thẻ đã chọn không còn trong danh mục của tổ chức. Tải lại trang rồi chọn lại.",
+      "slugTaken": "Mã thẻ này đã có trong tổ chức."
+    },
     "title": "Bài tập của tổ chức"
   },
   "orgQuota": {

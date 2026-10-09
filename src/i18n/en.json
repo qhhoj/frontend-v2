@@ -1985,6 +1985,58 @@
     "title": "Balloons"
   },
   "orgProblems": {
+    "filtersLabel": "Filter problems",
+    "tagFilter": "Filter by tag",
+    "allTags": "All",
+    "archiveFilter": "Archive state",
+    "archive": {
+      "false": "In use",
+      "true": "Archived",
+      "all": "All"
+    },
+    "searchLabel": "Search by problem code or name",
+    "searchPlaceholder": "Code or name",
+    "searchSubmit": "Search",
+    "tableCaption": "Organization problems",
+    "columns": {
+      "select": "Select",
+      "code": "Code",
+      "name": "Name",
+      "tags": "Tags",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "selectAll": "Select every problem on this page",
+    "selectRow": "Select {code}",
+    "archivedChip": "Archived",
+    "noTags": "No tags",
+    "editTags": "Tags",
+    "editTagsLabel": "Edit the tags of {code}",
+    "archiveRow": "Archive",
+    "archiveRowLabel": "Archive {code}",
+    "unarchiveRow": "Unarchive",
+    "unarchiveRowLabel": "Unarchive {code}",
+    "readOnlyBadge": "View only",
+    "memberReadOnly": "Members can only read. Tags and archiving are for the organization’s administrators.",
+    "forbiddenTitle": "Only members can see the organization’s problems",
+    "forbiddenBody": "Join the organization to see this list.",
+    "emptyTitle": "The organization has no problems yet",
+    "emptyBody": "Problems linked to the organization appear here. Ask a problem manager to add some.",
+    "filteredEmpty": "No problem matches the filter.",
+    "filteredEmptyTag": "No problem in use has the tag “{tag}”.",
+    "showArchived": "Show archived",
+    "pager": "Organization problem pages",
+    "tagsDialog": {
+      "title": "Tags of {code}",
+      "legend": "Pick the problem’s tags",
+      "save": "Save tags",
+      "limit": "At most 20 tags per problem.",
+      "none": "The organization has no tags yet. Create them under “Organization tags”."
+    },
+    "errors": {
+      "unknownTag": "A chosen tag is no longer in the organization’s catalogue. Reload and pick again.",
+      "slugTaken": "This tag code already exists in the organization."
+    },
     "title": "Organization problems"
   },
   "orgQuota": {
