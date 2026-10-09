@@ -1,4 +1,6 @@
-/** backend: libs/settings registry, the 15 keys the admin settings page reads (2026-10-08). */
+import type { Schemas } from '../schemas';
+
+/** @uiOnly the 15 registry keys the admin settings page reads (2026-10-08); the document types a key as `string`. */
 export type SettingKey =
   | 'site.timeZone'
   | 'contest.officialMode'
@@ -16,28 +18,12 @@ export type SettingKey =
   | 'similarity.maxPairs'
   | 'similarity.maxSubmissions';
 
-/** A sealed part of a value: the API says only whether it is set, never the value. */
+/** @uiOnly a sealed part of a value: the API says only whether it is set, never the value. */
 export interface Sealed {
   set: boolean;
 }
 
 /** `default` is the registry default redacted like `value`: a secret default reads `{ set: false }`. */
-export interface Setting {
-  key: SettingKey;
-  description: string;
-  hasSecret: boolean;
-  value: unknown;
-  default: unknown;
-  isDefault: boolean;
-  updatedAt: string | null;
-  updatedBy: string | null;
-}
+export type Setting = Omit<Schemas['SettingResponse'], 'key'> & { key: SettingKey };
 
-export interface SettingRevision {
-  id: string;
-  before: unknown;
-  after: unknown;
-  changedFields: string[];
-  actor: string | null;
-  createdAt: string;
-}
+export type SettingRevision = Schemas['SettingRevisionResponse'];

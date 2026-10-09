@@ -1,12 +1,10 @@
-import { apiPage, apiRequest } from './client';
-import type { PostListItem } from './types/blog';
+import { apiGetPage, apiSend } from './typed';
+import type { QueryOf } from './typed';
 
-export type ModerationState = 'hidden' | 'scheduled';
-
-const postPath = (id: string) => `/posts/${encodeURIComponent(id)}`;
+export type ModerationState = QueryOf<'/admin/posts'>['state'];
 
 const patchVisible = (id: string, visible: boolean) =>
-  apiRequest<unknown>(postPath(id), { method: 'PATCH', body: { visible } });
+  apiSend('patch', '/posts/{id}', { path: { id }, body: { visible } });
 
 /** B1: hiding is an edit (`visible: false`); the post leaves every list but stays reachable by its link for authors and staff. */
 export const hidePost = (id: string) => patchVisible(id, false);
@@ -16,4 +14,4 @@ export const showPost = (id: string) => patchVisible(id, true);
 
 /** Backend `BlogModerationController` (`judge.edit_all_post`): `hidden` = every draft, `scheduled` = visible posts whose publish time is ahead. */
 export const fetchModerationPosts = (state: ModerationState, page: number) =>
-  apiPage<PostListItem>('/admin/posts', { query: { state, page } });
+  apiGetPage('/admin/posts', { query: { state, page } });

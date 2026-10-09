@@ -1,6 +1,7 @@
-import { apiRequest, apiText } from './client';
+import { apiText } from './client';
 import { fetchOrganization } from './organizations.api';
 import type { OrganizationChip, PreviewSource, UserChip } from './types/admin-common';
+import { apiSend } from './typed';
 import { fetchUserPage } from './users.api';
 
 /** An exact username as the id the DTOs take (`GET /users/:username`); only the id and the name are kept. */
@@ -20,11 +21,10 @@ export async function lookupOrganization(slug: string): Promise<OrganizationChip
  * `POST /admin/site/pages/render-preview` `{ content }` (`flatpages.change_flatpage`). Both answer the sanitised `{ html }`.
  */
 export async function renderPreview(source: PreviewSource, markdown: string): Promise<string> {
-  const isPage = source === 'flatpage';
-  const { html } = await apiRequest<{ html: string }>(
-    isPage ? '/admin/site/pages/render-preview' : '/problems/render-preview',
-    { method: 'POST', body: isPage ? { content: markdown } : { style: source, markdown } },
-  );
+  const { html } =
+    source === 'flatpage'
+      ? await apiSend('post', '/admin/site/pages/render-preview', { body: { content: markdown } })
+      : await apiSend('post', '/problems/render-preview', { body: { style: source, markdown } });
   return html;
 }
 

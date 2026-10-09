@@ -1,40 +1,9 @@
-/** A programming language as staff see it (`GET /admin/languages`, backend `LanguageAdminResponse`). */
-export interface LanguageAdmin {
-  id: string;
-  /** The judge runtime key (`CPP20`); a judge reports its runtimes under this key. Fixed once created. */
-  key: string;
-  name: string;
-  shortName: string | null;
-  commonName: string;
-  ace: string;
-  pygments: string;
-  template: string;
-  info: string;
-  description: string;
-  extension: string;
-  fileOnly: boolean;
-  fileSizeLimit: number;
-  includeInProblem: boolean;
-}
+import type { JsonBodyOf } from '../typed';
+import type { Schemas } from '../schemas';
 
-/** `POST /admin/languages` body (`judge.add_language`). Optional text fields are sent only when filled in. */
-export interface CreateLanguageBody {
-  key: string;
-  name: string;
-  shortName?: string;
-  commonName: string;
-  ace: string;
-  pygments: string;
-  template?: string;
-  info?: string;
-  description?: string;
-  extension: string;
-  fileOnly?: boolean;
-  fileSizeLimit?: number;
-  includeInProblem?: boolean;
-}
-
+/** A programming language as staff see it (`GET /admin/languages`). */
+export type LanguageAdmin = Schemas['LanguageAdminResponse'];
+/** `POST /admin/languages` body (`judge.add_language`). */
+export type CreateLanguageBody = JsonBodyOf<'/admin/languages', 'post'>;
 /** `PATCH /admin/languages/:id` body: no `key` (fixed), and `shortName: null` clears it. */
-export type UpdateLanguageBody = Partial<Omit<CreateLanguageBody, 'key' | 'shortName'>> & {
-  shortName?: string | null;
-};
+export type UpdateLanguageBody = JsonBodyOf<'/admin/languages/{id}', 'patch'>;

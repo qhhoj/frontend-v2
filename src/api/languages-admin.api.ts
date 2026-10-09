@@ -1,16 +1,9 @@
-import { apiRequest } from './client';
-import type {
-  CreateLanguageBody,
-  LanguageAdmin,
-  UpdateLanguageBody,
-} from './types/languages-admin';
+import { apiGet, apiSend } from './typed';
+import type { CreateLanguageBody, UpdateLanguageBody } from './types/languages-admin';
 
 /** Backend `LanguagesAdminController` (`judge.change_language`). */
-export const fetchLanguagesAdmin = () => apiRequest<LanguageAdmin[]>('/admin/languages');
+export const fetchLanguagesAdmin = () => apiGet('/admin/languages');
 export const createLanguage = (body: CreateLanguageBody) =>
-  apiRequest<LanguageAdmin>('/admin/languages', { method: 'POST', body });
+  apiSend('post', '/admin/languages', { body });
 export const updateLanguage = (id: string, patch: UpdateLanguageBody) =>
-  apiRequest<LanguageAdmin>(`/admin/languages/${encodeURIComponent(id)}`, {
-    method: 'PATCH',
-    body: patch,
-  });
+  apiSend('patch', '/admin/languages/{id}', { path: { id }, body: patch });
