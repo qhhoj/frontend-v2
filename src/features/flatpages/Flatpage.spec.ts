@@ -6,7 +6,7 @@ import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 describe('flatpages', () => {
   it('renders a stored page on its own path with breadcrumb, title and tab title', async () => {
-    mockApi({ ...anonymousViewer, 'GET /pages/about/rules': ok(flatpage()) });
+    mockApi({ ...anonymousViewer, 'GET /pages/about%2Frules': ok(flatpage()) });
     const { wrapper } = await mountApp('/about/rules');
     expect(wrapper.get('h1').text()).toBe('Quy tắc cộng đồng');
     expect(wrapper.get('nav[aria-label="Đường dẫn"]').text()).toContain('Trang chủ');
@@ -21,7 +21,7 @@ describe('flatpages', () => {
     expect(state.get('a').attributes('href')).toBe('/login?redirect=/doi-tuyen');
   });
   it('falls back to the crying-Bit 404 page with the requested path', async () => {
-    mockApi({ ...signedInViewer(), 'GET /pages/khong/co': fail(404, 'not_found') });
+    mockApi({ ...signedInViewer(), 'GET /pages/khong%2Fco': fail(404, 'not_found') });
     const { wrapper } = await mountApp('/khong/co');
     expect(wrapper.get('h1').text()).toBe('Không tìm thấy trang');
     expect(wrapper.get('[data-testid="requested-path"]').text()).toBe('/khong/co');

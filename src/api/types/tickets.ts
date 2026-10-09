@@ -1,4 +1,5 @@
-import type { UserSummary } from './problems';
+import type { Schemas } from '../schemas';
+import type { JsonBodyOf, QueryOf } from '../typed';
 
 /** backend: libs/community tickets.ts */
 export const TICKET_TITLE_MAX_LENGTH = 100;
@@ -7,76 +8,27 @@ export const TICKET_ISSUE_URL_MAX_LENGTH = 200;
 export const TICKETS_PAGE_SIZE = 50;
 
 /** backend: tickets/core/dto/ticket.response.ts (TicketLinkResponse) */
-export interface TicketLink {
-  type: 'problem' | 'general';
-  id: string;
-  /** Problem code; null for a general issue or a deleted problem. */
-  key: string | null;
-  /** Problem name, or the issue url. */
-  title: string;
-  /** SPA path for a problem, the absolute url for a general issue; empty when the problem is gone. */
-  url: string;
-}
+export type TicketLink = Schemas['TicketLinkResponse'];
 /** backend: ticket.response.ts (TicketListItemResponse) */
-export interface TicketListItem {
-  id: string;
-  title: string;
-  creator: UserSummary;
-  assignees: UserSummary[];
-  link: TicketLink;
-  isOpen: boolean;
-  isContributive: boolean;
-  messageCount: number;
-  createdAt: string;
-  lastMessageAt: string;
-}
+export type TicketListItem = Schemas['TicketListItemResponse'];
 /** backend: ticket.response.ts (TicketMessageResponse); `bodyHtml` has raw HTML escaped. */
-export interface TicketMessage {
-  id: string;
-  author: UserSummary;
-  bodyHtml: string;
-  createdAt: string;
-}
+export type TicketMessage = Schemas['TicketMessageResponse'];
 /** backend: ticket.response.ts (TicketPermissionsResponse) */
-export interface TicketPermissions {
-  editNotes: boolean;
-  markGood: boolean;
-  assign: boolean;
-}
+export type TicketPermissions = Schemas['TicketPermissionsResponse'];
 /** backend: ticket.response.ts (TicketDetailResponse) */
-export interface TicketDetail extends TicketListItem {
-  notes: string;
-  messages: TicketMessage[];
-  can: TicketPermissions;
-}
+export type TicketDetail = Schemas['TicketDetailResponse'];
 /** backend: tickets/core/dto/ticket-list.dto.ts; `open=true` lists open tickets, `open=false` closed ones, unset lists both. */
-export interface TicketListQuery {
-  own: boolean;
-  open: boolean | undefined;
-  user: string[];
-  assignee: string[];
-  page: number;
-}
+export type TicketListQuery = Required<Omit<QueryOf<'/tickets'>, 'open'>> &
+  Pick<QueryOf<'/tickets'>, 'open'>;
 /** backend: tickets/editing/dto/update-ticket.dto.ts */
-export interface TicketPatch {
-  isOpen?: boolean;
-  isContributive?: boolean;
-  notes?: string;
-  assignees?: string[];
-}
+export type TicketPatch = JsonBodyOf<'/tickets/{id}', 'patch'>;
 /** backend: tickets/posting/dto/new-ticket.dto.ts */
-export interface NewProblemTicket {
-  title: string;
-  body: string;
-}
-export interface NewGeneralTicket extends NewProblemTicket {
-  issueUrl: string;
-}
+export type NewProblemTicket = JsonBodyOf<'/problems/{code}/tickets', 'post'>;
+export type NewGeneralTicket = JsonBodyOf<'/tickets/general', 'post'>;
 /** backend: libs/community ticket-events.ts */
-export const TICKET_EVENT_TYPES = ['new-ticket', 'ticket-message', 'ticket-status'] as const;
-export interface TicketEvent {
-  type: (typeof TICKET_EVENT_TYPES)[number];
-  ticketId: string;
-  messageId: string | null;
-  open: boolean | null;
-}
+export const TICKET_EVENT_TYPES = [
+  'new-ticket',
+  'ticket-message',
+  'ticket-status',
+] as const satisfies readonly Schemas['TicketEventFrame']['event'][];
+export type TicketEvent = Schemas['TicketEventResponse'];

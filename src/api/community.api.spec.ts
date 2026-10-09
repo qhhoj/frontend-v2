@@ -1,8 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { commentThreadPage, ticketDetail } from '@/test/community-fixtures';
+import {
+  commentDetail,
+  commentRevision,
+  commentThreadPage,
+  ticketDetail,
+  ticketMessage,
+} from '@/test/community-fixtures';
 import { mockApi, noContent, ok, page } from '@/test/mock-api';
-import { fetchCommentPage, postComment } from './comments.api';
-import { fetchTickets, updateTicket } from './tickets.api';
+import {
+  editComment,
+  fetchComment,
+  fetchCommentPage,
+  fetchCommentVotes,
+  fetchRevisions,
+  lockCommentPage,
+  postComment,
+  setCommentHidden,
+  unlockCommentPage,
+  voteComment,
+} from './comments.api';
+import {
+  createGeneralTicket,
+  createProblemTicket,
+  fetchTicket,
+  fetchTickets,
+  postTicketMessage,
+  updateTicket,
+} from './tickets.api';
 import { fetchFlatpage } from './flatpages.api';
 import { fetchRank, fetchUserComments } from './users.api';
 import { joinOrganization } from './organizations.api';
@@ -25,6 +49,53 @@ describe('comment calls', () => {
   });
 });
 
+describe('comment moderation and voting calls', () => {
+  it('reads, edits, votes, hides and lists a comment by its encoded id', async () => {
+    const calls = mockApi({
+      'GET /comments/c%2F1': ok(commentDetail()),
+      'PATCH /comments/c%2F1': ok(commentDetail()),
+      'GET /comments/c%2F1/revisions': ok([commentRevision()]),
+      'PUT /comments/c%2F1/vote': ok({ score: 1, viewerVote: -1 }),
+      'POST /comments/c%2F1/hidden': ok(commentDetail()),
+      'GET /comments/c%2F1/votes': ok([]),
+    });
+    await fetchComment('c/1');
+    await editComment('c/1', 'new');
+    await fetchRevisions('c/1');
+    await voteComment('c/1', -1);
+    await setCommentHidden('c/1', true);
+    await fetchCommentVotes('c/1');
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'GET /comments/c%2F1',
+      'PATCH /comments/c%2F1',
+      'GET /comments/c%2F1/revisions',
+      'PUT /comments/c%2F1/vote',
+      'POST /comments/c%2F1/hidden',
+      'GET /comments/c%2F1/votes',
+    ]);
+    expect(calls.map((call) => call.body)).toEqual([
+      undefined,
+      { body: 'new' },
+      undefined,
+      { score: -1 },
+      { hidden: true },
+      undefined,
+    ]);
+  });
+  it('locks with PUT and unlocks with DELETE on the same page route', async () => {
+    const calls = mockApi({
+      'PUT /comments/pages/blog/p-1/lock': noContent(),
+      'DELETE /comments/pages/blog/p-1/lock': noContent(),
+    });
+    await lockCommentPage('blog', 'p-1');
+    await unlockCommentPage('blog', 'p-1');
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'PUT /comments/pages/blog/p-1/lock',
+      'DELETE /comments/pages/blog/p-1/lock',
+    ]);
+  });
+});
+
 describe('ticket and flatpage calls', () => {
   it('repeats user and assignee and leaves an unset open filter out', async () => {
     const calls = mockApi({ 'GET /tickets': page([]) });
@@ -43,9 +114,29 @@ describe('ticket and flatpage calls', () => {
     await updateTicket('t-1', { isOpen: false });
     expect(calls[0]!.body).toEqual({ isOpen: false });
   });
-  it('keeps the slashes of a nested flatpage path and encodes each segment', async () => {
+  it('reads, opens and answers tickets on their routes with the draft as the body', async () => {
     const calls = mockApi({
-      'GET /pages/about/r%C3%A8gles': ok({
+      'GET /tickets/t-1': ok(ticketDetail()),
+      'POST /problems/a%2Fb/tickets': ok(ticketDetail()),
+      'POST /tickets/general': ok(ticketDetail()),
+      'POST /tickets/t-1/messages': ok(ticketMessage()),
+    });
+    await fetchTicket('t-1');
+    await createProblemTicket('a/b', { title: 'T', body: 'B' });
+    await createGeneralTicket({ title: 'T', body: 'B', issueUrl: 'https://x.test/1' });
+    await postTicketMessage('t-1', 'hello');
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'GET /tickets/t-1',
+      'POST /problems/a%2Fb/tickets',
+      'POST /tickets/general',
+      'POST /tickets/t-1/messages',
+    ]);
+    expect(calls[2]!.body).toEqual({ title: 'T', body: 'B', issueUrl: 'https://x.test/1' });
+    expect(calls[3]!.body).toEqual({ body: 'hello' });
+  });
+  it('encodes a nested flatpage path as one wildcard value the server decodes', async () => {
+    const calls = mockApi({
+      'GET /pages/about%2Fr%C3%A8gles': ok({
         url: '/about/règles',
         title: 'R',
         contentHtml: '',
@@ -53,7 +144,7 @@ describe('ticket and flatpage calls', () => {
       }),
     });
     const flatpage = await fetchFlatpage('about/règles');
-    expect(calls[0]!.path).toBe('/pages/about/r%C3%A8gles');
+    expect(calls[0]!.path).toBe('/pages/about%2Fr%C3%A8gles');
     expect(flatpage.url).toBe('/about/règles');
   });
 });

@@ -1,7 +1,6 @@
-import { apiRequest } from './client';
-import type { HomeResponse } from './types/home';
+import { apiGet } from './typed';
 
-export const fetchHome = () => apiRequest<HomeResponse>('/home');
+export const fetchHome = () => apiGet('/home');
 
 /** The sign-in screen reads only the counts of `GET /home`. */
 export const fetchHomeCounts = async () => (await fetchHome()).counts;

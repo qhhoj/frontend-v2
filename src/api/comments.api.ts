@@ -1,40 +1,28 @@
-import { apiRequest } from './client';
-import type {
-  Comment,
-  CommentDetail,
-  CommentPageType,
-  CommentRevision,
-  CommentThreadPage,
-  CommentVoteEntry,
-} from './types/comments';
+import { trustedUntilBackendFixed } from './backend-ask';
+import type { CommentPageType } from './types/comments';
 import type { VoteResponse, VoteScore } from './types/votes';
+import { apiGet, apiSend } from './typed';
+import type { JsonBodyOf } from './typed';
 
-const pagePath = (type: CommentPageType, key: string) =>
-  `/comments/pages/${type}/${encodeURIComponent(key)}`;
-const commentPath = (id: string) => `/comments/${encodeURIComponent(id)}`;
-
-export interface CommentDraft {
-  body: string;
-  /** Set for a reply. */
-  parentId?: string;
-}
+export type CommentDraft = JsonBodyOf<'/comments/pages/{type}/{key}', 'post'>;
 
 export const fetchCommentPage = (type: CommentPageType, key: string, page: number) =>
-  apiRequest<CommentThreadPage>(pagePath(type, key), { query: { page } });
-export const fetchComment = (id: string) => apiRequest<CommentDetail>(commentPath(id));
+  apiGet('/comments/pages/{type}/{key}', { path: { type, key }, query: { page } });
+export const fetchComment = (id: string) => apiGet('/comments/{id}', { path: { id } });
 export const postComment = (type: CommentPageType, key: string, draft: CommentDraft) =>
-  apiRequest<Comment>(pagePath(type, key), { method: 'POST', body: draft });
+  apiSend('post', '/comments/pages/{type}/{key}', { path: { type, key }, body: draft });
 export const editComment = (id: string, body: string) =>
-  apiRequest<Comment>(commentPath(id), { method: 'PATCH', body: { body } });
-export const fetchRevisions = (id: string) =>
-  apiRequest<CommentRevision[]>(`${commentPath(id)}/revisions`);
-export const voteComment = (id: string, score: VoteScore) =>
-  apiRequest<VoteResponse>(`${commentPath(id)}/vote`, { method: 'PUT', body: { score } });
+  apiSend('patch', '/comments/{id}', { path: { id }, body: { body } });
+export const fetchRevisions = (id: string) => apiGet('/comments/{id}/revisions', { path: { id } });
+export const voteComment = async (id: string, score: VoteScore) =>
+  trustedUntilBackendFixed<VoteResponse>(
+    'M5-01',
+    await apiSend('put', '/comments/{id}/vote', { path: { id }, body: { score } }),
+  );
 export const setCommentHidden = (id: string, hidden: boolean) =>
-  apiRequest<CommentDetail>(`${commentPath(id)}/hidden`, { method: 'POST', body: { hidden } });
-export const fetchCommentVotes = (id: string) =>
-  apiRequest<CommentVoteEntry[]>(`${commentPath(id)}/votes`);
+  apiSend('post', '/comments/{id}/hidden', { path: { id }, body: { hidden } });
+export const fetchCommentVotes = (id: string) => apiGet('/comments/{id}/votes', { path: { id } });
 export const lockCommentPage = (type: CommentPageType, key: string) =>
-  apiRequest<void>(`${pagePath(type, key)}/lock`, { method: 'PUT' });
+  apiSend('put', '/comments/pages/{type}/{key}/lock', { path: { type, key } });
 export const unlockCommentPage = (type: CommentPageType, key: string) =>
-  apiRequest<void>(`${pagePath(type, key)}/lock`, { method: 'DELETE' });
+  apiSend('delete', '/comments/pages/{type}/{key}/lock', { path: { type, key } });
