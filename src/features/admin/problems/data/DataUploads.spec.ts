@@ -100,7 +100,7 @@ describe('test data uploads', () => {
       ...problemEditorRoutes(),
       'GET /problems/hcmus41c/data': ok(problemData()),
       'POST /problems/hcmus41c/data/files/generator': fail(400, 'validation_failed', {
-        file: ['This file type is not allowed as problem material'],
+        file: ['This file type is not allowed as problem material.'],
       }),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
@@ -109,7 +109,7 @@ describe('test data uploads', () => {
       new File(['x'], 'gen.exe'),
     );
     expect(wrapper.get('[data-testid="source-generator"] [role="alert"]').text()).toContain(
-      'This file type is not allowed as problem material',
+      'Loại tệp này không được phép làm tài liệu của bài.',
     );
   });
 });

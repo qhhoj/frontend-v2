@@ -117,7 +117,6 @@ export function parseArgs(text: string): JsonObject | null | undefined {
   }
 }
 
-/** The PUT body, or the per-field refusals when a configuration box does not hold a JSON object. */
 /** Every refusal the backend would give for this form, keyed by field (`cases.<row>.<field>` for a test row). Shown live. */
 export function checkDataForm(form: DataForm): FieldErrors {
   const errors: FieldErrors = {};

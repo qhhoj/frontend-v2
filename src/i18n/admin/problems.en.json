@@ -315,5 +315,29 @@
     "leaveBody": "Unsaved changes in this part will be lost.",
     "leave": "Leave page",
     "stay": "Stay"
+  },
+  "refusals": {
+    "unexpectedField": "A field or file was sent wrongly, repeated or too large.",
+    "oneFile": "Send exactly one file in the \"file\" field.",
+    "malformed": "The upload is not valid.",
+    "fileRequired": "Choose a file.",
+    "emptyFile": "The file is empty; choose another.",
+    "svgTooLarge": "The SVG file is too large or too complex.",
+    "imageType": "Only JPG, PNG, GIF or SVG images are accepted.",
+    "pdfOnly": "The statement must be a PDF file.",
+    "materialType": "This file type is not allowed as problem material.",
+    "zipOnly": "The file must be a .zip archive.",
+    "noProblemXml": "The package has no problem.xml at its root.",
+    "zipInconsistent": "The zip archive's directory is inconsistent.",
+    "zipInvalid": "The file is not a valid zip archive.",
+    "zipOutside": "The zip archive points outside itself.",
+    "duplicateName": "The name {name} is already used by another data file.",
+    "extensions": "The allowed extensions for {kind} are: {list}.",
+    "corruptEntry": "{name} is corrupt; pack the archive again.",
+    "sizeMismatch": "{name} does not match its declared size.",
+    "tooLargeToRead": "{name} is too large to read.",
+    "noSuchEntry": "No file {name} in the package.",
+    "cannotRead": "Cannot read {name}.",
+    "unknown": "The file was not accepted. Check it and try again."
   }
 }

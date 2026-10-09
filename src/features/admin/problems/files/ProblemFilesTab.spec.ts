@@ -97,7 +97,7 @@ describe('ProblemFilesTab', () => {
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
     await pick(wrapper, 'upload-image', new File(['x'], 'b.bmp', { type: 'image/bmp' }));
     expect(wrapper.get('[data-testid="upload-image"] [role="alert"]').text()).toContain(
-      'Only JPG, PNG, GIF and SVG images are accepted.',
+      'Chỉ nhận ảnh JPG, PNG, GIF hoặc SVG.',
     );
   });
 });
