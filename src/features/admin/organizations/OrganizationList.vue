@@ -1,19 +1,37 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { PageMeta } from '@/api/client';
 import type { OrganizationListItem } from '@/api/types/organizations';
+import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
-import { useI18n } from 'vue-i18n';
+import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
+import HighlightedText from '../search/HighlightedText.vue';
+import IndexSearchBox from '../search/IndexSearchBox.vue';
 
-defineProps<{
+const props = defineProps<{
   items: OrganizationListItem[];
   meta: PageMeta;
   selected: string | null;
+  search: string;
 }>();
+const emit = defineEmits<{ search: [text: string] }>();
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+
+const total = computed(() => props.meta.total ?? props.items.length);
+const footer = computed(() =>
+  props.search
+    ? t('admin.organizations.list.countMatch', {
+        shown: props.items.length,
+        total: total.value,
+        search: props.search,
+      })
+    : t('admin.organizations.list.footer', { shown: props.items.length, total: total.value }),
+);
 
 function select(slug: string) {
   void router.push({ query: { ...route.query, org: slug } });
@@ -26,7 +44,23 @@ function select(slug: string) {
     :aria-label="$t('admin.organizations.list.label')"
     class="flex min-w-0 flex-col gap-4"
   >
-    <div class="overflow-x-auto rounded-card border border-line">
+    <IndexSearchBox
+      :value="search"
+      :label="$t('admin.organizations.search.label')"
+      :placeholder="$t('admin.organizations.search.placeholder')"
+      :clear-label="$t('admin.search.clear')"
+      :hint="$t('admin.organizations.search.hint')"
+      :status="search ? footer : ''"
+      @commit="emit('search', $event)"
+    />
+    <EmptyState v-if="items.length === 0" compact :kind="ADMIN_BIT_KINDS.empty">
+      {{
+        search
+          ? $t('admin.organizations.list.emptySearch', { search })
+          : $t('admin.organizations.list.empty')
+      }}
+    </EmptyState>
+    <div v-else class="overflow-x-auto rounded-card border border-line">
       <table class="w-full text-left text-sm">
         <thead class="text-muted">
           <tr>
@@ -53,10 +87,12 @@ function select(slug: string) {
                 :aria-pressed="item.slug === selected"
                 @click="select(item.slug)"
               >
-                <span class="font-semibold">{{ item.name }}</span>
+                <span class="font-semibold"
+                  ><HighlightedText :text="item.name" :query="search"
+                /></span>
                 <span class="font-mono text-xs text-muted"
-                  >{{ item.slug }} · {{ item.shortName }}</span
-                >
+                  ><HighlightedText :text="`${item.slug} · ${item.shortName}`" :query="search"
+                /></span>
               </button>
             </td>
             <td class="px-3 py-2">
@@ -78,14 +114,7 @@ function select(slug: string) {
         </tbody>
       </table>
     </div>
-    <p class="text-sm text-muted">
-      {{
-        t('admin.organizations.list.footer', {
-          shown: items.length,
-          total: meta.total ?? items.length,
-        })
-      }}
-    </p>
+    <p class="text-sm text-muted">{{ footer }}</p>
     <NumberedPager :meta="meta" :label="$t('admin.organizations.list.pager')" />
   </section>
 </template>

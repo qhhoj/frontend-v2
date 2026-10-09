@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useQueryClient } from '@tanstack/vue-query';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
-import { ApiError } from '@/api/client';
 import { decideJoinRequest } from '@/api/organizations.api';
 import type { JoinRequest, JoinRequestState } from '@/api/types/organizations';
 import { useJoinRequestsQuery } from '@/features/organizations/organizations.queries';
@@ -11,12 +11,12 @@ import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { formatDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
-import { translate } from '@/i18n';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { failureTextOf } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { shortId } from '../ui/short-id';
+import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
+import { decisionFailureText, invalidateAfterDecision } from './join-request-decision';
 import { useOrganizationWrite } from './organization-write';
 
 const STATE_TABS: { state: JoinRequestState; labelKey: string }[] = [
@@ -24,12 +24,9 @@ const STATE_TABS: { state: JoinRequestState; labelKey: string }[] = [
   { state: 'A', labelKey: 'admin.organizations.requests.accepted' },
   { state: 'R', labelKey: 'admin.organizations.requests.refused' },
 ];
-/** Backend refusal of an accept into a full organization; shown in the request's own row. */
-const FULL_STATUS = 409;
-const FULL_TEXT_KEY = 'admin.organizations.requests.full';
-
 const props = defineProps<{ slug: string }>();
 const route = useRoute();
+const queryClient = useQueryClient();
 const locale = useLocaleStore();
 const state = ref<JoinRequestState>('P');
 const page = computed(() => pageFromQuery(route.query.requests));
@@ -39,20 +36,11 @@ const failedRequestId = ref<string | null>(null);
 
 const decision = useOrganizationWrite<{ request: JoinRequest; next: 'A' | 'R' }, JoinRequest>({
   mutate: ({ request, next }) => decideJoinRequest(props.slug, request.id, next),
-  invalidates: () => [
-    ['organizations', 'requests', props.slug],
-    ['organizations', 'members', props.slug],
-  ],
+  onDone: () => invalidateAfterDecision(queryClient, props.slug),
 });
 
 const rows = computed(() => requests.data.value?.items ?? []);
 const pendingTotal = computed(() => pendingCount.data.value?.meta.total ?? 0);
-
-function failureTextFor(error: unknown): string {
-  return error instanceof ApiError && error.status === FULL_STATUS
-    ? translate(FULL_TEXT_KEY)
-    : failureTextOf(error);
-}
 
 async function decide(request: JoinRequest, next: 'A' | 'R') {
   failedRequestId.value = request.id;
@@ -110,11 +98,13 @@ async function decide(request: JoinRequest, next: 'A' | 'R') {
           <AdminStatus
             v-if="failedRequestId === row.id && decision.failure.value"
             kind="refused"
-            :text="failureTextFor(decision.failure.value)"
+            :text="decisionFailureText(decision.failure.value)"
           />
         </li>
       </ul>
-      <EmptyState v-else compact>{{ $t('admin.organizations.requests.empty') }}</EmptyState>
+      <EmptyState v-else compact :kind="ADMIN_BIT_KINDS.empty">
+        {{ $t('admin.organizations.requests.empty') }}
+      </EmptyState>
       <NumberedPager
         v-if="requests.data.value"
         :meta="requests.data.value.meta"

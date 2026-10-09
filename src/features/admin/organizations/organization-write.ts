@@ -8,8 +8,9 @@ import type { FieldErrors } from '../ui/admin-errors';
 interface OrganizationWriteOptions<Vars, Result> {
   mutate: (vars: Vars) => Promise<Result>;
   /** Organization writes refresh the public 8e keys (`['organizations', …]`), which `useAdminMutation` does not accept. */
-  invalidates: (vars: Vars) => QueryKey[];
-  onDone?: (result: Result, vars: Vars) => void;
+  invalidates?: (vars: Vars) => QueryKey[];
+  /** Awaited after the invalidation, so the pending flag stays up until a custom refresh has finished. */
+  onDone?: (result: Result, vars: Vars) => unknown;
 }
 
 // TODO(K-1): remove this wrapper once `useAdminMutation` accepts public query keys.
@@ -27,9 +28,11 @@ export function useOrganizationWrite<Vars, Result>(
 
   async function settle(result: Result, vars: Vars) {
     await Promise.all(
-      options.invalidates(vars).map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+      (options.invalidates?.(vars) ?? []).map((queryKey) =>
+        queryClient.invalidateQueries({ queryKey }),
+      ),
     );
-    options.onDone?.(result, vars);
+    await options.onDone?.(result, vars);
   }
 
   async function run(vars: Vars): Promise<boolean> {

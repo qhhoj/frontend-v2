@@ -17,7 +17,10 @@
     "closed": "Đóng",
     "hidden": "Ẩn",
     "footer": "{shown} / {total} tổ chức",
-    "pager": "Trang tổ chức"
+    "pager": "Trang tổ chức",
+    "countMatch": "{shown} / {total} tổ chức khớp “{search}”",
+    "emptySearch": "Không có tổ chức nào khớp “{search}”. Thử rút gọn từ khóa.",
+    "empty": "Chưa có tổ chức nào."
   },
   "editor": {
     "createTitle": "Tạo tổ chức",
@@ -58,7 +61,6 @@
     "accept": "Chấp nhận",
     "decidedBy": "duyệt bởi {id}",
     "empty": "Không có yêu cầu nào.",
-    "full": "Tổ chức đã đủ chỗ.",
     "pager": "Trang yêu cầu"
   },
   "members": {
@@ -68,5 +70,47 @@
     "kickTitle": "Đuổi {username} khỏi {organization}?",
     "kickBody": "Người này rời tổ chức ngay; có thể xin vào lại.",
     "pager": "Trang thành viên"
+  },
+  "views": {
+    "label": "Mục",
+    "organizations": "Tổ chức",
+    "requests": "Yêu cầu tham gia · tất cả tổ chức",
+    "pending": "{count} đang chờ duyệt"
+  },
+  "search": {
+    "label": "Tìm tổ chức",
+    "placeholder": "Tìm tổ chức…",
+    "hint": "Khớp một phần tên, tên ngắn hoặc địa chỉ."
+  },
+  "queue": {
+    "title": "Yêu cầu tham gia của mọi tổ chức",
+    "states": {
+      "label": "Trạng thái yêu cầu",
+      "P": "Chờ duyệt",
+      "A": "Đã chấp nhận",
+      "R": "Đã từ chối"
+    },
+    "columns": {
+      "organization": "Tổ chức",
+      "user": "Người xin",
+      "reason": "Lý do",
+      "sentAt": "Gửi lúc",
+      "actions": "Thao tác"
+    },
+    "region": "Yêu cầu tham gia",
+    "reject": "Từ chối",
+    "accept": "Chấp nhận",
+    "decided": {
+      "A": "Đã chấp nhận · duyệt lúc {time}",
+      "R": "Đã từ chối · duyệt lúc {time}"
+    },
+    "count": {
+      "P": "{total} yêu cầu chờ duyệt",
+      "A": "{total} yêu cầu đã chấp nhận",
+      "R": "{total} yêu cầu đã từ chối"
+    },
+    "empty": "Không có yêu cầu nào.",
+    "pager": "Trang yêu cầu",
+    "full": "Tổ chức đã đủ chỗ."
   }
 }

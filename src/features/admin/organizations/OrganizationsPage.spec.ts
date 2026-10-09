@@ -1,9 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
+import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
+import { TEXT_DEBOUNCE_MS } from '@/lib/use-debounced-text';
 import {
+  communityId,
   joinRequest,
   member,
   organizationDetail,
@@ -11,6 +14,7 @@ import {
 } from '@/test/community-fixtures';
 
 const ALL = ['judge.edit_all_organization', 'judge.add_organization'];
+const QUEUE = '/admin/organization-requests';
 const detail = organizationDetail({
   about: 'Trường THPT chuyên…',
   slots: 200,
@@ -27,6 +31,7 @@ const routes = (extra = {}, viewer = staffViewer(ALL)) => ({
   'GET /organizations/lhp': ok(detail),
   'GET /organizations/lhp/requests': page([request]),
   'GET /organizations/lhp/members': page([ngocanh]),
+  [`GET ${QUEUE}`]: page([]),
   ...extra,
 });
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
@@ -185,5 +190,186 @@ describe('OrganizationsPage', () => {
     expect(
       calls.some((call) => call.path.endsWith('/requests') || call.path.endsWith('/members')),
     ).toBe(false);
+  });
+});
+
+const queued = [
+  joinRequest({ id: communityId(511), organizationSlug: 'lhp', username: 'bichphuong' }),
+  joinRequest({ id: communityId(512), organizationSlug: 'hcmus-team', username: 'anh_khoa' }),
+];
+const queueRoutes = (extra = {}) =>
+  routes({
+    [`GET ${QUEUE}`]: ({ query }: ApiCall) =>
+      query.get('state') === 'P'
+        ? page(queued, { pageSize: 50, total: 4 })
+        : page([], { pageSize: 50, total: 0 }),
+    ...extra,
+  });
+const queueCalls = (calls: ReturnType<typeof mockApi>) =>
+  calls.filter((call) => call.path === QUEUE);
+
+describe('OrganizationsPage search', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('sends the typed text trimmed, marks the match and counts the matches', async () => {
+    const calls = mockApi(
+      routes({
+        'GET /organizations': ({ query }: ApiCall) =>
+          query.get('search')
+            ? page([organizationItem({ slug: 'ntt-club', name: 'CLB Tin học' })], { total: 4 })
+            : page([
+                organizationItem(),
+                organizationItem({ slug: 'ntt-club', name: 'CLB Tin học' }),
+              ]),
+      }),
+    );
+    const { wrapper } = await mountList('/admin/organizations');
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    await wrapper.get('input[type="search"]').setValue(' cl ');
+    await vi.advanceTimersByTimeAsync(TEXT_DEBOUNCE_MS);
+    await flushPromises();
+    expect(
+      calls
+        .filter((call) => call.path === '/organizations')
+        .at(-1)!
+        .query.get('search'),
+    ).toBe('cl');
+    expect(wrapper.get('[data-testid="org-list"] mark').text()).toBe('CL');
+    expect(wrapper.text()).toContain('1 / 4 tổ chức khớp “cl”');
+  });
+
+  it('says what an empty search found', async () => {
+    mockApi(routes({ 'GET /organizations': page([], { total: 0 }) }));
+    const { wrapper } = await mountScreen('/admin/organizations?q=olympic', (mounted) =>
+      mounted.text().includes('Không có tổ chức nào khớp “olympic”.'),
+    );
+    expect(wrapper.text()).toContain('Không có tổ chức nào khớp “olympic”.');
+  });
+});
+
+describe('OrganizationsPage request queue', () => {
+  it('offers the queue tab with the pending count to a viewer with judge.edit_all_organization', async () => {
+    mockApi(queueRoutes());
+    const { wrapper } = await mountWithButton('/admin/organizations', 'Tạo tổ chức');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="pending-count"]').exists()).toBe(true),
+    );
+    const tab = wrapper.get('[data-testid="view-requests"]');
+    expect(tab.text()).toContain('Yêu cầu tham gia · tất cả tổ chức');
+    expect(tab.get('[data-testid="pending-count"]').text()).toBe('4');
+  });
+
+  it('shows no queue tab, and sends no queue request, to a viewer who may only create organizations', async () => {
+    const calls = mockApi(queueRoutes(staffViewer(['judge.add_organization'])));
+    const { wrapper } = await mountList('/admin/organizations?view=requests');
+    expect(wrapper.find('[data-testid="view-requests"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="org-list"]').exists()).toBe(true);
+    expect(queueCalls(calls)).toHaveLength(0);
+  });
+
+  it('lists the pending requests of every organization with the organization named on each row', async () => {
+    const calls = mockApi(queueRoutes());
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    const rows = wrapper.findAll('[data-testid="queue-row"]');
+    expect(rows.map((row) => row.get('[data-testid="queue-org"]').text())).toEqual([
+      'lhp',
+      'hcmus-team',
+    ]);
+    expect(rows[0]!.text()).toContain('bichphuong');
+    expect(queueCalls(calls)[0]!.query.get('state')).toBe('P');
+    expect(wrapper.text()).toContain('4 yêu cầu chờ duyệt');
+  });
+
+  it('accepts a request in its own organization, refreshes the queue and marks that organization’s lists stale', async () => {
+    const calls = mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: ok({
+          ...queued[0],
+          state: 'A',
+        }),
+      }),
+    );
+    const { wrapper, queryClient } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    queryClient.setQueryData(['organizations', 'requests', 'lhp', 'P', 1], {
+      items: [],
+      meta: { page: 1, pageSize: 50 },
+    });
+    await wrapper
+      .findAll('[data-testid="queue-row"]')[0]!
+      .findAll('button')
+      .find((button) => button.text() === 'Chấp nhận')!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.path.endsWith('/decide'))?.body).toEqual({ state: 'A' });
+    expect(queueCalls(calls)).toHaveLength(2);
+    expect(
+      queryClient.getQueryState(['organizations', 'requests', 'lhp', 'P', 1])?.isInvalidated,
+    ).toBe(true);
+  });
+
+  it('refuses a full organization inside that row only', async () => {
+    mockApi(
+      queueRoutes({
+        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]: fail(409, 'conflict'),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    const rows = wrapper.findAll('[data-testid="queue-row"]');
+    await rows[1]!
+      .findAll('button')
+      .find((button) => button.text() === 'Chấp nhận')!
+      .trigger('click');
+    await flushPromises();
+    expect(rows[1]!.get('[role="alert"]').text()).toContain('Tổ chức đã đủ chỗ.');
+    expect(rows[0]!.find('[role="alert"]').exists()).toBe(false);
+  });
+
+  it('reads the decided states without decision buttons and keeps the pending badge', async () => {
+    const decided = joinRequest({
+      id: communityId(513),
+      organizationSlug: 'lhp',
+      state: 'A',
+      decidedBy: communityId(902),
+      decidedAt: '2026-10-08T12:00:00Z',
+    });
+    const calls = mockApi(
+      queueRoutes({
+        [`GET ${QUEUE}`]: ({ query }: ApiCall) =>
+          query.get('state') === 'A'
+            ? page([decided], { pageSize: 50, total: 1 })
+            : page(queued, { pageSize: 50, total: 4 }),
+      }),
+    );
+    const { wrapper } = await mountScreen(
+      '/admin/organizations?view=requests&state=A',
+      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
+    );
+    expect(
+      queueCalls(calls)
+        .map((call) => call.query.get('state'))
+        .sort(),
+    ).toEqual(['A', 'P']);
+    expect(wrapper.get('[data-testid="queue-row"]').findAll('button')).toHaveLength(0);
+    expect(wrapper.get('[data-testid="pending-count"]').text()).toBe('4');
+  });
+
+  it('refreshes the queue when a request is decided from an organization’s own panel', async () => {
+    const calls = mockApi(
+      queueRoutes({
+        [`POST /organizations/lhp/requests/${request.id}/decide`]: ok({ ...request, state: 'R' }),
+      }),
+    );
+    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Từ chối');
+    await click(wrapper, 'Từ chối');
+    expect(queueCalls(calls).length).toBeGreaterThanOrEqual(2);
   });
 });

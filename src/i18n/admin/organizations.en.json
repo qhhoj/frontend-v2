@@ -17,7 +17,10 @@
     "closed": "Closed",
     "hidden": "Hidden",
     "footer": "{shown} / {total} organizations",
-    "pager": "Organization pages"
+    "pager": "Organization pages",
+    "countMatch": "{shown} / {total} organizations match “{search}”",
+    "emptySearch": "No organization matches “{search}”. Try a shorter term.",
+    "empty": "No organizations yet."
   },
   "editor": {
     "createTitle": "Create organization",
@@ -58,7 +61,6 @@
     "accept": "Accept",
     "decidedBy": "decided by {id}",
     "empty": "No requests.",
-    "full": "The organization is full.",
     "pager": "Request pages"
   },
   "members": {
@@ -68,5 +70,47 @@
     "kickTitle": "Remove {username} from {organization}?",
     "kickBody": "They leave the organization at once; they may ask to join again.",
     "pager": "Member pages"
+  },
+  "views": {
+    "label": "Sections",
+    "organizations": "Organizations",
+    "requests": "Join requests · all organizations",
+    "pending": "{count} awaiting review"
+  },
+  "search": {
+    "label": "Search organizations",
+    "placeholder": "Search organizations…",
+    "hint": "Matches part of the name, short name or address."
+  },
+  "queue": {
+    "title": "Join requests from every organization",
+    "states": {
+      "label": "Request state",
+      "P": "Awaiting review",
+      "A": "Accepted",
+      "R": "Refused"
+    },
+    "columns": {
+      "organization": "Organization",
+      "user": "Applicant",
+      "reason": "Reason",
+      "sentAt": "Sent at",
+      "actions": "Actions"
+    },
+    "region": "Join requests",
+    "reject": "Refuse",
+    "accept": "Accept",
+    "decided": {
+      "A": "Accepted · decided at {time}",
+      "R": "Refused · decided at {time}"
+    },
+    "count": {
+      "P": "{total} requests awaiting review",
+      "A": "{total} accepted requests",
+      "R": "{total} refused requests"
+    },
+    "empty": "No requests.",
+    "pager": "Request pages",
+    "full": "The organization is full."
   }
 }
