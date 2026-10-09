@@ -1,0 +1,73 @@
+{
+  "lead": "Look up one account by username, or browse the server's users.",
+  "lookup": {
+    "label": "Username",
+    "submit": "Look up",
+    "hint": "Type the account's exact username."
+  },
+  "list": {
+    "region": "User list",
+    "empty": "No users.",
+    "columns": {
+      "user": "User",
+      "rank": "Display rank",
+      "joined": "Joined"
+    },
+    "banReason": "Ban reason: {reason}",
+    "pager": "User list pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} / {last}"
+  },
+  "card": {
+    "label": "User details",
+    "notFound": "No account \"{name}\".",
+    "joined": "{name} · joined {date}",
+    "copyId": "Copy ID",
+    "none": "None yet",
+    "facts": {
+      "rank": "Display rank",
+      "rating": "Rating",
+      "solved": "Problems solved",
+      "organization": "Organization",
+      "id": "ID"
+    }
+  },
+  "moderation": {
+    "title": "Ban account",
+    "reasonLabel": "Reason (required, shown to the banned user)",
+    "reasonHint": "At most 4,096 characters. A ban revokes every sign-in session. Timed bans are not supported yet: a ban lasts until it is lifted.",
+    "reasonRequired": "Enter a reason.",
+    "reasonTooLong": "The reason is longer than 4,096 characters.",
+    "ban": "Ban user",
+    "done": "Banned {username}.",
+    "unbanned": "Unbanned {username}.",
+    "alreadyBanned": "This account was already banned.",
+    "notBanned": "This account is not banned.",
+    "banDialog": {
+      "title": "Ban {username}?",
+      "body": "The account is locked, every sign-in session is revoked and the account is hidden from the leaderboard.",
+      "confirm": "Ban"
+    },
+    "banned": {
+      "title": "This account is banned",
+      "reason": "Ban reason: {reason}",
+      "noReason": "No reason was recorded.",
+      "unban": "Unban",
+      "unbanHint": "Unbanning restores the rank \"user\", shows the account again and activates it."
+    }
+  },
+  "impersonate": {
+    "title": "View as",
+    "note": "Superusers only. A superuser or a banned account cannot be viewed as.",
+    "open": "View as {username}",
+    "refused": "This superuser or locked account cannot be viewed as.",
+    "dialog": {
+      "title": "View as {username}?",
+      "body": "Your session will be replaced by {username}'s. You see and can do everything this person can, including submitting and commenting.",
+      "nested": "Nested views are not allowed; stop with the button on the warning bar.",
+      "lastLogin": "This person's last sign-in time is not changed.",
+      "confirm": "Start viewing"
+    }
+  }
+}

@@ -204,4 +204,33 @@ describe('useSessionStore', () => {
     expect(session.impersonatorId).toBe('staff-1');
     expect(session.status).toBe('authenticated');
   });
+
+  it('starting an impersonation takes over the session the server returns', async () => {
+    const asTarget = sessionResponse({
+      user: { ...sessionResponse().user!, id: 'target-1', username: 'tuan_k' },
+      impersonatorId: 'staff-1',
+    });
+    const calls = mockApi({
+      'GET /auth/me': signedIn(),
+      'POST /auth/impersonate/target-1': ok(asTarget),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await session.startImpersonating('target-1');
+    expect(calls.at(-1)).toMatchObject({ method: 'POST', path: '/auth/impersonate/target-1' });
+    expect(session.user?.username).toBe('tuan_k');
+    expect(session.impersonatorId).toBe('staff-1');
+  });
+
+  it('keeps the staff session when starting an impersonation fails, and rethrows', async () => {
+    mockApi({
+      'GET /auth/me': signedIn(),
+      'POST /auth/impersonate/target-1': fail(403, 'forbidden'),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await expect(session.startImpersonating('target-1')).rejects.toMatchObject({ status: 403 });
+    expect(session.impersonatorId).toBeNull();
+    expect(session.user?.username).toBe('user_01');
+  });
 });

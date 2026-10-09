@@ -17,6 +17,11 @@ export const login = (body: LoginBody) =>
 export const logout = () => apiRequest<void>('/auth/logout', { method: 'POST' });
 /** Ends every session of the account, this one included; the server clears the cookie. The backend refuses it while impersonating (`@NoImpersonation()`); the UI also locks it then (Decision 16). */
 export const logoutAllSessions = () => apiRequest<void>('/auth/logout-all', { method: 'POST' });
+/** Superuser only (backend U2); the answer is the new session and the response sets its cookie. 403 for a superuser target or while already impersonating. */
+export const startImpersonation = (userId: string) =>
+  apiRequest<SessionResponse>(`/auth/impersonate/${encodeURIComponent(userId)}`, {
+    method: 'POST',
+  });
 /** Back to the staff account that started viewing as this user. */
 export const stopImpersonation = () =>
   apiRequest<SessionResponse>('/auth/impersonate/stop', { method: 'POST' });

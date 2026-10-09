@@ -1,0 +1,73 @@
+{
+  "lead": "Tra cứu một tài khoản theo tên đăng nhập, hoặc xem danh sách người dùng của máy chủ.",
+  "lookup": {
+    "label": "Tên đăng nhập",
+    "submit": "Tra cứu",
+    "hint": "Nhập đúng tên đăng nhập của tài khoản."
+  },
+  "list": {
+    "region": "Danh sách người dùng",
+    "empty": "Không có người dùng nào.",
+    "columns": {
+      "user": "Người dùng",
+      "rank": "Hạng hiển thị",
+      "joined": "Tham gia"
+    },
+    "banReason": "Lý do cấm: {reason}",
+    "pager": "Trang danh sách người dùng",
+    "previous": "Trước",
+    "next": "Sau",
+    "pageOf": "Trang {page} / {last}"
+  },
+  "card": {
+    "label": "Thông tin người dùng",
+    "notFound": "Không có tài khoản \"{name}\".",
+    "joined": "{name} · tham gia {date}",
+    "copyId": "Sao chép ID",
+    "none": "Chưa có",
+    "facts": {
+      "rank": "Hạng hiển thị",
+      "rating": "Rating",
+      "solved": "Bài đã giải",
+      "organization": "Tổ chức",
+      "id": "ID"
+    }
+  },
+  "moderation": {
+    "title": "Cấm tài khoản",
+    "reasonLabel": "Lý do (bắt buộc, hiện cho người bị cấm)",
+    "reasonHint": "Tối đa 4 096 ký tự. Cấm sẽ thu hồi mọi phiên đăng nhập. Chưa hỗ trợ cấm có thời hạn: cấm kéo dài đến khi bỏ cấm.",
+    "reasonRequired": "Cần ghi lý do.",
+    "reasonTooLong": "Lý do dài hơn 4 096 ký tự.",
+    "ban": "Cấm người dùng",
+    "done": "Đã cấm {username}.",
+    "unbanned": "Đã bỏ cấm {username}.",
+    "alreadyBanned": "Tài khoản đã bị cấm từ trước.",
+    "notBanned": "Tài khoản không bị cấm.",
+    "banDialog": {
+      "title": "Cấm {username}?",
+      "body": "Tài khoản bị khoá, mọi phiên đăng nhập bị thu hồi và tài khoản bị ẩn khỏi bảng xếp hạng.",
+      "confirm": "Cấm"
+    },
+    "banned": {
+      "title": "Tài khoản đã bị cấm",
+      "reason": "Lý do cấm: {reason}",
+      "noReason": "Không có lý do được ghi.",
+      "unban": "Bỏ cấm",
+      "unbanHint": "Bỏ cấm trả hạng “user”, hiện lại và kích hoạt."
+    }
+  },
+  "impersonate": {
+    "title": "Đóng vai",
+    "note": "Chỉ siêu quản trị. Không đóng vai được siêu quản trị khác hoặc tài khoản đã khoá.",
+    "open": "Đóng vai {username}",
+    "refused": "Không đóng vai được siêu quản trị khác hoặc tài khoản đã khoá.",
+    "dialog": {
+      "title": "Đóng vai {username}?",
+      "body": "Phiên của bạn sẽ được thay bằng phiên của {username}. Bạn thấy và làm được mọi thứ như người này, kể cả nộp bài và bình luận.",
+      "nested": "Không đóng vai lồng nhau; dừng bằng nút trên thanh cảnh báo.",
+      "lastLogin": "Không đổi lần đăng nhập gần nhất của người này.",
+      "confirm": "Bắt đầu đóng vai"
+    }
+  }
+}

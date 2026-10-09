@@ -6,6 +6,7 @@ import {
   login as loginRequest,
   logout as logoutRequest,
   logoutAllSessions,
+  startImpersonation,
   stopImpersonation,
 } from '@/api/auth.api';
 import { ApiError, onCsrfFailed, onUnauthorized, setCsrfToken } from '@/api/client';
@@ -98,6 +99,9 @@ export const useSessionStore = defineStore('session', () => {
   /** Back to the staff account that started viewing as this user. */
   const stopImpersonating = async () => apply(await stopImpersonation());
 
+  /** Superuser: view the site as another account; the cache of the staff account is dropped by `useAccountCacheSync` when the user changes. Rethrows, so the caller can say why it was refused. */
+  const startImpersonating = async (userId: string) => apply(await startImpersonation(userId));
+
   onCsrfFailed(refresh);
   /** A protected request answered 401: the session expired, so the viewer is signed out here (guards redirect on the next navigation). */
   onUnauthorized(() => apply(null));
@@ -117,5 +121,6 @@ export const useSessionStore = defineStore('session', () => {
     logout,
     logoutEverywhere,
     stopImpersonating,
+    startImpersonating,
   };
 });
