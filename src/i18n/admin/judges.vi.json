@@ -1,0 +1,89 @@
+{
+  "crumbs": {
+    "group": "Chấm bài",
+    "judges": "Máy chấm",
+    "add": "Thêm"
+  },
+  "index": {
+    "lead": "Máy chấm đang kết nối, tải và trạng thái. Khoá xác thực chỉ hiện một lần khi tạo hoặc cấp mới.",
+    "addButton": "Thêm máy chấm",
+    "empty": "Chưa có máy chấm nào.",
+    "emptyAdd": "Thêm máy chấm"
+  },
+  "stats": {
+    "online": "đang trực tuyến",
+    "load": "tải trung bình",
+    "noLoad": "–",
+    "blocked": "bị chặn",
+    "disabled": "đã tắt"
+  },
+  "notes": {
+    "load": "Tải là trung bình của máy chấm báo về; trạng thái trực tuyến cập nhật khi tải lại.",
+    "rotate": "Cấp khoá mới sẽ ngắt kết nối máy ngay lập tức; chặn máy cũng ngắt máy đang kết nối."
+  },
+  "status": {
+    "online": "Trực tuyến",
+    "offline": "Ngoại tuyến",
+    "disabled": "Đã tắt",
+    "blocked": "Bị chặn"
+  },
+  "row": {
+    "ping": "{ms} ms",
+    "languages": "{count} ngôn ngữ",
+    "problems": "{count} bài đã chấm",
+    "disable": "Tắt",
+    "enable": "Bật lại",
+    "block": "Chặn",
+    "unblock": "Bỏ chặn",
+    "rotate": "Khoá",
+    "disconnect": "Ngắt",
+    "details": "Chi tiết",
+    "started": "Khởi động lúc {time} · ping là trung bình 6 lần gần nhất.",
+    "descriptionLabel": "Mô tả (hiện cho nhân viên)",
+    "saveDescription": "Lưu mô tả",
+    "loadLabel": "Tải"
+  },
+  "runtimes": {
+    "caption": "Ngôn ngữ máy chấm báo về",
+    "language": "Ngôn ngữ",
+    "compiler": "Trình biên dịch",
+    "version": "Phiên bản",
+    "priority": "Ưu tiên"
+  },
+  "block": {
+    "title": "Chặn {name}?",
+    "body": "Máy đang kết nối sẽ bị ngắt và không kết nối lại được cho tới khi bỏ chặn.",
+    "confirm": "Chặn"
+  },
+  "rotate": {
+    "title": "Cấp khoá mới cho {name}?",
+    "body": "Máy chấm bị ngắt ngay và cần khoá mới để kết nối lại.",
+    "confirm": "Cấp khoá mới"
+  },
+  "disconnect": {
+    "title": "Ngắt kết nối {name}?",
+    "body": "Máy chấm sẽ tự kết nối lại nếu không bị chặn. Muốn dừng hẳn, hãy chặn máy.",
+    "confirm": "Ngắt kết nối",
+    "force": "Ngắt ngay, không chờ bài đang chấm"
+  },
+  "key": {
+    "createdTitle": "Đã thêm máy chấm",
+    "rotatedTitle": "Khoá mới của {name}",
+    "warning": "Khoá xác thực chỉ hiển thị một lần — Hệ thống chỉ lưu giá trị băm. Sao chép khoá vào cấu hình máy chấm trước khi đóng.",
+    "label": "Khoá xác thực",
+    "saved": "Tôi đã lưu khoá này",
+    "close": "Đóng",
+    "copy": "Sao chép khoá"
+  },
+  "add": {
+    "title": "Thêm máy chấm",
+    "nameLabel": "Tên máy (khớp id khi máy chấm kết nối)",
+    "nameHint": "Chỉ dùng chữ, số, “_”, “.” hoặc “-” (tối đa 50 ký tự).",
+    "nameInvalid": "Chỉ dùng chữ, số, “_”, “.” hoặc “-” (tối đa 50 ký tự).",
+    "nameTaken": "Tên máy đã được dùng.",
+    "descriptionLabel": "Mô tả",
+    "descriptionHint": "Tối đa 10 000 ký tự.",
+    "cancel": "Huỷ",
+    "submit": "Tạo và lấy khoá"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "crumbs": {
+    "group": "Judging",
+    "judges": "Judges",
+    "add": "Add"
+  },
+  "index": {
+    "lead": "Connected judges, their load and status. An auth key is shown once, when a judge is created or its key is rotated.",
+    "addButton": "Add judge",
+    "empty": "No judges yet.",
+    "emptyAdd": "Add judge"
+  },
+  "stats": {
+    "online": "online",
+    "load": "mean load",
+    "noLoad": "–",
+    "blocked": "blocked",
+    "disabled": "disabled"
+  },
+  "notes": {
+    "load": "Load is the mean the judges report; online status refreshes when the page reloads.",
+    "rotate": "Rotating a key disconnects the judge at once; blocking a judge also disconnects it."
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "disabled": "Disabled",
+    "blocked": "Blocked"
+  },
+  "row": {
+    "ping": "{ms} ms",
+    "languages": "{count} languages",
+    "problems": "{count} problems judged",
+    "disable": "Disable",
+    "enable": "Enable again",
+    "block": "Block",
+    "unblock": "Unblock",
+    "rotate": "Key",
+    "disconnect": "Disconnect",
+    "details": "Details",
+    "started": "Started {time} · ping is the mean of the last 6 measurements.",
+    "descriptionLabel": "Description (shown to staff)",
+    "saveDescription": "Save description",
+    "loadLabel": "Load"
+  },
+  "runtimes": {
+    "caption": "Languages the judge reports",
+    "language": "Language",
+    "compiler": "Compiler",
+    "version": "Version",
+    "priority": "Priority"
+  },
+  "block": {
+    "title": "Block {name}?",
+    "body": "A connected judge is disconnected and cannot reconnect until it is unblocked.",
+    "confirm": "Block"
+  },
+  "rotate": {
+    "title": "Issue a new key for {name}?",
+    "body": "The judge is disconnected at once and needs the new key to reconnect.",
+    "confirm": "Issue new key"
+  },
+  "disconnect": {
+    "title": "Disconnect {name}?",
+    "body": "The judge reconnects by itself unless it is blocked. To stop it for good, block it.",
+    "confirm": "Disconnect",
+    "force": "Disconnect now, without waiting for running submissions"
+  },
+  "key": {
+    "createdTitle": "Judge added",
+    "rotatedTitle": "New key for {name}",
+    "warning": "The auth key is shown only once — the system stores only a hash of it. Copy the key into the judge's configuration before closing.",
+    "label": "Auth key",
+    "saved": "I have saved this key",
+    "close": "Close",
+    "copy": "Copy key"
+  },
+  "add": {
+    "title": "Add judge",
+    "nameLabel": "Judge name (matches the id the judge connects with)",
+    "nameHint": "Letters, digits, “_”, “.” or “-” only (up to 50 characters).",
+    "nameInvalid": "Letters, digits, “_”, “.” or “-” only (up to 50 characters).",
+    "nameTaken": "That judge name is already in use.",
+    "descriptionLabel": "Description",
+    "descriptionHint": "Up to 10,000 characters.",
+    "cancel": "Cancel",
+    "submit": "Create and get key"
+  }
+}
