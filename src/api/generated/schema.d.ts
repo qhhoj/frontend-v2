@@ -15250,7 +15250,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                sort?: "contributionPoints" | "performancePoints" | "points" | "problemCount" | "rating";
+                sort?: "performancePoints" | "points" | "problemCount" | "rating" | "contributionPoints";
             };
             header?: never;
             path?: never;
