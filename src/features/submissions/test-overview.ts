@@ -23,7 +23,7 @@ const isFailed = (testCase: SubmissionCase) => testCase.status !== 'AC' && !isSk
 const sumOf = (cases: SubmissionCase[], field: 'points' | 'total') =>
   cases.reduce((sum, testCase) => sum + testCase[field], 0);
 
-/** A subtask is all-or-nothing: its points are its maximum only when every test passed. */
+/** A subtask scores its smallest case points out of its largest case total, the rule the backend's batch summary uses. */
 function subtaskPoints(
   batch: number,
   cases: SubmissionCase[],
@@ -31,8 +31,10 @@ function subtaskPoints(
 ): { earned: number; max: number } {
   const summary = batches?.find((candidate) => candidate.batch === batch);
   if (summary) return { earned: summary.points, max: summary.total };
-  const max = Math.max(...cases.map((testCase) => testCase.total));
-  return { earned: cases.every((testCase) => testCase.status === 'AC') ? max : 0, max };
+  return {
+    earned: Math.min(...cases.map((testCase) => testCase.points)),
+    max: Math.max(...cases.map((testCase) => testCase.total)),
+  };
 }
 
 function buildRow(

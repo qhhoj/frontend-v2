@@ -32,9 +32,14 @@ describe('buildOverviewRows', () => {
     expect(rows[2]).toMatchObject({ passedCount: 0, skippedCount: 2 });
   });
 
-  it('scores a subtask all or nothing, unless the API gives the batch summary', () => {
+  it('scores a subtask by its weakest case out of its largest total, unless the API gives the batch summary', () => {
     const cases = [testCase(1, 'AC', 1), testCase(2, 'WA', 1)];
     expect(buildOverviewRows(cases, null)[0]).toMatchObject({ earned: 0, max: 10 });
+    const partial = [
+      submissionCase({ position: 1, status: 'AC', batch: 1, points: 30, total: 30 }),
+      submissionCase({ position: 2, status: 'WA', batch: 1, points: 12, total: 30 }),
+    ];
+    expect(buildOverviewRows(partial, null)[0]).toMatchObject({ earned: 12, max: 30 });
     const summary = [{ batch: 1, points: 5, total: 40, status: 'WA' as const }];
     expect(buildOverviewRows(cases, summary)[0]).toMatchObject({ earned: 5, max: 40 });
   });
