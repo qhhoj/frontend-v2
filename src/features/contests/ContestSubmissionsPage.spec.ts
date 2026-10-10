@@ -41,7 +41,7 @@ describe('contest submissions tab', () => {
       ...contestPageRoutes(open),
       'GET /contests/r42/submissions': page([
         submissionItem({
-          problem: { code: 'r42a', name: 'Dãy số đẹp', isDeleted: false, points: 100 },
+          problem: { code: 'r42a', name: 'Dãy số đẹp', points: 1000, isDeleted: false },
         }),
       ]),
       'GET /problems/meta': ok(problemMeta()),
@@ -92,13 +92,12 @@ describe('contest submissions tab', () => {
     expect(wrapper.findAll('thead th').map((header) => header.text())).toEqual([
       'Kết quả',
       'Bài',
-      'Điểm',
       'Lúc',
       'Mã nguồn',
     ]);
-    expect(wrapper.findAll('tbody tr td')).toHaveLength(5);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(4);
   });
-  it('keeps all eight columns once the list is public', async () => {
+  it('keeps all seven columns once the list is public', async () => {
     mockApi({
       ...signedInViewer(),
       ...contestPageRoutes(open),
@@ -106,8 +105,8 @@ describe('contest submissions tab', () => {
       'GET /problems/meta': ok(problemMeta()),
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(wrapper.findAll('thead th')).toHaveLength(9);
-    expect(wrapper.findAll('tbody tr td')).toHaveLength(9);
+    expect(wrapper.findAll('thead th')).toHaveLength(7);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(7);
   });
 
   it('ignores a ?user= filter in the own-only state: the list still asks only for the viewer', async () => {

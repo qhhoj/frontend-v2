@@ -25,7 +25,7 @@ describe('the submission list page', () => {
     expect(wrapper.find('[data-testid="stats-strip"]').exists()).toBe(true);
     const row = wrapper.get('tbody tr[data-id="sub-1"]');
     expect(row.text()).toContain('AC');
-    expect(row.text()).toContain('Chấp nhận');
+    expect(row.get('a').attributes('title')).toBe('Chấp nhận');
     expect(row.get('a').attributes('href')).toBe('/submissions/sub-1');
   });
 
@@ -77,11 +77,11 @@ describe('the submission list page', () => {
     });
     const { wrapper } = await openList();
     const done = wrapper.get('tbody tr[data-id="done"]').text();
-    for (const expected of ['100', '0.04s', 'C++17', 'Tổng hai số', 'user_01'])
+    for (const expected of ['100 / 1000', '0.04s', 'C++17', 'Tổng hai số', 'user_01'])
       expect(done).toContain(expected);
     const queued = wrapper.findAll('tbody tr[data-id="queued"] td').map((cell) => cell.text());
-    expect(queued).toContain('Đang chờ');
-    expect(queued.filter((text) => text === '—')).toHaveLength(3);
+    expect(queued[0]).toContain('QU');
+    expect(queued.filter((text) => text === '—')).toHaveLength(1);
   });
 
   it('asks for result=AC and writes it to the URL when Accepted is ticked', async () => {

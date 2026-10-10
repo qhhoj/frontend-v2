@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
   COLUMN_TIER_CLASS,
+  COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
   TABLE_CARD_CLASS,
   fullColumnClass,
 } from './submission-table-cells';
 import type { ColumnKey, ColumnSlot } from './submission-table-cells';
+import { useIsNarrow } from './use-card-compact';
 
-/** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
+/** Mirrors `SubmissionTable.vue` and `SubmissionCompactList.vue`: keep their card, table, header, cell and row classes in sync. */
 const ROW_COUNT = 10;
 const props = withDefaults(
   defineProps<{
@@ -26,12 +28,10 @@ const props = withDefaults(
 );
 /** Header cell width, then the cell's own width, per column in the table's order. */
 const COLUMNS = [
-  { key: 'verdict', header: 'w-12', cell: 'w-12', isNumber: false },
+  { key: 'verdict', header: 'w-12', cell: 'w-[7.875rem]', isNumber: false },
   { key: 'problem', header: 'w-12', cell: 'w-40', isNumber: false },
-  { key: 'user', header: 'w-16', cell: 'w-16', isNumber: false },
-  { key: 'score', header: 'w-10', cell: 'w-10', isNumber: true },
-  { key: 'time', header: 'w-12', cell: 'w-12', isNumber: true },
-  { key: 'memory', header: 'w-12', cell: 'w-14', isNumber: true },
+  { key: 'user', header: 'w-16', cell: 'w-20', isNumber: false },
+  { key: 'cost', header: 'w-20', cell: 'w-28', isNumber: true },
   { key: 'language', header: 'w-12', cell: 'w-12', isNumber: false },
   { key: 'when', header: 'w-10', cell: 'w-10', isNumber: false },
 ] as const;
@@ -42,14 +42,36 @@ const columns = computed(() =>
       (!props.columnKeys || props.columnKeys.includes(column.key)),
   ),
 );
+const card = ref<{ $el: HTMLElement } | null>(null);
+const isCompact = useIsNarrow(() => card.value?.$el ?? null, COMPACT_BELOW_PX);
+const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
 /** Only the full table has fixed column widths. */
 const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
 const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
-    <ScrollRegion placeholder label="">
+  <GlassCard ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+    <ul v-if="isCompact" aria-hidden="true" class="m-0 list-none p-0">
+      <li
+        v-for="row in ROW_COUNT"
+        :key="row"
+        data-skeleton-region="row"
+        class="flex items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0"
+      >
+        <SkeletonBlock class="h-12 w-24 shrink-0" />
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div v-if="isShown('problem')"><SkeletonBlock text class="w-32" /></div>
+          <div class="text-[13px]"><SkeletonBlock text class="w-28" /></div>
+          <div v-if="isShown('language') || isShown('cost')" class="text-xs">
+            <SkeletonBlock text class="w-36" />
+          </div>
+        </div>
+        <SkeletonBlock v-if="hasPickColumn" round class="size-11 shrink-0" />
+        <SkeletonBlock class="size-7 shrink-0" />
+      </li>
+    </ul>
+    <ScrollRegion v-else placeholder label="">
       <table
         aria-hidden="true"
         class="w-full border-collapse text-[15px]"
@@ -90,21 +112,7 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
                 { 'text-right font-mono': column.isNumber },
               ]"
             >
-              <SkeletonBlock
-                v-if="column.key === 'verdict'"
-                pill
-                class="h-7"
-                :class="column.cell"
-              />
-              <template v-else-if="column.key === 'problem'">
-                <!-- The real cell has the name and, under it, the code in a smaller font. -->
-                <SkeletonBlock text :class="column.cell" />
-                <div class="font-mono text-xs"><SkeletonBlock text class="w-16" /></div>
-              </template>
-              <span v-else-if="column.key === 'user'" class="flex items-center gap-2">
-                <SkeletonBlock class="size-6 shrink-0" />
-                <SkeletonBlock text :class="column.cell" />
-              </span>
+              <SkeletonBlock v-if="column.key === 'verdict'" class="h-12" :class="column.cell" />
               <SkeletonBlock v-else text :class="column.cell" />
             </td>
             <td :class="BODY_CELL_CLASSES"><SkeletonBlock class="size-7" /></td>

@@ -143,6 +143,10 @@ const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
   /** A solid fill with its own text colour (body text is not drawn on it). */
   ['first-solve-text', 'first-solve-bg'],
   ['first-solve-text', 'first-solve-bg-2'],
+  /** The solid verdict blocks of the submissions list. */
+  ...['ac', 'wa', 'tle', 'rte', 'ce', 'sys'].map(
+    (tone) => ['on-verdict-solid', `verdict-${tone}-solid`] as const,
+  ),
   ...[...new Set(TINT_PAIRS.map(([, tint]) => tint))].map((tint) => ['text', tint] as const),
 ];
 const allTokenNames = new Set(themes.flatMap(({ tokens }) => [...tokens.keys()]));

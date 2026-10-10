@@ -52,8 +52,8 @@ const labels = computed(() =>
   ),
 );
 const rows = computed(() => list.value?.items ?? []);
-/** The narrowed list shows the mock's four columns: every row is the viewer's own, so user, language and cost add nothing. */
-const OWN_ONLY_COLUMNS: readonly ColumnKey[] = ['verdict', 'problem', 'score', 'when'];
+/** The narrowed list shows the mock's columns (the score is in the verdict block): every row is the viewer's own, so user, language and cost add nothing. */
+const OWN_ONLY_COLUMNS: readonly ColumnKey[] = ['verdict', 'problem', 'when'];
 const listColumns = computed(() => (isOwnOnly.value ? OWN_ONLY_COLUMNS : undefined));
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,

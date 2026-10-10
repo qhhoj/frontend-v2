@@ -39,6 +39,20 @@ export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ce: 'bg-verdict-ce-bg text-verdict-ce',
   pending: 'bg-verdict-pending-bg text-verdict-pending',
 };
+/** The solid verdict block of a submission row (white text on a saturated fill); pending keeps the soft tint. System outcomes (IE, AB) are the dark `sys` block. */
+export type BlockTone = VerdictTone | 'sys';
+const SYSTEM_CODES: readonly VerdictCode[] = ['IE', 'AB'];
+export const BLOCK_TONE_CLASSES: Record<BlockTone, string> = {
+  ac: 'bg-verdict-ac-solid text-on-verdict-solid',
+  wa: 'bg-verdict-wa-solid text-on-verdict-solid',
+  tle: 'bg-verdict-tle-solid text-on-verdict-solid',
+  rte: 'bg-verdict-rte-solid text-on-verdict-solid',
+  ce: 'bg-verdict-ce-solid text-on-verdict-solid',
+  sys: 'bg-verdict-sys-solid text-on-verdict-solid',
+  pending: VERDICT_TONE_CLASSES.pending,
+};
+export const blockToneOf = ({ code, tone }: Verdict): BlockTone =>
+  SYSTEM_CODES.includes(code) ? 'sys' : tone;
 export const VERDICT_CODES = Object.keys(VERDICT_TONES) as VerdictCode[];
 
 /** A finished submission shows its result (or its final status when it has none); an unfinished one its status. */

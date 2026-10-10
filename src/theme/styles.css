@@ -60,6 +60,13 @@
   --color-verdict-ce-bg: var(--qh-verdict-ce-bg);
   --color-verdict-pending: var(--qh-verdict-pending);
   --color-verdict-pending-bg: var(--qh-verdict-pending-bg);
+  --color-on-verdict-solid: var(--qh-on-verdict-solid);
+  --color-verdict-ac-solid: var(--qh-verdict-ac-solid);
+  --color-verdict-wa-solid: var(--qh-verdict-wa-solid);
+  --color-verdict-tle-solid: var(--qh-verdict-tle-solid);
+  --color-verdict-rte-solid: var(--qh-verdict-rte-solid);
+  --color-verdict-ce-solid: var(--qh-verdict-ce-solid);
+  --color-verdict-sys-solid: var(--qh-verdict-sys-solid);
   --color-verdict-partial: var(--qh-verdict-partial);
   --color-diff-1: var(--qh-diff-1);
   --color-diff-2: var(--qh-diff-2);

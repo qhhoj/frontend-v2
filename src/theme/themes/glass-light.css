@@ -42,6 +42,13 @@
   --qh-verdict-ce-bg: rgba(71, 85, 105, 0.1);
   --qh-verdict-pending: #4c3a99;
   --qh-verdict-pending-bg: rgba(91, 63, 214, 0.12);
+  --qh-on-verdict-solid: #ffffff;
+  --qh-verdict-ac-solid: #3f7a34;
+  --qh-verdict-wa-solid: #b42318;
+  --qh-verdict-tle-solid: #94580a;
+  --qh-verdict-rte-solid: #7b3c94;
+  --qh-verdict-ce-solid: #46597a;
+  --qh-verdict-sys-solid: #2b2a27;
   --qh-verdict-partial: #365314;
   --qh-diff-1: #4d7c3a;
   --qh-diff-2: #a87400;

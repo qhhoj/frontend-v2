@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { PY3_ID, submissionDetail, submissionItem } from '../src/test/fixtures';
 import { expect, list, streamFrame, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
+import { ROW } from './fixtures/submission-rows';
 
 const PHONE_WIDTH = 375;
 /** The settle window of the live list (3 s) plus a margin. */
@@ -92,7 +93,7 @@ test.describe('submission page', () => {
   });
 });
 
-const rows = (page: Page) => page.locator('tbody tr');
+const rows = (page: Page) => page.locator(ROW);
 async function openList(page: Page, api: FakeApi, path = '/submissions') {
   api.routes['GET /submissions'] = ({ url }) => {
     const wantedResults = url.searchParams.getAll('result');
@@ -185,16 +186,15 @@ test.describe('submission list', () => {
   test.describe('at 375 px', () => {
     test.use({ viewport: { width: PHONE_WIDTH, height: 812 } });
 
-    test('stacks the rail above the table and scrolls the table inside its region', async ({
+    test('stacks the rail above the list, whose rows stack inside the card without scrolling the page', async ({
       page,
       api,
     }) => {
       await openList(page, api);
       const rail = (await page.getByRole('complementary', { name: 'Bộ lọc' }).boundingBox())!;
-      const table = (await page
-        .getByRole('region', { name: 'Bảng bài nộp, cuộn ngang' })
-        .boundingBox())!;
-      expect(rail.y + rail.height).toBeLessThanOrEqual(table.y);
+      const card = (await page.getByTestId('submission-table-card').boundingBox())!;
+      expect(rail.y + rail.height).toBeLessThanOrEqual(card.y);
+      await expect(page.getByTestId('submission-table-card').locator('table')).toHaveCount(0);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
       ).toBeLessThanOrEqual(0);

@@ -1062,9 +1062,7 @@
       "verdict": "Kết quả",
       "problem": "Bài",
       "user": "Người nộp",
-      "score": "Điểm",
-      "time": "Thời gian",
-      "memory": "Bộ nhớ",
+      "cost": "Thời gian · Bộ nhớ",
       "language": "Ngôn ngữ",
       "when": "Lúc",
       "source": "Mã nguồn"
@@ -1096,6 +1094,9 @@
       "noJudge": "không có máy chấm",
       "unavailable": "Không có số liệu thống kê"
     },
+    "queued": "Trong hàng đợi",
+    "queuedShort": "Chờ",
+    "gradingShort": "Chấm…",
     "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}",
     "liveAdded": "Có {count} bài nộp mới | Có {count} bài nộp mới",
     "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",
