@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Playwright runs locally before every merge (.batch/gates_fe.sh); on GitHub only when started by hand.
+  workflow_dispatch:
 
 jobs:
   # Pushes that touch only docs, changesets or deploy scripts skip the heavy jobs below; a skipped job counts as a
@@ -47,10 +49,10 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
-  # Playwright in 4 shards; each builds and previews dist/ through the config's webServer.
+  # Playwright in 4 shards, by hand only (Actions -> CI -> Run workflow); each builds and previews dist/ through the
+  # config's webServer. Pushes and the deploy gate rely on the local run.
   e2e:
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
