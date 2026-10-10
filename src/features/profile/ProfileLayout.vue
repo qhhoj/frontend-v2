@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { usePageTitle } from '@/router/page-title';
 import ProfileHeader from './ProfileHeader.vue';
 import ProfileHeaderSkeleton from './ProfileHeaderSkeleton.vue';
@@ -38,7 +39,7 @@ usePageTitle(() => user.value?.username);
       <template v-if="user">
         <nav :aria-label="$t('common.breadcrumb')" class="text-sm text-muted">
           <RouterLink to="/users" class="hover:underline">{{ $t('nav.users') }}</RouterLink> /
-          {{ user.username }}
+          <span :class="ratingTextClass(user.rating)">{{ user.username }}</span>
         </nav>
         <ProfileHeader :user="user" />
         <ProfileTabsNav :username="user.username" />

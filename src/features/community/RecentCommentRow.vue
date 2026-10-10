@@ -22,7 +22,11 @@ const target = computed(() => {
 <template>
   <article class="flex flex-col gap-1">
     <p class="text-sm">
-      <UserName v-if="comment.author" :username="comment.author.username" />
+      <UserName
+        v-if="comment.author"
+        :username="comment.author.username"
+        :rating="comment.author.rating"
+      />
       <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
       {{ ' ' }}{{ $t('comments.inPage') }}{{ ' ' }}
       <RouterLink v-if="target" :to="target" class="font-semibold text-accent-text hover:underline">

@@ -403,6 +403,10 @@
       },
       "BalloonTeamResponse": {
         "properties": {
+          "rating": {
+            "nullable": true,
+            "type": "number"
+          },
           "userId": {
             "type": "string"
           },
@@ -412,7 +416,8 @@
         },
         "required": [
           "userId",
-          "username"
+          "username",
+          "rating"
         ],
         "type": "object"
       },
@@ -8265,6 +8270,10 @@
             "nullable": true,
             "type": "string"
           },
+          "rating": {
+            "nullable": true,
+            "type": "number"
+          },
           "username": {
             "type": "string"
           }
@@ -8272,6 +8281,7 @@
         "required": [
           "id",
           "username",
+          "rating",
           "displayName",
           "displayRank",
           "isActive",
@@ -11075,6 +11085,10 @@
             },
             "type": "array"
           },
+          "rating": {
+            "nullable": true,
+            "type": "number"
+          },
           "siteTheme": {
             "type": "string"
           },
@@ -11085,6 +11099,7 @@
         "required": [
           "id",
           "username",
+          "rating",
           "email",
           "isStaff",
           "isSuperuser",
@@ -11102,13 +11117,19 @@
           "id": {
             "type": "string"
           },
+          "rating": {
+            "description": "Null when unrated; clients colour the name by it.",
+            "nullable": true,
+            "type": "number"
+          },
           "username": {
             "type": "string"
           }
         },
         "required": [
           "id",
-          "username"
+          "username",
+          "rating"
         ],
         "type": "object"
       },

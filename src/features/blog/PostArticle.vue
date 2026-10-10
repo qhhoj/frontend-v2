@@ -57,7 +57,7 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
           class="inline-flex items-center gap-2"
         >
           <UserAvatar :username="author.username" :size="28" />
-          <UserName :username="author.username" />
+          <UserName :username="author.username" :rating="author.rating" />
         </span>
         <time :datetime="post.publishOn">{{ publishedOn }}</time>
       </div>

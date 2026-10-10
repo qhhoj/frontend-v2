@@ -20,7 +20,10 @@ export const liveActivity = (overrides: Partial<LiveActivity> = {}): LiveActivit
   anonymousVisitors: 312,
   bots: 47,
   users: [
-    { user: { id: 'id-ngocanh', username: 'ngocanh' }, lastSeenAt: '2026-10-08T08:40:55.000Z' },
+    {
+      user: { id: 'id-ngocanh', username: 'ngocanh', rating: null },
+      lastSeenAt: '2026-10-08T08:40:55.000Z',
+    },
   ],
   hasMore: false,
   ...overrides,

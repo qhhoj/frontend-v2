@@ -153,7 +153,7 @@ const facts = computed(() => [
         <dd class="min-w-0 [overflow-wrap:anywhere]">
           <span v-if="submission.user" class="flex items-center gap-2.5">
             <UserAvatar :username="submission.user.username" :size="32" />
-            <UserName :username="submission.user.username" />
+            <UserName :username="submission.user.username" :rating="submission.user.rating" />
           </span>
           <template v-else>{{ NO_VALUE }}</template>
         </dd>

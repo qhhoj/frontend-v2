@@ -47,8 +47,8 @@ describe('contest detail header', () => {
     vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
     const twoAuthors = contestDetail({
       authors: [
-        { id: 'author-1', username: 'thayhung' },
-        { id: 'author-2', username: 'minhthu' },
+        { id: 'author-1', username: 'thayhung', rating: null },
+        { id: 'author-2', username: 'minhthu', rating: null },
       ],
     });
     mockApi({ ...anonymousViewer, ...contestPageRoutes(twoAuthors) });

@@ -2,6 +2,7 @@
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { useRoute, useRouter } from 'vue-router';
 import { useLogout } from '@/features/auth/use-logout';
 import { translate } from '@/i18n';
@@ -35,7 +36,10 @@ const items = computed<MenuItem[]>(() => [
       :aria-label="$t('account.menu', { username: session.user.username })"
       @click="menu?.toggle($event)"
     >
-      <span class="min-w-0 truncate" :title="session.user.username">{{
+      <span
+        :class="['min-w-0 truncate', ratingTextClass(session.user.rating)]"
+        :title="session.user.username"
+        >{{
         session.user.username
       }}</span>
       <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />

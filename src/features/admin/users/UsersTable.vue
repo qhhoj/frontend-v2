@@ -47,6 +47,7 @@ const now = Date.now();
           <td class="px-2 py-2">
             <AdminUserLabel
               :username="user.username"
+              :rating="user.rating"
               :link="false"
               :status="userStatusOf(user) === 'banned' ? 'banned' : 'active'"
             />

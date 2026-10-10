@@ -13,8 +13,8 @@ import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
-const COLAN = { id: '0192a000-0000-7000-8000-000000000905', username: 'colan' };
-const HOANGANH = { id: '0192a000-0000-7000-8000-000000000906', username: 'hoanganh' };
+const COLAN = { id: '0192a000-0000-7000-8000-000000000905', username: 'colan', rating: null };
+const HOANGANH = { id: '0192a000-0000-7000-8000-000000000906', username: 'hoanganh', rating: null };
 const first = ticketMessage({ id: 'm1', createdAt: '2026-10-08T13:12:00Z' });
 const reply = ticketMessage({
   id: 'm2',

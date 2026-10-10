@@ -88,6 +88,7 @@ const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
                 v-for="author in post.authors"
                 :key="author.id"
                 :username="author.username"
+                :rating="author.rating"
               />
             </div>
           </td>

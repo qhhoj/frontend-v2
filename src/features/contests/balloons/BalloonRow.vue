@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next';
 import type { Balloon } from '@/api/types/contest-ops';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { formatClock } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { isDelivered, solvedAtText, swatchClassOf } from './balloon-queue';
@@ -24,7 +25,9 @@ const locale = useLocaleStore();
       >{{ balloon.problemLabel }}</span
     >
     <div class="min-w-0">
-      <p class="truncate font-semibold">{{ balloon.team.username }}</p>
+      <p class="truncate font-semibold" :class="ratingTextClass(balloon.team.rating)">
+        {{ balloon.team.username }}
+      </p>
       <p class="text-sm text-muted">
         {{ balloon.problemCode }} ·
         <span class="font-mono tabular-nums">{{ solvedAtText(balloon.solvedAt) }}</span>

@@ -55,6 +55,7 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
         <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ row.rank }}:</span>
         <UserName
           :username="row.user.username"
+          :rating="row.user.rating"
           :title="row.user.username"
           class="block truncate text-lg"
         />

@@ -43,7 +43,8 @@ watch(
         <span>
           {{ $t('problem.authors') }}
           <template v-for="(author, index) in editorial.authors" :key="author.id"
-            ><template v-if="index">, </template><UserName :username="author.username"
+            ><template v-if="index">, </template
+            ><UserName :username="author.username" :rating="author.rating"
           /></template>
         </span>
         <span>{{ formatDate(editorial.publishOn, locale.locale) }}</span>

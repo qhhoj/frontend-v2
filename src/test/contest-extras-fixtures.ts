@@ -43,7 +43,7 @@ export const balloon = (index: number, overrides: Partial<Balloon> = {}): Balloo
   problemId: PROBLEM_IDS[index % PROBLEM_IDS.length]!,
   problemCode: `r42${'abc'[index % PROBLEM_IDS.length]}`,
   problemLabel: 'ABC'[index % PROBLEM_IDS.length]!,
-  team: { userId: `user-${index}`, username: TEAMS[index % TEAMS.length]! },
+  team: { userId: `user-${index}`, username: TEAMS[index % TEAMS.length]!, rating: null },
   solvedAt: 240 * (index + 1),
   isFirst: index < PROBLEM_IDS.length,
   deliveredAt: null,

@@ -146,6 +146,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               <UserName
                 v-if="row.user"
                 :username="row.user.username"
+                :rating="row.user.rating"
                 :title="row.user.username"
                 class="block truncate"
               />

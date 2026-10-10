@@ -22,7 +22,7 @@ defineProps<{ label: string; id: string; detail: SubmissionDetail | undefined }>
         >{{ submissionShortId(id) }}</RouterLink
       >
       <VerdictBadge v-if="detail" :verdict="verdictOf(detail)" size="sm" />
-      <UserName v-if="detail?.user" :username="detail.user.username" />
+      <UserName v-if="detail?.user" :username="detail.user.username" :rating="detail.user.rating" />
     </p>
     <p v-if="detail" class="truncate text-sm text-muted">
       {{ detail.problem?.name ?? '—' }} · {{ detail.language?.name ?? '—' }}

@@ -49,7 +49,12 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       </h2>
       <p class="line-clamp-2 min-h-12 text-muted [overflow-wrap:anywhere]">{{ excerpt }}</p>
       <footer class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-sm text-muted">
-        <UserName v-for="author in post.authors" :key="author.id" :username="author.username" />
+        <UserName
+          v-for="author in post.authors"
+          :key="author.id"
+          :username="author.username"
+          :rating="author.rating"
+        />
         <time :datetime="post.publishOn">
           {{ formatNumericDate(post.publishOn, locale.locale) }}
         </time>

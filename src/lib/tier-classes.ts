@@ -1,3 +1,4 @@
+import { ratingTier, tierColor } from './rating-tiers';
 import type { TierColor } from './rating-tiers';
 
 /** The text colour class of each rating tier's username (the tokens are `--color-tier-*`). */
@@ -23,3 +24,6 @@ export const TIER_FILL_CLASSES: Record<TierColor, string> = {
   master: 'fill-tier-master',
   grandmaster: 'fill-tier-grandmaster',
 };
+/** Colour class of a username: undefined rating (not known) keeps the body colour, null (unrated) the unrated tier colour. */
+export const ratingTextClass = (rating: number | null | undefined): string =>
+  rating === undefined ? 'text-content' : TIER_TEXT_CLASSES[tierColor(ratingTier(rating))];

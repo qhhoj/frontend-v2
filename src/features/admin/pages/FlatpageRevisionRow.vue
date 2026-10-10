@@ -37,7 +37,11 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
         >
       </td>
       <td class="px-3 py-2">
-        <AdminUserLabel v-if="revision.editor" :username="revision.editor.username" />
+        <AdminUserLabel
+          v-if="revision.editor"
+          :username="revision.editor.username"
+          :rating="revision.editor.rating"
+        />
         <span v-else class="text-muted">{{ t('admin.pages.history.deletedEditor') }}</span>
       </td>
       <td class="px-3 py-2">

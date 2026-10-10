@@ -36,12 +36,14 @@ const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
       <dt :class="DT">{{ $t('ticket.link') }}</dt>
       <dd :class="DD">{{ linkLabel }}</dd>
       <dt :class="DT">{{ $t('ticket.creator') }}</dt>
-      <dd :class="DD"><UserName :username="ticket.creator.username" /></dd>
+      <dd :class="DD">
+        <UserName :username="ticket.creator.username" :rating="ticket.creator.rating" />
+      </dd>
       <dt :class="DT">{{ $t('ticket.assignees') }}</dt>
       <dd :class="DD">
         <template v-if="ticket.assignees.length">
           <template v-for="(assignee, index) in ticket.assignees" :key="assignee.id">
-            <UserName :username="assignee.username" />
+            <UserName :username="assignee.username" :rating="assignee.rating" />
             <span v-if="index < ticket.assignees.length - 1">, </span>
           </template>
         </template>

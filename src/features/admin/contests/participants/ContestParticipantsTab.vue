@@ -117,7 +117,11 @@ const goToPage = (target: number) =>
             <tbody>
               <tr v-for="row in rows" :key="row.id" class="border-t border-line align-top">
                 <td class="px-2 py-3">
-                  <AdminUserLabel :username="row.user.username" :size="24" />
+                  <AdminUserLabel
+                    :username="row.user.username"
+                    :rating="row.user.rating"
+                    :size="24"
+                  />
                 </td>
                 <td class="hidden px-2 py-3 md:table-cell">
                   {{

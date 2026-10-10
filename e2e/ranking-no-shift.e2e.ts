@@ -170,7 +170,7 @@ const TABLE_CASES = [
             ? [
                 submissionItem({
                   problem: { code: 'long', name: LONG_NAME, isDeleted: false, points: 100 },
-                  user: { id: 'u', username: 'a_really_long_user_name_here' },
+                  user: { id: 'u', username: 'a_really_long_user_name_here', rating: null },
                   memory: 123456789,
                 }),
               ]

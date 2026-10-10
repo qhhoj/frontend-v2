@@ -59,7 +59,7 @@ export const contestSettings = (overrides: Partial<ContestSettings> = {}): Conte
   publishAfterEndBy: null,
   hasRankingAccessCode: false,
   problemOutputPrefixes: [],
-  users: [{ id: CURATOR_ID, username: 'admin_vnoj' }],
+  users: [{ id: CURATOR_ID, username: 'admin_vnoj', rating: null }],
   ...overrides,
 });
 
@@ -84,7 +84,7 @@ const contestBasics = (): Omit<EditableContest, 'problems' | 'viewer' | 'setting
   userCount: 214,
   isPrivate: false,
   isOrganizationPrivate: false,
-  authors: [{ id: 'id-thayhung', username: 'thayhung' }],
+  authors: [{ id: 'id-thayhung', username: 'thayhung', rating: null }],
   registrationStart: null,
   registrationEnd: null,
   frozenLastMinutes: 60,
@@ -204,7 +204,7 @@ export const participation = (overrides: Partial<Participation> = {}): Participa
   isDisqualified: false,
   realStart: '2026-10-08T06:00:00.000Z',
   endTime: '2026-10-08T10:00:00.000Z',
-  user: { id: 'id-ngocanh', username: 'ngocanh' },
+  user: { id: 'id-ngocanh', username: 'ngocanh', rating: null },
   score: 5,
   cumtime: 15120,
   rulesAcceptedAt: null,

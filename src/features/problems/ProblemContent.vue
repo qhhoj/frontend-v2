@@ -93,7 +93,7 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
           <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
             {{ $t('problem.authors') }}
             <template v-for="(author, index) in problem.authors" :key="author.id"
-              ><template v-if="index">, </template><UserName :username="author.username"
+              ><template v-if="index">, </template><UserName :username="author.username" :rating="author.rating"
             /></template>
           </p>
         </GlassCard>

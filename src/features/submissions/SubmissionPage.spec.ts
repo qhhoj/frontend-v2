@@ -283,7 +283,7 @@ describe('submission page', () => {
   });
 
   it("offers no Nộp lại on another user's submission", async () => {
-    const stranger = { id: 'someone-else', username: 'stranger' };
+    const stranger = { id: 'someone-else', username: 'stranger', rating: null };
     mockApi({
       ...signedInViewer(),
       ...submissionPageRoutes(submissionDetail({ user: stranger })),

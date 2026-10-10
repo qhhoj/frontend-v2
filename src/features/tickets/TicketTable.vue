@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TicketListItem } from '@/api/types/tickets';
+import UserName from '@/components/UserName.vue';
 import { formatAgo, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -66,9 +67,11 @@ const now = useNow(60_000);
             <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
           </td>
           <td :class="TICKET_COLUMNS.assignees.cell">
-            {{
-              ticket.assignees.map((user) => user.username).join(', ') || $t('tickets.unassigned')
-            }}
+            <template v-for="(user, index) in ticket.assignees" :key="user.id"
+              ><template v-if="index">, </template
+              ><UserName :username="user.username" :rating="user.rating"
+            /></template>
+            <template v-if="!ticket.assignees.length">{{ $t('tickets.unassigned') }}</template>
           </td>
           <td :class="TICKET_COLUMNS.messages.cell">
             {{ formatNumber(ticket.messageCount, locale.locale) }}

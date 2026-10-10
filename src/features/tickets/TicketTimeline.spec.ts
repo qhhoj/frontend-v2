@@ -12,8 +12,8 @@ import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
-const COLAN = { id: '0192a000-0000-7000-8000-000000000905', username: 'colan' };
-const HOANGANH = { id: '0192a000-0000-7000-8000-000000000906', username: 'hoanganh' };
+const COLAN = { id: '0192a000-0000-7000-8000-000000000905', username: 'colan', rating: null };
+const HOANGANH = { id: '0192a000-0000-7000-8000-000000000906', username: 'hoanganh', rating: null };
 const first = ticketMessage({ id: 'm1', createdAt: '2026-10-08T13:12:00Z' });
 const reply = ticketMessage({
   id: 'm2',
