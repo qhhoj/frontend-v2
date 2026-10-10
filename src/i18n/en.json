@@ -1609,7 +1609,10 @@
       "hide": "Hide",
       "more": "More actions",
       "lock": "Lock comments",
-      "unlock": "Unlock"
+      "unlock": "Unlock",
+      "delete": "Delete",
+      "report": "Report",
+      "unhide": "Unhide"
     },
     "composer": {
       "label": "Write a comment",
@@ -1630,22 +1633,33 @@
       "editing": "editing",
       "editHint": "Every save adds a version to the History.",
       "markdownHelp": "Markdown works: **bold**, `code`, ```cpp blocks and $…$ formulas.",
-      "reload": "Load the latest version"
+      "reload": "Load the latest version",
+      "views": "Composer view",
+      "tab": {
+        "write": "Write",
+        "preview": "Preview"
+      }
     },
     "gate": {
       "signedOutTitle": "Sign in to join the discussion.",
       "signIn": "Sign in to comment",
       "noAccount": "No account yet?",
       "register": "Register",
-      "gatedTitle": "You cannot comment yet",
-      "gatedBody": "Commenting and voting need at least {count} solved problems and an unmuted account. You can still read every comment.",
       "lockedTitle": "Comments on this page are locked",
       "lockedBody": "You can still read the existing comments, but not post new comments or replies.",
       "contestTitle": "Comments are hidden during the contest",
       "contestBody": "This problem is in the contest you are taking part in. Questions about the statement? See the",
       "contestLink": "contest announcements",
       "officialTitle": "Comments are closed",
-      "officialBody": "Comments are closed while the official contest runs."
+      "officialBody": "Comments are closed while the official contest runs.",
+      "needsSolvedTitle": "Solve at least {count} problems to comment",
+      "needsSolvedBody": "This keeps spam accounts out. You can still read every comment.",
+      "solved": "Solved",
+      "solvedLabel": "Problems solved",
+      "easyProblems": "See easy problems to start with",
+      "mutedTitle": "You are muted",
+      "mutedBody": "While muted you cannot comment, edit comments or vote. If you think this is a mistake,",
+      "mutedLink": "open a support ticket"
     },
     "failure": {
       "rateLimited": "You posted {limit} comments in {minutes} minutes. Wait a moment and try again — your text stays in the composer.",
@@ -1657,7 +1671,7 @@
     },
     "hide": {
       "title": "Hide the comment by {author}?",
-      "body": "Every reply to this comment is hidden with it. Users will no longer see them.",
+      "body": "Every reply to this comment is hidden with it. Users will no longer see them; you can unhide them later.",
       "confirm": "Hide comment",
       "failed": "Could not hide the comment. Try again."
     },
@@ -1676,7 +1690,53 @@
       "legend": "Lines marked − were removed, + are new. Raw Markdown.",
       "diffLabel": "Comparison of two versions",
       "loading": "Loading history…"
-    }
+    },
+    "preview": {
+      "empty": "Nothing to preview yet.",
+      "loading": "Rendering the preview…",
+      "failed": "The preview failed. You can still post the comment.",
+      "rateLimited": "Too many previews. Wait a moment and try again.",
+      "rateLimitedWait": "Too many previews. Try again in {seconds} s."
+    },
+    "hidden": {
+      "badge": "Hidden",
+      "by": "by {name}"
+    },
+    "deleted": {
+      "placeholder": "This comment was deleted.",
+      "quote": "(deleted comment)"
+    },
+    "delete": {
+      "title": "Delete comment #{number}?",
+      "body": "Its text is removed and a “deleted” line stays so replies keep their context. This cannot be undone.",
+      "confirm": "Delete comment",
+      "failed": "Could not delete the comment. Try again."
+    },
+    "report": {
+      "title": "Report the comment by {author}",
+      "body": "Moderators will review it. You can report each comment once.",
+      "confirm": "Send report",
+      "reasonLabel": "Reason",
+      "reason": {
+        "spam": "Spam or advertising",
+        "abuse": "Abuse or harassment",
+        "spoiler": "Spoils the solution",
+        "offTopic": "Off topic",
+        "other": "Something else"
+      },
+      "noteLabel": "Note for the moderators (optional)",
+      "sent": "Report sent. Thank you!",
+      "already": "You already reported this comment.",
+      "rateLimited": "You sent too many reports. Try again later.",
+      "gone": "This comment is gone.",
+      "own": "You cannot report your own comment."
+    },
+    "moderation": {
+      "lockedTitle": "Comments on this page are locked.",
+      "lockedOverride": "Other users can only read; you can still comment with the lock override.",
+      "lockedBody": "Other users can only read."
+    },
+    "unhideFailed": "Could not unhide the comment. Try again."
   },
   "tickets": {
     "lead": "Report statement mistakes, wrong tests or site problems. Staff answer here.",

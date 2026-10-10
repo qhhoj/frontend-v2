@@ -135,6 +135,11 @@ export const comment = (overrides: Partial<Comment> = {}): Comment => ({
   revisions: 0,
   viewerVote: 0,
   canEdit: false,
+  canDelete: false,
+  hidden: false,
+  hiddenBy: null,
+  deleted: false,
+  number: null,
   ...overrides,
 });
 export const commentThreadPage = (
@@ -142,7 +147,9 @@ export const commentThreadPage = (
 ): CommentThreadPage => ({
   page: { type: 'blog', key: communityId(601), title: postItem().title },
   locked: false,
+  pageLocked: false,
   canComment: true,
+  postBlock: null,
   comments: [comment()],
   pagination: { page: 1, pageSize: 20, total: 1 },
   ...overrides,

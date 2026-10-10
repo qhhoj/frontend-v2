@@ -16,3 +16,9 @@ export function commentPageRoute(link: CommentPageLink): RouteLocationRaw | null
       return null;
   }
 }
+
+/** One comment on its screen: the page's route with the `#comment-<id>` anchor (which also opens the right listing page). */
+export function commentRoute(link: CommentPageLink, commentId: string): RouteLocationRaw | null {
+  const route = commentPageRoute(link);
+  return route && typeof route === 'object' ? { ...route, hash: `#comment-${commentId}` } : null;
+}

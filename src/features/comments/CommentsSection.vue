@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Lock, LockOpen } from 'lucide-vue-next';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import type { CommentPageType } from '@/api/types/comments';
@@ -17,19 +18,21 @@ import { useSessionStore } from '@/stores/session.store';
 import CommentComposer from './CommentComposer.vue';
 import CommentGate from './CommentGate.vue';
 import CommentItem from './CommentItem.vue';
+import CommentReportDialog from './CommentReportDialog.vue';
 import CommentRevisionsDialog from './CommentRevisionsDialog.vue';
 import { commentFailureOf } from './comment-failure';
 import type { CommentFailure } from './comment-failure';
 import { flattenInTimeOrder } from './comment-order';
 import type { NumberedComment } from './comment-order';
-import { commentAnchor, quoteOf } from './comment-quote';
+import { quoteOf } from './comment-quote';
 import { canReplyTo, composerStateOf } from './composer-state';
 import { useCommentPageQuery, useCommentWrites } from './comments.queries';
+import { useCommentJump } from './use-comment-jump';
 
 /**
  * The comments of one page, layout C2 ("flat, with quotes"): one list in time order, a reply quoting the comment it answers,
- * the composer (or why there is none) below, moderators' lock and hide. `contestKey`: the viewer's running contest holds this
- * problem, so a locked answer means the backend hid the thread from a contestant.
+ * the composer (or why there is none, from the backend's `postBlock`) below; delete, report, and moderators' lock, hide and unhide
+ * (moderators also get the hidden comments). `contestKey` links the announcements of the viewer's running contest.
  */
 const props = withDefaults(
   defineProps<{
@@ -44,6 +47,7 @@ const PAGE_QUERY = 'commentPage';
 const MODERATE_PERMISSION = 'judge.change_comment';
 
 const route = useRoute();
+const { t } = useI18n();
 const session = useSessionStore();
 const isPhone = useMediaQuery(PHONE_QUERY);
 const now = useNow(60_000);
@@ -64,7 +68,7 @@ const isOfficialClosed = computed(
   () => error.value instanceof ApiError && error.value.code === 'forbidden',
 );
 const isUnreadable = computed(() => error.value instanceof ApiError && error.value.status === 404);
-const isContestHidden = computed(() => Boolean(props.contestKey && data.value?.locked));
+const isContestHidden = computed(() => data.value?.postBlock?.reason === 'contest');
 const composerState = computed(() => data.value && composerStateOf(isSignedIn.value, data.value));
 
 const entries = computed(() => flattenInTimeOrder(data.value?.comments ?? []));
@@ -74,6 +78,8 @@ const quoteFor = (entry: NumberedComment) =>
 const lastPage = computed(() => (data.value ? lastPageOf(data.value.pagination) : 1));
 const canReplyToEntry = (entry: NumberedComment) =>
   canReplyTo(entry.comment.createdAt, now.value, moderates.value);
+const authorOf = (entry: NumberedComment | null) =>
+  entry?.comment.author?.username ?? t('comments.deletedAccount');
 
 // The composer: a new comment or a reply.
 const composer = ref<{ focus: () => Promise<void> } | null>(null);
@@ -149,10 +155,49 @@ async function toggleLock() {
   if (!data.value) return;
   lockFailed.value = false;
   try {
-    await writes.setLocked.mutateAsync(!data.value.locked);
+    await writes.setLocked.mutateAsync(!data.value.pageLocked);
   } catch {
     lockFailed.value = true;
   }
+}
+
+const unhideFailedId = ref<string | null>(null);
+async function unhide(entry: NumberedComment) {
+  unhideFailedId.value = null;
+  try {
+    await writes.unhide.mutateAsync(entry.comment.id);
+  } catch {
+    unhideFailedId.value = entry.comment.id;
+  }
+}
+
+// Delete (the author, or a moderator): a confirm, then the placeholder.
+const deleteTarget = ref<NumberedComment | null>(null);
+const isDeleteOpen = ref(false);
+const deleteFailed = ref(false);
+function askDelete(entry: NumberedComment) {
+  deleteTarget.value = entry;
+  deleteFailed.value = false;
+  isDeleteOpen.value = true;
+}
+async function confirmDelete() {
+  if (!deleteTarget.value) return;
+  try {
+    await writes.remove.mutateAsync(deleteTarget.value.comment.id);
+    isDeleteOpen.value = false;
+  } catch {
+    deleteFailed.value = true;
+  }
+}
+
+// Report: a dialog, then a thank-you line.
+const reportTarget = ref<NumberedComment | null>(null);
+const isReportOpen = ref(false);
+const reportSent = ref(false);
+function askReport(entry: NumberedComment) {
+  reportTarget.value = entry;
+  reportSent.value = false;
+  isReportOpen.value = true;
 }
 
 const historyId = ref<string | null>(null);
@@ -173,16 +218,13 @@ watch(
   },
 );
 
-/** A `#comment-<id>` link scrolls once the list holding it has rendered (the router's own scroll runs before the fetch ends). */
-watch(
-  () => [data.value, route.hash] as const,
-  async ([loaded, hash]) => {
-    if (!loaded || !hash.startsWith(`#${commentAnchor('')}`)) return;
-    await nextTick();
-    document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
-  },
-  { immediate: true },
-);
+useCommentJump({
+  type: () => props.type,
+  pageKey: () => props.pageKey,
+  pageNumber: () => pageNumber.value,
+  pageQuery: PAGE_QUERY,
+  shownIds: () => (data.value ? new Set(byId.value.keys()) : null),
+});
 </script>
 
 <template>
@@ -208,14 +250,37 @@ watch(
         v-if="data && moderates && !isContestHidden"
         type="button"
         class="ml-auto inline-flex min-h-10 items-center gap-1.5 self-center rounded-pill border border-line px-3.5 text-sm font-semibold text-accent-text hover:bg-surface-hover"
-        :aria-pressed="data.locked"
+        :aria-pressed="data.pageLocked"
         :aria-busy="writes.setLocked.isPending.value || undefined"
         @click="toggleLock"
       >
-        <component :is="data.locked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
-        {{ $t(data.locked ? 'comments.action.unlock' : 'comments.action.lock') }}
+        <component :is="data.pageLocked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
+        {{ $t(data.pageLocked ? 'comments.action.unlock' : 'comments.action.lock') }}
       </button>
     </div>
+    <p
+      v-if="data && moderates && data.pageLocked && !isContestHidden"
+      role="status"
+      class="flex items-center gap-2.5 rounded-card border border-line bg-surface-strong px-4 py-3 text-sm"
+    >
+      <Lock aria-hidden="true" class="size-5 shrink-0" />
+      <span>
+        <strong>{{ $t('comments.moderation.lockedTitle') }}</strong>
+        {{
+          $t(
+            data.canComment
+              ? 'comments.moderation.lockedOverride'
+              : 'comments.moderation.lockedBody',
+          )
+        }}
+      </span>
+    </p>
+    <p v-if="reportSent" role="status" class="text-sm text-muted">
+      {{ $t('comments.report.sent') }}
+    </p>
+    <p v-if="unhideFailedId" role="alert" class="text-sm text-negative">
+      {{ $t('comments.unhideFailed') }}
+    </p>
     <p v-if="lockFailed" role="alert" class="text-sm text-negative">
       {{ $t('comments.lockFailed') }}
     </p>
@@ -241,12 +306,16 @@ watch(
               :can-reply="composerState === 'ready' && canReplyToEntry(entry)"
               :is-past-reply-window="composerState === 'ready' && !canReplyToEntry(entry)"
               :moderates="moderates"
+              :can-report="isSignedIn && entry.comment.author?.id !== session.user?.id"
               :is-editing="editingId === entry.comment.id"
               :is-phone="isPhone"
               @reply="startReply(entry)"
               @edit="startEdit(entry)"
               @history="showHistory(entry)"
               @hide="askHide(entry)"
+              @unhide="unhide(entry)"
+              @delete="askDelete(entry)"
+              @report="askReport(entry)"
             >
               <CommentComposer
                 v-model="editDraft"
@@ -292,7 +361,14 @@ watch(
             @submit="sendComment"
             @cancel-reply="replyToId = null"
           />
-          <CommentGate v-else-if="composerState" :reason="composerState" class="mt-2" />
+          <CommentGate
+            v-else-if="composerState"
+            :reason="composerState"
+            :contest-key="contestKey"
+            :solved="data.postBlock?.solved"
+            :required="data.postBlock?.required"
+            class="mt-2"
+          />
         </template>
       </template>
     </QueryState>
@@ -302,7 +378,7 @@ watch(
       tone="danger"
       :title="
         $t('comments.hide.title', {
-          author: hideTarget?.comment.author?.username ?? $t('comments.deletedAccount'),
+          author: authorOf(hideTarget),
         })
       "
       :body="$t('comments.hide.body')"
@@ -316,6 +392,28 @@ watch(
         </p>
       </template>
     </ConfirmDialog>
+    <ConfirmDialog
+      v-model:visible="isDeleteOpen"
+      tone="danger"
+      :title="$t('comments.delete.title', { number: deleteTarget?.number ?? '' })"
+      :body="$t('comments.delete.body')"
+      :confirm-label="$t('comments.delete.confirm')"
+      :busy="writes.remove.isPending.value"
+      @confirm="confirmDelete"
+    >
+      <template #error>
+        <p v-if="deleteFailed" role="alert" class="text-sm text-negative">
+          {{ $t('comments.delete.failed') }}
+        </p>
+      </template>
+    </ConfirmDialog>
+    <CommentReportDialog
+      v-if="reportTarget"
+      v-model:visible="isReportOpen"
+      :comment-id="reportTarget.comment.id"
+      :author="authorOf(reportTarget)"
+      @sent="reportSent = true"
+    />
     <CommentRevisionsDialog
       v-if="historyId"
       v-model:visible="isHistoryOpen"

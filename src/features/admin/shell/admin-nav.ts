@@ -8,6 +8,7 @@ import {
   Download,
   FileText,
   Files,
+  Flag,
   Gauge,
   GitCompare,
   History,
@@ -75,6 +76,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('problemImport', Download),
     screenItem('types', Tags),
     screenItem('posts', Newspaper),
+    screenItem('commentReports', Flag),
   ]),
   group('contests', [
     screenItem('contests', Trophy),

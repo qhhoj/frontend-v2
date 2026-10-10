@@ -18,6 +18,7 @@ describe('quoteOf', () => {
       number: 1,
       author: 'lananh.cp',
       excerpt: 'Đề bài C ghi n ≤ 10^5',
+      isDeleted: false,
       href: '#comment-p1',
     });
   });
@@ -40,7 +41,13 @@ describe('quoteOf', () => {
       number: null,
       author: null,
       excerpt: '',
+      isDeleted: false,
       href: '#comment-missing',
     });
+  });
+
+  it('marks a deleted parent, whose body is gone', () => {
+    const quote = quoteOf('p1', pageOf(comment({ id: 'p1', deleted: true, bodyHtml: '' })));
+    expect(quote).toMatchObject({ isDeleted: true, excerpt: '' });
   });
 });

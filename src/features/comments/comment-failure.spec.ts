@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { commentFailureOf } from './comment-failure';
+import { commentFailureOf, reportFailureKey } from './comment-failure';
 
 describe('commentFailureOf', () => {
   it('names the post rate on a 429 and the wait when the server sent one', () => {
@@ -36,5 +36,16 @@ describe('commentFailureOf', () => {
       key: 'errors.generic',
       refreshesPage: false,
     });
+  });
+});
+
+describe('reportFailureKey', () => {
+  it('says why a report was refused', () => {
+    expect(reportFailureKey(new ApiError('conflict', 409, 'x'))).toBe('comments.report.already');
+    expect(reportFailureKey(new ApiError('rate_limited', 429, 'x'))).toBe(
+      'comments.report.rateLimited',
+    );
+    expect(reportFailureKey(new ApiError('not_found', 404, 'x'))).toBe('comments.report.gone');
+    expect(reportFailureKey(new ApiError('forbidden', 403, 'x'))).toBe('comments.report.own');
   });
 });

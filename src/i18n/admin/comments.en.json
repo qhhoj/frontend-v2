@@ -1,0 +1,22 @@
+{
+  "crumbs": {
+    "content": "Content",
+    "reports": "Reported comments"
+  },
+  "title": "Reported comments",
+  "lead": "Each row is a comment with open reports, newest first. Open the comment to hide or delete it, then resolve or dismiss its reports.",
+  "empty": "No open reports.",
+  "reporters": "{count} reporter | {count} reporters",
+  "chips": {
+    "hidden": "Hidden",
+    "deleted": "Deleted"
+  },
+  "resolve": "Resolve",
+  "dismiss": "Dismiss",
+  "settled": {
+    "resolved": "Reports marked resolved.",
+    "dismissed": "Reports dismissed."
+  },
+  "settleFailed": "Could not update the reports. They may be settled already; reload.",
+  "pager": "Report pages"
+}

@@ -33,3 +33,22 @@ export const COMMENT_RATE_LIMIT = 10;
 export const COMMENT_RATE_WINDOW_MINUTES = 5;
 /** backend: libs/community interaction.ts (INTERACT_MIN_PROBLEM_COUNT) */
 export const INTERACT_MIN_PROBLEM_COUNT = 5;
+/** backend: comment.response.ts (CommentPostBlockResponse); why the viewer cannot comment. */
+export type CommentPostBlock = Schemas['CommentPostBlockResponse'];
+export type CommentPostBlockReason = Schemas['CommentPostBlockReason'];
+/** backend: comment.response.ts (CommentLocationResponse) */
+export type CommentLocation = Schemas['CommentLocationResponse'];
+/** backend: comments/reports/dto/comment-report-queue-item.response.ts */
+export type CommentReportQueueItem = Schemas['CommentReportQueueItemResponse'];
+export type CommentReportReason = Schemas['CommentReportReason'];
+export type CommentReportOutcome = Schemas['CommentReportOutcome'];
+/** backend: libs/database comment-report.schema.ts COMMENT_REPORT_REASONS */
+export const COMMENT_REPORT_REASONS = [
+  'spam',
+  'abuse',
+  'spoiler',
+  'offTopic',
+  'other',
+] as const satisfies readonly CommentReportReason[];
+/** backend: comments/reports/dto/report-comment.dto.ts REPORT_NOTE_MAX_LENGTH */
+export const COMMENT_REPORT_NOTE_MAX_LENGTH = 500;

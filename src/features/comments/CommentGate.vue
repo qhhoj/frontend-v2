@@ -5,12 +5,24 @@ import { useRoute } from 'vue-router';
 import { INTERACT_MIN_PROBLEM_COUNT } from '@/api/types/comments';
 import InlineBit from '@/components/InlineBit.vue';
 import { safeRedirect } from '@/router/safe-redirect';
+import { solvedPercent } from './composer-state';
 
-/** Why there is no composer, in the composer's place: sign in, the solve/mute gate, a locked page, the viewer's running contest, official contest mode. */
-const props = defineProps<{
-  reason: 'signedOut' | 'gated' | 'locked' | 'contest' | 'official';
-  contestKey?: string | null;
-}>();
+/**
+ * Why there is no composer, in the composer's place: sign in, too few solved problems (with the progress), a muted account,
+ * a locked page, the viewer's running contest, official contest mode.
+ */
+const props = withDefaults(
+  defineProps<{
+    reason: 'signedOut' | 'needsSolved' | 'muted' | 'locked' | 'contest' | 'official';
+    contestKey?: string | null;
+    solved?: number | null;
+    required?: number | null;
+  }>(),
+  { contestKey: null, solved: null, required: null },
+);
+const requiredCount = computed(() => props.required ?? INTERACT_MIN_PROBLEM_COUNT);
+const solvedCount = computed(() => props.solved ?? 0);
+const EASY_PROBLEMS = { name: 'problems', query: { sort: '-userCount' } };
 const route = useRoute();
 const signIn = computed(() => ({
   name: 'login',
@@ -24,7 +36,8 @@ const titleKey = computed(
   () =>
     ({
       signedOut: 'comments.gate.signedOutTitle',
-      gated: 'comments.gate.gatedTitle',
+      needsSolved: 'comments.gate.needsSolvedTitle',
+      muted: 'comments.gate.mutedTitle',
       locked: 'comments.gate.lockedTitle',
       contest: 'comments.gate.contestTitle',
       official: 'comments.gate.officialTitle',
@@ -36,11 +49,16 @@ const titleKey = computed(
   <div
     data-testid="comment-gate"
     :data-reason="reason"
-    class="flex flex-col items-center gap-2 rounded-card border border-line bg-surface-solid px-5 py-6 text-center"
+    class="flex flex-col gap-2 rounded-card border border-line bg-surface-solid px-5 py-6"
+    :class="
+      reason === 'needsSolved' || reason === 'muted' ? 'items-start' : 'items-center text-center'
+    "
   >
     <Lock v-if="reason === 'locked'" aria-hidden="true" class="size-6 text-muted" />
-    <InlineBit v-else-if="reason !== 'signedOut'" kind="security" />
-    <p class="font-display font-semibold text-content">{{ $t(titleKey) }}</p>
+    <InlineBit v-else-if="reason !== 'signedOut' && reason !== 'needsSolved'" kind="security" />
+    <p class="font-display font-semibold text-content">
+      {{ $t(titleKey, { count: requiredCount }) }}
+    </p>
     <template v-if="reason === 'signedOut'">
       <RouterLink
         :to="signIn"
@@ -56,8 +74,43 @@ const titleKey = computed(
         </RouterLink>
       </p>
     </template>
-    <p v-else-if="reason === 'gated'" class="max-w-md text-sm text-muted">
-      {{ $t('comments.gate.gatedBody', { count: INTERACT_MIN_PROBLEM_COUNT }) }}
+    <template v-else-if="reason === 'needsSolved'">
+      <p class="max-w-md text-sm text-muted">{{ $t('comments.gate.needsSolvedBody') }}</p>
+      <div class="w-full max-w-md">
+        <div class="mb-1.5 flex justify-between text-sm">
+          <span>{{ $t('comments.gate.solved') }}</span>
+          <span class="font-mono font-semibold tabular-nums"
+            >{{ solvedCount }} / {{ requiredCount }}</span
+          >
+        </div>
+        <div
+          role="progressbar"
+          :aria-label="$t('comments.gate.solvedLabel')"
+          aria-valuemin="0"
+          :aria-valuemax="requiredCount"
+          :aria-valuenow="Math.min(solvedCount, requiredCount)"
+          class="h-2 overflow-hidden rounded-pill bg-surface-strong"
+        >
+          <div
+            class="h-full rounded-pill bg-positive"
+            :style="{ width: `${solvedPercent(solvedCount, requiredCount)}%` }"
+          />
+        </div>
+      </div>
+      <RouterLink
+        :to="EASY_PROBLEMS"
+        class="text-sm font-semibold text-accent-text hover:underline"
+      >
+        {{ $t('comments.gate.easyProblems') }}
+      </RouterLink>
+    </template>
+    <p v-else-if="reason === 'muted'" class="max-w-md text-sm text-muted">
+      {{ $t('comments.gate.mutedBody') }}
+      <RouterLink
+        :to="{ name: 'ticket-new' }"
+        class="font-semibold text-accent-text hover:underline"
+        >{{ $t('comments.gate.mutedLink') }}</RouterLink
+      >.
     </p>
     <p v-else-if="reason === 'locked'" class="max-w-md text-sm text-muted">
       {{ $t('comments.gate.lockedBody') }}
