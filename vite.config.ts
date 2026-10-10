@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vitest/config';
+import { exemptFromRocketLoader } from './scripts/exempt-rocket-loader';
 
 /** The api the dev server proxies `/api` to; same origin keeps the session cookie and the Origin check (`SITE_URL=http://localhost:5173`). */
 const apiOrigin = process.env.API_ORIGIN ?? 'http://localhost:3000';
@@ -35,7 +36,14 @@ function buildCommit(): string {
 }
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    {
+      name: 'exempt-rocket-loader',
+      transformIndexHtml: { order: 'post', handler: exemptFromRocketLoader },
+    },
+  ],
   define: {
     __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
     __APP_COMMIT__: JSON.stringify(buildCommit()),

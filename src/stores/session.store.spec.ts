@@ -76,6 +76,44 @@ describe('useSessionStore', () => {
     expect(session.status).toBe('anonymous');
   });
 
+  it('signs out at once, without waiting for the server to answer', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout': noContent() });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    let answered = false;
+    const realFetch = globalThis.fetch;
+    vi.stubGlobal('fetch', async (...args: Parameters<typeof fetch>) => {
+      const response = await realFetch(...args);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      answered = true;
+      return response;
+    });
+    await session.logout();
+    expect(session.status).toBe('anonymous');
+    expect(answered).toBe(false);
+    expect(calls.at(-1)!.path).toBe('/auth/logout');
+  });
+
+  it('holds a login back until the sign-out request has finished', async () => {
+    const order: string[] = [];
+    mockApi({
+      'GET /auth/me': signedIn(),
+      'POST /auth/logout': () => {
+        order.push('logout');
+        return noContent();
+      },
+      'POST /auth/login': () => {
+        order.push('login');
+        return signedIn();
+      },
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await session.logout();
+    await session.login({ username: 'user_01', password: 'secret-password' });
+    expect(order).toEqual(['logout', 'login']);
+  });
+
   it('becomes anonymous when a request answers 401 after the session expired', async () => {
     mockApi({
       'GET /auth/me': signedIn(),

@@ -11,12 +11,13 @@ import AuthNotice from './AuthNotice.vue';
 import AuthSubmit from './AuthSubmit.vue';
 import LoginBrandPanel from './LoginBrandPanel.vue';
 import SocialButtons from './SocialButtons.vue';
-import { useAfterSignIn } from './use-after-sign-in';
+import { useAfterSignIn, usePreloadAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
 
 const session = useSessionStore();
 const route = useRoute();
 const afterSignIn = useAfterSignIn();
+const preloadAfterSignIn = usePreloadAfterSignIn();
 const form = reactive({ username: '', password: '' });
 const formElement = ref<HTMLFormElement | null>(null);
 const { pending, error, fieldErrors, summary, dismiss, run } = useAuthAction(formElement, [
@@ -43,6 +44,7 @@ const LINK = 'font-semibold text-accent-text underline';
 
 const submit = () =>
   run(async () => {
+    preloadAfterSignIn();
     await session.login({ ...form });
     await afterSignIn();
   });

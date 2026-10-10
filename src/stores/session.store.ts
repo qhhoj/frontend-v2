@@ -47,6 +47,8 @@ export const useSessionStore = defineStore('session', () => {
   const twoFactor = ref<TwoFactorPending | null>(null);
   const isStaff = computed(() => user.value?.isStaff ?? false);
   let loading: Promise<void> | null = null;
+  /** The sign-out request still in flight: a later login or reload waits for it, so it cannot end the new session. */
+  let signingOut: Promise<void> = Promise.resolve();
 
   function apply(session: SessionResponse | null) {
     const fields = sessionFields(session);
@@ -60,6 +62,7 @@ export const useSessionStore = defineStore('session', () => {
 
   /** 401 means signed out; any other failure leaves the status unknown and is rethrown. */
   async function refresh() {
+    await signingOut;
     try {
       apply(await fetchSession());
     } catch (error) {
@@ -75,16 +78,25 @@ export const useSessionStore = defineStore('session', () => {
     return loading;
   }
 
-  const login = async (body: LoginBody) => apply(await loginRequest(body));
+  const login = async (body: LoginBody) => {
+    await signingOut;
+    apply(await loginRequest(body));
+  };
 
   /** Finishing a social signup opens the session like a password login does. */
-  const completeSocialSignup = async (body: SocialCompleteBody) =>
+  const completeSocialSignup = async (body: SocialCompleteBody) => {
+    await signingOut;
     apply(await completeSocialSignupRequest(body));
+  };
 
-  /** Ends the session here even if the server cannot be told. */
-  async function logout() {
-    await logoutRequest().catch(() => undefined);
+  /** Ends the session here at once, without waiting for the server (it may be unreachable, and the viewer need not wait for it). */
+  function logout() {
+    signingOut = logoutRequest().then(
+      () => undefined,
+      () => undefined,
+    );
     apply(null);
+    return Promise.resolve();
   }
 
   /** The server ended this viewer's session and this tab could not learn it: the guest state, with no request. */
