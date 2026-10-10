@@ -5664,6 +5664,7 @@ export interface components {
             isSuperuser: boolean;
             /** Format: date-time */
             lastAccess: string | null;
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
             username: string;
         };
@@ -6398,6 +6399,7 @@ export interface components {
             isWebauthnEnabled: boolean;
             languageId: string | null;
             permissions: string[];
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
             siteTheme: string;
             username: string;

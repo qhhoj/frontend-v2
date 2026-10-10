@@ -39,9 +39,8 @@ const items = computed<MenuItem[]>(() => [
       <span
         :class="['min-w-0 truncate', ratingTextClass(session.user.rating)]"
         :title="session.user.username"
-        >{{
-        session.user.username
-      }}</span>
+        >{{ session.user.username }}</span
+      >
       <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />
     </button>
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false" />

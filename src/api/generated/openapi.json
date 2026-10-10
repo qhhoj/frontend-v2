@@ -8271,6 +8271,7 @@
             "type": "string"
           },
           "rating": {
+            "description": "Contest rating; null while unrated.",
             "nullable": true,
             "type": "number"
           },
@@ -11086,6 +11087,7 @@
             "type": "array"
           },
           "rating": {
+            "description": "Contest rating; null while unrated.",
             "nullable": true,
             "type": "number"
           },
