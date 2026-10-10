@@ -1013,7 +1013,7 @@
     "solved": "Solved",
     "attempted": "Attempted",
     "solve": "Solve",
-    "loadMore": "Load more problems",
+    "pager": "Problem pages",
     "empty": "No matching problems.",
     "searchLabel": "Search",
     "typesLabel": "Problem type",

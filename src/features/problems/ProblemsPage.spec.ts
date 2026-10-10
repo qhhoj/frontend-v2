@@ -1,5 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   problemDetail,
   problemItem,
@@ -39,7 +39,13 @@ const anonymous = (list: MockHandler = page(threeProblems, { total: 2318 })) => 
 const lastListQuery = (calls: { path: string; query: URLSearchParams }[]) =>
   calls.filter((call) => call.path === '/problems').at(-1)!.query;
 
+const scrollIntoView = vi.fn();
+
 describe('problem list', () => {
+  beforeEach(() => {
+    scrollIntoView.mockClear();
+    Element.prototype.scrollIntoView = scrollIntoView;
+  });
   afterEach(() => vi.useRealTimers());
 
   it("lists problems with topics, numbers and the viewer's status", async () => {
@@ -255,7 +261,7 @@ describe('problem list', () => {
     );
   });
 
-  it('keeps the loaded rows when loading more fails', async () => {
+  it('keeps the shown page and offers a retry when the next page fails', async () => {
     mockApi(
       anonymous(({ query }) =>
         query.get('page') === '2'
@@ -265,11 +271,9 @@ describe('problem list', () => {
     );
     const { wrapper } = await mountApp('/problems');
     await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tải thêm bài')!
+      .get('nav[aria-label="Các trang bài tập"] a[aria-label="Trang sau"]')
       .trigger('click');
     await flushPromises();
-    expect(wrapper.findAll('tbody tr')).toHaveLength(2);
     expect(wrapper.find('[role="alert"]').exists()).toBe(true);
   });
 
@@ -302,27 +306,58 @@ describe('problem list', () => {
     expect(header().attributes('aria-sort')).toBe('ascending');
   });
 
-  it('loads more pages until every problem is shown', async () => {
-    const calls = mockApi(
+  const twoPages = () =>
+    mockApi(
       anonymous(({ query }) =>
         query.get('page') === '2'
           ? page([threeProblems[2]], { page: 2, pageSize: 2, total: 3 })
           : page(threeProblems.slice(0, 2), { pageSize: 2, total: 3 }),
       ),
     );
-    const { wrapper } = await mountApp('/problems');
+
+  it('shows one numbered page at a time and resumes the page from the URL', async () => {
+    const calls = twoPages();
+    const { wrapper, router } = await mountApp('/problems');
     expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+    expect(wrapper.get('nav[aria-label="Các trang bài tập"] [aria-current="page"]').text()).toBe(
+      '1',
+    );
     await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tải thêm bài')!
+      .get('nav[aria-label="Các trang bài tập"] a[aria-label="Trang sau"]')
       .trigger('click');
     await flushPromises();
+    expect(router.currentRoute.value.query.page).toBe('2');
     expect(lastListQuery(calls).get('page')).toBe('2');
-    expect(wrapper.findAll('tbody tr')).toHaveLength(3);
-    expect(wrapper.findAll('button').some((button) => button.text() === 'Tải thêm bài')).toBe(
-      false,
+    expect(wrapper.findAll('tbody tr')).toHaveLength(1);
+    expect(wrapper.get('nav[aria-label="Các trang bài tập"] [aria-current="page"]').text()).toBe(
+      '2',
     );
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    const reloaded = await mountApp('/problems?page=2');
+    expect(reloaded.wrapper.findAll('tbody tr')).toHaveLength(1);
   });
+
+  it('goes back to page 1 when a filter or the sort changes', async () => {
+    twoPages();
+    const { wrapper, router } = await mountApp('/problems?page=2&min=800');
+    await wrapper.get('th button').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.page).toBeUndefined();
+    expect(router.currentRoute.value.query.min).toBe('800');
+  });
+
+  it.each(['999', 'abc', '0', '1'])(
+    'replaces an unusable or out-of-range ?page=%s with a valid page',
+    async (raw) => {
+      twoPages();
+      const { wrapper, router } = await mountApp(`/problems?sort=points&page=${raw}`);
+      await flushPromises();
+      const expected = raw === '999' ? '2' : undefined;
+      expect(router.currentRoute.value.query.page).toBe(expected);
+      expect(router.currentRoute.value.query.sort).toBe('points');
+      expect(wrapper.find('tbody tr').exists()).toBe(true);
+    },
+  );
 
   it('sets a points range from the popover', async () => {
     mockApi(anonymous());

@@ -2,6 +2,7 @@ import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { LocationQuery, LocationQueryRaw, LocationQueryValue } from 'vue-router';
 import { isProblemSort } from '@/api/types/problems';
+import { pageFromQuery } from '@/lib/paging';
 import type { ProblemListQuery, ProblemSort } from '@/api/types/problems';
 
 export interface ProblemFilters {
@@ -83,9 +84,11 @@ export function useProblemFilters() {
   const route = useRoute();
   const router = useRouter();
   const filters = computed(() => parseProblemFilters(route.query));
-  /** A new history entry per change, so the back button undoes it. */
+  /** The resume token: `?page=N`, 1 when absent or unusable. */
+  const page = computed(() => pageFromQuery(route.query.page));
+  /** A new history entry per change, so the back button undoes it. Any filter or sort change drops `page`, back to page 1. */
   const update = (patch: Partial<ProblemFilters>) =>
     void router.push({ query: toProblemQuery({ ...filters.value, ...patch }) });
   const clearAll = () => update({ ...NO_FILTERS, sort: filters.value.sort });
-  return { filters, update, clearAll };
+  return { filters, page, update, clearAll };
 }
