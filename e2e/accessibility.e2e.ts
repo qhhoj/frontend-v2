@@ -17,7 +17,7 @@ const PAGES = [
   },
   {
     path: '/problems',
-    ready: { anonymous: 'Chọn bài, bắt đầu giải', 'signed-in': 'Chọn bài, bắt đầu giải' },
+    ready: { anonymous: 'Bài tập', 'signed-in': 'Bài tập' },
   },
   {
     path: '/contests/r42/ranking',

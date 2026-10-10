@@ -1,25 +1,17 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp } from 'lucide-vue-next';
-import type { ProblemListItem, ProblemSort, ProblemSortField } from '@/api/types/problems';
-import TokenCoin from '@/components/TokenCoin.vue';
-import { formatNumber, formatProblemPoints, initials } from '@/lib/format';
+import type { ProblemListItem, ProblemSort } from '@/api/types/problems';
+import { formatNumber, formatProblemPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import ProblemStatusChip from './ProblemStatusChip.vue';
+import ProblemStatusMark from './ProblemStatusMark.vue';
+import ProblemTableColumns from './ProblemTableColumns.vue';
+import ProblemTableHead from './ProblemTableHead.vue';
+import { tierOf } from './problem-tier';
 
-const props = defineProps<{ problems: ProblemListItem[]; sort: ProblemSort | null }>();
+defineProps<{ problems: ProblemListItem[]; sort: ProblemSort | null }>();
 const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
 const locale = useLocaleStore();
 
-const SORTABLE = [
-  { field: 'points', labelKey: 'problems.columns.points' },
-  { field: 'acRate', labelKey: 'problems.columns.acRate' },
-  { field: 'userCount', labelKey: 'problems.columns.users' },
-] as const;
-const ariaSort = (field: ProblemSortField) =>
-  props.sort === field ? 'ascending' : props.sort === `-${field}` ? 'descending' : 'none';
-/** Highest first on the first click, then lowest first. */
-const nextSort = (field: ProblemSortField): ProblemSort =>
-  props.sort === `-${field}` ? field : `-${field}`;
+const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff-4' } as const;
 </script>
 
 <template>
@@ -29,76 +21,49 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
     :aria-label="$t('problems.scrollRegion')"
     class="overflow-x-auto focus-visible:-outline-offset-2"
   >
-    <table class="w-full min-w-[900px] table-fixed border-collapse text-[15px]">
+    <table class="w-full min-w-[900px] table-fixed border-collapse text-[14.5px]">
       <caption class="sr-only">
         {{
           $t('problems.listName')
         }}
       </caption>
-      <thead>
-        <tr class="text-left text-[13px] text-muted">
-          <th scope="col" class="px-6 py-4 font-medium">{{ $t('problems.columns.problem') }}</th>
-          <th scope="col" class="w-40 px-2.5 py-4 font-medium">
-            {{ $t('problems.columns.types') }}
-          </th>
-          <th
-            v-for="column in SORTABLE"
-            :key="column.field"
-            scope="col"
-            :aria-sort="ariaSort(column.field)"
-            class="w-24 px-2.5 py-2 text-right font-medium"
-          >
-            <button
-              type="button"
-              class="inline-flex min-h-11 items-center gap-1 hover:text-content"
-              @click="emit('sort', nextSort(column.field))"
-            >
-              {{ $t(column.labelKey) }}
-              <ArrowDown v-if="sort === `-${column.field}`" class="size-3.5" aria-hidden="true" />
-              <ArrowUp v-else-if="sort === column.field" class="size-3.5" aria-hidden="true" />
-            </button>
-          </th>
-          <th scope="col" class="w-28 px-6 py-4 text-right font-medium">
-            {{ $t('problems.columns.status') }}
-          </th>
-        </tr>
-      </thead>
+      <ProblemTableColumns />
+      <ProblemTableHead :sort="sort" interactive @sort="emit('sort', $event)" />
       <tbody>
-        <tr v-for="problem in problems" :key="problem.id" class="border-t border-line">
-          <td class="px-6 py-3.5">
-            <div class="flex items-center gap-3">
-              <TokenCoin :seed="problem.code" :label="initials(problem.name)" />
-              <div>
-                <RouterLink
-                  :to="{ name: 'problem', params: { code: problem.code } }"
-                  class="font-semibold text-content hover:underline"
-                  >{{ problem.name }}</RouterLink
-                >
-                <div class="font-mono text-xs text-muted">{{ problem.code }}</div>
-              </div>
-            </div>
+        <tr
+          v-for="problem in problems"
+          :key="problem.id"
+          class="relative border-t border-line hover:bg-surface-hover"
+        >
+          <td class="py-2.5 pl-[22px]"><ProblemStatusMark :status="problem.viewerStatus" /></td>
+          <td class="min-w-0 px-3 py-2">
+            <RouterLink
+              :to="{ name: 'problem', params: { code: problem.code } }"
+              class="block truncate font-medium text-content after:absolute after:inset-0 hover:text-accent-text"
+              >{{ problem.name }}</RouterLink
+            >
+            <span class="font-mono text-xs text-muted">{{ problem.code }}</span>
           </td>
-          <td class="px-2.5 py-3.5 text-muted">
+          <td class="truncate px-3 py-2 text-[12.5px] text-muted">
             {{ problem.types.map((type) => type.fullName).join(', ') }}
           </td>
-          <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
-            {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
+          <td class="px-3 py-2">
+            <span class="inline-flex items-center gap-[7px] font-medium tabular-nums">
+              <span
+                aria-hidden="true"
+                data-testid="tier-mark"
+                :data-tier="tierOf(problem.points)"
+                class="size-[9px] rounded-[3px]"
+                :class="TIER_CLASS[tierOf(problem.points)]"
+              />
+              {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
+            </span>
           </td>
-          <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
+          <td class="px-3 py-2 text-right tabular-nums">
             {{ formatNumber(problem.acRate, locale.locale, 1) }}%
           </td>
-          <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
+          <td class="py-2 pr-[22px] pl-3 text-right tabular-nums">
             {{ formatNumber(problem.userCount, locale.locale) }}
-          </td>
-          <td class="px-6 py-3.5 text-right">
-            <ProblemStatusChip v-if="problem.viewerStatus" :status="problem.viewerStatus" />
-            <RouterLink
-              v-else
-              :to="{ name: 'problem', params: { code: problem.code } }"
-              class="inline-flex min-h-11 items-center rounded-pill bg-accent-soft px-3.5 text-[13px] font-semibold text-accent-soft-text"
-            >
-              {{ $t('problems.solve') }}<span class="sr-only">: {{ problem.name }}</span>
-            </RouterLink>
           </td>
         </tr>
       </tbody>

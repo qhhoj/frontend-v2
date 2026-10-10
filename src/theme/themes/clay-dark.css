@@ -43,6 +43,10 @@
   --qh-verdict-pending: #d6cfc4;
   --qh-verdict-pending-bg: rgba(201, 193, 182, 0.16);
   --qh-verdict-partial: #d9f99d;
+  --qh-diff-1: #86b977;
+  --qh-diff-2: #e0b04a;
+  --qh-diff-3: #e8825f;
+  --qh-diff-4: #f0a58c;
   --qh-partial-bg-1: rgba(132, 204, 22, 0.1);
   --qh-partial-bg-2: rgba(132, 204, 22, 0.16);
   --qh-partial-bg-3: rgba(132, 204, 22, 0.24);

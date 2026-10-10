@@ -2684,6 +2684,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/problems/random": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProblemsController_random"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/problems/render-preview": {
         parameters: {
             query?: never;
@@ -5263,6 +5279,9 @@ export interface components {
             isOver: boolean;
             limit: number;
             used: number;
+        };
+        RandomProblemResponse: {
+            code: string;
         };
         RankingLinkResponse: {
             expiresAt: string | null;
@@ -13875,6 +13894,51 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProblemMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemsController_random: {
+        parameters: {
+            query?: {
+                groupId?: string;
+                hasEditorial?: boolean;
+                lang?: components["schemas"]["StatementLanguage"];
+                pointsMax?: number;
+                pointsMin?: number;
+                /** @description Case-insensitive substring of the code or any title; at most 100 characters. */
+                q?: string;
+                search?: string;
+                /** @description `false`: only problems the viewer has not solved; `true`: only solved ones (an AC with every case point). Anonymous viewers have solved nothing. */
+                solved?: boolean;
+                typeIds?: string[];
+                visibility?: "all" | "private" | "public";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RandomProblemResponse"];
                     };
                 };
             };

@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  problemDetail,
   problemItem,
   problemMeta,
   profile,
@@ -49,8 +50,8 @@ describe('problem list', () => {
       'GET /users/user_01': ok(userPage()),
     });
     const { wrapper } = await mountApp('/problems');
-    expect(wrapper.get('h1').text()).toBe('Chọn bài, bắt đầu giải');
-    expect(wrapper.text()).toContain('2.318 bài · bạn đã giải 412');
+    expect(wrapper.get('h1').text()).toBe('Bài tập');
+    expect(wrapper.text()).toContain('2.318 bài · 412 đã giải');
     const rows = wrapper.findAll('tbody tr');
     expect(rows).toHaveLength(3);
     expect(rows[0]!.text()).toContain('Dãy con tăng dài nhất');
@@ -60,8 +61,12 @@ describe('problem list', () => {
     expect(rows[0]!.text()).toContain('2.011');
     expect(rows[0]!.text()).toContain('1400');
     expect(rows[1]!.text()).toContain('2200');
-    expect(rows[0]!.text()).toContain('Đã giải');
-    expect(rows[2]!.text()).toContain('Đã thử');
+    expect(rows[0]!.find('svg[aria-label="Đã giải"]').exists()).toBe(true);
+    expect(rows[2]!.find('svg[aria-label="Đã thử, chưa đúng"]').exists()).toBe(true);
+    expect(rows[1]!.find('svg[aria-label="Chưa thử"]').exists()).toBe(true);
+    expect(rows.map((row) => row.get('[data-testid="tier-mark"]').attributes('data-tier'))).toEqual(
+      ['2', '3', '2'],
+    );
     expect(rows[1]!.find('a[href="/problems/knapsack2"]').exists()).toBe(true);
     const query = lastListQuery(calls);
     expect([query.get('lang'), query.get('page'), query.get('pageSize')]).toEqual([
@@ -83,21 +88,130 @@ describe('problem list', () => {
     mockApi(anonymous(page(threeProblems)));
     const { wrapper } = await mountApp('/problems');
     expect(wrapper.text()).toContain('3 bài');
-    expect(wrapper.text()).not.toContain('bạn đã giải');
+    expect(wrapper.text()).not.toMatch(/\d đã giải/);
   });
 
-  it('toggles a topic filter through the URL', async () => {
+  it('picks problem types from a searchable list and removes them as chips', async () => {
     const calls = mockApi(anonymous());
     const { wrapper, router } = await mountApp('/problems');
-    const chip = () => wrapper.get('[role="group"] button[aria-pressed]');
-    await chip().trigger('click');
+    const trigger = wrapper
+      .findAll('#main button[aria-haspopup="dialog"]')
+      .find((button) => button.text().startsWith('Dạng bài'))!;
+    await trigger.trigger('click');
+    await flushPromises();
+    const search = document.body.querySelector<HTMLInputElement>('input[name="typeSearch"]')!;
+    search.value = 'quy';
+    search.dispatchEvent(new Event('input'));
+    await flushPromises();
+    const boxes = document.body.querySelectorAll<HTMLInputElement>(
+      '[role="dialog"] input[type="checkbox"]',
+    );
+    expect(boxes).toHaveLength(1);
+    boxes[0]!.click();
     await flushPromises();
     expect([router.currentRoute.value.query.type].flat()).toEqual([TYPE_DP_ID]);
     expect(lastListQuery(calls).getAll('typeIds')).toEqual([TYPE_DP_ID]);
-    expect(chip().attributes('aria-pressed')).toBe('true');
-    await chip().trigger('click');
+    const chip = wrapper.get('button[aria-label="Bỏ lọc: Quy hoạch động"]');
+    await chip.trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.query.type).toBeUndefined();
+    expect(wrapper.find('button[aria-label^="Bỏ lọc"]').exists()).toBe(false);
+  });
+
+  it('toggles solved and editorial filters, clears all, and the back button undoes a change', async () => {
+    const calls = mockApi({
+      ...anonymous(),
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile()),
+      'GET /users/user_01': ok(userPage()),
+    });
+    const { wrapper, router } = await mountApp('/problems');
+    const toggle = (name: string) =>
+      wrapper.findAll('#main button[aria-pressed]').find((button) => button.text() === name)!;
+    await toggle('Ẩn bài đã giải').trigger('click');
+    await flushPromises();
+    await toggle('Có lời giải').trigger('click');
+    await flushPromises();
+    const query = lastListQuery(calls);
+    expect([query.get('solved'), query.get('hasEditorial')]).toEqual(['false', 'true']);
+    expect(toggle('Ẩn bài đã giải').attributes('aria-pressed')).toBe('true');
+    router.back();
+    await flushPromises();
+    expect(toggle('Có lời giải').attributes('aria-pressed')).toBe('false');
+    expect(toggle('Ẩn bài đã giải').attributes('aria-pressed')).toBe('true');
+    await toggle('Có lời giải').trigger('click');
+    await flushPromises();
+    const clearAll = wrapper.findAll('button').find((button) => button.text() === 'Xóa tất cả')!;
+    await clearAll.trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({});
+  });
+
+  it('disables hiding solved problems for anonymous viewers', async () => {
+    mockApi(anonymous());
+    const { wrapper } = await mountApp('/problems');
+    const hide = wrapper
+      .findAll('#main button')
+      .find((button) => button.text() === 'Ẩn bài đã giải')!;
+    expect(hide.attributes('disabled')).toBeDefined();
+  });
+
+  it('shows the group filter and sorts from the dropdown', async () => {
+    const calls = mockApi({
+      ...anonymous(),
+      'GET /problems/meta': ok({
+        ...problemMeta(),
+        groups: [{ id: '0192a000-0000-7000-8000-0000000000c1', name: 'voi', fullName: 'VOI' }],
+      }),
+    });
+    const { wrapper, router } = await mountApp('/problems');
+    const selects = wrapper.findAll('#main select');
+    await selects[0]!.setValue('0192a000-0000-7000-8000-0000000000c1');
+    await flushPromises();
+    expect(lastListQuery(calls).get('groupId')).toBe('0192a000-0000-7000-8000-0000000000c1');
+    await selects[1]!.setValue('-points');
+    await flushPromises();
+    expect(router.currentRoute.value.query.sort).toBe('-points');
+    expect(wrapper.find('th[aria-sort="descending"]').text()).toContain('Điểm');
+  });
+
+  it('opens a random problem under the current filters', async () => {
+    const calls = mockApi({
+      ...anonymous(),
+      'GET /problems/random': ok({ code: 'lucky' }),
+      'GET /problems/lucky': ok(problemDetail({ code: 'lucky' })),
+    });
+    const { wrapper, router } = await mountApp('/problems?min=800&editorial=1');
+    await wrapper
+      .findAll('#main button')
+      .find((button) => button.text() === 'Bài ngẫu nhiên')!
+      .trigger('click');
+    await flushPromises();
+    const asked = calls.find((call) => call.path === '/problems/random')!;
+    expect([asked.query.get('pointsMin'), asked.query.get('hasEditorial')]).toEqual([
+      '800',
+      'true',
+    ]);
+    expect(asked.query.has('page')).toBe(false);
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/lucky'));
+  });
+
+  it('says so when no problem matches the random pick', async () => {
+    mockApi({ ...anonymous(), 'GET /problems/random': fail(404, 'no_problem') });
+    const { wrapper, router } = await mountApp('/problems');
+    await wrapper
+      .findAll('#main button')
+      .find((button) => button.text() === 'Bài ngẫu nhiên')!
+      .trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="random-status"]').text()).toBe('Không có bài phù hợp.');
+    expect(router.currentRoute.value.name).toBe('problems');
+  });
+
+  it('writes the 1500p suffix for partial scoring', async () => {
+    mockApi(anonymous(page([problemItem({ points: 1500, partial: true })])));
+    const { wrapper } = await mountApp('/problems');
+    expect(wrapper.get('tbody tr').text()).toContain('1500p');
   });
 
   it('searches once typing pauses', async () => {
@@ -129,7 +243,7 @@ describe('problem list', () => {
   it('moves focus into the points popover from the keyboard', async () => {
     mockApi(anonymous());
     const { wrapper } = await mountApp('/problems');
-    const trigger = wrapper.get('#main button[aria-haspopup="dialog"]');
+    const trigger = wrapper.get('#main button[aria-label^="Lọc theo điểm"]');
     expect(trigger.attributes('aria-expanded')).toBe('false');
     await trigger.trigger('keydown.enter');
     await trigger.trigger('click');
@@ -213,14 +327,15 @@ describe('problem list', () => {
   it('sets a points range from the popover', async () => {
     mockApi(anonymous());
     const { wrapper, router } = await mountApp('/problems');
-    await wrapper.get('#main button[aria-haspopup="dialog"]').trigger('click');
+    await wrapper.get('#main button[aria-label^="Lọc theo điểm"]').trigger('click');
     await flushPromises();
     const minimum = document.body.querySelector<HTMLInputElement>('input[name="pointsMin"]')!;
     minimum.value = '800';
     minimum.dispatchEvent(new Event('change'));
     await flushPromises();
     expect(router.currentRoute.value.query.min).toBe('800');
-    expect(wrapper.get('#main button[aria-haspopup="dialog"]').text()).toBe('Điểm 800–…');
+    expect(wrapper.get('#main button[aria-label^="Lọc theo điểm"]').text()).toBe('Điểm 800–…');
+    expect(wrapper.find('button[aria-label="Bỏ lọc: 800–… điểm"]').exists()).toBe(true);
   });
 
   it('says when nothing matches', async () => {

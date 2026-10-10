@@ -8,13 +8,15 @@ import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import ProblemFilterChips from './ProblemFilterChips.vue';
 import ProblemFilters from './ProblemFilters.vue';
 import ProblemTable from './ProblemTable.vue';
 import ProblemTableSkeleton from './ProblemTableSkeleton.vue';
+import { filterChips } from './problem-filter-chips';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
 import { useProblemFilters } from './use-problem-filters';
 
-const { filters, update } = useProblemFilters();
+const { filters, update, clearAll } = useProblemFilters();
 const locale = useLocaleStore();
 const session = useSessionStore();
 const lang = computed(() => locale.locale);
@@ -31,6 +33,9 @@ const {
   isPlaceholderData,
 } = useProblemListQuery(filters, lang);
 const { data: viewer } = useUserPageQuery(() => session.user?.username ?? '');
+const chips = computed(() =>
+  filterChips(filters.value, { types: meta.value?.types ?? [], groups: meta.value?.groups ?? [] }),
+);
 
 const problems = computed(() => data.value?.pages.flatMap((result) => result.items) ?? []);
 const summary = computed(() => {
@@ -48,14 +53,19 @@ const summary = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-8">
-    <header class="pt-3 pb-1 text-center">
-      <h1 class="font-display text-4xl font-bold tracking-tight sm:text-[44px]">
-        {{ $t('problems.title') }}
-      </h1>
-      <p class="mt-2 min-h-6 text-muted">{{ summary }}</p>
+  <div class="mx-auto flex max-w-7xl flex-col gap-3.5 px-4 py-6 sm:px-8">
+    <header class="flex flex-wrap items-baseline gap-x-3">
+      <h1 class="font-display text-[26px] font-semibold">{{ $t('problems.title') }}</h1>
+      <p class="min-h-6 text-sm text-muted">{{ summary }}</p>
     </header>
-    <ProblemFilters :filters="filters" :types="meta?.types ?? []" @update="update" />
+    <ProblemFilters
+      :filters="filters"
+      :types="meta?.types ?? []"
+      :groups="meta?.groups ?? []"
+      :signed-in="session.user !== null"
+      @update="update"
+    />
+    <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />
     <GlassCard as="div" class="overflow-hidden">
       <QueryState
         :loading="isPending"

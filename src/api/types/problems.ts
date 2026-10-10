@@ -32,3 +32,5 @@ export const isProblemSort = (value: unknown): value is ProblemSort =>
   (PROBLEM_SORT_FIELDS as readonly string[]).includes(value.replace(/^-/, ''));
 
 export type ProblemListQuery = QueryOf<'/problems'>;
+export type RandomProblemQuery = QueryOf<'/problems/random'>;
+export type RandomProblem = Schemas['RandomProblemResponse'];

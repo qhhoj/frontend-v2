@@ -1,123 +1,90 @@
 <script setup lang="ts">
-import { ChevronDown, Search, X } from 'lucide-vue-next';
-import Popover from 'primevue/popover';
-import { computed, ref } from 'vue';
+import { Search } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { isProblemSort } from '@/api/types/problems';
 import type { CatalogItem } from '@/api/types/problems';
-import TokenCoin from '@/components/TokenCoin.vue';
 import { translate } from '@/i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
+import FilterToggle from './FilterToggle.vue';
+import ProblemPointsPicker from './ProblemPointsPicker.vue';
+import ProblemTypePicker from './ProblemTypePicker.vue';
+import RandomProblemButton from './RandomProblemButton.vue';
+import ToolbarSelect from './ToolbarSelect.vue';
+import { DEFAULT_SORT, sortOptions } from './problem-sort-options';
 import type { ProblemFilters } from './use-problem-filters';
 
-const props = defineProps<{ filters: ProblemFilters; types: CatalogItem[] }>();
+const props = defineProps<{
+  filters: ProblemFilters;
+  types: CatalogItem[];
+  groups: CatalogItem[];
+  /** "Ẩn bài đã giải" means nothing without a signed-in viewer. */
+  signedIn: boolean;
+}>();
 const emit = defineEmits<{ update: [patch: Partial<ProblemFilters>] }>();
 
 const searchText = useDebouncedText(
   () => props.filters.search,
   (search) => emit('update', { search }),
 );
-
-const isSelected = (id: string) => props.filters.typeIds.includes(id);
-const toggleType = (id: string) =>
-  emit('update', {
-    typeIds: isSelected(id)
-      ? props.filters.typeIds.filter((selected) => selected !== id)
-      : [...props.filters.typeIds, id],
-  });
-
-const pointsPopover = ref<InstanceType<typeof Popover>>();
-const pointsOpen = ref(false);
-const pointsLabel = computed(() => {
-  const { pointsMin, pointsMax } = props.filters;
-  return pointsMin === null && pointsMax === null
-    ? translate('problems.pointsAny')
-    : translate('problems.pointsRange', { min: pointsMin ?? '…', max: pointsMax ?? '…' });
-});
-function setPoints(key: 'pointsMin' | 'pointsMax', event: Event) {
-  const text = (event.target as HTMLInputElement).value;
-  emit('update', { [key]: text === '' ? null : Math.trunc(Number(text)) });
-}
+const groupOptions = computed(() => [
+  { value: '', label: translate('problems.groupAll') },
+  ...props.groups.map((group) => ({ value: group.id, label: group.fullName })),
+]);
+const setSort = (value: string) =>
+  emit('update', { sort: value !== DEFAULT_SORT && isProblemSort(value) ? value : null });
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4">
-    <label
-      class="glass flex h-14 w-full max-w-[720px] items-center gap-2.5 rounded-pill px-5 text-muted"
-    >
-      <span class="sr-only">{{ $t('problems.search') }}</span>
-      <Search class="size-5 shrink-0" aria-hidden="true" />
+  <div class="flex flex-wrap items-center gap-2" role="search">
+    <label class="relative flex min-w-[260px] max-w-[380px] flex-1 items-center text-muted">
+      <span class="sr-only">{{ $t('problems.searchLabel') }}</span>
+      <Search class="absolute left-3 size-4" aria-hidden="true" />
       <input
         v-model="searchText"
         type="search"
         :placeholder="$t('problems.search')"
-        class="min-h-11 flex-1 bg-transparent text-base text-content"
+        class="h-10 w-full rounded-row border border-line-strong bg-surface pr-3 pl-9 text-sm text-content"
       />
     </label>
-    <div
-      role="group"
-      :aria-label="$t('problems.types')"
-      class="flex flex-wrap justify-center gap-2"
+    <ToolbarSelect
+      :label="$t('problems.group')"
+      :model-value="filters.groupId ?? ''"
+      :options="groupOptions"
+      :active="filters.groupId !== null"
+      @update:model-value="emit('update', { groupId: $event || null })"
+    />
+    <ProblemTypePicker
+      :types="types"
+      :selected="filters.typeIds"
+      @change="emit('update', { typeIds: $event })"
+    />
+    <ProblemPointsPicker
+      :min="filters.pointsMin"
+      :max="filters.pointsMax"
+      @change="emit('update', $event)"
+    />
+    <FilterToggle
+      :pressed="filters.hideSolved"
+      :disabled="!signedIn"
+      :title="signedIn ? undefined : $t('problems.signInToHide')"
+      @toggle="emit('update', { hideSolved: !filters.hideSolved })"
     >
-      <button
-        v-for="type in types"
-        :key="type.id"
-        type="button"
-        :aria-pressed="isSelected(type.id)"
-        class="flex h-11 items-center gap-2 rounded-pill border pr-3 pl-1.5 text-sm"
-        :class="
-          isSelected(type.id)
-            ? 'border-accent bg-accent-soft font-semibold text-accent-soft-text'
-            : 'border-line bg-surface text-content hover:bg-surface-hover'
-        "
-        @click="toggleType(type.id)"
-      >
-        <TokenCoin :seed="type.name" size="sm" />
-        {{ type.fullName }}
-        <X v-if="isSelected(type.id)" class="size-4" aria-hidden="true" />
-      </button>
-      <span aria-hidden="true" class="mx-1.5 w-px self-stretch bg-line" />
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        :aria-expanded="pointsOpen"
-        :aria-label="`${$t('problems.pointsFilter')}: ${pointsLabel}`"
-        class="flex h-11 items-center gap-1.5 rounded-pill border border-line bg-surface px-4 text-sm hover:bg-surface-hover"
-        @click="pointsPopover?.toggle($event)"
-      >
-        {{ pointsLabel }}
-        <ChevronDown class="size-4" aria-hidden="true" />
-      </button>
-      <Popover
-        ref="pointsPopover"
-        :pt="{ root: { 'aria-label': $t('problems.pointsFilter') } }"
-        @show="pointsOpen = true"
-        @hide="pointsOpen = false"
-      >
-        <div class="flex gap-3">
-          <label class="flex flex-col gap-1 text-sm">
-            {{ $t('problems.pointsMin') }}
-            <input
-              name="pointsMin"
-              autofocus
-              type="number"
-              inputmode="numeric"
-              :value="filters.pointsMin ?? ''"
-              class="h-11 w-28 rounded-row border border-line bg-surface-strong px-3 text-content"
-              @change="setPoints('pointsMin', $event)"
-            />
-          </label>
-          <label class="flex flex-col gap-1 text-sm">
-            {{ $t('problems.pointsMax') }}
-            <input
-              name="pointsMax"
-              type="number"
-              inputmode="numeric"
-              :value="filters.pointsMax ?? ''"
-              class="h-11 w-28 rounded-row border border-line bg-surface-strong px-3 text-content"
-              @change="setPoints('pointsMax', $event)"
-            />
-          </label>
-        </div>
-      </Popover>
-    </div>
+      {{ $t('problems.hideSolved') }}
+    </FilterToggle>
+    <FilterToggle
+      :pressed="filters.hasEditorial"
+      @toggle="emit('update', { hasEditorial: !filters.hasEditorial })"
+    >
+      {{ $t('problems.hasEditorial') }}
+    </FilterToggle>
+    <span class="grow" />
+    <ToolbarSelect
+      :label="$t('problems.sort')"
+      :model-value="filters.sort ?? DEFAULT_SORT"
+      :options="sortOptions()"
+      :active="filters.sort !== null"
+      @update:model-value="setSort"
+    />
+    <RandomProblemButton :filters="filters" />
   </div>
 </template>

@@ -189,6 +189,7 @@ export class FakeApi {
               }),
             ],
       ),
+    'GET /problems/random': ok({ code: 'duongdi' }),
     'GET /problems/:code': ({ params }) => ok(problemDetail({ code: params.code })),
     'GET /problems/:code/editorial': ok(problemEditorial()),
     'POST /problems/:code/submit': ok({ id: 'sub-9' }),

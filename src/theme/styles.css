@@ -64,6 +64,10 @@
   --color-verdict-pending: var(--qh-verdict-pending);
   --color-verdict-pending-bg: var(--qh-verdict-pending-bg);
   --color-verdict-partial: var(--qh-verdict-partial);
+  --color-diff-1: var(--qh-diff-1);
+  --color-diff-2: var(--qh-diff-2);
+  --color-diff-3: var(--qh-diff-3);
+  --color-diff-4: var(--qh-diff-4);
   --color-partial-bg-1: var(--qh-partial-bg-1);
   --color-partial-bg-2: var(--qh-partial-bg-2);
   --color-partial-bg-3: var(--qh-partial-bg-3);

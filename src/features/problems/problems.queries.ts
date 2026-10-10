@@ -4,6 +4,7 @@ import type { Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { toApiFilters } from './use-problem-filters';
 import type { ProblemFilters } from './use-problem-filters';
 
 /** Types, groups and languages change rarely. */
@@ -17,9 +18,7 @@ export const useProblemListQuery = (filters: Ref<ProblemFilters>, lang: Ref<Stat
     queryKey: computed(() => ['problems', 'list', filters.value, lang.value]),
     queryFn: ({ pageParam }) =>
       fetchProblems({
-        ...filters.value,
-        pointsMin: filters.value.pointsMin ?? undefined,
-        pointsMax: filters.value.pointsMax ?? undefined,
+        ...toApiFilters(filters.value),
         sort: filters.value.sort ?? undefined,
         lang: lang.value,
         page: pageParam,
