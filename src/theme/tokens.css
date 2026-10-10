@@ -1,9 +1,9 @@
 /* Tokens shared by every theme; a theme file may override any of them. Colours live only in themes/. */
 /* Defaults sit on :root, not on a theme, so every theme and the pre-paint script read one shared fallback. The personal look is written inline on <html> and overrides these. */
 :root {
-  /* Body and UI text, Codeforces style: Verdana where installed (never bundled, licensed), else the bundled DejaVu Sans (fonts.css), the same design as Vera. */
+  /* Body and UI text, Codeforces style: Verdana where installed, else the system's own sans (DejaVu on Linux, Roboto on Android). System fonts only: a bundled web font behind Verdana rendered missing glyphs in Safari. */
   --qh-font-body:
-    Verdana, 'QH DejaVu Sans', 'DejaVu Sans', 'Bitstream Vera Sans', Geneva, sans-serif;
+    Verdana, 'DejaVu Sans', 'Bitstream Vera Sans', Geneva, sans-serif;
   /* Headings keep Space Grotesk (product owner's decision). */
   --qh-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --qh-font-mono: 'JetBrains Mono', ui-monospace, monospace;
