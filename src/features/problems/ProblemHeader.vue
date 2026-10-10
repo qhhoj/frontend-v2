@@ -14,20 +14,27 @@ import ProblemStatusChip from './ProblemStatusChip.vue';
 
 const props = defineProps<{ problem: ProblemDetail }>();
 const locale = useLocaleStore();
-/** Four columns of the mock-up: time, memory, points, AC rate. Keep `ProblemHeaderSkeleton.vue` in step. */
+/** Four chips: time (blue), memory (violet), points (amber), AC rate (neutral). Keep `ProblemHeaderSkeleton.vue` in step. */
 const limits = computed(() => [
-  { label: translate('problem.limits.time'), value: formatTimeLimit(props.problem.timeLimit) },
+  {
+    label: translate('problem.limits.time'),
+    value: formatTimeLimit(props.problem.timeLimit),
+    tone: 'bg-limit-time-bg text-limit-time',
+  },
   {
     label: translate('problem.limits.memory'),
     value: formatMemoryLimit(props.problem.memoryLimit),
+    tone: 'bg-limit-memory-bg text-limit-memory',
   },
   {
     label: translate('problem.limits.points'),
     value: formatProblemPoints(props.problem.points, props.problem.partial, locale.locale),
+    tone: 'bg-limit-points-bg text-limit-points',
   },
   {
     label: translate('problem.limits.acRate'),
     value: `${formatNumber(props.problem.acRate, locale.locale, 1)}%`,
+    tone: 'bg-surface-strong text-muted',
   },
 ]);
 </script>
@@ -40,9 +47,7 @@ const limits = computed(() => [
           {{ problem.code
           }}<template v-if="problem.group"> · {{ problem.group.fullName }}</template>
         </p>
-        <h1
-          class="mt-1 font-display text-3xl font-bold tracking-tight [overflow-wrap:anywhere] sm:text-[40px] sm:leading-[1.15]"
-        >
+        <h1 class="mt-1 page-title [overflow-wrap:anywhere] max-sm:min-h-[65px]">
           {{ problem.name }}
         </h1>
         <div class="mt-3 flex min-h-8 flex-wrap items-center gap-2">
@@ -60,10 +65,15 @@ const limits = computed(() => [
         <slot name="actions" />
       </div>
     </div>
-    <dl data-testid="limits" class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-      <div v-for="limit in limits" :key="limit.label">
-        <dt class="text-[13px] text-muted">{{ limit.label }}</dt>
-        <dd class="font-mono text-2xl font-semibold tabular-nums">{{ limit.value }}</dd>
+    <dl data-testid="limits" class="mt-5 flex flex-wrap gap-2">
+      <div
+        v-for="limit in limits"
+        :key="limit.label"
+        class="flex h-8 items-center gap-1.5 rounded-pill px-3 text-[13px]"
+        :class="limit.tone"
+      >
+        <dt>{{ limit.label }}</dt>
+        <dd class="font-bold tabular-nums">{{ limit.value }}</dd>
       </div>
     </dl>
   </GlassCard>

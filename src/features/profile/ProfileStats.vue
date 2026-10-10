@@ -55,7 +55,7 @@ const tiles = computed<StatTile[]>(() => [
 
 <template>
   <GlassCard data-testid="profile-stats" class="p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('profile.stats') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('profile.stats') }}</h2>
     <dl class="mt-3 grid grid-cols-2 gap-3">
       <div
         v-for="tile in tiles"

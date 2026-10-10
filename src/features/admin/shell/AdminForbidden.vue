@@ -16,7 +16,7 @@ const needed = computed(() => {
     class="mx-auto flex max-w-xl flex-col items-center gap-3 px-6 py-16 text-center"
   >
     <AdminBit placement="forbidden" />
-    <h1 class="font-display text-2xl font-semibold">{{ $t('admin.shell.forbidden.title') }}</h1>
+    <h1 class="page-title">{{ $t('admin.shell.forbidden.title') }}</h1>
     <p class="text-muted">{{ $t('admin.shell.forbidden.body', needed.length) }}</p>
     <ul class="flex flex-wrap justify-center gap-2">
       <li

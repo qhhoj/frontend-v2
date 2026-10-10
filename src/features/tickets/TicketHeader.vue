@@ -72,7 +72,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
         <span class="break-all">{{ ticket.link.title }}</span>
       </span>
     </div>
-    <h1 class="font-display text-2xl font-bold tracking-tight sm:text-3xl">{{ ticket.title }}</h1>
+    <h1 class="page-title">{{ ticket.title }}</h1>
     <p v-if="isCreator" class="text-sm font-semibold text-accent-soft-text">
       {{ $t('ticket.yours') }}
     </p>

@@ -79,7 +79,7 @@ const expiresError = computed(() =>
       novalidate
       @submit.prevent="submit"
     >
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.shortlinks.form.title') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('admin.shortlinks.form.title') }}</h2>
       <div class="grid gap-4 md:grid-cols-3">
         <AdminField
           v-slot="{ id, describedBy, invalid }"

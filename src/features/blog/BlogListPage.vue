@@ -36,9 +36,9 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <header class="flex flex-col gap-2">
-      <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="page-title">
         {{ $t('blog.title') }}
       </h1>
       <p class="text-muted">{{ $t('blog.lead') }}</p>
@@ -69,7 +69,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         </a>
       </div>
     </div>
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="scroll-mt-20">
         <GlassCard as="div" data-testid="post-list" class="overflow-hidden">
           <QueryState :loading="isPending" :error="error" @retry="refetch()">

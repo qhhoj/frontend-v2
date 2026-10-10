@@ -71,7 +71,7 @@ const ICON_BUTTON =
     class="flex flex-col gap-3 rounded-panel p-5"
   >
     <header class="flex items-center justify-between gap-2">
-      <h2 id="org-tags-title" class="font-display text-lg font-semibold">
+      <h2 id="org-tags-title" class="font-display text-base font-bold">
         {{ $t('orgProblems.tags.title') }}
       </h2>
       <span class="text-sm text-muted">{{

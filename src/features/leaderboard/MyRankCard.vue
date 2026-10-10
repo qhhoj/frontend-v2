@@ -40,7 +40,7 @@ const findMe = async () => {
 
 <template>
   <GlassCard data-testid="my-rank" class="p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('leaderboard.myRank') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('leaderboard.myRank') }}</h2>
     <p class="text-sm text-muted">{{ $t(`leaderboard.by.${sort}`) }}</p>
     <p v-if="isUnlisted" class="mt-3 text-sm">{{ $t('leaderboard.notListed') }}</p>
     <QueryState
@@ -50,7 +50,10 @@ const findMe = async () => {
       :registers-wait="false"
       @retry="refetch()"
     >
-      <template #skeleton><SkeletonBlock text class="mt-2 w-24 text-3xl" /></template>
+      <!-- Reserves the loaded body (rank, page line, button) so the cards below do not move. -->
+      <template #skeleton
+        ><div class="mt-2 h-[7.5rem]"><SkeletonBlock text class="w-24 text-3xl" /></div
+      ></template>
       <template v-if="rank">
         <p class="mt-2 font-display text-3xl font-bold tabular-nums">
           {{ formatNumber(rank.rank, locale.locale) }}

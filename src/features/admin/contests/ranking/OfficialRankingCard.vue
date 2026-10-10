@@ -73,7 +73,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
 <template>
   <section class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-lg font-semibold">
+      <h2 class="font-display text-base font-bold">
         {{ $t('admin.contests.ranking.official.title') }}
       </h2>
       <p class="text-sm text-muted">{{ $t('admin.contests.ranking.official.lead') }}</p>

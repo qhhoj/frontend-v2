@@ -91,7 +91,7 @@ const summaryBit = computed(() =>
         </p>
         <div data-overlay-part="panels" class="grid items-start gap-5 lg:grid-cols-2">
           <GlassCard as="div" class="overflow-hidden">
-            <h2 class="px-5 pt-4 font-display text-lg font-semibold">
+            <h2 class="px-5 pt-4 font-display text-base font-bold">
               {{ $t('replay.overlay.realBoard', { time: clock }) }}
             </h2>
             <ReplayTable
@@ -102,7 +102,7 @@ const summaryBit = computed(() =>
             />
           </GlassCard>
           <GlassCard as="div" class="overflow-hidden">
-            <h2 class="px-5 pt-4 font-display text-lg font-semibold">
+            <h2 class="px-5 pt-4 font-display text-base font-bold">
               {{ $t('replay.overlay.yourBoard', { time: clock }) }}
             </h2>
             <ReplayTable

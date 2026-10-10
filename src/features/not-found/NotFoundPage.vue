@@ -40,7 +40,7 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
       </div>
       <CryingBit class="[--bit-px:8px] sm:[--bit-px:12px]" :label="$t('notFound.bitLabel')" />
     </div>
-    <h1 class="mt-2 font-display text-3xl font-bold tracking-tight sm:text-[40px]">
+    <h1 class="mt-2 page-title">
       {{ $t('notFound.title') }}
     </h1>
     <p class="max-w-md text-base leading-relaxed text-muted">{{ $t('notFound.body') }}</p>

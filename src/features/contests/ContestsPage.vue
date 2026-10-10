@@ -33,10 +33,10 @@ const tagName = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 class="page-title">
           {{ $t('contests.title') }}
         </h1>
         <p class="mt-1 text-muted">{{ $t('contests.list.lead') }}</p>

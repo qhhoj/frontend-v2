@@ -31,7 +31,7 @@ const performancePoints = computed(() =>
         <OrganizationJoinChip :is-open="organization.isOpen" />
         <span class="text-sm text-muted">{{ $t('orgs.founded', { date: founded }) }}</span>
       </div>
-      <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="page-title">
         {{ organization.name }}
       </h1>
       <p class="text-muted">

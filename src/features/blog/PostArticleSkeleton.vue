@@ -8,9 +8,9 @@ const BODY_WIDTHS = ['w-full', 'w-11/12', 'w-full', 'w-4/5', 'w-full', 'w-10/12'
   <article class="flex min-w-0 flex-col gap-5">
     <div class="flex flex-col gap-3">
       <div data-skeleton-region="title" class="flex flex-col">
-        <div class="flex h-9 items-center sm:h-10"><SkeletonBlock pill class="h-6 w-4/5" /></div>
-        <div class="flex h-9 items-center sm:h-10"><SkeletonBlock pill class="h-6 w-3/5" /></div>
-        <div class="flex h-9 items-center sm:hidden"><SkeletonBlock pill class="h-6 w-2/5" /></div>
+        <div class="flex h-8 items-center"><SkeletonBlock pill class="h-6 w-4/5" /></div>
+        <div class="flex h-8 items-center sm:hidden"><SkeletonBlock pill class="h-6 w-3/5" /></div>
+        <div class="flex h-8 items-center sm:hidden"><SkeletonBlock pill class="h-6 w-2/5" /></div>
       </div>
       <div data-skeleton-region="byline" class="flex h-7 items-center gap-3">
         <SkeletonBlock round class="size-7" />

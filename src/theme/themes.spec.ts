@@ -107,6 +107,9 @@ const TEXT_TOKENS = [
   'tier-candidate-master',
   'tier-master',
   'tier-grandmaster',
+  'medal-gold',
+  'medal-silver',
+  'medal-bronze',
   ...SYNTAX_TOKENS,
 ];
 /** Contest tag chips (backend `TagColor`): text token on its own tint, eight of them. */

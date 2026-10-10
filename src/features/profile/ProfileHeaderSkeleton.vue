@@ -22,7 +22,7 @@ const TAB_COUNT = 5;
         <SkeletonBlock class="size-24" round />
         <div class="flex min-w-0 flex-col gap-2">
           <SkeletonBlock class="h-[26px] w-24" pill />
-          <SkeletonBlock class="h-9 w-56" />
+          <SkeletonBlock class="h-[30px] w-56" />
           <SkeletonBlock class="h-6 w-64" />
         </div>
       </div>

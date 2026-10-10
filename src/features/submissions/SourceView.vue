@@ -53,8 +53,8 @@ const lineNumbers = computed(() =>
 
 <template>
   <GlassCard id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-panel">
-    <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3 sm:px-8">
-      <h2 class="font-display text-lg font-semibold">{{ $t('submission.source.title') }}</h2>
+    <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3">
+      <h2 class="font-display text-base font-bold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
         <CopyButton v-if="data" :text="source" :label="$t('submission.source.copy')" />
         <RouterLink
@@ -65,7 +65,7 @@ const lineNumbers = computed(() =>
         >
       </div>
     </div>
-    <p v-if="forbiddenText" class="flex flex-wrap items-center gap-3 px-6 pb-6 text-muted sm:px-8">
+    <p v-if="forbiddenText" class="flex flex-wrap items-center gap-3 px-6 pb-6 text-muted">
       <InlineBit kind="sweat" />{{ forbiddenText }}
     </p>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
@@ -76,7 +76,7 @@ const lineNumbers = computed(() =>
         :aria-label="$t('submission.source.title')"
         class="flex overflow-x-auto bg-surface-strong py-4 font-mono text-[13px] leading-relaxed focus-visible:-outline-offset-2"
       >
-        <pre aria-hidden="true" class="shrink-0 px-4 text-right text-muted select-none">{{
+        <pre aria-hidden="true" class="shrink-0 pr-4 pl-6 text-right text-muted select-none">{{
           lineNumbers
         }}</pre>
         <pre ref="sourceBlock" class="pr-6"></pre>

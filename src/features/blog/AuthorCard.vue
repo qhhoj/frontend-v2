@@ -21,7 +21,7 @@ const tierLabelKey = computed(() => `tiers.${tier.value ?? 'unrated'}`);
 
 <template>
   <GlassCard data-testid="author-card" class="flex flex-col gap-4 p-4 sm:p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('blogPost.author') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('blogPost.author') }}</h2>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex items-center gap-3">

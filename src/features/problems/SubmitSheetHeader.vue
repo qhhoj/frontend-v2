@@ -28,7 +28,7 @@ defineExpose({
       <span aria-hidden="true" class="h-1 w-10 rounded-pill bg-line-strong"></span>
     </div>
     <div class="flex items-center justify-between gap-3 px-4 pb-1">
-      <h2 ref="title" tabindex="-1" class="font-display text-lg font-bold outline-none">
+      <h2 ref="title" tabindex="-1" class="font-display text-base font-bold outline-none">
         {{ $t('submit.title') }}
       </h2>
       <button

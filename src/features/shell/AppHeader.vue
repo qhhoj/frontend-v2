@@ -9,13 +9,13 @@ import UserMenu from './UserMenu.vue';
 
 <template>
   <header
-    class="relative flex flex-wrap md:flex-nowrap items-center gap-x-5 gap-y-3 px-4 py-4 sm:px-8"
+    class="page-gutter relative flex flex-wrap items-center gap-x-5 gap-y-3 py-4 md:flex-nowrap"
   >
     <RouterLink
       to="/"
-      class="flex min-h-11 shrink-0 items-center gap-2.5 font-display text-xl font-bold text-content"
+      class="flex min-h-11 shrink-0 items-center gap-2.5 font-display text-[17px] font-bold text-accent-text"
     >
-      <span aria-hidden="true" class="bg-gradient-accent inline-block size-[30px] rounded-full" />
+      <span aria-hidden="true" class="bg-gradient-accent inline-block size-[28px] rounded-full" />
       {{ $t('app.name') }}
     </RouterLink>
     <OfficialModePill />

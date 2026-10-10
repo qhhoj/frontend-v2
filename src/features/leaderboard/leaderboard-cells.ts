@@ -9,7 +9,7 @@ export const ORGANIZATION_CELL_CLASS = 'hidden truncate px-3 py-2.5 text-muted m
 
 /** The active number is always shown; the other numbers show from md up. */
 export const valueCellClass = (isActive: boolean) =>
-  `${RANK_CELL_CLASS} ${isActive ? 'font-semibold' : 'hidden md:table-cell'}`;
+  `${RANK_CELL_CLASS} ${isActive ? 'font-bold text-positive' : 'hidden md:table-cell'}`;
 
 /** The avatar's size in px. The skeleton's `size-7` is the same 28 px (Tailwind classes cannot be computed). */
 export const AVATAR_PX = 28 as const;

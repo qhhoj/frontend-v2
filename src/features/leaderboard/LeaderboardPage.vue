@@ -27,10 +27,10 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8">
-    <header class="flex flex-wrap items-end justify-between gap-4">
+  <div class="page-column">
+    <header class="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <h1 class="font-display text-3xl font-bold">{{ $t('leaderboard.title') }}</h1>
+        <h1 class="page-title">{{ $t('leaderboard.title') }}</h1>
         <p class="text-muted">{{ $t('leaderboard.lead', { total }) }}</p>
       </div>
       <UsernameJump />
@@ -46,7 +46,7 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
         {{ $t(`leaderboard.sorts.${key}`) }}
       </RouterLink>
     </nav>
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="min-w-0">
         <GlassCard class="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
           <QueryState :loading="isPending" :error="error" @retry="refetch()">

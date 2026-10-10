@@ -77,6 +77,9 @@
   --qh-tier-candidate-master: #ddd6fe;
   --qh-tier-master: #fed7aa;
   --qh-tier-grandmaster: #fecaca;
+  --qh-medal-gold: #f2c94c;
+  --qh-medal-silver: #d3dbe3;
+  --qh-medal-bronze: #f0bb90;
   --qh-syntax-keyword: #fdb8ff;
   --qh-syntax-type: #c4b5fd;
   --qh-syntax-number: #fcd34d;

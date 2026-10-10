@@ -79,7 +79,7 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
+  <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <QueryState v-else :loading="contestPending" :error="contestError" @retry="refetchContest()">
       <template #skeleton>
@@ -95,7 +95,7 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
         <ContestTabs :contest-key="key" :phase="contest.phase" />
         <div>
           <p class="text-muted">{{ summary }}</p>
-          <h1 class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
+          <h1 class="mt-1 page-title">
             {{ contest.name }}
           </h1>
         </div>

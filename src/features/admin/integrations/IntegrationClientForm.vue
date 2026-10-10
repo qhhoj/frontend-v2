@@ -75,7 +75,7 @@ function submit() {
       novalidate
       @submit.prevent="submit"
     >
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.integrations.form.title') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('admin.integrations.form.title') }}</h2>
       <div class="grid gap-4 md:grid-cols-2">
         <AdminField
           v-slot="{ id, describedBy, invalid }"

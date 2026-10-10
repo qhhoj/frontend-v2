@@ -103,7 +103,7 @@ function saveTags(tagIds: string[]) {
       >
       {{ $t('orgProblems.memberReadOnly') }}
     </SettingsNotice>
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)] lg:items-start">
       <GlassCard
         ref="listCard"
         as="div"

@@ -103,7 +103,7 @@ const retry = () => {
     </template>
 
     <template v-else-if="state === 'canRequest'">
-      <h2 class="font-display text-lg font-semibold">{{ $t('orgMembership.requestTitle') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('orgMembership.requestTitle') }}</h2>
       <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
       <JoinRequestForm
         v-else

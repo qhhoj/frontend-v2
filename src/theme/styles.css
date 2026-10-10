@@ -1,13 +1,10 @@
 @import 'tailwindcss';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/inter/700.css';
 @import '@fontsource/space-grotesk/500.css';
 @import '@fontsource/space-grotesk/600.css';
 @import '@fontsource/space-grotesk/700.css';
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/600.css';
+@import './fonts.css';
 @import './tokens.css';
 @import './themes/clay-light.css';
 @import './themes/clay-dark.css';
@@ -96,6 +93,15 @@
   --color-tier-candidate-master: var(--qh-tier-candidate-master);
   --color-tier-master: var(--qh-tier-master);
   --color-tier-grandmaster: var(--qh-tier-grandmaster);
+  --color-medal-gold: var(--qh-medal-gold);
+  --color-medal-silver: var(--qh-medal-silver);
+  --color-medal-bronze: var(--qh-medal-bronze);
+  --color-limit-time: var(--qh-limit-time);
+  --color-limit-time-bg: var(--qh-limit-time-bg);
+  --color-limit-memory: var(--qh-limit-memory);
+  --color-limit-memory-bg: var(--qh-limit-memory-bg);
+  --color-limit-points: var(--qh-limit-points);
+  --color-limit-points-bg: var(--qh-limit-points-bg);
   --font-display: var(--qh-font-display);
   --font-body: var(--qh-font-body);
   --font-mono: var(--qh-font-mono);
@@ -113,6 +119,37 @@
   --default-transition-timing-function: var(--qh-ease);
 }
 
+/* Page width: the header, every page's column and the footer share one left and right edge. */
+@utility page-gutter {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-width, var(--qh-page-max));
+  padding-inline: 1rem;
+  @media (min-width: 40rem) {
+    padding-inline: 2rem;
+  }
+}
+/* The standard page: a gutter and one vertical rhythm (24 px between blocks, 24 px above and below). */
+@utility page-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-block: 1.5rem;
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-width, var(--qh-page-max));
+  padding-inline: 1rem;
+  @media (min-width: 40rem) {
+    padding-inline: 2rem;
+  }
+}
+/* Page title, Codeforces-sized: one rule for every h1 (pages put it on the h1 instead of size classes). */
+@utility page-title {
+  font-family: var(--qh-font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+}
 @utility glass {
   background-color: var(--qh-surface-live);
   border: 1px solid var(--qh-line);
@@ -232,7 +269,13 @@
   }
   body {
     margin: 0;
+    font-size: 0.875rem;
     min-height: 100dvh;
+  }
+  /* A scroll box is also the containing block of the screen-reader-only text (position: absolute) inside it; otherwise that text escapes the clip and widens the page by a few px. */
+  .overflow-x-auto,
+  .overflow-auto {
+    position: relative;
   }
   :focus-visible {
     outline: 2px solid var(--qh-focus-ring);
@@ -303,6 +346,11 @@
   & table {
     display: block;
     overflow-x: auto;
+  }
+  & a {
+    color: var(--qh-accent-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 }
 
@@ -412,7 +460,35 @@
 /* Problem statement typography (StatementBody). Scoped to .statement so other user content keeps its own rhythm. */
 .user-content.statement {
   font-family: var(--qh-font-body);
-  line-height: 1.75;
+  font-size: 14.5px;
+  line-height: 1.7;
+  & h1,
+  & h2,
+  & h3,
+  & h4 {
+    font-family: var(--qh-font-display);
+    font-weight: 700;
+    color: var(--qh-accent-text);
+    margin-block: 1.25em 0.4em;
+  }
+  & h1,
+  & h2 {
+    font-size: 17px;
+  }
+  & h3,
+  & h4 {
+    font-size: 16px;
+  }
+  & > :first-child {
+    margin-top: 0;
+  }
+  /* Maths stays KaTeX (Computer Modern); it is a touch larger than the Verdana text beside it. */
+  & .katex {
+    font-size: 1.12em;
+  }
+  & .katex-display > .katex {
+    font-size: 1.2em;
+  }
 }
 
 /* Sample blocks in a statement are one rounded box: the copy bar is its top edge, the pre its body. The bar's padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */

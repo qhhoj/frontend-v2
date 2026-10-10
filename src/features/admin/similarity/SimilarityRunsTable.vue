@@ -25,7 +25,7 @@ const detailTo = (run: SimilarityRun) => ({
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2 class="font-display text-lg font-bold">
+    <h2 class="font-display text-base font-bold">
       {{
         'problem' in scope
           ? $t('admin.similarity.runs.ofProblem', { code: scope.problem })

@@ -99,7 +99,7 @@ const go = (patch: Record<string, string | undefined>) =>
         <div class="flex min-w-0 items-center gap-3">
           <InlineBit :kind="EXTRAS_BITS.balloonsHeading" />
           <div class="min-w-0">
-            <h1 class="font-display text-2xl font-bold sm:text-3xl">{{ $t('balloons.title') }}</h1>
+            <h1 class="page-title">{{ $t('balloons.title') }}</h1>
             <RouterLink
               :to="{ name: 'contest', params: { key } }"
               class="text-sm text-accent-text underline"

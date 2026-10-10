@@ -40,7 +40,7 @@ const failedText = computed(() => props.job?.error || '');
     aria-labelledby="import-progress-title"
   >
     <div class="flex items-center justify-between gap-3">
-      <h2 id="import-progress-title" class="text-lg font-semibold">
+      <h2 id="import-progress-title" class="text-base font-bold">
         {{ $t('admin.polygon.progress.title', { code }) }}
       </h2>
       <AdminBit v-if="!isFinished" placement="queued" />

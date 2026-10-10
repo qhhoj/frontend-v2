@@ -30,8 +30,8 @@ const tabs = computed(() =>
       v-for="tab in tabs"
       :key="tab.route"
       :to="{ name: tab.route, params: { username: props.username } }"
-      exact-active-class="border-accent font-semibold text-content"
-      class="-mb-px flex min-h-11 items-center border-b-2 border-transparent px-4 text-muted hover:text-content"
+      exact-active-class="border-accent font-bold text-accent-text"
+      class="-mb-px flex min-h-11 items-center border-b-2 border-transparent px-4 text-muted first:pl-0 hover:text-content"
     >
       {{ $t(`profile.tabs.${tab.key}`) }}
     </RouterLink>

@@ -66,7 +66,7 @@ async function save() {
 
 <template>
   <section data-testid="tag-editor" class="glass flex flex-col gap-4 rounded-panel p-5">
-    <h2 class="font-display text-lg font-semibold">
+    <h2 class="font-display text-base font-bold">
       {{
         tag
           ? $t('admin.contestTags.editTitle', { name: tag.name })

@@ -40,7 +40,7 @@ const lines = computed(() =>
 
 <template>
   <section :aria-labelledby="headingId" class="glass flex flex-col gap-3 rounded-card p-5">
-    <h2 :id="headingId" class="font-display text-lg font-semibold">
+    <h2 :id="headingId" class="font-display text-base font-bold">
       {{ $t('replay.feed.title') }}
     </h2>
     <EmptyState v-if="!lines.length" compact>{{ $t('replay.feed.empty') }}</EmptyState>

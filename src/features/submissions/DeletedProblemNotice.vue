@@ -16,7 +16,7 @@ defineProps<{ name: string }>();
   >
     <InlineBit :kind="DELETED_PROBLEM_BIT" />
     <div class="flex flex-col gap-1">
-      <h2 id="deleted-problem-title" class="font-display text-lg font-semibold">
+      <h2 id="deleted-problem-title" class="font-display text-base font-bold">
         {{ $t('deletedProblem.noticeTitle') }}
       </h2>
       <p class="text-muted">{{ $t('deletedProblem.noticeBody', { name }) }}</p>

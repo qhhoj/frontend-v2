@@ -26,7 +26,7 @@ const excerpt = computed(() => rulesExcerpt(props.contest.rules));
   <GlassCard v-if="isShown" data-testid="join-rules-card" class="flex flex-col gap-3 p-5">
     <div class="flex items-center gap-3">
       <InlineBit :kind="EXTRAS_BITS.rulesCard" />
-      <h2 class="font-display text-lg font-semibold">{{ $t('joinRules.cardTitle') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('joinRules.cardTitle') }}</h2>
       <span class="rounded-pill bg-surface-strong px-2.5 text-sm font-semibold">{{
         $t('joinRules.revision', { revision: contest.rulesRevision })
       }}</span>

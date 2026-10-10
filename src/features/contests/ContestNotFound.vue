@@ -12,7 +12,7 @@ import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
     <div data-testid="crying-bit" aria-hidden="true" class="[--bit-px:6px]">
       <BitSprite :look="PLACEMENT_LOOKS.crying" blinking tears />
     </div>
-    <h1 class="font-display text-3xl font-bold">{{ $t('contests.detail.notFoundTitle') }}</h1>
+    <h1 class="page-title">{{ $t('contests.detail.notFoundTitle') }}</h1>
     <p class="text-muted">{{ $t('contests.detail.notFoundBody') }}</p>
     <ShortLinkNotFoundHint />
     <RouterLink

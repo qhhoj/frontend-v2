@@ -32,7 +32,7 @@ const isLive = computed(
 <template>
   <GlassCard class="p-5">
     <div class="mb-1 flex items-center justify-between gap-3">
-      <h2 class="font-display text-lg font-semibold">{{ $t('contests.tabs.announcements') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('contests.tabs.announcements') }}</h2>
       <span
         v-if="isLive"
         class="rounded-pill bg-verdict-ac-bg px-2.5 text-[12px] font-semibold text-verdict-ac"

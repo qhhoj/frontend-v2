@@ -55,7 +55,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
         <span aria-hidden="true"> / </span>
         <span>{{ page.title }}</span>
       </nav>
-      <h1 class="font-display text-3xl font-bold tracking-tight">{{ page.title }}</h1>
+      <h1 class="page-title">{{ page.title }}</h1>
       <UserContent :html="page.contentHtml" class="overflow-x-auto" />
     </article>
   </QueryState>

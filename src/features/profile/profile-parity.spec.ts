@@ -35,7 +35,7 @@ it('the header skeleton draws the common shape: avatar, tier pill, name and join
   expect(blocks).toHaveLength(4);
   expect(blocks[0]!.attributes('class')).toContain('size-24');
   expect(blocks[1]!.attributes('class')).toContain('h-[26px] w-24');
-  expect(blocks[2]!.attributes('class')).toContain('h-9 w-56');
+  expect(blocks[2]!.attributes('class')).toContain('h-[30px] w-56');
   expect(blocks[3]!.attributes('class')).toContain('h-6 w-64');
 });
 

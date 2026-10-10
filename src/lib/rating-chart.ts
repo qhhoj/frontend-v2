@@ -39,6 +39,23 @@ export const ratingRange = (ratings: number[]): RatingRange => ({
 export const ratingTicks = ({ low, high }: RatingRange) =>
   Array.from({ length: (high - low) / STEP + 1 }, (_tick, index) => low + index * STEP);
 
+const LABEL_STEPS = [100, 200, 500, 1000, 2000];
+/** Rating labels and grid lines: multiples of the smallest step that keeps them `minGap` units apart, so 2 200 rating points do not stack into one smear. */
+export function ratingLabelTicks({ low, high }: RatingRange, plotHeight: number, minGap = 18) {
+  const step =
+    LABEL_STEPS.find((candidate) => ((high - low) / candidate) * minGap <= plotHeight) ??
+    LABEL_STEPS.at(-1)!;
+  const first = Math.ceil(low / step) * step;
+  return Array.from(
+    { length: Math.floor((high - first) / step) + 1 },
+    (_tick, index) => first + index * step,
+  );
+}
+
+/** Every how many contests a `#n` label is drawn so that neighbours stay `minGap` units apart. */
+export const labelEvery = (count: number, plotWidth: number, minGap = 40) =>
+  count < 2 ? 1 : Math.max(1, Math.ceil(minGap / (plotWidth / (count - 1))));
+
 /** y of a rating in the box: a higher rating sits higher, so a smaller y. */
 export const ratingY = (rating: number, range: RatingRange, box: ChartBox) =>
   box.height -

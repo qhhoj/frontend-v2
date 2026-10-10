@@ -94,7 +94,7 @@ function restoreFailureText(failure: ApiError): string {
         <h2
           ref="heading"
           tabindex="-1"
-          class="font-display text-lg font-semibold focus-visible:outline-none"
+          class="font-display text-base font-bold focus-visible:outline-none"
         >
           {{ t('admin.settings.revisions.title', { key: settingKey }) }}
         </h2>

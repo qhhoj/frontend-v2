@@ -161,7 +161,7 @@ async function confirmAction() {
         {{ $t('admin.staff.chip') }}
       </span>
       <AdminBit placement="header" />
-      <h2 id="staff-panel-title" class="font-display text-lg font-semibold">
+      <h2 id="staff-panel-title" class="font-display text-base font-bold">
         {{ $t('admin.staff.title') }}
       </h2>
     </header>

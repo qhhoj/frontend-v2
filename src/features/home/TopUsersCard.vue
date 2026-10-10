@@ -17,7 +17,7 @@ const LIST_MIN_HEIGHT = 'min-h-[6.4rem]';
 
 <template>
   <GlassCard data-testid="top-users" class="p-6">
-    <h2 class="mb-3 font-display text-lg font-semibold">{{ $t('home.topRating') }}</h2>
+    <h2 class="mb-3 font-display text-base font-bold">{{ $t('home.topRating') }}</h2>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <ol class="flex flex-col gap-2.5" :class="LIST_MIN_HEIGHT">

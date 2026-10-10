@@ -21,7 +21,7 @@ const stateKey = computed(() => {
 <template>
   <footer
     data-testid="app-footer"
-    class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 px-4 pt-2 pb-[calc(max(1.5rem,env(safe-area-inset-bottom))+var(--dock-height,0px))] text-[13px] text-muted sm:px-8"
+    class="page-gutter flex flex-wrap items-center gap-x-4 pt-2 pb-[calc(max(1.5rem,env(safe-area-inset-bottom))+var(--dock-height,0px))] text-[13px] text-muted"
   >
     <span>© QHHOJ</span>
     <span data-testid="app-version" class="font-mono text-xs" :title="$t('footer.versionTitle')"

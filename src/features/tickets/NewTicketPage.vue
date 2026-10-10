@@ -57,7 +57,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
       <GlassCard as="section" class="p-6 sm:p-8">
         <div class="flex items-center gap-4">
           <StateBit variant="writing" size="inline" />
-          <h1 class="font-display text-3xl font-bold tracking-tight">
+          <h1 class="page-title">
             {{ $t('tickets.newTicket') }}
           </h1>
         </div>
@@ -176,7 +176,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
       </GlassCard>
 
       <GlassCard as="aside" class="h-fit p-6">
-        <h2 class="font-display text-lg font-semibold">{{ $t('tickets.new.before') }}</h2>
+        <h2 class="font-display text-base font-bold">{{ $t('tickets.new.before') }}</h2>
         <ul class="mt-3 list-disc space-y-2 pl-5 text-[15px] text-muted">
           <li>
             <RouterLink

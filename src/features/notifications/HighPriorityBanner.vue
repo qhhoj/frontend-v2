@@ -29,7 +29,7 @@ const session = useSessionStore();
       role="region"
       data-testid="high-priority-banner"
       :aria-label="$t('notifications.banner.region')"
-      class="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-8"
+      class="page-gutter pt-4"
     >
       <SettingsNotice tone="info" :bit="NOTIFICATION_BITS.banner">
         <strong class="block text-xs tracking-wider uppercase">{{

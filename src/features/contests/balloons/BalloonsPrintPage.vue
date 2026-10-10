@@ -45,7 +45,7 @@ const printSheet = () => window.print();
     />
     <template v-else>
       <header class="flex flex-wrap items-center justify-between gap-3">
-        <h1 class="font-display text-2xl font-bold">
+        <h1 class="page-title">
           {{ $t('balloons.printTitle', { contest: contest?.name ?? key }) }}
         </h1>
         <div class="flex gap-2 print:hidden">

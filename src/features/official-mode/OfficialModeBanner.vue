@@ -27,7 +27,7 @@ const session = useSessionStore();
       role="region"
       data-testid="official-banner"
       :aria-label="$t('officialMode.region')"
-      class="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-8"
+      class="page-gutter pt-4"
     >
       <SettingsNotice tone="warning" :bit="NOTIFICATION_BITS.locked">
         <strong class="block">{{

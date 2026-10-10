@@ -73,7 +73,7 @@ const FILTER_CLASS =
       <div class="flex items-center gap-3">
         <InlineBit :kind="NOTIFICATION_BITS.header" />
         <div>
-          <h1 class="font-display text-4xl font-bold tracking-tight">
+          <h1 class="page-title">
             {{ $t('notifications.title') }}
           </h1>
           <p class="mt-2 text-muted">{{ $t('notifications.lead') }}</p>

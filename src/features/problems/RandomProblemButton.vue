@@ -8,8 +8,8 @@ const { open, pending, missing, failed } = useRandomProblem(toRef(props, 'filter
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <span data-testid="random-status" aria-live="polite" class="text-sm text-muted">
+  <div class="flex items-center">
+    <span data-testid="random-status" aria-live="polite" class="mr-2 text-sm text-muted empty:mr-0">
       <template v-if="missing">{{ $t('problems.randomNone') }}</template>
       <template v-else-if="failed">{{ $t('problems.randomFailed') }}</template>
     </span>

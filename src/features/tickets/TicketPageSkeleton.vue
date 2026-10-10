@@ -7,7 +7,7 @@ const MESSAGE_ROWS = [0, 1, 2];
 </script>
 
 <template>
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
     <div class="flex min-w-0 flex-col gap-5">
       <GlassCard
         as="div"
@@ -18,7 +18,7 @@ const MESSAGE_ROWS = [0, 1, 2];
         <div class="flex flex-wrap items-center gap-2">
           <SkeletonBlock pill class="h-6 w-24" />
         </div>
-        <p class="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+        <p class="page-title">
           <SkeletonBlock text class="w-3/4" />
         </p>
         <p class="text-sm"><SkeletonBlock text class="w-40" /></p>

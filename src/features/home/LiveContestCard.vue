@@ -55,7 +55,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
         </RouterLink>
       </template>
       <template v-else>
-        <h2 class="font-display text-lg font-semibold">{{ $t('home.liveContest') }}</h2>
+        <h2 class="font-display text-base leading-7 font-bold">{{ $t('home.liveContest') }}</h2>
         <EmptyState compact>{{ $t('home.noLiveContest') }}</EmptyState>
         <!-- mt-5 is tuned so the empty card is as tall as its skeleton (whose enter button sits below a gap); the CLS case
           "live contest card when it has nothing to list" in e2e/loading.e2e.ts guards it. Change it only with that case green. -->
