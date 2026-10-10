@@ -220,7 +220,7 @@ describe('the submission page loads with skeletons shaped like its cards', () =>
 });
 
 describe('the submission list page loads its stats strip and table as independent cards', () => {
-  it('shows four tiles and a table skeleton with the 9 real header cells and 10 rows, all inert', async () => {
+  it('shows four tiles and a table skeleton with the 7 real header cells and 10 rows, all inert', async () => {
     mockApi({ ...anonymousViewer });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/submissions');
@@ -229,7 +229,7 @@ describe('the submission list page loads its stats strip and table as independen
     expect(regionsIn(strip, 'value')).toBe(4);
     expect(regionsIn(strip, 'label')).toBe(4);
     const card = wrapper.get('[data-testid="submission-table-card"]');
-    expect(card.findAll('thead th')).toHaveLength(9);
+    expect(card.findAll('thead th')).toHaveLength(7);
     expect(regionsIn(card.element, 'row')).toBe(10);
     for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {
       expect(skeleton.attributes('aria-hidden')).toBe('true');

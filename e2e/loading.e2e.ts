@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import type { Locator, Page } from '@playwright/test';
+import { ROW } from './fixtures/submission-rows';
 import {
   contestItem,
   leaderboardEntry,
@@ -424,7 +425,9 @@ const SHIFT_CASES: ShiftCase[] = [
     parts: (page) => ({
       podium: page.locator('[data-skeleton-region="podium"], main section.grid'),
       'table header': page.locator('[data-skeleton-region="table-header"], main thead tr'),
-      'table rows': page.locator('[data-skeleton-region="row"], main tbody tr'),
+      'table rows': page.locator(
+        '[data-skeleton-region="row"], main [data-testid="submission-table-card"] [data-id]',
+      ),
     }),
     viewports: PHONE_AND_DESKTOP,
     placed: ['table header', 'table rows'],
@@ -541,7 +544,9 @@ const SHIFT_CASES: ShiftCase[] = [
       )),
     parts: (page) => ({
       'table card': page.getByTestId('submission-table-card'),
-      'table rows': page.locator('[data-skeleton-region="row"], main tbody tr'),
+      'table rows': page.locator(
+        '[data-skeleton-region="row"], main [data-testid="submission-table-card"] [data-id]',
+      ),
     }),
     viewports: PHONE_AND_DESKTOP,
     placed: ['table rows'],
@@ -636,12 +641,12 @@ for (const width of [PHONE, DESKTOP]) {
     await page.setViewportSize({ width, height: 900 });
     api.routes['GET /submissions'] = list([submissionItem({ id: 'sub-1' })]);
     await page.goto('/submissions');
-    await expect(page.locator('tbody tr').first()).toBeVisible();
+    await expect(page.locator(ROW).first()).toBeVisible();
     await expectNoticeMovesOnlyWhatIsBelow(
       () => closeStream(page),
       page.getByTestId('live-paused'),
       page.getByRole('heading', { level: 1 }),
-      page.locator('tbody tr').first(),
+      page.locator(ROW).first(),
     );
   });
 
@@ -685,7 +690,7 @@ for (const width of [PHONE, DESKTOP]) {
       },
       page.getByText('Không cập nhật được bảng, đang thử lại.'),
       page.getByRole('heading', { level: 1 }),
-      page.locator('main tbody tr').first(),
+      page.locator('main [data-testid="submission-table-card"] [data-id]').first(),
     );
   });
 }

@@ -1062,9 +1062,7 @@
       "verdict": "Verdict",
       "problem": "Problem",
       "user": "User",
-      "score": "Score",
-      "time": "Time",
-      "memory": "Memory",
+      "cost": "Time · Memory",
       "language": "Language",
       "when": "When",
       "source": "Source code"
@@ -1096,6 +1094,9 @@
       "noJudge": "no judge online",
       "unavailable": "Statistics unavailable"
     },
+    "queued": "In queue",
+    "queuedShort": "Wait",
+    "gradingShort": "Grading",
     "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}",
     "liveAdded": "{count} new submission | {count} new submissions",
     "liveNew": "{count} new submission on the first page | {count} new submissions on the first page",

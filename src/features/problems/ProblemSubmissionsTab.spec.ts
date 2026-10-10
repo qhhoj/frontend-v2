@@ -28,7 +28,7 @@ describe('the problem Submissions tab', () => {
     const headers = wrapper
       .findAll('#problem-panel-submissions thead th')
       .map((cell) => cell.text());
-    expect(headers).toHaveLength(8);
+    expect(headers).toHaveLength(6);
     expect(headers).not.toContain('Bài');
   });
 

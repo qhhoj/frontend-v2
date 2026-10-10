@@ -3,6 +3,7 @@ import { submissionItem } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { list } from './fixtures/api';
+import { ROW } from './fixtures/submission-rows';
 
 const PHONE_WIDTH = 375;
 const DESKTOP_WIDTH = 1280;
@@ -75,7 +76,7 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
       test('shows the N new pill on a later page and fits the viewport', async ({ page, api }) => {
         routePageTwoWithNewRows(api);
         await page.goto('/submissions?page=2');
-        await expect(page.locator('tbody tr')).toHaveCount(LONG_PAGE_ROWS);
+        await expect(page.locator(ROW)).toHaveCount(LONG_PAGE_ROWS);
         await pushQueued(page);
         const pill = page.getByTestId('new-pill');
         await expect(pill).toBeVisible({ timeout: SETTLE_TIMEOUT_MS });
@@ -96,12 +97,12 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
       }) => {
         routePageTwoWithNewRows(api);
         await page.goto('/submissions?page=2');
-        await expect(page.locator('tbody tr')).toHaveCount(LONG_PAGE_ROWS);
+        await expect(page.locator(ROW)).toHaveCount(LONG_PAGE_ROWS);
         await pushQueued(page);
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await page.getByTestId('new-pill').click({ timeout: SETTLE_TIMEOUT_MS });
         await expect(page).not.toHaveURL(/page=2/);
-        const firstRow = page.locator('tbody tr').first();
+        const firstRow = page.locator(ROW).first();
         await expect(firstRow).toBeInViewport();
         expect((await firstRow.boundingBox())!.y).toBeGreaterThanOrEqual(0);
       });
@@ -111,14 +112,14 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
         api.routes['GET /submissions'] = () =>
           list(calls++ === 0 ? [submissionItem()] : [newRow(), submissionItem()]);
         await page.goto('/submissions');
-        await expect(page.locator('tbody tr')).toHaveCount(1);
+        await expect(page.locator(ROW)).toHaveCount(1);
         if (SHOTS_DIR)
           await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'no-preference' });
         await pushQueued(page);
-        await expect(page.locator('tbody tr').first()).toHaveAttribute('data-id', 'new', {
+        await expect(page.locator(ROW).first()).toHaveAttribute('data-id', 'new', {
           timeout: SETTLE_TIMEOUT_MS,
         });
-        await expect(page.locator('tbody tr').first()).toHaveClass(/row-added/);
+        await expect(page.locator(ROW).first()).toHaveClass(/row-added/);
         if (SHOTS_DIR)
           await page.screenshot({ path: `${SHOTS_DIR}/task-8b-row-${width}-${scheme}.png` });
       });
