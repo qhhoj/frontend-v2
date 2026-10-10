@@ -134,12 +134,7 @@ The `API drift` workflow checks out `qhhoj/backend-v2` `main` and runs the same 
 
 ## Releasing
 
-The app follows Semantic Versioning (`package.json` `version`, starting at 2.0.0): major = breaking API, protocol or DB migration; minor = feature; patch = fix.
-
-- Every PR that changes behaviour adds a changeset: `npm run changeset` (pick the bump, write one line for the changelog) and commit the `.changeset/*.md` file. CI runs `npx changeset status --since=origin/main` on pull requests.
-- Releases are automated (`.github/workflows/release.yml`): every push to `main` opens or updates the "chore: version packages" PR, which bumps `package.json` and `package-lock.json`, writes `CHANGELOG.md` and consumes the changesets. Review and merge it; the next run tags `v<version>` (`npm run release:tag`, idempotent) and creates a GitHub Release from the changelog section. Nothing is published to npm.
-- One-time repo setting: Settings -> Actions -> General -> "Allow GitHub Actions to create and approve pull requests". The workflow uses only the default `GITHUB_TOKEN`.
-- First release: the pending changesets were folded into the 2.0.0 entry, so the first Version PR is for the first change after 2.0.0.
+There are no versions, changesets or release PRs. `main` is protected: changes land only by squash-merged PR, with signed commits and the required checks (`changes`, `scripts`, `check`, `drift`) green. Every push to `main` triggers `.github/workflows/deploy.yml`, which waits for CI on that commit, builds with `GIT_SHA` and deploys through `qhhoj-deploy` (`releases/sha-<12>` + `current` symlink). Two quick merges deploy in order; a deploy that has not started is cancelled by the newer one. A deploy deferred by a running contest (exit 75) is retried. Redeploy by hand with the `deploy` workflow (`ref`, `force` skips the CI wait). The footer shows the commit and build date.
 
 ## Commits
 

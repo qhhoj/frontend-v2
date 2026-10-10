@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
 
-/** Package version and short commit of this build (vite `define`). */
-declare const __APP_VERSION__: string;
+/** Short commit and UTC build date (YYYY-MM-DD) of this build (vite `define`). */
+declare const __BUILD_DATE__: string;
 declare const __APP_COMMIT__: string;

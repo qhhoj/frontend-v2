@@ -1,13 +1,23 @@
-# Builds dist/ and deploys it with qhhoj-deploy on the production host (releases/<version> + current symlink).
-# Called by release.yml when that run created the version tag, and by hand for any ref.
+# Builds dist/ and deploys it with qhhoj-deploy on the production host (releases/sha-<12> + current symlink).
+# Runs on every push to main (a squash-merged PR) once CI has passed on that commit; by hand for any ref.
 name: deploy
 on:
-  workflow_call:
-    inputs:
-      ref: { type: string, required: true }
+  push: { branches: [main] }
   workflow_dispatch:
     inputs:
-      ref: { description: 'Tag, branch or SHA (empty: latest v* tag)', type: string, default: '' }
+      ref:
+        {
+          description: 'Branch, tag or SHA (empty: the selected branch head)',
+          type: string,
+          default: '',
+        }
+      force:
+        {
+          description: 'Deploy without waiting for CI on the commit',
+          type: boolean,
+          default: false,
+        }
+# One deploy at a time. A newer run replaces a pending older one; a running deploy is never cancelled.
 concurrency:
   group: deploy-frontend
   cancel-in-progress: false
@@ -23,16 +33,18 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with: { fetch-depth: 0 }
       - id: ref
-        env: { REF: '${{ inputs.ref }}' }
+        env: { REF: '${{ inputs.ref || github.sha }}' }
         run: bash scripts/deploy/resolve-ref.sh "$REF" >> "$GITHUB_OUTPUT"
       - run: git checkout --detach "${{ steps.ref.outputs.sha }}"
       - name: Wait for CI on this commit
+        if: ${{ !inputs.force }}
         env: { GH_TOKEN: '${{ github.token }}' }
         run: bash scripts/deploy/wait-for-ci.sh "${{ steps.ref.outputs.sha }}" ci.yml 120
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - run: npm run build
+        env: { GIT_SHA: '${{ steps.ref.outputs.sha }}' }
       - name: Package
         env: { TAG: '${{ steps.ref.outputs.tag }}' }
         run: |
