@@ -14,39 +14,41 @@ import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
 describe('organization list', () => {
-  it('lists the viewer’s own organizations above all of them, with join mode, members and PP', async () => {
+  it('ranks organizations by performance points and filters to the viewer’s own', async () => {
     mockApi({
       ...signedInViewer(),
       ...organizationListRoutes,
       'GET /organizations': page([
-        organizationItem(),
+        organizationItem({ performancePoints: 100 }),
         organizationItem({
           id: 'o2',
           slug: 'hcmus',
           shortName: 'HCMUS',
           name: 'Đội tuyển HCMUS',
           isOpen: false,
+          performancePoints: 900,
         }),
       ]),
       'GET /users/user_01': ok(userPage({ organizations: [organizationSummary()] })),
     });
     const { wrapper } = await mountApp('/organizations');
-    const mine = wrapper.get('[data-testid="my-organizations"]');
-    expect(mine.text()).toContain('THPT chuyên Lê Hồng Phong');
     const cards = wrapper.findAll('[data-testid="organization-card"]');
     expect(cards.map((card) => card.text())).toEqual([
-      expect.stringContaining('Tham gia tự do'),
-      expect.stringContaining('Riêng tư · cần duyệt'),
+      expect.stringContaining('#1'),
+      expect.stringContaining('#2'),
     ]);
-    expect(cards[0]!.text()).toContain('842 thành viên');
-    expect(
-      mine.element.compareDocumentPosition(cards[0]!.element) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expect(cards[0]!.text()).toContain('Cần duyệt');
+    expect(cards[1]!.text()).toContain('Mở tự do');
+    expect(cards[1]!.text()).toContain('Đã tham gia');
+    expect(cards[1]!.text()).toContain('842');
+    const mine = wrapper.findAll('button').find((button) => button.text().startsWith('Của tôi'))!;
+    await mine.trigger('click');
+    expect(wrapper.findAll('[data-testid="organization-card"]')).toHaveLength(1);
   });
-  it('hides "your organizations" from anonymous visitors and never asks for their profile', async () => {
+  it('hides the "Của tôi" filter from anonymous visitors and never asks for their profile', async () => {
     const calls = mockApi({ ...anonymousViewer, ...organizationListRoutes });
     const { wrapper } = await mountApp('/organizations');
-    expect(wrapper.find('[data-testid="my-organizations"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Của tôi');
     expect(calls.some((call) => call.path.startsWith('/users/'))).toBe(false);
   });
 });
@@ -144,7 +146,7 @@ describe('organization list states', () => {
     mockApi({ ...anonymousViewer, 'GET /organizations': page([]) });
     const { wrapper } = await mountApp('/organizations');
     expect(wrapper.findAll('[data-testid="organization-card"]')).toHaveLength(0);
-    expect(wrapper.text()).toContain('Chưa có tổ chức nào.');
+    expect(wrapper.text()).toContain('Chưa có tổ chức công khai');
   });
 });
 

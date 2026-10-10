@@ -1088,7 +1088,7 @@
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
     "podium": "Top 3",
     "timeLeft": "Time left",
-    "scrollRegion": "Leaderboard, scrolls sideways",
+    "scrollRegion": "Scrollable ranking board",
     "columns": {
       "rank": "Rank",
       "user": "Contestant",
@@ -1121,7 +1121,6 @@
     "solvedCount": "{count} solved",
     "empty": "No contestants yet.",
     "disqualified": "Disqualified",
-    "scrollRegion": "Scrollable ranking board",
     "refreshFailed": "Could not refresh the board, retrying.",
     "scrollHint": "Swipe sideways to see the problems →"
   },
@@ -1384,13 +1383,9 @@
     "title": "Profile sections"
   },
   "orgs": {
-    "lead": "Schools, clubs and teams. You may be in at most 3 open organizations; private ones do not count.",
-    "mine": "Your organizations",
-    "member": "Member",
-    "all": "All organizations",
-    "allHint": "Up to 100 per page · hidden organizations show to their members only",
+    "lead": "Classes, teams and clubs on QHHOJ",
     "open": "Open to join",
-    "private": "Private · approval needed",
+    "private": "Approval needed",
     "unlisted": "Hidden",
     "members": "{count} members",
     "pp": "{pp} PP",
@@ -1401,7 +1396,7 @@
     "breadcrumb": "Breadcrumb",
     "tabsLabel": "Organization sections",
     "tabs": {
-      "about": "About",
+      "about": "Overview",
       "members": "Members",
       "posts": "Posts",
       "requests": "Join requests",
@@ -1427,7 +1422,33 @@
       "points": "Points",
       "problemCount": "Solved"
     },
-    "title": "Organizations"
+    "title": "Organizations",
+    "filtersLabel": "Filter organizations",
+    "filters": {
+      "all": "All",
+      "mine": "Mine",
+      "open": "Open"
+    },
+    "rankLabel": "Rank",
+    "rankBadge": "Rank {rank}",
+    "membersLabel": "Members",
+    "ppLabel": "Performance points",
+    "act": {
+      "join": "Join",
+      "request": "Request",
+      "joined": "Joined",
+      "signIn": "Sign in"
+    },
+    "emptyPublicTitle": "No public organizations yet",
+    "emptyPublicBody": "Once an organization goes public it will show up here.",
+    "emptyFilterTitle": "No organizations in this view",
+    "emptyFilterBody": "Try another filter.",
+    "back": "← Organizations",
+    "about": "About",
+    "joinPolicyOpen": "Anyone can join",
+    "joinPolicyApproval": "Joining needs approval",
+    "ppMeta": "{pp} performance points",
+    "membersMeta": "{count} members"
   },
   "orgMembership": {
     "signIn": "Sign in to join",

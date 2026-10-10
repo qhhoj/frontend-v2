@@ -1088,7 +1088,7 @@
     "frozenBody": "{minutes} phút cuối, kết quả mới hiện \"?\" đến khi công bố.",
     "podium": "Top 3",
     "timeLeft": "Thời gian còn lại",
-    "scrollRegion": "Bảng xếp hạng, cuộn ngang",
+    "scrollRegion": "Vùng cuộn bảng xếp hạng",
     "columns": {
       "rank": "Hạng",
       "user": "Thí sinh",
@@ -1121,7 +1121,6 @@
     "solvedCount": "{count} bài",
     "empty": "Chưa có thí sinh.",
     "disqualified": "Bị loại",
-    "scrollRegion": "Vùng cuộn bảng xếp hạng",
     "refreshFailed": "Không cập nhật được bảng, đang thử lại.",
     "scrollHint": "Vuốt ngang để xem các bài →"
   },
@@ -1384,13 +1383,9 @@
     "title": "Mục hồ sơ"
   },
   "orgs": {
-    "lead": "Trường, câu lạc bộ và đội tuyển. Mỗi người tham gia tối đa 3 tổ chức mở; tổ chức riêng tư không tính vào giới hạn.",
-    "mine": "Tổ chức của bạn",
-    "member": "Thành viên",
-    "all": "Tất cả tổ chức",
-    "allHint": "Tối đa 100 tổ chức mỗi trang · tổ chức ẩn chỉ hiện với thành viên",
-    "open": "Tham gia tự do",
-    "private": "Riêng tư · cần duyệt",
+    "lead": "Lớp, đội tuyển và câu lạc bộ trên QHHOJ",
+    "open": "Mở tự do",
+    "private": "Cần duyệt",
     "unlisted": "Ẩn",
     "members": "{count} thành viên",
     "pp": "{pp} PP",
@@ -1401,7 +1396,7 @@
     "breadcrumb": "Đường dẫn",
     "tabsLabel": "Mục tổ chức",
     "tabs": {
-      "about": "Giới thiệu",
+      "about": "Tổng quan",
       "members": "Thành viên",
       "posts": "Bài viết",
       "requests": "Yêu cầu tham gia",
@@ -1427,7 +1422,33 @@
       "points": "Tổng điểm",
       "problemCount": "Số bài giải"
     },
-    "title": "Tổ chức"
+    "title": "Tổ chức",
+    "filtersLabel": "Lọc tổ chức",
+    "filters": {
+      "all": "Tất cả",
+      "mine": "Của tôi",
+      "open": "Mở tự do"
+    },
+    "rankLabel": "Hạng",
+    "rankBadge": "Hạng {rank}",
+    "membersLabel": "Thành viên",
+    "ppLabel": "Điểm thành tích",
+    "act": {
+      "join": "Tham gia",
+      "request": "Xin vào",
+      "joined": "Đã tham gia",
+      "signIn": "Đăng nhập"
+    },
+    "emptyPublicTitle": "Chưa có tổ chức công khai",
+    "emptyPublicBody": "Khi một tổ chức được công khai, nó sẽ hiện ở đây.",
+    "emptyFilterTitle": "Không có tổ chức nào trong mục này",
+    "emptyFilterBody": "Thử chọn mục khác ở bộ lọc.",
+    "back": "← Tổ chức",
+    "about": "Giới thiệu",
+    "joinPolicyOpen": "Mở tự do khi tham gia",
+    "joinPolicyApproval": "Cần duyệt khi tham gia",
+    "ppMeta": "{pp} điểm thành tích",
+    "membersMeta": "{count} thành viên"
   },
   "orgMembership": {
     "signIn": "Đăng nhập để tham gia",

@@ -8,7 +8,10 @@ const labelKey = computed(() => joinModeKey(props.isOpen));
 </script>
 
 <template>
-  <span class="rounded-pill border border-line px-3 py-1 text-sm text-muted">
+  <span
+    class="rounded-pill px-3 py-1 text-sm"
+    :class="isOpen ? 'bg-verdict-ac-bg text-verdict-ac' : 'bg-surface-hover text-muted'"
+  >
     {{ $t(labelKey) }}
   </span>
 </template>

@@ -1,42 +1,97 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import type { OrganizationListItem } from '@/api/types/organizations';
 import { formatNumber } from '@/lib/format';
+import { medalClass } from '@/lib/medal';
+import { safeRedirect } from '@/router/safe-redirect';
 import { useLocaleStore } from '@/stores/locale.store';
-import OrganizationBadge from './OrganizationBadge.vue';
 import OrganizationJoinChip from './OrganizationJoinChip.vue';
+import OrganizationLogo from './OrganizationLogo.vue';
 
-const props = defineProps<{ organization: OrganizationListItem }>();
+const props = defineProps<{
+  organization: OrganizationListItem;
+  rank: number;
+  isMember: boolean;
+  isSignedIn: boolean;
+}>();
+const route = useRoute();
 const locale = useLocaleStore();
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
 const performancePoints = computed(() =>
   formatNumber(props.organization.performancePoints, locale.locale),
 );
+const organizationRoute = computed(() => ({
+  name: 'organization',
+  params: { slug: props.organization.slug },
+}));
+/** Joining happens on the organization page; a visitor first signs in and comes back to this list. */
+const actionRoute = computed(() =>
+  props.isSignedIn || props.isMember
+    ? organizationRoute.value
+    : { name: 'login', query: { redirect: safeRedirect(route.fullPath) } },
+);
+const actionKey = computed(() => {
+  if (props.isMember) return 'orgs.act.joined';
+  if (!props.isSignedIn) return 'orgs.act.signIn';
+  return props.organization.isOpen ? 'orgs.act.join' : 'orgs.act.request';
+});
+const actionClass = computed(() =>
+  !props.isMember && props.isSignedIn && props.organization.isOpen
+    ? 'bg-accent text-on-accent'
+    : 'bg-accent-soft text-accent-soft-text',
+);
 </script>
 
 <template>
-  <article data-testid="organization-card" class="glass flex flex-col gap-3 rounded-card p-5">
-    <div class="flex flex-wrap items-center gap-2">
-      <OrganizationBadge :short-name="organization.shortName" />
-      <OrganizationJoinChip :is-open="organization.isOpen" />
+  <article data-testid="organization-card" class="glass flex flex-col gap-3.5 rounded-card p-5">
+    <div class="flex min-w-0 items-center gap-3">
+      <OrganizationLogo :organization="organization" />
+      <div class="min-w-0 flex-1">
+        <h3 class="truncate font-bold">
+          <RouterLink :to="organizationRoute" class="hover:underline">
+            {{ organization.name }}
+          </RouterLink>
+        </h3>
+        <span class="font-mono text-xs text-muted">{{ organization.shortName }}</span>
+      </div>
       <span
-        v-if="organization.isUnlisted"
-        class="rounded-pill border border-line px-3 py-1 text-sm text-muted"
+        :aria-label="$t('orgs.rankBadge', { rank })"
+        class="shrink-0 font-display font-bold text-muted"
+        :class="medalClass(rank)"
       >
-        {{ $t('orgs.unlisted') }}
+        #{{ rank }}
       </span>
     </div>
-    <h3 class="font-display text-lg font-semibold">
+    <dl class="grid grid-cols-2 gap-2 tabular-nums">
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs text-muted">{{ $t('orgs.membersLabel') }}</dt>
+        <dd class="font-bold">{{ memberCount }}</dd>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <dt class="text-xs text-muted">{{ $t('orgs.ppLabel') }}</dt>
+        <dd class="font-bold text-positive">{{ performancePoints }}</dd>
+      </div>
+    </dl>
+    <div
+      class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3"
+    >
+      <div class="flex flex-wrap items-center gap-2">
+        <OrganizationJoinChip :is-open="organization.isOpen" />
+        <span
+          v-if="organization.isUnlisted"
+          class="rounded-pill border border-line px-3 py-1 text-sm text-muted"
+        >
+          {{ $t('orgs.unlisted') }}
+        </span>
+      </div>
       <RouterLink
-        :to="{ name: 'organization', params: { slug: organization.slug } }"
-        class="hover:underline"
+        :to="actionRoute"
+        class="inline-flex min-h-9 items-center rounded-pill px-3.5 text-sm font-bold"
+        :class="actionClass"
       >
-        {{ organization.name }}
+        {{ $t(actionKey) }}
       </RouterLink>
-    </h3>
-    <p class="mt-auto flex flex-wrap gap-x-4 text-sm text-muted">
-      <span>{{ $t('orgs.members', { count: memberCount }) }}</span>
-      <span>{{ $t('orgs.pp', { pp: performancePoints }) }}</span>
-    </p>
+    </div>
   </article>
 </template>
