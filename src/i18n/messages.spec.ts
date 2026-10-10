@@ -44,8 +44,8 @@ describe('messages', () => {
 
   it('render singular and plural English forms from the count', () => {
     i18n.global.locale.value = 'en';
-    expect(translate('problems.summary', { total: 1 }, 1)).toBe('1 problem');
-    expect(translate('problems.summary', { total: 2 }, 2)).toBe('2 problems');
+    expect(translate('problems.results', { n: 1 }, 1)).toBe('1 result');
+    expect(translate('problems.results', { n: 2 }, 2)).toBe('2 results');
     expect(translate('ranking.cell.failed', { tries: 1 }, 1)).toBe('1 wrong try');
     expect(translate('ranking.cell.failed', { tries: 2 }, 2)).toBe('2 wrong tries');
     expect(translate('ranking.cell.pending', { tries: 1 }, 1)).toBe(

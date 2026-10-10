@@ -57,7 +57,8 @@ describe('problem list', () => {
     });
     const { wrapper } = await mountApp('/problems');
     expect(wrapper.get('h1').text()).toBe('Bài tập');
-    expect(wrapper.text()).toContain('2.318 bài · 412 đã giải');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Đã giải 412 bài');
     const rows = wrapper.findAll('tbody tr');
     expect(rows).toHaveLength(3);
     expect(rows[0]!.text()).toContain('Dãy con tăng dài nhất');
@@ -90,11 +91,13 @@ describe('problem list', () => {
     expect(lastListQuery(calls).get('lang')).toBe('en');
   });
 
-  it('shows the total alone to anonymous viewers', async () => {
+  it('shows no count to anonymous viewers until a filter is active', async () => {
     mockApi(anonymous(page(threeProblems)));
     const { wrapper } = await mountApp('/problems');
-    expect(wrapper.text()).toContain('3 bài');
-    expect(wrapper.text()).not.toMatch(/\d đã giải/);
+    expect(wrapper.get('h1').element.parentElement!.textContent).toBe('Bài tập');
+    await wrapper.vm.$router.push('/problems?search=lis');
+    await flushPromises();
+    expect(wrapper.get('h1').element.parentElement!.textContent).toContain('3 kết quả');
   });
 
   it('picks problem types from a searchable list and removes them as chips', async () => {

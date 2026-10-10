@@ -51,17 +51,17 @@ watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () 
 const listTop = ref<HTMLElement | null>(null);
 watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }), { flush: 'post' });
 
+/** Filtered: how many match. Otherwise the signed-in viewer's progress; anonymous visitors get nothing. */
 const summary = computed(() => {
-  const total = data.value?.meta.total;
-  if (total === undefined) return '';
-  const totalText = formatNumber(total, locale.locale);
-  return viewer.value
-    ? translate(
-        'problems.summarySolved',
-        { total: totalText, solved: formatNumber(viewer.value.problemCount, locale.locale) },
-        total,
-      )
-    : translate('problems.summary', { total: totalText }, total);
+  if (chips.value.length) {
+    const total = data.value?.meta.total;
+    if (total === undefined) return '';
+    return translate('problems.results', { n: formatNumber(total, locale.locale) }, total);
+  }
+  if (!viewer.value) return '';
+  return translate('problems.solvedCount', {
+    solved: formatNumber(viewer.value.problemCount, locale.locale),
+  });
 });
 </script>
 
