@@ -9,8 +9,11 @@ import {
   STEP_PX,
   bitCount,
   hopOffset,
+  isGone,
+  leaveHeading,
   legStep,
   spawnWalker,
+  stepLeaver,
   stepWalker,
   walkBounds,
 } from './bit-walk';
@@ -246,6 +249,124 @@ describe('stepWalker', () => {
         expect(walker.y).toBeLessThanOrEqual(area.maxY);
       }
     }
+  });
+});
+
+describe('a walker outside the walk bounds', () => {
+  const centre = { x: (bounds.minX + bounds.maxX) / 2, y: (bounds.minY + bounds.maxY) / 2 };
+  const distanceToCentre = (walker: Walker) => Math.hypot(walker.x - centre.x, walker.y - centre.y);
+  const outside = [
+    walkerAt({ x: -200, y: 300, heading: Math.PI }),
+    walkerAt({ x: VIEWPORT.width + 50, y: 300, heading: 0 }),
+    walkerAt({ x: 400, y: -150, heading: 1.5 * Math.PI }),
+    walkerAt({ x: 400, y: VIEWPORT.height + 90, heading: 0.5 * Math.PI }),
+  ];
+
+  it.each(outside)('heads straight for the centre without bouncing or wobbling (%#)', (start) => {
+    const wobbly = seededRandom(3);
+    let walker = start;
+    for (let frame = 0; frame < 20; frame++) {
+      const next = stepWalker(walker, bounds, 16, wobbly);
+      expect(distanceToCentre(next)).toBeLessThan(distanceToCentre(walker));
+      expect(next.heading).toBeCloseTo(
+        (Math.atan2(centre.y - walker.y, centre.x - walker.x) + 2 * Math.PI) % (2 * Math.PI),
+      );
+      walker = next;
+    }
+  });
+
+  it.each(outside)('never moves further than speed times the longest frame (%#)', (start) => {
+    const random = seededRandom(11);
+    let walker = start;
+    for (let frame = 0; frame < 600; frame++) {
+      const next = stepWalker(walker, bounds, frame % 2 ? 16 : 5000, random);
+      const step = Math.hypot(next.x - walker.x, next.y - walker.y);
+      expect(step).toBeLessThanOrEqual((SPEED_BAND.max * MAX_FRAME_MS) / 1000 + 1e-9);
+      walker = next;
+    }
+  });
+
+  it.each(outside)('ends up inside the bounds and wanders from there (%#)', (start) => {
+    const random = seededRandom(5);
+    let walker = start;
+    for (let frame = 0; frame < 2000; frame++) walker = stepWalker(walker, bounds, 16, random);
+    expect(walker.x).toBeGreaterThanOrEqual(bounds.minX);
+    expect(walker.x).toBeLessThanOrEqual(bounds.maxX);
+    expect(walker.y).toBeGreaterThanOrEqual(bounds.minY);
+    expect(walker.y).toBeLessThanOrEqual(bounds.maxY);
+  });
+});
+
+describe('leaveHeading', () => {
+  const size = LOADING_BIT_SIZE;
+  it.each([
+    ['west', { x: 50, y: 300 }, Math.PI],
+    ['east', { x: 900, y: 300 }, 0],
+    ['north', { x: 480, y: 20 }, 1.5 * Math.PI],
+    ['south', { x: 480, y: 620 }, 0.5 * Math.PI],
+  ])('picks the nearest edge: %s', (_name, at, expected) => {
+    expect(leaveHeading(walkerAt(at), VIEWPORT, size)).toBeCloseTo(expected);
+  });
+});
+
+describe('stepLeaver', () => {
+  const size = LOADING_BIT_SIZE;
+  const leaving = () => {
+    const start = walkerAt({ x: 900, y: 300, speed: 75, heading: 1 });
+    return { ...start, heading: leaveHeading(start, VIEWPORT, size) };
+  };
+
+  it('keeps its own speed and heading, with no randomness, and the legs keep stepping', () => {
+    let walker = leaving();
+    for (let frame = 0; frame < 30; frame++) {
+      const next = stepLeaver(walker, 16);
+      expect(next.speed).toBe(75);
+      expect(next.heading).toBe(walker.heading);
+      expect(next.travelled).toBeGreaterThan(walker.travelled);
+      walker = next;
+    }
+    expect(walker.travelled).toBeCloseTo((75 * 30 * 16) / 1000);
+    expect(walker.y).toBeCloseTo(300);
+  });
+
+  it('walks off the nearest edge and is gone after enough frames, not before', () => {
+    let walker = leaving();
+    expect(isGone(walker, VIEWPORT, size)).toBe(false);
+    let frames = 0;
+    while (!isGone(walker, VIEWPORT, size) && frames < 10_000) {
+      walker = stepLeaver(walker, 16);
+      frames++;
+    }
+    expect(walker.x).toBeGreaterThanOrEqual(VIEWPORT.width);
+    expect(frames).toBeCloseTo((VIEWPORT.width - 900) / ((75 * 16) / 1000), -1);
+  });
+
+  it('keeps facing where it was when it leaves through the top or the bottom', () => {
+    const up = stepLeaver(walkerAt({ heading: 1.5 * Math.PI, facing: -1 }), 16);
+    expect(up.facing).toBe(-1);
+    const east = stepLeaver(walkerAt({ heading: 0, facing: -1 }), 16);
+    expect(east.facing).toBe(1);
+  });
+
+  it('caps a stalled frame, finishes a started hop and starts no new one', () => {
+    const next = stepLeaver(walkerAt({ speed: 60, hopMsLeft: 100 }), 5000);
+    expect(next.x - 500).toBeCloseTo((60 * MAX_FRAME_MS) / 1000);
+    expect(next.hopMsLeft).toBe(0);
+    expect(stepLeaver(walkerAt(), 16).hopMsLeft).toBe(0);
+  });
+});
+
+describe('isGone', () => {
+  const size = LOADING_BIT_SIZE;
+  it('is true only once the whole box, hop included, is outside the viewport', () => {
+    expect(isGone(walkerAt({ x: -size + 1 }), VIEWPORT, size)).toBe(false);
+    expect(isGone(walkerAt({ x: -size }), VIEWPORT, size)).toBe(true);
+    expect(isGone(walkerAt({ x: VIEWPORT.width - 1 }), VIEWPORT, size)).toBe(false);
+    expect(isGone(walkerAt({ x: VIEWPORT.width }), VIEWPORT, size)).toBe(true);
+    expect(isGone(walkerAt({ y: -size - HOP_PX + 1 }), VIEWPORT, size)).toBe(false);
+    expect(isGone(walkerAt({ y: -size - HOP_PX }), VIEWPORT, size)).toBe(true);
+    expect(isGone(walkerAt({ y: VIEWPORT.height + HOP_PX - 1 }), VIEWPORT, size)).toBe(false);
+    expect(isGone(walkerAt({ y: VIEWPORT.height + HOP_PX }), VIEWPORT, size)).toBe(true);
   });
 });
 

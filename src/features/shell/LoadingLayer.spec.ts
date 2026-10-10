@@ -45,6 +45,21 @@ describe('LoadingLayer', () => {
     expect(region().text()).toBe('');
   });
 
+  it('walks the Bits off when loading ends, and hides the layer once they are gone', async () => {
+    const wrapper = await mountSettled();
+    const loading = useLoadingStore();
+    const source = Symbol('page');
+    loading.begin(source);
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.showAfterMs);
+    loading.end(source);
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.settleMs);
+    expect(wrapper.get('[data-testid="loading-bits"]').attributes('data-phase')).toBe('leaving');
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.leaveMs);
+    expect(wrapper.get('[data-testid="loading-bits"]').attributes('data-phase')).toBe('fading');
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.fadeMs);
+    expect(wrapper.find('[data-testid="loading-bits"]').exists()).toBe(false);
+  });
+
   it('shows nothing for a load that ends before the threshold', async () => {
     const wrapper = await mountSettled();
     const loading = useLoadingStore();
