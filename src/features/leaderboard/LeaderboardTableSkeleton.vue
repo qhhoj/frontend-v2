@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import type { BoardSort } from '@/api/types/users';
+import type { LeaderboardSort } from '@/api/types/users';
 import {
   BOARD_HEAD_CLASS,
   BOARD_TABLE_CLASS,
   SKELETON_ROW_COUNT,
   BOARD_ROW_CLASS,
-  SPACER_CELL_CLASS,
-  SPACER_HEAD_CLASS,
   ORGANIZATION_HEAD_CLASS,
   RANK_HEAD_CLASS,
   USER_HEAD_CLASS,
   valueHeadClass,
+  VALUE_HEAD_INNER_CLASS,
   ORGANIZATION_CELL_CLASS,
   RANK_CELL_CLASS,
   USER_CELL_CLASS,
@@ -20,7 +19,7 @@ import {
 } from './leaderboard-cells';
 import { boardColumns } from './leaderboard-columns';
 
-const props = defineProps<{ sort: BoardSort }>();
+const props = defineProps<{ sort: LeaderboardSort }>();
 const columns = computed(() => boardColumns(props.sort));
 const rows = Array.from({ length: SKELETON_ROW_COUNT }, (_row, index) => index);
 </script>
@@ -41,9 +40,8 @@ const rows = Array.from({ length: SKELETON_ROW_COUNT }, (_row, index) => index);
             scope="col"
             :class="valueHeadClass(column.isActive)"
           >
-            <SkeletonBlock text class="w-16" />
+            <div :class="VALUE_HEAD_INNER_CLASS"><SkeletonBlock text class="w-16" /></div>
           </th>
-          <th v-if="sort === 'contributors'" scope="col" :class="SPACER_HEAD_CLASS" />
         </tr>
       </thead>
       <tbody>
@@ -64,7 +62,6 @@ const rows = Array.from({ length: SKELETON_ROW_COUNT }, (_row, index) => index);
           <td v-for="column in columns" :key="column.key" :class="valueCellClass(column.isActive)">
             <SkeletonBlock text class="w-12" />
           </td>
-          <td v-if="sort === 'contributors'" :class="SPACER_CELL_CLASS" />
         </tr>
       </tbody>
     </table>

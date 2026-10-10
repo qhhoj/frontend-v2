@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { BOARD_SORTS } from '@/api/types/users';
 import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -22,7 +21,6 @@ const session = useSessionStore();
 const locale = useLocaleStore();
 const listTop = ref<HTMLElement | null>(null);
 watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }));
-const sortLink = (key: string) => ({ query: key === 'rating' ? {} : { sort: key } });
 const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
 </script>
 
@@ -35,17 +33,6 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
       </div>
       <UsernameJump />
     </header>
-    <nav :aria-label="$t('leaderboard.sortNav')" class="flex flex-wrap gap-2">
-      <RouterLink
-        v-for="key in BOARD_SORTS"
-        :key="key"
-        :to="sortLink(key)"
-        :aria-current="key === sort ? 'page' : undefined"
-        class="inline-flex min-h-11 items-center rounded-pill border border-transparent px-4 font-medium text-muted hover:bg-surface-hover aria-[current=page]:border-line-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text"
-      >
-        {{ $t(`leaderboard.sorts.${key}`) }}
-      </RouterLink>
-    </nav>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="min-w-0">
         <GlassCard class="flex min-w-0 flex-col gap-4 p-4 sm:p-6">

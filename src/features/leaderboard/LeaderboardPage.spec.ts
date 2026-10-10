@@ -40,21 +40,26 @@ describe('leaderboard page: reads the board from the URL', () => {
     expect(row.findComponent(UserAvatar).exists()).toBe(true);
     expect(row.get('a[href="/users/dinhphuc"]').classes()).toContain('text-tier-specialist');
     expect(row.text()).toContain('PBC');
-    expect(wrapper.get('a[aria-current="page"][href="/users?sort=points"]').text()).toBe(
-      'Tổng điểm',
-    );
+    expect(wrapper.get('th[aria-sort="descending"]').text()).toBe('Tổng điểm');
+    expect(wrapper.findAll('th[aria-sort="none"]')).toHaveLength(3);
   });
 
-  it('asks /contributors on the contributors tab and shows only contribution points', async () => {
-    const calls = mockApi({
-      ...anonymousViewer,
-      'GET /contributors': page([leaderboardEntry(1, 'thayhung', null)]),
-    });
-    const { wrapper } = await mountApp('/users?sort=contributors');
-    expect(calls.some((call) => call.path === '/contributors')).toBe(true);
-    const headings = wrapper.findAll('thead th').map((cell) => cell.text());
-    expect(headings).toContain('Điểm đóng góp');
-    expect(headings).not.toContain('Rating');
+  it('sorts by a clicked column heading and returns to the first page', async () => {
+    const calls = mockApi({ ...anonymousViewer, 'GET /users': board });
+    const { wrapper, router } = await mountApp('/users?sort=points&page=12');
+    const button = wrapper
+      .findAll('thead th button')
+      .find((candidate) => candidate.text() === 'Số bài giải')!;
+    await button.trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.fullPath).toBe('/users?sort=problemCount');
+    expect(
+      calls
+        .filter((call) => call.path === '/users')
+        .at(-1)!
+        .query.get('page'),
+    ).toBe('1');
+    expect(wrapper.get('th[aria-sort="descending"]').text()).toBe('Số bài giải');
   });
 });
 

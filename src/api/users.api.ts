@@ -3,7 +3,6 @@ import type { Schemas } from './schemas';
 import { apiGet, apiGetPage, apiSend } from './typed';
 import type { PostListItem } from './types/blog';
 import type { RecentComment } from './types/comments';
-import { LEADERBOARD_PAGE_SIZE } from './types/users';
 import type {
   ActivityResponse,
   LeaderboardEntry,
@@ -22,8 +21,6 @@ export const fetchRatingHistory = (username: string): Promise<RatingHistoryEntry
   apiGet('/users/{username}/ratings', { path: { username } });
 export const fetchLeaderboard = (query: LeaderboardQuery): Promise<Page<LeaderboardEntry>> =>
   apiGetPage('/users', { query });
-export const fetchContributors = (page: number): Promise<Page<LeaderboardEntry>> =>
-  apiGetPage('/contributors', { query: { page, pageSize: LEADERBOARD_PAGE_SIZE } });
 export const fetchRank = (username: string, field: RankField): Promise<RankResponse> =>
   apiGet('/users/{username}/rank', { path: { username }, query: { sort: field } });
 export const fetchSolved = (username: string): Promise<SolvedResponse> =>

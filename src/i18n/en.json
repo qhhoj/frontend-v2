@@ -1262,14 +1262,6 @@
   },
   "leaderboard": {
     "lead": "{total} active users · 100 per page",
-    "sortNav": "Sort",
-    "sorts": {
-      "rating": "Rating",
-      "performancePoints": "Performance points",
-      "points": "Points",
-      "problemCount": "Solved",
-      "contributors": "Contributors"
-    },
     "columns": {
       "rank": "Rank",
       "user": "User",
@@ -1277,16 +1269,14 @@
       "rating": "Rating",
       "performancePoints": "PP",
       "points": "Points",
-      "problemCount": "Solved",
-      "contributionPoints": "Contribution"
+      "problemCount": "Solved"
     },
     "myRank": "Your rank",
     "by": {
       "rating": "By rating",
       "performancePoints": "By performance points",
       "points": "By points",
-      "problemCount": "By problems solved",
-      "contributors": "By contribution"
+      "problemCount": "By problems solved"
     },
     "pageOf": "Page {page}",
     "findMe": "Find my rank",
