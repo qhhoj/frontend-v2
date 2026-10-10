@@ -15,8 +15,12 @@ export const boardColumns = (sort: LeaderboardSort): BoardColumn[] =>
     isActive: key === sort,
   }));
 
+/** Only the board's own columns: a sort the backend takes but the board does not show (`contributionPoints`) falls back. */
+const isBoardSort = (value: unknown): value is LeaderboardSort =>
+  (LEADERBOARD_SORTS as readonly unknown[]).includes(value);
+
 export const sortFromQuery = (value: unknown): LeaderboardSort =>
-  LEADERBOARD_SORTS.includes(value as LeaderboardSort) ? (value as LeaderboardSort) : 'rating';
+  isBoardSort(value) ? value : 'rating';
 
 /** Sorting by a column opens its first page; the default sort is left out of the URL. */
 export const sortLocation = (sort: LeaderboardSort) => ({

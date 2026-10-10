@@ -8,8 +8,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List judge languages with their full settings
+         * @description Needs `judge.change_language`. Returns every programming language of the
+         *     site, sorted by name, including editor, highlighting and file-size settings
+         *     that the public catalog omits.
+         */
         get: operations["LanguagesAdminController_list"];
         put?: never;
+        /**
+         * Add a judge language
+         * @description Needs `judge.add_language`. The `key` is what judges report for the language
+         *     and cannot be changed afterwards. Responds 409 `conflict` when the key
+         *     already exists. The change takes effect on this server at once and on others
+         *     through the change stream.
+         */
         post: operations["LanguagesAdminController_create"];
         delete?: never;
         options?: never;
@@ -30,6 +43,12 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update a judge language
+         * @description Needs `judge.change_language`. Send only the fields to change;
+         *     `shortName: null` clears the short name and every other field refuses null.
+         *     The `key` cannot be changed. Responds 404 `not_found` for an unknown id.
+         */
         patch: operations["LanguagesAdminController_update"];
         trace?: never;
     };
@@ -40,6 +59,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List join requests across organizations
+         * @description Requires `judge.edit_all_organization`. Returns the staff queue of join
+         *     requests over all organizations, one `state` at a time (`P` by default),
+         *     newest first, 50 per page.
+         */
         get: operations["OrganizationRequestQueueController_list"];
         put?: never;
         post?: never;
@@ -56,6 +81,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List posts awaiting moderation
+         * @description Requires `judge.edit_all_post`. Returns posts by `state`: `hidden` (every
+         *     draft, personal or organization) or `scheduled` (visible posts whose
+         *     publish time is still ahead), newest first. Paged with `page`.
+         */
         get: operations["BlogModerationController_list"];
         put?: never;
         post?: never;
@@ -72,6 +103,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List site settings
+         * @description Requires `judge.change_settings`. Returns every registered setting with its description, current value, default and whether it differs from the default. Secret parts (keys, passwords) are never returned; they read `{set: boolean}`.
+         */
         get: operations["SettingsController_list"];
         put?: never;
         post?: never;
@@ -94,6 +129,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Change a site setting
+         * @description Requires `judge.change_settings`. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 404 `not_found` for an unknown key.
+         */
         patch: operations["SettingsController_update"];
         trace?: never;
     };
@@ -104,6 +143,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the revisions of a setting
+         * @description Requires `judge.change_settings`. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). 404 `not_found` for an unknown key.
+         */
         get: operations["SettingsController_revisions"];
         put?: never;
         post?: never;
@@ -122,6 +165,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Restore a setting to an earlier revision
+         * @description Requires `judge.change_settings`. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.
+         */
         post: operations["SettingsController_restore"];
         delete?: never;
         options?: never;
@@ -137,8 +184,16 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Set a public config value
+         * @description Requires `judge.change_miscconfig`. Creates or replaces a free-form key/value text served to everyone by `GET /site`, so it must never hold a secret. The empty string is a valid value.
+         */
         put: operations["MiscConfigAdminController_put"];
         post?: never;
+        /**
+         * Delete a public config value
+         * @description Requires `judge.change_miscconfig`. Removes the key. 404 `not_found` if it does not exist. Returns 204.
+         */
         delete: operations["MiscConfigAdminController_delete"];
         options?: never;
         head?: never;
@@ -152,8 +207,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List site pages
+         * @description Requires `flatpages.change_flatpage`. Returns a page of 50 pages with their URL, title and last update.
+         */
         get: operations["FlatpagesAdminController_list"];
         put?: never;
+        /**
+         * Create a site page
+         * @description Requires `flatpages.add_flatpage`. Stores a page and renders its Markdown to sanitised HTML. The URL is canonicalised (`about/` becomes `/about`). Records a revision. Errors: 400 `invalid_url`, 409 `conflict` when the URL is taken.
+         */
         post: operations["FlatpagesAdminController_create"];
         delete?: never;
         options?: never;
@@ -168,12 +231,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a site page for editing
+         * @description Requires `flatpages.change_flatpage`. Returns the page with its Markdown source and the rendered HTML. 404 `not_found`.
+         */
         get: operations["FlatpagesAdminController_one"];
         put?: never;
         post?: never;
+        /**
+         * Delete a site page
+         * @description Requires `flatpages.delete_flatpage`. Removes the page; its history stays readable and the deletion is recorded. 404 `not_found`. Returns 204.
+         */
         delete: operations["FlatpagesAdminController_delete"];
         options?: never;
         head?: never;
+        /**
+         * Edit a site page
+         * @description Requires `flatpages.change_flatpage`. Partial update; null values are refused. Last write wins. Records a revision when something changed. Errors: 404 `not_found`, 400 `invalid_url`, 409 `conflict` when the new URL is taken.
+         */
         patch: operations["FlatpagesAdminController_update"];
         trace?: never;
     };
@@ -184,6 +259,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Show the history of a site page
+         * @description Requires `flatpages.change_flatpage`. Returns the change history (creation, edits, deletion) of a page by id, newest first, 20 per page, with the editor and the before/after of each changed field. Still readable after the page is deleted; 400 `validation_failed` for a malformed id.
+         */
         get: operations["FlatpagesAdminController_revisions"];
         put?: never;
         post?: never;
@@ -200,7 +279,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Declared before `:id`, which would take `deleted` for an id. */
+        /**
+         * List deleted site pages
+         * @description Requires `flatpages.change_flatpage`. Returns deleted pages, newest deletion first, 20 per page, with the id that keeps their history readable at `pages/{id}/revisions`.
+         */
         get: operations["FlatpagesAdminController_deleted"];
         put?: never;
         post?: never;
@@ -219,6 +301,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Preview page Markdown
+         * @description Requires `flatpages.change_flatpage`. Renders and sanitises the Markdown exactly as saving would and returns the HTML. Limited to 60 previews per user per minute (429 `rate_limited`).
+         */
         post: operations["FlatpagesAdminController_preview"];
         delete?: never;
         options?: never;
@@ -236,6 +322,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete anonymous activity data
+         * @description Requires `judge.can_see_user_activity`. Deletes all activity log rows and sessions of signed-out visitors; the deletion is written to the server log with the acting staff member. Returns 204.
+         */
         delete: operations["UserActivityStaffController_deleteAnonymous"];
         options?: never;
         head?: never;
@@ -249,6 +339,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List who is on the site now
+         * @description Requires `judge.can_see_user_activity`. Returns counts of signed-in users, anonymous visitors and bots seen in the last 30 minutes, plus a page of 50 signed-in users, most recently seen first (`hasMore` tells whether a later page exists).
+         */
         get: operations["UserActivityStaffController_liveVisitors"];
         put?: never;
         post?: never;
@@ -265,6 +359,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Search the user activity log
+         * @description Requires `judge.can_see_user_activity`. Returns request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. `user` is a username fragment or `anonymous`, `ip` an address prefix and `path` a path fragment; a `user` fragment that matches nobody gives an empty page.
+         */
         get: operations["UserActivityStaffController_list"];
         put?: never;
         post?: never;
@@ -281,7 +379,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** CSV attachment, streamed from a cursor: at most 100000 rows, every cell spreadsheet-safe. The filename is fixed, never built from the query. */
+        /**
+         * Export the user activity log as CSV
+         * @description Requires `judge.can_see_user_activity`. Same filters as the log search, streamed as a `text/csv` attachment named `user-activity.csv` (newest first, at most 100000 rows, cells made spreadsheet-safe).
+         */
         get: operations["UserActivityStaffController_export"];
         put?: never;
         post?: never;
@@ -301,7 +402,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Deletes the user's rows and sessions. */
+        /**
+         * Delete a user's activity data
+         * @description Requires `judge.can_see_user_activity`. Deletes the user's activity log rows and their stored sessions; the deletion is written to the server log with the acting staff member. 404 `not_found` for an unknown user. Returns 204.
+         */
         delete: operations["UserActivityStaffController_deleteUser"];
         options?: never;
         head?: never;
@@ -315,6 +419,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the activity log of one user
+         * @description Requires `judge.can_see_user_activity`. Returns the user's request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. 404 `not_found` for an unknown user.
+         */
         get: operations["UserActivityStaffController_userLogs"];
         put?: never;
         post?: never;
@@ -331,6 +439,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Summarize one user's activity
+         * @description Requires `judge.can_see_user_activity`. Returns the number of requests over the last `days` (1-90, default 90), requests per UTC day, the 20 most used IP addresses, the 30 most requested paths and the 50 most recent sessions. 404 `not_found` for an unknown user.
+         */
         get: operations["UserActivityStaffController_summary"];
         put?: never;
         post?: never;
@@ -347,6 +459,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List users for staff
+         * @description Requires `judge.ban_user`. Returns a page of users with moderation details (never email addresses or credentials). Filter by `search` (username prefix) and `banned`; sort by last access. Without a sort, a search is ordered by username and the rest by newest account.
+         */
         get: operations["UserAdminController_list"];
         put?: never;
         post?: never;
@@ -365,6 +481,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Finish authenticator app setup
+         * @description Browser session only, not while impersonating. Checks a code from the app against the pending secret, enables TOTP and returns the one-time scratch (backup) codes, shown only now. Errors: 400 `invalid_code` for a wrong code or when there is no pending setup.
+         */
         post: operations["TotpController_confirm"];
         delete?: never;
         options?: never;
@@ -381,6 +501,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Turn off authenticator app sign-in
+         * @description Browser session only, not while impersonating. Needs a valid TOTP or scratch code; removes the secret and the scratch codes. Errors: 400 `totp_not_enabled`, 400 `invalid_code`, 429 `rate_limited`. Returns 204.
+         */
         post: operations["TotpController_disable"];
         delete?: never;
         options?: never;
@@ -397,6 +521,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Start authenticator app setup
+         * @description Browser session only, not while impersonating. Requires the current password. Generates a TOTP secret, keeps it pending on the session and returns it with an `otpauth://` URL for a QR code; setup finishes with `POST /auth/2fa/totp/confirm`. Errors: 400 `invalid_credentials` (wrong password), 400 `invalid_code` when TOTP is already enabled.
+         */
         post: operations["TotpController_enroll"];
         delete?: never;
         options?: never;
@@ -411,8 +539,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Count unused scratch codes
+         * @description Browser session only, not while impersonating. Returns how many scratch codes are left; 400 `totp_not_enabled` when TOTP is off.
+         */
         get: operations["TotpController_remainingScratchCodes"];
         put?: never;
+        /**
+         * Replace the scratch codes
+         * @description Browser session only, not while impersonating. Needs a valid TOTP or scratch code, then replaces all scratch codes with a new set, returned once. Errors: 400 `totp_not_enabled`, 400 `invalid_code`, 429 `rate_limited`.
+         */
         post: operations["TotpController_regenerateScratchCodes"];
         delete?: never;
         options?: never;
@@ -429,6 +565,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Pass the second factor with a TOTP or scratch code
+         * @description Browser session. Accepts a 6-digit app code or an unused scratch code and marks the session as fully signed in. A scratch code works once and a TOTP step cannot be replayed. Does nothing when the session already passed. Attempts share a per-account budget (10 in 15 minutes and 50 a day, 429 `rate_limited`); 400 `invalid_code` for a wrong code. Returns 204.
+         */
         post: operations["TotpController_verify"];
         delete?: never;
         options?: never;
@@ -443,6 +583,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List registered security keys
+         * @description Browser session only, not while impersonating. Returns the user's WebAuthn security keys, oldest first. Only the display name and id are returned.
+         */
         get: operations["WebauthnController_list"];
         put?: never;
         post?: never;
@@ -462,6 +606,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Remove a security key
+         * @description Browser session only, not while impersonating. Requires the current password in the body (400 `invalid_credentials`, 429 `rate_limited`). Errors: 404 `not_found` for an unknown key. Returns 204.
+         */
         delete: operations["WebauthnController_remove"];
         options?: never;
         head?: never;
@@ -477,6 +625,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Get options to sign in with a security key
+         * @description Browser session, usable before the second factor is passed. Returns WebAuthn request options for `navigator.credentials.get` and stores the challenge on the session. Returns null (nothing stored) when the session already passed its second factor. Errors: 400 `webauthn_not_enabled` when the user has no key.
+         */
         post: operations["WebauthnController_loginOptions"];
         delete?: never;
         options?: never;
@@ -493,6 +645,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Pass the second factor with a security key
+         * @description Browser session, usable before the second factor is passed. Verifies the assertion against the pending challenge and the key's sign counter, then marks the session as fully signed in. Does nothing when already passed. Shares the per-account attempt budget (429 `rate_limited`); 400 `webauthn_failed` for a missing challenge, unknown credential or failed verification. Returns 204.
+         */
         post: operations["WebauthnController_login"];
         delete?: never;
         options?: never;
@@ -509,6 +665,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Get options to register a security key
+         * @description Browser session only, not while impersonating. Requires the current password (400 `invalid_credentials`, 429 `rate_limited`). Returns WebAuthn credential creation options for `navigator.credentials.create`; the challenge is stored on the session and used by the next `register/verify` call.
+         */
         post: operations["WebauthnController_registrationOptions"];
         delete?: never;
         options?: never;
@@ -525,6 +685,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Register a security key
+         * @description Browser session only, not while impersonating. Verifies the browser's registration response against the pending challenge, stores the key under the given name and returns it. Errors: 400 `webauthn_failed` (no pending challenge, failed verification, or the authenticator is already registered).
+         */
         post: operations["WebauthnController_register"];
         delete?: never;
         options?: never;
@@ -541,6 +705,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Activate an account
+         * @description Public. Consumes the single-use key from the activation mail and turns the account on. Errors: 400 `invalid_token` for an unknown, used or expired key. Returns 204.
+         */
         post: operations["RegistrationController_activate"];
         delete?: never;
         options?: never;
@@ -557,6 +725,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Resend the activation mail
+         * @description Public. Sends a fresh activation link to every pending account registered with the email. Answers 204 whether or not the email matches, so it does not reveal which emails are registered. Limited per IP and per email (10 and 3 per hour, 429 `rate_limited`); 503 `mail_unavailable` when mail is not configured.
+         */
         post: operations["RegistrationController_resend"];
         delete?: never;
         options?: never;
@@ -573,6 +745,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Impersonate a user
+         * @description Superusers only, browser session only. Replaces the current session with one acting as the target user, whose last-login time is not touched; the response has `impersonatorId` set. Security changes (password, tokens, two-factor) are refused while impersonating.
+         *     Errors: 403 `forbidden` when already impersonating, not a superuser, or the target is a superuser; 404 `not_found` for an unknown or inactive user.
+         */
         post: operations["ImpersonationController_start"];
         delete?: never;
         options?: never;
@@ -589,6 +766,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Stop impersonating
+         * @description Browser session only. Replaces the impersonation session with a fresh session of the superuser who started it. Errors: 400 `not_impersonating`, 401 `unauthorized` when that user is no longer an active superuser.
+         */
         post: operations["ImpersonationController_stop"];
         delete?: never;
         options?: never;
@@ -605,6 +786,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Sign in with a username and password
+         * @description Public. Verifies the credentials and opens a browser session: the `qhhoj_session` cookie is set and any session the browser already held is replaced. Send the returned `csrfToken` in the `X-CSRF-Token` header on every later non-GET request.
+         *     When the account has TOTP or a security key, `twoFactorRequired` is true and `user` is null until the second factor is passed. When the password appears in a known breach, `passwordChangeRequired` is true and only the password change works.
+         *     Failed attempts are limited per IP and per account (10 in 15 minutes, then 429 `rate_limited`). Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.
+         */
         post: operations["AuthController_login"];
         delete?: never;
         options?: never;
@@ -621,6 +808,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Sign out of the current session
+         * @description Signed-in callers only. Destroys the current session on the server and clears the `qhhoj_session` cookie. Other sessions of the user stay valid. Returns 204.
+         */
         post: operations["AuthController_logout"];
         delete?: never;
         options?: never;
@@ -637,6 +828,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Sign out of every session
+         * @description Browser session only (API tokens get 403) and not while impersonating. Destroys all sessions of the user, including the current one, and clears the cookie. Returns 204.
+         */
         post: operations["AuthController_logoutAll"];
         delete?: never;
         options?: never;
@@ -651,6 +846,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the current session and user
+         * @description Signed-in callers only (cookie session or API token); also served while a second factor or a password change is still pending. Returns the same shape as login: the user with their permission codenames, the CSRF token of the session, and the pending second-factor methods when `twoFactorRequired` is true.
+         *     An API token has no session, so `csrfToken` is null for it.
+         */
         get: operations["AuthController_me"];
         put?: never;
         post?: never;
@@ -669,6 +869,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Change the account password
+         * @description Browser session only, not while impersonating; reachable while the password is flagged as breached. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).
+         *     The new password must pass the password policy, differ from the current one and not appear in a known breach, otherwise 400 `validation_failed` with per-field issues on `newPassword`. All other sessions are signed out; the API token stays valid. A concurrent change gives 409 `conflict`. Returns 204.
+         */
         post: operations["AuthController_changePassword"];
         delete?: never;
         options?: never;
@@ -685,6 +890,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Request a password reset mail
+         * @description Public. Mails a reset link (valid 3 days) to every active account with the email, and also serves accounts without a usable password, for which the link sets the first one. Answers 204 whether or not the email matches. Limited per IP and per email (10 and 3 per hour, 429 `rate_limited`); 503 `mail_unavailable` when mail is not configured.
+         */
         post: operations["PasswordResetController_request"];
         delete?: never;
         options?: never;
@@ -701,6 +910,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Set a new password from a reset link
+         * @description Public. Takes the token from the reset mail and the new password. On success the password changes, the account's API token is revoked and all its sessions are signed out. Errors: 400 `invalid_token` for an unknown, expired or already used link, 400 `validation_failed` with issues on `newPassword` (password policy or breached password). Returns 204.
+         */
         post: operations["PasswordResetController_confirm"];
         delete?: never;
         options?: never;
@@ -717,6 +930,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Create an account
+         * @description Public. Creates an inactive account and mails an activation link (valid 7 days); the account cannot sign in until it is activated. Optionally joins an open, listed organization and sets the default language.
+         *     Limited to 5 attempts per IP per hour, every attempt counts. Errors: 400 `validation_failed` with per-field issues (`username_taken`, `email_taken`, `language_unknown`, `organization_unavailable`, password policy or breached password), 503 `mail_unavailable` when the activation mail cannot be sent (nothing is created then), 429 `rate_limited`. Returns 204.
+         */
         post: operations["RegistrationController_register"];
         delete?: never;
         options?: never;
@@ -731,6 +949,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Finish a social sign-in
+         * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned` or `account_not_activated`.
+         *     A verified email that matches exactly one active account links the provider to it. The state is single use.
+         */
         get: operations["SocialController_callback"];
         put?: never;
         post?: never;
@@ -747,6 +970,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Begin a social sign-in
+         * @description Public. Redirects (302) the browser to the provider's authorization page and sets a short-lived `oauth_state` cookie that ties the flow to this browser. Limited to 30 starts per IP per 10 minutes (429 `rate_limited`); 404 `not_found` for an unknown provider.
+         */
         get: operations["SocialController_start"];
         put?: never;
         post?: never;
@@ -765,6 +992,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Complete a social sign-up
+         * @description Public. Creates the account for a pending social sign-in using the `token` from the callback redirect (valid 10 minutes, single use, and only from the browser that ran the callback, which holds the `oauth_pending` cookie). The account is active at once and the response signs it in like login.
+         *     Errors: 400 `invalid_token`, 400 `validation_failed` (taken username, password policy), 409 `conflict`, 429 `rate_limited` (shares the registration budget of 5 per IP per hour).
+         */
         post: operations["SocialController_complete"];
         delete?: never;
         options?: never;
@@ -779,6 +1011,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List enabled social sign-in providers
+         * @description Public. Returns the slugs of the OAuth providers that are configured, for the login page buttons.
+         */
         get: operations["SocialController_providers"];
         put?: never;
         post?: never;
@@ -797,6 +1033,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Create a new API token
+         * @description Browser session only, not while impersonating. Issues a new personal API token for `Authorization: Bearer`, replacing the previous one, which stops working at once. The token is shown only in this response.
+         */
         post: operations["AuthController_regenerateToken"];
         delete?: never;
         options?: never;
@@ -811,6 +1051,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Check whether a username is free
+         * @description Public. Returns `available` for a username that could be registered now; unactivated signups older than 7 days do not block it. Limited to 30 checks per IP per 10 minutes (429 `rate_limited`).
+         */
         get: operations["RegistrationController_usernameAvailable"];
         put?: never;
         post?: never;
@@ -827,12 +1071,34 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a comment
+         * @description Public. Returns one comment with the link to its page. Hidden comments are
+         *     only returned to holders of `judge.change_comment`. Fails with 404
+         *     `not_found` for malformed, unknown, hidden or unreadable comments.
+         */
         get: operations["CommentsController_detail"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete a comment
+         * @description Allowed for its author and for holders of `judge.change_comment` (403
+         *     `forbidden` otherwise). The comment stays in its thread as a placeholder
+         *     (`deleted: true`, empty `bodyHtml`) so replies keep their context; it can
+         *     no longer be edited, voted on, replied to or reported, and its score
+         *     leaves the author's contribution. Its edit history becomes
+         *     moderator-only. Fails with 404 `not_found` when the comment is unknown,
+         *     unreadable or already deleted. Returns the placeholder.
+         */
+        delete: operations["CommentPostingController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Edit a comment
+         * @description Changes the comment's body. Allowed for its author (not muted) and for
+         *     holders of `judge.change_comment`; a revision with the old text is kept.
+         *     Fails with 409 `conflict` if the comment changed meanwhile.
+         */
         patch: operations["CommentPostingController_edit"];
         trace?: never;
     };
@@ -845,7 +1111,86 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Hide or unhide a comment
+         * @description Requires `judge.change_comment`. Hides the comment together with its
+         *     replies, or restores what that comment had hidden, and recomputes the
+         *     authors' contribution points; each hide and unhide is recorded with the
+         *     moderator (shown to moderators as `hiddenBy`). A comment under a hidden
+         *     parent cannot be unhidden alone (409 `conflict`). Returns the comment.
+         */
         post: operations["CommentModerationController_setHidden"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/{id}/location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Locate a comment
+         * @description Public. Returns the page a comment belongs to and the listing page number
+         *     (`?page=` of the page listing) holding its thread for this viewer, so a
+         *     `#comment-<id>` link can open the right page. Fails with 404 `not_found`
+         *     like getting the comment.
+         */
+        get: operations["CommentsController_locate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/{id}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a comment
+         * @description Flags a visible comment of someone else for the moderators with a
+         *     `reason` (spam, abuse, spoiler, offTopic, other) and an optional `note`
+         *     (up to 500 characters). Each user reports a comment once (409
+         *     `conflict`); reporting one's own comment is 403 `forbidden`, a hidden or
+         *     deleted one 404 `not_found`. Limited to 10 reports per hour per user (429
+         *     `rate_limited`). Returns 204.
+         */
+        post: operations["CommentReportsController_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/{id}/reports/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Settle the reports of a comment
+         * @description Requires `judge.change_comment`. Marks every open report of the comment
+         *     `resolved` (acted on) or `dismissed`; hiding or deleting the comment is a
+         *     separate call. Fails with 404 `not_found` when the comment is unreadable
+         *     or has no open reports. Returns 204.
+         */
+        post: operations["CommentReportsController_settle"];
         delete?: never;
         options?: never;
         head?: never;
@@ -859,6 +1204,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the edit history of a comment
+         * @description Public. Returns every edit of a comment with the time, the editor, and the
+         *     text before and after. Hidden and deleted comments are only available to
+         *     holders of `judge.change_comment`.
+         */
         get: operations["CommentPostingController_revisions"];
         put?: never;
         post?: never;
@@ -876,6 +1227,14 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Vote on a comment
+         * @description Sets the caller's vote on a visible comment that is not hidden or deleted: `score` is 1, -1,
+         *     or 0 to withdraw. Returns the new total and the caller's vote. Authors
+         *     cannot vote on their own comment (403 `forbidden`); voters need enough
+         *     solved problems and an unmuted account. Limited to 60 votes per minute per
+         *     user.
+         */
         put: operations["CommentVotesController_vote"];
         post?: never;
         delete?: never;
@@ -891,6 +1250,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List who voted on a comment
+         * @description Requires `judge.change_comment`. Returns each voter with their score on
+         *     the comment.
+         */
         get: operations["CommentModerationController_votes"];
         put?: never;
         post?: never;
@@ -907,8 +1271,34 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the comments of a page
+         * @description Public. Returns one page of threads (20 top-level comments with all their
+         *     replies) of a commentable page, addressed by `type` (problem, editorial,
+         *     contest, blog or tagProblem) and its natural `key` (problem code, contest
+         *     key, post id). Also reports the page's lock (`pageLocked`), whether it is
+         *     locked for the viewer (`locked`), and whether the viewer can comment
+         *     (`canComment`) or why not (`postBlock`: `signed_out`, `contest`,
+         *     `locked`, `muted`, or `needs_solved` with `solved` and `required`).
+         *     Hidden comments are returned only to holders of `judge.change_comment`,
+         *     flagged `hidden` with the moderator in `hiddenBy`; deleted comments stay
+         *     as placeholders (`deleted`, empty `bodyHtml`). Fails with 404
+         *     `not_found` when the page is unknown or unreadable, and 403 `forbidden`
+         *     while an official contest closes comments. Contest problem threads are
+         *     empty for contestants who are in the contest.
+         */
         get: operations["CommentsController_page"];
         put?: never;
+        /**
+         * Post a comment
+         * @description Adds a comment to a page, or a reply when `parentId` is given. Needs
+         *     enough solved problems and an unmuted account, a page that is not locked,
+         *     and a parent on the same page that is visible, not older than a year
+         *     (unless the caller holds `judge.change_comment`) and not nested too deep.
+         *     Limited to 10 comments per 5 minutes per user (429 `rate_limited`).
+         *     Markdown is rendered in safe mode; public comments are announced on
+         *     Discord.
+         */
         post: operations["CommentPostingController_create"];
         delete?: never;
         options?: never;
@@ -924,9 +1314,67 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Lock the comments of a page
+         * @description Requires `judge.change_comment`. Prevents new comments on the page;
+         *     holders of `judge.override_comment_lock` can still post. Returns 204.
+         */
         put: operations["CommentModerationController_lock"];
         post?: never;
+        /**
+         * Unlock the comments of a page
+         * @description Requires `judge.change_comment`. Allows new comments on the page again.
+         *     Returns 204.
+         */
         delete: operations["CommentModerationController_unlock"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview a comment
+         * @description Renders a comment body to HTML exactly as posting would (safe-mode
+         *     Markdown, same length rule: 400 `validation_failed` when blank or over
+         *     8192 characters) without saving anything. Needs enough solved problems
+         *     and an unmuted account (403 `forbidden`). Limited to 30 previews per
+         *     minute per user (429 `rate_limited`).
+         */
+        post: operations["CommentPostingController_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List reported comments
+         * @description Requires `judge.change_comment`. Returns the comments with open reports,
+         *     the most recently reported first, 20 per page: an excerpt, the page link,
+         *     how many users reported it, and each open report with its reason and
+         *     note. Comments on pages the moderator cannot read are left out of the
+         *     page.
+         */
+        get: operations["CommentReportsController_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -939,8 +1387,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List contest tags
+         * @description Returns the contest tag catalogue, public. Paged with `page` and
+         *     `pageSize`.
+         */
         get: operations["ContestTagsController_list"];
         put?: never;
+        /**
+         * Create a contest tag
+         * @description Requires `judge.change_contest_tag`. Adds a tag to the catalogue; fails
+         *     with 409 `tag_limit` when the catalogue is full.
+         */
         post: operations["ContestTagsController_create"];
         delete?: never;
         options?: never;
@@ -958,9 +1416,20 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete a contest tag
+         * @description Requires `judge.change_contest_tag`. Deletes the tag; contests that carry
+         *     it keep the slug and show a neutral chip. Returns 204, or 404 `not_found`
+         *     for an unknown slug.
+         */
         delete: operations["ContestTagsController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Update a contest tag
+         * @description Requires `judge.change_contest_tag`. Changes the tag's fields by slug;
+         *     null values are refused. Fails with 404 `not_found` for an unknown slug.
+         */
         patch: operations["ContestTagsController_update"];
         trace?: never;
     };
@@ -971,8 +1440,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the contests visible to the viewer
+         * @description Returns one page of contests the viewer may see, each row carrying the
+         *     signed-in viewer's own state in it. Anonymous callers see only visible
+         *     contests that are neither private nor organization-private. Filters are
+         *     `phase` (upcoming, running or ended), `tag`, `organization`, `rated`, and
+         *     `search` or `q` (case-insensitive key or name substring, ANDed together).
+         *     Upcoming contests are sorted soonest first, all other views newest first.
+         *     Paged with `page` and `pageSize` (default 50, at most 100).
+         */
         get: operations["ContestsController_list"];
         put?: never;
+        /**
+         * Create a contest
+         * @description Requires `judge.add_contest`. Creates a contest with the given key
+         *     (reserved keys fail with 400 `key_reserved`) and makes the caller its
+         *     author. Field errors are returned as issues (400 `validation_failed`). For
+         *     an organization-private contest the first listed organization is charged
+         *     against its quota. FSO judging and automatic publishing are scheduled for
+         *     the contest's end.
+         */
         post: operations["ContestEditingController_create"];
         delete?: never;
         options?: never;
@@ -987,12 +1475,30 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a contest by key
+         * @description Returns the contest's description, rules, scoring settings, authors and
+         *     the viewer's own participation state. The problem list is null until the
+         *     viewer may see it (taking part, contest ended, or editor or tester), and
+         *     `settings` is only filled for viewers who can edit. Fails with 404
+         *     `not_found` for a malformed, unknown or invisible key alike, so existence
+         *     never leaks.
+         */
         get: operations["ContestsController_detail"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update a contest
+         * @description Contest editors only. Changes the fields sent (null is refused for fields
+         *     that cannot be cleared). Edits that affect scoring queue a rescore, the
+         *     ranking cache is purged, changed rules raise the rules revision, and a new
+         *     lock is copied onto live submissions. Fails with 409 `conflict` when the
+         *     contest changed meanwhile or when leaving the final-submission format with
+         *     pending submissions, and with 403 `forbidden` for non-editors.
+         */
         patch: operations["ContestEditingController_update"];
         trace?: never;
     };
@@ -1003,6 +1509,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the available editor actions of a contest
+         * @description Contest editors only. Reports, for each background action of the contest
+         *     (rescore, judge final, rate, publish problems, rebuild replay, export),
+         *     whether its job is currently queued or running, so the editing UI can show
+         *     progress and disable buttons.
+         */
         get: operations["ContestEditingController_actions"];
         put?: never;
         post?: never;
@@ -1019,8 +1532,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the announcements of a contest
+         * @description Returns the contest's announcements, rendered, one page at a time. Public
+         *     for any contest the viewer may see.
+         */
         get: operations["ContestAnnouncementsController_list"];
         put?: never;
+        /**
+         * Post a contest announcement
+         * @description Contest editors only. Stores the announcement (Markdown, rendered to HTML)
+         *     and, when the contest pushes announcements, delivers it live on the
+         *     contest event stream and to users' notification inboxes. Pushes are
+         *     limited per contest per hour (429 `rate_limited`). Fails with 400
+         *     `validation_failed` when the text cannot be rendered.
+         */
         post: operations["ContestAnnouncementsController_create"];
         delete?: never;
         options?: never;
@@ -1038,6 +1564,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete a contest announcement
+         * @description Contest editors only. Deletes the announcement and returns 204, or 404
+         *     `not_found` when it does not exist in this contest.
+         */
         delete: operations["ContestAnnouncementsController_remove"];
         options?: never;
         head?: never;
@@ -1053,6 +1584,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Resend a contest announcement
+         * @description Contest editors only. Pushes an existing announcement again to the open
+         *     contest streams; inboxes keep one entry per announcement, so only users
+         *     the first delivery missed are notified. Returns 204, or 404 `not_found`
+         *     for an unknown announcement.
+         */
         post: operations["ContestAnnouncementsController_resend"];
         delete?: never;
         options?: never;
@@ -1067,6 +1605,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the balloon queue of a contest
+         * @description For contests with balloons on, available to editors and the balloon
+         *     volunteers they listed; a volunteer who is also a contestant is refused
+         *     (403 `contestant_forbidden`, and `balloons_forbidden` for others, 404
+         *     `balloons_off` when balloons are off). The queue is derived from the live
+         *     solves; filter with `state` (pending by default, delivered or all) and
+         *     page with `page` and `pageSize`. While the contest is frozen readers who
+         *     cannot edit get no solve times or totals, and each such read is audited.
+         */
         get: operations["BalloonsController_list"];
         put?: never;
         post?: never;
@@ -1085,6 +1633,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Mark a balloon as delivered
+         * @description Marks the balloon for a team's solved problem as delivered and returns
+         *     204. Fails with 409 `already_delivered` if it already was. Same access as
+         *     the queue; writes are rate limited per user.
+         */
         post: operations["BalloonsController_deliver"];
         delete?: never;
         options?: never;
@@ -1101,6 +1655,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Mark a balloon as not delivered
+         * @description Reverts a delivery and returns 204. Fails with 409 `not_delivered` if the
+         *     balloon was not delivered. Same access as the queue; writes are rate
+         *     limited per user.
+         */
         post: operations["BalloonsController_undeliver"];
         delete?: never;
         options?: never;
@@ -1117,6 +1677,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Clone a contest
+         * @description Requires `judge.clone_contest` and edit rights on the source. Copies
+         *     settings and problems to a new, hidden contest under the new key, with the
+         *     caller as its only author; participations, announcements and similar per-
+         *     contest data stay with the source. Reserved keys fail with 400
+         *     `key_reserved`.
+         */
         post: operations["ContestEditingController_clone"];
         delete?: never;
         options?: never;
@@ -1131,8 +1699,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the state of the contest data download
+         * @description Contest editors only, once the contest has ended. Returns whether the zip
+         *     of the contest's problem data is `none`, `preparing` or `ready`, with its
+         *     size and when the next preparation is allowed. 404 when the feature is not
+         *     configured, 409 before the contest has ended.
+         */
         get: operations["ContestDataController_status"];
         put?: never;
+        /**
+         * Prepare the contest data download
+         * @description Contest editors only, once the contest has ended. Queues building a zip of
+         *     the problems' data, optionally narrowed with `problemGlob` and including
+         *     the chosen `results`; returns 202. Fails with 409 `conflict` while a build
+         *     is running and 429 `rate_limited` since it can be prepared once a day.
+         */
         post: operations["ContestDataController_prepare"];
         delete?: never;
         options?: never;
@@ -1147,7 +1729,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Always an attachment with `nosniff`; the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
+        /**
+         * Download the contest data
+         * @description Contest editors only, once the contest has ended. Streams the prepared zip
+         *     as an attachment; 404 `not_found` when none has been prepared.
+         */
         get: operations["ContestDataController_download"];
         put?: never;
         post?: never;
@@ -1164,8 +1750,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the state of the contest export
+         * @description Contest editors only, once the contest has ended. Returns whether the zip
+         *     of every contestant's submissions is `none`, `preparing` or `ready`, with
+         *     its size and when the next preparation is allowed. Fails with 404 when
+         *     exports are not configured and 409 `contest_not_ended` before the end.
+         */
         get: operations["ContestExportController_status"];
         put?: never;
+        /**
+         * Request a contest export
+         * @description Contest editors only, once the contest has ended. Queues preparation of
+         *     the zip and returns 202. Fails with 409 `export_in_progress` while one is
+         *     being prepared and 429 `export_rate_limited` since it can be prepared once
+         *     a day.
+         */
         post: operations["ContestExportController_request"];
         delete?: never;
         options?: never;
@@ -1180,7 +1780,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Always a `private, no-store` attachment with `nosniff` (the zip holds every contestant's source); the file name is the contest key (`[a-z0-9_]`), nothing to escape. */
+        /**
+         * Download the contest export
+         * @description Contest editors only, once the contest has ended. Streams the prepared zip
+         *     as a private attachment; 404 `export_not_prepared` when no export exists.
+         */
         get: operations["ContestExportController_download"];
         put?: never;
         post?: never;
@@ -1197,7 +1801,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** HTTP Basic with the contest's feed key, no session: resolver tools only speak Basic. NDJSON, one event per line. */
+        /**
+         * Get the event feed of a contest
+         * @description For ICPC resolver tools. Authenticated with HTTP Basic, user `feed` and a
+         *     contest feed key as password, no session. Returns the whole feed as
+         *     NDJSON, one event per line. A key in `frozen-until-release` mode shows the
+         *     feed cut at the freeze until an editor releases it. All failures are the
+         *     same 401 `unauthorized` and wrong attempts are rate limited per IP (429
+         *     `rate_limited`); 409 `feed_too_large` when the contest has too many
+         *     submissions.
+         */
         get: operations["FeedController_snapshot"];
         put?: never;
         post?: never;
@@ -1214,9 +1827,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the feed key status of a contest
+         * @description Contest editors only. Tells whether a usable feed key exists, its mode,
+         *     expiry, release time and the editor it belongs to. The key itself is never
+         *     shown again.
+         */
         get: operations["FeedKeysController_status"];
         put?: never;
+        /**
+         * Create a feed key for a contest
+         * @description Contest editors only, with a browser session (no API tokens, no
+         *     impersonation). Creates a key and returns it once with the Basic user name
+         *     `feed`; earlier keys stop working. The mode is `frozen-until-release` by
+         *     default or `live`, and it expires after `expiresInDays` (at most 30).
+         *     Limited to a few per hour.
+         */
         post: operations["FeedKeysController_mint"];
+        /**
+         * Revoke the feed keys of a contest
+         * @description Contest editors only, with a browser session. Revokes every feed key of
+         *     the contest; returns 204.
+         */
         delete: operations["FeedKeysController_revoke"];
         options?: never;
         head?: never;
@@ -1232,6 +1864,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Release the feed to the resolver
+         * @description Contest editors only, with a browser session. Stops cutting the feed at
+         *     the freeze in progress. Returns 204; 409 `no_active_feed_key` without a
+         *     usable key and 409 `not_frozen` when no freeze is on.
+         */
         post: operations["FeedKeysController_release"];
         delete?: never;
         options?: never;
@@ -1246,10 +1884,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the ghosts of a contest
+         * @description Contest editors only. Returns the stored ghosts with their per-problem
+         *     cells.
+         */
         get: operations["GhostsController_list"];
-        /** The whole request body is capped at `GHOST_CSV_MAX_BYTES` (Fastify answers 413 beyond it). */
+        /**
+         * Import ghost participants from CSV
+         * @description Contest editors only. Replaces the contest's ghosts (reference teams shown
+         *     in the replay) with the rows of the CSV, with columns label, caption and
+         *     then one per contest problem code (a cell is minute, optionally with
+         *     points before an at sign and rejected tries after a plus sign). The whole
+         *     request body is capped (413 beyond it). Use `dryRun` to validate and
+         *     preview without storing and `anonymize` to relabel ghosts as Ghost 001 and
+         *     so on. Fails with 400 `ghost_import_invalid` listing the row issues, or
+         *     409 `ghost_unsupported_format` for final-submission contests. Once the
+         *     contest has ended a replay rebuild is queued.
+         */
         put: operations["GhostsController_importCsv"];
         post?: never;
+        /**
+         * Delete all ghosts of a contest
+         * @description Contest editors only. Removes every ghost and returns 204; a replay
+         *     rebuild is queued when the contest has ended.
+         */
         delete: operations["GhostsController_remove"];
         options?: never;
         head?: never;
@@ -1263,6 +1922,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Download the ghosts as CSV
+         * @description Contest editors only. Returns the current ghost set in the import grammar
+         *     as a `text/csv` attachment, to edit and upload again.
+         */
         get: operations["GhostsController_csv"];
         put?: never;
         post?: never;
@@ -1281,6 +1945,16 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Join a contest
+         * @description Makes the contest the viewer's current one and returns the participation.
+         *     Before the contest ends this is the live participation (created or re-
+         *     entered, which starts the clock after registering); after it ends it
+         *     creates a virtual participation unless the contest forbids it. Editors and
+         *     testers join as spectators. Refusals include 409 `contest_not_started`,
+         *     `virtual_disallowed` and `not_registered`, 403 `banned_from_contest` and
+         *     the access-code and rules errors listed for registering.
+         */
         post: operations["ContestParticipationController_join"];
         delete?: never;
         options?: never;
@@ -1297,6 +1971,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Judge the final submissions of a contest
+         * @description Contest editors only. Queues judging of the pending final submissions of
+         *     an ended final-submission contest; returns 202. Fails with 409 `conflict`
+         *     for any other format or while the contest is still running.
+         */
         post: operations["ContestEditingController_judgeFinal"];
         delete?: never;
         options?: never;
@@ -1313,6 +1993,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Leave the current contest
+         * @description Clears the viewer's current-contest pointer when it points at this
+         *     contest, so the site is no longer scoped to it. Returns 204 on success and
+         *     404 `not_in_contest` when the viewer is not in this contest.
+         */
         post: operations["ContestParticipationController_leave"];
         delete?: never;
         options?: never;
@@ -1327,9 +2013,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the official ranking of a contest
+         * @description Returns the official ranking an editor uploaded after the contest (rows
+         *     with rank, username, full name and per-problem scores) or the URL of an
+         *     external ranking. The viewer must be allowed to see the scoreboard (403
+         *     `forbidden` otherwise); 404 `not_found` when no official ranking exists.
+         */
         get: operations["OfficialRankingController_show"];
+        /**
+         * Upload the official ranking
+         * @description Contest editors only. Replaces the stored official ranking with either a
+         *     CMS export in `csv` or an external `url` (http or https); sending both, or
+         *     a CSV that does not parse, fails with 400 `validation_failed`. The request
+         *     body is size-limited.
+         */
         put: operations["OfficialRankingController_set"];
         post?: never;
+        /**
+         * Delete the official ranking
+         * @description Contest editors only. Removes the stored official ranking; returns 204.
+         */
         delete: operations["OfficialRankingController_remove"];
         options?: never;
         head?: never;
@@ -1343,6 +2047,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List participations in a contest
+         * @description Returns the viewer's own participations in the contest, or anyone's for
+         *     contest editors (filter by `user`; other users are refused with 403 for
+         *     non-editors). Live and virtual participations are included (not spectator
+         *     rows). Results are frozen for non-editors while the ranking is frozen.
+         *     Paged with `page` and `pageSize`.
+         */
         get: operations["ContestParticipationController_participations"];
         put?: never;
         post?: never;
@@ -1361,6 +2073,17 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Disqualify or reinstate a participant
+         * @description Contest editors only. Sets the participation's disqualified flag to the
+         *     value sent (not a toggle): the contestant is banned from, or allowed back
+         *     into, the contest and moved out of it, the ranking cache is purged and a
+         *     rescore is queued by the worker. When the
+         *     `contest.banAfterDisqualifications` setting is above 0 the account itself
+         *     is banned once it reaches that many disqualifications. Fails with 404
+         *     `not_found` for an unknown participation and 403 `forbidden` for non-
+         *     editors.
+         */
         post: operations["ContestParticipationController_disqualify"];
         delete?: never;
         options?: never;
@@ -1377,6 +2100,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Publish the problems of an ended contest
+         * @description Contest editors only, after the contest has ended (409
+         *     `contest_not_ended`). Judges each problem with the same rule as the
+         *     automatic job and makes it public, and with `editorials` true also its
+         *     editorial, writing a revision for each change. Use `dryRun` to see the
+         *     verdicts without changing anything. A real run is limited to a few per
+         *     hour per user. Returns one item per problem with its outcome.
+         */
         post: operations["ContestPublishController_publish"];
         delete?: never;
         options?: never;
@@ -1391,6 +2123,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the ranking of a contest
+         * @description Returns the standings: each row's rank, score and per-problem cells
+         *     (`formatData`), with ties sharing a rank. Set `virtual` to include virtual
+         *     participations. Depending on the contest's scoreboard visibility the
+         *     viewer sees the full board, only their own row, or nothing (403
+         *     `forbidden`); non-editors see frozen standings during a freeze. A contest
+         *     ranking access code sent as `code` shows the full board whatever those
+         *     rules say, and wrong codes (403) are rate limited per IP. Boards of non-
+         *     editors are cached.
+         */
         get: operations["ContestRankingController_ranking"];
         put?: never;
         post?: never;
@@ -1407,12 +2150,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the public ranking link settings
+         * @description Contest editors only. Returns the contest's public ranking link: its
+         *     token, status and expiry. Fails with 404 `not_found` when the contest has
+         *     no link yet.
+         */
         get: operations["RankingLinksController_show"];
         put?: never;
+        /**
+         * Create the public ranking link
+         * @description Contest editors only. Creates the public ranking link for the contest, or
+         *     returns the existing one. The link lets anyone with the token read the
+         *     ranking at `/public-rankings/{token}` without signing in.
+         */
         post: operations["RankingLinksController_create"];
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update the public ranking link settings
+         * @description Contest editors only. Sets the link's status and its expiry: never, after
+         *     a number of minutes or days from the last regeneration (`expiryAmount`),
+         *     or at a fixed time (`expiresAt`). Fails with 404 `not_found` when the
+         *     contest has no link.
+         */
         patch: operations["RankingLinksController_update"];
         trace?: never;
     };
@@ -1425,6 +2187,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Regenerate the public ranking link token
+         * @description Contest editors only. Replaces the token, so the previous URL stops
+         *     working, and restarts relative expiry.
+         */
         post: operations["RankingLinksController_regenerate"];
         delete?: never;
         options?: never;
@@ -1441,6 +2208,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Rate a contest
+         * @description Requires `judge.contest_rating` and edit rights on the contest. Queues
+         *     rating of an ended contest, which gives ratings to its participants; a
+         *     contest that is no longer rated loses its ratings and the later contests
+         *     are re-rated. Returns 202. Fails with 409 `conflict` if the contest has
+         *     not ended or its ranking is still frozen.
+         */
         post: operations["ContestRatingController_rate"];
         delete?: never;
         options?: never;
@@ -1457,6 +2232,17 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Register for a contest
+         * @description Registers the signed-in user for a contest that requires registration,
+         *     before registration closes. Send `accessCode` when the contest has one
+         *     (editors skip it) and `acceptRules` true when the contest has rules.
+         *     Refusals are 409 `editor_cannot_register`, `registration_not_required`,
+         *     `registration_closed`, `contest_ended` or `already_registered`; 403
+         *     `banned_from_contest`, `access_code_required` or `wrong_access_code`; and
+         *     400 `rules_not_accepted`. Wrong access codes are rate limited per user and
+         *     per IP.
+         */
         post: operations["ContestParticipationController_register"];
         delete?: never;
         options?: never;
@@ -1471,7 +2257,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** `private`: the body depends on who asks (freeze), so no shared cache may keep it. A `building` answer is 202 and never cached. */
+        /**
+         * Get the replay of a contest
+         * @description Returns the ended contest's ranking over time in chunks. Chunk 0 (the
+         *     default) carries participants, problems, ghosts and a `buildId`; later
+         *     chunks need that `build` id so a reader never mixes builds. When no replay
+         *     is stored yet it answers 202 with state `building` and queues a single
+         *     build, so poll again after a few seconds. Refusals are 403 when the board
+         *     is hidden or frozen for the viewer, 409 `contest_not_ended`,
+         *     `replay_unsupported` (final-submission format) or `replay_changed`, 404
+         *     `replay_not_ready` or `replay_chunk_not_found`, and 400
+         *     `replay_build_required`. Responses are cached privately for 60 seconds.
+         */
         get: operations["ReplayController_replay"];
         put?: never;
         post?: never;
@@ -1490,6 +2287,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Rebuild the replay of a contest
+         * @description Contest editors only, after the contest has ended. Queues a rebuild of the
+         *     stored replay, waiting for the settle time when the end is recent. Limited
+         *     to a few rebuilds per hour per editor (429 `rate_limited`); fails with 503
+         *     `replay_unavailable` when the queue is down. Returns 202.
+         */
         post: operations["ReplayController_rebuild"];
         delete?: never;
         options?: never;
@@ -1506,6 +2310,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Rescore a contest
+         * @description Contest editors only. Queues a full rescore of the contest's submissions
+         *     and ranking; returns 202 with `queued` true.
+         */
         post: operations["ContestEditingController_rescore"];
         delete?: never;
         options?: never;
@@ -1520,6 +2329,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the statistics of a contest
+         * @description Returns result counts per problem and per language. Subject to the same
+         *     rule as the full submission list, so it fails with 403 `forbidden` while
+         *     the viewer may not see that list.
+         */
         get: operations["ContestStatsController_get"];
         put?: never;
         post?: never;
@@ -1536,6 +2351,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the submissions of a contest
+         * @description Returns the contest's submissions in the same shape as the global
+         *     submission list, with its filters and paging. Everyone's submissions are
+         *     listed to editors, and to other viewers who may see the full scoreboard
+         *     when the contest is not frozen and has either ended or has its submission
+         *     list enabled; otherwise only the viewer's own, and asking for another user
+         *     fails with 403 `forbidden`. Public for visible contests.
+         */
         get: operations["ContestSubmissionsController_list"];
         put?: never;
         post?: never;
@@ -1552,6 +2376,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the contest the viewer is currently in
+         * @description Returns the contest and participation the signed-in viewer is currently
+         *     taking part in, or null when they are in none. A participation whose time
+         *     ran out no longer counts.
+         */
         get: operations["ContestParticipationController_current"];
         put?: never;
         post?: never;
@@ -1568,6 +2398,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List top contributors
+         * @description Public. Pages of users ranked by contribution points, with the same entry shape as the user leaderboard.
+         */
         get: operations["LeaderboardsController_contributors"];
         put?: never;
         post?: never;
@@ -1584,7 +2418,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Contest announcements as ids (`announcement`), for anyone who sees the contest; `resync` after a lost subscription. */
+        /**
+         * Stream live events of a contest
+         * @description Server-sent events (`text/event-stream`) for anyone who can see the
+         *     contest. The `announcement` event carries the id of a new or resent
+         *     announcement, and `resync` tells the client its subscription was lost and
+         *     it should reload the list. Nothing is sent until an event happens apart
+         *     from heartbeat comments every 15 seconds; the client reconnects after the
+         *     advertised 3 second retry delay. Open streams are capped per user, per IP
+         *     and in total (429 `rate_limited`).
+         */
         get: operations["ContestStreamsController_contest"];
         put?: never;
         post?: never;
@@ -1601,7 +2444,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The feed as a stream: the snapshot, then new events, one NDJSON line each. HTTP Basic like the snapshot URL. */
+        /**
+         * Stream the event feed of a contest
+         * @description The feed as `application/x-ndjson`: the snapshot first, then new events as
+         *     one JSON line each, re-checked every 10 seconds. Authenticated with HTTP
+         *     Basic like the snapshot. A blank line is sent every 30 seconds as keep-
+         *     alive, and the stream ends when the key stops qualifying or builds keep
+         *     failing; reconnect to continue. At most two streams per key (429
+         *     `rate_limited`); 409 `feed_too_large_for_stream` for contests that are too
+         *     large, poll the snapshot instead.
+         */
         get: operations["FeedStreamController_feed"];
         put?: never;
         post?: never;
@@ -1618,7 +2470,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Public feed: `queued`, `processing`, `grading-begin` and `done` of the submissions the anonymous submission list shows (public, non-organisation-private problems; never a contest whose list is hidden, e.g. running or frozen), as ids and status. */
+        /**
+         * Stream the public submission feed
+         * @description Public Server-Sent Events stream (`text/event-stream`). Emits `queued`,
+         *     `processing`, `grading-begin` and `done` for the submissions the anonymous
+         *     submission list shows, with
+         *     `{ submissionId, userId, problemId, type, status }` as data; per-case
+         *     progress is never sent. A `resync` event means events may have been missed,
+         *     so reload the list. A `: ping` comment is sent every 15 seconds and the
+         *     stream asks clients to retry after 3 seconds, so `EventSource` reconnects by
+         *     itself. Open streams are capped per client IP and per server (429
+         *     `rate_limited`).
+         */
         get: operations["SubmissionStreamsController_feed"];
         put?: never;
         post?: never;
@@ -1635,7 +2498,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** One submission, gated like its detail: `state` first, then its events (`test-case` only when every case result is visible), `resync` after a lost subscription. */
+        /**
+         * Stream the live judging progress of one submission
+         * @description Needs a signed-in user who may see the submission's detail (same access
+         *     rules and 404 or 403 errors). Server-Sent Events (`text/event-stream`): a
+         *     `state` event first with the current status, result and points, then
+         *     `queued`, `processing`, `grading-begin` and `done` events, and `test-case`
+         *     events only when the viewer may see every case result. `resync` means events
+         *     may have been missed, so reload the submission. Heartbeat `: ping` every 15
+         *     seconds. Access is re-checked every minute and the stream closes when it is
+         *     lost. Open streams are capped per user and per client IP (429
+         *     `rate_limited`).
+         */
         get: operations["SubmissionStreamsController_submission"];
         put?: never;
         post?: never;
@@ -1652,7 +2526,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** New tickets, messages and status changes of every ticket the viewer may read (`new-ticket`, `ticket-message`, `ticket-status`; ids only); `resync` after a lost subscription. */
+        /**
+         * Stream ticket events
+         * @description Server-sent events (`text/event-stream`) for every ticket the caller may
+         *     read. Events are `new-ticket`, `ticket-message` and `ticket-status` with
+         *     ids only (`ticketId`, `messageId`, `open`), so the client fetches the
+         *     content itself; `resync` means events were lost and the client should
+         *     reload. Heartbeat comments every 15 seconds, access is re-checked about
+         *     once a minute, and the client reconnects after the advertised 3 second
+         *     retry delay. Open streams are capped per user and per IP (429
+         *     `rate_limited`).
+         */
         get: operations["TicketStreamsController_feed"];
         put?: never;
         post?: never;
@@ -1669,7 +2553,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The same frames for one ticket. */
+        /**
+         * Stream the events of one ticket
+         * @description The same frames as the ticket feed, for a single ticket. The ticket's
+         *     detail rules apply first: 404 `not_found` for an unknown id and 403
+         *     `forbidden` when the caller may not read it.
+         */
         get: operations["TicketStreamsController_ticket"];
         put?: never;
         post?: never;
@@ -1686,7 +2575,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** `notification` (`{ id }`: a row of the viewer's inbox was created or merged) and `resync` after a lost subscription. */
+        /**
+         * Stream my notification events
+         * @description Signed-in callers only. Server-sent events (`text/event-stream`). The server starts with `retry: 3000` (reconnect after 3 seconds), then sends a `: ping` comment every 15 seconds, a `notification` frame (`data` is `{"id": "<notification id>"}`) whenever a row of the caller's inbox is created or merged, and a `resync` frame after the server lost its subscription (reload the inbox then). There is no replay: fetch the inbox after connecting.
+         *     At most 12 streams per user, 16 per IP and 2000 user streams in total (429 `rate_limited`). The session is re-checked every minute; the stream ends when the session, the account or the API token is no longer valid.
+         */
         get: operations["UserStreamsController_open"];
         put?: never;
         post?: never;
@@ -1703,6 +2596,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Read an RSS or Atom feed
+         * @description Public. Returns the 25 newest items of `kind` (`blog`, `comments` or `problems`) as `rss` (`application/rss+xml`) or `atom` (`application/atom+xml`). Feeds show only what a signed-out visitor may read and are cached for 5 minutes. The legacy `/feed/<kind>/<rss|atom>/` URLs map here.
+         */
         get: operations["FeedsController_feed"];
         put?: never;
         post?: never;
@@ -1719,6 +2616,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the home page widgets
+         * @description Public. Returns the side widgets of the home page: the newest comments the viewer may read, the 7 newest problems, the top 5 users by performance points and by contribution points, and site-wide counts. The anonymous comment slice is cached for 60 seconds. Running and upcoming contests come from the contests list.
+         */
         get: operations["HomeController_get"];
         put?: never;
         post?: never;
@@ -1735,8 +2636,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List integration clients
+         * @description Requires `judge.manage_integration`; browser session only and not while impersonating. Returns a page of integration clients, newest first, with key prefix, scopes, allowed networks, acting user, last use, revocation and expiry. Keys are never returned.
+         */
         get: operations["IntegrationClientsController_list"];
         put?: never;
+        /**
+         * Create an integration client
+         * @description Requires `judge.manage_integration`; browser session only and not while impersonating. Creates a client and returns its key once, in `key`; only a hash is stored. The acting user must be an active non-superuser holding `judge.add_contest` and `judge.create_private_contest`. Limited to 10 clients per administrator per day.
+         *     Errors: 400 `validation_failed` (unknown or unfit `actsAs`, malformed CIDR, expiry in the past), 429 `rate_limited`.
+         */
         post: operations["IntegrationClientsController_create"];
         delete?: never;
         options?: never;
@@ -1754,6 +2664,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Revoke an integration client
+         * @description Requires `judge.manage_integration`; browser session only and not while impersonating. The key stops working on its next request. Idempotent: revoking a revoked client does nothing. 404 `not_found`. Returns 204.
+         */
         delete: operations["IntegrationClientsController_revoke"];
         options?: never;
         head?: never;
@@ -1767,8 +2681,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List judge servers
+         * @description Needs `judge.change_judge`. Returns every judge sorted by name with its
+         *     online state, ping, load, slots in use, runtimes and last IP. Authentication
+         *     keys are never returned.
+         */
         get: operations["JudgesController_list"];
         put?: never;
+        /**
+         * Register a judge server
+         * @description Needs `judge.change_judge`. `name` uses letters, digits, `_`, `.` or `-` (at
+         *     most 50) and is what the judge sends when it connects. Returns the judge and
+         *     its `authKey`, shown only this once (only a hash is stored). Responds 409
+         *     `conflict` (issue `name_taken`) when the name exists.
+         */
         post: operations["JudgesController_create"];
         delete?: never;
         options?: never;
@@ -1789,6 +2716,14 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update a judge server
+         * @description Needs `judge.change_judge`. Send only the fields to change: `isBlocked`,
+         *     `isDisabled` and `description`. Blocking disconnects the judge and refuses
+         *     it until unblocked; disabling tells a connected judge to stop taking work,
+         *     enabling lets it resume. Responds 404 `not_found` (issue `judge_not_found`)
+         *     for an unknown name.
+         */
         patch: operations["JudgesController_update"];
         trace?: never;
     };
@@ -1801,6 +2736,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Disconnect a judge server
+         * @description Needs `judge.change_judge`. Asks the bridge to disconnect the judge; it may
+         *     reconnect. With `force` every session and socket of the judge is retired at
+         *     once. Answers 204; 404 `not_found` for an unknown name.
+         */
         post: operations["JudgesController_disconnect"];
         delete?: never;
         options?: never;
@@ -1817,6 +2758,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Issue a new authentication key for a judge
+         * @description Needs `judge.change_judge`. The old key stops working and a connected judge
+         *     is disconnected; it can only reconnect with the new `authKey`, returned only
+         *     this once. Responds 404 `not_found` for an unknown name.
+         */
         post: operations["JudgesController_rotateKey"];
         delete?: never;
         options?: never;
@@ -1831,6 +2778,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List my notifications
+         * @description Signed-in callers only. Returns the caller's inbox, most recently active first, 20 per page. Filter by `state` (`all`, `unread`, `read`), `priority` and repeated `kind` parameters. Repeated events can be merged into one row whose `count` grows.
+         */
         get: operations["NotificationsController_list"];
         put?: never;
         post?: never;
@@ -1849,6 +2800,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Mark a notification as read
+         * @description Signed-in callers only. Idempotent. 404 `not_found` for an unknown id or one that belongs to another user. While a superuser impersonates, it does nothing. Returns 204.
+         */
         post: operations["NotificationsController_read"];
         delete?: never;
         options?: never;
@@ -1865,6 +2820,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Mark all notifications as read
+         * @description Signed-in callers only. Marks the whole inbox read. Limited to 30 calls per user per minute (429 `rate_limited`). While a superuser impersonates, it does nothing. Returns 204.
+         */
         post: operations["NotificationsController_readAll"];
         delete?: never;
         options?: never;
@@ -1879,7 +2838,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The bell polls this every 60 s and on window focus. */
+        /**
+         * Count my unread notifications
+         * @description Signed-in callers only. Returns the number of unread notifications. The client may reuse the answer for 15 seconds (`private, max-age=15`); the bell polls every 60 seconds and on window focus.
+         */
         get: operations["NotificationsController_unreadCount"];
         put?: never;
         post?: never;
@@ -1896,8 +2858,26 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List organizations
+         * @description Returns one page of organizations the viewer may list. Unlisted
+         *     organizations appear only to their members, their admins and holders of
+         *     `judge.edit_all_organization`. `search` narrows by a case-insensitive
+         *     substring of name, short name or slug. Paged with `page` and `pageSize`
+         *     (default 100, at most 100). Anonymous callers may use it.
+         */
         get: operations["OrganizationsController_list"];
         put?: never;
+        /**
+         * Create an organization
+         * @description Requires `judge.add_organization`. The creator is always an admin;
+         *     `adminIds` adds more. New organizations are unlisted until staff lists
+         *     them, and the short name defaults to the first 20 characters of the slug.
+         *     `isUnlisted`, `slots` and `shortName` need `judge.edit_all_organization`
+         *     (403 `forbidden`). A taken slug is 400 `validation_failed`. A user may
+         *     administer at most three organizations unless the actor holds
+         *     `judge.spam_organization`.
+         */
         post: operations["OrganizationEditingController_create"];
         delete?: never;
         options?: never;
@@ -1912,12 +2892,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get an organization by slug
+         * @description Returns the organization's profile: name, rendered about text, admins,
+         *     member slots, and the viewer's own state (member, may administer, pending
+         *     join request). The raw `about` text is only returned to administrators.
+         *     Unlisted organizations are reachable by slug for anyone. Fails with 404
+         *     `not_found` for an unknown slug.
+         */
         get: operations["OrganizationsController_detail"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Edit an organization
+         * @description Organization administrators only. Changes the fields sent (null is refused
+         *     for `slots`); `about` is re-rendered, `adminIds` is the whole new admin
+         *     list and must not be empty, and new admins are subject to the three-
+         *     organization cap. Staff fields `isUnlisted`, `slots` and `shortName` need
+         *     `judge.edit_all_organization`. A slug that is taken is 400
+         *     `validation_failed`.
+         */
         patch: operations["OrganizationEditingController_update"];
         trace?: never;
     };
@@ -1930,6 +2927,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Join an open organization
+         * @description Adds the signed-in user to an organization that is open. A user may be in
+         *     at most three open organizations (private ones do not count). Returns 204.
+         *     Refusals are 409 `conflict` for a private organization (send a join
+         *     request instead), an organization already joined, or the open-organization
+         *     cap; 409 `organization_full` when the organization has no free slot; and
+         *     403 `locked_in_official_contest` while an official contest locks it.
+         */
         post: operations["MembershipController_join"];
         delete?: never;
         options?: never;
@@ -1946,6 +2952,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Remove a member from an organization
+         * @description Organization administrators (and holders of `judge.edit_all_organization`)
+         *     remove the member given by `userId`. Admins cannot be removed, and the
+         *     user must be a member (409 `conflict`). Returns 204; 403 `forbidden` for
+         *     non-administrators.
+         */
         post: operations["MembershipController_kick"];
         delete?: never;
         options?: never;
@@ -1962,6 +2975,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Leave an organization
+         * @description Removes the signed-in user from the organization and returns 204. Admins
+         *     cannot leave (409 `conflict`), nor can a user who is not a member. Locked
+         *     during an official contest (403 `locked_in_official_contest`).
+         */
         post: operations["MembershipController_leave"];
         delete?: never;
         options?: never;
@@ -1976,6 +2995,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the members of an organization
+         * @description Returns the organization's members with their points, problem count and
+         *     rating, ranked by the chosen `sort` (`performancePoints` by default,
+         *     `points`, `problemCount` or `rating`; ties share a rank). Paged with
+         *     `page` and `pageSize` (default 100). Fails with 404 `not_found` for an
+         *     unknown slug.
+         */
         get: operations["OrganizationsController_members"];
         put?: never;
         post?: never;
@@ -1992,6 +3019,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the posts of an organization
+         * @description Public. Returns the organization's posts the viewer may see, pinned first
+         *     then newest first: members see published ones, administrators also drafts.
+         *     Viewers who may see none get an empty page. Paged with `page`. Fails with
+         *     404 `not_found` for an unknown slug.
+         */
         get: operations["OrganizationPostsController_list"];
         put?: never;
         post?: never;
@@ -2008,8 +3042,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the problem tags of an organization
+         * @description Members and administrators only (403 `forbidden`). Returns the tags the
+         *     organization's admins use to label its problems. Paged with `page` and
+         *     `pageSize` (default 100).
+         */
         get: operations["ProblemTagsController_list"];
         put?: never;
+        /**
+         * Create a problem tag
+         * @description Organization administrators only. Creates a tag with a slug, name and
+         *     optional colour. An organization may have at most 100 tags (409
+         *     `tag_limit_reached`) and slugs are unique within it (409 `slug_taken`).
+         */
         post: operations["ProblemTagsController_create"];
         delete?: never;
         options?: never;
@@ -2027,9 +3073,21 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete a problem tag
+         * @description Organization administrators only. Deletes the tag and removes it from the
+         *     organization's problems. Returns 204, or 404 `not_found` for an unknown
+         *     tag.
+         */
         delete: operations["ProblemTagsController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Update a problem tag
+         * @description Organization administrators only. Changes the tag's name or colour; the
+         *     slug never changes and null values are refused. Fails with 404 `not_found`
+         *     for an unknown tag.
+         */
         patch: operations["ProblemTagsController_update"];
         trace?: never;
     };
@@ -2040,6 +3098,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the problems of an organization
+         * @description Members and administrators only. Returns the organization's problems that
+         *     the viewer could already see, with the organization's tags and archive
+         *     flag. Archived ones are hidden unless `archived` is `true` or `all`.
+         *     Filter by `tag` (an unknown tag matches nothing) and `q` (code or name
+         *     substring). Paged with `page` and `pageSize` (default 50, at most 100).
+         */
         get: operations["OrganizationProblemsController_list"];
         put?: never;
         post?: never;
@@ -2058,7 +3124,20 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Archive a problem in an organization
+         * @description Organization administrators only. Hides the problem from the
+         *     organization's problem list by default; the problem itself is not changed.
+         *     Returns 204, or 404 `not_found` if the problem does not list the
+         *     organization.
+         */
         post: operations["OrganizationProblemsController_archive"];
+        /**
+         * Unarchive a problem in an organization
+         * @description Organization administrators only. Shows an archived problem in the
+         *     organization's problem list again. Returns 204, or 404 `not_found` if the
+         *     problem does not list the organization.
+         */
         delete: operations["OrganizationProblemsController_unarchive"];
         options?: never;
         head?: never;
@@ -2073,6 +3152,13 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Set the tags of an organization problem
+         * @description Organization administrators only. Replaces the problem's tags with
+         *     `tagIds` (at most 20, all must belong to the organization; 400
+         *     `unknown_tag` otherwise). Fails with 404 `not_found` if the problem does
+         *     not list the organization.
+         */
         put: operations["OrganizationProblemsController_setTags"];
         post?: never;
         delete?: never;
@@ -2090,6 +3176,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Apply a bulk action to organization problems
+         * @description Organization administrators only. Applies `archive`, `unarchive`, `add-
+         *     tag` or `remove-tag` (the last two need `tagId`) to up to 100 problem
+         *     `codes`. Codes that are not live problems of the organization are reported
+         *     as `skipped` with reason `not_found` rather than failing the request.
+         *     Limited to 20 requests per hour per user (429 `rate_limited`).
+         */
         post: operations["OrganizationProblemBulkController_run"];
         delete?: never;
         options?: never;
@@ -2110,6 +3204,13 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Change the quota of an organization
+         * @description Requires `judge.edit_all_organization`. Sets the monthly credits cap, the
+         *     storage cap in bytes, or the unlimited flag; `null` clears a cap so the
+         *     site default applies again, and omitted fields stay as they are. The
+         *     change is logged. Returns the updated usage.
+         */
         patch: operations["OrganizationUsageController_updateQuota"];
         trace?: never;
     };
@@ -2120,8 +3221,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the join requests of an organization
+         * @description Organization administrators only. Returns one state at a time (`P` pending
+         *     by default, `A` approved or `R` rejected), newest first, 50 per page. 403
+         *     `forbidden` for non-administrators.
+         */
         get: operations["OrganizationRequestsController_list"];
         put?: never;
+        /**
+         * Request to join a private organization
+         * @description Files a join request with a `reason` for a private organization. At most
+         *     five requests per hour per user (429 `rate_limited`). Refusals are 409
+         *     `organization_open` (join directly instead), `already_member` and
+         *     `request_pending`, and 403 `locked_in_official_contest` during an official
+         *     contest.
+         */
         post: operations["OrganizationRequestsController_create"];
         delete?: never;
         options?: never;
@@ -2136,6 +3251,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a join request
+         * @description Returns one request. Only its requester and organization administrators
+         *     may read it (403 `forbidden`); 404 `not_found` for a request that does not
+         *     belong to the organization.
+         */
         get: operations["OrganizationRequestsController_detail"];
         put?: never;
         post?: never;
@@ -2154,6 +3275,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Approve or reject a join request
+         * @description Organization administrators only. Send `state` `A` to approve or `R` to
+         *     reject. Approval adds the user to the organization and refreshes its
+         *     points, unless the organization is full (409 `organization_full`); a
+         *     request that was already decided is 409 `request_already_decided`. The
+         *     requester is notified in their inbox.
+         */
         post: operations["OrganizationRequestsController_decide"];
         delete?: never;
         options?: never;
@@ -2168,6 +3297,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the quota usage of an organization
+         * @description Organization administrators only. Returns the current month's credits and
+         *     storage against the organization's limits, whether quotas are enforced,
+         *     and the most recent credit entries with the users who spent them.
+         */
         get: operations["OrganizationUsageController_one"];
         put?: never;
         post?: never;
@@ -2184,7 +3319,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Static `usage` wins over `:slug` (the slug `usage` is reserved). */
+        /**
+         * List quota usage of all organizations
+         * @description Requires `judge.edit_all_organization`. Returns one row per organization
+         *     for the current month: credits used and their limit, storage used and its
+         *     limit, and whether it is unlimited. Sort by `name` (default) or `credits`;
+         *     paged with `page` and `pageSize`.
+         */
         get: operations["OrganizationUsageController_overview"];
         put?: never;
         post?: never;
@@ -2201,10 +3342,119 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The wildcard (`*`) is everything after `/pages/`, nested urls included. `private, no-cache`: the body depends on the session (`registrationRequired` pages), so a shared cache must never serve it and a private one must revalidate (an edit shows at once). */
+        /**
+         * Read a site page by URL
+         * @description Public. Returns a static page (for example `/about`) found by the path after `/pages/`, nested paths included; the path is normalised. Pages marked `registrationRequired` need a signed-in caller. Errors: 404 `not_found`, 401 `unauthorized`. Not shared-cacheable (`private, no-cache`) because the answer depends on the session.
+         */
         get: operations["FlatpagesController_page"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/polygon/problems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the Polygon problems shared with the QHHOJ account
+         * @description Needs `judge.import_polygon_package`. Every problem the account can read,
+         *     with its newest package (`READY`, `RUNNING`, `FAILED` or `NONE`), its
+         *     statement title and the code of the QHHOJ problem already linked to it.
+         *     `search` matches id, name, title or owner; `state` keeps one package state.
+         *     The list is cached for 60 seconds and titles for a day per revision;
+         *     `refresh=true` skips the list cache and is limited to 6 a minute per user.
+         *     Errors: 409 `polygon_not_connected`, 502 `polygon_unauthorized`,
+         *     `polygon_clock_skew` or `polygon_failed`, 503 `polygon_unavailable`,
+         *     429 `rate_limited`.
+         */
+        get: operations["PolygonController_problems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/polygon/problems/{polygonId}/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a Polygon problem and link it
+         * @description Needs `judge.import_polygon_package`, plus `judge.add_problem` to create a
+         *     problem or write access to the problem to update it. The body takes the zip
+         *     import's options (`code`, `mode`, authors, curators, group, types, points,
+         *     statement languages, zero-point and main-solution switches) and `autoSync`.
+         *     The server downloads the newest package itself and the same background job
+         *     as the zip import applies it, then links the problem to Polygon. Answers 202
+         *     with a `jobId` to poll at `GET /problems/imports/{jobId}` (its `step` goes
+         *     queued, downloading, statements, tests, done or failed). Counts towards the
+         *     10 imports an hour per user. Errors: 400 `code_taken`, 404 `not_found` (not
+         *     shared with the account), 409 `polygon_package_not_ready`,
+         *     `polygon_already_linked` or `polygon_not_connected`, 502/503 Polygon errors,
+         *     429 `rate_limited`.
+         */
+        post: operations["PolygonController_importProblem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/polygon/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get whether the Polygon account is connected
+         * @description Needs `judge.import_polygon_package`. `connected` is true when both the API
+         *     key and secret are set in the admin settings; `accountName` is the Polygon
+         *     login setters add as a READ co-author (empty when unset). No call to Polygon
+         *     is made. The secret is never returned.
+         */
+        get: operations["PolygonController_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/polygon/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test the Polygon connection
+         * @description Needs `judge.change_settings`. Calls Polygon's `problems.list` with the saved
+         *     key and secret and answers how many problems the account can read. Errors:
+         *     409 `polygon_not_connected` (key or secret unset), 502
+         *     `polygon_unauthorized` (wrong key or secret), 502 `polygon_clock_skew` (the
+         *     server clock is off by more than Polygon allows), 503 `polygon_unavailable`.
+         */
+        post: operations["PolygonConnectionController_test"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2218,8 +3468,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List blog posts
+         * @description Public. Returns published personal posts, newest first. `feed` is `global`
+         *     (default: posts marked global, pinned ones first) or `all` (every
+         *     published personal post). Organization posts never appear here; see the
+         *     organization posts endpoint. Paged with `page`.
+         */
         get: operations["BlogPostsController_list"];
         put?: never;
+        /**
+         * Create a blog post
+         * @description Creates a personal post, or an organization post when `organization` (a
+         *     slug) is given. A personal post needs enough solved problems and an
+         *     unmuted account; an organization post needs an unmuted organization admin
+         *     holding `judge.edit_organization_post` (403 `forbidden`). `globalPost`
+         *     needs `judge.mark_global_post`, `sticky` needs `judge.pin_post`, and
+         *     `summary` and `ogImage` need `judge.edit_all_post`. Creating and editing
+         *     share a limit of 10 writes per hour (429 `rate_limited`); posts are locked
+         *     during an official contest. A revision is written, and a published
+         *     personal post is announced on Discord.
+         */
         post: operations["BlogEditingController_create"];
         delete?: never;
         options?: never;
@@ -2234,12 +3503,36 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a blog post
+         * @description Public for published personal posts; organization posts need membership,
+         *     and drafts or scheduled posts need edit rights. Returns the rendered
+         *     content, the author and organization, vote totals and whether the viewer
+         *     can edit or delete. The raw `content` and `summary` are returned only to
+         *     those who can edit. Fails with 404 `not_found` for malformed, unknown and
+         *     invisible ids alike.
+         */
         get: operations["BlogPostsController_detail"];
         put?: never;
         post?: never;
+        /**
+         * Delete a blog post
+         * @description Requires edit rights plus `judge.delete_blogpost`. Deletes the post with
+         *     its discussion, writes a revision and recomputes the contribution points
+         *     of the authors and commenters. Returns 204; 403 `forbidden` otherwise.
+         */
         delete: operations["BlogEditingController_delete"];
         options?: never;
         head?: never;
+        /**
+         * Edit a blog post
+         * @description Changes the fields sent (null is refused). Allowed for the author,
+         *     organization admins and `judge.edit_all_post` holders; muted users cannot
+         *     edit. Authors can only be changed with `judge.edit_all_post`, and the flag
+         *     and staff fields follow the permissions listed for creating. A revision
+         *     records the difference. Hiding or showing a post alone with
+         *     `judge.edit_all_post` skips the write limit and the contest lock.
+         */
         patch: operations["BlogEditingController_edit"];
         trace?: never;
     };
@@ -2251,6 +3544,15 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Vote on a blog post
+         * @description Sets the caller's vote on a post they can see: `score` is 1, -1, or 0 to
+         *     withdraw, and a new vote replaces the old one. Returns the new total and
+         *     the caller's vote. Authors cannot vote on their own post (403
+         *     `forbidden`), and voters need enough solved problems and an unmuted
+         *     account. Limited to 60 votes per minute per user across posts and
+         *     comments. Votes change the author's contribution points.
+         */
         put: operations["BlogVotesController_vote"];
         post?: never;
         delete?: never;
@@ -2266,8 +3568,33 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List problems visible to the viewer
+         * @description Public. Returns one page of the problems the viewer may see, a signed-in
+         *     viewer's own solved or attempted mark included. `visibility` narrows to
+         *     public, private or all visible problems (default public). `search` splits on
+         *     spaces and needs every word inside the code or a title, ignoring case and
+         *     Vietnamese accents; `q` is a substring match on the code or any title; `sort`
+         *     takes `date`, `code`, `name`, `points`, `acRate` or `userCount`, with a
+         *     leading `-` for descending (default `-date`). Paging: `page` from 1,
+         *     `pageSize` 1-100 (default 50). While the viewer is in a contest, its
+         *     problems are listed even if private, and nothing is listed before the
+         *     contest starts.
+         */
         get: operations["ProblemsController_list"];
         put?: never;
+        /**
+         * Create a problem
+         * @description Needs `judge.add_problem`. The creator becomes a curator. Some fields are
+         *     gated: `isPublic` needs `judge.change_public_visibility`,
+         *     `isManuallyManaged` needs `judge.change_manually_managed`, `isFullMarkup`
+         *     needs `judge.problem_full_markup`, people, licence, organizations and other
+         *     staff fields need `judge.edit_all_problem`, and a time limit above 5 seconds
+         *     needs `judge.high_problem_timelimit` (400 `time_limit_too_high`). Writes a
+         *     revision, charges the organization's quota for organization-private problems
+         *     (403 `quota_exceeded`) and returns the new problem as `GET /problems/{code}`
+         *     would. A taken or reserved code is 400 `code_taken`.
+         */
         post: operations["ProblemEditingController_create"];
         delete?: never;
         options?: never;
@@ -2282,12 +3609,44 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a problem statement and its metadata
+         * @description Public for problems the viewer may see; an unknown, malformed or invisible
+         *     code is 404 `not_found` either way, so existence never leaks. `lang` selects
+         *     the statement language and falls back to the base statement when no
+         *     translation exists (`translated` tells which). When the viewer can edit the
+         *     problem the response also carries the `editor` block with raw markdown,
+         *     translations and people. Inside a running contest that lists the problem,
+         *     `contest` reports the remaining attempts.
+         */
         get: operations["ProblemsController_detail"];
         put?: never;
         post?: never;
+        /**
+         * Delete a problem (restorable during the grace period)
+         * @description Needs `judge.delete_problem` and edit rights on the problem. The body's
+         *     `confirmCode` must repeat the problem code. The problem is hidden at once;
+         *     it can be restored until the purge job removes its data after the grace
+         *     period (setting `problem.deleteGraceDays`), and its submissions are kept. A
+         *     problem used by a contest is refused with 409 `problem_in_contest`; each
+         *     user may delete 10 problems per hour (429 `rate_limited`). Queues a
+         *     recomputation of the points of everyone who solved it. Failures carry the
+         *     code in `error.issues[0].code`.
+         */
         delete: operations["ProblemLifecycleController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Update a problem
+         * @description Needs edit rights on the problem (404 `not_found` when it is invisible to
+         *     the caller, 403 `forbidden` when visible but not editable). Send only the
+         *     fields to change; `licenseId` and `date` accept null, other fields refuse
+         *     it. The same permission gates as on creation apply to the fields they
+         *     protect. Changing the description re-renders the statement; changing the
+         *     code moves the test data directory (400 `data_directory_taken` if one
+         *     exists) and changing points, partial scoring or organization privacy
+         *     rescores the problem. Writes a revision and returns the updated problem.
+         */
         patch: operations["ProblemEditingController_edit"];
         trace?: never;
     };
@@ -2298,6 +3657,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the viewer's organizations that archived a problem
+         * @description Returns the organizations (slug and name) in which the viewer is a member
+         *     or administrator and which archived the problem, for the notice on the
+         *     problem page. Fails with 404 `not_found` when the viewer cannot see the
+         *     problem.
+         */
         get: operations["ArchiveNoticeController_archivedIn"];
         put?: never;
         post?: never;
@@ -2316,6 +3682,16 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Clone a problem under a new code
+         * @description Needs `judge.clone_problem` and edit rights on the source. Copies the
+         *     statement, limits, languages, classification and visibility settings; test
+         *     data, translations, editorial, people and counters are not copied. The
+         *     caller becomes the only curator and the clone starts private. Charges the
+         *     organization's quota when the source is organization-private (403
+         *     `quota_exceeded`); a taken code is 400 `code_taken`. Returns the new
+         *     problem.
+         */
         post: operations["ProblemEditingController_clone"];
         delete?: never;
         options?: never;
@@ -2330,7 +3706,23 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the test data configuration of a problem
+         * @description Needs edit rights on the problem. Returns the checker, grader, limits,
+         *     uploaded file names, the list of test cases, the members of the archive and
+         *     the last `init.yml` generation error. Problems managed manually are 404
+         *     `not_found` here.
+         */
         get: operations["ProblemDataController_get"];
+        /**
+         * Replace the test data configuration of a problem
+         * @description Needs edit rights; mirror problems are refused (403) because they use their
+         *     source problem's data. Send the whole configuration, including every test
+         *     case (at most 300, or 9999 with `judge.create_mass_testcases`; body up to 8
+         *     MiB). The server regenerates `init.yml`; a configuration problem is reported
+         *     in `feedback`, not as an error. Responds 409 `conflict` when the data
+         *     changed meanwhile, so reload and retry.
+         */
         put: operations["ProblemDataController_put"];
         post?: never;
         delete?: never;
@@ -2348,6 +3740,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload the test data archive of a problem
+         * @description Needs edit rights; mirror problems are refused. Send one multipart `file`, a
+         *     .zip of up to 512 MiB (400 `zip_required` or a zip error code otherwise). It
+         *     replaces the previous archive, regenerates `init.yml` and is counted against
+         *     the organization's storage and credits (403 `quota_exceeded`). Limited to 30
+         *     uploads per hour per user. Returns the new data configuration.
+         */
         post: operations["ProblemDataController_uploadArchive"];
         delete?: never;
         options?: never;
@@ -2364,7 +3764,22 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload a generator, checker, grader or header file
+         * @description Needs edit rights; mirror problems are refused. `kind` is `generator`,
+         *     `customChecker`, `customGrader` or `customHeader`; send one multipart `file`
+         *     of up to 1 MiB whose extension fits the kind (400 `extension_not_allowed`).
+         *     It replaces the previous file of that kind and returns the new data
+         *     configuration. Shares the upload budget of 30 per hour per user.
+         */
         post: operations["ProblemDataController_uploadSource"];
+        /**
+         * Remove an uploaded data file
+         * @description Needs edit rights; mirror problems are refused. `kind` is `archive`,
+         *     `generator`, `customChecker`, `customGrader` or `customHeader`. Clears the
+         *     setting, regenerates `init.yml` and deletes the file. Returns the new data
+         *     configuration.
+         */
         delete: operations["ProblemDataController_deleteFile"];
         options?: never;
         head?: never;
@@ -2378,7 +3793,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Always an attachment with `nosniff`: uploaded files are never rendered by the browser. */
+        /**
+         * Download an uploaded test data file
+         * @description Needs edit rights on the problem. Always sent as an attachment with
+         *     `X-Content-Type-Options: nosniff`, so the browser never renders it. An
+         *     unknown or unsafe file name is 404 `not_found`.
+         */
         get: operations["ProblemDataController_download"];
         put?: never;
         post?: never;
@@ -2395,6 +3815,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the generated init.yml of a problem
+         * @description Needs edit rights on the problem. Returns the judge configuration file
+         *     generated from the test data as `text/yaml`. Responds 404 `not_found` when
+         *     none was generated, for example because of a configuration error.
+         */
         get: operations["ProblemDataController_init"];
         put?: never;
         post?: never;
@@ -2411,7 +3837,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the editorial of a problem
+         * @description Public once the editorial is published (`isPublic` set and `publishOn`
+         *     reached). Viewers with `judge.see_private_solution` and problem editors can
+         *     read it earlier. Responds 404 `not_found` when there is no editorial, when
+         *     the viewer may not read it yet, or when the viewer is taking part in a
+         *     contest.
+         */
         get: operations["ProblemsController_editorial"];
+        /**
+         * Create or replace the editorial of a problem
+         * @description Needs edit rights on the problem. Sets `isPublic`, the `publishOn` time (ISO
+         *     8601 with offset), the author ids and the markdown `content`. Readers see
+         *     the editorial once it is public and `publishOn` has passed. The markdown is
+         *     always sanitized. Answers 204.
+         */
         put: operations["ProblemEditingController_putEditorial"];
         post?: never;
         delete?: never;
@@ -2429,6 +3870,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload the downloadable material of a problem
+         * @description Needs `judge.upload_problem_material` and edit rights on the problem. Send
+         *     one multipart `file` of up to 20 MiB with an allowed extension (archives,
+         *     documents, sources, plain images and data files; 400
+         *     `material_type_not_allowed` otherwise). It replaces the previous material
+         *     and returns its `url`. Shares the upload budget of 30 per hour per user.
+         */
         post: operations["ProblemUploadsController_uploadMaterial"];
         delete?: never;
         options?: never;
@@ -2443,10 +3892,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 200 the zip (attachment), 202 while building, 404 `package_not_built`, 409 `package_too_large`, 503 `package_unavailable`. */
+        /**
+         * Download the package of a problem
+         * @description Needs edit rights on the problem. 200 returns the cached zip as an
+         *     attachment named `<code>.zip`; 202 `{ data: { status: 'building' } }` with
+         *     `Retry-After` means the build is still running. Other outcomes: 404
+         *     `package_not_built` when no package was requested for the current data, 409
+         *     `package_too_large`, 503 `package_unavailable` with `Retry-After` when the
+         *     build failed. Polling is free of rate limits.
+         */
         get: operations["ProblemPackageController_download"];
         put?: never;
-        /** 200 `{data: {status: 'ready', key}}` when the current package is cached, 202 `{data: {status: 'building', key}}` when a build is queued or running. Plain `@Res()` because the status depends on the answer. */
+        /**
+         * Request a downloadable package of a problem
+         * @description Needs edit rights on the problem. Asks for a zip of the problem as it is now
+         *     (statement and test data). 200 `{ data: { status: 'ready', key } }` means
+         *     the package is cached and `GET` on the same path returns it; 202
+         *     `{ data: { status: 'building', key } }` means a build is queued or running,
+         *     so poll `GET`. Every request counts against 3 per problem and 10 in total
+         *     per user per hour (429 `rate_limited`). Responds 409 `package_too_large`
+         *     when the package is over the size limit.
+         */
         post: operations["ProblemPackageController_request"];
         delete?: never;
         options?: never;
@@ -2462,13 +3928,86 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Outcomes, documented here because the plain `@Res()` hides them from the plugin:
-         *     200 the PDF (`application/pdf`, inline); 202 `{ data: { status: 'rendering' } }` with `Retry-After` while the render is pending, poll the same URL;
-         *     503 `pdf_unavailable` with `Retry-After` when the render failed; 404 when the problem is not visible.
+         * Download the problem statement as a PDF
+         * @description Public for problems the viewer may see. The PDF is rendered by a background
+         *     job and cached per problem and language: 200 returns the file inline
+         *     (`application/pdf`); 202 `{ data: { status: 'rendering' } }` with
+         *     `Retry-After` means the render is pending, so poll the same URL; 503
+         *     `pdf_unavailable` with `Retry-After` means the last render failed. `lang`
+         *     picks the statement language (falling back to the base one). Starting a
+         *     render is limited to 30 per minute per client IP, `HEAD` requests never
+         *     start one, and polling a pending render is free. Unknown or invisible
+         *     problems are 404 `not_found`.
          */
         get: operations["ProblemPdfController_pdf"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/polygon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a problem's Polygon link
+         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         *     data. Returns the link (Polygon id, synced revision and package, last sync
+         *     time, result and error, auto-sync switch) and Polygon's newest package,
+         *     which is null when Polygon cannot be asked. Errors: 404 `not_found`, 404
+         *     `polygon_not_linked`, 403 `forbidden`.
+         */
+        get: operations["ProblemPolygonLinkController_state"];
+        put?: never;
+        post?: never;
+        /**
+         * Unlink a problem from Polygon
+         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         *     data. Removes the link only; statement, tests and every other field stay.
+         *     Writes a problem revision. Answers 204. Errors: 404 `polygon_not_linked`,
+         *     409 `conflict` when the link changed meanwhile.
+         */
+        delete: operations["ProblemPolygonLinkController_unlink"];
+        options?: never;
+        head?: never;
+        /**
+         * Switch a problem's Polygon auto-sync
+         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         *     data. With `autoSync` on, the worker checks Polygon every 10 minutes and
+         *     syncs a newer READY package, except while a contest using the problem is
+         *     running. Writes a problem revision. Errors: 404 `polygon_not_linked`, 409
+         *     `conflict` when the link changed meanwhile.
+         */
+        patch: operations["ProblemPolygonLinkController_update"];
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/polygon/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync a linked problem from Polygon
+         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         *     data. Queues the import job in sync mode on the newest READY package:
+         *     statement, tutorial, tests, checker and limits are overwritten; code,
+         *     points, group, types, authors, curators and allowed languages are kept.
+         *     The result is recorded on the link. Answers 202 with a `jobId` to poll at
+         *     `GET /problems/imports/{jobId}`. Counts towards the 10 imports an hour per
+         *     user. Errors: 404 `polygon_not_linked`, 409 `polygon_package_not_ready`,
+         *     409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
+         */
+        post: operations["ProblemPolygonLinkController_sync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2484,6 +4023,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Purge a deleted problem immediately
+         * @description Superuser only (403 `forbidden` otherwise), and the body's `confirmCode`
+         *     must repeat the problem code. Queues the purge job without waiting for the
+         *     grace period and answers 202 `{ queued: true }`; the job deletes the test
+         *     data and statement files but leaves a tombstone with the code and name, and
+         *     all submissions. Responds 409 `purged` when the purge already finished and
+         *     409 `not_deleted` for a live problem.
+         */
         post: operations["ProblemLifecycleController_purgeNow"];
         delete?: never;
         options?: never;
@@ -2500,6 +4048,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Restore a deleted problem
+         * @description Needs `judge.delete_problem` and edit rights. Brings the problem back, with
+         *     its data, until it is purged. Responds 409 `not_deleted` when the problem is
+         *     live and 409 `purged` when the purge has started or finished. Queues a
+         *     recomputation of the solvers' points.
+         */
         post: operations["ProblemLifecycleController_restore"];
         delete?: never;
         options?: never;
@@ -2516,6 +4071,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload the PDF statement of a problem
+         * @description Needs `judge.upload_file_statement` and edit rights on the problem. Send one
+         *     multipart `file`, a PDF of up to 5 MiB (400 `statement_not_pdf` otherwise).
+         *     It replaces the previous PDF statement and returns its `url`. Cached
+         *     packages of the problem are dropped. Shares the upload budget of 30 per hour
+         *     per user.
+         */
         post: operations["ProblemUploadsController_uploadStatement"];
         delete?: never;
         options?: never;
@@ -2532,6 +4095,21 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Submit a solution as typed source code
+         * @description Needs a signed-in user who can see the problem. `language` must be one of
+         *     the problem's allowed languages and not a file-only language (400
+         *     `language_takes_file`); `source` is 1 to 65536 characters. `judgeId` pins a
+         *     judge and is for problem editors only (403 `judge_choice_forbidden`; 400
+         *     `judge_unavailable` if it is offline or lacks the language). When the
+         *     caller's current contest lists the problem, the submission counts as a
+         *     contest submission, subject to the contest's attempt cap (403
+         *     `contest_submission_limit`). Other errors: 403 `banned_from_problem`, 429
+         *     `rate_limited` (20 per minute per user) and 429
+         *     `unfinished_submission_limit` (2 unfinished submissions, waived by
+         *     `judge.spam_submission`). Queues the submission for judging and returns its
+         *     `id`.
+         */
         post: operations["SubmissionCreateController_submit"];
         delete?: never;
         options?: never;
@@ -2548,7 +4126,16 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Multipart: `language`, optional `judgeId`, and one `file` (file-only languages). */
+        /**
+         * Submit a solution as an uploaded file
+         * @description Same rules and errors as the typed submission, for languages that take a
+         *     file (`fileOnly`); a typed-source language is 400 `language_takes_text`.
+         *     Send a multipart form with `language`, optional `judgeId` and one `file`
+         *     whose extension is the language's (400 `file_wrong_extension`) and whose
+         *     size is within the language's `fileSizeLimit` in MB (413 `file_too_large`;
+         *     400 `file_upload_disabled` when uploads are off). The file is stored and its
+         *     media URL becomes the submission's source.
+         */
         post: operations["SubmissionCreateController_submitFile"];
         delete?: never;
         options?: never;
@@ -2563,8 +4150,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the tickets of a problem
+         * @description Returns the tickets filed about a problem: all of them for staff and
+         *     problem editors, otherwise only the caller's own. Fails with 404
+         *     `not_found` when the caller cannot see the problem. Paged with `page`.
+         */
         get: operations["TicketsController_problemList"];
         put?: never;
+        /**
+         * File a ticket about a problem
+         * @description Opens a ticket with a title and first message about a problem the caller
+         *     can see (404 `not_found` otherwise). The assignees are the problem's
+         *     authors, or the contest's authors when the caller is in a contest that
+         *     includes the problem. Muted users are refused (403 `forbidden` with issue
+         *     code `muted`). Limited to 5 tickets per 10 minutes (429 `rate_limited`).
+         *     The new ticket is pushed on the ticket event stream, announced on Discord
+         *     and sent to the assignees' inboxes.
+         */
         post: operations["TicketCreationController_forProblem"];
         delete?: never;
         options?: never;
@@ -2580,6 +4183,14 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Create or replace a statement translation
+         * @description Needs edit rights on the problem. Stores the name and markdown description
+         *     for `lang` (`en` or `vi`) and re-renders it. Problems in full-markup mode
+         *     need `judge.problem_full_markup` to change the text. Sending the stored text
+         *     again changes nothing. Answers 204 and invalidates the cached PDF
+         *     statements.
+         */
         put: operations["ProblemEditingController_putTranslation"];
         post?: never;
         delete?: never;
@@ -2595,6 +4206,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List deleted problems awaiting purge
+         * @description Needs `judge.delete_problem`. Returns one page (`page`, `pageSize` up to
+         *     100) of deleted problems the caller could see before deletion, with who
+         *     deleted them, the whole days left before the purge job may take them
+         *     (`daysLeft`) and whether the heavy data is already gone (`isPurged`).
+         */
         get: operations["ProblemLifecycleController_list"];
         put?: never;
         post?: never;
@@ -2613,6 +4231,20 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Import a Polygon package as a new or existing problem
+         * @description Needs `judge.import_polygon_package`; creating a problem also needs
+         *     `judge.add_problem`, updating needs write access to the problem's test data.
+         *     Send the Polygon package as a multipart `file` (a zip with `problem.xml` at
+         *     its root, up to 512 MiB) and the options in the query string: `code`, `mode`
+         *     (`create` or `update`), authors, curators, group, types, points, statement
+         *     language mapping and the zero-point and main-solution switches. The package
+         *     is checked, then imported by a background job; the answer is 202 with a
+         *     `jobId` to poll at `GET /problems/imports/{jobId}`. Limited to 10 imports
+         *     per hour per user. Errors: 400 `code_taken`, 400 for a bad package
+         *     (`no_problem_xml` or a zip error code), 403 `quota_exceeded`, 413
+         *     `file_too_large`, 429 `rate_limited`.
+         */
         post: operations["ProblemImportsController_start"];
         delete?: never;
         options?: never;
@@ -2627,6 +4259,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the state of a Polygon import job
+         * @description Needs `judge.import_polygon_package`. Returns the job state (`waiting`,
+         *     `active`, `completed`, `failed`, ...), the imported problem when completed,
+         *     and the error written for the requester when it failed. Only the user who
+         *     started the job, or a superuser, can read it; anyone else gets the same 404
+         *     `not_found` as for an unknown id. Finished jobs stay readable for a day.
+         */
         get: operations["ProblemImportsController_status"];
         put?: never;
         post?: never;
@@ -2643,6 +4283,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the catalogs used to classify and filter problems
+         * @description Public. Returns the problem types, problem groups, licenses and judge
+         *     languages, each sorted by name. Use the ids to fill the filters of
+         *     `GET /problems` and the fields of the problem editor.
+         */
         get: operations["ProblemsController_meta"];
         put?: never;
         post?: never;
@@ -2659,6 +4305,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Pick a random problem code
+         * @description Public. Applies the same filters and visibility rules as `GET /problems`
+         *     (search, groups, types, points, editorial, solved, visibility) and returns
+         *     the code of one matching problem. Responds 404 `no_problem` when nothing
+         *     matches.
+         */
         get: operations["ProblemsController_random"];
         put?: never;
         post?: never;
@@ -2677,6 +4330,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Render markdown to HTML for the editor preview
+         * @description Needs `judge.edit_own_problem`. Renders `markdown` with one of the site's
+         *     render styles and returns the HTML; nothing is saved. The unsanitized
+         *     `problem-full` style also needs `judge.problem_full_markup`. Limited to 60
+         *     previews per minute per user (429 `rate_limited`).
+         */
         post: operations["ProblemEditingController_preview"];
         delete?: never;
         options?: never;
@@ -2693,6 +4353,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Suggest a problem for review
+         * @description Needs `judge.suggest_new_problem`. Same body as creating a problem, but the
+         *     problem is stored private with the caller as its suggester and is announced
+         *     to the configured Discord webhook for review. Suggested problems stay
+         *     visible to their suggester and to reviewers until published.
+         */
         post: operations["ProblemEditingController_suggest"];
         delete?: never;
         options?: never;
@@ -2709,6 +4376,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload an image for use in statements
+         * @description Allowed for staff and users with `judge.can_upload_image`. Send one
+         *     multipart `file` of up to 5 MiB; the type is detected from the content and
+         *     only JPG, PNG, GIF and SVG are accepted (400 `image_type_not_allowed`). SVGs
+         *     are sanitized and must stay under 512 KiB (400 `svg_too_large`). Returns the
+         *     public `url` to reference from markdown. Shares the upload budget of 30 per
+         *     hour per user (429 `rate_limited`).
+         */
         post: operations["ProblemUploadsController_uploadImage"];
         delete?: never;
         options?: never;
@@ -2723,12 +4399,21 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get my profile
+         * @description Signed-in callers only. Returns the editable profile of the caller: about text (source and rendered HTML), display name, time zone, default programming language, editor and site themes, appearance, math engine, user script, owned badges with the displayed one, and the organizations the caller belongs to in display order.
+         */
         get: operations["ProfileController_get"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update my profile
+         * @description Signed-in callers only. Partial update: send only the fields to change and read the full profile back. `null` is accepted only for `displayBadgeId` (no badge) and `appearance` (the site look); `appearance` replaces the stored look as a whole.
+         *     `organizations` may only reorder or shorten the current memberships (join from the organization page). Errors: 400 `unknown_language`, 400 `not_your_badge`, 400 `organizations_not_editable`; 403 `forbidden` when editing `about` or `firstName` during the official contest (superusers excepted) or when editing `about` while muted or before solving 5 problems (staff excepted); 409 `conflict` when leaving an organization the caller administers or when memberships changed meanwhile. The badge and organization order are also frozen in official contest mode.
+         */
         patch: operations["ProfileController_update"];
         trace?: never;
     };
@@ -2739,8 +4424,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the state of my data export
+         * @description Signed-in callers only. Reports whether a zip of the caller's own data is being prepared, ready to download or absent, with its size, when it expires (7 days after it is written) and when a new export may be requested. 404 `not_found` when exports are switched off on this server or the account is muted.
+         */
         get: operations["UserDataController_status"];
         put?: never;
+        /**
+         * Request an export of my data
+         * @description Signed-in callers only, not while impersonating. Queues a background job that builds a zip of the caller's data and answers 202 `{queued: true}`. Allowed once a day while a fresh zip exists, and at most 3 times a day in total.
+         *     Errors: 409 `conflict` while an export is already being prepared, 429 `rate_limited` when asking again within a day or past the daily cap, 404 `not_found` when exports are unavailable.
+         */
         post: operations["UserDataController_prepare"];
         delete?: never;
         options?: never;
@@ -2755,7 +4449,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Always an attachment with `nosniff`; the username is not trusted to be ASCII. */
+        /**
+         * Download my data export
+         * @description Signed-in callers only, not while impersonating. Streams the prepared zip as an attachment (`application/zip`, `nosniff`). 404 `not_found` when no unexpired export exists.
+         */
         get: operations["UserDataController_download"];
         put?: never;
         post?: never;
@@ -2772,6 +4469,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a ranking through its public link
+         * @description Anonymous. Returns the contest's key, name and times and the ranking board
+         *     for a valid, unexpired, enabled token, as long as the contest shows its
+         *     scoreboard. Every miss is the same 404 `not_found` and spends the caller's
+         *     IP budget, so tokens cannot be guessed.
+         */
         get: operations["RankingLinksController_publicRanking"];
         put?: never;
         post?: never;
@@ -2788,8 +4492,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List short links
+         * @description Signed-in callers only. Returns the caller's own links, newest first. `scope=all` lists every link and needs `judge.manage_short_link` (403 `forbidden`). Includes hit counts and expiry.
+         */
         get: operations["ShortLinksController_list"];
         put?: never;
+        /**
+         * Create a short link
+         * @description Signed-in callers only. Shortens a site path to `/s/<code>`; only problems, contests (and their announcements, submissions, stats and ranking tabs), blog posts, users and organizations are allowed, otherwise 400 `validation_failed` on `path`. Without `code` and `expiresAt` the link is automatic and idempotent: the same path always returns the same link, and users get 20 new links per day (429 `rate_limited`).
+         *     Choosing a `code` or an `expiresAt` needs `judge.manage_short_link` (403 `forbidden` otherwise), and staff have no daily quota. A taken code gives 409 `conflict`; a reserved code or a past expiry gives 400.
+         */
         post: operations["ShortLinksController_create"];
         delete?: never;
         options?: never;
@@ -2807,6 +4520,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete a short link
+         * @description Requires `judge.manage_short_link`. Removes the link by code; the deletion is written to the server log. 404 `not_found`. Returns 204.
+         */
         delete: operations["ShortLinksController_remove"];
         options?: never;
         head?: never;
@@ -2820,6 +4537,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get one similar pair with both sources
+         * @description Needs `judge.moss_contest` and edit rights on the run's scope. Returns the
+         *     pair, both submitted sources and the matched fragments. It is 404
+         *     `not_found` unless the viewer could open both submissions' sources, so
+         *     nothing is shown that the submission routes would hide.
+         */
         get: operations["SimilarityPairsController_detail"];
         put?: never;
         post?: never;
@@ -2836,8 +4560,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List recent similarity runs of a problem or contest
+         * @description Needs `judge.moss_contest` and edit rights on the scope. Give exactly one of
+         *     the `problem` (code) or `contest` (key) query parameters. Returns the 10
+         *     newest runs, newest first, with their status, limits and per-language
+         *     groups. Unknown or not editable scopes are 404 `not_found`.
+         */
         get: operations["SimilarityRunsController_list"];
         put?: never;
+        /**
+         * Start a code similarity check
+         * @description Needs `judge.moss_contest` and edit rights on the scope. Give exactly one of
+         *     `problem` (code) or `contest` (key) in the body (400 `scope_required`); an
+         *     unknown or not editable scope is 404 `not_found`. A background job compares
+         *     the submitted sources of the scope using the limits in the site settings at
+         *     this moment. Responds 409 `conflict` while the scope has a run in progress
+         *     and 429 `rate_limited` after 10 starts per hour per user. Answers 202 with
+         *     the new `runId`; poll `GET /similarity/runs/{runId}`.
+         */
         post: operations["SimilarityStartController_start"];
         delete?: never;
         options?: never;
@@ -2852,6 +4593,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a similarity run
+         * @description Needs `judge.moss_contest` and edit rights on the run's scope. Returns the
+         *     status (`queued`, `running`, `done` or `failed`), the error code for a
+         *     failed run, the limits used and the compared groups, plus languages that
+         *     could not be compared. Unknown, malformed and hidden ids are all 404
+         *     `not_found`.
+         */
         get: operations["SimilarityRunsController_detail"];
         put?: never;
         post?: never;
@@ -2868,6 +4617,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the similar submission pairs of a run
+         * @description Needs `judge.moss_contest` and edit rights on the run's scope. Returns one
+         *     page (`page`, `pageSize` up to 100), most similar first. Filter by
+         *     `problemId`, `language` (engine family such as `cpp`) and `minSimilarity` (0
+         *     to 1). Pairs on problems the viewer cannot see are left out. Unknown or
+         *     hidden runs are 404 `not_found`.
+         */
         get: operations["SimilarityPairsController_list"];
         put?: never;
         post?: never;
@@ -2884,7 +4641,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** What the SPA shell needs on every load. `private`: the auth guard may attach a refreshed session cookie to any request, so a shared cache must never store this response. */
+        /**
+         * Get the site shell data
+         * @description Public. Returns what the web app needs on every load: the navigation bar entries (hidden ones included, flagged), the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.
+         */
         get: operations["SiteController_site"];
         put?: never;
         post?: never;
@@ -2901,6 +4661,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List submissions visible to the viewer
+         * @description Public. Returns one page, newest first (`page` from 1, `pageSize` 1-100,
+         *     default 50), of submissions on problems the viewer may see. Filter by `user`
+         *     (username), `problem` (code), `language` (ids, repeat the parameter),
+         *     `result` and `status` (repeat the parameter). Other users' submissions of a
+         *     contest are left out while that contest's submission list is closed to the
+         *     viewer. Filtering by the internal codes `IE`, `QU`, `P`, `G`, `D` or `SC` is
+         *     staff only (400 `validation_failed`). A deleted problem's history stays
+         *     visible to its submitters.
+         */
         get: operations["SubmissionsController_list"];
         put?: never;
         post?: never;
@@ -2917,6 +4688,18 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a submission with its judging details
+         * @description Needs a signed-in user. The owner, problem editors and users with
+         *     `judge.view_all_submission` always see it; others depend on the problem's
+         *     `submissionSourceVisibility` (everyone, only after solving the problem, or
+         *     owner and testers only). Test case results follow
+         *     `testcaseResultVisibility`: every case, batch summaries only, or totals
+         *     only; feedback and program output have their own rules. `viewer` tells which
+         *     of abort, rejudge and reject the caller may use. Errors: 404 `not_found`,
+         *     403 `hidden`, 403 `solve_first` (solve the problem to see it) and 403
+         *     `contest_running` (the contest's list is not open to the viewer yet).
+         */
         get: operations["SubmissionsController_detail"];
         put?: never;
         post?: never;
@@ -2935,6 +4718,13 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Abort a submission that is waiting or being judged
+         * @description Allowed for the submission's owner, until an admin rejudges it, and for
+         *     users with `judge.abort_any_submission` (403 `forbidden` otherwise). A
+         *     queued submission becomes aborted at once; a running one is stopped through
+         *     the bridge; a finished one is left alone. Answers 204.
+         */
         post: operations["SubmissionActionsController_abort"];
         delete?: never;
         options?: never;
@@ -2951,6 +4741,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Reject a submission
+         * @description Needs `judge.reject_submission` and edit rights on the problem (403
+         *     `forbidden`). Sets the result to `RJ` with zero points and clears the case
+         *     results. Responds 409 `conflict` while the submission is still queued or
+         *     being judged, and 409 `problem_deleted` when the problem is deleted. Answers
+         *     204.
+         */
         post: operations["SubmissionActionsController_reject"];
         delete?: never;
         options?: never;
@@ -2967,6 +4765,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Rejudge one submission
+         * @description Needs `judge.rejudge_submission` and edit rights on the problem (403
+         *     `forbidden`). Resets the submission and queues it again at rejudge priority.
+         *     Responds 409 `conflict` when the submission is locked after a contest, is a
+         *     pending final submission or is being judged, and 409 `problem_deleted` when
+         *     the problem is deleted. Answers 204.
+         */
         post: operations["SubmissionActionsController_rejudge"];
         delete?: never;
         options?: never;
@@ -2981,6 +4787,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the source code of a submission
+         * @description Needs a signed-in user and follows the same access rules and errors as the
+         *     submission detail. Returns the submitted source text; for a file-only
+         *     language it is the URL of the uploaded file.
+         */
         get: operations["SubmissionsController_source"];
         put?: never;
         post?: never;
@@ -2999,6 +4811,17 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Rejudge many submissions of a problem
+         * @description Needs `judge.rejudge_submission` and edit rights on the problem named by
+         *     `problem` (code). Matches the problem's submissions by optional `idFrom` and
+         *     `idTo`, `languages` and `results`; submissions a judge currently holds and
+         *     pending final-submission rows are skipped, and locked ones unless `force` is
+         *     set. More than 10 matches also need `judge.rejudge_submission_lot` (403
+         *     `forbidden`). With `dryRun` nothing changes and `count` and `allowed` report
+         *     what would happen. Otherwise the matches are queued at batch priority and
+         *     `count` is how many were reset.
+         */
         post: operations["SubmissionActionsController_bulkRejudge"];
         delete?: never;
         options?: never;
@@ -3013,7 +4836,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Declared before `:id`, which would take `stats` for an id. */
+        /**
+         * Get the judging figures shown above the submission list
+         * @description Public. Returns the submissions judged and accepted today (site time zone),
+         *     the number of queued or running submissions and the judges online out of all
+         *     usable judges, counted over what a signed-out viewer may see. Cached for 30
+         *     seconds.
+         */
         get: operations["SubmissionsController_statistics"];
         put?: never;
         post?: never;
@@ -3030,8 +4859,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List tagged problems from other online judges
+         * @description Public. Returns one page (`page` from 1, `pageSize` 1-100) of external
+         *     problems that users have tagged. Filter by `tag` (tag code), `search`
+         *     (substring of the code or name) and `judges` (`Atcoder`, `Codeforces`,
+         *     `CodeforcesGym`, `Kattis`, `VNOJ`; repeat the parameter).
+         */
         get: operations["TagsController_list"];
         put?: never;
+        /**
+         * Add an external problem to the tag index
+         * @description Needs a user who opted in to tagging and has `judge.add_tagproblem` or a
+         *     rating of at least 1900 (403 `forbidden`). `link` must be the URL of a
+         *     problem on a supported judge; the code and judge are derived from it (400
+         *     `validation_failed` otherwise) and `name` is the title. Responds 409
+         *     `conflict` when the problem already exists. Writes a revision and returns
+         *     the new entry.
+         */
         post: operations["TagsController_create"];
         delete?: never;
         options?: never;
@@ -3046,6 +4891,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a tagged problem
+         * @description Public. Returns the problem, its tags and who assigned each one. A malformed
+         *     or unknown code is 404 `not_found`.
+         */
         get: operations["TagsController_detail"];
         put?: never;
         post?: never;
@@ -3064,6 +4914,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Add tags to a tagged problem
+         * @description Same permission as adding a problem. Adds the tags in `tagCodes` (1 to 50)
+         *     that the problem does not have yet, recording the caller as assigner; tags
+         *     already present are ignored. Responds 400 `validation_failed` for an unknown
+         *     tag code and 404 `not_found` for an unknown problem. Returns the updated
+         *     problem.
+         */
         post: operations["TagsController_assign"];
         delete?: never;
         options?: never;
@@ -3078,6 +4936,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List the available tags
+         * @description Public. Returns the tag groups, sorted by code, each with its tags. Use the
+         *     tag codes with `GET /tags` and `POST /tags/{code}/assign`.
+         */
         get: operations["TagsController_catalog"];
         put?: never;
         post?: never;
@@ -3094,8 +4957,19 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List canned ticket replies
+         * @description Requires `judge.change_ticket`. Returns the staff's stored reply templates
+         *     in their order. Paged with `page`.
+         */
         get: operations["CannedRepliesController_list"];
         put?: never;
+        /**
+         * Create a canned reply
+         * @description Requires `judge.change_ticket`. Adds a reply template with a title, body
+         *     and optional order (default last). Fails with 409 `conflict` when the
+         *     maximum number of canned replies exists.
+         */
         post: operations["CannedRepliesController_create"];
         delete?: never;
         options?: never;
@@ -3113,9 +4987,19 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /**
+         * Delete a canned reply
+         * @description Requires `judge.change_ticket`. Deletes the template and returns 204, or
+         *     404 `not_found` for an unknown id.
+         */
         delete: operations["CannedRepliesController_remove"];
         options?: never;
         head?: never;
+        /**
+         * Update a canned reply
+         * @description Requires `judge.change_ticket`. Changes the fields sent; null is refused.
+         *     Fails with 404 `not_found` for an unknown id.
+         */
         patch: operations["CannedRepliesController_update"];
         trace?: never;
     };
@@ -3126,6 +5010,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List tickets
+         * @description Returns tickets the caller may read: their own and those assigned to them,
+         *     tickets of problems they can edit, and every ticket for holders of
+         *     `judge.change_ticket`. Filter with `open`, `own` (only tickets they filed
+         *     or are assigned to), and repeated `user` and `assignee` usernames (at most
+         *     10 each; unknown names match nothing). Paged with `page`.
+         */
         get: operations["TicketsController_list"];
         put?: never;
         post?: never;
@@ -3142,12 +5034,29 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a ticket
+         * @description Returns the ticket with its messages, notes, assignees and timeline.
+         *     Readable by its creator, its assignees, editors of the linked problem and
+         *     staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`
+         *     for a ticket the caller may not read.
+         */
         get: operations["TicketsController_detail"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update a ticket
+         * @description Changes only the fields sent: `isOpen` (close or reopen), `notes`
+         *     (assignees and staff), `isContributive` (staff only, never on their own
+         *     ticket, counts toward the creator's contribution points) and `assignees`
+         *     (staff only, usernames of active users, replaces the list; 400
+         *     `assignee_unknown` otherwise). Everything is checked before one write, so
+         *     a refused request changes nothing. Fails with 409 `conflict` if the ticket
+         *     changed meanwhile.
+         */
         patch: operations["TicketUpdatesController_update"];
         trace?: never;
     };
@@ -3160,6 +5069,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Reply to a ticket
+         * @description Adds a message to a ticket the caller can read, open or closed. Muted
+         *     users are refused (403 `forbidden`, issue code `muted`). Limited to 30
+         *     messages per 10 minutes (429 `rate_limited`); a ticket holds at most 500
+         *     messages (409 `conflict`). The message is pushed on the event stream,
+         *     announced on Discord and sent to the owner and assignees.
+         */
         post: operations["TicketMessagesController_post"];
         delete?: never;
         options?: never;
@@ -3176,6 +5093,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * File a general ticket
+         * @description Opens a ticket about the site rather than a problem, with the `issueUrl`
+         *     of the page concerned (http or https). It has no assignees, so staff are
+         *     notified. Same limits and refusals as filing a ticket about a problem.
+         */
         post: operations["TicketCreationController_general"];
         delete?: never;
         options?: never;
@@ -3190,7 +5113,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The ticket badge; the browser may reuse it for 15 seconds. */
+        /**
+         * Get the ticket badge counts
+         * @description Returns how many open tickets are assigned to the caller and, for staff,
+         *     how many are waiting for staff. The browser may reuse the answer for 15
+         *     seconds.
+         */
         get: operations["TicketSummaryController_summary"];
         put?: never;
         post?: never;
@@ -3207,6 +5135,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List users on the leaderboard
+         * @description Public. Pages of 100 listed, active users ranked by `sort` (`rating` by default, or `performancePoints`, `points`, `problemCount`, `contributionPoints`). Ties share a rank. Each entry carries the user's first listed organization.
+         */
         get: operations["LeaderboardsController_users"];
         put?: never;
         post?: never;
@@ -3223,6 +5155,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a user's profile page
+         * @description Public. Returns the public profile: points, performance points, solved count, contribution points, rating and ranks, a rating summary over the contests the viewer may read, listed organizations and the join date. Viewers holding `judge.ban_user` also get a `staff` block with the ban reason and activation state. 404 `not_found` for an unknown user.
+         */
         get: operations["UserPagesController_page"];
         put?: never;
         post?: never;
@@ -3239,6 +5175,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get a user's submission heatmap
+         * @description Public. Returns submission counts per day for the last 365 days in the `timezone` asked for, defaulting to the viewer's profile zone and then UTC. Days without submissions are absent. Cached for 10 minutes per user and zone.
+         */
         get: operations["UserPagesController_activity"];
         put?: never;
         post?: never;
@@ -3257,6 +5197,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Ban a user
+         * @description Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason and signs the user out everywhere. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.
+         */
         post: operations["UserModerationController_ban"];
         delete?: never;
         options?: never;
@@ -3271,6 +5215,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List a user's blog posts
+         * @description Public. Returns a page of the user's blog posts that the viewer may read (the author tab of their profile); 404 `not_found` for an unknown user.
+         */
         get: operations["UserPagesController_blog"];
         put?: never;
         post?: never;
@@ -3287,6 +5235,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List a user's recent comments
+         * @description Requires `judge.view_all_user_comment`. Returns comments written by the user on pages the viewer may read, newest first, with cursor paging: pass `nextBefore` from the previous page as `before`. Errors: 401 `unauthorized` when signed out, 403 `forbidden` without the permission, 404 `not_found` for an unknown user.
+         */
         get: operations["UserPagesController_comments"];
         put?: never;
         post?: never;
@@ -3303,6 +5255,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Show how performance points are computed
+         * @description Public. Returns the user's best submissions in order, each with its weight (percent of its points that count, falling by a fixed factor per rank) and scaled points. Uses `hasMore` paging; at most 300 entries are weighted. Cached for 10 minutes.
+         */
         get: operations["UserPagesController_ppBreakdown"];
         put?: never;
         post?: never;
@@ -3319,6 +5275,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Find a user's leaderboard position
+         * @description Public. Returns the user's rank for the chosen `sort` field and the page (with its page size) of the leaderboard that holds them. 404 `not_found` for an unknown, unlisted, banned or never-activated user.
+         */
         get: operations["LeaderboardsController_rank"];
         put?: never;
         post?: never;
@@ -3335,6 +5295,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List a user's contest ratings
+         * @description Public. Returns the user's rating history, oldest first. Contest name and key are null when the viewer cannot see that contest; rating, rank and performance are null while the viewer may not read its scoreboard (hidden or frozen).
+         */
         get: operations["UserPagesController_ratings"];
         put?: never;
         post?: never;
@@ -3353,6 +5317,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Reset a user's two-factor sign-in
+         * @description Requires `judge.ban_user`. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.
+         */
         post: operations["UserModerationController_resetTwoFactor"];
         delete?: never;
         options?: never;
@@ -3367,6 +5335,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * List problems a user has solved
+         * @description Public. Returns the user's solved problems grouped by problem group, with points earned and total points per problem. Problems solved only in contests whose submissions are still hidden from the public are left out.
+         */
         get: operations["UserPagesController_solved"];
         put?: never;
         post?: never;
@@ -3385,6 +5357,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Unban a user
+         * @description Requires `judge.ban_user`. Restores the account as an active, listed `user`, whatever rank it had before. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when the user is not banned. Returns 204.
+         */
         post: operations["UserModerationController_unban"];
         delete?: never;
         options?: never;
@@ -3399,9 +5375,23 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Read a synced contest
+         * @description Integration key only (`Authorization: Bearer qhi_...`); cookies and user API tokens are refused with 403. Needs the `contests:read` scope. Returns the name, times, visibility and participant count of a contest this client manages. 404 `not_found` for a missing contest and for one managed by someone else.
+         */
         get: operations["SyncContestsController_read"];
+        /**
+         * Create or update a synced contest
+         * @description Integration key only (`Authorization: Bearer qhi_...`); cookies and user API tokens are refused with 403. Needs the `contests:write` scope. Idempotent upsert of the contest `key` from an external system. The body replaces the contest: an omitted optional field returns to its default. A new contest is created hidden and private, owned by the client and authored by its acting user; a person publishes it later.
+         *     With `dryRun=true` everything is validated and nothing is written. `action` tells whether the contest was `created`, `updated` or `unchanged`.
+         *     Errors: 400 `validation_failed` (reserved key `key_reserved`, unknown problem code, invalid times or format), 403 `forbidden` when the key belongs to a contest this client does not manage or the acting user lost its permissions, 409 `contest_frozen` when a published or started contest would change, 429 `rate_limited` (60 requests per client per minute across all sync routes).
+         */
         put: operations["SyncContestsController_put"];
         post?: never;
+        /**
+         * Delete a synced contest
+         * @description Integration key only (`Authorization: Bearer qhi_...`); cookies and user API tokens are refused with 403. Needs the `contests:write` scope. Deletes a contest this client manages, only while it is unpublished, has not started and has no submissions. Errors: 404 `not_found`, 409 `contest_not_deletable`, 429 `rate_limited`. Returns 204.
+         */
         delete: operations["SyncContestsController_remove"];
         options?: never;
         head?: never;
@@ -3416,6 +5406,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /**
+         * Replace the participants of a synced contest
+         * @description Integration key only (`Authorization: Bearer qhi_...`); cookies and user API tokens are refused with 403. Needs the `contests:write` scope. Replaces the contestant list with the given usernames, at any time, even after the contest is published or started. Sync never creates users: usernames that match no active user are returned in `unknown` and skipped. At most 2000 usernames. 404 `not_found`, 429 `rate_limited`.
+         */
         put: operations["SyncContestsController_setParticipants"];
         post?: never;
         delete?: never;
@@ -3431,6 +5425,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get the standings of a synced contest
+         * @description Integration key only (`Authorization: Bearer qhi_...`); cookies and user API tokens are refused with 403. Needs the `contests:read` scope. Returns the scoreboard as an anonymous visitor would see it: frozen values during a freeze, live values otherwise. Errors: 403 `forbidden` (issue `board_hidden`) while the board is hidden from the public, 404 `not_found`, 429 `rate_limited`.
+         */
         get: operations["SyncContestsController_getStandings"];
         put?: never;
         post?: never;
@@ -3463,7 +5461,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A `@Res()` handler returns no body: the 302 is documented by hand. The error envelope is the global `default` response, nothing per route. This route is not added to `UNDOCUMENTED_BODY`. */
+        /**
+         * Follow a short link
+         * @description Public, not under `/api`. Redirects (302) to the stored site path with `Cache-Control: no-store` and always a relative `Location`. A HEAD request, as link previews send, redirects without counting a hit. Limited to 120 visits per IP per minute (429 `rate_limited`). 404 `not_found` for an unknown or expired code, never cached.
+         */
         get: operations["ShortLinkRedirectController_go"];
         put?: never;
         post?: never;
@@ -3478,23 +5479,36 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         ActivityCountResponse: {
+            /** @description Number of requests. */
             count: number;
+            /** @description The IP address or path counted. */
             value: string;
         };
         ActivityDayResponse: {
+            /** @description Number of requests that day. */
             count: number;
             /** @description UTC day, `YYYY-MM-DD`. */
             day: string;
         };
         ActivityLogResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the request was made.
+             */
             at: string;
+            /** @description Log row id. */
             id: string;
+            /** @description Client IP address. */
             ip: string;
+            /** @description HTTP method. */
             method: string;
+            /** @description Request path. */
             path: string;
+            /** @description Referer header. */
             referer: string;
+            /** @description HTTP status code of the response. */
             statusCode: number;
+            /** @description User-Agent header. */
             userAgent: string;
             /** @description Null for anonymous visitors. */
             username: string | null;
@@ -3506,55 +5520,88 @@ export interface components {
             };
             /** @description ISO; identical whether served from the cache or not. */
             since: string;
+            /** @description The time zone used for the days, as requested. */
             timezone: string;
         };
         ActivitySessionResponse: {
+            /** @description Browser parsed from the user agent. */
             browser: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the session started.
+             */
             createdAt: string;
+            /** @description Device class parsed from the user agent. */
             deviceType: string;
+            /** @description Session id. */
             id: string;
+            /** @description IP address the session started from. */
             ip: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the session was last used.
+             */
             lastActivityAt: string;
+            /** @description Operating system parsed from the user agent. */
             os: string;
+            /** @description User-Agent header. */
             userAgent: string;
         };
         ActivitySummaryResponse: {
+            /** @description Requests per UTC day. */
             daily: components["schemas"]["ActivityDayResponse"][];
             /** @description The 50 most recent. */
             sessions: components["schemas"]["ActivitySessionResponse"][];
+            /** @description The 20 most used IP addresses. */
             topIps: components["schemas"]["ActivityCountResponse"][];
+            /** @description The 30 most requested paths. */
             topPaths: components["schemas"]["ActivityCountResponse"][];
+            /** @description Total requests in the period. */
             total: number;
+            /** @description Username the summary is for. */
             username: string;
         };
         AnnouncementResponse: {
+            /** @description When the announcement was posted, ISO 8601. */
             createdAt: string;
+            /** @description Markdown source of the announcement. */
             description: string;
+            /** @description The announcement rendered to HTML. */
             descriptionHtml: string;
             id: string;
             title: string;
         };
         AppearanceDto: {
-            /** @enum {string} */
+            /**
+             * @description Accent colour preset.
+             * @enum {string}
+             */
             accent: "clay" | "gold" | "mint" | "mono" | "ocean" | "orchid" | "sunset";
+            /** @description Glass effect strength, 0-100. */
             glass: number;
+            /** @description Glow effect strength, 0-100. */
             glow: number;
         };
         AppearanceResponse: {
+            /** @description Accent colour preset. */
             accent: string;
+            /** @description Glass effect strength, 0-100. */
             glass: number;
+            /** @description Glow effect strength, 0-100. */
             glow: number;
         };
         ArchivedInOrganizationResponse: {
+            /** @description Name of the organization. */
             name: string;
+            /** @description Slug of the organization. */
             slug: string;
         };
         ArchivedInResponse: {
+            /** @description Organizations of the viewer that archived the problem. */
             organizations: components["schemas"]["ArchivedInOrganizationResponse"][];
         };
         AssignTagsDto: {
+            /** @description Codes of the tags to add (from `GET /tags/catalog`), 1 to 50. */
             tagCodes: string[];
         };
         BalloonPageMetaResponse: {
@@ -3569,10 +5616,12 @@ export interface components {
             deliveredAt: string | null;
             /** @description Username of the volunteer who delivered it. */
             deliveredBy: string | null;
+            /** @description True when this team was the first to solve the problem. */
             isFirst: boolean;
             participationId: string;
             problemCode: string;
             problemId: string;
+            /** @description The problem's label in the contest, such as A or B. */
             problemLabel: string;
             /** @description Seconds from the team's start; null when the format keeps no solve time, and for a reader who cannot edit while the contest is frozen. */
             solvedAt: number | null;
@@ -3586,17 +5635,26 @@ export interface components {
             username: string;
         };
         BanDto: {
+            /** @description Why the user is banned; shown to the user at sign-in and to staff. Must not be blank. */
             reason: string;
         };
         BulkProblemsDto: {
+            /** @description What to do to every listed problem. */
             action: components["schemas"]["OrganizationProblemBulkAction"];
+            /** @description Problem codes to change, 1 to 100, no repeats. */
             codes: string[];
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Id of the tag to add or remove; required for add-tag and remove-tag only.
+             */
             tagId?: string;
         };
         BulkProblemsResponse: {
+            /** @description Number of problems changed. */
             done: number;
+            /** @description One entry per requested code, in request order. */
             results: components["schemas"]["BulkResultResponse"][];
+            /** @description Number of problems left unchanged. */
             skipped: number;
         };
         BulkRejudgeDto: {
@@ -3609,22 +5667,33 @@ export interface components {
              * @description Inclusive id range (UUIDv7 ids sort by submission time).
              */
             idFrom?: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Highest submission id to rejudge.
+             */
             idTo?: string;
+            /** @description Only submissions in these language ids. */
             languages?: string[];
             /** @description Problem code; required. */
             problem: string;
+            /** @description Only submissions with these verdicts. */
             results?: components["schemas"]["SubmissionResult"][];
         };
         BulkRejudgeResponse: {
             /** @description The caller may run this rejudge: within `BULK_REJUDGE_LIMIT` or holds `judge.rejudge_submission_lot`. */
             allowed: boolean;
+            /** @description Submissions matched (dry run) or reset for rejudging. */
             count: number;
+            /** @description Whether nothing was changed. */
             dryRun: boolean;
         };
         BulkResultResponse: {
+            /** @description The problem code from the request. */
             code: string;
-            /** @enum {string} */
+            /**
+             * @description done if the action was applied, skipped if not.
+             * @enum {string}
+             */
             outcome: "done" | "skipped";
             /** @description Set when skipped: the code is not a live problem of this organization. */
             reason?: string;
@@ -3632,33 +5701,54 @@ export interface components {
         CannedReplyResponse: {
             /** @description With `{tên}` / `{bài}` still in it. */
             body: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the template was created, ISO 8601.
+             */
             createdAt: string;
+            /** @description Id of the template. */
             id: string;
+            /** @description Sort position; lower comes first. */
             order: number;
+            /** @description Short name of the template. */
             title: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the template was last changed, ISO 8601.
+             */
             updatedAt: string;
         };
         CatalogItemResponse: {
+            /** @description Full display name. */
             fullName: string;
+            /** @description Catalog item id. */
             id: string;
+            /** @description Short name. */
             name: string;
         };
         ChangePasswordDto: {
+            /** @description The account password, re-entered to confirm the change. */
             currentPassword: string;
+            /** @description The new password; it must pass the password policy. */
             newPassword: string;
         };
         CloneContestDto: {
+            /**
+             * @description Key of the new contest: lowercase letters, digits and underscores, at most
+             *     32.
+             */
             key: string;
         };
         CloneProblemDto: {
+            /** @description Code of the new problem. */
             code: string;
         };
         CodeDto: {
+            /** @description A 6-digit authenticator code, or a scratch code where the endpoint allows it. */
             code: string;
         };
         CommentBodyDto: {
+            /** @description Markdown text of the comment; must not be blank. */
             body: string;
         };
         CommentDetailResponse: {
@@ -3666,78 +5756,207 @@ export interface components {
             author: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Markdown source, for the edit form: the author and moderators only (`canEdit`), else null. */
             body: string | null;
+            /** @description The comment rendered to HTML. */
             bodyHtml: string;
+            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
+            canDelete: boolean;
+            /** @description The caller may edit the comment (never once deleted). */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was posted, ISO 8601.
+             */
             createdAt: string;
+            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
+            deleted: boolean;
+            /** @description Nesting level; 0 for top-level comments. */
             depth: number;
+            /** @description Hidden by a moderator; hidden comments reach moderators only. */
             hidden: boolean;
+            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
+            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Id of the comment. */
             id: string;
+            /** @description Stable 1-based position on its page in posting order; null until numbered. */
+            number: number | null;
+            /** @description The page the comment belongs to. */
             page: components["schemas"]["CommentPageLinkResponse"];
+            /** @description Id of the comment replied to; null for a top-level comment. */
             parentId: string | null;
+            /** @description Number of edits made to the comment. */
             revisions: number;
+            /** @description Sum of the votes. */
             score: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was last changed, ISO 8601.
+             */
             updatedAt: string;
             viewerVote: components["schemas"]["VoteScore"];
         };
+        CommentLocationResponse: {
+            /** @description The page the comment belongs to. */
+            page: components["schemas"]["CommentPageLinkResponse"];
+            /** @description The 1-based listing page (`?page=`) that holds the comment's thread, for this viewer. */
+            pageNumber: number;
+        };
         CommentPageLinkResponse: {
+            /** @description Natural key of the page. */
             key: string;
+            /** @description Title of the page. */
             title: string;
+            /** @description Kind of page. */
             type: components["schemas"]["CommentPageType"];
         };
         CommentPageResponse: {
-            /** @description Signed in, past the interaction gate, and not locked. */
+            /** @description Signed in, past the interaction gate, and not locked: `postBlock` is null. */
             canComment: boolean;
-            /** @description Roots newest first, each followed by its visible replies in tree order. */
+            /** @description Roots newest first, each followed by its replies in tree order: hidden ones only for moderators, deleted ones as placeholders. */
             comments: components["schemas"]["CommentResponse"][];
             /** @description Locked for this viewer (a lock without `override_comment_lock`, or a problem of their running contest). */
             locked: boolean;
+            /** @description The page the comments belong to. */
             page: components["schemas"]["CommentPageLinkResponse"];
+            /** @description The page's own lock flag, whoever views it: what moderators toggle with `PUT`/`DELETE .../lock`. */
+            pageLocked: boolean;
+            /** @description Paging of the top-level threads. */
             pagination: components["schemas"]["CommentPaginationResponse"];
+            /** @description Why the viewer cannot comment, by the same rule posting enforces; null when they can. */
+            postBlock: components["schemas"]["CommentPostBlockResponse"] | null;
         };
-        /** @enum {string} */
+        /**
+         * @description Kind of page.
+         * @enum {string}
+         */
         CommentPageType: "blog" | "contest" | "editorial" | "problem" | "tagProblem";
         CommentPaginationResponse: {
+            /** @description 1-based page number of threads. */
             page: number;
+            /** @description Threads per page. */
             pageSize: number;
+            /** @description Total number of threads. */
             total: number;
         };
+        /**
+         * @description Why the viewer cannot comment: signed out, a problem of their running contest, a locked page, a muted account, or too few solved problems.
+         * @enum {string}
+         */
+        CommentPostBlockReason: "contest" | "locked" | "muted" | "needs_solved" | "signed_out";
+        CommentPostBlockResponse: {
+            /** @description Why the viewer cannot comment: signed out, a problem of their running contest, a locked page, a muted account, or too few solved problems. */
+            reason: components["schemas"]["CommentPostBlockReason"];
+            /** @description Problems needed to comment; only for `needs_solved`. */
+            required: number | null;
+            /** @description Problems the viewer solved; only for `needs_solved`. */
+            solved: number | null;
+        };
+        CommentPreviewResponse: {
+            /** @description The body rendered exactly as posting would store it. */
+            bodyHtml: string;
+        };
+        CommentReportEntryResponse: {
+            /**
+             * Format: date-time
+             * @description When it was reported, ISO 8601.
+             */
+            createdAt: string;
+            /** @description The reporter's note; may be empty. */
+            note: string;
+            /** @description Why it was reported. */
+            reason: components["schemas"]["CommentReportReason"];
+            /** @description Who reported; null when the account is gone. */
+            reporter: components["schemas"]["UserSummaryResponse"] | null;
+        };
+        /**
+         * @description `resolved` when the reports led to action, `dismissed` when they did not.
+         * @enum {string}
+         */
+        CommentReportOutcome: "dismissed" | "resolved";
+        CommentReportQueueItemResponse: {
+            /** @description The reported comment. */
+            comment: components["schemas"]["ReportedCommentResponse"];
+            /**
+             * Format: date-time
+             * @description When the newest open report came in, ISO 8601.
+             */
+            lastReportedAt: string;
+            /** @description The page it belongs to. */
+            page: components["schemas"]["CommentPageLinkResponse"];
+            /** @description Users with an open report on it. */
+            reporterCount: number;
+            /** @description Its open reports, oldest first. */
+            reports: components["schemas"]["CommentReportEntryResponse"][];
+        };
+        /**
+         * @description Why the comment is reported.
+         * @enum {string}
+         */
+        CommentReportReason: "abuse" | "offTopic" | "other" | "spam" | "spoiler";
         CommentResponse: {
             /** @description Null when the author's account is gone. */
             author: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Markdown source, for the edit form: the author and moderators only (`canEdit`), else null. */
             body: string | null;
+            /** @description The comment rendered to HTML. */
             bodyHtml: string;
+            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
+            canDelete: boolean;
+            /** @description The caller may edit the comment (never once deleted). */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was posted, ISO 8601.
+             */
             createdAt: string;
+            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
+            deleted: boolean;
+            /** @description Nesting level; 0 for top-level comments. */
             depth: number;
+            /** @description Hidden by a moderator; hidden comments reach moderators only. */
+            hidden: boolean;
+            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
+            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Id of the comment. */
             id: string;
+            /** @description Stable 1-based position on its page in posting order; null until numbered. */
+            number: number | null;
+            /** @description Id of the comment replied to; null for a top-level comment. */
             parentId: string | null;
+            /** @description Number of edits made to the comment. */
             revisions: number;
+            /** @description Sum of the votes. */
             score: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was last changed, ISO 8601.
+             */
             updatedAt: string;
             viewerVote: components["schemas"]["VoteScore"];
         };
         CommentRevisionResponse: {
             after: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the edit was made, ISO 8601.
+             */
             at: string;
             /** @description Markdown before and after the edit. */
             before: string;
+            /** @description Who edited; null when the account is gone. */
             editor: components["schemas"]["UserSummaryResponse"] | null;
         };
         CommentVoteEntryResponse: {
+            /** @description The vote: 1 or -1. */
             score: number;
+            /** @description The voter; null when the account is gone. */
             voter: components["schemas"]["UserSummaryResponse"] | null;
         };
         ConfirmCodeDto: {
+            /** @description The problem code, typed again to confirm. */
             confirmCode: string;
         };
         ContestActionsResponse: {
@@ -3752,7 +5971,9 @@ export interface components {
         /** @enum {string} */
         ContestActionState: "idle" | "queued" | "running";
         ContestAnnouncementEventResponse: {
+            /** @description The new or resent announcement; fetch it from the announcements list. */
             announcementId: string;
+            /** @description The contest the announcement belongs to. */
             contestId: string;
         };
         ContestAnnouncementFrame: {
@@ -3761,15 +5982,24 @@ export interface components {
             event: "announcement";
         };
         ContestAutoPublishResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the automatic publish ran, ISO 8601.
+             */
             at: string;
+            /** @description Problems made public. */
             published: number;
             /** @description Empty on success; `no_permission`, `actor_unavailable` or `cannot_edit_contest` on a failure. */
             reason: string;
+            /** @description Problems left as they were. */
             skipped: number;
+            /** @description Outcome of the automatic publish. */
             status: components["schemas"]["ContestAutoPublishStatus"];
         };
-        /** @enum {string} */
+        /**
+         * @description Outcome of the automatic publish.
+         * @enum {string}
+         */
         ContestAutoPublishStatus: "failed" | "published";
         ContestDataStatusResponse: {
             /** @description Null when a prepare is allowed now. */
@@ -3778,31 +6008,56 @@ export interface components {
             preparedAt: string | null;
             /** @description When the zip on disk was written. */
             readyAt: string | null;
+            /** @description Zip size in bytes; null when none exists. */
             size: number | null;
-            /** @enum {string} */
+            /**
+             * @description Whether the zip is not prepared, being prepared or ready.
+             * @enum {string}
+             */
             state: "none" | "preparing" | "ready";
         };
         ContestDetailResponse: {
+            /** @description The contest's authors. */
             authors: components["schemas"]["UserSummaryResponse"][];
+            /** @description Markdown source of the description. */
             description: string;
+            /** @description The description rendered to HTML. */
             descriptionHtml: string;
+            /** @description Virtual participation after the end is not allowed. */
             disallowVirtual: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest ends, ISO 8601.
+             */
             endTime: string;
+            /** @description Format-specific options, validated by the contest format. */
             formatConfig: {
                 [key: string]: number | boolean;
             };
+            /** @description Scoring format of the contest. */
             formatName: components["schemas"]["ContestFormatName"];
+            /**
+             * @description Minutes before the end during which the ranking is frozen for non-editors;
+             *     0 for no freeze.
+             */
             frozenLastMinutes: number;
+            /** @description Hide problem authors from contestants. */
             hideProblemAuthors: boolean;
+            /** @description Hide problem tags from contestants. */
             hideProblemTags: boolean;
+            /** @description Only members of its organizations may see it. */
             isOrganizationPrivate: boolean;
+            /** @description Only listed contestants may see it. */
             isPrivate: boolean;
+            /** @description Whether finishing the contest changes participants' ratings. */
             isRated: boolean;
+            /** @description Unique short identifier used in URLs. */
             key: string;
             labelStyle: components["schemas"]["ContestLabelStyle"];
             name: string;
+            /** @description Where the contest is now relative to its start and end. */
             phase: components["schemas"]["ContestPhase"];
+            /** @description Decimal places shown in scores. */
             pointsPrecision: number;
             /** @description Null until the viewer may see them (in the contest, ended, editor or tester). */
             problems: components["schemas"]["ContestProblemResponse"][] | null;
@@ -3817,54 +6072,93 @@ export interface components {
             requiresAccessCode: boolean;
             /** @description The public ranking links ask for a ranking access code. */
             requiresRankingAccessCode: boolean;
+            /** @description Markdown rules each participation must accept; empty for none. */
             rules: string;
+            /** @description The rules rendered to HTML. */
             rulesHtml: string;
+            /** @description Increases whenever the rules text changes. */
             rulesRevision: number;
+            /** @description Submissions are judged on pretests only until the contest ends. */
             runPretestsOnly: boolean;
             scoreboardVisibility: components["schemas"]["ScoreboardVisibility"];
+            /** @description Editor-only settings; null for other viewers. */
             settings: components["schemas"]["ContestSettingsResponse"] | null;
+            /** @description Show problem points and counts in a compact form. */
             showShortDisplay: boolean;
+            /** @description Whether contestants see everyone's submissions while the contest runs. */
             showSubmissionList: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest starts, ISO 8601.
+             */
             startTime: string;
+            /** @description Short plain-text description for lists. */
             summary: string;
+            /** @description Slugs of the contest's tags. */
             tags: string[];
             /** @description Seconds. */
             timeLimit: number | null;
+            /** @description Live participants, registrations included. */
             userCount: number;
+            /** @description The viewer's own permissions and participation state. */
             viewer: components["schemas"]["ContestViewerResponse"];
+            /** @description Virtual participations. */
             virtualCount: number;
         };
         ContestExportStatusResponse: {
             /** @description When another request is allowed; null: now. */
             nextPrepareAt: string | null;
+            /** @description When the last preparation was requested, ISO 8601. */
             preparedAt: string | null;
+            /** @description When the zip on disk was written, ISO 8601. */
             readyAt: string | null;
+            /** @description Zip size in bytes; null when none exists. */
             size: number | null;
-            /** @enum {string} */
+            /**
+             * @description Whether the zip is not prepared, being prepared or ready.
+             * @enum {string}
+             */
             state: "none" | "preparing" | "ready";
         };
-        /** @enum {string} */
+        /**
+         * @description Scoring format of the contest.
+         * @enum {string}
+         */
         ContestFormatName: "default" | "final_submission" | "icpc" | "ioi" | "ioi16" | "ultimate" | "vnoj";
-        /** @enum {string} */
+        /**
+         * @description How problems are labelled in the contest.
+         * @enum {string}
+         */
         ContestLabelStyle: "alpha" | "numeric";
         ContestLanguageStatsResponse: {
             /** @description Percentage of `count`. */
             acRate: number;
+            /** @description Submissions in this language. */
             count: number;
             languageId: string;
+            /** @description Language name. */
             name: string;
         };
         ContestListItemResponse: {
+            /** @description Virtual participation after the end is not allowed. */
             disallowVirtual: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest ends, ISO 8601.
+             */
             endTime: string;
+            /** @description Scoring format of the contest. */
             formatName: components["schemas"]["ContestFormatName"];
+            /** @description Only members of its organizations may see it. */
             isOrganizationPrivate: boolean;
+            /** @description Only listed contestants may see it. */
             isPrivate: boolean;
+            /** @description Whether finishing the contest changes participants' ratings. */
             isRated: boolean;
+            /** @description Unique short identifier used in URLs. */
             key: string;
             name: string;
+            /** @description Where the contest is now relative to its start and end. */
             phase: components["schemas"]["ContestPhase"];
             /** Format: date-time */
             registrationEnd: string | null;
@@ -3877,15 +6171,22 @@ export interface components {
             requiresAccessCode: boolean;
             /** @description The public ranking links ask for a ranking access code. */
             requiresRankingAccessCode: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest starts, ISO 8601.
+             */
             startTime: string;
+            /** @description Short plain-text description for lists. */
             summary: string;
+            /** @description Slugs of the contest's tags. */
             tags: string[];
             /** @description Seconds. */
             timeLimit: number | null;
+            /** @description Live participants, registrations included. */
             userCount: number;
             /** @description Null for a signed-out visitor. */
             viewer: components["schemas"]["ContestListViewerResponse"] | null;
+            /** @description Virtual participations. */
             virtualCount: number;
         };
         ContestListViewerResponse: {
@@ -3897,31 +6198,55 @@ export interface components {
              */
             liveStatus: "finished" | "participating" | "registered" | null;
         };
-        /** @enum {string} */
+        /**
+         * @description Where the contest is now relative to its start and end.
+         * @enum {string}
+         */
         ContestPhase: "ended" | "running" | "upcoming";
         ContestProblemDto: {
+            /** @description Whether the problem is judged on pretests during the contest. */
             isPretested?: boolean;
+            /** @description Most scored submissions per participant; null for unlimited. */
             maxSubmissions?: number | null;
+            /** @description Bytes of output to show; null uses the judge default. */
             outputPrefixOverride?: number | null;
+            /** @description Whether partial scores are given. */
             partial?: boolean;
+            /** @description Points the problem is worth. */
             points: number;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Id of the problem to include.
+             */
             problem: string;
         };
         ContestProblemOutputPrefixResponse: {
+            /** @description Bytes of output shown for the problem; null uses the judge default. */
             outputPrefixOverride: number | null;
+            /** @description Id of the problem. */
             problemId: string;
         };
         ContestProblemResponse: {
+            /** @description Problem code. */
             code: string;
+            /** @description Whether the problem is judged on pretests during the contest. */
             isPretested: boolean;
+            /**
+             * @description The problem's label in this contest, such as A or B, by the contest's
+             *     label style.
+             */
             label: string;
+            /** @description Most scored submissions per participant; null means unlimited. */
             maxSubmissions: number | null;
             /** @description KiB; null when the viewer cannot see the problem. */
             memoryLimit: number | null;
+            /** @description Problem name. */
             name: string;
+            /** @description Whether partial scores are given. */
             partial: boolean;
+            /** @description Points the problem is worth in this contest. */
             points: number;
+            /** @description Id of the problem. */
             problemId: string;
             /** @description Live participants whose cell is worth the problem's full points (the ranking's `acceptedCount`), frozen for non-editors during a freeze; null unless the viewer may see the full ranking. Up to 30 s old. */
             solverCount: number | null;
@@ -3931,21 +6256,28 @@ export interface components {
             viewerResult: components["schemas"]["ContestProblemViewerResultResponse"] | null;
         };
         ContestProblemResultsResponse: {
+            /** @description Accepted submissions. */
             AC: number;
+            /** @description Compile error submissions. */
             CE: number;
             /** @description MLE, OLE, IR, RTE, AB and IE together. */
             ERR: number;
+            /** @description Rejected submissions. */
             RJ: number;
+            /** @description Time limit exceeded submissions. */
             TLE: number;
+            /** @description Wrong answer submissions. */
             WA: number;
         };
         ContestProblemStatsResponse: {
             /** @description Percentage of `total`. */
             acRate: number;
             code: string;
+            /** @description The problem's label in the contest. */
             label: string;
             name: string;
             problemId: string;
+            /** @description Submission counts per result. */
             results: components["schemas"]["ContestProblemResultsResponse"];
             /** @description Every submission, pending ones included. */
             total: number;
@@ -3963,57 +6295,92 @@ export interface components {
             isSolved: boolean;
         };
         ContestSettingsResponse: {
+            /** @description On-site balloon deliveries are tracked. */
             balloons: boolean;
+            /** @description User ids of balloon volunteers. */
             balloonStaff: string[];
+            /** @description Names of judges that may not judge this contest. */
             bannedJudges: string[];
+            /** @description User ids banned from joining. */
             bannedUsers: string[];
+            /** @description User ids with edit rights besides the authors. */
             curators: string[];
             /** @description Whether a ranking access code is set; the code itself is never returned. */
             hasRankingAccessCode: boolean;
+            /** @description Only members of the listed organizations may see it. */
             isOrganizationPrivate: boolean;
+            /** @description Only the listed contestants may see it. */
             isPrivate: boolean;
+            /** @description Whether the contest is shown to users who may see it. */
             isVisible: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Live submissions are not rejudged after this time; null for no lock.
+             */
             lockedAfter: string | null;
+            /** @description Organization ids tied to the contest. */
             organizations: string[];
+            /** @description User ids allowed in a private contest. */
             privateContestants: string[];
             problemOutputPrefixes: components["schemas"]["ContestProblemOutputPrefixResponse"][];
+            /** @description Publish the problems and editorials automatically when the contest ends. */
             publishAfterEnd: boolean;
             /** @description The editor whose rights the automatic publish re-checks at the end. */
             publishAfterEndBy: string | null;
+            /** @description Announcements are pushed live and to notification inboxes. */
             pushAnnouncements: boolean;
+            /** @description Rate every participant, not only those who solved a problem. */
             rateAll: boolean;
+            /** @description User ids excluded from rating. */
             rateExclude: string[];
+            /** @description Rating ceiling applied when rating the contest; null for none. */
             ratingCeiling: number | null;
+            /** @description Rating floor applied when rating the contest; null for none. */
             ratingFloor: number | null;
+            /** @description Seconds the ranking is cached; 0 disables the cache. */
             scoreboardCacheTimeout: number;
+            /** @description User ids who can see the contest and spectate it before it starts. */
             testers: string[];
             /** @description The users named by the id lists above, resolved to usernames. */
             users: components["schemas"]["UserSummaryResponse"][];
+            /** @description User ids who may see the scoreboard whatever its visibility. */
             viewContestScoreboard: string[];
         };
         ContestStatsResponse: {
             /** @description Most used first. */
             languages: components["schemas"]["ContestLanguageStatsResponse"][];
+            /** @description Statistics per contest problem, in contest order. */
             problems: components["schemas"]["ContestProblemStatsResponse"][];
         };
         ContestTagResponse: {
             /** @description A theme token key (`tag-1`..`tag-8`), never a hex. */
             color: components["schemas"]["TagColor"];
+            /** @description Short description. */
             description: string;
+            /** @description Display name. */
             name: string;
+            /** @description Sort position; lower comes first. */
             order: number;
+            /** @description The tag's identifier. */
             slug: string;
         };
         ContestViewerResponse: {
+            /** @description The viewer may edit the contest. */
             canEdit: boolean;
             /** @description The balloon screen is on for this contest and the viewer may use it (editors, listed volunteers). */
             canViewBalloons: boolean;
+            /**
+             * @description The viewer's current participation is in this contest and has started (or
+             *     is a spectator).
+             */
             inContest: boolean;
             /** @description Their current contest (`GET /contests/current`) is this one, and that participation has not ended. */
             isCurrent: boolean;
+            /** @description The viewer is an author or curator of the contest. */
             isEditor: boolean;
+            /** @description The viewer is a tester of the contest. */
             isTester: boolean;
+            /** @description The viewer's live participation, or null if none. */
             liveParticipation: components["schemas"]["ParticipationSummaryResponse"] | null;
             /**
              * @description Their live participation (`liveStatusOf`); null when they have none.
@@ -4022,7 +6389,9 @@ export interface components {
             liveStatus: "finished" | "participating" | "registered" | null;
         };
         CreateAnnouncementDto: {
+            /** @description Announcement body in Markdown; it is rendered to HTML when saved. */
             description: string;
+            /** @description Announcement title. */
             title: string;
         };
         CreateCannedReplyDto: {
@@ -4030,106 +6399,181 @@ export interface components {
             body: string;
             /** @description Default: after the last one. */
             order?: number;
+            /** @description Short name of the template. */
             title: string;
         };
         CreateContestDto: {
             /** @description Stored hashed; an empty string removes it. */
             accessCode?: string;
+            /** @description User ids of the authors. */
             authors?: string[];
+            /** @description Track on-site balloon deliveries. */
             balloons?: boolean;
+            /** @description User ids of balloon volunteers. */
             balloonStaff?: string[];
+            /** @description Names of judges that may not judge this contest. */
             bannedJudges?: string[];
+            /** @description User ids banned from joining. */
             bannedUsers?: string[];
+            /** @description User ids with edit rights besides the authors. */
             curators?: string[];
+            /** @description Markdown description. */
             description?: string;
+            /** @description Forbid virtual participation after the end. */
             disallowVirtual?: boolean;
+            /** @description End, ISO 8601. */
             endTime: string;
             /** @description Checked by the format (`parseFormatConfig`); omitted on a format change: that format's defaults. */
             formatConfig?: {
                 [key: string]: unknown;
             };
+            /** @description Scoring format of the contest. */
             formatName?: components["schemas"]["ContestFormatName"];
+            /**
+             * @description Minutes before the end during which the ranking is frozen for non-editors;
+             *     0 for none.
+             */
             frozenLastMinutes?: number;
+            /** @description Hide problem authors from contestants. */
             hideProblemAuthors?: boolean;
+            /** @description Hide problem tags from contestants. */
             hideProblemTags?: boolean;
+            /** @description Only members of the listed organizations may see it. */
             isOrganizationPrivate?: boolean;
+            /** @description Only the listed contestants may see it. */
             isPrivate?: boolean;
+            /** @description Whether the contest changes ratings. */
             isRated?: boolean;
+            /** @description Whether the contest is shown to users who may see it. */
             isVisible?: boolean;
+            /**
+             * @description Unique identifier used in URLs: lowercase letters, digits and underscores,
+             *     1 to 32.
+             */
             key: string;
+            /** @description How problems are labelled in the contest. */
             labelStyle?: components["schemas"]["ContestLabelStyle"];
+            /**
+             * @description Live submissions are not rejudged after this time, ISO 8601; null for
+             *     none.
+             */
             lockedAfter?: string | null;
+            /** @description Contest name, 1 to 100 characters. */
             name: string;
+            /** @description Organization ids tied to the contest. */
             organizations?: string[];
+            /** @description Decimal places shown in scores. */
             pointsPrecision?: number;
+            /** @description User ids allowed in a private contest. */
             privateContestants?: string[];
+            /** @description The contest's problems; the array order is the contest order. */
             problems?: components["schemas"]["ContestProblemDto"][];
+            /** @description Publish the problems and editorials automatically when the contest ends. */
             publishAfterEnd?: boolean;
+            /** @description Push announcements live and to notification inboxes. */
             pushAnnouncements?: boolean;
             /** @description Stored hashed; an empty string removes it. */
             rankingAccessCode?: string;
+            /** @description Rate every participant, not only those who solved a problem. */
             rateAll?: boolean;
+            /** @description User ids excluded from rating. */
             rateExclude?: string[];
+            /** @description Rating ceiling applied when rating the contest; null for none. */
             ratingCeiling?: number | null;
+            /** @description Rating floor applied when rating the contest; null for none. */
             ratingFloor?: number | null;
+            /** @description When registration closes, ISO 8601. */
             registrationEnd?: string | null;
+            /**
+             * @description When registration opens, ISO 8601; null with registrationEnd null for no
+             *     registration.
+             */
             registrationStart?: string | null;
             /** @description Markdown, trimmed at save; empty or whitespace: no rules. */
             rules?: string;
+            /** @description Judge on pretests only until the contest ends. */
             runPretestsOnly?: boolean;
             /** @description Seconds; 0 disables the ranking cache. */
             scoreboardCacheTimeout?: number;
+            /** @description Who sees the scoreboard and when. */
             scoreboardVisibility?: components["schemas"]["ScoreboardVisibility"];
+            /** @description Show problem points and counts in a compact form. */
             showShortDisplay?: boolean;
+            /** @description Whether contestants see everyone's submissions while the contest runs. */
             showSubmissionList?: boolean;
+            /** @description Start, ISO 8601. */
             startTime: string;
+            /** @description Short plain-text description for lists, at most 1000 characters. */
             summary?: string;
+            /** @description Contest tag slugs, at most 20; unknown tags are refused. */
             tags?: string[];
+            /** @description User ids who can see the contest and spectate it before it starts. */
             testers?: string[];
             /** @description Seconds. */
             timeLimit?: number | null;
+            /** @description User ids who may see the scoreboard whatever its visibility. */
             viewContestScoreboard?: string[];
         };
         CreateContestTagDto: {
             /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
             color: components["schemas"]["TagColor"];
+            /** @description Short description, at most 200 characters. */
             description?: string;
+            /** @description Display name, 1 to 40 characters. */
             name: string;
+            /** @description Sort position, from -1000 to 1000; lower comes first. */
             order?: number;
+            /** @description Lowercase letters, digits and hyphens, 1 to 20 characters; never changes. */
             slug: string;
         };
         CreatedIntegrationClientResponse: {
             /** @description The user whose permissions bound the client. */
             actsAs: components["schemas"]["IntegrationClientActingUserResponse"];
+            /** @description CIDR blocks the client may call from. */
             allowedCidrs: string[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the client was created.
+             */
             createdAt: string;
             /**
              * Format: date-time
              * @description The key stops working at this instant; null when it never expires.
              */
             expiresAt: string | null;
+            /** @description Client id. */
             id: string;
             /** @description Shown once; only its hash is stored. */
             key: string;
             /** @description First characters of the key, to recognise it in this list. */
             keyPrefix: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the key was last used; null if never.
+             */
             lastUsedAt: string | null;
+            /** @description Label of the client. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the client was revoked; null while active.
+             */
             revokedAt: string | null;
+            /** @description What the client may do. */
             scopes: components["schemas"]["IntegrationScope"][];
         };
         CreatedJudgeResponse: {
             /** @description Shown once; only its sha256 is stored. */
             authKey: string;
+            /** @description The registered judge. */
             judge: components["schemas"]["JudgeResponse"];
         };
         CreateFlatpageDto: {
             /** @description Markdown, rendered and sanitised on save in the `blog` style. */
             content: string;
+            /** @description Only signed-in users may read the page; default false. */
             registrationRequired?: boolean;
+            /** @description Page title. */
             title: string;
             /** @description Canonicalised on save (`about/` becomes `/about`). */
             url: string;
@@ -4141,49 +6585,83 @@ export interface components {
             allowedCidrs: string[];
             /** @description When the key stops working; omitted, it works until revoked. Must be in the future. */
             expiresAt?: string;
+            /** @description Label to recognise the client, 1-60 characters. */
             name: string;
             scopes: components["schemas"]["IntegrationScope"][];
         };
         CreateJudgeDto: {
+            /** @description Free-form notes about the judge, up to 10000 characters. */
             description?: string;
             /** @description Hostname-style: the judge sends it as `x-judge-name` metadata when it opens the judge link. */
             name: string;
         };
         CreateLanguageDto: {
+            /** @description Editor mode name for the code editor. */
             ace: string;
+            /** @description Generic family name shared by versions of the language. */
             commonName: string;
+            /** @description Longer description of the language. */
             description?: string;
+            /** @description File extension without the dot. */
             extension: string;
+            /** @description Whether solutions are uploaded as a file instead of typed. */
             fileOnly?: boolean;
+            /** @description Largest uploaded file in MB; 0 turns uploads off. */
             fileSizeLimit?: number;
+            /** @description Whether new problems allow this language by default. */
             includeInProblem?: boolean;
+            /** @description Notes shown to users about the compiler or runtime. */
             info?: string;
+            /** @description Key judges report for the language; letters, digits and `_+#.-`, up to 10 characters. Fixed once created. */
             key: string;
+            /** @description Display name, up to 20 characters. */
             name: string;
+            /** @description Syntax highlighter name. */
             pygments: string;
+            /** @description Short display name; omit for none. */
             shortName?: string;
+            /** @description Starter code offered in the editor. */
             template?: string;
         };
         CreateOrganizationDto: {
+            /** @description Markdown about text, rendered to HTML when saved. */
             about?: string;
             /** @description Admins besides the creator on create; the whole list on edit. */
             adminIds?: string[];
+            /** @description Whether anyone may join without a request. */
             isOpen?: boolean;
             /** @description Staff fields (`judge.edit_all_organization`). */
             isUnlisted?: boolean;
+            /** @description Empty, an http or https URL, or a site path, at most 150 characters. */
             logoOverrideImage?: string;
+            /** @description Organization name, 1 to 128 characters. */
             name: string;
+            /**
+             * @description Short name shown beside members, 1 to 20 characters; defaults to the start
+             *     of the slug.
+             */
             shortName?: string;
+            /** @description Most members allowed; null for no limit. */
             slots?: number | null;
+            /**
+             * @description Unique identifier used in URLs: starts with a letter, then letters,
+             *     digits, hyphens and underscores; the word usage is reserved.
+             */
             slug: string;
         };
         CreateOrganizationRequestDto: {
+            /** @description Why the user wants to join; must not be blank. */
             reason: string;
         };
         CreatePostDto: {
+            /** @description Markdown content, rendered when saved. */
             content: string;
             /** @description `judge.mark_global_post`. */
             globalPost?: boolean;
+            /**
+             * @description Image for link previews: empty, an http or https URL, or a site path, at
+             *     most 150 characters; needs judge.edit_all_post.
+             */
             ogImage?: string;
             /** @description Organization slug: a post for that organization by one of its admins with `judge.edit_organization_post`. */
             organization?: string;
@@ -4191,86 +6669,139 @@ export interface components {
             publishOn?: string;
             /** @description `judge.pin_post`. */
             sticky?: boolean;
+            /** @description Markdown summary for lists; needs judge.edit_all_post. */
             summary?: string;
+            /** @description Post title, up to the blog title limit. */
             title: string;
+            /** @description False keeps the post as a draft. */
             visible?: boolean;
         };
         CreateProblemDto: {
+            /** @description Ids of languages solutions may use; defaults to the languages flagged for new problems. */
             allowedLanguages?: string[];
+            /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
-            /** @description The rest need judge.edit_all_problem (Django-admin-only in legacy). */
+            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem`. */
             authors?: string[];
+            /** @description User ids that may not submit to the problem. */
             bannedUsers?: string[];
+            /** @description Unique code: lowercase letters, digits and underscores, 1 to 32 characters; a few words used by routes are reserved. */
             code: string;
+            /** @description Curator user ids; curators can edit the problem. */
             curators?: string[];
+            /** @description Publication date (ISO 8601 with offset); null clears it. */
             date?: string | null;
+            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set. */
             description?: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Problem group id.
+             */
             groupId: string;
-            /** @description judge.problem_full_markup */
+            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. */
             isFullMarkup?: boolean;
-            /** @description judge.change_manually_managed */
+            /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
+            /** @description Whether only members of `organizations` can see the problem. */
             isOrganizationPrivate?: boolean;
-            /** @description judge.change_public_visibility */
+            /** @description Whether the problem is public. Changing it needs `judge.change_public_visibility`. */
             isPublic?: boolean;
+            /** @description Per-language limits overriding the defaults; each language at most once. */
             languageLimits?: components["schemas"]["LanguageLimitDto"][];
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description License id; null for none. Needs `judge.edit_all_problem`.
+             */
             licenseId?: string | null;
+            /** @description Memory limit in KiB, up to 1048576. */
             memoryLimit: number;
+            /** @description Base-language title, 1 to 100 characters. */
             name: string;
+            /** @description Image URL used for link previews, up to 150 characters. */
             ogImage?: string;
+            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). */
             organizations?: string[];
+            /** @description Whether partial scores are given. */
             partial?: boolean;
+            /** @description Points the problem is worth, 800 to 3500. */
             points: number;
+            /** @description Origin or credit line, up to 200 characters. */
             source?: string;
+            /** @description Who may read submitted sources: `F` follow the site setting, `A` everyone who sees the problem, `S` users who solved it, `O` only the owner, testers and editors. */
             submissionSourceVisibility?: components["schemas"]["SubmissionSourceVisibility"];
+            /** @description Short summary for previews, up to 1000 characters. Needs `judge.edit_all_problem`. */
             summary?: string;
+            /** @description How much of the test case results is shown: `A` every case, `B` batch summaries, `S` totals only. Needs `judge.edit_all_problem`. */
             testcaseResultVisibility?: components["schemas"]["TestcaseResultVisibility"];
+            /** @description When program output of test cases is shown to non-editors: `O` never, `C` outside contests, `A` always. */
             testcaseVisibility?: components["schemas"]["TestcaseVisibility"];
+            /** @description Users who can see the problem while it is private. */
             testers?: string[];
+            /** @description Time limit in seconds, 0.01 to 60; above 5 needs `judge.high_problem_timelimit`. */
             timeLimit: number;
+            /** @description Problem type ids, at least one (ids from `GET /problems/meta`). */
             typeIds: string[];
         };
         CreateProblemTagDto: {
             /** @description The palette token keys, shared with the contest tags (`TagColor`). */
             color?: components["schemas"]["TagColor"];
+            /** @description Display name, 1 to 40 characters. */
             name: string;
+            /** @description Lowercase letters, digits and hyphens, 1 to 20 characters; never changes. */
             slug: string;
         };
         CreateShortLinkDto: {
-            /** @description Staff only. */
+            /** @description Custom short code. Staff only (`judge.manage_short_link`). */
             code?: string;
-            /** @description Staff only. */
+            /** @description When the link stops working, ISO 8601, in the future. Staff only (`judge.manage_short_link`). */
             expiresAt?: string;
-            /** @description Checked against the same-site allow-list by the service (a 400 `path` issue), not by a pattern here. */
+            /** @description Site path to shorten, for example `/problems/aplusb`; only problems, contests, posts, users and organizations are accepted (otherwise 400). */
             path: string;
         };
         CreateTagProblemDto: {
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description URL of the problem on a supported judge; the problem code and judge are derived from it.
+             */
             link: string;
             /** @description Legacy fetched the title from the judge's API; the client supplies it now. */
             name: string;
         };
         CreditActorResponse: {
+            /** @description Id of the user. */
             id: string;
+            /** @description Username of the user. */
             username: string;
         };
         CreditEntryResponse: {
             /** @description The user who spent the credits; null for a system entry or a user that no longer exists. */
             actor: components["schemas"]["CreditActorResponse"] | null;
+            /** @description Credits spent; negative for a refund. */
             amount: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the entry was recorded, ISO 8601.
+             */
             createdAt: string;
+            /** @description What the credits were spent on. */
             reason: string;
+            /** @description Problem code or contest key the spend was for. */
             ref: string;
         };
         CurrentContestResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest ends, ISO 8601.
+             */
             endTime: string;
+            /** @description Key of the contest. */
             key: string;
+            /** @description Name of the contest. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest starts, ISO 8601.
+             */
             startTime: string;
         };
         CurrentParticipationResponse: {
@@ -4278,6 +6809,7 @@ export interface components {
             participation: components["schemas"]["ParticipationSummaryResponse"];
         };
         CurrentPasswordDto: {
+            /** @description The account password, re-entered to confirm the change. */
             currentPassword: string;
         };
         CursorPageMetaResponse: {
@@ -4289,21 +6821,31 @@ export interface components {
             state: "A" | "R";
         };
         DeletedProblemResponse: {
+            /** @description Problem code. */
             code: string;
             /** @description Whole days before the purge job may take it; 0 once the grace period is over. */
             daysLeft: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the problem was deleted.
+             */
             deletedAt: string;
+            /** @description Who deleted it; null when unknown. */
             deletedBy: components["schemas"]["UserSummaryResponse"] | null;
             /** @description The heavy data is gone; only the tombstone (code and name) stays and it cannot be restored. */
             isPurged: boolean;
+            /** @description Problem title. */
             name: string;
         };
         DisconnectJudgeDto: {
-            /** @default false */
+            /**
+             * @description true retires every session and socket of the judge at once. Default false.
+             * @default false
+             */
             force: boolean;
         };
         DisqualifyDto: {
+            /** @description True to disqualify the participation, false to reinstate it. */
             disqualified: boolean;
         };
         /**
@@ -4312,11 +6854,17 @@ export interface components {
          */
         EditorialOutcome: "none" | "published" | "skipped" | "unchanged";
         EditorialResponse: {
+            /** @description Authors of the editorial. */
             authors: components["schemas"]["UserSummaryResponse"][];
+            /** @description Whether the viewer can edit the problem. */
             canEdit: boolean;
+            /** @description Rendered, sanitized HTML. */
             contentHtml: string;
+            /** @description Whether the editorial is marked public. */
             isPublic: boolean;
+            /** @description The problem the editorial belongs to. */
             problem: components["schemas"]["ProblemRefResponse"];
+            /** @description When it becomes readable by everyone (ISO 8601). */
             publishOn: string;
         };
         ErrorBodyResponse: {
@@ -4335,23 +6883,38 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
         };
-        /** @enum {string} */
+        /**
+         * @description Mode of the active key; null if none.
+         * @enum {string}
+         */
         FeedKeyMode: "frozen-until-release" | "live";
         FeedKeyStatusResponse: {
             /** @description Username of the editor the key is bound to. */
             createdBy: string | null;
+            /** @description When the active key expires, ISO 8601; null if none. */
             expiresAt: string | null;
+            /** @description Whether a usable, unexpired and unrevoked key exists. */
             isActive: boolean;
+            /** @description Mode of the active key; null if none. */
             mode: components["schemas"]["FeedKeyMode"] | null;
+            /**
+             * @description When the feed was released to the resolver, ISO 8601; null if not
+             *     released.
+             */
             releasedAt: string | null;
         };
         FeedLineResponse: {
             data: {
                 [key: string]: unknown;
             };
+            /** @description Id of the object; null for objects without one. */
             id: string | null;
+            /** @description Counter that orders the events of a feed. */
             token: string;
-            /** @enum {string} */
+            /**
+             * @description Kind of ICPC contest API object in data.
+             * @enum {string}
+             */
             type: "contest" | "groups" | "judgement-types" | "judgements" | "languages" | "problems" | "state" | "submissions" | "teams";
         };
         FieldChangeResponse: {
@@ -4369,11 +6932,18 @@ export interface components {
             row?: number;
         };
         FlatpageAdminListItemResponse: {
+            /** @description Page id. */
             id: string;
+            /** @description Only signed-in users may read the page. */
             registrationRequired: boolean;
+            /** @description Page title. */
             title: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the page was last edited.
+             */
             updatedAt: string;
+            /** @description Canonical URL: leading slash, no trailing slash. */
             url: string;
         };
         FlatpageAdminResponse: {
@@ -4381,23 +6951,38 @@ export interface components {
             content: string;
             /** @description What the public page serves: rendered and sanitised. */
             contentHtml: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the page was created.
+             */
             createdAt: string;
+            /** @description Page id. */
             id: string;
+            /** @description Only signed-in users may read the page. */
             registrationRequired: boolean;
+            /** @description Page title. */
             title: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the page was last edited.
+             */
             updatedAt: string;
+            /** @description Canonical URL: leading slash, no trailing slash. */
             url: string;
         };
         FlatpageDeletedResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the page was deleted.
+             */
             deletedAt: string;
+            /** @description Id of the deleted page. */
             id: string;
             /** @description The url the page had when it was deleted. */
             url: string;
         };
         FlatpagePreviewDto: {
+            /** @description Markdown to render. */
             content: string;
         };
         FlatpageResponse: {
@@ -4405,14 +6990,21 @@ export interface components {
             contentHtml: string;
             /** @description Members-only page: the reader is signed in (a signed-out reader gets 401). */
             registrationRequired: boolean;
+            /** @description Page title. */
             title: string;
             /** @description Canonical: leading slash, no trailing slash. */
             url: string;
         };
         FlatpageRevisionResponse: {
-            /** @enum {string} */
+            /**
+             * @description What happened to the page.
+             * @enum {string}
+             */
             action: "create" | "delete" | "edit";
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the change was made.
+             */
             at: string;
             /** @description Per changed field, its value before and after. */
             changes: {
@@ -4420,12 +7012,20 @@ export interface components {
             };
             /** @description Null when the editor's account is gone. */
             editor: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Revision id. */
             id: string;
         };
         GhostCellResponse: {
+            /** @description Minute of the contest at which the ghost solved the problem. */
             minute: number;
+            /** @description Points earned; null when the format keeps none. */
             points: number | null;
+            /** @description Code of the problem the cell is for. */
             problemCode: string;
+            /**
+             * @description Rejected attempts before the accepted one; null when the format does not
+             *     count them.
+             */
             rejectedBefore: number | null;
         };
         /**
@@ -4434,20 +7034,25 @@ export interface components {
          */
         GhostGap: "points" | "rejectedBefore";
         GhostImportResponse: {
+            /** @description The ghosts parsed from the CSV. */
             ghosts: components["schemas"]["GhostResponse"][];
             /** @description False for a `dryRun`. */
             stored: boolean;
         };
         GhostListResponse: {
+            /** @description Every ghost of the contest. */
             ghosts: components["schemas"]["GhostResponse"][];
         };
         GhostResponse: {
+            /** @description Secondary text shown with the label. */
             caption: string;
+            /** @description The ghost's cells, one per solved problem. */
             cells: components["schemas"]["GhostCellResponse"][];
             /** @description R3: `GhostGap` is a union alias, which the plugin drops without an explicit enum. */
             gap: components["schemas"]["GhostGap"] | null;
             /** @description Derived from the contest's format on every read; unranked ghosts are shown last. */
             isUnranked: boolean;
+            /** @description Name shown for the ghost. */
             label: string;
         };
         HasMorePageMetaResponse: {
@@ -4459,42 +7064,69 @@ export interface components {
             status: string;
         };
         HideCommentDto: {
+            /** @description True to hide the comment and its replies, false to restore them. */
             hidden: boolean;
         };
         HomeCountsResponse: {
             /** @description Contests an anonymous visitor can see. */
             contests: number;
+            /** @description Programming languages available. */
             languages: number;
+            /** @description Problems in the archive. */
             problems: number;
+            /** @description Submissions made (an estimate). */
             submissions: number;
+            /** @description Accounts on the site (an estimate). */
             users: number;
         };
         HomeProblemResponse: {
+            /** @description Problem code. */
             code: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the problem was added.
+             */
             date: string;
+            /** @description Problem name. */
             name: string;
+            /** @description Points the problem is worth. */
             points: number;
         };
         HomeResponse: {
+            /** @description Site-wide totals. */
             counts: components["schemas"]["HomeCountsResponse"];
+            /** @description The 7 newest problems. */
             newProblems: components["schemas"]["HomeProblemResponse"][];
+            /** @description Newest comments the viewer may read. */
             recentComments: components["schemas"]["RecentCommentResponse"][];
+            /** @description Top 5 users by contribution points. */
             topContributors: components["schemas"]["HomeUserResponse"][];
+            /** @description Top 5 users by performance points. */
             topPerformers: components["schemas"]["HomeUserResponse"][];
         };
         HomeUserResponse: {
+            /** @description Contribution points. */
             contributionPoints: number;
+            /** @description Rank title such as `user` or `admin`. */
             displayRank: string;
             /** @description The user's first listed organization, whoever views; null when none is listed. */
             organization: components["schemas"]["OrganizationSummaryResponse"] | null;
+            /** @description Performance points. */
             performancePoints: number;
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
+            /** @description Login name. */
             username: string;
         };
         ImportGhostsDto: {
             /** @description Replace every label by "Ghost 001", ...: labels may be real students' names. */
             anonymize?: boolean;
+            /**
+             * @description The ghost CSV: a header row with label, caption and the contest problem
+             *     codes, then one row per ghost. A cell is empty for an unsolved problem, or
+             *     minute, optionally prefixed with points and an at sign and suffixed with a
+             *     plus sign and the rejected tries, for example `12.5@47+2`.
+             */
             csv: string;
             /** @description Validate and preview without storing. */
             dryRun?: boolean;
@@ -4502,78 +7134,134 @@ export interface components {
         ImportJobResponse: {
             /** @description Only an import error written for the requester; any other failure is "Import failed". */
             error: string | null;
+            /** @description Job id. */
             id: string;
+            /** @description Progress of the running step; null while queued and once finished. */
+            progress: components["schemas"]["ImportProgressResponse"] | null;
+            /** @description The imported problem; null until the job completes. */
             result: components["schemas"]["ImportResultResponse"] | null;
             /** @description BullMQ state: waiting | active | completed | failed | delayed | prioritized. */
             state: string;
+            /**
+             * @description Step for a progress display: queued, then downloading (Polygon imports only), statements, tests, and done or failed.
+             * @enum {string}
+             */
+            step: "done" | "downloading" | "failed" | "queued" | "statements" | "tests";
         };
         ImportJobStartedResponse: {
+            /** @description Job id to poll at `GET /problems/imports/{jobId}`. */
             jobId: string;
         };
+        ImportProgressResponse: {
+            done: number | null;
+            /** @enum {string} */
+            step: "downloading" | "statements" | "tests";
+            total: number | null;
+        };
         ImportResultResponse: {
+            /** @description Its code. */
             code: string;
+            /** @description Id of the created or updated problem. */
             problemId: string;
         };
         IntegrationClientActingUserResponse: {
+            /** @description User id. */
             id: string;
+            /** @description Login name. */
             username: string;
         };
         IntegrationClientResponse: {
             /** @description The user whose permissions bound the client. */
             actsAs: components["schemas"]["IntegrationClientActingUserResponse"];
+            /** @description CIDR blocks the client may call from. */
             allowedCidrs: string[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the client was created.
+             */
             createdAt: string;
             /**
              * Format: date-time
              * @description The key stops working at this instant; null when it never expires.
              */
             expiresAt: string | null;
+            /** @description Client id. */
             id: string;
             /** @description First characters of the key, to recognise it in this list. */
             keyPrefix: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the key was last used; null if never.
+             */
             lastUsedAt: string | null;
+            /** @description Label of the client. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the client was revoked; null while active.
+             */
             revokedAt: string | null;
+            /** @description What the client may do. */
             scopes: components["schemas"]["IntegrationScope"][];
         };
-        /** @enum {string} */
+        /**
+         * @description What the client may do.
+         * @enum {string}
+         */
         IntegrationScope: "contests:read" | "contests:write";
         JoinBodyDto: {
             acceptRules?: boolean;
             accessCode?: string;
         };
         JudgeKeyResponse: {
+            /** @description The new authentication key, shown only this once; only its hash is stored. */
             authKey: string;
         };
         JudgeResponse: {
+            /** @description Judge software build identifier. */
             build: string;
             /** @description Slots in use at its last pong; 0 while offline. */
             busy: number;
+            /** @description Free-form notes. */
             description: string;
+            /** @description Optional protocol features the judge supports. */
             features: string[];
+            /** @description Judge id. */
             id: string;
+            /** @description Whether the judge is refused. */
             isBlocked: boolean;
+            /** @description Whether the judge is told to take no new work. */
             isDisabled: boolean;
+            /** @description IP address of the last connection; null if it never connected. */
             lastIp: string | null;
+            /** @description Load reported by the judge; null if never reported. */
             load: number | null;
+            /** @description Unique judge name. */
             name: string;
+            /** @description Whether the judge is connected now. */
             online: boolean;
             /** @description Seconds, mean of the last 6 pings. */
             ping: number | null;
+            /** @description Minor version of the judge protocol it speaks. */
             protocolMinor: number;
+            /** @description Languages the judge can run. */
             runtimes: components["schemas"]["JudgeRuntimeResponse"][];
             /** @description Assignments it runs at once. */
             slots: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the judge process last started; null if it never connected.
+             */
             startTime: string | null;
         };
         JudgeRuntimeResponse: {
+            /** @description Language key the runtime serves. */
             language: string;
+            /** @description Compiler or interpreter name. */
             name: string;
+            /** @description Preference among runtimes of the same language; higher is tried first. */
             priority: number;
+            /** @description Runtime version. */
             version: string;
         };
         KickDto: {
@@ -4581,114 +7269,187 @@ export interface components {
             userId: string;
         };
         LanguageAdminResponse: {
+            /** @description Editor mode name. */
             ace: string;
+            /** @description Generic family name shared by versions. */
             commonName: string;
+            /** @description Longer description. */
             description: string;
+            /** @description File extension without the dot. */
             extension: string;
+            /** @description Whether solutions are uploaded as a file. */
             fileOnly: boolean;
+            /** @description Largest uploaded file in MB; 0 turns uploads off. */
             fileSizeLimit: number;
+            /** @description Language id. */
             id: string;
+            /** @description Whether new problems allow it by default. */
             includeInProblem: boolean;
+            /** @description Notes about the compiler or runtime. */
             info: string;
+            /** @description Key judges report for the language. */
             key: string;
+            /** @description Display name. */
             name: string;
+            /** @description Syntax highlighter name. */
             pygments: string;
+            /** @description Short display name; null when none. */
             shortName: string | null;
+            /** @description Starter code offered in the editor. */
             template: string;
         };
         LanguageLimitDto: {
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Language id.
+             */
             languageId: string;
+            /** @description Memory limit in KiB for this language. */
             memoryLimit: number;
+            /** @description Time limit in seconds for this language. */
             timeLimit: number;
         };
         LanguageLimitResponse: {
+            /** @description Language key. */
             language: string;
+            /** @description Memory limit in KiB for this language. */
             memoryLimit: number;
+            /** @description Time limit in seconds for this language. */
             timeLimit: number;
         };
         LanguageResponse: {
+            /** @description Editor mode name for the code editor. */
             ace: string;
+            /** @description Generic family name, shared by versions. */
             commonName: string;
+            /** @description File extension without the dot. */
             extension: string;
+            /** @description Whether solutions are uploaded as a file instead of typed. */
             fileOnly: boolean;
+            /** @description Largest uploaded file in MB; 0 turns uploads off. */
             fileSizeLimit: number;
+            /** @description Language id. */
             id: string;
+            /** @description Whether new problems allow this language by default. */
             includeInProblem: boolean;
+            /** @description Key judges report for the language. */
             key: string;
+            /** @description Display name. */
             name: string;
+            /** @description Short display name; null when none. */
             shortName: string | null;
+            /** @description Starter code offered in the editor. */
             template: string;
         };
         LeaderboardEntryResponse: {
+            /** @description Points earned from community contributions. */
             contributionPoints: number;
+            /** @description Name to show: the staff-set override, else the username. */
             displayName: string;
+            /** @description Rank title such as `user`, `admin` or `banned`. */
             displayRank: string;
+            /** @description User id. */
             id: string;
             /** @description The user's first listed organization, whoever views (legacy prefetched listed ones only). */
             organization: components["schemas"]["OrganizationSummaryResponse"] | null;
+            /** @description Performance points (weighted best solves). */
             performancePoints: number;
+            /** @description Total points earned from solved problems. */
             points: number;
+            /** @description Number of fully solved problems. */
             problemCount: number;
+            /** @description Position on the board; users with equal values share a rank. */
             rank: number;
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
+            /** @description Login name. */
             username: string;
         };
         LicenseResponse: {
+            /** @description Text shown beside problems under this license. */
             display: string;
+            /** @description URL of the license icon. */
             icon: string;
+            /** @description License id. */
             id: string;
+            /** @description Unique key. */
             key: string;
+            /** @description URL of the license text. */
             link: string;
+            /** @description License name. */
             name: string;
         };
         LiveActivityResponse: {
+            /** @description Signed-out visitors seen in the window. */
             anonymousVisitors: number;
+            /** @description Signed-in users seen in the window. */
             authenticatedUsers: number;
+            /** @description Bot requests seen in the window. */
             bots: number;
             /** @description True when a later `page` has more signed-in users (measured on the live set, so a user without an account still counts). */
             hasMore: boolean;
             /** @description Signed-in users, most recently seen first. */
             users: components["schemas"]["LiveUserResponse"][];
+            /** @description Length of the "now" window in minutes. */
             windowMinutes: number;
         };
         LiveUserResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the user was last seen.
+             */
             lastSeenAt: string;
+            /** @description The signed-in user. */
             user: components["schemas"]["UserSummaryResponse"];
         };
         LoginDto: {
+            /** @description Account password. */
             password: string;
+            /** @description Account username. */
             username: string;
         };
         MemberResponse: {
+            /** @description The name to show: the user's display override, else the username. */
             displayName: string;
+            /** @description Rank title shown beside the user, such as user or admin. */
             displayRank: string;
             id: string;
+            /** @description Performance points (weighted best scores). */
             performancePoints: number;
+            /** @description Total problem points. */
             points: number;
+            /** @description Problems solved. */
             problemCount: number;
+            /** @description Rank by the chosen sort; ties share a rank. */
             rank: number;
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
             username: string;
         };
         MintedFeedKeyResponse: {
+            /** @description When the key expires, ISO 8601. */
             expiresAt: string;
+            /** @description The feed key, the Basic password. It is shown only once. */
             key: string;
+            /** @description Whether the feed is cut at the freeze until released, or live. */
             mode: components["schemas"]["FeedKeyMode"];
             /** @description The Basic user name, always `feed`. */
             username: string;
         };
         MintFeedKeyDto: {
+            /** @description Days until the key expires, 1 to 30. */
             expiresInDays?: number;
             /** @description Default `frozen-until-release`; `live` is an explicit opt-in. */
             mode?: components["schemas"]["FeedKeyMode"];
         };
         MiscConfigResponse: {
+            /** @description Config key. */
             key: string;
+            /** @description Stored text value. */
             value: string;
         };
         NewCommentDto: {
+            /** @description Markdown text of the comment; must not be blank. */
             body: string;
             /**
              * Format: uuid
@@ -4697,19 +7458,28 @@ export interface components {
             parentId?: string;
         };
         NewGeneralTicketDto: {
+            /** @description Message text in Markdown. */
             body: string;
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description http or https URL of the page the issue is about.
+             */
             issueUrl: string;
+            /** @description Ticket title. */
             title: string;
         };
         NewTicketDto: {
+            /** @description Message text in Markdown. */
             body: string;
+            /** @description Ticket title. */
             title: string;
         };
         NewTicketMessageDto: {
+            /** @description Message text in Markdown. */
             body: string;
         };
         NotificationEventResponse: {
+            /** @description Id of the notification row that was created or merged. */
             id: string;
         };
         NotificationFrame: {
@@ -4717,7 +7487,10 @@ export interface components {
             /** @enum {string} */
             event: "notification";
         };
-        /** @enum {string} */
+        /**
+         * @description What happened, for example a ticket message.
+         * @enum {string}
+         */
         NotificationKind: "contest-announcement" | "organization-request-decided" | "quota-warning" | "ticket-message" | "ticket-new" | "ticket-status";
         /** @enum {string} */
         NotificationPriority: "high" | "normal";
@@ -4726,9 +7499,14 @@ export interface components {
             body: string;
             /** @description Events merged into this row. */
             count: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the first event arrived.
+             */
             createdAt: string;
+            /** @description Notification id. */
             id: string;
+            /** @description What happened, for example a ticket message. */
             kind: components["schemas"]["NotificationKind"];
             /**
              * Format: date-time
@@ -4738,65 +7516,106 @@ export interface components {
             /** @description Internal SPA path. */
             path: string;
             priority: components["schemas"]["NotificationPriority"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When it was marked read; null while unread.
+             */
             readAt: string | null;
+            /** @description Headline text. */
             title: string;
+            /** @description True until the notification is marked read. */
             unread: boolean;
         };
         /** @enum {string} */
         NotificationState: "all" | "read" | "unread";
         OfficialRankingResponse: {
+            /** @description Problem names in column order. */
             problems: string[];
+            /** @description Ranking rows; empty for an external ranking. */
             rows: components["schemas"]["OfficialRankingRowResponse"][];
+            /** @description URL of an external ranking, or null when rows are stored. */
             url: string | null;
         };
         OfficialRankingRowResponse: {
+            /** @description Contestant's full name as given in the export. */
             fullName: string;
+            /** @description Place in the official ranking. */
             rank: number;
+            /** @description Score per problem, in the order of problems. */
             scores: number[];
+            /** @description Sum of the scores. */
             totalScore: number;
+            /** @description Account name of the contestant. */
             username: string;
         };
         OrganizationDetailResponse: {
             /** @description Markdown source, for the edit form: administrators only. */
             about: string | null;
+            /** @description The about text rendered to HTML. */
             aboutHtml: string;
+            /** @description Administrators in their stored order. */
             admins: components["schemas"]["UserSummaryResponse"][];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the organization was created, ISO 8601.
+             */
             createdAt: string;
             id: string;
+            /** @description Anyone may join; otherwise members need an approved request. */
             isOpen: boolean;
+            /** @description Hidden from lists for everyone but members, admins and staff. */
             isUnlisted: boolean;
+            /** @description URL or site path of a custom logo; empty for the default. */
             logoOverrideImage: string;
+            /** @description Number of members. */
             memberCount: number;
             name: string;
+            /** @description Combined performance points of the members. */
             performancePoints: number;
+            /** @description Short name shown beside members, at most 20 characters. */
             shortName: string;
+            /** @description Most members the organization may have; null for no limit. */
             slots: number | null;
+            /** @description Unique identifier used in URLs. */
             slug: string;
             /** @description Null for anonymous viewers. */
             viewer: components["schemas"]["OrganizationViewerResponse"] | null;
         };
         OrganizationListItemResponse: {
             id: string;
+            /** @description Anyone may join; otherwise members need an approved request. */
             isOpen: boolean;
+            /** @description Hidden from lists for everyone but members, admins and staff. */
             isUnlisted: boolean;
+            /** @description Number of members. */
             memberCount: number;
             name: string;
+            /** @description Combined performance points of the members. */
             performancePoints: number;
+            /** @description Short name shown beside members, at most 20 characters. */
             shortName: string;
+            /** @description Unique identifier used in URLs. */
             slug: string;
         };
         /** @enum {string} */
         OrganizationProblemArchiveFilter: "all" | "false" | "true";
-        /** @enum {string} */
+        /**
+         * @description What to do to every listed problem.
+         * @enum {string}
+         */
         OrganizationProblemBulkAction: "add-tag" | "archive" | "remove-tag" | "unarchive";
         OrganizationProblemResponse: {
+            /** @description Problem code. */
             code: string;
+            /** @description Whether the organization archived the problem. */
             isArchived: boolean;
+            /** @description Whether the problem is public. */
             isPublic: boolean;
+            /** @description Problem name. */
             name: string;
+            /** @description Points the problem is worth. */
             points: number;
+            /** @description The organization's tags on the problem. */
             tags: components["schemas"]["ProblemTagResponse"][];
             /**
              * Format: date-time
@@ -4805,19 +7624,34 @@ export interface components {
             updatedAt: string;
         };
         OrganizationRequestResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the request was filed, ISO 8601.
+             */
             createdAt: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the request was decided, ISO 8601; null while pending.
+             */
             decidedAt: string | null;
+            /** @description Id of the admin who decided; null while pending. */
             decidedBy: string | null;
             id: string;
+            /** @description Slug of the organization asked to join. */
             organizationSlug: string;
+            /** @description The reason the requester gave. */
             reason: string;
+            /** @description P pending, A approved or R rejected. */
             state: components["schemas"]["OrganizationRequestState"];
+            /** @description Id of the requester. */
             userId: string;
+            /** @description Username of the requester. */
             username: string;
         };
-        /** @enum {string} */
+        /**
+         * @description P pending, A approved or R rejected.
+         * @enum {string}
+         */
         OrganizationRequestState: "A" | "P" | "R";
         OrganizationSummaryResponse: {
             id: string;
@@ -4827,13 +7661,19 @@ export interface components {
             slug: string;
         };
         OrganizationUsageResponse: {
+            /** @description Credits used this month against the limit. */
             credits: components["schemas"]["QuotaMeterResponse"];
+            /** @description Whether limits are enforced by refusing actions. */
             enforcing: boolean;
             /** @description `YYYY-MM` in the site time zone. */
             month: string;
+            /** @description The organization. */
             organization: components["schemas"]["UsageOrganizationResponse"];
+            /** @description The caps staff set for this organization. */
             quota: components["schemas"]["UsageQuotaResponse"];
+            /** @description The most recent credit entries. */
             recent: components["schemas"]["CreditEntryResponse"][];
+            /** @description Problem data storage in bytes against the limit. */
             storage: components["schemas"]["QuotaMeterResponse"];
             /** @description Promotion: the limits below are reported but not applied, and the meters are never near or over. */
             unlimited: boolean;
@@ -4841,19 +7681,27 @@ export interface components {
         /** @enum {string} */
         OrganizationUsageSort: "credits" | "name";
         OrganizationViewerResponse: {
+            /** @description The viewer is an admin or holds judge.edit_all_organization. */
             canAdminister: boolean;
+            /** @description The viewer belongs to the organization. */
             isMember: boolean;
             /** @description The viewer's pending join request (Task 6), else null. */
             pendingRequestId: string | null;
         };
         PackageBuildingResponse: {
-            /** @enum {string} */
+            /**
+             * @description Always `building`.
+             * @enum {string}
+             */
             status: "building";
         };
         PackageStatusResponse: {
             /** @description `<dataVersion>.<contentHash>` of what the build is (or was) for. */
             key: string;
-            /** @enum {string} */
+            /**
+             * @description `ready`: the package is cached; `building`: a build is queued or running.
+             * @enum {string}
+             */
             status: "building" | "ready";
         };
         PageMetaResponse: {
@@ -4862,18 +7710,30 @@ export interface components {
             total: number;
         };
         ParticipationResponse: {
+            /** @description The format's per-problem cells, keyed by problem id. */
             cells: {
                 [key: string]: {
                     [key: string]: (number | boolean) | null;
                 };
             };
+            /** @description Cumulative time (penalty) in seconds. */
             cumtime: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When this participation ends: the contest end, or the personal time limit
+             *     if earlier.
+             */
             endTime: string;
+            /** @description Id of the participation. */
             id: string;
+            /** @description Whether an editor disqualified this participation. */
             isDisqualified: boolean;
+            /** @description True while registered but not yet started. */
             isRegistered: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When this participation started, ISO 8601.
+             */
             realStart: string;
             /**
              * Format: date-time
@@ -4882,19 +7742,32 @@ export interface components {
             rulesAcceptedAt: string | null;
             /** @description The rules revision accepted: it may be older than the contest's current `rulesRevision`. */
             rulesAcceptedRevision: number | null;
+            /** @description Total score; frozen values for non-editors during a freeze. */
             score: number;
+            /** @description Tiebreak value used when scores and times are equal. */
             tiebreaker: number;
+            /** @description The participant. */
             user: components["schemas"]["UserSummaryResponse"];
             /** @description 0 live, -1 spectate, n ≥ 1 virtual. */
             virtual: number;
         };
         ParticipationSummaryResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When this participation ends: the contest end, or the personal time limit
+             *     if earlier.
+             */
             endTime: string;
+            /** @description Id of the participation. */
             id: string;
+            /** @description Whether an editor disqualified this participation. */
             isDisqualified: boolean;
+            /** @description True while registered but not yet started. */
             isRegistered: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When this participation started, ISO 8601.
+             */
             realStart: string;
             /**
              * Format: date-time
@@ -4907,74 +7780,220 @@ export interface components {
             virtual: number;
         };
         PasswordResetConfirmDto: {
+            /** @description The new password; it must pass the password policy. */
             newPassword: string;
+            /** @description The token from the reset link. */
             token: string;
         };
         PasswordResetRequestDto: {
+            /** @description Email address of the account. */
             email: string;
         };
         PdfRenderingResponse: {
+            /** @description Always `rendering`. */
             status: string;
         };
+        PolygonLatestPackageResponse: {
+            id: number | null;
+            revision: number | null;
+            state: components["schemas"]["PolygonPackageState"];
+        };
+        PolygonLinkImportDto: {
+            /**
+             * @description Append the package's main solution to the editorial.
+             * @default false
+             */
+            appendMainSolution: boolean;
+            /** @description Author user ids; repeat the parameter. */
+            authors?: string[];
+            /** @default false */
+            autoSync: boolean;
+            /** @description Code of the problem to create or update. */
+            code: string;
+            /** @description Curator user ids; repeat the parameter. On create the caller is added. */
+            curators?: string[];
+            /**
+             * Format: uuid
+             * @description Problem group id.
+             */
+            groupId?: string;
+            /**
+             * @description Skip batches worth zero points.
+             * @default false
+             */
+            ignoreZeroPointBatches: boolean;
+            /**
+             * @description Skip cases worth zero points.
+             * @default false
+             */
+            ignoreZeroPointCases: boolean;
+            /** @description Polygon language of the statement stored as the base statement. */
+            mainStatementLanguage?: string;
+            /**
+             * @description `create` (default) makes a new problem; `update` replaces the data and statement of an existing one.
+             * @default create
+             * @enum {string}
+             */
+            mode: "create" | "update";
+            /** @description Points the problem is worth, 800 to 3500. */
+            points?: number;
+            /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */
+            statementLanguages?: string[];
+            /** @description Polygon language of the tutorial imported as the editorial. */
+            tutorialLanguage?: string;
+            /** @description Problem type ids; repeat the parameter. */
+            typeIds?: string[];
+        };
+        PolygonLinkResponse: {
+            autoSync: boolean;
+            /** Format: date-time */
+            lastSyncAt: string | null;
+            /** @description Why the last sync failed, as shown to the requester. */
+            lastSyncError: string | null;
+            lastSyncResult: components["schemas"]["PolygonSyncResult"] | null;
+            /** Format: date-time */
+            linkedAt: string;
+            name: string;
+            owner: string;
+            packageId: number;
+            /** @description Polygon problem id. */
+            problemId: number;
+            /** @description Revision and package the problem's content was last taken from. */
+            revision: number;
+        };
+        PolygonLinkStateResponse: {
+            /** @description The newest package on Polygon now; null when Polygon could not be asked (not connected, unreachable, access revoked). */
+            latestPackage: components["schemas"]["PolygonLatestPackageResponse"] | null;
+            link: components["schemas"]["PolygonLinkResponse"];
+        };
+        /** @enum {string} */
+        PolygonPackageState: "FAILED" | "NONE" | "READY" | "RUNNING";
+        PolygonProblemResponse: {
+            /** @description Polygon problem id. */
+            id: number;
+            latestPackage: components["schemas"]["PolygonLatestPackageResponse"];
+            /** @description Code of the QHHOJ problem already linked to it, or null. */
+            linkedProblemCode: string | null;
+            /** @description The working copy has uncommitted changes. */
+            modified: boolean;
+            /** @description Polygon short name. */
+            name: string;
+            owner: string;
+            /** @description Current revision of the problem on Polygon. */
+            revision: number;
+            /** @description Statement name (Vietnamese, else English, else any language); null when no statement is named. */
+            title: string | null;
+        };
+        PolygonStatusResponse: {
+            /** @description `polygon.accountName`: the login setters add as a READ co-author; empty when unset. */
+            accountName: string;
+            /** @description Both `polygon.apiKey` and `polygon.apiSecret` are set. */
+            connected: boolean;
+        };
+        /** @enum {string} */
+        PolygonSyncResult: "failed" | "ok";
+        PolygonTestResponse: {
+            ok: boolean;
+            /** @description Problems the account can read. */
+            problemCount: number;
+        };
         PostDetailResponse: {
+            /** @description The post's authors. */
             authors: components["schemas"]["UserSummaryResponse"][];
+            /** @description The viewer may delete the post. */
             canDelete: boolean;
+            /** @description The viewer may edit the post. */
             canEdit: boolean;
             /** @description Visible comments. */
             commentCount: number;
             /** @description Markdown sources for the edit form: editors only. */
             content: string | null;
+            /** @description The post rendered to HTML. */
             contentHtml: string;
+            /** @description Shown in the global newsfeed. */
             globalPost: boolean;
+            /** @description Id of the post. */
             id: string;
+            /** @description Image URL or site path used for link previews; empty for none. */
             ogImage: string;
+            /** @description The organization the post was written for; null for a personal post. */
             organization: components["schemas"]["OrganizationSummaryResponse"] | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the post is or becomes public, ISO 8601.
+             */
             publishOn: string;
+            /** @description Sum of the votes. */
             score: number;
+            /** @description URL-friendly name derived from the author or organization. */
             slug: string;
+            /** @description Pinned to the top of lists. */
             sticky: boolean;
             summary: string | null;
             /** @description The summary, else the content (legacy list rendering). */
             summaryHtml: string;
+            /** @description Post title. */
             title: string;
             viewerVote: components["schemas"]["VoteScore"];
+            /** @description False for a draft. */
             visible: boolean;
         };
         /** @enum {string} */
         PostFeed: "all" | "global";
         PostListItemResponse: {
+            /** @description The post's authors. */
             authors: components["schemas"]["UserSummaryResponse"][];
             /** @description Visible comments. */
             commentCount: number;
+            /** @description Shown in the global newsfeed. */
             globalPost: boolean;
+            /** @description Id of the post. */
             id: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the post is or becomes public, ISO 8601.
+             */
             publishOn: string;
+            /** @description Sum of the votes. */
             score: number;
+            /** @description URL-friendly name derived from the author or organization. */
             slug: string;
+            /** @description Pinned to the top of lists. */
             sticky: boolean;
             /** @description The summary, else the content (legacy list rendering). */
             summaryHtml: string;
+            /** @description Post title. */
             title: string;
             viewerVote: components["schemas"]["VoteScore"];
+            /** @description False for a draft. */
             visible: boolean;
         };
         PpEntryResponse: {
+            /** @description Raw points of the submission. */
             points: number;
+            /** @description The problem the submission solved. */
             problem: components["schemas"]["ProblemRefResponse"];
+            /** @description 1-based position among the user's best submissions. */
             rank: number;
+            /** @description Points after applying the weight. */
             scaledPoints: number;
+            /** @description The counted submission. */
             submission: components["schemas"]["PpSubmissionResponse"];
             /** @description Percent of the points counted, 100 for the best problem. */
             weight: number;
         };
         PpSubmissionResponse: {
+            /** @description Points scored on the test cases. */
             casePoints: number;
+            /** @description Total points of the test cases. */
             caseTotal: number;
+            /** @description When the submission was made, ISO 8601. */
             date: string;
+            /** @description Submission id. */
             id: string;
+            /** @description Short name of the programming language. */
             language: string;
+            /** @description Verdict code such as `AC`; null if none. */
             result: string | null;
         };
         PrepareDataDto: {
@@ -4986,79 +8005,137 @@ export interface components {
         ProblemContestResponse: {
             /** @description Null when the contest problem has no `maxSubmissions`. */
             attemptsLeft: number | null;
+            /** @description Key of the viewer's current contest. */
             contestKey: string;
         };
         ProblemDataLimitsResponse: {
+            /** @description Most cases the caller may save. */
             maxCases: number;
+            /** @description Number of cases above which the editor warns; never enforced. */
             softCases: number;
         };
         ProblemDataResponse: {
+            /** @description Name of the uploaded test data zip; null when none. */
             archive: string | null;
             /** @description Members of the archive, for the editor's file pickers; empty when there is no readable archive. */
             archiveFiles: string[];
+            /** @description Every test case, in judging order. */
             cases: components["schemas"]["TestCaseResponse"][];
-            /** @enum {string} */
+            /**
+             * @description Problem-wide checker.
+             * @enum {string}
+             */
             checker: "bridged" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            /** @description Arguments of the checker; null for none. */
             checkerArgs: {
                 [key: string]: unknown;
             } | null;
+            /** @description Name of the uploaded checker source; null when none. */
             customChecker: string | null;
+            /** @description Name of the uploaded grader source; null when none. */
             customGrader: string | null;
+            /** @description Name of the uploaded header file; null when none. */
             customHeader: string | null;
             /** @description Last init.yml generation error, empty when it was written. */
             feedback: string;
+            /** @description Name of the uploaded generator source; null when none. */
             generator: string | null;
-            /** @enum {string} */
+            /**
+             * @description Grader.
+             * @enum {string}
+             */
             grader: "interactive" | "output_only" | "signature" | "standard";
+            /** @description Arguments of the grader; null for none. */
             graderArgs: {
                 [key: string]: unknown;
             } | null;
+            /** @description Whether an `init.yml` was generated; see `GET /problems/{code}/data/init`. */
             hasInit: boolean;
+            /** @description Case count limits for the editor. */
             limits: components["schemas"]["ProblemDataLimitsResponse"];
+            /** @description Judge `nobigmath` flag: big-number arithmetic is off in the checker. */
             nobigmath: boolean;
+            /** @description Largest output accepted, in bytes (`output_limit_length`); null for the default. */
             outputLimit: number | null;
+            /** @description Leading output bytes kept for display (`output_prefix_length`); null for the default. */
             outputPrefix: number | null;
+            /** @description Judge `unicode` flag: output is read as Unicode text. */
             unicode: boolean;
         };
         ProblemDetailResponse: {
+            /** @description Percentage of accepted submissions, 0 to 100. */
             acRate: number;
+            /** @description Languages solutions may use. */
             allowedLanguages: components["schemas"]["LanguageResponse"][];
+            /** @description Whether checker feedback is shown to submitters. */
             allowViewFeedback: boolean;
+            /** @description Problem authors. */
             authors: components["schemas"]["UserSummaryResponse"][];
+            /** @description Languages with a translated statement. */
             availableTranslations: components["schemas"]["StatementLanguage"][];
+            /** @description Whether the viewer can edit the problem. */
             canEdit: boolean;
+            /** @description Problem code, unique and used in URLs. */
             code: string;
             /** @description The viewer's current contest when it lists this problem. */
             contest: components["schemas"]["ProblemContestResponse"] | null;
+            /** @description Publication date (ISO 8601); null when unset. */
             date: string | null;
+            /** @description Rendered statement HTML. */
             descriptionHtml: string;
+            /** @description Raw fields for the editor; null unless `canEdit`. */
             editor: components["schemas"]["ProblemEditorResponse"] | null;
+            /** @description Problem group; null when none. */
             group: components["schemas"]["CatalogItemResponse"] | null;
+            /** @description Whether the viewer can read an editorial. */
             hasEditorial: boolean;
+            /** @description Problem id. */
             id: string;
+            /** @description Whether the statement may contain unsanitized HTML. */
             isFullMarkup: boolean;
+            /** @description Whether test data is managed outside the site (the data editor is off). */
             isManuallyManaged: boolean;
+            /** @description Whether only members of the listed organizations can see it. */
             isOrganizationPrivate: boolean;
+            /** @description Whether the problem is public. */
             isPublic: boolean;
+            /** @description Language of the returned statement. */
             language: components["schemas"]["StatementLanguage"];
+            /** @description Per-language limits overriding the defaults. */
             languageLimits: components["schemas"]["LanguageLimitResponse"][];
+            /** @description License; null when none. */
             license: components["schemas"]["LicenseResponse"] | null;
+            /** @description URL of the downloadable material; null when none. */
             materialUrl: string | null;
+            /** @description Default memory limit in KiB. */
             memoryLimit: number;
+            /** @description Title in the returned `language`. */
             name: string;
+            /** @description Ids of those organizations. */
             organizations: string[];
+            /** @description Whether partial scores are given. */
             partial: boolean;
+            /** @description URL of the uploaded PDF statement; null when none. */
             pdfStatementUrl: string | null;
+            /** @description Points the problem is worth. */
             points: number;
+            /** @description Where the problem comes from (contest or author credit). */
             source: string;
+            /** @description Who may read submitted sources: `F` follow the site setting, `A` everyone who sees the problem, `S` users who solved it, `O` only the owner, testers and editors. */
             submissionSourceVisibility: components["schemas"]["SubmissionSourceVisibility"];
+            /** @description Short summary for previews. */
             summary: string;
+            /** @description How much of the test case results is shown: `A` every case, `B` batch summaries, `S` totals only. */
             testcaseResultVisibility: components["schemas"]["TestcaseResultVisibility"];
+            /** @description When program output of test cases is shown to non-editors: `O` never, `C` outside contests, `A` always. */
             testcaseVisibility: components["schemas"]["TestcaseVisibility"];
+            /** @description Default time limit in seconds. */
             timeLimit: number;
             /** @description True when the statement is in the requested language (the base language counts); false when it fell back to the base statement. */
             translated: boolean;
+            /** @description Problem types. */
             types: components["schemas"]["CatalogItemResponse"][];
+            /** @description Number of users who solved the problem. */
             userCount: number;
             /**
              * @description For the signed-in viewer; null when anonymous or never submitted.
@@ -5067,41 +8144,71 @@ export interface components {
             viewerStatus: "attempted" | "solved" | null;
         };
         ProblemEditorialDraftResponse: {
+            /** @description Editorial authors. */
             authors: components["schemas"]["UserSummaryResponse"][];
+            /** @description Editorial markdown. */
             content: string;
+            /** @description Whether the editorial is marked public. */
             isPublic: boolean;
+            /** @description When it becomes readable by everyone (ISO 8601). */
             publishOn: string;
         };
         ProblemEditorResponse: {
+            /** @description Ids of languages solutions may use. */
             allowedLanguageIds: string[];
+            /** @description Users who may not submit. */
             bannedUsers: components["schemas"]["UserSummaryResponse"][];
             /** @description The base (default-language) name, whatever `lang` the detail was read in; the detail's own `name` follows `lang`. */
             baseName: string;
+            /** @description Users who can edit the problem. */
             curators: components["schemas"]["UserSummaryResponse"][];
+            /** @description Base-language statement in markdown. */
             description: string;
+            /** @description Problem group id. */
             groupId: string;
+            /** @description License id; null when none. */
             licenseId: string | null;
+            /** @description Ids of the organizations the problem is private to. */
             organizations: string[];
+            /** @description The editorial draft; null when none. */
             solution: components["schemas"]["ProblemEditorialDraftResponse"] | null;
+            /** @description User who suggested the problem; null if it was not suggested. */
             suggester: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Users who can see the problem while it is private. */
             testers: components["schemas"]["UserSummaryResponse"][];
+            /** @description Statement translations. */
             translations: components["schemas"]["ProblemTranslationResponse"][];
+            /** @description Problem type ids. */
             typeIds: string[];
         };
         ProblemListItemResponse: {
+            /** @description Percentage of accepted submissions, 0 to 100. */
             acRate: number;
+            /** @description Problem code, unique and used in URLs. */
             code: string;
+            /** @description Publication date (ISO 8601); null when unset. */
             date: string | null;
+            /** @description Problem group; null when none. */
             group: components["schemas"]["CatalogItemResponse"] | null;
+            /** @description Whether a PDF statement was uploaded. */
             hasPdfStatement: boolean;
+            /** @description Whether an editorial is published. */
             hasPublicEditorial: boolean;
+            /** @description Problem id. */
             id: string;
+            /** @description Whether only members of the listed organizations can see it. */
             isOrganizationPrivate: boolean;
+            /** @description Whether the problem is public. */
             isPublic: boolean;
+            /** @description Title in the requested language, or the base language when untranslated. */
             name: string;
+            /** @description Whether partial scores are given. */
             partial: boolean;
+            /** @description Points the problem is worth. */
             points: number;
+            /** @description Problem types. */
             types: components["schemas"]["CatalogItemResponse"][];
+            /** @description Number of users who solved the problem. */
             userCount: number;
             /**
              * @description For the signed-in viewer; null when anonymous or never submitted.
@@ -5110,13 +8217,19 @@ export interface components {
             viewerStatus: "attempted" | "solved" | null;
         };
         ProblemMetaResponse: {
+            /** @description Problem groups. */
             groups: components["schemas"]["CatalogItemResponse"][];
+            /** @description Judge languages. */
             languages: components["schemas"]["LanguageResponse"][];
+            /** @description Licenses a problem can use. */
             licenses: components["schemas"]["LicenseResponse"][];
+            /** @description Problem types. */
             types: components["schemas"]["CatalogItemResponse"][];
         };
         ProblemRefResponse: {
+            /** @description Problem code. */
             code: string;
+            /** @description Problem title. */
             name: string;
         };
         /** @enum {string} */
@@ -5124,42 +8237,71 @@ export interface components {
         ProblemTagResponse: {
             /** @description A colour token key (`tag-1`..`tag-8`), never a hex. */
             color: components["schemas"]["TagColor"];
+            /** @description Id of the tag. */
             id: string;
+            /** @description Display name. */
             name: string;
+            /** @description The tag's identifier within the organization. */
             slug: string;
         };
         ProblemTranslationResponse: {
+            /** @description Translated statement in markdown. */
             description: string;
+            /** @description Language of the translation. */
             language: components["schemas"]["StatementLanguage"];
+            /** @description Translated title. */
             name: string;
         };
         ProfileOrganizationResponse: {
+            /** @description Organization id. */
             id: string;
+            /** @description Whether the caller administers the organization. */
             isAdmin: boolean;
+            /** @description Whether anyone may join without an invitation. */
             isOpen: boolean;
+            /** @description Full name. */
             name: string;
+            /** @description Short name shown next to usernames. */
             shortName: string;
+            /** @description URL slug of the organization. */
             slug: string;
         };
         ProfileResponse: {
+            /** @description About-me text in Markdown. */
             about: string;
+            /** @description Rendered, sanitised HTML of `about`. */
             aboutHtml: string;
+            /** @description Code editor theme. */
             aceTheme: string;
+            /** @description Custom accent and glass settings; null for the site look. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
+            /** @description Ids of the badges the user owns. */
             badges: string[];
+            /** @description Id of the displayed badge; null for none. */
             displayBadgeId: string | null;
+            /** @description Display first name. */
             firstName: string;
+            /** @description Default programming language id; null when none. */
             languageId: string | null;
+            /** @description How math is rendered. */
             mathEngine: string;
+            /** @description Organizations the user belongs to, in display order. */
             organizations: components["schemas"]["ProfileOrganizationResponse"][];
+            /** @description Site theme id. */
             siteTheme: string;
+            /** @description IANA time zone name used to show dates. */
             timezone: string;
+            /** @description Custom JavaScript run on the site for this user. */
             userScript: string;
         };
         PublicRankingContestResponse: {
+            /** @description When the contest ends, ISO 8601. */
             endTime: string;
+            /** @description Key of the contest. */
             key: string;
+            /** @description Name of the contest. */
             name: string;
+            /** @description When the contest starts, ISO 8601. */
             startTime: string;
         };
         PublicRankingResponse: {
@@ -5173,6 +8315,7 @@ export interface components {
             editorial: components["schemas"]["EditorialOutcome"] | null;
             /** @description In a dry run, `published` means "would be published". */
             outcome: components["schemas"]["PublishOutcome"];
+            /** @description Id of the problem. */
             problemId: string;
             reason: components["schemas"]["PublishSkipReason"] | null;
         };
@@ -5188,19 +8331,28 @@ export interface components {
             editorials?: boolean;
         };
         PublishProblemsResponse: {
+            /** @description True when nothing was changed. */
             dryRun: boolean;
+            /** @description One entry per contest problem. */
             items: components["schemas"]["PublishedProblemResponse"][];
         };
         /** @enum {string} */
         PublishSkipReason: "deleted" | "no_permission" | "not_found" | "organization_private";
         PurgeQueuedResponse: {
+            /** @description Always true: the purge job was queued. */
             queued: boolean;
         };
         PutEditorialDto: {
-            /** @default [] */
+            /**
+             * @description Ids of the editorial authors.
+             * @default []
+             */
             authors: string[];
+            /** @description Editorial markdown. */
             content: string;
+            /** @description Whether the editorial is public once `publishOn` has passed. */
             isPublic: boolean;
+            /** @description When the editorial becomes readable (ISO 8601 with offset). */
             publishOn: string;
         };
         PutMiscConfigDto: {
@@ -5208,56 +8360,101 @@ export interface components {
             value: string;
         };
         PutProblemDataDto: {
+            /** @description Every test case, in judging order. */
             cases: components["schemas"]["TestCaseDto"][];
-            /** @enum {string} */
+            /**
+             * @description Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical` or `linecount`.
+             * @enum {string}
+             */
             checker: "bridged" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
-            /** @default null */
+            /**
+             * @description Arguments of the checker; null for none.
+             * @default null
+             */
             checkerArgs: {
                 [key: string]: unknown;
             } | null;
-            /** @enum {string} */
+            /**
+             * @description Grader: `standard`, `interactive`, `signature` or `output_only`.
+             * @enum {string}
+             */
             grader: "interactive" | "output_only" | "signature" | "standard";
-            /** @default null */
+            /**
+             * @description Arguments of the grader; null for none.
+             * @default null
+             */
             graderArgs: {
                 [key: string]: unknown;
             } | null;
-            /** @default false */
+            /**
+             * @description Judge `nobigmath` flag: turns off big-number arithmetic in the checker.
+             * @default false
+             */
             nobigmath: boolean;
-            /** @default null */
+            /**
+             * @description Largest output accepted, in bytes (`output_limit_length`); null for the default.
+             * @default null
+             */
             outputLimit: number | null;
-            /** @default null */
+            /**
+             * @description Leading output bytes kept for display (`output_prefix_length`); null for the default.
+             * @default null
+             */
             outputPrefix: number | null;
-            /** @default false */
+            /**
+             * @description Judge `unicode` flag: output is read as Unicode text.
+             * @default false
+             */
             unicode: boolean;
         };
         PutTranslationDto: {
+            /** @description Translated statement in markdown. */
             description: string;
+            /** @description Translated title, 1 to 100 characters. */
             name: string;
         };
         QueuedResponse: {
+            /** @description Always true: the job was queued. */
             queued: boolean;
         };
         QuotaMeterResponse: {
+            /** @description Usage is close to the limit. */
             isNearLimit: boolean;
+            /** @description Usage is over the limit. */
             isOver: boolean;
+            /** @description Amount allowed, in the same unit. */
             limit: number;
+            /** @description Amount used: credits for the credit meter, bytes for the storage meter. */
             used: number;
         };
         RandomProblemResponse: {
+            /** @description Code of the picked problem. */
             code: string;
         };
         RankingLinkResponse: {
+            /** @description When the link stops working, ISO 8601; null if never. */
             expiresAt: string | null;
+            /** @description Minutes or days for modes M and D, else null. */
             expiryAmount: number | null;
-            /** @enum {string} */
+            /**
+             * @description U never expires, M minutes, D days, A at a fixed time.
+             * @enum {string}
+             */
             expiryMode: "A" | "D" | "M" | "U";
+            /** @description Whether the link works now: public and not expired. */
             isValid: boolean;
+            /** @description When the token was last generated, ISO 8601. */
             regeneratedAt: string;
-            /** @enum {string} */
+            /**
+             * @description public or private.
+             * @enum {string}
+             */
             status: "private" | "public";
+            /** @description The secret in the public URL. */
             token: string;
         };
         RankingProblemResponse: {
+            /** @description Participants whose cell is worth the full points. */
             acceptedCount: number;
             code: string;
             /** @description The live participation credited with the first solve. */
@@ -5267,8 +8464,11 @@ export interface components {
             problemId: string;
         };
         RankingResponse: {
+            /** @description Whether the standings shown are the frozen ones. */
             frozen: boolean;
+            /** @description The contest's problem columns in order. */
             problems: components["schemas"]["RankingProblemResponse"][];
+            /** @description Participants, best first. */
             rows: components["schemas"]["RankingRowResponse"][];
         };
         RankingRowResponse: {
@@ -5278,14 +8478,21 @@ export interface components {
                     [key: string]: (number | boolean) | null;
                 };
             };
+            /** @description Cumulative time (penalty) in seconds. */
             cumtime: number;
+            /** @description Whether the participation was disqualified. */
             isDisqualified: boolean;
+            /** @description Id of the participation. */
             participationId: string;
             /** @description Null on a board that shows only the viewer's row. */
             rank: number | null;
+            /** @description Total score. */
             score: number;
+            /** @description Tiebreak value used when scores and times are equal. */
             tiebreaker: number;
+            /** @description The participant. */
             user: components["schemas"]["RankingUserResponse"];
+            /** @description 0 live, -1 spectate, n at least 1 virtual. */
             virtual: number;
         };
         RankingUserResponse: {
@@ -5297,15 +8504,21 @@ export interface components {
             username: string;
         };
         RankResponse: {
+            /** @description Leaderboard page that contains the user. */
             page: number;
+            /** @description Entries per leaderboard page. */
             pageSize: number;
+            /** @description 1-based position of the user. */
             rank: number;
         };
         RatingHistoryEntryResponse: {
             /** @description Null when the viewer may not see the contest. */
             contestKey: string | null;
             contestName: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the contest ended.
+             */
             endTime: string;
             performance: number | null;
             rank: number | null;
@@ -5313,8 +8526,11 @@ export interface components {
             rating: number | null;
         };
         RatingSummaryResponse: {
+            /** @description Number of rated contests counted. */
             contests: number;
+            /** @description Highest rating over the readable contests. */
             max: number;
+            /** @description Lowest rating over the readable contests. */
             min: number;
         };
         RecentCommentResponse: {
@@ -5322,26 +8538,52 @@ export interface components {
             author: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Markdown source, for the edit form: the author and moderators only (`canEdit`), else null. */
             body: string | null;
+            /** @description The comment rendered to HTML. */
             bodyHtml: string;
+            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
+            canDelete: boolean;
+            /** @description The caller may edit the comment (never once deleted). */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was posted, ISO 8601.
+             */
             createdAt: string;
+            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
+            deleted: boolean;
+            /** @description Nesting level; 0 for top-level comments. */
             depth: number;
+            /** @description Hidden by a moderator; hidden comments reach moderators only. */
+            hidden: boolean;
+            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
+            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Id of the comment. */
             id: string;
+            /** @description Stable 1-based position on its page in posting order; null until numbered. */
+            number: number | null;
+            /** @description The page the comment belongs to. */
             page: components["schemas"]["CommentPageLinkResponse"];
+            /** @description Id of the comment replied to; null for a top-level comment. */
             parentId: string | null;
+            /** @description Number of edits made to the comment. */
             revisions: number;
+            /** @description Sum of the votes. */
             score: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the comment was last changed, ISO 8601.
+             */
             updatedAt: string;
             viewerVote: components["schemas"]["VoteScore"];
         };
         RegenerateTokenResponse: {
+            /** @description The new API token; shown only once. */
             token: string;
         };
         RegisterDto: {
+            /** @description Email address for the activation link and password resets, up to 254 characters. */
             email: string;
             /**
              * Format: uuid
@@ -5353,50 +8595,68 @@ export interface components {
              * @description An open, listed organization the new account joins.
              */
             organizationId?: string;
+            /** @description Account password; must pass the password policy and not appear in a known breach. */
             password: string;
+            /** @description Desired login name: letters, digits and underscores, up to 30 characters. */
             username: string;
         };
         RenderPreviewDto: {
+            /** @description Markdown to render. */
             markdown: string;
-            /** @enum {string} */
+            /**
+             * @description Render style: `problem`, `problem-full` (unsanitized, needs `judge.problem_full_markup`), `solution`, `blog` or `user`.
+             * @enum {string}
+             */
             style: "blog" | "problem" | "problem-full" | "solution" | "user";
         };
         RenderPreviewResponse: {
             html: string;
         };
         ReplayGhostResponse: {
+            /** @description Secondary text shown with the label. */
             caption: string;
+            /** @description The ghost's events, in the same shape as the participants' events. */
             events: (number | {
                 [key: string]: unknown;
             })[][];
             /** @description Same named enum as `GhostResponse.gap`; R3: an alias of a union needs the explicit decorator. */
             gap: components["schemas"]["GhostGap"] | null;
+            /** @description Whether the ghost is shown outside the ranking. */
             isUnranked: boolean;
+            /** @description Name shown for the ghost. */
             label: string;
         };
         ReplayParticipantResponse: {
+            /** @description Id of the participation. */
             participationId: string;
             user: components["schemas"]["ReplayUserResponse"];
         };
         ReplayProblemResponse: {
             code: string;
+            /** @description The problem's label in the contest. */
             label: string;
+            /** @description Points the problem is worth. */
             points: number;
             problemId: string;
         };
         ReplayResponse: {
             /** @description The build every later chunk request must send as `build`; null while building. */
             buildId: string | null;
+            /** @description When the replay was built, ISO 8601; null while building. */
             builtAt: string | null;
+            /** @description Index of this chunk. */
             chunk: number;
+            /** @description Number of chunks in the build. */
             chunkCount: number;
             /** @description Seconds from the participation's own start; see `REPLAY_EVENTS_SCHEMA` for the tuple. */
             events: (number | {
                 [key: string]: unknown;
             })[][];
+            /** @description Ghost streams; chunk 0 only, else null. */
             ghosts: components["schemas"]["ReplayGhostResponse"][] | null;
             /** @description Chunk 0 only; explicit, so the plugin does not lose the element class behind `| null`. */
             participants: components["schemas"]["ReplayParticipantResponse"][] | null;
+            /** @description Problems in the order that events index; chunk 0 only, else null. */
             problems: components["schemas"]["ReplayProblemResponse"][] | null;
             /**
              * @description `building`: a build is queued or running; retry in a few seconds.
@@ -5406,11 +8666,32 @@ export interface components {
         };
         ReplayUserResponse: {
             id: string;
+            /** @description Short name of the user's first listed organization, else null. */
             organization: string | null;
+            /** @description Rating, null while unrated. */
             rating: number | null;
             username: string;
         };
+        ReportCommentDto: {
+            /** @description Optional details for the moderators. */
+            note?: string;
+            /** @description Why the comment is reported. */
+            reason: components["schemas"]["CommentReportReason"];
+        };
+        ReportedCommentResponse: {
+            /** @description Null when the author's account is gone. */
+            author: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Deleted by its author or a moderator. */
+            deleted: boolean;
+            /** @description The first 200 characters of its Markdown; empty once deleted. */
+            excerpt: string;
+            /** @description Hidden by a moderator. */
+            hidden: boolean;
+            /** @description Id of the comment. */
+            id: string;
+        };
         ResendActivationDto: {
+            /** @description Email address for the activation link and password resets, up to 254 characters. */
             email: string;
         };
         ResyncFrame: {
@@ -5418,7 +8699,10 @@ export interface components {
             data: {
                 [key: string]: unknown;
             };
-            /** @enum {string} */
+            /**
+             * @description Always `resync`.
+             * @enum {string}
+             */
             event: "resync";
         };
         ScopeQueryDto: {
@@ -5427,79 +8711,131 @@ export interface components {
             /** @description Problem code. */
             problem?: string;
         };
-        /** @enum {string} */
+        /**
+         * @description Who sees the scoreboard and when.
+         * @enum {string}
+         */
         ScoreboardVisibility: "C" | "H" | "P" | "V";
         ScratchCodesRemainingResponse: {
+            /** @description Number of unused scratch codes. */
             remaining: number;
         };
         ScratchCodesResponse: {
+            /** @description One-time backup codes; shown only once. */
             scratchCodes: string[];
         };
         SessionResponse: {
+            /** @description Token to send as `X-CSRF-Token` on non-GET requests; null for API tokens. */
             csrfToken: string | null;
+            /** @description Id of the superuser acting as this user; null when not impersonating. */
             impersonatorId: string | null;
+            /** @description True when the password appears in a known breach and must be changed. */
             passwordChangeRequired: boolean;
+            /** @description What the second-factor page needs; null unless `twoFactorRequired` is true. */
             twoFactor: components["schemas"]["TwoFactorPendingResponse"] | null;
+            /** @description True while the session has not passed its second factor. */
             twoFactorRequired: boolean;
+            /** @description The signed-in user; null while a second factor is still pending. */
             user: components["schemas"]["UserResponse"] | null;
         };
         SetOfficialRankingDto: {
+            /** @description CMS export of the ranking; send this or url. */
             csv?: string;
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description URL of an external ranking, http or https; send this or csv.
+             */
             url?: string;
         };
         SetProblemTagsDto: {
+            /**
+             * @description Ids of the tags the problem should have, at most 20; replaces its current
+             *     tags.
+             */
             tagIds: string[];
         };
-        /** @enum {string} */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        /**
+         * @description Setting key.
+         * @enum {string}
+         */
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
+            /** @description What the setting controls. */
             description: string;
             /** @description True when the value holds a secret; its secret parts read `{set: boolean}`. */
             hasSecret: boolean;
             /** @description True while the value equals the registry default (also after a patch back to it). */
             isDefault: boolean;
+            /** @description Setting key. */
             key: components["schemas"]["SettingKey"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the value was last changed; null if never.
+             */
             updatedAt: string | null;
+            /** @description Id of the user who last changed it; null if never changed. */
             updatedBy: string | null;
             /** @description Any JSON value; its shape is the setting definition. */
             value: unknown;
         };
         SettingRevisionResponse: {
+            /** @description Id of the user who made the change; null if unknown. */
             actor: string | null;
             /** @description Any JSON value; its shape is the setting definition. */
             after: unknown;
             /** @description Any JSON value; its shape is the setting definition. */
             before: unknown;
+            /** @description Names of the fields that changed. */
             changedFields: string[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the change was made.
+             */
             createdAt: string;
+            /** @description Revision id. */
             id: string;
         };
+        SettleCommentReportsDto: {
+            /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
+            outcome: components["schemas"]["CommentReportOutcome"];
+        };
         ShortLinkResponse: {
+            /** @description The code in `/s/<code>`. */
             code: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the link was created.
+             */
             createdAt: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the link stops working; null if it never expires.
+             */
             expiresAt: string | null;
+            /** @description Number of counted visits. */
             hits: number;
             /** @description Made for anyone by path (idempotent) rather than chosen by staff. */
             isAuto: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the link was last visited; null if never.
+             */
             lastHitAt: string | null;
+            /** @description Site path the link redirects to. */
             path: string;
         };
         /** @enum {string} */
         ShortLinkScope: "all" | "own";
         SimilarityFragmentResponse: {
+            /** @description Last matched line in the left source (inclusive). */
             leftEnd: number;
-            /** @description 1-based, inclusive, in the left source. */
+            /** @description First matched line in the left source (1-based). */
             leftStart: number;
+            /** @description Last matched line in the right source (inclusive). */
             rightEnd: number;
-            /** @description 1-based, inclusive, in the right source. */
+            /** @description First matched line in the right source (1-based). */
             rightStart: number;
         };
         SimilarityGroupResponse: {
@@ -5509,36 +8845,54 @@ export interface components {
             failed: boolean;
             /** @description Engine family: `cpp`, `python`, `pascal`, ... */
             language: string;
+            /** @description Pairs found in this group. */
             pairCount: number;
+            /** @description Problem code. */
             problemCode: string;
+            /** @description Problem id. */
             problemId: string;
+            /** @description Submissions skipped because their source is empty. */
             skippedEmpty: number;
+            /** @description Submissions skipped because their source is too large. */
             skippedTooLarge: number;
             /** @description Submissions of the family in scope, before the cap. */
             submissionCount: number;
-            /** @enum {string} */
+            /**
+             * @description How sources were tokenized: `syntax` (language-aware) or `text` (plain text).
+             * @enum {string}
+             */
             tokenizer: "syntax" | "text";
             /** @description Only the newest `limits.maxSubmissions` were compared. */
             truncated: boolean;
         };
         SimilarityLimitsResponse: {
+            /** @description Most pairs kept per run. */
             maxPairs: number;
+            /** @description Most submissions compared per problem and language; the newest are kept. */
             maxSubmissions: number;
+            /** @description Pairs below this similarity percentage are dropped. */
             minPercent: number;
         };
         SimilarityPairDetailResponse: {
+            /** @description Number of matched fragments. */
             fragmentCount: number;
             /** @description Matched regions in left-file order, at most 50. */
             fragments: components["schemas"]["SimilarityFragmentResponse"][];
+            /** @description Pair id. */
             id: string;
             /** @description Engine family. */
             language: string;
+            /** @description One submission of the pair, with its source. */
             left: components["schemas"]["SimilarityPairSourceResponse"];
             /** @description Longest shared fragment, in k-grams. */
             longestFragment: number;
+            /** @description Problem code. */
             problemCode: string;
+            /** @description Problem id. */
             problemId: string;
+            /** @description The other submission of the pair, with its source. */
             right: components["schemas"]["SimilarityPairSourceResponse"];
+            /** @description Run id. */
             runId: string;
             /** @description 0 to 1. */
             similarity: number;
@@ -5546,16 +8900,23 @@ export interface components {
             totalOverlap: number;
         };
         SimilarityPairResponse: {
+            /** @description Number of matched fragments. */
             fragmentCount: number;
+            /** @description Pair id. */
             id: string;
             /** @description Engine family. */
             language: string;
+            /** @description One submission of the pair. */
             left: components["schemas"]["SimilaritySideResponse"];
             /** @description Longest shared fragment, in k-grams. */
             longestFragment: number;
+            /** @description Problem code. */
             problemCode: string;
+            /** @description Problem id. */
             problemId: string;
+            /** @description The other submission of the pair. */
             right: components["schemas"]["SimilaritySideResponse"];
+            /** @description Run id. */
             runId: string;
             /** @description 0 to 1. */
             similarity: number;
@@ -5568,42 +8929,75 @@ export interface components {
              * @description Null when the submission no longer exists.
              */
             date: string | null;
+            /** @description Submission points; null when it no longer exists. */
             points: number | null;
+            /** @description Submission verdict; null when the submission no longer exists. */
             result: string | null;
             /** @description The code as submitted; empty when it no longer exists. */
             source: string;
+            /** @description Submission id. */
             submissionId: string;
+            /** @description Submitter id. */
             userId: string;
+            /** @description Submitter username. */
             username: string;
         };
         SimilarityRunResponse: {
+            /** @description Contest id for a contest run; null otherwise. */
             contestId: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the run was requested.
+             */
             createdAt: string;
-            /** @enum {string|null} */
+            /**
+             * @description Why a failed run failed: `deadline`, `engine_failed`, `internal_error` or `abandoned`; null otherwise.
+             * @enum {string|null}
+             */
             error: "abandoned" | "deadline" | "engine_failed" | "internal_error" | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the run ended; null while unfinished.
+             */
             finishedAt: string | null;
+            /** @description Compared groups, one per problem and language family. */
             groups: components["schemas"]["SimilarityGroupResponse"][];
+            /** @description Run id. */
             id: string;
+            /** @description Limits that were in force when the run started. */
             limits: components["schemas"]["SimilarityLimitsResponse"];
+            /** @description Problem id for a problem run; null otherwise. */
             problemId: string | null;
-            /** @enum {string} */
+            /**
+             * @description `problem` or `contest`.
+             * @enum {string}
+             */
             scope: "contest" | "problem";
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the job started; null while queued.
+             */
             startedAt: string | null;
-            /** @enum {string} */
+            /**
+             * @description `queued`, `running`, `done` or `failed`.
+             * @enum {string}
+             */
             status: "done" | "failed" | "queued" | "running";
+            /** @description Languages whose submissions were not compared. */
             unsupported: components["schemas"]["SimilarityUnsupportedResponse"][];
         };
         SimilaritySideResponse: {
+            /** @description Submission id. */
             submissionId: string;
+            /** @description Submitter id. */
             userId: string;
+            /** @description Submitter username. */
             username: string;
         };
         SimilarityUnsupportedResponse: {
             /** @description The judge language's common name. */
             language: string;
+            /** @description Submissions in a language that cannot be compared. */
             submissionCount: number;
         };
         SiteResponse: {
@@ -5630,88 +9024,145 @@ export interface components {
              * @description An open, listed organization the new account joins.
              */
             organizationId?: string;
+            /** @description Account password; must pass the password policy and not appear in a known breach. */
             password: string;
+            /** @description The pending sign-up token from the callback redirect. */
             token: string;
+            /** @description Desired login name: letters, digits and underscores, up to 30 characters. */
             username: string;
         };
         SocialProvidersResponse: {
+            /** @description Slugs of the enabled providers. */
             providers: ("facebook" | "github" | "google")[];
         };
         SolvedGroupResponse: {
+            /** @description Problem group name. */
             name: string;
+            /** @description Sum of the points earned in the group. */
             points: number;
+            /** @description Solved problems of the group, sorted by code. */
             problems: components["schemas"]["SolvedProblemResponse"][];
         };
         SolvedProblemResponse: {
+            /** @description Problem code. */
             code: string;
+            /** @description Problem name. */
             name: string;
+            /** @description Points the user earned. */
             points: number;
+            /** @description Full points the problem is worth. */
             total: number;
         };
         SolvedResponse: {
+            /** @description Groups sorted by name. */
             groups: components["schemas"]["SolvedGroupResponse"][];
         };
         StaffUserResponse: {
             /** @description Null unless banned. */
             banReason: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the account was created.
+             */
             dateJoined: string;
+            /** @description Name to show: the staff-set override, else the username. */
             displayName: string;
+            /** @description Rank title such as `user`, `admin` or `banned`. */
             displayRank: string;
+            /** @description User id. */
             id: string;
+            /** @description False for banned or never-activated accounts. */
             isActive: boolean;
+            /** @description Whether the user is staff. */
             isStaff: boolean;
+            /** @description Whether the user is a superuser. */
             isSuperuser: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Last time the user was seen; null if never.
+             */
             lastAccess: string | null;
             /** @description Contest rating; null while unrated. */
             rating: number | null;
+            /** @description Login name. */
             username: string;
         };
         /** @enum {string} */
         StaffUserSort: "-lastAccess" | "lastAccess";
         StartedSimilarityRunResponse: {
+            /** @description Id of the queued run. */
             runId: string;
         };
         /** @enum {string} */
         StatementLanguage: "en" | "vi";
         SubmissionBatchResponse: {
+            /** @description Batch number, from 1. */
             batch: number;
+            /** @description Smallest points of the batch's cases. */
             points: number;
-            /** @enum {string} */
+            /**
+             * @description Verdict of the first non-accepted case of the batch, or accepted.
+             * @enum {string}
+             */
             status: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "SC" | "TLE" | "WA";
+            /** @description Largest total of the batch's cases. */
             total: number;
         };
         SubmissionCaseResponse: {
+            /** @description Batch number, from 1; null for a case outside any batch. */
             batch: number | null;
+            /** @description Longer checker feedback; present only when the viewer may see feedback. */
             extendedFeedback?: string;
+            /** @description Checker feedback; present only when the viewer may see feedback. */
             feedback?: string;
+            /** @description Memory used in KiB. */
             memory: number;
+            /** @description Program output; present only when the problem shows output to the viewer. */
             output?: string;
+            /** @description Points earned by the case. */
             points: number;
+            /** @description Position of the case in judging order. */
             position: number;
-            /** @enum {string} */
+            /**
+             * @description Case verdict: `AC`, `WA`, `TLE`, `MLE`, `OLE`, `IR`, `RTE` or `SC`.
+             * @enum {string}
+             */
             status: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "SC" | "TLE" | "WA";
+            /** @description Running time in seconds. */
             time: number;
+            /** @description Points available for the case. */
             total: number;
         };
         SubmissionDetailResponse: {
             /** @description Batch summaries when the problem shows only those (B). */
             batches: components["schemas"]["SubmissionBatchResponse"][] | null;
+            /** @description Points earned over all test cases. */
             casePoints: number;
             /** @description Every case when the problem shows them (`testcaseResultVisibility` A) or to superusers. */
             cases: components["schemas"]["SubmissionCaseResponse"][] | null;
+            /** @description Points available over all test cases. */
             caseTotal: number;
+            /** @description Number of the case being judged while the submission runs. */
             currentTestcase: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the submission was made.
+             */
             date: string;
             /** @description Compile log or compiler warnings; the judge's internal error message only for editors. */
             error: string | null;
+            /** @description Submission id; ids sort by submission time. */
             id: string;
+            /** @description Whether only the pretests are judged (contest pretest mode). */
             isPretested: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When judging finished; null when not judged yet.
+             */
             judgedDate: string | null;
+            /** @description Name of the judge that graded it; null when not judged yet. */
             judgedOn: string | null;
+            /** @description The language; null if it was removed. */
             language: components["schemas"]["SubmissionLanguageResponse"] | null;
             /**
              * Format: date-time
@@ -5720,58 +9171,95 @@ export interface components {
             lockedAfter: string | null;
             /** @description KiB (largest case). */
             memory: number | null;
+            /** @description Points awarded for the submission; null while unjudged. */
             points: number | null;
+            /** @description The problem; null if it no longer exists. */
             problem: components["schemas"]["SubmissionProblemResponse"] | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When an admin last rejudged it; null if never.
+             */
             rejudgedDate: string | null;
+            /** @description Verdict: `AC` accepted, `WA` wrong answer, `TLE` time limit, `MLE` memory limit, `OLE` output limit, `IR` invalid return, `RTE` runtime error, `CE` compile error, `IE` internal error, `SC` short circuited, `AB` aborted, `RJ` rejected; null while unjudged. */
             result: components["schemas"]["SubmissionResult"] | null;
+            /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
             /** @description Seconds (largest case). */
             time: number | null;
             /** @description The problem's test case count; null whenever the viewer may not see case results. */
             totalCases: number | null;
+            /** @description The submitter; null if the account no longer exists. */
             user: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Which actions the caller may use on this submission. */
             viewer: components["schemas"]["SubmissionViewerResponse"];
         };
         SubmissionFeedEventResponse: {
+            /** @description Problem id. */
             problemId: string;
+            /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
+            /** @description Submission id. */
             submissionId: string;
-            /** @enum {string} */
+            /**
+             * @description Event type: `queued`, `processing`, `grading-begin` or `done`.
+             * @enum {string}
+             */
             type: "done" | "grading-begin" | "processing" | "queued";
+            /** @description Submitter id. */
             userId: string;
         };
         SubmissionFeedFrame: {
+            /** @description Event payload. */
             data: components["schemas"]["SubmissionFeedEventResponse"];
-            /** @enum {string} */
+            /**
+             * @description Event name.
+             * @enum {string}
+             */
             event: "done" | "grading-begin" | "processing" | "queued";
         };
         SubmissionLanguageResponse: {
+            /** @description Language id. */
             id: string;
+            /** @description Key judges report for the language. */
             key: string;
+            /** @description Display name. */
             name: string;
         };
         SubmissionListItemResponse: {
+            /** @description Points earned over all test cases. */
             casePoints: number;
+            /** @description Points available over all test cases. */
             caseTotal: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the submission was made.
+             */
             date: string;
+            /** @description Submission id; ids sort by submission time. */
             id: string;
+            /** @description The language; null if it was removed. */
             language: components["schemas"]["SubmissionLanguageResponse"] | null;
             /** @description KiB (largest case). */
             memory: number | null;
+            /** @description Points awarded for the submission; null while unjudged. */
             points: number | null;
+            /** @description The problem; null if it no longer exists. */
             problem: components["schemas"]["SubmissionProblemResponse"] | null;
+            /** @description Verdict: `AC` accepted, `WA` wrong answer, `TLE` time limit, `MLE` memory limit, `OLE` output limit, `IR` invalid return, `RTE` runtime error, `CE` compile error, `IE` internal error, `SC` short circuited, `AB` aborted, `RJ` rejected; null while unjudged. */
             result: components["schemas"]["SubmissionResult"] | null;
+            /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
             /** @description Seconds (largest case). */
             time: number | null;
+            /** @description The submitter; null if the account no longer exists. */
             user: components["schemas"]["UserSummaryResponse"] | null;
         };
         SubmissionProblemResponse: {
+            /** @description Problem code. */
             code: string;
             /** @description The problem was deleted or purged; its name is kept. */
             isDeleted: boolean;
+            /** @description Problem title. */
             name: string;
             /** @description The problem's max points: the denominator of a submission's score. */
             points: number;
@@ -5779,56 +9267,93 @@ export interface components {
         SubmissionProgressEventResponse: {
             /** @description The next case being judged on `test-case`, else 0. */
             currentTestcase: number;
+            /** @description Problem id. */
             problemId: string;
+            /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
+            /** @description Submission id. */
             submissionId: string;
             /**
              * @description The SSE event name repeats it.
              * @enum {string}
              */
             type: "done" | "grading-begin" | "processing" | "queued" | "test-case";
+            /** @description Submitter id. */
             userId: string;
         };
         SubmissionProgressFrame: {
+            /** @description Event payload. */
             data: components["schemas"]["SubmissionProgressEventResponse"];
-            /** @enum {string} */
+            /**
+             * @description Event name.
+             * @enum {string}
+             */
             event: "done" | "grading-begin" | "processing" | "queued" | "test-case";
         };
-        /** @enum {string} */
+        /**
+         * @description Verdict: `AC` accepted, `WA` wrong answer, `TLE` time limit, `MLE` memory limit, `OLE` output limit, `IR` invalid return, `RTE` runtime error, `CE` compile error, `IE` internal error, `SC` short circuited, `AB` aborted, `RJ` rejected; null while unjudged.
+         * @enum {string}
+         */
         SubmissionResult: "AB" | "AC" | "CE" | "IE" | "IR" | "MLE" | "OLE" | "RJ" | "RTE" | "SC" | "TLE" | "WA";
         SubmissionSourceResponse: {
+            /** @description Submission id. */
             id: string;
+            /** @description Submitted source text; for a file-only language, the URL of the uploaded file. */
             source: string;
         };
-        /** @enum {string} */
+        /**
+         * @description Who may read submitted sources: `F` follow the site setting, `A` everyone who sees the problem, `S` users who solved it, `O` only the owner, testers and editors.
+         * @enum {string}
+         */
         SubmissionSourceVisibility: "A" | "F" | "O" | "S";
         SubmissionStateEventResponse: {
+            /** @description Points earned over all test cases. */
             casePoints: number;
+            /** @description Points available over all test cases. */
             caseTotal: number;
             /** @description The progress `test-case` events carry; null when the viewer may not see case results. */
             currentTestcase: number | null;
+            /** @description Points awarded for the submission; null while unjudged. */
             points: number | null;
+            /** @description Verdict: `AC` accepted, `WA` wrong answer, `TLE` time limit, `MLE` memory limit, `OLE` output limit, `IR` invalid return, `RTE` runtime error, `CE` compile error, `IE` internal error, `SC` short circuited, `AB` aborted, `RJ` rejected; null while unjudged. */
             result: components["schemas"]["SubmissionResult"] | null;
+            /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
+            /** @description Submission id. */
             submissionId: string;
         };
         SubmissionStateFrame: {
+            /** @description Event payload. */
             data: components["schemas"]["SubmissionStateEventResponse"];
-            /** @enum {string} */
+            /**
+             * @description Always `state`.
+             * @enum {string}
+             */
             event: "state";
         };
         SubmissionStatsResponse: {
+            /** @description Those among them that were accepted. */
             acceptedToday: number;
+            /** @description Submissions judged since midnight in the site time zone. */
             judgedToday: number;
+            /** @description Usable judges that are connected. */
             judgesOnline: number;
+            /** @description Judges that are neither blocked nor disabled. */
             judgesTotal: number;
+            /** @description Submissions queued or being judged now. */
             queueLength: number;
         };
-        /** @enum {string} */
+        /**
+         * @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end.
+         * @enum {string}
+         */
         SubmissionStatus: "AB" | "CE" | "D" | "G" | "IE" | "P" | "PD" | "QU";
         SubmissionViewerResponse: {
+            /** @description Whether `POST /submissions/{id}/abort` is allowed. */
             canAbort: boolean;
+            /** @description Whether `POST /submissions/{id}/reject` is allowed. */
             canReject: boolean;
+            /** @description Whether `POST /submissions/{id}/rejudge` is allowed. */
             canRejudge: boolean;
         };
         SubmitDto: {
@@ -5839,37 +9364,52 @@ export interface components {
              * @description Language id; must be one of the problem's allowed languages.
              */
             language: string;
+            /** @description Source code, 1 to 65536 characters. */
             source: string;
         };
         SubmitResponse: {
+            /** @description Id of the new submission. */
             id: string;
         };
         SyncContestDto: {
+            /** @description Contest description in Markdown. */
             description?: string;
+            /** @description End time, ISO 8601. */
             endTime: string;
             /** @description Free-form JSON: the keys depend on the format. */
             formatConfig?: {
                 [key: string]: unknown;
             };
             formatName?: components["schemas"]["ContestFormatName"];
+            /** @description Minutes before the end during which the scoreboard is frozen. */
             frozenLastMinutes?: number;
+            /** @description Contest name, 1-100 characters. */
             name: string;
             /** @description In contest order. */
             problems: components["schemas"]["SyncProblemDto"][];
+            /** @description Start time, ISO 8601. */
             startTime: string;
             /** @description Seconds a participant has once started; omitted, the whole window. */
             timeLimit?: number;
         };
         SyncContestResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description End time.
+             */
             endTime: string;
             /** @description False until a person publishes it; the sync API cannot change it. */
             isVisible: boolean;
+            /** @description Contest key. */
             key: string;
+            /** @description Contest name. */
             name: string;
             /** @description Users on the contestant list. */
             participantCount: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Start time.
+             */
             startTime: string;
         };
         SyncParticipantsDto: {
@@ -5883,9 +9423,11 @@ export interface components {
             unknown: string[];
         };
         SyncProblemDto: {
+            /** @description Code of an existing problem the acting user can see. */
             code: string;
             /** @description Partial scoring; true when omitted. */
             partial?: boolean;
+            /** @description Points the problem is worth in this contest. */
             points: number;
         };
         /**
@@ -5898,22 +9440,33 @@ export interface components {
             action: components["schemas"]["SyncUpsertAction"];
             /** @description True when nothing was written (`?dryRun=true`). */
             dryRun: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description End time.
+             */
             endTime: string;
             /** @description False until a person publishes it; the sync API cannot change it. */
             isVisible: boolean;
+            /** @description Contest key. */
             key: string;
+            /** @description Contest name. */
             name: string;
             /** @description Users on the contestant list. */
             participantCount: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Start time.
+             */
             startTime: string;
         };
         TagAssignmentResponse: {
+            /** @description User who assigned it; null if the account no longer exists. */
             assigner: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description The tag. */
             tag: components["schemas"]["TagResponse"];
         };
         TagCatalogResponse: {
+            /** @description Tag groups, sorted by code. */
             groups: components["schemas"]["TagGroupResponse"][];
         };
         /**
@@ -5922,34 +9475,53 @@ export interface components {
          */
         TagColor: "tag-1" | "tag-2" | "tag-3" | "tag-4" | "tag-5" | "tag-6" | "tag-7" | "tag-8";
         TagGroupResponse: {
+            /** @description Unique group code. */
             code: string;
+            /** @description Group id. */
             id: string;
+            /** @description Group name. */
             name: string;
+            /** @description Tags of the group, sorted by code. */
             tags: components["schemas"]["TagResponse"][];
         };
         TagProblemListItemResponse: {
+            /** @description Problem code on its judge, with the judge prefix. */
             code: string;
+            /** @description Entry id. */
             id: string;
+            /** @description Judge the problem belongs to; null when unknown. */
             judge: string | null;
+            /** @description URL of the problem. */
             link: string;
+            /** @description Problem title. */
             name: string;
             /** @description Sorted by code. */
             tags: components["schemas"]["TagResponse"][];
         };
         TagProblemResponse: {
+            /** @description Each tag with the user who assigned it. */
             assignments: components["schemas"]["TagAssignmentResponse"][];
+            /** @description Problem code on its judge, with the judge prefix. */
             code: string;
+            /** @description Entry id. */
             id: string;
+            /** @description Judge the problem belongs to; null when unknown. */
             judge: string | null;
+            /** @description URL of the problem. */
             link: string;
+            /** @description Problem title. */
             name: string;
             /** @description Sorted by code. */
             tags: components["schemas"]["TagResponse"][];
         };
         TagResponse: {
+            /** @description Unique tag code. */
             code: string;
+            /** @description Id of the tag group. */
             groupId: string;
+            /** @description Tag id. */
             id: string;
+            /** @description Tag name. */
             name: string;
         };
         TestCaseDto: {
@@ -5959,70 +9531,137 @@ export interface components {
              * @enum {string}
              */
             checker: "" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
-            /** @default null */
+            /**
+             * @description Arguments of the case checker; null for none.
+             * @default null
+             */
             checkerArgs: {
                 [key: string]: unknown;
             } | null;
-            /** @default  */
+            /**
+             * @description Arguments passed to the uploaded generator, one per line, up to 1000 characters.
+             * @default
+             */
             generatorArgs: string;
-            /** @default  */
+            /**
+             * @description Input file name inside the archive.
+             * @default
+             */
             input: string;
-            /** @default false */
+            /**
+             * @description Whether this case belongs to the pretests.
+             * @default false
+             */
             isPretest: boolean;
-            /** @default  */
+            /**
+             * @description Output file name inside the archive.
+             * @default
+             */
             output: string;
-            /** @default null */
+            /**
+             * @description Largest output accepted, in bytes (`output_limit_length`); null for the default.
+             * @default null
+             */
             outputLimit: number | null;
-            /** @default null */
+            /**
+             * @description Leading output bytes kept for display (`output_prefix_length`); null for the default.
+             * @default null
+             */
             outputPrefix: number | null;
-            /** @default null */
+            /**
+             * @description Points of the case or batch; null when unscored.
+             * @default null
+             */
             points: number | null;
-            /** @enum {string} */
+            /**
+             * @description `C` normal case, `S` start of a batch, `E` end of a batch.
+             * @enum {string}
+             */
             type: "C" | "E" | "S";
         };
         TestCaseResponse: {
-            /** @enum {string} */
+            /**
+             * @description Per-case checker override; empty for the problem-wide checker.
+             * @enum {string}
+             */
             checker: "" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            /** @description Arguments of the case checker; null for none. */
             checkerArgs: {
                 [key: string]: unknown;
             } | null;
+            /** @description Arguments passed to the generator, one per line. */
             generatorArgs: string;
+            /** @description Input file name. */
             input: string;
+            /** @description Whether this case belongs to the pretests. */
             isPretest: boolean;
+            /** @description Output file name. */
             output: string;
+            /** @description Largest output accepted, in bytes (`output_limit_length`); null for the default. */
             outputLimit: number | null;
+            /** @description Leading output bytes kept for display; null for the default. */
             outputPrefix: number | null;
+            /** @description Points of the case or batch; null when unscored. */
             points: number | null;
-            /** @enum {string} */
+            /**
+             * @description `C` normal case, `S` start of a batch, `E` end of a batch.
+             * @enum {string}
+             */
             type: "C" | "E" | "S";
         };
-        /** @enum {string} */
+        /**
+         * @description How much of the test case results is shown: `A` every case, `B` batch summaries, `S` totals only.
+         * @enum {string}
+         */
         TestcaseResultVisibility: "A" | "B" | "S";
-        /** @enum {string} */
+        /**
+         * @description When program output of test cases is shown to non-editors: `O` never, `C` outside contests, `A` always.
+         * @enum {string}
+         */
         TestcaseVisibility: "A" | "C" | "O";
         TicketDetailResponse: {
+            /** @description Users assigned to handle the ticket. */
             assignees: components["schemas"]["UserSummaryResponse"][];
+            /** @description What the caller may do with the ticket. */
             can: components["schemas"]["TicketPermissionsResponse"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the ticket was filed, ISO 8601.
+             */
             createdAt: string;
+            /** @description The user who filed the ticket. */
             creator: components["schemas"]["UserSummaryResponse"];
+            /** @description Id of the ticket. */
             id: string;
+            /** @description Marked good by staff: counts toward the creator's contribution points. */
             isContributive: boolean;
+            /** @description False once the ticket is closed. */
             isOpen: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the newest message was posted, ISO 8601.
+             */
             lastMessageAt: string;
+            /** @description What the ticket is about. */
             link: components["schemas"]["TicketLinkResponse"];
+            /** @description Number of messages. */
             messageCount: number;
+            /** @description The ticket's messages, oldest first. */
             messages: components["schemas"]["TicketMessageResponse"][];
             /** @description Every reader sees it; `can.editNotes` says who may change it. */
             notes: string;
             /** @description Messages and state changes by time (equal instants: message first). */
             timeline: components["schemas"]["TicketTimelineEntryResponse"][];
+            /** @description Ticket title. */
             title: string;
         };
         TicketEventFrame: {
+            /** @description Ids describing the event. */
             data: components["schemas"]["TicketEventResponse"];
-            /** @enum {string} */
+            /**
+             * @description Event name: new-ticket, ticket-message or ticket-status.
+             * @enum {string}
+             */
             event: "new-ticket" | "ticket-message" | "ticket-status";
         };
         TicketEventResponse: {
@@ -6030,44 +9669,71 @@ export interface components {
             messageId: string | null;
             /** @description The new state on `ticket-status`, else null. */
             open: boolean | null;
+            /** @description Id of the ticket the event is about. */
             ticketId: string;
         };
         TicketLinkResponse: {
+            /** @description Id of the problem or issue. */
             id: string;
             /** @description The problem code; null for a general issue and for a deleted problem. */
             key: string | null;
             /** @description The problem name, or the issue url. */
             title: string;
-            /** @enum {string} */
+            /**
+             * @description problem for a ticket about a problem, general for a site issue.
+             * @enum {string}
+             */
             type: "general" | "problem";
             /** @description SPA path for a problem, the absolute url for a general issue; empty when the problem is gone. */
             url: string;
         };
         TicketListItemResponse: {
+            /** @description Users assigned to handle the ticket. */
             assignees: components["schemas"]["UserSummaryResponse"][];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the ticket was filed, ISO 8601.
+             */
             createdAt: string;
+            /** @description The user who filed the ticket. */
             creator: components["schemas"]["UserSummaryResponse"];
+            /** @description Id of the ticket. */
             id: string;
+            /** @description Marked good by staff: counts toward the creator's contribution points. */
             isContributive: boolean;
+            /** @description False once the ticket is closed. */
             isOpen: boolean;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the newest message was posted, ISO 8601.
+             */
             lastMessageAt: string;
+            /** @description What the ticket is about. */
             link: components["schemas"]["TicketLinkResponse"];
+            /** @description Number of messages. */
             messageCount: number;
+            /** @description Ticket title. */
             title: string;
         };
         TicketMessageResponse: {
+            /** @description The user who wrote the message. */
             author: components["schemas"]["UserSummaryResponse"];
             /** @description Rendered at save in the `user` style (raw HTML escaped). */
             bodyHtml: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the message was posted, ISO 8601.
+             */
             createdAt: string;
+            /** @description Id of the message. */
             id: string;
         };
         TicketPermissionsResponse: {
+            /** @description The caller may change the assignees. */
             assign: boolean;
+            /** @description The caller may edit the notes. */
             editNotes: boolean;
+            /** @description The caller may mark the ticket good. */
             markGood: boolean;
         };
         TicketSummaryResponse: {
@@ -6077,17 +9743,30 @@ export interface components {
             awaitingStaff: number;
         };
         TicketTimelineEntryResponse: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the entry happened, ISO 8601.
+             */
             at: string;
+            /** @description The state change, when kind is event. */
             event: components["schemas"]["TicketTimelineEventResponse"] | null;
-            /** @enum {string} */
+            /**
+             * @description message or event; the matching property is set and the other is null.
+             * @enum {string}
+             */
             kind: "event" | "message";
+            /** @description The message, when kind is message. */
             message: components["schemas"]["TicketMessageResponse"] | null;
         };
         TicketTimelineEventResponse: {
+            /** @description The user who made the change. */
             actor: components["schemas"]["UserSummaryResponse"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the change was made, ISO 8601.
+             */
             at: string;
+            /** @description Id of the event. */
             id: string;
             /** @description The assignee of `assigned` / `unassigned`, else null. */
             target: components["schemas"]["UserSummaryResponse"] | null;
@@ -6096,217 +9775,380 @@ export interface components {
         /** @enum {string} */
         TicketTimelineType: "assigned" | "closed" | "marked-good" | "reopened" | "unassigned" | "unmarked-good";
         TokenDto: {
+            /** @description The key from the activation link. */
             token: string;
         };
         TotpEnrollmentResponse: {
+            /** @description `otpauth://` URL to render as a QR code. */
             otpauthUrl: string;
+            /** @description The base32 TOTP secret for manual entry. */
             secret: string;
         };
         TwoFactorPendingResponse: {
+            /** @description Second factors the account can use to continue. */
             methods: ("totp" | "webauthn")[];
+            /** @description Username of the account being signed in. */
             username: string;
         };
         UnreadCountResponse: {
+            /** @description Number of unread notifications. */
             count: number;
         };
         UpdateCannedReplyDto: {
+            /** @description Template text. */
             body?: string;
             order?: number;
+            /** @description Short name of the template. */
             title?: string;
         };
         UpdateContestDto: {
             /** @description Stored hashed; an empty string removes it. */
             accessCode?: string;
+            /** @description User ids of the authors. */
             authors?: string[];
+            /** @description Track on-site balloon deliveries. */
             balloons?: boolean;
+            /** @description User ids of balloon volunteers. */
             balloonStaff?: string[];
+            /** @description Names of judges that may not judge this contest. */
             bannedJudges?: string[];
+            /** @description User ids banned from joining. */
             bannedUsers?: string[];
+            /** @description User ids with edit rights besides the authors. */
             curators?: string[];
+            /** @description Markdown description. */
             description?: string;
+            /** @description Forbid virtual participation after the end. */
             disallowVirtual?: boolean;
+            /** @description End, ISO 8601. */
             endTime?: string;
             /** @description Checked by the format (`parseFormatConfig`); omitted on a format change: that format's defaults. */
             formatConfig?: {
                 [key: string]: unknown;
             };
+            /** @description Scoring format of the contest. */
             formatName?: components["schemas"]["ContestFormatName"];
+            /**
+             * @description Minutes before the end during which the ranking is frozen for non-editors;
+             *     0 for none.
+             */
             frozenLastMinutes?: number;
+            /** @description Hide problem authors from contestants. */
             hideProblemAuthors?: boolean;
+            /** @description Hide problem tags from contestants. */
             hideProblemTags?: boolean;
+            /** @description Only members of the listed organizations may see it. */
             isOrganizationPrivate?: boolean;
+            /** @description Only the listed contestants may see it. */
             isPrivate?: boolean;
+            /** @description Whether the contest changes ratings. */
             isRated?: boolean;
+            /** @description Whether the contest is shown to users who may see it. */
             isVisible?: boolean;
+            /** @description How problems are labelled in the contest. */
             labelStyle?: components["schemas"]["ContestLabelStyle"];
+            /**
+             * @description Live submissions are not rejudged after this time, ISO 8601; null for
+             *     none.
+             */
             lockedAfter?: string | null;
+            /** @description Contest name, 1 to 100 characters. */
             name?: string;
+            /** @description Organization ids tied to the contest. */
             organizations?: string[];
+            /** @description Decimal places shown in scores. */
             pointsPrecision?: number;
+            /** @description User ids allowed in a private contest. */
             privateContestants?: string[];
+            /** @description The contest's problems; the array order is the contest order. */
             problems?: components["schemas"]["ContestProblemDto"][];
+            /** @description Publish the problems and editorials automatically when the contest ends. */
             publishAfterEnd?: boolean;
+            /** @description Push announcements live and to notification inboxes. */
             pushAnnouncements?: boolean;
             /** @description Stored hashed; an empty string removes it. */
             rankingAccessCode?: string;
+            /** @description Rate every participant, not only those who solved a problem. */
             rateAll?: boolean;
+            /** @description User ids excluded from rating. */
             rateExclude?: string[];
+            /** @description Rating ceiling applied when rating the contest; null for none. */
             ratingCeiling?: number | null;
+            /** @description Rating floor applied when rating the contest; null for none. */
             ratingFloor?: number | null;
+            /** @description When registration closes, ISO 8601. */
             registrationEnd?: string | null;
+            /**
+             * @description When registration opens, ISO 8601; null with registrationEnd null for no
+             *     registration.
+             */
             registrationStart?: string | null;
             /** @description Markdown, trimmed at save; empty or whitespace: no rules. */
             rules?: string;
+            /** @description Judge on pretests only until the contest ends. */
             runPretestsOnly?: boolean;
             /** @description Seconds; 0 disables the ranking cache. */
             scoreboardCacheTimeout?: number;
+            /** @description Who sees the scoreboard and when. */
             scoreboardVisibility?: components["schemas"]["ScoreboardVisibility"];
+            /** @description Show problem points and counts in a compact form. */
             showShortDisplay?: boolean;
+            /** @description Whether contestants see everyone's submissions while the contest runs. */
             showSubmissionList?: boolean;
+            /** @description Start, ISO 8601. */
             startTime?: string;
+            /** @description Short plain-text description for lists, at most 1000 characters. */
             summary?: string;
+            /** @description Contest tag slugs, at most 20; unknown tags are refused. */
             tags?: string[];
+            /** @description User ids who can see the contest and spectate it before it starts. */
             testers?: string[];
             /** @description Seconds. */
             timeLimit?: number | null;
+            /** @description User ids who may see the scoreboard whatever its visibility. */
             viewContestScoreboard?: string[];
         };
         UpdateContestTagDto: {
             /** @description A union alias: the plugin drops it without the explicit decorator (R3). */
             color?: components["schemas"]["TagColor"];
+            /** @description Short description, at most 200 characters. */
             description?: string;
+            /** @description Display name, 1 to 40 characters. */
             name?: string;
+            /** @description Sort position, from -1000 to 1000; lower comes first. */
             order?: number;
         };
         UpdateFlatpageDto: {
             /** @description Markdown, rendered and sanitised on save in the `blog` style. */
             content?: string;
+            /** @description Only signed-in users may read the page; default false. */
             registrationRequired?: boolean;
+            /** @description Page title. */
             title?: string;
             /** @description Canonicalised on save (`about/` becomes `/about`). */
             url?: string;
         };
         UpdateJudgeDto: {
+            /** @description Free-form notes about the judge, up to 10000 characters. */
             description?: string;
+            /** @description true disconnects the judge and refuses it until unblocked. */
             isBlocked?: boolean;
+            /** @description true tells the judge to stop taking new work. */
             isDisabled?: boolean;
         };
         UpdateLanguageDto: {
+            /** @description Editor mode name for the code editor. */
             ace?: string;
+            /** @description Generic family name shared by versions of the language. */
             commonName?: string;
+            /** @description Longer description of the language. */
             description?: string;
+            /** @description File extension without the dot. */
             extension?: string;
+            /** @description Whether solutions are uploaded as a file instead of typed. */
             fileOnly?: boolean;
+            /** @description Largest uploaded file in MB; 0 turns uploads off. */
             fileSizeLimit?: number;
+            /** @description Whether new problems allow this language by default. */
             includeInProblem?: boolean;
+            /** @description Notes shown to users about the compiler or runtime. */
             info?: string;
+            /** @description Display name, up to 20 characters. */
             name?: string;
+            /** @description Syntax highlighter name. */
             pygments?: string;
+            /** @description Short display name; null clears it. */
             shortName?: string | null;
+            /** @description Starter code offered in the editor. */
             template?: string;
         };
         UpdateOrganizationDto: {
+            /** @description Markdown about text, rendered to HTML when saved. */
             about?: string;
             /** @description Admins besides the creator on create; the whole list on edit. */
             adminIds?: string[];
+            /** @description Whether anyone may join without a request. */
             isOpen?: boolean;
             /** @description Staff fields (`judge.edit_all_organization`). */
             isUnlisted?: boolean;
+            /** @description Empty, an http or https URL, or a site path, at most 150 characters. */
             logoOverrideImage?: string;
+            /** @description Organization name, 1 to 128 characters. */
             name?: string;
+            /**
+             * @description Short name shown beside members, 1 to 20 characters; defaults to the start
+             *     of the slug.
+             */
             shortName?: string;
+            /** @description Most members allowed; null for no limit. */
             slots?: number | null;
+            /**
+             * @description Unique identifier used in URLs: starts with a letter, then letters,
+             *     digits, hyphens and underscores; the word usage is reserved.
+             */
             slug?: string;
+        };
+        UpdatePolygonLinkDto: {
+            autoSync: boolean;
         };
         UpdatePostDto: {
             /** @description Replaces the authors; `judge.edit_all_post`. */
             authorIds?: string[];
+            /** @description Markdown content, rendered when saved. */
             content?: string;
             /** @description `judge.mark_global_post`. */
             globalPost?: boolean;
+            /**
+             * @description Image for link previews: empty, an http or https URL, or a site path, at
+             *     most 150 characters; needs judge.edit_all_post.
+             */
             ogImage?: string;
             /** @description Defaults to now. */
             publishOn?: string;
             /** @description `judge.pin_post`. */
             sticky?: boolean;
+            /** @description Markdown summary for lists; needs judge.edit_all_post. */
             summary?: string;
+            /** @description Post title, up to the blog title limit. */
             title?: string;
+            /** @description False keeps the post as a draft. */
             visible?: boolean;
         };
         UpdateProblemDto: {
+            /** @description Ids of languages solutions may use; defaults to the languages flagged for new problems. */
             allowedLanguages?: string[];
+            /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
-            /** @description The rest need judge.edit_all_problem (Django-admin-only in legacy). */
+            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem`. */
             authors?: string[];
+            /** @description User ids that may not submit to the problem. */
             bannedUsers?: string[];
+            /** @description Unique code: lowercase letters, digits and underscores, 1 to 32 characters; a few words used by routes are reserved. */
             code?: string;
+            /** @description Curator user ids; curators can edit the problem. */
             curators?: string[];
+            /** @description Publication date (ISO 8601 with offset); null clears it. */
             date?: string | null;
+            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set. */
             description?: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Problem group id.
+             */
             groupId?: string;
-            /** @description judge.problem_full_markup */
+            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. */
             isFullMarkup?: boolean;
-            /** @description judge.change_manually_managed */
+            /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
+            /** @description Whether only members of `organizations` can see the problem. */
             isOrganizationPrivate?: boolean;
-            /** @description judge.change_public_visibility */
+            /** @description Whether the problem is public. Changing it needs `judge.change_public_visibility`. */
             isPublic?: boolean;
+            /** @description Per-language limits overriding the defaults; each language at most once. */
             languageLimits?: components["schemas"]["LanguageLimitDto"][];
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description License id; null for none. Needs `judge.edit_all_problem`.
+             */
             licenseId?: string | null;
+            /** @description Memory limit in KiB, up to 1048576. */
             memoryLimit?: number;
+            /** @description Base-language title, 1 to 100 characters. */
             name?: string;
+            /** @description Image URL used for link previews, up to 150 characters. */
             ogImage?: string;
+            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). */
             organizations?: string[];
+            /** @description Whether partial scores are given. */
             partial?: boolean;
+            /** @description Points the problem is worth, 800 to 3500. */
             points?: number;
+            /** @description Origin or credit line, up to 200 characters. */
             source?: string;
+            /** @description Who may read submitted sources: `F` follow the site setting, `A` everyone who sees the problem, `S` users who solved it, `O` only the owner, testers and editors. */
             submissionSourceVisibility?: components["schemas"]["SubmissionSourceVisibility"];
+            /** @description Short summary for previews, up to 1000 characters. Needs `judge.edit_all_problem`. */
             summary?: string;
+            /** @description How much of the test case results is shown: `A` every case, `B` batch summaries, `S` totals only. Needs `judge.edit_all_problem`. */
             testcaseResultVisibility?: components["schemas"]["TestcaseResultVisibility"];
+            /** @description When program output of test cases is shown to non-editors: `O` never, `C` outside contests, `A` always. */
             testcaseVisibility?: components["schemas"]["TestcaseVisibility"];
+            /** @description Users who can see the problem while it is private. */
             testers?: string[];
+            /** @description Time limit in seconds, 0.01 to 60; above 5 needs `judge.high_problem_timelimit`. */
             timeLimit?: number;
+            /** @description Problem type ids, at least one (ids from `GET /problems/meta`). */
             typeIds?: string[];
         };
         UpdateProblemTagDto: {
             /** @description The palette token keys, shared with the contest tags (`TagColor`). */
             color?: components["schemas"]["TagColor"];
+            /** @description Display name, 1 to 40 characters. */
             name?: string;
         };
         UpdateProfileDto: {
+            /** @description About-me text in Markdown, rendered and sanitised on save. */
             about?: string;
-            /** @enum {string} */
+            /**
+             * @description Code editor theme.
+             * @enum {string}
+             */
             aceTheme?: "ambiance" | "auto" | "chaos" | "chrome" | "clouds" | "clouds_midnight" | "cobalt" | "crimson_editor" | "dawn" | "dreamweaver" | "eclipse" | "github" | "idle_fingers" | "katzenmilch" | "kr_theme" | "kuroir" | "merbivore" | "merbivore_soft" | "mono_industrial" | "monokai" | "pastel_on_dark" | "solarized_dark" | "solarized_light" | "terminal" | "textmate" | "tomorrow" | "tomorrow_night" | "tomorrow_night_blue" | "tomorrow_night_bright" | "tomorrow_night_eighties" | "twilight" | "vibrant_ink" | "xcode";
             /** @description The whole look replaces the stored one; `null` clears it (the site's look). */
             appearance?: components["schemas"]["AppearanceDto"] | null;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Id of one of the user's badges to display; `null` shows none.
+             */
             displayBadgeId?: string | null;
+            /** @description Display first name, up to 30 characters. */
             firstName?: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Id of the default programming language.
+             */
             languageId?: string;
-            /** @enum {string} */
+            /**
+             * @description How math is rendered.
+             * @enum {string}
+             */
             mathEngine?: "auto" | "jax" | "mml" | "svg" | "tex";
             /** @description The current memberships reordered or shortened. */
             organizations?: string[];
+            /** @description Site theme id; unknown ids fall back to the operating system scheme. */
             siteTheme?: string;
+            /** @description IANA time zone name used to show dates, for example `Asia/Ho_Chi_Minh`. */
             timezone?: string;
+            /** @description Custom JavaScript run on the site for this user, up to 65536 characters. */
             userScript?: string;
         };
         UpdateQuotaDto: {
+            /**
+             * @description Credits per month, 0 to 1000000; null clears the cap so the site default
+             *     applies.
+             */
             quotaMonthlyCredits?: number | null;
+            /** @description Problem data storage in bytes, 0 to 1099511627776; null clears the cap. */
             quotaStorageBytes?: number | null;
             /** @description The unlimited promotion: true applies no limit, false ends it. */
             quotaUnlimited?: boolean;
         };
         UpdateRankingLinkDto: {
+            /** @description Expiry, ISO 8601; required when expiryMode is A. */
             expiresAt?: string;
             /** @description Minutes (M) or days (D). */
             expiryAmount?: number;
-            /** @enum {string} */
+            /**
+             * @description U never expires, M minutes after regeneration, D days after regeneration,
+             *     A at a fixed time.
+             * @enum {string}
+             */
             expiryMode: "A" | "D" | "M" | "U";
-            /** @enum {string} */
+            /**
+             * @description public lets anyone with the token read the ranking; private disables the
+             *     link.
+             * @enum {string}
+             */
             status: "private" | "public";
         };
         UpdateSettingDto: {
@@ -6323,25 +10165,37 @@ export interface components {
             notes?: string;
         };
         UploadedFileResponse: {
+            /** @description Public URL of the stored file. */
             url: string;
         };
         UsageOrganizationResponse: {
+            /** @description Name of the organization. */
             name: string;
+            /** @description Slug of the organization. */
             slug: string;
         };
         UsageOverviewRowResponse: {
+            /** @description Credits allowed per month. */
             creditsLimit: number;
+            /** @description Credits used this month. */
             creditsUsed: number;
+            /** @description Month of the figures, YYYY-MM. */
             month: string;
+            /** @description Name of the organization. */
             name: string;
+            /** @description Slug of the organization. */
             slug: string;
+            /** @description Problem data storage allowed, in bytes. */
             storageLimit: number;
+            /** @description Problem data storage used, in bytes. */
             storageUsed: number;
             /** @description Limits are reported but not applied. */
             unlimited: boolean;
         };
         UsageQuotaResponse: {
+            /** @description Staff-set monthly credits; null for the site default. */
             monthlyCredits: number | null;
+            /** @description Staff-set storage cap in bytes; null for the site default. */
             storageBytes: number | null;
         };
         UserDataStatusResponse: {
@@ -6355,81 +10209,120 @@ export interface components {
             preparedAt: string | null;
             /** @description When the zip on disk was written. */
             readyAt: string | null;
+            /** @description Size of the zip in bytes; null when there is none. */
             size: number | null;
             /** @enum {string} */
             state: "none" | "preparing" | "ready";
         };
         UsernameAvailableResponse: {
+            /** @description True when the username can be registered now. */
             available: boolean;
         };
         UserPageResponse: {
+            /** @description Rendered, sanitised about-me HTML. */
             aboutHtml: string;
+            /** @description Points earned from community contributions. */
             contributionPoints: number;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description When the account was created.
+             */
             dateJoined: string;
+            /** @description Name to show: the staff-set override, else the username. */
             displayName: string;
+            /** @description Rank title such as `user`, `admin` or `banned`. */
             displayRank: string;
+            /** @description User id. */
             id: string;
+            /** @description Listed organizations the user belongs to. */
             organizations: components["schemas"]["OrganizationSummaryResponse"][];
+            /** @description Performance points (weighted best solves). */
             performancePoints: number;
+            /** @description Total points earned from solved problems. */
             points: number;
+            /** @description Number of fully solved problems. */
             problemCount: number;
             /** @description Among listed, active users by performance points. */
             rank: number;
+            /** @description Contest rating; null while unrated. */
             rating: number | null;
             /** @description Null while the user is unrated. */
             ratingRank: number | null;
+            /** @description Min, max and count of ratings the viewer may read; null when none. */
             ratingSummary: components["schemas"]["RatingSummaryResponse"] | null;
+            /** @description Moderation details; null unless the viewer holds `judge.ban_user`. */
             staff: components["schemas"]["UserPageStaffResponse"] | null;
+            /** @description Login name. */
             username: string;
         };
         UserPageStaffResponse: {
+            /** @description Reason given when the user was banned; null if not banned. */
             banReason: string | null;
             /** @description False for a never-activated account as well as a banned one; only an active account can be impersonated. */
             isActive: boolean;
+            /** @description Whether the user is a superuser. */
             isSuperuser: boolean;
         };
         UserResponse: {
+            /** @description Custom accent and glass settings; null for the site default. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
+            /** @description Account email address. */
             email: string;
+            /** @description Stable user id. */
             id: string;
+            /** @description Whether the user is staff. */
             isStaff: boolean;
+            /** @description Whether the user is a superuser, who holds every permission. */
             isSuperuser: boolean;
+            /** @description Whether an authenticator app (TOTP) is set up. */
             isTotpEnabled: boolean;
+            /** @description Whether at least one security key is registered. */
             isWebauthnEnabled: boolean;
+            /** @description Default programming language id; null when none is chosen. */
             languageId: string | null;
+            /** @description Permission codenames the user holds (directly or through groups), sorted. */
             permissions: string[];
             /** @description Contest rating; null while unrated. */
             rating: number | null;
+            /** @description Theme id chosen in the profile. */
             siteTheme: string;
+            /** @description Unique login name. */
             username: string;
         };
         UserSummaryResponse: {
+            /** @description User id. */
             id: string;
             /** @description Null when unrated; clients colour the name by it. */
             rating: number | null;
+            /** @description Username. */
             username: string;
         };
         VoteDto: {
             score: components["schemas"]["VoteScore"];
         };
         VoteResponse: {
+            /** @description The target's total score after the vote. */
             score: number;
             viewerVote: components["schemas"]["VoteScore"];
         };
         /** @enum {number} */
         VoteScore: -1 | 0 | 1;
         WebauthnCredentialResponse: {
+            /** @description Id of the key, used to remove it. */
             id: string;
+            /** @description Display name chosen at registration. */
             name: string;
         };
         WebauthnLoginDto: {
+            /** @description The assertion response object from `navigator.credentials.get`, serialized as JSON. */
             response: {
                 [key: string]: unknown;
             };
         };
         WebauthnRegisterDto: {
+            /** @description Display name for the key, 1-100 characters. */
             name: string;
+            /** @description The registration response object from `navigator.credentials.create`, serialized as JSON. */
             response: {
                 [key: string]: unknown;
             };
@@ -6516,6 +10409,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Language id. */
                 id: string;
             };
             cookie?: never;
@@ -6552,7 +10446,9 @@ export interface operations {
     OrganizationRequestQueueController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number; 50 requests per page. */
                 page?: number;
+                /** @description P pending, A approved or R rejected. */
                 state?: components["schemas"]["OrganizationRequestState"];
             };
             header?: never;
@@ -6588,6 +10484,7 @@ export interface operations {
     BlogModerationController_list: {
         parameters: {
             query: {
+                /** @description 1-based page number. */
                 page?: number;
                 state: "hidden" | "scheduled";
             };
@@ -6658,6 +10555,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Setting key, for example `auth.google`. */
                 key: string;
             };
             cookie?: never;
@@ -6694,11 +10592,14 @@ export interface operations {
     SettingsController_revisions: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Revisions per page, 1-100. */
                 pageSize?: number;
             };
             header?: never;
             path: {
+                /** @description Setting key, for example `auth.google`. */
                 key: string;
             };
             cookie?: never;
@@ -6734,7 +10635,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Setting key, for example `auth.google`. */
                 key: string;
+                /** @description Id of the revision, from the revision list. */
                 revisionId: string;
             };
             cookie?: never;
@@ -6769,6 +10672,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Config key, 1-64 characters without control characters. */
                 key: string;
             };
             cookie?: never;
@@ -6807,6 +10711,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Config key, 1-64 characters without control characters. */
                 key: string;
             };
             cookie?: never;
@@ -6835,6 +10740,7 @@ export interface operations {
     FlatpagesAdminController_list: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
             };
             header?: never;
@@ -6908,6 +10814,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the entry; an unknown or malformed id gives 404. */
                 id: string;
             };
             cookie?: never;
@@ -6942,6 +10849,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the entry; an unknown or malformed id gives 404. */
                 id: string;
             };
             cookie?: never;
@@ -6972,6 +10880,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the entry; an unknown or malformed id gives 404. */
                 id: string;
             };
             cookie?: never;
@@ -7008,10 +10917,12 @@ export interface operations {
     FlatpagesAdminController_revisions: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
             };
             header?: never;
             path: {
+                /** @description Page id, also of a deleted page. */
                 id: string;
             };
             cookie?: never;
@@ -7045,6 +10956,7 @@ export interface operations {
     FlatpagesAdminController_deleted: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
             };
             header?: never;
@@ -7144,6 +11056,7 @@ export interface operations {
     UserActivityStaffController_liveVisitors: {
         parameters: {
             query?: {
+                /** @description Page number, 1-200. */
                 page?: number;
             };
             header?: never;
@@ -7178,10 +11091,15 @@ export interface operations {
     UserActivityStaffController_list: {
         parameters: {
             query?: {
+                /** @description How many days back to look, 1-90; default 7. */
                 days?: number;
+                /** @description IP address prefix. */
                 ip?: string;
+                /** @description Page number, 1-200. */
                 page?: number;
+                /** @description Fragment of the request path, case-insensitive. */
                 path?: string;
+                /** @description A username fragment, or `anonymous` for signed-out visitors. */
                 user?: string;
             };
             header?: never;
@@ -7217,9 +11135,13 @@ export interface operations {
     UserActivityStaffController_export: {
         parameters: {
             query?: {
+                /** @description How many days back to look, 1-90; default 7. */
                 days?: number;
+                /** @description IP address prefix. */
                 ip?: string;
+                /** @description Fragment of the request path, case-insensitive. */
                 path?: string;
+                /** @description A username fragment, or `anonymous` for signed-out visitors. */
                 user?: string;
             };
             header?: never;
@@ -7255,6 +11177,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -7283,14 +11206,20 @@ export interface operations {
     UserActivityStaffController_userLogs: {
         parameters: {
             query?: {
+                /** @description How many days back to look, 1-90; default 7. */
                 days?: number;
+                /** @description IP address prefix. */
                 ip?: string;
+                /** @description Page number, 1-200. */
                 page?: number;
+                /** @description Fragment of the request path, case-insensitive. */
                 path?: string;
+                /** @description A username fragment, or `anonymous` for signed-out visitors. */
                 user?: string;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -7324,10 +11253,12 @@ export interface operations {
     UserActivityStaffController_summary: {
         parameters: {
             query?: {
+                /** @description How many days back to look, 1-90; default 90. */
                 days?: number;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -7362,7 +11293,9 @@ export interface operations {
             query?: {
                 /** @description True: banned users only. False: users who are not banned only. Unset: everyone. */
                 banned?: boolean;
+                /** @description Page number, starting at 1 (up to 500). */
                 page?: number;
+                /** @description Users per page, 1-100. */
                 pageSize?: number;
                 /** @description Case-insensitive username prefix; surrounding spaces are dropped. */
                 search?: string;
@@ -7640,6 +11573,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the security key from the list. */
                 credentialId: string;
             };
             cookie?: never;
@@ -7878,6 +11812,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the user to act as. */
                 userId: string;
             };
             cookie?: never;
@@ -8196,6 +12131,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Provider slug the flow was started with. */
                 provider: string;
             };
             cookie?: never;
@@ -8226,6 +12162,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Provider slug, one of `GET /auth/social/providers`. */
                 provider: string;
             };
             cookie?: never;
@@ -8354,6 +12291,7 @@ export interface operations {
     RegistrationController_usernameAvailable: {
         parameters: {
             query: {
+                /** @description Desired login name: letters, digits and underscores, up to 30 characters. */
                 username: string;
             };
             header?: never;
@@ -8390,6 +12328,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8419,11 +12358,47 @@ export interface operations {
             };
         };
     };
+    CommentPostingController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the comment. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     CommentPostingController_edit: {
         parameters: {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8462,6 +12437,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8495,11 +12471,117 @@ export interface operations {
             };
         };
     };
+    CommentsController_locate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the comment. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentLocationResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CommentReportsController_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the comment. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportCommentDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CommentReportsController_settle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the comment. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettleCommentReportsDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     CommentPostingController_revisions: {
         parameters: {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8534,6 +12616,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8572,6 +12655,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the comment. */
                 id: string;
             };
             cookie?: never;
@@ -8604,11 +12688,17 @@ export interface operations {
     CommentsController_page: {
         parameters: {
             query?: {
+                /** @description 1-based page number of threads. */
                 page?: number;
             };
             header?: never;
             path: {
+                /**
+                 * @description Natural key of the page: problem code, contest key, post id or tag problem
+                 *     code.
+                 */
                 key: string;
+                /** @description Kind of page the comments belong to. */
                 type: components["schemas"]["CommentPageType"];
             };
             cookie?: never;
@@ -8643,7 +12733,12 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description Natural key of the page: problem code, contest key, post id or tag problem
+                 *     code.
+                 */
                 key: string;
+                /** @description Kind of page the comments belong to. */
                 type: components["schemas"]["CommentPageType"];
             };
             cookie?: never;
@@ -8682,7 +12777,12 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description Natural key of the page: problem code, contest key, post id or tag problem
+                 *     code.
+                 */
                 key: string;
+                /** @description Kind of page the comments belong to. */
                 type: components["schemas"]["CommentPageType"];
             };
             cookie?: never;
@@ -8713,7 +12813,12 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /**
+                 * @description Natural key of the page: problem code, contest key, post id or tag problem
+                 *     code.
+                 */
                 key: string;
+                /** @description Kind of page the comments belong to. */
                 type: components["schemas"]["CommentPageType"];
             };
             cookie?: never;
@@ -8739,10 +12844,84 @@ export interface operations {
             };
         };
     };
+    CommentPostingController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentPreviewResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CommentReportsController_queue: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number of threads. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentReportQueueItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestTagsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Tags per page, 1 to 100. */
                 pageSize?: number;
             };
             header?: never;
@@ -8816,6 +12995,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the contest tag. */
                 slug: string;
             };
             cookie?: never;
@@ -8846,6 +13026,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the contest tag. */
                 slug: string;
             };
             cookie?: never;
@@ -8882,15 +13063,21 @@ export interface operations {
     ContestsController_list: {
         parameters: {
             query?: {
+                /** @description Only contests of this organization id. */
                 organization?: string;
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Contests per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Only contests currently upcoming, running or ended. */
                 phase?: components["schemas"]["ContestPhase"];
                 /** @description Key or name substring, case-insensitive; at most 100 characters. ANDed with `search`, which stays. */
                 q?: string;
+                /** @description Only rated (true) or unrated (false) contests. */
                 rated?: boolean;
                 /** @description Key or name, case-insensitive. */
                 search?: string;
+                /** @description Only contests carrying this tag slug. */
                 tag?: string;
             };
             header?: never;
@@ -8964,6 +13151,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -8998,6 +13186,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9036,6 +13225,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9068,11 +13258,14 @@ export interface operations {
     ContestAnnouncementsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Announcements per page, 1 to 50. */
                 pageSize?: number;
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9108,6 +13301,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9146,7 +13340,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the announcement. */
                 id: string;
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9177,7 +13373,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the announcement. */
                 id: string;
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9206,12 +13404,16 @@ export interface operations {
     BalloonsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Balloons per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Which balloons to list; pending by default. */
                 state?: components["schemas"]["BalloonState"];
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9247,8 +13449,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
+                /** @description Id of the team's participation. */
                 participation: string;
+                /** @description Id of the solved problem. */
                 problem: string;
             };
             cookie?: never;
@@ -9279,8 +13484,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
+                /** @description Id of the team's participation. */
                 participation: string;
+                /** @description Id of the solved problem. */
                 problem: string;
             };
             cookie?: never;
@@ -9311,6 +13519,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9349,6 +13558,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9383,6 +13593,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9421,6 +13632,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9454,6 +13666,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9488,6 +13701,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9522,6 +13736,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9555,6 +13770,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9588,6 +13804,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9622,6 +13839,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9660,6 +13878,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9690,6 +13909,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9720,6 +13940,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9754,6 +13975,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9792,6 +14014,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9822,6 +14045,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9855,6 +14079,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9893,6 +14118,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9927,6 +14153,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9957,6 +14184,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -9991,6 +14219,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10029,6 +14258,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10057,13 +14287,16 @@ export interface operations {
     ContestParticipationController_participations: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Participations per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Username; others than the viewer need edit rights. */
                 user?: string;
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10099,7 +14332,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the participation. */
                 id: string;
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10138,6 +14373,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10181,6 +14417,7 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10215,6 +14452,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10249,6 +14487,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10283,6 +14522,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10321,6 +14561,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10355,6 +14596,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10389,6 +14631,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10432,6 +14675,7 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10466,6 +14710,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10500,6 +14745,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10534,6 +14780,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10568,17 +14815,22 @@ export interface operations {
             query?: {
                 /** @description Language ids; repeat the parameter. */
                 language?: string[];
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Problem code. */
                 problem?: string;
+                /** @description Only submissions with these verdicts (`AC`, `WA`, `TLE`, ...); repeat the parameter. `IE`, `SC` are staff only. */
                 result?: components["schemas"]["SubmissionResult"][];
+                /** @description Only submissions in these judging states (`QU`, `P`, `G`, `D`, `IE`, `CE`, `AB`, `PD`); repeat the parameter. `IE`, `QU`, `P`, `G`, `D` are staff only. */
                 status?: components["schemas"]["SubmissionStatus"][];
                 /** @description Username. */
                 user?: string;
             };
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10645,7 +14897,9 @@ export interface operations {
     LeaderboardsController_contributors: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Entries per page, 1-100. */
                 pageSize?: number;
             };
             header?: never;
@@ -10683,6 +14937,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10716,6 +14971,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Key of the contest. */
                 key: string;
             };
             cookie?: never;
@@ -10780,6 +15036,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -10844,6 +15101,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the ticket. */
                 id: string;
             };
             cookie?: never;
@@ -10908,7 +15166,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Feed format: `rss` or `atom`. */
                 format: "atom" | "rss";
+                /** @description Which feed: `blog`, `comments` or `problems`. */
                 kind: "blog" | "comments" | "problems";
             };
             cookie?: never;
@@ -10972,7 +15232,9 @@ export interface operations {
     IntegrationClientsController_list: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Clients per page, 1-100. */
                 pageSize?: number;
             };
             header?: never;
@@ -11046,6 +15308,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the integration client; an unknown id gives 404. */
                 id: string;
             };
             cookie?: never;
@@ -11144,6 +15407,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Judge name. */
                 name: string;
             };
             cookie?: never;
@@ -11182,6 +15446,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Judge name. */
                 name: string;
             };
             cookie?: never;
@@ -11216,6 +15481,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Judge name. */
                 name: string;
             };
             cookie?: never;
@@ -11250,9 +15516,11 @@ export interface operations {
             query?: {
                 /** @description Repeat the parameter (`kind=ticket-new&kind=ticket-message`); the inbox "Loại" chips send the kinds of their group. */
                 kind?: components["schemas"]["NotificationKind"][];
+                /** @description Page number, starting at 1; pages hold 20 rows. */
                 page?: number;
                 /** @description The banner asks for `state=unread&priority=high`. */
                 priority?: components["schemas"]["NotificationPriority"];
+                /** @description Read state to show; default `all`. */
                 state?: components["schemas"]["NotificationState"];
             };
             header?: never;
@@ -11290,6 +15558,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Notification id; an unknown id gives 404. */
                 id: string;
             };
             cookie?: never;
@@ -11378,7 +15647,9 @@ export interface operations {
     OrganizationsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Organizations per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Substring over name, shortName and slug; surrounding spaces are dropped. 50 bounds a name; the user search allows 64. */
                 search?: string;
@@ -11454,6 +15725,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11488,6 +15760,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11526,6 +15799,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11556,6 +15830,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11590,6 +15865,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11618,12 +15894,16 @@ export interface operations {
     OrganizationsController_members: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Members per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Ranking column, best first. */
                 sort?: "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11657,10 +15937,12 @@ export interface operations {
     OrganizationPostsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
             };
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11694,11 +15976,14 @@ export interface operations {
     ProblemTagsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Tags per page, 1 to 100. */
                 pageSize?: number;
             };
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11734,6 +16019,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11772,7 +16058,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
+                /** @description Slug of the problem tag. */
                 tagSlug: string;
             };
             cookie?: never;
@@ -11803,7 +16091,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
+                /** @description Slug of the problem tag. */
                 tagSlug: string;
             };
             cookie?: never;
@@ -11842,14 +16132,18 @@ export interface operations {
             query?: {
                 /** @description Default: archived problems are hidden. */
                 archived?: components["schemas"]["OrganizationProblemArchiveFilter"];
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Problems per page, 1 to 100. */
                 pageSize?: number;
                 /** @description The `q` query parameter (a longer property name keeps the `id-length` lint rule); `name: 'q'` documents the wire name. */
                 q?: string;
+                /** @description Only problems with this tag slug. */
                 tag?: string;
             };
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11885,7 +16179,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11916,7 +16212,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11947,7 +16245,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -11986,6 +16286,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12024,6 +16325,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12060,11 +16362,14 @@ export interface operations {
     OrganizationRequestsController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number; 50 requests per page. */
                 page?: number;
+                /** @description P pending, A approved or R rejected. */
                 state?: components["schemas"]["OrganizationRequestState"];
             };
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12100,6 +16405,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12140,6 +16446,7 @@ export interface operations {
             path: {
                 /** @description Unvalidated: a malformed id is a 404. */
                 id: string;
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12176,6 +16483,7 @@ export interface operations {
             path: {
                 /** @description Unvalidated: a malformed id is a 404. */
                 id: string;
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12214,6 +16522,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the organization. */
                 slug: string;
             };
             cookie?: never;
@@ -12246,8 +16555,11 @@ export interface operations {
     OrganizationUsageController_overview: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Rows per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Order of the rows: by name or by credits used. */
                 sort?: components["schemas"]["OrganizationUsageSort"];
             };
             header?: never;
@@ -12315,10 +16627,152 @@ export interface operations {
             };
         };
     };
+    PolygonController_problems: {
+        parameters: {
+            query?: {
+                /** @description Skip the 60-second cache; limited per user. */
+                refresh?: boolean;
+                /** @description Case-insensitive match on id, name, title or owner. */
+                search?: string;
+                state?: components["schemas"]["PolygonPackageState"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonProblemResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PolygonController_importProblem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                polygonId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolygonLinkImportDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobStartedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PolygonController_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonStatusResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PolygonConnectionController_test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonTestResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     BlogPostsController_list: {
         parameters: {
             query?: {
+                /** @description global for the newsfeed, all for every published personal post. */
                 feed?: components["schemas"]["PostFeed"];
+                /** @description 1-based page number. */
                 page?: number;
             };
             header?: never;
@@ -12392,6 +16846,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the blog post. */
                 id: string;
             };
             cookie?: never;
@@ -12426,6 +16881,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the blog post. */
                 id: string;
             };
             cookie?: never;
@@ -12456,6 +16912,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the blog post. */
                 id: string;
             };
             cookie?: never;
@@ -12494,6 +16951,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the blog post. */
                 id: string;
             };
             cookie?: never;
@@ -12530,20 +16988,31 @@ export interface operations {
     ProblemsController_list: {
         parameters: {
             query?: {
+                /** @description Only problems in this problem group (id from `GET /problems/meta`). */
                 groupId?: string;
+                /** @description true: only problems with a published editorial; false: only problems without one. */
                 hasEditorial?: boolean;
+                /** @description Language of the returned titles; falls back to the base language when untranslated. */
                 lang?: components["schemas"]["StatementLanguage"];
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Only problems worth at most this many points. */
                 pointsMax?: number;
+                /** @description Only problems worth at least this many points. */
                 pointsMin?: number;
                 /** @description Case-insensitive substring of the code or any title; at most 100 characters. */
                 q?: string;
+                /** @description Words separated by spaces (first 8 used); each must be a substring of the code or any title, ignoring case and Vietnamese accents. */
                 search?: string;
                 /** @description `false`: only problems the viewer has not solved; `true`: only solved ones (an AC with every case point). Anonymous viewers have solved nothing. */
                 solved?: boolean;
+                /** @description Sort field (`date`, `code`, `name`, `points`, `acRate`, `userCount`); a leading `-` sorts descending. */
                 sort?: components["schemas"]["ProblemSort"];
+                /** @description Only problems having any of these problem types (ids from `GET /problems/meta`); repeat the parameter. */
                 typeIds?: string[];
+                /** @description `public` (default): public problems; `private`: visible problems that are not public; `all`: both. */
                 visibility?: "all" | "private" | "public";
             };
             header?: never;
@@ -12615,10 +17084,12 @@ export interface operations {
     ProblemsController_detail: {
         parameters: {
             query?: {
+                /** @description Statement language; falls back to the base statement when no translation exists. */
                 lang?: components["schemas"]["StatementLanguage"];
             };
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12653,6 +17124,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12687,6 +17159,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12725,6 +17198,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
             };
             cookie?: never;
@@ -12759,6 +17233,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12797,6 +17272,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12831,6 +17307,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12869,6 +17346,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -12910,7 +17388,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code. */
                 code: string;
+                /** @description Which source file: `generator`, `customChecker`, `customGrader` or `customHeader`. */
                 kind: "customChecker" | "customGrader" | "customHeader" | "generator";
             };
             cookie?: never;
@@ -12952,7 +17432,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code. */
                 code: string;
+                /** @description Which data file: `archive`, `generator`, `customChecker`, `customGrader` or `customHeader`. */
                 kind: "archive" | "customChecker" | "customGrader" | "customHeader" | "generator";
             };
             cookie?: never;
@@ -12987,7 +17469,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code. */
                 code: string;
+                /** @description File name as stored in the problem data directory. */
                 name: string;
             };
             cookie?: never;
@@ -13021,6 +17505,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13051,10 +17536,12 @@ export interface operations {
     ProblemsController_editorial: {
         parameters: {
             query?: {
+                /** @description Statement language; falls back to the base statement when no translation exists. */
                 lang?: components["schemas"]["StatementLanguage"];
             };
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13089,6 +17576,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13123,6 +17611,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13164,6 +17653,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13208,6 +17698,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13252,10 +17743,12 @@ export interface operations {
     ProblemPdfController_pdf: {
         parameters: {
             query?: {
+                /** @description Statement language; falls back to the base statement when no translation exists. */
                 lang?: components["schemas"]["StatementLanguage"];
             };
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13304,11 +17797,152 @@ export interface operations {
             };
         };
     };
+    ProblemPolygonLinkController_state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonLinkStateResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemPolygonLinkController_unlink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemPolygonLinkController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePolygonLinkDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonLinkResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemPolygonLinkController_sync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobStartedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ProblemLifecycleController_purgeNow: {
         parameters: {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13347,6 +17981,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13377,6 +18012,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13418,6 +18054,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13456,6 +18093,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
             };
             cookie?: never;
@@ -13502,10 +18140,12 @@ export interface operations {
     TicketsController_problemList: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
             };
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
             };
             cookie?: never;
@@ -13541,6 +18181,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the problem. */
                 code: string;
             };
             cookie?: never;
@@ -13579,7 +18220,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
                 code: string;
+                /** @description Language of the translation. */
                 lang: components["schemas"]["StatementLanguage"];
             };
             cookie?: never;
@@ -13612,7 +18255,9 @@ export interface operations {
     ProblemLifecycleController_list: {
         parameters: {
             query?: {
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
             };
             header?: never;
@@ -13648,18 +18293,31 @@ export interface operations {
     ProblemImportsController_start: {
         parameters: {
             query: {
+                /** @description Append the package's main solution to the editorial. */
                 appendMainSolution?: boolean;
+                /** @description Author user ids; repeat the parameter. */
                 authors?: string[];
+                /** @description Code of the problem to create or update. */
                 code: string;
+                /** @description Curator user ids; repeat the parameter. On create the caller is added. */
                 curators?: string[];
+                /** @description Problem group id. */
                 groupId?: string;
+                /** @description Skip batches worth zero points. */
                 ignoreZeroPointBatches?: boolean;
+                /** @description Skip cases worth zero points. */
                 ignoreZeroPointCases?: boolean;
+                /** @description Polygon language of the statement stored as the base statement. */
                 mainStatementLanguage?: string;
+                /** @description `create` (default) makes a new problem; `update` replaces the data and statement of an existing one. */
                 mode?: "create" | "update";
+                /** @description Points the problem is worth, 800 to 3500. */
                 points?: number;
+                /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */
                 statementLanguages?: string[];
+                /** @description Polygon language of the tutorial imported as the editorial. */
                 tutorialLanguage?: string;
+                /** @description Problem type ids; repeat the parameter. */
                 typeIds?: string[];
             };
             header?: never;
@@ -13703,6 +18361,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Job id from the start response. */
                 jobId: string;
             };
             cookie?: never;
@@ -13767,17 +18426,25 @@ export interface operations {
     ProblemsController_random: {
         parameters: {
             query?: {
+                /** @description Only problems in this problem group (id from `GET /problems/meta`). */
                 groupId?: string;
+                /** @description true: only problems with a published editorial; false: only problems without one. */
                 hasEditorial?: boolean;
+                /** @description Language of the returned titles; falls back to the base language when untranslated. */
                 lang?: components["schemas"]["StatementLanguage"];
+                /** @description Only problems worth at most this many points. */
                 pointsMax?: number;
+                /** @description Only problems worth at least this many points. */
                 pointsMin?: number;
                 /** @description Case-insensitive substring of the code or any title; at most 100 characters. */
                 q?: string;
+                /** @description Words separated by spaces (first 8 used); each must be a substring of the code or any title, ignoring case and Vietnamese accents. */
                 search?: string;
                 /** @description `false`: only problems the viewer has not solved; `true`: only solved ones (an AC with every case point). Anonymous viewers have solved nothing. */
                 solved?: boolean;
+                /** @description Only problems having any of these problem types (ids from `GET /problems/meta`); repeat the parameter. */
                 typeIds?: string[];
+                /** @description `public` (default): public problems; `private`: visible problems that are not public; `all`: both. */
                 visibility?: "all" | "private" | "public";
             };
             header?: never;
@@ -14121,9 +18788,11 @@ export interface operations {
     ShortLinksController_list: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Links per page, 1-100. */
                 pageSize?: number;
-                /** @description `ShortLinkScope` is an alias of a union, so the plugin would drop it: spelled out (SDK R3). */
+                /** @description `own` lists the caller's links; `all` lists every link and needs `judge.manage_short_link`. */
                 scope?: components["schemas"]["ShortLinkScope"];
             };
             header?: never;
@@ -14197,6 +18866,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Short code; matched case-insensitively, unknown gives 404. */
                 code: string;
             };
             cookie?: never;
@@ -14227,6 +18897,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Pair id. */
                 pairId: string;
             };
             cookie?: never;
@@ -14334,6 +19005,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Run id. */
                 runId: string;
             };
             cookie?: never;
@@ -14370,12 +19042,16 @@ export interface operations {
                 language?: string;
                 /** @description 0 to 1. */
                 minSimilarity?: number;
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Only pairs on this problem id. */
                 problemId?: string;
             };
             header?: never;
             path: {
+                /** @description Run id. */
                 runId: string;
             };
             cookie?: never;
@@ -14443,11 +19119,15 @@ export interface operations {
             query?: {
                 /** @description Language ids; repeat the parameter. */
                 language?: string[];
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Problem code. */
                 problem?: string;
+                /** @description Only submissions with these verdicts (`AC`, `WA`, `TLE`, ...); repeat the parameter. `IE`, `SC` are staff only. */
                 result?: components["schemas"]["SubmissionResult"][];
+                /** @description Only submissions in these judging states (`QU`, `P`, `G`, `D`, `IE`, `CE`, `AB`, `PD`); repeat the parameter. `IE`, `QU`, `P`, `G`, `D` are staff only. */
                 status?: components["schemas"]["SubmissionStatus"][];
                 /** @description Username. */
                 user?: string;
@@ -14487,6 +19167,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -14521,6 +19202,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -14551,6 +19233,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -14581,6 +19264,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -14611,6 +19295,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Submission id. */
                 id: string;
             };
             cookie?: never;
@@ -14711,8 +19396,11 @@ export interface operations {
     TagsController_list: {
         parameters: {
             query?: {
+                /** @description Only problems from these judges: `Atcoder`, `Codeforces`, `CodeforcesGym`, `Kattis` or `VNOJ`; repeat the parameter. */
                 judges?: ("Atcoder" | "Codeforces" | "CodeforcesGym" | "Kattis" | "VNOJ")[];
+                /** @description Page number, from 1. */
                 page?: number;
+                /** @description Items per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Case-insensitive substring of the code or name (legacy `icontains`). */
                 search?: string;
@@ -14790,6 +19478,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the tagged problem. */
                 code: string;
             };
             cookie?: never;
@@ -14824,6 +19513,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Code of the tagged problem. */
                 code: string;
             };
             cookie?: never;
@@ -14892,6 +19582,7 @@ export interface operations {
     CannedRepliesController_list: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
             };
             header?: never;
@@ -14965,6 +19656,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the canned reply. */
                 id: string;
             };
             cookie?: never;
@@ -14995,6 +19687,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the canned reply. */
                 id: string;
             };
             cookie?: never;
@@ -15031,10 +19724,15 @@ export interface operations {
     TicketsController_list: {
         parameters: {
             query?: {
+                /** @description Usernames of assignees; repeat the parameter, at most 10. */
                 assignee?: string[];
+                /** @description true for open tickets only, false for closed only, absent for both. */
                 open?: boolean;
+                /** @description true limits the list to tickets the caller filed or is assigned to. */
                 own?: boolean;
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description Usernames of ticket creators; repeat the parameter, at most 10. */
                 user?: string[];
             };
             header?: never;
@@ -15072,6 +19770,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the ticket. */
                 id: string;
             };
             cookie?: never;
@@ -15106,6 +19805,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the ticket. */
                 id: string;
             };
             cookie?: never;
@@ -15144,6 +19844,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Id of the ticket. */
                 id: string;
             };
             cookie?: never;
@@ -15248,9 +19949,12 @@ export interface operations {
     LeaderboardsController_users: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Entries per page, 1-100. */
                 pageSize?: number;
-                sort?: "performancePoints" | "points" | "problemCount" | "rating" | "contributionPoints";
+                /** @description Ranking field; ties share a rank. */
+                sort?: "contributionPoints" | "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path?: never;
@@ -15287,6 +19991,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15319,10 +20024,12 @@ export interface operations {
     UserPagesController_activity: {
         parameters: {
             query?: {
+                /** @description IANA time zone for the day boundaries; defaults to the viewer's profile zone, then UTC. */
                 timezone?: string;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15357,6 +20064,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15389,10 +20097,12 @@ export interface operations {
     UserPagesController_blog: {
         parameters: {
             query?: {
+                /** @description 1-based page number. */
                 page?: number;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15426,10 +20136,12 @@ export interface operations {
     UserPagesController_comments: {
         parameters: {
             query?: {
+                /** @description Id of the last comment of the previous page; returns older comments. */
                 before?: string;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15463,11 +20175,14 @@ export interface operations {
     UserPagesController_ppBreakdown: {
         parameters: {
             query?: {
+                /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Entries per page, 1-100. */
                 pageSize?: number;
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15501,10 +20216,12 @@ export interface operations {
     LeaderboardsController_rank: {
         parameters: {
             query?: {
+                /** @description Leaderboard field to rank by. */
                 sort?: "contributionPoints" | "performancePoints" | "points" | "problemCount" | "rating";
             };
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15539,6 +20256,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15573,6 +20291,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15603,6 +20322,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15637,6 +20357,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Username of the account; an unknown name gives 404. */
                 username: string;
             };
             cookie?: never;
@@ -15667,6 +20388,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Contest key chosen by the client. */
                 key: string;
             };
             cookie?: never;
@@ -15704,6 +20426,7 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Contest key chosen by the client. */
                 key: string;
             };
             cookie?: never;
@@ -15742,6 +20465,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Contest key chosen by the client. */
                 key: string;
             };
             cookie?: never;
@@ -15772,6 +20496,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Contest key chosen by the client. */
                 key: string;
             };
             cookie?: never;
@@ -15810,6 +20535,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Contest key chosen by the client. */
                 key: string;
             };
             cookie?: never;
@@ -15876,6 +20602,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Short code; matched case-insensitively, unknown gives 404. */
                 code: string;
             };
             cookie?: never;
