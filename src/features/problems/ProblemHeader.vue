@@ -3,7 +3,12 @@ import { computed } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import GlassCard from '@/components/GlassCard.vue';
 import { translate } from '@/i18n';
-import { formatMemoryLimit, formatNumber, formatProblemPoints, formatTimeLimit } from '@/lib/format';
+import {
+  formatMemoryLimit,
+  formatNumber,
+  formatProblemPoints,
+  formatTimeLimit,
+} from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusChip from './ProblemStatusChip.vue';
 
