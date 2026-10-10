@@ -14,7 +14,15 @@ const card = () => mountComponent(PostCard, { props: { post: postItem({ sticky: 
 describe('post row skeleton parity', () => {
   it('shares the row grid and padding', () => {
     mockApi({ ...anonymousViewer });
-    const shared = ['grid', 'grid-cols-[minmax(0,1fr)_auto]', 'gap-x-3', 'px-4', 'py-2', 'sm:px-5'];
+    const shared = [
+      'grid',
+      'grid-cols-[minmax(0,1fr)_auto]',
+      'gap-x-3',
+      'px-4',
+      'py-3.5',
+      'sm:px-5',
+      'sm:py-4',
+    ];
     expect(row().classes()).toEqual(expect.arrayContaining(shared));
     expect(mountComponent(PostRowSkeleton).classes()).toEqual(expect.arrayContaining(shared));
   });

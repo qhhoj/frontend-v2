@@ -6,7 +6,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 <template>
   <article
     data-skeleton-region="post-row"
-    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-2 sm:px-5"
+    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-3.5 sm:px-5 sm:py-4"
   >
     <div data-part="body" class="flex min-w-0 flex-col gap-0.5">
       <div data-part="title" class="flex h-6 items-center">

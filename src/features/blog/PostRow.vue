@@ -26,9 +26,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 <template>
   <article
     data-testid="post-row"
-    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-2 sm:px-5"
+    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-3.5 sm:px-5 sm:py-4"
   >
-    <div class="flex min-w-0 flex-col gap-0.5">
+    <div class="flex min-w-0 flex-col gap-1">
       <h2 class="truncate text-base font-semibold">
         <span
           v-if="post.sticky"
