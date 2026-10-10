@@ -216,7 +216,7 @@ test.describe('loading with motion', () => {
     await expect.poll(() => readBoxes(page), 'the Bits walk again').not.toEqual(pausedAt);
   });
 
-  test('when the data arrives the Bits stop where they are, blink, fade and disappear', async ({
+  test('when the data arrives the Bits keep walking out of the viewport and the layer goes', async ({
     page,
     api,
   }) => {
@@ -226,11 +226,12 @@ test.describe('loading with motion', () => {
     release();
     await expect(page.getByText(LOADED_ROW).first()).toBeVisible();
     await expect(page.locator('[data-skeleton]')).toHaveCount(0);
-    await expect(page.locator(LAYER)).toHaveAttribute('data-phase', 'stopped');
-    const [stoppedAt, ...laterFrames] = await boxesOverFrames(page, 20);
-    for (const boxes of laterFrames) expect(boxes).toEqual(stoppedAt);
-    await expect(page.locator(BITS)).toHaveCount(0, { timeout: 5000 });
+    await expect(page.locator(LAYER)).toHaveAttribute('data-phase', 'leaving');
+    const samples = await boxesOverFrames(page, 20);
+    for (let index = 0; index < 5; index += 1)
+      expect(pathLength(samples, index), `Bit ${index} keeps walking`).toBeGreaterThan(0);
     await expect(page.locator('[role="status"]')).toHaveText('');
+    await expect(page.locator(BITS)).toHaveCount(0, { timeout: 8000 });
   });
 
   test('a page that loads quickly never shows a Bit', async ({ page, api }) => {

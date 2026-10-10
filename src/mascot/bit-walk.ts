@@ -1,5 +1,13 @@
 import { SPRITE_SIZE } from './bit-sprite';
 
+/**
+ * Pure movement of the loading Bits (no DOM, no clock; randomness is injected so specs are deterministic).
+ * - `stepWalker`: wander inside the walk bounds at a drifting speed, bouncing off the edges; a walker found outside the bounds
+ *   (it was leaving) heads straight for their centre instead, with no wobble and no jump, and wanders again once inside.
+ * - `leaveHeading`, `stepLeaver`, `isGone`: the exit. The heading to the nearest viewport edge is chosen once; the Bit then keeps
+ *   its own speed in a straight line, legs stepping, until its whole sprite box is outside the viewport.
+ */
+
 /** Random numbers in [0, 1); `Math.random` in the app, a seeded generator in specs. */
 export type Random = () => number;
 
@@ -55,6 +63,16 @@ const reflect = (value: number, min: number, max: number) =>
       ? { value: Math.max(min, 2 * max - value), bounced: true }
       : { value, bounced: false };
 
+const isOutside = (walker: Walker, bounds: Bounds) =>
+  walker.x < bounds.minX ||
+  walker.x > bounds.maxX ||
+  walker.y < bounds.minY ||
+  walker.y > bounds.maxY;
+const normalise = (heading: number) => ((heading % FULL_TURN) + FULL_TURN) % FULL_TURN;
+const secondsOf = (frameMs: number) =>
+  // NaN counts as no time passed; negative frames are clamped too, so sqrt() never sees a negative.
+  (Number.isNaN(frameMs) ? 0 : clamp(frameMs, 0, MAX_FRAME_MS)) / 1000;
+
 /** Where a sprite box of `size` px may sit so it (and its hop) stays fully inside the viewport. */
 export const walkBounds = (viewport: { width: number; height: number }, size: number): Bounds => ({
   minX: 0,
@@ -83,8 +101,7 @@ export const stepWalker = (
   frameMs: number,
   random: Random,
 ): Walker => {
-  // NaN counts as no time passed; negative frames are clamped too, so sqrt() never sees a negative.
-  const seconds = (Number.isNaN(frameMs) ? 0 : clamp(frameMs, 0, MAX_FRAME_MS)) / 1000;
+  const seconds = secondsOf(frameMs);
   let heading = walker.heading + (random() - 0.5) * 2 * HEADING_JITTER * Math.sqrt(seconds);
   if (random() < chance(TURN_RATE, seconds)) heading = random() * FULL_TURN;
   const speed = clamp(
@@ -94,22 +111,77 @@ export const stepWalker = (
   );
   const hopStarts = walker.hopMsLeft <= 0 && random() < chance(HOP_RATE, seconds);
   const hopMsLeft = hopStarts ? HOP_MS : Math.max(0, walker.hopMsLeft - seconds * 1000);
-  const reach = speed * seconds;
-  const horizontal = reflect(walker.x + Math.cos(heading) * reach, bounds.minX, bounds.maxX);
-  const vertical = reflect(walker.y + Math.sin(heading) * reach, bounds.minY, bounds.maxY);
-  if (horizontal.bounced) heading = Math.PI - heading;
-  if (vertical.bounced) heading = -heading;
-  heading = ((heading % FULL_TURN) + FULL_TURN) % FULL_TURN;
+  const moved = isOutside(walker, bounds)
+    ? walkIn(walker, bounds, speed * seconds)
+    : walkInside(walker, bounds, heading, speed * seconds);
   return {
-    x: horizontal.value,
-    y: vertical.value,
-    heading,
+    ...moved,
     speed,
-    facing: facingOf(heading, walker.facing),
-    travelled: walker.travelled + reach,
+    facing: facingOf(moved.heading, walker.facing),
+    travelled: walker.travelled + speed * seconds,
     hopMsLeft,
   };
 };
+
+type Move = Pick<Walker, 'x' | 'y' | 'heading'>;
+
+/** A step inside the bounds: bounces off the edges. */
+function walkInside(walker: Walker, bounds: Bounds, heading: number, reach: number): Move {
+  const horizontal = reflect(walker.x + Math.cos(heading) * reach, bounds.minX, bounds.maxX);
+  const vertical = reflect(walker.y + Math.sin(heading) * reach, bounds.minY, bounds.maxY);
+  let bounced = heading;
+  if (horizontal.bounced) bounced = Math.PI - bounced;
+  if (vertical.bounced) bounced = -bounced;
+  return { x: horizontal.value, y: vertical.value, heading: normalise(bounced) };
+}
+
+/** A step from outside the bounds: straight at their centre, no bounce and no wobble, never past it. */
+function walkIn(walker: Walker, bounds: Bounds, reach: number): Move {
+  const dx = (bounds.minX + bounds.maxX) / 2 - walker.x;
+  const dy = (bounds.minY + bounds.maxY) / 2 - walker.y;
+  const heading = normalise(Math.atan2(dy, dx));
+  const step = Math.min(reach, Math.hypot(dx, dy));
+  return {
+    x: walker.x + Math.cos(heading) * step,
+    y: walker.y + Math.sin(heading) * step,
+    heading,
+  };
+}
+
+type Viewport = { width: number; height: number };
+
+/** The heading, chosen once, that takes the walker's box out through the nearest of the four viewport edges. */
+export const leaveHeading = (walker: Walker, viewport: Viewport, size: number): number => {
+  const exits = [
+    { distance: walker.x + size, heading: Math.PI },
+    { distance: viewport.width - walker.x, heading: 0 },
+    { distance: walker.y + size + HOP_PX, heading: 1.5 * Math.PI },
+    { distance: viewport.height - walker.y + HOP_PX, heading: 0.5 * Math.PI },
+  ];
+  return exits.reduce((nearest, exit) => (exit.distance < nearest.distance ? exit : nearest))
+    .heading;
+};
+
+/** One frame of leaving: same speed and heading, no randomness, a started hop finishes but none starts. */
+export const stepLeaver = (walker: Walker, frameMs: number): Walker => {
+  const seconds = secondsOf(frameMs);
+  const reach = walker.speed * seconds;
+  return {
+    ...walker,
+    x: walker.x + Math.cos(walker.heading) * reach,
+    y: walker.y + Math.sin(walker.heading) * reach,
+    facing: facingOf(walker.heading, walker.facing),
+    travelled: walker.travelled + reach,
+    hopMsLeft: Math.max(0, walker.hopMsLeft - seconds * 1000),
+  };
+};
+
+/** True when the sprite box (with room for a hop) lies fully outside the viewport. */
+export const isGone = (walker: Walker, viewport: Viewport, size: number): boolean =>
+  walker.x + size <= 0 ||
+  walker.x >= viewport.width ||
+  walker.y + size + HOP_PX <= 0 ||
+  walker.y - HOP_PX >= viewport.height;
 
 /** Vertical offset (px, up is negative) of a hop with `hopMsLeft` still to go. */
 export const hopOffset = (hopMsLeft: number) =>

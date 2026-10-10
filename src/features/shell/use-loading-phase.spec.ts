@@ -3,13 +3,13 @@ import type { Ref } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LOADING_TIMING, useLoadingPhase, type LoadingPhase } from './use-loading-phase';
 
-const { showAfterMs, settleMs, holdMs, fadeMs } = LOADING_TIMING;
+const { showAfterMs, settleMs, leaveMs, fadeMs } = LOADING_TIMING;
 
 function setup(initiallyWaiting = false) {
   const waiting = ref(initiallyWaiting);
   const scope = effectScope();
-  const { phase } = scope.run(() => useLoadingPhase(() => waiting.value))!;
-  return { waiting, phase, scope };
+  const { phase, gone } = scope.run(() => useLoadingPhase(() => waiting.value))!;
+  return { waiting, phase, gone, scope };
 }
 
 describe('useLoadingPhase', () => {
@@ -56,15 +56,39 @@ describe('useLoadingPhase', () => {
     expect(phase.value).toBe('walking');
   });
 
-  it('stops, holds, fades, then hides, in that order', () => {
-    const { waiting, phase } = setup();
+  const startLeaving = (waiting: Ref<boolean>) => {
     waiting.value = true;
     vi.advanceTimersByTime(showAfterMs);
     waiting.value = false;
     vi.advanceTimersByTime(settleMs);
-    expect(phase.value).toBe('stopped');
-    vi.advanceTimersByTime(holdMs - 1);
-    expect(phase.value).toBe('stopped');
+  };
+
+  it('leaves once the wait has been over for the settle time, not before', () => {
+    const { waiting, phase } = setup();
+    waiting.value = true;
+    vi.advanceTimersByTime(showAfterMs);
+    waiting.value = false;
+    vi.advanceTimersByTime(settleMs - 1);
+    expect(phase.value).toBe('walking');
+    vi.advanceTimersByTime(1);
+    expect(phase.value).toBe('leaving');
+  });
+
+  it('hides as soon as every Bit is gone', () => {
+    const { waiting, phase, gone } = setup();
+    startLeaving(waiting);
+    vi.advanceTimersByTime(500);
+    gone();
+    expect(phase.value).toBe('hidden');
+    vi.advanceTimersByTime(leaveMs + fadeMs);
+    expect(phase.value).toBe('hidden'); // the pending fade timer was cancelled
+  });
+
+  it('fades the Bits still on screen at leaveMs, then hides after fadeMs', () => {
+    const { waiting, phase } = setup();
+    startLeaving(waiting);
+    vi.advanceTimersByTime(leaveMs - 1);
+    expect(phase.value).toBe('leaving');
     vi.advanceTimersByTime(1);
     expect(phase.value).toBe('fading');
     vi.advanceTimersByTime(fadeMs - 1);
@@ -73,19 +97,35 @@ describe('useLoadingPhase', () => {
     expect(phase.value).toBe('hidden');
   });
 
-  it('walks again when a new wait begins while stopped or fading', () => {
-    const { waiting, phase } = setup();
+  it('hides when the last Bit is gone during the fade', () => {
+    const { waiting, phase, gone } = setup();
+    startLeaving(waiting);
+    vi.advanceTimersByTime(leaveMs);
+    gone();
+    expect(phase.value).toBe('hidden');
+  });
+
+  it('ignores gone() unless it is leaving or fading', () => {
+    const { waiting, phase, gone } = setup();
+    gone();
+    expect(phase.value).toBe('hidden');
     waiting.value = true;
     vi.advanceTimersByTime(showAfterMs);
-    waiting.value = false;
-    vi.advanceTimersByTime(settleMs + holdMs / 2);
-    expect(phase.value).toBe('stopped');
+    gone();
+    expect(phase.value).toBe('walking');
+  });
+
+  it('walks again when a new wait begins while leaving or fading', () => {
+    const { waiting, phase } = setup();
+    startLeaving(waiting);
+    vi.advanceTimersByTime(leaveMs / 2);
+    expect(phase.value).toBe('leaving');
     waiting.value = true;
     expect(phase.value).toBe('walking');
-    vi.advanceTimersByTime(holdMs + fadeMs + 1000);
-    expect(phase.value).toBe('walking'); // the old hold and fade timers were cancelled
+    vi.advanceTimersByTime(leaveMs + fadeMs + 1000);
+    expect(phase.value).toBe('walking'); // the old leave and fade timers were cancelled
     waiting.value = false;
-    vi.advanceTimersByTime(settleMs + holdMs);
+    vi.advanceTimersByTime(settleMs + leaveMs);
     expect(phase.value).toBe('fading');
     waiting.value = true;
     expect(phase.value).toBe('walking');
@@ -100,7 +140,7 @@ describe('useLoadingPhase', () => {
       waiting.value = true;
       vi.advanceTimersByTime(waitMs);
       waiting.value = false;
-      vi.advanceTimersByTime(showAfterMs + settleMs + holdMs + fadeMs);
+      vi.advanceTimersByTime(showAfterMs + settleMs + leaveMs + fadeMs);
       expect(seen).toEqual([]);
       expect(phase.value).toBe('hidden');
     },
@@ -129,7 +169,7 @@ describe('useLoadingPhase', () => {
       },
     ],
     [
-      'hold',
+      'leave',
       (waiting: Ref<boolean>) => {
         vi.advanceTimersByTime(showAfterMs);
         waiting.value = false;
@@ -141,7 +181,7 @@ describe('useLoadingPhase', () => {
       (waiting: Ref<boolean>) => {
         vi.advanceTimersByTime(showAfterMs);
         waiting.value = false;
-        vi.advanceTimersByTime(settleMs + holdMs);
+        vi.advanceTimersByTime(settleMs + leaveMs);
       },
     ],
   ])(
