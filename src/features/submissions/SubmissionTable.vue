@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { Code } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { FINISHED_STATUSES } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
@@ -21,7 +23,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import {
   BODY_CELL_CLASSES,
   COLUMN_WIDTH_CLASS,
-  FULL_TABLE_MIN_WIDTH_CLASS,
+  FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
 } from './submission-table-cells';
 import type { ColumnKey } from './submission-table-cells';
@@ -53,6 +55,20 @@ const props = withDefaults(
 );
 const locale = useLocaleStore();
 const emit = defineEmits<{ togglePick: [id: string] }>();
+const router = useRouter();
+/** Clicks that start on a link, button or box keep their own action; the rest of the row opens the submission. */
+const OWN_ACTION = 'a, button, input, label';
+function openRow(event: MouseEvent, id: string) {
+  if ((event.target as Element).closest(OWN_ACTION)) return;
+  const location = { name: 'submission', params: { id } };
+  if (event.ctrlKey || event.metaKey) window.open(router.resolve(location).href, '_blank');
+  else void router.push(location);
+}
+/** A middle click opens the submission in a new tab, as it would on the verdict link. */
+function openRowInTab(event: MouseEvent, id: string) {
+  if (event.button !== 1 || (event.target as Element).closest(OWN_ACTION)) return;
+  window.open(router.resolve({ name: 'submission', params: { id } }).href, '_blank');
+}
 const isPicking = computed(() => props.pickedIds !== undefined);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
 /** A third box is refused (`aria-disabled`): the click is cancelled so the box does not tick. */
@@ -108,7 +124,8 @@ const finishedValue = (
 const formatScore = (value: number) =>
   formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false);
 /** Only the full table has fixed column widths. */
-const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key]);
+const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
+  props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key];
 </script>
 
 <template>
@@ -119,10 +136,7 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
       :aria-label="$t('submissions.scrollRegion')"
       class="overflow-x-auto focus-visible:-outline-offset-2"
     >
-      <table
-        class="w-full border-collapse text-[15px]"
-        :class="columnKeys ? '' : `table-fixed ${FULL_TABLE_MIN_WIDTH_CLASS}`"
-      >
+      <table class="w-full border-collapse text-[15px]" :class="columnKeys ? '' : FULL_TABLE_CLASS">
         <caption class="sr-only">
           {{
             $t('submissions.listName')
@@ -141,6 +155,9 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
             >
               {{ $t(`submissions.columns.${column.key}`) }}
             </th>
+            <th scope="col" :class="[HEADER_CELL_CLASSES, widthOf('source')]">
+              <span class="sr-only">{{ $t('submissions.columns.source') }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -148,8 +165,10 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
             v-for="row in submissions"
             :key="row.id"
             :data-id="row.id"
-            class="border-t border-line"
+            class="cursor-pointer border-t border-line hover:bg-surface-hover"
             :class="{ 'row-added': highlightIds.has(row.id) }"
+            @click="openRow($event, row.id)"
+            @auxclick="openRowInTab($event, row.id)"
           >
             <td v-if="isPicking" :class="BODY_CELL_CLASSES">
               <label class="relative inline-flex size-11 items-center justify-center">
@@ -237,6 +256,16 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
               <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
                 formatRelative(row.date, now, locale.locale)
               }}</time>
+            </td>
+            <td :class="BODY_CELL_CLASSES">
+              <RouterLink
+                :to="{ name: 'submission', params: { id: row.id }, hash: '#source' }"
+                :aria-label="$t('submissions.viewSource')"
+                :title="$t('submissions.viewSource')"
+                class="inline-flex size-7 items-center justify-center rounded-pill text-muted hover:bg-surface-hover hover:text-content"
+              >
+                <Code class="size-4" aria-hidden="true" />
+              </RouterLink>
             </td>
           </tr>
         </tbody>

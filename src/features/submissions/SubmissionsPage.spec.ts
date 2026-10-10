@@ -29,6 +29,27 @@ describe('the submission list page', () => {
     expect(row.get('a').attributes('href')).toBe('/submissions/sub-1');
   });
 
+  it('opens the submission when a row is clicked away from its links, and links the source with #source', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper, router } = await openList();
+    const row = wrapper.get('tbody tr[data-id="sub-1"]');
+    const source = row.get('a[aria-label="Xem mã nguồn"]');
+    expect(source.attributes('href')).toBe('/submissions/sub-1#source');
+    const push = vi.spyOn(router, 'push').mockResolvedValue(undefined);
+    await row.findAll('td')[2]!.trigger('click');
+    expect(push).toHaveBeenCalledExactlyOnceWith({ name: 'submission', params: { id: 'sub-1' } });
+  });
+
+  it('leaves a click on an inner link to the link itself', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper, router } = await openList();
+    const push = vi.spyOn(router, 'push').mockResolvedValue(undefined);
+    await wrapper.get('tbody tr[data-id="sub-1"] a[aria-label="Xem mã nguồn"]').trigger('click');
+    expect(push).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ hash: '#source', name: 'submission' }),
+    );
+  });
+
   it('shows score, time, memory, language and problem of a finished row, dashes for an unfinished one', async () => {
     mockApi({
       ...anonymousViewer,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed, onMounted, toRef } from 'vue';
+import { useRoute } from 'vue-router';
 import CopyButton from '@/components/CopyButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
@@ -11,6 +12,11 @@ import { useSubmissionSourceQuery } from './submissions.queries';
 
 /** Keep `SourceViewSkeleton.vue` in step: same card, header and line classes. */
 const props = defineProps<{ id: string; problemCode: string | null; isOwn: boolean }>();
+const route = useRoute();
+/** "View source" in a submission list links here: the page loads before this card exists, so the hash is applied on mount. */
+onMounted(() => {
+  if (route.hash === '#source') document.getElementById('source')?.scrollIntoView();
+});
 const { data, isPending, error, refetch } = useSubmissionSourceQuery(toRef(props, 'id'));
 
 /** A 403 is a reason to show, not an error to retry: the B18 reason, else the plain "hidden" text. */
@@ -33,7 +39,7 @@ const lineNumbers = computed(() =>
 </script>
 
 <template>
-  <GlassCard as="div" class="overflow-hidden rounded-panel">
+  <GlassCard id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3 sm:px-8">
       <h2 class="font-display text-lg font-semibold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">

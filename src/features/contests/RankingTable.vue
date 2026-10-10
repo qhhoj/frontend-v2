@@ -118,21 +118,25 @@ const scoreHeaderKey = computed(() => {
           :class="{ 'bg-surface-hover': row.user.id === viewerId }"
         >
           <td class="px-5 py-2.5 text-left">{{ row.rank ?? '—' }}</td>
-          <th scope="row" class="truncate px-2.5 py-2.5 text-left font-body">
-            <span class="inline-flex max-w-full items-center gap-2 align-middle">
+          <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
+            <span class="flex items-center gap-2">
               <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />
-              <UserName :username="row.user.username" class="truncate" />
+              <UserName
+                :username="row.user.username"
+                :title="row.user.username"
+                class="min-w-0 truncate"
+              />
+              <span
+                v-if="row.user.id === viewerId"
+                class="shrink-0 rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"
+                >{{ $t('common.you') }}</span
+              >
+              <span
+                v-if="row.isDisqualified"
+                class="shrink-0 rounded-pill bg-verdict-wa-bg px-2 py-0.5 text-[11px] text-verdict-wa"
+                >{{ $t('ranking.disqualified') }}</span
+              >
             </span>
-            <span
-              v-if="row.user.id === viewerId"
-              class="ml-1.5 rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"
-              >{{ $t('common.you') }}</span
-            >
-            <span
-              v-if="row.isDisqualified"
-              class="ml-1.5 rounded-pill bg-verdict-wa-bg px-2 py-0.5 text-[11px] text-verdict-wa"
-              >{{ $t('ranking.disqualified') }}</span
-            >
           </th>
           <td class="font-bold">
             {{

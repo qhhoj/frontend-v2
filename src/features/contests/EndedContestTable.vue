@@ -29,7 +29,7 @@ const whenText = (contest: ContestListItem) => {
     :aria-label="$t('contests.list.endedRegion')"
     class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
   >
-    <table class="w-full min-w-[640px] table-fixed border-collapse text-sm">
+    <table class="w-full min-w-[960px] table-fixed border-collapse text-sm">
       <caption class="sr-only">
         {{
           $t('contests.phase.ended')

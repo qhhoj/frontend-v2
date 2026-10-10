@@ -80,6 +80,10 @@ const rows = computed(() => {
 const PODIUM_LIMIT = 6;
 const PODIUM_SKELETON_CARDS = 3;
 /** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
+/** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
+const problemCount = computed(
+  () => ranking.value?.problems.length ?? contest.value?.problems?.length ?? 0,
+);
 const skeletonHasTimeColumn = computed(
   () =>
     contest.value !== undefined &&
@@ -233,10 +237,7 @@ const VIEW_MODES = [
               </div>
             </div>
           </div>
-          <RankingSkeleton
-            :problem-count="contest.problems?.length ?? 0"
-            :has-time-column="skeletonHasTimeColumn"
-          />
+          <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
       <EmptyState v-if="!ranking?.rows.length" class="glass rounded-card">{{

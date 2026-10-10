@@ -5,7 +5,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
   COLUMN_WIDTH_CLASS,
-  FULL_TABLE_MIN_WIDTH_CLASS,
+  FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
 } from './submission-table-cells';
 import type { ColumnKey } from './submission-table-cells';
@@ -40,7 +40,8 @@ const columns = computed(() =>
   ),
 );
 /** Only the full table has fixed column widths. */
-const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key]);
+const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
+  props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key];
 </script>
 
 <template>
@@ -49,7 +50,7 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
       <table
         aria-hidden="true"
         class="w-full border-collapse text-[15px]"
-        :class="columnKeys ? '' : `table-fixed ${FULL_TABLE_MIN_WIDTH_CLASS}`"
+        :class="columnKeys ? '' : FULL_TABLE_CLASS"
       >
         <thead>
           <tr class="text-left text-[13px] text-muted">
@@ -64,6 +65,7 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
             >
               <SkeletonBlock text :class="column.header" />
             </th>
+            <th scope="col" :class="[HEADER_CELL_CLASSES, widthOf('source')]" />
           </tr>
         </thead>
         <tbody>
@@ -98,6 +100,7 @@ const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WID
               </span>
               <SkeletonBlock v-else text :class="column.cell" />
             </td>
+            <td :class="BODY_CELL_CLASSES"><SkeletonBlock class="size-7" /></td>
           </tr>
         </tbody>
       </table>

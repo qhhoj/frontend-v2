@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { RANK_COLUMN_REM, statsWidthRem } from './ranking-columns';
+import { RANK_COLUMN_REM, statsWidthRem, tableMinWidthRem } from './ranking-columns';
 
 const props = defineProps<{ problemCount: number; hasTimeColumn: boolean }>();
 const ROWS = 10;
-/** Same columns as RankingTable: rank, name (the rest), then the score and problem columns together. */
+/** Same columns and minimum width as RankingTable (which scrolls sideways below it): rank, name (the rest), then the score and problem columns together. */
 const columns = computed(
   () =>
-    `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, props.hasTimeColumn)}rem`,
+    `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, props.hasTimeColumn)}rem; min-width: ${tableMinWidthRem(props.problemCount, props.hasTimeColumn)}rem`,
 );
 </script>
 
@@ -24,7 +24,7 @@ const columns = computed(
     >
       <span class="block px-5"><SkeletonBlock text class="w-8" /></span>
       <span class="block px-2.5"><SkeletonBlock text class="w-24" /></span>
-      <span class="hidden px-2.5 sm:block"><SkeletonBlock text class="w-full" /></span>
+      <span class="block px-2.5"><SkeletonBlock text class="w-full" /></span>
     </div>
     <div
       v-for="row in ROWS"
@@ -38,7 +38,7 @@ const columns = computed(
         <SkeletonBlock class="size-6 shrink-0" />
         <SkeletonBlock text class="w-40 max-w-full" />
       </span>
-      <span class="hidden px-2.5 sm:block"><SkeletonBlock text class="w-full" /></span>
+      <span class="block px-2.5"><SkeletonBlock text class="w-full" /></span>
     </div>
   </div>
 </template>

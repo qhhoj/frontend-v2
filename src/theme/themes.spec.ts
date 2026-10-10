@@ -361,7 +361,6 @@ describe.each(variants)('theme $theme with accent $accent', ({ theme, accent, to
   });
 
   it('keeps the first-solve fill a stronger green than the accepted tint (3:1), apart from wrong answer, with readable text', () => {
-    if (!flat) return;
     const card = colour('surface-solid');
     const accepted = over(colour('verdict-ac-bg'), card);
     for (const fill of ['first-solve-bg', 'first-solve-bg-2'])

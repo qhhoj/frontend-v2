@@ -213,3 +213,34 @@ for (const table of TABLE_CASES)
       ),
     );
   });
+
+test('the ended-contest table keeps a readable name column on a phone', async ({ page, api }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  api.routes['GET /contests'] = list([contestItem({ phase: 'ended', name: LONG_NAME })]);
+  await page.goto('/contests?phase=ended');
+  const nameHeader = page.locator('#main thead th').first();
+  await expect(nameHeader).toBeVisible();
+  const box = await nameHeader.boundingBox();
+  expect(box!.width).toBeGreaterThan(200);
+});
+
+for (const width of [1440, 390])
+  test(`the ranking skeleton columns start where the table's do at ${width} px`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    api.routes['GET /contests/r42/ranking'] = { body: { data: longBoard() } };
+    const release = api.hold('GET /contests/r42/ranking');
+    await page.goto('/contests/r42/ranking');
+    const header = page.locator('[data-skeleton-region="table-header"]');
+    await expect(header).toBeVisible();
+    const skeleton = await lefts(header.locator('> span'));
+    release();
+    await expect(page.locator('thead th').first()).toBeVisible();
+    const table = await lefts(page.locator('thead th'));
+    // Skeleton cells: rank, name, then the stats block, which starts at the score column.
+    [table[0], table[1], table[2]].forEach((left, index) =>
+      expect(Math.abs(skeleton[index] - left), `column ${index}`).toBeLessThanOrEqual(TOLERANCE_PX),
+    );
+  });

@@ -1001,6 +1001,7 @@
       "language": "language"
     },
     "listName": "Submissions",
+    "viewSource": "View source",
     "scrollRegion": "Submissions table, scrolls horizontally",
     "columns": {
       "verdict": "Verdict",
@@ -1010,7 +1011,8 @@
       "time": "Time",
       "memory": "Memory",
       "language": "Language",
-      "when": "When"
+      "when": "When",
+      "source": "Source code"
     },
     "rail": {
       "title": "Filters",

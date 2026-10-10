@@ -53,7 +53,11 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
       <UserAvatar :username="row.user.username" :size="24" />
       <div class="min-w-0 flex-1">
         <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ row.rank }}:</span>
-        <UserName :username="row.user.username" class="block truncate text-lg" />
+        <UserName
+          :username="row.user.username"
+          :title="row.user.username"
+          class="block truncate text-lg"
+        />
         <p class="truncate font-mono text-[13px] text-muted">
           {{
             isPenaltyFormat(context.formatName)

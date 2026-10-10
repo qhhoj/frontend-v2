@@ -92,8 +92,9 @@ describe('contest submissions tab', () => {
       'Bài',
       'Điểm',
       'Lúc',
+      'Mã nguồn',
     ]);
-    expect(wrapper.findAll('tbody tr td')).toHaveLength(4);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(5);
   });
   it('keeps all eight columns once the list is public', async () => {
     mockApi({
@@ -103,8 +104,8 @@ describe('contest submissions tab', () => {
       'GET /problems/meta': ok(problemMeta()),
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(wrapper.findAll('thead th')).toHaveLength(8);
-    expect(wrapper.findAll('tbody tr td')).toHaveLength(8);
+    expect(wrapper.findAll('thead th')).toHaveLength(9);
+    expect(wrapper.findAll('tbody tr td')).toHaveLength(9);
   });
 
   it('ignores a ?user= filter in the own-only state: the list still asks only for the viewer', async () => {
@@ -119,7 +120,7 @@ describe('contest submissions tab', () => {
     expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
   });
 
-  it('drops the 1040 px table minimum in the four-column state only', async () => {
+  it('drops the 1168 px table minimum in the four-column state only', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     mockApi({
       ...signedInViewer(),
@@ -128,7 +129,7 @@ describe('contest submissions tab', () => {
       'GET /problems/meta': ok(problemMeta()),
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(wrapper.get('table').classes()).not.toContain('min-w-[1040px]');
+    expect(wrapper.get('table').classes()).not.toContain('min-w-[1168px]');
   });
 
   it('shows no all-users rows while the own-only list replaces a public one', async () => {

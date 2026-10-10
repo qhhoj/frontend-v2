@@ -1001,6 +1001,7 @@
       "language": "ngôn ngữ"
     },
     "listName": "Danh sách bài nộp",
+    "viewSource": "Xem mã nguồn",
     "scrollRegion": "Bảng bài nộp, cuộn ngang",
     "columns": {
       "verdict": "Kết quả",
@@ -1010,7 +1011,8 @@
       "time": "Thời gian",
       "memory": "Bộ nhớ",
       "language": "Ngôn ngữ",
-      "when": "Lúc"
+      "when": "Lúc",
+      "source": "Mã nguồn"
     },
     "rail": {
       "title": "Bộ lọc",

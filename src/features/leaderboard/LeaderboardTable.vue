@@ -74,13 +74,18 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
         </td>
         <td :class="USER_CELL_CLASS">
           <span class="flex items-center gap-2.5">
-            <UserAvatar :username="entry.username" :size="AVATAR_PX" />
+            <UserAvatar :username="entry.username" :size="AVATAR_PX" class="shrink-0" />
             <span class="flex min-w-0 flex-col">
               <span class="flex items-center gap-2">
-                <UserName :username="entry.username" :rating="entry.rating" />
+                <UserName
+                  :username="entry.username"
+                  :rating="entry.rating"
+                  :title="entry.username"
+                  class="min-w-0 truncate"
+                />
                 <span
                   v-if="entry.username === viewerName"
-                  class="rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
+                  class="shrink-0 rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
                 >
                   {{ $t('common.you') }}
                 </span>
