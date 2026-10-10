@@ -5,7 +5,7 @@ import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import { DESKTOP, PHONE, PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
 
-const READY = 'Luyện thuật toán mỗi ngày, thi đấu cùng cả nước';
+const READY = 'Quốc Học Huế Online Judge';
 
 for (const theme of THEMES)
   for (const viewport of [

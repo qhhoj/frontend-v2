@@ -22,16 +22,10 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
     class="flex flex-wrap items-center gap-6 p-6 sm:flex-nowrap sm:gap-8 sm:p-8"
   >
     <div class="flex min-w-0 flex-1 flex-col gap-3">
-      <p class="text-sm font-semibold text-accent-text">{{ $t('home.anon.eyebrow') }}</p>
       <h1 class="page-title">
         {{ $t('home.anon.title') }}
       </h1>
-      <p v-if="!isError" class="max-w-2xl text-muted">
-        <template v-if="counts">
-          {{ $t('home.anon.body', { problems: formatCount(counts.problems) }) }}
-        </template>
-        <SkeletonBlock v-else-if="isPending" text class="inline-block h-4 w-72 align-middle" />
-      </p>
+      <p class="max-w-2xl text-muted">{{ $t('home.anon.body') }}</p>
       <div class="flex flex-wrap gap-2.5">
         <RouterLink
           to="/register"

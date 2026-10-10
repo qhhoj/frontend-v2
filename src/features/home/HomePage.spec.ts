@@ -114,7 +114,7 @@ describe('home', () => {
   it('seats a labelled Bit in a graduation cap in the hero of an anonymous viewer', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
-    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán mỗi ngày, thi đấu cùng cả nước');
+    expect(wrapper.get('h1').text()).toBe('Quốc Học Huế Online Judge');
     expect(wrapper.get('[data-testid="home-bit"]').attributes('aria-label')).toBe(
       'Bit đội mũ tốt nghiệp',
     );
@@ -173,7 +173,7 @@ describe('home', () => {
   it('shows anonymous viewers the public cards only', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
-    expect(wrapper.get('h1').text()).toBe('Luyện thuật toán mỗi ngày, thi đấu cùng cả nước');
+    expect(wrapper.get('h1').text()).toBe('Quốc Học Huế Online Judge');
     expect(wrapper.find('[data-testid="rating-hero"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="top-users"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="running-contests"]').exists()).toBe(true);

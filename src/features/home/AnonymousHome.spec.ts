@@ -20,8 +20,8 @@ describe('anonymous home', () => {
     mockApi(anonymousHomeRoutes);
     const { wrapper } = await mountApp('/');
     const hero = wrapper.get('[data-testid="anonymous-hero"]');
-    expect(hero.get('h1').text()).toBe('Luyện thuật toán mỗi ngày, thi đấu cùng cả nước');
-    expect(hero.text()).toContain('1.284 bài tập');
+    expect(hero.get('h1').text()).toBe('Quốc Học Huế Online Judge');
+    expect(hero.get('[data-testid="home-counts"]').text()).toContain('1.284');
     expect(hero.findAll('a').map((link) => link.attributes('href'))).toEqual([
       '/register',
       '/login',
