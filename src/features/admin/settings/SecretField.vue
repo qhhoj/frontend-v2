@@ -6,8 +6,11 @@ import AdminField from '../ui/AdminField.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
 import type { SecretDraft } from './setting-values';
 
-/** A sealed value: only "set" or "not set" is ever shown. Typing is a replacement, and an empty box keeps the stored value. */
-defineProps<{ label: string; hint: string }>();
+/**
+ * A sealed value: only "set" or "not set" is ever shown (`preview` replaces the dots for a credential shown masked to its
+ * last characters). Typing is a replacement, and an empty box keeps the stored value.
+ */
+defineProps<{ label: string; hint: string; preview?: string }>();
 const part = defineModel<SecretDraft>({ required: true });
 const { t } = useI18n();
 
@@ -52,7 +55,7 @@ const cancelReplacing = () => (part.value = { ...part.value, isReplacing: false,
       <slot name="actions" />
     </div>
     <p v-if="part.isSet && !part.isReplacing" class="font-mono text-sm text-muted">
-      {{ t('admin.settings.secret.masked') }}
+      {{ preview || t('admin.settings.secret.masked') }}
     </p>
     <AdminField
       v-if="part.isReplacing"

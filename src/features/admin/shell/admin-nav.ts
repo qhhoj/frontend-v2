@@ -2,6 +2,7 @@ import type { Component } from 'vue';
 import {
   Activity,
   Braces,
+  CloudDownload,
   Building2,
   Code,
   Download,
@@ -70,6 +71,7 @@ const group = (id: AdminNavGroup['id'], items: AdminNavItem[]): AdminNavGroup =>
 export const ADMIN_NAV: AdminNavGroup[] = [
   group('content', [
     screenItem('problems', FileText),
+    screenItem('polygonImport', CloudDownload),
     screenItem('problemImport', Download),
     screenItem('types', Tags),
     screenItem('posts', Newspaper),
@@ -153,7 +155,7 @@ const section = (key: string, ids: AdminNavId[]): DashboardSection => ({
 
 /** Board AdminShell: three sections of quick-link cards. */
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
-  section('content', ['problems', 'problemImport', 'posts']),
+  section('content', ['problems', 'polygonImport', 'problemImport', 'posts']),
   section('contests', ['contests', 'similarity', 'rejudge', 'judges']),
   section('people', ['users', 'activity', 'settings', 'pages', 'tickets']),
 ];
@@ -165,4 +167,4 @@ export const visibleDashboard = (user: PermissionHolder | null) =>
   })).filter((entry) => entry.items.length > 0);
 
 /** The greeting card's three actions; each shows only with its screen's permission. */
-export const QUICK_ACTIONS: AdminScreenId[] = ['problemNew', 'problemImport', 'contestNew'];
+export const QUICK_ACTIONS: AdminScreenId[] = ['problemNew', 'polygonImport', 'contestNew'];

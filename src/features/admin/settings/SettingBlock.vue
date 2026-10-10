@@ -149,6 +149,7 @@ function historyLabel(key: SettingKey): string {
           @cleared="onCleared"
         />
       </div>
+      <slot />
       <AdminStatus
         v-if="notice"
         :kind="notice.tone === 'done' ? 'done' : 'refused'"

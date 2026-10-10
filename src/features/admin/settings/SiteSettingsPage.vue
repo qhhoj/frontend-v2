@@ -8,6 +8,7 @@ import type { SettingKey } from '@/api/types/settings-admin';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import RevisionsPanel from './RevisionsPanel.vue';
 import SettingBlock from './SettingBlock.vue';
+import { SETTING_BLOCK_EXTRAS } from './setting-block-extras';
 import { SETTING_GROUPS, shownBlocksOf } from './setting-blocks';
 import { useSettingsQuery } from './settings.queries';
 
@@ -81,7 +82,13 @@ function closeHistory() {
             :key="block.id"
             :block="block"
             @history="openHistory"
-          />
+          >
+            <component
+              :is="SETTING_BLOCK_EXTRAS[block.id]"
+              v-if="SETTING_BLOCK_EXTRAS[block.id]"
+              :settings="block.settings"
+            />
+          </SettingBlock>
         </section>
       </div>
       <aside v-if="historyKey" class="lg:sticky lg:top-4">

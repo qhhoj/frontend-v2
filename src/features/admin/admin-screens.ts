@@ -26,6 +26,7 @@ export const ADMIN_SCREENS = {
     path: '/admin/problems/new',
     permission: ['judge.add_problem', 'judge.suggest_new_problem'],
   },
+  polygonImport: { path: '/admin/problems/polygon', permission: 'judge.import_polygon_package' },
   problemImport: { path: '/admin/problems/import', permission: 'judge.import_polygon_package' },
   problemGeneral: problemTab('general'),
   problemStatements: problemTab('statements'),

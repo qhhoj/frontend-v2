@@ -6,8 +6,21 @@ import { staffViewer } from '@/test/admin-routes';
 import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 
 const PERMS = ['judge.import_polygon_package', 'judge.add_problem'];
+const STEP_OF: Record<string, string> = {
+  active: 'statements',
+  completed: 'done',
+  failed: 'failed',
+};
 const job = (state: string, extra = {}) =>
-  ok({ id: 'job-1', state, result: null, error: null, ...extra });
+  ok({
+    id: 'job-1',
+    state,
+    step: STEP_OF[state] ?? 'queued',
+    progress: null,
+    result: null,
+    error: null,
+    ...extra,
+  });
 
 const start = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
   /** The screen is a lazy route: the form is there once its chunk has loaded. */
@@ -25,8 +38,8 @@ const start = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =
 beforeEach(() => vi.useFakeTimers({ shouldAdvanceTime: true }));
 afterEach(() => vi.useRealTimers());
 
-describe('PolygonImportPage', () => {
-  it('reads a delayed job as waiting, keeps polling every 2 s and links the problem when done', async () => {
+describe('ZipImportPage', () => {
+  it('shows the job step (no download for a zip), keeps polling every 2 s and links the problem when done', async () => {
     const calls = mockApi({
       ...staffViewer(PERMS),
       'GET /problems/meta': ok(problemEditingMeta()),
@@ -39,10 +52,11 @@ describe('PolygonImportPage', () => {
     });
     const { wrapper } = await mountApp('/admin/problems/import');
     await start(wrapper);
-    expect(wrapper.get('[aria-current="step"]').text()).toContain('Đang chờ trong hàng đợi');
+    expect(wrapper.get('[aria-current="step"]').text()).toContain('Đã xếp hàng');
+    expect(wrapper.find('[data-step="downloading"]').exists()).toBe(false);
     await vi.advanceTimersByTimeAsync(2000);
     await flushPromises();
-    expect(wrapper.get('[aria-current="step"]').text()).toContain('Đang xử lý');
+    expect(wrapper.get('[aria-current="step"]').text()).toContain('Chuyển đề bài');
     await vi.advanceTimersByTimeAsync(2000);
     await flushPromises();
     expect(wrapper.get('a[href="/admin/problems/hcmus41c/general"]').text()).toBe('Mở hcmus41c');

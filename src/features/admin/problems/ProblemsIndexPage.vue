@@ -28,6 +28,12 @@ const open = (code: string) => router.push({ name: 'admin-problemGeneral', param
           >{{ $t('admin.shell.dashboard.actions.problemNew') }}</RouterLink
         >
         <RouterLink
+          v-if="canAny(ADMIN_SCREENS.polygonImport.permission)"
+          :to="{ name: 'admin-polygonImport' }"
+          :class="ADMIN_BUTTON_CLASS"
+          >{{ $t('admin.shell.dashboard.actions.polygonImport') }}</RouterLink
+        >
+        <RouterLink
           v-if="canAny(ADMIN_SCREENS.problemImport.permission)"
           :to="{ name: 'admin-problemImport' }"
           :class="ADMIN_BUTTON_CLASS"

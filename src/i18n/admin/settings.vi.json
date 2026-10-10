@@ -15,7 +15,8 @@
     "pdf": "Xuất PDF",
     "similarity": "Giống nhau",
     "quota": "Hạn mức",
-    "problem": "Bài tập"
+    "problem": "Bài tập",
+    "polygon": "Polygon"
   },
   "infoCard": "Giá trị được kiểm tra khi lưu. Lỗi hiện ngay dưới khối sai; không có gì bị lưu một phần trong một khoá. Chỉ người có quyền “Sửa cài đặt” mới thấy trang này.",
   "blocks": {
@@ -66,6 +67,10 @@
     "problem": {
       "title": "Xóa bài tập",
       "help": "Số ngày một bài đã xóa còn khôi phục được; sau đó dữ liệu bị xóa hẳn và chỉ còn lại mã và tên bài. Các bài nộp không bao giờ bị xóa."
+    },
+    "polygon": {
+      "title": "Tài khoản Polygon của QHHOJ",
+      "help": "QHHOJ đọc bài trên Polygon bằng tài khoản này. Người ra đề chia sẻ bài với tài khoản, rồi nhập ở mục Nhập từ Polygon. Thiếu khoá hoặc bí mật là chưa kết nối."
     }
   },
   "fields": {
@@ -108,6 +113,11 @@
     },
     "problem": {
       "deleteGraceDays": "Số ngày có thể khôi phục bài đã xóa"
+    },
+    "polygon": {
+      "accountName": "Tên tài khoản",
+      "apiKey": "Khoá API",
+      "apiSecret": "Bí mật API"
     }
   },
   "hints": {
@@ -145,6 +155,11 @@
     },
     "problem": {
       "deleteGraceDays": "Số nguyên từ 1 đến 365."
+    },
+    "polygon": {
+      "accountName": "Tài khoản Polygon sở hữu khoá API; hiện trong hướng dẫn cho người ra đề.",
+      "apiKey": "Lấy ở Polygon: Settings, API keys. Chỉ hiện bốn ký tự cuối.",
+      "apiSecret": "Mã hoá khi lưu, không hiện lại. Thay bí mật thì kiểm tra kết nối lại."
     }
   },
   "chip": {
@@ -240,6 +255,10 @@
         "google": "bí mật máy khách Google",
         "github": "bí mật máy khách GitHub",
         "facebook": "bí mật máy khách Facebook"
+      },
+      "polygon": {
+        "apiKey": "khoá API Polygon",
+        "apiSecret": "bí mật API Polygon"
       }
     },
     "consequences": {
@@ -248,7 +267,8 @@
       "senderKept": "Người gửi (mail.from) không đổi.",
       "notificationsOff": "Thông báo Discord tắt cho mọi sự kiện (danh sách rỗng).",
       "providerOff": "Đăng nhập bằng nhà cung cấp này bị tắt cùng lúc, vì máy chủ không nhận nhà cung cấp đã bật mà thiếu bí mật.",
-      "clientIdKept": "Mã khách OAuth không đổi."
+      "clientIdKept": "Mã khách OAuth không đổi.",
+      "polygonOff": "Kết nối Polygon tắt: không liệt kê, nhập hay đồng bộ được bài từ Polygon cho tới khi đặt lại."
     }
   },
   "log": {

@@ -9,7 +9,14 @@ import { useImportJob } from './use-import-job';
 vi.mock('@/api/problem-imports.api', () => ({ fetchImportJob: vi.fn() }));
 const fetchMock = vi.mocked(fetchImportJob);
 
-const job = (state: string, id = 'job-1'): ImportJob => ({ id, state, result: null, error: null });
+const job = (state: string, id = 'job-1'): ImportJob => ({
+  id,
+  state,
+  step: 'queued',
+  progress: null,
+  result: null,
+  error: null,
+});
 const apiError = (status: number) => new ApiError('error', status, 'error');
 const callsFor = (id: string) => fetchMock.mock.calls.filter(([called]) => called === id).length;
 

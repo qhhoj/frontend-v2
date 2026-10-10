@@ -9,6 +9,7 @@ import ProblemAttachmentsSection from '../files/ProblemAttachmentsSection.vue';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { useProblemForm } from './use-problem-form';
 import ProblemDangerZone from '../lifecycle/ProblemDangerZone.vue';
+import PolygonLinkPanel from '../polygon/PolygonLinkPanel.vue';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { form, save, errors, mutation, isDirty } = useProblemForm(
@@ -20,6 +21,7 @@ const { can } = usePermissions();
 
 <template>
   <div class="flex flex-col gap-5">
+    <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
     <form class="flex flex-col gap-5" novalidate @submit.prevent="save">
       <fieldset
         :disabled="mutation.isPending.value"

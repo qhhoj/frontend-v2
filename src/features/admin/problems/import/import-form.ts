@@ -1,4 +1,4 @@
-import { PROBLEM_CODE_PATTERN } from '../problem-code';
+import { PROBLEM_CODE_PATTERN, PROBLEM_CODE_MAX } from '../problem-code';
 import type { UserChip } from '@/api/types/admin-common';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { translate } from '@/i18n';
@@ -73,9 +73,9 @@ const isPointsInRange = (text: string) => {
   return points >= POINTS_MIN && points <= POINTS_MAX;
 };
 
-function fileAndCodeErrors(form: ImportForm): FieldErrors {
+function fileAndCodeErrors(form: ImportForm, needsFile: boolean): FieldErrors {
   const errors: FieldErrors = {};
-  if (!form.file) errors.file = translate('admin.polygon.form.submitNeedsFile');
+  if (needsFile && !form.file) errors.file = translate('admin.polygon.form.submitNeedsFile');
   if (!PROBLEM_CODE_PATTERN.test(form.code))
     errors.code = translate('admin.polygon.form.codeInvalid');
   return errors;
@@ -114,13 +114,17 @@ function languageErrors(form: ImportForm): FieldErrors {
   return errors;
 }
 
-/** Local checks, the same ones the backend DTO and the permission check make; the server's own refusals arrive as field errors. */
+/**
+ * Local checks, the same ones the backend DTO and the permission check make; the server's own refusals arrive as field
+ * errors. An import from Polygon has no file (`needsFile: false`).
+ */
 export function importFormErrors(
   form: ImportForm,
   canUseMode: (mode: ImportMode) => boolean,
+  { needsFile = true }: { needsFile?: boolean } = {},
 ): FieldErrors {
   return {
-    ...fileAndCodeErrors(form),
+    ...fileAndCodeErrors(form, needsFile),
     ...modeAndPointsErrors(form, canUseMode),
     ...languageErrors(form),
   };
@@ -145,4 +149,14 @@ export function toImportOptions(form: ImportForm): ImportOptions {
     ignoreZeroPointCases: form.ignoreZeroPointCases,
     appendMainSolution: form.appendMainSolution,
   };
+}
+
+/** A Polygon short name as a problem code (`xau-doi-xung` -> `xau_doi_xung`); empty when nothing usable is left. */
+export function codeFromPolygonName(name: string): string {
+  const code = name
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, PROBLEM_CODE_MAX);
+  return PROBLEM_CODE_PATTERN.test(code) ? code : '';
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Download, Plus, Trophy } from 'lucide-vue-next';
+import { CloudDownload, Plus, Trophy } from 'lucide-vue-next';
 import { allowsAny } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
@@ -9,7 +9,11 @@ import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
 
 const session = useSessionStore();
 const sections = computed(() => visibleDashboard(session.user));
-const ACTION_ICONS = { problemNew: Plus, problemImport: Download, contestNew: Trophy } as const;
+const ACTION_ICONS = {
+  problemNew: Plus,
+  polygonImport: CloudDownload,
+  contestNew: Trophy,
+} as const;
 const actions = computed(() =>
   QUICK_ACTIONS.filter((id) => allowsAny(session.user, ADMIN_SCREENS[id].permission)),
 );

@@ -20,7 +20,7 @@ describe('AdminShell', () => {
     const { wrapper } = await mountApp('/admin');
     await waitForAdminShell(wrapper);
     expect(wrapper.text()).toContain('Chào minhthu');
-    expect(navLinks(wrapper)).toEqual(['Bài tập', 'Nhập từ Polygon']);
+    expect(navLinks(wrapper)).toEqual(['Bài tập', 'Nhập từ Polygon', 'Nhập tệp .zip']);
     expect(wrapper.find('[data-testid="admin-dashboard"]').text()).toContain(
       '/admin/problems/import',
     );

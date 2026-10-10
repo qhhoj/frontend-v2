@@ -840,7 +840,16 @@
     "unexpected_tag": "Only adding or removing a tag takes a tag.",
     "quota_exceeded": "The organization has used up its quota. Ask an administrator to raise it.",
     "quotaExceededCredits": "Over the organization’s credit quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it.",
-    "quotaExceededStorage": "Over the organization’s storage quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it."
+    "quotaExceededStorage": "Over the organization’s storage quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it.",
+    "polygon_not_connected": "Polygon is not connected: the site has no API key or secret.",
+    "polygon_unauthorized": "Polygon refused the key: the key or the secret is wrong.",
+    "polygon_clock_skew": "Polygon refused the signature: the server clock is too far off Polygon's.",
+    "polygon_failed": "Polygon answered with an error. Try again later.",
+    "polygon_unavailable": "Polygon cannot be reached right now. Try again later.",
+    "polygon_package_not_ready": "The newest package on Polygon is not READY.",
+    "polygon_already_linked": "This Polygon problem is already linked to a QHHOJ problem.",
+    "polygon_not_linked": "This problem is not linked to Polygon.",
+    "polygon_package_too_large": "The Polygon package is too large (512 MiB at most)."
   },
   "common": {
     "scrollHint": "Swipe sideways to see more columns →",

@@ -9,7 +9,7 @@ import type { OAuthDraft, SecretDraft, WebhooksDraft } from './setting-values';
  */
 export function clearValueOf(setting: Setting): unknown {
   const { kind } = SETTING_KINDS[setting.key];
-  if (kind === 'secretText') return '';
+  if (kind === 'secretText' || kind === 'maskedText') return '';
   if (kind === 'webhooks') return {};
   if (kind === 'oauth') return { enabled: false, clientSecret: '' };
   throw new Error(`${setting.key} has no secret to clear`);
@@ -18,7 +18,7 @@ export function clearValueOf(setting: Setting): unknown {
 export function isClearable(setting: Setting): boolean {
   const { kind } = SETTING_KINDS[setting.key];
   const draft = draftOf(setting);
-  if (kind === 'secretText' || kind === 'webhooks')
+  if (kind === 'secretText' || kind === 'maskedText' || kind === 'webhooks')
     return (draft as SecretDraft | WebhooksDraft).isSet;
   return kind === 'oauth' && (draft as OAuthDraft).secretSet;
 }
@@ -26,6 +26,8 @@ export function isClearable(setting: Setting): boolean {
 const PLAIN_CONSEQUENCES: Partial<Record<SettingKey, string[]>> = {
   'mail.smtpUrl': ['mailOff', 'notRestorable', 'senderKept'],
   'discord.webhooks': ['notificationsOff', 'notRestorable'],
+  'polygon.apiKey': ['polygonOff'],
+  'polygon.apiSecret': ['polygonOff', 'notRestorable'],
 };
 
 /** Ids under `admin.settings.clear.consequences`: what stops, that the history keeps no value, what stays. */

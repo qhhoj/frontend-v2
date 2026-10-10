@@ -1,6 +1,6 @@
 {
-  "title": "Import a problem from Polygon",
-  "lead": "The package is processed in the background; the status comes from the job queue.",
+  "title": "Import a .zip file",
+  "lead": "Upload a Polygon .zip package; it is processed in the background and the state comes from the queued job.",
   "rateLimited": "At most 10 imports per hour.",
   "form": {
     "board": "Import a Polygon package",
@@ -39,12 +39,8 @@
   "progress": {
     "title": "Importing {code}",
     "state": "State",
-    "received": "Package received",
-    "queued": "Waiting in the queue",
-    "running": "Processing",
     "runningHint": "the page asks again every 2 seconds",
-    "done": "Done",
-    "doneText": "Import finished. The problem is created; open it to keep editing.",
+    "doneText": "Import finished. Open the problem to check it and keep editing.",
     "open": "Open {code}",
     "failed": "The import failed. The system gives no further reason.",
     "pollFailed": "Could not fetch the status yet. The page will try again.",
@@ -53,6 +49,20 @@
       "forbidden": "You may not view this import.",
       "unknown": "The queue no longer knows this import.",
       "gaveUp": "The status could not be fetched after several tries. Reload the page to try again."
+    },
+    "steps": {
+      "queued": "Queued",
+      "downloading": "Downloading the package from Polygon",
+      "statements": "Converting statements",
+      "tests": "Uploading tests",
+      "end": "Done",
+      "failed": "Import failed"
+    },
+    "status": {
+      "done": "done",
+      "current": "running",
+      "pending": "not yet",
+      "failed": "failed"
     }
   }
 }

@@ -8,10 +8,12 @@ export type SettingKind =
   | { kind: 'choice'; options: readonly string[] }
   | { kind: 'url' }
   | { kind: 'secretText' }
+  /** A credential the API returns in plain text: shown masked to its last characters, typed only to replace it. */
+  | { kind: 'maskedText' }
   | { kind: 'oauth' }
   | { kind: 'webhooks' };
 
-/** From `libs/settings/src/registry.ts` (2026-10-08). */
+/** From `libs/settings/src/registry.ts` (2026-10-11). */
 export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'site.timeZone': { kind: 'timeZone' },
   'contest.officialMode': { kind: 'boolean' },
@@ -36,6 +38,9 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'quota.cost.problem': { kind: 'integer', min: 0, max: 1000 },
   'quota.cost.contest': { kind: 'integer', min: 0, max: 1000 },
   'quota.cost.dataPer10MiB': { kind: 'integer', min: 0, max: 1000 },
+  'polygon.accountName': { kind: 'text' },
+  'polygon.apiKey': { kind: 'maskedText' },
+  'polygon.apiSecret': { kind: 'secretText' },
 };
 
 export const WEBHOOK_EVENTS = [
@@ -50,12 +55,22 @@ export const WEBHOOK_EVENTS = [
 export const MAX_WEBHOOKS = 20;
 
 export type SettingGroup =
-  'site' | 'contest' | 'problem' | 'mail' | 'auth' | 'notify' | 'pdf' | 'similarity' | 'quota';
+  | 'site'
+  | 'contest'
+  | 'problem'
+  | 'polygon'
+  | 'mail'
+  | 'auth'
+  | 'notify'
+  | 'pdf'
+  | 'similarity'
+  | 'quota';
 /** The page's group strip and sections, in this order. */
 export const SETTING_GROUPS: SettingGroup[] = [
   'site',
   'contest',
   'problem',
+  'polygon',
   'mail',
   'auth',
   'notify',
@@ -81,6 +96,11 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
     ],
   },
   { id: 'problem', group: 'problem', keys: ['problem.deleteGraceDays'] },
+  {
+    id: 'polygon',
+    group: 'polygon',
+    keys: ['polygon.accountName', 'polygon.apiKey', 'polygon.apiSecret'],
+  },
   { id: 'mail', group: 'mail', keys: ['mail.from', 'mail.smtpUrl'] },
   { id: 'google', group: 'auth', keys: ['auth.google'] },
   { id: 'github', group: 'auth', keys: ['auth.github'] },

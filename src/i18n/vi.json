@@ -840,7 +840,16 @@
     "unexpected_tag": "Chỉ thao tác gắn hoặc gỡ thẻ mới cần chọn thẻ.",
     "quota_exceeded": "Tổ chức đã hết hạn mức. Liên hệ quản trị để tăng hạn mức.",
     "quotaExceededCredits": "Vượt hạn mức tín dụng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức.",
-    "quotaExceededStorage": "Vượt hạn mức dung lượng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức."
+    "quotaExceededStorage": "Vượt hạn mức dung lượng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức.",
+    "polygon_not_connected": "Chưa kết nối Polygon: trang chưa có khoá API hoặc bí mật.",
+    "polygon_unauthorized": "Polygon từ chối khoá: khoá hoặc bí mật sai.",
+    "polygon_clock_skew": "Polygon từ chối chữ ký: đồng hồ máy chủ lệch quá nhiều so với Polygon.",
+    "polygon_failed": "Polygon trả lời lỗi. Thử lại sau.",
+    "polygon_unavailable": "Không liên lạc được Polygon lúc này. Thử lại sau.",
+    "polygon_package_not_ready": "Gói mới nhất trên Polygon chưa ở trạng thái READY.",
+    "polygon_already_linked": "Bài Polygon này đã liên kết với một bài trên QHHOJ.",
+    "polygon_not_linked": "Bài này không liên kết với Polygon.",
+    "polygon_package_too_large": "Gói Polygon quá lớn (tối đa 512 MiB)."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",

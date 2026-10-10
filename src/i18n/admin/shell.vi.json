@@ -24,8 +24,9 @@
     "helloBody": "Chọn một mục ở cột trái hoặc dùng lối tắt bên dưới. Chỉ những mục tài khoản được phép mới hiện ra.",
     "actions": {
       "problemNew": "Tạo bài tập",
-      "problemImport": "Nhập từ Polygon",
-      "contestNew": "Tạo kỳ thi"
+      "problemImport": "Nhập tệp .zip",
+      "contestNew": "Tạo kỳ thi",
+      "polygonImport": "Nhập từ Polygon"
     },
     "sections": {
       "content": "Nội dung",
@@ -34,7 +35,7 @@
     },
     "descriptions": {
       "problems": "Sửa đề, bản dịch, lời giải, dữ liệu chấm; nhân bản bài.",
-      "problemImport": "Tải gói Polygon lên, theo dõi tiến trình nhập.",
+      "problemImport": "Tải gói Polygon dạng .zip lên, theo dõi tiến trình nhập.",
       "posts": "Duyệt và gỡ bài viết, bình luận bị báo cáo.",
       "contests": "Thông báo, bảng xếp hạng chính thức, chấm lại, tính rating.",
       "similarity": "Chạy so sánh mã nguồn theo bài hoặc theo kỳ thi.",
@@ -44,14 +45,15 @@
       "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
       "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
       "pages": "Tạo và sửa trang giới thiệu, quy định.",
-      "tickets": "Phiếu do người dùng gửi."
+      "tickets": "Phiếu do người dùng gửi.",
+      "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập."
     }
   },
   "screens": {
     "dashboard": "Trang chủ quản trị",
     "problems": "Bài tập",
     "problemNew": "Tạo bài tập",
-    "problemImport": "Nhập từ Polygon",
+    "problemImport": "Nhập tệp .zip",
     "problemGeneral": "Sửa bài: thông tin chung",
     "problemStatements": "Sửa bài: đề bài và bản dịch",
     "problemEditorial": "Sửa bài: lời giải",
@@ -92,6 +94,7 @@
     "languageEdit": "Sửa ngôn ngữ",
     "problemsDeleted": "Bài đã xóa",
     "organizationQuotas": "Hạn mức tổ chức",
-    "cannedReplies": "Mẫu trả lời phiếu"
+    "cannedReplies": "Mẫu trả lời phiếu",
+    "polygonImport": "Nhập từ Polygon"
   }
 }
