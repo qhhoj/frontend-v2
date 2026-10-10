@@ -1,0 +1,55 @@
+# Builds dist/ and deploys it with qhhoj-deploy on the production host (releases/<version> + current symlink).
+# Called by release.yml when that run created the version tag, and by hand for any ref.
+name: deploy
+on:
+  workflow_call:
+    inputs:
+      ref: { type: string, required: true }
+  workflow_dispatch:
+    inputs:
+      ref: { description: 'Tag, branch or SHA (empty: latest v* tag)', type: string, default: '' }
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    environment: production
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { fetch-depth: 0 }
+      - id: ref
+        env: { REF: '${{ inputs.ref }}' }
+        run: bash scripts/deploy/resolve-ref.sh "$REF" >> "$GITHUB_OUTPUT"
+      - run: git checkout --detach "${{ steps.ref.outputs.sha }}"
+      - name: Wait for CI on this commit
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: bash scripts/deploy/wait-for-ci.sh "${{ steps.ref.outputs.sha }}" ci.yml 120
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - name: Package
+        env: { TAG: '${{ steps.ref.outputs.tag }}' }
+        run: |
+          tar -czf "frontend-dist-$TAG.tar.gz" -C dist .
+          sha256sum "frontend-dist-$TAG.tar.gz" > "frontend-dist-$TAG.tar.gz.sha256"
+      - name: SSH key
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+      - name: Deploy
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          TAG: ${{ steps.ref.outputs.tag }}
+        run: |
+          scp "frontend-dist-$TAG.tar.gz" "frontend-dist-$TAG.tar.gz.sha256" "deploy@$DEPLOY_HOST:/var/lib/qhhoj-deploy/incoming/"
+          bash scripts/deploy/remote-deploy.sh frontend "$TAG"
