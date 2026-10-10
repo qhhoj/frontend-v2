@@ -7,6 +7,11 @@ const lowPower = useLowPowerStore();
 /** The served build, so staff can tell which release a page came from. */
 const APP_VERSION = __APP_VERSION__;
 const APP_COMMIT = __APP_COMMIT__;
+/** AGPL-3.0 §13: every visitor is offered the source of the running site (frontend commit; backend and judge in the same org). */
+const SOURCE_URL = 'https://github.com/qhhoj';
+const commitUrl = /^[0-9a-f]{7}$/.test(APP_COMMIT)
+  ? `https://github.com/qhhoj/frontend-v2/commit/${APP_COMMIT}`
+  : null;
 const stateKey = computed(() => {
   if (lowPower.preference !== 'auto') return `lowPower.footerState.${lowPower.preference}`;
   return lowPower.isOn ? 'lowPower.footerState.autoOn' : 'lowPower.footerState.autoOff';
@@ -20,7 +25,16 @@ const stateKey = computed(() => {
   >
     <span>© QHHOJ</span>
     <span data-testid="app-version" class="font-mono text-xs" :title="$t('footer.versionTitle')"
-      >v{{ APP_VERSION }} · {{ APP_COMMIT }}</span
+      >v{{ APP_VERSION }} ·
+      <a v-if="commitUrl" :href="commitUrl" class="underline" rel="noopener">{{ APP_COMMIT }}</a
+      ><template v-else>{{ APP_COMMIT }}</template></span
+    >
+    <a
+      data-testid="source-link"
+      :href="SOURCE_URL"
+      class="inline-flex min-h-11 items-center text-accent-text underline"
+      rel="noopener"
+      >{{ $t('footer.source') }}</a
     >
     <span>
       {{ $t('lowPower.footer', { state: $t(stateKey) }) }} ·

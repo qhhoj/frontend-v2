@@ -29,6 +29,18 @@ describe('AppFooter', () => {
     );
   });
 
+  it('offers the source of the running site (AGPL) and links the commit', async () => {
+    const { wrapper } = await openBlog();
+    const source = wrapper.get('[data-testid="source-link"]');
+    expect(source.attributes('href')).toBe('https://github.com/qhhoj');
+    expect(source.text()).toBe('Mã nguồn (AGPL)');
+    const commit = wrapper.find('[data-testid="app-version"] a');
+    if (commit.exists())
+      expect(commit.attributes('href')).toBe(
+        `https://github.com/qhhoj/frontend-v2/commit/${commit.text()}`,
+      );
+  });
+
   it('follows a change of the choice', async () => {
     const { wrapper } = await openBlog();
     useLowPowerStore().choose('on');
