@@ -985,7 +985,9 @@
       "links": {
         "label": "Problem links",
         "submissions": "Submissions",
-        "best": "Best submissions"
+        "best": "Best submissions",
+        "pdfStatement": "PDF statement",
+        "material": "Attached material"
       }
     }
   },

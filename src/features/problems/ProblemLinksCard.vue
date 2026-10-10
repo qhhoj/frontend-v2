@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FileText, Paperclip } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import GlassCard from '@/components/GlassCard.vue';
@@ -8,7 +9,9 @@ import { useLocaleStore } from '@/stores/locale.store';
 import PdfButton from './PdfButton.vue';
 
 const LINK = 'flex min-h-11 items-center rounded-row px-3 hover:bg-surface-hover';
-/** Where else this problem leads: its submissions, the editorial tab, the PDF and the short link. */
+const FILE_LINK =
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-4 text-sm font-semibold hover:bg-surface-hover';
+/** Where else this problem leads: its submissions, the editorial tab, the uploaded PDF statement and material, the rendered PDF and the short link. */
 defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
 const route = useRoute();
 const locale = useLocaleStore();
@@ -39,6 +42,26 @@ const locale = useLocaleStore();
       data-testid="header-actions"
       class="flex flex-col gap-2 empty:hidden [&:not(:empty)]:p-1 [&:not(:empty)]:pt-2"
     >
+      <a
+        v-if="problem.pdfStatementUrl"
+        :href="problem.pdfStatementUrl"
+        target="_blank"
+        rel="noopener"
+        data-testid="pdf-statement-link"
+        :class="FILE_LINK"
+      >
+        <FileText aria-hidden="true" class="size-4" />{{ $t('problem.rail.links.pdfStatement') }}
+      </a>
+      <a
+        v-if="problem.materialUrl"
+        :href="problem.materialUrl"
+        target="_blank"
+        rel="noopener"
+        data-testid="material-link"
+        :class="FILE_LINK"
+      >
+        <Paperclip aria-hidden="true" class="size-4" />{{ $t('problem.rail.links.material') }}
+      </a>
       <ShortLinkButton :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
       <PdfButton v-if="problem.pdfStatementUrl" :code="problem.code" :lang="locale.locale" />
     </div>
