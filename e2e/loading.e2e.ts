@@ -517,7 +517,8 @@ const SHIFT_CASES: ShiftCase[] = [
       'cases card': page.getByTestId('cases-card'),
     }),
     viewports: PHONE_AND_DESKTOP,
-    placed: ['cases card'],
+    // The source sits above the cases card and its height is the source's length, so only sizes are compared.
+    placed: [],
   },
   {
     name: 'submission verdict card with its Bit',
