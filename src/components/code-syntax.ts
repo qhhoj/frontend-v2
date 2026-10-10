@@ -1,10 +1,21 @@
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { tags } from '@lezer/highlight';
+import { tagHighlighter, tags, type Tag } from '@lezer/highlight';
 
-/** Six colours from the theme's `--qh-syntax-*` tokens, so a theme recolours code with CSS only; comments are italic. */
-export const syntaxStyle = HighlightStyle.define([
+export type SyntaxToken = 'keyword' | 'type' | 'number' | 'string' | 'comment' | 'function';
+
+interface SyntaxRule {
+  token: SyntaxToken;
+  tags: Tag[];
+}
+
+/**
+ * The one tag-to-colour mapping: the editor (inline colours) and the static highlighter (classes, see
+ * `code-highlight.css`) both derive from it, so edit-time and read-only code always look alike.
+ */
+export const SYNTAX_RULES: readonly SyntaxRule[] = [
   {
-    tag: [
+    token: 'keyword',
+    tags: [
       tags.keyword,
       tags.controlKeyword,
       tags.operatorKeyword,
@@ -14,26 +25,38 @@ export const syntaxStyle = HighlightStyle.define([
       tags.meta,
       tags.processingInstruction,
     ],
-    color: 'var(--qh-syntax-keyword)',
   },
-  { tag: [tags.typeName, tags.className, tags.namespace], color: 'var(--qh-syntax-type)' },
-  { tag: [tags.number, tags.bool, tags.null, tags.atom], color: 'var(--qh-syntax-number)' },
+  { token: 'type', tags: [tags.typeName, tags.className, tags.namespace] },
+  { token: 'number', tags: [tags.number, tags.bool, tags.null, tags.atom] },
   {
-    tag: [tags.string, tags.special(tags.string), tags.character, tags.regexp],
-    color: 'var(--qh-syntax-string)',
+    token: 'string',
+    tags: [tags.string, tags.special(tags.string), tags.character, tags.regexp],
   },
+  { token: 'comment', tags: [tags.comment, tags.lineComment, tags.blockComment] },
   {
-    tag: [tags.comment, tags.lineComment, tags.blockComment],
-    color: 'var(--qh-syntax-comment)',
-    fontStyle: 'italic',
-  },
-  {
-    tag: [
+    token: 'function',
+    tags: [
       tags.function(tags.variableName),
       tags.function(tags.propertyName),
       tags.definition(tags.function(tags.variableName)),
     ],
-    color: 'var(--qh-syntax-function)',
   },
-]);
+];
+
+/** Class on a highlighted span; `code-highlight.css` colours it from the `--qh-syntax-*` token. */
+export const syntaxClass = (token: SyntaxToken) => `syn-${token}`;
+
+/** For the static highlighter: the same rules, as class names. */
+export const syntaxClasses = tagHighlighter(
+  SYNTAX_RULES.map((rule) => ({ tag: rule.tags, class: syntaxClass(rule.token) })),
+);
+
+/** Six colours from the theme's `--qh-syntax-*` tokens, so a theme recolours code with CSS only; comments are italic. */
+export const syntaxStyle = HighlightStyle.define(
+  SYNTAX_RULES.map((rule) => ({
+    tag: rule.tags,
+    color: `var(--qh-syntax-${rule.token})`,
+    ...(rule.token === 'comment' && { fontStyle: 'italic' }),
+  })),
+);
 export const syntaxHighlight = syntaxHighlighting(syntaxStyle);

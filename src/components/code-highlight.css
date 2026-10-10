@@ -1,0 +1,20 @@
+/* Static (read-only) code colours: the same six tokens the editor uses, see code-syntax.ts. */
+.syn-keyword {
+  color: var(--qh-syntax-keyword);
+}
+.syn-type {
+  color: var(--qh-syntax-type);
+}
+.syn-number {
+  color: var(--qh-syntax-number);
+}
+.syn-string {
+  color: var(--qh-syntax-string);
+}
+.syn-comment {
+  color: var(--qh-syntax-comment);
+  font-style: italic;
+}
+.syn-function {
+  color: var(--qh-syntax-function);
+}

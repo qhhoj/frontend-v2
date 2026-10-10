@@ -207,3 +207,19 @@ describe('UserContent', () => {
     }
   });
 });
+
+describe('UserContent highlighting', () => {
+  const block = (language: string, code: string) =>
+    `<pre><code class="language-${language}">${code}</code></pre>`;
+
+  it('re-colours after the html changes, with no stale spans and the exact text', async () => {
+    const content = mountComponent(UserContent, { props: { html: block('cpp', 'return 1;') } });
+    await vi.waitFor(() => expect(content.find('.syn-keyword').exists()).toBe(true));
+    await content.setProps({ html: block('py', 'x = 2') });
+    expect(content.find('code').text()).toBe('x = 2');
+    await vi.waitFor(() => expect(content.find('.syn-number').text()).toBe('2'));
+    await content.setProps({ html: '<pre><code>return 1;</code></pre>' });
+    expect(content.find('span').exists()).toBe(false);
+    expect(content.find('code').text()).toBe('return 1;');
+  });
+});

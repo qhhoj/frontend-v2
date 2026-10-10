@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { computed, onMounted, toRef } from 'vue';
+import { computed, onMounted, ref, toRef, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import CopyButton from '@/components/CopyButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
+import { aceForSubmissionKey } from '@/components/code-language-keys';
+import { showCode } from '@/components/code-highlight';
 import { translate } from '@/i18n';
 import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
 /** Keep `SourceViewSkeleton.vue` in step: same card, header and line classes. */
-const props = defineProps<{ id: string; problemCode: string | null; isOwn: boolean }>();
+const props = defineProps<{
+  id: string;
+  problemCode: string | null;
+  isOwn: boolean;
+  languageKey: string | null;
+}>();
 const route = useRoute();
 /** "View source" in a submission list links here: the page loads before this card exists, so the hash is applied on mount. */
 onMounted(() => {
@@ -29,6 +36,12 @@ const forbiddenText = computed(() => {
 /** A source ending in a newline has no empty last line to number. */
 const TRAILING_NEWLINE = /\n$/;
 const source = computed(() => data.value?.source ?? '');
+/** Plain text first, coloured once the language's parser has loaded; the text itself never changes. */
+const sourceBlock = ref<HTMLElement | null>(null);
+watchEffect(() => {
+  const ace = props.languageKey === null ? null : aceForSubmissionKey(props.languageKey);
+  if (sourceBlock.value) void showCode(sourceBlock.value, source.value, ace);
+});
 /** One text node for the whole gutter, so a 65 536-line source adds one element, not thousands. */
 const lineNumbers = computed(() =>
   Array.from(
@@ -66,7 +79,7 @@ const lineNumbers = computed(() =>
         <pre aria-hidden="true" class="shrink-0 px-4 text-right text-muted select-none">{{
           lineNumbers
         }}</pre>
-        <pre class="pr-6">{{ source }}</pre>
+        <pre ref="sourceBlock" class="pr-6"></pre>
       </div>
     </QueryState>
   </GlassCard>
