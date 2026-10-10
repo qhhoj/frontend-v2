@@ -1080,17 +1080,7 @@ export interface paths {
         get: operations["CommentsController_detail"];
         put?: never;
         post?: never;
-        /**
-         * Delete a comment
-         * @description Allowed for its author and for holders of `judge.change_comment` (403
-         *     `forbidden` otherwise). The comment stays in its thread as a placeholder
-         *     (`deleted: true`, empty `bodyHtml`) so replies keep their context; it can
-         *     no longer be edited, voted on, replied to or reported, and its score
-         *     leaves the author's contribution. Its edit history becomes
-         *     moderator-only. Fails with 404 `not_found` when the comment is unknown,
-         *     unreadable or already deleted. Returns the placeholder.
-         */
-        delete: operations["CommentPostingController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
         /**
@@ -1115,82 +1105,10 @@ export interface paths {
          * Hide or unhide a comment
          * @description Requires `judge.change_comment`. Hides the comment together with its
          *     replies, or restores what that comment had hidden, and recomputes the
-         *     authors' contribution points; each hide and unhide is recorded with the
-         *     moderator (shown to moderators as `hiddenBy`). A comment under a hidden
-         *     parent cannot be unhidden alone (409 `conflict`). Returns the comment.
+         *     authors' contribution points. A comment under a hidden parent cannot be
+         *     unhidden alone (409 `conflict`). Returns the comment.
          */
         post: operations["CommentModerationController_setHidden"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/comments/{id}/location": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Locate a comment
-         * @description Public. Returns the page a comment belongs to and the listing page number
-         *     (`?page=` of the page listing) holding its thread for this viewer, so a
-         *     `#comment-<id>` link can open the right page. Fails with 404 `not_found`
-         *     like getting the comment.
-         */
-        get: operations["CommentsController_locate"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/comments/{id}/reports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Report a comment
-         * @description Flags a visible comment of someone else for the moderators with a
-         *     `reason` (spam, abuse, spoiler, offTopic, other) and an optional `note`
-         *     (up to 500 characters). Each user reports a comment once (409
-         *     `conflict`); reporting one's own comment is 403 `forbidden`, a hidden or
-         *     deleted one 404 `not_found`. Limited to 10 reports per hour per user (429
-         *     `rate_limited`). Returns 204.
-         */
-        post: operations["CommentReportsController_report"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/comments/{id}/reports/settle": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Settle the reports of a comment
-         * @description Requires `judge.change_comment`. Marks every open report of the comment
-         *     `resolved` (acted on) or `dismissed`; hiding or deleting the comment is a
-         *     separate call. Fails with 404 `not_found` when the comment is unreadable
-         *     or has no open reports. Returns 204.
-         */
-        post: operations["CommentReportsController_settle"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1207,8 +1125,8 @@ export interface paths {
         /**
          * List the edit history of a comment
          * @description Public. Returns every edit of a comment with the time, the editor, and the
-         *     text before and after. Hidden and deleted comments are only available to
-         *     holders of `judge.change_comment`.
+         *     text before and after. Hidden comments are only available to holders of
+         *     `judge.change_comment`.
          */
         get: operations["CommentPostingController_revisions"];
         put?: never;
@@ -1229,7 +1147,7 @@ export interface paths {
         get?: never;
         /**
          * Vote on a comment
-         * @description Sets the caller's vote on a visible comment that is not hidden or deleted: `score` is 1, -1,
+         * @description Sets the caller's vote on a visible, non-hidden comment: `score` is 1, -1,
          *     or 0 to withdraw. Returns the new total and the caller's vote. Authors
          *     cannot vote on their own comment (403 `forbidden`); voters need enough
          *     solved problems and an unmuted account. Limited to 60 votes per minute per
@@ -1276,13 +1194,8 @@ export interface paths {
          * @description Public. Returns one page of threads (20 top-level comments with all their
          *     replies) of a commentable page, addressed by `type` (problem, editorial,
          *     contest, blog or tagProblem) and its natural `key` (problem code, contest
-         *     key, post id). Also reports the page's lock (`pageLocked`), whether it is
-         *     locked for the viewer (`locked`), and whether the viewer can comment
-         *     (`canComment`) or why not (`postBlock`: `signed_out`, `contest`,
-         *     `locked`, `muted`, or `needs_solved` with `solved` and `required`).
-         *     Hidden comments are returned only to holders of `judge.change_comment`,
-         *     flagged `hidden` with the moderator in `hiddenBy`; deleted comments stay
-         *     as placeholders (`deleted`, empty `bodyHtml`). Fails with 404
+         *     key, post id). Also reports whether the page is locked and whether the
+         *     viewer can comment. Hidden comments are not returned. Fails with 404
          *     `not_found` when the page is unknown or unreadable, and 403 `forbidden`
          *     while an official contest closes comments. Contest problem threads are
          *     empty for contestants who are in the contest.
@@ -1327,54 +1240,6 @@ export interface paths {
          *     Returns 204.
          */
         delete: operations["CommentModerationController_unlock"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/comments/preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Preview a comment
-         * @description Renders a comment body to HTML exactly as posting would (safe-mode
-         *     Markdown, same length rule: 400 `validation_failed` when blank or over
-         *     8192 characters) without saving anything. Needs enough solved problems
-         *     and an unmuted account (403 `forbidden`). Limited to 30 previews per
-         *     minute per user (429 `rate_limited`).
-         */
-        post: operations["CommentPostingController_preview"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/comments/reports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List reported comments
-         * @description Requires `judge.change_comment`. Returns the comments with open reports,
-         *     the most recently reported first, 20 per page: an excerpt, the page link,
-         *     how many users reported it, and each open report with its reason and
-         *     note. Comments on pages the moderator cannot read are left out of the
-         *     page.
-         */
-        get: operations["CommentReportsController_queue"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -5758,9 +5623,7 @@ export interface components {
             body: string | null;
             /** @description The comment rendered to HTML. */
             bodyHtml: string;
-            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
-            canDelete: boolean;
-            /** @description The caller may edit the comment (never once deleted). */
+            /** @description The caller may edit the comment. */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
@@ -5769,18 +5632,12 @@ export interface components {
              * @description When the comment was posted, ISO 8601.
              */
             createdAt: string;
-            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
-            deleted: boolean;
             /** @description Nesting level; 0 for top-level comments. */
             depth: number;
-            /** @description Hidden by a moderator; hidden comments reach moderators only. */
+            /** @description Whether the comment is hidden; only moderators can read hidden comments. */
             hidden: boolean;
-            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
-            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Id of the comment. */
             id: string;
-            /** @description Stable 1-based position on its page in posting order; null until numbered. */
-            number: number | null;
             /** @description The page the comment belongs to. */
             page: components["schemas"]["CommentPageLinkResponse"];
             /** @description Id of the comment replied to; null for a top-level comment. */
@@ -5796,12 +5653,6 @@ export interface components {
             updatedAt: string;
             viewerVote: components["schemas"]["VoteScore"];
         };
-        CommentLocationResponse: {
-            /** @description The page the comment belongs to. */
-            page: components["schemas"]["CommentPageLinkResponse"];
-            /** @description The 1-based listing page (`?page=`) that holds the comment's thread, for this viewer. */
-            pageNumber: number;
-        };
         CommentPageLinkResponse: {
             /** @description Natural key of the page. */
             key: string;
@@ -5811,20 +5662,16 @@ export interface components {
             type: components["schemas"]["CommentPageType"];
         };
         CommentPageResponse: {
-            /** @description Signed in, past the interaction gate, and not locked: `postBlock` is null. */
+            /** @description Signed in, past the interaction gate, and not locked. */
             canComment: boolean;
-            /** @description Roots newest first, each followed by its replies in tree order: hidden ones only for moderators, deleted ones as placeholders. */
+            /** @description Roots newest first, each followed by its visible replies in tree order. */
             comments: components["schemas"]["CommentResponse"][];
             /** @description Locked for this viewer (a lock without `override_comment_lock`, or a problem of their running contest). */
             locked: boolean;
             /** @description The page the comments belong to. */
             page: components["schemas"]["CommentPageLinkResponse"];
-            /** @description The page's own lock flag, whoever views it: what moderators toggle with `PUT`/`DELETE .../lock`. */
-            pageLocked: boolean;
             /** @description Paging of the top-level threads. */
             pagination: components["schemas"]["CommentPaginationResponse"];
-            /** @description Why the viewer cannot comment, by the same rule posting enforces; null when they can. */
-            postBlock: components["schemas"]["CommentPostBlockResponse"] | null;
         };
         /**
          * @description Kind of page.
@@ -5839,61 +5686,6 @@ export interface components {
             /** @description Total number of threads. */
             total: number;
         };
-        /**
-         * @description Why the viewer cannot comment: signed out, a problem of their running contest, a locked page, a muted account, or too few solved problems.
-         * @enum {string}
-         */
-        CommentPostBlockReason: "contest" | "locked" | "muted" | "needs_solved" | "signed_out";
-        CommentPostBlockResponse: {
-            /** @description Why the viewer cannot comment: signed out, a problem of their running contest, a locked page, a muted account, or too few solved problems. */
-            reason: components["schemas"]["CommentPostBlockReason"];
-            /** @description Problems needed to comment; only for `needs_solved`. */
-            required: number | null;
-            /** @description Problems the viewer solved; only for `needs_solved`. */
-            solved: number | null;
-        };
-        CommentPreviewResponse: {
-            /** @description The body rendered exactly as posting would store it. */
-            bodyHtml: string;
-        };
-        CommentReportEntryResponse: {
-            /**
-             * Format: date-time
-             * @description When it was reported, ISO 8601.
-             */
-            createdAt: string;
-            /** @description The reporter's note; may be empty. */
-            note: string;
-            /** @description Why it was reported. */
-            reason: components["schemas"]["CommentReportReason"];
-            /** @description Who reported; null when the account is gone. */
-            reporter: components["schemas"]["UserSummaryResponse"] | null;
-        };
-        /**
-         * @description `resolved` when the reports led to action, `dismissed` when they did not.
-         * @enum {string}
-         */
-        CommentReportOutcome: "dismissed" | "resolved";
-        CommentReportQueueItemResponse: {
-            /** @description The reported comment. */
-            comment: components["schemas"]["ReportedCommentResponse"];
-            /**
-             * Format: date-time
-             * @description When the newest open report came in, ISO 8601.
-             */
-            lastReportedAt: string;
-            /** @description The page it belongs to. */
-            page: components["schemas"]["CommentPageLinkResponse"];
-            /** @description Users with an open report on it. */
-            reporterCount: number;
-            /** @description Its open reports, oldest first. */
-            reports: components["schemas"]["CommentReportEntryResponse"][];
-        };
-        /**
-         * @description Why the comment is reported.
-         * @enum {string}
-         */
-        CommentReportReason: "abuse" | "offTopic" | "other" | "spam" | "spoiler";
         CommentResponse: {
             /** @description Null when the author's account is gone. */
             author: components["schemas"]["UserSummaryResponse"] | null;
@@ -5901,9 +5693,7 @@ export interface components {
             body: string | null;
             /** @description The comment rendered to HTML. */
             bodyHtml: string;
-            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
-            canDelete: boolean;
-            /** @description The caller may edit the comment (never once deleted). */
+            /** @description The caller may edit the comment. */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
@@ -5912,18 +5702,10 @@ export interface components {
              * @description When the comment was posted, ISO 8601.
              */
             createdAt: string;
-            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
-            deleted: boolean;
             /** @description Nesting level; 0 for top-level comments. */
             depth: number;
-            /** @description Hidden by a moderator; hidden comments reach moderators only. */
-            hidden: boolean;
-            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
-            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Id of the comment. */
             id: string;
-            /** @description Stable 1-based position on its page in posting order; null until numbered. */
-            number: number | null;
             /** @description Id of the comment replied to; null for a top-level comment. */
             parentId: string | null;
             /** @description Number of edits made to the comment. */
@@ -8540,9 +8322,7 @@ export interface components {
             body: string | null;
             /** @description The comment rendered to HTML. */
             bodyHtml: string;
-            /** @description The caller may delete the comment: its author or a moderator, while not deleted. */
-            canDelete: boolean;
-            /** @description The caller may edit the comment (never once deleted). */
+            /** @description The caller may edit the comment. */
             canEdit: boolean;
             /** @description Score at or below -5: the SPA folds it (legacy collapsed client-side). */
             collapsed: boolean;
@@ -8551,18 +8331,10 @@ export interface components {
              * @description When the comment was posted, ISO 8601.
              */
             createdAt: string;
-            /** @description Deleted by its author or a moderator: `bodyHtml` is empty and `body` null; the row stays as a placeholder for its replies. */
-            deleted: boolean;
             /** @description Nesting level; 0 for top-level comments. */
             depth: number;
-            /** @description Hidden by a moderator; hidden comments reach moderators only. */
-            hidden: boolean;
-            /** @description The moderator who hid it; null while visible or when unknown (hidden on the old site). */
-            hiddenBy: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Id of the comment. */
             id: string;
-            /** @description Stable 1-based position on its page in posting order; null until numbered. */
-            number: number | null;
             /** @description The page the comment belongs to. */
             page: components["schemas"]["CommentPageLinkResponse"];
             /** @description Id of the comment replied to; null for a top-level comment. */
@@ -8672,24 +8444,6 @@ export interface components {
             rating: number | null;
             username: string;
         };
-        ReportCommentDto: {
-            /** @description Optional details for the moderators. */
-            note?: string;
-            /** @description Why the comment is reported. */
-            reason: components["schemas"]["CommentReportReason"];
-        };
-        ReportedCommentResponse: {
-            /** @description Null when the author's account is gone. */
-            author: components["schemas"]["UserSummaryResponse"] | null;
-            /** @description Deleted by its author or a moderator. */
-            deleted: boolean;
-            /** @description The first 200 characters of its Markdown; empty once deleted. */
-            excerpt: string;
-            /** @description Hidden by a moderator. */
-            hidden: boolean;
-            /** @description Id of the comment. */
-            id: string;
-        };
         ResendActivationDto: {
             /** @description Email address for the activation link and password resets, up to 254 characters. */
             email: string;
@@ -8796,10 +8550,6 @@ export interface components {
             createdAt: string;
             /** @description Revision id. */
             id: string;
-        };
-        SettleCommentReportsDto: {
-            /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
-            outcome: components["schemas"]["CommentReportOutcome"];
         };
         ShortLinkResponse: {
             /** @description The code in `/s/<code>`. */
@@ -12358,41 +12108,6 @@ export interface operations {
             };
         };
     };
-    CommentPostingController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the comment. */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CommentResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     CommentPostingController_edit: {
         parameters: {
             query?: never;
@@ -12457,111 +12172,6 @@ export interface operations {
                         data: components["schemas"]["CommentDetailResponse"];
                     };
                 };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    CommentsController_locate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the comment. */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CommentLocationResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    CommentReportsController_report: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the comment. */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReportCommentDto"];
-            };
-        };
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    CommentReportsController_settle: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the comment. */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SettleCommentReportsDto"];
-            };
-        };
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -12830,78 +12440,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    CommentPostingController_preview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CommentBodyDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CommentPreviewResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    CommentReportsController_queue: {
-        parameters: {
-            query?: {
-                /** @description 1-based page number of threads. */
-                page?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CommentReportQueueItemResponse"][];
-                        meta: components["schemas"]["PageMetaResponse"];
-                    };
-                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
