@@ -85,6 +85,7 @@ describe('app shell', () => {
       'Trang chủ',
       'Bài tập',
       'Kỳ thi',
+      'Bài nộp',
       'Xếp hạng',
       'Blog',
       'Tổ chức',

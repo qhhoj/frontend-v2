@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { path: '/', labelKey: 'nav.home' },
   { path: '/problems', labelKey: 'nav.problems' },
   { path: '/contests', labelKey: 'nav.contests' },
+  { path: '/submissions', labelKey: 'nav.submissions' },
   { path: '/users', labelKey: 'nav.users' },
   { path: '/blog', labelKey: 'nav.blog' },
   { path: '/organizations', labelKey: 'nav.organizations' },
