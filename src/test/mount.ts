@@ -45,18 +45,24 @@ afterEach(() => mounted.splice(0).forEach((wrapper) => wrapper.unmount()));
 /** Mounts one component with the app's plugins (router not navigated). */
 export function mountComponent(
   component: Parameters<typeof mount>[0],
-  options: { props?: Record<string, unknown>; slots?: Record<string, string> } = {},
+  options: {
+    props?: Record<string, unknown>;
+    slots?: Record<string, string>;
+    /** Extra stubs, e.g. a popup rendered inline so its content can be read. */
+    stubs?: Record<string, unknown>;
+  } = {},
 ) {
   const pinia = createPinia();
   setActivePinia(pinia);
   const router = createAppRouter(createMemoryHistory());
   const queryClient = createQueryClient();
+  const { stubs, ...mountOptions } = options;
   const wrapper = mount(component, {
-    ...options,
+    ...mountOptions,
     attachTo: document.body,
     global: {
       plugins: appPlugins({ pinia, router, queryClient }),
-      stubs: { transition: false, 'transition-group': false },
+      stubs: { transition: false, 'transition-group': false, ...stubs },
     },
   });
   mounted.push(wrapper);
