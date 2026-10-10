@@ -5094,6 +5094,7 @@ export interface components {
             testcaseResultVisibility: components["schemas"]["TestcaseResultVisibility"];
             testcaseVisibility: components["schemas"]["TestcaseVisibility"];
             timeLimit: number;
+            /** @description True when the statement is in the requested language (the base language counts); false when it fell back to the base statement. */
             translated: boolean;
             types: components["schemas"]["CatalogItemResponse"][];
             userCount: number;
