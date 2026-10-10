@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# Copy of backend-v2 deploy/ci/resolve-ref.sh; keep in sync.
 # resolve-ref.sh <ref>: prints sha=<commit> and tag=<image/release tag> for $GITHUB_OUTPUT.
-# Empty ref = the highest v* tag. A ref that is exactly a vX.Y.Z tag keeps its name; anything else becomes sha-<12>. Copy of backend-v2 deploy/ci/resolve-ref.sh; keep in sync.
+# Empty ref = the highest v* tag. A ref that is exactly a vX.Y.Z tag keeps its name; anything else becomes sha-<12>.
 set -euo pipefail
 ref="${1:-}"
 if [ -z "$ref" ]; then

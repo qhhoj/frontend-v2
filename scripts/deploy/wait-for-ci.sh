@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# wait-for-ci.sh <sha> <workflow file> <timeout minutes>: waits for that workflow's run on <sha>; exit 0 only on success. Copy of backend-v2 deploy/ci/wait-for-ci.sh; keep in sync.
+# Copy of backend-v2 deploy/ci/wait-for-ci.sh; keep in sync.
+# wait-for-ci.sh <sha> <workflow file> <timeout minutes>: waits for that workflow's run on <sha>; exit 0 only on success.
 set -euo pipefail
 sha="${1:?sha}" workflow="${2:?workflow}" minutes="${3:?timeout minutes}"
 interval="${WAIT_INTERVAL:-30}"
