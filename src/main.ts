@@ -3,6 +3,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { appPlugins } from './app-plugins';
 import { createQueryClient } from './api/query-client';
+import { createStaleChunkReloader, installStaleChunkReload } from './lib/stale-chunk-reload';
 import { createAppRouter } from './router';
 import { useLocaleStore } from './stores/locale.store';
 import { useAppearanceStore } from './theme/appearance.store';
@@ -12,9 +13,18 @@ import './theme/styles.css';
 
 const app = createApp(App);
 const pinia = createPinia();
+const router = createAppRouter();
+installStaleChunkReload(
+  router,
+  createStaleChunkReloader(
+    () => sessionStorage,
+    __APP_COMMIT__,
+    (target) => window.location.assign(target),
+  ),
+);
 for (const [plugin, ...options] of appPlugins({
   pinia,
-  router: createAppRouter(),
+  router,
   queryClient: createQueryClient(),
 }))
   app.use(plugin, ...options);
