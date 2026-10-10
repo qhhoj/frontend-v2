@@ -1,6 +1,14 @@
 import { useRoute, useRouter } from 'vue-router';
+import { preloadRoute } from '@/router/preload';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
+
+/** Starts downloading the page after sign-in while the sign-in request is still on its way. */
+export function usePreloadAfterSignIn() {
+  const route = useRoute();
+  const router = useRouter();
+  return () => preloadRoute(router, safeRedirect(route.query.redirect));
+}
 
 /**
  * The step every sign-in ends with (password, social signup, second factor). It only routes: the shell's

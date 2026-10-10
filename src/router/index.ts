@@ -14,6 +14,7 @@ import { focusMain } from './focus-main';
 import { resolveNavigation } from './guards';
 import { trackFirstPage } from '@/lib/arrived-by-redirect';
 import { pageTitle } from './page-title';
+import { preloadRouteComponents } from './preload';
 import { routes } from './routes';
 
 /** Back/forward restores the saved position; a hash scrolls to its element; a query-only change (a tab, a filter) keeps the position; a new page starts at the top. */
@@ -44,6 +45,8 @@ function installNavigationLoading(router: Router) {
     const source = sourceOf(to) || Symbol('navigation');
     navigationSources.set(to, source);
     useLoadingStore().begin(source);
+    // The page's code downloads while the session loads, not after it.
+    preloadRouteComponents(to);
     return resolveNavigation(to, useSessionStore());
   });
   // afterEach also runs for cancelled and duplicate navigations; onError covers a failed chunk or a throwing guard.
