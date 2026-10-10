@@ -54,7 +54,8 @@ test('ranking columns and page content keep their x across tab switches and data
   api.routes['GET /contests/:key/submissions'] = list([]);
   const release = api.hold('GET /contests/r42/ranking');
   const log: Record<string, unknown>[] = [];
-  const tabLink = (suffix: string) => page.locator(`nav[aria-label] a[href$="${suffix}"]`).first();
+  const tabLink = (suffix: string) =>
+    page.locator(`nav[aria-label] a[href$="/contests/r42${suffix}"]`).first();
 
   await page.goto('/contests/r42');
   await expect(tabLink('/ranking')).toBeVisible();

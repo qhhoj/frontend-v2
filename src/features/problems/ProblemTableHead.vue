@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { ProblemSort, ProblemSortField } from '@/api/types/problems';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import ProblemSortButton from './ProblemSortButton.vue';
 
-/** `interactive` false renders the same header with plain text (the skeleton), so nothing shifts when rows load. */
+/** `interactive` false renders the same cells with placeholder blocks (the skeleton: no text to read), so nothing shifts when rows load. */
 const props = defineProps<{ sort: ProblemSort | null; interactive: boolean }>();
 const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
 
@@ -20,18 +21,27 @@ const NUMBER_COLUMNS = [
   <thead>
     <tr class="bg-surface-strong text-left text-[13px] text-muted">
       <th scope="col" :class="`${CELL} pl-[22px]`">
-        <span class="sr-only">{{ $t('problems.columns.status') }}</span>
+        <span v-if="interactive" class="sr-only">{{ $t('problems.columns.status') }}</span>
       </th>
       <th scope="col" :class="`${CELL} px-3`" :aria-sort="ariaSort('name')">
         <ProblemSortButton
+          v-if="interactive"
           field="name"
           :label="$t('problems.columns.problem')"
           :sort="sort"
           :interactive="interactive"
           @sort="emit('sort', $event)"
         />
+        <span v-else class="inline-flex min-h-11 items-center"
+          ><SkeletonBlock text class="w-10"
+        /></span>
       </th>
-      <th scope="col" :class="`${CELL} px-3`">{{ $t('problems.columns.types') }}</th>
+      <th scope="col" :class="`${CELL} px-3`">
+        <template v-if="interactive">{{ $t('problems.columns.types') }}</template>
+        <span v-else class="inline-flex min-h-11 items-center"
+          ><SkeletonBlock text class="w-16"
+        /></span>
+      </th>
       <th
         v-for="column in NUMBER_COLUMNS"
         :key="column.field"
@@ -40,12 +50,19 @@ const NUMBER_COLUMNS = [
         :class="`${CELL} ${column.cell}`"
       >
         <ProblemSortButton
+          v-if="interactive"
           :field="column.field"
           :label="$t(column.labelKey)"
           :sort="sort"
           :interactive="interactive"
           @sort="emit('sort', $event)"
         />
+        <span
+          v-else
+          class="flex min-h-11 items-center"
+          :class="{ 'justify-end': column.field !== 'points' }"
+          ><SkeletonBlock text class="w-10"
+        /></span>
       </th>
     </tr>
   </thead>
