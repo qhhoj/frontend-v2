@@ -1218,6 +1218,22 @@
       "submitted": "Submitted"
     },
     "pretest": "This submission was graded on the pretests only.",
+    "overview": {
+      "title": "Test overview",
+      "scrollRegion": "Test overview, scrolls sideways",
+      "group": "Group",
+      "tests": "Tests",
+      "result": "Result",
+      "points": "Points",
+      "subtask": "Subtask {number}",
+      "allTests": "All tests",
+      "testTitle": "Test {number}: {verdict}",
+      "allPassed": "{passed}/{total} tests passed",
+      "failed": "Test {number} {verdict}",
+      "skipped": "{count} skipped",
+      "total": "Total",
+      "rule": "a subtask scores only when every test is AC"
+    },
     "cases": {
       "title": "Results per test",
       "scrollRegion": "Results per test, scrolls sideways",

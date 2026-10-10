@@ -126,7 +126,7 @@ const isHidden = computed(
         </thead>
         <tbody>
           <template v-for="row in gradedRows" :key="row.key">
-            <tr data-testid="case-row" class="border-t border-line">
+            <tr :id="row.key" data-testid="case-row" class="scroll-mt-20 border-t border-line">
               <th scope="row" class="px-6 py-3 text-left font-mono font-normal">{{ row.label }}</th>
               <td class="px-6 py-3"><VerdictLabel :verdict="caseVerdict(row.status)" /></td>
               <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.time }}</td>
