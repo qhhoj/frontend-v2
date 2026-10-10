@@ -2,31 +2,20 @@
 import { computed, ref, toRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
-import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import UserName from '@/components/UserName.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
-import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
-import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
-import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
-import EditorialTab from './EditorialTab.vue';
-import ProblemHeader from './ProblemHeader.vue';
-import PdfButton from './PdfButton.vue';
-import ProblemSubmissionsTab from './ProblemSubmissionsTab.vue';
+import ProblemContent from './ProblemContent.vue';
 import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
-import ProblemTabs from './ProblemTabs.vue';
-import StatementBody from './StatementBody.vue';
+import ProblemRailSkeleton from './ProblemRailSkeleton.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
-import SubmitDock from './SubmitDock.vue';
+import { PROBLEM_LAYOUT } from './problem-layout';
 import { useProblemQuery } from './problems.queries';
 
 const DEFAULT_TAB = 'statement';
-const SKELETON_TAB_COUNT = 3;
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
@@ -39,6 +28,10 @@ const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
 const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);
 
 usePageTitle(() => problem.value?.name);
+
+const layout = computed(
+  () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
+);
 
 /** Set when the editorial answers 404 for this problem; the tab then disappears until another problem is opened. */
 const editorialGone = ref(false);
@@ -86,7 +79,7 @@ watch(
       'page-column',
       contest && railEntries
         ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
-        : '[--page-width:60rem]',
+        : '[--page-width:80rem]',
     ]"
   >
     <ContestProblemSwitcher
@@ -98,70 +91,21 @@ watch(
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <ProblemHeaderSkeleton />
-          <div data-skeleton-region="tabs" class="flex flex-wrap gap-2">
-            <SkeletonBlock
-              v-for="index in SKELETON_TAB_COUNT"
-              :key="index"
-              pill
-              class="h-11 w-24"
-            />
+          <div :class="layout.grid">
+            <ProblemHeaderSkeleton :class="layout.left" />
+            <ProblemRailSkeleton data-testid="problem-rail" :class="layout.rail" />
+            <StatementSkeleton :class="layout.left" />
           </div>
-          <StatementSkeleton />
         </template>
-        <template v-if="problem">
-          <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
-          <ProblemHeader :problem="problem"
-            ><template #actions
-              ><div class="flex flex-wrap items-center gap-2">
-                <ShortLinkButton :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
-                <PdfButton
-                  v-if="problem.pdfStatementUrl"
-                  :code="problem.code"
-                  :lang="locale.locale"
-                /></div></template
-          ></ProblemHeader>
-          <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
-          <div
-            v-for="panel in tabs"
-            :id="`problem-panel-${panel.id}`"
-            :key="panel.id"
-            role="tabpanel"
-            :aria-labelledby="`problem-tab-${panel.id}`"
-            :hidden="panel.id !== tab"
-            :tabindex="panel.id === tab ? 0 : undefined"
-          >
-            <GlassCard
-              v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
-              as="div"
-              data-testid="statement-card"
-              class="rounded-panel p-6 sm:p-8"
-            >
-              <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
-                {{ $t('problem.untranslated') }}
-              </p>
-              <StatementBody :html="problem.descriptionHtml" />
-              <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
-                {{ $t('problem.authors') }}
-                <template v-for="(author, index) in problem.authors" :key="author.id"
-                  ><template v-if="index">, </template><UserName :username="author.username"
-                /></template>
-              </p>
-            </GlassCard>
-            <!-- Mounted only while selected, so the editorial request is lazy. -->
-            <EditorialTab
-              v-if="panel.id === 'editorial' && tab === 'editorial'"
-              :code="code"
-              @gone="editorialGone = true"
-            />
-            <ProblemSubmissionsTab
-              v-if="panel.id === 'submissions' && tab === 'submissions'"
-              :code="code"
-            />
-          </div>
-          <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
-          <SubmitDock :key="problem.code" :problem="problem" />
-        </template>
+        <ProblemContent
+          v-if="problem"
+          :key="problem.code"
+          v-model:tab="tab"
+          :problem="problem"
+          :tabs="tabs"
+          :layout="layout"
+          @gone="editorialGone = true"
+        />
       </QueryState>
     </div>
   </div>

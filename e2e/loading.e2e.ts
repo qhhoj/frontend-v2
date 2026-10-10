@@ -485,12 +485,12 @@ const SHIFT_CASES: ShiftCase[] = [
     placedOnly: ['statement'],
   },
   {
-    name: 'problem header limits',
+    name: 'problem rail limits',
     path: '/problems/duongdi',
     signedIn: false,
     hold: 'GET /problems/duongdi',
     parts: (page) => ({
-      card: page.getByTestId('problem-header'),
+      card: page.getByTestId('problem-rail'),
       limits: page.locator('[data-skeleton-region="limits"], [data-testid="limits"]'),
     }),
     viewports: PHONE_AND_DESKTOP,

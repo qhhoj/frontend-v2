@@ -74,6 +74,15 @@ describe('StatementBody', () => {
     expect(pre.find('button').exists()).toBe(false);
     expect(pre.element.previousElementSibling?.classList.contains('copy-bar')).toBe(true);
   });
+  it('puts the copy button in the sample title row when a heading precedes the sample', async () => {
+    stubClipboard(vi.fn().mockResolvedValue(undefined));
+    const wrapper = mountComponent(StatementBody, {
+      props: { html: '<h4>Ví dụ vào</h4><pre>a</pre>' },
+    });
+    await flushPromises();
+    expect(wrapper.find('h4 button.copy-block').exists()).toBe(true);
+    expect(wrapper.find('.copy-bar').exists()).toBe(false);
+  });
   it('relabels the buttons and the announcement when the language changes', async () => {
     stubClipboard(vi.fn().mockResolvedValue(undefined));
     const wrapper = mountComponent(StatementBody, { props: { html: '<pre>a</pre>' } });

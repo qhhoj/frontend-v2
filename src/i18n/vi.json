@@ -963,7 +963,32 @@
     "pdfRateLimited": "Quá nhiều yêu cầu PDF",
     "pdfRetry": "Thử lại",
     "pdfRetryIn": "Thử lại sau {seconds} giây",
-    "noSubmissions": "Bạn chưa nộp bài này."
+    "noSubmissions": "Bạn chưa nộp bài này.",
+    "rail": {
+      "railLabel": "Thông tin bài",
+      "submit": {
+        "title": "Nộp bài",
+        "language": "Ngôn ngữ",
+        "open": "Mở khung nộp bài",
+        "goTo": "Đến khung nộp bài",
+        "hint": "Dán mã hoặc kéo thả tệp."
+      },
+      "facts": {
+        "solvers": "Người giải",
+        "status": "Trạng thái",
+        "untried": "Chưa thử",
+        "hideTypes": "Ẩn dạng bài",
+        "showTypes": "Hiện dạng bài"
+      },
+      "mine": {
+        "title": "Bài nộp của tôi"
+      },
+      "links": {
+        "label": "Liên kết của bài",
+        "submissions": "Bài nộp",
+        "best": "Bài nộp tốt nhất"
+      }
+    }
   },
   "problems": {
     "title": "Bài tập",

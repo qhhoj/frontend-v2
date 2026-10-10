@@ -118,7 +118,7 @@ test('the footer is not under the submit dock on the problem page', async ({ pag
 
 defineShiftTests([
   {
-    name: 'problem header with the short-link button',
+    name: 'problem header and rail with the short-link button',
     path: PROBLEM,
     signedIn: true,
     hold: 'GET /problems/duongdi',
@@ -127,7 +127,10 @@ defineShiftTests([
       api.routes['GET /problems/:code'] = ({ params }) =>
         ok(problemDetail({ code: params.code, name: 'Đường đi qua mê cung' }));
     },
-    parts: (page) => ({ 'problem header': page.getByTestId('problem-header') }),
+    parts: (page) => ({
+      'problem header': page.getByTestId('problem-header'),
+      'problem rail': page.getByTestId('problem-rail'),
+    }),
     viewports: PHONE_AND_DESKTOP,
   },
   {

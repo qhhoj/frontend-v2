@@ -963,7 +963,32 @@
     "pdfRateLimited": "Too many PDF requests",
     "pdfRetry": "Try again",
     "pdfRetryIn": "Try again in {seconds} s",
-    "noSubmissions": "You have not submitted this problem yet."
+    "noSubmissions": "You have not submitted this problem yet.",
+    "rail": {
+      "railLabel": "Problem info",
+      "submit": {
+        "title": "Submit",
+        "language": "Language",
+        "open": "Open the submit panel",
+        "goTo": "Go to the submit panel",
+        "hint": "Paste code or drop a file."
+      },
+      "facts": {
+        "solvers": "Solvers",
+        "status": "Status",
+        "untried": "Not tried",
+        "hideTypes": "Hide problem types",
+        "showTypes": "Show problem types"
+      },
+      "mine": {
+        "title": "My submissions"
+      },
+      "links": {
+        "label": "Problem links",
+        "submissions": "Submissions",
+        "best": "Best submissions"
+      }
+    }
   },
   "problems": {
     "title": "Problems",
