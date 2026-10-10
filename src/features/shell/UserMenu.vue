@@ -29,27 +29,29 @@ const items = computed<MenuItem[]>(() => [
   <template v-if="session.user">
     <button
       type="button"
-      class="flex h-11 items-center gap-2.5 rounded-pill border border-line bg-surface-strong pr-1.5 pl-4 text-sm font-semibold hover:bg-surface-hover"
+      class="flex h-11 max-w-[9rem] items-center gap-2.5 sm:max-w-[12rem] rounded-pill border border-line bg-surface-strong pr-1.5 pl-4 text-sm font-semibold hover:bg-surface-hover"
       aria-haspopup="menu"
       :aria-expanded="isOpen"
       :aria-label="$t('account.menu', { username: session.user.username })"
       @click="menu?.toggle($event)"
     >
-      {{ session.user.username }}
-      <UserAvatar :username="session.user.username" :size="28" />
+      <span class="min-w-0 truncate" :title="session.user.username">{{
+        session.user.username
+      }}</span>
+      <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />
     </button>
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false" />
   </template>
   <div v-else class="flex items-center gap-2">
     <RouterLink
       :to="{ name: 'login', query: { redirect: route.fullPath } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-strong px-4 text-sm font-semibold hover:bg-surface-hover"
+      class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-strong px-3 text-sm sm:px-4 font-semibold hover:bg-surface-hover"
     >
       {{ $t('account.login') }}
     </RouterLink>
     <RouterLink
       :to="{ name: 'register' }"
-      class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-4 text-sm font-bold text-on-accent"
+      class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-3 text-sm font-bold text-on-accent sm:px-4"
     >
       {{ $t('account.register') }}
     </RouterLink>
