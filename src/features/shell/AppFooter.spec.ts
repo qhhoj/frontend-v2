@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import packageJson from '../../../package.json';
 import { partialSession, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import { blogListRoutes } from '@/test/community-routes';
@@ -18,6 +19,14 @@ describe('AppFooter', () => {
     const link = footer.get('[data-testid="low-power-footer"]');
     expect(link.attributes('href')).toBe('/settings/appearance#low-power');
     expect(link.attributes('aria-label')).toBe('Đổi chế độ tiết kiệm');
+  });
+
+  it('shows the served build: package version and commit', async () => {
+    const { wrapper } = await openBlog();
+    const version = wrapper.get('[data-testid="app-version"]').text();
+    expect(version).toMatch(
+      new RegExp(`^v${packageJson.version.replaceAll('.', '\\.')} · ([0-9a-f]{7}|dev)$`),
+    );
   });
 
   it('follows a change of the choice', async () => {

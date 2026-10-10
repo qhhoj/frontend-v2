@@ -35,6 +35,9 @@ const usedNames = new Set(
   ),
 );
 
+/** A name ending in a dash is a template prefix (`var(--qh-syntax-${token})`); its members are checked as SYNTAX_TOKENS. */
+for (const name of usedNames) if (name.endsWith('-')) usedNames.delete(name);
+
 interface Rule {
   /** The preset a rule belongs to; `null` for the base rule. */
   accent: string | null;

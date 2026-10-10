@@ -2179,5 +2179,8 @@
     "chip": "Đã xóa",
     "noticeTitle": "Bài đã bị xóa",
     "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test."
+  },
+  "footer": {
+    "versionTitle": "Phiên bản giao diện đang chạy"
   }
 }

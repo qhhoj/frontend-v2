@@ -2179,5 +2179,8 @@
     "chip": "Deleted",
     "noticeTitle": "Problem deleted",
     "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone."
+  },
+  "footer": {
+    "versionTitle": "Frontend version being served"
   }
 }
