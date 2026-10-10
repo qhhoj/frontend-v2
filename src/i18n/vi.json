@@ -1220,6 +1220,22 @@
       "submitted": "Nộp lúc"
     },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
+    "overview": {
+      "title": "Tổng quan test",
+      "scrollRegion": "Tổng quan test, cuộn ngang",
+      "group": "Nhóm",
+      "tests": "Test",
+      "result": "Kết quả",
+      "points": "Điểm",
+      "subtask": "Subtask {number}",
+      "allTests": "Các test",
+      "testTitle": "Test {number}: {verdict}",
+      "allPassed": "{passed}/{total} test đúng",
+      "failed": "Test {number} {verdict}",
+      "skipped": "{count} bỏ qua",
+      "total": "Tổng",
+      "rule": "subtask chỉ tính điểm khi mọi test đều AC"
+    },
     "cases": {
       "title": "Kết quả từng test",
       "scrollRegion": "Kết quả từng test, cuộn ngang",

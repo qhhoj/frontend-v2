@@ -17,6 +17,7 @@ import CasesTable from './CasesTable.vue';
 import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
+import TestOverview from './TestOverview.vue';
 import SubmissionSummary from './SubmissionSummary.vue';
 import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
@@ -115,6 +116,14 @@ const verdict = computed(() => {
           :problem-points="problemQuery.data.value?.points ?? null"
           :is-problem-loading="problemQuery.isLoading.value"
           :is-live="isLive"
+        />
+        <TestOverview
+          v-if="!isDeletedProblem"
+          :cases="row.cases"
+          :batches="row.batches"
+          :points="row.points"
+          :problem-points="problemQuery.data.value?.points ?? null"
+          :running="isLive"
         />
         <SubmissionStaffPanel :submission="row" />
         <SourceView
