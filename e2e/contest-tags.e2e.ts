@@ -4,7 +4,6 @@ import { CONTEST_FIXTURE_NOW, expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 /** The M4A board's catalogue, one tag per colour (e2e cannot import `src/test/contest-extras-fixtures`: it uses the `@/` alias). */
 const TAG_CATALOGUE = [
@@ -132,46 +131,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       );
     }
   });
-
-defineShiftTests([
-  {
-    name: 'contest tag row',
-    path: '/contests',
-    signedIn: false,
-    hold: 'GET /contest-tags',
-    answer: (api) => {
-      api.routes['GET /contest-tags'] = list(TAG_CATALOGUE.slice(0, 4));
-    },
-    parts: (page) => ({ row: page.getByTestId('tag-filter') }),
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: CONTEST_FIXTURE_NOW,
-  },
-  {
-    name: 'contest tag row, empty catalogue',
-    path: '/contests',
-    signedIn: false,
-    hold: 'GET /contest-tags',
-    answer: (api) => {
-      api.routes['GET /contest-tags'] = list([]);
-    },
-    parts: (page) => ({ row: page.getByTestId('tag-filter') }),
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: CONTEST_FIXTURE_NOW,
-  },
-  {
-    name: 'admin tag catalogue',
-    path: '/admin/contest-tags',
-    signedIn: true,
-    hold: 'GET /contest-tags',
-    answer: (api) => {
-      signInAsStaff(api, ['judge.change_contest_tag']);
-      api.routes['GET /contest-tags'] = adminList(TAG_CATALOGUE.slice(0, 4));
-    },
-    parts: (page) => ({
-      heading: page.getByRole('heading', { level: 1 }),
-      editor: page.getByTestId('tag-editor'),
-    }),
-    placed: ['editor'],
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

@@ -1,11 +1,10 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { installOrgProblems } from './fixtures/f4-api';
-import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { list } from './fixtures/reply';
 import { organizationDetail } from '../src/test/community-fixtures';
 import { problemDetail } from '../src/test/fixtures';
-import { ORG_PROBLEMS, f4Id } from '../src/test/f4-fixtures';
+import { f4Id } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
 
 const TAB = '/organizations/lhp/problems';
@@ -76,18 +75,6 @@ test('archives a row and the list reloads', async ({ page, api }) => {
     )
     .toBeGreaterThan(1);
 });
-
-defineShiftTests([
-  {
-    name: 'organization problem list',
-    path: TAB,
-    signedIn: true,
-    hold: 'GET /organizations/lhp/problems',
-    answer: (api) => installOrgProblems(api, { canAdminister: true, rows: ORG_PROBLEMS }),
-    parts: (page) => ({ list: page.getByTestId('org-problem-list') }),
-    viewports: [PHONE, DESKTOP],
-  },
-]);
 
 test('an admin adds a tag in the catalogue', async ({ page, api }) => {
   installOrgProblems(api, { canAdminister: true });

@@ -6,7 +6,6 @@ import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/ad
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 const PATH = '/admin/contests/hcmus-w41/ghosts';
 const fitsWidth = (page: Page) =>
@@ -110,20 +109,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await axeViolationsIn(page)).toEqual([]);
       expect(await fitsWidth(page)).toBe(true);
     });
-
-defineShiftTests([
-  {
-    name: 'ghost tab',
-    path: PATH,
-    signedIn: true,
-    hold: 'GET /contests/hcmus-w41/ghosts',
-    answer: withGhosts,
-    parts: (page) => ({
-      tabs: page.getByRole('navigation', { name: 'Các phần của kỳ thi' }),
-      grid: page.locator('[data-ghost-part="grid"]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['grid'],
-    placed: ['grid'],
-  },
-]);

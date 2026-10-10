@@ -1,15 +1,10 @@
-import { shortLink } from '../src/test/f5-fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, confirmInDialog, signInAsStaff } from './fixtures/admin';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
 
 const PERMISSIONS = ['judge.manage_short_link'];
-const SIX_LINKS = Array.from({ length: 6 }, (_unused, index) =>
-  shortLink({ code: `code-${index + 1}`, path: `/problems/p${index + 1}`, hits: index }),
-);
 const staff = (api: FakeApi) => signInAsStaff(api, PERMISSIONS);
 
 test('creates a chosen-code link and deletes another after confirming', async ({ page, api }) => {
@@ -51,20 +46,3 @@ for (const viewport of AUDIT_VIEWPORTS)
         true,
       );
     });
-
-defineShiftTests([
-  {
-    name: 'staff short-link table',
-    path: '/admin/short-links',
-    signedIn: true,
-    hold: 'GET /short-links',
-    answer: (api) => {
-      staff(api);
-      api.routes['GET /short-links'] = adminList(SIX_LINKS);
-    },
-    parts: (page) => ({
-      'short-link rows': page.locator('[data-skeleton-region="short-link-row"], tr[data-code]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

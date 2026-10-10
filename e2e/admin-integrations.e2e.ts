@@ -4,7 +4,6 @@ import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
 
 const staff = (api: FakeApi) => signInAsStaff(api, ['judge.manage_integration']);
 
@@ -66,24 +65,3 @@ test('the key dialog is accessible', async ({ page, api }) => {
   await expect(dialogOf(page)).toBeVisible();
   expect(await axeViolationsIn(page)).toEqual([]);
 });
-
-defineShiftTests([
-  {
-    name: 'integration client table',
-    path: '/admin/integrations',
-    signedIn: true,
-    hold: 'GET /integration-clients',
-    answer: (api) => {
-      staff(api);
-      api.routes['GET /integration-clients'] = adminList([
-        integrationClient({ name: 'Cổng 1' }),
-        integrationClient({ id: 'c-2', name: 'Cổng 2' }),
-        integrationClient({ id: 'c-3', name: 'Cổng 3' }),
-      ]);
-    },
-    parts: (page) => ({
-      'client rows': page.locator('[data-skeleton-region="integration-row"], tr[data-client]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

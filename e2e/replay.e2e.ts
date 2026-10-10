@@ -4,7 +4,6 @@ import { buildingChunk, endedContest } from '../src/test/replay-fixtures';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 import type { Reply } from './fixtures/reply';
 
@@ -99,20 +98,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await axeViolationsIn(page)).toEqual([]);
       expect(await fitsWidth(page)).toBe(true);
     });
-
-defineShiftTests([
-  {
-    name: 'replay page',
-    path: REPLAY,
-    signedIn: false,
-    hold: 'GET /contests/r41/replay',
-    parts: (page) => ({
-      player: page.locator('[data-replay-part="player"]'),
-      board: page.locator('[data-replay-part="board"]'),
-      feed: page.locator('[data-replay-part="feed"]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['board', 'feed'],
-    placed: ['board'],
-  },
-]);

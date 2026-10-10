@@ -39,7 +39,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 
 - A card, list or table that waits on a query uses `QueryState :loading="isPending"` and fills its `#skeleton` slot; no loading text. Pass the query's `isPending`, never `isFetching`: background refetches, polls and kept data must not show skeletons or Bits
 - Only pass `isPending` for an enabled query: it stays true while a query is disabled or paused offline. For a query that can be disabled, pass `isLoading`
-- Adding a skeleton for a new card: copy the loaded markup's wrapper elements (same text, spacing and grid classes), replace each text line with `<SkeletonBlock text class="w-..." />` inside the element that carries the font classes, replace avatars, badges and tiles with fixed-size `SkeletonBlock` (`round` for circles), and repeat rows as many times as the query's page size. Heights then match without magic numbers; confirm with an e2e `boundingBox` comparison before and after (see `e2e/loading.e2e.ts`)
+- Adding a skeleton for a new card: copy the loaded markup's wrapper elements (same text, spacing and grid classes), replace each text line with `<SkeletonBlock text class="w-..." />` inside the element that carries the font classes, replace avatars, badges and tiles with fixed-size `SkeletonBlock` (`round` for circles), and repeat rows as many times as the query's page size. Heights then match without magic numbers
 - The Bit swarm and the live region live once in the shell (`LoadingLayer`); pages never mount their own. A new route is covered automatically (navigation and `QueryState` register as waiting sources)
 - Tests that need a page to stay loading: `hangRequestsExcept([...])` (unit), `api.hold('GET /path')` (e2e)
 

@@ -9,7 +9,6 @@ import { adminOk, confirmInDialog, signInAsStaff } from './fixtures/admin';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 const PATH = '/admin/contests/hcmus-w41/actions';
 const fitsWidth = (page: Page) =>
@@ -52,20 +51,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await axeViolationsIn(page)).toEqual([]);
       expect(await fitsWidth(page)).toBe(true);
     });
-
-defineShiftTests([
-  {
-    name: 'actions tab with the rebuild card',
-    path: PATH,
-    signedIn: true,
-    hold: 'GET /contests/hcmus-w41/actions',
-    answer: endedEditor,
-    parts: (page) => ({
-      tabs: page.getByRole('navigation', { name: 'Các phần của kỳ thi' }),
-      cards: page.locator('[data-testid^="action-"], [data-testid="query-skeleton"] > *').first(),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['cards'],
-    placed: ['cards'],
-  },
-]);

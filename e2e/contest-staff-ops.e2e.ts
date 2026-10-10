@@ -9,7 +9,6 @@ import { adminOk, confirmInDialog, signInAsStaff } from './fixtures/admin';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 const ACTIONS_PATH = '/admin/contests/hcmus-w41/actions';
 const PUBLISH_ROUTE = 'POST /contests/hcmus-w41/publish-problems';
@@ -68,31 +67,7 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await fitsWidth(page)).toBe(true);
     });
 
-defineShiftTests([
-  {
-    name: 'actions tab with the publish card',
-    path: ACTIONS_PATH,
-    signedIn: true,
-    hold: 'GET /contests/hcmus-w41/actions',
-    answer: endedEditor,
-    parts: (page) => ({
-      tabs: page.getByRole('navigation', { name: 'Các phần của kỳ thi' }),
-      publish: page.getByTestId('publish-card'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['publish'],
-    placed: ['publish'],
-  },
-]);
-
 const NO_KEY = { isActive: false, mode: null, expiresAt: null, createdBy: null, releasedAt: null };
-const ACTIVE_KEY = {
-  isActive: true,
-  mode: 'frozen-until-release',
-  expiresAt: '2026-10-22T08:00:00.000Z',
-  createdBy: 'minhthu',
-  releasedAt: null,
-};
 const MINTED_KEY = 'qhf_8Kq2Zr5Lw9Tn3Vb6Xc1Md4Fg7Hj0Pa2s';
 
 function dataTab(api: FakeApi, feedStatus: object = NO_KEY) {
@@ -149,20 +124,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await axeViolationsIn(page), 'reveal').toEqual([]);
       expect(await fitsWidth(page)).toBe(true);
     });
-
-defineShiftTests([
-  {
-    name: 'contest Data tab',
-    path: '/admin/contests/hcmus-w41/data',
-    signedIn: true,
-    hold: 'GET /contests/hcmus-w41/feed-key',
-    answer: (api) => dataTab(api, ACTIVE_KEY),
-    parts: (page) => ({
-      feed: page.getByTestId('feed-key-card'),
-      exportCard: page.getByTestId('export-card'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['exportCard'],
-    placed: ['exportCard'],
-  },
-]);

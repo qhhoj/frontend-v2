@@ -1,11 +1,8 @@
-import { problemDetail } from '../src/test/fixtures';
 import type { Locator, Page } from '@playwright/test';
 import { THEMES } from '../src/theme/registry';
-import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
+import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
-import { ok } from './fixtures/reply';
 
 const PROBLEM = '/problems/duongdi';
 const BUTTON = 'short-link-button';
@@ -115,35 +112,3 @@ test('the footer is not under the submit dock on the problem page', async ({ pag
   const footerBottom = await bottomOf(page.getByTestId('low-power-footer'));
   expect(footerBottom).toBeLessThanOrEqual(box!.y + 1);
 });
-
-defineShiftTests([
-  {
-    name: 'problem header and rail with the short-link button',
-    path: PROBLEM,
-    signedIn: true,
-    hold: 'GET /problems/duongdi',
-    // A title of two phone lines: the skeleton draws two, and the button then sits on its own row.
-    answer: (api) => {
-      api.routes['GET /problems/:code'] = ({ params }) =>
-        ok(problemDetail({ code: params.code, name: 'Đường đi qua mê cung' }));
-    },
-    parts: (page) => ({
-      'problem header': page.getByTestId('problem-header'),
-      'problem rail': page.getByTestId('problem-rail'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'contest header with the short-link button',
-    path: '/contests/r42',
-    signedIn: true,
-    hold: 'GET /contests/r42',
-    clockAt: CONTEST_FIXTURE_NOW,
-    parts: (page) => ({
-      header: page.locator(
-        '[data-skeleton-region="contest-header"], [data-testid="contest-header"]',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

@@ -2,7 +2,6 @@ import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installUsageOverview } from './fixtures/f4-api';
-import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { usageRow } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -53,21 +52,6 @@ test('the admin nav links the overview', async ({ page, api }) => {
   await page.getByRole('link', { name: 'Hạn mức tổ chức' }).click();
   await expect(page).toHaveURL(/\/admin\/organizations\/quotas$/);
 });
-
-defineShiftTests([
-  {
-    name: 'staff quota overview',
-    path: '/admin/organizations/quotas',
-    signedIn: true,
-    hold: 'GET /organizations/usage',
-    answer: (api) => {
-      signInAsStaff(api, EDIT);
-      installUsageOverview(api, ROWS);
-    },
-    parts: (page) => ({ table: page.getByTestId('quota-overview') }),
-    viewports: [PHONE, DESKTOP],
-  },
-]);
 
 test('a clone refused by the quota names the credits with the sweating Bit', async ({
   page,

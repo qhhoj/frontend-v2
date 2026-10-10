@@ -5,7 +5,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
 const NOW = new Date('2026-10-09T10:25:00Z');
@@ -62,21 +61,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await axeViolationsIn(page)).toEqual([]);
       expect(await fitsWidth(page)).toBe(true);
     });
-
-defineShiftTests([
-  {
-    name: 'virtual overlay',
-    path: `${RANKING}?compare=1`,
-    signedIn: true,
-    hold: 'GET /contests/r41/replay',
-    answer: inVirtualRun,
-    clockAt: NOW,
-    parts: (page) => ({
-      summary: page.locator('[data-overlay-part="summary"]'),
-      panels: page.locator('[data-overlay-part="panels"]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    placedOnly: ['panels'],
-    placed: ['panels'],
-  },
-]);

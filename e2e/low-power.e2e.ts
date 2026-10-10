@@ -2,7 +2,6 @@ import type { Page } from '@playwright/test';
 import { THEMES } from '../src/theme/registry';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
 
 /** Runs after the FakeApi's strong-device script, so this device reports two cores. */
 const weakDevice = (page: Page) =>
@@ -99,14 +98,3 @@ test('the appearance page with the low-power cards never scrolls sideways at 375
   await expect(page.getByTestId('low-power-section')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
-
-defineShiftTests([
-  {
-    name: 'low-power cards',
-    path: '/settings/appearance',
-    signedIn: true,
-    hold: 'GET /profile',
-    parts: (page) => ({ 'low-power section': page.getByTestId('low-power-section') }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

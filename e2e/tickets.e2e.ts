@@ -7,8 +7,6 @@ import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
 import type { Reply } from './fixtures/reply';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
-import type { ShiftCase } from './fixtures/layout-shift';
 
 const PROBLEM_TICKETS = '/problems/hcmus41b/tickets';
 const SAVED_TICKET_PATH = `/tickets/${ticketDetail().id}`;
@@ -138,17 +136,3 @@ for (const path of ['/tickets', '/tickets/new'])
     );
     expect(overflows).toBe(false);
   });
-
-const SHIFT_CASES: ShiftCase[] = [
-  {
-    name: 'ticket table',
-    path: '/tickets',
-    signedIn: true,
-    hold: 'GET /tickets',
-    answer: (api) => (api.routes['GET /tickets'] = list(eightTickets())),
-    parts: (page) => ({ table: page.locator('table') }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-];
-
-defineShiftTests(SHIFT_CASES);

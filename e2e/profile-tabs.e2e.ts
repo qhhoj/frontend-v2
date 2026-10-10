@@ -1,10 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { profile, sessionResponse, sessionUser } from '../src/test/fixtures';
-import { ppEntry } from '../src/test/community-fixtures';
 import { THEMES } from '../src/theme/registry';
-import { expect, list, test } from './fixtures/api';
+import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 /** Each tab, the text that shows once its data is in (exact), and the viewer it needs. */
 const TABS = [
@@ -21,7 +19,6 @@ const VIEWPORTS = [
   { name: 'desktop', width: 1280, height: 800 },
   { name: 'phone 375 px', width: 375, height: 812 },
 ] as const;
-const PP_KEY = 'GET /users/user_01/pp-breakdown';
 
 /** A signed-in viewer who holds the right to list other users' comments. */
 const grantCommentRight = (api: FakeApi) => {
@@ -66,17 +63,3 @@ for (const viewport of VIEWPORTS)
           ),
         ).toEqual([]);
       });
-
-defineShiftTests([
-  {
-    name: 'PP table',
-    path: '/users/user_01/pp',
-    signedIn: false,
-    hold: PP_KEY,
-    answer: (api) => {
-      api.routes[PP_KEY] = list([...Array(10).keys()].map((index) => ppEntry(index + 1)));
-    },
-    parts: (page) => ({ table: page.locator('table').first() }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

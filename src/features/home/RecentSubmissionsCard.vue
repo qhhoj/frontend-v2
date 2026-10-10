@@ -21,8 +21,7 @@ const locale = useLocaleStore();
 const now = useNow(60_000);
 /**
  * The list box on a phone: the four skeleton rows, measured at 382 px on a 375 px screen. The skeleton and the empty
- * message both take it, so the card keeps its height when rows or the message replace the skeleton (CLS cases
- * "recent submissions card" and "recent submissions card when it has nothing to list" in e2e/loading.e2e.ts). From `sm`
+ * message both take it, so the card keeps its height when rows or the message replace the skeleton. From `sm`
  * the card sits beside the right column in a flex row that stretches it, so the box is dropped there.
  */
 const LIST_BOX = 'min-h-[382px] sm:min-h-0';

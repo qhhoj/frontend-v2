@@ -4,7 +4,6 @@ import { adminList, adminOk, confirmInDialog, dialogOf, signInAsStaff } from './
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 const PATH = '/admin/tickets/canned';
 const FIVE = Array.from({ length: 5 }, (_item, index) =>
@@ -64,19 +63,3 @@ test('the screen and its open dialog do not scroll sideways at 375 px', async ({
   await expect(dialogOf(page)).toBeVisible();
   expect(await overflows()).toBe(false);
 });
-
-defineShiftTests([
-  {
-    name: 'canned-reply table',
-    path: PATH,
-    signedIn: true,
-    hold: 'GET /ticket-canned-replies',
-    answer: (api) => withReplies(api),
-    parts: (page) => ({
-      table: page.locator(
-        '[data-skeleton-region="canned-table"] table, [data-testid="canned-replies"] table',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

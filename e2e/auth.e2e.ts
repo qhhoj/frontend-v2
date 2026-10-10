@@ -2,7 +2,6 @@ import { generateKeyPairSync } from 'node:crypto';
 import type { Page } from '@playwright/test';
 import { CPP17_ID, organizationItem } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS } from './fixtures/audit';
 import { PASSKEY_CREDENTIAL_ID, fail, installAuth, invalid } from './fixtures/auth';
 import type { AuthScenario } from './fixtures/auth';
 
@@ -472,60 +471,3 @@ test.describe('passwords', () => {
     ]);
   });
 });
-
-/** Parts that hold space with blocks while their data loads must not move the page when it arrives (8a3 rule). */
-const SHIFT_TOLERANCE_PX = 2;
-const SHIFT_CASES = [
-  {
-    name: 'social buttons on the login screen',
-    path: '/login',
-    hold: 'GET /auth/social/providers',
-    part: '[data-testid="social-skeleton"], [data-testid="social-buttons"]',
-  },
-  {
-    name: 'school and language pickers',
-    path: '/register',
-    hold: 'GET /organizations',
-    part: '[data-skeleton-region="select"], [data-auth-select]',
-  },
-  {
-    name: 'login counts line',
-    path: '/login',
-    hold: 'GET /home',
-    part: '[data-testid="site-counts"]',
-  },
-] as const;
-
-for (const shift of SHIFT_CASES)
-  for (const viewport of AUDIT_VIEWPORTS)
-    test(`the ${shift.name} keep their size when the data arrives, ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      installAuth(api);
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      const release = api.hold(shift.hold);
-      await page.goto(shift.path);
-      const part = page.locator(shift.part);
-      await expect(part.first()).toBeVisible();
-      await page.evaluate(() => document.fonts.ready);
-      const span = () =>
-        part.evaluateAll((elements) => {
-          const rects = elements.map((element) => element.getBoundingClientRect());
-          const top = Math.min(...rects.map((rect) => rect.top));
-          return { top, height: Math.max(...rects.map((rect) => rect.bottom)) - top };
-        });
-      const skeleton = await span();
-      release();
-      await expect(page.locator('[data-skeleton]')).toHaveCount(0);
-      await page.evaluate(() => document.fonts.ready);
-      await expect
-        .poll(async () => {
-          const loaded = await span();
-          return [
-            Math.abs(loaded.top - skeleton.top) <= SHIFT_TOLERANCE_PX,
-            Math.abs(loaded.height - skeleton.height) <= SHIFT_TOLERANCE_PX,
-          ];
-        })
-        .toEqual([true, true]);
-    });

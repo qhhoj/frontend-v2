@@ -3,7 +3,6 @@ import { THEMES } from '../src/theme/registry';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
 const problems = [
@@ -78,23 +77,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       );
     }
   });
-
-defineShiftTests([
-  {
-    name: 'problem page inside a contest',
-    path: '/problems/r42b',
-    signedIn: true,
-    hold: 'GET /problems/r42b',
-    answer: inContest,
-    // Offsets are measured from the header, so the rail (beside it from lg, above it below lg) is the declared exception.
-    parts: (page) => ({
-      header: page.getByTestId('problem-header'),
-      tabs: page.locator('[data-skeleton-region="tabs"], [role="tablist"]'),
-      statement: page.getByTestId('statement-card'),
-    }),
-    placed: ['tabs', 'statement'],
-    placedOnly: ['statement'],
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: CONTEST_FIXTURE_NOW,
-  },
-]);

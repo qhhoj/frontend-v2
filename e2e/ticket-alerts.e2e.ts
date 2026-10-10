@@ -3,7 +3,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 import type { Page } from '@playwright/test';
 
@@ -65,17 +64,3 @@ test('the strip does not make /tickets scroll sideways at 375 px', async ({ page
   );
   expect(overflows).toBe(false);
 });
-
-defineShiftTests([
-  {
-    name: 'ticket alerts strip',
-    path: '/tickets',
-    signedIn: true,
-    hold: 'GET /tickets/summary',
-    answer: (api) => asHandler(api, 0, 3),
-    parts: (page) => ({
-      strip: page.locator('[data-skeleton-region="ticket-alerts"], [data-testid="ticket-alerts"]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

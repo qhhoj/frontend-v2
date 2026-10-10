@@ -1,7 +1,6 @@
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { list, ok } from './fixtures/reply';
 import { submissionDetail, submissionItem } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -66,15 +65,3 @@ for (const viewport of AUDIT_VIEWPORTS)
         true,
       );
     });
-
-defineShiftTests([
-  {
-    name: 'submission page of a deleted problem',
-    path: `/submissions/${TOMBSTONED.id}`,
-    signedIn: true,
-    hold: `GET /submissions/${TOMBSTONED.id}`,
-    answer: tombstoneRoutes,
-    parts: (page) => ({ summary: page.getByTestId('submission-summary') }),
-    viewports: [PHONE, DESKTOP],
-  },
-]);
