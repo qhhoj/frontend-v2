@@ -26,9 +26,12 @@ describe('blog list: feed, pages and links', () => {
     const { wrapper } = await mountApp('/blog?feed=all&page=2');
     const request = calls.find((call) => call.path === '/posts')!;
     expect([request.query.get('feed'), request.query.get('page')]).toEqual(['all', '2']);
+    const pinned = wrapper.get('[data-testid="post-card"]');
+    expect(pinned.text()).toContain('Đã ghim');
+    expect(pinned.get('h2 a').text()).toBe('Thông báo');
     const rows = wrapper.findAll('[data-testid="post-row"]');
-    expect(rows[0]!.text()).toContain('Ghim');
-    expect(rows[1]!.get('h2 a').attributes('href')).toBe('/blog/p2');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.get('h2 a').attributes('href')).toBe('/blog/p2');
     expect(wrapper.get('a[aria-current="page"][href="/blog?feed=all"]').text()).toBe(
       'Tất cả bài viết',
     );

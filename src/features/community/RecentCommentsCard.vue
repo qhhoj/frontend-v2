@@ -7,7 +7,7 @@ import { useHomeQuery } from './community.queries';
 import CommunityCard from './CommunityCard.vue';
 import RecentCommentRow from './RecentCommentRow.vue';
 
-const props = defineProps<{ limit: number }>();
+const props = defineProps<{ limit: number; embedded?: boolean }>();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const now = useNow();
 const comments = computed(() => (home.value?.recentComments ?? []).slice(0, props.limit));
@@ -16,6 +16,7 @@ const comments = computed(() => (home.value?.recentComments ?? []).slice(0, prop
 <template>
   <CommunityCard
     :title="$t('blog.recentComments')"
+    :embedded="embedded"
     :loading="isPending"
     :error="error"
     @retry="refetch()"

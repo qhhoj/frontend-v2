@@ -1509,6 +1509,7 @@
     "write": "Write a post",
     "rss": "RSS feed",
     "pinned": "Pinned",
+    "pinnedLabel": "Pinned",
     "comments": "{count} comments",
     "readMore": "Read more",
     "pager": "Post pages",

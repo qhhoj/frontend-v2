@@ -1509,6 +1509,7 @@
     "write": "Viết bài",
     "rss": "Nguồn RSS",
     "pinned": "Ghim",
+    "pinnedLabel": "Đã ghim",
     "comments": "{count} bình luận",
     "readMore": "Đọc tiếp",
     "pager": "Trang bài viết",

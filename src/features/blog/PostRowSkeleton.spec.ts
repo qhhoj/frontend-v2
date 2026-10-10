@@ -3,45 +3,36 @@ import { postItem } from '@/test/community-fixtures';
 import { mockApi } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
+import PostCard from './PostCard.vue';
+import PostCardSkeleton from './PostCardSkeleton.vue';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
 
-const loaded = () => mountComponent(PostRow, { props: { post: postItem({ sticky: true }) } });
-const skeleton = () => mountComponent(PostRowSkeleton);
+const row = () => mountComponent(PostRow, { props: { post: postItem() } });
+const card = () => mountComponent(PostCard, { props: { post: postItem({ sticky: true }) } });
 
 describe('post row skeleton parity', () => {
-  it('shares the row box: 16 px gap, 16 px and 20 px sides and 16 px top and bottom padding', () => {
+  it('shares the row grid and padding', () => {
     mockApi({ ...anonymousViewer });
-    expect(loaded().classes()).toEqual(
-      expect.arrayContaining(['flex', 'gap-3', 'px-4', 'py-4', 'sm:px-5']),
-    );
-    expect(skeleton().classes()).toEqual(
-      expect.arrayContaining(['flex', 'gap-3', 'px-4', 'py-4', 'sm:px-5']),
-    );
+    const shared = ['grid', 'grid-cols-[minmax(0,1fr)_auto]', 'gap-x-3', 'px-4', 'py-2', 'sm:px-5'];
+    expect(row().classes()).toEqual(expect.arrayContaining(shared));
+    expect(mountComponent(PostRowSkeleton).classes()).toEqual(expect.arrayContaining(shared));
   });
-  it('gives the vote column the 44 px arrows, 2 px gaps and a 24 px score line', () => {
+  it('reserves the 44 px vote on the right', () => {
     mockApi({ ...anonymousViewer });
-    const upArrow = loaded().get('button[aria-label="Bình chọn lên"]');
-    expect(upArrow.classes()).toContain('size-11');
-    expect(upArrow.element.parentElement!.classList).toContain('gap-0.5');
-    expect(skeleton().get('[data-part="vote"]').classes()).toEqual(
-      expect.arrayContaining(['w-11', 'shrink-0', 'gap-0.5']),
-    );
-    expect(skeleton().get('[data-part="vote"]').element.querySelectorAll('.size-11')).toHaveLength(
-      2,
-    );
+    expect(row().get('button[aria-label="Bình chọn lên"]').classes()).toContain('size-11');
+    expect(mountComponent(PostRowSkeleton).get('[data-part="vote"]').classes()).toContain('h-11');
   });
-  it('reserves the same title, summary and footer heights as the loaded row', () => {
+});
+
+describe('post card skeleton parity', () => {
+  it('shares the glass card box and the 144 px image area', () => {
     mockApi({ ...anonymousViewer });
-    expect(loaded().get('h2').classes()).toContain('min-h-14');
-    expect(loaded().get('.user-content, [class~="line-clamp-3"]').classes()).toContain('min-h-18');
-    expect(loaded().get('footer').classes()).toEqual(
-      expect.arrayContaining(['min-h-11', 'sm:min-h-5']),
-    );
-    expect(skeleton().get('[data-part="title"]').classes()).toContain('h-14');
-    expect(skeleton().get('[data-part="summary"]').classes()).toContain('h-18');
-    expect(skeleton().get('[data-part="footer"]').classes()).toEqual(
-      expect.arrayContaining(['min-h-11', 'sm:min-h-5']),
-    );
+    const skeleton = mountComponent(PostCardSkeleton);
+    for (const box of [card(), skeleton]) {
+      expect(box.classes()).toEqual(expect.arrayContaining(['glass', 'flex', 'flex-col']));
+    }
+    skeleton.get('.h-36');
+    card().get('a.h-36');
   });
 });

@@ -7,9 +7,10 @@ import { useHomeQuery } from './community.queries';
 import CommunityCard from './CommunityCard.vue';
 
 /** The newest problems; `home` adds the code and date under each name and writes the points out. */
-const props = withDefaults(defineProps<{ limit: number; variant?: 'rail' | 'home' }>(), {
-  variant: 'rail',
-});
+const props = withDefaults(
+  defineProps<{ limit: number; variant?: 'rail' | 'home'; embedded?: boolean }>(),
+  { variant: 'rail', embedded: false },
+);
 const locale = useLocaleStore();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.limit));
@@ -18,6 +19,7 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
 <template>
   <CommunityCard
     :title="$t('blog.newProblems')"
+    :embedded="embedded"
     :loading="isPending"
     :error="error"
     @retry="refetch()"
