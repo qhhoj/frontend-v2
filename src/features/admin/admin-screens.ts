@@ -72,7 +72,6 @@ export const ADMIN_SCREENS = {
   activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },
   settings: { path: '/admin/settings', permission: 'judge.change_settings' },
   config: { path: '/admin/config', permission: 'judge.change_miscconfig' },
-  nav: { path: '/admin/nav', permission: 'judge.change_navigationbar' },
   pages: { path: '/admin/pages', permission: 'flatpages.change_flatpage' },
   log: { path: '/admin/log', permission: 'judge.change_settings' },
   shortLinks: { path: '/admin/short-links', permission: 'judge.manage_short_link' },

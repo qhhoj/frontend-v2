@@ -43,7 +43,6 @@
       "users": "Ban or unban accounts and sign in as a user.",
       "activity": "View and export logs, summaries by user.",
       "settings": "Limits, similarity and other settings, and the change history.",
-      "nav": "Arrange the links on the main bar.",
       "pages": "Create and edit about and policy pages.",
       "tickets": "Tickets sent by users."
     }
@@ -84,7 +83,6 @@
     "activity": "User activity",
     "settings": "Site settings",
     "config": "Raw config",
-    "nav": "Navigation bar",
     "pages": "Static pages",
     "log": "Change log",
     "shortLinks": "Short links",

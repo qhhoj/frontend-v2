@@ -11,7 +11,7 @@ describe('mockApi shell defaults', () => {
   });
 
   it('lets a test route a shell read itself and records that call', async () => {
-    const calls = mockApi({ 'GET /site': ok({ navigation: [], config: {}, officialMode: true }) });
+    const calls = mockApi({ 'GET /site': ok({ config: {}, officialMode: true }) });
     const response = await fetch('/api/internal/site');
     expect(((await response.json()) as { data: { officialMode: boolean } }).data.officialMode).toBe(
       true,

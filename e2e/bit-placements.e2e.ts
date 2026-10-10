@@ -123,7 +123,7 @@ test('the notification envelope Bit and the lock Bit stand still under reduced m
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   api.signedIn = true;
-  api.routes['GET /site'] = { body: { data: { navigation: [], config: {}, officialMode: true } } };
+  api.routes['GET /site'] = { body: { data: { config: {}, officialMode: true } } };
   await page.goto('/notifications');
   const envelope = page.locator('main [data-testid="inline-bit"]').first();
   const lock = page

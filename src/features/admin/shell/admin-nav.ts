@@ -13,7 +13,6 @@ import {
   LifeBuoy,
   Link,
   ListChecks,
-  Menu,
   Newspaper,
   Plug,
   RotateCcw,
@@ -90,7 +89,6 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   group('site', [
     screenItem('settings', Settings),
     screenItem('config', Braces),
-    screenItem('nav', Menu),
     screenItem('pages', Files),
     screenItem('log', History),
     screenItem('shortLinks', Link),
@@ -157,7 +155,7 @@ const section = (key: string, ids: AdminNavId[]): DashboardSection => ({
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
   section('content', ['problems', 'problemImport', 'posts']),
   section('contests', ['contests', 'similarity', 'rejudge', 'judges']),
-  section('people', ['users', 'activity', 'settings', 'nav', 'pages', 'tickets']),
+  section('people', ['users', 'activity', 'settings', 'pages', 'tickets']),
 ];
 
 export const visibleDashboard = (user: PermissionHolder | null) =>

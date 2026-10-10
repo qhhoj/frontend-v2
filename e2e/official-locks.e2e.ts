@@ -25,7 +25,7 @@ const TWO_ORGANIZATIONS = [
 ];
 const lockedSite = (api: FakeApi) => {
   api.signedIn = true;
-  api.routes['GET /site'] = ok({ navigation: [], config: {}, officialMode: true });
+  api.routes['GET /site'] = ok({ config: {}, officialMode: true });
   api.routes[`GET /organizations/${LHP.slug}`] = ok(LHP);
 };
 /** The account in settings belongs to two organizations, so the order buttons show; call after `applyTheme` (it keeps the theme). */

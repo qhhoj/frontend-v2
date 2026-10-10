@@ -45,7 +45,6 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   activity: () => import('./activity/UserActivityPage.vue'),
   settings: () => import('./settings/SiteSettingsPage.vue'),
   config: () => import('./site/MiscConfigPage.vue'),
-  nav: () => import('./site/NavBarPage.vue'),
   pages: () => import('./pages/FlatpagesPage.vue'),
   log: () => import('./settings/AdminLogPage.vue'),
   shortLinks: () => import('./short-links/ShortLinksPage.vue'),

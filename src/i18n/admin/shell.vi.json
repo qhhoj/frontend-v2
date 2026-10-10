@@ -43,7 +43,6 @@
       "users": "Cấm hoặc bỏ cấm tài khoản, đăng nhập thay.",
       "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
       "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
-      "nav": "Sắp xếp liên kết trên thanh chính.",
       "pages": "Tạo và sửa trang giới thiệu, quy định.",
       "tickets": "Phiếu do người dùng gửi."
     }
@@ -84,7 +83,6 @@
     "activity": "Nhật ký hoạt động",
     "settings": "Cấu hình hệ thống",
     "config": "Cấu hình thô",
-    "nav": "Thanh điều hướng",
     "pages": "Trang tĩnh",
     "log": "Nhật ký thay đổi",
     "shortLinks": "Liên kết ngắn",

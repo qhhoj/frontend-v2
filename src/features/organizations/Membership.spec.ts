@@ -114,7 +114,7 @@ describe('membership panel: private membership', () => {
 });
 
 describe('membership panel: official contest', () => {
-  const officialSite = { 'GET /site': ok({ navigation: [], config: {}, officialMode: true }) };
+  const officialSite = { 'GET /site': ok({ config: {}, officialMode: true }) };
   const panelButton = (wrapper: Pick<VueWrapper, 'get'>, name: string) =>
     wrapper
       .get('[data-testid="membership-panel"]')
