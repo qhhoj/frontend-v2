@@ -7,7 +7,10 @@ const TILE_COUNT = 4;
 </script>
 
 <template>
-  <div data-testid="stats-strip" class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+  <div
+    data-testid="stats-strip"
+    class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 md:grid-cols-[280px_repeat(3,minmax(0,1fr))] md:gap-5"
+  >
     <GlassCard
       v-for="tile in TILE_COUNT"
       :key="tile"

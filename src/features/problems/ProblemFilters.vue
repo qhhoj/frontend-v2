@@ -40,7 +40,7 @@ const setSort = (value: string) =>
       v-model="searchText"
       :label="$t('problems.searchLabel')"
       :placeholder="$t('problems.search')"
-      class="min-w-[200px] max-w-[380px] flex-1"
+      class="min-w-[180px] max-w-[320px] flex-1"
     />
     <ToolbarSelect
       :label="$t('problems.group')"
@@ -74,7 +74,7 @@ const setSort = (value: string) =>
       {{ $t('problems.hasEditorial') }}
     </FilterToggle>
     <!-- Sort and the random pick wrap together, so a narrow row never leaves one of them alone. -->
-    <div class="ml-auto flex items-center gap-2">
+    <div class="ml-auto flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2">
       <ToolbarSelect
         :label="$t('problems.sort')"
         :model-value="filters.sort ?? DEFAULT_SORT"

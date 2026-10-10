@@ -49,7 +49,10 @@ const tiles = computed(() => {
 </script>
 
 <template>
-  <div data-testid="stats-strip" class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+  <div
+    data-testid="stats-strip"
+    class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 md:grid-cols-[280px_repeat(3,minmax(0,1fr))] md:gap-5"
+  >
     <p v-if="!stats" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
     <GlassCard v-for="tile in tiles" :key="tile.id" as="div" class="p-5">
       <dl class="flex flex-col">
