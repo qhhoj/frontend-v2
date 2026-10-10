@@ -180,6 +180,19 @@ describe('submission page', () => {
     expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Đã được 35% điểm');
   });
 
+  it('shows the source right under the verdict, before the test cases', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(submissionDetail()),
+      ...problemPageRoutes(),
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    const html = wrapper.get('#main').html();
+    const source = html.indexOf('id="source"');
+    expect(source).toBeGreaterThan(-1);
+    expect(source).toBeLessThan(html.indexOf('data-testid="cases-card"'));
+  });
+
   it('shows the compile message of a compile error', async () => {
     const compileError = submissionDetail({
       status: 'CE',
@@ -192,7 +205,9 @@ describe('submission page', () => {
     });
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(compileError), ...problemPageRoutes() });
     const { wrapper } = await openSubmission('sub-1');
-    expect(wrapper.get('#main pre').text()).toBe('main.cpp:3: error: expected ;');
+    expect(wrapper.findAll('#main pre').map((pre) => pre.text())).toContain(
+      'main.cpp:3: error: expected ;',
+    );
     expect(wrapper.text()).toContain('Lỗi biên dịch');
   });
 

@@ -16,6 +16,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import CasesTable from './CasesTable.vue';
 import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
+import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import SubmissionSummary from './SubmissionSummary.vue';
 import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
@@ -88,6 +89,7 @@ const verdict = computed(() => {
     >
       <template #skeleton>
         <SubmissionSummarySkeleton />
+        <SourceViewSkeleton />
         <CasesTableSkeleton />
       </template>
       <template v-if="row && verdict">
@@ -115,6 +117,11 @@ const verdict = computed(() => {
           :is-live="isLive"
         />
         <SubmissionStaffPanel :submission="row" />
+        <SourceView
+          :id="row.id"
+          :problem-code="isDeletedProblem ? null : problemCode"
+          :is-own="isOwn"
+        />
         <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
         <CasesTable
           v-else
@@ -123,11 +130,6 @@ const verdict = computed(() => {
           :total-cases="row.totalCases"
           :running="isLive"
           :compile-error="row.status === 'CE' ? row.error : null"
-        />
-        <SourceView
-          :id="row.id"
-          :problem-code="isDeletedProblem ? null : problemCode"
-          :is-own="isOwn"
         />
         <CompareWithForm :current-id="row.id" />
       </template>
