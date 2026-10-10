@@ -1,5 +1,4 @@
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
@@ -23,9 +22,7 @@ function chunkFileName(chunk: { moduleIds: string[] }) {
   return isEditorCore ? 'assets/code-editor-core-[hash].js' : 'assets/[name]-[hash].js';
 }
 
-/** What the footer shows as the served build: the package version and the commit it was built from. */
-const appVersion = (JSON.parse(readFileSync('package.json', 'utf8')) as { version: string })
-  .version;
+/** What the footer shows as the served build: the commit it was built from and the build date (UTC). */
 function buildCommit(): string {
   if (process.env.GIT_SHA) return process.env.GIT_SHA.slice(0, 7);
   try {
@@ -40,7 +37,7 @@ function buildCommit(): string {
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   define: {
-    __APP_VERSION__: JSON.stringify(appVersion),
+    __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
     __APP_COMMIT__: JSON.stringify(buildCommit()),
   },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },

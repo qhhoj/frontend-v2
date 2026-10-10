@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import packageJson from '../../../package.json';
 import { partialSession, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import { blogListRoutes } from '@/test/community-routes';
@@ -21,12 +20,10 @@ describe('AppFooter', () => {
     expect(link.attributes('aria-label')).toBe('Đổi chế độ tiết kiệm');
   });
 
-  it('shows the served build: package version and commit', async () => {
+  it('shows the served build: commit and build date', async () => {
     const { wrapper } = await openBlog();
-    const version = wrapper.get('[data-testid="app-version"]').text();
-    expect(version).toMatch(
-      new RegExp(`^v${packageJson.version.replaceAll('.', '\\.')} · ([0-9a-f]{7}|dev)$`),
-    );
+    const build = wrapper.get('[data-testid="app-version"]').text();
+    expect(build).toMatch(/^([0-9a-f]{7}|dev) · \d{4}-\d{2}-\d{2}$/);
   });
 
   it('offers the source of the running site (AGPL) and links the commit', async () => {
@@ -35,10 +32,12 @@ describe('AppFooter', () => {
     expect(source.attributes('href')).toBe('https://github.com/qhhoj');
     expect(source.text()).toBe('Mã nguồn (AGPL)');
     const commit = wrapper.find('[data-testid="app-version"] a');
-    if (commit.exists())
+    if (commit.exists()) {
+      expect(commit.text()).toMatch(/^[0-9a-f]{7}$/);
       expect(commit.attributes('href')).toBe(
         `https://github.com/qhhoj/frontend-v2/commit/${commit.text()}`,
       );
+    }
   });
 
   it('follows a change of the choice', async () => {

@@ -4,8 +4,8 @@ import { useLowPowerStore } from '@/theme/low-power.store';
 
 /** Board M10C: the footer always offers a way to the low-power switch, with the state this device is in. */
 const lowPower = useLowPowerStore();
-/** The served build, so staff can tell which release a page came from. */
-const APP_VERSION = __APP_VERSION__;
+/** The served build, so staff can tell which deploy a page came from. */
+const BUILD_DATE = __BUILD_DATE__;
 const APP_COMMIT = __APP_COMMIT__;
 /** AGPL-3.0 §13: every visitor is offered the source of the running site (frontend commit; backend and judge in the same org). */
 const SOURCE_URL = 'https://github.com/qhhoj';
@@ -25,9 +25,8 @@ const stateKey = computed(() => {
   >
     <span>© QHHOJ</span>
     <span data-testid="app-version" class="font-mono text-xs" :title="$t('footer.versionTitle')"
-      >v{{ APP_VERSION }} ·
-      <a v-if="commitUrl" :href="commitUrl" class="underline" rel="noopener">{{ APP_COMMIT }}</a
-      ><template v-else>{{ APP_COMMIT }}</template></span
+      ><a v-if="commitUrl" :href="commitUrl" class="underline" rel="noopener">{{ APP_COMMIT }}</a
+      ><template v-else>{{ APP_COMMIT }}</template> · {{ BUILD_DATE }}</span
     >
     <a
       data-testid="source-link"

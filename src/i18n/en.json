@@ -2181,7 +2181,7 @@
     "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone."
   },
   "footer": {
-    "versionTitle": "Frontend version being served",
+    "versionTitle": "Frontend build being served (commit and date)",
     "source": "Source code (AGPL)"
   }
 }

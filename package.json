@@ -13,11 +13,7 @@
     "e2e": "playwright test",
     "api:gen": "node scripts/api-gen.mjs",
     "api:check": "node scripts/api-gen.mjs --check",
-    "check": "npm run api:check && npm run lint && npm run typecheck && npm test",
-    "changeset": "changeset",
-    "version": "changeset version",
-    "release:version": "changeset version && npm install --package-lock-only",
-    "release:tag": "node scripts/release/tag-release.mjs"
+    "check": "npm run api:check && npm run lint && npm run typecheck && npm test"
   },
   "private": true,
   "type": "module",
@@ -52,7 +48,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@changesets/cli": "3.0.3",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "22.20.5",

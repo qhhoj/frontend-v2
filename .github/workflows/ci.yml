@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Pushes that touch only docs, changesets or deploy scripts skip the heavy jobs below; a skipped job counts as a
+  # Pushes that touch only docs or deploy scripts skip the heavy jobs below; a skipped job counts as a
   # pass, so the run (and the deploy gate waiting on it) stays green. scripts always runs.
   changes:
     runs-on: ubuntu-24.04
@@ -22,7 +22,7 @@ jobs:
       - id: diff
         env:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-          CI_LIGHT_PATHS: '^(.*[.]md|docs/.*|[.]changeset/.*|scripts/deploy/.*)$'
+          CI_LIGHT_PATHS: '^(.*[.]md|docs/.*|scripts/deploy/.*)$'
         run: bash scripts/deploy/code-changed.sh "$BASE" >> "$GITHUB_OUTPUT"
 
   scripts:
