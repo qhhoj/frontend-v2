@@ -41,6 +41,7 @@ export const communityHomeRoutes: Routes = { 'GET /home': ok(homeResponse()) };
 export const blogListRoutes: Routes = { ...communityHomeRoutes, 'GET /posts': page([]) };
 /** The organization layout and its about tab. */
 export const organizationRoutes = (detail: OrganizationDetail = organizationDetail()): Routes => ({
+  'GET /organizations': page([organizationItem()], { pageSize: 100 }),
   [`GET /organizations/${detail.slug}`]: ok(detail),
   [`GET /organizations/${detail.slug}/members`]: page([], { pageSize: 5 }),
   [`GET /organizations/${detail.slug}/posts`]: page([], { pageSize: 10 }),

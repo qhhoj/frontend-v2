@@ -18,7 +18,7 @@ const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POS
 
 <template>
   <section class="glass flex flex-col gap-3 rounded-card p-5">
-    <h2 class="font-display text-base font-bold">{{ $t('orgs.posts') }}</h2>
+    <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.posts') }}</h2>
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"

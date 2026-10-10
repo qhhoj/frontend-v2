@@ -14,7 +14,7 @@ const members = computed(() => query.data.value?.items ?? []);
 
 <template>
   <section data-testid="top-members" class="glass flex flex-col gap-3 rounded-card p-5">
-    <h2 class="font-display text-base font-bold">{{ $t('orgs.topMembers') }}</h2>
+    <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.topMembers') }}</h2>
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"

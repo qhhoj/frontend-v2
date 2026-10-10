@@ -5,20 +5,12 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 <template>
   <section
     data-skeleton-region="organization-header"
-    class="glass flex flex-col gap-5 rounded-card p-5 sm:p-7 md:flex-row md:items-start md:justify-between"
+    class="flex flex-col gap-5 md:flex-row md:items-center"
   >
-    <div class="flex min-w-0 flex-1 flex-col gap-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <SkeletonBlock pill class="h-7 w-16" />
-        <SkeletonBlock pill class="h-[30px] w-32" />
-        <span class="flex h-5 items-center text-sm">
-          <SkeletonBlock text class="w-36" />
-        </span>
-      </div>
-      <div class="page-title">
-        <SkeletonBlock text class="w-3/5" />
-      </div>
-      <p><SkeletonBlock text class="w-48" /></p>
+    <SkeletonBlock class="size-[76px] shrink-0" />
+    <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+      <div class="font-display text-3xl leading-tight"><SkeletonBlock text class="w-3/5" /></div>
+      <p class="min-h-5 text-sm"><SkeletonBlock text class="w-3/4" /></p>
       <p class="min-h-5 text-sm"><SkeletonBlock text class="w-40" /></p>
     </div>
     <!-- Reserves the membership panel's height and width: the signed-out panel is one 44 px button. -->

@@ -25,20 +25,20 @@ const tabs = computed<OrganizationTab[]>(() => {
   const problems = { routeName: 'organization-problems', labelKey: 'orgs.tabs.problems' };
   const quota = { routeName: 'organization-quota', labelKey: 'orgs.tabs.quota' };
   const viewer = props.organization.viewer;
-  if (viewer?.canAdminister) return [about, members, posts, problems, requests, quota];
-  if (viewer?.isMember) return [about, members, posts, problems];
+  if (viewer?.canAdminister) return [about, members, problems, posts, requests, quota];
+  if (viewer?.isMember) return [about, members, problems, posts];
   return [about, members, posts];
 });
 </script>
 
 <template>
-  <nav :aria-label="$t('orgs.tabsLabel')" class="flex gap-1 overflow-x-auto border-b border-line">
+  <nav :aria-label="$t('orgs.tabsLabel')" class="flex gap-1 overflow-x-auto">
     <RouterLink
       v-for="tab in tabs"
       :key="tab.routeName"
       :to="{ name: tab.routeName, params: { slug: organization.slug } }"
       class="inline-flex min-h-11 items-center whitespace-nowrap border-b-2 border-transparent px-4 font-semibold text-muted hover:text-content"
-      exact-active-class="border-accent text-content"
+      exact-active-class="border-accent text-accent-text"
     >
       {{ $t(tab.labelKey) }}
       <span v-if="tab.count" class="ml-1.5 rounded-pill bg-surface-hover px-2 text-sm">{{

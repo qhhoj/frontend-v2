@@ -6,10 +6,11 @@ import { usePageTitle } from '@/router/page-title';
 import OrganizationHeader from './OrganizationHeader.vue';
 import OrganizationHeaderSkeleton from './OrganizationHeaderSkeleton.vue';
 import OrganizationTabsNav from './OrganizationTabsNav.vue';
-import { isNotFoundError, useOrganization } from './use-organization';
+import { isNotFoundError, useOrganization, useOrganizationRank } from './use-organization';
 
-const { query } = useOrganization();
+const { slug, query } = useOrganization();
 const organization = computed(() => query.data.value);
+const rank = useOrganizationRank(slug, () => organization.value !== undefined);
 const isNotFound = computed(() => isNotFoundError(query.error.value));
 usePageTitle(() => organization.value?.name);
 </script>
@@ -30,26 +31,30 @@ usePageTitle(() => organization.value?.name);
       </RouterLink>
     </StatePanel>
   </div>
-  <div v-else class="page-column">
-    <nav :aria-label="$t('orgs.breadcrumb')" class="text-sm text-muted">
-      <RouterLink :to="{ name: 'organizations' }" class="hover:underline">
-        {{ $t('orgs.title') }}
-      </RouterLink>
-      <template v-if="organization">
-        / <span class="text-content">{{ organization.shortName }}</span>
-      </template>
-    </nav>
-    <QueryState
-      :loading="query.isPending.value"
-      :error="query.error.value"
-      @retry="query.refetch()"
-    >
-      <template #skeleton><OrganizationHeaderSkeleton /></template>
-      <template v-if="organization">
-        <OrganizationHeader :organization="organization" />
-        <OrganizationTabsNav :organization="organization" />
-      </template>
-    </QueryState>
-    <RouterView />
+  <div v-else class="flex flex-col">
+    <div class="border-b border-line bg-surface-solid">
+      <div class="page-gutter flex flex-col gap-5 pt-7">
+        <RouterLink
+          :to="{ name: 'organizations' }"
+          class="w-fit text-sm text-accent-text hover:underline"
+        >
+          {{ $t('orgs.back') }}
+        </RouterLink>
+        <QueryState
+          :loading="query.isPending.value"
+          :error="query.error.value"
+          @retry="query.refetch()"
+        >
+          <template #skeleton><OrganizationHeaderSkeleton /></template>
+          <template v-if="organization">
+            <OrganizationHeader :organization="organization" :rank="rank" />
+            <OrganizationTabsNav :organization="organization" />
+          </template>
+        </QueryState>
+      </div>
+    </div>
+    <div class="page-column">
+      <RouterView />
+    </div>
   </div>
 </template>
