@@ -25,7 +25,7 @@ export const flatpageRevision = (overrides: Partial<FlatpageRevision> = {}): Fla
   id: 'rev-1',
   at: '2026-10-09T07:22:00.000Z',
   action: 'edit',
-  editor: { id: '0192a000-0000-7000-8000-00000000a001', username: 'minhthu' },
+  editor: { id: '0192a000-0000-7000-8000-00000000a001', username: 'minhthu', rating: null },
   changes: {
     title: { before: 'Giới thiệu', after: 'Giới thiệu QHHOJ' },
     content: { before: '- Hơn **1 000** bài tập', after: '- Hơn **1 200** bài tập' },

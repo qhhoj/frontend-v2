@@ -87,7 +87,7 @@ describe('UserActivityPage', () => {
     'shows the live next-page button only when hasMore=%s, not by the row count',
     async (hasMore, rows) => {
       const users = Array.from({ length: rows }, (_row, index) => ({
-        user: { id: `id-${index}`, username: `user${index}` },
+        user: { id: `id-${index}`, username: `user${index}`, rating: null },
         lastSeenAt: '2026-10-08T08:40:55.000Z',
       }));
       mockApi(routes({ 'GET /admin/user-activity/live': ok(liveActivity({ users, hasMore })) }));

@@ -140,7 +140,7 @@ describe('contest submissions tab', () => {
     });
     const everyone = submissionItem({
       id: 'sub-everyone',
-      user: { id: 'u-2', username: 'other_user' },
+      user: { id: 'u-2', username: 'other_user', rating: null },
     });
     const mine = submissionItem({ id: 'sub-mine' });
     mockApi({

@@ -46,7 +46,7 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
         <UserAvatar :username="row.message.author.username" :size="32" />
         <div class="flex min-w-0 flex-1 flex-col gap-2">
           <div class="flex flex-wrap items-center gap-2 text-sm">
-            <UserName :username="row.message.author.username" />
+            <UserName :username="row.message.author.username" :rating="row.message.author.rating" />
             <span
               v-if="isAssignee(row.message.author.username)"
               class="rounded-pill bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-soft-text"

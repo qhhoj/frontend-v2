@@ -3,6 +3,7 @@ import type { StaffUser } from '../../api/types/users-admin';
 export const staffUser = (overrides: Partial<StaffUser> = {}): StaffUser => ({
   id: '0192a000-0000-7000-8000-00000000c101',
   username: 'tuan_k',
+  rating: null,
   displayName: 'tuan_k',
   displayRank: 'user',
   isActive: true,

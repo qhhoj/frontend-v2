@@ -87,7 +87,7 @@ const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${tick
             <td :class="`${CELL} ${WIDE_ONLY}`">
               <ul v-if="ticket.assignees.length" class="flex flex-col gap-1">
                 <li v-for="assignee in ticket.assignees" :key="assignee.id">
-                  <AdminUserLabel :username="assignee.username" />
+                  <AdminUserLabel :username="assignee.username" :rating="assignee.rating" />
                 </li>
               </ul>
               <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>

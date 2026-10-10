@@ -13,7 +13,7 @@ const cpp = { id: 'l-cpp', key: 'CPP20', name: 'C++20' };
 const py = { id: 'l-py', key: 'PY3', name: 'Python 3' };
 const side = (id: string, source: string, language = cpp, username = 'user_01') => ({
   [`GET /submissions/${id}`]: ok(
-    submissionDetail({ id, language, user: { id: `u-${username}`, username } }),
+    submissionDetail({ id, language, user: { id: `u-${username}`, username, rating: null } }),
   ),
   [`GET /submissions/${id}/source`]: ok({ id, source }),
 });
@@ -53,7 +53,7 @@ describe('SubmissionDiffPage', () => {
     mockApi({
       ...signedInViewer(),
       [`GET /submissions/${LEFT}`]: ok(
-        submissionDetail({ id: LEFT, user: { id: 'u-colan', username: 'colan' } }),
+        submissionDetail({ id: LEFT, user: { id: 'u-colan', username: 'colan', rating: null } }),
       ),
       [`GET /submissions/${LEFT}/source`]: fail(403, 'solve_first'),
       ...side(RIGHT, 'b'),
@@ -71,11 +71,14 @@ describe('SubmissionDiffPage', () => {
     mockApi({
       ...signedInViewer(),
       [`GET /submissions/${LEFT}`]: ok(
-        submissionDetail({ id: LEFT, user: { id: 'u-colan', username: 'colan' } }),
+        submissionDetail({ id: LEFT, user: { id: 'u-colan', username: 'colan', rating: null } }),
       ),
       [`GET /submissions/${LEFT}/source`]: fail(403, 'solve_first'),
       [`GET /submissions/${RIGHT}`]: ok(
-        submissionDetail({ id: RIGHT, user: { id: sessionUser().id, username: 'user_01' } }),
+        submissionDetail({
+          id: RIGHT,
+          user: { id: sessionUser().id, username: 'user_01', rating: null },
+        }),
       ),
       [`GET /submissions/${RIGHT}/source`]: ok({ id: RIGHT, source: 'b' }),
     });

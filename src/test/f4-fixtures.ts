@@ -115,7 +115,7 @@ export const deletedProblem = (overrides: Partial<DeletedProblem> = {}): Deleted
   code: 'cuvui',
   name: 'Cú vui',
   deletedAt: '2026-10-05T03:00:00Z',
-  deletedBy: { id: f4Id(721), username: 'minhthu' },
+  deletedBy: { id: f4Id(721), username: 'minhthu', rating: null },
   daysLeft: 26,
   isPurged: false,
   ...overrides,

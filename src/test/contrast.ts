@@ -57,3 +57,19 @@ export function mixPremultiplied(top: Rgba, bottom: Rgba, weight: number): Rgba 
     alpha,
   ];
 }
+
+const labPivot = (value: number) =>
+  value > 216 / 24389 ? Math.cbrt(value) : ((24389 / 27) * value + 16) / 116;
+function toLab([red, green, blue]: Rgba): [number, number, number] {
+  const [lr, lg, lb] = [red, green, blue].map(linear) as [number, number, number];
+  const fx = labPivot((0.4124564 * lr + 0.3575761 * lg + 0.1804375 * lb) / 0.95047);
+  const fy = labPivot(0.2126729 * lr + 0.7151522 * lg + 0.072175 * lb);
+  const fz = labPivot((0.0193339 * lr + 0.119192 * lg + 0.9503041 * lb) / 1.08883);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+}
+
+/** CIE76 colour difference (Euclidean distance in CIELAB, D65) of two opaque colours. */
+export function colourDistance(first: Rgba, second: Rgba): number {
+  const [from, to] = [toLab(first), toLab(second)];
+  return Math.hypot(from[0] - to[0], from[1] - to[1], from[2] - to[2]);
+}

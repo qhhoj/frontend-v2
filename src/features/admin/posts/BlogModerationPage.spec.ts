@@ -108,7 +108,7 @@ const hiddenPost = (overrides = {}) =>
     id: 'h-1',
     title: 'Lời giải bài Cây khung nhỏ nhất',
     visible: false,
-    authors: [{ id: communityId(910), username: 'bao_ly' }],
+    authors: [{ id: communityId(910), username: 'bao_ly', rating: null }],
     publishOn: '2026-10-06T22:10:00Z',
     score: 2,
     commentCount: 0,

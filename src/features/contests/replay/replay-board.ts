@@ -17,6 +17,8 @@ export interface BoardRowIdentity {
   caption: string;
   /** Null for ghosts. */
   userId: string | null;
+  /** The person's rating (null: unrated or a ghost); colours the name. */
+  rating: number | null;
   /** A ghost the server could not score: listed last, no rank, no cells. */
   isUnranked: boolean;
   /** Position inside its class (participant index, ghost position): the last tie order. */
@@ -61,6 +63,7 @@ function realTracks(replay: LoadedReplay): ReplayTrack[] {
       name: participant.user.username,
       caption: '',
       userId: participant.user.id,
+      rating: participant.user.rating,
       isUnranked: false,
       order,
     },
@@ -78,6 +81,7 @@ const ghostTracks = (replay: LoadedReplay): ReplayTrack[] =>
       name: ghost.label,
       caption: ghost.caption,
       userId: null,
+      rating: null,
       isUnranked: ghost.isUnranked,
       order,
     },
@@ -173,6 +177,7 @@ export const virtualRowOf = (row: RankingRow): BoardRow => ({
   name: row.user.username,
   caption: '',
   userId: row.user.id,
+  rating: row.user.rating,
   isUnranked: false,
   order: 0,
   rank: null,

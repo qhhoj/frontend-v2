@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { contrastRatio, mixPremultiplied, over, parseColour } from '@/test/contrast';
+import {
+  colourDistance,
+  contrastRatio,
+  mixPremultiplied,
+  over,
+  parseColour,
+} from '@/test/contrast';
 import type { Rgba } from '@/test/contrast';
 import { ACCENTS } from './appearance';
 import globalTokensCss from './tokens.css?raw';
@@ -34,6 +40,8 @@ const usedNames = new Set(
     [...source.matchAll(/var\(--qh-([\w-]+)/g)].map(([, name]) => name!),
   ),
 );
+/** A name ending in a dash is a template prefix (`var(--qh-syntax-${token})`); its members are checked as SYNTAX_TOKENS. */
+for (const name of usedNames) if (name.endsWith('-')) usedNames.delete(name);
 
 /** A name ending in a dash is a template prefix (`var(--qh-syntax-${token})`); its members are checked as SYNTAX_TOKENS. */
 for (const name of usedNames) if (name.endsWith('-')) usedNames.delete(name);
@@ -92,13 +100,7 @@ const ACCENT_TOKENS = [
 const GLASS_LEVELS = [0, 25, 50, 75, 100];
 
 /** Tokens used as text colour directly on a ground; the syntax colours are drawn on the inner tile, which this check also covers. */
-const TEXT_TOKENS = [
-  'text',
-  'text-muted',
-  'accent-text',
-  'positive',
-  'negative',
-  'focus-ring',
+const TIER_TOKENS = [
   'tier-none',
   'tier-newbie',
   'tier-pupil',
@@ -107,6 +109,15 @@ const TEXT_TOKENS = [
   'tier-candidate-master',
   'tier-master',
   'tier-grandmaster',
+];
+const TEXT_TOKENS = [
+  'text',
+  'text-muted',
+  'accent-text',
+  'positive',
+  'negative',
+  'focus-ring',
+  ...TIER_TOKENS,
   'medal-gold',
   'medal-silver',
   'medal-bronze',
@@ -134,6 +145,8 @@ const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['text-muted', 'accent-soft'],
   ['positive', 'verdict-ac-bg'],
   ['negative', 'verdict-wa-bg'],
+  /** The viewer's own row on the leaderboard is tinted with the accent. */
+  ...TIER_TOKENS.map((tier) => [tier, 'accent-soft'] as const),
   ...TAG_PAIRS,
 ];
 
@@ -282,6 +295,16 @@ describe.each(themes)('theme $id', ({ id, css, tokens, presets }) => {
       ACCENT_TOKENS.every((name) => presets.get(accent)?.tokens.get(name) === tokens.get(name)),
     ).map((accent) => accent.id);
     expect(native).toEqual([entryOf(id).accent]);
+  });
+
+  it('keeps adjacent rating tiers at least 20 apart in CIELAB (CIE76), newbie to grandmaster', () => {
+    const colour = colourOf(tokens, id);
+    const ranked = TIER_TOKENS.slice(1);
+    const gaps = ranked.slice(1).map((token, index) => {
+      const previous = ranked[index]!;
+      return `${previous} / ${token}: ${colourDistance(colour(previous), colour(token)).toFixed(1)}`;
+    });
+    expect(gaps.filter((gap) => Number(gap.split(': ')[1]) < 20)).toEqual([]);
   });
 
   it('gives the six syntax tokens six different colours', () => {

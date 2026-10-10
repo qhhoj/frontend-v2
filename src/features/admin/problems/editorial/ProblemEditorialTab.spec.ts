@@ -25,7 +25,7 @@ describe('ProblemEditorialTab', () => {
     problem.editor!.solution = {
       isPublic: false,
       publishOn: '2026-10-08T06:00:00.000Z',
-      authors: [{ id: 'id-thayhung', username: 'thayhung' }],
+      authors: [{ id: 'id-thayhung', username: 'thayhung', rating: null }],
       content: 'Gọi $d[v][j]$…',
     };
     const calls = mockApi({

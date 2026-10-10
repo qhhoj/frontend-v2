@@ -62,6 +62,7 @@ const detailsOf = (row: SubmissionListItem) =>
           <UserName
             v-if="isShown('user') && row.user"
             :username="row.user.username"
+            :rating="row.user.rating"
             class="min-w-0 truncate"
           />
           <span v-if="isShown('user') && isShown('when')" aria-hidden="true">·</span>

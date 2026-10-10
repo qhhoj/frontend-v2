@@ -39,7 +39,11 @@ const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POS
             {{ post.title }}
           </RouterLink>
           <p class="flex flex-wrap gap-x-3 text-sm text-muted">
-            <UserName v-if="post.authors[0]" :username="post.authors[0].username" />
+            <UserName
+              v-if="post.authors[0]"
+              :username="post.authors[0].username"
+              :rating="post.authors[0].rating"
+            />
             <span>{{ formatNumericDate(post.publishOn, locale.locale) }}</span>
             <span>{{
               $t('orgs.postStats', {

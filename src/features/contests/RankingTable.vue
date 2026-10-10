@@ -122,6 +122,7 @@ const scoreHeaderKey = computed(() => {
               <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />
               <UserName
                 :username="row.user.username"
+                :rating="row.user.rating"
                 :title="row.user.username"
                 class="min-w-0 truncate"
               />

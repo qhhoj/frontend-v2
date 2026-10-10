@@ -72,7 +72,7 @@ async function confirmKick() {
         >
           <span class="flex min-w-0 items-center gap-3">
             <span class="w-8 text-sm text-muted">{{ row.rank }}</span>
-            <AdminUserLabel :username="row.username" />
+            <AdminUserLabel :username="row.username" :rating="row.rating" />
           </span>
           <span class="flex items-center gap-3">
             <span class="text-sm text-muted">{{ row.performancePoints }}</span>

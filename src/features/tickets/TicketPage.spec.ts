@@ -19,7 +19,7 @@ describe('ticket page', () => {
     const detail = ticketDetail({
       messages: [
         ticketMessage(),
-        ticketMessage({ id: 'm2', author: { id: 'a1', username: 'colan' } }),
+        ticketMessage({ id: 'm2', author: { id: 'a1', username: 'colan', rating: null } }),
       ],
     });
     mockApi({ ...signedInViewer(), [`GET /tickets/${id}`]: ok(detail) });
@@ -37,7 +37,7 @@ describe('ticket page', () => {
 describe('ticket page', () => {
   it('shows the staff view with notes, good-contribution and assignees by permission', async () => {
     const detail = ticketDetail({
-      creator: { id: 'x', username: 'minhthu' },
+      creator: { id: 'x', username: 'minhthu', rating: null },
       notes: 'Test 17 sinh sai.',
       can: { editNotes: true, markGood: true, assign: true },
     });
@@ -185,7 +185,7 @@ describe('ticket page: route and account changes', () => {
     mockApi({ ...signedInViewer(), ...homeRoutes, [`GET /tickets/${id}`]: ok(ticketDetail()) });
     await mountApp(`/tickets/${id}`);
     const first = latestEventSource();
-    useSessionStore().user = sessionUser({ id: STAFF_ID, username: 'thayhung' });
+    useSessionStore().user = sessionUser({ id: STAFF_ID, username: 'thayhung', rating: null });
     await flushPromises();
     expect(first.closed).toBe(true);
     expect(latestEventSource()).not.toBe(first);
@@ -195,7 +195,7 @@ describe('ticket page: route and account changes', () => {
 
 describe('ticket page: staff controls follow the backend permission', () => {
   it('hides every staff control from a viewer whom the backend gives no staff rights', async () => {
-    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu' } });
+    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu', rating: null } });
     mockApi({ ...signedInViewer(), [`GET /tickets/${id}`]: ok(detail) });
     const { wrapper } = await mountApp(`/tickets/${id}`);
     expect(wrapper.find('button[data-testid="mark-good"]').exists()).toBe(false);
@@ -204,7 +204,7 @@ describe('ticket page: staff controls follow the backend permission', () => {
     expect(wrapper.text()).not.toContain('Góc nhìn quản trị viên');
   });
   it('shows no assignees form to staff whom the backend does not let assign', async () => {
-    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu' } });
+    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu', rating: null } });
     mockApi({
       ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
       [`GET /tickets/${id}`]: ok(detail),
@@ -260,7 +260,12 @@ describe('ticket page: drafts follow refetches unless edited', () => {
       ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
       [`GET /tickets/${id}`]: sequence(
         ok(ticketDetail({ can: staff })),
-        ok(ticketDetail({ can: staff, assignees: [{ id: 'z', username: 'thayhung' }] })),
+        ok(
+          ticketDetail({
+            can: staff,
+            assignees: [{ id: 'z', username: 'thayhung', rating: null }],
+          }),
+        ),
       ),
     });
     const { wrapper } = await mountApp(`/tickets/${id}`);

@@ -51,6 +51,7 @@ const isImpersonateOpen = ref(false);
       <header class="flex flex-col gap-1">
         <AdminUserLabel
           :username="user.username"
+          :rating="user.rating"
           :size="28"
           :link="false"
           :status="user.displayRank === 'banned' ? 'banned' : 'active'"

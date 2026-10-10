@@ -34,6 +34,7 @@ import type { OrganizationListItem } from '../api/types/organizations';
 export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   id: '0192a000-0000-7000-8000-000000000001',
   username: 'user_01',
+  rating: null,
   email: 'user01@example.com',
   isStaff: false,
   isSuperuser: false,
@@ -213,7 +214,7 @@ export const submissionItem = (
   overrides: Partial<SubmissionListItem> = {},
 ): SubmissionListItem => ({
   id: 'sub-1',
-  user: { id: sessionUser().id, username: 'user_01' },
+  user: { id: sessionUser().id, username: 'user_01', rating: null },
   problem: { code: 'aplusb', name: 'Tổng hai số', isDeleted: false, points: 100 },
   language: { id: CPP17_ID, key: 'CPP17', name: 'C++17' },
   date: '2026-10-08T09:58:00Z',
@@ -365,7 +366,7 @@ export const contestDetail = (overrides: Partial<ContestDetail> = {}): ContestDe
   rules: '',
   rulesHtml: '',
   rulesRevision: 0,
-  authors: [{ id: '0192a000-0000-7000-8000-0000000003a1', username: 'thayhung' }],
+  authors: [{ id: '0192a000-0000-7000-8000-0000000003a1', username: 'thayhung', rating: null }],
   frozenLastMinutes: 60,
   scoreboardVisibility: 'V',
   showSubmissionList: false,
@@ -535,7 +536,7 @@ export const problemDetail = (overrides: Partial<ProblemDetail> = {}): ProblemDe
   partial: false,
   types: [{ id: TYPE_GRAPH_ID, name: 'graph', fullName: 'Đồ thị' }],
   group: null,
-  authors: [{ id: sessionUser().id, username: 'user_07' }],
+  authors: [{ id: sessionUser().id, username: 'user_07', rating: null }],
   allowedLanguages: [
     languageItem(CPP17_ID, 'CPP17', 'C++17', {
       template: '#include <bits/stdc++.h>\nint main() {}\n',
@@ -575,7 +576,7 @@ export const problemEditorial = (overrides: Partial<ProblemEditorial> = {}): Pro
   problem: { code: 'duongdi', name: 'Đường đi ngắn nhất' },
   isPublic: true,
   publishOn: '2026-09-30T00:00:00Z',
-  authors: [{ id: sessionUser().id, username: 'user_07' }],
+  authors: [{ id: sessionUser().id, username: 'user_07', rating: null }],
   contentHtml: '<p>Dùng Dijkstra.</p>',
   canEdit: false,
   ...overrides,

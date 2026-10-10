@@ -75,7 +75,9 @@ describe('blog list: inert arrows', () => {
     const calls = mockApi({
       ...signedInViewer(),
       ...communityHomeRoutes,
-      'GET /posts': page([postItem({ authors: [{ id: OWN_AUTHOR_ID, username: 'user_01' }] })]),
+      'GET /posts': page([
+        postItem({ authors: [{ id: OWN_AUTHOR_ID, username: 'user_01', rating: null }] }),
+      ]),
     });
     const { wrapper } = await mountApp('/blog');
     expect(wrapper.get(UP).attributes('aria-disabled')).toBe('true');

@@ -28,7 +28,7 @@ const organization = computed(() => query.data.value);
         <ul class="flex flex-col gap-2">
           <li v-for="admin in organization.admins" :key="admin.id" class="flex items-center gap-2">
             <UserAvatar :username="admin.username" :size="28" />
-            <UserName :username="admin.username" />
+            <UserName :username="admin.username" :rating="admin.rating" />
           </li>
         </ul>
       </section>

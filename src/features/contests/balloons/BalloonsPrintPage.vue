@@ -7,6 +7,7 @@ import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { EXTRAS_BITS } from '../contest-extras-bits';
 import { useBalloonsQuery } from '../contest-extras.queries';
 import { useContestQuery } from '../contests.queries';
@@ -95,7 +96,11 @@ const printSheet = () => window.print();
               ]"
               >{{ item.problemLabel }}</span
             >
-            <span class="min-w-0 flex-1 truncate font-semibold">{{ item.team.username }}</span>
+            <span
+              class="min-w-0 flex-1 truncate font-semibold"
+              :class="ratingTextClass(item.team.rating)"
+              >{{ item.team.username }}</span
+            >
             <span class="font-mono tabular-nums">{{ solvedAtText(item.solvedAt) }}</span>
             <span v-if="item.isFirst" class="text-base font-semibold">{{
               $t('balloons.first')

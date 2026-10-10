@@ -29,9 +29,9 @@ import { HOME_COUNTS, sessionUser } from './fixtures';
 /** UUID v7-shaped ids (the backend validates `before` and `parentId` as v7). */
 export const communityId = (suffix: number) =>
   `0192a000-0000-7000-8000-${String(suffix).padStart(12, '0')}`;
-export const VIEWER = { id: sessionUser().id, username: sessionUser().username };
-export const OTHER_USER = { id: communityId(901), username: 'ngoc_anh' };
-export const ADMIN_USER = { id: communityId(902), username: 'thayhung' };
+export const VIEWER = { id: sessionUser().id, username: sessionUser().username, rating: null };
+export const OTHER_USER = { id: communityId(901), username: 'ngoc_anh', rating: null };
+export const ADMIN_USER = { id: communityId(902), username: 'thayhung', rating: null };
 
 export const organizationSummary = (
   overrides: Partial<OrganizationSummary> = {},
@@ -125,7 +125,7 @@ export const comment = (overrides: Partial<Comment> = {}): Comment => ({
   id: communityId(701),
   parentId: null,
   depth: 0,
-  author: { id: communityId(904), username: 'linhnt' },
+  author: { id: communityId(904), username: 'linhnt', rating: null },
   createdAt: '2026-10-08T10:00:00Z',
   updatedAt: '2026-10-08T10:00:00Z',
   bodyHtml: '<p>Phần rerooting giải thích rất rõ.</p>',
@@ -170,7 +170,7 @@ export const ticketItem = (overrides: Partial<TicketListItem> = {}): TicketListI
   id: communityId(801),
   title: 'Test 17 của bài Trò chơi trên cây có vẻ sai',
   creator: VIEWER,
-  assignees: [{ id: communityId(905), username: 'colan' }],
+  assignees: [{ id: communityId(905), username: 'colan', rating: null }],
   link: {
     type: 'problem',
     id: communityId(802),

@@ -123,7 +123,7 @@ defineExpose({ focusRow });
             </span>
             <span v-else class="inline-flex flex-wrap items-center gap-2 align-middle">
               <UserAvatar :username="row.name" :size="24" />
-              <UserName :username="row.name" />
+              <UserName :username="row.name" :rating="row.rating" />
               <span v-if="row.kind === 'virtual'" class="text-muted">{{
                 $t('replay.table.virtual')
               }}</span>

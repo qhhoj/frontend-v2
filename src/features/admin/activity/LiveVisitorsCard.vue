@@ -68,7 +68,7 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
           :key="entry.user.id"
           class="flex flex-wrap items-center justify-between gap-2 text-sm"
         >
-          <AdminUserLabel :username="entry.user.username" />
+          <AdminUserLabel :username="entry.user.username" :rating="entry.user.rating" />
           <time :datetime="entry.lastSeenAt" class="font-mono text-muted">
             {{ formatNumericDateTimeSeconds(entry.lastSeenAt, locale.locale) }}
           </time>

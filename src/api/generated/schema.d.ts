@@ -3581,6 +3581,7 @@ export interface components {
         /** @enum {string} */
         BalloonState: "all" | "delivered" | "pending";
         BalloonTeamResponse: {
+            rating: number | null;
             userId: string;
             username: string;
         };
@@ -5663,6 +5664,8 @@ export interface components {
             isSuperuser: boolean;
             /** Format: date-time */
             lastAccess: string | null;
+            /** @description Contest rating; null while unrated. */
+            rating: number | null;
             username: string;
         };
         /** @enum {string} */
@@ -6396,11 +6399,15 @@ export interface components {
             isWebauthnEnabled: boolean;
             languageId: string | null;
             permissions: string[];
+            /** @description Contest rating; null while unrated. */
+            rating: number | null;
             siteTheme: string;
             username: string;
         };
         UserSummaryResponse: {
             id: string;
+            /** @description Null when unrated; clients colour the name by it. */
+            rating: number | null;
             username: string;
         };
         VoteDto: {

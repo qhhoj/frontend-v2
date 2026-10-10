@@ -18,7 +18,7 @@ const VIEWPORTS = [
   { name: 'phone 375 px', width: 375, height: 812 },
 ] as const;
 const STAFF_DETAIL = ticketDetail({
-  creator: { id: 'x', username: 'minhthu' },
+  creator: { id: 'x', username: 'minhthu', rating: null },
   notes: 'Test 17 sinh sai.',
   can: { editNotes: true, markGood: true, assign: true },
 });
