@@ -9,6 +9,7 @@ import WebhooksField from './WebhooksField.vue';
 import ClearSecretButton from './ClearSecretButton.vue';
 import { SETTING_KINDS } from './setting-blocks';
 import { isClearable } from './setting-clear';
+import { maskedPreview } from './setting-values';
 import type {
   OAuthDraft,
   ScalarDraft,
@@ -51,10 +52,11 @@ const onCleared = (answer: Setting) => emit('cleared', answer);
     @update:model-value="draft = $event"
   />
   <SecretField
-    v-else-if="kind === 'secretText'"
+    v-else-if="kind === 'secretText' || kind === 'maskedText'"
     :model-value="draft as SecretDraft"
     :label="t(`admin.settings.fields.${setting.key}`)"
     :hint="secretHint"
+    :preview="kind === 'maskedText' ? maskedPreview(setting.value) : undefined"
     @update:model-value="draft = $event"
   >
     <template #actions>

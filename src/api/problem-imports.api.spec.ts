@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { mockApi, ok } from '@/test/mock-api';
-import { fetchImportJob, startPolygonImport } from './problem-imports.api';
+import { fetchImportJob, startZipImport } from './problem-imports.api';
 
-describe('startPolygonImport', () => {
+describe('startZipImport', () => {
   it('puts the options in the query string and only the file in the body', async () => {
     const calls = mockApi({
       'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
     });
-    const result = await startPolygonImport(
+    const result = await startZipImport(
       {
         code: 'hcmus41c',
         mode: 'create',

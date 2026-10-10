@@ -21,16 +21,30 @@ import {
 } from './import-form';
 import type { ImportForm, ImportMode } from './import-form';
 
-const props = defineProps<{ isPending: boolean; serverErrors: FieldErrors }>();
-const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File }] }>();
+/**
+ * The import options of both imports. The zip import (`withFile`) adds the package drop zone; an import from Polygon has
+ * none, starts from `initial` (the code from the Polygon name) and adds its own switch (`extra` slot) and back button
+ * (`actions` slot).
+ */
+const props = withDefaults(
+  defineProps<{
+    isPending: boolean;
+    serverErrors: FieldErrors;
+    withFile?: boolean;
+    title?: string;
+    initial?: Partial<ImportForm>;
+  }>(),
+  { withFile: true, title: undefined, initial: undefined },
+);
+const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File | null }] }>();
 
-const form = ref<ImportForm>(emptyImportForm());
+const form = ref<ImportForm>({ ...emptyImportForm(), ...props.initial });
 const localErrors = ref<FieldErrors>({});
 const { data: meta } = useProblemEditingMetaQuery();
 const groups = computed(() => meta.value?.groups ?? []);
 const types = computed(() => meta.value?.types ?? []);
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
-const isSubmitBlocked = computed(() => props.isPending || !form.value.file);
+const isSubmitBlocked = computed(() => props.isPending || (props.withFile && !form.value.file));
 const { canAny } = usePermissions();
 const canUseMode = (mode: ImportMode) => canAny(IMPORT_MODE_PERMISSION[mode]);
 /** A viewer who may only update starts on update, so the default never refuses itself. */
@@ -54,26 +68,29 @@ function onDrop(event: DragEvent) {
 
 function submit() {
   if (props.isPending) return;
-  localErrors.value = importFormErrors(form.value, canUseMode);
-  const { file } = form.value;
-  if (!file || Object.keys(localErrors.value).length > 0) return;
-  emit('start', { options: toImportOptions(form.value), file });
+  localErrors.value = importFormErrors(form.value, canUseMode, { needsFile: props.withFile });
+  if (Object.keys(localErrors.value).length > 0) return;
+  emit('start', { options: toImportOptions(form.value), file: form.value.file });
 }
 </script>
 
 <template>
   <section class="glass flex flex-col gap-5 rounded-panel p-5">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-base font-bold">{{ $t('admin.polygon.form.board') }}</h2>
-      <span class="rounded-pill border border-line-strong px-2.5 py-1 font-mono text-xs text-muted">
+      <h2 class="text-base font-bold">{{ title ?? $t('admin.polygon.form.board') }}</h2>
+      <span
+        v-if="withFile"
+        class="rounded-pill border border-line-strong px-2.5 py-1 font-mono text-xs text-muted"
+      >
         {{
           $t('admin.polygon.form.permissionChip', { permission: 'judge.import_polygon_package' })
         }}
       </span>
     </div>
 
-    <form class="flex flex-col gap-5" @submit.prevent="submit">
+    <form class="@container flex flex-col gap-5" @submit.prevent="submit">
       <div
+        v-if="withFile"
         data-testid="polygon-file"
         class="flex flex-col gap-3 rounded-panel border border-dashed border-line-strong p-4"
         @dragover.prevent
@@ -98,146 +115,149 @@ function submit() {
         <p v-if="errorOf('file')" class="text-sm text-negative">{{ errorOf('file') }}</p>
       </div>
 
-      <AdminField
-        v-slot="{ id, describedBy, invalid }"
-        :label="$t('admin.polygon.form.code')"
-        :error="errorOf('code')"
-        input-id="import-code"
-      >
-        <input
-          :id="id"
-          v-model="form.code"
-          :class="ADMIN_INPUT_CLASS"
-          autocomplete="off"
-          :aria-describedby="describedBy"
-          :aria-invalid="invalid ? 'true' : undefined"
-        />
-      </AdminField>
-
-      <fieldset class="flex flex-col gap-2">
-        <legend class="mb-1.5 text-sm font-semibold">
-          {{ $t('admin.polygon.form.mode.label') }}
-        </legend>
-        <label
-          v-for="mode in IMPORT_MODES"
-          :key="mode"
-          class="flex min-h-11 flex-wrap items-center gap-2"
+      <div class="grid gap-5 @lg:grid-cols-2">
+        <AdminField
+          v-slot="{ id, describedBy, invalid }"
+          :label="$t('admin.polygon.form.code')"
+          :error="errorOf('code')"
+          input-id="import-code"
         >
           <input
-            v-model="form.mode"
-            type="radio"
-            name="import-mode"
-            :value="mode"
-            :disabled="!canUseMode(mode)"
+            :id="id"
+            v-model="form.code"
+            :class="ADMIN_INPUT_CLASS"
+            autocomplete="off"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
           />
-          {{ $t(`admin.polygon.form.mode.${mode}`) }}
-          <span v-if="!canUseMode(mode)" class="basis-full pl-6 text-sm text-muted">
-            {{ $t('admin.ui.needsPermission', { permission: IMPORT_MODE_PERMISSION[mode] }) }}
-          </span>
-        </label>
-        <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>
-      </fieldset>
+        </AdminField>
 
-      <AdminField
-        v-slot="{ id, describedBy }"
-        :label="$t('admin.polygon.form.group')"
-        :error="errorOf('groupId')"
-      >
-        <select
-          :id="id"
-          v-model="form.groupId"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
+        <fieldset class="flex flex-col gap-2">
+          <legend class="mb-1.5 text-sm font-semibold">
+            {{ $t('admin.polygon.form.mode.label') }}
+          </legend>
+          <label
+            v-for="mode in IMPORT_MODES"
+            :key="mode"
+            class="flex min-h-11 flex-wrap items-center gap-2"
+          >
+            <input
+              v-model="form.mode"
+              type="radio"
+              name="import-mode"
+              :value="mode"
+              :disabled="!canUseMode(mode)"
+            />
+            {{ $t(`admin.polygon.form.mode.${mode}`) }}
+            <span v-if="!canUseMode(mode)" class="basis-full pl-6 text-sm text-muted">
+              {{ $t('admin.ui.needsPermission', { permission: IMPORT_MODE_PERMISSION[mode] }) }}
+            </span>
+          </label>
+          <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>
+        </fieldset>
+
+        <AdminField
+          v-slot="{ id, describedBy }"
+          :label="$t('admin.polygon.form.group')"
+          :error="errorOf('groupId')"
         >
-          <option value="">{{ $t('admin.polygon.form.groupDefault') }}</option>
-          <option v-for="group in groups" :key="group.id" :value="group.id">
-            {{ group.fullName }}
-          </option>
-        </select>
-      </AdminField>
+          <select
+            :id="id"
+            v-model="form.groupId"
+            :class="ADMIN_INPUT_CLASS"
+            :aria-describedby="describedBy"
+          >
+            <option value="">{{ $t('admin.polygon.form.groupDefault') }}</option>
+            <option v-for="group in groups" :key="group.id" :value="group.id">
+              {{ group.fullName }}
+            </option>
+          </select>
+        </AdminField>
 
-      <fieldset class="flex flex-col gap-2">
-        <legend class="mb-1.5 text-sm font-semibold">{{ $t('admin.polygon.form.types') }}</legend>
-        <p v-if="errorOf('typeIds')" class="text-sm text-negative">{{ errorOf('typeIds') }}</p>
-        <label v-for="type in types" :key="type.id" class="flex min-h-11 items-center gap-2">
-          <input v-model="form.typeIds" type="checkbox" :value="type.id" />
-          {{ type.fullName }}
-        </label>
-      </fieldset>
+        <AdminField
+          v-slot="{ id, describedBy, invalid }"
+          :label="$t('admin.polygon.form.points')"
+          :hint="$t('admin.polygon.form.pointsHint')"
+          :error="errorOf('points')"
+        >
+          <input
+            :id="id"
+            v-model="form.points"
+            type="number"
+            inputmode="numeric"
+            min="800"
+            max="3500"
+            :class="ADMIN_INPUT_CLASS"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
+          />
+        </AdminField>
 
-      <AdminField
-        v-slot="{ id, describedBy, invalid }"
-        :label="$t('admin.polygon.form.points')"
-        :hint="$t('admin.polygon.form.pointsHint')"
-        :error="errorOf('points')"
-      >
-        <input
-          :id="id"
-          v-model="form.points"
-          type="number"
-          inputmode="numeric"
-          min="800"
-          max="3500"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-          :aria-invalid="invalid ? 'true' : undefined"
+        <fieldset class="flex flex-col gap-2 @lg:col-span-2">
+          <legend class="mb-1.5 text-sm font-semibold">{{ $t('admin.polygon.form.types') }}</legend>
+          <p v-if="errorOf('typeIds')" class="text-sm text-negative">{{ errorOf('typeIds') }}</p>
+          <label v-for="type in types" :key="type.id" class="flex min-h-11 items-center gap-2">
+            <input v-model="form.typeIds" type="checkbox" :value="type.id" />
+            {{ type.fullName }}
+          </label>
+        </fieldset>
+
+        <UsernameChips
+          v-model="form.authors"
+          :label="$t('admin.polygon.form.authors')"
+          :error="errorOf('authors')"
         />
-      </AdminField>
-
-      <UsernameChips
-        v-model="form.authors"
-        :label="$t('admin.polygon.form.authors')"
-        :error="errorOf('authors')"
-      />
-      <UsernameChips
-        v-model="form.curators"
-        :label="$t('admin.polygon.form.curators')"
-        :error="errorOf('curators')"
-      />
-
-      <AdminField
-        v-slot="{ id, describedBy }"
-        :label="$t('admin.polygon.form.mainLanguage')"
-        :hint="$t('admin.polygon.form.mainLanguageHint')"
-        :error="errorOf('mainStatementLanguage')"
-      >
-        <input
-          :id="id"
-          v-model="form.mainStatementLanguage"
-          :class="ADMIN_INPUT_CLASS"
-          autocomplete="off"
-          :aria-describedby="describedBy"
+        <UsernameChips
+          v-model="form.curators"
+          :label="$t('admin.polygon.form.curators')"
+          :error="errorOf('curators')"
         />
-      </AdminField>
 
-      <AdminField
-        v-slot="{ id }"
-        :label="$t('admin.polygon.form.solutionLanguage')"
-        :error="errorOf('tutorialLanguage')"
-      >
-        <input
-          :id="id"
-          v-model="form.tutorialLanguage"
-          :class="ADMIN_INPUT_CLASS"
-          autocomplete="off"
-        />
-      </AdminField>
+        <AdminField
+          v-slot="{ id, describedBy }"
+          :label="$t('admin.polygon.form.mainLanguage')"
+          :hint="$t('admin.polygon.form.mainLanguageHint')"
+          :error="errorOf('mainStatementLanguage')"
+        >
+          <input
+            :id="id"
+            v-model="form.mainStatementLanguage"
+            :class="ADMIN_INPUT_CLASS"
+            autocomplete="off"
+            :aria-describedby="describedBy"
+          />
+        </AdminField>
 
-      <AdminField
-        v-slot="{ id, describedBy, invalid }"
-        :label="$t('admin.polygon.form.languageMap')"
-        :hint="$t('admin.polygon.form.languageMapHint')"
-        :error="errorOf('statementLanguages')"
-      >
-        <textarea
-          :id="id"
-          v-model="form.languageMapText"
-          rows="3"
-          :class="[ADMIN_INPUT_CLASS, 'py-2']"
-          :aria-describedby="describedBy"
-          :aria-invalid="invalid ? 'true' : undefined"
-        />
-      </AdminField>
+        <AdminField
+          v-slot="{ id }"
+          :label="$t('admin.polygon.form.solutionLanguage')"
+          :error="errorOf('tutorialLanguage')"
+        >
+          <input
+            :id="id"
+            v-model="form.tutorialLanguage"
+            :class="ADMIN_INPUT_CLASS"
+            autocomplete="off"
+          />
+        </AdminField>
+
+        <AdminField
+          v-slot="{ id, describedBy, invalid }"
+          class="@lg:col-span-2"
+          :label="$t('admin.polygon.form.languageMap')"
+          :hint="$t('admin.polygon.form.languageMapHint')"
+          :error="errorOf('statementLanguages')"
+        >
+          <textarea
+            :id="id"
+            v-model="form.languageMapText"
+            rows="3"
+            :class="[ADMIN_INPUT_CLASS, 'py-2']"
+            :aria-describedby="describedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
+          />
+        </AdminField>
+      </div>
 
       <div class="flex flex-col gap-4">
         <AdminSwitch
@@ -254,15 +274,19 @@ function submit() {
         />
       </div>
 
-      <div class="flex flex-col gap-2">
+      <slot name="extra" />
+
+      <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <slot name="actions" />
         <button
           type="submit"
+          class="ml-auto"
           :class="ADMIN_PRIMARY_CLASS"
           :aria-disabled="isSubmitBlocked || undefined"
         >
           {{ $t('admin.polygon.form.submit') }}
         </button>
-        <p v-if="!form.file" class="text-sm text-muted">
+        <p v-if="withFile && !form.file" class="basis-full text-sm text-muted">
           {{ $t('admin.polygon.form.submitNeedsFile') }}
         </p>
       </div>

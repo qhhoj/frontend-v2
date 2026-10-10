@@ -1,0 +1,157 @@
+{
+  "packageState": {
+    "READY": "READY",
+    "RUNNING": "RUNNING",
+    "FAILED": "FAILED",
+    "NONE": "Chưa có gói"
+  },
+  "howTo": {
+    "title": "Hướng dẫn cho người ra đề",
+    "steps": {
+      "open": "Mở bài trên polygon.codeforces.com.",
+      "access": "Vào Manage access, thêm {account} làm cộng tác viên với quyền đọc (Read).",
+      "package": "Commit thay đổi và dựng gói (Packages, Create package); chờ gói ở trạng thái READY.",
+      "import": "Trên QHHOJ mở Quản trị, Nhập từ Polygon: bài sẽ hiện trong danh sách."
+    },
+    "unnamed": "tài khoản của QHHOJ",
+    "readIsEnough": "Quyền đọc là đủ: QHHOJ không sửa gì trên Polygon.",
+    "copy": "Sao chép tên tài khoản {account}"
+  },
+  "check": {
+    "button": "Kiểm tra kết nối",
+    "hint": "Gọi Polygon một lần bằng khoá và bí mật đã lưu; lưu thay đổi trước khi kiểm tra.",
+    "ok": "Kết nối được lúc {time}. Polygon nhận khoá của {account}: {count} bài đang được chia sẻ với tài khoản.",
+    "failed": "Kiểm tra lúc {time} thất bại. {reason}"
+  },
+  "wizard": {
+    "title": "Nhập từ Polygon",
+    "lead": "Bài nào được chia sẻ với tài khoản {account} trên Polygon sẽ hiện ở đây. Chọn một bài, thiết lập, rồi theo dõi tiến trình.",
+    "stepsLabel": "Các bước nhập",
+    "steps": {
+      "pick": "Chọn bài",
+      "configure": "Thiết lập",
+      "progress": "Nhập"
+    },
+    "fromPolygon": "Nhập từ Polygon",
+    "zipFile": "Nhập tệp .zip",
+    "zipInstead": "Nhập tệp .zip thay vì"
+  },
+  "pick": {
+    "title": "Chọn bài trên Polygon",
+    "updatedAt": "Cập nhật lúc {time}",
+    "refresh": "Làm mới",
+    "refreshList": "Làm mới danh sách",
+    "search": "Tìm bài",
+    "searchPlaceholder": "Tên, mã Polygon hoặc chủ sở hữu",
+    "filterLabel": "Lọc theo trạng thái gói",
+    "filters": {
+      "all": "Tất cả",
+      "ready": "Có gói READY",
+      "running": "Đang dựng",
+      "unavailable": "Lỗi hoặc chưa có gói"
+    },
+    "blocked": {
+      "linked": "Đã liên kết với {code}: đồng bộ ở trang sửa bài đó.",
+      "running": "Polygon đang dựng gói, thử lại sau.",
+      "failed": "Gói dựng lỗi: sửa và dựng lại trên Polygon.",
+      "noPackage": "Chưa có gói: dựng gói trên Polygon trước."
+    },
+    "modified": "Có thay đổi chưa commit; gói READY mới nhất vẫn nhập được.",
+    "noMatch": "Không có bài nào khớp tìm kiếm và bộ lọc.",
+    "selected": "Đã chọn:",
+    "noneSelected": "Chọn một bài có gói READY để tiếp tục.",
+    "next": "Tiếp tục"
+  },
+  "notConnected": {
+    "title": "Chưa kết nối được Polygon",
+    "bodyAdmin": "Trang chưa có khoá API hoặc bí mật của Polygon, nên không lấy được danh sách bài. Vẫn nhập được bằng tệp .zip.",
+    "bodyAsk": "Trang chưa có khoá API của Polygon. Nhờ người quản lý cài đặt thêm khoá; trong lúc chờ, nhập được bằng tệp .zip.",
+    "openSettings": "Mở cài đặt Polygon"
+  },
+  "nothingShared": {
+    "title": "Chưa có bài nào được chia sẻ với {account}",
+    "body": "Bài trên Polygon chỉ hiện ở đây sau khi chủ bài thêm {account} làm cộng tác viên với quyền đọc.",
+    "steps": {
+      "access": "Mở bài trên Polygon, vào Manage access.",
+      "grant": "Thêm {account} với quyền đọc (Read).",
+      "package": "Dựng gói, chờ READY, rồi làm mới trang này."
+    },
+    "openPolygon": "Mở Polygon"
+  },
+  "source": {
+    "label": "Nguồn",
+    "owner": "Chủ sở hữu",
+    "package": "Bản",
+    "packageValue": "r{revision}, gói #{id}",
+    "fromPolygon": "Lấy từ gói Polygon",
+    "taken": {
+      "statements": "Đề bài, bản dịch và lời giải",
+      "tests": "Test và nhóm test theo điểm",
+      "checker": "Checker hoặc interactor",
+      "limits": "Giới hạn thời gian, bộ nhớ và chấm từng phần"
+    },
+    "keptByQhhoj": "Do QHHOJ quản lý",
+    "kept": "Mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt và ngôn ngữ được nộp. Đồng bộ sau này không ghi đè các mục này."
+  },
+  "configure": {
+    "title": "Thiết lập bài nhập",
+    "lead": "Giống như khi nhập tệp .zip. Đề, test và checker lấy từ gói Polygon; phần còn lại là cài đặt của QHHOJ.",
+    "board": "Bài trên QHHOJ",
+    "autoSync": "Tự đồng bộ khi có gói mới",
+    "autoSyncHint": "Khi chủ bài dựng gói READY mới hơn r{revision}, QHHOJ tự nhập lại đề, test và checker (kiểm tra mỗi 10 phút, hoãn khi kỳ thi dùng bài đang diễn ra).",
+    "back": "Quay lại"
+  },
+  "progress": {
+    "title": "Đang nhập từ Polygon",
+    "lead": "Gói được xử lý nền. Có thể rời trang; lượt nhập vẫn chạy và xem lại được ở địa chỉ này trong 24 giờ.",
+    "retry": "Thử lại",
+    "another": "Nhập bài khác"
+  },
+  "panel": {
+    "title": "Liên kết Polygon",
+    "status": {
+      "newer": "Có bản mới",
+      "upToDate": "Đã cập nhật",
+      "syncFailed": "Đồng bộ lỗi",
+      "notReady": "Gói chưa sẵn sàng",
+      "unknown": "Không hỏi được Polygon"
+    },
+    "problem": "Bài trên Polygon",
+    "lastSync": "Lần đồng bộ cuối",
+    "linkedAt": "Chưa đồng bộ (liên kết {date})",
+    "result": "Kết quả",
+    "results": {
+      "ok": "Thành công, đang dùng r{revision}",
+      "failed": "Thất bại",
+      "never": "Chưa đồng bộ"
+    },
+    "inUse": "Đang dùng",
+    "latest": "Mới nhất",
+    "revisionText": {
+      "newer": "Gói #{id} của r{revision} đã dựng xong (READY). Đồng bộ để lấy bản mới.",
+      "upToDate": "Đang dùng gói READY mới nhất (gói #{package}).",
+      "syncFailed": "Gói mới nhất trên Polygon: r{revision}, {state}. Lần đồng bộ trước lỗi; bài vẫn dùng bản cũ.",
+      "notReady": "Gói mới nhất trên Polygon đang ở trạng thái {state}; chưa đồng bộ được.",
+      "unknown": "Không hỏi được Polygon lúc này: chưa kết nối, mất kết nối hoặc tài khoản bị thu quyền đọc."
+    },
+    "syncFailed": "Đồng bộ lúc {date} thất bại: {reason} Bài chưa bị thay đổi.",
+    "syncNow": "Đồng bộ ngay",
+    "syncNowRevision": "Đồng bộ ngay (r{revision})",
+    "syncBlocked": "Cần một gói READY trên Polygon để đồng bộ.",
+    "autoSyncOn": "Có gói READY mới hơn thì tự nhập lại đề, test và checker. Đang bật.",
+    "autoSyncOff": "Có gói READY mới hơn thì tự nhập lại đề, test và checker. Đang tắt.",
+    "unlink": "Huỷ liên kết",
+    "syncConfirm": {
+      "title": "Đồng bộ {code} từ Polygon?",
+      "confirm": "Đồng bộ và ghi đè",
+      "overwrites": "Đồng bộ sẽ ghi đè trên QHHOJ: đề bài và bản dịch, lời giải, test, checker, giới hạn thời gian và bộ nhớ.",
+      "lost": "Mọi sửa đổi các mục đó trên QHHOJ từ lần nhập trước sẽ mất; hãy chép sang Polygon trước nếu cần giữ.",
+      "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp."
+    },
+    "unlinkConfirm": {
+      "title": "Huỷ liên kết {code} với Polygon?",
+      "body": "Nội dung bài giữ nguyên; chỉ ngừng đồng bộ (cả tự đồng bộ). Muốn liên kết lại thì nhập lại bài ở chế độ cập nhật.",
+      "confirm": "Huỷ liên kết"
+    }
+  }
+}

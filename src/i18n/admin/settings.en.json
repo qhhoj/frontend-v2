@@ -15,7 +15,8 @@
     "pdf": "PDF export",
     "similarity": "Similarity",
     "quota": "Quota",
-    "problem": "Problems"
+    "problem": "Problems",
+    "polygon": "Polygon"
   },
   "infoCard": "Values are checked when saved. An error shows right under the wrong block; nothing is saved part-way through a key. Only people with the “Change settings” permission see this page.",
   "blocks": {
@@ -66,6 +67,10 @@
     "problem": {
       "title": "Deleting problems",
       "help": "Days a deleted problem can be restored; after that its data is purged and only the code and name stay. Submissions are never deleted."
+    },
+    "polygon": {
+      "title": "QHHOJ's Polygon account",
+      "help": "QHHOJ reads Polygon problems with this account. Setters share a problem with it, then import it in Import from Polygon. Without a key or secret it is not connected."
     }
   },
   "fields": {
@@ -108,6 +113,11 @@
     },
     "problem": {
       "deleteGraceDays": "Days a deleted problem can be restored"
+    },
+    "polygon": {
+      "accountName": "Account name",
+      "apiKey": "API key",
+      "apiSecret": "API secret"
     }
   },
   "hints": {
@@ -145,6 +155,11 @@
     },
     "problem": {
       "deleteGraceDays": "An integer from 1 to 365."
+    },
+    "polygon": {
+      "accountName": "The Polygon account that owns the API key; shown in the how-to for setters.",
+      "apiKey": "From Polygon: Settings, API keys. Only the last four characters show.",
+      "apiSecret": "Encrypted when saved, never shown again. After replacing it, test the connection again."
     }
   },
   "chip": {
@@ -240,6 +255,10 @@
         "google": "Google client secret",
         "github": "GitHub client secret",
         "facebook": "Facebook client secret"
+      },
+      "polygon": {
+        "apiKey": "Polygon API key",
+        "apiSecret": "Polygon API secret"
       }
     },
     "consequences": {
@@ -248,7 +267,8 @@
       "senderKept": "The sender (mail.from) stays the same.",
       "notificationsOff": "Discord notifications are off for every event (empty list).",
       "providerOff": "Sign-in with this provider is switched off at the same time, because the server refuses an enabled provider without a secret.",
-      "clientIdKept": "The OAuth client id stays the same."
+      "clientIdKept": "The OAuth client id stays the same.",
+      "polygonOff": "The Polygon connection stops: no listing, importing or syncing from Polygon until it is set again."
     }
   },
   "log": {

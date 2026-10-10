@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { emptyImportForm, importFormErrors, toImportOptions } from './import-form';
+import {
+  codeFromPolygonName,
+  emptyImportForm,
+  importFormErrors,
+  toImportOptions,
+} from './import-form';
 
 const readyForm = () => ({
   ...emptyImportForm(),
@@ -70,5 +75,26 @@ describe('import form', () => {
       everyMode,
     );
     expect(Object.keys(errors)).toEqual(['tutorialLanguage']);
+  });
+});
+
+describe('importFormErrors without a file', () => {
+  it('does not ask for a file when the package comes from Polygon', () => {
+    const errors = importFormErrors({ ...emptyImportForm(), code: 'sum' }, () => true, {
+      needsFile: false,
+    });
+    expect(errors).toEqual({});
+  });
+});
+
+describe('codeFromPolygonName', () => {
+  it.each([
+    ['xau-doi-xung', 'xau_doi_xung'],
+    ['Dem-Cap--Chia.Het', 'dem_cap_chia_het'],
+    ['-a-', 'a'],
+    ['a'.repeat(40), 'a'.repeat(32)],
+    ['---', ''],
+  ])('turns %s into %s', (name, code) => {
+    expect(codeFromPolygonName(name)).toBe(code);
   });
 });

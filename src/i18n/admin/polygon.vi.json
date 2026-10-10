@@ -1,6 +1,6 @@
 {
-  "title": "Nhập bài từ Polygon",
-  "lead": "Gói được xử lý nền; trạng thái lấy từ công việc trong hàng đợi.",
+  "title": "Nhập tệp .zip",
+  "lead": "Tải gói Polygon dạng .zip lên; gói được xử lý nền, trạng thái lấy từ công việc trong hàng đợi.",
   "rateLimited": "Tối đa 10 lượt nhập mỗi giờ.",
   "form": {
     "board": "Nhập gói Polygon",
@@ -39,12 +39,8 @@
   "progress": {
     "title": "Đang nhập {code}",
     "state": "Trạng thái",
-    "received": "Đã nhận gói",
-    "queued": "Đang chờ trong hàng đợi",
-    "running": "Đang xử lý",
     "runningHint": "trang hỏi lại mỗi 2 giây",
-    "done": "Hoàn tất",
-    "doneText": "Nhập xong. Bài đã tạo, mở để chỉnh tiếp.",
+    "doneText": "Nhập xong. Mở bài để xem và chỉnh tiếp.",
     "open": "Mở {code}",
     "failed": "Không nhập được. Hệ thống không cho biết thêm lý do.",
     "pollFailed": "Chưa lấy được trạng thái. Trang sẽ thử lại.",
@@ -53,6 +49,20 @@
       "forbidden": "Bạn không được xem lượt nhập này.",
       "unknown": "Hàng đợi không còn biết lượt nhập này.",
       "gaveUp": "Không lấy được trạng thái sau nhiều lần thử. Tải lại trang để thử lại."
+    },
+    "steps": {
+      "queued": "Đã xếp hàng",
+      "downloading": "Tải gói từ Polygon",
+      "statements": "Chuyển đề bài",
+      "tests": "Tải test lên",
+      "end": "Hoàn tất",
+      "failed": "Không nhập được"
+    },
+    "status": {
+      "done": "xong",
+      "current": "đang chạy",
+      "pending": "chưa tới",
+      "failed": "lỗi"
     }
   }
 }

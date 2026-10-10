@@ -19,6 +19,8 @@ const META = {
 const job = (state: string, result: unknown = null) => ({
   id: 'job-1',
   state,
+  step: state === 'completed' ? 'done' : 'statements',
+  progress: null,
   result,
   error: null,
 });

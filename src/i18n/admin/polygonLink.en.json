@@ -1,0 +1,157 @@
+{
+  "packageState": {
+    "READY": "READY",
+    "RUNNING": "RUNNING",
+    "FAILED": "FAILED",
+    "NONE": "No package"
+  },
+  "howTo": {
+    "title": "How-to for problem setters",
+    "steps": {
+      "open": "Open the problem on polygon.codeforces.com.",
+      "access": "In Manage access, add {account} as a collaborator with Read access.",
+      "package": "Commit your changes and build a package (Packages, Create package); wait until it is READY.",
+      "import": "On QHHOJ open Admin, Import from Polygon: the problem shows in the list."
+    },
+    "unnamed": "the QHHOJ account",
+    "readIsEnough": "Read access is enough: QHHOJ changes nothing on Polygon.",
+    "copy": "Copy the account name {account}"
+  },
+  "check": {
+    "button": "Test the connection",
+    "hint": "Calls Polygon once with the saved key and secret; save your changes before testing.",
+    "ok": "Connected at {time}. Polygon accepts the key of {account}: {count} problems are shared with the account.",
+    "failed": "The test at {time} failed. {reason}"
+  },
+  "wizard": {
+    "title": "Import from Polygon",
+    "lead": "Every problem shared with the {account} account on Polygon shows here. Pick one, configure it, then follow the import.",
+    "stepsLabel": "Import steps",
+    "steps": {
+      "pick": "Pick",
+      "configure": "Configure",
+      "progress": "Import"
+    },
+    "fromPolygon": "Import from Polygon",
+    "zipFile": "Import a .zip file",
+    "zipInstead": "Import a .zip file instead"
+  },
+  "pick": {
+    "title": "Pick a problem on Polygon",
+    "updatedAt": "Updated at {time}",
+    "refresh": "Refresh",
+    "refreshList": "Refresh the list",
+    "search": "Search problems",
+    "searchPlaceholder": "Title, Polygon name or owner",
+    "filterLabel": "Filter by package state",
+    "filters": {
+      "all": "All",
+      "ready": "READY package",
+      "running": "Building",
+      "unavailable": "Failed or no package"
+    },
+    "blocked": {
+      "linked": "Linked to {code}: sync it from that problem's editor.",
+      "running": "Polygon is building the package; try again later.",
+      "failed": "The package build failed: fix it and build again on Polygon.",
+      "noPackage": "No package yet: build one on Polygon first."
+    },
+    "modified": "Has uncommitted changes; the newest READY package still imports.",
+    "noMatch": "No problem matches the search and the filter.",
+    "selected": "Picked:",
+    "noneSelected": "Pick a problem with a READY package to continue.",
+    "next": "Continue"
+  },
+  "notConnected": {
+    "title": "Polygon is not connected",
+    "bodyAdmin": "The site has no Polygon API key or secret yet, so the problem list cannot be read. A .zip file still imports.",
+    "bodyAsk": "The site has no Polygon API key yet. Ask an administrator to add one; meanwhile a .zip file still imports.",
+    "openSettings": "Open the Polygon settings"
+  },
+  "nothingShared": {
+    "title": "No problem is shared with {account} yet",
+    "body": "A Polygon problem shows here once its owner adds {account} as a collaborator with Read access.",
+    "steps": {
+      "access": "Open the problem on Polygon, go to Manage access.",
+      "grant": "Add {account} with Read access.",
+      "package": "Build a package, wait for READY, then refresh this page."
+    },
+    "openPolygon": "Open Polygon"
+  },
+  "source": {
+    "label": "Source",
+    "owner": "Owner",
+    "package": "Version",
+    "packageValue": "r{revision}, package #{id}",
+    "fromPolygon": "Taken from the Polygon package",
+    "taken": {
+      "statements": "Statements, translations and the tutorial",
+      "tests": "Tests and point groups",
+      "checker": "Checker or interactor",
+      "limits": "Time and memory limits and partial scoring"
+    },
+    "keptByQhhoj": "Kept by QHHOJ",
+    "kept": "Code, points, group, types, authors, curators and allowed languages. Later syncs never overwrite these."
+  },
+  "configure": {
+    "title": "Configure the import",
+    "lead": "The same as a .zip import. Statements, tests and the checker come from the Polygon package; the rest are QHHOJ settings.",
+    "board": "Problem on QHHOJ",
+    "autoSync": "Sync automatically on a new package",
+    "autoSyncHint": "When the owner builds a READY package newer than r{revision}, QHHOJ imports the statements, tests and checker again (checked every 10 minutes, deferred while a contest using the problem runs).",
+    "back": "Back"
+  },
+  "progress": {
+    "title": "Importing from Polygon",
+    "lead": "The package is processed in the background. You may leave; the import keeps running and stays at this address for 24 hours.",
+    "retry": "Try again",
+    "another": "Import another problem"
+  },
+  "panel": {
+    "title": "Polygon link",
+    "status": {
+      "newer": "Newer version",
+      "upToDate": "Up to date",
+      "syncFailed": "Sync failed",
+      "notReady": "Package not ready",
+      "unknown": "Polygon unreachable"
+    },
+    "problem": "Polygon problem",
+    "lastSync": "Last sync",
+    "linkedAt": "Never synced (linked {date})",
+    "result": "Result",
+    "results": {
+      "ok": "Succeeded, using r{revision}",
+      "failed": "Failed",
+      "never": "Never synced"
+    },
+    "inUse": "In use",
+    "latest": "Newest",
+    "revisionText": {
+      "newer": "Package #{id} of r{revision} is built (READY). Sync to take the new version.",
+      "upToDate": "Using the newest READY package (package #{package}).",
+      "syncFailed": "Newest package on Polygon: r{revision}, {state}. The last sync failed; the problem keeps the old version.",
+      "notReady": "The newest package on Polygon is {state}; it cannot be synced yet.",
+      "unknown": "Polygon cannot be asked right now: not connected, unreachable, or the account lost read access."
+    },
+    "syncFailed": "The sync at {date} failed: {reason} The problem was not changed.",
+    "syncNow": "Sync now",
+    "syncNowRevision": "Sync now (r{revision})",
+    "syncBlocked": "Syncing needs a READY package on Polygon.",
+    "autoSyncOn": "A newer READY package re-imports the statements, tests and checker. On.",
+    "autoSyncOff": "A newer READY package re-imports the statements, tests and checker. Off.",
+    "unlink": "Unlink",
+    "syncConfirm": {
+      "title": "Sync {code} from Polygon?",
+      "confirm": "Sync and overwrite",
+      "overwrites": "The sync overwrites on QHHOJ: statements and translations, the tutorial, tests, the checker, time and memory limits.",
+      "lost": "Every edit to those on QHHOJ since the last import is lost; copy it to Polygon first if you need it.",
+      "kept": "Kept: code, points, group, types, authors, curators, allowed languages."
+    },
+    "unlinkConfirm": {
+      "title": "Unlink {code} from Polygon?",
+      "body": "The problem's content stays; only syncing stops (auto-sync too). To link again, import the problem in update mode.",
+      "confirm": "Unlink"
+    }
+  }
+}
