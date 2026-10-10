@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
 import Popover from 'primevue/popover';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
 import { toolbarControlClass } from './toolbar-classes';
 
@@ -10,17 +11,39 @@ const emit = defineEmits<{
   change: [range: { pointsMin: number | null; pointsMax: number | null }];
 }>();
 
-const SLIDER = { min: 0, max: 4000, step: 100 } as const;
+/** The slider spans the points a problem can have; a handle at its end of the track means "no bound". */
+const SLIDER = { ...PROBLEM_LIMITS.points, step: 100 } as const;
 const popover = ref<InstanceType<typeof Popover>>();
 const open = ref(false);
-const active = computed(() => props.min !== null || props.max !== null);
+/** The bounds follow the pointer while dragging; the filter changes once, on release. null: no bound. */
+const draftMin = ref<number | null>(null);
+const draftMax = ref<number | null>(null);
+watch(
+  () => [props.min, props.max] as const,
+  ([min, max]) => {
+    draftMin.value = min;
+    draftMax.value = max;
+  },
+  { immediate: true },
+);
+const low = computed(() => draftMin.value ?? SLIDER.min);
+const high = computed(() => draftMax.value ?? SLIDER.max);
+const active = computed(() => draftMin.value !== null || draftMax.value !== null);
 const label = computed(() =>
   active.value
-    ? translate('problems.pointsRange', { min: props.min ?? '…', max: props.max ?? '…' })
+    ? translate('problems.pointsRange', {
+        min: draftMin.value ?? '…',
+        max: draftMax.value ?? '…',
+      })
     : translate('problems.pointsAny'),
 );
-const low = computed(() => props.min ?? SLIDER.min);
-const high = computed(() => props.max ?? SLIDER.max);
+const percent = (value: number) => ((value - SLIDER.min) / (SLIDER.max - SLIDER.min)) * 100;
+const fill = computed(() => ({
+  '--fill-from': `${percent(low.value)}%`,
+  '--fill-to': `${percent(high.value)}%`,
+}));
+/** Both handles at the right end: the minimum must be on top, or it could never move. */
+const minOnTop = computed(() => low.value >= high.value - SLIDER.step);
 
 const numberOf = (event: Event) => {
   const text = (event.target as HTMLInputElement).value;
@@ -36,15 +59,16 @@ function setRange(pointsMin: number | null, pointsMax: number | null) {
 }
 const setMin = (value: number | null) => setRange(value, props.max);
 const setMax = (value: number | null) => setRange(props.min, value);
-/** A handle resting on its end of the track means "no bound". */
-const slideMin = (event: Event) => {
-  const value = Math.min(numberOf(event) ?? SLIDER.min, high.value);
-  setMin(value <= SLIDER.min ? null : value);
-};
-const slideMax = (event: Event) => {
-  const value = Math.max(numberOf(event) ?? SLIDER.max, low.value);
-  setMax(value >= SLIDER.max ? null : value);
-};
+/** A handle cannot pass the other one; the input is put back where the value is, so the thumb never drifts. A handle at its end of the track means "no bound". */
+function slide(event: Event, edge: 'low' | 'high') {
+  const input = event.target as HTMLInputElement;
+  const value = Number(input.value);
+  const kept = edge === 'low' ? Math.min(value, high.value) : Math.max(value, low.value);
+  if (kept !== value) input.value = String(kept);
+  if (edge === 'low') draftMin.value = kept === SLIDER.min ? null : kept;
+  else draftMax.value = kept === SLIDER.max ? null : kept;
+}
+const commit = () => setRange(draftMin.value, draftMax.value);
 </script>
 
 <template>
@@ -74,6 +98,9 @@ const slideMax = (event: Event) => {
             autofocus
             type="number"
             inputmode="numeric"
+            :min="SLIDER.min"
+            :max="SLIDER.max"
+            :step="SLIDER.step"
             :value="min ?? ''"
             class="h-11 w-full rounded-row border border-line bg-surface-strong px-3 text-content"
             @change="setMin(numberOf($event))"
@@ -85,22 +112,27 @@ const slideMax = (event: Event) => {
             name="pointsMax"
             type="number"
             inputmode="numeric"
+            :min="SLIDER.min"
+            :max="SLIDER.max"
+            :step="SLIDER.step"
             :value="max ?? ''"
             class="h-11 w-full rounded-row border border-line bg-surface-strong px-3 text-content"
             @change="setMax(numberOf($event))"
           />
         </label>
       </div>
-      <div class="points-slider" data-testid="points-slider">
+      <div class="points-slider" data-testid="points-slider" :style="fill">
         <input
           type="range"
           name="pointsMinSlider"
+          :class="{ 'is-top': minOnTop }"
           :min="SLIDER.min"
           :max="SLIDER.max"
           :step="SLIDER.step"
           :value="low"
           :aria-label="$t('problems.pointsMin')"
-          @change="slideMin"
+          @input="slide($event, 'low')"
+          @change="commit"
         />
         <input
           type="range"
@@ -110,9 +142,14 @@ const slideMax = (event: Event) => {
           :step="SLIDER.step"
           :value="high"
           :aria-label="$t('problems.pointsMax')"
-          @change="slideMax"
+          @input="slide($event, 'high')"
+          @change="commit"
         />
       </div>
+      <p class="flex justify-between text-xs text-muted tabular-nums" aria-hidden="true">
+        <span>{{ SLIDER.min }}</span
+        ><span>{{ SLIDER.max }}</span>
+      </p>
     </div>
   </Popover>
 </template>
@@ -123,8 +160,25 @@ const slideMax = (event: Event) => {
   position: relative;
   height: 2rem;
 }
+/* The chosen range is the filled part of the track. */
+.points-slider::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 2px);
+  left: var(--fill-from);
+  right: calc(100% - var(--fill-to));
+  height: 4px;
+  border-radius: 2px;
+  background: var(--qh-accent);
+  pointer-events: none;
+  z-index: 1;
+}
+.points-slider input.is-top {
+  z-index: 3;
+}
 .points-slider input {
   position: absolute;
+  z-index: 2;
   inset: 0;
   width: 100%;
   margin: 0;
