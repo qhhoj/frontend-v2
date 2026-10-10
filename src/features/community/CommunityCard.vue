@@ -9,7 +9,7 @@ defineEmits<{ retry: [] }>();
 
 <template>
   <GlassCard class="flex flex-col gap-3 p-4 sm:p-5">
-    <h2 class="font-display text-lg font-semibold">{{ title }}</h2>
+    <h2 class="font-display text-base font-bold">{{ title }}</h2>
     <QueryState :loading="loading" :error="error" @retry="$emit('retry')">
       <template #skeleton><slot name="skeleton" /></template>
       <slot />

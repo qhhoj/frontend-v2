@@ -15,7 +15,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
           <SkeletonBlock text class="w-36" />
         </span>
       </div>
-      <div class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <div class="page-title">
         <SkeletonBlock text class="w-3/5" />
       </div>
       <p><SkeletonBlock text class="w-48" /></p>

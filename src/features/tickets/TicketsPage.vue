@@ -39,7 +39,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <header class="flex flex-wrap items-end justify-between gap-4 pt-3 pb-1">
       <div>
         <h1 class="font-display text-4xl font-bold tracking-tight sm:text-[44px]">

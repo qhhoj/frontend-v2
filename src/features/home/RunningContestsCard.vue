@@ -29,7 +29,7 @@ const timeLeftOf = (contest: ContestListItem) =>
 <template>
   <GlassCard data-testid="running-contests" class="flex flex-col gap-4 p-5 sm:p-6">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="flex items-center gap-2 font-display text-lg font-semibold">
+      <h2 class="flex items-center gap-2 font-display text-base font-bold">
         {{ $t('home.anon.running') }}
         <span class="rounded-pill bg-surface-strong px-2 font-mono text-sm tabular-nums">{{
           contests.length

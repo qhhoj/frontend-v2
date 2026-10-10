@@ -17,6 +17,7 @@ import {
   RANK_HEAD_CLASS,
   USER_CELL_CLASS,
   USER_HEAD_CLASS,
+  medalClass,
   valueCellClass,
   valueHeadClass,
 } from './leaderboard-cells';
@@ -67,7 +68,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
         :class="[BOARD_ROW_CLASS, { 'bg-accent-soft': entry.username === viewerName }]"
       >
         <td :class="RANK_CELL_CLASS">
-          <span class="flex items-center justify-end gap-1.5">
+          <span class="flex items-center justify-end gap-1.5" :class="medalClass(entry.rank)">
             <StateBit v-if="entry.rank <= 3" variant="rankUp" size="tiny" />
             {{ formatNumber(entry.rank, locale.locale) }}
           </span>

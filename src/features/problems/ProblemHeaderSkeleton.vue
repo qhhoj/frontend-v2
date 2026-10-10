@@ -18,13 +18,8 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         <p data-skeleton-region="meta" class="font-mono text-sm">
           <SkeletonBlock text class="w-40" />
         </p>
-        <div
-          data-skeleton-region="title"
-          class="mt-1 font-display text-3xl font-bold tracking-tight sm:text-[40px] sm:leading-[1.15]"
-        >
+        <div data-skeleton-region="title" class="mt-1 page-title">
           <SkeletonBlock text class="w-3/4" />
-          <!-- a phone title usually wraps to a second line -->
-          <span class="sm:hidden"><br /><SkeletonBlock text class="w-1/2" /></span>
         </div>
         <div data-skeleton-region="chips" class="mt-3 flex min-h-8 flex-wrap items-center gap-2">
           <SkeletonBlock pill class="h-7 w-20" />
@@ -35,11 +30,14 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         <SkeletonBlock pill class="h-11 w-24" />
       </div>
     </div>
-    <dl data-skeleton-region="limits" class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-      <div v-for="limit in LIMIT_COUNT" :key="limit" data-skeleton-region="limit">
-        <dt class="text-[13px]"><SkeletonBlock text class="w-16" /></dt>
-        <dd class="font-mono text-2xl font-semibold"><SkeletonBlock text class="w-20" /></dd>
-      </div>
-    </dl>
+    <div data-skeleton-region="limits" class="mt-5 flex flex-wrap gap-2">
+      <SkeletonBlock
+        v-for="limit in LIMIT_COUNT"
+        :key="limit"
+        pill
+        data-skeleton-region="limit"
+        class="h-8 w-32"
+      />
+    </div>
   </GlassCard>
 </template>

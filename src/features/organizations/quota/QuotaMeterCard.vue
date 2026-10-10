@@ -24,7 +24,7 @@ const state = computed(() => {
 <template>
   <GlassCard as="div" data-testid="quota-meter" class="flex flex-col gap-2 rounded-panel p-5">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
-      <h2 class="font-display text-lg font-semibold">{{ label }}</h2>
+      <h2 class="font-display text-base font-bold">{{ label }}</h2>
       <p class="font-semibold tabular-nums">{{ valueText }}</p>
     </div>
     <div

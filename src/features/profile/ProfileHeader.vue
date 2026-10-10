@@ -58,7 +58,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
               {{ $t('profile.own') }}
             </span>
           </p>
-          <h1 :class="tierClass" class="font-display text-3xl font-semibold break-all">
+          <h1 :class="tierClass" class="page-title break-all">
             {{ user.username }}
           </h1>
           <p class="text-muted">

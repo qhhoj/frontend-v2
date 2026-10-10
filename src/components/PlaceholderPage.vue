@@ -11,7 +11,7 @@ const route = useRoute();
 <template>
   <section class="mx-auto max-w-3xl px-4 py-16 text-center">
     <InlineBit :kind="bitKind" class="mx-auto mb-3" />
-    <h1 class="font-display text-3xl font-semibold">
+    <h1 class="page-title">
       {{ $t(route.meta.titleKey ?? 'pages.notFound') }}
     </h1>
     <p class="mt-3 text-muted">{{ $t('placeholder.pending') }}</p>

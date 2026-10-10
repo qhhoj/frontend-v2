@@ -65,8 +65,8 @@ function goToPage(page: number) {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-8">
-    <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+  <div class="page-column">
+    <h1 class="page-title">
       {{ $t('submissions.title') }}
     </h1>
     <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>

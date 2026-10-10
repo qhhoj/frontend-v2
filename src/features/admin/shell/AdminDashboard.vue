@@ -18,7 +18,7 @@ const actions = computed(() =>
 <template>
   <div data-testid="admin-dashboard" class="flex flex-col gap-6">
     <header>
-      <h1 class="font-display text-3xl font-semibold">{{ $t('admin.shell.screens.dashboard') }}</h1>
+      <h1 class="page-title">{{ $t('admin.shell.screens.dashboard') }}</h1>
       <p class="text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>
     </header>
     <section class="glass flex flex-wrap items-center gap-4 rounded-panel p-5">
@@ -51,7 +51,7 @@ const actions = computed(() =>
       </div>
     </section>
     <section v-for="entry in sections" :key="entry.labelKey" class="flex flex-col gap-3">
-      <h2 class="font-display text-lg font-semibold">{{ $t(entry.labelKey) }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t(entry.labelKey) }}</h2>
       <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <li v-for="item in entry.items" :key="item.id">
           <RouterLink

@@ -98,7 +98,7 @@ async function saveLink() {
 <template>
   <section class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-lg font-semibold">
+      <h2 class="font-display text-base font-bold">
         {{ $t('admin.contests.ranking.link.title') }}
       </h2>
     </header>

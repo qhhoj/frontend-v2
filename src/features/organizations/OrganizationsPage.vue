@@ -29,9 +29,9 @@ const myOrganizations = computed(() => viewerPage.value?.organizations ?? []);
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <header>
-      <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="page-title">
         {{ $t('orgs.title') }}
       </h1>
       <p class="mt-1 text-muted">{{ $t('orgs.lead') }}</p>
@@ -42,7 +42,7 @@ const myOrganizations = computed(() => viewerPage.value?.organizations ?? []);
       data-testid="my-organizations"
       class="glass flex flex-col gap-3 rounded-card p-5"
     >
-      <h2 class="font-display text-lg font-semibold">
+      <h2 class="font-display text-base font-bold">
         {{ $t('orgs.mine') }} {{ formatNumber(myOrganizations.length, locale.locale) }}
       </h2>
       <ul class="flex flex-col gap-2">

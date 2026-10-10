@@ -31,7 +31,7 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
 <template>
   <GlassCard data-testid="recent-submissions" class="p-6">
     <div class="flex items-center justify-between">
-      <h2 class="font-display text-lg font-semibold">{{ $t('home.recentSubmissions') }}</h2>
+      <h2 class="font-display text-base leading-7 font-bold">{{ $t('home.recentSubmissions') }}</h2>
       <RouterLink
         :to="{ name: 'submissions', query: { user: username } }"
         class="text-accent-text hover:underline"

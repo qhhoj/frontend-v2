@@ -64,7 +64,7 @@ function submit() {
 <template>
   <section class="glass flex flex-col gap-5 rounded-panel p-5">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-lg font-semibold">{{ $t('admin.polygon.form.board') }}</h2>
+      <h2 class="text-base font-bold">{{ $t('admin.polygon.form.board') }}</h2>
       <span class="rounded-pill border border-line-strong px-2.5 py-1 font-mono text-xs text-muted">
         {{
           $t('admin.polygon.form.permissionChip', { permission: 'judge.import_polygon_package' })

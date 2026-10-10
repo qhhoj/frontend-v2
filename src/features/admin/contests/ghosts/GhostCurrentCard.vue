@@ -39,7 +39,7 @@ const removing = useAdminMutation({
 <template>
   <section data-testid="ghost-current" class="glass flex min-w-0 flex-col gap-4 rounded-panel p-5">
     <header class="flex flex-wrap items-center justify-between gap-3">
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.ghosts.current.title') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('admin.ghosts.current.title') }}</h2>
       <span v-if="ghosts.length" class="text-sm text-muted">
         {{ $t('admin.ghosts.current.count', { count: ghosts.length }) }}
       </span>

@@ -46,7 +46,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 pt-5 pb-5 sm:px-8">
+  <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestDetailSkeleton /></template>
@@ -58,12 +58,12 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
           /></template>
         </ContestHeaderCard>
         <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <div class="flex min-w-0 flex-col gap-5">
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
+          <div class="flex min-w-0 flex-col gap-6">
             <ContestProblemsTable :contest="contest" />
             <ContestIntroCard :contest="contest" />
           </div>
-          <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-5">
+          <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-6">
             <ContestRulesCard :contest="contest" />
             <ContestAnnouncementsRail :contest="contest" />
             <ContestJoinRulesCard

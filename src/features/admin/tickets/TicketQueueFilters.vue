@@ -47,7 +47,7 @@ const reset = () =>
     @submit.prevent="applyPeople"
   >
     <div class="flex items-center justify-between gap-2">
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.tickets.filters.heading') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('admin.tickets.filters.heading') }}</h2>
       <button type="button" :class="BUTTON" @click="reset">
         {{ $t('admin.tickets.filters.reset') }}
       </button>

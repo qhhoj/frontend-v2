@@ -22,7 +22,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
 
 <template>
   <GlassCard as="section" class="flex flex-col gap-3 p-5">
-    <h2 class="font-display text-lg font-semibold">
+    <h2 class="font-display text-base font-bold">
       {{ ticket.can.assign ? $t('ticket.notesInternal') : $t('ticket.notes') }}
     </h2>
     <form v-if="ticket.can.editNotes" class="flex flex-col gap-3" novalidate @submit.prevent="save">

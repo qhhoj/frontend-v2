@@ -41,7 +41,7 @@ const rows = computed(() => [
     </section>
 
     <section v-if="outcome" class="flex flex-col gap-3" aria-labelledby="rejudge-outcome-title">
-      <h2 id="rejudge-outcome-title" class="font-display text-lg font-semibold">
+      <h2 id="rejudge-outcome-title" class="font-display text-base font-bold">
         {{ $t('admin.rejudge.summary.lastResult') }}
       </h2>
       <AdminStatus :kind="outcome.kind" :text="outcome.text" :data-placement="outcome.kind" />

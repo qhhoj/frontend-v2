@@ -25,7 +25,9 @@ const isCurrent = (path: string) =>
   path === '/' ? route.path === '/' : route.path === path || route.path.startsWith(`${path}/`);
 const itemClass = (path: string) => [
   NAV_ITEM_CLASS,
-  isCurrent(path) ? 'bg-surface-hover font-semibold text-content' : 'text-muted hover:text-content',
+  isCurrent(path)
+    ? 'relative font-bold text-accent-text after:absolute after:inset-x-3 after:bottom-1.5 after:h-0.5 after:rounded-pill after:bg-accent sm:after:inset-x-4'
+    : 'text-muted hover:text-content',
 ];
 
 const isPhone = useMediaQuery(PHONE_QUERY);

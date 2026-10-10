@@ -15,7 +15,11 @@ const hasActionRow = computed(() => session.status === 'authenticated');
   >
     <!-- Line boxes mirror ContestHeaderCard: the phone line and the authors line each show at one width only. -->
     <div class="flex flex-col gap-3">
-      <SkeletonBlock pill class="h-7 w-48" />
+      <div class="flex flex-wrap items-center gap-1.5">
+        <SkeletonBlock pill class="h-7 w-48" />
+        <!-- The phone chips row wraps to a second line. -->
+        <SkeletonBlock pill class="h-6 w-28 sm:hidden" />
+      </div>
       <div>
         <div class="font-display text-2xl leading-tight font-bold md:text-4xl">
           <SkeletonBlock text class="w-3/4" />
@@ -33,7 +37,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
       <p class="hidden text-sm md:block"><SkeletonBlock text class="w-80" /></p>
     </div>
     <div class="flex flex-col gap-4">
-      <div data-skeleton-region="countdown" class="flex items-center gap-4">
+      <div data-skeleton-region="countdown" class="flex items-center gap-3">
         <!-- The stopwatch Bit box: 32 rows of 3 px on a phone; from md up a running contest's notice-size Bit and timer (98 px), an upcoming contest's 4 px Bit is 30 px taller. -->
         <SkeletonBlock round class="size-24 shrink-0 md:size-[98px]" />
         <div class="flex min-w-0 flex-1 flex-col">
@@ -41,7 +45,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
           <p class="font-mono text-3xl leading-tight md:text-5xl">
             <SkeletonBlock text class="w-48" />
           </p>
-          <p class="text-sm"><SkeletonBlock text class="w-40" /></p>
+          <p class="text-[13px]"><SkeletonBlock text class="w-40" /></p>
         </div>
       </div>
       <!-- ContestActions is static from md (below md it is a fixed bar and takes no row), then the short-link row. -->
@@ -50,7 +54,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
     </div>
   </div>
   <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
-  <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+  <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
     <div data-skeleton-region="problems" class="glass flex flex-col rounded-card px-5">
       <div v-for="row in 3" :key="row" class="py-3">
         <SkeletonBlock text class="w-full" />

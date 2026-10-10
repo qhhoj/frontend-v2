@@ -44,9 +44,7 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
           {{ $t('blogPost.pinned') }}
         </span>
       </div>
-      <h1
-        class="font-display text-3xl font-bold tracking-tight [overflow-wrap:anywhere] sm:text-4xl"
-      >
+      <h1 class="page-title [overflow-wrap:anywhere]">
         {{ post.title }}
       </h1>
       <div

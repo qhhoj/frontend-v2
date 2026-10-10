@@ -37,7 +37,7 @@ const submit = () => post.run({ title: title.value, description: description.val
   <section class="glass flex flex-col gap-4 rounded-panel p-5">
     <header class="flex items-center gap-3">
       <AdminBit placement="composing" />
-      <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="font-display text-lg font-semibold">
+      <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="font-display text-base font-bold">
         {{ $t('admin.contests.announcements.composeTitle') }}
       </h2>
     </header>

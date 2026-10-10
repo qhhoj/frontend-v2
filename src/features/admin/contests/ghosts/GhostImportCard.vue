@@ -88,7 +88,7 @@ function startReplace() {
 <template>
   <section data-testid="ghost-import" class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.ghosts.import.title') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('admin.ghosts.import.title') }}</h2>
       <p class="text-sm text-muted">{{ $t('admin.ghosts.import.lead') }}</p>
     </header>
     <UploadButton

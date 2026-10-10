@@ -34,7 +34,7 @@ const freezeClock = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-3">
     <!-- Upcoming: the stopwatch Bit, bigger from md up. Running: the same loop at the one notice size. -->
     <BitLoop
       v-if="target?.kind === 'start'"
@@ -50,7 +50,7 @@ const freezeClock = computed(() => {
       <p class="font-mono text-3xl leading-tight font-semibold md:text-5xl">
         <CountdownTimer :key="target.at" :until="target.at" />
       </p>
-      <p class="text-sm text-muted">
+      <p class="text-[13px] text-muted">
         {{ $t(CAPTIONS[target.kind], { time: instantLabel(target.at) }) }}
       </p>
     </div>

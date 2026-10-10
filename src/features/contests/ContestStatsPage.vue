@@ -32,7 +32,7 @@ const tiles = computed(() =>
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
+  <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
       <ContestCompactHeader v-if="contest" :contest="contest" />

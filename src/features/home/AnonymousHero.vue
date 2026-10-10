@@ -23,7 +23,7 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
   >
     <div class="flex min-w-0 flex-1 flex-col gap-3">
       <p class="text-sm font-semibold text-accent-text">{{ $t('home.anon.eyebrow') }}</p>
-      <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="page-title">
         {{ $t('home.anon.title') }}
       </h1>
       <p v-if="!isError" class="max-w-2xl text-muted">

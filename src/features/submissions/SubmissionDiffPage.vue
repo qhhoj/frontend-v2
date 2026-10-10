@@ -13,7 +13,7 @@ const pairKey = computed(() => (pair.value ? `${pair.value.left}|${pair.value.ri
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <nav :aria-label="$t('common.breadcrumb')" class="flex items-center gap-2 text-sm">
       <RouterLink :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
         $t('pages.submissions')
@@ -21,7 +21,7 @@ const pairKey = computed(() => (pair.value ? `${pair.value.left}|${pair.value.ri
       <span aria-hidden="true" class="text-muted">/</span>
       <span class="text-content">{{ $t('pages.submissionDiff') }}</span>
     </nav>
-    <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+    <h1 class="page-title">
       {{ $t('pages.submissionDiff') }}
     </h1>
     <SubmissionDiffView v-if="pair" :key="pairKey" :pair="pair" />

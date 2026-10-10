@@ -21,7 +21,7 @@ const CELL = 'py-2 pr-3 align-middle';
     aria-labelledby="credit-ledger-title"
     class="flex flex-col gap-3 rounded-panel p-5"
   >
-    <h2 id="credit-ledger-title" class="font-display text-lg font-semibold">
+    <h2 id="credit-ledger-title" class="font-display text-base font-bold">
       {{ $t('orgQuota.ledger', { month: monthText }) }}
     </h2>
     <EmptyState v-if="entries.length === 0" compact :kind="ORG_BITS.ledgerEmpty">

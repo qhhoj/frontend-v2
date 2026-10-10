@@ -21,7 +21,7 @@ const itemText = (fragment: SimilarityFragment, index: number) =>
 
 <template>
   <section class="flex flex-col gap-2">
-    <h2 class="font-display text-lg font-bold">
+    <h2 class="font-display text-base font-bold">
       {{ $t('admin.similarity.pair.fragments.heading') }}
     </h2>
     <p class="text-sm text-muted">{{ $t('admin.similarity.pair.fragments.scrolls') }}</p>

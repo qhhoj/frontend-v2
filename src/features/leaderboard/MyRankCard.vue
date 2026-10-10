@@ -40,7 +40,7 @@ const findMe = async () => {
 
 <template>
   <GlassCard data-testid="my-rank" class="p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('leaderboard.myRank') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('leaderboard.myRank') }}</h2>
     <p class="text-sm text-muted">{{ $t(`leaderboard.by.${sort}`) }}</p>
     <p v-if="isUnlisted" class="mt-3 text-sm">{{ $t('leaderboard.notListed') }}</p>
     <QueryState

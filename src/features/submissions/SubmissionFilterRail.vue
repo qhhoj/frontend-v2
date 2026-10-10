@@ -68,7 +68,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
     class="flex flex-col gap-4 p-5 md:w-[280px] md:shrink-0"
   >
     <div class="flex items-center justify-between">
-      <h2 class="font-display text-lg font-semibold">{{ $t('submissions.rail.title') }}</h2>
+      <h2 class="font-display text-base font-bold">{{ $t('submissions.rail.title') }}</h2>
       <button
         type="button"
         data-testid="filters-reset"

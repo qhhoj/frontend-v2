@@ -17,7 +17,7 @@ const isFull = computed(() => isFullSuccess(props.result));
     aria-labelledby="org-bulk-result-title"
     class="glass flex flex-col gap-3 rounded-panel p-5"
   >
-    <h2 id="org-bulk-result-title" class="font-display text-lg font-semibold">
+    <h2 id="org-bulk-result-title" class="font-display text-base font-bold">
       {{
         $t(
           'orgProblems.bulk.resultTitle',

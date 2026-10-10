@@ -10,8 +10,8 @@ const NUMBER_COLUMN_COUNT = 3;
 
 <template>
   <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3 sm:px-8">
-      <h2 class="font-display text-lg font-semibold"><SkeletonBlock text class="w-40" /></h2>
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
+      <h2 class="font-display text-base font-bold"><SkeletonBlock text class="w-40" /></h2>
     </div>
     <div class="overflow-x-auto">
       <table aria-hidden="true" class="w-full min-w-[560px] border-collapse text-[15px]">

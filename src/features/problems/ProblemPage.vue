@@ -83,10 +83,10 @@ watch(
   <div
     v-else
     :class="[
-      'mx-auto flex flex-col gap-5 px-4 py-6 sm:px-8',
+      'page-column',
       contest && railEntries
-        ? 'max-w-[1240px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-6'
-        : 'max-w-[960px]',
+        ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
+        : '[--page-width:60rem]',
     ]"
   >
     <ContestProblemSwitcher
@@ -135,7 +135,7 @@ watch(
               v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
               as="div"
               data-testid="statement-card"
-              class="rounded-panel p-6 text-[15px] sm:p-8"
+              class="rounded-panel p-6 sm:p-8"
             >
               <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
                 {{ $t('problem.untranslated') }}

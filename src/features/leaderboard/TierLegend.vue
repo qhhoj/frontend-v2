@@ -36,7 +36,7 @@ const rows = RATING_TIERS.map(legendRow).reverse();
 
 <template>
   <GlassCard class="p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('leaderboard.legend') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('leaderboard.legend') }}</h2>
     <ul class="mt-3 flex flex-col gap-2 text-sm">
       <li v-for="row in rows" :key="row.tier" class="flex items-center gap-2.5">
         <span aria-hidden="true" class="size-3 shrink-0 rounded-full" :class="row.swatchClass" />

@@ -33,7 +33,7 @@ function submit() {
       novalidate
       @submit.prevent="submit"
     >
-      <h2 class="flex items-center gap-3 font-display text-lg font-semibold">
+      <h2 class="flex items-center gap-3 font-display text-base font-bold">
         <InlineBit :kind="DIFF_INLINE_BITS.compareForm" />{{ $t('sourceDiff.compare.title') }}
       </h2>
       <label :for="inputId" class="text-sm font-semibold">{{

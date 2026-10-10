@@ -25,7 +25,7 @@ const route = useRoute();
   <!-- `isolate` keeps the fixed blobs (-z-10) above this ground and below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
-    class="relative isolate min-h-dvh pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[15px] text-content"
+    class="relative isolate min-h-dvh pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[14px] text-content"
   >
     <BackgroundBlobs />
     <a

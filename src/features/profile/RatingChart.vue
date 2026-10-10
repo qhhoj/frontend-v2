@@ -35,6 +35,8 @@ const polyline = computed(() => points.value.map((point) => `${point.x},${point.
 const best = computed(() =>
   points.value.reduce((top, point) => (point.rating > top.rating ? point : top)),
 );
+/** The best-point label is centred on the point; near the right edge it would be cut, so it ends at the point instead. */
+const bestLabelEnd = computed(() => best.value.x > BOX.width - 70);
 const current = computed(() => points.value.at(-1)!);
 /** Every second contest is labelled `#1, #3, …` along the bottom edge, so the axis reads in contest order. */
 const xLabels = computed(() =>
@@ -107,9 +109,9 @@ const pointTitle = (point: { contestName: string | null; rating: number }) =>
       {{ mark.text }}
     </text>
     <text
-      :x="best.x"
+      :x="bestLabelEnd ? best.x + POINT_RADIUS : best.x"
       :y="best.y - 10"
-      text-anchor="middle"
+      :text-anchor="bestLabelEnd ? 'end' : 'middle'"
       class="fill-content text-[11px] font-semibold"
     >
       {{ $t('ratingChart.best', { max: best.rating }) }}

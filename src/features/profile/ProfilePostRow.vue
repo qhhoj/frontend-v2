@@ -12,7 +12,7 @@ const locale = useLocaleStore();
 
 <template>
   <GlassCard as="article" class="flex flex-col gap-2 p-4 sm:p-5">
-    <h2 class="font-display text-lg font-semibold">
+    <h2 class="font-display text-base font-bold">
       <RouterLink
         :to="{ name: 'post', params: { id: post.id } }"
         class="text-content hover:text-accent-text hover:underline"

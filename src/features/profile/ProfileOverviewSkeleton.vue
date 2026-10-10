@@ -13,7 +13,8 @@ const CONTEST_ROWS = 5;
 
 <template>
   <template v-if="part === 'chart'">
-    <SkeletonBlock class="mt-1 h-5 w-56" />
+    <!-- the lead wraps to two lines on a phone -->
+    <SkeletonBlock class="mt-1 h-10 w-56 sm:h-5" />
     <SkeletonBlock class="mt-3 aspect-[640/220] w-full" />
   </template>
   <div v-else-if="part === 'heatmap'" class="mt-3 flex flex-col gap-3">

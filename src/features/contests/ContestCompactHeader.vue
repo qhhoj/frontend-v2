@@ -16,7 +16,7 @@ defineProps<{ contest: ContestSummary }>();
     </nav>
     <div class="flex flex-wrap items-center gap-3">
       <PhasePill :phase="contest.phase" />
-      <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ contest.name }}</h1>
+      <h1 class="page-title">{{ contest.name }}</h1>
     </div>
   </header>
 </template>

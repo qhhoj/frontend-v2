@@ -1,9 +1,21 @@
 /* Tokens shared by every theme; a theme file may override any of them. Colours live only in themes/. */
 /* Defaults sit on :root, not on a theme, so every theme and the pre-paint script read one shared fallback. The personal look is written inline on <html> and overrides these. */
 :root {
+  /* Body and UI text, Codeforces style: Verdana where installed (never bundled, licensed), else the bundled DejaVu Sans (fonts.css), the same design as Vera. */
+  --qh-font-body:
+    Verdana, 'QH DejaVu Sans', 'DejaVu Sans', 'Bitstream Vera Sans', Geneva, sans-serif;
+  /* Headings keep Space Grotesk (product owner's decision). */
   --qh-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --qh-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --qh-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Limit chips by meaning: time blue, memory violet, points amber. They reuse the tag colours, so their contrast is the tag pairs' (themes.spec.ts). */
+  --qh-limit-time: var(--qh-tag-5);
+  --qh-limit-time-bg: var(--qh-tag-5-bg);
+  --qh-limit-memory: var(--qh-tag-6);
+  --qh-limit-memory-bg: var(--qh-tag-6-bg);
+  --qh-limit-points: var(--qh-tag-8);
+  --qh-limit-points-bg: var(--qh-tag-8-bg);
+  --qh-page-max: 80rem;
+  --qh-sidebar-width: 20rem;
   --qh-radius-cell: 12px;
   --qh-radius-row: 16px;
   --qh-radius-tile: 20px;

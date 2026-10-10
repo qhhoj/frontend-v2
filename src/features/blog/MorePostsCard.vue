@@ -18,7 +18,7 @@ const posts = computed(() =>
 
 <template>
   <GlassCard data-testid="more-posts" class="flex flex-col gap-3 p-4 sm:p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('blogPost.morePosts') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('blogPost.morePosts') }}</h2>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-2.5">

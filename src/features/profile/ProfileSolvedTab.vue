@@ -32,7 +32,7 @@ const isFullScore = (points: number, total: number) => points >= total;
         :aria-labelledby="`solved-group-${index}`"
       >
         <GlassCard as="div" class="flex flex-col gap-3 p-4 sm:p-5">
-          <h2 :id="`solved-group-${index}`" class="font-display text-lg font-semibold">
+          <h2 :id="`solved-group-${index}`" class="font-display text-base font-bold">
             {{ group.name }}
             <span class="ml-2 text-sm font-normal text-muted">
               {{

@@ -21,7 +21,7 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
 
 <template>
   <GlassCard v-if="rows.length" data-testid="recent-contests" class="p-5">
-    <h2 class="font-display text-lg font-semibold">{{ $t('profile.recent') }}</h2>
+    <h2 class="font-display text-base font-bold">{{ $t('profile.recent') }}</h2>
     <table class="mt-3 hidden w-full text-left text-sm md:table">
       <thead class="text-muted">
         <tr>

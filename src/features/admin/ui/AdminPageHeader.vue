@@ -19,7 +19,7 @@ defineProps<{ crumbs: { label: string; to?: RouteLocationRaw }[]; title: string;
           <span v-else class="font-mono">{{ crumb.label }}</span>
         </template>
       </nav>
-      <h1 class="font-display text-2xl font-semibold sm:text-3xl">{{ title }}</h1>
+      <h1 class="page-title">{{ title }}</h1>
       <p v-if="lead" class="text-sm text-muted">{{ lead }}</p>
     </div>
     <div class="flex flex-wrap gap-2"><slot name="actions" /></div>

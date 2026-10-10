@@ -34,12 +34,15 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
 </script>
 
 <template>
-  <div v-if="user" class="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem]">
+  <div
+    v-if="user"
+    class="flex flex-col gap-6 lg:grid lg:items-start lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]"
+  >
     <ProfileStats :user="user" class="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-span-2 lg:row-start-1">
       <GlassCard data-testid="rating-card" class="p-5">
-        <h2 class="font-display text-lg font-semibold">{{ $t('ratingChart.title') }}</h2>
+        <h2 class="font-display text-base font-bold">{{ $t('ratingChart.title') }}</h2>
         <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
           <template #skeleton><ProfileOverviewSkeleton part="chart" /></template>
           <template v-if="ratedCount > 0">
@@ -65,7 +68,7 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
       </GlassCard>
 
       <GlassCard class="p-5">
-        <h2 class="font-display text-lg font-semibold">{{ $t('profile.activityTitle') }}</h2>
+        <h2 class="font-display text-base font-bold">{{ $t('profile.activityTitle') }}</h2>
         <QueryState :loading="activityPending" :error="activityError" @retry="refetchActivity()">
           <template #skeleton><ProfileOverviewSkeleton part="heatmap" /></template>
           <ActivityHeatmap v-if="activity" :activity="activity" class="mt-3" />
@@ -80,11 +83,11 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2">
       <GlassCard v-if="user.aboutHtml" class="p-5">
-        <h2 class="font-display text-lg font-semibold">{{ $t('profile.about') }}</h2>
+        <h2 class="font-display text-base font-bold">{{ $t('profile.about') }}</h2>
         <UserContent :html="user.aboutHtml" class="mt-3" />
       </GlassCard>
       <GlassCard v-if="user.organizations.length" class="p-5">
-        <h2 class="font-display text-lg font-semibold">{{ $t('profile.organizations') }}</h2>
+        <h2 class="font-display text-base font-bold">{{ $t('profile.organizations') }}</h2>
         <ul class="mt-3 flex flex-col gap-2">
           <li v-for="organization in user.organizations" :key="organization.id">
             <RouterLink
