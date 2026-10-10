@@ -27017,7 +27017,8 @@
                 "performancePoints",
                 "points",
                 "problemCount",
-                "rating"
+                "rating",
+                "contributionPoints"
               ],
               "type": "string"
             }

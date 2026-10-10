@@ -1289,14 +1289,16 @@
       "rating": "Rating",
       "performancePoints": "PP",
       "points": "Points",
-      "problemCount": "Solved"
+      "problemCount": "Solved",
+      "contributionPoints": "Contribution"
     },
     "myRank": "Your rank",
     "by": {
       "rating": "By rating",
       "performancePoints": "By performance points",
       "points": "By points",
-      "problemCount": "By problems solved"
+      "problemCount": "By problems solved",
+      "contributionPoints": "By contribution"
     },
     "pageOf": "Page {page}",
     "findMe": "Find my rank",

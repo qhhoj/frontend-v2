@@ -17,6 +17,7 @@ export const LEADERBOARD_SORTS = [
   'performancePoints',
   'points',
   'problemCount',
+  'contributionPoints',
 ] as const satisfies readonly LeaderboardSort[];
 /** Rows per board page; the backend's default and maximum. The board query and its skeleton both read it. */
 export const LEADERBOARD_PAGE_SIZE = 100;

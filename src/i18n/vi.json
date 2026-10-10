@@ -1289,14 +1289,16 @@
       "rating": "Rating",
       "performancePoints": "Điểm PP",
       "points": "Tổng điểm",
-      "problemCount": "Số bài giải"
+      "problemCount": "Số bài giải",
+      "contributionPoints": "Đóng góp"
     },
     "myRank": "Hạng của bạn",
     "by": {
       "rating": "Theo rating",
       "performancePoints": "Theo điểm PP",
       "points": "Theo tổng điểm",
-      "problemCount": "Theo số bài giải"
+      "problemCount": "Theo số bài giải",
+      "contributionPoints": "Theo đóng góp"
     },
     "pageOf": "Trang {page}",
     "findMe": "Tìm hạng của tôi",

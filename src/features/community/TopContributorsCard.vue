@@ -46,7 +46,10 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
       </li>
     </ol>
     <template #footer>
-      <RouterLink :to="{ name: 'users' }" class="font-semibold text-accent-text hover:underline">
+      <RouterLink
+        :to="{ name: 'users', query: { sort: 'contributionPoints' } }"
+        class="font-semibold text-accent-text hover:underline"
+      >
         {{ $t('blog.toLeaderboard') }}
       </RouterLink>
     </template>

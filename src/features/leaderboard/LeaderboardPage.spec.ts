@@ -41,7 +41,7 @@ describe('leaderboard page: reads the board from the URL', () => {
     expect(row.get('a[href="/users/dinhphuc"]').classes()).toContain('text-tier-specialist');
     expect(row.text()).toContain('PBC');
     expect(wrapper.get('th[aria-sort="descending"]').text()).toBe('Tổng điểm');
-    expect(wrapper.findAll('th[aria-sort="none"]')).toHaveLength(3);
+    expect(wrapper.findAll('th[aria-sort="none"]')).toHaveLength(4);
   });
 
   it('sorts by a clicked column heading and returns to the first page', async () => {
@@ -133,7 +133,7 @@ describe('leaderboard page: loading and empty boards', () => {
     const { wrapper } = await mountApp('/users');
     const skeleton = wrapper.get('[data-testid="query-skeleton"]');
     expect(skeleton.findAll('tbody tr')).toHaveLength(12);
-    expect(skeleton.findAll('thead th')).toHaveLength(7);
+    expect(skeleton.findAll('thead th')).toHaveLength(8);
     expect(skeleton.text().trim()).toBe('');
   });
 
