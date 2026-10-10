@@ -27,12 +27,14 @@ const HEADS = [
   VALUE_HEAD,
   VALUE_HEAD,
   VALUE_HEAD,
+  VALUE_HEAD,
 ];
 const CELLS = [
   RANK_CELL,
   USER_CELL,
   ORGANIZATION_CELL,
   VALUE_CELL_ACTIVE,
+  RANK_CELL,
   RANK_CELL,
   RANK_CELL,
   RANK_CELL,
@@ -69,6 +71,7 @@ describe('leaderboard skeleton parity', () => {
           true,
           true,
           true,
+          true,
         ]);
       }
     });
@@ -93,9 +96,9 @@ describe('leaderboard skeleton parity', () => {
       props: { entries: [leaderboardEntry(1, 'user_01', 1500)], sort: 'rating', viewerName: null },
     });
     const classes = table.get('table').classes();
-    // 56 + 4 x 112 (numbers) + 192 = 696 px = 43.5rem; with the 112 px organization 808 px = 50.5rem.
-    expect(classes).toContain('min-w-[43.5rem]');
-    expect(classes).toContain('md:min-w-[50.5rem]');
+    // 56 + 5 x 112 (numbers) + 192 = 808 px = 50.5rem; with the 112 px organization 920 px = 57.5rem.
+    expect(classes).toContain('min-w-[50.5rem]');
+    expect(classes).toContain('md:min-w-[57.5rem]');
     expect(table.get('[role="region"]').attributes('tabindex')).toBe('0');
   });
 });

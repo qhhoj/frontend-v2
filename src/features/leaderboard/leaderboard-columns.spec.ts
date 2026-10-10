@@ -8,13 +8,14 @@ import {
 } from './leaderboard-columns';
 
 describe('leaderboard columns', () => {
-  it('shows the four user numbers on the user boards and marks the sorted one', () => {
+  it('shows the five user numbers on the user boards and marks the sorted one', () => {
     const columns = boardColumns('points');
     expect(columns.map((column) => column.key)).toEqual([
       'rating',
       'performancePoints',
       'points',
       'problemCount',
+      'contributionPoints',
     ]);
     expect(columns.filter((column) => column.isActive).map((column) => column.key)).toEqual([
       'points',

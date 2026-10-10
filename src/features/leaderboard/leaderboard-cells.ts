@@ -15,10 +15,10 @@ export const valueCellClass = (isActive: boolean) =>
 export const AVATAR_PX = 28 as const;
 
 /**
- * The table never squeezes the user column: it is at least 12rem wide beside the rank and the four numbers (43.5rem),
- * and from md up also beside the organization (50.5rem). A card narrower than that scrolls sideways.
+ * The table never squeezes the user column: it is at least 12rem wide beside the rank and the five numbers (50.5rem),
+ * and from md up also beside the organization (57.5rem). A card narrower than that scrolls sideways.
  */
-export const BOARD_TABLE_CLASS = 'w-full table-fixed text-sm min-w-[43.5rem] md:min-w-[50.5rem]';
+export const BOARD_TABLE_CLASS = 'w-full table-fixed text-sm min-w-[50.5rem] md:min-w-[57.5rem]';
 
 /** One viewport's worth of skeleton rows; a full page of them would be thousands of px tall. */
 export const SKELETON_ROW_COUNT = 12;
