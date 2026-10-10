@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
+import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
+import { lastPageOf } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilterChips from './ProblemFilterChips.vue';
@@ -16,30 +19,40 @@ import { filterChips } from './problem-filter-chips';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
 import { useProblemFilters } from './use-problem-filters';
 
-const { filters, update, clearAll } = useProblemFilters();
+const router = useRouter();
+const { filters, page, update, clearAll } = useProblemFilters();
 const locale = useLocaleStore();
 const session = useSessionStore();
 const lang = computed(() => locale.locale);
 const { data: meta } = useProblemMetaQuery();
-const {
-  data,
-  isPending,
-  error,
-  refetch,
-  hasNextPage,
-  fetchNextPage,
-  isFetchingNextPage,
-  isFetchNextPageError,
-  isPlaceholderData,
-} = useProblemListQuery(filters, lang);
+const { data, isPending, error, refetch, isPlaceholderData } = useProblemListQuery(
+  filters,
+  lang,
+  page,
+);
 const { data: viewer } = useUserPageQuery(() => session.user?.username ?? '');
 const chips = computed(() =>
   filterChips(filters.value, { types: meta.value?.types ?? [], groups: meta.value?.groups ?? [] }),
 );
 
-const problems = computed(() => data.value?.pages.flatMap((result) => result.items) ?? []);
+const problems = computed(() => data.value?.items ?? []);
+
+/** A page past the end (a stale link, a shrunk list) or an unusable `?page=` is replaced by the nearest valid one. */
+watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () => {
+  if (!data.value || isPlaceholderData.value) return;
+  const target = Math.min(page.value, lastPageOf(data.value.meta));
+  const { page: raw, ...kept } = router.currentRoute.value.query;
+  const canonical = target === 1 ? undefined : String(target);
+  if (raw !== canonical)
+    void router.replace({ query: canonical ? { ...kept, page: canonical } : kept });
+});
+
+/** Another page is a new list: bring its top (not the rail's) into view, below the shell's header. */
+const listTop = ref<HTMLElement | null>(null);
+watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }), { flush: 'post' });
+
 const summary = computed(() => {
-  const total = data.value?.pages[0]?.meta.total;
+  const total = data.value?.meta.total;
   if (total === undefined) return '';
   const totalText = formatNumber(total, locale.locale);
   return viewer.value
@@ -66,38 +79,21 @@ const summary = computed(() => {
       @update="update"
     />
     <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />
-    <GlassCard as="div" class="overflow-hidden">
-      <QueryState
-        :loading="isPending"
-        :error="isFetchNextPageError ? null : error"
-        @retry="refetch()"
-      >
-        <template #skeleton><ProblemTableSkeleton /></template>
-        <EmptyState v-if="!problems.length">{{ $t('problems.empty') }}</EmptyState>
-        <ProblemTable
-          v-else
-          :problems="problems"
-          :sort="filters.sort"
-          :signed-in="session.user !== null"
-          @sort="update({ sort: $event })"
-        />
-        <div v-if="hasNextPage" class="flex justify-center p-4">
-          <button
-            type="button"
-            :disabled="isFetchingNextPage || isPlaceholderData"
-            class="h-12 rounded-pill border border-line bg-surface-strong px-7 font-semibold hover:bg-surface-hover"
-            @click="fetchNextPage()"
-          >
-            {{ $t('problems.loadMore') }}
-          </button>
-        </div>
-      </QueryState>
-      <QueryState
-        v-if="isFetchNextPageError"
-        :loading="false"
-        :error="error"
-        @retry="fetchNextPage()"
-      />
-    </GlassCard>
+    <div ref="listTop" class="scroll-mt-20" :aria-busy="isPlaceholderData">
+      <GlassCard as="div" class="overflow-hidden">
+        <QueryState :loading="isPending" :error="error" @retry="refetch()">
+          <template #skeleton><ProblemTableSkeleton /></template>
+          <EmptyState v-if="!problems.length">{{ $t('problems.empty') }}</EmptyState>
+          <ProblemTable
+            v-else
+            :problems="problems"
+            :sort="filters.sort"
+            :signed-in="session.user !== null"
+            @sort="update({ sort: $event })"
+          />
+          <NumberedPager v-if="data" class="p-4" :meta="data.meta" :label="$t('problems.pager')" />
+        </QueryState>
+      </GlassCard>
+    </div>
   </div>
 </template>

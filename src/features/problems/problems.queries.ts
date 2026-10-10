@@ -1,4 +1,4 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-query';
+import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
@@ -13,22 +13,24 @@ export const useProblemMetaQuery = () =>
 
 export const PROBLEM_PAGE_SIZE = 50;
 
-export const useProblemListQuery = (filters: Ref<ProblemFilters>, lang: Ref<StatementLanguage>) =>
-  useInfiniteQuery({
-    queryKey: computed(() => ['problems', 'list', filters.value, lang.value]),
-    queryFn: ({ pageParam }) =>
+/** One numbered page of the list; the previous page stays on screen while the next loads. */
+export const useProblemListQuery = (
+  filters: Ref<ProblemFilters>,
+  lang: Ref<StatementLanguage>,
+  page: Ref<number>,
+) =>
+  useQuery({
+    queryKey: computed(() => ['problems', 'list', filters.value, lang.value, page.value]),
+    queryFn: () =>
       fetchProblems({
         ...toApiFilters(filters.value),
         sort: filters.value.sort ?? undefined,
         lang: lang.value,
-        page: pageParam,
+        page: page.value,
         pageSize: PROBLEM_PAGE_SIZE,
       }),
-    initialPageParam: 1,
-    /** The table stays mounted (and focused) while a new sort or filter loads. */
+    /** The table stays mounted (and focused) while a new page, sort or filter loads. */
     placeholderData: keepPreviousData,
-    getNextPageParam: ({ meta }) =>
-      meta.page * meta.pageSize < (meta.total ?? 0) ? meta.page + 1 : undefined,
   });
 
 const VIEWER_KEY_INDEX = 2;

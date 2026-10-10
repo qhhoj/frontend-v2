@@ -1013,7 +1013,7 @@
     "solved": "Đã giải",
     "attempted": "Đã thử",
     "solve": "Giải ngay",
-    "loadMore": "Tải thêm bài",
+    "pager": "Các trang bài tập",
     "empty": "Không có bài phù hợp.",
     "searchLabel": "Tìm kiếm",
     "typesLabel": "Dạng bài",
