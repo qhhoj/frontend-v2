@@ -908,9 +908,8 @@
     "noUsers": "Chưa có người dùng nào có rating.",
     "topRating": "Top rating",
     "anon": {
-      "eyebrow": "Quốc Học Huế Online Judge",
-      "title": "Luyện thuật toán mỗi ngày, thi đấu cùng cả nước",
-      "body": "{problems} bài tập, kỳ thi hằng tuần và bảng xếp hạng rating dành cho học sinh chuyên Tin. Đăng ký miễn phí để nộp bài và lưu tiến độ.",
+      "title": "Quốc Học Huế Online Judge",
+      "body": "Hệ thống chấm bài trực tuyến của Trường THPT Chuyên Quốc Học Huế.",
       "register": "Đăng ký tài khoản",
       "signIn": "Đăng nhập",
       "problems": "Xem bài tập",

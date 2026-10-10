@@ -11,7 +11,7 @@ const PAGES = [
   {
     path: '/',
     ready: {
-      anonymous: 'Luyện thuật toán mỗi ngày, thi đấu cùng cả nước',
+      anonymous: 'Quốc Học Huế Online Judge',
       'signed-in': 'Tổng hai số',
     },
   },
