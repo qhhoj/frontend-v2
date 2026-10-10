@@ -5,8 +5,18 @@ on:
   push: { branches: [main] }
   workflow_dispatch:
     inputs:
-      ref: { description: 'Branch, tag or SHA (empty: the selected branch head)', type: string, default: '' }
-      force: { description: 'Deploy without waiting for CI on the commit', type: boolean, default: false }
+      ref:
+        {
+          description: 'Branch, tag or SHA (empty: the selected branch head)',
+          type: string,
+          default: '',
+        }
+      force:
+        {
+          description: 'Deploy without waiting for CI on the commit',
+          type: boolean,
+          default: false,
+        }
 # One deploy at a time. A newer run replaces a pending older one; a running deploy is never cancelled.
 concurrency:
   group: deploy-frontend
