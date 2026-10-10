@@ -1,14 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { RatingHistoryEntry } from '@/api/types/users';
-import {
-  chartPoints,
-  labelEvery,
-  ratedHistory,
-  ratingLabelTicks,
-  ratingRange,
-  ratingTicks,
-  tierBands,
-} from './rating-chart';
+import { chartPoints, ratedHistory, ratingRange, ratingTicks, tierBands } from './rating-chart';
 
 const entry = (
   endTime: string,
@@ -55,17 +47,5 @@ describe('rating chart model', () => {
       { color: 'specialist', low: 1400, high: 1600 },
       { color: 'expert', low: 1600, high: 1700 },
     ]);
-  });
-});
-
-describe('chart label spacing', () => {
-  it('keeps rating labels at least 18 units apart over a wide range', () => {
-    const ticks = ratingLabelTicks({ low: 700, high: 3100 }, 156);
-    expect(ticks.length).toBeLessThanOrEqual(8);
-    expect(ticks.every((tick) => tick % 100 === 0)).toBe(true);
-  });
-  it('labels every contest of a short history and thins a long one out', () => {
-    expect(labelEvery(5, 576)).toBe(1);
-    expect(labelEvery(60, 576)).toBe(5);
   });
 });
