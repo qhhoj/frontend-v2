@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  formatProblemPoints,
   coinIndex,
   formatAgo,
   formatNumericDate,
@@ -37,6 +38,13 @@ describe('format helpers', () => {
   it('formats ranking times as H:MM from the start', () => {
     expect(formatElapsed(31 * 60 + 59)).toBe('0:31');
     expect(formatElapsed(2 * 3600 + 5 * 60)).toBe('2:05');
+  });
+
+  it('marks partially scored problems with a p suffix, as 1500p', () => {
+    expect(formatProblemPoints(1500, true, 'vi')).toBe('1500p');
+    expect(formatProblemPoints(1500, false, 'vi')).toBe('1500');
+    expect(formatProblemPoints(12.5, true, 'vi')).toBe('12,5p');
+    expect(formatProblemPoints(12.5, true, 'en')).toBe('12.5p');
   });
 
   it('formats numbers per locale', () => {

@@ -26,6 +26,10 @@ export const formatNumber = (
     useGrouping,
   }).format(value);
 
+/** A problem's points as the old site showed them: `1500p` when tests score partially, else `1500`. */
+export const formatProblemPoints = (points: number, partial: boolean, locale: Locale) =>
+  `${formatNumber(points, locale, 2, false)}${partial ? 'p' : ''}`;
+
 /** A number with exactly `digits` decimals: `100` reads `100,0` at one, so weights and counted points line up. */
 export const formatFixed = (value: number, locale: Locale, digits: number) =>
   new Intl.NumberFormat(INTL_LOCALES[locale], {

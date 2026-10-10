@@ -2,7 +2,7 @@
 import { ArrowDown, ArrowUp } from 'lucide-vue-next';
 import type { ProblemListItem, ProblemSort, ProblemSortField } from '@/api/types/problems';
 import TokenCoin from '@/components/TokenCoin.vue';
-import { formatNumber, initials } from '@/lib/format';
+import { formatNumber, formatProblemPoints, initials } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusChip from './ProblemStatusChip.vue';
 
@@ -80,7 +80,7 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
             {{ problem.types.map((type) => type.fullName).join(', ') }}
           </td>
           <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
-            {{ formatNumber(problem.points, locale.locale, 2, false) }}
+            {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
           </td>
           <td class="px-2.5 py-3.5 text-right font-mono tabular-nums">
             {{ formatNumber(problem.acRate, locale.locale, 1) }}%
