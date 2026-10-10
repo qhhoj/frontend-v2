@@ -43,12 +43,12 @@ watchEffect(() => {
   if (sourceBlock.value) void showCode(sourceBlock.value, source.value, ace);
 });
 /** One text node for the whole gutter, so a 65 536-line source adds one element, not thousands. */
+const lineCount = computed(() => source.value.replace(TRAILING_NEWLINE, '').split('\n').length);
 const lineNumbers = computed(() =>
-  Array.from(
-    { length: source.value.replace(TRAILING_NEWLINE, '').split('\n').length },
-    (_unused, index) => index + 1,
-  ).join('\n'),
+  Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );
+/** The source opens folded, whatever its length; "View source" links (#source) open it unfolded. */
+const isExpanded = ref(route.hash === '#source');
 </script>
 
 <template>
@@ -56,6 +56,16 @@ const lineNumbers = computed(() =>
     <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
+        <button
+          v-if="data && isExpanded"
+          type="button"
+          aria-controls="source-code"
+          :aria-expanded="true"
+          class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 text-sm font-semibold hover:bg-surface-hover"
+          @click="isExpanded = false"
+        >
+          {{ $t('submission.source.collapse') }}
+        </button>
         <CopyButton v-if="data" :text="source" :label="$t('submission.source.copy')" />
         <RouterLink
           v-if="isOwn && problemCode && !forbiddenText"
@@ -71,6 +81,8 @@ const lineNumbers = computed(() =>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
       <div
+        v-if="isExpanded"
+        id="source-code"
         tabindex="0"
         role="region"
         :aria-label="$t('submission.source.title')"
@@ -80,6 +92,18 @@ const lineNumbers = computed(() =>
           lineNumbers
         }}</pre>
         <pre ref="sourceBlock" class="pr-6"></pre>
+      </div>
+      <div v-else class="px-6 pb-5">
+        <button
+          type="button"
+          data-testid="source-expand"
+          aria-controls="source-code"
+          :aria-expanded="false"
+          class="flex min-h-11 w-full items-center justify-center rounded-row border border-dashed border-line bg-surface-strong px-5 font-mono text-sm font-semibold hover:bg-surface-hover"
+          @click="isExpanded = true"
+        >
+          {{ $t('submission.source.expand', { count: lineCount }) }}
+        </button>
       </div>
     </QueryState>
   </GlassCard>

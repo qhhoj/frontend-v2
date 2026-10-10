@@ -17,6 +17,8 @@ describe('SourceView highlighting', () => {
     const source = 'return 1;';
     mockApi({ ...anonymousViewer, 'GET /submissions/sub-1/source': ok({ id: 'sub-1', source }) });
     const view = mountComponent(SourceView, { props: props('CPP17') });
+    await vi.waitFor(() => expect(view.find('[data-testid="source-expand"]').exists()).toBe(true));
+    await view.get('[data-testid="source-expand"]').trigger('click');
     await flushPromises();
     await vi.waitFor(() => expect(view.find('pre.pr-6 .syn-keyword').exists()).toBe(true));
     await view.setProps(props('PAS') as never);

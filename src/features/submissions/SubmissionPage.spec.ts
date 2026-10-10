@@ -363,6 +363,10 @@ describe('submission page', () => {
       'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
     });
     const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="source-expand"]').exists()).toBe(true),
+    );
+    await wrapper.get('[data-testid="source-expand"]').trigger('click');
     await vi.waitFor(() => expect(wrapper.find('pre[aria-hidden="true"]').exists()).toBe(true));
     expect(wrapper.get('pre[aria-hidden="true"]').text()).toBe('1');
   });
