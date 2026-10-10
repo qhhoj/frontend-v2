@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { fetchRandomProblem } from '@/api/problems.api';
@@ -12,6 +12,11 @@ export function useRandomProblem(filters: Ref<ProblemFilters>) {
   const pending = ref(false);
   const missing = ref(false);
   const failed = ref(false);
+  /** The message belongs to the filters it was asked under. */
+  watch(filters, () => {
+    missing.value = false;
+    failed.value = false;
+  });
   async function open() {
     pending.value = true;
     missing.value = false;

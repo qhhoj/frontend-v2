@@ -44,7 +44,7 @@ defineProps<{ status: ViewerStatus }>();
     viewBox="0 0 18 18"
     role="img"
     :aria-label="$t('problems.notTried')"
-    class="text-line-strong"
+    class="text-muted"
   >
     <circle cx="9" cy="9" r="7.2" stroke="currentColor" stroke-width="1.6" fill="none" />
   </svg>

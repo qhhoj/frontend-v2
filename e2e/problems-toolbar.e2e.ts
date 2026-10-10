@@ -92,8 +92,7 @@ test('the status mark, tier square and whole-row link of a row', async ({ page, 
   await expect(row.getByRole('img', { name: 'Chưa thử' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Chưa thử' }).first()).toBeVisible();
   await expect(row.getByTestId('tier-mark')).toHaveAttribute('data-tier', '2');
-  // The link's overlay covers the whole row, so a click on a plain cell lands on it.
-  await row.getByRole('cell').nth(2).click({ force: true });
+  await row.getByRole('cell').nth(2).click();
   await expect(page).toHaveURL(/\/problems\/sp$/);
 });
 

@@ -6,10 +6,18 @@ import ProblemStatusMark from './ProblemStatusMark.vue';
 import ProblemTableColumns from './ProblemTableColumns.vue';
 import ProblemTableHead from './ProblemTableHead.vue';
 import { tierOf } from './problem-tier';
+import { useRowLink } from './use-row-link';
 
-defineProps<{ problems: ProblemListItem[]; sort: ProblemSort | null }>();
+defineProps<{
+  problems: ProblemListItem[];
+  sort: ProblemSort | null;
+  /** Without a viewer there is no status to show, not even "not tried". */
+  signedIn: boolean;
+}>();
 const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
 const locale = useLocaleStore();
+const { open, openInTab } = useRowLink();
+const target = (code: string) => ({ name: 'problem', params: { code } });
 
 const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff-4' } as const;
 </script>
@@ -33,13 +41,17 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
         <tr
           v-for="problem in problems"
           :key="problem.id"
-          class="relative border-t border-line hover:bg-surface-hover"
+          class="cursor-pointer border-t border-line hover:bg-surface-hover"
+          @click="open($event, target(problem.code))"
+          @auxclick="openInTab($event, target(problem.code))"
         >
-          <td class="py-2.5 pl-[22px]"><ProblemStatusMark :status="problem.viewerStatus" /></td>
+          <td class="py-2.5 pl-[22px]">
+            <ProblemStatusMark v-if="signedIn" :status="problem.viewerStatus" />
+          </td>
           <td class="min-w-0 px-3 py-2">
             <RouterLink
-              :to="{ name: 'problem', params: { code: problem.code } }"
-              class="block truncate font-medium text-content after:absolute after:inset-0 hover:text-accent-text"
+              :to="target(problem.code)"
+              class="block truncate font-medium text-content hover:text-accent-text"
               >{{ problem.name }}</RouterLink
             >
             <span class="font-mono text-xs text-muted">{{ problem.code }}</span>

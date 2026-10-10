@@ -338,6 +338,53 @@ describe('problem list', () => {
     expect(wrapper.find('button[aria-label="Bỏ lọc: 800–… điểm"]').exists()).toBe(true);
   });
 
+  it('shows no status marks to anonymous viewers', async () => {
+    mockApi(anonymous());
+    const { wrapper } = await mountApp('/problems');
+    expect(wrapper.findAll('tbody svg[role="img"]')).toHaveLength(0);
+  });
+
+  it('opens a problem from a click anywhere in its row, but not at the end of a text selection', async () => {
+    mockApi({
+      ...anonymous(),
+      'GET /problems/knapsack2': ok(problemDetail({ code: 'knapsack2' })),
+    });
+    const { wrapper, router } = await mountApp('/problems');
+    const typesCell = wrapper.findAll('tbody tr')[1]!.findAll('td')[2]!;
+    const selection = vi.spyOn(window, 'getSelection').mockReturnValue({
+      toString: () => 'Quy hoạch',
+    } as Selection);
+    await typesCell.trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.name).toBe('problems');
+    selection.mockReturnValue({ toString: () => '' } as Selection);
+    await typesCell.trigger('click');
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/knapsack2'));
+    selection.mockRestore();
+  });
+
+  it('swaps a minimum above the maximum and forgets the random message on the next filter', async () => {
+    mockApi({ ...anonymous(), 'GET /problems/random': fail(404, 'no_problem') });
+    const { wrapper, router } = await mountApp('/problems?max=1000');
+    await wrapper
+      .findAll('#main button')
+      .find((button) => button.text() === 'Bài ngẫu nhiên')!
+      .trigger('click');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="random-status"]').text()).not.toBe('');
+    await wrapper.get('#main button[aria-label^="Lọc theo điểm"]').trigger('click');
+    await flushPromises();
+    const minimum = document.body.querySelector<HTMLInputElement>('input[name="pointsMin"]')!;
+    minimum.value = '2000';
+    minimum.dispatchEvent(new Event('change'));
+    await flushPromises();
+    expect([router.currentRoute.value.query.min, router.currentRoute.value.query.max]).toEqual([
+      '1000',
+      '2000',
+    ]);
+    expect(wrapper.get('[data-testid="random-status"]').text()).toBe('');
+  });
+
   it('says when nothing matches', async () => {
     mockApi(anonymous(page([])));
     const { wrapper } = await mountApp('/problems?search=zzz');

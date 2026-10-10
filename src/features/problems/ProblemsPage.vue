@@ -78,6 +78,7 @@ const summary = computed(() => {
           v-else
           :problems="problems"
           :sort="filters.sort"
+          :signed-in="session.user !== null"
           @sort="update({ sort: $event })"
         />
         <div v-if="hasNextPage" class="flex justify-center p-4">

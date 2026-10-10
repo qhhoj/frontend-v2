@@ -26,8 +26,16 @@ const numberOf = (event: Event) => {
   const text = (event.target as HTMLInputElement).value;
   return text === '' ? null : Math.trunc(Number(text));
 };
-const setMin = (value: number | null) => emit('change', { pointsMin: value, pointsMax: props.max });
-const setMax = (value: number | null) => emit('change', { pointsMin: props.min, pointsMax: value });
+/** A minimum above the maximum (or the reverse) swaps the two, so the range is never empty. */
+function setRange(pointsMin: number | null, pointsMax: number | null) {
+  const swapped = pointsMin !== null && pointsMax !== null && pointsMin > pointsMax;
+  emit(
+    'change',
+    swapped ? { pointsMin: pointsMax, pointsMax: pointsMin } : { pointsMin, pointsMax },
+  );
+}
+const setMin = (value: number | null) => setRange(value, props.max);
+const setMax = (value: number | null) => setRange(props.min, value);
 /** A handle resting on its end of the track means "no bound". */
 const slideMin = (event: Event) => {
   const value = Math.min(numberOf(event) ?? SLIDER.min, high.value);

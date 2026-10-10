@@ -412,4 +412,22 @@ describe('theme registry', () => {
     ).map((theme) => theme.id);
     expect(mismatched).toEqual([]);
   });
+
+  it('keeps the problem list graphics (difficulty squares, empty status ring) at 3:1 on every row ground', () => {
+    const MIN_GRAPHIC_CONTRAST = 3;
+    const graphics = ['diff-1', 'diff-2', 'diff-3', 'diff-4', 'text-muted'];
+    const failures = themes.flatMap(({ id, tokens }) => {
+      const colour = colourOf(tokens, id);
+      return ['surface-solid', 'surface-hover', 'surface-strong'].flatMap((ground) =>
+        graphics
+          .filter(
+            (name) =>
+              contrastRatio(colour(name), over(colour(ground), colour('ground'))) <
+              MIN_GRAPHIC_CONTRAST,
+          )
+          .map((name) => `${id}: --qh-${name} on --qh-${ground}`),
+      );
+    });
+    expect(failures).toEqual([]);
+  });
 });
