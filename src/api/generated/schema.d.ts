@@ -145,38 +145,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/internal/admin/site/navigation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["NavigationAdminController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/admin/site/navigation/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["NavigationAdminController_delete"];
-        options?: never;
-        head?: never;
-        patch: operations["NavigationAdminController_update"];
-        trace?: never;
-    };
     "/api/internal/admin/site/pages": {
         parameters: {
             query?: never;
@@ -1650,7 +1618,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Public feed: `queued`, `processing`, `grading-begin` and `done` of submissions on public, non-organisation-private problems, as ids and status. */
+        /** Public feed: `queued`, `processing`, `grading-begin` and `done` of the submissions the anonymous submission list shows (public, non-organisation-private problems; never a contest whose list is hidden, e.g. running or frozen), as ids and status. */
         get: operations["SubmissionStreamsController_feed"];
         put?: never;
         post?: never;
@@ -3376,6 +3344,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/users/{username}/reset-two-factor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UserModerationController_resetTwoFactor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/users/{username}/solved": {
         parameters: {
             query?: never;
@@ -4179,18 +4163,6 @@ export interface components {
             shortName?: string;
             template?: string;
         };
-        CreateNavigationItemDto: {
-            hidden?: boolean;
-            key: string;
-            label: string;
-            order: number;
-            /** @description Id of an existing entry; absent or `null` = top level. */
-            parentId?: string | null;
-            /** @description A site path (`/problems`) or an http(s) URL. */
-            path: string;
-            /** @description A JavaScript regular expression the SPA tests against the current path (marks the entry active). */
-            regex?: string;
-        };
         CreateOrganizationDto: {
             about?: string;
             /** @description Admins besides the creator on create; the whole list on edit. */
@@ -4230,7 +4202,7 @@ export interface components {
             bannedUsers?: string[];
             code: string;
             curators?: string[];
-            date?: string;
+            date?: string | null;
             description?: string;
             /** Format: uuid */
             groupId: string;
@@ -4714,17 +4686,6 @@ export interface components {
         MiscConfigResponse: {
             key: string;
             value: string;
-        };
-        NavigationItemResponse: {
-            hidden: boolean;
-            id: string;
-            key: string;
-            label: string;
-            order: number;
-            parentId: string | null;
-            path: string;
-            /** @description A JavaScript regular expression for the SPA to test against the current path. */
-            regex: string;
         };
         NewCommentDto: {
             body: string;
@@ -5649,7 +5610,6 @@ export interface components {
             config: {
                 [key: string]: string;
             };
-            navigation: components["schemas"]["NavigationItemResponse"][];
             /** @description Official contest mode is on right now (the flag and its end time). The response is cached `private, max-age=60`, so the shell may show the banner up to a minute after the mode ends. */
             officialMode: boolean;
             /**
@@ -5810,6 +5770,8 @@ export interface components {
             /** @description The problem was deleted or purged; its name is kept. */
             isDeleted: boolean;
             name: string;
+            /** @description The problem's max points: the denominator of a submission's score. */
+            points: number;
         };
         SubmissionProgressEventResponse: {
             /** @description The next case being judged on `test-case`, else 0. */
@@ -6240,18 +6202,6 @@ export interface components {
             shortName?: string | null;
             template?: string;
         };
-        UpdateNavigationItemDto: {
-            hidden?: boolean;
-            key?: string;
-            label?: string;
-            order?: number;
-            /** @description Id of an existing entry; absent or `null` = top level. */
-            parentId?: string | null;
-            /** @description A site path (`/problems`) or an http(s) URL. */
-            path?: string;
-            /** @description A JavaScript regular expression the SPA tests against the current path (marks the entry active). */
-            regex?: string;
-        };
         UpdateOrganizationDto: {
             about?: string;
             /** @description Admins besides the creator on create; the whole list on edit. */
@@ -6288,7 +6238,7 @@ export interface components {
             bannedUsers?: string[];
             code?: string;
             curators?: string[];
-            date?: string;
+            date?: string | null;
             description?: string;
             /** Format: uuid */
             groupId?: string;
@@ -6861,110 +6811,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    NavigationAdminController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateNavigationItemDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["NavigationItemResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    NavigationAdminController_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    NavigationAdminController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateNavigationItemDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["NavigationItemResponse"];
-                    };
-                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -15701,6 +15547,36 @@ export interface operations {
                         data: components["schemas"]["RatingHistoryEntryResponse"][];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserModerationController_resetTwoFactor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {

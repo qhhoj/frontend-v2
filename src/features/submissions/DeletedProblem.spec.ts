@@ -11,7 +11,7 @@ import {
 } from '@/test/problem-routes';
 import { submissionDetail, submissionItem } from '@/test/fixtures';
 
-const GONE = { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: true };
+const GONE = { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: true, points: 100 };
 const tombstoned = submissionDetail({
   problem: GONE,
   cases: [],

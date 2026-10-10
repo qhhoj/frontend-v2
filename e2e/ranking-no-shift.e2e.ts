@@ -169,7 +169,7 @@ const TABLE_CASES = [
           url.searchParams.get('page') === '2'
             ? [
                 submissionItem({
-                  problem: { code: 'long', name: LONG_NAME, isDeleted: false },
+                  problem: { code: 'long', name: LONG_NAME, isDeleted: false, points: 100 },
                   user: { id: 'u', username: 'a_really_long_user_name_here' },
                   memory: 123456789,
                 }),

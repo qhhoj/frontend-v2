@@ -214,7 +214,7 @@ export const submissionItem = (
 ): SubmissionListItem => ({
   id: 'sub-1',
   user: { id: sessionUser().id, username: 'user_01' },
-  problem: { code: 'aplusb', name: 'Tổng hai số', isDeleted: false },
+  problem: { code: 'aplusb', name: 'Tổng hai số', isDeleted: false, points: 100 },
   language: { id: CPP17_ID, key: 'CPP17', name: 'C++17' },
   date: '2026-10-08T09:58:00Z',
   status: 'D',
@@ -596,7 +596,7 @@ export const submissionCase = (overrides: Partial<SubmissionCase> = {}): Submiss
 export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): SubmissionDetail => ({
   ...submissionItem({
     id: 'sub-1',
-    problem: { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: false },
+    problem: { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: false, points: 100 },
     status: 'D',
     result: 'WA',
     points: 560,

@@ -4,7 +4,9 @@ import { isProblemDeleted } from './deleted-problem';
 
 describe('isProblemDeleted', () => {
   it('is true only for a row whose problem the server flags as deleted', () => {
-    const gone = submissionItem({ problem: { code: 'x', name: 'X', isDeleted: true } });
+    const gone = submissionItem({
+      problem: { code: 'x', name: 'X', isDeleted: true, points: 100 },
+    });
     expect(isProblemDeleted(gone)).toBe(true);
     expect(isProblemDeleted(submissionItem())).toBe(false);
     expect(isProblemDeleted(submissionItem({ problem: null }))).toBe(false);
