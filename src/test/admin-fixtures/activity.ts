@@ -5,7 +5,7 @@ export const activityLog = (overrides: Partial<ActivityLog> = {}): ActivityLog =
   id: 'l-1',
   at: '2026-10-08T08:41:08.000Z',
   username: 'ngocanh',
-  ip: '113.161.40.7',
+  ip: '203.0.113.7',
   path: '/api/internal/problems/hcmus41a/submit',
   method: 'POST',
   statusCode: 200,
@@ -38,8 +38,8 @@ export const activitySummary = (overrides: Partial<ActivitySummary> = {}): Activ
   total: 3482,
   daily: thirtyDays(),
   topIps: [
-    { value: '27.69.12.3', count: 2910 },
-    { value: '113.161.40.7', count: 412 },
+    { value: '198.51.100.3', count: 2910 },
+    { value: '203.0.113.7', count: 412 },
   ],
   topPaths: [
     { value: '/submissions', count: 840 },
@@ -48,7 +48,7 @@ export const activitySummary = (overrides: Partial<ActivitySummary> = {}): Activ
   sessions: [
     {
       id: 's-1',
-      ip: '27.69.12.3',
+      ip: '198.51.100.3',
       userAgent: 'Mozilla/5.0 (iPhone)',
       deviceType: 'mobile',
       browser: 'Safari',
@@ -58,7 +58,7 @@ export const activitySummary = (overrides: Partial<ActivitySummary> = {}): Activ
     },
     {
       id: 's-2',
-      ip: '113.161.40.7',
+      ip: '203.0.113.7',
       userAgent: 'Mozilla/5.0 (X11; Linux x86_64)',
       deviceType: 'desktop',
       browser: 'Firefox',

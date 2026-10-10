@@ -62,7 +62,7 @@ export const JUDGE_FLEET: Judge[] = [
     slots: 2,
     busy: 0,
     build: '',
-    lastIp: '113.161.40.7',
+    lastIp: '203.0.113.7',
     runtimes: RUNTIMES.slice(0, 2),
   }),
 ];
