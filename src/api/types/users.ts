@@ -20,9 +20,6 @@ export const LEADERBOARD_SORTS = [
 ] as const satisfies readonly LeaderboardSort[];
 /** Rows per board page; the backend's default and maximum. The board query and its skeleton both read it. */
 export const LEADERBOARD_PAGE_SIZE = 100;
-/** The leaderboard tabs: the four `/users` sorts and `/contributors`. */
-export const BOARD_SORTS = [...LEADERBOARD_SORTS, 'contributors'] as const;
-export type BoardSort = (typeof BOARD_SORTS)[number];
 /** backend: libs/database LEADERBOARD_FIELDS (the `sort` of `/users/:username/rank`). */
 export type RankField = NonNullable<QueryOf<'/users/{username}/rank'>['sort']>;
 /** backend: leaderboard.response.ts (RankResponse); `page` counts pages of `pageSize` (100). */

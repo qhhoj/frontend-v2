@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
-import type { BoardSort } from '@/api/types/users';
+import type { LeaderboardSort } from '@/api/types/users';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -11,20 +11,15 @@ import { formatNumber } from '@/lib/format';
 import { ratingTier } from '@/lib/rating-tiers';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import { rankFieldOf, rankLocation, rowAnchor } from './leaderboard-columns';
+import { rankLocation, rowAnchor } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
 
-const props = defineProps<{ sort: BoardSort }>();
+const props = defineProps<{ sort: LeaderboardSort }>();
 const session = useSessionStore();
 const router = useRouter();
 const locale = useLocaleStore();
 const username = computed(() => session.user?.username ?? '');
-const {
-  data: rank,
-  error,
-  isPending,
-  refetch,
-} = useRankQuery(username, () => rankFieldOf(props.sort));
+const { data: rank, error, isPending, refetch } = useRankQuery(username, () => props.sort);
 const { data: viewer } = useUserPageQuery(username);
 /** The API answers 404 for an account the board does not list (inactive or hidden). */
 const isUnlisted = computed(() => error.value instanceof ApiError && error.value.status === 404);

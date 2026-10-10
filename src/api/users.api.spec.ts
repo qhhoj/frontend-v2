@@ -64,13 +64,6 @@ describe('leaderboard calls', () => {
     expect(calls[0]!.query.get('page')).toBe('2');
     expect(calls[0]!.query.get('pageSize')).toBe('100');
   });
-
-  it('reads contributors at the board page size', async () => {
-    const calls = mockApi({ 'GET /contributors': page([leaderboardEntry(1, 'ada', 1500)]) });
-    await users.fetchContributors(4);
-    expect(calls[0]!.query.get('page')).toBe('4');
-    expect(calls[0]!.query.get('pageSize')).toBe('100');
-  });
 });
 
 describe('banUser', () => {

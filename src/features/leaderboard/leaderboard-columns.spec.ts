@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   boardColumns,
-  rankFieldOf,
   rankLocation,
   rowAnchor,
   sortFromQuery,
+  sortLocation,
 } from './leaderboard-columns';
 
 describe('leaderboard columns', () => {
@@ -20,28 +20,19 @@ describe('leaderboard columns', () => {
       'points',
     ]);
   });
-
-  it('shows only contribution points on the contributors board', () => {
-    expect(boardColumns('contributors')).toEqual([
-      {
-        key: 'contributionPoints',
-        labelKey: 'leaderboard.columns.contributionPoints',
-        isActive: true,
-      },
-    ]);
-  });
-
-  it('asks the rank of the field the board is sorted by', () => {
-    expect(rankFieldOf('contributors')).toBe('contributionPoints');
-    expect(rankFieldOf('problemCount')).toBe('problemCount');
-  });
 });
 
 describe('leaderboard routing', () => {
   it('reads a known sort from the URL and falls back to rating', () => {
-    expect(sortFromQuery('contributors')).toBe('contributors');
+    expect(sortFromQuery('points')).toBe('points');
+    expect(sortFromQuery('contributors')).toBe('rating');
     expect(sortFromQuery('bogus')).toBe('rating');
     expect(sortFromQuery(undefined)).toBe('rating');
+  });
+
+  it('sorts to the first page, leaving the default sort out of the URL', () => {
+    expect(sortLocation('points')).toEqual({ query: { sort: 'points' } });
+    expect(sortLocation('rating')).toEqual({ query: {} });
   });
 
   it('anchors a row by username', () => {

@@ -246,13 +246,7 @@ for (const width of [1440, 390])
     );
   });
 
-const BOARD_TABS = [
-  'rating',
-  'performancePoints',
-  'points',
-  'problemCount',
-  'contributors',
-] as const;
+const BOARD_TABS = ['rating', 'performancePoints', 'points', 'problemCount'] as const;
 /** Left edge and width of every visible header cell, and the height of the first row. */
 const boardBoxes = (page: Page) =>
   page.evaluate(() => ({
@@ -265,7 +259,7 @@ const boardBoxes = (page: Page) =>
     row: document.querySelector('#main tbody tr')!.getBoundingClientRect().height,
   }));
 
-test('the leaderboard keeps its columns and row height on every tab, whatever the names', async ({
+test('the leaderboard keeps its columns and row height on every sort, whatever the names', async ({
   page,
   api,
 }) => {
@@ -278,8 +272,6 @@ test('the leaderboard keeps its columns and row height on every tab, whatever th
       { ...leaderboardEntry(2, 'user_12', 2431), displayName: 'Nguyễn Văn A' },
     ]);
   };
-  api.routes['GET /contributors'] = () =>
-    list([{ ...leaderboardEntry(1, 'user_07', 2788), contributionPoints: 12 }]);
   await page.goto('/users');
   await expect(page.locator('#main tbody tr').first()).toBeVisible();
   const first = await boardBoxes(page);
@@ -289,9 +281,8 @@ test('the leaderboard keeps its columns and row height on every tab, whatever th
     await expect(page.locator('#main tbody tr').first()).toContainText(/\S/);
     await page.waitForTimeout(400);
     const next = await boardBoxes(page);
-    // Rank, user and organization sit in the same place on every tab; the number columns match on the four user boards.
-    const shared = tab === 'contributors' ? 3 : first.heads.length;
-    for (let index = 0; index < shared; index++) {
+    // Every column sits in the same place whichever number the board is sorted by.
+    for (let index = 0; index < first.heads.length; index++) {
       expect(
         Math.abs(next.heads[index].left - first.heads[index].left),
         `${tab} head ${index} x`,

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import type { BoardSort, LeaderboardEntry, RankField } from '@/api/types/users';
+import { ArrowDown } from 'lucide-vue-next';
+import { useRoute, useRouter } from 'vue-router';
+import type { LeaderboardEntry, LeaderboardSort, RankField } from '@/api/types/users';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import StateBit from '@/components/StateBit.vue';
 import UserName from '@/components/UserName.vue';
@@ -14,8 +15,6 @@ import {
   BOARD_TABLE_CLASS,
   BOARD_ROW_CLASS,
   NO_FULL_NAME,
-  SPACER_CELL_CLASS,
-  SPACER_HEAD_CLASS,
   ORGANIZATION_CELL_CLASS,
   ORGANIZATION_HEAD_CLASS,
   RANK_CELL_CLASS,
@@ -24,17 +23,19 @@ import {
   USER_HEAD_CLASS,
   valueCellClass,
   valueHeadClass,
+  VALUE_HEAD_INNER_CLASS,
 } from './leaderboard-cells';
-import { boardColumns, rowAnchor } from './leaderboard-columns';
+import { boardColumns, rowAnchor, sortLocation } from './leaderboard-columns';
 import { medalClass } from '@/lib/medal';
 import { revealRow } from './reveal-row';
 
 const props = defineProps<{
   entries: LeaderboardEntry[];
-  sort: BoardSort;
+  sort: LeaderboardSort;
   viewerName: string | null;
 }>();
 const route = useRoute();
+const router = useRouter();
 const locale = useLocaleStore();
 const valueOf = (entry: LeaderboardEntry, key: RankField) =>
   entry[key] === null ? '—' : formatNumber(entry[key], locale.locale);
@@ -60,10 +61,25 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
             :key="column.key"
             scope="col"
             :class="valueHeadClass(column.isActive)"
+            :aria-sort="column.isActive ? 'descending' : 'none'"
           >
-            {{ $t(column.labelKey) }}
+            <button
+              type="button"
+              :class="[
+                VALUE_HEAD_INNER_CLASS,
+                'cursor-pointer rounded-sm uppercase hover:text-content',
+              ]"
+              @click="router.push(sortLocation(column.key))"
+            >
+              {{ $t(column.labelKey) }}
+              <ArrowDown
+                :size="14"
+                aria-hidden="true"
+                class="shrink-0"
+                :class="{ invisible: !column.isActive }"
+              />
+            </button>
           </th>
-          <th v-if="sort === 'contributors'" scope="col" :class="SPACER_HEAD_CLASS" />
         </tr>
       </thead>
       <tbody>
@@ -114,7 +130,6 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
           >
             {{ valueOf(entry, column.key) }}
           </td>
-          <td v-if="sort === 'contributors'" :class="SPACER_CELL_CLASS" />
         </tr>
       </tbody>
     </table>
