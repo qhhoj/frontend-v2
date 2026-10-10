@@ -1237,7 +1237,9 @@
     "source": {
       "title": "Source code",
       "copy": "Copy the source code",
-      "resubmit": "Resubmit"
+      "resubmit": "Resubmit",
+      "collapse": "Collapse",
+      "expand": "Show all ({count} lines)"
     },
     "forbidden": {
       "solve_first": "Solve this problem first to see the submission",
