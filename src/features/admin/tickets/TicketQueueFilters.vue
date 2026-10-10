@@ -42,17 +42,19 @@ const reset = () =>
 
 <template>
   <form
-    class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-4"
+    class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-4 xl:flex-row xl:flex-wrap xl:items-end xl:gap-x-6 min-[1800px]:flex-col min-[1800px]:items-stretch"
     novalidate
     @submit.prevent="applyPeople"
   >
-    <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center justify-between gap-2 xl:basis-full min-[1800px]:basis-auto">
       <h2 class="font-display text-base font-bold">{{ $t('admin.tickets.filters.heading') }}</h2>
       <button type="button" :class="BUTTON" @click="reset">
         {{ $t('admin.tickets.filters.reset') }}
       </button>
     </div>
-    <fieldset class="flex flex-col gap-1">
+    <fieldset
+      class="flex flex-col gap-1 xl:flex-row xl:gap-4 min-[1800px]:flex-col min-[1800px]:gap-1"
+    >
       <legend class="mb-1 text-sm font-semibold">{{ $t('admin.tickets.filters.status') }}</legend>
       <label
         v-for="status in STATUSES"
@@ -96,7 +98,11 @@ const reset = () =>
         @blur="applyPeople"
       />
     </label>
-    <p class="text-[13px] text-muted">{{ $t('admin.tickets.filters.peopleHint') }}</p>
-    <p class="text-[13px] text-muted">{{ $t('admin.tickets.filters.untaggedNote') }}</p>
+    <p class="text-[13px] text-muted xl:basis-full min-[1800px]:basis-auto">
+      {{ $t('admin.tickets.filters.peopleHint') }}
+    </p>
+    <p class="text-[13px] text-muted xl:basis-full min-[1800px]:basis-auto">
+      {{ $t('admin.tickets.filters.untaggedNote') }}
+    </p>
   </form>
 </template>

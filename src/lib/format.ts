@@ -169,6 +169,25 @@ export const formatNumericDateTimeSeconds = (date: string, locale: Locale) => {
   return `${formatNumericDate(date, locale)} ${time}`;
 };
 const WEEK_MS = 7 * 86_400_000;
+const COMPACT_UNITS = [
+  { unit: 'second', seconds: 1 },
+  { unit: 'minute', seconds: 60 },
+  { unit: 'hour', seconds: 3600 },
+  { unit: 'day', seconds: 86_400 },
+] as const;
+/** "5 phút" / "5m", "3 giờ" / "3h" within a week (a table cell under a "when" heading needs no "ago"), the short date (`04/10`) after. */
+export function formatAgoCompact(date: string, now: number, locale: Locale): string {
+  const elapsed = Math.max(0, now - Date.parse(date));
+  if (elapsed > WEEK_MS) return formatShortDate(date, locale);
+  const seconds = Math.floor(elapsed / 1000);
+  const { unit, seconds: size } =
+    COMPACT_UNITS.filter((entry) => seconds >= entry.seconds).pop() ?? COMPACT_UNITS[0];
+  return new Intl.NumberFormat(INTL_LOCALES[locale], {
+    style: 'unit',
+    unit,
+    unitDisplay: 'narrow',
+  }).format(Math.floor(seconds / size));
+}
 /** "2 giờ trước" within a week, the numeric date after. */
 export const formatAgo = (date: string, now: number, locale: Locale) =>
   now - Date.parse(date) <= WEEK_MS

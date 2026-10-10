@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -99,58 +100,66 @@ const countText = computed(() => {
         </strong>
         <span>{{ $t('admin.search.contests.emptyAdvice') }}</span>
       </EmptyState>
-      <div v-else-if="data" class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <caption class="sr-only">
-            {{
-              $t('admin.search.contests.title')
-            }}
-          </caption>
-          <thead class="text-xs text-muted uppercase">
-            <tr>
-              <th scope="col" class="px-3 py-2">
-                {{ $t('admin.search.contests.columns.contest') }}
-              </th>
-              <th scope="col" class="px-3 py-2">{{ $t('admin.search.contests.columns.time') }}</th>
-              <th scope="col" class="px-3 py-2">{{ $t('admin.search.contests.columns.phase') }}</th>
-              <th scope="col" class="px-3 py-2">{{ $t('admin.search.contests.columns.users') }}</th>
-              <th scope="col" class="px-3 py-2">
-                <span class="sr-only">{{ $t('admin.search.edit') }}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="contest in data.items" :key="contest.key" class="border-t border-line">
-              <td class="px-3 py-3">
-                <RouterLink
-                  :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
-                  class="font-semibold text-accent hover:underline"
-                >
-                  <HighlightedText :text="contest.name" :query="search" />
-                </RouterLink>
-                <div class="font-mono text-xs text-muted">
-                  <HighlightedText :text="contest.key" :query="search" />
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">
-                {{ formatDateTime(contest.startTime, locale.locale) }} –
-                {{ formatDateTime(contest.endTime, locale.locale) }}
-                <span v-if="contest.isRated"> · {{ $t('admin.search.contests.rated') }}</span>
-              </td>
-              <td class="px-3 py-3">{{ $t(`contests.phase.${contest.phase}`) }}</td>
-              <td class="px-3 py-3 font-mono">
-                {{ formatNumber(contest.userCount, locale.locale) }}
-              </td>
-              <td class="px-3 py-3 text-right">
-                <RouterLink
-                  :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
-                  :class="ADMIN_BUTTON_CLASS"
-                  >{{ $t('admin.search.edit') }}</RouterLink
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-else-if="data">
+        <ScrollRegion :label="$t('admin.search.contests.title')">
+          <table class="w-full text-left text-sm">
+            <caption class="sr-only">
+              {{
+                $t('admin.search.contests.title')
+              }}
+            </caption>
+            <thead class="text-xs text-muted uppercase">
+              <tr>
+                <th scope="col" class="px-3 py-2">
+                  {{ $t('admin.search.contests.columns.contest') }}
+                </th>
+                <th scope="col" class="px-3 py-2">
+                  {{ $t('admin.search.contests.columns.time') }}
+                </th>
+                <th scope="col" class="px-3 py-2">
+                  {{ $t('admin.search.contests.columns.phase') }}
+                </th>
+                <th scope="col" class="px-3 py-2">
+                  {{ $t('admin.search.contests.columns.users') }}
+                </th>
+                <th scope="col" class="px-3 py-2">
+                  <span class="sr-only">{{ $t('admin.search.edit') }}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="contest in data.items" :key="contest.key" class="border-t border-line">
+                <td class="px-3 py-3">
+                  <RouterLink
+                    :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
+                    class="font-semibold text-accent hover:underline"
+                  >
+                    <HighlightedText :text="contest.name" :query="search" />
+                  </RouterLink>
+                  <div class="font-mono text-xs text-muted">
+                    <HighlightedText :text="contest.key" :query="search" />
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-sm">
+                  {{ formatDateTime(contest.startTime, locale.locale) }} –
+                  {{ formatDateTime(contest.endTime, locale.locale) }}
+                  <span v-if="contest.isRated"> · {{ $t('admin.search.contests.rated') }}</span>
+                </td>
+                <td class="px-3 py-3">{{ $t(`contests.phase.${contest.phase}`) }}</td>
+                <td class="px-3 py-3 font-mono">
+                  {{ formatNumber(contest.userCount, locale.locale) }}
+                </td>
+                <td class="px-3 py-3 text-right">
+                  <RouterLink
+                    :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
+                    :class="ADMIN_BUTTON_CLASS"
+                    >{{ $t('admin.search.edit') }}</RouterLink
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ScrollRegion>
         <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
           <p class="text-sm text-muted">{{ countText }}</p>
           <NumberedPager :meta="data.meta" :label="$t('admin.search.pager')" />

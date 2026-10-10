@@ -6,7 +6,6 @@ import { organizationSummary } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
-import { LEADERBOARD_PAGE_SIZE } from '@/api/types/users';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
 const board = page(
@@ -123,12 +122,12 @@ describe('leaderboard page: opens a profile by username', () => {
 });
 
 describe('leaderboard page: loading and empty boards', () => {
-  it('shows a table skeleton with the header and one row per page item while loading, inert', async () => {
+  it('shows a table skeleton with the header and one viewport of rows (not a page of 100) while loading, inert', async () => {
     mockApi({ ...anonymousViewer });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/users');
     const skeleton = wrapper.get('[data-testid="query-skeleton"]');
-    expect(skeleton.findAll('tbody tr')).toHaveLength(LEADERBOARD_PAGE_SIZE);
+    expect(skeleton.findAll('tbody tr')).toHaveLength(12);
     expect(skeleton.findAll('thead th')).toHaveLength(7);
     expect(skeleton.text().trim()).toBe('');
   });

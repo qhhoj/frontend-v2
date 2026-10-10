@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Search } from 'lucide-vue-next';
+import ToolbarSearch from '@/components/ToolbarSearch.vue';
+import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import { computed } from 'vue';
+import { translate } from '@/i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useContestTagsQuery } from './contest-extras.queries';
 import ContestGroup from './ContestGroup.vue';
@@ -15,6 +17,10 @@ const search = useDebouncedText(
 );
 const shownPhases = computed(() => (filters.value.phase ? [filters.value.phase] : PHASE_ORDER));
 /** The select's values are the URL's: `rated=1` for the rated-only choice, none for both. */
+const ratedOptions = computed(() => [
+  { value: 'any', label: translate('contests.list.ratedAny') },
+  { value: 'rated', label: translate('contests.list.ratedOnly') },
+]);
 const ratedChoice = computed({
   get: () => (filters.value.isRatedOnly ? 'rated' : 'any'),
   set: (choice: string) => update({ isRatedOnly: choice === 'rated' }),
@@ -42,24 +48,19 @@ const tagName = computed(() => {
         <p class="mt-1 text-muted">{{ $t('contests.list.lead') }}</p>
       </div>
       <div class="flex flex-wrap items-center gap-2.5">
-        <label class="glass flex h-12 items-center gap-2 rounded-pill px-4 text-muted">
-          <span class="sr-only">{{ $t('contests.list.search') }}</span>
-          <Search class="size-4 shrink-0" aria-hidden="true" />
-          <input
-            v-model="search"
-            type="search"
-            maxlength="100"
-            :placeholder="$t('contests.list.searchPlaceholder')"
-            class="min-h-11 w-56 bg-transparent text-content"
-          />
-        </label>
-        <label class="flex items-center">
-          <span class="sr-only">{{ $t('contests.list.ratedLabel') }}</span>
-          <select v-model="ratedChoice" class="glass h-12 w-52 rounded-pill px-4 text-content">
-            <option value="any">{{ $t('contests.list.ratedAny') }}</option>
-            <option value="rated">{{ $t('contests.list.ratedOnly') }}</option>
-          </select>
-        </label>
+        <ToolbarSearch
+          v-model="search"
+          :label="$t('contests.list.search')"
+          :placeholder="$t('contests.list.searchPlaceholder')"
+          :maxlength="100"
+          class="w-64"
+        />
+        <ToolbarSelect
+          v-model="ratedChoice"
+          :label="$t('contests.list.ratedLabel')"
+          :options="ratedOptions"
+          :active="ratedChoice !== 'any'"
+        />
       </div>
     </header>
     <ContestTagFilter

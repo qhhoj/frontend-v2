@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ContestPhase } from '@/api/types/contests';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import EndedContestSkeleton from './EndedContestSkeleton.vue';
 
 defineProps<{ kind: ContestPhase }>();
 </script>
@@ -47,18 +48,5 @@ defineProps<{ kind: ContestPhase }>();
       <SkeletonBlock pill class="h-11 w-36" />
     </div>
   </div>
-  <div v-else class="glass rounded-card">
-    <div data-skeleton-region="ended-header" class="px-5 py-3 text-[12px]">
-      <SkeletonBlock text class="w-64" />
-    </div>
-    <div
-      v-for="row in 5"
-      :key="row"
-      data-skeleton-region="ended-row"
-      class="flex items-center gap-4 border-t border-line px-5 py-3 text-sm"
-    >
-      <span class="flex-1"><SkeletonBlock text class="w-48" /></span>
-      <SkeletonBlock pill class="h-11 w-24" />
-    </div>
-  </div>
+  <EndedContestSkeleton v-else />
 </template>

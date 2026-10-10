@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import type { ContestListItem } from '@/api/types/contests';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatShortDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
 import { listCallToAction } from './contest-action';
+import {
+  ENDED_CELL,
+  ENDED_HEAD_ROW_CLASS,
+  ENDED_ROW_CLASS,
+  ENDED_TABLE_CLASS,
+} from './ended-columns';
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
@@ -22,41 +29,39 @@ const whenText = (contest: ContestListItem) => {
 </script>
 
 <template>
-  <div
+  <ScrollRegion
     data-testid="ended-contests"
-    tabindex="0"
-    role="region"
-    :aria-label="$t('contests.list.endedRegion')"
-    class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
+    :label="$t('contests.list.endedRegion')"
+    class="glass overflow-hidden rounded-card"
   >
-    <table class="w-full min-w-[960px] table-fixed border-collapse text-sm">
+    <table :class="ENDED_TABLE_CLASS">
       <caption class="sr-only">
         {{
           $t('contests.phase.ended')
         }}
       </caption>
       <thead>
-        <tr class="text-left text-[12px] tracking-wider text-muted uppercase">
-          <th scope="col" class="px-5 py-3 font-semibold">
+        <tr :class="ENDED_HEAD_ROW_CLASS">
+          <th scope="col" class="font-semibold" :class="ENDED_CELL.name">
             {{ $t('contests.list.columns.contest') }}
           </th>
-          <th scope="col" class="w-48 px-3 py-3 font-semibold">
+          <th scope="col" class="font-semibold" :class="ENDED_CELL.when">
             {{ $t('contests.list.columns.when') }}
           </th>
-          <th scope="col" class="w-56 px-3 py-3 font-semibold">
+          <th scope="col" class="font-semibold" :class="ENDED_CELL.format">
             {{ $t('contests.list.columns.format') }}
           </th>
-          <th scope="col" class="w-36 px-3 py-3 text-right font-semibold">
+          <th scope="col" class="font-semibold" :class="ENDED_CELL.participants">
             {{ $t('contests.list.columns.participants') }}
           </th>
-          <th scope="col" class="w-40 px-5 py-3">
+          <th scope="col" :class="ENDED_CELL.action">
             <span class="sr-only">{{ $t('contests.list.columns.action') }}</span>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="contest in contests" :key="contest.key" class="border-t border-line">
-          <th scope="row" class="px-5 py-3 text-left font-normal">
+        <tr v-for="contest in contests" :key="contest.key" :class="ENDED_ROW_CLASS">
+          <th scope="row" class="text-left font-normal" :class="ENDED_CELL.name">
             <RouterLink
               :to="{ name: 'contest', params: { key: contest.key } }"
               class="font-semibold hover:text-accent-text"
@@ -64,14 +69,14 @@ const whenText = (contest: ContestListItem) => {
             >
             <span class="block font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
           </th>
-          <td class="px-3 py-3 whitespace-nowrap">{{ whenText(contest) }}</td>
-          <td class="px-3 py-3">
+          <td class="whitespace-nowrap" :class="ENDED_CELL.when">{{ whenText(contest) }}</td>
+          <td :class="ENDED_CELL.format">
             <span class="flex flex-wrap gap-1.5">
               <ContestChips :contest="contest" with-tags with-code-needed />
               <ViewerBadge :badge-key="callOf(contest).badgeKey" />
             </span>
           </td>
-          <td class="px-3 py-3 text-right font-mono tabular-nums">
+          <td class="font-mono tabular-nums" :class="ENDED_CELL.participants">
             {{ formatNumber(contest.userCount, locale.locale) }}
             <span v-if="contest.virtualCount" class="block text-[12.5px] text-muted">{{
               $t('contests.virtualExtra', {
@@ -79,7 +84,7 @@ const whenText = (contest: ContestListItem) => {
               })
             }}</span>
           </td>
-          <td class="px-5 py-3 text-right">
+          <td :class="ENDED_CELL.action">
             <ContestCallLink
               :contest-key="contest.key"
               :contest-name="contest.name"
@@ -90,5 +95,5 @@ const whenText = (contest: ContestListItem) => {
         </tr>
       </tbody>
     </table>
-  </div>
+  </ScrollRegion>
 </template>

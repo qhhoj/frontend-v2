@@ -12,13 +12,15 @@ const RANK_CELL = 'px-3 py-2.5 text-right font-mono tabular-nums';
 const USER_CELL = 'overflow-hidden px-3 py-2.5';
 const ORGANIZATION_CELL = 'hidden truncate px-3 py-2.5 text-muted md:table-cell';
 const VALUE_CELL_ACTIVE = `${RANK_CELL} font-bold text-positive`;
-const VALUE_CELL_HIDDEN = `${RANK_CELL} hidden md:table-cell`;
+const VALUE_CELL_HIDDEN = `${RANK_CELL} hidden xl:table-cell`;
 const RANK_HEAD = 'w-14 px-3 py-2 text-right';
 const USER_HEAD = 'px-3 py-2';
 const ORGANIZATION_HEAD = 'hidden w-28 px-3 py-2 md:table-cell';
-const VALUE_HEAD_ACTIVE = 'w-28 px-3 py-2 text-right whitespace-nowrap md:w-32 text-content';
-const VALUE_HEAD_HIDDEN =
-  'w-28 px-3 py-2 text-right whitespace-nowrap md:w-32 hidden md:table-cell';
+const VALUE_HEAD_ACTIVE = 'w-28 px-3 py-2 text-right whitespace-nowrap text-content';
+const VALUE_HEAD_HIDDEN = 'w-28 px-3 py-2 text-right whitespace-nowrap hidden xl:table-cell';
+
+const SPACER_HEAD = 'hidden w-[21rem] xl:table-cell';
+const SPACER_CELL = 'hidden xl:table-cell';
 
 const EXPECTED = {
   rating: {
@@ -42,8 +44,8 @@ const EXPECTED = {
     ],
   },
   contributors: {
-    head: [RANK_HEAD, USER_HEAD, VALUE_HEAD_ACTIVE],
-    cells: [RANK_CELL, USER_CELL, VALUE_CELL_ACTIVE],
+    head: [RANK_HEAD, USER_HEAD, ORGANIZATION_HEAD, VALUE_HEAD_ACTIVE, SPACER_HEAD],
+    cells: [RANK_CELL, USER_CELL, ORGANIZATION_CELL, VALUE_CELL_ACTIVE, SPACER_CELL],
   },
 };
 
@@ -79,5 +81,21 @@ describe('leaderboard skeleton parity', () => {
     const skeleton = mountComponent(LeaderboardTableSkeleton, { props: { sort: 'rating' } });
     expect(table.get('tbody svg').attributes('width')).toBe('28');
     expect(skeleton.find('tbody .size-7').exists()).toBe(true);
+  });
+
+  it('keeps the skeleton to one viewport of rows, not a page of 100', () => {
+    const skeleton = mountComponent(LeaderboardTableSkeleton, { props: { sort: 'rating' } });
+    expect(skeleton.findAll('tbody tr')).toHaveLength(12);
+  });
+
+  it('gives the table a floor that leaves the user column 12rem beside the columns shown', () => {
+    const table = mountComponent(LeaderboardTable, {
+      props: { entries: [leaderboardEntry(1, 'user_01', 1500)], sort: 'rating', viewerName: null },
+    });
+    const classes = table.get('table').classes();
+    // 56 + 112 (organization) + 112 (active number) + 192 = 472 px = 29.5rem; with all four numbers 808 px = 50.5rem.
+    expect(classes).toContain('md:min-w-[29.5rem]');
+    expect(classes).toContain('xl:min-w-[50.5rem]');
+    expect(table.get('[role="region"]').attributes('tabindex')).toBe('0');
   });
 });

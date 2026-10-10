@@ -17,7 +17,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
     <span class="text-muted">{{ label }}:</span>
     <select
       :value="modelValue"
-      class="max-w-44 cursor-pointer appearance-none truncate bg-transparent pr-5 text-current outline-offset-8"
+      class="max-w-44 cursor-pointer appearance-none truncate bg-transparent pr-5 text-current outline-none"
       @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option v-for="option in options" :key="option.value" :value="option.value">

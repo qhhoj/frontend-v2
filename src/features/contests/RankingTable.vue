@@ -3,6 +3,7 @@ import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { medalClass } from '@/lib/medal';
 import type { Ranking, RankingRow } from '@/api/types/contests';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
@@ -61,15 +62,7 @@ const scoreHeaderKey = computed(() => {
 </script>
 
 <template>
-  <p aria-hidden="true" class="px-5 pt-3 text-[13px] text-muted md:hidden">
-    {{ $t('ranking.scrollHint') }}
-  </p>
-  <div
-    tabindex="0"
-    role="region"
-    :aria-label="$t('ranking.scrollRegion')"
-    class="overflow-x-auto focus-visible:-outline-offset-2"
-  >
+  <ScrollRegion :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
     <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
       <colgroup>
         <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
@@ -164,7 +157,7 @@ const scoreHeaderKey = computed(() => {
         </tr>
       </tbody>
     </table>
-  </div>
+  </ScrollRegion>
   <ul
     v-if="penalty"
     class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-[13px] text-muted"

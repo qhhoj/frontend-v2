@@ -8,7 +8,7 @@ import {
   rankingRow,
   submissionItem,
 } from '../src/test/fixtures';
-import { expect, test } from './fixtures/api';
+import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import { list } from './fixtures/reply';
 
 /** Chromium headless hides scrollbars; without this flag a classic (layout-taking) scrollbar never appears and the page-level jump cannot be seen. */
@@ -245,3 +245,99 @@ for (const width of [1440, 390])
       expect(Math.abs(skeleton[index] - left), `column ${index}`).toBeLessThanOrEqual(TOLERANCE_PX),
     );
   });
+
+const BOARD_TABS = [
+  'rating',
+  'performancePoints',
+  'points',
+  'problemCount',
+  'contributors',
+] as const;
+/** Left edge and width of every visible header cell, and the height of the first row. */
+const boardBoxes = (page: Page) =>
+  page.evaluate(() => ({
+    heads: [...document.querySelectorAll('#main thead th')]
+      .filter((th) => th.getBoundingClientRect().width > 0)
+      .map((th) => {
+        const box = th.getBoundingClientRect();
+        return { left: box.left, width: box.width };
+      }),
+    row: document.querySelector('#main tbody tr')!.getBoundingClientRect().height,
+  }));
+
+test('the leaderboard keeps its columns and row height on every tab, whatever the names', async ({
+  page,
+  api,
+}) => {
+  api.routes['GET /users'] = ({ url }: { url: URL }) => {
+    const odd = BOARD_TABS.indexOf(url.searchParams.get('sort') as (typeof BOARD_TABS)[number]) % 2;
+    return list([
+      odd
+        ? { ...leaderboardEntry(1, 'x', 3000), displayName: LONG_NAME, points: 123456789 }
+        : { ...leaderboardEntry(1, 'user_07', 2788), displayName: 'user_07' },
+      { ...leaderboardEntry(2, 'user_12', 2431), displayName: 'Nguyễn Văn A' },
+    ]);
+  };
+  api.routes['GET /contributors'] = () =>
+    list([{ ...leaderboardEntry(1, 'user_07', 2788), contributionPoints: 12 }]);
+  await page.goto('/users');
+  await expect(page.locator('#main tbody tr').first()).toBeVisible();
+  const first = await boardBoxes(page);
+  for (const tab of BOARD_TABS.slice(1)) {
+    await goInApp(page, `/users?sort=${tab}`);
+    await expect(page).toHaveURL(new RegExp(`sort=${tab}`));
+    await expect(page.locator('#main tbody tr').first()).toContainText(/\S/);
+    await page.waitForTimeout(400);
+    const next = await boardBoxes(page);
+    // Rank, user and organization sit in the same place on every tab; the number columns match on the four user boards.
+    const shared = tab === 'contributors' ? 3 : first.heads.length;
+    for (let index = 0; index < shared; index++) {
+      expect(
+        Math.abs(next.heads[index].left - first.heads[index].left),
+        `${tab} head ${index} x`,
+      ).toBeLessThanOrEqual(TOLERANCE_PX);
+      expect(
+        Math.abs(next.heads[index].width - first.heads[index].width),
+        `${tab} head ${index} w`,
+      ).toBeLessThanOrEqual(TOLERANCE_PX);
+    }
+    expect(Math.abs(next.row - first.row), `${tab} row height`).toBeLessThanOrEqual(TOLERANCE_PX);
+  }
+});
+
+const CONTEST_TABS = ['', '/announcements', '/submissions', '/stats', '/ranking'] as const;
+/** Box of the tab bar and of the page column, and the top of the tab bar: what must not move between tabs. */
+const contestFrame = (page: Page) =>
+  page.evaluate(() => {
+    const nav = document.querySelector('#main nav[aria-label]')!.getBoundingClientRect();
+    const column = document.querySelector('#main > div')!.getBoundingClientRect();
+    return {
+      navLeft: nav.left,
+      navWidth: nav.width,
+      navTop: nav.top,
+      colLeft: column.left,
+      colWidth: column.width,
+    };
+  });
+
+test('the contest tab bar and page column keep their x, width and top on every tab', async ({
+  page,
+  api,
+}) => {
+  await page.clock.setFixedTime(CONTEST_FIXTURE_NOW);
+  api.routes['GET /contests/r42/ranking'] = { body: { data: longBoard() } };
+  await page.goto('/contests/r42');
+  await expect(page.locator('#main nav[aria-label] a').first()).toBeVisible();
+  await page.waitForTimeout(500);
+  const first = await contestFrame(page);
+  for (const tab of CONTEST_TABS.slice(1)) {
+    await goInApp(page, `/contests/r42${tab}`);
+    await expect(page).toHaveURL(new RegExp(`/contests/r42${tab}$`));
+    await page.waitForTimeout(700);
+    const frame = await contestFrame(page);
+    for (const key of Object.keys(first) as (keyof typeof first)[])
+      expect(Math.abs(frame[key] - first[key]), `${tab || 'problems'} ${key}`).toBeLessThanOrEqual(
+        TOLERANCE_PX,
+      );
+  }
+});

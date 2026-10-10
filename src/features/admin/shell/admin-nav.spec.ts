@@ -77,6 +77,19 @@ describe('admin nav current section and dashboard', () => {
     expect(isCurrentNav('/admin/nav', '/admin/navigation-old')).toBe(false);
   });
 
+  it('marks only the most specific item on a nested route, whichever items nest', () => {
+    expect(isCurrentNav('/admin/organizations', '/admin/organizations/quotas')).toBe(false);
+    expect(isCurrentNav('/admin/organizations/quotas', '/admin/organizations/quotas')).toBe(true);
+    expect(isCurrentNav('/admin/organizations', '/admin/organizations/lhp')).toBe(true);
+    const nested = ['/admin/a', '/admin/a/b', '/admin/a/b/c'];
+    const current = nested.filter((path) => isCurrentNav(path, '/admin/a/b/c/d', nested));
+    expect(current).toEqual(['/admin/a/b/c']);
+    const highlighted = ADMIN_NAV.flatMap((navGroup) => navGroup.items).filter((item) =>
+      isCurrentNav(item.path, '/admin/organizations/quotas'),
+    );
+    expect(highlighted.map((item) => item.id)).toEqual(['organizationQuotas']);
+  });
+
   it('builds the dashboard from the same rules and names only a permission the viewer holds', () => {
     const sections = visibleDashboard(staff(['judge.add_contest', 'judge.change_judge']));
     expect(sections.map((section) => section.items.map((item) => item.id))).toEqual([

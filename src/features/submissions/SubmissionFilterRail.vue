@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
 import { ChevronDown } from 'lucide-vue-next';
 import Select from 'primevue/select';
 import { computed } from 'vue';
@@ -28,8 +29,7 @@ const RESULT_CHOICES: readonly SubmissionResult[] = ['AC', 'WA', 'TLE', 'MLE', '
 const STATUS_GROUPS: readonly StatusGroup[] = ['grading', 'final'];
 const ANY_LANGUAGE = '';
 const LANGUAGE_LABEL_ID = 'submission-language-label';
-const TEXT_INPUT_CLASSES =
-  'h-11 w-full rounded-pill border border-line bg-surface-strong px-4 text-base text-content placeholder:text-muted';
+const TEXT_INPUT_CLASSES = `${TOOLBAR_INPUT_CLASS} w-full`;
 
 const problemText = useDebouncedText(
   () => props.filters.problem,

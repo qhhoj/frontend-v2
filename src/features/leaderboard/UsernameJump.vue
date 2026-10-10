@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
 import { ref, useId } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -30,7 +31,7 @@ const openProfile = () => {
         autocomplete="off"
         :maxlength="USERNAME_MAX_LENGTH"
         :placeholder="$t('leaderboard.jumpPlaceholder')"
-        class="min-h-11 min-w-0 rounded-pill border border-line bg-surface-solid px-4 text-content placeholder:text-muted"
+        :class="[TOOLBAR_INPUT_CLASS, 'min-w-0']"
       />
     </div>
     <button

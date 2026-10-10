@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProblemListItem, ProblemSort } from '@/api/types/problems';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusMark from './ProblemStatusMark.vue';
@@ -23,12 +24,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
 </script>
 
 <template>
-  <div
-    tabindex="0"
-    role="region"
-    :aria-label="$t('problems.scrollRegion')"
-    class="overflow-x-auto focus-visible:-outline-offset-2"
-  >
+  <ScrollRegion :label="$t('problems.scrollRegion')">
     <table class="w-full min-w-[900px] table-fixed border-collapse text-[14.5px]">
       <caption class="sr-only">
         {{
@@ -80,5 +76,5 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
         </tr>
       </tbody>
     </table>
-  </div>
+  </ScrollRegion>
 </template>

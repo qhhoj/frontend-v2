@@ -4,7 +4,7 @@ import Popover from 'primevue/popover';
 import { computed, ref, watch } from 'vue';
 import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
-import { toolbarControlClass } from './toolbar-classes';
+import { toolbarControlClass } from '@/components/toolbar-classes';
 
 const props = defineProps<{ min: number | null; max: number | null }>();
 const emit = defineEmits<{

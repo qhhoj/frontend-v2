@@ -2,26 +2,47 @@
 export type ColumnKey =
   'verdict' | 'problem' | 'user' | 'score' | 'time' | 'memory' | 'language' | 'when';
 
-/** The full table needs this width to keep its eight columns readable; a narrowed one fits a phone without it. */
-export const FULL_TABLE_CLASS = 'table-fixed min-w-[1168px] [&_td]:break-words';
+/** A column plus the two that have no heading text: the pick box and the source link. */
+export type ColumnSlot = ColumnKey | 'pick' | 'source';
 
 /**
- * Column widths of the full table, which is `table-fixed` (a narrowed one stays auto-sized to fit a phone), so a column keeps its width whatever the rows hold and
- * the problem column takes the rest. Shared with the skeleton.
+ * The full table is `table-fixed` and shows columns by the width of its card (a container query, so the filter rail
+ * beside it does not matter): verdict, problem, user, score and source always; "when" from @2xl (42rem), language from
+ * @3xl (48rem), time and memory from @4xl (56rem). Its minimum width is the shown columns plus 10rem for the problem
+ * name, so a card narrower than that (a phone) scrolls sideways under the swipe cue instead of squeezing a column.
  */
-export const COLUMN_WIDTH_CLASS: Record<ColumnKey | 'pick' | 'source', string> = {
-  pick: 'w-16',
-  verdict: 'w-32',
+export const FULL_TABLE_CLASS =
+  'table-fixed min-w-[35.5rem] @2xl:min-w-[40rem] @3xl:min-w-[45rem] @4xl:min-w-[55.5rem] [&_td]:break-words';
+
+/** The width of the card that holds the full table: the container the column tiers above are measured against. */
+export const TABLE_CARD_CLASS = '@container overflow-hidden';
+
+/** Column widths of the full table (a narrowed one stays auto-sized), so a column keeps its width whatever the rows hold; the problem column takes the rest. Shared with the skeleton. */
+export const COLUMN_WIDTH_CLASS: Record<ColumnSlot, string> = {
+  pick: 'w-20',
+  verdict: 'w-22',
   problem: '',
-  user: 'w-40',
-  score: 'w-20',
+  user: 'w-32',
+  score: 'w-14',
   time: 'w-20',
-  memory: 'w-24',
-  language: 'w-32',
-  when: 'w-28',
-  source: 'w-16',
+  memory: 'w-22',
+  language: 'w-20',
+  when: 'w-18',
+  source: 'w-14',
 };
 
+/** The columns that give way as the card narrows (see `FULL_TABLE_CLASS`). */
+export const COLUMN_TIER_CLASS: Partial<Record<ColumnKey, string>> = {
+  when: 'hidden @2xl:table-cell',
+  language: 'hidden @3xl:table-cell',
+  time: 'hidden @4xl:table-cell',
+  memory: 'hidden @4xl:table-cell',
+};
+
+/** Width and tier of a column of the full table; a narrowed table has neither. */
+export const fullColumnClass = (key: ColumnSlot, isFull: boolean) =>
+  isFull ? `${COLUMN_WIDTH_CLASS[key]} ${COLUMN_TIER_CLASS[key as ColumnKey] ?? ''}` : '';
+
 /** Shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width. */
-export const HEADER_CELL_CLASSES = 'px-3 py-3.5 font-medium first:pl-6 last:pr-6';
-export const BODY_CELL_CLASSES = 'px-3 py-[11px] first:pl-6 last:pr-6';
+export const HEADER_CELL_CLASSES = 'px-2 py-3.5 font-medium whitespace-nowrap first:pl-6 last:pr-4';
+export const BODY_CELL_CLASSES = 'px-2 py-[11px] align-middle first:pl-6 last:pr-4';

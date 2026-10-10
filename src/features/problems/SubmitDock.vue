@@ -43,7 +43,7 @@ useDockHeight(dock);
     :aria-label="$t('submit.title')"
     class="fixed inset-x-0 bottom-0 z-30 border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
   >
-    <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-3">
+    <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-2">
       <SubmitSignInLink v-if="!isSignedIn" />
       <SubmitForm
         v-else

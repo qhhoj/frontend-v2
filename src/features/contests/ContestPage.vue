@@ -51,13 +51,13 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestDetailSkeleton /></template>
       <template v-if="contest">
+        <ContestTabs :contest-key="key" :phase="contest.phase" />
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
           <template #actions
             ><ContestActions :contest="contest" /><ShortLinkButton
               :path="shortLinkPath({ kind: 'contest', key: contest.key })"
           /></template>
         </ContestHeaderCard>
-        <ContestTabs :contest-key="key" :phase="contest.phase" />
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
           <div class="flex min-w-0 flex-col gap-6">
             <ContestProblemsTable :contest="contest" />

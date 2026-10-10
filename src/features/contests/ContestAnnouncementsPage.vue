@@ -59,11 +59,11 @@ const goTo = (next: number) =>
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-4xl flex-col gap-5 px-4 py-5 sm:px-8">
+  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
-      <ContestCompactHeader v-if="contest" :contest="contest" />
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
+      <ContestCompactHeader v-if="contest" :contest="contest" />
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div class="glass rounded-card px-5">
