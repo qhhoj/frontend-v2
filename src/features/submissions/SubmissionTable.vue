@@ -58,16 +58,19 @@ const emit = defineEmits<{ togglePick: [id: string] }>();
 const router = useRouter();
 /** Clicks that start on a link, button or box keep their own action; the rest of the row opens the submission. */
 const OWN_ACTION = 'a, button, input, label';
+/** A drag that selects text ends in a click too: it must not navigate away from the selection. */
+const isSelectingText = () => (window.getSelection()?.toString() ?? '') !== '';
 function openRow(event: MouseEvent, id: string) {
-  if ((event.target as Element).closest(OWN_ACTION)) return;
+  if ((event.target as Element).closest(OWN_ACTION) || isSelectingText()) return;
   const location = { name: 'submission', params: { id } };
-  if (event.ctrlKey || event.metaKey) window.open(router.resolve(location).href, '_blank');
+  if (event.ctrlKey || event.metaKey)
+    window.open(router.resolve(location).href, '_blank', 'noopener');
   else void router.push(location);
 }
 /** A middle click opens the submission in a new tab, as it would on the verdict link. */
 function openRowInTab(event: MouseEvent, id: string) {
   if (event.button !== 1 || (event.target as Element).closest(OWN_ACTION)) return;
-  window.open(router.resolve({ name: 'submission', params: { id } }).href, '_blank');
+  window.open(router.resolve({ name: 'submission', params: { id } }).href, '_blank', 'noopener');
 }
 const isPicking = computed(() => props.pickedIds !== undefined);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;

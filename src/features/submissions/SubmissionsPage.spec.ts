@@ -40,6 +40,15 @@ describe('the submission list page', () => {
     expect(push).toHaveBeenCalledExactlyOnceWith({ name: 'submission', params: { id: 'sub-1' } });
   });
 
+  it('stays on the list when the click ends a text selection inside the row', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const { wrapper, router } = await openList();
+    const push = vi.spyOn(router, 'push').mockResolvedValue(undefined);
+    vi.spyOn(window, 'getSelection').mockReturnValue({ toString: () => 'C++17' } as Selection);
+    await wrapper.get('tbody tr[data-id="sub-1"]').findAll('td')[2]!.trigger('click');
+    expect(push).not.toHaveBeenCalled();
+  });
+
   it('leaves a click on an inner link to the link itself', async () => {
     mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const { wrapper, router } = await openList();
