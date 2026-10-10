@@ -11,9 +11,27 @@ interface CopyBar {
   resetTimer?: ReturnType<typeof setTimeout>;
 }
 
+const HEADING = 'h1,h2,h3,h4,h5,h6';
+const BOLD_TAGS = ['STRONG', 'B'];
+
+/** The sample's title row: a heading, or a paragraph that is only bold text ("Ví dụ vào"), right before the block. */
+function titleRowOf(block: HTMLElement): HTMLElement | null {
+  const previous = block.previousElementSibling;
+  if (!(previous instanceof HTMLElement)) return null;
+  if (previous.matches(HEADING)) return previous;
+  const bold = previous.children[0];
+  const isBoldLine =
+    previous.tagName === 'P' &&
+    previous.children.length === 1 &&
+    BOLD_TAGS.includes(bold?.tagName ?? '') &&
+    previous.textContent?.trim() === bold?.textContent?.trim();
+  return isBoldLine ? previous : null;
+}
+
 /**
- * Adds a copy bar (button right-aligned) above every `pre` in backend-sanitized HTML (samples have no structured
- * form yet, backend ask B22). The bar is a sibling above the block, never inside it: the button covers no sample
+ * Adds a copy button to every `pre` in backend-sanitized HTML (samples have no structured form yet, backend ask B22).
+ * Right after a title row the button joins that row (right-aligned, no extra line above the box); otherwise a bar
+ * sits above the block. Either way it is a sibling above the block, never inside it: the button covers no sample
  * text and its focus ring is not cut by the block's scroll box. `v-html` replaces the whole subtree when `html`
  * changes, so the bars are made again after each render; a `pre` that already has its bar is skipped. Without
  * the Clipboard API no bar is added and the sample stays selectable text.
@@ -31,8 +49,9 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
 
   function addBar(block: HTMLElement) {
     const text = block.textContent ?? '';
+    const titleRow = titleRowOf(block);
     const element = document.createElement('div');
-    element.className = 'copy-bar';
+    element.className = titleRow ? 'copy-bar-inline' : 'copy-bar';
     const bar: CopyBar = {
       button: document.createElement('button'),
       status: document.createElement('span'),
@@ -55,14 +74,19 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     bar.button.addEventListener('click', () => void copyAndConfirm());
     label(bar);
     element.append(bar.button, bar.status);
-    block.before(element);
+    if (titleRow) {
+      titleRow.classList.add('sample-title');
+      titleRow.append(element);
+    } else block.before(element);
     bars.add(bar);
   }
 
   const decorate = () => {
     if (!clipboardAvailable()) return;
     for (const block of root.value?.querySelectorAll<HTMLElement>('pre') ?? []) {
-      if (!block.previousElementSibling?.matches('.copy-bar')) addBar(block);
+      const previous = block.previousElementSibling;
+      if (!previous?.matches('.copy-bar') && !previous?.querySelector('.copy-bar-inline'))
+        addBar(block);
     }
   };
   onMounted(decorate);

@@ -18,8 +18,8 @@ const props = defineProps<{
   /** `?resubmit=` of a signed-in viewer: the prefilled code is the point of the visit, so the sheet opens for it. */
   resubmitId: string | null;
 }>();
-/** Per page load: no storage. Starts collapsed so the statement is what the viewer sees first. */
-const isExpanded = ref(false);
+/** Per page load: no storage. The page starts it closed so the statement is what the viewer sees first. */
+const isExpanded = defineModel<boolean>('open', { required: true });
 // Every time the id appears, not only on load: an anonymous viewer arrives with it after signing in.
 watch(
   () => props.resubmitId,

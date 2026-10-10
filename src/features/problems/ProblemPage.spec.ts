@@ -10,7 +10,7 @@ import {
   problemEditorial,
   sessionUser,
 } from '@/test/fixtures';
-import { fail, holdRequestsTo, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, holdRequestsTo, mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -91,7 +91,7 @@ describe('problem page', () => {
       ...problemPageRoutes(problemDetail({ viewerStatus: 'solved' })),
     });
     const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="problem-header"]').text()).toContain('Đã giải');
+    expect(wrapper.get('[data-testid="viewer-status"]').text()).toContain('Đã giải');
   });
 
   it('renders the not-found page in place for a 404, whatever the reason', async () => {
@@ -119,13 +119,14 @@ describe('problem page', () => {
   it("does not show the previous account's viewer status after the account changes", async () => {
     const calls = mockApi({
       ...signedInViewer(),
+      'GET /submissions': page([]),
       'GET /problems/duongdi': sequence(
         ok(problemDetail({ viewerStatus: 'solved' })),
         ok(problemDetail({ viewerStatus: null })),
       ),
     });
     const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="problem-header"]').text()).toContain('Đã giải');
+    expect(wrapper.get('[data-testid="viewer-status"]').text()).toContain('Đã giải');
     useSessionStore().user = sessionUser({
       id: '0192a000-0000-7000-8000-000000000002',
       username: 'user_02',
@@ -134,7 +135,7 @@ describe('problem page', () => {
       expect(calls.filter((call) => call.path === '/problems/duongdi')).toHaveLength(2),
     );
     await vi.waitFor(() =>
-      expect(wrapper.get('[data-testid="problem-header"]').text()).not.toContain('Đã giải'),
+      expect(wrapper.get('[data-testid="viewer-status"]').text()).not.toContain('Đã giải'),
     );
   });
 

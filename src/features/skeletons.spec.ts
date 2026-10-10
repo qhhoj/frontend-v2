@@ -109,9 +109,9 @@ describe('loading screens show blocks shaped like their content', () => {
     mockApi({ ...anonymousViewer });
     hangRequestsExcept(['/auth/me']);
     const { wrapper } = await mountApp('/problems/duongdi');
-    for (const region of ['meta', 'title', 'chips', 'limits', 'statement'])
+    for (const region of ['meta', 'title', 'tabs', 'limits', 'statement'])
       expect(regionsIn(wrapper.element, region), region).toBe(1);
-    expect(regionsIn(wrapper.element, 'limit')).toBe(4);
+    expect(regionsIn(wrapper.element, 'limit')).toBe(5);
     for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]')) {
       expect(skeleton.attributes('aria-hidden')).toBe('true');
       expectInert(skeleton.element, 'problem skeleton');

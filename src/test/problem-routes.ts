@@ -22,6 +22,8 @@ export const signedInViewer = (overrides: Parameters<typeof signedIn>[0] = {}) =
 /** `GET /problems/:code` for one problem (add `GET /problems/<code>/editorial` yourself where a test opens that tab). */
 export const problemPageRoutes = (detail: ProblemDetail = problemDetail()) => ({
   [`GET /problems/${encodeURIComponent(detail.code)}`]: ok(detail),
+  /** The rail's "my submissions" of a signed-in viewer. */
+  'GET /submissions': page([]),
 });
 /** The detail and the source of one submission. */
 export const submissionPageRoutes = (detail: SubmissionDetail = submissionDetail()) => ({

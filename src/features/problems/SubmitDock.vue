@@ -1,30 +1,28 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronUp } from 'lucide-vue-next';
-import { computed, ref, toRef } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
-import { useSessionStore } from '@/stores/session.store';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
 import SubmitSignInLink from './SubmitSignInLink.vue';
 import { useDockHeight } from './use-dock-height';
-import { useSubmitForm } from './use-submit-form';
+import type { useSubmitForm } from './use-submit-form';
 
 const BODY_ID = 'submit-dock-body';
-const props = defineProps<{ problem: ProblemDetail }>();
-/** The phone gets a bottom sheet, anything wider the pinned dock; both share one form state. */
-const isPhone = useMediaQuery(PHONE_QUERY);
-const route = useRoute();
-const session = useSessionStore();
-const isSignedIn = computed(() => session.status === 'authenticated');
-// An anonymous viewer would only get a 401 for the fetch, so it is not started.
-const resubmitId = computed(() =>
-  isSignedIn.value && typeof route.query.resubmit === 'string' ? route.query.resubmit : null,
-);
-const form = useSubmitForm(toRef(props, 'problem'), resubmitId);
-/** Per page load: no storage. */
-const isCollapsed = ref(false);
+/** The phone gets a bottom sheet, anything wider the pinned dock; both share the form state the page owns. */
+defineProps<{
+  problem: ProblemDetail;
+  form: ReturnType<typeof useSubmitForm>;
+  isPhone: boolean;
+  isSignedIn: boolean;
+  resubmitId: string | null;
+}>();
+/** Whether the editor shows (dock expanded, sheet open); the rail's submit card can open it too. */
+const open = defineModel<boolean>('open', { required: true });
+const isCollapsed = computed({
+  get: () => !open.value,
+  set: (collapsed) => (open.value = !collapsed),
+});
 const dock = ref<HTMLElement | null>(null);
 useDockHeight(dock);
 </script>
@@ -32,6 +30,7 @@ useDockHeight(dock);
 <template>
   <SubmitSheet
     v-if="isPhone"
+    v-model:open="open"
     :problem="problem"
     :form="form"
     :is-signed-in="isSignedIn"

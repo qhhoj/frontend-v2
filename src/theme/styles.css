@@ -513,6 +513,19 @@
   border-radius: 0 0 var(--qh-radius-cell) var(--qh-radius-cell);
 }
 
+/* A sample's title row ("Ví dụ vào") holds its copy button: one line, no bar above the box. */
+.user-content.statement .sample-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4em;
+}
+@utility copy-bar-inline {
+  display: flex;
+  margin-block: -0.25rem;
+}
+
 /* The copy button itself. */
 @utility copy-block {
   min-width: 2.75rem;
