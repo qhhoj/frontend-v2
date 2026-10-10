@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
+import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
@@ -62,6 +63,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
           <div class="flex min-w-0 flex-col gap-6">
             <ContestProblemsTable :contest="contest" />
             <ContestIntroCard :contest="contest" />
+            <CommentsSection type="contest" :page-key="contest.key" class="mt-2" />
           </div>
           <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-6">
             <ContestRulesCard :contest="contest" />

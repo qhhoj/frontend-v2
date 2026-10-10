@@ -13,6 +13,7 @@ import {
 import { ok, page } from './mock-api';
 import type { MockHandler } from './mock-api';
 import type { PostDetail } from '../api/types/blog';
+import type { CommentPageType, CommentThreadPage } from '../api/types/comments';
 import type { OrganizationDetail } from '../api/types/organizations';
 import type { UserPage } from '../api/types/users';
 
@@ -59,4 +60,20 @@ export const postRoutes = (detail: PostDetail = postDetail()): Routes => ({
     userPage({ username: detail.authors[0]!.username, rating: 2450 }),
   ),
   [`GET /users/${detail.authors[0]!.username}/blog`]: page([detail], { pageSize: 10 }),
+});
+
+/** `GET /comments/pages/<type>/<key>`: an open page with no comments unless `overrides` says otherwise. */
+export const commentPageRoute = (
+  type: CommentPageType,
+  key: string,
+  overrides: Partial<CommentThreadPage> = {},
+): Routes => ({
+  [`GET /comments/pages/${type}/${encodeURIComponent(key)}`]: ok(
+    commentThreadPage({
+      page: { type, key, title: key },
+      comments: [],
+      pagination: { page: 1, pageSize: 20, total: 0 },
+      ...overrides,
+    }),
+  ),
 });

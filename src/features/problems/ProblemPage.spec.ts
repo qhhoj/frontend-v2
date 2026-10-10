@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { contestListRoutes } from '@/test/contest-routes';
+import { commentPageRoute } from '@/test/community-routes';
 import {
   contestDetail,
   contestProblem,
@@ -120,6 +121,7 @@ describe('problem page', () => {
     const calls = mockApi({
       ...signedInViewer(),
       'GET /submissions': page([]),
+      ...commentPageRoute('problem', 'duongdi'),
       'GET /problems/duongdi': sequence(
         ok(problemDetail({ viewerStatus: 'solved' })),
         ok(problemDetail({ viewerStatus: null })),

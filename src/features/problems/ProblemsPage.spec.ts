@@ -11,6 +11,7 @@ import {
   userPage,
 } from '@/test/fixtures';
 import { fail, mockApi, ok, page } from '@/test/mock-api';
+import { commentPageRoute } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -186,6 +187,7 @@ describe('problem list', () => {
       ...anonymous(),
       'GET /problems/random': ok({ code: 'lucky' }),
       'GET /problems/lucky': ok(problemDetail({ code: 'lucky' })),
+      ...commentPageRoute('problem', 'lucky'),
     });
     const { wrapper, router } = await mountApp('/problems?min=800&editorial=1');
     await wrapper
@@ -383,6 +385,7 @@ describe('problem list', () => {
     mockApi({
       ...anonymous(),
       'GET /problems/knapsack2': ok(problemDetail({ code: 'knapsack2' })),
+      ...commentPageRoute('problem', 'knapsack2'),
     });
     const { wrapper, router } = await mountApp('/problems');
     const typesCell = wrapper.findAll('tbody tr')[1]!.findAll('td')[2]!;

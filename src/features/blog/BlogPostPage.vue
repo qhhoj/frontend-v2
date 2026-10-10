@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import CommentsSection from '@/features/comments/CommentsSection.vue';
 import { usePageTitle } from '@/router/page-title';
 import AuthorCard from './AuthorCard.vue';
 import MorePostsCard from './MorePostsCard.vue';
@@ -58,11 +59,7 @@ usePageTitle(() => post.value?.title);
             {{ $t('blogPost.back') }}
           </RouterLink>
           <PostArticle :post="post" />
-          <section id="comments" aria-labelledby="comments-heading" class="mt-8 scroll-mt-20">
-            <h2 id="comments-heading" class="font-display text-xl font-semibold">
-              {{ $t('comments.title') }}
-            </h2>
-          </section>
+          <CommentsSection type="blog" :page-key="post.id" class="mt-8" />
         </div>
         <aside v-if="author" class="flex flex-col gap-6">
           <AuthorCard :username="author.username" />

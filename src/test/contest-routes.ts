@@ -4,17 +4,19 @@ import type {
   ContestListItem,
   ContestPhase,
 } from '@/api/types/contests';
+import { commentPageRoute } from './community-routes';
 import { contestDetail } from './fixtures';
 import { ok, page } from './mock-api';
 import type { ApiCall, MockHandler } from './mock-api';
 
-/** A contest page: its detail and the announcement list every contest tab reads through ContestTabs. */
+/** A contest page: its detail, the announcement list every contest tab reads through ContestTabs, and its (empty) comments. */
 export const contestPageRoutes = (
   detail: ContestDetail = contestDetail(),
   announcements: Announcement[] = [],
 ): Record<string, MockHandler> => ({
   [`GET /contests/${encodeURIComponent(detail.key)}`]: ok(detail),
   [`GET /contests/${encodeURIComponent(detail.key)}/announcements`]: page(announcements),
+  ...commentPageRoute('contest', detail.key),
 });
 
 /** `GET /contests` answering each phase group with its own rows (no `phase`: every row). */

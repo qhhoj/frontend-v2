@@ -1,23 +1,13 @@
 /** What a post's list card shows, derived from the backend-sanitized `summaryHtml`: a plain-text excerpt and the first image. */
+import { htmlExcerpt } from '@/lib/html-excerpt';
 
 const EXCERPT_LENGTH = 220;
-/** Parts of a summary that are not running prose: headings, code, scripts, styles and embedded media. */
-const NON_PROSE = 'h1,h2,h3,h4,h5,h6,pre,script,style,img,figure,table,iframe,svg';
-const BLOCKS = 'p,li,div,br,blockquote,ul,ol';
 const MEDIA_PATHS = ['/media/', '/martor/'];
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
 /** Plain text of the summary's prose: no tags, no headings, no code, whitespace collapsed, cut at a word. */
-export function summaryExcerpt(html: string): string {
-  const body = parse(html).body;
-  body.querySelectorAll(NON_PROSE).forEach((node) => node.remove());
-  body.querySelectorAll(BLOCKS).forEach((node) => node.append(' '));
-  const text = (body.textContent ?? '').replace(/\s+/g, ' ').trim();
-  if (text.length <= EXCERPT_LENGTH) return text;
-  const cut = text.slice(0, EXCERPT_LENGTH);
-  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), EXCERPT_LENGTH / 2))}…`;
-}
+export const summaryExcerpt = (html: string): string => htmlExcerpt(html, EXCERPT_LENGTH);
 
 /** An image address is shown only when it stays on this site: a /media or /martor path, or an absolute URL of this origin. */
 function ownImagePath(src: string, origin: string): string | null {

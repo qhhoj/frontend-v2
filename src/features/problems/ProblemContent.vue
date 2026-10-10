@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
+import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
@@ -98,6 +99,14 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
             /></template>
           </p>
         </GlassCard>
+        <CommentsSection
+          v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
+          type="problem"
+          :page-key="problem.code"
+          :contest-key="problem.contest?.contestKey ?? null"
+          placeholder-key="comments.composer.problemPlaceholder"
+          class="mt-8"
+        />
         <!-- Mounted only while selected, so the editorial request is lazy. -->
         <EditorialTab
           v-if="panel.id === 'editorial' && tab === 'editorial'"
