@@ -50,7 +50,10 @@ const findMe = async () => {
       :registers-wait="false"
       @retry="refetch()"
     >
-      <template #skeleton><SkeletonBlock text class="mt-2 w-24 text-3xl" /></template>
+      <!-- Reserves the loaded body (rank, page line, button) so the cards below do not move. -->
+      <template #skeleton
+        ><div class="mt-2 h-[7.5rem]"><SkeletonBlock text class="w-24 text-3xl" /></div
+      ></template>
       <template v-if="rank">
         <p class="mt-2 font-display text-3xl font-bold tabular-nums">
           {{ formatNumber(rank.rank, locale.locale) }}

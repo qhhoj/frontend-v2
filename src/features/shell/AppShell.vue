@@ -25,7 +25,7 @@ const route = useRoute();
   <!-- `isolate` keeps the fixed blobs (-z-10) above this ground and below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
-    class="relative isolate min-h-dvh pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[14px] text-content"
+    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[14px] text-content"
   >
     <BackgroundBlobs />
     <a
@@ -44,7 +44,7 @@ const route = useRoute();
         <OfficialModeBanner />
         <HighPriorityBanner />
       </template>
-      <main id="main" tabindex="-1" class="relative focus-visible:outline-none">
+      <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
         <slot />
       </main>
       <AppFooter v-if="route.meta.layout !== 'auth'" />

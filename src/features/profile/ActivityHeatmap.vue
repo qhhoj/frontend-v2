@@ -35,37 +35,42 @@ const cellY = (row: number) => LABEL_ROW + row * STEP;
     <p class="text-sm text-muted">
       {{ $t('ratingChart.activityLine', { count: total, zone: activity.timezone }) }}
     </p>
-    <svg
-      role="img"
-      :aria-label="$t('ratingChart.heatmapLabel')"
-      viewBox="0 0 739 115"
-      class="h-auto w-full"
-    >
-      <text
-        v-for="mark in months"
-        :key="mark.column"
-        :x="cellX(mark.column)"
-        y="10"
-        class="fill-muted text-[10px]"
+    <div class="overflow-x-auto">
+      <svg
+        role="img"
+        :aria-label="$t('ratingChart.heatmapLabel')"
+        viewBox="0 0 739 115"
+        class="h-auto w-full min-w-[46rem]"
       >
-        {{ $t(`ratingChart.months.${mark.month}`) }}
-      </text>
-      <template v-for="(week, column) in weeks" :key="column">
-        <template v-for="(cell, row) in week" :key="row">
-          <rect
-            v-if="cell"
-            :x="cellX(column)"
-            :y="cellY(row)"
-            :width="SQUARE"
-            :height="SQUARE"
-            rx="2"
-            :class="HEAT_CLASSES[cell.level]"
-          >
-            <title>{{ $t('ratingChart.cellTitle', { date: cell.date, count: cell.count }) }}</title>
-          </rect>
+        <text
+          v-for="mark in months"
+          :key="mark.column"
+          :x="cellX(mark.column) > 700 ? 739 : cellX(mark.column)"
+          y="10"
+          :text-anchor="cellX(mark.column) > 700 ? 'end' : 'start'"
+          class="fill-muted text-[10px]"
+        >
+          {{ $t(`ratingChart.months.${mark.month}`) }}
+        </text>
+        <template v-for="(week, column) in weeks" :key="column">
+          <template v-for="(cell, row) in week" :key="row">
+            <rect
+              v-if="cell"
+              :x="cellX(column)"
+              :y="cellY(row)"
+              :width="SQUARE"
+              :height="SQUARE"
+              rx="2"
+              :class="HEAT_CLASSES[cell.level]"
+            >
+              <title>
+                {{ $t('ratingChart.cellTitle', { date: cell.date, count: cell.count }) }}
+              </title>
+            </rect>
+          </template>
         </template>
-      </template>
-    </svg>
+      </svg>
+    </div>
     <div class="flex items-center justify-end gap-1.5 text-xs text-muted">
       <span>{{ $t('ratingChart.less') }}</span>
       <svg

@@ -20,6 +20,8 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         </p>
         <div data-skeleton-region="title" class="mt-1 page-title">
           <SkeletonBlock text class="w-3/4" />
+          <!-- a phone title reserves two lines -->
+          <span class="sm:hidden"><br /><SkeletonBlock text class="w-1/2" /></span>
         </div>
         <div data-skeleton-region="chips" class="mt-3 flex min-h-8 flex-wrap items-center gap-2">
           <SkeletonBlock pill class="h-7 w-20" />

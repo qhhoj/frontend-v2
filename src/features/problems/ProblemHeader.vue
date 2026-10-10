@@ -47,7 +47,7 @@ const limits = computed(() => [
           {{ problem.code
           }}<template v-if="problem.group"> · {{ problem.group.fullName }}</template>
         </p>
-        <h1 class="mt-1 page-title [overflow-wrap:anywhere]">
+        <h1 class="mt-1 page-title [overflow-wrap:anywhere] max-sm:min-h-[65px]">
           {{ problem.name }}
         </h1>
         <div class="mt-3 flex min-h-8 flex-wrap items-center gap-2">
