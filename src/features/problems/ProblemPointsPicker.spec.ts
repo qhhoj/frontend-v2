@@ -45,7 +45,7 @@ describe('ProblemPointsPicker', () => {
     expect(picker.emitted('change')).toEqual([[{ pointsMin: 2000, pointsMax: 2000 }]]);
   });
 
-  it('puts the minimum on top when both handles meet at the right end', async () => {
+  it('puts the minimum on top when both handles meet at the right end', () => {
     const picker = open(3500, null);
     expect(picker.get('input[name="pointsMinSlider"]').classes()).toContain('is-top');
   });
