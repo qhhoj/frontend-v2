@@ -5,12 +5,15 @@ import { computed, ref, watch } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import type { PostFeed } from '@/api/types/blog';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
 import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
 import { useSessionStore } from '@/stores/session.store';
+import PostCard from './PostCard.vue';
+import PostCardSkeleton from './PostCardSkeleton.vue';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
 import { usePostsQuery } from './blog.queries';
@@ -19,7 +22,12 @@ import { useBlogRoute } from './use-blog-route';
 const { feed, page } = useBlogRoute();
 const session = useSessionStore();
 const { data, isPending, error, refetch } = usePostsQuery(feed, page);
-const posts = computed(() => data.value?.items ?? []);
+const items = computed(() => data.value?.items ?? []);
+/** Pinned posts lead as cards; the rest of the page is the compact list. */
+const pinned = computed(() => items.value.filter((post) => post.sticky));
+const posts = computed(() => items.value.filter((post) => !post.sticky));
+/** Only the first page of the newsfeed can open with pinned cards. */
+const expectsPinned = computed(() => feed.value === 'global' && page.value === 1);
 const meta = computed(() => data.value?.meta);
 const FEED_TABS: { feed: PostFeed; to: RouteLocationRaw }[] = [
   { feed: 'global', to: { name: 'blog' } },
@@ -69,6 +77,16 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         </a>
       </div>
     </div>
+    <section
+      v-if="pinned.length || (isPending && expectsPinned)"
+      :aria-label="$t('blog.pinnedLabel')"
+      class="grid gap-4 sm:grid-cols-2"
+    >
+      <template v-if="isPending">
+        <PostCardSkeleton v-for="card in 2" :key="card" />
+      </template>
+      <PostCard v-for="post in pinned" v-else :key="post.id" :post="post" />
+    </section>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="scroll-mt-20">
         <GlassCard as="div" data-testid="post-list" class="overflow-hidden">
@@ -78,19 +96,27 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
                 <PostRowSkeleton v-for="row in 6" :key="row" />
               </div>
             </template>
-            <StatePanel v-if="!posts.length" kind="communityEmpty" :title="$t('blog.empty')" />
-            <div v-else class="divide-y divide-line">
+            <StatePanel v-if="!items.length" kind="communityEmpty" :title="$t('blog.empty')" />
+            <div v-else-if="posts.length" class="divide-y divide-line">
               <PostRow v-for="post in posts" :key="post.id" :post="post" />
             </div>
             <NumberedPager v-if="meta" class="p-4" :meta="meta" :label="$t('blog.pager')" />
           </QueryState>
         </GlassCard>
       </div>
-      <aside class="flex flex-col gap-5">
-        <RecentCommentsCard :limit="3" />
-        <NewProblemsCard :limit="4" />
-        <TopContributorsCard :limit="3" />
-      </aside>
+      <GlassCard
+        as="aside"
+        class="relative divide-y divide-line [&>section]:p-4 sm:[&>section]:p-5"
+      >
+        <StateBit
+          variant="community"
+          size="tiny"
+          class="absolute top-4 right-4 sm:top-5 sm:right-5"
+        />
+        <RecentCommentsCard embedded :limit="3" />
+        <NewProblemsCard embedded :limit="4" />
+        <TopContributorsCard embedded :limit="3" />
+      </GlassCard>
     </div>
   </div>
 </template>

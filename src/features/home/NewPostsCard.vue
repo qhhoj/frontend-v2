@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import StatePanel from '@/components/StatePanel.vue';
-import UserContent from '@/components/UserContent.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
+import { summaryExcerpt } from '@/features/blog/post-summary';
 import { formatNumber, formatShortDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -45,7 +45,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
           class="font-semibold hover:underline"
           >{{ post.title }}</RouterLink
         >
-        <UserContent :html="post.summaryHtml" class="line-clamp-2 text-sm text-muted" />
+        <p class="line-clamp-2 text-sm text-muted">{{ summaryExcerpt(post.summaryHtml) }}</p>
         <p class="text-xs text-muted">
           {{ post.authors.map((author) => author.username).join(', ') }}
           · {{ formatShortDate(post.publishOn, locale.locale) }} ·

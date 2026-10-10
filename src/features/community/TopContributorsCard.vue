@@ -9,7 +9,7 @@ import { useHomeQuery } from './community.queries';
 import CommunityCard from './CommunityCard.vue';
 
 /** The users with the most contribution points, ranked in the order the API gives them. */
-const props = defineProps<{ limit: number }>();
+const props = defineProps<{ limit: number; embedded?: boolean }>();
 const locale = useLocaleStore();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const contributors = computed(() => (home.value?.topContributors ?? []).slice(0, props.limit));
@@ -18,6 +18,7 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
 <template>
   <CommunityCard
     :title="$t('blog.topContributors')"
+    :embedded="embedded"
     :loading="isPending"
     :error="error"
     @retry="refetch()"
