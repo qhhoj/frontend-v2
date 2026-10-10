@@ -19,11 +19,11 @@ describe('SourceView highlighting', () => {
     const view = mountComponent(SourceView, { props: props('CPP17') });
     await flushPromises();
     await vi.waitFor(() => expect(view.find('pre.pr-6 .syn-keyword').exists()).toBe(true));
-    await view.setProps(props('PAS'));
+    await view.setProps(props('PAS') as never);
     await flushPromises();
     expect(view.find('pre.pr-6 span').exists()).toBe(false);
     expect(view.get('pre.pr-6').text()).toBe(source);
-    await view.setProps(props('PY3'));
+    await view.setProps(props('PY3') as never);
     await vi.waitFor(() => expect(view.find('pre.pr-6 .syn-keyword').exists()).toBe(true));
     expect(view.get('pre.pr-6').text()).toBe(source);
   });
