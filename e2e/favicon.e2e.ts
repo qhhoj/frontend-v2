@@ -5,7 +5,8 @@ test('declares the site icon and serves every declared file', async ({ page, req
   const hrefs = await page
     .locator('link[rel="icon"], link[rel="apple-touch-icon"]')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  expect(hrefs).toEqual(['/favicon.svg', '/favicon.ico', '/apple-touch-icon.png']);
+  // Versioned: browsers that cached the old site's icon (served with `expires max`) fetch the new one.
+  expect(hrefs).toEqual(['/favicon.svg?v=2', '/favicon.ico?v=2', '/apple-touch-icon.png?v=2']);
   for (const href of hrefs) {
     const response = await request.get(href!);
     expect(response.status(), href!).toBe(200);
