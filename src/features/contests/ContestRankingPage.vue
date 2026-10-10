@@ -8,7 +8,7 @@ import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { translate } from '@/i18n';
+import { rankingSummary } from './ranking-summary';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
@@ -97,11 +97,11 @@ const podium = computed(() =>
 );
 const summary = computed(() =>
   contest.value
-    ? translate('ranking.summary', {
-        format: translate(`formats.${contest.value.formatName}`),
-        problems: ranking.value?.problems.length ?? contest.value.problems?.length ?? 0,
-        participants: contest.value.userCount,
-      })
+    ? rankingSummary(
+        contest.value.formatName,
+        ranking.value?.problems.length ?? contest.value.problems?.length ?? 0,
+        contest.value.userCount,
+      )
     : '',
 );
 const setVirtual = (value: boolean) =>
@@ -209,7 +209,13 @@ const VIEW_MODES = [
           </span>
           <span
             ><strong class="text-content">{{ $t('ranking.frozenTitle') }}</strong> —
-            {{ $t('ranking.frozenBody', { minutes: contest.frozenLastMinutes }) }}</span
+            {{
+              $t(
+                'ranking.frozenBody',
+                { minutes: contest.frozenLastMinutes },
+                contest.frozenLastMinutes,
+              )
+            }}</span
           >
         </p>
       </template>

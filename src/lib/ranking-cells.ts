@@ -49,9 +49,9 @@ const roundTo = (value: number, precision: number) => {
   const scale = 10 ** precision;
   return Math.round(value * scale) / scale;
 };
-/** Float sums such as 99.999999 count as the full score once rounded to the contest precision. */
+/** Float sums such as 99.999999 count as the full score once rounded to the contest precision. Zero points never solve, even on a 0-point problem. */
 const isFullPoints = (points: number, problem: RankingProblem, precision: number) =>
-  roundTo(points, precision) >= roundTo(problem.points, precision);
+  points > 0 && roundTo(points, precision) >= roundTo(problem.points, precision);
 
 /** icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). */
 export const formatCumtime = (formatName: ContestFormatName, cumtime: number) =>

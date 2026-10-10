@@ -48,37 +48,42 @@ const archive = useAdminMutation({
       novalidate
       @submit.prevent="save"
     >
-      <DataArchiveCard :code="problem.code" :data="query.data.value">
-        <template #upload>
-          <UploadButton
-            data-testid="upload-archive"
-            :label="$t('admin.problems.uploads.archive.upload')"
-            accept=".zip"
-            :max-bytes="UPLOAD_LIMITS.archive"
-            :is-pending="archive.isPending.value"
-            @picked="archive.run"
-          />
-        </template>
-      </DataArchiveCard>
-      <AdminStatus
-        v-if="archive.failure.value"
-        kind="refused"
-        :text="failureReasonOf(archive.failure.value)"
-      />
-      <ProblemPackageCard :code="problem.code" />
-      <DataSourceFiles :code="problem.code" :data="query.data.value" />
-      <DataFeedback :feedback="query.data.value.feedback" />
-      <CheckerSection
-        v-model="form"
-        :errors="errors"
-        :has-custom-checker="query.data.value.customChecker !== null"
-      />
-      <CasesEditor
-        v-model="form.cases"
-        :data="query.data.value"
-        :errors="errors"
-        @invalid="markInvalid"
-      />
+      <fieldset
+        :disabled="mutation.isPending.value"
+        class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
+      >
+        <DataArchiveCard :code="problem.code" :data="query.data.value">
+          <template #upload>
+            <UploadButton
+              data-testid="upload-archive"
+              :label="$t('admin.problems.uploads.archive.upload')"
+              accept=".zip"
+              :max-bytes="UPLOAD_LIMITS.archive"
+              :is-pending="archive.isPending.value"
+              @picked="archive.run"
+            />
+          </template>
+        </DataArchiveCard>
+        <AdminStatus
+          v-if="archive.failure.value"
+          kind="refused"
+          :text="failureReasonOf(archive.failure.value)"
+        />
+        <ProblemPackageCard :code="problem.code" />
+        <DataSourceFiles :code="problem.code" :data="query.data.value" />
+        <DataFeedback :feedback="query.data.value.feedback" />
+        <CheckerSection
+          v-model="form"
+          :errors="errors"
+          :has-custom-checker="query.data.value.customChecker !== null"
+        />
+        <CasesEditor
+          v-model="form.cases"
+          :data="query.data.value"
+          :errors="errors"
+          @invalid="markInvalid"
+        />
+      </fieldset>
       <div
         class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
       >

@@ -16,8 +16,12 @@ function patchFailureKey(failure: unknown): string {
 export function useTicketPatch(ticketId: string) {
   const client = useQueryClient();
   const { isPending, error, mutate } = useMutation({
-    mutationFn: (patch: TicketPatch) => updateTicket(ticketId, patch),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['tickets'] }),
+    mutationFn: ({ patch }: { patch: TicketPatch; onSaved?: () => void }) =>
+      updateTicket(ticketId, patch),
+    onSuccess: (_answer, { onSaved }) => {
+      onSaved?.();
+      return client.invalidateQueries({ queryKey: ['tickets'] });
+    },
     /** 409 `conflict`: the ticket changed after it was read, so show what is stored now beside the message. */
     onError: (failure) => {
       if (isConflict(failure)) return client.invalidateQueries({ queryKey: ['tickets'] });
@@ -25,7 +29,6 @@ export function useTicketPatch(ticketId: string) {
   });
   const failureKey = computed(() => (error.value ? patchFailureKey(error.value) : null));
   /** `onSaved` runs only when the server accepted the change, so a refused draft is never reset. */
-  const patch = (value: TicketPatch, onSaved?: () => void) =>
-    mutate(value, { onSuccess: () => onSaved?.() });
+  const patch = (value: TicketPatch, onSaved?: () => void) => mutate({ patch: value, onSaved });
   return { isPending, failureKey, patch };
 }

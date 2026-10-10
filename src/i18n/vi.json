@@ -1077,7 +1077,7 @@
     "liveReload": "Kết nối lại"
   },
   "ranking": {
-    "summary": "{format} · {problems} bài · {participants} thí sinh",
+    "summary": "{format} · {problems} bài · {participants}",
     "viewMode": "Chế độ bảng",
     "official": "Chính thức",
     "withVirtual": "Gồm thi ảo",

@@ -38,9 +38,10 @@ describe('problem form', () => {
     expect(patch.date).toMatch(/^2026-10-0\dT\d\d:00:00\.000Z$/);
   });
 
-  it('leaves a cleared date out of the patch, since the backend refuses null for it', () => {
+  it('sends a cleared date as null so it is unset', () => {
     const before = { ...seeded(), date: '2026-10-08T13:00' };
     expect(changedProblemFields(before, { ...before, date: '', points: 1500 })).toEqual({
+      date: null,
       points: 1500,
     });
   });

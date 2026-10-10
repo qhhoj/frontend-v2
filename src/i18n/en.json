@@ -1077,7 +1077,7 @@
     "liveReload": "Reconnect"
   },
   "ranking": {
-    "summary": "{format} · {problems} problem · {participants} contestants | {format} · {problems} problems · {participants} contestants",
+    "summary": "{format} · {problems} problem · {participants} | {format} · {problems} problems · {participants}",
     "viewMode": "Board mode",
     "official": "Official",
     "withVirtual": "Include virtual",

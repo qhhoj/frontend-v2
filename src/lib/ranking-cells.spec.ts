@@ -192,13 +192,10 @@ describe('ranking cells, points formats (Cells A)', () => {
     );
   });
 
-  it('shows zero points as failed without a time, and survives a zero-point problem', () => {
+  it('shows zero points as failed without a time', () => {
     const zero = rankingCell({ points: 0, time: 300 }, problem(), 'me', timedDefault);
     expect(zero).toMatchObject({ kind: 'failed', text: '0' });
     expect(zero.time).toBeUndefined();
-    expect(
-      rankingCell({ points: 0, time: 0 }, problem({ points: 0 }), 'me', timedDefault).kind,
-    ).toBe('solved');
   });
 
   it.each([
@@ -320,5 +317,20 @@ describe('points precision and locale', () => {
     expect(
       rankingCell({ points: 99.999999, time: 0 }, problem(), 'me', context('ioi', 8)).kind,
     ).toBe('partial');
+  });
+});
+
+describe('ranking cells, zero-point problem', () => {
+  const free = problem({ points: 0 });
+
+  it('does not count a 0-point problem as solved on a points board', () => {
+    const view = rankingCell({ points: 0, time: 10 }, free, 'me', timedDefault);
+    expect(view.kind).toBe('failed');
+  });
+
+  it('does not count a 0-point problem as solved on a vnoj board', () => {
+    const view = rankingCell({ points: 0, time: 10, penalty: 0 }, free, 'me', vnoj);
+    expect(view.kind).not.toBe('solved');
+    expect(view.kind).not.toBe('first-solve');
   });
 });

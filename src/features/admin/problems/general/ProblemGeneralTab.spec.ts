@@ -49,6 +49,20 @@ describe('ProblemGeneralTab', () => {
     expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu.');
   });
 
+  it('disables the fields while the save is in flight, so a typed edit is not overwritten by the answer', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'PATCH /problems/hcmus41c': ok(editableProblem({ points: 1500 })),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+    await wrapper.get('#problem-points').setValue('1500');
+    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    expect(wrapper.get('fieldset').attributes('disabled')).toBeDefined();
+    await flushPromises();
+    expect(wrapper.get('fieldset').attributes('disabled')).toBeUndefined();
+  });
+
   it('puts a backend issue under its field and keeps the typed value', async () => {
     mockApi({
       ...staffViewer(EDIT),
