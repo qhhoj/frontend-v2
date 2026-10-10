@@ -1239,7 +1239,7 @@
       "copy": "Sao chép mã nguồn",
       "resubmit": "Nộp lại",
       "collapse": "Thu gọn",
-      "expand": "Xem toàn bộ ({count} dòng)"
+      "expand": "Xem mã nguồn ({count} dòng)"
     },
     "forbidden": {
       "solve_first": "Giải bài này trước để xem bài nộp",

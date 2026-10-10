@@ -47,11 +47,8 @@ const lineCount = computed(() => source.value.replace(TRAILING_NEWLINE, '').spli
 const lineNumbers = computed(() =>
   Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );
-/** A long source opens folded to its first lines; the reader unfolds it and can fold it back. */
-const FOLDED_LINES = 20;
-const isFoldable = computed(() => lineCount.value > FOLDED_LINES);
-const isExpanded = ref(false);
-const isFolded = computed(() => isFoldable.value && !isExpanded.value);
+/** The source opens folded, whatever its length; "View source" links (#source) open it unfolded. */
+const isExpanded = ref(route.hash === '#source');
 </script>
 
 <template>
@@ -60,7 +57,7 @@ const isFolded = computed(() => isFoldable.value && !isExpanded.value);
       <h2 class="font-display text-base font-bold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
         <button
-          v-if="isFoldable && isExpanded"
+          v-if="data && isExpanded"
           type="button"
           aria-controls="source-code"
           :aria-expanded="true"
@@ -83,35 +80,30 @@ const isFolded = computed(() => isFoldable.value && !isExpanded.value);
     </p>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
-      <div class="relative">
-        <div
-          id="source-code"
-          tabindex="0"
-          role="region"
-          :aria-label="$t('submission.source.title')"
-          class="flex overflow-x-auto bg-surface-strong py-4 font-mono text-[13px] leading-relaxed focus-visible:-outline-offset-2"
-          :class="isFolded && 'max-h-[calc(20lh+2rem)] cursor-pointer overflow-y-hidden'"
-          @click="isFolded && (isExpanded = true)"
+      <div
+        v-if="isExpanded"
+        id="source-code"
+        tabindex="0"
+        role="region"
+        :aria-label="$t('submission.source.title')"
+        class="flex overflow-x-auto bg-surface-strong py-4 font-mono text-[13px] leading-relaxed focus-visible:-outline-offset-2"
+      >
+        <pre aria-hidden="true" class="shrink-0 pr-4 pl-6 text-right text-muted select-none">{{
+          lineNumbers
+        }}</pre>
+        <pre ref="sourceBlock" class="pr-6"></pre>
+      </div>
+      <div v-else class="px-6 pb-5">
+        <button
+          type="button"
+          data-testid="source-expand"
+          aria-controls="source-code"
+          :aria-expanded="false"
+          class="flex min-h-11 w-full items-center justify-center rounded-row border border-dashed border-line bg-surface-strong px-5 font-mono text-sm font-semibold hover:bg-surface-hover"
+          @click="isExpanded = true"
         >
-          <pre aria-hidden="true" class="shrink-0 pr-4 pl-6 text-right text-muted select-none">{{
-            lineNumbers
-          }}</pre>
-          <pre ref="sourceBlock" class="pr-6"></pre>
-        </div>
-        <div
-          v-if="isFolded"
-          class="absolute inset-x-0 bottom-0 flex justify-center bg-linear-to-t from-surface-strong via-surface-strong/90 to-transparent pt-12 pb-4"
-        >
-          <button
-            type="button"
-            aria-controls="source-code"
-            :aria-expanded="false"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-solid px-5 text-sm font-semibold hover:bg-surface-hover"
-            @click="isExpanded = true"
-          >
-            {{ $t('submission.source.expand', { count: lineCount }) }}
-          </button>
-        </div>
+          {{ $t('submission.source.expand', { count: lineCount }) }}
+        </button>
       </div>
     </QueryState>
   </GlassCard>
