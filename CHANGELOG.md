@@ -1,5 +1,27 @@
 # qhhoj-frontend-v2
 
+## 2.1.0
+
+### Minor Changes
+
+- 72a4b96: Continuous deployment: a release tag builds dist/ and deploys it through qhhoj-deploy after CI passes; the deploy workflow also deploys any ref by hand.
+- 9711c82: Syntax colours in read-only code: the submission source and fenced code blocks in problem statements, editorials, posts and comments.
+- 6094b08: Problem list redesign: compact header, one toolbar (search, group, problem types, points range, hide solved, has editorial, sort, random problem), removable filter chips kept in the URL, and a fixed-column table with status marks and difficulty tiers.
+- 89ee9b6: Unlimited quota promotion: organizations flagged `unlimited` show "Không giới hạn" instead of limits, bars and warnings, and staff get an "Unlimited (promotion)" toggle in the quota editor.
+- bc4eb36: Site icon: the crowned QH lettermark (G2) as favicon.svg, a 16/32/48 px favicon.ico and an Apple touch icon.
+
+### Patch Changes
+
+- 23d3deb: Admin screens get their gutter from the admin shell; tickets, organizations, settings, similarity and activity no longer touch the sidebar.
+- 9f48574: Loading Bits walk off-screen at their own pace when the page has loaded, instead of stopping and vanishing.
+- 7aa7057: The footer shows the served frontend version and commit.
+- 9697710: Header nav links to the submissions list.
+- c9a0487: Partially scored problems show their points as `1500p` (problem page and problem list), as on the old site.
+- 150d13f: Tables and pages no longer shift sideways: the page keeps a stable scrollbar gutter, and the contest ranking, leaderboard, problem, submission and ended-contest tables use fixed column widths (the ranking skeleton matches its table). The first-place podium card truncates long names, so its Bit no longer covers them. A first solve is now a stronger shade of the accepted green (with its star) instead of yellow.
+- 240a619: Submission lists: the whole row opens the submission (links, the pick box and middle/ctrl-click keep their own behaviour), and every row has a "View source" link that opens the submission scrolled to its source code.
+- 24c4a7f: The submission page shows the source code right under the verdict, above the test cases.
+- ab97737: Rendered Markdown in statements, posts, comments and other user content gets its typography back (paragraph spacing, heading sizes, list markers, link colour, inline code, table borders, blockquotes, rules), which Tailwind's reset had removed; KaTeX's stylesheet now loads wherever user content is shown, so formulas in posts no longer appear twice.
+
 ## 2.0.0
 
 - New Vue 3 SPA (Vite, TypeScript strict, Vue Router, Pinia, vue-i18n, Tailwind 4, PrimeVue unstyled) served against `backend-v2` (`/api/internal`).
