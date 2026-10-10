@@ -42,12 +42,16 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       <p class="text-xs font-bold tracking-wide text-accent-text uppercase">
         {{ $t('blog.pinnedLabel') }}
       </p>
-      <h2 class="line-clamp-2 text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
+      <h2
+        class="line-clamp-2 max-h-[2lh] text-lg leading-snug font-semibold [overflow-wrap:anywhere]"
+      >
         <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
           {{ post.title }}
         </RouterLink>
       </h2>
-      <p class="line-clamp-2 min-h-12 text-muted [overflow-wrap:anywhere]">{{ excerpt }}</p>
+      <p class="line-clamp-2 h-[2lh] leading-6 text-muted [overflow-wrap:anywhere]">
+        {{ excerpt }}
+      </p>
       <footer class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-sm text-muted">
         <UserName v-for="author in post.authors" :key="author.id" :username="author.username" />
         <time :datetime="post.publishOn">
