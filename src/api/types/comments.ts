@@ -28,3 +28,8 @@ export type RecentComment = Schemas['RecentCommentResponse'];
 export type CommentRevision = Schemas['CommentRevisionResponse'];
 /** backend: comments/moderation/dto/comment-vote-entry.response.ts (CommentVoteEntryResponse) */
 export type CommentVoteEntry = Schemas['CommentVoteEntryResponse'];
+/** backend: comments/core/rate-limits.ts (COMMENT_LIMIT per COMMENT_WINDOW_SECONDS) */
+export const COMMENT_RATE_LIMIT = 10;
+export const COMMENT_RATE_WINDOW_MINUTES = 5;
+/** backend: libs/community interaction.ts (INTERACT_MIN_PROBLEM_COUNT) */
+export const INTERACT_MIN_PROBLEM_COUNT = 5;

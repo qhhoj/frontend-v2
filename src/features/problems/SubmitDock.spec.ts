@@ -3,6 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PY3_ID, SCRATCH_ID, contestDetail, problemDetail, sessionUser } from '@/test/fixtures';
 import { fail, mockApi, ok } from '@/test/mock-api';
+import { commentPageRoute } from '@/test/community-routes';
 import { useLocaleStore } from '@/stores/locale.store';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
@@ -238,7 +239,7 @@ describe('?resubmit', () => {
 
 describe('another problem', () => {
   it('starts fresh when the viewer leaves a problem and comes back to it', async () => {
-    mockApi(signedInRoutes());
+    mockApi({ ...signedInRoutes(), ...commentPageRoute('problem', 'lis') });
     const { wrapper, router, queryClient } = await openProblem();
     // A cached detail shows at once, so the page (and the dock) is not torn down by a loading state.
     queryClient.setQueryData(

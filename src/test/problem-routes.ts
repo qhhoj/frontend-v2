@@ -1,5 +1,6 @@
 import type { ProblemDetail } from '@/api/types/problems';
 import type { SubmissionDetail } from '@/api/types/submissions';
+import { commentPageRoute } from './community-routes';
 import {
   problemDetail,
   problemMeta,
@@ -19,9 +20,10 @@ export const signedInViewer = (overrides: Parameters<typeof signedIn>[0] = {}) =
   'GET /auth/me': signedIn(overrides),
   'GET /profile': ok(profile()),
 });
-/** `GET /problems/:code` for one problem (add `GET /problems/<code>/editorial` yourself where a test opens that tab). */
+/** `GET /problems/:code` for one problem and its (empty) comments (add `GET /problems/<code>/editorial` yourself where a test opens that tab). */
 export const problemPageRoutes = (detail: ProblemDetail = problemDetail()) => ({
   [`GET /problems/${encodeURIComponent(detail.code)}`]: ok(detail),
+  ...commentPageRoute('problem', detail.code),
   /** The rail's "my submissions" of a signed-in viewer. */
   'GET /submissions': page([]),
 });
