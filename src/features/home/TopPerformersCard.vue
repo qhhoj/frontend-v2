@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import StateBit from '@/components/StateBit.vue';
 import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
 import { useHomeQuery } from '@/features/community/community.queries';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
+import { medalClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 
 const PERFORMER_COUNT = 5;
-/** Ranks 1-3 carry the decorative rising-arrow Bit, as on the leaderboard. */
-const MEDALLED_RANKS = 3;
 const locale = useLocaleStore();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const performers = computed(() => (home.value?.topPerformers ?? []).slice(0, PERFORMER_COUNT));
@@ -34,10 +32,12 @@ const performers = computed(() => (home.value?.topPerformers ?? []).slice(0, PER
         :key="entry.username"
         class="flex items-center gap-2.5"
       >
-        <span class="w-5 shrink-0 text-right font-mono text-sm tabular-nums text-muted">
+        <span
+          class="w-5 shrink-0 text-right font-mono text-sm tabular-nums"
+          :class="medalClass(index + 1) || 'text-muted'"
+        >
           {{ index + 1 }}
         </span>
-        <StateBit v-if="index < MEDALLED_RANKS" variant="rankUp" size="tiny" />
         <UserAvatar :username="entry.username" :size="28" />
         <div class="flex min-w-0 flex-1 flex-col">
           <UserName :username="entry.username" :rating="entry.rating" class="truncate" />
