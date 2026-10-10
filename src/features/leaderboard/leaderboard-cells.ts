@@ -7,16 +7,6 @@ export const RANK_CELL_CLASS = 'px-3 py-2.5 text-right font-mono tabular-nums';
 export const USER_CELL_CLASS = 'overflow-hidden px-3 py-2.5';
 export const ORGANIZATION_CELL_CLASS = 'hidden truncate px-3 py-2.5 text-muted md:table-cell';
 
-/** Medal colour of ranks 1 to 3; other ranks keep the body colour. */
-export const medalClass = (rank: number) =>
-  rank === 1
-    ? 'font-bold text-medal-gold'
-    : rank === 2
-      ? 'font-bold text-medal-silver'
-      : rank === 3
-        ? 'font-bold text-medal-bronze'
-        : '';
-
 /** The active number is always shown; the other numbers show from md up. */
 export const valueCellClass = (isActive: boolean) =>
   `${RANK_CELL_CLASS} ${isActive ? 'font-bold text-positive' : 'hidden md:table-cell'}`;

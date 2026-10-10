@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { medalClass } from '@/lib/medal';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -117,7 +118,12 @@ const scoreHeaderKey = computed(() => {
           class="border-t border-line text-center"
           :class="{ 'bg-surface-hover': row.user.id === viewerId }"
         >
-          <td class="px-5 py-2.5 text-left">{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</td>
+          <td
+            class="px-5 py-2.5 text-left"
+            :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
+          >
+            {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
+          </td>
           <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
             <span class="flex items-center gap-2">
               <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />

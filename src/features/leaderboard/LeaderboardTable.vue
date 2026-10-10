@@ -17,10 +17,10 @@ import {
   RANK_HEAD_CLASS,
   USER_CELL_CLASS,
   USER_HEAD_CLASS,
-  medalClass,
   valueCellClass,
   valueHeadClass,
 } from './leaderboard-cells';
+import { medalClass } from '@/lib/medal';
 import { boardColumns, rowAnchor } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
 

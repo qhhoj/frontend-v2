@@ -113,7 +113,7 @@ const VIEW_MODES = [
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
+  <div class="page-column">
     <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
       <template #skeleton>
         <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
@@ -135,7 +135,7 @@ const VIEW_MODES = [
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-muted">{{ summary }}</p>
-            <h1 class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
+            <h1 class="mt-1 page-title">
               {{ contest.name }}
             </h1>
           </div>

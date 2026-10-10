@@ -53,9 +53,9 @@ const summary = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-7xl flex-col gap-3.5 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <header class="flex flex-wrap items-baseline gap-x-3">
-      <h1 class="font-display text-[26px] font-semibold">{{ $t('problems.title') }}</h1>
+      <h1 class="page-title">{{ $t('problems.title') }}</h1>
       <p class="min-h-6 text-sm text-muted">{{ summary }}</p>
     </header>
     <ProblemFilters
