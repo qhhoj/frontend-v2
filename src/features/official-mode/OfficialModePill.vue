@@ -17,7 +17,7 @@ const remaining = computed(() =>
   <span
     v-if="mode.isActive.value"
     data-testid="official-pill"
-    class="inline-flex min-h-8 items-center gap-1.5 rounded-pill bg-verdict-tle-bg px-3 text-sm font-semibold text-verdict-tle"
+    class="inline-flex min-h-8 shrink-0 items-center whitespace-nowrap gap-1.5 rounded-pill bg-verdict-tle-bg px-3 text-sm font-semibold text-verdict-tle"
   >
     <Lock aria-hidden="true" class="size-4" />
     {{ $t('officialMode.pill') }}
