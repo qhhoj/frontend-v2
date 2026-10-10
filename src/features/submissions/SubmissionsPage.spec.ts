@@ -77,7 +77,7 @@ describe('the submission list page', () => {
     });
     const { wrapper } = await openList();
     const done = wrapper.get('tbody tr[data-id="done"]').text();
-    for (const expected of ['100 / 1000', '0.04s', 'C++17', 'Tổng hai số', 'user_01'])
+    for (const expected of ['100 / 100', '0.04s', 'C++17', 'Tổng hai số', 'user_01'])
       expect(done).toContain(expected);
     const queued = wrapper.findAll('tbody tr[data-id="queued"] td').map((cell) => cell.text());
     expect(queued[0]).toContain('QU');

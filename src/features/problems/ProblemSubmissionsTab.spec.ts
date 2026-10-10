@@ -15,7 +15,7 @@ describe('the problem Submissions tab', () => {
       ...problemPageRoutes(),
       'GET /submissions': page([
         submissionItem({
-          problem: { code: 'duongdi', name: 'Đường đi', points: 1000, isDeleted: false },
+          problem: { code: 'duongdi', name: 'Đường đi', isDeleted: false, points: 100 },
         }),
       ]),
     });
@@ -67,10 +67,10 @@ describe('the problem Submissions tab', () => {
     );
   });
 
-  it('does not ask for submissions while another tab is open', async () => {
+  it('asks for the list once, for the rail, while another tab is open', async () => {
     const calls = mockApi({ ...signedInViewer(), ...problemPageRoutes() });
     const { wrapper } = await mountApp('/problems/duongdi');
     await vi.waitFor(() => expect(wrapper.find('[role="tabpanel"]').exists()).toBe(true));
-    expect(submissionCalls(calls)).toHaveLength(0);
+    expect(submissionCalls(calls)).toHaveLength(1);
   });
 });
