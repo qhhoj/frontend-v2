@@ -25,7 +25,7 @@ const overflowingChildren = (container: Locator) =>
 /** `ready` is text that only shows once the page has left its loading state. */
 const PAGES = [
   { path: '/', signedIn: true, ready: 'Tổng hai số' },
-  { path: '/problems', signedIn: true, ready: 'Chọn bài, bắt đầu giải' },
+  { path: '/problems', signedIn: true, ready: 'Đường đi ngắn nhất' },
   { path: '/contests/r42/ranking', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
   { path: '/contests', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
   { path: '/contests/r42', signedIn: true, ready: 'QHH Round #42 (Div. 2)' },
