@@ -17,7 +17,17 @@ const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
 </script>
 
 <template>
-  <table class="w-full text-sm">
+  <table class="w-full table-fixed text-sm">
+    <colgroup>
+      <col class="w-12" />
+      <col />
+      <col
+        v-for="(column, index) in columns"
+        :key="column"
+        class="w-20"
+        :class="narrowClass(index)"
+      />
+    </colgroup>
     <thead>
       <tr class="text-left text-muted">
         <th scope="col" class="py-2 pr-3 font-semibold">{{ $t('orgs.columns.rank') }}</th>
@@ -38,9 +48,14 @@ const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
         <td class="py-2 pr-3 font-mono">{{ member.rank }}</td>
         <td class="py-2">
           <div class="flex min-w-0 items-center gap-2">
-            <UserAvatar :username="member.username" :size="24" />
+            <UserAvatar :username="member.username" :size="24" class="shrink-0" />
             <div class="flex min-w-0 flex-col">
-              <UserName :username="member.username" :rating="member.rating" />
+              <UserName
+                :username="member.username"
+                :rating="member.rating"
+                class="truncate"
+                :title="member.username"
+              />
               <span
                 v-if="member.displayName !== member.username"
                 class="truncate text-sm text-muted"
