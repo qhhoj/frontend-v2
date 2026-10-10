@@ -21,7 +21,7 @@ export type MockHandler = MockResponse | ((call: ApiCall) => MockResponse);
  */
 export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
   'GET /site': {
-    body: { data: { navigation: [], config: {}, officialMode: false, officialModeEndsAt: null } },
+    body: { data: { config: {}, officialMode: false, officialModeEndsAt: null } },
   },
   'GET /notifications/unread-count': { body: { data: { count: 0 } } },
   'GET /notifications': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },

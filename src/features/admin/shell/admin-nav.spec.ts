@@ -74,7 +74,7 @@ describe('admin nav current section and dashboard', () => {
     expect(isCurrentNav('/admin/problems', '/admin/problems')).toBe(true);
     expect(isCurrentNav('/admin/problems/import', '/admin/problems/import')).toBe(true);
     expect(isCurrentNav('/admin/problems', '/admin/problems/import')).toBe(false);
-    expect(isCurrentNav('/admin/nav', '/admin/navigation-old')).toBe(false);
+    expect(isCurrentNav('/admin/pages', '/admin/pages-old')).toBe(false);
   });
 
   it('marks only the most specific item on a nested route, whichever items nest', () => {

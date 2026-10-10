@@ -6,7 +6,7 @@ import { list, ok } from './fixtures/reply';
 import { submissionDetail, submissionItem } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 
-const GONE = { code: 'duongdi', name: 'Đường đi', isDeleted: true };
+const GONE = { code: 'duongdi', name: 'Đường đi', isDeleted: true, points: 100 };
 const TOMBSTONED = submissionDetail({ problem: GONE, cases: [], batches: null, totalCases: null });
 
 function tombstoneRoutes(api: FakeApi) {

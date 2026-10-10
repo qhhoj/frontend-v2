@@ -13,7 +13,7 @@ const CLB = profileOrganization({
   shortName: 'CLB',
 });
 const site = (officialMode: boolean) => ({
-  'GET /site': ok({ navigation: [], config: {}, officialMode }),
+  'GET /site': ok({ config: {}, officialMode }),
 });
 async function openSettings(officialMode: boolean, isSuperuser = false) {
   const calls = mockApi({

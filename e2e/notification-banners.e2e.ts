@@ -24,7 +24,7 @@ function withImportant(api: FakeApi) {
 }
 const withOfficialMode = (api: FakeApi) => {
   api.signedIn = true;
-  api.routes['GET /site'] = ok({ navigation: [], config: {}, officialMode: true });
+  api.routes['GET /site'] = ok({ config: {}, officialMode: true });
 };
 const highBanner = (page: Page) => page.getByRole('region', { name: 'Thông báo quan trọng' });
 const officialBanner = (page: Page) => page.getByRole('region', { name: 'Chế độ thi chính thức' });
@@ -57,7 +57,7 @@ test('an anonymous visitor sees no official banner and sends no /site request', 
   page,
   api,
 }) => {
-  api.routes['GET /site'] = ok({ navigation: [], config: {}, officialMode: true });
+  api.routes['GET /site'] = ok({ config: {}, officialMode: true });
   await page.goto('/blog');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(officialBanner(page)).toHaveCount(0);

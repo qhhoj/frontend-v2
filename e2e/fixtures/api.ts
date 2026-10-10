@@ -247,7 +247,7 @@ export class FakeApi {
     'GET /events/submissions/:id': eventStream(),
     'GET /events/submissions': eventStream(),
     // Plan F1: the shell's own reads on every signed-in public page; specs replace single keys.
-    'GET /site': ok({ navigation: [], config: {}, officialMode: false, officialModeEndsAt: null }),
+    'GET /site': ok({ config: {}, officialMode: false, officialModeEndsAt: null }),
     'GET /notifications/unread-count': ok({ count: 0 }),
     'GET /notifications': list([]),
     'GET /events/user': eventStream(),

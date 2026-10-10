@@ -6,7 +6,7 @@ import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 const START = '/blog/new';
 const site = (officialMode: boolean) => ({
-  'GET /site': ok({ navigation: [], config: {}, officialMode }),
+  'GET /site': ok({ config: {}, officialMode }),
 });
 /** `signedInViewer` with a superuser session; its `GET /profile` stays. */
 const superuserViewer = () => ({

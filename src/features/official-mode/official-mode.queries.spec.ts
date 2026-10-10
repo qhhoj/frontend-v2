@@ -15,7 +15,7 @@ const Probe = defineComponent({
   },
 });
 const site = (officialMode: boolean) => ({
-  'GET /site': ok({ navigation: [], config: {}, officialMode }),
+  'GET /site': ok({ config: {}, officialMode }),
 });
 const asMember = { 'GET /auth/me': signedIn() };
 const asSuperuser = { 'GET /auth/me': signedIn({ user: sessionUser({ isSuperuser: true }) }) };
@@ -78,7 +78,7 @@ describe('official mode on an open page (fake timers)', () => {
       officialMode: true,
       officialModeEndsAt: endsInSeconds === null ? null : secondsFromStart(endsInSeconds),
     });
-  const off = ok({ navigation: [], config: {}, officialMode: false });
+  const off = ok({ config: {}, officialMode: false });
 
   it('refetches /site the moment the countdown reaches its end and drops the lock', async () => {
     const { wrapper, siteCalls } = await mountWatching([on(10), off]);

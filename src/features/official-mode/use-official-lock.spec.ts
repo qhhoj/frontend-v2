@@ -26,7 +26,7 @@ const Probe = defineComponent({
 async function mountAs(officialMode: boolean, isSuperuser = false) {
   mockApi({
     'GET /auth/me': signedIn({ user: sessionUser({ isSuperuser }) }),
-    'GET /site': ok({ navigation: [], config: {}, officialMode }),
+    'GET /site': ok({ config: {}, officialMode }),
   });
   clicks.value = 0;
   const wrapper = mountComponent(Probe);
