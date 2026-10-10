@@ -70,7 +70,7 @@ async function loadRevision(revision: FlatpageRevision) {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-6 sm:px-8">
+  <div class="mx-auto flex max-w-[1280px] flex-col gap-6">
     <AdminPageHeader
       :crumbs="[
         { label: $t('admin.pages.crumbs.content') },

@@ -68,10 +68,7 @@ const onGone = async () => {
 </script>
 
 <template>
-  <div
-    data-testid="canned-replies"
-    class="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-6 sm:px-8"
-  >
+  <div data-testid="canned-replies" class="mx-auto flex max-w-[1280px] flex-col gap-6">
     <AdminPageHeader
       :crumbs="[
         { label: $t('admin.cannedReplies.crumbs'), to: { name: adminRouteName('tickets') } },

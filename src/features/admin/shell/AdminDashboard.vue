@@ -16,7 +16,7 @@ const actions = computed(() =>
 </script>
 
 <template>
-  <div data-testid="admin-dashboard" class="flex flex-col gap-6 px-4 py-6 sm:px-8">
+  <div data-testid="admin-dashboard" class="flex flex-col gap-6">
     <header>
       <h1 class="font-display text-3xl font-semibold">{{ $t('admin.shell.screens.dashboard') }}</h1>
       <p class="text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>

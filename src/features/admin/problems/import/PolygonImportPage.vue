@@ -50,7 +50,7 @@ const refusal = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 px-4 py-6 sm:px-8">
+  <div class="flex flex-col gap-5">
     <AdminPageHeader
       :crumbs="[{ label: $t('admin.shell.groups.content') }]"
       :title="$t('admin.polygon.title')"

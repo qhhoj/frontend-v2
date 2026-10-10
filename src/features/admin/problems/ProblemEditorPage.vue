@@ -27,7 +27,7 @@ const retry = () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 px-4 py-6 sm:px-8">
+  <div class="flex flex-col gap-5">
     <p v-if="isMissing" role="alert" class="flex items-center gap-3">
       <AdminBit placement="refused" />{{ $t('admin.problems.notFound', { code }) }}
     </p>

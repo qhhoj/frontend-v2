@@ -41,7 +41,7 @@ const summaryLine = computed(() => {
 <template>
   <QueryState :loading="isPending" :error="isMissing ? null : error" @retry="refetch()">
     <template #skeleton>
-      <div class="flex flex-col gap-4 px-4 py-6 sm:px-8">
+      <div class="flex flex-col gap-4">
         <SkeletonBlock
           data-skeleton-region="contest-editor-header"
           class="h-36 w-full sm:h-[4.75rem]"
@@ -49,8 +49,8 @@ const summaryLine = computed(() => {
         <SkeletonBlock data-skeleton-region="contest-editor-body" class="h-64 w-full" />
       </div>
     </template>
-    <p v-if="isMissing" class="px-4 py-6 sm:px-8">{{ $t('admin.contests.notFound', { key }) }}</p>
-    <div v-else-if="contest" class="flex flex-col gap-6 px-4 py-6 sm:px-8">
+    <p v-if="isMissing">{{ $t('admin.contests.notFound', { key }) }}</p>
+    <div v-else-if="contest" class="flex flex-col gap-6">
       <AdminPageHeader
         :crumbs="[
           { label: $t('admin.contests.crumb'), to: { name: 'admin-contests' } },

@@ -25,8 +25,10 @@ const isAllowed = computed(() => canAny(route.meta.permission ?? null));
       <AdminNav data-testid="admin-nav-phone" class="pt-2" />
     </details>
     <main id="main" tabindex="-1" class="relative min-w-0 focus-visible:outline-none">
-      <slot v-if="isAllowed" />
-      <AdminForbidden v-else />
+      <div class="flex flex-col gap-5 px-4 py-6 sm:px-8">
+        <slot v-if="isAllowed" />
+        <AdminForbidden v-else />
+      </div>
     </main>
   </div>
 </template>
