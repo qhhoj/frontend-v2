@@ -12,7 +12,12 @@ const props = defineProps<{ activity: ActivityResponse }>();
 const weeks = computed(() =>
   heatmapWeeks(props.activity.days, todayIn(props.activity.timezone, Date.now())),
 );
-const months = computed(() => monthStarts(weeks.value));
+/** A month label is dropped when it would touch the previous one (the first, partial month is followed closely by the next). */
+const months = computed(() =>
+  monthStarts(weeks.value).filter(
+    (mark, index, all) => index === 0 || mark.column - all[index - 1]!.column >= MIN_LABEL_COLUMNS,
+  ),
+);
 const total = computed(() => totalSubmissions(props.activity.days));
 const HEAT_CLASSES: Record<HeatmapLevel, string> = {
   0: 'fill-surface-strong',
@@ -23,6 +28,7 @@ const HEAT_CLASSES: Record<HeatmapLevel, string> = {
 };
 const LEVELS: HeatmapLevel[] = [0, 1, 2, 3, 4];
 /** Geometry in SVG units: a 14-unit step per day or week, an 11-unit square, and a row of month labels on top. */
+const MIN_LABEL_COLUMNS = 3;
 const STEP = 14;
 const SQUARE = 11;
 const LABEL_ROW = 14;
@@ -45,7 +51,7 @@ const cellY = (row: number) => LABEL_ROW + row * STEP;
         <text
           v-for="mark in months"
           :key="mark.column"
-          :x="cellX(mark.column) > 700 ? 739 : cellX(mark.column)"
+          :x="cellX(mark.column) > 700 ? 739 : cellX(mark.column) + 2"
           y="10"
           :text-anchor="cellX(mark.column) > 700 ? 'end' : 'start'"
           class="fill-muted text-[10px]"
