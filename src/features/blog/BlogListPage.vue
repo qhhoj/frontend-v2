@@ -45,11 +45,14 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
 
 <template>
   <div class="page-column">
-    <header class="flex flex-col gap-2">
-      <h1 class="page-title">
-        {{ $t('blog.title') }}
-      </h1>
-      <p class="text-muted">{{ $t('blog.lead') }}</p>
+    <header class="flex items-center justify-between gap-3">
+      <div class="flex min-w-0 flex-col gap-2">
+        <h1 class="page-title">
+          {{ $t('blog.title') }}
+        </h1>
+        <p class="text-muted">{{ $t('blog.lead') }}</p>
+      </div>
+      <StateBit variant="writing" size="inline" class="shrink-0" />
     </header>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <nav :aria-label="$t('blog.feedsLabel')" class="glass flex flex-wrap gap-1 rounded-pill p-1">

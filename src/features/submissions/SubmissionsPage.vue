@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import InlineBit from '@/components/InlineBit.vue';
+import StateBit from '@/components/StateBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
@@ -66,9 +67,12 @@ function goToPage(page: number) {
 
 <template>
   <div class="page-column">
-    <h1 class="page-title">
-      {{ $t('submissions.title') }}
-    </h1>
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="page-title">
+        {{ $t('submissions.title') }}
+      </h1>
+      <StateBit variant="judging" size="inline" class="shrink-0" />
+    </div>
     <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>
     <QueryState :loading="isStatsPending" :error="null">
       <template #skeleton><SubmissionStatsStripSkeleton /></template>

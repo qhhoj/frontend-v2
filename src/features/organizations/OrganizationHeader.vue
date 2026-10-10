@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
+import StateBit from '@/components/StateBit.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { formatNumber, formatNumericDate } from '@/lib/format';
@@ -31,7 +32,12 @@ const joinPolicyKey = computed(() =>
   >
     <OrganizationLogo :organization="organization" size="lg" />
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-      <h1 class="font-display text-3xl font-bold leading-tight">{{ organization.name }}</h1>
+      <div class="flex items-center gap-3">
+        <h1 class="min-w-0 font-display text-3xl font-bold leading-tight">
+          {{ organization.name }}
+        </h1>
+        <StateBit variant="community" size="inline" class="shrink-0" />
+      </div>
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm tabular-nums text-muted">
         <span class="font-mono">{{ organization.shortName }}</span>
         <span v-if="rank !== null">

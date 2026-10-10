@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { pageFromQuery } from '@/lib/paging';
 import { formatNumber } from '@/lib/format';
@@ -51,9 +52,12 @@ const isListEmpty = computed(() => ranked.value.length === 0);
 <template>
   <div class="page-column">
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <header class="flex flex-col gap-1">
-        <h1 class="page-title">{{ $t('orgs.title') }}</h1>
-        <p class="text-muted">{{ $t('orgs.lead') }}</p>
+      <header class="flex items-center gap-3">
+        <StateBit variant="community" size="inline" class="shrink-0" />
+        <div class="flex min-w-0 flex-col gap-1">
+          <h1 class="page-title">{{ $t('orgs.title') }}</h1>
+          <p class="text-muted">{{ $t('orgs.lead') }}</p>
+        </div>
       </header>
       <div
         v-if="!isListEmpty"
