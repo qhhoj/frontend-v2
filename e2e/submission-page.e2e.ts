@@ -64,7 +64,7 @@ for (const width of [PHONE_WIDTH, DESKTOP_WIDTH])
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       );
-      expect(overflow).toBe(0);
+      expect(overflow).toBeLessThanOrEqual(0);
       const resubmit = (await page.getByRole('link', { name: 'Nộp lại' }).boundingBox())!;
       expect(resubmit.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
     });
