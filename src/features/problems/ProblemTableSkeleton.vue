@@ -8,22 +8,24 @@ const NUMBER_COLUMNS = 3;
 
 <template>
   <div class="overflow-x-auto">
-    <table aria-hidden="true" class="w-full min-w-[900px] border-collapse text-[15px]">
+    <table aria-hidden="true" class="w-full min-w-[900px] table-fixed border-collapse text-[15px]">
       <thead>
         <tr class="text-left text-[13px] text-muted">
           <th scope="col" class="px-6 py-4 font-medium"><SkeletonBlock text class="w-20" /></th>
-          <th scope="col" class="px-2.5 py-4 font-medium"><SkeletonBlock text class="w-16" /></th>
+          <th scope="col" class="w-40 px-2.5 py-4 font-medium">
+            <SkeletonBlock text class="w-16" />
+          </th>
           <th
             v-for="column in NUMBER_COLUMNS"
             :key="column"
             scope="col"
-            class="px-2.5 py-2 text-right font-medium"
+            class="w-24 px-2.5 py-2 text-right font-medium"
           >
             <span class="inline-flex min-h-11 items-center"
               ><SkeletonBlock text class="w-12"
             /></span>
           </th>
-          <th scope="col" class="px-6 py-4 text-right font-medium" />
+          <th scope="col" class="w-28 px-6 py-4 text-right font-medium" />
         </tr>
       </thead>
       <tbody>

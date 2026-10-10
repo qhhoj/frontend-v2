@@ -40,7 +40,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
 </script>
 
 <template>
-  <table class="w-full text-sm">
+  <table class="w-full table-fixed text-sm">
     <thead :class="BOARD_HEAD_CLASS">
       <tr>
         <th scope="col" :class="RANK_HEAD_CLASS">{{ $t('leaderboard.columns.rank') }}</th>

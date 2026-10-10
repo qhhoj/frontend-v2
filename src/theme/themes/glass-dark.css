@@ -46,9 +46,9 @@
   --qh-partial-bg-1: rgba(132, 204, 22, 0.1);
   --qh-partial-bg-2: rgba(132, 204, 22, 0.16);
   --qh-partial-bg-3: rgba(132, 204, 22, 0.24);
-  --qh-first-solve-bg: rgba(252, 114, 255, 0.28);
-  --qh-first-solve-bg-2: rgba(123, 97, 255, 0.28);
-  --qh-first-solve-text: #fff0ff;
+  --qh-first-solve-bg: #16a34a;
+  --qh-first-solve-bg-2: #22c55e;
+  --qh-first-solve-text: #03170a;
   --qh-tag-1: #f8cdb9;
   --qh-tag-1-bg: rgba(217, 119, 87, 0.16);
   --qh-tag-2: #5eead4;

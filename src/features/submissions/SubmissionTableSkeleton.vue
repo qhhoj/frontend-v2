@@ -4,6 +4,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
+  COLUMN_WIDTH_CLASS,
   FULL_TABLE_MIN_WIDTH_CLASS,
   HEADER_CELL_CLASSES,
 } from './submission-table-cells';
@@ -38,6 +39,8 @@ const columns = computed(() =>
       (!props.columnKeys || props.columnKeys.includes(column.key)),
   ),
 );
+/** Only the full table has fixed column widths. */
+const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key]);
 </script>
 
 <template>
@@ -46,18 +49,18 @@ const columns = computed(() =>
       <table
         aria-hidden="true"
         class="w-full border-collapse text-[15px]"
-        :class="columnKeys ? '' : FULL_TABLE_MIN_WIDTH_CLASS"
+        :class="columnKeys ? '' : `table-fixed ${FULL_TABLE_MIN_WIDTH_CLASS}`"
       >
         <thead>
           <tr class="text-left text-[13px] text-muted">
-            <th v-if="hasPickColumn" scope="col" :class="HEADER_CELL_CLASSES">
+            <th v-if="hasPickColumn" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
               <SkeletonBlock text class="w-10" />
             </th>
             <th
               v-for="column in columns"
               :key="column.key"
               scope="col"
-              :class="[HEADER_CELL_CLASSES, { 'text-right': column.isNumber }]"
+              :class="[HEADER_CELL_CLASSES, widthOf(column.key), { 'text-right': column.isNumber }]"
             >
               <SkeletonBlock text :class="column.header" />
             </th>

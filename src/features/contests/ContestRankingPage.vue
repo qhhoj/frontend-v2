@@ -9,12 +9,13 @@ import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { showsCellTime } from '@/lib/ranking-cells';
+import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ContestTabs from './ContestTabs.vue';
+import RankingSkeleton from './RankingSkeleton.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
@@ -77,8 +78,14 @@ const rows = computed(() => {
 });
 /** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
 const PODIUM_LIMIT = 6;
-const RANKING_SKELETON_ROWS = 10;
 const PODIUM_SKELETON_CARDS = 3;
+/** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
+const skeletonHasTimeColumn = computed(
+  () =>
+    contest.value !== undefined &&
+    isPenaltyFormat(contest.value.formatName) &&
+    showsCumtime(contest.value.formatName),
+);
 const podium = computed(() =>
   (ranking.value?.rows ?? [])
     .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
@@ -226,33 +233,10 @@ const VIEW_MODES = [
               </div>
             </div>
           </div>
-          <div class="glass overflow-hidden rounded-card">
-            <p aria-hidden="true" class="px-5 pt-3 text-[13px] md:hidden">
-              <SkeletonBlock text class="w-48" />
-            </p>
-            <div
-              data-skeleton-region="table-header"
-              class="flex items-center gap-4 px-5 py-4 text-[13px]"
-            >
-              <span class="block"><SkeletonBlock text class="w-8" /></span>
-              <span class="block"><SkeletonBlock text class="w-24" /></span>
-              <span class="flex-1" />
-              <span class="hidden sm:block"><SkeletonBlock text class="w-64" /></span>
-            </div>
-            <div
-              v-for="row in RANKING_SKELETON_ROWS"
-              :key="row"
-              data-skeleton-region="row"
-              class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm"
-            >
-              <SkeletonBlock text class="w-8" />
-              <span class="flex min-w-0 flex-1 items-center gap-2">
-                <SkeletonBlock class="size-6 shrink-0" />
-                <SkeletonBlock text class="w-40 max-w-full" />
-              </span>
-              <SkeletonBlock text class="hidden w-64 sm:inline-block" />
-            </div>
-          </div>
+          <RankingSkeleton
+            :problem-count="contest.problems?.length ?? 0"
+            :has-time-column="skeletonHasTimeColumn"
+          />
         </div>
       </template>
       <EmptyState v-if="!ranking?.rows.length" class="glass rounded-card">{{

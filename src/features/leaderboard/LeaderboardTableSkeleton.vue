@@ -24,7 +24,7 @@ const rows = Array.from({ length: LEADERBOARD_PAGE_SIZE }, (_row, index) => inde
 </script>
 
 <template>
-  <table class="w-full text-sm" data-skeleton-region="board">
+  <table class="w-full table-fixed text-sm" data-skeleton-region="board">
     <thead :class="BOARD_HEAD_CLASS">
       <tr>
         <th scope="col" :class="RANK_HEAD_CLASS"><SkeletonBlock text class="w-8" /></th>

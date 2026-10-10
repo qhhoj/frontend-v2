@@ -9,15 +9,16 @@ import LeaderboardTableSkeleton from './LeaderboardTableSkeleton.vue';
 const HEAD = 'text-left text-[12px] font-semibold tracking-wide text-muted uppercase';
 const ROW = 'border-t border-line target:bg-accent-soft';
 const RANK_CELL = 'px-3 py-2.5 text-right font-mono tabular-nums';
-const USER_CELL = 'px-3 py-2.5';
-const ORGANIZATION_CELL = 'hidden px-3 py-2.5 text-muted md:table-cell';
+const USER_CELL = 'overflow-hidden px-3 py-2.5';
+const ORGANIZATION_CELL = 'hidden truncate px-3 py-2.5 text-muted md:table-cell';
 const VALUE_CELL_ACTIVE = `${RANK_CELL} font-semibold`;
 const VALUE_CELL_HIDDEN = `${RANK_CELL} hidden md:table-cell`;
-const RANK_HEAD = 'px-3 py-2 text-right';
+const RANK_HEAD = 'w-14 px-3 py-2 text-right';
 const USER_HEAD = 'px-3 py-2';
-const ORGANIZATION_HEAD = 'hidden px-3 py-2 md:table-cell';
-const VALUE_HEAD_ACTIVE = 'px-3 py-2 text-right text-content';
-const VALUE_HEAD_HIDDEN = 'px-3 py-2 text-right hidden md:table-cell';
+const ORGANIZATION_HEAD = 'hidden w-28 px-3 py-2 md:table-cell';
+const VALUE_HEAD_ACTIVE = 'w-28 px-3 py-2 text-right whitespace-nowrap md:w-32 text-content';
+const VALUE_HEAD_HIDDEN =
+  'w-28 px-3 py-2 text-right whitespace-nowrap md:w-32 hidden md:table-cell';
 
 const EXPECTED = {
   rating: {

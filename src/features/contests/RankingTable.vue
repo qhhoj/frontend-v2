@@ -14,6 +14,13 @@ import {
 } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
+import {
+  PROBLEM_COLUMN_REM,
+  RANK_COLUMN_REM,
+  SCORE_COLUMN_REM,
+  TIME_COLUMN_REM,
+  tableMinWidthRem,
+} from './ranking-columns';
 
 const props = defineProps<{
   ranking: Ranking;
@@ -43,6 +50,9 @@ const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
+const minWidth = computed(
+  () => `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value)}rem`,
+);
 const scoreHeaderKey = computed(() => {
   if (penalty.value) return 'ranking.columns.solved';
   return hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score';
@@ -59,7 +69,18 @@ const scoreHeaderKey = computed(() => {
     :aria-label="$t('ranking.scrollRegion')"
     class="overflow-x-auto focus-visible:-outline-offset-2"
   >
-    <table class="w-full min-w-[720px] border-collapse">
+    <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
+      <colgroup>
+        <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
+        <col />
+        <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
+        <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
+        <col
+          v-for="problem in ranking.problems"
+          :key="problem.problemId"
+          :style="{ width: `${PROBLEM_COLUMN_REM}rem` }"
+        />
+      </colgroup>
       <caption class="sr-only">
         {{
           $t('pages.ranking')
@@ -97,10 +118,10 @@ const scoreHeaderKey = computed(() => {
           :class="{ 'bg-surface-hover': row.user.id === viewerId }"
         >
           <td class="px-5 py-2.5 text-left">{{ row.rank ?? '—' }}</td>
-          <th scope="row" class="px-2.5 py-2.5 text-left font-body">
-            <span class="inline-flex items-center gap-2 align-middle">
-              <UserAvatar :username="row.user.username" :size="24" />
-              <UserName :username="row.user.username" />
+          <th scope="row" class="truncate px-2.5 py-2.5 text-left font-body">
+            <span class="inline-flex max-w-full items-center gap-2 align-middle">
+              <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />
+              <UserName :username="row.user.username" class="truncate" />
             </span>
             <span
               v-if="row.user.id === viewerId"

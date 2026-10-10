@@ -126,8 +126,6 @@ const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['verdict-partial', 'partial-bg-3'],
   ['accent-soft-text', 'accent-soft'],
   ['text-muted', 'accent-soft'],
-  ['first-solve-text', 'first-solve-bg'],
-  ['first-solve-text', 'first-solve-bg-2'],
   ['positive', 'verdict-ac-bg'],
   ['negative', 'verdict-wa-bg'],
   ...TAG_PAIRS,
@@ -136,6 +134,9 @@ const TINT_PAIRS: ReadonlyArray<readonly [string, string]> = [
 /** Verdict and accent tints with their dedicated text colour, plus plain body text on each tint. */
 const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ...TINT_PAIRS,
+  /** A solid fill with its own text colour (body text is not drawn on it). */
+  ['first-solve-text', 'first-solve-bg'],
+  ['first-solve-text', 'first-solve-bg-2'],
   ...[...new Set(TINT_PAIRS.map(([, tint]) => tint))].map((tint) => ['text', tint] as const),
 ];
 const allTokenNames = new Set(themes.flatMap(({ tokens }) => [...tokens.keys()]));
@@ -359,9 +360,12 @@ describe.each(variants)('theme $theme with accent $accent', ({ theme, accent, to
     for (const blob of BLOBS) expect(colour(blob)[3], `--qh-${blob} alpha`).toBe(0);
   });
 
-  it('keeps the first-solve tint apart from the wrong-answer tint, and its text readable', () => {
+  it('keeps the first-solve fill a stronger green than the accepted tint (3:1), apart from wrong answer, with readable text', () => {
     if (!flat) return;
     const card = colour('surface-solid');
+    const accepted = over(colour('verdict-ac-bg'), card);
+    for (const fill of ['first-solve-bg', 'first-solve-bg-2'])
+      expect(contrastRatio(colour(fill), accepted), fill).toBeGreaterThanOrEqual(3);
     const gap = Math.abs(
       hueOf(over(colour('first-solve-bg'), card)) - hueOf(over(colour('verdict-wa-bg'), card)),
     );

@@ -20,6 +20,7 @@ import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   BODY_CELL_CLASSES,
+  COLUMN_WIDTH_CLASS,
   FULL_TABLE_MIN_WIDTH_CLASS,
   HEADER_CELL_CLASSES,
 } from './submission-table-cells';
@@ -106,6 +107,8 @@ const finishedValue = (
 ) => (isFinished(row) && value !== null ? format(value) : NO_VALUE);
 const formatScore = (value: number) =>
   formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false);
+/** Only the full table has fixed column widths. */
+const widthOf = (key: ColumnKey | 'pick') => (props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key]);
 </script>
 
 <template>
@@ -118,7 +121,7 @@ const formatScore = (value: number) =>
     >
       <table
         class="w-full border-collapse text-[15px]"
-        :class="columnKeys ? '' : FULL_TABLE_MIN_WIDTH_CLASS"
+        :class="columnKeys ? '' : `table-fixed ${FULL_TABLE_MIN_WIDTH_CLASS}`"
       >
         <caption class="sr-only">
           {{
@@ -127,14 +130,14 @@ const formatScore = (value: number) =>
         </caption>
         <thead>
           <tr class="text-left text-[13px] text-muted">
-            <th v-if="isPicking" scope="col" :class="HEADER_CELL_CLASSES">
+            <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
               {{ $t('sourceDiff.select.column') }}
             </th>
             <th
               v-for="column in columns"
               :key="column.key"
               scope="col"
-              :class="[HEADER_CELL_CLASSES, { 'text-right': column.isNumber }]"
+              :class="[HEADER_CELL_CLASSES, widthOf(column.key), { 'text-right': column.isNumber }]"
             >
               {{ $t(`submissions.columns.${column.key}`) }}
             </th>

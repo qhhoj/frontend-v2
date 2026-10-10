@@ -7,7 +7,7 @@ Source of truth for values is the code: `src/theme/tokens.css` (global tokens) a
 ## Style
 
 - **Clay (default)**: ivory ground, white cards (`bg-surface` = `--qh-surface-solid`) with a 1 px `--qh-line` hairline, no blur (`--qh-blur: 0px`), no background blobs (`--qh-blob-display: none`, blob colours transparent), one solid clay colour for primary actions (`--qh-gradient-accent` has two equal stops, so `bg-gradient-accent` is flat), no glow (`--qh-glow` is transparent).
-- **Glass (optional)**: frosted cards (`backdrop-filter: blur(var(--qh-blur))`, 24 px, translucent fill, hairline) over 2-3 large blurred radial blobs (pink, violet; the third is hidden on narrow or short screens); pink to violet accent gradient on primary actions and first-solve cells.
+- **Glass (optional)**: frosted cards (`backdrop-filter: blur(var(--qh-blur))`, 24 px, translucent fill, hairline) over 2-3 large blurred radial blobs (pink, violet; the third is hidden on narrow or short screens); pink to violet accent gradient on primary actions.
 - Components never know which: they use `glass rounded-card`, `bg-surface`, `bg-gradient-accent`; the theme decides what those render.
 - Tone: big friendly numbers, pill controls, token-pill tags with a "coin", swap-card submit panel, podium for top 3.
 
@@ -84,7 +84,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - **Primary button**: `bg-gradient-accent` + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
 - **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.
 - **Verdict badge**: 40 px circle (`size-10`), verdict tint, abbreviation + accessible full label.
-- **Ranking cell**: `rounded-cell` block; first solve = `bg-first-solve` with a star: pink-violet in Glass, gold/amber in Clay (kept apart from the red wrong-answer tint; `themes.spec.ts` checks the hue gap and 4.5:1 text); pending = `?n`.
+- **Ranking cell**: `rounded-cell` block; first solve = `bg-first-solve` with a star: a stronger shade of the accepted green in every theme (deeper in the light themes, brighter in the dark ones; `themes.spec.ts` checks 3:1 against the accepted tint, the hue gap from the red wrong-answer tint and 4.5:1 text); pending = `?n`.
 - **Overlays** (menus, popovers): opaque `bg-surface-solid`.
 - **Appearance panel**: a 44 px palette button in the header opens an opaque popover with Style (Clay, Glass) and Mode (Light, Dark, Automatic), seven accent dots, Glass Clear, Frosted and Solid, "use site default" and a link to Settings › Appearance. It has a focus trap; Escape returns focus to the button.
 - **Settings › Appearance** (`/settings/appearance`, public): an opt-in switch, Style and Mode, accent swatches in a 4 + 3 grid, Glass and Glow sliders, reset and a live preview.

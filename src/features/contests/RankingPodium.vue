@@ -51,10 +51,10 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
         {{ row.rank }}
       </span>
       <UserAvatar :username="row.user.username" :size="24" />
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ row.rank }}:</span>
-        <UserName :username="row.user.username" class="text-lg" />
-        <p class="font-mono text-[13px] text-muted">
+        <UserName :username="row.user.username" class="block truncate text-lg" />
+        <p class="truncate font-mono text-[13px] text-muted">
           {{
             isPenaltyFormat(context.formatName)
               ? `${$t('ranking.solvedCount', { count: solved(row) }, solved(row))} · ${formatCumtime(context.formatName, row.cumtime)}`
@@ -67,7 +67,7 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
         v-if="row.rank === 1"
         data-testid="podium-bit"
         kind="rankUp"
-        class="ml-auto shrink-0 [--bit-px:3px]"
+        class="shrink-0 [--bit-px:3px]"
       />
     </div>
   </section>

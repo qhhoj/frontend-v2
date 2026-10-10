@@ -119,7 +119,7 @@ describe('contest submissions tab', () => {
     expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
   });
 
-  it('drops the 900 px table minimum in the four-column state only', async () => {
+  it('drops the 1040 px table minimum in the four-column state only', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     mockApi({
       ...signedInViewer(),
@@ -128,7 +128,7 @@ describe('contest submissions tab', () => {
       'GET /problems/meta': ok(problemMeta()),
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(wrapper.get('table').classes()).not.toContain('min-w-[900px]');
+    expect(wrapper.get('table').classes()).not.toContain('min-w-[1040px]');
   });
 
   it('shows no all-users rows while the own-only list replaces a public one', async () => {

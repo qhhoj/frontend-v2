@@ -220,6 +220,8 @@
 
 @layer base {
   html {
+    /* The page's scrollbar track is always reserved, so content does not jump sideways between a short and a long page. */
+    scrollbar-gutter: stable;
     background-color: var(--qh-ground);
     color: var(--qh-text);
     font-family: var(--qh-font-body);

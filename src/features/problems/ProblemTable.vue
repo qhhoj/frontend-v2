@@ -29,7 +29,7 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
     :aria-label="$t('problems.scrollRegion')"
     class="overflow-x-auto focus-visible:-outline-offset-2"
   >
-    <table class="w-full min-w-[900px] border-collapse text-[15px]">
+    <table class="w-full min-w-[900px] table-fixed border-collapse text-[15px]">
       <caption class="sr-only">
         {{
           $t('problems.listName')
@@ -38,13 +38,15 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
       <thead>
         <tr class="text-left text-[13px] text-muted">
           <th scope="col" class="px-6 py-4 font-medium">{{ $t('problems.columns.problem') }}</th>
-          <th scope="col" class="px-2.5 py-4 font-medium">{{ $t('problems.columns.types') }}</th>
+          <th scope="col" class="w-40 px-2.5 py-4 font-medium">
+            {{ $t('problems.columns.types') }}
+          </th>
           <th
             v-for="column in SORTABLE"
             :key="column.field"
             scope="col"
             :aria-sort="ariaSort(column.field)"
-            class="px-2.5 py-2 text-right font-medium"
+            class="w-24 px-2.5 py-2 text-right font-medium"
           >
             <button
               type="button"
@@ -56,7 +58,7 @@ const nextSort = (field: ProblemSortField): ProblemSort =>
               <ArrowUp v-else-if="sort === column.field" class="size-3.5" aria-hidden="true" />
             </button>
           </th>
-          <th scope="col" class="px-6 py-4 text-right font-medium">
+          <th scope="col" class="w-28 px-6 py-4 text-right font-medium">
             {{ $t('problems.columns.status') }}
           </th>
         </tr>

@@ -4,8 +4,8 @@
  */
 export const BOARD_ROW_CLASS = 'border-t border-line target:bg-accent-soft';
 export const RANK_CELL_CLASS = 'px-3 py-2.5 text-right font-mono tabular-nums';
-export const USER_CELL_CLASS = 'px-3 py-2.5';
-export const ORGANIZATION_CELL_CLASS = 'hidden px-3 py-2.5 text-muted md:table-cell';
+export const USER_CELL_CLASS = 'overflow-hidden px-3 py-2.5';
+export const ORGANIZATION_CELL_CLASS = 'hidden truncate px-3 py-2.5 text-muted md:table-cell';
 
 /** The active number is always shown; the other numbers show from md up. */
 export const valueCellClass = (isActive: boolean) =>
@@ -17,10 +17,12 @@ export const AVATAR_PX = 28 as const;
 /** The header row and its cells, shared by the board and its skeleton. */
 export const BOARD_HEAD_CLASS =
   'text-left text-[12px] font-semibold tracking-wide text-muted uppercase';
-export const RANK_HEAD_CLASS = 'px-3 py-2 text-right';
+/** The table is `table-fixed`: the header cells' widths are the column widths, so a sort change or new rows never move a column. The user column takes the rest. */
+export const RANK_HEAD_CLASS = 'w-14 px-3 py-2 text-right';
 export const USER_HEAD_CLASS = 'px-3 py-2';
-export const ORGANIZATION_HEAD_CLASS = 'hidden px-3 py-2 md:table-cell';
+export const ORGANIZATION_HEAD_CLASS = 'hidden w-28 px-3 py-2 md:table-cell';
+const VALUE_HEAD_BASE = 'w-28 px-3 py-2 text-right whitespace-nowrap md:w-32';
 
 /** The active number's heading is in full colour; the others show from md up. */
 export const valueHeadClass = (isActive: boolean) =>
-  `${RANK_HEAD_CLASS} ${isActive ? 'text-content' : 'hidden md:table-cell'}`;
+  `${VALUE_HEAD_BASE} ${isActive ? 'text-content' : 'hidden md:table-cell'}`;

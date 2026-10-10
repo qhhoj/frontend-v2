@@ -29,7 +29,7 @@ const whenText = (contest: ContestListItem) => {
     :aria-label="$t('contests.list.endedRegion')"
     class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
   >
-    <table class="w-full min-w-[640px] border-collapse text-sm">
+    <table class="w-full min-w-[640px] table-fixed border-collapse text-sm">
       <caption class="sr-only">
         {{
           $t('contests.phase.ended')
@@ -40,16 +40,16 @@ const whenText = (contest: ContestListItem) => {
           <th scope="col" class="px-5 py-3 font-semibold">
             {{ $t('contests.list.columns.contest') }}
           </th>
-          <th scope="col" class="px-3 py-3 font-semibold">
+          <th scope="col" class="w-48 px-3 py-3 font-semibold">
             {{ $t('contests.list.columns.when') }}
           </th>
-          <th scope="col" class="px-3 py-3 font-semibold">
+          <th scope="col" class="w-56 px-3 py-3 font-semibold">
             {{ $t('contests.list.columns.format') }}
           </th>
-          <th scope="col" class="px-3 py-3 text-right font-semibold">
+          <th scope="col" class="w-36 px-3 py-3 text-right font-semibold">
             {{ $t('contests.list.columns.participants') }}
           </th>
-          <th scope="col" class="px-5 py-3">
+          <th scope="col" class="w-40 px-5 py-3">
             <span class="sr-only">{{ $t('contests.list.columns.action') }}</span>
           </th>
         </tr>
