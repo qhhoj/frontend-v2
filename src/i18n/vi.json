@@ -993,8 +993,8 @@
   },
   "problems": {
     "title": "Bài tập",
-    "summary": "{total} bài",
-    "summarySolved": "{total} bài · {solved} đã giải",
+    "results": "{n} kết quả",
+    "solvedCount": "Đã giải {solved} bài",
     "search": "Mã hoặc tên bài",
     "types": "Lọc theo dạng bài",
     "pointsAny": "Điểm",

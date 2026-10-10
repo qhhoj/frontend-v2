@@ -993,8 +993,8 @@
   },
   "problems": {
     "title": "Problems",
-    "summary": "{total} problem | {total} problems",
-    "summarySolved": "{total} problem · {solved} solved | {total} problems · {solved} solved",
+    "results": "{n} result | {n} results",
+    "solvedCount": "{solved} solved",
     "search": "Code or name",
     "types": "Filter by problem type",
     "pointsAny": "Points",
