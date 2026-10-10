@@ -25,7 +25,7 @@ const members = computed(() => query.data.value?.items ?? []);
           <SkeletonBlock v-for="row in 5" :key="row" text class="h-6 w-full" />
         </div>
       </template>
-      <MemberRows :members="members" :columns="['performancePoints', 'problemCount']" />
+      <MemberRows :members="members" :columns="['performancePoints']" />
     </QueryState>
     <RouterLink
       :to="{ name: 'organization-members', params: { slug } }"
