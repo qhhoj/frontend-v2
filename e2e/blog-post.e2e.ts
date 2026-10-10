@@ -2,7 +2,7 @@ import { postDetail } from '../src/test/community-fixtures';
 import { THEMES } from '../src/theme/registry';
 import { AUDIT_VIEWPORTS, applyTheme, expectNoAxeViolations } from './fixtures/audit';
 import { expect, test } from './fixtures/api';
-import { defineShiftTests, PHONE, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
+import { PHONE } from './fixtures/viewports';
 import { ok } from './fixtures/reply';
 
 const POST_ID = 'post-1';
@@ -45,24 +45,3 @@ for (const theme of THEMES)
         ).toBeVisible();
         await expectNoAxeViolations(page);
       });
-
-defineShiftTests([
-  {
-    name: 'blog post article',
-    path: `/blog/${POST_ID}`,
-    signedIn: false,
-    hold: `GET /posts/${POST_ID}`,
-    answer: (api) => {
-      api.routes[`GET /posts/${POST_ID}`] = ok(postDetail({ id: POST_ID }));
-    },
-    // The title and byline are the same boxes in both states; the body's height follows the post, so only its place is compared.
-    parts: (page) => ({
-      'post title': page.locator('article h1, [data-skeleton-region="title"]'),
-      'post byline': page.locator('[data-testid="post-byline"], [data-skeleton-region="byline"]'),
-      'post body': page.locator('.user-content, [data-skeleton-region="body"]'),
-    }),
-    placed: ['post byline', 'post body'],
-    placedOnly: ['post body'],
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

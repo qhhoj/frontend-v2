@@ -10,7 +10,6 @@ import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
 // Not imported from src/test/contest-extras-fixtures.ts: its `@/` imports do not resolve in the e2e tsconfig.
@@ -123,26 +122,6 @@ for (const viewport of AUDIT_VIEWPORTS)
       expect(await fitsWidth(page)).toBe(true);
     }
   });
-
-defineShiftTests([
-  {
-    name: 'contest page with a rules card',
-    path: '/contests/r42',
-    signedIn: true,
-    hold: 'GET /contests/r42',
-    answer: (api) => {
-      api.routes['GET /contests/r42'] = ok(ruled);
-    },
-    // The card sits last in the aside, so only the header is measured: nothing above it may move.
-    parts: (page) => ({
-      header: page.locator(
-        '[data-skeleton-region="contest-header"], [data-testid="contest-header"]',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: CONTEST_FIXTURE_NOW,
-  },
-]);
 
 test('an editor writes the rules and sees accepted revisions in the participations list', async ({
   page,

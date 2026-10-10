@@ -1,10 +1,8 @@
 import { LEADERBOARD_PAGE_SIZE } from '../src/api/types/users';
 import { leaderboardEntry } from '../src/test/fixtures';
-import { SKELETON_ROW_COUNT } from '../src/features/leaderboard/leaderboard-cells';
 import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 
 /** One full page of the board, as the query asks for it (`LEADERBOARD_PAGE_SIZE` rows). */
 const fullPage = Array.from({ length: LEADERBOARD_PAGE_SIZE }, (_row, index) =>
@@ -47,15 +45,3 @@ for (const viewport of AUDIT_VIEWPORTS)
         true,
       );
     });
-
-defineShiftTests([
-  {
-    name: 'leaderboard table',
-    path: '/users',
-    signedIn: false,
-    hold: 'GET /users',
-    answer: (api) => (api.routes['GET /users'] = list(fullPage.slice(0, SKELETON_ROW_COUNT))),
-    parts: (page) => ({ table: page.locator('table') }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

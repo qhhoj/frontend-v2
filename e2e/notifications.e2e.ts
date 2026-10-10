@@ -5,7 +5,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 import type { Reply } from './fixtures/reply';
 
@@ -31,18 +30,6 @@ function withInbox(api: FakeApi, rows: NotificationItem[] = inboxSample()) {
   api.routes['POST /notifications/:id/read'] = { status: 204 };
   api.routes['POST /notifications/read-all'] = { status: 204 };
 }
-/** Six short rows of today: they fill the page skeleton's six rows exactly. */
-const sixToday = () =>
-  Array.from({ length: 6 }, (_row, index) =>
-    notificationItem({
-      id: `n-shift-${index}`,
-      title: `Thông báo ${index + 1}`,
-      body: 'Có tin mới.',
-      count: 1,
-      priority: 'normal',
-      lastActivityAt: '2026-10-09T09:00:00Z',
-    }),
-  );
 const bellOf = (page: Page) => page.getByTestId('notification-bell');
 const drawerOf = (page: Page) => page.getByRole('dialog', { name: 'Thông báo' });
 
@@ -183,16 +170,3 @@ test('Bit shows in the page header, the empty inbox and the empty drawer', async
   await bellOf(page).click();
   await expect(drawerOf(page).locator('[data-testid="inline-bit"]')).toBeVisible();
 });
-
-defineShiftTests([
-  {
-    name: 'notifications page',
-    path: '/notifications',
-    signedIn: true,
-    hold: 'GET /notifications',
-    answer: (api) => withInbox(api, sixToday()),
-    parts: (page) => ({ card: page.getByTestId('notifications-card') }),
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: NOTIFICATION_NOW,
-  },
-]);

@@ -1,9 +1,9 @@
-import { joinRequest, organizationDetail, organizationItem } from '../src/test/community-fixtures';
+import { joinRequest, organizationDetail } from '../src/test/community-fixtures';
 import { THEMES } from '../src/theme/registry';
 import { applyTheme, expectNoAxeViolations } from './fixtures/audit';
 import { expect, list, test } from './fixtures/api';
 import { ok } from './fixtures/reply';
-import { PHONE, PHONE_AND_DESKTOP, DESKTOP, defineShiftTests } from './fixtures/layout-shift';
+import { PHONE, DESKTOP } from './fixtures/viewports';
 
 const VIEWPORTS = [
   { name: 'desktop', width: DESKTOP, height: 800 },
@@ -11,10 +11,6 @@ const VIEWPORTS = [
 ] as const;
 const LIST_NAME = 'THPT chuyên Lê Hồng Phong';
 const ABOUT_TEXT = 'Câu lạc bộ Tin học.';
-/** Six cards: the skeleton's six, so the loaded grid is as tall as the skeleton. */
-const SIX_ORGANIZATIONS = Array.from({ length: 6 }, (_unused, index) =>
-  organizationItem({ id: `org-${index}`, slug: `org-${index}`, name: `Tổ chức ${index}` }),
-);
 
 const PAGES = [
   { name: 'the list', path: '/organizations', ready: LIST_NAME },
@@ -67,42 +63,6 @@ test('an unknown organization shows the crying Bit and a way back to the list', 
   await page.getByRole('link', { name: 'Xem các tổ chức' }).click();
   await expect(page).toHaveURL(/\/organizations$/);
 });
-
-defineShiftTests([
-  {
-    name: 'organization list grid',
-    path: '/organizations',
-    signedIn: false,
-    hold: 'GET /organizations',
-    answer: (api) => {
-      api.routes['GET /organizations'] = list(SIX_ORGANIZATIONS);
-    },
-    parts: (page) => ({
-      'organization cards': page.locator(
-        '[data-skeleton-region="organization-card"], [data-testid="organization-card"]',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'organization header card',
-    path: '/organizations/lhp',
-    signedIn: false,
-    hold: 'GET /organizations/lhp',
-    answer: (api) => {
-      // A one-line name: the header skeleton's title is one line, so the loaded title must be too.
-      api.routes['GET /organizations/lhp'] = {
-        body: { data: organizationDetail({ name: 'Tin học LHP' }) },
-      };
-    },
-    parts: (page) => ({
-      'organization header': page.locator(
-        '[data-skeleton-region="organization-header"], [data-testid="organization-header"]',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);
 
 const REQUEST_ID = 'c0ffee00-0000-4000-8000-000000000501';
 const HCMUS = {

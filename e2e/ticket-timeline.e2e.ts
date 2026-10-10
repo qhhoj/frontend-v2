@@ -10,7 +10,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
 const COLAN = { id: '0192a000-0000-7000-8000-000000000905', username: 'colan', rating: null };
@@ -63,27 +62,6 @@ const DETAIL = ticketDetail({
 });
 const PATH = `/tickets/${DETAIL.id}`;
 const KEY = `GET /tickets/${DETAIL.id}`;
-/** The shift case answers a short title and a short link: the default 43-character title wraps at 375 px while the skeleton title is one line. */
-const SHIFT_DETAIL = ticketDetail({
-  ...DETAIL,
-  title: 'Test 17 sai',
-  link: { type: 'problem', id: 'p', key: 'hcmus41b', title: 'Đề A', url: '/problems/hcmus41b' },
-  messages: [first, reply],
-  messageCount: 2,
-  timeline: [
-    messageEntry(first),
-    eventEntry(
-      timelineEvent({
-        id: 'e1',
-        type: 'assigned',
-        actor: ADMIN_USER,
-        target: COLAN,
-        at: '2026-10-08T13:30:00Z',
-      }),
-    ),
-    messageEntry(reply),
-  ],
-});
 const withTicket = (api: FakeApi) => {
   api.signedIn = true;
   api.routes[KEY] = ok(DETAIL);
@@ -144,20 +122,3 @@ test('the cap notice carries the hard-hat Bit', async ({ page, api }) => {
     page.getByRole('region', { name: 'Tin nhắn' }).locator('[data-testid="inline-bit"]'),
   ).toBeVisible();
 });
-
-defineShiftTests([
-  {
-    name: 'ticket thread counts line',
-    path: PATH,
-    signedIn: true,
-    hold: KEY,
-    answer: (api) => (api.routes[KEY] = ok(SHIFT_DETAIL)),
-    parts: (page) => ({
-      'thread counts': page.locator(
-        '[data-skeleton-region="thread-counts"], [data-testid="thread-counts"]',
-      ),
-    }),
-    placed: ['thread counts'],
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

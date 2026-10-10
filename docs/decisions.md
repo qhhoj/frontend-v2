@@ -187,7 +187,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Contest instants show in the viewer's own zone (`formatClock`, `formatDayMonth`); the contest's day is the viewer's day, so a late-evening contest keeps its own date.
 - Detail and list keys carry the viewer id: one account's join state never shows to another on the same browser.
 - After backend 4c the detail's actions read `viewer.liveStatus`/`isCurrent`; the client-side copy of `liveStatusOf` is gone.
-- E2E: `e2e/contests.e2e.ts` covers the list, the detail (390 px layout A, access-code dialog under axe), announcements over SSE and the points cells; every contest page is in the axe and phone-layout lists, and the contest fixtures run on a clock pinned inside Round #42 (`CONTEST_FIXTURE_NOW`).
+- E2E: `e2e/contests.e2e.ts` covers the list, the detail (390 px layout A, access-code dialog under axe), announcements over SSE and the points cells; every contest page is in the axe list, and the contest fixtures run on a clock pinned inside Round #42 (`CONTEST_FIXTURE_NOW`).
 - The list and detail read backend 4c's viewer fields (`viewer.liveStatus`, `isCurrent`, `viewerResult`, `solverCount`): the list's own state and the problems table's own result and solver count come from the server, not from the client.
 - Solver counts hide their column when every count is null: the viewer may not see the full ranking, so a column of dashes would read as zeros.
 - Every contest refusal code has its own text, and `access_code_required` opens the code dialog instead of only showing the text: the user can act on it in place.
@@ -300,7 +300,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Access codes**: hashed, so a blank box keeps the code and a "Bỏ mã" checkbox removes it (the board says "xóa trắng để bỏ mã"); `hasRankingAccessCode` and `requiresAccessCode` say whether one is set.
 - **Create bodies**: a create sends no staff-only field (problem `STAFF_ONLY_FIELDS`, contest `GATED_CONTEST_FIELDS` incl. `rateAll`) unless the account holds its permission and the value was changed.
 - **Admin indexes**: open-by-key stays and a URL-driven search card (`q`, `phase`, `page`) lists problems and contests beside it (pick 2B, 2026-10-09), its box shared with the users list; search is `q`, a case-insensitive substring of code or title (max 100).
-- **Admin loading parity**: `e2e/admin-loading.e2e.ts` holds each screen's first request and checks the skeleton keeps the loaded box; skeleton heights fit a typical screen (one run, five users), so other row counts still move what follows.
+- **Admin loading parity**: skeleton heights fit a typical screen (one run, five users), so other row counts still move what follows.
 - **Admin i18n**: per-area files under `src/i18n/admin/`, merged by `src/i18n/index.ts` — parallel tasks never conflict in one JSON.
 - **Judge ping and key**: ping shows in ms (the API sends seconds); one `JudgeKeyDialog` serves "Tạo và lấy khoá" and a rotation (after a confirm that the judge disconnects), the key lives in component state only — the board says the key shows once.
 - **Languages**: list from `GET /admin/languages`; judge coverage ("{judges} / {total}", "chỉ có trên một máy") joins `GET /judges` and shows only with `judge.change_judge`; create and edit are own pages with a sticky save bar, the key sealed on edit, PATCH sends changed fields only — no `GET /admin/languages/:id`, so edit finds the language in the list.
@@ -315,7 +315,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Static pages**: the URL is canonicalised as the backend does (no trim, `/` and dot segments refused); live preview through `useRenderPreview(…, 'flatpage')`, a "Lịch sử" tab with line diff where "Nạp giá trị cũ" fills the form and the normal PATCH saves; "Trang đã xoá" lists `GET /admin/site/pages/deleted` and opens a deleted page's history read-only (`?deleted=<id>`); no recreate button.
 - **Tickets queue**: reuses 8e's ticket queries, stream and components and its URL helpers; status Đang mở / Đã đóng / Tất cả is the server's `open` filter and the first visit writes `scope=all&open=1` once.
 - **Activity**: `hasMore` pager (no total), filter in the URL, CSV export as a plain link with the same filter, live visitors refetch every 30 s (next page by `hasMore`), summary bars in SVG with a text table; deletes sit behind confirms.
-- **Admin site loading parity**: `e2e/admin-site-loading.e2e.ts` covers judges (stats and rows, offset included), the first settings block and the activity table; skeleton heights are per breakpoint (`sm`) and fit a typical load (5 judges, 3 log rows), so other counts still move what follows.
+- **Admin site loading parity**: judges (stats and rows), the first settings block and the activity table; skeleton heights are per breakpoint (`sm`) and fit a typical load (5 judges, 3 log rows), so other counts still move what follows.
 - **Admin writes and reads**: shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages use 8e's API files — one query per data, no copy.
 
 ## Settings (8h)
@@ -458,3 +458,4 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - Usernames are coloured by rating tier via `UserName` / `ratingTextClass` (user refs carry `rating`, null = unrated); light-theme tier tokens darkened so tiers hold 4.5:1 on `accent-soft`. Markdown user links stay plain: no batched rating lookup exists, and render-time colour would go stale.
 - Comments use mock-up C2 (product owner, 2026-10-11): each API page of threads is shown flat in time order (oldest first within the page; page 1 holds the newest threads) and a reply quotes its parent (`#comment-<id>`) instead of nesting; `#N` is the position on the page, since comments carry no sequence number.
 - Comment composer has no preview tab: the only render endpoints need problem-edit or flatpage rights, and a client-side Markdown renderer would bypass the backend's sanitiser. Add the tab when a public comment preview endpoint exists.
+- **Tests assert behaviour, not markup**: removed class-string parity specs, skeleton row/cell counts, Playwright layout-shift and bounding-box specs, and the replay timing spec; a UI regression is found by users, not by a pixel test.

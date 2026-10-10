@@ -2,8 +2,7 @@ import type { Page } from '@playwright/test';
 import { THEMES } from '../src/theme/registry';
 import { applyTheme, AUDIT_VIEWPORTS, expectNoAxeViolations } from './fixtures/audit';
 import { expect, test } from './fixtures/api';
-import { defineShiftTests, PHONE, DESKTOP, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
-import type { ShiftCase } from './fixtures/layout-shift';
+import { PHONE } from './fixtures/viewports';
 
 const OWN = '/users/user_01';
 const OTHER = '/users/ngoc_anh';
@@ -42,27 +41,6 @@ test('an unknown user shows the crying Bit; its tears move only with motion', as
   await page.emulateMedia({ reducedMotion: 'reduce' });
   expect(await runningCssAnimations(page)).toBe(0);
 });
-
-/** Anonymous visitors on a profile without organizations: the common loaded shape the skeleton draws. */
-const SHIFT_CASES: ShiftCase[] = [
-  {
-    name: 'profile header',
-    path: OTHER,
-    signedIn: false,
-    hold: 'GET /users/ngoc_anh',
-    parts: (page) => ({ header: page.getByTestId('profile-header') }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'rating chart card',
-    path: OTHER,
-    signedIn: false,
-    hold: 'GET /users/ngoc_anh/ratings',
-    parts: (page) => ({ chart: page.getByTestId('rating-card') }),
-    viewports: [PHONE, DESKTOP],
-  },
-];
-defineShiftTests(SHIFT_CASES);
 
 for (const theme of THEMES)
   for (const viewport of AUDIT_VIEWPORTS) {

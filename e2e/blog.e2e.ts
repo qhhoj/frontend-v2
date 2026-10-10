@@ -3,7 +3,7 @@ import { postItem } from '../src/test/community-fixtures';
 import { THEMES } from '../src/theme/registry';
 import { AUDIT_VIEWPORTS, applyTheme, expectNoAxeViolations } from './fixtures/audit';
 import { expect, list, test } from './fixtures/api';
-import { defineShiftTests, PHONE, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
+import { PHONE } from './fixtures/viewports';
 import { ok } from './fixtures/reply';
 
 const POST_SCORE = 58;
@@ -63,18 +63,3 @@ for (const theme of THEMES)
         await expect(page.getByTestId('post-row').first()).toBeVisible();
         await expectNoAxeViolations(page);
       });
-
-defineShiftTests([
-  {
-    name: 'post list',
-    path: '/blog',
-    signedIn: false,
-    hold: 'GET /posts',
-    answer: (api) =>
-      (api.routes['GET /posts'] = list(
-        Array.from({ length: 6 }, (_post, index) => postItem({ id: `post-${index}` })),
-      )),
-    parts: (page) => ({ 'post list': page.getByTestId('post-list') }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

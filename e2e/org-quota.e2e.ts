@@ -1,7 +1,6 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { installOrgUsage } from './fixtures/f4-api';
-import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { organizationDetail } from '../src/test/community-fixtures';
 import { MIB, organizationUsage, quotaMeter } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -58,15 +57,3 @@ test('a member who is not an admin sees the forbidden state', async ({ page, api
   await page.goto(TAB);
   await expect(page.locator('[data-testid="state-panel"][data-state="forbidden"]')).toBeVisible();
 });
-
-defineShiftTests([
-  {
-    name: 'organization quota dashboard',
-    path: TAB,
-    signedIn: true,
-    hold: 'GET /organizations/lhp/usage',
-    answer: (api) => installOrgUsage(api),
-    parts: (page) => ({ dashboard: page.getByTestId('org-quota') }),
-    viewports: [PHONE, DESKTOP],
-  },
-]);

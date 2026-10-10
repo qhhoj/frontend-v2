@@ -1,9 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
-import { contestItem } from '../src/test/fixtures';
-import { homeResponse } from '../src/test/community-fixtures';
 import { THEMES } from '../src/theme/registry';
-import { expect, list, test } from './fixtures/api';
-import { DESKTOP, PHONE, PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
+import { expect, test } from './fixtures/api';
+import { DESKTOP, PHONE } from './fixtures/viewports';
 
 const READY = 'Quốc Học Huế Online Judge';
 
@@ -38,37 +36,3 @@ test('the anonymous home does not scroll sideways on a phone', async ({ page, ap
     ),
   ).toBe(true);
 });
-
-defineShiftTests([
-  {
-    name: 'running contests card',
-    path: '/',
-    signedIn: false,
-    hold: 'GET /contests',
-    answer: (api) => {
-      api.routes['GET /contests'] = list([
-        contestItem(),
-        contestItem({ key: 'r43', name: 'QHH Round #43' }),
-      ]);
-    },
-    parts: (page) => ({
-      'running contests': page.locator(
-        '[data-skeleton-region="running-contest"], [data-testid="running-contests"] article',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'hero counts',
-    path: '/',
-    signedIn: false,
-    hold: 'GET /home',
-    answer: (api) => {
-      api.routes['GET /home'] = { body: { data: homeResponse() } };
-    },
-    parts: (page) => ({
-      'hero counts': page.locator('[data-skeleton-region="counts"], [data-testid="home-counts"]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

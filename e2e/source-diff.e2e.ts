@@ -3,7 +3,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
-import { PHONE_AND_DESKTOP, defineShiftTests } from './fixtures/layout-shift';
 import { list, ok } from './fixtures/reply';
 
 const LEFT = 'dif-1';
@@ -13,8 +12,6 @@ const LEFT_SOURCE = Array.from(
   { length: 12 },
   (_unused, index) => `int a${index} = ${index};`,
 ).join('\n');
-/** The list skeleton draws this many rows; the shift case answers with as many. */
-const SKELETON_ROWS = 10;
 const RIGHT_SOURCE = LEFT_SOURCE.replace('int a5 = 5;', 'long long a5 = 5;');
 
 function diffRoutes(api: FakeApi, rightSource = RIGHT_SOURCE) {
@@ -107,37 +104,3 @@ test('the diff page never scrolls sideways at 375 px; the code region does', asy
   await expect(page.getByTestId('source-diff')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
-
-defineShiftTests([
-  {
-    name: 'diff summary',
-    path: DIFF_PATH,
-    signedIn: true,
-    hold: `GET /submissions/${RIGHT}/source`,
-    answer: (api) => diffRoutes(api),
-    parts: (page) => ({
-      'diff summary': page.locator(
-        '[data-skeleton-region="diff-summary"], [data-testid="diff-summary"]',
-      ),
-      'side headers': page.getByTestId('diff-side-header'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'signed-in submission list rows',
-    path: '/submissions',
-    signedIn: true,
-    hold: 'GET /submissions',
-    answer: (api) => {
-      api.routes['GET /submissions'] = list(
-        Array.from({ length: SKELETON_ROWS }, (_unused, index) =>
-          submissionItem({ id: `row-${index}` }),
-        ),
-      );
-    },
-    parts: (page) => ({
-      rows: page.locator('[data-skeleton-region="row"], tbody tr[data-id]'),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-]);

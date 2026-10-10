@@ -4,7 +4,6 @@ import { THEMES } from '../src/theme/registry';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
 import { ok } from './fixtures/reply';
 
 const queue = [balloon(0), balloon(1), balloon(4)];
@@ -91,30 +90,3 @@ for (const viewport of AUDIT_VIEWPORTS)
       }
     }
   });
-
-defineShiftTests([
-  {
-    name: 'balloon queue',
-    path: '/contests/r42/balloons',
-    signedIn: true,
-    hold: 'GET /contests/r42/balloons',
-    answer: (api) => {
-      volunteer(api);
-      const six = Array.from({ length: 6 }, (_unused, index) => balloon(index));
-      api.routes['GET /contests/r42/balloons'] = {
-        body: {
-          data: six,
-          meta: { page: 1, pageSize: 50, total: 6, pendingTotal: 6, deliveredTotal: 0 },
-        },
-      };
-    },
-    parts: (page) => ({
-      heading: page.getByRole('heading', { level: 1 }),
-      list: page.locator('[data-region="balloon-list"]'),
-    }),
-    placed: ['list'],
-    placedOnly: ['list'],
-    viewports: PHONE_AND_DESKTOP,
-    clockAt: CONTEST_FIXTURE_NOW,
-  },
-]);

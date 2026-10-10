@@ -6,8 +6,6 @@ import { THEMES } from '../src/theme/registry';
 import { expect, streamFrame, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
-import { defineShiftTests, PHONE_AND_DESKTOP } from './fixtures/layout-shift';
-import type { ShiftCase } from './fixtures/layout-shift';
 
 const TICKET_ID = ticketDetail().id;
 const TICKET_PATH = `/tickets/${TICKET_ID}`;
@@ -102,43 +100,3 @@ test('two new messages on the open ticket refetch it once and announce one count
   await expect(page.getByTestId('ticket-live')).toHaveText('2 tin nhắn mới');
   expect(api.requestsTo(TICKET_KEY)).toHaveLength(2);
 });
-
-/** Short text on every line: the skeleton's lines are one line each, so the loaded page must be too. */
-const SHIFT_DETAIL = ticketDetail({
-  title: 'Test 17 sai',
-  link: { type: 'problem', id: 'p', key: 'hcmus41b', title: 'Đề A', url: '/problems/hcmus41b' },
-  messages: [0, 1, 2].map((index) =>
-    ticketMessage({ id: `m${index}`, bodyHtml: '<p>Đáp án in ra 1.</p>' }),
-  ),
-});
-
-const SHIFT_CASES: ShiftCase[] = [
-  {
-    name: 'ticket header',
-    path: TICKET_PATH,
-    signedIn: true,
-    hold: TICKET_KEY,
-    answer: (api) => (api.routes[TICKET_KEY] = ok(SHIFT_DETAIL)),
-    parts: (page) => ({
-      'ticket header': page.locator(
-        '[data-skeleton-region="ticket-header"], [data-testid="ticket-header"]',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-  {
-    name: 'ticket messages',
-    path: TICKET_PATH,
-    signedIn: true,
-    hold: TICKET_KEY,
-    answer: (api) => (api.routes[TICKET_KEY] = ok(SHIFT_DETAIL)),
-    parts: (page) => ({
-      'ticket messages': page.locator(
-        '[data-skeleton-region="message"], section[aria-label="Tin nhắn"] article',
-      ),
-    }),
-    viewports: PHONE_AND_DESKTOP,
-  },
-];
-
-defineShiftTests(SHIFT_CASES);

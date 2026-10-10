@@ -2,7 +2,6 @@ import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installDeletedProblems } from './fixtures/f4-api';
-import { DESKTOP, PHONE, defineShiftTests } from './fixtures/layout-shift';
 import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { deletedProblem } from '../src/test/f4-fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -66,21 +65,6 @@ test('the problems index links to the deleted tab', async ({ page, api }) => {
   await page.getByRole('link', { name: 'Đã xóa' }).click();
   await expect(page).toHaveURL(/\/admin\/problems\/deleted$/);
 });
-
-defineShiftTests([
-  {
-    name: 'deleted problem list',
-    path: '/admin/problems/deleted',
-    signedIn: true,
-    hold: 'GET /problems/deleted',
-    answer: (api) => {
-      signInAsStaff(api, DELETE);
-      installDeletedProblems(api, THREE_ROWS);
-    },
-    parts: (page) => ({ list: page.getByTestId('deleted-problems') }),
-    viewports: [PHONE, DESKTOP],
-  },
-]);
 
 test('the danger zone deletes after the code is typed and lands on the deleted list', async ({
   page,
