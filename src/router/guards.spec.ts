@@ -149,6 +149,13 @@ describe('navigation guards', () => {
     expect(calls).toHaveLength(1);
   });
 
+  it('sends staff-only pages to login when the session cannot be loaded', async () => {
+    vi.stubGlobal('fetch', () => Promise.reject(new TypeError('offline')));
+    const router = createAppRouter(createMemoryHistory());
+    await router.push('/admin/judges');
+    expect(router.currentRoute.value.name).toBe('login');
+  });
+
   it('titles the document from the route', async () => {
     await navigate('/problems', signedOut);
     expect(document.title).toBe('Bài tập · QHHOJ');

@@ -21,9 +21,11 @@ const pageFailure = computed(() =>
 
 <template>
   <form class="flex flex-col gap-5" @submit.prevent="submit">
-    <LanguageIdentitySection v-model:form="form" :mode="mode" :errors="errors" />
-    <LanguageEditorSection v-model:form="form" :errors="errors" />
-    <LanguageContentSection v-model:form="form" :errors="errors" />
+    <fieldset :disabled="isPending" class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0">
+      <LanguageIdentitySection v-model:form="form" :mode="mode" :errors="errors" />
+      <LanguageEditorSection v-model:form="form" :errors="errors" />
+      <LanguageContentSection v-model:form="form" :errors="errors" />
+    </fieldset>
     <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
     <AdminStatus
       v-if="saved && mode === 'edit' && changeCount === 0"

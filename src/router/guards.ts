@@ -101,7 +101,8 @@ export async function resolveNavigation(
   try {
     await session.ensureLoaded();
   } catch {
-    return to.meta.requiresAuth ? toLogin(to) : true;
+    // Without a session the staff-only and password rules cannot run: send those routes to sign-in rather than skip them.
+    return to.meta.requiresAuth || to.meta.staffOnly ? toLogin(to) : true;
   }
   for (const rule of RULES) {
     const result = rule(to, session);

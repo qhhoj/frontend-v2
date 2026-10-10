@@ -17,7 +17,17 @@ const hasCodes = computed(() => ({
 
 <template>
   <form class="flex flex-col gap-6" @submit.prevent="save">
-    <ContestGeneralForm v-model="form" :errors="errors" :is-create="false" :has-codes="hasCodes" />
+    <fieldset
+      :disabled="mutation.isPending.value"
+      class="m-0 flex min-w-0 flex-col gap-6 border-0 p-0"
+    >
+      <ContestGeneralForm
+        v-model="form"
+        :errors="errors"
+        :is-create="false"
+        :has-codes="hasCodes"
+      />
+    </fieldset>
     <div
       class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
     >

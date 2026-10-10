@@ -21,7 +21,12 @@ const { can } = usePermissions();
 <template>
   <div class="flex flex-col gap-5">
     <form class="flex flex-col gap-5" novalidate @submit.prevent="save">
-      <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
+      <fieldset
+        :disabled="mutation.isPending.value"
+        class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
+      >
+        <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
+      </fieldset>
       <div
         class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
       >

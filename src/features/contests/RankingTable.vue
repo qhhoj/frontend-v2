@@ -117,7 +117,7 @@ const scoreHeaderKey = computed(() => {
           class="border-t border-line text-center"
           :class="{ 'bg-surface-hover': row.user.id === viewerId }"
         >
-          <td class="px-5 py-2.5 text-left">{{ row.rank ?? '—' }}</td>
+          <td class="px-5 py-2.5 text-left">{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</td>
           <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
             <span class="flex items-center gap-2">
               <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />
@@ -139,17 +139,20 @@ const scoreHeaderKey = computed(() => {
             </span>
           </th>
           <td class="font-bold">
-            {{
+            <template v-if="row.isDisqualified">—</template>
+            <template v-else>{{
               penalty
                 ? solvedCount(row, ranking.problems, context)
                 : formatNumber(row.score, context.locale, context.pointsPrecision)
-            }}
-            <small v-if="hasCombinedScore" class="block text-[11px] font-medium text-muted">{{
-              formatCumtime(context.formatName, row.cumtime)
-            }}</small>
+            }}</template>
+            <small
+              v-if="hasCombinedScore && !row.isDisqualified"
+              class="block text-[11px] font-medium text-muted"
+              >{{ formatCumtime(context.formatName, row.cumtime) }}</small
+            >
           </td>
           <td v-if="hasTimeColumn">
-            {{ formatCumtime(context.formatName, row.cumtime) }}
+            {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
           </td>
           <RankingCell v-for="cell in cellsOf(row)" :key="cell.problemId" :view="cell.view" />
         </tr>

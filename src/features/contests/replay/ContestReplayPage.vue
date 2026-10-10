@@ -8,6 +8,7 @@ import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
+import { rankingSummary } from '../ranking-summary';
 import { useSessionStore } from '@/stores/session.store';
 import ContestNotFound from '../ContestNotFound.vue';
 import ContestTabs from '../ContestTabs.vue';
@@ -57,11 +58,11 @@ const myRowId = computed(
 );
 const summary = computed(() =>
   contest.value
-    ? translate('ranking.summary', {
-        format: translate(`formats.${contest.value.formatName}`),
-        problems: index.value?.problems.length ?? contest.value.problems?.length ?? 0,
-        participants: contest.value.userCount,
-      })
+    ? rankingSummary(
+        contest.value.formatName,
+        index.value?.problems.length ?? contest.value.problems?.length ?? 0,
+        contest.value.userCount,
+      )
     : '',
 );
 /** Phase changes only: the replay became ready after building, or playback reached the end. */

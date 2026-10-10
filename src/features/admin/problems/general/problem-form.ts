@@ -193,8 +193,6 @@ export function changedProblemFields(before: ProblemForm, after: ProblemForm): P
   for (const key of Object.keys(after) as (keyof ProblemForm)[]) {
     if (sameJson(before[key], after[key])) continue;
     const sent = toSent(key, after[key]);
-    // The backend refuses `null` for every field but the license: a cleared date is left unchanged, not sent.
-    if (key === 'date' && sent === null) continue;
     Object.assign(patch, { [key]: sent });
   }
   return patch;

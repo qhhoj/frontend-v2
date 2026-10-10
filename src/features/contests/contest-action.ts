@@ -66,6 +66,7 @@ function runningAction(facts: ActionFacts): ContestAction {
 }
 
 function endedAction(facts: ActionFacts): ContestAction {
+  if (facts.canSpectate) return action('spectate', newRowNeedsCode(facts));
   if (facts.disallowVirtual) return action('virtualDisallowed');
   return action('virtual', facts.requiresAccessCode && !facts.skipsAccessCode);
 }

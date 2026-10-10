@@ -40,6 +40,7 @@ describe('contestAction', () => {
       'registrationClosed',
     ],
     ['a running contest for an editor or tester', { canSpectate: true }, 'spectate'],
+    ['an ended contest for an editor or tester', { phase: 'ended', canSpectate: true }, 'spectate'],
     ['an upcoming contest without registration', { phase: 'upcoming' }, 'opensLater'],
     [
       'an upcoming contest with registration open',
