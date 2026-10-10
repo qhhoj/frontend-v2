@@ -10,6 +10,8 @@ const props = defineProps<{
   meter: QuotaMeter;
   valueText: string;
   detail: string;
+  /** Promotion: the bar and percentage are hidden, the numbers stay. */
+  unlimited?: boolean;
 }>();
 const FILL = { normal: 'bg-accent', near: 'bg-caution-strong', over: 'bg-negative' } as const;
 const percent = computed(() => meterPercent(props.meter));
@@ -26,6 +28,7 @@ const state = computed(() => {
       <p class="font-semibold tabular-nums">{{ valueText }}</p>
     </div>
     <div
+      v-if="!unlimited"
       role="progressbar"
       aria-valuemin="0"
       aria-valuemax="100"
@@ -41,7 +44,7 @@ const state = computed(() => {
     </div>
     <div class="flex flex-wrap justify-between gap-2 text-sm text-muted">
       <span>{{ detail }}</span
-      ><span class="tabular-nums">{{ percent.percent }}%</span>
+      ><span v-if="!unlimited" class="tabular-nums">{{ percent.percent }}%</span>
     </div>
   </GlassCard>
 </template>

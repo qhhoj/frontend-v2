@@ -5,16 +5,19 @@ import { MEBIBYTE } from '@/lib/quota';
 export interface QuotaForm {
   credits: string;
   storageMib: string;
+  /** The unlimited promotion toggle. */
+  unlimited: boolean;
 }
 /** Backend `UpdateQuotaDto` limits: credits ≤ 1 000 000, storage ≤ 2^40 bytes (1 048 576 MiB). */
 const MAX_CREDITS = 1_000_000;
 const MAX_STORAGE_MIB = 1_048_576;
 const WHOLE_NUMBER = /^\d+$/;
 
-export const quotaFormOf = (quota: {
-  monthlyCredits: number | null;
-  storageBytes: number | null;
-}): QuotaForm => ({
+export const quotaFormOf = (
+  quota: { monthlyCredits: number | null; storageBytes: number | null },
+  unlimited: boolean,
+): QuotaForm => ({
+  unlimited,
   credits: quota.monthlyCredits === null ? '' : String(quota.monthlyCredits),
   storageMib: quota.storageBytes === null ? '' : String(Math.round(quota.storageBytes / MEBIBYTE)),
 });
@@ -44,5 +47,6 @@ export function quotaBodyOf(form: QuotaForm, original: QuotaForm): QuotaChanges 
     ...(form.storageMib.trim() === original.storageMib
       ? {}
       : { quotaStorageBytes: valueOf(form.storageMib, MEBIBYTE) }),
+    ...(form.unlimited === original.unlimited ? {} : { quotaUnlimited: form.unlimited }),
   };
 }

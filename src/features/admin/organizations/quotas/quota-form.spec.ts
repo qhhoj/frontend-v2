@@ -4,32 +4,44 @@ import { quotaBodyOf, quotaFormErrors, quotaFormOf } from './quota-form';
 
 describe('quota form', () => {
   it('shows an override as a number and the site default as an empty box (storage in MiB)', () => {
-    expect(quotaFormOf({ monthlyCredits: 300, storageBytes: 1024 * MIB })).toEqual({
+    expect(quotaFormOf({ monthlyCredits: 300, storageBytes: 1024 * MIB }, false)).toEqual({
       credits: '300',
       storageMib: '1024',
+      unlimited: false,
     });
-    expect(quotaFormOf({ monthlyCredits: null, storageBytes: null })).toEqual({
+    expect(quotaFormOf({ monthlyCredits: null, storageBytes: null }, true)).toEqual({
       credits: '',
       storageMib: '',
+      unlimited: true,
     });
   });
 
   it('sends only what changed: an emptied box is null, MiB become bytes', () => {
-    const original = { credits: '300', storageMib: '' };
-    expect(quotaBodyOf({ credits: '300', storageMib: '' }, original)).toEqual({});
-    expect(quotaBodyOf({ credits: '', storageMib: '1024' }, original)).toEqual({
+    const original = { credits: '300', storageMib: '', unlimited: false };
+    expect(quotaBodyOf({ ...original }, original)).toEqual({});
+    expect(quotaBodyOf({ credits: '', storageMib: '1024', unlimited: false }, original)).toEqual({
       quotaMonthlyCredits: null,
       quotaStorageBytes: 1024 * MIB,
     });
   });
 
+  it('sends the promotion toggle only when it was flipped', () => {
+    const original = { credits: '', storageMib: '', unlimited: true };
+    expect(quotaBodyOf({ ...original }, original)).toEqual({});
+    expect(quotaBodyOf({ ...original, unlimited: false }, original)).toEqual({
+      quotaUnlimited: false,
+    });
+  });
+
   it('accepts whole numbers within the backend limits only', () => {
-    expect(quotaFormErrors({ credits: '200', storageMib: '' })).toEqual({});
-    expect(quotaFormErrors({ credits: '-5', storageMib: '1.5' })).toEqual({
+    expect(quotaFormErrors({ credits: '200', storageMib: '', unlimited: false })).toEqual({});
+    expect(quotaFormErrors({ credits: '-5', storageMib: '1.5', unlimited: false })).toEqual({
       credits: 'admin.quota.errors.credits',
       storageMib: 'admin.quota.errors.storage',
     });
-    expect(quotaFormErrors({ credits: '1000001', storageMib: '1048577' })).toEqual({
+    expect(
+      quotaFormErrors({ credits: '1000001', storageMib: '1048577', unlimited: false }),
+    ).toEqual({
       credits: 'admin.quota.errors.credits',
       storageMib: 'admin.quota.errors.storage',
     });

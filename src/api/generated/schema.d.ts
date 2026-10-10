@@ -4857,6 +4857,8 @@ export interface components {
             quota: components["schemas"]["UsageQuotaResponse"];
             recent: components["schemas"]["CreditEntryResponse"][];
             storage: components["schemas"]["QuotaMeterResponse"];
+            /** @description Promotion: the limits below are reported but not applied, and the meters are never near or over. */
+            unlimited: boolean;
         };
         /** @enum {string} */
         OrganizationUsageSort: "credits" | "name";
@@ -6322,6 +6324,8 @@ export interface components {
         UpdateQuotaDto: {
             quotaMonthlyCredits?: number | null;
             quotaStorageBytes?: number | null;
+            /** @description The unlimited promotion: true applies no limit, false ends it. */
+            quotaUnlimited?: boolean;
         };
         UpdateRankingLinkDto: {
             expiresAt?: string;
@@ -6360,6 +6364,8 @@ export interface components {
             slug: string;
             storageLimit: number;
             storageUsed: number;
+            /** @description Limits are reported but not applied. */
+            unlimited: boolean;
         };
         UsageQuotaResponse: {
             monthlyCredits: number | null;

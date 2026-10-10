@@ -2104,6 +2104,8 @@
     }
   },
   "orgQuota": {
+    "unlimited": "Unlimited",
+    "unlimitedNotice": "Your organization has unlimited quota: usage is counted but nothing is limited.",
     "credits": "Credits, {month}",
     "creditsValue": "{used} / {limit} credits",
     "creditsDetail": "Resets by itself when the month changes (site time zone)",

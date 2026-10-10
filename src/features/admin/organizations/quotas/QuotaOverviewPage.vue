@@ -130,27 +130,40 @@ const CELL = 'py-2 pr-3 align-middle';
                   <span class="block font-mono text-xs text-muted">{{ row.slug }}</span>
                 </td>
                 <td :class="CELL" class="tabular-nums">
-                  {{ formatNumber(row.creditsUsed, locale.locale) }} /
-                  {{ formatNumber(row.creditsLimit, locale.locale) }}
-                  <span class="text-muted"
-                    >·
-                    {{
-                      $t('admin.quota.percent', {
-                        percent: percentOf(row.creditsUsed, row.creditsLimit),
-                      })
-                    }}</span
-                  >
+                  <template v-if="row.unlimited">
+                    {{ formatNumber(row.creditsUsed, locale.locale) }} /
+                    <span data-testid="quota-unlimited-label">{{
+                      $t('admin.quota.unlimited')
+                    }}</span>
+                  </template>
+                  <template v-else>
+                    {{ formatNumber(row.creditsUsed, locale.locale) }} /
+                    {{ formatNumber(row.creditsLimit, locale.locale) }}
+                    <span class="text-muted"
+                      >·
+                      {{
+                        $t('admin.quota.percent', {
+                          percent: percentOf(row.creditsUsed, row.creditsLimit),
+                        })
+                      }}</span
+                    >
+                  </template>
                 </td>
                 <td class="hidden tabular-nums md:table-cell" :class="CELL">
-                  {{ mib(row.storageUsed) }} / {{ mib(row.storageLimit) }}
-                  <span class="text-muted"
-                    >·
-                    {{
-                      $t('admin.quota.percent', {
-                        percent: percentOf(row.storageUsed, row.storageLimit),
-                      })
-                    }}</span
-                  >
+                  <template v-if="row.unlimited">
+                    {{ mib(row.storageUsed) }} / {{ $t('admin.quota.unlimited') }}
+                  </template>
+                  <template v-else>
+                    {{ mib(row.storageUsed) }} / {{ mib(row.storageLimit) }}
+                    <span class="text-muted"
+                      >·
+                      {{
+                        $t('admin.quota.percent', {
+                          percent: percentOf(row.storageUsed, row.storageLimit),
+                        })
+                      }}</span
+                    >
+                  </template>
                 </td>
                 <td class="py-2 text-right">
                   <button

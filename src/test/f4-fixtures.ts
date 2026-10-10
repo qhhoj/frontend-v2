@@ -76,6 +76,7 @@ export const organizationUsage = (
   organization: { slug: 'lhp', name: 'THPT chuyên Lê Hồng Phong' },
   month: '2026-10',
   enforcing: false,
+  unlimited: false,
   credits: quotaMeter(164, 200),
   storage: quotaMeter(410 * MIB, 512 * MIB),
   quota: { monthlyCredits: null, storageBytes: null },
@@ -106,6 +107,7 @@ export const usageRow = (overrides: Partial<UsageOverviewRow> = {}): UsageOvervi
   creditsLimit: 200,
   storageUsed: 410 * MIB,
   storageLimit: 512 * MIB,
+  unlimited: false,
   ...overrides,
 });
 

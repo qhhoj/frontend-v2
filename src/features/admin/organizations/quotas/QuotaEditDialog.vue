@@ -25,9 +25,12 @@ const emit = defineEmits<{ saved: [] }>();
 const locale = useLocaleStore();
 const detail = useUsageDetailQuery(toRef(props, 'slug'));
 const original = computed<QuotaForm>(() =>
-  quotaFormOf(detail.data.value?.quota ?? { monthlyCredits: null, storageBytes: null }),
+  quotaFormOf(
+    detail.data.value?.quota ?? { monthlyCredits: null, storageBytes: null },
+    detail.data.value?.unlimited ?? false,
+  ),
 );
-const form = ref<QuotaForm>({ credits: '', storageMib: '' });
+const form = ref<QuotaForm>({ credits: '', storageMib: '', unlimited: false });
 const errors = ref<{ credits?: string; storageMib?: string }>({});
 const isLoaded = computed(() => detail.data.value !== undefined);
 /**
@@ -108,6 +111,19 @@ function submit() {
         :aria-describedby="describedBy"
       />
     </AdminField>
+    <label class="flex items-start gap-2 text-sm">
+      <input
+        v-model="form.unlimited"
+        type="checkbox"
+        data-testid="quota-unlimited"
+        :disabled="!isLoaded"
+        class="mt-1"
+      />
+      <span>
+        <span class="font-semibold">{{ $t('admin.quota.unlimitedToggle') }}</span>
+        <span class="block text-muted">{{ $t('admin.quota.unlimitedHint') }}</span>
+      </span>
+    </label>
     <template #error>
       <AdminStatus
         v-if="save.failure.value"

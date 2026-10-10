@@ -57,27 +57,36 @@ const number = (value: number) => formatNumber(value, locale.locale);
           <QuotaMeterCard
             :label="$t('orgQuota.credits', { month: monthText })"
             :meter="data.credits"
+            :unlimited="data.unlimited"
             :value-text="
-              $t('orgQuota.creditsValue', {
-                used: number(data.credits.used),
-                limit: number(data.credits.limit),
-              })
+              data.unlimited
+                ? $t('orgQuota.creditsValue', {
+                    used: number(data.credits.used),
+                    limit: $t('orgQuota.unlimited'),
+                  })
+                : $t('orgQuota.creditsValue', {
+                    used: number(data.credits.used),
+                    limit: number(data.credits.limit),
+                  })
             "
             :detail="$t('orgQuota.creditsDetail')"
           />
           <QuotaMeterCard
             :label="$t('orgQuota.storage')"
             :meter="data.storage"
+            :unlimited="data.unlimited"
             :value-text="
               $t('orgQuota.storageValue', {
                 used: mib(data.storage.used),
-                limit: mib(data.storage.limit),
+                limit: data.unlimited ? $t('orgQuota.unlimited') : mib(data.storage.limit),
               })
             "
             :detail="
-              $t('orgQuota.storageDetail', {
-                left: mib(Math.max(0, data.storage.limit - data.storage.used)),
-              })
+              data.unlimited
+                ? $t('orgQuota.unlimited')
+                : $t('orgQuota.storageDetail', {
+                    left: mib(Math.max(0, data.storage.limit - data.storage.used)),
+                  })
             "
           />
         </div>

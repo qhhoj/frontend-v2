@@ -35,6 +35,25 @@ describe('OrgQuotaPage', () => {
     expect(notice.find('[data-testid="inline-bit"]').exists()).toBe(true);
   });
 
+  it('shows Không giới hạn with no bars, percentages or blocking for an unlimited organization', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...orgUsageRoutes(
+        organizationUsage({
+          unlimited: true,
+          enforcing: true,
+          credits: { used: 900, limit: 200, isOver: false, isNearLimit: false },
+        }),
+      ),
+    });
+    const { wrapper } = await mountTab();
+    const text = wrapper.text();
+    expect(text).toContain('900 / Không giới hạn tín dụng');
+    expect(wrapper.findAll('[role="progressbar"]')).toHaveLength(0);
+    expect(wrapper.get('[data-testid="quota-notice"]').text()).toContain('Không giới hạn');
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+  });
+
   it('says every quota has room below 80 %', async () => {
     mockApi({
       ...signedInViewer(),

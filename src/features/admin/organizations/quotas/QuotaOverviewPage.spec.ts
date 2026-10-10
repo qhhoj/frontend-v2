@@ -102,6 +102,27 @@ describe('QuotaOverviewPage', () => {
     expect(overviewCalls(calls).length).toBeGreaterThan(1);
   });
 
+  it('shows Không giới hạn instead of limits and percentages, and the toggle ends the promotion', async () => {
+    const calls = mockApi({
+      ...routes(),
+      [`GET ${OVERVIEW}`]: page([usageRow({ unlimited: true, creditsLimit: 200 })]),
+      'GET /organizations/lhp/usage': ok(organizationUsage({ unlimited: true })),
+      'PATCH /organizations/lhp/quota': ok(organizationUsage()),
+    });
+    const { wrapper } = await mountOverview();
+    expect(wrapper.text()).toContain('164 / Không giới hạn');
+    expect(wrapper.text()).not.toContain('164 / 200');
+    expect(wrapper.text()).not.toContain('82%');
+    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
+    await flushPromises();
+    const toggle = openDialog().querySelector<HTMLInputElement>('[data-testid="quota-unlimited"]')!;
+    expect(toggle.checked).toBe(true);
+    toggle.click();
+    await flushPromises();
+    await confirmDialog('Lưu hạn mức');
+    expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({ quotaUnlimited: false });
+  });
+
   it('sends nothing for a malformed number or an unchanged form', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountOverview();

@@ -18,8 +18,9 @@ const firstMeter = (usage: OrganizationUsage, isHit: (meter: QuotaMeter) => bool
 /** A meter that takes nothing more: over by the server flag, or used up to its limit (a limit of 0 is full from the start, whatever the flags say). */
 const isExhausted = (meter: QuotaMeter): boolean => meter.isOver || meter.used >= meter.limit;
 
-/** Blocked: enforce mode and a meter exhausted (limit 0 included); near: any meter at 80 % or more (over included in warn mode). */
+/** Unlimited organizations are always healthy. Blocked: enforce mode and a meter exhausted (limit 0 included); near: any meter at 80 % or more (over included in warn mode). */
 export function quotaNoticeOf(usage: OrganizationUsage): QuotaNoticeState {
+  if (usage.unlimited) return { kind: 'healthy', meter: null, percent: 0 };
   const over = firstMeter(usage, (meter) => meter.isOver);
   const full = firstMeter(usage, isExhausted);
   if (usage.enforcing && full)

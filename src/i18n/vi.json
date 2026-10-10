@@ -2104,6 +2104,8 @@
     }
   },
   "orgQuota": {
+    "unlimited": "Không giới hạn",
+    "unlimitedNotice": "Tổ chức của bạn không bị giới hạn hạn mức: mức dùng vẫn được đếm nhưng không bị chặn.",
     "credits": "Tín dụng {month}",
     "creditsValue": "{used} / {limit} tín dụng",
     "creditsDetail": "Đặt lại tự động khi sang tháng (múi giờ site)",

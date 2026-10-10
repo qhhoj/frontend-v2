@@ -23,6 +23,7 @@ const modeText = computed(() =>
 );
 const headline = computed(() => {
   const { kind, meter, percent } = state.value;
+  if (props.usage.unlimited) return translate('orgQuota.unlimited');
   if (kind === 'healthy' || meter === null) return translate('orgQuota.healthy');
   const meterName = translate(`orgQuota.meters.${meter}`);
   return kind === 'near'
@@ -35,6 +36,7 @@ const headline = computed(() => {
 });
 const detail = computed(() => {
   const { kind, meter } = state.value;
+  if (props.usage.unlimited) return translate('orgQuota.unlimitedNotice');
   if (kind !== 'blocked') return modeText.value;
   if (meter === 'storage') return translate('orgQuota.blockedStorage');
   return translate('orgQuota.blockedCredits', { date: nextMonthStart(props.usage.month) });
