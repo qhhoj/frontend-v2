@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import 'katex/dist/katex.min.css';
 import { computed, ref, toRef } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import { useCopyableBlocks } from './use-copyable-blocks';

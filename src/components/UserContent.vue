@@ -1,5 +1,7 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-v-html -- backend-sanitized HTML, see the doc comment below */
+// Formulas can be in any user content (posts, comments, announcements), not only statements.
+import 'katex/dist/katex.min.css';
 /**
  * The only way to show user-authored HTML (posts, comments, about texts, ticket messages).
  * `html` must already be sanitized by the backend; the `user-content` class (styles.css) confines
