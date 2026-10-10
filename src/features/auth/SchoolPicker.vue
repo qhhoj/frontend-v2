@@ -21,7 +21,7 @@ const errorId = `${labelId}-error`;
 const passThrough = computed(() => ({
   root: {
     class: [
-      'relative flex h-12 w-full min-w-0 cursor-pointer items-center rounded-row border bg-surface-solid pl-10 text-[15px] text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus',
+      'relative flex h-12 w-full min-w-0 cursor-pointer items-center rounded-row border bg-surface-solid pl-10 text-[15px] text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus',
       props.error ? 'border-negative' : 'border-line-strong',
     ],
   },

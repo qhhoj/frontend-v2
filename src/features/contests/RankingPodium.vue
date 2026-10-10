@@ -24,19 +24,19 @@ const MEDALS: Record<number, string> = {
 const medalOf = (row: RankingRow) => MEDALS[row.rank ?? 3];
 /**
  * DOM order is rank order (screen readers). Only the plain 1-2-3 podium is rearranged on wide screens
- * (first place in the middle, raised); ties keep rank order.
+ * (first place in the middle, raised) from lg up; below it three cards in a row leave the name no room; ties keep rank order.
  */
 const isPlainPodium = computed(() => props.rows.map((row) => row.rank).join() === '1,2,3');
 const PLACES: Record<number, string> = {
-  1: 'md:order-2 md:-translate-y-2',
-  2: 'md:order-1',
-  3: 'md:order-3',
+  1: 'lg:order-2 lg:-translate-y-2',
+  2: 'lg:order-1',
+  3: 'lg:order-3',
 };
 const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3] : '');
 </script>
 
 <template>
-  <section :aria-label="$t('ranking.podium')" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+  <section :aria-label="$t('ranking.podium')" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
     <div
       v-for="row in rows"
       :key="row.participationId"

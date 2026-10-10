@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
@@ -22,6 +23,8 @@ const total = computed(() => ('total' in props.meta ? props.meta.total : props.i
 const hasNext = computed(() => props.filters.page * props.meta.pageSize < total.value);
 const CELL = 'px-3 py-3 align-top';
 const HEAD = 'px-3 py-3 text-left text-[13px] font-medium text-muted';
+/** Who is assigned and how many messages show from 2xl up; below it the list is half a screen wide and the open ticket shows both. */
+const WIDE_ONLY = 'hidden 2xl:table-cell';
 
 const selectTicket = (id: string) => router.replace({ query: queueLocation(props.filters, id) });
 const goToPage = (page: number) =>
@@ -39,7 +42,7 @@ const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${tick
       <AdminBit placement="empty" />
       {{ $t('admin.tickets.table.empty') }}
     </p>
-    <div v-else class="overflow-x-auto">
+    <ScrollRegion v-else :label="$t('admin.tickets.table.caption')">
       <table class="w-full border-collapse text-sm">
         <caption class="sr-only">
           {{
@@ -50,11 +53,15 @@ const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${tick
           <tr class="border-b border-line">
             <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.status') }}</th>
             <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.ticket') }}</th>
-            <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.assignees') }}</th>
-            <th scope="col" :class="`${HEAD} text-right`">
+            <th scope="col" :class="`${HEAD} ${WIDE_ONLY}`">
+              {{ $t('admin.tickets.table.assignees') }}
+            </th>
+            <th scope="col" :class="`${HEAD} ${WIDE_ONLY} text-right`">
               {{ $t('admin.tickets.table.messages') }}
             </th>
-            <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.updated') }}</th>
+            <th scope="col" :class="`${HEAD} whitespace-nowrap`">
+              {{ $t('admin.tickets.table.updated') }}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +84,7 @@ const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${tick
                 </span>
               </button>
             </td>
-            <td :class="CELL">
+            <td :class="`${CELL} ${WIDE_ONLY}`">
               <ul v-if="ticket.assignees.length" class="flex flex-col gap-1">
                 <li v-for="assignee in ticket.assignees" :key="assignee.id">
                   <AdminUserLabel :username="assignee.username" />
@@ -85,14 +92,16 @@ const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${tick
               </ul>
               <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>
             </td>
-            <td :class="`${CELL} text-right font-mono tabular-nums`">
+            <td :class="`${CELL} ${WIDE_ONLY} text-right font-mono tabular-nums`">
               {{ formatNumber(ticket.messageCount, locale.locale) }}
             </td>
-            <td :class="CELL">{{ formatDateTime(ticket.lastMessageAt, locale.locale) }}</td>
+            <td :class="`${CELL} whitespace-nowrap`">
+              {{ formatDateTime(ticket.lastMessageAt, locale.locale) }}
+            </td>
           </tr>
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
     <footer
       class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13px] text-muted"
     >

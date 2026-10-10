@@ -843,6 +843,7 @@
     "quotaExceededStorage": "Vượt hạn mức dung lượng của tổ chức: cần {needed}, còn lại {left} (đã dùng {used} / {limit}). Liên hệ quản trị để tăng hạn mức."
   },
   "common": {
+    "scrollHint": "Vuốt ngang để xem thêm cột →",
     "retry": "Thử lại",
     "loading": "Đang tải…",
     "viewAll": "Xem tất cả",
@@ -1087,6 +1088,7 @@
     "frozenBody": "{minutes} phút cuối, kết quả mới hiện \"?\" đến khi công bố.",
     "podium": "Top 3",
     "timeLeft": "Thời gian còn lại",
+    "scrollRegion": "Bảng xếp hạng, cuộn ngang",
     "columns": {
       "rank": "Hạng",
       "user": "Thí sinh",

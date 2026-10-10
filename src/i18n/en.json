@@ -843,6 +843,7 @@
     "quotaExceededStorage": "Over the organization’s storage quota: needs {needed}, {left} left ({used} / {limit} used). Ask an administrator to raise it."
   },
   "common": {
+    "scrollHint": "Swipe sideways to see more columns →",
     "retry": "Retry",
     "loading": "Loading…",
     "viewAll": "View all",
@@ -1087,6 +1088,7 @@
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
     "podium": "Top 3",
     "timeLeft": "Time left",
+    "scrollRegion": "Leaderboard, scrolls sideways",
     "columns": {
       "rank": "Rank",
       "user": "Contestant",

@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { FINISHED_STATUSES } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
@@ -13,7 +14,7 @@ import {
   formatCaseTime,
   formatDateTime,
   formatNumber,
-  formatRelative,
+  formatAgoCompact,
 } from '@/lib/format';
 import { translate } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
@@ -22,11 +23,13 @@ import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   BODY_CELL_CLASSES,
-  COLUMN_WIDTH_CLASS,
+  COLUMN_TIER_CLASS,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
+  TABLE_CARD_CLASS,
+  fullColumnClass,
 } from './submission-table-cells';
-import type { ColumnKey } from './submission-table-cells';
+import type { ColumnKey, ColumnSlot } from './submission-table-cells';
 import DeletedProblemChip from './DeletedProblemChip.vue';
 import { MAX_DIFF_PICKS } from './diff-picks';
 import { submissionShortId } from './submission-short-id';
@@ -126,19 +129,14 @@ const finishedValue = (
 ) => (isFinished(row) && value !== null ? format(value) : NO_VALUE);
 const formatScore = (value: number) =>
   formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false);
-/** Only the full table has fixed column widths. */
-const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
-  props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key];
+/** Only the full table has fixed column widths and tiers. */
+const widthTier = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
+const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="submission-table-card" class="overflow-hidden">
-    <div
-      tabindex="0"
-      role="region"
-      :aria-label="$t('submissions.scrollRegion')"
-      class="overflow-x-auto focus-visible:-outline-offset-2"
-    >
+  <GlassCard as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+    <ScrollRegion :label="$t('submissions.scrollRegion')">
       <table class="w-full border-collapse text-[15px]" :class="columnKeys ? '' : FULL_TABLE_CLASS">
         <caption class="sr-only">
           {{
@@ -242,22 +240,28 @@ const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
             </td>
             <td
               v-if="isShown('time')"
-              :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']"
+              :class="[BODY_CELL_CLASSES, widthTier('time'), 'text-right font-mono tabular-nums']"
             >
               {{ finishedValue(row, formatCaseTime, row.time) }}
             </td>
             <td
               v-if="isShown('memory')"
-              :class="[BODY_CELL_CLASSES, 'text-right font-mono tabular-nums']"
+              :class="[BODY_CELL_CLASSES, widthTier('memory'), 'text-right font-mono tabular-nums']"
             >
               {{ finishedValue(row, formatCaseMemory, row.memory) }}
             </td>
-            <td v-if="isShown('language')" :class="[BODY_CELL_CLASSES, 'text-muted']">
+            <td
+              v-if="isShown('language')"
+              :class="[BODY_CELL_CLASSES, widthTier('language'), 'text-muted']"
+            >
               {{ row.language?.name ?? NO_VALUE }}
             </td>
-            <td v-if="isShown('when')" :class="[BODY_CELL_CLASSES, 'whitespace-nowrap text-muted']">
+            <td
+              v-if="isShown('when')"
+              :class="[BODY_CELL_CLASSES, widthTier('when'), 'whitespace-nowrap text-muted']"
+            >
               <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
-                formatRelative(row.date, now, locale.locale)
+                formatAgoCompact(row.date, now, locale.locale)
               }}</time>
             </td>
             <td :class="BODY_CELL_CLASSES">
@@ -273,6 +277,6 @@ const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
           </tr>
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
   </GlassCard>
 </template>

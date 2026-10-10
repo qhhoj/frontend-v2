@@ -9,6 +9,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
 </script>
 
 <template>
+  <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
   <div
     data-skeleton-region="contest-header"
     class="glass grid gap-5 rounded-card p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
@@ -53,7 +54,6 @@ const hasActionRow = computed(() => session.status === 'authenticated');
       <SkeletonBlock v-if="hasActionRow" pill class="h-11 w-full" />
     </div>
   </div>
-  <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
   <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
     <div data-skeleton-region="problems" class="glass flex flex-col rounded-card px-5">
       <div v-for="row in 3" :key="row" class="py-3">

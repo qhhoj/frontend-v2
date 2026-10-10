@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatAgo, formatDate, formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
@@ -13,12 +14,7 @@ const now = Date.now();
 </script>
 
 <template>
-  <div
-    role="region"
-    tabindex="0"
-    :aria-label="$t('admin.users.list.region')"
-    class="overflow-x-auto"
-  >
+  <ScrollRegion :label="$t('admin.users.list.region')">
     <table class="w-full min-w-[40rem] text-left text-sm">
       <thead>
         <tr class="text-muted">
@@ -116,5 +112,5 @@ const now = Date.now();
         </tr>
       </tbody>
     </table>
-  </div>
+  </ScrollRegion>
 </template>

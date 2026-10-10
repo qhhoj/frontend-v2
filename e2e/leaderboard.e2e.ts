@@ -1,5 +1,6 @@
 import { LEADERBOARD_PAGE_SIZE } from '../src/api/types/users';
 import { leaderboardEntry } from '../src/test/fixtures';
+import { SKELETON_ROW_COUNT } from '../src/features/leaderboard/leaderboard-cells';
 import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
@@ -53,7 +54,7 @@ defineShiftTests([
     path: '/users',
     signedIn: false,
     hold: 'GET /users',
-    answer: (api) => (api.routes['GET /users'] = list(fullPage)),
+    answer: (api) => (api.routes['GET /users'] = list(fullPage.slice(0, SKELETON_ROW_COUNT))),
     parts: (page) => ({ table: page.locator('table') }),
     viewports: PHONE_AND_DESKTOP,
   },

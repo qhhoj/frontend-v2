@@ -22,6 +22,7 @@ import {
   formatShortDate,
   formatWeekdayDate,
   formatRelative,
+  formatAgoCompact,
   signedScore,
   greetingKey,
   formatTimeLimit,
@@ -63,6 +64,17 @@ describe('format helpers', () => {
     const now = Date.parse('2026-10-08T10:00:00Z');
     expect(formatRelative('2026-10-08T09:58:00Z', now, 'en')).toBe('2 minutes ago');
     expect(formatRelative('2026-10-08T07:00:00Z', now, 'vi')).toBe('3 giờ trước');
+  });
+
+  it('writes a compact age: a number and a unit within a week, the short date after', () => {
+    const now = Date.parse('2026-10-08T10:00:00Z');
+    expect(formatAgoCompact('2026-10-08T09:58:30Z', now, 'vi')).toBe('1 phút');
+    expect(formatAgoCompact('2026-10-08T07:00:00Z', now, 'vi')).toBe('3 giờ');
+    expect(formatAgoCompact('2026-10-08T07:00:00Z', now, 'en')).toBe('3h');
+    expect(formatAgoCompact('2026-10-08T09:59:50Z', now, 'en')).toBe('10s');
+    expect(formatAgoCompact('2026-10-05T10:00:00Z', now, 'vi')).toBe('3 ngày');
+    expect(formatAgoCompact('2026-09-20T10:00:00Z', now, 'vi')).toBe('20/09');
+    expect(formatAgoCompact('2026-10-08T10:00:05Z', now, 'vi')).toBe('0 giây');
   });
 
   it('greets by the time of day', () => {

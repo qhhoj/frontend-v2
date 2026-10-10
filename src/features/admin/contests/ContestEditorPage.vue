@@ -44,7 +44,7 @@ const summaryLine = computed(() => {
       <div class="flex flex-col gap-4">
         <SkeletonBlock
           data-skeleton-region="contest-editor-header"
-          class="h-36 w-full sm:h-[4.75rem]"
+          class="h-[11.5rem] w-full sm:h-[4.75rem]"
         />
         <SkeletonBlock data-skeleton-region="contest-editor-body" class="h-64 w-full" />
       </div>

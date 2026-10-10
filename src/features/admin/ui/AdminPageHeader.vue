@@ -6,7 +6,7 @@ defineProps<{ crumbs: { label: string; to?: RouteLocationRaw }[]; title: string;
 
 <template>
   <header class="flex flex-wrap items-end gap-4">
-    <div class="min-w-0 flex-1">
+    <div class="min-w-[min(100%,16rem)] flex-1">
       <nav
         :aria-label="$t('common.breadcrumb')"
         class="flex flex-wrap items-center gap-1.5 text-sm text-muted"

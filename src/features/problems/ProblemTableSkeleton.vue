@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import ProblemTableColumns from './ProblemTableColumns.vue';
 import ProblemTableHead from './ProblemTableHead.vue';
@@ -8,7 +9,7 @@ const ROW_COUNT = 8;
 </script>
 
 <template>
-  <div class="overflow-x-auto">
+  <ScrollRegion placeholder label="">
     <table
       aria-hidden="true"
       class="w-full min-w-[900px] table-fixed border-collapse text-[14.5px]"
@@ -29,5 +30,5 @@ const ROW_COUNT = 8;
         </tr>
       </tbody>
     </table>
-  </div>
+  </ScrollRegion>
 </template>

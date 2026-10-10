@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
-  COLUMN_WIDTH_CLASS,
+  COLUMN_TIER_CLASS,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
+  TABLE_CARD_CLASS,
+  fullColumnClass,
 } from './submission-table-cells';
-import type { ColumnKey } from './submission-table-cells';
+import type { ColumnKey, ColumnSlot } from './submission-table-cells';
 
 /** Mirrors `SubmissionTable.vue`: keep its card, table, header and cell classes in sync. */
 const ROW_COUNT = 10;
@@ -23,14 +26,14 @@ const props = withDefaults(
 );
 /** Header cell width, then the cell's own width, per column in the table's order. */
 const COLUMNS = [
-  { key: 'verdict', header: 'w-14', cell: 'w-16', isNumber: false },
+  { key: 'verdict', header: 'w-12', cell: 'w-12', isNumber: false },
   { key: 'problem', header: 'w-12', cell: 'w-40', isNumber: false },
-  { key: 'user', header: 'w-16', cell: 'w-24', isNumber: false },
+  { key: 'user', header: 'w-16', cell: 'w-16', isNumber: false },
   { key: 'score', header: 'w-10', cell: 'w-10', isNumber: true },
-  { key: 'time', header: 'w-14', cell: 'w-14', isNumber: true },
-  { key: 'memory', header: 'w-14', cell: 'w-14', isNumber: true },
-  { key: 'language', header: 'w-16', cell: 'w-16', isNumber: false },
-  { key: 'when', header: 'w-14', cell: 'w-20', isNumber: false },
+  { key: 'time', header: 'w-12', cell: 'w-12', isNumber: true },
+  { key: 'memory', header: 'w-12', cell: 'w-14', isNumber: true },
+  { key: 'language', header: 'w-12', cell: 'w-12', isNumber: false },
+  { key: 'when', header: 'w-10', cell: 'w-10', isNumber: false },
 ] as const;
 const columns = computed(() =>
   COLUMNS.filter(
@@ -40,13 +43,13 @@ const columns = computed(() =>
   ),
 );
 /** Only the full table has fixed column widths. */
-const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
-  props.columnKeys ? '' : COLUMN_WIDTH_CLASS[key];
+const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
+const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="submission-table-card" class="overflow-hidden">
-    <div class="overflow-x-auto">
+  <GlassCard as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+    <ScrollRegion placeholder label="">
       <table
         aria-hidden="true"
         class="w-full border-collapse text-[15px]"
@@ -81,7 +84,11 @@ const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
             <td
               v-for="column in columns"
               :key="column.key"
-              :class="[BODY_CELL_CLASSES, { 'text-right font-mono': column.isNumber }]"
+              :class="[
+                BODY_CELL_CLASSES,
+                tierOf(column.key),
+                { 'text-right font-mono': column.isNumber },
+              ]"
             >
               <SkeletonBlock
                 v-if="column.key === 'verdict'"
@@ -104,6 +111,6 @@ const widthOf = (key: keyof typeof COLUMN_WIDTH_CLASS) =>
           </tr>
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
   </GlassCard>
 </template>

@@ -31,8 +31,9 @@ const submitLabelKey = computed(() => {
 });
 
 /**
- * Where each region sits, top to bottom (dock: left to right, wrapping). Collapsing the dock moves the actions and
- * the submit button up beside the language, so those two have a second place.
+ * Where each region sits, top to bottom (dock: left to right, wrapping). The dock keeps the actions and the submit
+ * button in its top row beside the language, expanded or not, so it stays short; the sheet puts them below the editor
+ * until it is collapsed, so those two have a second place.
  */
 const REGION_ORDER = {
   languageRow: 'order-1',
@@ -53,8 +54,8 @@ const LAYOUTS = {
     form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
     languageRow: '',
     body: 'basis-full',
-    editor: 'max-h-[45dvh] overflow-auto rounded-tile',
-    editorMinLines: 8,
+    editor: 'max-h-[30dvh] overflow-auto rounded-tile',
+    editorMinLines: 4,
     counterRow: 'flex-1',
     submit: 'h-11 px-6',
   },
@@ -70,6 +71,8 @@ const LAYOUTS = {
 } as const;
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
+/** Where the actions and submit sit: the top row of the dock, or of a collapsed form. */
+const isTopRow = computed(() => props.layout === 'dock' || props.collapsed);
 const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
 </script>
 
@@ -123,7 +126,7 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
     />
     <div
       v-if="$slots.actions"
-      :class="collapsed ? REGION_ORDER.actionsCollapsed : REGION_ORDER.actions"
+      :class="isTopRow ? REGION_ORDER.actionsCollapsed : REGION_ORDER.actions"
     >
       <slot name="actions" />
     </div>
@@ -201,7 +204,7 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
       type="submit"
       :aria-disabled="!state.canSubmit"
       class="bg-gradient-accent shrink-0 rounded-pill font-display font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
-      :class="[classes.submit, collapsed ? REGION_ORDER.submitCollapsed : REGION_ORDER.submit]"
+      :class="[classes.submit, isTopRow ? REGION_ORDER.submitCollapsed : REGION_ORDER.submit]"
     >
       {{ $t(submitLabelKey) }}
     </button>

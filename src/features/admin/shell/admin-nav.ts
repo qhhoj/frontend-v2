@@ -116,14 +116,20 @@ export function visibleNav(
     .filter((navGroup) => navGroup.items.length > 0);
 }
 
-/** The most specific item wins: `/admin/problems/import` is not inside `/admin/problems` (it has its own item). */
-const SPECIFIC_PATHS = ['/admin/problems/import'];
-export function isCurrentNav(itemPath: string, routePath: string): boolean {
-  if (routePath === itemPath) return true;
-  const isInside = routePath.startsWith(`${itemPath}/`);
-  return (
-    isInside && !SPECIFIC_PATHS.some((path) => path !== itemPath && routePath.startsWith(path))
-  );
+const isWithin = (basePath: string, routePath: string) =>
+  routePath === basePath || routePath.startsWith(`${basePath}/`);
+const NAV_PATHS = ADMIN_NAV.flatMap((navGroup) => navGroup.items.map((item) => item.path));
+/**
+ * An item is current when the route is its page or inside it, unless a longer item path also holds the route:
+ * `/admin/organizations/quotas` is the quotas item's, not the organizations item's, and no list of exceptions is needed.
+ */
+export function isCurrentNav(
+  itemPath: string,
+  routePath: string,
+  navPaths: readonly string[] = NAV_PATHS,
+): boolean {
+  if (!isWithin(itemPath, routePath)) return false;
+  return !navPaths.some((path) => path.length > itemPath.length && isWithin(path, routePath));
 }
 
 /** The first permission of a rule that this viewer holds: a card names what the viewer can use, never a permission they lack. */

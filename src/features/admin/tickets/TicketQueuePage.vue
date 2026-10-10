@@ -57,8 +57,15 @@ const { isLive, announcement } = useTicketStream(null);
       {{ $t('admin.tickets.live') }}
     </p>
     <p class="sr-only" aria-live="polite" data-testid="queue-live">{{ announcement }}</p>
-    <div class="grid gap-5 xl:grid-cols-[18rem_minmax(0,1fr)_minmax(0,1.2fr)]">
-      <TicketQueueFilters :key="route.fullPath" :filters="filters" :ticket-id="ticketId" />
+    <div
+      class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] min-[1800px]:grid-cols-[18rem_minmax(0,1fr)_minmax(0,1.2fr)]"
+    >
+      <TicketQueueFilters
+        :key="route.fullPath"
+        :filters="filters"
+        :ticket-id="ticketId"
+        class="xl:col-span-2 min-[1800px]:col-span-1"
+      />
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SkeletonBlock class="h-80 w-full" /></template>
         <TicketQueueTable

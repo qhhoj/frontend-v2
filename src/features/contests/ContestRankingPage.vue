@@ -228,7 +228,7 @@ const VIEW_MODES = [
     >
       <template #skeleton>
         <div class="flex flex-col gap-5">
-          <div data-skeleton-region="podium" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div data-skeleton-region="podium" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div
               v-for="place in PODIUM_SKELETON_CARDS"
               :key="place"

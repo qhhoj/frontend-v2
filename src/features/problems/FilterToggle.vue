@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toolbarControlClass } from './toolbar-classes';
+import { toolbarControlClass } from '@/components/toolbar-classes';
 
 defineProps<{ pressed: boolean; disabled?: boolean }>();
 defineEmits<{ toggle: [] }>();

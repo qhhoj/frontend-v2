@@ -35,8 +35,8 @@ const tiles = computed(() =>
   <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
-      <ContestCompactHeader v-if="contest" :contest="contest" />
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
+      <ContestCompactHeader v-if="contest" :contest="contest" />
       <GlassCard
         v-if="isClosed"
         as="div"

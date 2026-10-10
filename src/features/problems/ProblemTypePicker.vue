@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-vue-next';
 import Popover from 'primevue/popover';
 import { computed, ref } from 'vue';
 import type { CatalogItem } from '@/api/types/problems';
-import { toolbarControlClass } from './toolbar-classes';
+import { toolbarControlClass } from '@/components/toolbar-classes';
 
 const props = defineProps<{ types: CatalogItem[]; selected: string[] }>();
 const emit = defineEmits<{ change: [typeIds: string[]] }>();

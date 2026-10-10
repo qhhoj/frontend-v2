@@ -460,10 +460,12 @@ describe('contest ranking', () => {
     expect(rowOf(wrapper, 'user_07').findAll('td')[1]!.text()).toBe('99,5');
   });
 
-  it('hints that the board scrolls sideways', async () => {
+  it('hints that the board scrolls sideways once its table is wider than the frame', async () => {
+    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(2000);
     mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.text()).toContain('Vuốt ngang');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="scroll-hint"]').text()).toContain('Vuốt ngang');
   });
 
   it('reports an unknown contest', async () => {
