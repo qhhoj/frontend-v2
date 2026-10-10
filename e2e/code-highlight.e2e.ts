@@ -16,7 +16,7 @@ for (const [theme, scheme] of [
     };
     await page.emulateMedia({ colorScheme: scheme });
     await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme);
-    await page.goto('/submissions/sub-1');
+    await page.goto('/submissions/sub-1#source');
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     const keyword = page.locator('pre .syn-keyword', { hasText: 'return' });
     await expect(keyword).toBeVisible();
