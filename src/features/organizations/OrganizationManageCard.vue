@@ -29,7 +29,7 @@ const ROW =
   <section
     data-testid="organization-manage-card"
     :aria-label="$t('orgs.manageCard.title')"
-    class="glass flex flex-col gap-4 rounded-card border-2 border-accent p-5"
+    class="glass flex flex-col gap-4 rounded-card p-5 ring-2 ring-accent"
   >
     <div class="flex items-center gap-3">
       <InlineBit kind="staff" />

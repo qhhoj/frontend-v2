@@ -10,14 +10,15 @@
   },
   "problem": {
     "timeHint": "Giây, ví dụ 1.",
-    "memoryHint": "KB, ví dụ 262144 (256 MB).",
+    "memoryHint": "KiB, ví dụ 262144 (256 MiB).",
     "pointsHint": "Từ 800 đến 3500.",
     "type": "Dạng bài",
     "pickType": "Chọn dạng bài",
     "statement": "Đề bài",
     "statementHint": "Có thể để trống và viết sau.",
     "nextNote": "Sau khi tạo: tải test lên, chọn trình chấm và điểm, nộp thử.",
-    "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau."
+    "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau.",
+    "statementPreview": "Xem trước"
   },
   "steps": {
     "label": "Các bước chuẩn bị bài",

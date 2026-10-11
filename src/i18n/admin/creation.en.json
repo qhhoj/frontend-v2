@@ -10,14 +10,15 @@
   },
   "problem": {
     "timeHint": "Seconds, e.g. 1.",
-    "memoryHint": "KB, e.g. 262144 (256 MB).",
+    "memoryHint": "KiB, e.g. 262144 (256 MiB).",
     "pointsHint": "From 800 to 3500.",
     "type": "Type",
     "pickType": "Pick a type",
     "statement": "Statement",
     "statementHint": "You can leave it empty and write it later.",
     "nextNote": "After creating: upload tests, pick the checker and points, try a submission.",
-    "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest."
+    "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest.",
+    "statementPreview": "Preview"
   },
   "steps": {
     "label": "Problem setup steps",

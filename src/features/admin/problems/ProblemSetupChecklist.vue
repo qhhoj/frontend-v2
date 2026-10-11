@@ -65,7 +65,7 @@ const linkOf = (step: SetupStep) => ({
         </span>
         <span class="flex min-w-0 flex-1 flex-col">
           <b>
-            <template v-if="step === next">{{ $t('admin.creation.steps.next') }} </template
+            <template v-if="step === next">{{ `${$t('admin.creation.steps.next')} ` }}</template
             >{{ $t(titleKey(step)) }}
           </b>
           <span class="text-sm text-muted">{{ $t(`admin.creation.steps.${step.id}.hint`) }}</span>

@@ -226,6 +226,7 @@ watch(
         :label="$t('admin.creation.problem.statement')"
         :hint="$t('admin.creation.problem.statementHint')"
         preview-style="problem"
+        :preview-label="$t('admin.creation.problem.statementPreview')"
       />
     </section>
     <div class="flex flex-col gap-3">
