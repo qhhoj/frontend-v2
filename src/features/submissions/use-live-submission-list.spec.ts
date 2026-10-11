@@ -68,7 +68,10 @@ describe('live updates on the submission list', () => {
     await vi.advanceTimersByTimeAsync(1);
     await flushPromises();
     expect(listCalls(calls)).toHaveLength(2);
-    expect(wrapper.findAll('[data-id]').map((tr) => tr.attributes('data-id'))).toEqual(['new', 'a']);
+    expect(wrapper.findAll('[data-id]').map((tr) => tr.attributes('data-id'))).toEqual([
+      'new',
+      'a',
+    ]);
   });
   it('ignores a progress frame of a submission that is not on the page', async () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });

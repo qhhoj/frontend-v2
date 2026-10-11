@@ -182,7 +182,7 @@ test.describe('submission list', () => {
       submissionItem({ testSummary: strip(['AC', 'AC', 'WA']), result: 'WA', points: 0 }),
     ];
     let reads = 0;
-    api.routes['GET /submissions'] = () => list([states[Math.min(reads++, states.length - 1)]!]);
+    api.routes['GET /submissions'] = () => list([states[Math.min(reads++, states.length - 1)]]);
     await page.goto('/submissions');
     await expect(page.getByTestId('test-strip')).toContainText('1/3 test đúng');
     await expect(page.getByTestId('test-strip')).toContainText('2/3 test đúng', { timeout: 5_000 });
