@@ -51,7 +51,6 @@ test.beforeEach(({ api }) => {
     body: {
       data: problemDetail({
         code: CODE,
-        pdfStatementUrl: `/api/internal/problems/${CODE}/pdf`,
       }),
     },
   };

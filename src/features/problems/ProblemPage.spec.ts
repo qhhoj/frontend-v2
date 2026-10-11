@@ -141,19 +141,35 @@ describe('problem page', () => {
     );
   });
 
-  it('leaves the header actions empty when the problem has no PDF', async () => {
-    mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ pdfStatementUrl: null })) });
-    const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="header-actions"]').text()).toBe('');
-  });
-
-  it('puts the PDF button in the header actions when the problem has a PDF', async () => {
+  it('offers no rendered PDF when the statement is only an uploaded PDF', async () => {
     mockApi({
       ...anonymousViewer,
-      ...problemPageRoutes(problemDetail({ pdfStatementUrl: '/pdf' })),
+      ...problemPageRoutes(problemDetail({ descriptionHtml: ' ', pdfStatementUrl: '/pdf/a.pdf' })),
     });
     const { wrapper } = await openProblem();
+    expect(wrapper.find('[data-testid="header-actions"] button').exists()).toBe(false);
+  });
+
+  it('offers the rendered PDF for a text statement without an uploaded PDF', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ pdfStatementUrl: null })) });
+    const { wrapper } = await openProblem();
     expect(wrapper.get('[data-testid="header-actions"] button').text()).toBe('PDF');
+  });
+
+  it('shows the uploaded PDF statement inside the statement card', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail({ descriptionHtml: '', pdfStatementUrl: '/pdf/a.pdf' })),
+    });
+    const { wrapper } = await openProblem();
+    const card = wrapper.get('[data-testid="statement-card"]');
+    expect(card.get('iframe').attributes('src')).toBe('/pdf/a.pdf');
+  });
+
+  it('shows no PDF frame for a problem without an uploaded PDF', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ pdfStatementUrl: null })) });
+    const { wrapper } = await openProblem();
+    expect(wrapper.get('[data-testid="statement-card"]').find('iframe').exists()).toBe(false);
   });
 
   it('changes tabs without adding history entries', async () => {

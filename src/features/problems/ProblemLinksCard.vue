@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { FileText, Paperclip } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import GlassCard from '@/components/GlassCard.vue';
@@ -12,7 +13,9 @@ const LINK = 'flex min-h-11 items-center rounded-row px-3 hover:bg-surface-hover
 const FILE_LINK =
   'inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-4 text-sm font-semibold hover:bg-surface-hover';
 /** Where else this problem leads: its submissions, the editorial tab, the uploaded PDF statement and material, the rendered PDF and the short link. */
-defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
+const props = defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
+/** The rendered PDF prints the text statement; a statement that is only an uploaded PDF has none. */
+const hasTextStatement = computed(() => props.problem.descriptionHtml.trim() !== '');
 const route = useRoute();
 const locale = useLocaleStore();
 </script>
@@ -63,7 +66,7 @@ const locale = useLocaleStore();
         <Paperclip aria-hidden="true" class="size-4" />{{ $t('problem.rail.links.material') }}
       </a>
       <ShortLinkButton :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
-      <PdfButton v-if="problem.pdfStatementUrl" :code="problem.code" :lang="locale.locale" />
+      <PdfButton v-if="hasTextStatement" :code="problem.code" :lang="locale.locale" />
     </div>
   </GlassCard>
 </template>

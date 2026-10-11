@@ -971,6 +971,11 @@
     "pdfRateLimited": "Too many PDF requests",
     "pdfRetry": "Try again",
     "pdfRetryIn": "Try again in {seconds} s",
+    "pdfStatement": {
+      "hint": "This statement is a PDF file.",
+      "open": "Open in a new tab",
+      "title": "PDF statement"
+    },
     "noSubmissions": "You have not submitted this problem yet.",
     "rail": {
       "railLabel": "Problem info",

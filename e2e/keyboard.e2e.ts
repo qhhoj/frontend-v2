@@ -113,7 +113,7 @@ async function focusByTab(page: Page, target: Locator) {
 const pdfProblem = (api: FakeApi) => {
   api.routes['GET /problems/duongdi'] = {
     body: {
-      data: problemDetail({ pdfStatementUrl: '/api/internal/problems/duongdi/pdf' }),
+      data: problemDetail(),
     },
   };
   api.routes['GET /problems/duongdi/pdf'] = pdfReady;

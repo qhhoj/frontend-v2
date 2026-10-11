@@ -14,7 +14,6 @@ import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 
 /** The settle window of the live list (3 s) plus a margin. */
 const SETTLE_TIMEOUT_MS = 6000;
-const PDF_ADDRESS = '/api/internal/problems/duongdi/pdf';
 const IS_PHONE = (width: number) => width < 768;
 
 interface StateCase {
@@ -27,7 +26,7 @@ interface StateCase {
 
 const withPdf = (api: FakeApi) => {
   api.routes['GET /problems/duongdi'] = {
-    body: { data: problemDetail({ pdfStatementUrl: PDF_ADDRESS }) },
+    body: { data: problemDetail() },
   };
 };
 const pdfButton = (page: Page) => page.getByTestId('pdf-button');
