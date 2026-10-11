@@ -104,8 +104,12 @@ const SCREENS: Screen[] = [
   list('languages', '/admin/languages', 'judge.change_language', 'GET /admin/languages', (index) =>
     languageAdmin({ id: `l-${index}`, key: `LANG${index}` }),
   ),
-  list('short links', '/admin/short-links', 'judge.manage_short_link', 'GET /short-links', (index) =>
-    shortLink({ code: `code${index}` }),
+  list(
+    'short links',
+    '/admin/short-links',
+    'judge.manage_short_link',
+    'GET /short-links',
+    (index) => shortLink({ code: `code${index}` }),
   ),
   list(
     'integrations',
@@ -215,21 +219,31 @@ const SCREENS: Screen[] = [
     'GET /comments/locks',
     (index) => ({ key: `hcmus${index}`, title: 'Dãy số đẹp', type: 'problem', url: '/problems/x' }),
   ),
-  list('all comments', '/admin/comments', 'judge.change_comment', 'GET /admin/comments', (index) => ({
-    comment: {
-      author: { id: 'u', rating: null, username: 'linhnt' },
-      deleted: false,
-      excerpt: 'Nội dung bình luận',
-      hidden: false,
-      id: `cm${index}`,
-    },
-    hiddenBy: null,
-    page: { key: 'hcmus41a', title: 'Dãy số đẹp', type: 'problem' },
-    pageNumber: 1,
-    createdAt: '2026-10-08T10:00:00Z',
-  })),
-  list('submissions', '/admin/submissions', 'judge.rejudge_submission', 'GET /submissions', (index) =>
-    submissionItem({ id: `sub-${index}` }),
+  list(
+    'all comments',
+    '/admin/comments',
+    'judge.change_comment',
+    'GET /admin/comments',
+    (index) => ({
+      comment: {
+        author: { id: 'u', rating: null, username: 'linhnt' },
+        deleted: false,
+        excerpt: 'Nội dung bình luận',
+        hidden: false,
+        id: `cm${index}`,
+      },
+      hiddenBy: null,
+      page: { key: 'hcmus41a', title: 'Dãy số đẹp', type: 'problem' },
+      pageNumber: 1,
+      createdAt: '2026-10-08T10:00:00Z',
+    }),
+  ),
+  list(
+    'submissions',
+    '/admin/submissions',
+    'judge.rejudge_submission',
+    'GET /submissions',
+    (index) => submissionItem({ id: `sub-${index}` }),
   ),
 ];
 
