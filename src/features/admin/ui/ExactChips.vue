@@ -3,7 +3,7 @@ import { computed, ref, useId } from 'vue';
 import { failureTextOf, isNotFound } from './admin-errors';
 import { needsPermissionText } from './permission-text';
 import { X } from 'lucide-vue-next';
-import { ADMIN_INPUT_CLASS } from './classes';
+import { INPUT } from './controls';
 import { useChipSuggestions } from './use-chip-suggestions';
 import type { Suggest } from './use-chip-suggestions';
 
@@ -111,7 +111,7 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
       <input
         :id="id"
         v-model="typed"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :placeholder="placeholder"
         :disabled="isChipsFull || Boolean(lockedBy)"
         :aria-invalid="lookupError || error ? 'true' : undefined"

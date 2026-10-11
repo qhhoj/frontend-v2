@@ -2,7 +2,7 @@
 import GlassCard from '@/components/GlassCard.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../../shell/AdminBit.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { BUTTON } from '../../ui/controls';
 
 /** No base URL or token saved: nothing can be searched or verified. */
 const { can } = usePermissions();
@@ -24,7 +24,7 @@ const { can } = usePermissions();
     <RouterLink
       v-if="can('judge.change_settings')"
       :to="{ name: 'admin-settings', hash: '#settings-externalJudge' }"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="BUTTON.secondary"
       >{{ $t('admin.externalJudge.notConnected.openSettings') }}</RouterLink
     >
   </GlassCard>

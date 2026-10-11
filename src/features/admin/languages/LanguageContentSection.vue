@@ -5,7 +5,7 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { LANGUAGE_LIMITS, codePointsOf } from './language-form';
 import type { LanguageForm } from './language-form';
 
@@ -33,7 +33,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
         <span :id="`${id}-count`" class="text-xs text-muted">
           {{ countOf(form.template) }} / {{ textLimitText }}
@@ -51,7 +51,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           rows="3"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
         <span :id="`${id}-count`" class="text-xs text-muted">
           {{ countOf(form.info) }} / {{ textLimitText }}
@@ -69,7 +69,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           rows="3"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
         <span :id="`${id}-count`" class="text-xs text-muted">
           {{ countOf(form.description) }} / {{ textLimitText }}

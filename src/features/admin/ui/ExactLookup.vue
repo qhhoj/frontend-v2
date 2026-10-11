@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from './classes';
+import { BUTTON, INPUT } from './controls';
 
 defineProps<{ label: string; submitLabel: string; hint?: string }>();
 const emit = defineEmits<{ open: [value: string] }>();
@@ -18,12 +18,12 @@ const submit = () => {
       <input
         :id="id"
         v-model="typed"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         autocomplete="off"
         :aria-describedby="hint ? `${id}-hint` : undefined"
       />
     </div>
-    <button type="submit" :class="ADMIN_BUTTON_CLASS">{{ submitLabel }}</button>
+    <button type="submit" :class="BUTTON.secondary">{{ submitLabel }}</button>
     <p v-if="hint" :id="`${id}-hint`" class="basis-full text-xs text-muted">{{ hint }}</p>
   </form>
 </template>

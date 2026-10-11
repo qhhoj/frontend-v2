@@ -6,7 +6,7 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { megabytesOf } from './language-form';
 import type { LanguageForm } from './language-form';
 
@@ -44,7 +44,7 @@ const fileSizeHint = computed(() => {
           class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -62,7 +62,7 @@ const fileSizeHint = computed(() => {
           class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -80,7 +80,7 @@ const fileSizeHint = computed(() => {
           class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -97,7 +97,7 @@ const fileSizeHint = computed(() => {
           inputmode="numeric"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <div class="flex flex-col gap-3 md:col-span-2">

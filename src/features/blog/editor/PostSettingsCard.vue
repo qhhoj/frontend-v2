@@ -4,7 +4,7 @@ import type { PostComposeOptions } from '@/api/types/blog';
 import AdminField from '@/features/admin/ui/AdminField.vue';
 import AdminSwitch from '@/features/admin/ui/AdminSwitch.vue';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '@/features/admin/ui/classes';
+import { INPUT } from '@/features/admin/ui/controls';
 import type { PostFieldRights, PublishMode } from './post-form';
 
 /**
@@ -71,12 +71,7 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
         :hint="$t('postEditor.settings.organizationHint')"
         input-id="post-organization"
       >
-        <select
-          :id="id"
-          v-model="organization"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-        >
+        <select :id="id" v-model="organization" :class="INPUT" :aria-describedby="describedBy">
           <option v-for="item in organizations" :key="item.slug" :value="item.slug">
             {{ item.name }}
           </option>
@@ -110,7 +105,7 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
         :id="id"
         v-model="publishOn"
         type="datetime-local"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="invalid ? 'true' : undefined"
       />
@@ -130,7 +125,7 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
         v-model="summary"
         rows="3"
         :disabled="!rights.staff"
-        :class="[ADMIN_INPUT_CLASS, 'py-2 text-sm disabled:text-muted']"
+        :class="[INPUT, 'py-2 text-sm disabled:text-muted']"
         :aria-describedby="describedBy"
       />
     </AdminField>

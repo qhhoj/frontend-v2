@@ -10,12 +10,7 @@ import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import {
-  ADMIN_BUTTON_CLASS,
-  ADMIN_DANGER_CLASS,
-  ADMIN_INPUT_CLASS,
-  ADMIN_PRIMARY_CLASS,
-} from '../../ui/classes';
+import { BUTTON, INPUT } from '../../ui/controls';
 import ExternalJudgeNotConnected from './ExternalJudgeNotConnected.vue';
 import ExternalJudgeSearch from './ExternalJudgeSearch.vue';
 import ExternalLanguageTable from './ExternalLanguageTable.vue';
@@ -56,10 +51,10 @@ async function confirmRemove() {
         />
         <div class="grid gap-4 sm:grid-cols-2">
           <AdminField v-slot="{ id }" :label="$t('admin.externalJudge.oj')">
-            <input :id="id" v-model="form.oj" type="text" :class="ADMIN_INPUT_CLASS" />
+            <input :id="id" v-model="form.oj" type="text" :class="INPUT" />
           </AdminField>
           <AdminField v-slot="{ id }" :label="$t('admin.externalJudge.problemId')">
-            <input :id="id" v-model="form.problemId" type="text" :class="ADMIN_INPUT_CLASS" />
+            <input :id="id" v-model="form.problemId" type="text" :class="INPUT" />
           </AdminField>
         </div>
         <ExternalJudgeSearch
@@ -71,7 +66,7 @@ async function confirmRemove() {
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            :class="ADMIN_BUTTON_CLASS"
+            :class="BUTTON.secondary"
             :disabled="!canVerify"
             :aria-busy="verify.isPending.value || undefined"
             @click="verify.run(undefined)"
@@ -114,7 +109,7 @@ async function confirmRemove() {
         <div class="flex flex-wrap gap-3">
           <button
             type="submit"
-            :class="ADMIN_PRIMARY_CLASS"
+            :class="BUTTON.primary"
             :disabled="!canSave"
             :aria-busy="save.isPending.value || undefined"
           >
@@ -123,7 +118,7 @@ async function confirmRemove() {
           <button
             v-if="query.data.value.link"
             type="button"
-            :class="ADMIN_DANGER_CLASS"
+            :class="BUTTON.danger"
             @click="isRemoveOpen = true"
           >
             <Trash2 aria-hidden="true" class="size-4" />{{

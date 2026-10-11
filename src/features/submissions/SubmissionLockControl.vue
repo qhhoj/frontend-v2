@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import { lockSubmission, unlockSubmission } from '@/api/submission-actions.api';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from '@/features/admin/ui/classes';
+import { BUTTON } from '@/features/admin/ui/controls';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -34,7 +34,7 @@ const label = computed(() =>
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="BUTTON.secondary"
         :disabled="mutation.isPending.value"
         :aria-busy="mutation.isPending.value || undefined"
         @click="mutation.run(!isLocked)"

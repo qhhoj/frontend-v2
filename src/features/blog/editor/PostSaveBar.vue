@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '@/features/admin/ui/classes';
+import { BUTTON } from '@/features/admin/ui/controls';
 import type { PublishMode } from './post-form';
 import type { SaveIntent } from './use-post-editor';
 
@@ -44,7 +44,7 @@ const publishLabel = computed(() => {
       <button
         v-if="!isLive"
         type="button"
-        :class="[ADMIN_BUTTON_CLASS, 'flex-1 sm:flex-none']"
+        :class="[BUTTON.secondary, 'flex-1 sm:flex-none']"
         :aria-disabled="isPending || undefined"
         @click="isPending || emit('save', 'draft')"
       >
@@ -52,7 +52,7 @@ const publishLabel = computed(() => {
       </button>
       <button
         type="button"
-        :class="[ADMIN_PRIMARY_CLASS, 'flex-1 sm:flex-none']"
+        :class="[BUTTON.primary, 'flex-1 sm:flex-none']"
         :aria-disabled="isPending || undefined"
         @click="isPending || emit('save', isLive ? 'keep' : 'publish')"
       >

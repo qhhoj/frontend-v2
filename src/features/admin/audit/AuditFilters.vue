@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import AdminField from '../ui/AdminField.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { BUTTON, INPUT } from '../ui/controls';
 import { AUDIT_TYPES } from './audit';
 import type { AuditFilter, AuditType } from './audit';
 
@@ -43,7 +43,7 @@ function clear() {
         maxlength="150"
         autocomplete="off"
         :placeholder="$t('admin.audit.filters.actorPlaceholder')"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
       />
     </AdminField>
     <AdminField
@@ -54,7 +54,7 @@ function clear() {
       <select
         :id="id"
         :value="filter.type"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         @change="change({ type: ($event.target as HTMLSelectElement).value as AuditType | '' })"
       >
         <option value="">{{ $t('admin.audit.filters.anyType') }}</option>
@@ -69,7 +69,7 @@ function clear() {
         type="date"
         :value="filter.from"
         :max="filter.to || undefined"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         @change="change({ from: ($event.target as HTMLInputElement).value })"
       />
     </AdminField>
@@ -79,14 +79,14 @@ function clear() {
         type="date"
         :value="filter.to"
         :min="filter.from || undefined"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         @change="change({ to: ($event.target as HTMLInputElement).value })"
       />
     </AdminField>
     <button
       v-if="isFiltered"
       type="button"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="BUTTON.secondary"
       class="col-span-2 self-end justify-self-start lg:col-span-1"
       @click="clear"
     >

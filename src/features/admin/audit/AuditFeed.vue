@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminBit from '../shell/AdminBit.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import AuditEntryRow from './AuditEntryRow.vue';
 import AuditFilters from './AuditFilters.vue';
 import { auditFilterFromQuery, auditFilterQuery, toAuditRequest } from './audit';
@@ -54,7 +54,7 @@ function showFilter(next: AuditFilter) {
       <div v-if="feed.hasNextPage.value" class="flex justify-center">
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="BUTTON.secondary"
           :disabled="feed.isFetchingNextPage.value"
           @click="feed.fetchNextPage()"
         >

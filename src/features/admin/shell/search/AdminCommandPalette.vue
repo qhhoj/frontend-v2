@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useSessionStore } from '@/stores/session.store';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 import { ADMIN_NAV, visibleNav } from '../admin-nav';
 import { MIN_RECORD_SEARCH, matchScreens, paletteOptionId, steppedKey } from './admin-search';
 import type { PaletteEntry } from './admin-search';
@@ -117,7 +117,7 @@ const status = computed(() => {
           :aria-activedescendant="activeId"
           :aria-label="$t('admin.shell.search.label')"
           :placeholder="$t('admin.shell.search.placeholder')"
-          :class="[ADMIN_INPUT_CLASS, 'pl-9']"
+          :class="[INPUT, 'pl-9']"
           autocomplete="off"
           spellcheck="false"
           @keydown="onKeydown"
