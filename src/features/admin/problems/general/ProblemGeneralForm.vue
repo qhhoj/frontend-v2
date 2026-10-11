@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProblemEditingMeta } from '@/api/types/problem-editing';
+import type { ProblemEditingMeta, UserSummaryView } from '@/api/types/problem-editing';
 import type { FieldErrors } from '../../ui/admin-errors';
 import ProblemBasicsSection from './ProblemBasicsSection.vue';
 import ProblemClassSection from './ProblemClassSection.vue';
@@ -10,7 +10,13 @@ import ProblemVisibilitySection from './ProblemVisibilitySection.vue';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
-defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors }>();
+/** `suggester`: who suggested an existing problem (read-only); the create form leaves it out. */
+defineProps<{
+  meta: ProblemEditingMeta;
+  errors: FieldErrors;
+  suggester?: UserSummaryView | null;
+  isSuggestionPending?: boolean;
+}>();
 </script>
 
 <template>
@@ -19,7 +25,12 @@ defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors }>();
     <ProblemLimitsSection v-model="form" :meta="meta" :errors="errors" />
     <ProblemClassSection v-model="form" :meta="meta" :errors="errors" />
     <ProblemVisibilitySection v-model="form" :errors="errors" />
-    <ProblemPeopleSection v-model="form" :errors="errors" />
+    <ProblemPeopleSection
+      v-model="form"
+      :errors="errors"
+      :suggester="suggester ?? null"
+      :is-suggestion-pending="isSuggestionPending ?? false"
+    />
     <ProblemStatusSection v-model="form" />
   </div>
 </template>

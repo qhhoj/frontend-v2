@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, noContent, page, sequence } from '@/test/mock-api';
+import { fail, mockApi, noContent, ok, page, sequence } from '@/test/mock-api';
+import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -120,7 +121,11 @@ describe('DeletedProblemsPage', () => {
 
   it('shows the list tabs on the problems index only to delete_problem holders', async () => {
     const hasDeletedTab = async (permissions: string[]) => {
-      mockApi({ ...staffViewer(permissions), 'GET /problems': page([]) });
+      mockApi({
+        ...staffViewer(permissions),
+        'GET /problems': page([]),
+        'GET /problems/meta': ok(problemEditingMeta()),
+      });
       const { wrapper } = await mountApp('/admin/problems');
       await vi.waitFor(() => expect(wrapper.find('input[type="search"]').exists()).toBe(true));
       const found = wrapper.findAll('a').some((link) => link.text() === 'Đã xóa');

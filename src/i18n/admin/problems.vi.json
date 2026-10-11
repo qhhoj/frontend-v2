@@ -47,7 +47,7 @@
       "summary": "Tóm tắt",
       "summaryHint": "Hiện trong danh sách bài, tối đa 1000 ký tự.",
       "ogImage": "Ảnh xem trước",
-      "ogImageHint": "Để trống để giữ nguyên."
+      "ogImageHint": "Địa chỉ ảnh dùng khi chia sẻ liên kết bài; để trống nếu không có."
     },
     "limits": {
       "timeLimit": "Thời gian (giây)",
@@ -76,7 +76,13 @@
       "types": "Loại bài (ít nhất 1)",
       "pickType": "Chọn loại bài",
       "addType": "Thêm loại",
-      "allowedLanguages": "Ngôn ngữ được phép"
+      "allowedLanguages": "Ngôn ngữ được phép",
+      "allowedCount": "({count} / {total})",
+      "pick": {
+        "all": "Tất cả",
+        "none": "Bỏ hết",
+        "defaults": "Mặc định của trang"
+      }
     },
     "visibility": {
       "source": "Hiển thị mã nguồn bài nộp",
@@ -103,7 +109,9 @@
       "memory": "Từ 0 đến 1048576 KiB.",
       "points": "Từ 800 đến 3500.",
       "types": "Cần ít nhất một loại bài."
-    }
+    },
+    "changeMessage": "Lý do",
+    "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử"
   },
   "people": {
     "title": "Người phụ trách",
@@ -113,14 +121,18 @@
     "banned": "Bị cấm nộp",
     "organizations": "Tổ chức",
     "orgPrivate": "Riêng tư theo tổ chức",
-    "orgPrivateHint": "Chỉ thành viên các tổ chức trên thấy bài."
+    "orgPrivateHint": "Chỉ thành viên các tổ chức trên thấy bài.",
+    "suggester": "Người đề xuất",
+    "suggesterPending": "đang chờ duyệt"
   },
   "status": {
     "title": "Trạng thái",
     "public": "Công khai",
     "manual": "Quản lý thủ công",
     "fullMarkup": "Cho phép markup đầy đủ",
-    "fullMarkupHint": "HTML không được lọc."
+    "fullMarkupHint": "HTML không được lọc.",
+    "dateOffer": "Đặt ngày đăng là bây giờ để bài hiện như bài mới?",
+    "dateNow": "Dùng ngày hôm nay"
   },
   "clone": {
     "title": "Nhân bản bài",

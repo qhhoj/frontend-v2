@@ -39,6 +39,19 @@ function removeType(typeId: string) {
   form.value.typeIds = form.value.typeIds.filter((id) => id !== typeId);
 }
 
+/** Quick picks for the allowed-language list: every language, none, or the site defaults for new problems. */
+const LANGUAGE_PICKS = {
+  all: () => props.meta.languages.map((language) => language.id),
+  none: () => [],
+  defaults: () =>
+    props.meta.languages
+      .filter((language) => language.includeInProblem)
+      .map((language) => language.id),
+} as const;
+const pickLanguages = (pick: keyof typeof LANGUAGE_PICKS) => {
+  form.value.allowedLanguages = LANGUAGE_PICKS[pick]();
+};
+
 function setLanguageAllowed(languageId: string, isAllowed: boolean) {
   const others = form.value.allowedLanguages.filter((id) => id !== languageId);
   form.value.allowedLanguages = isAllowed ? [...others, languageId] : others;
@@ -127,21 +140,40 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
     >
       <legend class="text-sm font-semibold">
         {{ $t('admin.problems.general.classes.allowedLanguages') }}
+        <span class="font-normal text-muted">{{
+          $t('admin.problems.general.classes.allowedCount', {
+            count: form.allowedLanguages.length,
+            total: meta.languages.length,
+          })
+        }}</span>
       </legend>
-      <label
-        v-for="language in meta.languages"
-        :key="language.id"
-        class="flex min-h-11 items-center gap-3"
-      >
-        <input
-          type="checkbox"
-          class="size-5"
-          :checked="form.allowedLanguages.includes(language.id)"
-          :disabled="isStaffLocked"
-          @change="setLanguageAllowed(language.id, ($event.target as HTMLInputElement).checked)"
-        />
-        {{ language.name }}
-      </label>
+      <div v-if="!isStaffLocked" class="flex flex-wrap gap-2">
+        <button
+          v-for="pick in ['all', 'none', 'defaults'] as const"
+          :key="pick"
+          type="button"
+          :class="ADMIN_BUTTON_CLASS"
+          @click="pickLanguages(pick)"
+        >
+          {{ $t(`admin.problems.general.classes.pick.${pick}`) }}
+        </button>
+      </div>
+      <div class="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3">
+        <label
+          v-for="language in meta.languages"
+          :key="language.id"
+          class="flex min-h-11 items-center gap-3"
+        >
+          <input
+            type="checkbox"
+            class="size-5"
+            :checked="form.allowedLanguages.includes(language.id)"
+            :disabled="isStaffLocked"
+            @change="setLanguageAllowed(language.id, ($event.target as HTMLInputElement).checked)"
+          />
+          {{ language.name }}
+        </label>
+      </div>
       <p v-if="isStaffLocked" :id="allowedLanguagesLockId" class="text-xs text-muted">
         {{ lockNotice(isStaffLocked) }}
       </p>

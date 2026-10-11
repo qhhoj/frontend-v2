@@ -35,7 +35,7 @@ export interface ProblemForm {
   summary: string;
   /** `datetime-local` value; '' = no date. */
   date: string;
-  /** Not returned by the detail: '' = leave unchanged. */
+  /** Image URL for link previews; '' = none. */
   ogImage: string;
   timeLimit: number;
   memoryLimit: number;
@@ -79,7 +79,7 @@ const basicsOf = (problem: EditableProblem, editor: ProblemEditor) => ({
   source: problem.source,
   summary: problem.summary,
   date: toLocalInput(problem.date),
-  ogImage: '',
+  ogImage: editor.ogImage,
 });
 
 const limitsOf = (problem: EditableProblem, meta: ProblemEditingMeta) => ({

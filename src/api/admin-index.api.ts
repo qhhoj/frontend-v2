@@ -1,11 +1,14 @@
-import { apiGetPage } from './typed';
-import type { QueryOf } from './typed';
+import { apiGetPage, apiSend } from './typed';
+import type { JsonBodyOf, QueryOf } from './typed';
 
-/** The page, size, language and `q` the index sends; `visibility` is fixed by `fetchAdminProblems`. */
-export type AdminProblemSearch = Required<
-  Pick<QueryOf<'/problems'>, 'page' | 'pageSize' | 'lang' | 'q'>
->;
+/** What the staff problem list sends: filters, sort and page; `pageSize` and `lang` come from the page. */
+export type AdminProblemSearch = QueryOf<'/problems'>;
 
-/** The staff index of problems: `visibility=all` adds private problems (the backend still limits the list to what the account may see). */
+/** The staff index of problems: `visibility` defaults to `all` (private ones too); the backend still limits the list to what the account may see. */
 export const fetchAdminProblems = (query: AdminProblemSearch) =>
-  apiGetPage('/problems', { query: { ...query, visibility: 'all' } });
+  apiGetPage('/problems', { query: { visibility: 'all', ...query } });
+
+/** `POST /problems/bulk/visibility` (`judge.change_public_visibility`): one PATCH per code, results per code. */
+export type BulkVisibilityBody = JsonBodyOf<'/problems/bulk/visibility', 'post'>;
+export const setProblemsVisibility = (body: BulkVisibilityBody) =>
+  apiSend('post', '/problems/bulk/visibility', { body });

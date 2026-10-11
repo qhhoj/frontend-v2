@@ -1,0 +1,49 @@
+{
+  "lead": "The problem types, groups and licenses the problem editor and the public filters offer. Rows are never deleted, since problems refer to them.",
+  "tabsLabel": "Catalogs",
+  "problem-types": {
+    "tab": "Problem types",
+    "createTitle": "Add a problem type",
+    "caption": "Problem types"
+  },
+  "problem-groups": {
+    "tab": "Problem groups",
+    "createTitle": "Add a problem group",
+    "caption": "Problem groups"
+  },
+  "licenses": {
+    "tab": "Licenses",
+    "createTitle": "Add a license",
+    "caption": "Licenses"
+  },
+  "editTitle": "Edit “{name}”",
+  "noAdd": "You can edit existing rows but not add new ones.",
+  "empty": "Nothing here yet.",
+  "actions": "Actions",
+  "edit": "Edit",
+  "create": "Add",
+  "save": "Save",
+  "cancel": "Cancel",
+  "fields": {
+    "name": "Name",
+    "fullName": "Full name",
+    "key": "Key",
+    "display": "Short notice",
+    "link": "Link",
+    "icon": "Icon URL",
+    "text": "License text (markdown)"
+  },
+  "hints": {
+    "name": "Unique, ignoring case.",
+    "key": "Unique: letters, digits, “.”, “_” and “-”; up to 20 characters.",
+    "display": "Shown beside problems under this license.",
+    "link": "http(s) address of the full text, or empty.",
+    "icon": "http(s) address of an icon, or empty."
+  },
+  "errors": {
+    "length": "Needed, at most {max} characters.",
+    "key": "Use 1 to 20 letters, digits, “.”, “_” or “-”.",
+    "url": "Use an http:// or https:// address, or leave it empty.",
+    "taken": "Already used (ignoring case)."
+  }
+}

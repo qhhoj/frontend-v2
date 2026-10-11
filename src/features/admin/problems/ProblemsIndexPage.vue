@@ -42,8 +42,8 @@ const open = (code: string) => router.push({ name: 'admin-problemGeneral', param
       </template>
     </AdminPageHeader>
     <ProblemsIndexTabs />
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
-      <section class="glass rounded-panel p-5">
+    <div class="flex flex-col gap-5">
+      <section class="glass rounded-panel p-5 lg:max-w-2xl">
         <ExactLookup
           :label="$t('admin.problems.lookupLabel')"
           :submit-label="$t('admin.problems.lookupSubmit')"

@@ -1,0 +1,53 @@
+{
+  "statusLabel": "Problem status",
+  "status": {
+    "all": "All",
+    "public": "Public",
+    "private": "Private",
+    "suggested": "Suggested"
+  },
+  "group": "Group",
+  "anyGroup": "Any group",
+  "type": "Type",
+  "anyType": "Any type",
+  "author": "Author",
+  "authorPlaceholder": "Exact username",
+  "sort": "Sort by",
+  "sorts": {
+    "dateDesc": "Newest first",
+    "dateAsc": "Oldest first",
+    "codeAsc": "Code A–Z",
+    "nameAsc": "Name A–Z",
+    "pointsDesc": "Most points",
+    "pointsAsc": "Fewest points"
+  },
+  "columns": {
+    "authors": "Authors",
+    "group": "Group",
+    "date": "Published"
+  },
+  "orgPrivate": "Organization",
+  "selectPage": "Select every problem on this page",
+  "selectRow": "Select {code}",
+  "selected": "{count} selected",
+  "clearSelection": "Clear selection",
+  "bulk": {
+    "publish": "Make public",
+    "unpublish": "Make private",
+    "publishTitle": "Make {count} problem public? | Make {count} problems public?",
+    "unpublishTitle": "Make {count} problem private? | Make {count} problems private?",
+    "publishBody": "Each problem is saved as if edited by hand: a history entry is written and scores are recalculated.",
+    "unpublishBody": "Users who are not testers or editors will no longer see these problems. Scores are recalculated.",
+    "publishConfirm": "Make public",
+    "unpublishConfirm": "Make private",
+    "setDateToNow": "Also set the publication date to now (listed as new)",
+    "changeMessage": "Reason (optional)",
+    "changeMessagePlaceholder": "Kept in each problem's history",
+    "summary": "{done} changed, {unchanged} already so, {failed} refused.",
+    "reasons": {
+      "not_found": "not found or hidden from you",
+      "forbidden": "you cannot edit it or change this field",
+      "unknown": "refused"
+    }
+  }
+}

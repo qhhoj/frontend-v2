@@ -1,0 +1,49 @@
+{
+  "lead": "Loại bài, nhóm bài và giấy phép mà trình sửa bài và bộ lọc công khai dùng. Không xóa dòng nào vì bài tập tham chiếu tới chúng.",
+  "tabsLabel": "Danh mục",
+  "problem-types": {
+    "tab": "Loại bài",
+    "createTitle": "Thêm loại bài",
+    "caption": "Loại bài"
+  },
+  "problem-groups": {
+    "tab": "Nhóm bài",
+    "createTitle": "Thêm nhóm bài",
+    "caption": "Nhóm bài"
+  },
+  "licenses": {
+    "tab": "Giấy phép",
+    "createTitle": "Thêm giấy phép",
+    "caption": "Giấy phép"
+  },
+  "editTitle": "Sửa “{name}”",
+  "noAdd": "Bạn được sửa các dòng có sẵn nhưng không được thêm mới.",
+  "empty": "Chưa có gì.",
+  "actions": "Thao tác",
+  "edit": "Sửa",
+  "create": "Thêm",
+  "save": "Lưu",
+  "cancel": "Hủy",
+  "fields": {
+    "name": "Tên",
+    "fullName": "Tên đầy đủ",
+    "key": "Khóa",
+    "display": "Ghi chú ngắn",
+    "link": "Liên kết",
+    "icon": "URL biểu tượng",
+    "text": "Nội dung giấy phép (markdown)"
+  },
+  "hints": {
+    "name": "Không trùng, không phân biệt hoa thường.",
+    "key": "Không trùng: chữ, số, “.”, “_” và “-”; tối đa 20 ký tự.",
+    "display": "Hiện cạnh các bài dùng giấy phép này.",
+    "link": "Địa chỉ http(s) của toàn văn, hoặc để trống.",
+    "icon": "Địa chỉ http(s) của biểu tượng, hoặc để trống."
+  },
+  "errors": {
+    "length": "Bắt buộc, tối đa {max} ký tự.",
+    "key": "Dùng 1 đến 20 chữ, số, “.”, “_” hoặc “-”.",
+    "url": "Dùng địa chỉ http:// hoặc https://, hoặc để trống.",
+    "taken": "Đã có (không phân biệt hoa thường)."
+  }
+}

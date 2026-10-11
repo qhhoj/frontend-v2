@@ -1,0 +1,53 @@
+{
+  "statusLabel": "Trạng thái bài",
+  "status": {
+    "all": "Tất cả",
+    "public": "Công khai",
+    "private": "Riêng tư",
+    "suggested": "Đề xuất"
+  },
+  "group": "Nhóm",
+  "anyGroup": "Mọi nhóm",
+  "type": "Loại",
+  "anyType": "Mọi loại",
+  "author": "Tác giả",
+  "authorPlaceholder": "Tên đăng nhập chính xác",
+  "sort": "Sắp xếp",
+  "sorts": {
+    "dateDesc": "Mới nhất trước",
+    "dateAsc": "Cũ nhất trước",
+    "codeAsc": "Mã A–Z",
+    "nameAsc": "Tên A–Z",
+    "pointsDesc": "Nhiều điểm nhất",
+    "pointsAsc": "Ít điểm nhất"
+  },
+  "columns": {
+    "authors": "Tác giả",
+    "group": "Nhóm",
+    "date": "Ngày đăng"
+  },
+  "orgPrivate": "Tổ chức",
+  "selectPage": "Chọn mọi bài trên trang này",
+  "selectRow": "Chọn {code}",
+  "selected": "Đã chọn {count}",
+  "clearSelection": "Bỏ chọn",
+  "bulk": {
+    "publish": "Công khai",
+    "unpublish": "Chuyển riêng tư",
+    "publishTitle": "Công khai {count} bài?",
+    "unpublishTitle": "Chuyển {count} bài sang riêng tư?",
+    "publishBody": "Mỗi bài được lưu như khi sửa tay: ghi lịch sử và tính lại điểm.",
+    "unpublishBody": "Người không phải tester hay người sửa bài sẽ không thấy các bài này nữa. Điểm được tính lại.",
+    "publishConfirm": "Công khai",
+    "unpublishConfirm": "Chuyển riêng tư",
+    "setDateToNow": "Đặt ngày đăng là bây giờ (hiện như bài mới)",
+    "changeMessage": "Lý do (không bắt buộc)",
+    "changeMessagePlaceholder": "Lưu vào lịch sử của từng bài",
+    "summary": "{done} bài đã đổi, {unchanged} bài vốn đã vậy, {failed} bài bị từ chối.",
+    "reasons": {
+      "not_found": "không tồn tại hoặc bạn không thấy",
+      "forbidden": "bạn không được sửa bài hoặc trường này",
+      "unknown": "bị từ chối"
+    }
+  }
+}
