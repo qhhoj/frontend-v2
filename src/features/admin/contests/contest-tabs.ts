@@ -1,5 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
+import type { EditableContest } from '@/api/types/contest-editing';
 
 export type ContestTabId =
   | 'general'
@@ -87,4 +88,11 @@ export function contestTabOf(routeName: unknown): ContestTabId | null {
 
 export function contestTabComponent(id: ContestTabId): Component | null {
   return TAB_COMPONENTS[id];
+}
+
+/** The count chip a tab carries: the problems and the participants; the other tabs carry none. */
+export function contestTabCount(id: ContestTabId, contest: EditableContest): number | null {
+  if (id === 'problems') return contest.problems?.length ?? null;
+  if (id === 'participants') return contest.userCount;
+  return null;
 }

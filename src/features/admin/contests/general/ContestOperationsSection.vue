@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { RULES_MAX_LENGTH } from '../contest-form';
 import type { ContestForm } from '../contest-form';
+import ContestCheck from './ContestCheck.vue';
 
 /** Contest rules and the balloon queue settings. */
 const form = defineModel<ContestForm>({ required: true });
@@ -14,8 +14,13 @@ defineProps<{ errors: FieldErrors }>();
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.contestRules.section')">
+  <AdminFormSection
+    id="contest-section-operations"
+    :title="$t('admin.contestRules.section')"
+    :description="$t('admin.contests.general.sectionLeads.operations')"
+  >
     <AdminField
+      class="lg:col-span-2"
       input-id="contest-rules"
       :label="$t('admin.contestRules.fields.rules')"
       :hint="$t('admin.contestRules.hints.rules')"
@@ -27,22 +32,25 @@ defineProps<{ errors: FieldErrors }>();
           v-model="form.rules"
           rows="8"
           :maxlength="RULES_MAX_LENGTH"
-          :class="[ADMIN_INPUT_CLASS, 'font-mono text-sm']"
+          :class="[INPUT, 'py-2 font-mono text-sm']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
       </template>
     </AdminField>
-    <AdminSwitch
+    <ContestCheck
       v-model="form.balloons"
+      input-id="contest-balloons"
       :label="$t('admin.contestRules.fields.balloons')"
       :description="$t('admin.contestRules.hints.balloons')"
     />
-    <UsernameChips
-      v-model="form.balloonStaff"
-      data-testid="contest-balloon-staff"
-      :label="$t('admin.contestRules.fields.balloonStaff')"
-    />
-    <p class="text-sm text-muted">{{ $t('admin.contestRules.hints.balloonStaff') }}</p>
-  </SettingsCard>
+    <div class="flex flex-col gap-1.5">
+      <UsernameChips
+        v-model="form.balloonStaff"
+        data-testid="contest-balloon-staff"
+        :label="$t('admin.contestRules.fields.balloonStaff')"
+      />
+      <p class="text-xs text-muted">{{ $t('admin.contestRules.hints.balloonStaff') }}</p>
+    </div>
+  </AdminFormSection>
 </template>

@@ -19,7 +19,6 @@
   },
   "view": "View contest",
   "tabsLabel": "Parts of the contest",
-  "summaryLine": "{format} · {start} to {end} · {count} participants",
   "formats": {
     "default": "Default",
     "ioi": "IOI",
@@ -128,7 +127,8 @@
       "time": "Time",
       "format": "Format and scoring",
       "access": "Viewing and ranking access",
-      "rating": "Rating"
+      "rating": "Rating",
+      "people": "People"
     },
     "fields": {
       "key": "Contest key",
@@ -186,19 +186,28 @@
       "ratingCeiling": "Maximum rating",
       "rateExclude": "Excluded from rating",
       "ogImage": "Link preview image",
-      "logoOverrideImage": "Logo inside the contest"
+      "logoOverrideImage": "Logo inside the contest",
+      "optionsTitle": "Display and judging options",
+      "runPretestsOnlyHint": "Only pretests run during the contest; full tests at final judging.",
+      "hideProblemTagsHint": "Contestants do not see the problem tags.",
+      "isVisibleHint": "Off: only the contest staff see it.",
+      "isOrganizationPrivateHint": "Only members of the chosen organizations may enter."
     },
     "hints": {
       "key": "Cannot change after creation.",
       "timeLimit": "Leave empty if everyone takes the contest in the same window.",
       "pointsPrecision": "From 0 to 10.",
-      "scoreboardVisibility": "V visible, H hidden, C hidden during the contest, P hidden during the participation.",
       "scoreboardCacheTimeout": "0 turns the cache off. At most 86400.",
       "accessCodeSet": "A code is set (stored hashed). Type a new one to replace it; leave empty to keep it.",
       "accessCodeNone": "No code yet. Type one to set it.",
       "rankingCodeSet": "A code is set. Type a new one to replace it; leave empty to keep it.",
       "ogImage": "Shown when the contest link is shared (Discord, Facebook). An http(s) address or a path starting with /. Empty: the site image.",
-      "logoOverrideImage": "Shown beside the contest name at the top of the contest page. An http(s) address or a path starting with /. Empty: no logo."
+      "logoOverrideImage": "Shown beside the contest name at the top of the contest page. An http(s) address or a path starting with /. Empty: no logo.",
+      "siteZone": "Vietnam time (UTC+7).",
+      "optionalTime": "Optional.",
+      "lockedAfter": "Submissions after this time are not rejudged.",
+      "frozenLastMinutes": "0 means no freeze.",
+      "length": "Lasts {span}."
     },
     "scoreboardOptions": {
       "V": "Public",
@@ -207,7 +216,29 @@
       "P": "Hidden during the participation"
     },
     "tagPlaceholder": "Type a tag and press Enter",
-    "jumpLabel": "Jump to section"
+    "saved": "Saved contest {key}.",
+    "sectionLeads": {
+      "info": "The name, description and tags shown on the contest page.",
+      "people": "Who sets, curates and tests. Each may edit the contest by role.",
+      "time": "Every time is in Vietnam time (UTC+7).",
+      "access": "Who sees the contest, who may enter and who sees the scoreboard.",
+      "rating": "Whether the contest is rated, and for whom.",
+      "operations": "The rules shown to contestants, and balloons."
+    },
+    "timeline": {
+      "registrationStart": "Registration opens",
+      "start": "Start",
+      "freeze": "Scoreboard freeze",
+      "end": "End",
+      "lockedAfter": "Judging lock"
+    },
+    "rail": {
+      "label": "Contest summary",
+      "phase": "Status",
+      "participants": "Participants",
+      "virtual": "plus {count} virtual",
+      "problems": "Problems"
+    }
   },
   "format": {
     "fields": {
@@ -461,5 +492,7 @@
     "clear": "Clear selection",
     "selectPage": "Select the whole page",
     "selectRow": "Select {name}"
-  }
+  },
+  "backToList": "Contests",
+  "participantCount": "{count} participants"
 }

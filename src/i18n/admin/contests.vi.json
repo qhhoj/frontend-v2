@@ -19,7 +19,6 @@
   },
   "view": "Xem kỳ thi",
   "tabsLabel": "Các phần của kỳ thi",
-  "summaryLine": "{format} · {start} đến {end} · {count} thí sinh",
   "formats": {
     "default": "Mặc định",
     "ioi": "IOI",
@@ -128,7 +127,8 @@
       "time": "Thời gian",
       "format": "Thể thức và chấm",
       "access": "Quyền xem và xếp hạng",
-      "rating": "Rating"
+      "rating": "Rating",
+      "people": "Người phụ trách"
     },
     "fields": {
       "key": "Khóa kỳ thi",
@@ -186,19 +186,28 @@
       "ratingCeiling": "Rating tối đa",
       "rateExclude": "Loại khỏi rating",
       "ogImage": "Ảnh xem trước liên kết",
-      "logoOverrideImage": "Logo trong kỳ thi"
+      "logoOverrideImage": "Logo trong kỳ thi",
+      "optionsTitle": "Tùy chọn hiển thị và chấm",
+      "runPretestsOnlyHint": "Trong giờ thi chỉ chấm pretest; chấm đủ test khi chấm cuối.",
+      "hideProblemTagsHint": "Thí sinh không thấy thẻ của bài.",
+      "isVisibleHint": "Tắt: chỉ người phụ trách thấy kỳ thi.",
+      "isOrganizationPrivateHint": "Chỉ thành viên các tổ chức được chọn vào được."
     },
     "hints": {
       "key": "Không đổi được sau khi tạo.",
       "timeLimit": "Để trống nếu mọi người thi cùng khung giờ.",
       "pointsPrecision": "Từ 0 đến 10.",
-      "scoreboardVisibility": "V hiện, H ẩn, C ẩn trong kỳ thi, P ẩn trong lượt tham gia.",
       "scoreboardCacheTimeout": "0 là tắt cache. Tối đa 86400.",
       "accessCodeSet": "Đang có mã (lưu dạng băm). Nhập mã mới để thay; để trống để giữ.",
       "accessCodeNone": "Chưa có mã. Nhập để đặt.",
       "rankingCodeSet": "Đã đặt mã. Nhập mã mới để thay; để trống để giữ.",
       "ogImage": "Ảnh hiện khi chia sẻ liên kết kỳ thi (Discord, Facebook). Địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /. Để trống: ảnh chung của trang.",
-      "logoOverrideImage": "Hiện cạnh tên kỳ thi ở đầu trang kỳ thi. Địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /. Để trống: không có logo."
+      "logoOverrideImage": "Hiện cạnh tên kỳ thi ở đầu trang kỳ thi. Địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /. Để trống: không có logo.",
+      "siteZone": "Giờ Việt Nam (UTC+7).",
+      "optionalTime": "Không bắt buộc.",
+      "lockedAfter": "Bài nộp sau mốc này không được chấm lại.",
+      "frozenLastMinutes": "0 là không đóng băng.",
+      "length": "Kéo dài {span}."
     },
     "scoreboardOptions": {
       "V": "Công khai",
@@ -207,7 +216,29 @@
       "P": "Ẩn trong lượt tham gia"
     },
     "tagPlaceholder": "Nhập thẻ rồi nhấn Enter",
-    "jumpLabel": "Đi tới mục"
+    "saved": "Đã lưu kỳ thi {key}.",
+    "sectionLeads": {
+      "info": "Tên, mô tả và thẻ hiện trên trang kỳ thi.",
+      "people": "Ai ra đề, duyệt và thử bài. Họ sửa được kỳ thi theo vai trò.",
+      "time": "Mọi mốc giờ tính theo giờ Việt Nam (UTC+7).",
+      "access": "Ai thấy kỳ thi, ai vào được và ai xem được bảng xếp hạng.",
+      "rating": "Kỳ thi có tính rating không và tính cho ai.",
+      "operations": "Quy định hiện cho thí sinh và việc phát bóng bay."
+    },
+    "timeline": {
+      "registrationStart": "Mở đăng ký",
+      "start": "Bắt đầu",
+      "freeze": "Đóng băng bảng",
+      "end": "Kết thúc",
+      "lockedAfter": "Khóa chấm"
+    },
+    "rail": {
+      "label": "Tóm tắt kỳ thi",
+      "phase": "Trạng thái",
+      "participants": "Thí sinh",
+      "virtual": "thêm {count} lượt thi ảo",
+      "problems": "Bài"
+    }
   },
   "format": {
     "fields": {
@@ -461,5 +492,7 @@
     "clear": "Bỏ chọn",
     "selectPage": "Chọn cả trang",
     "selectRow": "Chọn {name}"
-  }
+  },
+  "backToList": "Danh sách kỳ thi",
+  "participantCount": "{count} thí sinh"
 }

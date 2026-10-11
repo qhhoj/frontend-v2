@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import UsernameChips from '../../ui/UsernameChips.vue';
 import type { ContestForm } from '../contest-form';
 import TagChips from './TagChips.vue';
 
@@ -13,19 +12,24 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.contests.general.sections.info')">
+  <AdminFormSection
+    id="contest-section-info"
+    :title="$t('admin.contests.general.sections.info')"
+    :description="$t('admin.contests.general.sectionLeads.info')"
+  >
     <AdminField
       input-id="contest-key"
       :label="$t('admin.contests.general.fields.key')"
       :hint="isCreate ? $t('admin.contests.general.hints.key') : undefined"
       :error="props.errors.key"
+      :required="isCreate"
     >
       <template #default="{ id, describedBy, invalid }">
         <input
           :id="id"
           v-model="form.key"
           :readonly="!isCreate"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'font-mono', !isCreate && 'bg-surface-strong text-muted']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
           autocomplete="off"
@@ -36,18 +40,20 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
       input-id="contest-name"
       :label="$t('admin.contests.general.fields.name')"
       :error="props.errors.name"
+      required
     >
       <template #default="{ id, describedBy, invalid }">
         <input
           :id="id"
           v-model="form.name"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
       </template>
     </AdminField>
     <AdminField
+      class="lg:col-span-2"
       input-id="contest-summary"
       :label="$t('admin.contests.general.fields.summary')"
       :error="props.errors.summary"
@@ -57,13 +63,14 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
           :id="id"
           v-model="form.summary"
           rows="2"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'py-2']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
       </template>
     </AdminField>
     <AdminField
+      class="lg:col-span-2"
       input-id="contest-description"
       :label="$t('admin.contests.general.fields.description')"
       :error="props.errors.description"
@@ -73,7 +80,7 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
           :id="id"
           v-model="form.description"
           rows="6"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'py-2']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
@@ -95,7 +102,7 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
           inputmode="url"
           maxlength="150"
           placeholder="https://… /media/…"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
           autocomplete="off"
@@ -105,17 +112,11 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
     </AdminField>
     <TagChips
       v-model="form.tags"
+      class="lg:col-span-2"
       :label="$t('admin.contests.general.fields.tags')"
       :placeholder="$t('admin.contests.general.tagPlaceholder')"
       :max="20"
       :error="props.errors.tags"
     />
-    <UsernameChips v-model="form.authors" :label="$t('admin.contests.general.fields.authors')" />
-    <UsernameChips
-      v-model="form.curators"
-      data-testid="contest-curators"
-      :label="$t('admin.contests.general.fields.curators')"
-    />
-    <UsernameChips v-model="form.testers" :label="$t('admin.contests.general.fields.testers')" />
-  </SettingsCard>
+  </AdminFormSection>
 </template>
