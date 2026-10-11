@@ -117,7 +117,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
         run: |
-          if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests; else npm test -- --shard="$SHARD"; fi
+          if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests && npm run test:scanners; else npm test -- --shard="$SHARD"; fi
 
   # The required status check: green when lint, typecheck and test passed or were skipped.
   check:
