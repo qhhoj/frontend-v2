@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
 import type { ProblemData } from '@/api/types/problem-data';
-import { Plus } from 'lucide-vue-next';
+import { FileArchive, Plus } from 'lucide-vue-next';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { buttonClass } from '../../ui/controls';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import CaseRow from './CaseRow.vue';
+import ZipAutofillDialog from './ZipAutofillDialog.vue';
+import type { AutofillMode } from './ZipAutofillDialog.vue';
+import { useAdminToast } from '../../ui/feedback/use-admin-toast';
 import {
   addBatch,
   addCase,
@@ -20,7 +23,12 @@ import type { KeyedCase, ListWarning } from './test-cases';
 import type { FieldErrors } from '../../ui/admin-errors';
 
 const cases = defineModel<KeyedCase[]>({ required: true });
-const props = defineProps<{ data: ProblemData; errors: FieldErrors }>();
+const props = defineProps<{
+  data: ProblemData;
+  errors: FieldErrors;
+  /** The problem's points: the default total the zip autofill splits across its tests. */
+  problemPoints?: number | null;
+}>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
 
 const warnings = computed(() => listWarnings({ cases: cases.value }, props.data));
@@ -55,6 +63,17 @@ const messagesAt = (index: number) => {
 };
 
 const HEAD = 'border-b border-line px-2 py-2 whitespace-nowrap';
+
+const isAutofillShown = ref(false);
+const toast = useAdminToast();
+/** Replaced rows take their args-box flags with them, as a removed row does. */
+function applyAutofill(rows: KeyedCase[], mode: AutofillMode) {
+  if (mode === 'replace') cases.value.forEach((row) => emit('invalid', row.key, false));
+  cases.value = mode === 'replace' ? rows : [...cases.value, ...rows];
+  toast.show({
+    text: translate('admin.problems.data.autofill.appliedToast', { count: rows.length }),
+  });
+}
 
 function move(index: number, offset: -1 | 1) {
   cases.value = moveCase(cases.value, index, offset);
@@ -127,6 +146,16 @@ function remove(index: number) {
       </table>
     </ScrollRegion>
     <div class="flex flex-wrap gap-2">
+      <button
+        v-if="data.archiveFiles.length > 0"
+        type="button"
+        data-testid="zip-autofill-open"
+        :class="buttonClass(cases.length === 0 ? 'primary' : 'secondary')"
+        @click="isAutofillShown = true"
+      >
+        <FileArchive aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        {{ $t('admin.problems.data.cases.autofill') }}
+      </button>
       <button type="button" :class="buttonClass('secondary')" @click="cases = addCase(cases)">
         <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.problems.data.cases.addCase') }}
@@ -137,5 +166,12 @@ function remove(index: number) {
       </button>
     </div>
     <p class="text-xs text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
+    <ZipAutofillDialog
+      v-model:visible="isAutofillShown"
+      :archive-files="data.archiveFiles"
+      :cases="cases"
+      :problem-points="problemPoints ?? null"
+      @apply="applyAutofill"
+    />
   </AdminFormSection>
 </template>

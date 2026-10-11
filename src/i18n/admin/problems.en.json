@@ -283,7 +283,8 @@
         "strayEnd": "E without an S"
       },
       "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
-      "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups."
+      "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups.",
+      "autofill": "Create tests from the zip"
     },
     "errors": {
       "fileName": "A file name is at most 100 characters and holds no NUL character.",
@@ -291,7 +292,26 @@
       "count": "Must be a whole number, zero or more.",
       "argsTotal": "All test arguments together are over 1 MiB; shorten them."
     },
-    "savedToast": "Saved the judging setup of {code}."
+    "savedToast": "Saved the judging setup of {code}.",
+    "autofill": {
+      "title": "Create tests from the zip",
+      "found": "Found {count} input/output pairs",
+      "rules": "Name files in one of these layouts: 1.in + 1.out, test01/task.inp + test01/task.out, input1.txt + output1.txt. Inputs end in .in or .inp or start with input; outputs end in .out, .ans or .ok or start with output.",
+      "modeLegend": "The list already has tests",
+      "modes": {
+        "append": "Add after the {count} existing tests",
+        "replace": "Replace the {count} existing tests"
+      },
+      "skipped": "Skipping {count} pairs already in the list.",
+      "total": "Total points",
+      "totalHint": "Split evenly across the tests; the remainder goes to the last tests. Edit each test's points afterwards.",
+      "previewLabel": "Tests to create",
+      "unpaired": "{count} files left unpaired",
+      "unpairedHint": "These files will not become tests. Check their names: a test's input and output must share a folder and a base name.",
+      "others": "{count} other files (not input/output)",
+      "apply": "Add {count} tests",
+      "appliedToast": "Added {count} tests. Press “Save configuration” to save."
+    }
   },
   "uploads": {
     "archive": {
