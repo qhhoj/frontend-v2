@@ -39,6 +39,8 @@ const props = withDefaults(
     problemLabels?: Record<string, string>;
     /** Rows picked for the diff, in pick order; given only to signed-in viewers of the list page (shows the "Chọn" column). */
     pickedIds?: readonly string[];
+    /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
+    rankStart?: number;
   }>(),
   {
     showProblem: true,
@@ -46,6 +48,7 @@ const props = withDefaults(
     problemLabels: () => ({}),
     columnKeys: undefined,
     pickedIds: undefined,
+    rankStart: undefined,
   },
 );
 const locale = useLocaleStore();
@@ -90,6 +93,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
       :highlight-ids="highlightIds"
       :problem-labels="problemLabels"
       :picked-ids="pickedIds"
+      :rank-start="rankStart"
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
@@ -103,6 +107,13 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
           <tr class="text-left text-[13px] text-muted">
             <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
               {{ $t('sourceDiff.select.column') }}
+            </th>
+            <th
+              v-if="rankStart !== undefined"
+              scope="col"
+              :class="[HEADER_CELL_CLASSES, 'w-14 text-right']"
+            >
+              {{ $t('submissions.columns.rank') }}
             </th>
             <th
               v-for="column in columns"
@@ -119,7 +130,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
         </thead>
         <tbody>
           <tr
-            v-for="row in submissions"
+            v-for="(row, index) in submissions"
             :key="row.id"
             :data-id="row.id"
             class="cursor-pointer border-t border-line hover:bg-surface-hover"
@@ -134,6 +145,12 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
                 :picked-count="pickedIds?.length ?? 0"
                 @toggle="emit('togglePick', $event)"
               />
+            </td>
+            <td
+              v-if="rankStart !== undefined"
+              :class="[BODY_CELL_CLASSES, 'text-right font-semibold text-muted tabular-nums']"
+            >
+              {{ rankStart + index }}
             </td>
             <td :class="BODY_CELL_CLASSES"><SubmissionVerdictBlock :row="row" /></td>
             <td v-if="isShown('problem')" :class="[BODY_CELL_CLASSES, 'w-full max-w-0']">

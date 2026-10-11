@@ -35,7 +35,7 @@ afterEach(() => {
 describe('PdfButton', () => {
   it('shows a plain PDF button and an empty status region before any click', () => {
     const wrapper = open();
-    expect(wrapper.get('button').text()).toBe('PDF');
+    expect(wrapper.get('button').text()).toBe('Tải đề dạng PDF');
     expect(wrapper.get('[role="status"]').text()).toBe('');
   });
   it('starts no countdown timer until the server asks the viewer to wait', () => {

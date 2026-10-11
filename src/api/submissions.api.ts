@@ -3,6 +3,9 @@ import type { SubmissionListQuery, SubmitBody } from './types/submissions';
 
 export const fetchSubmissions = (query: SubmissionListQuery) =>
   apiGetPage('/submissions', { query });
+/** Each user's best submission on a problem, best first (public). */
+export const fetchBestSubmissions = (code: string, query: { page: number; pageSize: number }) =>
+  apiGetPage('/problems/{code}/best-submissions', { path: { code }, query });
 export const fetchSubmission = (id: string) => apiGet('/submissions/{id}', { path: { id } });
 export const submit = (problemCode: string, body: SubmitBody) =>
   apiSend('post', '/problems/{code}/submit', { path: { code: problemCode }, body });

@@ -24,6 +24,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.problem' },
   },
   {
+    path: '/problems/:code/best',
+    name: 'problem-best',
+    component: () => import('@/features/submissions/BestSubmissionsPage.vue'),
+    meta: { titleKey: 'pages.problemBest' },
+  },
+  {
     path: '/submissions',
     name: 'submissions',
     component: () => import('@/features/submissions/SubmissionsPage.vue'),

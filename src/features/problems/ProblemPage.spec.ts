@@ -141,6 +141,17 @@ describe('problem page', () => {
     );
   });
 
+  it('links all submissions and the best-submissions ranking of the problem', async () => {
+    mockApi({ ...anonymousViewer, ...problemPageRoutes() });
+    const { wrapper } = await openProblem();
+    expect(wrapper.get('[data-testid="all-submissions-link"]').attributes('href')).toBe(
+      '/submissions?problem=duongdi',
+    );
+    expect(wrapper.get('[data-testid="best-submissions-link"]').attributes('href')).toBe(
+      '/problems/duongdi/best',
+    );
+  });
+
   it('offers no rendered PDF when the statement is only an uploaded PDF', async () => {
     mockApi({
       ...anonymousViewer,
@@ -153,7 +164,7 @@ describe('problem page', () => {
   it('offers the rendered PDF for a text statement without an uploaded PDF', async () => {
     mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ pdfStatementUrl: null })) });
     const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="header-actions"] button').text()).toBe('PDF');
+    expect(wrapper.get('[data-testid="header-actions"] button').text()).toBe('Tải đề dạng PDF');
   });
 
   it('shows the uploaded PDF statement inside the statement card', async () => {
