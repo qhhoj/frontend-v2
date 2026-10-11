@@ -24,10 +24,10 @@ const hasTiles = computed(() =>
 
 <template>
   <section v-if="hasTiles" aria-labelledby="admin-overview-title" class="flex flex-col gap-3">
-    <h2 id="admin-overview-title" class="font-display text-base font-bold">
+    <h2 id="admin-overview-title" class="font-display text-base font-semibold">
       {{ $t('admin.shell.overview.title') }}
     </h2>
-    <ul class="grid grid-cols-2 gap-3 lg:grid-cols-3 2xl:grid-cols-5">
+    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
       <JudgingTiles v-if="canAny(JUDGING_STAFF)" />
       <OverviewTile
         v-if="can(ADMIN_SCREENS.tickets.permission)"

@@ -4,16 +4,23 @@ import { readStorage, writeStorage } from '@/lib/storage';
 import { useViewerId } from '@/stores/use-viewer-id';
 
 /** One admin page the viewer opened: its path, its screen title and the record it was about (a code, a key). */
-export interface RecentScreen {
+export interface RecentVisit {
   path: string;
   titleKey: string;
   detail: string | null;
 }
-export const RECENT_LIMIT = 6;
+/** A remembered page and how many times this browser opened it. */
+export interface RecentScreen extends RecentVisit {
+  visits: number;
+}
+/** Pages remembered per account; the oldest falls off, so a screen no longer used stops being a shortcut. */
+export const RECENT_LIMIT = 20;
+/** The dashboard's "Lối tắt": the most-opened pages. */
+export const SHORTCUT_LIMIT = 6;
 /** Pages not worth a shortcut: the dashboard that lists them, and unknown admin paths. */
 const SKIPPED_ROUTES = new Set(['admin-dashboard', 'admin-unknown']);
 
-const isRecentScreen = (value: unknown): value is RecentScreen => {
+const isRecentVisit = (value: unknown): value is RecentVisit & { visits?: unknown } => {
   const candidate = value as Partial<RecentScreen> | null;
   return (
     typeof candidate?.path === 'string' &&
@@ -21,23 +28,42 @@ const isRecentScreen = (value: unknown): value is RecentScreen => {
     (candidate.detail === null || typeof candidate.detail === 'string')
   );
 };
+/** An entry stored before visits were counted counts as one visit. */
+const visitsOf = (value: unknown) =>
+  typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : 1;
 
-/** The stored list, dropping anything malformed (an old format, a hand edit), never more than the limit. */
+/** The stored list, newest first, dropping anything malformed (an old format, a hand edit), never more than the limit. */
 export function parseRecent(raw: string | null): RecentScreen[] {
   try {
     const value: unknown = JSON.parse(raw ?? '[]');
-    return Array.isArray(value) ? value.filter(isRecentScreen).slice(0, RECENT_LIMIT) : [];
+    if (!Array.isArray(value)) return [];
+    return value
+      .filter(isRecentVisit)
+      .slice(0, RECENT_LIMIT)
+      .map(({ path, titleKey, detail, visits }) => ({
+        path,
+        titleKey,
+        detail,
+        visits: visitsOf(visits),
+      }));
   } catch {
     return [];
   }
 }
 
-/** The visit first, once: an earlier visit to the same path moves up instead of repeating. */
-export const withVisit = (list: readonly RecentScreen[], visit: RecentScreen): RecentScreen[] =>
-  [visit, ...list.filter((entry) => entry.path !== visit.path)].slice(0, RECENT_LIMIT);
+/** The visit first, once: an earlier visit to the same path moves up and adds to its count instead of repeating. */
+export function withVisit(list: readonly RecentScreen[], visit: RecentVisit): RecentScreen[] {
+  const earlier = list.find((entry) => entry.path === visit.path);
+  const entry = { ...visit, visits: (earlier?.visits ?? 0) + 1 };
+  return [entry, ...list.filter((other) => other.path !== visit.path)].slice(0, RECENT_LIMIT);
+}
+
+/** The most-opened pages; between equal counts the more recent one wins (the sort is stable). */
+export const shortcutsOf = (list: readonly RecentScreen[]): RecentScreen[] =>
+  [...list].sort((left, right) => right.visits - left.visits).slice(0, SHORTCUT_LIMIT);
 
 /** What a route is worth remembering as, or `null` for a page that is not a shortcut. */
-export function visitOf(route: RouteLocationNormalizedLoaded): RecentScreen | null {
+export function visitOf(route: RouteLocationNormalizedLoaded): RecentVisit | null {
   const name = typeof route.name === 'string' ? route.name : '';
   if (!route.meta.titleKey || SKIPPED_ROUTES.has(name)) return null;
   const detail = Object.values(route.params).find((value) => typeof value === 'string');

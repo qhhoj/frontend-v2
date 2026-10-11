@@ -4,14 +4,18 @@ import { CloudDownload, Plus, Trophy } from 'lucide-vue-next';
 import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
-import AdminBit from './AdminBit.vue';
-import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
 import RecentChangesCard from '../audit/RecentChangesCard.vue';
+import { buttonClass } from '../ui/controls';
+import AdminBit from './AdminBit.vue';
+import { QUICK_ACTIONS } from './admin-nav';
 import OverviewTiles from './overview/OverviewTiles.vue';
 import RecentScreens from './recent/RecentScreens.vue';
 
+/**
+ * The admin home (pages/admin.md, "Dashboard"): the greeting with the one staff Bit and the quick actions, what waits for
+ * staff, then the recent changes beside this account's shortcuts. The sidebar lists every screen, so this page does not.
+ */
 const session = useSessionStore();
-const sections = computed(() => visibleDashboard(session.user));
 const ACTION_ICONS = {
   problemNew: Plus,
   polygonImport: CloudDownload,
@@ -24,70 +28,35 @@ const actions = computed(() =>
 
 <template>
   <div data-testid="admin-dashboard" class="flex flex-col gap-6">
-    <header>
-      <h1 class="page-title">{{ $t('admin.shell.screens.dashboard') }}</h1>
-      <p class="text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>
-    </header>
-    <section class="glass flex flex-wrap items-center gap-4 rounded-panel p-5">
+    <header class="flex flex-wrap items-center gap-x-4 gap-y-3">
       <AdminBit placement="greeting" />
-      <div class="min-w-0 flex-1">
-        <h2 class="font-display text-xl font-semibold">
+      <div class="min-w-0 flex-1 basis-60">
+        <h1 class="font-display text-xl font-semibold md:text-2xl">
           {{ $t('admin.shell.dashboard.hello', { name: session.user?.username }) }}
-        </h2>
-        <p class="text-sm text-muted">{{ $t('admin.shell.dashboard.helloBody') }}</p>
-        <p class="mt-1 hidden text-xs text-muted sm:block">
-          {{ $t('admin.shell.search.tip') }}
-        </p>
+        </h1>
+        <p class="text-sm text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div v-if="actions.length" class="flex flex-wrap gap-2">
         <RouterLink
           v-for="(id, index) in actions"
           :key="id"
           :to="{ name: adminRouteName(id) }"
-          class="inline-flex min-h-11 items-center gap-2 rounded-pill px-4 text-sm font-semibold"
-          :class="
-            index === 0
-              ? 'bg-gradient-accent text-on-accent'
-              : 'border border-line-strong bg-surface-solid'
-          "
+          :class="buttonClass(index === 0 ? 'primary' : 'secondary')"
         >
           <component
             :is="ACTION_ICONS[id as keyof typeof ACTION_ICONS]"
             aria-hidden="true"
             class="size-4"
+            :stroke-width="1.75"
           />
           {{ $t(`admin.shell.dashboard.actions.${id}`) }}
         </RouterLink>
       </div>
-    </section>
+    </header>
     <OverviewTiles />
-    <RecentScreens />
-    <RecentChangesCard />
-    <section v-for="entry in sections" :key="entry.id" class="flex flex-col gap-3">
-      <h2 class="font-display text-base font-bold">{{ $t(entry.labelKey) }}</h2>
-      <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <li v-for="item in entry.items" :key="item.id">
-          <RouterLink
-            :to="{ name: item.routeName }"
-            class="glass flex h-full min-w-0 flex-col gap-2 rounded-card p-4 wrap-anywhere hover:bg-surface-hover"
-          >
-            <component :is="item.icon" aria-hidden="true" class="size-5 text-accent" />
-            <span class="font-semibold">{{ $t(item.labelKey) }}</span>
-            <span class="text-sm text-muted">
-              {{ $t(`admin.shell.dashboard.descriptions.${item.id}`) }}
-            </span>
-            <span class="mt-auto flex flex-wrap items-center gap-2 text-xs">
-              <span
-                v-if="heldPermission(item.permission, session.user)"
-                class="rounded-pill border border-line px-2 py-0.5"
-              >
-                {{ heldPermission(item.permission, session.user) }}
-              </span>
-              <span class="font-mono text-muted">{{ item.path }}</span>
-            </span>
-          </RouterLink>
-        </li>
-      </ul>
-    </section>
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <RecentChangesCard />
+      <RecentScreens />
+    </div>
   </div>
 </template>

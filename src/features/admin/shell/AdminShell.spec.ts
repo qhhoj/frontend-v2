@@ -21,9 +21,12 @@ describe('AdminShell', () => {
     await waitForAdminShell(wrapper);
     expect(wrapper.text()).toContain('Chào minhthu');
     expect(navLinks(wrapper)).toEqual(['Tổng quan', 'Bài tập', 'Nhập từ Polygon', 'Nhập tệp .zip']);
-    expect(wrapper.find('[data-testid="admin-dashboard"]').text()).toContain(
-      '/admin/problems/import',
-    );
+    const dashboard = wrapper.find('[data-testid="admin-dashboard"]').text();
+    expect(dashboard).toContain('Tạo bài tập');
+    expect(dashboard).toContain('Nhập từ Polygon');
+    expect(dashboard).not.toContain('Tạo kỳ thi');
+    expect(dashboard).not.toContain('/admin/');
+    expect(dashboard).not.toContain('judge.');
     expect(wrapper.text()).not.toContain('Máy chấm');
     expect(wrapper.find('[data-testid="admin-bit"]').attributes('data-placement')).toBe('greeting');
   });

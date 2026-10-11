@@ -25,41 +25,13 @@
     "back": "Back to admin home"
   },
   "dashboard": {
-    "lead": "Shortcuts to everyday tasks.",
+    "lead": "What is waiting, recent changes and your shortcuts.",
     "hello": "Hello {name}",
-    "helloBody": "Pick a section on the left or use a shortcut below. Only sections your account may open are shown.",
     "actions": {
       "problemNew": "New problem",
       "problemImport": "Import a .zip file",
       "contestNew": "New contest",
       "polygonImport": "Import from Polygon"
-    },
-    "descriptions": {
-      "problems": "Edit statements, translations, editorials and test data; clone a problem.",
-      "problemImport": "Upload a Polygon .zip package and follow the import progress.",
-      "posts": "Review and remove posts.",
-      "commentReports": "Review reported comments, resolve or dismiss the reports.",
-      "comments": "Search every comment, hide or show many at once.",
-      "contests": "Announcements, official rankings, rejudging and rating.",
-      "similarity": "Run a code similarity check by problem or by contest.",
-      "rejudge": "Rejudge or rescore by problem, contest, user or judge.",
-      "judges": "The list of judges, locking and disconnecting them.",
-      "users": "Ban or unban accounts and sign in as a user.",
-      "activity": "View and export logs, summaries by user.",
-      "settings": "Limits, similarity and other settings, and the change history.",
-      "pages": "Create and edit about and policy pages.",
-      "organizations": "Edit the organizations you administer, their members and join requests.",
-      "tickets": "Tickets sent by users.",
-      "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import.",
-      "submissions": "Filter submissions, select many to rejudge or recalculate points.",
-      "types": "Problem types, groups and licenses.",
-      "contestTags": "The tag catalogue shown on the contest list.",
-      "languages": "Languages submissions can use, and the judges that run them.",
-      "organizationQuotas": "Each organization's quota and usage.",
-      "config": "Other key–value configuration.",
-      "shortLinks": "Choose codes, set expiry and delete short links.",
-      "integrations": "Keys that let an external system create private contests and read standings.",
-      "log": "Every recorded change: who, what and when."
     }
   },
   "screens": {
@@ -127,7 +99,6 @@
     "tooShort": "Type at least {count} characters to search problems, contests, users and organizations.",
     "count": "{count} result | {count} results",
     "keys": "↑ ↓ to choose · Enter to open · Esc to close",
-    "tip": "Tip: press Ctrl K or / anywhere to search.",
     "groups": {
       "screens": "Admin screens",
       "problems": "Problems",
@@ -148,9 +119,10 @@
     "reports": "Reported comments",
     "reportsDetail": "Comments with reports not yet settled.",
     "requests": "Organization join requests",
-    "requestsDetail": "Requests waiting for a decision across organizations."
+    "requestsDetail": "Requests waiting for a decision across organizations.",
+    "attention": "Needs action"
   },
   "recent": {
-    "title": "Recently opened"
+    "title": "Shortcuts"
   }
 }

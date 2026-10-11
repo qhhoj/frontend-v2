@@ -25,41 +25,13 @@
     "back": "Về trang chủ quản trị"
   },
   "dashboard": {
-    "lead": "Lối tắt tới các việc thường làm.",
+    "lead": "Việc đang chờ, thay đổi gần đây và lối tắt của bạn.",
     "hello": "Chào {name}",
-    "helloBody": "Chọn một mục ở cột trái hoặc dùng lối tắt bên dưới. Chỉ những mục tài khoản được phép mới hiện ra.",
     "actions": {
       "problemNew": "Tạo bài tập",
       "problemImport": "Nhập tệp .zip",
       "contestNew": "Tạo kỳ thi",
       "polygonImport": "Nhập từ Polygon"
-    },
-    "descriptions": {
-      "problems": "Sửa đề, bản dịch, lời giải, dữ liệu chấm; nhân bản bài.",
-      "problemImport": "Tải gói Polygon dạng .zip lên, theo dõi tiến trình nhập.",
-      "posts": "Duyệt và gỡ bài viết.",
-      "commentReports": "Xem bình luận bị báo cáo, xử lý hoặc bỏ qua báo cáo.",
-      "comments": "Tìm mọi bình luận, ẩn hoặc hiện nhiều bình luận một lần.",
-      "contests": "Thông báo, bảng xếp hạng chính thức, chấm lại, tính rating.",
-      "similarity": "Chạy so sánh mã nguồn theo bài hoặc theo kỳ thi.",
-      "rejudge": "Chấm lại hoặc tính lại điểm theo bộ lọc bài, kỳ thi, người dùng, máy chấm.",
-      "judges": "Danh sách máy chấm, khóa, ngắt kết nối.",
-      "users": "Cấm hoặc bỏ cấm tài khoản, đăng nhập thay.",
-      "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
-      "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
-      "pages": "Tạo và sửa trang giới thiệu, quy định.",
-      "organizations": "Sửa tổ chức mình quản trị, thành viên và yêu cầu tham gia.",
-      "tickets": "Phiếu do người dùng gửi.",
-      "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập.",
-      "submissions": "Lọc bài nộp, chọn nhiều bài để chấm lại hoặc tính lại điểm.",
-      "types": "Dạng bài, nhóm bài và giấy phép.",
-      "contestTags": "Danh mục nhãn hiện ở danh sách kỳ thi.",
-      "languages": "Ngôn ngữ dùng để nộp bài và máy chấm chạy chúng.",
-      "organizationQuotas": "Hạn mức và mức dùng của từng tổ chức.",
-      "config": "Cấu hình khác dạng khoá – giá trị.",
-      "shortLinks": "Đặt mã, hạn dùng và xoá liên kết rút gọn.",
-      "integrations": "Khoá cho hệ thống ngoài tạo kỳ thi riêng và đọc bảng xếp hạng.",
-      "log": "Mọi thay đổi đã ghi: ai sửa, sửa gì, lúc nào."
     }
   },
   "screens": {
@@ -127,7 +99,6 @@
     "tooShort": "Gõ ít nhất {count} ký tự để tìm bài tập, kỳ thi, người dùng và tổ chức.",
     "count": "{count} kết quả",
     "keys": "↑ ↓ để chọn · Enter để mở · Esc để đóng",
-    "tip": "Mẹo: nhấn Ctrl K hoặc / ở bất kỳ đâu để tìm nhanh.",
     "groups": {
       "screens": "Mục quản trị",
       "problems": "Bài tập",
@@ -148,9 +119,10 @@
     "reports": "Bình luận bị báo cáo",
     "reportsDetail": "Bình luận còn báo cáo chưa xử lý.",
     "requests": "Yêu cầu vào tổ chức",
-    "requestsDetail": "Yêu cầu đang chờ duyệt ở mọi tổ chức."
+    "requestsDetail": "Yêu cầu đang chờ duyệt ở mọi tổ chức.",
+    "attention": "Cần xử lý"
   },
   "recent": {
-    "title": "Mở gần đây"
+    "title": "Lối tắt"
   }
 }
