@@ -119,8 +119,6 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
     isTester: false,
     inContest: false,
     canViewBalloons: false,
-    canSeeFullScoreboard: true,
-    boardFrozenAt: null,
     isCurrent: false,
     liveStatus: null,
     liveParticipation: null,
