@@ -29,14 +29,14 @@ describe('official mode in the shell', () => {
     expect(officialBanner()).toBeNull();
   });
 
-  it('asks nothing for an anonymous viewer', async () => {
-    const calls = mockApi({
+  // The shell still reads `/site` for everyone (the site notice); the official-mode query itself is covered in official-mode.queries.spec.
+  it('shows no banner to an anonymous viewer, even with the mode on', async () => {
+    mockApi({
       ...anonymousViewer,
       'GET /pages/no-such-page': fail(404, 'not_found'),
       ...site(true),
     });
     await mountApp('/no-such-page');
-    expect(calls.some((call) => call.path === '/site')).toBe(false);
     expect(officialBanner()).toBeNull();
   });
 });
