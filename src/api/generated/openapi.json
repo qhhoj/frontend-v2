@@ -467,6 +467,129 @@
         ],
         "type": "object"
       },
+      "AuditActorResponse": {
+        "properties": {
+          "id": {
+            "description": "User id.",
+            "type": "string"
+          },
+          "username": {
+            "description": "Username; null when the account no longer exists.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username"
+        ],
+        "type": "object"
+      },
+      "AuditEntryResponse": {
+        "properties": {
+          "action": {
+            "description": "What was done: `create`, `edit`, `delete`, `hide`, `lock`, ... as the writer recorded it.",
+            "type": "string"
+          },
+          "actor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AuditActorResponse"
+              }
+            ],
+            "description": "Who made it; null for system writes (workers, imports).",
+            "nullable": true,
+            "type": "object"
+          },
+          "at": {
+            "description": "When the change was made.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "changedFields": {
+            "description": "Names of the changed fields. Values are never returned: some records hold sensitive before/after values.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "comment": {
+            "description": "The writer's free-text note, often empty.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Record id (UUIDv7, sorts by time).",
+            "type": "string"
+          },
+          "object": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AuditObjectResponse"
+              }
+            ],
+            "description": "The object changed."
+          },
+          "type": {
+            "description": "Object kind: a `revisions` entity such as `problem`, or `setting`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "actor",
+          "type",
+          "action",
+          "object",
+          "changedFields",
+          "comment"
+        ],
+        "type": "object"
+      },
+      "AuditFeedResponse": {
+        "properties": {
+          "items": {
+            "description": "Newest first, at most `limit`.",
+            "items": {
+              "$ref": "#/components/schemas/AuditEntryResponse"
+            },
+            "type": "array"
+          },
+          "nextBefore": {
+            "description": "Pass as `before` to read the next (older) page; null on the last page.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "nextBefore"
+        ],
+        "type": "object"
+      },
+      "AuditObjectResponse": {
+        "properties": {
+          "deleted": {
+            "description": "The object no longer exists (or is soft-deleted); clients show the label without a link.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Object id, or the key for a setting.",
+            "type": "string"
+          },
+          "label": {
+            "description": "What to call the object: problem code, contest key, username, organization slug, page url, post title, setting key, catalog name. Null when the kind has no name (comment, submission) or the object is gone.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "deleted"
+        ],
+        "type": "object"
+      },
       "BalloonPageMetaResponse": {
         "properties": {
           "deliveredTotal": {
@@ -587,6 +710,178 @@
         },
         "required": [
           "reason"
+        ],
+        "type": "object"
+      },
+      "BulkContestResponse": {
+        "properties": {
+          "done": {
+            "description": "Number of contests changed.",
+            "type": "number"
+          },
+          "failed": {
+            "description": "Number of contests refused.",
+            "type": "number"
+          },
+          "results": {
+            "description": "One entry per requested key, in request order.",
+            "items": {
+              "$ref": "#/components/schemas/BulkContestResultResponse"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results",
+          "done",
+          "failed"
+        ],
+        "type": "object"
+      },
+      "BulkContestResultResponse": {
+        "properties": {
+          "key": {
+            "description": "The contest key from the request.",
+            "type": "string"
+          },
+          "outcome": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BulkVisibilityOutcome"
+              }
+            ],
+            "description": "`done` when the contest changed, `unchanged` when it already was so, `failed` when the edit was refused."
+          },
+          "reason": {
+            "description": "Set when failed: the error code the single-contest PATCH would answer (`not_found`, `forbidden`, `conflict`, ...), or `too_many_tags`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome",
+          "key"
+        ],
+        "type": "object"
+      },
+      "BulkContestTagDto": {
+        "properties": {
+          "assigned": {
+            "description": "true adds the tag to every listed contest, false removes it.",
+            "type": "boolean"
+          },
+          "keys": {
+            "description": "Contest keys to change, 1 to 100, no repeats.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "tag": {
+            "description": "The tag slug to add or remove.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag",
+          "assigned",
+          "keys"
+        ],
+        "type": "object"
+      },
+      "BulkContestVisibilityDto": {
+        "properties": {
+          "isVisible": {
+            "description": "true shows every listed contest, false hides it.",
+            "type": "boolean"
+          },
+          "keys": {
+            "description": "Contest keys to change, 1 to 100, no repeats.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "isVisible",
+          "keys"
+        ],
+        "type": "object"
+      },
+      "BulkDisqualifyDto": {
+        "properties": {
+          "disqualified": {
+            "description": "True to disqualify the participation, false to reinstate it.",
+            "type": "boolean"
+          },
+          "ids": {
+            "description": "Participation ids, 1 to 100, no repeats.",
+            "items": {
+              "maxLength": 36,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "disqualified",
+          "ids"
+        ],
+        "type": "object"
+      },
+      "BulkDisqualifyResponse": {
+        "properties": {
+          "done": {
+            "description": "Number of participations changed.",
+            "type": "number"
+          },
+          "failed": {
+            "description": "Number of ids refused.",
+            "type": "number"
+          },
+          "results": {
+            "description": "One entry per requested id, in request order.",
+            "items": {
+              "$ref": "#/components/schemas/BulkDisqualifyResultResponse"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results",
+          "done",
+          "failed"
+        ],
+        "type": "object"
+      },
+      "BulkDisqualifyResultResponse": {
+        "properties": {
+          "id": {
+            "description": "The participation id from the request.",
+            "type": "string"
+          },
+          "outcome": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BulkVisibilityOutcome"
+              }
+            ],
+            "description": "`done` when the flag changed, `unchanged` when it already had that value, `failed` when the participation is not in the contest."
+          },
+          "reason": {
+            "description": "Set when failed: the error code (`not_found`).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome",
+          "id"
         ],
         "type": "object"
       },
@@ -2064,6 +2359,10 @@
               }
             ]
           },
+          "logoOverrideImage": {
+            "description": "Shown instead of the site logo inside the contest; empty for none.",
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
@@ -2203,6 +2502,7 @@
           "rules",
           "rulesHtml",
           "rulesRevision",
+          "logoOverrideImage",
           "authors",
           "frozenLastMinutes",
           "showSubmissionList",
@@ -2323,11 +2623,46 @@
         ],
         "type": "object"
       },
+      "ContestListEditorResponse": {
+        "properties": {
+          "isVisible": {
+            "description": "Whether the contest is shown to users who may see it.",
+            "type": "boolean"
+          },
+          "lockedAfter": {
+            "description": "Live submissions are not rejudged after this time; null for no lock.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "pendingCount": {
+            "description": "Submissions still waiting for the final judge; null unless the format is `final_submission`.",
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "isVisible",
+          "lockedAfter",
+          "pendingCount"
+        ],
+        "type": "object"
+      },
       "ContestListItemResponse": {
         "properties": {
           "disallowVirtual": {
             "description": "Virtual participation after the end is not allowed.",
             "type": "boolean"
+          },
+          "editor": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContestListEditorResponse"
+              }
+            ],
+            "description": "Null unless the viewer may edit the contest.",
+            "nullable": true,
+            "type": "object"
           },
           "endTime": {
             "description": "When the contest ends, ISO 8601.",
@@ -2439,6 +2774,7 @@
           "phase",
           "formatName",
           "viewer",
+          "editor",
           "key",
           "name",
           "summary",
@@ -2459,6 +2795,15 @@
           "registrationEnd"
         ],
         "type": "object"
+      },
+      "ContestListSort": {
+        "enum": [
+          "name",
+          "newest",
+          "oldest",
+          "users"
+        ],
+        "type": "string"
       },
       "ContestListViewerResponse": {
         "properties": {
@@ -2831,6 +3176,10 @@
             "nullable": true,
             "type": "string"
           },
+          "ogImage": {
+            "description": "Image for link previews; empty for the site image.",
+            "type": "string"
+          },
           "organizations": {
             "description": "Organization ids tied to the contest.",
             "items": {
@@ -2933,6 +3282,7 @@
           "balloonStaff",
           "publishAfterEnd",
           "publishAfterEndBy",
+          "ogImage",
           "hasRankingAccessCode",
           "problemOutputPrefixes",
           "users"
@@ -2972,6 +3322,10 @@
             ],
             "description": "A theme token key (`tag-1`..`tag-8`), never a hex."
           },
+          "contestCount": {
+            "description": "Contests carrying the tag, among those the viewer may see.",
+            "type": "number"
+          },
           "description": {
             "description": "Short description.",
             "type": "string"
@@ -2994,7 +3348,8 @@
           "slug",
           "name",
           "description",
-          "order"
+          "order",
+          "contestCount"
         ],
         "type": "object"
       },
@@ -3238,10 +3593,20 @@
             "nullable": true,
             "type": "string"
           },
+          "logoOverrideImage": {
+            "description": "Replaces the site logo inside the contest: an http(s) URL or a site path, up to 150 characters; empty for none.",
+            "maxLength": 150,
+            "type": "string"
+          },
           "name": {
             "description": "Contest name, 1 to 100 characters.",
             "maxLength": 100,
             "minLength": 1,
+            "type": "string"
+          },
+          "ogImage": {
+            "description": "Image for link previews: an http(s) URL or a site path, up to 150 characters; empty for the site image.",
+            "maxLength": 150,
             "type": "string"
           },
           "organizations": {
@@ -3363,7 +3728,6 @@
             "items": {
               "type": "string"
             },
-            "maxItems": 20,
             "type": "array"
           },
           "testers": {
@@ -4623,6 +4987,280 @@
         },
         "required": [
           "error"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeLanguageResponse": {
+        "properties": {
+          "languageId": {
+            "description": "Site language id.",
+            "type": "string"
+          },
+          "remoteId": {
+            "description": "The remote OJ's language id.",
+            "type": "string"
+          },
+          "remoteName": {
+            "description": "The remote OJ's language name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "languageId",
+          "remoteId",
+          "remoteName"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeLinkResponse": {
+        "properties": {
+          "isActive": {
+            "description": "Whether submissions go to the external judge.",
+            "type": "boolean"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalJudgeLanguageResponse"
+            },
+            "type": "array"
+          },
+          "oj": {
+            "type": "string"
+          },
+          "problemId": {
+            "type": "string"
+          },
+          "title": {
+            "description": "Remote title from the last verify.",
+            "type": "string"
+          },
+          "verifiedAt": {
+            "description": "When the link was last verified; null if never.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "isActive",
+          "oj",
+          "problemId",
+          "title",
+          "languages",
+          "verifiedAt"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeSearchDto": {
+        "properties": {
+          "oj": {
+            "description": "OJ id to search in.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "page": {
+            "description": "Page, from 1.",
+            "minimum": 1,
+            "type": "number"
+          },
+          "problemId": {
+            "description": "Problem id (or part of it) to search for.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ExternalJudgeSearchItemResponse": {
+        "properties": {
+          "oj": {
+            "type": "string"
+          },
+          "problemId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "oj",
+          "problemId",
+          "title",
+          "source"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeSearchResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalJudgeSearchItemResponse"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeStatusResponse": {
+        "properties": {
+          "checkedAt": {
+            "description": "When the last check ran (ISO 8601); null when not configured.",
+            "nullable": true,
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Whether an external judge is configured.",
+            "type": "boolean"
+          },
+          "ojs": {
+            "description": "OJ ids it serves; empty when unreachable.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "reachable": {
+            "description": "Whether the last check reached it; null when not configured.",
+            "nullable": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "reachable",
+          "checkedAt",
+          "ojs"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeTestResponse": {
+        "properties": {
+          "ojs": {
+            "description": "OJ ids the external judge serves.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "ojs"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeVerifyDto": {
+        "properties": {
+          "oj": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "problemId": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "oj",
+          "problemId"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeVerifyLanguageResponse": {
+        "properties": {
+          "remoteId": {
+            "type": "string"
+          },
+          "remoteName": {
+            "type": "string"
+          },
+          "suggestedLanguageId": {
+            "description": "The site language this one most likely is; null when no good match.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "remoteId",
+          "remoteName",
+          "suggestedLanguageId"
+        ],
+        "type": "object"
+      },
+      "ExternalJudgeVerifyResponse": {
+        "properties": {
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/ExternalJudgeVerifyLanguageResponse"
+            },
+            "type": "array"
+          },
+          "oj": {
+            "type": "string"
+          },
+          "problemId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "oj",
+          "problemId",
+          "title",
+          "languages"
+        ],
+        "type": "object"
+      },
+      "ExternalLanguageDto": {
+        "properties": {
+          "languageId": {
+            "description": "Site language id.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "remoteId": {
+            "description": "The remote OJ's language id.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "remoteName": {
+            "description": "The remote OJ's language name, for display.",
+            "maxLength": 100,
+            "type": "string"
+          }
+        },
+        "required": [
+          "languageId",
+          "remoteId"
         ],
         "type": "object"
       },
@@ -7072,6 +7710,19 @@
         ],
         "type": "object"
       },
+      "OverrideResult": {
+        "description": "The verdict to show. `AC` needs full points.",
+        "enum": [
+          "AC",
+          "IR",
+          "MLE",
+          "OLE",
+          "RTE",
+          "TLE",
+          "WA"
+        ],
+        "type": "string"
+      },
       "PackageBuildingResponse": {
         "properties": {
           "status": {
@@ -8378,6 +9029,16 @@
             "nullable": true,
             "type": "object"
           },
+          "externalJudge": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProblemExternalJudgeBadgeResponse"
+              }
+            ],
+            "description": "Where the problem is judged when an external judge does it; null for judge-v2.",
+            "nullable": true,
+            "type": "object"
+          },
           "group": {
             "allOf": [
               {
@@ -8569,6 +9230,7 @@
           "acRate",
           "canEdit",
           "contest",
+          "externalJudge",
           "editor"
         ],
         "type": "object"
@@ -8711,6 +9373,41 @@
           "publishOn",
           "authors",
           "content"
+        ],
+        "type": "object"
+      },
+      "ProblemExternalJudgeBadgeResponse": {
+        "properties": {
+          "oj": {
+            "description": "The external judge's OJ the problem is judged on (`CodeForces`, `QOJ`, ...).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "oj"
+        ],
+        "type": "object"
+      },
+      "ProblemExternalJudgeResponse": {
+        "properties": {
+          "connected": {
+            "description": "Whether the site has an external judge connection configured.",
+            "type": "boolean"
+          },
+          "link": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalJudgeLinkResponse"
+              }
+            ],
+            "description": "The problem's link; null when none.",
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "connected",
+          "link"
         ],
         "type": "object"
       },
@@ -9280,6 +9977,46 @@
           "isPublic",
           "publishOn",
           "content"
+        ],
+        "type": "object"
+      },
+      "PutExternalJudgeDto": {
+        "properties": {
+          "isActive": {
+            "description": "Whether the problem is judged by the external judge.",
+            "type": "boolean"
+          },
+          "languages": {
+            "description": "Site languages and the remote language each is sent as; at most one entry per site language.",
+            "items": {
+              "$ref": "#/components/schemas/ExternalLanguageDto"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "oj": {
+            "description": "The external judge's OJ id (`CodeForces`, `QOJ`, ...).",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "problemId": {
+            "description": "The problem id on that OJ.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "description": "The remote title from a verify; stamps the link as verified.",
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "isActive",
+          "oj",
+          "problemId",
+          "languages"
         ],
         "type": "object"
       },
@@ -10485,6 +11222,39 @@
         },
         "type": "object"
       },
+      "ScoreOverrideDto": {
+        "properties": {
+          "comment": {
+            "description": "Why, kept in the submission's revision log; 1 to 500 characters.",
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "lock": {
+            "description": "true also locks it, so a later rejudge cannot discard the override. Default false.",
+            "type": "boolean"
+          },
+          "points": {
+            "description": "Points on the problem's scale, 0 to the problem's points (3 decimals); a problem without partial points takes only 0 or full.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "result": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OverrideResult"
+              }
+            ],
+            "description": "The verdict to show. `AC` needs full points."
+          }
+        },
+        "required": [
+          "result",
+          "points",
+          "comment"
+        ],
+        "type": "object"
+      },
       "ScoreboardVisibility": {
         "description": "Who sees the scoreboard and when.",
         "enum": [
@@ -10653,6 +11423,10 @@
           "contest.officialMode",
           "contest.officialModeEndsAt",
           "discord.webhooks",
+          "externalJudge.apiToken",
+          "externalJudge.baseUrl",
+          "externalJudge.maxInFlight",
+          "externalJudge.maxWaitMinutes",
           "mail.from",
           "mail.smtpUrl",
           "pdf.maxBytes",
@@ -11829,6 +12603,16 @@
             "nullable": true,
             "type": "string"
           },
+          "externalRun": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionExternalRunResponse"
+              }
+            ],
+            "description": "The run on the external judge; only for viewers who may rejudge, and only for the current judging generation.",
+            "nullable": true,
+            "type": "object"
+          },
           "id": {
             "description": "Submission id; ids sort by submission time.",
             "type": "string"
@@ -11959,7 +12743,60 @@
           "viewer",
           "cases",
           "batches",
+          "externalRun",
           "totalCases"
+        ],
+        "type": "object"
+      },
+      "SubmissionExternalRunResponse": {
+        "properties": {
+          "oj": {
+            "description": "The external judge's OJ.",
+            "type": "string"
+          },
+          "problemId": {
+            "description": "The problem id on that OJ.",
+            "type": "string"
+          },
+          "remoteId": {
+            "description": "The external judge's submission id; null until it accepted the submit.",
+            "nullable": true,
+            "type": "string"
+          },
+          "remoteUrl": {
+            "description": "Link to the run on the remote OJ.",
+            "nullable": true,
+            "type": "string"
+          },
+          "scoreText": {
+            "description": "The remote score, as text (`100/100`).",
+            "nullable": true,
+            "type": "string"
+          },
+          "statusCanonical": {
+            "description": "The remote verdict (`AC`, `WA`, `PENDING`, ...).",
+            "type": "string"
+          },
+          "submittedAt": {
+            "description": "When the run was sent; null until then.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "systemStatus": {
+            "description": "The external judge's own status (`queued`, `done`, ...).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "oj",
+          "problemId",
+          "remoteId",
+          "systemStatus",
+          "statusCanonical",
+          "scoreText",
+          "remoteUrl",
+          "submittedAt"
         ],
         "type": "object"
       },
@@ -12447,6 +13284,10 @@
             "description": "Whether `POST` and `DELETE /submissions/{id}/lock` are allowed.",
             "type": "boolean"
           },
+          "canOverrideScore": {
+            "description": "Whether `PUT /submissions/{id}/score` is allowed.",
+            "type": "boolean"
+          },
           "canReject": {
             "description": "Whether `POST /submissions/{id}/reject` is allowed.",
             "type": "boolean"
@@ -12460,7 +13301,8 @@
           "canAbort",
           "canRejudge",
           "canReject",
-          "canLock"
+          "canLock",
+          "canOverrideScore"
         ],
         "type": "object"
       },
@@ -13730,10 +14572,20 @@
             "nullable": true,
             "type": "string"
           },
+          "logoOverrideImage": {
+            "description": "Replaces the site logo inside the contest: an http(s) URL or a site path, up to 150 characters; empty for none.",
+            "maxLength": 150,
+            "type": "string"
+          },
           "name": {
             "description": "Contest name, 1 to 100 characters.",
             "maxLength": 100,
             "minLength": 1,
+            "type": "string"
+          },
+          "ogImage": {
+            "description": "Image for link previews: an http(s) URL or a site path, up to 150 characters; empty for the site image.",
+            "maxLength": 150,
             "type": "string"
           },
           "organizations": {
@@ -13855,7 +14707,6 @@
             "items": {
               "type": "string"
             },
-            "maxItems": 20,
             "type": "array"
           },
           "testers": {
@@ -15405,129 +16256,6 @@
         "required": [
           "name",
           "response"
-        ],
-        "type": "object"
-      },
-      "AuditActorResponse": {
-        "properties": {
-          "id": {
-            "description": "User id.",
-            "type": "string"
-          },
-          "username": {
-            "description": "Username; null when the account no longer exists.",
-            "nullable": true,
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "username"
-        ],
-        "type": "object"
-      },
-      "AuditEntryResponse": {
-        "properties": {
-          "action": {
-            "description": "What was done: `create`, `edit`, `delete`, `hide`, `lock`, ... as the writer recorded it.",
-            "type": "string"
-          },
-          "actor": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AuditActorResponse"
-              }
-            ],
-            "description": "Who made it; null for system writes (workers, imports).",
-            "nullable": true,
-            "type": "object"
-          },
-          "at": {
-            "description": "When the change was made.",
-            "format": "date-time",
-            "type": "string"
-          },
-          "changedFields": {
-            "description": "Names of the changed fields. Values are never returned: some records hold sensitive before/after values.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "comment": {
-            "description": "The writer's free-text note, often empty.",
-            "type": "string"
-          },
-          "id": {
-            "description": "Record id (UUIDv7, sorts by time).",
-            "type": "string"
-          },
-          "object": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AuditObjectResponse"
-              }
-            ],
-            "description": "The object changed."
-          },
-          "type": {
-            "description": "Object kind: a `revisions` entity such as `problem`, or `setting`.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "at",
-          "actor",
-          "type",
-          "action",
-          "object",
-          "changedFields",
-          "comment"
-        ],
-        "type": "object"
-      },
-      "AuditFeedResponse": {
-        "properties": {
-          "items": {
-            "description": "Newest first, at most `limit`.",
-            "items": {
-              "$ref": "#/components/schemas/AuditEntryResponse"
-            },
-            "type": "array"
-          },
-          "nextBefore": {
-            "description": "Pass as `before` to read the next (older) page; null on the last page.",
-            "nullable": true,
-            "type": "string"
-          }
-        },
-        "required": [
-          "items",
-          "nextBefore"
-        ],
-        "type": "object"
-      },
-      "AuditObjectResponse": {
-        "properties": {
-          "deleted": {
-            "description": "The object no longer exists (or is soft-deleted); clients show the label without a link.",
-            "type": "boolean"
-          },
-          "id": {
-            "description": "Object id, or the key for a setting.",
-            "type": "string"
-          },
-          "label": {
-            "description": "What to call the object: problem code, contest key, username, organization slug, page url, post title, setting key, catalog name. Null when the kind has no name (comment, submission) or the object is gone.",
-            "nullable": true,
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "label",
-          "deleted"
         ],
         "type": "object"
       }
@@ -21830,7 +22558,7 @@
     },
     "/api/internal/contest-tags": {
       "get": {
-        "description": "Returns the contest tag catalogue, public. Paged with `page` and\n`pageSize`.",
+        "description": "Returns the contest tag catalogue, public, each tag with the number of\ncontests the viewer may see that carry it. Paged with `page` and\n`pageSize`.",
         "operationId": "ContestTagsController_list",
         "parameters": [
           {
@@ -22121,6 +22849,15 @@
             }
           },
           {
+            "description": "Row order; without it upcoming contests come soonest first and the rest newest first.",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ContestListSort"
+            }
+          },
+          {
             "description": "Only contests carrying this tag slug.",
             "in": "query",
             "name": "tag",
@@ -22155,6 +22892,42 @@
             "required": false,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "description": "true: only visible contests; false: only hidden ones (which only their editors, testers and staff see).",
+            "in": "query",
+            "name": "visible",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "true: only contests the viewer authors, curates or tests; a signed-out visitor gets none.",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Only contests starting at or after this time, ISO 8601.",
+            "in": "query",
+            "name": "startFrom",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only contests starting before this time, ISO 8601.",
+            "in": "query",
+            "name": "startBefore",
+            "required": false,
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -22286,6 +23059,126 @@
           }
         },
         "summary": "Create a contest",
+        "tags": [
+          "Contest editing"
+        ]
+      }
+    },
+    "/api/internal/contests/bulk/tag": {
+      "post": {
+        "description": "Requires `judge.change_contest_tag`. Adds (`assigned` true) or removes\nthe tag on each listed contest as `PATCH /contests/{key}` would, so the\ncaller needs edit rights on each and an added tag must exist. A contest\nwhose tags changed meanwhile fails with `conflict`, one already holding 20\ntags with `too_many_tags`; failures do not stop the others. Limited to 20\nruns per hour per user, shared with the bulk visibility route (429\n`rate_limited`).",
+        "operationId": "ContestBulkController_tag",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkContestTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BulkContestResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Add or remove a tag on contests in bulk",
+        "tags": [
+          "Contest editing"
+        ]
+      }
+    },
+    "/api/internal/contests/bulk/visibility": {
+      "post": {
+        "description": "Applies `isVisible` to each listed contest exactly as `PATCH\n/contests/{key}` would: the caller needs edit rights on each, and showing\none needs `judge.change_contest_visibility` (or\n`judge.create_private_contest` for a private contest). A refused contest\nis reported as `failed` with the PATCH's error code and does not stop the\nothers. Limited to 20 runs per hour per user, shared with the bulk tag\nroute (429 `rate_limited`).",
+        "operationId": "ContestBulkController_visibility",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkContestVisibilityDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BulkContestResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Show or hide contests in bulk",
         "tags": [
           "Contest editing"
         ]
@@ -24227,7 +25120,7 @@
     },
     "/api/internal/contests/{key}/judge-final": {
       "post": {
-        "description": "Contest editors only. Queues judging of the pending final submissions of\nan ended final-submission contest; returns 202. Fails with 409 `conflict`\nfor any other format or while the contest is still running.",
+        "description": "Contest editors only. Queues judging of the pending final submissions of\na final-submission contest that has started; returns 202. A running\ncontest is judged early (results become visible) and what is submitted\nafterwards waits for the end. Fails with 409 `conflict` for any other\nformat or before the start.",
         "operationId": "ContestEditingController_judgeFinal",
         "parameters": [
           {
@@ -24503,7 +25396,7 @@
     },
     "/api/internal/contests/{key}/participations": {
       "get": {
-        "description": "Returns the viewer's own participations in the contest, or anyone's for\ncontest editors (filter by `user`; other users are refused with 403 for\nnon-editors). Live and virtual participations are included (not spectator\nrows). Results are frozen for non-editors while the ranking is frozen.\nPaged with `page` and `pageSize`.",
+        "description": "Returns the viewer's own participations in the contest, or anyone's for\ncontest editors (filter by the exact `user`, or by `search` for usernames\ncontaining the text; other users and `search` are refused with 403 for\nnon-editors). Live and virtual participations are included (not spectator\nrows). Results are frozen for non-editors while the ranking is frozen.\nPaged with `page` and `pageSize`.",
         "operationId": "ContestParticipationController_participations",
         "parameters": [
           {
@@ -24569,6 +25462,16 @@
             "description": "Username; others than the viewer need edit rights.",
             "in": "query",
             "name": "user",
+            "required": false,
+            "schema": {
+              "maxLength": 30,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Usernames containing this text, case-insensitive; contest editors only.",
+            "in": "query",
+            "name": "search",
             "required": false,
             "schema": {
               "maxLength": 30,
@@ -24703,6 +25606,76 @@
         "summary": "Add a participation",
         "tags": [
           "Contest editing"
+        ]
+      }
+    },
+    "/api/internal/contests/{key}/participations/disqualify": {
+      "post": {
+        "description": "Contest editors only. Applies `disqualified` to each listed participation\nof the contest as the single route does (contest ban, current contest,\ncheating ban), then purges the ranking cache and queues one rescore. An\nid that is not a participation of this contest is reported as `failed`\n(`not_found`) and does not stop the others; a row that already had the\nvalue is `unchanged`. Limited to 20 runs per hour per user (429\n`rate_limited`).",
+        "operationId": "ContestParticipationController_disqualifyMany",
+        "parameters": [
+          {
+            "description": "Key of the contest.",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDisqualifyDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BulkDisqualifyResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Disqualify or reinstate many participants",
+        "tags": [
+          "Contests"
         ]
       }
     },
@@ -26631,6 +27604,106 @@
         "summary": "Stream my notification events",
         "tags": [
           "Live events"
+        ]
+      }
+    },
+    "/api/internal/external-judge/status": {
+      "get": {
+        "description": "Public. Whether an external judge is configured and whether its OJ list\ncould be read, with the OJ ids. The check runs at most once a minute per\nserver process; the base URL and the token are never shown.",
+        "operationId": "ExternalJudgeStatusController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalJudgeStatusResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "External judge status",
+        "tags": [
+          "Judging"
+        ]
+      }
+    },
+    "/api/internal/external-judge/test": {
+      "post": {
+        "description": "Needs `judge.change_settings`. Calls the external judge's OJ list with the\nsaved base URL and token and answers the OJ ids it serves. Errors: 409\n`external_judge_not_configured`, 502 `external_judge_unauthorized`, 404\n`external_judge_not_found`, 502 `external_judge_rejected`, 503\n`external_judge_unavailable`. Messages never carry the URL or the token.",
+        "operationId": "ExternalJudgeConnectionController_test",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalJudgeTestResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Test the external judge connection",
+        "tags": [
+          "Admin: site & settings"
         ]
       }
     },
@@ -32804,6 +33877,332 @@
         ]
       }
     },
+    "/api/internal/problems/{code}/external-judge": {
+      "delete": {
+        "description": "Needs edit rights on the problem. The problem is judged by judge-v2 again;\nits allowed languages are left as they are.",
+        "operationId": "ProblemExternalJudgeController_remove",
+        "parameters": [
+          {
+            "description": "Problem code: lowercase letters, digits and underscores, 1 to 32 characters.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProblemExternalJudgeResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Remove a problem's external judge link",
+        "tags": [
+          "Problem editing"
+        ]
+      },
+      "get": {
+        "description": "Needs edit rights on the problem (404 `not_found` when invisible, 403\n`forbidden` when not editable). `connected` tells whether the site has an\nexternal judge configured; `link` is null when the problem has none.",
+        "operationId": "ProblemExternalJudgeController_get",
+        "parameters": [
+          {
+            "description": "Problem code: lowercase letters, digits and underscores, 1 to 32 characters.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProblemExternalJudgeResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a problem's external judge link",
+        "tags": [
+          "Problem editing"
+        ]
+      },
+      "put": {
+        "description": "Needs edit rights on the problem. Replaces the link: the remote OJ and\nproblem and the site-to-remote language mapping. Every language must exist\nand take typed source (400 `validation_failed`). While `isActive`, the\nproblem's allowed languages become exactly the mapped ones and its\nsubmissions are judged by the external judge. Writes a revision.",
+        "operationId": "ProblemExternalJudgeController_put",
+        "parameters": [
+          {
+            "description": "Problem code: lowercase letters, digits and underscores, 1 to 32 characters.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutExternalJudgeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProblemExternalJudgeResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Set a problem's external judge link",
+        "tags": [
+          "Problem editing"
+        ]
+      }
+    },
+    "/api/internal/problems/{code}/external-judge/search": {
+      "post": {
+        "description": "Needs edit rights on the problem. Give an OJ, a problem id or both (400\n`validation_failed` otherwise). Limited to 30 lookups a minute per user\n(429 `rate_limited`). External judge errors: 409\n`external_judge_not_configured`, 502 `external_judge_unauthorized`, 502\n`external_judge_rejected`, 503 `external_judge_unavailable`.",
+        "operationId": "ProblemExternalJudgeController_search",
+        "parameters": [
+          {
+            "description": "Problem code: lowercase letters, digits and underscores, 1 to 32 characters.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalJudgeSearchDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalJudgeSearchResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Search the external judge's problems",
+        "tags": [
+          "Problem editing"
+        ]
+      }
+    },
+    "/api/internal/problems/{code}/external-judge/verify": {
+      "post": {
+        "description": "Needs edit rights on the problem. Reads the remote problem's title and\nlanguages, each with the site language it most likely maps to (null when\nno good match). Same limit and errors as search; 404\n`external_judge_not_found` when the remote problem does not exist.",
+        "operationId": "ProblemExternalJudgeController_verify",
+        "parameters": [
+          {
+            "description": "Problem code: lowercase letters, digits and underscores, 1 to 32 characters.",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalJudgeVerifyDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalJudgeVerifyResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Verify a remote problem",
+        "tags": [
+          "Problem editing"
+        ]
+      }
+    },
     "/api/internal/problems/{code}/material": {
       "post": {
         "description": "Needs `judge.upload_problem_material` and edit rights on the problem. Send\none multipart `file` of up to 20 MiB with an allowed extension (archives,\ndocuments, sources, plain images and data files; 400\n`material_type_not_allowed` otherwise). It replaces the previous material\nand returns its `url`. Shares the upload budget of 30 per hour per user.",
@@ -35841,6 +37240,61 @@
           }
         },
         "summary": "Rejudge one submission",
+        "tags": [
+          "Judging"
+        ]
+      }
+    },
+    "/api/internal/submissions/{id}/score": {
+      "put": {
+        "description": "Needs `judge.change_submission` and edit rights on the problem (403\n`forbidden`). Sets `result` (a graded verdict) and `points` on the\nproblem's scale; the case results stay as judged. User points, problem\nstatistics and contest results are recomputed as after a judging (an\n`ioi16` contest still scores batches from the judged cases). Sending the\nstored score again changes nothing. 400\n`points_above_problem`, `points_not_partial` (a problem without partial\npoints takes 0 or full) or `accepted_needs_full_points`. 409 `conflict`\nwhile the submission is queued or judged, or is a pending final\nsubmission; 409 `problem_deleted` when the problem is deleted. A rejudge\ndiscards the override unless `lock` locks the submission too. Logged as a\nsubmission revision with `comment`. Answers 204.",
+        "operationId": "SubmissionActionsController_overrideScore",
+        "parameters": [
+          {
+            "description": "Submission id.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoreOverrideDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Override a submission's verdict and score",
         "tags": [
           "Judging"
         ]
