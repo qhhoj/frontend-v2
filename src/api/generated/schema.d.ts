@@ -2649,6 +2649,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/contests/{key}/problems/{code}/best-submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the best submission of each user on a contest problem
+         * @description Public for visible contests. Same rows and order as the problem's best
+         *     submissions (most points, then less time, less memory, the earlier
+         *     submission; `page` from 1, `pageSize` 1-100, default 50), but only
+         *     submissions made in the contest. Everyone's rows go to editors and to
+         *     viewers the contest submission list is open to; other viewers get only
+         *     their own. While the ranking is frozen for the viewer, submissions made at
+         *     or after the freeze are left out. 403
+         *     `forbidden` unless the viewer may see the full ranking and the problem
+         *     list; 404 `not_found` for a problem the contest does not have.
+         */
+        get: operations["ContestBestSubmissionsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/contests/{key}/problems/{code}/rejudge": {
         parameters: {
             query?: never;
@@ -5321,7 +5349,7 @@ export interface paths {
          *     left out) with online state, slots, slots in use, mean ping in milliseconds
          *     and when they started, and every programming language with the compiler
          *     version each judge has for it. Keys, addresses, builds and notes are never
-         *     returned.
+         *     returned. Cached for 3 seconds, shared by all callers.
          */
         get: operations["RuntimesController_overview"];
         put?: never;
@@ -7588,8 +7616,15 @@ export interface components {
             slug: string;
         };
         ContestViewerResponse: {
+            /**
+             * Format: date-time
+             * @description When the ranking froze for this viewer; null when it has not, never does, or the viewer edits the contest (editors see it live).
+             */
+            boardFrozenAt: string | null;
             /** @description The viewer may edit the contest. */
             canEdit: boolean;
+            /** @description The viewer may see the full ranking (legacy `can_see_full_scoreboard`); false while it is hidden from them. */
+            canSeeFullScoreboard: boolean;
             /** @description The balloon screen is on for this contest and the viewer may use it (editors, listed volunteers). */
             canViewBalloons: boolean;
             /**
@@ -17349,6 +17384,49 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["QueuedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestBestSubmissionsController_list: {
+        parameters: {
+            query?: {
+                /** @description Page number, from 1. */
+                page?: number;
+                /** @description Items per page, 1 to 100. */
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Code of the problem. */
+                code: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SubmissionListItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
                     };
                 };
             };
