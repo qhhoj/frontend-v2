@@ -7,13 +7,11 @@
   "columns": {
     "order": "Order",
     "title": "Title",
-    "body": "Text",
-    "actions": "Actions"
+    "body": "Text"
   },
   "edit": "Edit",
   "editNamed": "Edit template {title}",
   "delete": "Delete",
-  "deleteNamed": "Delete template {title}",
   "deleteTitle": "Delete the template “{title}”?",
   "deleteBody": "Handlers will no longer be able to pick it. Messages already sent do not change.",
   "deleteConfirm": "Delete template",

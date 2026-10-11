@@ -1,136 +1,128 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { Star } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
-import ScrollRegion from '@/components/ScrollRegion.vue';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import { rangeOf } from '../ui/table/table-columns';
+import type { AdminColumn } from '../ui/table/table-columns';
 import { queueLocation } from './ticket-queue';
 
-/** The rows as the server returned them: the status is the server's filter, so nothing is filtered here. */
+/**
+ * The rows as the server returned them: the status is the server's filter, so nothing is filtered here. With a ticket open
+ * beside the list (`narrow`) the assignee and message columns step aside; the open ticket shows both.
+ */
 const props = defineProps<{
   items: TicketListItem[];
-  meta: NumberedPageMeta;
+  meta: NumberedPageMeta | undefined;
+  loading: boolean;
+  error: unknown;
   filters: TicketListQuery;
   ticketId: string | null;
+  narrow: boolean;
 }>();
+defineEmits<{ retry: [] }>();
 const router = useRouter();
 const locale = useLocaleStore();
-const total = computed(() => ('total' in props.meta ? props.meta.total : props.items.length));
-const hasNext = computed(() => props.filters.page * props.meta.pageSize < total.value);
-const CELL = 'px-3 py-3 align-top';
-const HEAD = 'px-3 py-3 text-left text-[13px] font-medium text-muted';
-/** Who is assigned and how many messages show from 2xl up; below it the list is half a screen wide and the open ticket shows both. */
-const WIDE_ONLY = 'hidden 2xl:table-cell';
-
+const { t } = useI18n();
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'ticket', label: t('admin.tickets.table.ticket'), priority: 'primary' },
+  { key: 'status', label: t('admin.tickets.table.status'), priority: 'badge' },
+  ...(props.narrow
+    ? []
+    : [
+        { key: 'assignees', label: t('admin.tickets.table.assignees') },
+        { key: 'messages', label: t('admin.tickets.table.messages'), align: 'end' as const },
+      ]),
+  { key: 'updated', label: t('admin.tickets.table.updated'), cellClass: 'whitespace-nowrap' },
+]);
+const range = computed(() => {
+  const meta = props.meta;
+  return meta && 'total' in meta
+    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
+    : null;
+});
 const selectTicket = (id: string) => router.replace({ query: queueLocation(props.filters, id) });
-const goToPage = (page: number) =>
-  router.replace({
-    query: queueLocation({ ...props.filters, page }, props.ticketId),
-  });
-const statusKey = (ticket: TicketListItem) =>
-  ticket.isOpen ? 'admin.tickets.table.open' : 'admin.tickets.table.closed';
 const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${ticket.link.title}`;
+const rowAttrs = (ticket: TicketListItem) => ({
+  'data-ticket': ticket.id,
+  class: ticket.id === props.ticketId ? 'bg-accent-soft' : undefined,
+});
 </script>
 
 <template>
-  <section class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-surface">
-    <p v-if="!items.length" class="flex flex-col items-center gap-2 p-8 text-center text-muted">
-      <AdminBit placement="empty" />
-      {{ $t('admin.tickets.table.empty') }}
-    </p>
-    <ScrollRegion v-else :label="$t('admin.tickets.table.caption')">
-      <table class="w-full border-collapse text-sm">
-        <caption class="sr-only">
-          {{
-            $t('admin.tickets.table.caption')
-          }}
-        </caption>
-        <thead>
-          <tr class="border-b border-line">
-            <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.status') }}</th>
-            <th scope="col" :class="HEAD">{{ $t('admin.tickets.table.ticket') }}</th>
-            <th scope="col" :class="`${HEAD} ${WIDE_ONLY}`">
-              {{ $t('admin.tickets.table.assignees') }}
-            </th>
-            <th scope="col" :class="`${HEAD} ${WIDE_ONLY} text-right`">
-              {{ $t('admin.tickets.table.messages') }}
-            </th>
-            <th scope="col" :class="`${HEAD} whitespace-nowrap`">
-              {{ $t('admin.tickets.table.updated') }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="ticket in items" :key="ticket.id" class="border-t border-line">
-            <td :class="CELL">{{ $t(statusKey(ticket)) }}</td>
-            <td :class="CELL">
-              <button
-                type="button"
-                class="block min-h-11 text-left"
-                :aria-pressed="ticket.id === ticketId ? 'true' : 'false'"
-                @click="selectTicket(ticket.id)"
-              >
-                <span class="font-semibold">{{ ticket.title }}</span>
-                <span class="block text-[13px] text-muted">
-                  {{ byline(ticket) }}
-                  <template v-if="ticket.isContributive">
-                    <span aria-hidden="true">★</span>
-                    <span class="sr-only">{{ $t('admin.tickets.table.contributive') }}</span>
-                  </template>
-                </span>
-              </button>
-            </td>
-            <td :class="`${CELL} ${WIDE_ONLY}`">
-              <ul v-if="ticket.assignees.length" class="flex flex-col gap-1">
-                <li v-for="assignee in ticket.assignees" :key="assignee.id">
-                  <AdminUserLabel :username="assignee.username" :rating="assignee.rating" />
-                </li>
-              </ul>
-              <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>
-            </td>
-            <td :class="`${CELL} ${WIDE_ONLY} text-right font-mono tabular-nums`">
-              {{ formatNumber(ticket.messageCount, locale.locale) }}
-            </td>
-            <td :class="`${CELL} whitespace-nowrap`">
-              {{ formatDateTime(ticket.lastMessageAt, locale.locale) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </ScrollRegion>
-    <footer
-      class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13px] text-muted"
-    >
-      <span>
-        {{
-          $t('admin.tickets.table.footer', {
-            shown: formatNumber(items.length, locale.locale),
-            total: formatNumber(total, locale.locale),
-          })
-        }}
+  <AdminDataTable
+    :columns="columns"
+    :rows="items"
+    :row-key="(ticket) => ticket.id"
+    :row-label="(ticket) => ticket.title"
+    :row-attrs="rowAttrs"
+    :label="$t('admin.tickets.table.caption')"
+    :loading="loading"
+    :error="error"
+    @retry="$emit('retry')"
+  >
+    <template #empty>
+      <p class="m-0 flex flex-col items-center gap-2 p-8 text-center text-muted">
+        <AdminBit placement="empty" />
+        {{ $t('admin.tickets.table.empty') }}
+      </p>
+    </template>
+    <template #cell-ticket="{ row }">
+      <button
+        type="button"
+        class="flex min-h-10 min-w-0 flex-col items-start py-1.5 text-left"
+        :aria-pressed="row.id === ticketId ? 'true' : 'false'"
+        @click="selectTicket(row.id)"
+      >
+        <span class="font-semibold break-words">{{ row.title }}</span>
+        <span class="flex items-center gap-1 text-[13px] text-muted">
+          {{ byline(row) }}
+          <template v-if="row.isContributive">
+            <Star aria-hidden="true" class="size-3.5 text-accent-text" :stroke-width="1.75" />
+            <span class="sr-only">{{ $t('admin.tickets.table.contributive') }}</span>
+          </template>
+        </span>
+      </button>
+    </template>
+    <template #cell-status="{ row }">
+      <AdminChip :tone="row.isOpen ? 'accent' : 'neutral'">
+        {{ row.isOpen ? $t('admin.tickets.table.open') : $t('admin.tickets.table.closed') }}
+      </AdminChip>
+    </template>
+    <template #cell-assignees="{ row }">
+      <span v-if="row.assignees.length" class="inline-flex flex-wrap gap-x-2 gap-y-1">
+        <AdminUserLabel
+          v-for="assignee in row.assignees"
+          :key="assignee.id"
+          :username="assignee.username"
+          :rating="assignee.rating"
+        />
       </span>
-      <span class="flex gap-2">
-        <button
-          type="button"
-          class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content"
-          :disabled="filters.page <= 1"
-          @click="goToPage(filters.page - 1)"
-        >
-          {{ $t('admin.tickets.table.previous') }}
-        </button>
-        <button
-          type="button"
-          class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content"
-          :disabled="!hasNext"
-          @click="goToPage(filters.page + 1)"
-        >
-          {{ $t('admin.tickets.table.next') }}
-        </button>
-      </span>
-    </footer>
-  </section>
+      <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>
+    </template>
+    <template #cell-messages="{ row }">{{
+      formatNumber(row.messageCount, locale.locale)
+    }}</template>
+    <template #cell-updated="{ row }">{{
+      formatDateTime(row.lastMessageAt, locale.locale)
+    }}</template>
+    <template v-if="meta" #footer>
+      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
+      <NumberedPager
+        class="ml-auto"
+        compact
+        :meta="meta"
+        :label="$t('admin.tickets.table.pager')"
+      />
+    </template>
+  </AdminDataTable>
 </template>

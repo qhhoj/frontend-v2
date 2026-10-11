@@ -7,7 +7,7 @@ import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /** A moderator's edit of someone's comment (`judge.change_comment`): the full Markdown is loaded on open, saved as one `edit` revision. */
@@ -83,7 +83,7 @@ function submit() {
         :id="id"
         v-model="body"
         rows="10"
-        :class="[ADMIN_INPUT_CLASS, 'min-h-48 resize-y font-mono text-sm']"
+        :class="[INPUT, 'min-h-48 resize-y font-mono text-sm']"
         :aria-describedby="describedBy"
         :aria-invalid="localError ? 'true' : undefined"
       />

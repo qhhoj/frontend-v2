@@ -1,67 +1,124 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { BULK_HIDE_MAX } from '@/api/types/comments';
-import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
-import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { COMMENT_PAGE_TYPES } from '@/api/types/comments';
 import { adminRouteName } from '../admin-screens';
+import AdminField from '../ui/AdminField.vue';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import AdminBulkBar from '../ui/AdminBulkBar.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import { useSelection } from '../ui/use-selection';
-import AdminCommentCard from './AdminCommentCard.vue';
+import { INPUT, buttonClass } from '../ui/controls';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
+import { useAdminToast } from '../ui/feedback/use-admin-toast';
+import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
+import AdminCommentsTable from './AdminCommentsTable.vue';
 import CommentEditDialog from './CommentEditDialog.vue';
-import CommentFiltersForm from './CommentFiltersForm.vue';
-import { apiQueryOf, filtersFromQuery, queryOfFilters } from './admin-comments';
+import { COMMENT_STATES, apiQueryOf, filtersFromQuery, queryOfFilters } from './admin-comments';
 import type { CommentFilters } from './admin-comments';
 import { useAdminCommentsQuery, useBulkHide } from './admin-comments.queries';
 
 /** Legacy `CommentAdmin`: every comment of the site (`judge.change_comment`), searched and hidden or shown in bulk. */
 const { t } = useI18n();
+const toast = useAdminToast();
 const route = useRoute();
 const router = useRouter();
 const filters = computed(() => filtersFromQuery(route.query));
 const { data, isPending, error, refetch } = useAdminCommentsQuery(() => apiQueryOf(route.query));
 const items = computed(() => data.value?.items ?? []);
-const selection = useSelection(
-  () => items.value.filter((item) => !item.comment.deleted).map((item) => item.comment.id),
-  BULK_HIDE_MAX,
-);
-const { selected } = selection;
 
-const bulk = useBulkHide();
-/** The last bulk run: how many were changed, and each refused id with the reason code. */
-const outcome = ref<{ hidden: boolean; done: number; refused: Map<string, string> } | null>(null);
-
-function applyFilters(next: CommentFilters) {
-  void router.push({ name: adminRouteName('comments'), query: queryOfFilters(next) });
+/** Every filter lives in the URL, so a search can be shared and the back button undoes it; a change starts at page 1. */
+function applyFilters(patch: Partial<CommentFilters>) {
+  void router.push({
+    name: adminRouteName('comments'),
+    query: queryOfFilters({ ...filters.value, ...patch }),
+  });
 }
+const searchModel = computed({
+  get: () => filters.value.search,
+  set: (search: string) => applyFilters({ search }),
+});
+const stateTabs = computed<AdminFilterTab[]>(() =>
+  COMMENT_STATES.map((state) => ({
+    key: state,
+    label: t(`admin.comments.all.states.${state}`),
+    to: {
+      name: adminRouteName('comments'),
+      query: queryOfFilters({ ...filters.value, state }),
+    },
+  })),
+);
+const authorText = ref(filters.value.author);
+watch(
+  () => filters.value.author,
+  (author) => (authorText.value = author),
+);
+const applyAuthor = () => {
+  if (authorText.value.trim() !== filters.value.author) applyFilters({ author: authorText.value });
+};
+const chips = computed(() => [
+  ...(filters.value.author
+    ? [
+        {
+          key: 'author',
+          label: t('admin.comments.all.chips.author', { name: filters.value.author }),
+        },
+      ]
+    : []),
+  ...(filters.value.pageType
+    ? [{ key: 'pageType', label: t(`admin.comments.all.pageTypes.${filters.value.pageType}`) }]
+    : []),
+]);
+const removeChip = (key: string) => applyFilters({ [key]: '' });
+const clearFilters = () => applyFilters({ search: '', author: '', pageType: '', state: 'all' });
+const isFiltered = computed(() => Object.keys(queryOfFilters(filters.value)).length > 0);
+
+/** Ticked comments of the shown page; a new page or filter starts with none. */
+const selected = ref(new Set<string>());
+watch(
+  () => route.query,
+  () => (selected.value = new Set()),
+);
+const bulk = useBulkHide();
+/** Each refused id with the reason code, from the last run. */
+const refused = ref(new Map<string, string>());
 
 async function setHidden(ids: string[], hidden: boolean) {
-  outcome.value = null;
+  refused.value = new Map();
   const results = await bulk.run({ ids, hidden });
   if (!results) return;
-  const refused = new Map(results.filter((row) => row.code).map((row) => [row.id, row.code!]));
-  outcome.value = { hidden, done: results.length - refused.size, refused };
+  refused.value = new Map(results.filter((row) => row.code).map((row) => [row.id, row.code!]));
+  const counts = { done: results.length - refused.value.size, refused: refused.value.size };
+  toast.show({
+    text: t(
+      hidden ? 'admin.comments.all.result.hidden' : 'admin.comments.all.result.shown',
+      counts,
+    ),
+    tone: counts.refused ? 'error' : 'success',
+  });
+  selected.value = new Set();
 }
+/** A deleted comment has nothing to hide or show: it is left out of a bulk run. */
+const selectedLive = () =>
+  items.value
+    .filter((item) => selected.value.has(item.comment.id) && !item.comment.deleted)
+    .map((item) => item.comment.id);
+const runBulk = (hidden: boolean) => {
+  if (!bulk.isPending.value) void setHidden(selectedLive(), hidden);
+};
+
 const editingId = ref<string | null>(null);
 const isEditOpen = ref(false);
-const isEdited = ref(false);
 function openEdit(id: string) {
-  isEdited.value = false;
   editingId.value = id;
   isEditOpen.value = true;
 }
+const onEdited = () => toast.show({ text: t('admin.comments.edit.done') });
 
-/** A refused comment's reason, on its card: a hidden parent (409), else gone or unreadable (404). */
+/** A refused comment's reason, on its row: a hidden parent (409), else gone or unreadable (404). */
 const refusalOf = (id: string) => {
-  const code = outcome.value?.refused.get(id);
+  const code = refused.value.get(id);
   if (!code) return null;
   return t(
     code === 'conflict'
@@ -69,86 +126,113 @@ const refusalOf = (id: string) => {
       : 'admin.comments.all.refused.gone',
   );
 };
+const resultText = computed(() => {
+  const meta = data.value?.meta;
+  return meta && 'total' in meta ? t('admin.comments.all.total', { count: meta.total }) : undefined;
+});
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[1080px] flex-col gap-6">
+  <div class="flex w-full flex-col gap-4">
     <AdminPageHeader :title="$t('admin.comments.all.title')" :lead="$t('admin.comments.all.lead')">
       <template #actions>
-        <RouterLink :to="{ name: adminRouteName('commentReports') }" :class="ADMIN_BUTTON_CLASS">
+        <RouterLink :to="{ name: adminRouteName('commentReports') }" :class="buttonClass()">
           {{ $t('admin.comments.all.reportsLink') }}
         </RouterLink>
       </template>
     </AdminPageHeader>
 
-    <CommentFiltersForm :filters="filters" @apply="applyFilters" />
-
-    <AdminBulkBar
-      :label="$t('admin.comments.all.bulk.label')"
-      :count-text="$t('admin.comments.all.bulk.count', { count: selected.size }, selected.size)"
-      :all-selected="selection.allSelected.value"
-      :can-select="items.some((item) => !item.comment.deleted)"
-      @toggle-all="selection.toggleAll()"
+    <AdminFilterBar
+      v-model:search="searchModel"
+      :search-label="$t('admin.comments.all.filters.searchPlaceholder')"
+      :result-text="resultText"
+      :chips="chips"
+      :filter-count="chips.length"
+      @remove="removeChip"
+      @clear-all="clearFilters"
     >
-      <button
-        type="button"
-        :class="ADMIN_BUTTON_CLASS"
-        :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
-        @click="selected.size && !bulk.isPending.value && setHidden([...selected], true)"
-      >
-        {{ $t('admin.comments.all.bulk.hide') }}
-      </button>
-      <button
-        type="button"
-        :class="ADMIN_BUTTON_CLASS"
-        :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
-        @click="selected.size && !bulk.isPending.value && setHidden([...selected], false)"
-      >
-        {{ $t('admin.comments.all.bulk.show') }}
-      </button>
-    </AdminBulkBar>
-
-    <AdminStatus
-      v-if="outcome"
-      :kind="outcome.refused.size ? 'refused' : 'done'"
-      :text="
-        $t(
-          outcome.hidden ? 'admin.comments.all.result.hidden' : 'admin.comments.all.result.shown',
-          { done: outcome.done, refused: outcome.refused.size },
-        )
-      "
-    />
-    <AdminStatus v-if="isEdited" kind="done" :text="$t('admin.comments.edit.done')" />
-    <AdminStatus
-      v-if="bulk.failure.value"
-      kind="refused"
-      :text="failureTextOf(bulk.failure.value)"
-    />
-
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton><SkeletonBlock class="h-48 w-full" /></template>
-      <GlassCard v-if="items.length === 0" as="div">
-        <EmptyState>{{ $t('admin.comments.all.empty') }}</EmptyState>
-      </GlassCard>
-      <ol v-else class="flex flex-col gap-3">
-        <li v-for="item in items" :key="item.comment.id">
-          <AdminCommentCard
-            :item="item"
-            :selected="selected.has(item.comment.id)"
-            :busy="bulk.isPending.value"
-            :refusal="refusalOf(item.comment.id)"
-            @update:selected="selection.setSelected(item.comment.id, $event)"
-            @set-hidden="setHidden([item.comment.id], $event)"
-            @edit="openEdit(item.comment.id)"
+      <template #view>
+        <AdminFilterTabs
+          :tabs="stateTabs"
+          :current="filters.state"
+          :label="$t('admin.comments.all.filters.state')"
+        />
+      </template>
+      <template #filters>
+        <AdminField :label="$t('admin.comments.all.filters.author')" input-id="comments-author">
+          <input
+            id="comments-author"
+            v-model="authorText"
+            maxlength="100"
+            autocomplete="off"
+            :class="INPUT"
+            :placeholder="$t('admin.comments.all.filters.authorPlaceholder')"
+            @change="applyAuthor"
+            @keydown.enter.prevent="applyAuthor"
           />
-        </li>
-      </ol>
-      <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.comments.all.pager')" />
-    </QueryState>
-    <CommentEditDialog
-      v-model:visible="isEditOpen"
-      :comment-id="editingId"
-      @saved="isEdited = true"
+        </AdminField>
+        <AdminField
+          :label="$t('admin.comments.all.filters.pageType')"
+          input-id="comments-page-type"
+        >
+          <select
+            id="comments-page-type"
+            :value="filters.pageType"
+            :class="INPUT"
+            @change="
+              applyFilters({
+                pageType: ($event.target as HTMLSelectElement).value as CommentFilters['pageType'],
+              })
+            "
+          >
+            <option value="">{{ $t('admin.comments.all.pageTypes.any') }}</option>
+            <option v-for="type in COMMENT_PAGE_TYPES" :key="type" :value="type">
+              {{ $t(`admin.comments.all.pageTypes.${type}`) }}
+            </option>
+          </select>
+        </AdminField>
+      </template>
+    </AdminFilterBar>
+
+    <AdminNotice
+      v-if="bulk.failure.value"
+      tone="danger"
+      :title="failureTextOf(bulk.failure.value)"
     />
+
+    <AdminCommentsTable
+      v-model:selected="selected"
+      :items="items"
+      :meta="data?.meta"
+      :loading="isPending"
+      :error="error"
+      :busy="bulk.isPending.value"
+      :filtered="isFiltered"
+      :refusal-of="refusalOf"
+      @retry="refetch()"
+      @clear-filters="clearFilters"
+      @set-hidden="(id, hidden) => setHidden([id], hidden)"
+      @edit="openEdit"
+    >
+      <template #bulk>
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-disabled="bulk.isPending.value || undefined"
+          @click="runBulk(true)"
+        >
+          {{ $t('admin.comments.all.bulk.hide') }}
+        </button>
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-disabled="bulk.isPending.value || undefined"
+          @click="runBulk(false)"
+        >
+          {{ $t('admin.comments.all.bulk.show') }}
+        </button>
+      </template>
+    </AdminCommentsTable>
+    <CommentEditDialog v-model:visible="isEditOpen" :comment-id="editingId" @saved="onEdited" />
   </div>
 </template>

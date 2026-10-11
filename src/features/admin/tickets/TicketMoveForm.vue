@@ -8,7 +8,7 @@ import { TICKET_TITLE_MAX_LENGTH } from '@/api/types/tickets';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT, buttonClass } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { movePatchOf } from './ticket-queue';
 
@@ -57,7 +57,7 @@ function submit() {
           v-model="title"
           :maxlength="TICKET_TITLE_MAX_LENGTH"
           autocomplete="off"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
         />
       </AdminField>
@@ -72,14 +72,14 @@ function submit() {
           v-model="problem"
           autocomplete="off"
           spellcheck="false"
-          :class="[ADMIN_INPUT_CLASS, 'font-mono']"
+          :class="[INPUT, 'font-mono']"
           :aria-describedby="describedBy"
         />
       </AdminField>
       <div class="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass()"
           :aria-disabled="save.isPending.value || undefined"
         >
           {{ $t('admin.tickets.move.save') }}

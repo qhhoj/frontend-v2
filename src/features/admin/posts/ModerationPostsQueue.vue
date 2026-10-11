@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PostListItem } from '@/api/types/blog';
 import type { PostFlags, QueueFeed, RowFailure } from './moderation';
-import PostsQueueView from './PostsQueueView.vue';
+import PostsTable from './PostsTable.vue';
 import { useModerationPostsQuery } from './posts.queries';
 
 const props = withDefaults(
@@ -12,9 +12,11 @@ const props = withDefaults(
     organization: string;
     rowFailure: RowFailure | null;
     pendingPostId?: string | null;
+    selectable?: boolean;
   }>(),
-  { pendingPostId: null },
+  { pendingPostId: null, selectable: false },
 );
+const selected = defineModel<Set<string>>('selected', { default: () => new Set<string>() });
 defineEmits<{
   hide: [post: PostListItem];
   show: [post: PostListItem];
@@ -29,17 +31,21 @@ const { data, isPending, error, refetch } = useModerationPostsQuery(
 </script>
 
 <template>
-  <PostsQueueView
+  <PostsTable
+    v-model:selected="selected"
     :feed="feed"
     :posts="data?.items ?? []"
     :meta="data?.meta"
-    :is-pending="isPending"
+    :loading="isPending"
     :error="error"
     :row-failure="rowFailure"
     :pending-post-id="pendingPostId"
+    :selectable="selectable"
     @retry="refetch()"
     @hide="$emit('hide', $event)"
     @show="$emit('show', $event)"
     @flag="(post, patch) => $emit('flag', post, patch)"
-  />
+  >
+    <template #bulk="{ count }"><slot name="bulk" :count="count" /></template>
+  </PostsTable>
 </template>

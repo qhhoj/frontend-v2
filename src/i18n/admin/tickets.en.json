@@ -3,18 +3,16 @@
   "lead": "Tickets sent by users: read, reply, assign and keep internal notes.",
   "live": "Live — new tickets and messages appear by themselves",
   "filters": {
-    "heading": "Filters",
-    "reset": "Reset",
     "status": "Status",
     "open": "Open",
     "closed": "Closed",
     "all": "All",
     "own": "Only my tickets",
-    "creator": "Sender",
     "assignee": "Assignee",
-    "peopleHint": "Separate several names with commas. Applied on Enter or when you leave the box.",
-    "untaggedNote": "Not filtered by label or priority: tickets without those fields are not matched by them.",
-    "awaiting": "Waiting for a staff reply"
+    "peopleHint": "Separate several names with commas.",
+    "awaiting": "Waiting for a staff reply",
+    "creatorSearch": "Creator (username)",
+    "assigneeChip": "Assignee: {names}"
   },
   "table": {
     "caption": "Ticket list",
@@ -28,9 +26,7 @@
     "unassigned": "Unassigned",
     "contributive": "good contribution",
     "empty": "No ticket matches the filters.",
-    "footer": "{shown} / {total} tickets",
-    "previous": "Previous",
-    "next": "Next"
+    "pager": "Ticket pages"
   },
   "detail": {
     "byline": "{creator} · opened {date}",
@@ -45,5 +41,6 @@
     "problemHint": "Link the ticket to another problem; editors of that problem then see it. Leave as is to keep the link.",
     "save": "Save title and link",
     "saved": "Ticket updated."
-  }
+  },
+  "total": "{count} ticket | {count} tickets"
 }

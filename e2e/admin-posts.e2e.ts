@@ -16,7 +16,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['GET /admin/posts'] = adminList([]);
     api.routes['PATCH /posts/:id'] = adminOk({});
     await page.goto('/admin/posts');
-    const row = page.getByRole('row', { name: /Bán tài khoản VIP/ });
+    const row = page.locator('[data-post="p-2"]');
     await expect(row).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
 
@@ -53,7 +53,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     ]);
     api.routes['PATCH /posts/:id'] = adminOk({});
     await page.goto('/admin/posts?feed=hidden');
-    await expect(page.getByRole('row', { name: /Bản nháp cũ/ })).toBeVisible();
+    await expect(page.locator('[data-post="h-1"]')).toContainText('Bản nháp cũ');
 
     await page.getByRole('button', { name: 'Hiện lại', exact: true }).click();
     await expect(dialogOf(page)).toContainText('Hiện lại bài viết?');

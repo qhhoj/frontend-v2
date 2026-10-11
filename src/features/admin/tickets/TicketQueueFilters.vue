@@ -1,135 +1,145 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { TicketListQuery } from '@/api/types/tickets';
 import { parseUsernames } from '@/features/tickets/ticket-filters';
 import { useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
+import AdminField from '../ui/AdminField.vue';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
+import { CHECK_CHIP, INPUT } from '../ui/controls';
+import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import { queueLocation, seedQueueQuery, statusOf, withStatus } from './ticket-queue';
 import type { QueueStatus } from './ticket-queue';
 
-const props = defineProps<{ filters: TicketListQuery; ticketId: string | null }>();
+/** The queue's filter row: creator search, the status switch, and a panel with "waiting for staff", own tickets and assignee. */
+const props = defineProps<{
+  filters: TicketListQuery;
+  ticketId: string | null;
+  resultText?: string;
+}>();
 const router = useRouter();
-const STATUSES: { value: QueueStatus; labelKey: string }[] = [
-  { value: 'open', labelKey: 'admin.tickets.filters.open' },
-  { value: 'closed', labelKey: 'admin.tickets.filters.closed' },
-  { value: 'all', labelKey: 'admin.tickets.filters.all' },
-];
+const { t } = useI18n();
 const summary = useTicketSummaryQuery();
-const creatorText = ref(props.filters.user.join(', '));
-const assigneeText = ref(props.filters.assignee.join(', '));
-const BUTTON =
-  'inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold';
-const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
-const INPUT = 'min-h-11 rounded-lg border border-line bg-surface px-3 text-base text-content';
 
 /** Every change writes the whole filter into the URL, with the open ticket kept. */
 const show = (next: TicketListQuery) =>
   router.replace({ query: queueLocation(next, props.ticketId) });
-const chooseStatus = (status: QueueStatus) => show(withStatus(props.filters, status));
+const statusTabs = computed<AdminFilterTab[]>(() =>
+  (['open', 'closed', 'all'] as const).map((status) => ({
+    key: status,
+    label: t(`admin.tickets.filters.${status}`),
+  })),
+);
+const chooseStatus = (status: string) => show(withStatus(props.filters, status as QueueStatus));
+const creatorModel = computed({
+  get: () => props.filters.user.join(', '),
+  set: (text: string) => void show({ ...props.filters, user: parseUsernames(text), page: 1 }),
+});
 /** Waiting for staff are open tickets only, so the status follows. */
-const chooseAwaiting = (event: Event) => {
-  const isOn = (event.target as HTMLInputElement).checked;
-  void show({
+const setAwaiting = (isOn: boolean) =>
+  show({
     ...props.filters,
     awaiting: isOn || undefined,
     open: isOn ? true : props.filters.open,
     page: 1,
   });
-};
-const chooseOwn = (event: Event) =>
-  show({ ...props.filters, own: (event.target as HTMLInputElement).checked, page: 1 });
-const applyPeople = () =>
-  show({
-    ...props.filters,
-    user: parseUsernames(creatorText.value),
-    assignee: parseUsernames(assigneeText.value),
-    page: 1,
-  });
+const setOwn = (own: boolean) => show({ ...props.filters, own, page: 1 });
+const assigneeText = ref(props.filters.assignee.join(', '));
+watch(
+  () => props.filters.assignee,
+  (names) => (assigneeText.value = names.join(', ')),
+);
+const applyAssignee = () =>
+  show({ ...props.filters, assignee: parseUsernames(assigneeText.value), page: 1 });
+
+const chips = computed(() => [
+  ...(props.filters.awaiting
+    ? [{ key: 'awaiting', label: t('admin.tickets.filters.awaiting') }]
+    : []),
+  ...(props.filters.own ? [{ key: 'own', label: t('admin.tickets.filters.own') }] : []),
+  ...(props.filters.assignee.length
+    ? [
+        {
+          key: 'assignee',
+          label: t('admin.tickets.filters.assigneeChip', {
+            names: props.filters.assignee.join(', '),
+          }),
+        },
+      ]
+    : []),
+]);
+function removeChip(key: string) {
+  if (key === 'awaiting') void setAwaiting(false);
+  else if (key === 'own') void setOwn(false);
+  else void show({ ...props.filters, assignee: [], page: 1 });
+}
 /** Reset returns to the queue's first-visit view (everyone's open tickets), keeping the open ticket. */
 const reset = () =>
-  router.replace({
-    query: seedQueueQuery(props.ticketId ? { ticket: props.ticketId } : {}),
-  });
+  router.replace({ query: seedQueueQuery(props.ticketId ? { ticket: props.ticketId } : {}) });
 </script>
 
 <template>
-  <form
-    class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-4 xl:flex-row xl:flex-wrap xl:items-end xl:gap-x-6 min-[1800px]:flex-col min-[1800px]:items-stretch"
-    novalidate
-    @submit.prevent="applyPeople"
+  <AdminFilterBar
+    v-model:search="creatorModel"
+    :search-label="$t('admin.tickets.filters.creatorSearch')"
+    :result-text="resultText"
+    :chips="chips"
+    :filter-count="chips.length"
+    @remove="removeChip"
+    @clear-all="reset"
   >
-    <div class="flex items-center justify-between gap-2 xl:basis-full min-[1800px]:basis-auto">
-      <h2 class="font-display text-base font-bold">{{ $t('admin.tickets.filters.heading') }}</h2>
-      <button type="button" :class="BUTTON" @click="reset">
-        {{ $t('admin.tickets.filters.reset') }}
-      </button>
-    </div>
-    <fieldset
-      class="flex flex-col gap-1 xl:flex-row xl:gap-4 min-[1800px]:flex-col min-[1800px]:gap-1"
-    >
-      <legend class="mb-1 text-sm font-semibold">{{ $t('admin.tickets.filters.status') }}</legend>
-      <label
-        v-for="status in STATUSES"
-        :key="status.value"
-        class="flex min-h-11 items-center gap-2"
+    <template #view>
+      <AdminFilterTabs
+        :tabs="statusTabs"
+        :current="statusOf(filters)"
+        :label="$t('admin.tickets.filters.status')"
+        @update:current="chooseStatus"
+      />
+    </template>
+    <template #filters>
+      <label :class="[CHECK_CHIP, 'self-end']">
+        <input
+          type="checkbox"
+          name="awaiting"
+          class="size-4 accent-[var(--qh-accent)]"
+          :checked="filters.awaiting === true"
+          @change="setAwaiting(($event.target as HTMLInputElement).checked)"
+        />
+        {{ $t('admin.tickets.filters.awaiting') }}
+        <span
+          v-if="summary.data.value?.awaitingStaff"
+          class="rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums"
+          >{{ summary.data.value.awaitingStaff }}</span
+        >
+      </label>
+      <label :class="[CHECK_CHIP, 'self-end']">
+        <input
+          type="checkbox"
+          name="own"
+          class="size-4 accent-[var(--qh-accent)]"
+          :checked="filters.own"
+          @change="setOwn(($event.target as HTMLInputElement).checked)"
+        />
+        {{ $t('admin.tickets.filters.own') }}
+      </label>
+      <AdminField
+        :label="$t('admin.tickets.filters.assignee')"
+        :hint="$t('admin.tickets.filters.peopleHint')"
+        input-id="ticket-assignee"
       >
         <input
-          type="radio"
-          name="status"
-          :value="status.value"
-          :checked="statusOf(filters) === status.value"
-          class="size-5"
-          @change="chooseStatus(status.value)"
+          id="ticket-assignee"
+          v-model="assigneeText"
+          name="assignee"
+          type="text"
+          autocomplete="off"
+          :class="INPUT"
+          @change="applyAssignee"
+          @keydown.enter.prevent="applyAssignee"
         />
-        {{ $t(status.labelKey) }}
-      </label>
-    </fieldset>
-    <label class="flex min-h-11 items-center gap-2 text-sm font-medium">
-      <input
-        type="checkbox"
-        name="awaiting"
-        :checked="filters.awaiting === true"
-        class="size-5"
-        @change="chooseAwaiting"
-      />
-      {{ $t('admin.tickets.filters.awaiting') }}
-      <span
-        v-if="summary.data.value?.awaitingStaff"
-        class="rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
-        >{{ summary.data.value.awaitingStaff }}</span
-      >
-    </label>
-    <label class="flex min-h-11 items-center gap-2 text-sm font-medium">
-      <input type="checkbox" name="own" :checked="filters.own" class="size-5" @change="chooseOwn" />
-      {{ $t('admin.tickets.filters.own') }}
-    </label>
-    <label :class="FIELD">
-      {{ $t('admin.tickets.filters.creator') }}
-      <input
-        v-model="creatorText"
-        name="user"
-        type="text"
-        autocomplete="off"
-        :class="INPUT"
-        @blur="applyPeople"
-      />
-    </label>
-    <label :class="FIELD">
-      {{ $t('admin.tickets.filters.assignee') }}
-      <input
-        v-model="assigneeText"
-        name="assignee"
-        type="text"
-        autocomplete="off"
-        :class="INPUT"
-        @blur="applyPeople"
-      />
-    </label>
-    <p class="text-[13px] text-muted xl:basis-full min-[1800px]:basis-auto">
-      {{ $t('admin.tickets.filters.peopleHint') }}
-    </p>
-    <p class="text-[13px] text-muted xl:basis-full min-[1800px]:basis-auto">
-      {{ $t('admin.tickets.filters.untaggedNote') }}
-    </p>
-  </form>
+      </AdminField>
+    </template>
+  </AdminFilterBar>
 </template>
