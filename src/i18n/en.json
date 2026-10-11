@@ -1447,8 +1447,10 @@
       "posts": "Posts",
       "requests": "Join requests",
       "problems": "Problems",
+      "contests": "Contests",
       "quota": "Quota"
     },
+    "noContests": "This organization has no contests yet",
     "noAbout": "No description yet.",
     "posts": "Organization posts",
     "noPosts": "No posts yet.",

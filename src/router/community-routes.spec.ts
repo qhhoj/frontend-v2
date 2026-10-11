@@ -25,6 +25,7 @@ describe('8e routes', () => {
       'user',
     ]);
     expect(resolve('/organizations/lhp/members').name).toBe('organization-members');
+    expect(resolve('/organizations/lhp/contests').name).toBe('organization-contests');
   });
   it('keeps the legacy links of mails, Discord and feeds working, hash included', async () => {
     const post = await landOn('/post/p-1#comment-c-9');

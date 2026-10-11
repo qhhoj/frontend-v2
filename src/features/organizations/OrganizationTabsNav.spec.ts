@@ -20,6 +20,14 @@ describe('organization tabs', () => {
     );
   });
 
+  it('shows "Kỳ thi" to everyone, after Bài tập for members and after Thành viên for the rest', () => {
+    for (const viewer of [ADMIN_STATE, MEMBER_STATE, STRANGER_STATE, null])
+      expect(labelsFor(viewer)).toContain('Kỳ thi');
+    const order = (viewer: typeof ADMIN_STATE | null) => labelsFor(viewer);
+    expect(order(MEMBER_STATE).indexOf('Kỳ thi')).toBe(order(MEMBER_STATE).indexOf('Bài tập') + 1);
+    expect(order(null).indexOf('Kỳ thi')).toBe(order(null).indexOf('Thành viên') + 1);
+  });
+
   it('shows neither to a stranger or an anonymous visitor', () => {
     for (const viewer of [STRANGER_STATE, null]) {
       expect(labelsFor(viewer)).not.toContain('Bài tập');
@@ -30,7 +38,9 @@ describe('organization tabs', () => {
   it('links each tab to its route with the slug', () => {
     const hrefs = linksFor(ADMIN_STATE).map((link) => link.attributes('href'));
     expect(hrefs).toEqual(
-      expect.arrayContaining(['/organizations/lhp/problems', '/organizations/lhp/quota']),
+      expect.arrayContaining(['/organizations/lhp/problems',
+        '/organizations/lhp/contests',
+        '/organizations/lhp/quota']),
     );
   });
 });

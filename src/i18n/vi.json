@@ -1447,8 +1447,10 @@
       "posts": "Bài viết",
       "requests": "Yêu cầu tham gia",
       "problems": "Bài tập",
+      "contests": "Kỳ thi",
       "quota": "Hạn mức"
     },
+    "noContests": "Tổ chức chưa có kỳ thi nào",
     "noAbout": "Tổ chức chưa có giới thiệu.",
     "posts": "Bài viết của tổ chức",
     "noPosts": "Chưa có bài viết.",

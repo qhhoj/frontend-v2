@@ -5,6 +5,7 @@ import type { ContestPhase } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import { translate } from '@/i18n';
+import type { ContestListRoute } from './use-contest-list-filters';
 
 const props = defineProps<{
   phase: ContestPhase;
@@ -16,6 +17,8 @@ const props = defineProps<{
   tagName?: string | null;
   /** The same list without the tag. */
   clearTagTarget?: RouteLocationRaw;
+  /** The page the list lives on; the ended-contests hint stays inside it. */
+  listRoute?: ContestListRoute;
 }>();
 const isTagEmpty = computed(() => Boolean(props.tagName) && !props.isPastLastPage);
 /** With a filter set, the empty text says the filter is the reason, not that the phase is empty. */
@@ -30,14 +33,17 @@ const showsUpcomingHint = computed(
   () => props.phase === 'upcoming' && !props.isFiltered && !props.isPastLastPage,
 );
 /** An empty upcoming group points at the ended contests: a virtual run is the way to practise meanwhile. */
-const ENDED_TARGET = { name: 'contests', query: { phase: 'ended' } };
+const endedTarget = computed(() => ({
+  ...(props.listRoute ?? { name: 'contests' }),
+  query: { phase: 'ended' },
+}));
 const action = computed(() => {
   if (props.isPastLastPage)
     return { to: props.firstPageTarget, labelKey: 'contests.list.empty.backToFirstPage' };
   if (isTagEmpty.value && props.clearTagTarget)
     return { to: props.clearTagTarget, labelKey: 'contestTags.clear' };
   if (showsUpcomingHint.value)
-    return { to: ENDED_TARGET, labelKey: 'contests.list.empty.seeEnded' };
+    return { to: endedTarget.value, labelKey: 'contests.list.empty.seeEnded' };
   return null;
 });
 </script>
