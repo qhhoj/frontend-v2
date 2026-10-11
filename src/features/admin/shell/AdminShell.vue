@@ -2,7 +2,8 @@
 import { ChevronDown } from 'lucide-vue-next';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../admin-access';
 import AdminForbidden from './AdminForbidden.vue';
 import AdminNav from './AdminNav.vue';
 import AdminTopBar from './AdminTopBar.vue';
@@ -14,9 +15,14 @@ import { usePaletteShortcut } from './search/use-palette-shortcut';
 const AdminCommandPalette = defineAsyncComponent(() => import('./search/AdminCommandPalette.vue'));
 
 const route = useRoute();
-const { canAny } = usePermissions();
+const session = useSessionStore();
 /** Checked before the page mounts, so a forbidden screen never asks for its data. */
-const isAllowed = computed(() => canAny(route.meta.permission ?? null));
+const isAllowed = computed(() =>
+  canUseAdmin(session.user, {
+    permission: route.meta.permission ?? null,
+    capability: route.meta.capability,
+  }),
+);
 
 const navCounts = useNavCounts();
 const isPhoneNavOpen = ref(false);

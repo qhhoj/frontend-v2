@@ -4,13 +4,13 @@ import { ADMIN_SCREENS } from './admin-screens';
 import { adminRoutes } from './admin-routes';
 
 describe('admin routes', () => {
-  it('has one staff-only admin-layout route per screen, carrying the screen permission', () => {
+  it('has one admin-area route per screen, carrying the screen permission', () => {
     for (const [id, screen] of Object.entries(ADMIN_SCREENS)) {
       const record = adminRoutes.find((route) => route.name === `admin-${id}`);
       expect(record?.path, id).toBe(screen.path);
       expect(record?.meta).toMatchObject({
         requiresAuth: true,
-        staffOnly: true,
+        adminArea: true,
         layout: 'admin',
         titleKey: `admin.shell.screens.${id}`,
       });

@@ -1,7 +1,7 @@
 {
   "placeholder": "This screen has no approved drawing yet.",
   "title": "Admin",
-  "staffOnly": "Staff only",
+  "staffOnly": "Admin area",
   "backToSite": "Back to the site",
   "navLabel": "Admin",
   "navToggle": "Admin sections",
@@ -47,6 +47,7 @@
       "activity": "View and export logs, summaries by user.",
       "settings": "Limits, similarity and other settings, and the change history.",
       "pages": "Create and edit about and policy pages.",
+      "organizations": "Edit the organizations you administer, their members and join requests.",
       "tickets": "Tickets sent by users.",
       "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import.",
       "submissions": "Filter submissions, select many to rejudge or recalculate points."

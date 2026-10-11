@@ -1,7 +1,7 @@
 {
   "placeholder": "Màn hình này chưa có bản vẽ.",
   "title": "Quản trị",
-  "staffOnly": "Chỉ dành cho nhân viên",
+  "staffOnly": "Khu vực quản trị",
   "backToSite": "Về trang chính",
   "navLabel": "Quản trị",
   "navToggle": "Mục quản trị",
@@ -47,6 +47,7 @@
       "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
       "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
       "pages": "Tạo và sửa trang giới thiệu, quy định.",
+      "organizations": "Sửa tổ chức mình quản trị, thành viên và yêu cầu tham gia.",
       "tickets": "Phiếu do người dùng gửi.",
       "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập.",
       "submissions": "Lọc bài nộp, chọn nhiều bài để chấm lại hoặc tính lại điểm."

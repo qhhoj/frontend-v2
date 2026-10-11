@@ -22,14 +22,14 @@ export const fetchAllJoinRequests = (state: JoinRequestState, page: number, sear
 
 export type OrganizationListFilters = Pick<QueryOf<'/organizations'>, 'open' | 'unlisted'>;
 
-/** The staff list: the public `GET /organizations` with its state filters. */
+/** The admin list: the public `GET /organizations` with its state filters, narrowed to the organizations the viewer may administer (all of them with `edit_all_organization`). */
 export const fetchAdminOrganizations = (
   page: number,
   search: string,
   filters: OrganizationListFilters,
 ) =>
   apiGetPage('/organizations', {
-    query: { page, pageSize: 50, ...(search ? { search } : {}), ...filters },
+    query: { page, pageSize: 50, ...(search ? { search } : {}), ...filters, administered: true },
   });
 
 /** Creates, edits and member removals, newest first (20 per page); administrators only. */

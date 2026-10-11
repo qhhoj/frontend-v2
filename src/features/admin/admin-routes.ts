@@ -1,6 +1,6 @@
 import type { RouteComponent, RouteRecordRaw } from 'vue-router';
 import { ADMIN_SCREENS, adminRouteName } from './admin-screens';
-import type { AdminScreenId } from './admin-screens';
+import type { AdminScreen, AdminScreenId } from './admin-screens';
 
 type Loader = () => Promise<RouteComponent | { default: RouteComponent }>;
 
@@ -56,18 +56,22 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   organizationQuotas: () => import('./organizations/quotas/QuotaOverviewPage.vue'),
 };
 
-const ADMIN_META = { requiresAuth: true, staffOnly: true, layout: 'admin' } as const;
+const ADMIN_META = { requiresAuth: true, adminArea: true, layout: 'admin' } as const;
 
-const screenRoute = (id: AdminScreenId): RouteRecordRaw => ({
-  path: ADMIN_SCREENS[id].path,
-  name: adminRouteName(id),
-  component: SCREEN_COMPONENTS[id],
-  meta: {
-    ...ADMIN_META,
-    titleKey: `admin.shell.screens.${id}`,
-    permission: ADMIN_SCREENS[id].permission ?? undefined,
-  },
-});
+const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
+  const screen: AdminScreen = ADMIN_SCREENS[id];
+  return {
+    path: screen.path,
+    name: adminRouteName(id),
+    component: SCREEN_COMPONENTS[id],
+    meta: {
+      ...ADMIN_META,
+      titleKey: `admin.shell.screens.${id}`,
+      permission: screen.permission ?? undefined,
+      capability: screen.capability,
+    },
+  };
+};
 
 export const adminRoutes: RouteRecordRaw[] = [
   ...(Object.keys(ADMIN_SCREENS) as AdminScreenId[]).map(screenRoute),

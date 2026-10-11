@@ -8,6 +8,6 @@ export const ADMIN_SEARCH_PAGE = { page: 1, pageSize: ADMIN_SEARCH_LIMIT } as co
 /** Backend `UserAdminController` (`judge.ban_user`): `search` is a username prefix. */
 export const searchAdminUsers = (search: string) =>
   apiGetPage('/admin/users', { query: { ...ADMIN_SEARCH_PAGE, search } });
-/** The organization index at the palette's size (`fetchOrganizations` always reads the largest page). */
+/** The organizations the viewer may administer, at the palette's size (`fetchOrganizations` always reads the largest page). */
 export const searchAdminOrganizations = (search: string) =>
-  apiGetPage('/organizations', { query: { ...ADMIN_SEARCH_PAGE, search } });
+  apiGetPage('/organizations', { query: { ...ADMIN_SEARCH_PAGE, search, administered: true } });
