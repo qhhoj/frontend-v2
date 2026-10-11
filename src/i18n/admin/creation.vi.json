@@ -14,11 +14,8 @@
     "pointsHint": "Từ 800 đến 3500.",
     "type": "Dạng bài",
     "pickType": "Chọn dạng bài",
-    "statement": "Đề bài",
-    "statementHint": "Có thể để trống và viết sau.",
-    "nextNote": "Sau khi tạo: tải test lên, chọn trình chấm và điểm, nộp thử.",
-    "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau.",
-    "statementPreview": "Xem trước"
+    "nextNote": "Sau khi tạo: viết đề bài, tải test lên, chọn trình chấm và điểm, nộp thử.",
+    "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau."
   },
   "steps": {
     "label": "Các bước chuẩn bị bài",

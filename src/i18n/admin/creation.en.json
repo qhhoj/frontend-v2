@@ -14,11 +14,8 @@
     "pointsHint": "From 800 to 3500.",
     "type": "Type",
     "pickType": "Pick a type",
-    "statement": "Statement",
-    "statementHint": "You can leave it empty and write it later.",
-    "nextNote": "After creating: upload tests, pick the checker and points, try a submission.",
-    "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest.",
-    "statementPreview": "Preview"
+    "nextNote": "After creating: write the statement, upload tests, pick the checker and points, try a submission.",
+    "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest."
   },
   "steps": {
     "label": "Problem setup steps",

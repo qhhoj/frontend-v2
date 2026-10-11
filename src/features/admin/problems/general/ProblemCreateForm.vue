@@ -13,7 +13,6 @@ import type { CreationOwner } from '../../creation/creation-owners';
 import { useCreationScope } from '../../creation/creation-scope';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import MarkdownField from '../../ui/MarkdownField.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { failureTextOf } from '../../ui/admin-errors';
 import { BUTTON, CARD, INPUT } from '../../ui/controls';
@@ -25,8 +24,8 @@ import { checkProblemForm, cloneForm, emptyProblemForm, toProblemBody } from './
 import type { ProblemForm } from './problem-form';
 
 /**
- * Mock-up 3C, the short create form: owner, code (with the organization prefix), name, limits, points, type, group and an
- * optional statement. Every other setting lives on the editor tabs, where the setup checklist leads next.
+ * Mock-up 3C, the short create form: owner, code (with the organization prefix), name, limits, points, type, group.
+ * Every other setting lives on the editor tabs, where the setup checklist leads next.
  */
 const props = defineProps<{ meta: ProblemEditingMeta }>();
 const router = useRouter();
@@ -38,7 +37,6 @@ const form = ref<ProblemForm>({
   ...cloneForm(defaults),
   typeIds: uncategorized ? [uncategorized.id] : [],
 });
-const description = ref('');
 const owner = ref<CreationOwner | null>(null);
 const isOwnerReady = ref(false);
 const localErrors = ref<FieldErrors>({});
@@ -80,8 +78,7 @@ const errors = computed<FieldErrors>(() => ({
 function checkedBody(): ProblemBody | null {
   localErrors.value = checkProblemForm(form.value, can);
   if (Object.keys(localErrors.value).length > 0) return null;
-  const body = toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
-  return description.value.trim() ? { ...body, description: description.value } : body;
+  return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
 }
 
 async function create() {
@@ -96,7 +93,7 @@ async function suggest() {
 
 // A message describes the values it was made from: editing a field retires it until the next submit.
 watch(
-  [form, description, owner],
+  [form, owner],
   () => {
     localErrors.value = {};
     createMutation.fieldErrors.value = {};
@@ -221,13 +218,6 @@ watch(
           </select>
         </AdminField>
       </div>
-      <MarkdownField
-        v-model="description"
-        :label="$t('admin.creation.problem.statement')"
-        :hint="$t('admin.creation.problem.statementHint')"
-        preview-style="problem"
-        :preview-label="$t('admin.creation.problem.statementPreview')"
-      />
     </section>
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center gap-3">
