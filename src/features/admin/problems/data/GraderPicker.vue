@@ -11,6 +11,7 @@ import { INPUT } from '../../ui/controls';
 import { argsOf, setGrader, usesFileIo, withArg } from './checker-config';
 import ChoiceCards from './ChoiceCards.vue';
 import DataSourceRow from './DataSourceRow.vue';
+import SourceCheckStatus from './SourceCheckStatus.vue';
 import type { DataForm } from './test-cases';
 
 /**
@@ -128,6 +129,11 @@ const allowMain = computed({
         :stored-name="data.customHeader"
       />
     </ul>
+    <SourceCheckStatus
+      v-if="grader === 'interactive'"
+      :check="data.sourceChecks.customGrader"
+      :stored-name="data.customGrader"
+    />
     <AdminStatus
       v-if="grader === 'interactive' && !data.customGrader"
       kind="queued"

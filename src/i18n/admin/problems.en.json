@@ -451,6 +451,14 @@
         "weights": "At least one line needs points above 0.",
         "weightsFormat": "Only whole numbers of 0 or more, separated by spaces.",
         "fileName": "Enter a file name without / or \\, not starting with a dot, other than input, output, main."
+      },
+      "compile": {
+        "pending": "Compiling on a judge…",
+        "ok": "Compiles.",
+        "error": "Compile error: fix the source and upload it again.",
+        "unavailable": "No judge could check it. The problem still saves; any error shows when submissions are judged.",
+        "log": "Compile log",
+        "reason": "Reason"
       }
     }
   },

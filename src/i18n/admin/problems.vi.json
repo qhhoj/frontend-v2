@@ -451,6 +451,14 @@
         "weights": "Cần ít nhất một dòng có điểm lớn hơn 0.",
         "weightsFormat": "Chỉ nhập các số nguyên không âm, cách nhau bởi dấu cách.",
         "fileName": "Nhập tên file, không có / hay \\, không bắt đầu bằng dấu chấm, khác input, output, main."
+      },
+      "compile": {
+        "pending": "Đang biên dịch trên máy chấm…",
+        "ok": "Biên dịch được.",
+        "error": "Lỗi biên dịch: sửa mã nguồn rồi tải lên lại.",
+        "unavailable": "Chưa kiểm tra được bằng máy chấm. Bài vẫn lưu được; lỗi (nếu có) sẽ hiện khi chấm.",
+        "log": "Nhật ký biên dịch",
+        "reason": "Lý do"
       }
     }
   },

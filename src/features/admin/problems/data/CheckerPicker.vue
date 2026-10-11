@@ -24,6 +24,7 @@ import {
 import type { CheckerFamily } from './checker-config';
 import ChoiceCards from './ChoiceCards.vue';
 import DataSourceRow from './DataSourceRow.vue';
+import SourceCheckStatus from './SourceCheckStatus.vue';
 import type { DataForm } from './test-cases';
 
 /**
@@ -227,6 +228,10 @@ const weightsError = computed(() =>
           :stored-name="data.customChecker"
         />
       </ul>
+      <SourceCheckStatus
+        :check="data.sourceChecks.customChecker"
+        :stored-name="data.customChecker"
+      />
       <AdminStatus
         v-if="!data.customChecker"
         kind="queued"
