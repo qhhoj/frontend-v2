@@ -9,3 +9,13 @@ export function graceTextOf(row: Pick<DeletedProblem, 'daysLeft' | 'isPurged'>):
   if (row.daysLeft === 0) return { key: 'admin.lifecycle.grace.due', count: 0 };
   return { key: 'admin.lifecycle.grace.left', count: row.daysLeft };
 }
+
+/** The grace chip's tone: due is negative, under a week caution, otherwise (and once purged) neutral. */
+const CAUTION_DAYS = 7;
+export function graceToneOf(
+  row: Pick<DeletedProblem, 'daysLeft' | 'isPurged'>,
+): 'neutral' | 'caution' | 'negative' {
+  if (row.isPurged) return 'neutral';
+  if (row.daysLeft === 0) return 'negative';
+  return row.daysLeft < CAUTION_DAYS ? 'caution' : 'neutral';
+}

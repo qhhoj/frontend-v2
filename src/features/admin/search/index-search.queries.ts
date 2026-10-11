@@ -4,7 +4,8 @@ import type { Ref } from 'vue';
 import { fetchAdminProblems } from '@/api/admin-index.api';
 import { lookupUser } from '@/api/admin-common.api';
 import type { ProblemListQuery } from '@/api/types/problems';
-import { PROBLEM_INDEX_KEY } from '../problems/problem-editing.queries';
+import { fetchEditableProblem } from '@/api/problem-editing.api';
+import { editableProblemKey, PROBLEM_INDEX_KEY } from '../problems/problem-editing.queries';
 import { fetchContests } from '@/api/contests.api';
 import type { ContestListQuery } from '@/api/types/contests';
 import { CONTEST_INDEX_KEY } from '../contests/contest-editing.queries';
@@ -33,6 +34,21 @@ export function useAuthorIdQuery(username: Ref<string>) {
     enabled: computed(() => username.value !== ''),
     retry: false,
     staleTime: Infinity,
+  });
+}
+
+/**
+ * Whether `code` names a problem this account may edit (the editor's own query, so opening it is instant). Empty: no
+ * request. A miss (404, 403) is an answer, not an error to retry.
+ */
+export function useExactProblemQuery(code: Ref<string>) {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => editableProblemKey(code.value, viewerId.value)),
+    queryFn: () => fetchEditableProblem(code.value),
+    enabled: computed(() => code.value !== ''),
+    retry: false,
+    staleTime: 60_000,
   });
 }
 

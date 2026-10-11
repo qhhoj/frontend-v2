@@ -12,25 +12,15 @@
   "anyType": "Any type",
   "author": "Author",
   "authorPlaceholder": "Exact username",
-  "sort": "Sort by",
-  "sorts": {
-    "dateDesc": "Newest first",
-    "dateAsc": "Oldest first",
-    "codeAsc": "Code A–Z",
-    "nameAsc": "Name A–Z",
-    "pointsDesc": "Most points",
-    "pointsAsc": "Fewest points"
-  },
   "columns": {
-    "authors": "Authors",
+    "problem": "Problem",
+    "status": "Status",
     "group": "Group",
+    "authors": "Authors",
+    "points": "Points",
     "date": "Published"
   },
   "orgPrivate": "Organization",
-  "selectPage": "Select every problem on this page",
-  "selectRow": "Select {code}",
-  "selected": "{count} selected",
-  "clearSelection": "Clear selection",
   "bulk": {
     "publish": "Make public",
     "unpublish": "Make private",
@@ -50,5 +40,26 @@
       "unknown": "refused",
       "internal_error": "server error; open the problem to check it"
     }
-  }
+  },
+  "searchLabel": "Search by code or name",
+  "tableCaption": "Problems",
+  "moreAuthors": "+{count}",
+  "chips": {
+    "group": "Group: {name}",
+    "type": "Type: {name}",
+    "author": "Author: {name}"
+  },
+  "edit": "Edit {code}",
+  "menu": {
+    "label": "More actions for {code}",
+    "view": "View problem",
+    "data": "Test data",
+    "delete": "Delete problem…"
+  },
+  "deleted": "Deleted {code}. You can restore it under “Deleted”.",
+  "import": {
+    "button": "Import",
+    "label": "Import problems"
+  },
+  "count": "{total} problems"
 }

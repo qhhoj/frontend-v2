@@ -8,7 +8,7 @@ import { SEARCH_MAX_LENGTH } from './index-search';
 export const PROBLEM_STATUS_FILTERS = ['all', 'public', 'private', 'suggested'] as const;
 export type ProblemStatusFilter = (typeof PROBLEM_STATUS_FILTERS)[number];
 
-/** Sorts the staff list offers, newest first by default. */
+/** Sorts the staff list's column headers offer (Bài: name, Điểm, Ngày đăng), newest first by default; `code` stays valid in old links. */
 export const ADMIN_PROBLEM_SORTS = [
   '-date',
   'date',
@@ -17,14 +17,10 @@ export const ADMIN_PROBLEM_SORTS = [
   '-points',
   'points',
 ] as const satisfies readonly ProblemSort[];
-const DEFAULT_SORT: ProblemSort = '-date';
-/** Only the offered sorts: another public sort in the address would leave the select showing the wrong option. */
+const DEFAULT_PROBLEM_SORT: ProblemSort = '-date';
+/** Only the sorts a column header offers: another public sort in the address would leave no header marked. */
 const isAdminSort = (value: string): value is (typeof ADMIN_PROBLEM_SORTS)[number] =>
   (ADMIN_PROBLEM_SORTS as readonly string[]).includes(value);
-
-/** The i18n key of a sort option: `date` / `-date` become `dateAsc` / `dateDesc`. */
-export const sortLabelKey = (sort: ProblemSort): string =>
-  sort.startsWith('-') ? `${sort.slice(1)}Desc` : `${sort}Asc`;
 
 /** Everything the staff list reads from the address; empty strings mean "not filtered". */
 export interface ProblemListFilters {
@@ -55,7 +51,7 @@ export function filtersFromQuery(query: LocationQuery): ProblemListFilters {
     groupId: firstOf(query.group),
     typeId: firstOf(query.type),
     author: firstOf(query.author).trim(),
-    sort: isAdminSort(sort) ? sort : DEFAULT_SORT,
+    sort: isAdminSort(sort) ? sort : DEFAULT_PROBLEM_SORT,
     page: pageFromQuery(query.page),
   };
 }
@@ -71,7 +67,7 @@ const ADDRESS_KEYS = {
 } as const;
 const DEFAULTS: Partial<Record<keyof typeof ADDRESS_KEYS, string>> = {
   status: 'all',
-  sort: DEFAULT_SORT,
+  sort: DEFAULT_PROBLEM_SORT,
 };
 export type FilterPatch = Partial<Pick<ProblemListFilters, keyof typeof ADDRESS_KEYS>>;
 
@@ -110,6 +106,3 @@ export function listQueryOf(
     page: filters.page,
   };
 }
-
-/** The bulk visibility route takes at most this many codes. */
-export const MAX_BULK_CODES = 100;

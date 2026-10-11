@@ -3,19 +3,6 @@
   "edit": "Edit",
   "pager": "Result pages",
   "problems": {
-    "title": "Search problems",
-    "label": "Search problems",
-    "placeholder": "Problem code or name…",
-    "hint": "Matches part of the code or a title.",
-    "columns": {
-      "problem": "Problem",
-      "points": "Points"
-    },
-    "private": "Private",
-    "count": "{shown} / {total} problems",
-    "countFor": "{shown} / {total} problems match “{q}”",
-    "empty": "No problems yet.",
-    "emptyFor": "No problem matches “{q}”",
-    "emptyAdvice": "Try a shorter part of the code or name, or open by code beside the list."
+    "empty": "No problems yet."
   }
 }

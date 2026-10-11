@@ -7,19 +7,15 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { DELETED_PROBLEMS_KEY, SUBMISSIONS_KEY } from './lifecycle.queries';
 
-export interface DeletedOutcome {
-  kind: 'done' | 'queued' | 'refused';
-  text: string;
-}
 interface PurgeCommand {
   code: string;
   confirmCode: string;
 }
 
-/** Restore and purge-now for the deleted list, and the one result line the page shows. */
+/** Restore and purge-now for the deleted list: success is a toast, a refused restore is the page's one `refusal` line. */
 export function useDeletedActions() {
   const queryClient = useQueryClient();
-  const outcome = ref<DeletedOutcome | null>(null);
+  const refusal = ref('');
   const restore = useAdminMutation({
     mutate: (code: string) => restoreProblem(code),
     invalidates: () => [
@@ -28,19 +24,13 @@ export function useDeletedActions() {
       PUBLIC_PROBLEMS_KEY,
       SUBMISSIONS_KEY,
     ],
-    onDone: (_result, code) => {
-      outcome.value = { kind: 'done', text: translate('admin.lifecycle.restored', { code }) };
-    },
+    successText: (_result, code) => translate('admin.lifecycle.restored', { code }),
   });
   const purge = useAdminMutation({
     mutate: (command: PurgeCommand) => purgeProblemNow(command.code, command.confirmCode),
     invalidates: () => [DELETED_PROBLEMS_KEY],
-    onDone: (_result, command) => {
-      outcome.value = {
-        kind: 'queued',
-        text: translate('admin.lifecycle.purgeQueued', { code: command.code }),
-      };
-    },
+    successText: (_result, command) =>
+      translate('admin.lifecycle.purgeQueued', { code: command.code }),
   });
 
   /** A conflict (already purged, restored, or claimed by a purge) means the row is stale: reload the list. */
@@ -50,11 +40,11 @@ export function useDeletedActions() {
   };
 
   async function restoreRow(code: string) {
-    outcome.value = null;
+    refusal.value = '';
     await restore.run(code);
     const failure = restore.failure.value;
     if (!failure) return;
-    outcome.value = { kind: 'refused', text: failureTextOf(failure) };
+    refusal.value = failureTextOf(failure);
     await reloadWhenStale(failure);
   }
 
@@ -68,8 +58,8 @@ export function useDeletedActions() {
   /** Clears an earlier dialog refusal before the dialog opens for another row. */
   function openPurgeFor() {
     purge.reset();
-    outcome.value = null;
+    refusal.value = '';
   }
 
-  return { restore, purge, outcome, restoreRow, purgeRow, openPurgeFor };
+  return { restore, purge, refusal, restoreRow, purgeRow, openPurgeFor };
 }
