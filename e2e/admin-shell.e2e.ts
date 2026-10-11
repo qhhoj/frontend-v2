@@ -12,6 +12,8 @@ function signInAsSuperuser(api: FakeApi) {
   api.routes['GET /comments/reports'] = adminList([], { total: 2 });
   api.routes['GET /admin/organization-requests'] = adminList([], { total: 4 });
   api.routes['GET /judges/queue'] = adminOk(EMPTY_JUDGE_QUEUE);
+  api.routes['GET /admin/audit'] = adminOk({ items: [], nextBefore: null });
+  api.routes['GET /admin/users'] = adminList([]);
 }
 
 for (const viewport of AUDIT_VIEWPORTS)
@@ -64,16 +66,31 @@ test('a record hit links to its editor', async ({ page, api }) => {
   expect(api.unmatched).toEqual([]);
 });
 
-test('the phone menu names the screen and closes after a choice', async ({ page, api }) => {
+test('the phone menu sheet traps focus, marks the screen and closes after a choice', async ({
+  page,
+  api,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   signInAsSuperuser(api);
   api.routes['GET /judges'] = adminOk([]);
   await page.goto('/admin');
-  const menu = page.locator('details', { has: page.getByTestId('admin-nav-phone') });
-  await expect(menu.locator('summary')).toContainText('Trang chủ quản trị');
-  await menu.locator('summary').click();
-  await menu.getByRole('link', { name: 'Máy chấm' }).click();
+  const opener = page.getByTestId('admin-nav-open');
+  await opener.click();
+  const sheet = page.getByRole('dialog', { name: 'Quản trị' });
+  await expect(sheet.getByRole('link', { name: 'Tổng quan' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  await page.keyboard.press('Escape');
+  await expect(sheet).toBeHidden();
+  await expect(opener).toBeFocused();
+  await opener.click();
+  await sheet.getByRole('link', { name: 'Máy chấm' }).click();
   await expect(page).toHaveURL(/\/admin\/judges$/);
-  await expect(menu).not.toHaveAttribute('open');
-  await expect(menu.locator('summary')).toContainText('Máy chấm');
+  await expect(sheet).toBeHidden();
+  await opener.click();
+  await expect(sheet.getByRole('link', { name: 'Máy chấm' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 });

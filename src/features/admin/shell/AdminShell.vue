@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ChevronDown } from 'lucide-vue-next';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../admin-access';
 import AdminForbidden from './AdminForbidden.vue';
+import '../ui/admin-density.css';
 import AdminNav from './AdminNav.vue';
+import AdminNavSheet from './AdminNavSheet.vue';
 import AdminTopBar from './AdminTopBar.vue';
 import { useNavCounts } from './overview/admin-overview.queries';
 import { useRecentScreens } from './recent/recent-screens';
@@ -47,38 +48,18 @@ watch(
 </script>
 
 <template>
-  <AdminTopBar @search="openPalette" />
-  <div class="min-[900px]:grid min-[900px]:grid-cols-[248px_minmax(0,1fr)]">
-    <aside class="hidden border-r border-line px-3 py-5 min-[900px]:block">
-      <AdminNav :counts="navCounts" />
-    </aside>
-    <details
-      :open="isPhoneNavOpen"
-      class="group border-b border-line px-4 py-1 min-[900px]:hidden"
-      @toggle="isPhoneNavOpen = ($event.target as HTMLDetailsElement).open"
-    >
-      <summary
-        class="flex min-h-11 cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden"
-      >
-        <span class="text-sm text-muted">{{ $t('admin.shell.navToggle') }}</span>
-        <span aria-hidden="true" class="text-muted">·</span>
-        <span class="min-w-0 flex-1 truncate font-semibold">
-          {{ route.meta.titleKey ? $t(route.meta.titleKey) : '' }}
-        </span>
-        <ChevronDown
-          aria-hidden="true"
-          class="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
-        />
-      </summary>
-      <AdminNav
-        :counts="navCounts"
-        data-testid="admin-nav-phone"
-        class="max-h-[70dvh] overflow-y-auto pt-1 pb-3"
-      />
-    </details>
+  <AdminTopBar :is-nav-open="isPhoneNavOpen" @search="openPalette" @menu="isPhoneNavOpen = true" />
+  <div class="lg:grid lg:grid-cols-[var(--qa-sidebar)_minmax(0,1fr)]">
+    <!-- The column draws the border at full page height; the nav inside is sticky, one screen tall, with its own scroll. -->
+    <div class="hidden border-r border-line lg:block">
+      <aside class="sticky top-0 h-dvh overflow-y-auto overscroll-contain px-3 py-4">
+        <AdminNav :counts="navCounts" />
+      </aside>
+    </div>
+    <AdminNavSheet v-model:open="isPhoneNavOpen" :counts="navCounts" />
     <main id="main" tabindex="-1" class="relative min-w-0 focus-visible:outline-none">
-      <!-- One width cap for every screen; it only shows on screens wider than about 1530px. -->
-      <div class="mx-auto flex w-full max-w-[1344px] flex-col gap-5 px-4 py-6 sm:px-8">
+      <!-- No width cap: tables use the width; a form page caps itself (880 px). -->
+      <div class="flex w-full flex-col gap-6 px-(--qa-gutter) py-6">
         <slot v-if="isAllowed" />
         <AdminForbidden v-else />
       </div>

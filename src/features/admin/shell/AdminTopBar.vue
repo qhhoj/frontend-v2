@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { House, Search, ShieldCheck } from 'lucide-vue-next';
+import { House, Menu, Search, ShieldCheck } from 'lucide-vue-next';
 import UserMenu from '@/features/shell/UserMenu.vue';
 import { shortcutHint } from './search/use-palette-shortcut';
 
-defineEmits<{ search: [] }>();
+defineProps<{ isNavOpen: boolean }>();
+defineEmits<{ search: []; menu: [] }>();
 </script>
 
 <template>
@@ -30,7 +31,7 @@ defineEmits<{ search: [] }>();
       type="button"
       data-testid="admin-search-button"
       aria-keyshortcuts="Control+K Meta+K /"
-      class="ml-auto flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-3 text-sm text-muted hover:bg-surface-hover sm:min-w-56 sm:justify-start"
+      class="ml-auto flex min-h-(--qa-control) min-w-(--qa-control) items-center justify-center gap-2 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm text-muted hover:bg-surface-hover sm:min-w-56 sm:justify-start"
       @click="$emit('search')"
     >
       <Search aria-hidden="true" class="size-4" />
@@ -49,5 +50,16 @@ defineEmits<{ search: [] }>();
       <span class="sr-only sm:not-sr-only">{{ $t('admin.shell.backToSite') }}</span>
     </RouterLink>
     <UserMenu />
+    <button
+      type="button"
+      data-testid="admin-nav-open"
+      aria-haspopup="dialog"
+      :aria-expanded="isNavOpen"
+      :aria-label="$t('admin.shell.navOpen')"
+      class="flex size-11 shrink-0 items-center justify-center rounded-cell border border-line-strong bg-surface-solid hover:bg-surface-hover lg:hidden"
+      @click="$emit('menu')"
+    >
+      <Menu aria-hidden="true" class="size-5" />
+    </button>
   </header>
 </template>
