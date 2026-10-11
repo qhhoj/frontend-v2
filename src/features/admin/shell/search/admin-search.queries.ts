@@ -2,8 +2,9 @@ import { useQueries } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useLocaleStore } from '@/stores/locale.store';
-import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { canUseAdmin } from '../../admin-access';
 import { MIN_RECORD_SEARCH, RECORD_SOURCES } from './admin-search';
 import type { PaletteEntry } from './admin-search';
 
@@ -15,10 +16,12 @@ const SEARCH_STALE_MS = 60_000;
  * A kind whose screen the viewer cannot open is never asked for, so a limited staff member sees no 403.
  */
 export function useAdminRecordSearch(term: Ref<string>) {
-  const { canAny } = usePermissions();
+  const session = useSessionStore();
   const viewerId = useViewerId();
   const locale = useLocaleStore();
-  const sources = computed(() => RECORD_SOURCES.filter((source) => canAny(source.permission)));
+  const sources = computed(() =>
+    RECORD_SOURCES.filter((source) => canUseAdmin(session.user, source)),
+  );
   const isLongEnough = computed(() => term.value.length >= MIN_RECORD_SEARCH);
   const results = useQueries({
     queries: computed(() =>

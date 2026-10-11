@@ -7,7 +7,7 @@ import {
 } from '@/api/admin-search.api';
 import { fetchContests } from '@/api/contests.api';
 import type { Locale } from '@/i18n';
-import type { PermissionRule } from '@/lib/permissions';
+import type { AdminAccess } from '../../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../../admin-screens';
 import { highlightParts } from '../../search/index-search';
 import type { AdminNavItem } from '../admin-nav';
@@ -50,10 +50,9 @@ export function matchScreens(
     }));
 }
 
-/** One remote kind of record: the permission that opens its admin screen, and how to fetch and link its hits. */
-export interface RecordSource {
+/** One remote kind of record: what opens its admin screen, and how to fetch and link its hits. */
+export interface RecordSource extends AdminAccess {
   group: Exclude<PaletteGroupId, 'screens'>;
-  permission: PermissionRule | null;
   search: (term: string, lang: Locale) => Promise<PaletteEntry[]>;
 }
 
@@ -82,8 +81,9 @@ export const RECORD_SOURCES: readonly RecordSource[] = [
     group: 'contests',
     permission: ADMIN_SCREENS.contestGeneral.permission,
     search: async (term) =>
-      (await fetchContests({ ...ADMIN_SEARCH_PAGE, q: term })).items.map(({ key, name }) =>
-        entry('contests', key, name, { name: adminRouteName('contestGeneral'), params: { key } }),
+      (await fetchContests({ ...ADMIN_SEARCH_PAGE, q: term, editable: true })).items.map(
+        ({ key, name }) =>
+          entry('contests', key, name, { name: adminRouteName('contestGeneral'), params: { key } }),
       ),
   },
   {
@@ -100,6 +100,7 @@ export const RECORD_SOURCES: readonly RecordSource[] = [
   {
     group: 'organizations',
     permission: ADMIN_SCREENS.organizations.permission,
+    capability: ADMIN_SCREENS.organizations.capability,
     search: async (term) =>
       (await searchAdminOrganizations(term)).items.map(({ slug, name }) =>
         entry('organizations', slug, name, {

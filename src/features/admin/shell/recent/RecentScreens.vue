@@ -2,17 +2,24 @@
 import { History } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../../admin-access';
 import { useRecentScreens } from './recent-screens';
 
 const router = useRouter();
-const { canAny } = usePermissions();
+const session = useSessionStore();
 const { recent } = useRecentScreens();
 /** A shortcut whose screen the viewer can no longer open (permissions change) is left out, not offered as a dead end. */
 const openable = computed(() =>
   recent.value.filter((entry) => {
     const target = router.resolve(entry.path);
-    return target.name !== 'admin-unknown' && canAny(target.meta.permission ?? null);
+    return (
+      target.name !== 'admin-unknown' &&
+      canUseAdmin(session.user, {
+        permission: target.meta.permission ?? null,
+        capability: target.meta.capability,
+      })
+    );
   }),
 );
 </script>
