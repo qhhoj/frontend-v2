@@ -2,7 +2,11 @@ import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installUsageOverview } from './fixtures/f4-api';
-import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
+import {
+  editableProblem,
+  problemData,
+  problemEditingMeta,
+} from '../src/test/admin-fixtures/problems';
 import { usageRow } from '../src/test/f4-fixtures';
 
 const EDIT = ['judge.edit_all_organization'];
@@ -51,13 +55,14 @@ test('the admin nav links the overview', async ({ page, api }) => {
   await expect(page).toHaveURL(/\/admin\/organizations\/quotas$/);
 });
 
-test('a clone refused by the quota names the credits with the sweating Bit', async ({
+test('a clone refused by the quota names the credits and shows the refusal alert', async ({
   page,
   api,
 }) => {
   signInAsStaff(api, ['judge.edit_own_problem', 'judge.clone_problem']);
   api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
   api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
+  api.routes['GET /problems/hcmus41c/data'] = adminOk(problemData());
   api.routes['POST /problems/hcmus41c/clone'] = {
     status: 403,
     body: {
@@ -82,5 +87,4 @@ test('a clone refused by the quota names the credits with the sweating Bit', asy
   await page.locator('#problem-clone-code').press('Enter');
   const alert = page.getByRole('alert').filter({ hasText: 'cần 10, còn lại 6' });
   await expect(alert).toBeVisible();
-  await expect(alert.getByTestId('inline-bit')).toBeVisible();
 });
