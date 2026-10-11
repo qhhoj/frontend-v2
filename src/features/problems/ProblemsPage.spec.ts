@@ -1,5 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   problemDetail,
   problemItem,
@@ -42,6 +42,8 @@ const lastListQuery = (calls: { path: string; query: URLSearchParams }[]) =>
 const scrollIntoView = vi.fn();
 
 describe('problem list', () => {
+  // The problem page is a lazy route; import it up front so a cold worker pays that cost here, not inside a test's wait.
+  beforeAll(() => import('@/features/problems/ProblemPage.vue'), 60_000);
   beforeEach(() => {
     scrollIntoView.mockClear();
     Element.prototype.scrollIntoView = scrollIntoView;
@@ -96,10 +98,7 @@ describe('problem list', () => {
       'true',
     ]);
     expect(asked.query.has('page')).toBe(false);
-    // The problem page is a lazy route: a cold worker (a CI shard) can take over a second to import it.
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/lucky'), {
-      timeout: 5000,
-    });
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/lucky'));
   });
 
   it('says so when no problem matches the random pick', async () => {
