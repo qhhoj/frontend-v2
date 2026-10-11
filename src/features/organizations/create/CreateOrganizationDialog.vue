@@ -8,7 +8,7 @@ import { useSlugFromName } from '@/features/admin/organizations/use-slug-from-na
 import AdminField from '@/features/admin/ui/AdminField.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '@/features/admin/ui/classes';
+import { INPUT } from '@/features/admin/ui/controls';
 import JoinModeField from '../manage/JoinModeField.vue';
 
 /**
@@ -52,7 +52,7 @@ async function create() {
           <input
             :id="id"
             v-model="form.name"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             maxlength="128"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
@@ -70,7 +70,7 @@ async function create() {
             <input
               :id="id"
               v-model="form.slug"
-              :class="`${ADMIN_INPUT_CLASS} font-mono`"
+              :class="`${INPUT} font-mono`"
               maxlength="128"
               :aria-describedby="describedBy"
               :aria-invalid="invalid ? 'true' : undefined"
@@ -82,7 +82,7 @@ async function create() {
       </div>
       <AdminField input-id="org-create-about" :label="$t('orgAdmin.create.about')">
         <template #default="{ id }">
-          <textarea :id="id" v-model="form.about" rows="3" :class="`${ADMIN_INPUT_CLASS} py-2`" />
+          <textarea :id="id" v-model="form.about" rows="3" :class="`${INPUT} py-2`" />
         </template>
       </AdminField>
       <p class="text-xs text-muted">{{ $t('orgAdmin.create.unlistedNote') }}</p>

@@ -2,7 +2,7 @@
 import AdminField from '@/features/admin/ui/AdminField.vue';
 import UsernameChips from '@/features/admin/ui/UsernameChips.vue';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '@/features/admin/ui/classes';
+import { INPUT } from '@/features/admin/ui/controls';
 import { POST_LIMITS } from './post-form';
 import type { UserChip } from '@/api/types/admin-common';
 
@@ -31,7 +31,7 @@ const authors = defineModel<UserChip[]>('authors', { required: true });
         :id="id"
         v-model="ogImage"
         :maxlength="POST_LIMITS.ogImage"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="invalid ? 'true' : undefined"
         placeholder="https://…"

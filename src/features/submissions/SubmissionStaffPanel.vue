@@ -8,7 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminBit from '@/features/admin/shell/AdminBit.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import SubmissionLockControl from './SubmissionLockControl.vue';
-import { ADMIN_DANGER_CLASS } from '@/features/admin/ui/classes';
+import { BUTTON } from '@/features/admin/ui/controls';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { hasPermission } from '@/lib/permissions';
@@ -188,7 +188,7 @@ async function confirmAction() {
         <button
           v-if="actions[action] !== 'hidden'"
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          :class="BUTTON.danger"
           :aria-disabled="!isReady(action) || undefined"
           :aria-describedby="!isReady(action) ? reasonIdOf(action) : undefined"
           @click="openAction(action)"

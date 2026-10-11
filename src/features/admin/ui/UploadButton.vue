@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
 import { formatFileSize } from '@/lib/format';
-import { ADMIN_BUTTON_CLASS } from './classes';
+import { BUTTON } from './controls';
 import { tooLargeFor } from './upload-limits';
 
 /**
@@ -42,7 +42,7 @@ function onChange(event: Event) {
   <span class="inline-flex flex-col gap-1">
     <label
       :for="id"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="BUTTON.secondary"
       class="cursor-pointer focus-within:ring-2 focus-within:ring-accent"
     >
       {{ isPending ? $t('admin.ui.uploading') : label }}

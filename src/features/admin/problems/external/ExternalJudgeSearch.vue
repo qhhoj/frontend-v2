@@ -5,7 +5,7 @@ import { searchExternalJudge } from '@/api/external-judge.api';
 import type { ExternalJudgeSearchItem } from '@/api/types/external-judge';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { BUTTON } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 /** Searches the remote OJs by the typed OJ and problem id; a click on a result fills both fields. */
@@ -31,7 +31,7 @@ const search = useAdminMutation({
     <div>
       <button
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="BUTTON.secondary"
         :aria-busy="search.isPending.value || undefined"
         @click="search.run(undefined)"
       >

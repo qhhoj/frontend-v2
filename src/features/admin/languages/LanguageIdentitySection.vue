@@ -3,7 +3,7 @@ import { Lock } from 'lucide-vue-next';
 import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import type { LanguageForm } from './language-form';
 
 defineProps<{ mode: 'create' | 'edit'; errors: FieldErrors }>();
@@ -30,7 +30,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
           class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <div v-else data-testid="language-key-sealed" class="flex flex-col gap-1.5">
@@ -58,7 +58,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
           type="text"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -78,7 +78,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
           type="text"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -94,7 +94,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
           type="text"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
     </div>

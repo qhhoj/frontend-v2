@@ -8,11 +8,7 @@ import AdminField from '@/features/admin/ui/AdminField.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import MarkdownField from '@/features/admin/ui/MarkdownField.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import {
-  ADMIN_BUTTON_CLASS,
-  ADMIN_INPUT_CLASS,
-  ADMIN_PRIMARY_CLASS,
-} from '@/features/admin/ui/classes';
+import { BUTTON, INPUT } from '@/features/admin/ui/controls';
 import JoinModeField from './JoinModeField.vue';
 
 /**
@@ -50,7 +46,7 @@ function reset() {
             <input
               :id="id"
               v-model="form.name"
-              :class="ADMIN_INPUT_CLASS"
+              :class="INPUT"
               maxlength="128"
               :aria-describedby="describedBy"
               :aria-invalid="invalid ? 'true' : undefined"
@@ -67,7 +63,7 @@ function reset() {
             <input
               :id="id"
               v-model="form.slug"
-              :class="`${ADMIN_INPUT_CLASS} font-mono`"
+              :class="`${INPUT} font-mono`"
               maxlength="128"
               :aria-describedby="describedBy"
               :aria-invalid="invalid ? 'true' : undefined"
@@ -90,12 +86,12 @@ function reset() {
         >
           {{ $t('orgAdmin.info.staffLink') }}
         </RouterLink>
-        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="reset">
+        <button type="button" :class="BUTTON.secondary" @click="reset">
           {{ $t('orgAdmin.info.reset') }}
         </button>
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="BUTTON.primary"
           :aria-busy="mutation.isPending.value || undefined"
         >
           {{ $t('orgAdmin.info.save') }}

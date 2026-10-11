@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { LanguageOption } from '@/api/types/problem-editing';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 import type { LanguageMapping } from './language-mapping';
 
 /** Each remote language with the site language it is sent as. A site language can be used once. */
@@ -43,7 +43,7 @@ const isTakenElsewhere = (remoteId: string, siteLanguageId: string) =>
             :value="mapping[remote.remoteId] ?? ''"
             :aria-label="$t('admin.externalJudge.languages.pick', { name: remote.remoteName })"
             :aria-invalid="duplicates.has(mapping[remote.remoteId] ?? '') || undefined"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             @change="pick(remote.remoteId, ($event.target as HTMLSelectElement).value)"
           >
             <option value="">{{ $t('admin.externalJudge.languages.unused') }}</option>

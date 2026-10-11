@@ -2,7 +2,7 @@
 import { Search, X } from 'lucide-vue-next';
 import { ref, useId } from 'vue';
 import { useDebouncedText } from '@/lib/use-debounced-text';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { BUTTON, INPUT } from '../ui/controls';
 
 const props = defineProps<{
   value: string;
@@ -42,7 +42,7 @@ function clear() {
           ref="input"
           v-model="text"
           type="search"
-          :class="[ADMIN_INPUT_CLASS, 'pl-9']"
+          :class="[INPUT, 'pl-9']"
           :placeholder="placeholder"
           :aria-describedby="hint ? `${id}-hint` : undefined"
           autocomplete="off"
@@ -51,7 +51,7 @@ function clear() {
       <button
         v-if="text"
         type="button"
-        :class="[ADMIN_BUTTON_CLASS, '!px-0 w-11']"
+        :class="[BUTTON.secondary, '!px-0 w-11']"
         :aria-label="clearLabel"
         @click="clear"
       >

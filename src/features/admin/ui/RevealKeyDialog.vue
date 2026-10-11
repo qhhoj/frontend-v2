@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 import CopyButton from '@/components/CopyButton.vue';
 import AdminStatus from './AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from './classes';
+import { BUTTON } from './controls';
 
 /** The texts of one reveal-once dialog (judge keys, integration keys). */
 interface RevealKeyTexts {
@@ -84,7 +84,7 @@ function close() {
       <button
         type="button"
         data-testid="key-close"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="BUTTON.secondary"
         :aria-disabled="!isSaved || undefined"
         @click="close"
       >

@@ -16,7 +16,7 @@ export interface AdminFilterTab {
 
 /**
  * The segmented control of a list's view or filter: pills inside one pill frame, at the admin chip density. Links
- * (`aria-current="page"`) or toggle buttons (`aria-pressed`, replacing `ADMIN_TOGGLE_CLASS` rows). On a narrow phone the
+ * (`aria-current="page"`) or toggle buttons (`aria-pressed`, replacing `TOGGLE` rows). On a narrow phone the
  * pills wrap instead of being clipped; the current one is scrolled into view when the row still overflows.
  */
 const props = defineProps<{ tabs: AdminFilterTab[]; current: string; label: string }>();
