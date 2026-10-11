@@ -12,18 +12,10 @@ type MemberQueryParams = QueryOf<'/organizations/{slug}/members'>;
 export type MemberQuery = Required<Omit<MemberQueryParams, 'search'>> &
   Pick<MemberQueryParams, 'search'>;
 
-/**
- * `search` is a literal, case-insensitive substring over name, short name and slug; blank (after trimming) sends nothing.
- * `administered` keeps only the organizations the viewer may administer.
- */
-export const fetchOrganizations = (page: number, search?: string, administered?: boolean) =>
+/** `search` is a literal, case-insensitive substring over name, short name and slug; blank (after trimming) sends nothing. */
+export const fetchOrganizations = (page: number, search?: string) =>
   apiGetPage('/organizations', {
-    query: {
-      page,
-      pageSize: ORGANIZATION_PAGE_SIZE,
-      search: search?.trim(),
-      ...(administered ? { administered } : {}),
-    },
+    query: { page, pageSize: ORGANIZATION_PAGE_SIZE, search: search?.trim() },
   });
 export const fetchOrganization = (slug: string) =>
   apiGet('/organizations/{slug}', { path: { slug } });

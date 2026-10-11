@@ -39,7 +39,6 @@ export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser =
   isStaff: false,
   isSuperuser: false,
   permissions: [],
-  adminCapabilities: { organizations: false },
   isTotpEnabled: false,
   isWebauthnEnabled: false,
   siteTheme: 'auto',
