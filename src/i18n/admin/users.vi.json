@@ -152,6 +152,7 @@
       "current": "Mật khẩu của bạn",
       "currentHint": "Xác nhận chính bạn thực hiện thay đổi.",
       "submit": "Đặt mật khẩu",
+      "submitting": "Đang đặt mật khẩu…",
       "done": "Đã đặt mật khẩu cho {username}; họ đã bị đăng xuất khỏi mọi phiên."
     },
     "reset": {

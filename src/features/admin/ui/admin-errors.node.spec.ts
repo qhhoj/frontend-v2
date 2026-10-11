@@ -16,6 +16,14 @@ describe('fieldErrorsOf', () => {
     });
   });
 
+  it('leaves out issues that name no field, so the refusal shows as the page line (429, 403, 409)', () => {
+    const error = new ApiError('rate_limited', 429, 'Too many attempts', {
+      issues: [{ field: '', code: 'rate_limited', message: 'Too many attempts; try again later' }],
+    });
+    expect(fieldErrorsOf(error)).toEqual({});
+    expect(failureTextOf(error)).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
+  });
+
   it('falls back to the fields map when the backend sent no issues (the reserved ban reason)', () => {
     const error = new ApiError('validation_failed', 400, 'Reserved ban reason', {
       fields: { reason: ['Reserved for automatic contest-cheating bans.', 'second'] },

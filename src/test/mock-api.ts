@@ -156,9 +156,11 @@ export const quotaExceeded = (details: {
   );
 export const noContent = (): MockResponse => ({ status: 204 });
 
-/** A 429 `rate_limited` carrying `Retry-After` (whole seconds), as the backend's rate limiter sends it. */
+/** A 429 `rate_limited` carrying `Retry-After` (whole seconds) and its field-less issue, as the backend's rate limiter sends it. */
 export const rateLimited = (seconds: number): MockResponse => ({
-  ...fail(429, 'rate_limited'),
+  ...fail(429, 'rate_limited', undefined, [
+    issue('', 'rate_limited', 'Too many attempts; try again later'),
+  ]),
   headers: { 'Retry-After': String(seconds) },
 });
 

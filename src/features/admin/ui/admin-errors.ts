@@ -22,16 +22,18 @@ export const hasIssueText = (code: string): boolean =>
 export const hasIssueCode = (error: unknown, code: string): error is ApiError =>
   error instanceof ApiError && error.issues.some((issue) => issue.code === code);
 
+/** An issue on field `''` (rate limit, forbidden, conflict) names no field: it is the page-line refusal, not a field error. */
 const fromIssues = (issues: FieldIssue[]): FieldErrors => {
   const errors: FieldErrors = {};
-  for (const issue of issues) errors[issue.field] ??= adminIssueText(issue);
+  for (const issue of issues.filter((item) => item.field !== ''))
+    errors[issue.field] ??= adminIssueText(issue);
   return errors;
 };
 
 const fromFields = (fields: Record<string, string[]>): FieldErrors =>
   Object.fromEntries(
     Object.entries(fields)
-      .filter(([, messages]) => messages.length > 0)
+      .filter(([field, messages]) => field !== '' && messages.length > 0)
       .map(([field, messages]) => [field, messages[0]!]),
   );
 

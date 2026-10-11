@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { openDialog, staffViewer } from '@/test/admin-routes';
 import { userPage } from '@/test/fixtures';
@@ -78,5 +78,14 @@ describe('UserPasswordForm', () => {
       'Mật khẩu của bạn không đúng.',
     );
     expect(admin.value).toBe('my own secret');
+  });
+
+  it('shows the hourly limit as a line under the button, with the wait', async () => {
+    mockApi(routes(rateLimited(120)));
+    const dialog = await openPasswordForm();
+    expect(dialog.querySelector('[role="alert"]')?.textContent).toContain('120');
+    expect(dialog.querySelector('#edit-admin-password')?.getAttribute('aria-invalid')).toBe(
+      'false',
+    );
   });
 });
