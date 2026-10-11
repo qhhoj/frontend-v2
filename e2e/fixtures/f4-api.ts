@@ -25,6 +25,7 @@ export function installOrgProblems(
   );
   api.routes['GET /organizations/lhp/problems'] = list(options.rows ?? ORG_PROBLEMS);
   api.routes['GET /organizations/lhp/problem-tags'] = list(TAGS);
+  if (options.canAdminister) api.routes['GET /organizations/lhp/requests'] = list([]);
 }
 
 /** Signs in an admin of `lhp` and answers its usage dashboard. */
@@ -36,6 +37,7 @@ export function installOrgUsage(api: FakeApi, usage: OrganizationUsage = organiz
     }),
   );
   api.routes['GET /organizations/lhp/usage'] = ok(usage);
+  api.routes['GET /organizations/lhp/requests'] = list([]);
 }
 
 export function installDeletedProblems(api: FakeApi, rows: DeletedProblem[] = [deletedProblem()]) {
