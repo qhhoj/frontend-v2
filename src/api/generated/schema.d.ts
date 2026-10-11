@@ -4562,6 +4562,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/seo/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the link-preview tags of a page
+         * @description Public. Returns a small HTML document with `og:` and `twitter:` tags for a problem, contest, blog post or user page, for link-preview bots that do not run the SPA. A page that does not exist or is not public gets the site's generic tags.
+         */
+        get: operations["SeoController_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/seo/robots.txt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read robots.txt
+         * @description Public. Allows the public pages, disallows the admin area, the API and account pages, and points to the sitemap.
+         */
+        get: operations["SeoController_robots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/seo/sitemap.xml": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the sitemap index
+         * @description Public. Lists one sitemap per part of the site (static pages, problems, contests, posts, users) and per 10000 URLs. Only what a signed-out visitor may read is listed; cached for an hour.
+         */
+        get: operations["SeoController_sitemapIndex"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/seo/sitemaps/{kind}/{page}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read one sitemap
+         * @description Public. Returns the URLs of page `page` of `kind`. 404 `not_found` past the last page.
+         */
+        get: operations["SeoController_sitemap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/short-links": {
         parameters: {
             query?: never;
@@ -8440,10 +8520,17 @@ export interface components {
         PublicRankingContestResponse: {
             /** @description When the contest ends, ISO 8601. */
             endTime: string;
+            /** @description Format-specific options, as in the contest detail. */
+            formatConfig: {
+                [key: string]: number | boolean;
+            };
+            formatName: components["schemas"]["ContestFormatName"];
             /** @description Key of the contest. */
             key: string;
             /** @description Name of the contest. */
             name: string;
+            /** @description Decimal places shown in scores. */
+            pointsPrecision: number;
             /** @description When the contest starts, ISO 8601. */
             startTime: string;
         };
@@ -19045,6 +19132,134 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["PublicRankingResponse"];
                     };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SeoController_preview: {
+        parameters: {
+            query: {
+                /** @description Site path of the page, e.g. `/problems/aplusb`. */
+                path: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SeoController_robots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SeoController_sitemapIndex: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/xml": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SeoController_sitemap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Which part of the site: `pages`, `problems`, `contests`, `posts` or `users`. */
+                kind: "contests" | "pages" | "posts" | "problems" | "users";
+                /** @description Page number, starting at 1. */
+                page: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/xml": string;
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */

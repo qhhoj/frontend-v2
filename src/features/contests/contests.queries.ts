@@ -8,6 +8,7 @@ import {
   fetchContestStats,
   fetchContests,
   fetchCurrentParticipation,
+  fetchPublicRanking,
   fetchRanking,
 } from '@/api/contests.api';
 import type { ContestListQuery } from '@/api/types/contests';
@@ -110,6 +111,21 @@ export const useRankingQuery = (
     placeholderData: computed(() => keepBoardOfContest(viewerId.value, toValue(key))),
     refetchInterval: computed(() => (running.value ? rankingPollMs(isLowPower.value) : false)),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
+    refetchIntervalInBackground: false,
+  });
+};
+
+/** The board behind a public link: no viewer, so one key per token. A board whose contest has not ended is re-read like the live one. */
+export const usePublicRankingQuery = (token: MaybeRefOrGetter<string>) => {
+  const isLowPower = useLowPowerPainted();
+  return useQuery({
+    queryKey: computed(() => ['contests', 'public-ranking', toValue(token)]),
+    queryFn: () => fetchPublicRanking(toValue(token)),
+    retry: false,
+    refetchInterval: (query) =>
+      query.state.data && Date.parse(query.state.data.contest.endTime) <= Date.now()
+        ? false
+        : rankingPollMs(isLowPower.value),
     refetchIntervalInBackground: false,
   });
 };

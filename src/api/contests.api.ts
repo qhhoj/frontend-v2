@@ -17,6 +17,9 @@ export const fetchContest = (key: string) => apiGet('/contests/{key}', { path: {
 export const fetchRanking = (key: string, withVirtual: boolean) =>
   apiGet('/contests/{key}/ranking', { path: { key }, query: { virtual: withVirtual } });
 
+export const fetchPublicRanking = (token: string) =>
+  apiGet('/public-rankings/{token}', { path: { token } });
+
 export const joinContest = (key: string, accessCode?: string, acceptRules?: boolean) =>
   apiSend('post', '/contests/{key}/join', {
     path: { key },

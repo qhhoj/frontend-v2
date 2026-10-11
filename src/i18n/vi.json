@@ -15,6 +15,7 @@
     "more": "Thêm"
   },
   "pages": {
+    "publicRanking": "Bảng xếp hạng công khai",
     "submissions": "Bài nộp",
     "submission": "Chi tiết bài nộp",
     "submissionDiff": "So sánh bài nộp",
@@ -1149,6 +1150,11 @@
     }
   },
   "ranking": {
+    "public": {
+      "subtitle": "Bảng xếp hạng công khai · chỉ xem",
+      "notFoundTitle": "Không tìm thấy bảng xếp hạng",
+      "notFoundBody": "Đường dẫn sai, đã tắt hoặc đã hết hạn."
+    },
     "summary": "{format} · {problems} bài · {participants}",
     "viewMode": "Chế độ bảng",
     "official": "Chính thức",
