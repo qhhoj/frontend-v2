@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Pencil } from 'lucide-vue-next';
+import { ArrowLeft } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -9,6 +9,7 @@ import CommentsSection from '@/features/comments/CommentsSection.vue';
 import { usePageTitle } from '@/router/page-title';
 import AuthorCard from './AuthorCard.vue';
 import MorePostsCard from './MorePostsCard.vue';
+import PostActions from './PostActions.vue';
 import PostArticle from './PostArticle.vue';
 import PostArticleSkeleton from './PostArticleSkeleton.vue';
 import { usePostQuery } from './blog.queries';
@@ -59,14 +60,7 @@ usePageTitle(() => post.value?.title);
               <ArrowLeft aria-hidden="true" class="size-4" />
               {{ $t('blogPost.back') }}
             </RouterLink>
-            <RouterLink
-              v-if="post.canEdit"
-              :to="{ name: 'post-edit', params: { id: post.id } }"
-              class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-            >
-              <Pencil aria-hidden="true" class="size-4" />
-              {{ $t('admin.postEditor.editTitle') }}
-            </RouterLink>
+            <PostActions :post="post" />
           </div>
           <PostArticle :post="post" />
           <CommentsSection type="blog" :page-key="post.id" class="mt-8" />

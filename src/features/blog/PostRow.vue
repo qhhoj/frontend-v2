@@ -10,6 +10,7 @@ import { formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { summaryExcerpt } from './post-summary';
+import { postStateOf } from './post-state';
 
 /** One post as a row: a two-line title, a muted two-line excerpt, then author, date and comments, with the vote centred on the right. */
 const props = defineProps<{ post: PostListItem }>();
@@ -20,6 +21,11 @@ const isAuthor = computed(() =>
   props.post.authors.some((author) => author.id === session.user?.id),
 );
 const canVote = computed(() => session.user !== null && !isAuthor.value);
+/** Lists that include unpublished posts (an organization's admins, staff) mark them. */
+const unpublished = computed(() => {
+  const state = postStateOf(props.post);
+  return state === 'live' ? null : state;
+});
 const excerpt = computed(() => summaryExcerpt(props.post.summaryHtml));
 const send = (score: VoteScore) => votePost(props.post.id, score);
 const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] });
@@ -37,6 +43,12 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           class="mr-2 inline-flex rounded-pill bg-accent-soft px-2.5 py-0.5 align-middle text-xs font-semibold text-accent-soft-text"
         >
           {{ $t('blog.pinned') }}
+        </span>
+        <span
+          v-if="unpublished"
+          class="mr-2 inline-flex rounded-pill bg-surface-hover px-2.5 py-0.5 align-middle text-xs font-semibold text-muted"
+        >
+          {{ $t(`blog.drafts.state.${unpublished}`) }}
         </span>
         <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
           {{ post.title }}

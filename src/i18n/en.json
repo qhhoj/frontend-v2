@@ -57,7 +57,8 @@
     "contestBalloons": "Balloons",
     "contestBalloonsPrint": "Balloon run sheet",
     "problemBest": "Best submissions",
-    "runtimes": "Judges and languages"
+    "runtimes": "Judges and languages",
+    "postDrafts": "My drafts"
   },
   "contests": {
     "title": "Contests",
@@ -1604,7 +1605,11 @@
     "membersPager": "Member pages",
     "noMembers": "No members yet.",
     "postsPager": "Post pages",
-    "noPosts": "No posts yet."
+    "noPosts": "No posts yet.",
+    "postsTitle": "Organization posts",
+    "writePost": "Write for the organization",
+    "writeFirstPost": "Write the first post",
+    "noPostsBody": "Admins post for the organization here; members can read them."
   },
   "blog": {
     "lead": "News, guides and stories from the community. Pinned posts stay on top.",
@@ -1628,7 +1633,18 @@
     "problemPoints": "{points} points",
     "topContributors": "Top contributors",
     "toLeaderboard": "Leaderboard",
-    "title": "Blog"
+    "title": "Blog",
+    "myDrafts": "My drafts",
+    "drafts": {
+      "title": "My drafts",
+      "lead": "Your drafts and scheduled posts. Only you and the staff see them until they are published.",
+      "empty": "No drafts yet",
+      "state": {
+        "draft": "Draft",
+        "scheduled": "Scheduled"
+      },
+      "publishesAt": "Publishes {time}"
+    }
   },
   "blogPost": {
     "breadcrumb": "Breadcrumb",
@@ -1641,7 +1657,17 @@
     "noMorePosts": "No other posts yet.",
     "notFoundTitle": "Post not found",
     "notFoundBody": "The post does not exist or is not public yet.",
-    "backToBlog": "Back to the blog"
+    "backToBlog": "Back to the blog",
+    "edit": "Edit",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "actions": "Post actions",
+    "delete": {
+      "action": "Delete",
+      "title": "Delete this post?",
+      "body": "“{title}” and its comments and votes will be deleted for good. This cannot be undone.",
+      "confirm": "Delete post"
+    }
   },
   "comments": {
     "deletedAccount": "Deleted account",
@@ -2500,5 +2526,66 @@
     "extension": "File extension",
     "perJudge": "Version on each judge",
     "notInstalled": "not installed"
+  },
+  "postEditor": {
+    "newTitle": "New post",
+    "editTitle": "Edit post",
+    "backToPost": "Back to the post",
+    "body": {
+      "label": "Content (Markdown)",
+      "write": "Write",
+      "preview": "Preview",
+      "toolbar": "Formatting",
+      "empty": "The preview shows here as you write.",
+      "tools": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "code": "Code",
+        "link": "Link",
+        "bullet": "Bulleted list",
+        "numbered": "Numbered list",
+        "math": "Formula"
+      }
+    },
+    "settings": {
+      "title": "Publishing",
+      "toggle": "Publishing settings",
+      "postAs": "Post as",
+      "self": "Myself",
+      "organization": "Organization",
+      "organizationHint": "Only organizations you administer. Its members can read the post.",
+      "visibility": "Visibility",
+      "publishOn": "Publish time",
+      "summary": "Summary",
+      "summaryHint": "Shown on the post card. Empty uses the start of the post.",
+      "summaryLocked": "Only staff can change the summary. Empty uses the start of the post.",
+      "sticky": "Pin to the feed",
+      "stickyHint": "Always at the top of the list. Staff only."
+    },
+    "mode": {
+      "draft": "Draft",
+      "public": "Public",
+      "scheduled": "Scheduled"
+    },
+    "modeHint": {
+      "draft": "Only you and the staff see it",
+      "public": "Anyone can read it; organization posts, members only",
+      "scheduled": "Publishes itself at the chosen time"
+    },
+    "bar": {
+      "saveDraft": "Save draft",
+      "publish": "Publish",
+      "schedule": "Schedule",
+      "update": "Update",
+      "unsaved": "Unsaved changes",
+      "clean": "No changes yet"
+    },
+    "refused": {
+      "title": "You cannot write a post yet",
+      "body": "A personal post needs at least {count} solved problems and an unmuted account. Organization admins can post for their organization."
+    },
+    "errors": {
+      "scheduleAhead": "Pick a time in the future."
+    }
   }
 }

@@ -45,6 +45,7 @@ describe('blog list: votes', () => {
     const calls = mockApi({
       ...signedInViewer(),
       ...communityHomeRoutes,
+      'GET /posts/drafts': page([]),
       'GET /posts': () => page([postItem({ ...vote })]),
       [`PUT /posts/${postItem().id}/vote`]: ({ body }) => {
         const { score } = body as { score: VoteScore };
@@ -67,6 +68,7 @@ describe('blog list: inert arrows', () => {
     const calls = mockApi({
       ...signedInViewer(),
       ...communityHomeRoutes,
+      'GET /posts/drafts': page([]),
       'GET /posts': page([
         postItem({ authors: [{ id: OWN_AUTHOR_ID, username: 'user_01', rating: null }] }),
       ]),

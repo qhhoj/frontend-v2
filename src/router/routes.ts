@@ -229,6 +229,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.postNew', requiresAuth: true },
   },
   {
+    path: '/blog/drafts',
+    name: 'post-drafts',
+    component: () => import('@/features/blog/BlogDraftsPage.vue'),
+    meta: { titleKey: 'pages.postDrafts', requiresAuth: true },
+  },
+  {
     path: '/blog/:id/edit',
     name: 'post-edit',
     component: () => import('@/features/blog/editor/PostEditorPage.vue'),
