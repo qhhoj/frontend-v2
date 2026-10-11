@@ -39,5 +39,5 @@ export function useAdminRecordSearch(term: Ref<string>) {
   const hasFailure = computed(
     () => isLongEnough.value && results.value.some((result) => result.isError),
   );
-  return { entries, isSearching, hasFailure, isLongEnough };
+  return { entries, isSearching, hasFailure };
 }

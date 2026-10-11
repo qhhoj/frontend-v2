@@ -4,13 +4,15 @@ import { computed, useId } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
 import { ADMIN_NAV, isCurrentNav, visibleNav } from './admin-nav';
-import { useNavCounts } from './overview/admin-overview.queries';
+import type { AdminNavId } from './admin-nav';
 import { useNavCollapse } from './use-nav-collapse';
+
+/** Badge counts by item; the shell reads them once for both copies of the nav. */
+defineProps<{ counts: Partial<Record<AdminNavId, number | null>> }>();
 
 const route = useRoute();
 const session = useSessionStore();
 const groups = computed(() => visibleNav(ADMIN_NAV, session.user));
-const counts = useNavCounts();
 const { isOpen, toggle } = useNavCollapse();
 /** The shell renders two copies of this nav (side column and phone disclosure): ids are per instance, never repeated in the DOM. */
 const idPrefix = useId();
@@ -40,12 +42,13 @@ const idPrefix = useId();
           />
         </button>
       </h2>
-      <ul
-        v-show="isOpen(navGroup.id)"
-        :id="`${idPrefix}-${navGroup.id}-items`"
-        class="flex flex-col"
-      >
-        <li v-for="item in navGroup.items" :key="item.id">
+      <!-- A folded group still shows the current screen's item, so the nav always says where the viewer is. -->
+      <ul :id="`${idPrefix}-${navGroup.id}-items`" class="flex flex-col">
+        <li
+          v-for="item in navGroup.items"
+          v-show="isOpen(navGroup.id) || isCurrentNav(item.path, route.path)"
+          :key="item.id"
+        >
           <RouterLink
             :to="{ name: item.routeName }"
             :aria-current="isCurrentNav(item.path, route.path) ? 'page' : undefined"

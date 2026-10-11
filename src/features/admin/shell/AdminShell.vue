@@ -6,6 +6,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminForbidden from './AdminForbidden.vue';
 import AdminNav from './AdminNav.vue';
 import AdminTopBar from './AdminTopBar.vue';
+import { useNavCounts } from './overview/admin-overview.queries';
 import { useRecentScreens } from './recent/recent-screens';
 import { usePaletteShortcut } from './search/use-palette-shortcut';
 
@@ -17,6 +18,7 @@ const { canAny } = usePermissions();
 /** Checked before the page mounts, so a forbidden screen never asks for its data. */
 const isAllowed = computed(() => canAny(route.meta.permission ?? null));
 
+const navCounts = useNavCounts();
 const isPhoneNavOpen = ref(false);
 const isPaletteOpen = ref(false);
 const hasOpenedPalette = ref(false);
@@ -42,7 +44,7 @@ watch(
   <AdminTopBar @search="openPalette" />
   <div class="min-[900px]:grid min-[900px]:grid-cols-[248px_minmax(0,1fr)]">
     <aside class="hidden border-r border-line px-3 py-5 min-[900px]:block">
-      <AdminNav />
+      <AdminNav :counts="navCounts" />
     </aside>
     <details
       :open="isPhoneNavOpen"
@@ -62,7 +64,11 @@ watch(
           class="size-4 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
         />
       </summary>
-      <AdminNav data-testid="admin-nav-phone" class="max-h-[70dvh] overflow-y-auto pt-1 pb-3" />
+      <AdminNav
+        :counts="navCounts"
+        data-testid="admin-nav-phone"
+        class="max-h-[70dvh] overflow-y-auto pt-1 pb-3"
+      />
     </details>
     <main id="main" tabindex="-1" class="relative min-w-0 focus-visible:outline-none">
       <div class="flex flex-col gap-5 px-4 py-6 sm:px-8">

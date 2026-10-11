@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import { History } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { usePermissions } from '@/stores/use-permissions';
 import { useRecentScreens } from './recent-screens';
 
+const router = useRouter();
+const { canAny } = usePermissions();
 const { recent } = useRecentScreens();
+/** A shortcut whose screen the viewer can no longer open (permissions change) is left out, not offered as a dead end. */
+const openable = computed(() =>
+  recent.value.filter((entry) => {
+    const target = router.resolve(entry.path);
+    return target.name !== 'admin-unknown' && canAny(target.meta.permission ?? null);
+  }),
+);
 </script>
 
 <template>
   <section
-    v-if="recent.length > 0"
+    v-if="openable.length > 0"
     aria-labelledby="admin-recent-title"
     class="flex flex-col gap-3"
     data-testid="admin-recent"
@@ -16,7 +28,7 @@ const { recent } = useRecentScreens();
       {{ $t('admin.shell.recent.title') }}
     </h2>
     <ul class="flex flex-wrap gap-2">
-      <li v-for="entry in recent" :key="entry.path">
+      <li v-for="entry in openable" :key="entry.path">
         <RouterLink
           :to="entry.path"
           class="flex min-h-11 items-center gap-2 rounded-pill border border-line bg-surface-solid px-4 text-sm hover:bg-surface-hover"

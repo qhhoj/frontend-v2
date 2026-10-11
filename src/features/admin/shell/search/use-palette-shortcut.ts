@@ -29,3 +29,7 @@ export function usePaletteShortcut(open: () => void) {
   onMounted(() => window.addEventListener('keydown', onKeydown));
   onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 }
+
+/** The hint on the search button: ⌘K on Apple systems, Ctrl K elsewhere (both work everywhere). */
+export const shortcutHint = (platform = navigator.platform): string =>
+  /Mac|iPhone|iPad/.test(platform) ? '⌘K' : 'Ctrl K';

@@ -22,7 +22,6 @@ const visible = defineModel<boolean>('visible', { required: true });
 const router = useRouter();
 const { t } = useI18n();
 const session = useSessionStore();
-const input = ref<HTMLInputElement | null>(null);
 const listboxId = useId();
 
 const searchTerm = ref('');
@@ -56,6 +55,7 @@ function choose(entry: PaletteEntry) {
   void router.push(entry.to);
 }
 function onKeydown(event: KeyboardEvent) {
+  if (event.isComposing) return;
   const step = { ArrowDown: 1, ArrowUp: -1 }[event.key] as 1 | -1 | undefined;
   if (step) {
     event.preventDefault();
@@ -66,18 +66,22 @@ function onKeydown(event: KeyboardEvent) {
     if (active) choose(active);
   }
 }
-/** Each opening starts from an empty box with the caret in it. */
+/** Each opening starts from an empty box; the Dialog focuses it (`autofocus`) and later returns focus to the opener. */
 function onShow() {
   text.commitNow('');
   activeKey.value = entries.value[0]?.key ?? null;
-  input.value?.focus();
 }
+/** Between a key and the debounced lookup the records are about to be asked for, not missing. */
+const isWaiting = computed(
+  () => records.isSearching.value || text.value.trim() !== searchTerm.value,
+);
 
 const status = computed(() => {
-  if (records.isSearching.value) return t('admin.shell.search.searching');
+  const typedLength = text.value.trim().length;
+  if (isWaiting.value && typedLength >= MIN_RECORD_SEARCH) return t('admin.shell.search.searching');
   if (records.hasFailure.value) return t('admin.shell.search.failed');
   if (entries.value.length === 0) return t('admin.shell.search.empty');
-  if (!records.isLongEnough.value && text.value.trim())
+  if (typedLength > 0 && typedLength < MIN_RECORD_SEARCH)
     return t('admin.shell.search.tooShort', { count: MIN_RECORD_SEARCH });
   return t('admin.shell.search.count', entries.value.length);
 });
@@ -103,8 +107,8 @@ const status = computed(() => {
           class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
         />
         <input
-          ref="input"
           v-model="text"
+          autofocus
           type="text"
           role="combobox"
           aria-autocomplete="list"
@@ -130,7 +134,7 @@ const status = computed(() => {
           @choose="choose"
           @hover="activeKey = $event"
         />
-        <EmptyState v-else-if="!records.isSearching.value" compact>
+        <EmptyState v-else-if="!isWaiting" compact>
           {{ $t('admin.shell.search.emptyAdvice') }}
         </EmptyState>
       </div>

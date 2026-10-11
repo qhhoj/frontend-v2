@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { House, Search, ShieldCheck } from 'lucide-vue-next';
 import UserMenu from '@/features/shell/UserMenu.vue';
+import { shortcutHint } from './search/use-palette-shortcut';
 
 defineEmits<{ search: [] }>();
 </script>
@@ -35,7 +36,7 @@ defineEmits<{ search: [] }>();
       <kbd
         aria-hidden="true"
         class="ml-auto hidden rounded-row border border-line px-1.5 font-mono text-xs sm:inline"
-        >Ctrl K</kbd
+        >{{ shortcutHint() }}</kbd
       >
     </button>
     <RouterLink

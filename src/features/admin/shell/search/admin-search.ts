@@ -1,10 +1,11 @@
 import type { RouteLocationRaw } from 'vue-router';
+import { fetchAdminProblems } from '@/api/admin-index.api';
 import {
-  searchAdminContests,
+  ADMIN_SEARCH_PAGE,
   searchAdminOrganizations,
-  searchAdminProblems,
   searchAdminUsers,
 } from '@/api/admin-search.api';
+import { fetchContests } from '@/api/contests.api';
 import type { Locale } from '@/i18n';
 import type { PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS, adminRouteName } from '../../admin-screens';
@@ -69,15 +70,19 @@ export const RECORD_SOURCES: readonly RecordSource[] = [
     group: 'problems',
     permission: ADMIN_SCREENS.problemGeneral.permission,
     search: async (term, lang) =>
-      (await searchAdminProblems(term, lang)).items.map(({ code, name }) =>
-        entry('problems', code, name, { name: adminRouteName('problemGeneral'), params: { code } }),
+      (await fetchAdminProblems({ ...ADMIN_SEARCH_PAGE, q: term, lang })).items.map(
+        ({ code, name }) =>
+          entry('problems', code, name, {
+            name: adminRouteName('problemGeneral'),
+            params: { code },
+          }),
       ),
   },
   {
     group: 'contests',
     permission: ADMIN_SCREENS.contestGeneral.permission,
     search: async (term) =>
-      (await searchAdminContests(term)).items.map(({ key, name }) =>
+      (await fetchContests({ ...ADMIN_SEARCH_PAGE, q: term })).items.map(({ key, name }) =>
         entry('contests', key, name, { name: adminRouteName('contestGeneral'), params: { key } }),
       ),
   },
