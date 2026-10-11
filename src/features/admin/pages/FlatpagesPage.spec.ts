@@ -65,6 +65,22 @@ describe('FlatpagesPage', () => {
     expect(wrapper.text()).toContain('Đã lưu lúc');
   });
 
+  it('switching pages from the list with unsaved edits asks first; Stay keeps the page and its edits', async () => {
+    mockApi(
+      routes({
+        'GET /admin/site/pages/fp-2': ok(flatpage({ id: 'fp-2', url: '/training' })),
+        'GET /admin/site/pages/fp-2/revisions': page([]),
+      }),
+    );
+    const { wrapper, router } = await mountPages('/admin/pages?page=fp-1');
+    await vi.waitFor(() => expect(wrapper.find('#page-title').exists()).toBe(true));
+    await wrapper.get('#page-title').setValue('Đổi tiêu đề');
+    await router.push({ query: { page: 'fp-2' } });
+    await flushPromises();
+    expect(router.currentRoute.value.query.page).toBe('fp-1');
+    expect(document.body.textContent).toContain('Rời trang');
+  });
+
   it('after a create, the page is opened at its id and the next save is an update, never a second create', async () => {
     const created = flatpage({ id: 'fp-3', url: '/faq', title: 'Câu hỏi thường gặp' });
     const calls = mockApi(

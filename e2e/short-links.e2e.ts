@@ -13,7 +13,7 @@ test('copies the problem short link and announces it', async ({ page, api }) => 
   await grantClipboard(page);
   await page.goto(PROBLEM);
   await page.getByTestId(BUTTON).click();
-  await expect(page.getByTestId(BUTTON)).toHaveText('Đã sao chép');
+  await expect(page.getByTestId(BUTTON)).toHaveAttribute('aria-label', 'Đã sao chép');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/\/s\/k7m2xq$/);
   expect(api.requestsTo('POST /short-links')).toHaveLength(1);
 });

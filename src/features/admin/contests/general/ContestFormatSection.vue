@@ -2,11 +2,11 @@
 import type { ContestFormatName, LabelStyle } from '@/api/types/contest-editing';
 import AdminField from '../../ui/AdminField.vue';
 import { INPUT } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { FORMAT_DEFAULTS, FORMAT_FIELDS } from '../format-config';
 import type { ContestForm } from '../contest-form';
-import ContestCheck from './ContestCheck.vue';
 import { numberOrNaN, textOf } from './input-values';
 
 const form = defineModel<ContestForm>({ required: true });
@@ -131,7 +131,7 @@ function chooseFormat(event: Event) {
             />
           </template>
         </AdminField>
-        <ContestCheck
+        <AdminCheckbox
           v-else
           :model-value="Boolean(form.formatConfig[field.name])"
           :input-id="`contest-format-${field.name}`"
@@ -144,7 +144,7 @@ function chooseFormat(event: Event) {
       <legend class="mb-3 text-sm font-semibold">
         {{ $t('admin.contests.general.fields.optionsTitle') }}
       </legend>
-      <ContestCheck
+      <AdminCheckbox
         v-for="option in OPTIONS"
         :key="option.field"
         v-model="form[option.field]"

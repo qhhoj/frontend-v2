@@ -3,11 +3,10 @@ import AdminField from '../../ui/AdminField.vue';
 import OrganizationChips from '../../ui/OrganizationChips.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { INPUT } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
-import ContestCheck from './ContestCheck.vue';
-import LockedFieldset from './LockedFieldset.vue';
 import TagChips from './TagChips.vue';
 import { numberOrNaN, textOf } from './input-values';
 import { usePermissionLocks } from './permission-locks';
@@ -27,27 +26,28 @@ const ACCESS_CODE = 'judge.contest_access_code';
     :title="$t('admin.contests.general.sections.access')"
     :description="$t('admin.contests.general.sectionLeads.access')"
   >
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.isVisible"
       input-id="contest-isVisible"
       :label="$t('admin.contests.general.fields.isVisible')"
       :description="$t('admin.contests.general.fields.isVisibleHint')"
       :locked-by="lockedBy('judge.change_contest_visibility')"
     />
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.isPrivate"
       input-id="contest-isPrivate"
       :label="$t('admin.contests.general.fields.isPrivate')"
       :description="$t('admin.contests.general.fields.isPrivateHint')"
       :locked-by="lockedBy(PRIVATE)"
     />
-    <LockedFieldset v-if="form.isPrivate" class="lg:col-span-2" :locked-by="lockedBy(PRIVATE)">
-      <UsernameChips
-        v-model="form.privateContestants"
-        :label="$t('admin.contests.general.fields.privateContestants')"
-      />
-    </LockedFieldset>
-    <ContestCheck
+    <UsernameChips
+      v-if="form.isPrivate"
+      v-model="form.privateContestants"
+      class="lg:col-span-2"
+      :label="$t('admin.contests.general.fields.privateContestants')"
+      :locked-by="lockedBy(PRIVATE)"
+    />
+    <AdminCheckbox
       v-model="form.isOrganizationPrivate"
       class="lg:col-span-2"
       input-id="contest-isOrganizationPrivate"
@@ -55,16 +55,13 @@ const ACCESS_CODE = 'judge.contest_access_code';
       :description="$t('admin.contests.general.fields.isOrganizationPrivateHint')"
       :locked-by="lockedBy(PRIVATE)"
     />
-    <LockedFieldset
+    <OrganizationChips
       v-if="form.isOrganizationPrivate"
+      v-model="form.organizations"
       class="lg:col-span-2"
+      :label="$t('admin.contests.general.fields.organizations')"
       :locked-by="lockedBy(PRIVATE)"
-    >
-      <OrganizationChips
-        v-model="form.organizations"
-        :label="$t('admin.contests.general.fields.organizations')"
-      />
-    </LockedFieldset>
+    />
 
     <div class="flex flex-col gap-2">
       <AdminField
@@ -91,7 +88,7 @@ const ACCESS_CODE = 'judge.contest_access_code';
           />
         </template>
       </AdminField>
-      <ContestCheck
+      <AdminCheckbox
         v-if="hasCodes.access && !lockedBy(ACCESS_CODE)"
         v-model="form.removeAccessCode"
         input-id="contest-removeAccessCode"
@@ -120,7 +117,7 @@ const ACCESS_CODE = 'judge.contest_access_code';
           />
         </template>
       </AdminField>
-      <ContestCheck
+      <AdminCheckbox
         v-if="hasCodes.ranking"
         v-model="form.removeRankingAccessCode"
         input-id="contest-removeRankingAccessCode"

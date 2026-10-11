@@ -2,11 +2,10 @@
 import AdminField from '../../ui/AdminField.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { INPUT } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
-import ContestCheck from './ContestCheck.vue';
-import LockedFieldset from './LockedFieldset.vue';
 import { nullableNumber, textOf } from './input-values';
 import { usePermissionLocks } from './permission-locks';
 
@@ -24,13 +23,13 @@ const BOUNDS = ['ratingFloor', 'ratingCeiling'] as const;
     :title="$t('admin.contests.general.sections.rating')"
     :description="$t('admin.contests.general.sectionLeads.rating')"
   >
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.isRated"
       input-id="contest-isRated"
       :label="$t('admin.contests.general.fields.isRated')"
       :locked-by="lockedBy(RATING)"
     />
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.rateAll"
       input-id="contest-rateAll"
       :label="$t('admin.contests.general.fields.rateAll')"
@@ -59,11 +58,11 @@ const BOUNDS = ['ratingFloor', 'ratingCeiling'] as const;
         />
       </template>
     </AdminField>
-    <LockedFieldset class="lg:col-span-2" :locked-by="lockedBy(RATING)">
-      <UsernameChips
-        v-model="form.rateExclude"
-        :label="$t('admin.contests.general.fields.rateExclude')"
-      />
-    </LockedFieldset>
+    <UsernameChips
+      v-model="form.rateExclude"
+      class="lg:col-span-2"
+      :label="$t('admin.contests.general.fields.rateExclude')"
+      :locked-by="lockedBy(RATING)"
+    />
   </AdminFormSection>
 </template>
