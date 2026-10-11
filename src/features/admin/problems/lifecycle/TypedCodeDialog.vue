@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 
 /**
  * Type-the-code confirm for an irreversible step (delete, purge now): the confirm stays `aria-disabled` and Enter does
@@ -48,7 +48,7 @@ watch(visible, (isOpen) => {
       <input
         :id="id"
         v-model="typed"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         class="font-mono"
         :aria-describedby="describedBy"
         autocomplete="off"

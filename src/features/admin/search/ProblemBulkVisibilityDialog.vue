@@ -5,7 +5,7 @@ import type { BulkVisibilityResult } from '@/api/types/problems';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problems/problem-editing.queries';
 
@@ -47,7 +47,7 @@ const verb = computed(() => (props.isPublic ? 'publish' : 'unpublish'));
     v-model:visible="visible"
     :title="$t(`admin.problemList.bulk.${verb}Title`, { count: codes.length }, codes.length)"
     :confirm-label="$t(`admin.problemList.bulk.${verb}Confirm`)"
-    :tone="isPublic ? 'neutral' : 'danger'"
+    tone="neutral"
     :busy="mutation.isPending.value"
     :width="520"
     @confirm="mutation.run(undefined)"
@@ -66,7 +66,7 @@ const verb = computed(() => (props.isPublic ? 'publish' : 'unpublish'));
           type="text"
           maxlength="500"
           :placeholder="$t('admin.problemList.bulk.changeMessagePlaceholder')"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </label>
     </div>

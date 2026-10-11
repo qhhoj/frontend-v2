@@ -7,12 +7,10 @@
   "deletedLead": "Deleted problems are hidden everywhere. They can be restored during the grace period; after it the heavy data is purged and submissions stay.",
   "tableCaption": "Deleted problems",
   "columns": {
-    "code": "Code",
-    "name": "Name",
     "deletedAt": "Deleted at",
     "deletedBy": "Deleted by",
     "grace": "Grace period",
-    "actions": "Actions"
+    "problem": "Problem"
   },
   "grace": {
     "left": "{count} day left | {count} days left",
@@ -23,7 +21,6 @@
   "restoreLabel": "Restore {code}",
   "restored": "{code} was restored. It is visible again.",
   "purgeNow": "Purge now",
-  "purgeNowLabel": "Purge {code} now",
   "purgeTitle": "Purge {code}?",
   "purgeBody": "Test data, statements, translations and comments are removed for good. Submissions and contest history stay. This cannot be undone.",
   "purgeConfirm": "Purge",
@@ -39,5 +36,6 @@
     "title2": "Delete {code}?",
     "dialogBody": "The problem disappears from lists, its page and search. Everyone’s submissions stay.",
     "confirm": "Delete problem"
-  }
+  },
+  "menu": "More actions for {code}"
 }

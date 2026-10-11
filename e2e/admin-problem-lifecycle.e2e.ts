@@ -18,15 +18,13 @@ test('restore and purge-now from the deleted list', async ({ page, api }) => {
   api.routes['POST /problems/hethan/purge-now'] = { status: 202, body: { data: { queued: true } } };
   await page.goto('/admin/problems/deleted');
   await page.getByRole('button', { name: 'Khôi phục cuvui' }).click();
-  const restored = page.getByRole('status').filter({ hasText: 'Đã khôi phục cuvui' });
-  await expect(restored).toBeVisible();
-  await expect(restored.getByTestId('inline-bit')).toBeVisible();
-  await page.getByRole('button', { name: 'Xóa hẳn hethan ngay' }).click();
+  const toasts = page.getByTestId('admin-toasts');
+  await expect(toasts).toContainText('Đã khôi phục cuvui');
+  await page.getByRole('button', { name: 'Thao tác khác cho hethan' }).click();
+  await page.getByRole('menuitem', { name: 'Xóa hẳn ngay' }).click();
   await dialogOf(page).getByLabel('Gõ mã bài hethan để xác nhận').fill('hethan');
   await confirmInDialog(page, 'Xóa hẳn');
-  const queued = page.getByRole('status').filter({ hasText: 'Đã xếp lịch xóa hẳn hethan' });
-  await expect(queued).toBeVisible();
-  await expect(queued.getByTestId('inline-bit')).toBeVisible();
+  await expect(toasts).toContainText('Đã xếp lịch xóa hẳn hethan');
 });
 
 test('the problems index links to the deleted tab', async ({ page, api }) => {

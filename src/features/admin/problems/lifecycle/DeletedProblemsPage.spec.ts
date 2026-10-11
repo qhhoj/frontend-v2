@@ -25,6 +25,17 @@ const mountDeleted = async () => {
 };
 const buttonNamed = (wrapper: Wrapper, name: string) =>
   wrapper.findAll('button').find((button) => button.attributes('aria-label') === name);
+/** Opens the row's "⋯" menu and picks "Xóa hẳn ngay". */
+async function pickPurge(wrapper: Wrapper, code: string) {
+  await buttonNamed(wrapper, `Thao tác khác cho ${code}`)!.trigger('click');
+  await flushPromises();
+  const item = [...document.body.querySelectorAll('[role="menuitem"]')].find(
+    (entry) => entry.textContent?.trim() === 'Xóa hẳn ngay',
+  );
+  (item!.querySelector('a') as HTMLElement).click();
+  await flushPromises();
+}
+const toastText = () => document.querySelector('[data-testid="admin-toasts"]')?.textContent ?? '';
 const listCalls = (calls: ApiCall[]) => calls.filter((call) => call.path === '/problems/deleted');
 const dialogConfirm = (label: string) =>
   [...openDialog().querySelectorAll<HTMLButtonElement>('button[type="submit"]')].find(
@@ -54,10 +65,10 @@ describe('DeletedProblemsPage', () => {
     expect(text).toContain('Đã xóa hẳn');
     expect(buttonNamed(wrapper, 'Khôi phục cuvui')).toBeDefined();
     expect(buttonNamed(wrapper, 'Khôi phục cu')).toBeUndefined();
-    expect(buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')).toBeUndefined();
+    expect(buttonNamed(wrapper, 'Thao tác khác cho cuvui')).toBeUndefined();
   });
 
-  it('restores once on a double click, says so and refetches the list', async () => {
+  it('restores once on a double click, toasts it and refetches the list', async () => {
     const calls = mockApi({
       ...staffViewer(DELETE),
       'GET /problems/deleted': sequence(page([deletedProblem()]), page([])),
@@ -69,7 +80,7 @@ describe('DeletedProblemsPage', () => {
     void restore.trigger('click');
     await flushPromises();
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
-    expect(wrapper.get('[role="status"]').text()).toContain('Đã khôi phục cuvui');
+    expect(toastText()).toContain('Đã khôi phục cuvui');
     expect(listCalls(calls)).toHaveLength(2);
   });
 
@@ -93,8 +104,7 @@ describe('DeletedProblemsPage', () => {
       'POST /problems/cuvui/purge-now': { status: 202, body: { data: { queued: true } } },
     });
     const { wrapper } = await mountDeleted();
-    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
-    await flushPromises();
+    await pickPurge(wrapper, 'cuvui');
     expect(dialogConfirm('Xóa hẳn').getAttribute('aria-disabled')).toBe('true');
     await typeInDialog('CUVUI');
     expect(dialogConfirm('Xóa hẳn').getAttribute('aria-disabled')).toBe('true');
@@ -102,7 +112,7 @@ describe('DeletedProblemsPage', () => {
     expect(dialogConfirm('Xóa hẳn').hasAttribute('aria-disabled')).toBe(false);
     await confirmDialog('Xóa hẳn');
     expect(calls.find((call) => call.method === 'POST')!.body).toEqual({ confirmCode: 'cuvui' });
-    expect(wrapper.get('[role="status"]').text()).toContain('Đã xếp lịch xóa hẳn cuvui');
+    expect(toastText()).toContain('Đã xếp lịch xóa hẳn cuvui');
   });
 
   it('reloads the list when a purge hits a stale row, and keeps the refusal in the dialog', async () => {
@@ -112,7 +122,7 @@ describe('DeletedProblemsPage', () => {
       'POST /problems/cuvui/purge-now': fail(409, 'purged'),
     });
     const { wrapper } = await mountDeleted();
-    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
+    await pickPurge(wrapper, 'cuvui');
     await typeInDialog('cuvui');
     await confirmDialog('Xóa hẳn');
     expect(openDialog().textContent).toContain('Bài đã bị xóa hẳn.');
@@ -128,6 +138,7 @@ describe('DeletedProblemsPage', () => {
       });
       const { wrapper } = await mountApp('/admin/problems');
       await vi.waitFor(() => expect(wrapper.find('input[type="search"]').exists()).toBe(true));
+      await flushPromises();
       const found = wrapper.findAll('a').some((link) => link.text() === 'Đã xóa');
       wrapper.unmount();
       return found;

@@ -1,34 +1,57 @@
 <script setup lang="ts">
+import { Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { DeletedProblem } from '@/api/types/problem-lifecycle';
 import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { actorName } from '@/lib/actor';
 import { formatNumericDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
-import AdminBit from '../../shell/AdminBit.vue';
+import AdminChip from '../../ui/AdminChip.vue';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
-import { graceTextOf } from './days-left';
+import { buttonClass } from '../../ui/controls';
+import AdminDataTable from '../../ui/table/AdminDataTable.vue';
+import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
+import { rangeOf } from '../../ui/table/table-columns';
+import type { AdminColumn } from '../../ui/table/table-columns';
+import { graceTextOf, graceToneOf } from './days-left';
 import { useDeletedProblemsQuery } from './lifecycle.queries';
 import ProblemsIndexTabs from './ProblemsIndexTabs.vue';
 import TypedCodeDialog from './TypedCodeDialog.vue';
 import { useDeletedActions } from './use-deleted-actions';
 
-const SKELETON_ROWS = 3;
 const route = useRoute();
 const locale = useLocaleStore();
+const { t } = useI18n();
 const page = computed(() => pageFromQuery(route.query.page));
 const { data, isPending, error, refetch } = useDeletedProblemsQuery(page);
+const rows = computed(() => data.value?.items ?? []);
 const { isSuperuser } = usePermissions();
-const { restore, purge, outcome, restoreRow, purgeRow, openPurgeFor } = useDeletedActions();
+const { restore, purge, refusal, restoreRow, purgeRow, openPurgeFor } = useDeletedActions();
+
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'problem', label: t('admin.lifecycle.columns.problem'), priority: 'primary' },
+  { key: 'grace', label: t('admin.lifecycle.columns.grace'), priority: 'badge' },
+  { key: 'deletedAt', label: t('admin.lifecycle.columns.deletedAt') },
+  { key: 'deletedBy', label: t('admin.lifecycle.columns.deletedBy') },
+]);
+const range = computed(() => {
+  const meta = data.value?.meta;
+  return meta && 'total' in meta
+    ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total)
+    : null;
+});
+const graceText = (row: DeletedProblem) => {
+  const grace = graceTextOf(row);
+  return t(grace.key, { count: grace.count }, grace.count);
+};
+
 const purging = ref<DeletedProblem | null>(null);
 const isPurgeOpen = computed({
   get: () => purging.value !== null,
@@ -39,7 +62,6 @@ const isPurgeOpen = computed({
 const purgeFailure = computed(() =>
   purge.failure.value ? failureTextOf(purge.failure.value) : '',
 );
-
 function openPurge(row: DeletedProblem) {
   openPurgeFor();
   purging.value = row;
@@ -49,124 +71,93 @@ async function confirmPurge(typed: string) {
   const result = await purgeRow({ code: purging.value.code, confirmCode: typed });
   if (result) purging.value = null;
 }
+const menuItems = (row: DeletedProblem) => [
+  {
+    label: t('admin.lifecycle.purgeNow'),
+    icon: Trash2,
+    danger: true,
+    run: () => openPurge(row),
+  },
+];
+
 const listSection = ref<HTMLElement | null>(null);
 /** A restored row leaves the list: focus goes to the list, not to the page top. */
 useFocusFallback(
   () => data.value?.items.length,
   () => listSection.value,
 );
-const CELL = 'py-2 pr-3 align-middle';
-const HEAD = 'whitespace-nowrap py-2 pr-3 align-middle';
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <AdminPageHeader
       :title="$t('admin.shell.screens.problemsDeleted')"
       :lead="$t('admin.lifecycle.deletedLead')"
     />
     <ProblemsIndexTabs />
-    <AdminStatus v-if="outcome" :kind="outcome.kind" :text="outcome.text" />
+    <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     <section
       ref="listSection"
       tabindex="-1"
       data-testid="deleted-problems"
-      class="glass flex flex-col gap-4 rounded-panel p-5"
+      class="focus-visible:outline-offset-2"
     >
-      <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton>
-          <table data-skeleton-region="deleted-table" class="w-full text-left text-sm">
-            <thead class="text-muted">
-              <tr>
-                <th v-for="index in 4" :key="index" :class="CELL">
-                  <SkeletonBlock text class="w-12" />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="index in SKELETON_ROWS" :key="index" class="border-t border-line">
-                <td :class="CELL"><SkeletonBlock text class="w-16" /></td>
-                <td :class="CELL"><SkeletonBlock text class="w-32" /></td>
-                <td :class="CELL"><SkeletonBlock text class="w-20" /></td>
-                <td class="py-2"><SkeletonBlock pill class="ml-auto h-11 w-28" /></td>
-              </tr>
-            </tbody>
-          </table>
+      <AdminDataTable
+        :columns="columns"
+        :rows="rows"
+        :row-key="(row) => row.code"
+        :row-label="(row) => row.code"
+        :row-attrs="(row) => ({ 'data-code': row.code })"
+        :label="$t('admin.lifecycle.tableCaption')"
+        :loading="isPending"
+        :error="error"
+        :skeleton-rows="3"
+        :empty-text="$t('admin.lifecycle.empty')"
+        @retry="refetch()"
+      >
+        <template #cell-problem="{ row }">
+          <span class="block font-semibold">{{ row.name }}</span>
+          <span class="block font-mono text-xs text-muted">{{ row.code }}</span>
         </template>
-        <p v-if="data && data.items.length === 0" class="flex items-center gap-3 text-muted">
-          <AdminBit placement="empty" />{{ $t('admin.lifecycle.empty') }}
-        </p>
-        <div v-else-if="data" class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <caption class="sr-only">
-              {{
-                $t('admin.lifecycle.tableCaption')
-              }}
-            </caption>
-            <thead class="text-muted">
-              <tr>
-                <th scope="col" :class="HEAD">{{ $t('admin.lifecycle.columns.code') }}</th>
-                <th scope="col" :class="HEAD">{{ $t('admin.lifecycle.columns.name') }}</th>
-                <th scope="col" class="hidden md:table-cell" :class="HEAD">
-                  {{ $t('admin.lifecycle.columns.deletedAt') }}
-                </th>
-                <th scope="col" class="hidden md:table-cell" :class="HEAD">
-                  {{ $t('admin.lifecycle.columns.deletedBy') }}
-                </th>
-                <th scope="col" :class="HEAD">{{ $t('admin.lifecycle.columns.grace') }}</th>
-                <th scope="col" class="py-2 text-right">
-                  <span class="sr-only">{{ $t('admin.lifecycle.columns.actions') }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in data.items" :key="row.code" class="border-t border-line">
-                <td :class="CELL" class="font-mono font-semibold">{{ row.code }}</td>
-                <td :class="CELL">{{ row.name }}</td>
-                <td class="hidden md:table-cell" :class="CELL">
-                  {{ formatNumericDateTime(row.deletedAt, locale.locale) }}
-                </td>
-                <td class="hidden md:table-cell" :class="CELL">
-                  {{ actorName(row.deletedBy) }}
-                </td>
-                <td :class="CELL" class="whitespace-nowrap">
-                  {{
-                    $t(
-                      graceTextOf(row).key,
-                      { count: graceTextOf(row).count },
-                      graceTextOf(row).count,
-                    )
-                  }}
-                </td>
-                <td class="py-2">
-                  <div class="flex min-h-11 flex-wrap items-center justify-end gap-2">
-                    <button
-                      v-if="!row.isPurged"
-                      type="button"
-                      :class="ADMIN_BUTTON_CLASS"
-                      :aria-label="$t('admin.lifecycle.restoreLabel', { code: row.code })"
-                      :aria-disabled="restore.isPending.value ? 'true' : undefined"
-                      @click="restoreRow(row.code)"
-                    >
-                      {{ $t('admin.lifecycle.restore') }}
-                    </button>
-                    <button
-                      v-if="isSuperuser && !row.isPurged"
-                      type="button"
-                      :class="ADMIN_DANGER_CLASS"
-                      :aria-label="$t('admin.lifecycle.purgeNowLabel', { code: row.code })"
-                      @click="openPurge(row)"
-                    >
-                      {{ $t('admin.lifecycle.purgeNow') }}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.lifecycle.pager')" />
-      </QueryState>
+        <template #cell-grace="{ row }">
+          <AdminChip :tone="graceToneOf(row)">{{ graceText(row) }}</AdminChip>
+        </template>
+        <template #cell-deletedAt="{ row }">
+          <span class="whitespace-nowrap">{{
+            formatNumericDateTime(row.deletedAt, locale.locale)
+          }}</span>
+        </template>
+        <template #cell-deletedBy="{ row }">{{ actorName(row.deletedBy) }}</template>
+        <template #actions="{ row }">
+          <template v-if="!row.isPurged">
+            <button
+              type="button"
+              :class="buttonClass('secondary', 'sm')"
+              :aria-label="$t('admin.lifecycle.restoreLabel', { code: row.code })"
+              :aria-disabled="restore.isPending.value ? 'true' : undefined"
+              @click="restoreRow(row.code)"
+            >
+              {{ $t('admin.lifecycle.restore') }}
+            </button>
+            <AdminRowMenu
+              v-if="isSuperuser"
+              :label="$t('admin.lifecycle.menu', { code: row.code })"
+              :items="menuItems(row)"
+            />
+          </template>
+        </template>
+        <template v-if="data" #footer>
+          <span v-if="range" class="font-mono tabular-nums">{{
+            $t('admin.table.range', range)
+          }}</span>
+          <NumberedPager
+            class="ml-auto"
+            compact
+            :meta="data.meta"
+            :label="$t('admin.lifecycle.pager')"
+          />
+        </template>
+      </AdminDataTable>
     </section>
     <TypedCodeDialog
       v-model:visible="isPurgeOpen"

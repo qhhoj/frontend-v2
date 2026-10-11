@@ -12,25 +12,15 @@
   "anyType": "Mọi loại",
   "author": "Tác giả",
   "authorPlaceholder": "Tên đăng nhập chính xác",
-  "sort": "Sắp xếp",
-  "sorts": {
-    "dateDesc": "Mới nhất trước",
-    "dateAsc": "Cũ nhất trước",
-    "codeAsc": "Mã A–Z",
-    "nameAsc": "Tên A–Z",
-    "pointsDesc": "Nhiều điểm nhất",
-    "pointsAsc": "Ít điểm nhất"
-  },
   "columns": {
-    "authors": "Tác giả",
+    "problem": "Bài",
+    "status": "Trạng thái",
     "group": "Nhóm",
+    "authors": "Tác giả",
+    "points": "Điểm",
     "date": "Ngày đăng"
   },
   "orgPrivate": "Tổ chức",
-  "selectPage": "Chọn mọi bài trên trang này",
-  "selectRow": "Chọn {code}",
-  "selected": "Đã chọn {count}",
-  "clearSelection": "Bỏ chọn",
   "bulk": {
     "publish": "Công khai",
     "unpublish": "Chuyển riêng tư",
@@ -50,5 +40,26 @@
       "unknown": "bị từ chối",
       "internal_error": "lỗi máy chủ; hãy mở bài để kiểm tra"
     }
-  }
+  },
+  "searchLabel": "Tìm theo mã hoặc tên bài",
+  "tableCaption": "Bài tập",
+  "moreAuthors": "+{count}",
+  "chips": {
+    "group": "Nhóm: {name}",
+    "type": "Loại: {name}",
+    "author": "Tác giả: {name}"
+  },
+  "edit": "Sửa {code}",
+  "menu": {
+    "label": "Thao tác khác cho {code}",
+    "view": "Xem bài",
+    "data": "Dữ liệu chấm",
+    "delete": "Xóa bài…"
+  },
+  "deleted": "Đã xóa {code}. Khôi phục được ở mục “Đã xóa”.",
+  "import": {
+    "button": "Nhập",
+    "label": "Nhập bài tập"
+  },
+  "count": "{total} bài"
 }

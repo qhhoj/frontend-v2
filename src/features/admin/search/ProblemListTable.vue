@@ -1,108 +1,177 @@
 <script setup lang="ts">
+import { Building2, Database, ExternalLink, Globe, Lock, Pencil, Trash2 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDate, formatProblemPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { usePermissions } from '@/stores/use-permissions';
+import AdminChip from '../ui/AdminChip.vue';
+import AdminUserLabel from '../ui/AdminUserLabel.vue';
+import { iconButtonClass } from '../ui/controls';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
+import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
+import { rangeOf } from '../ui/table/table-columns';
+import type { AdminColumn } from '../ui/table/table-columns';
 import HighlightedText from './HighlightedText.vue';
 
-/** One page of the staff list; with `selectable` each row has a checkbox for the bulk actions. */
-defineProps<{
+/**
+ * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
+ * headers bound to `?sort=`, a pencil to the editor and a "⋯" menu per row. `toolbar` and `bulk` pass through.
+ */
+const props = defineProps<{
   items: ProblemListItem[];
+  meta: NumberedPageMeta | undefined;
   search: string;
   selectable: boolean;
-  isSelected: (code: string) => boolean;
-  isAllSelected: boolean;
-  isSomeSelected: boolean;
+  loading: boolean;
+  error: unknown;
+  filtered: boolean;
 }>();
-const emit = defineEmits<{ toggle: [code: string, isOn: boolean]; toggleAll: [isOn: boolean] }>();
+const sort = defineModel<string>('sort', { required: true });
+const selected = defineModel<Set<string>>('selected', { required: true });
+const emit = defineEmits<{ retry: []; 'clear-filters': []; delete: [code: string] }>();
 const locale = useLocaleStore();
-const checked = (event: Event) => (event.target as HTMLInputElement).checked;
-const dateText = (iso: string | null) => (iso ? formatDate(iso, locale.locale) : '—');
-const BADGE = 'rounded-pill border border-line px-2 py-0.5 font-sans';
+const { t } = useI18n();
+const { can } = usePermissions();
+
+const columns = computed<AdminColumn[]>(() => [
+  {
+    key: 'problem',
+    label: t('admin.problemList.columns.problem'),
+    priority: 'primary',
+    sort: { asc: 'name', desc: '-name' },
+  },
+  { key: 'status', label: t('admin.problemList.columns.status'), priority: 'badge' },
+  { key: 'group', label: t('admin.problemList.columns.group'), cellClass: 'max-w-48 truncate' },
+  { key: 'authors', label: t('admin.problemList.columns.authors') },
+  {
+    key: 'points',
+    label: t('admin.problemList.columns.points'),
+    align: 'end',
+    sort: { asc: 'points', desc: '-points', first: 'desc' },
+  },
+  {
+    key: 'date',
+    label: t('admin.problemList.columns.date'),
+    cellClass: 'whitespace-nowrap text-muted',
+    sort: { asc: 'date', desc: '-date', first: 'desc' },
+  },
+]);
+const range = computed(() => {
+  const meta = props.meta;
+  return meta && 'total' in meta
+    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
+    : null;
+});
+const editorOf = (code: string) => ({ name: 'admin-problemGeneral', params: { code } });
+const menuItems = (code: string): RowMenuItem[] => [
+  {
+    label: t('admin.problemList.menu.view'),
+    icon: ExternalLink,
+    to: { name: 'problem', params: { code } },
+  },
+  {
+    label: t('admin.problemList.menu.data'),
+    icon: Database,
+    to: { name: 'admin-problemData', params: { code } },
+  },
+  ...(can('judge.delete_problem')
+    ? [
+        {
+          label: t('admin.problemList.menu.delete'),
+          icon: Trash2,
+          danger: true,
+          run: () => emit('delete', code),
+        },
+      ]
+    : []),
+];
 </script>
 
 <template>
-  <table class="w-full text-left text-sm">
-    <caption class="sr-only">
-      {{
-        $t('admin.search.problems.title')
-      }}
-    </caption>
-    <thead class="text-xs text-muted uppercase">
-      <tr>
-        <th v-if="selectable" scope="col" class="w-11 px-3 py-2">
-          <input
-            type="checkbox"
-            class="size-5"
-            :checked="isAllSelected"
-            :indeterminate="isSomeSelected"
-            :aria-label="$t('admin.problemList.selectPage')"
-            @change="emit('toggleAll', checked($event))"
-          />
-        </th>
-        <th scope="col" class="px-3 py-2">{{ $t('admin.search.problems.columns.problem') }}</th>
-        <th scope="col" class="hidden px-3 py-2 md:table-cell">
-          {{ $t('admin.problemList.columns.authors') }}
-        </th>
-        <th scope="col" class="hidden px-3 py-2 lg:table-cell">
-          {{ $t('admin.problemList.columns.group') }}
-        </th>
-        <th scope="col" class="px-3 py-2">{{ $t('admin.search.problems.columns.points') }}</th>
-        <th scope="col" class="hidden px-3 py-2 lg:table-cell">
-          {{ $t('admin.problemList.columns.date') }}
-        </th>
-        <th scope="col" class="hidden px-3 py-2 sm:table-cell">
-          <span class="sr-only">{{ $t('admin.search.edit') }}</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="problem in items" :key="problem.id" class="border-t border-line">
-        <td v-if="selectable" class="px-3 py-3 align-top">
-          <input
-            type="checkbox"
-            class="size-5"
-            :checked="isSelected(problem.code)"
-            :aria-label="$t('admin.problemList.selectRow', { code: problem.code })"
-            @change="emit('toggle', problem.code, checked($event))"
-          />
-        </td>
-        <td class="px-3 py-3">
-          <RouterLink
-            :to="{ name: 'admin-problemGeneral', params: { code: problem.code } }"
-            class="font-semibold text-accent hover:underline"
-          >
-            <HighlightedText :text="problem.name" :query="search" />
-          </RouterLink>
-          <div class="flex flex-wrap items-center gap-2 font-mono text-xs text-muted">
-            <HighlightedText :text="problem.code" :query="search" />
-            <span v-if="!problem.isPublic" :class="BADGE">{{
-              $t('admin.search.problems.private')
-            }}</span>
-            <span v-if="problem.isOrganizationPrivate" :class="BADGE">{{
-              $t('admin.problemList.orgPrivate')
-            }}</span>
-          </div>
-        </td>
-        <td class="hidden px-3 py-3 md:table-cell">
-          <span v-if="problem.authors.length === 0" class="text-muted">—</span>
-          <span v-else>{{ problem.authors.map((author) => author.username).join(', ') }}</span>
-        </td>
-        <td class="hidden px-3 py-3 lg:table-cell">{{ problem.group?.fullName ?? '—' }}</td>
-        <td class="px-3 py-3 font-mono">
-          {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
-        </td>
-        <td class="hidden px-3 py-3 whitespace-nowrap text-muted lg:table-cell">
-          {{ dateText(problem.date) }}
-        </td>
-        <td class="hidden px-3 py-3 text-right sm:table-cell">
-          <RouterLink
-            :to="{ name: 'admin-problemGeneral', params: { code: problem.code } }"
-            :class="ADMIN_BUTTON_CLASS"
-            >{{ $t('admin.search.edit') }}</RouterLink
-          >
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <AdminDataTable
+    v-model:sort="sort"
+    v-model:selected="selected"
+    :columns="columns"
+    :rows="items"
+    :row-key="(problem) => problem.code"
+    :row-label="(problem) => problem.code"
+    :row-attrs="(problem) => ({ 'data-code': problem.code })"
+    :label="$t('admin.problemList.tableCaption')"
+    :selectable="selectable"
+    :loading="loading"
+    :error="error"
+    :filtered="filtered"
+    :empty-text="$t('admin.search.problems.empty')"
+    @retry="emit('retry')"
+    @clear-filters="emit('clear-filters')"
+  >
+    <template #toolbar><slot name="toolbar" /></template>
+    <template #bulk><slot name="bulk" /></template>
+    <template v-if="$slots.empty" #empty><slot name="empty" /></template>
+    <template #cell-problem="{ row }">
+      <RouterLink
+        :to="editorOf(row.code)"
+        class="block min-w-0 font-semibold text-accent-text hover:underline"
+      >
+        <HighlightedText :text="row.name" :query="search" />
+      </RouterLink>
+      <span class="block font-mono text-xs text-muted">
+        <HighlightedText :text="row.code" :query="search" />
+      </span>
+    </template>
+    <template #cell-status="{ row }">
+      <span class="inline-flex gap-1">
+        <AdminChip v-if="row.isPublic" tone="positive" :icon="Globe">
+          {{ $t('admin.problemList.status.public') }}
+        </AdminChip>
+        <AdminChip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</AdminChip>
+        <AdminChip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
+          {{ $t('admin.problemList.orgPrivate') }}
+        </AdminChip>
+      </span>
+    </template>
+    <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>
+    <template #cell-authors="{ row }">
+      <span v-if="row.authors.length === 0" class="text-muted">—</span>
+      <span v-else class="inline-flex items-center gap-1.5">
+        <AdminUserLabel
+          :username="row.authors[0]!.username"
+          :rating="row.authors[0]!.rating"
+          :link="false"
+        />
+        <span v-if="row.authors.length > 1" class="text-xs text-muted">
+          {{ $t('admin.problemList.moreAuthors', { count: row.authors.length - 1 }) }}
+        </span>
+      </span>
+    </template>
+    <template #cell-points="{ row }">
+      {{ formatProblemPoints(row.points, row.partial, locale.locale) }}
+    </template>
+    <template #cell-date="{ row }">
+      {{ row.date ? formatDate(row.date, locale.locale) : '—' }}
+    </template>
+    <template #actions="{ row }">
+      <RouterLink
+        :to="editorOf(row.code)"
+        :class="iconButtonClass('ghost', 'sm')"
+        :aria-label="$t('admin.problemList.edit', { code: row.code })"
+        :title="$t('admin.problemList.edit', { code: row.code })"
+      >
+        <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
+      </RouterLink>
+      <AdminRowMenu
+        :label="$t('admin.problemList.menu.label', { code: row.code })"
+        :items="menuItems(row.code)"
+      />
+    </template>
+    <template v-if="meta" #footer>
+      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
+      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.search.pager')" />
+    </template>
+  </AdminDataTable>
 </template>
