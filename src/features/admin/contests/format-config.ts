@@ -44,3 +44,19 @@ export function configFor(
   }
   return config;
 }
+
+/** Changing the format puts the new format's own defaults in its config (the backend refuses keys it does not know). */
+export function chooseFormat(
+  form: { formatName: ContestFormatName; formatConfig: Record<string, number | boolean> },
+  name: ContestFormatName,
+): void {
+  form.formatName = name;
+  form.formatConfig = { ...FORMAT_DEFAULTS[name] };
+}
+
+/** The formats the Basic view offers as cards; the others are picked in the Advanced view. */
+export const COMMON_FORMATS = [
+  'ioi',
+  'icpc',
+  'default',
+] as const satisfies readonly ContestFormatName[];

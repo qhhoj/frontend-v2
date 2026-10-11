@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, shallowRef, toRaw } from 'vue';
+import { computed } from 'vue';
 import { translate } from '@/i18n';
 import type { ProblemData } from '@/api/types/problem-data';
-import { FileArchive, Plus } from 'lucide-vue-next';
+import { Plus } from 'lucide-vue-next';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { buttonClass } from '../../ui/controls';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import CaseRow from './CaseRow.vue';
-import ZipAutofillDialog from './ZipAutofillDialog.vue';
-import type { AutofillMode } from './ZipAutofillDialog.vue';
-import AdminStatus from '../../ui/AdminStatus.vue';
+import CasesAutofill from './CasesAutofill.vue';
 import {
   addBatch,
   addCase,
@@ -64,25 +62,6 @@ const messagesAt = (index: number) => {
 
 const HEAD = 'border-b border-line px-2 py-2 whitespace-nowrap';
 
-const isAutofillShown = ref(false);
-/**
- * The "added N tests, now save" line: shown inline (a toast would sit over the save bar it points to) while the list is still the
- * one the autofill made; any later change, a save or a discard replaces the list and hides it.
- */
-const applied = shallowRef<{ list: KeyedCase[]; count: number } | null>(null);
-const appliedText = computed(() =>
-  applied.value && applied.value.list === toRaw(cases.value)
-    ? translate('admin.problems.data.autofill.applied', { count: applied.value.count })
-    : '',
-);
-/** Replaced rows take their args-box flags with them, as a removed row does. */
-function applyAutofill(rows: KeyedCase[], mode: AutofillMode) {
-  if (mode === 'replace') cases.value.forEach((row) => emit('invalid', row.key, false));
-  const list = mode === 'replace' ? rows : [...cases.value, ...rows];
-  cases.value = list;
-  applied.value = { list: toRaw(list), count: rows.length };
-}
-
 function move(index: number, offset: -1 | 1) {
   cases.value = moveCase(cases.value, index, offset);
 }
@@ -112,12 +91,6 @@ function remove(index: number) {
         })
       }}
     </p>
-    <AdminStatus
-      v-if="appliedText"
-      kind="done"
-      data-testid="autofill-applied"
-      :text="appliedText"
-    />
     <datalist id="archive-files">
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
@@ -160,16 +133,12 @@ function remove(index: number) {
       </table>
     </ScrollRegion>
     <div class="flex flex-wrap gap-2">
-      <button
-        v-if="data.archiveFiles.length > 0"
-        type="button"
-        data-testid="zip-autofill-open"
-        :class="buttonClass(cases.length === 0 ? 'primary' : 'secondary')"
-        @click="isAutofillShown = true"
-      >
-        <FileArchive aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        {{ $t('admin.problems.data.cases.autofill') }}
-      </button>
+      <CasesAutofill
+        v-model="cases"
+        :archive-files="data.archiveFiles"
+        :problem-points="problemPoints ?? null"
+        @invalid="(key, isInvalid) => emit('invalid', key, isInvalid)"
+      />
       <button type="button" :class="buttonClass('secondary')" @click="cases = addCase(cases)">
         <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.problems.data.cases.addCase') }}
@@ -180,12 +149,5 @@ function remove(index: number) {
       </button>
     </div>
     <p class="text-xs text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
-    <ZipAutofillDialog
-      v-model:visible="isAutofillShown"
-      :archive-files="data.archiveFiles"
-      :cases="cases"
-      :problem-points="problemPoints ?? null"
-      @apply="applyAutofill"
-    />
   </AdminFormSection>
 </template>

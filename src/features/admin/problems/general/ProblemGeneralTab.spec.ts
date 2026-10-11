@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
@@ -26,7 +26,8 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
+      if (!mounted.wrapper.find('#problem-code, [data-testid="editor-view-basic"]').exists())
+        throw new Error('form not yet');
     },
     { timeout: 5000 },
   );
@@ -55,12 +56,12 @@ describe('ProblemGeneralTab', () => {
 
   it('locks the staff-only basics (summary, og image, date, license) without judge.edit_all_problem, and unlocks them with it', async () => {
     mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes() });
-    const own = await mountAdmin('/admin/problems/hcmus41c/general');
+    const own = await mountAdmin('/admin/problems/hcmus41c/general?view=advanced');
     for (const id of ['#problem-summary', '#problem-ogImage', '#problem-date', '#problem-license'])
       expect(own.wrapper.get(id).attributes('disabled'), id).toBeDefined();
     own.wrapper.unmount();
     mockApi({ ...staffViewer(ALL), ...problemEditorRoutes() });
-    const all = await mountAdmin('/admin/problems/hcmus41c/general');
+    const all = await mountAdmin('/admin/problems/hcmus41c/general?view=advanced');
     for (const id of ['#problem-summary', '#problem-ogImage', '#problem-date', '#problem-license'])
       expect(all.wrapper.get(id).attributes('disabled'), id).toBeUndefined();
   });
@@ -254,5 +255,19 @@ describe('ProblemGeneralTab', () => {
       await flushPromises();
       expect(wrapper.find('[data-testid="publish-readiness"]').exists()).toBe(false);
     });
+  });
+
+  it('brings the Advanced view up when a save is refused for one of its fields', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'PATCH /problems/hcmus41c': invalid(issue('source', 'max_length', 'too long')),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/general');
+    await wrapper.get('#problem-points').setValue('1500');
+    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.view).toBe('advanced');
+    expect(wrapper.get('#problem-source').attributes('aria-invalid')).toBe('true');
   });
 });

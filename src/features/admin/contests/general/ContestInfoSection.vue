@@ -7,7 +7,7 @@ import type { ContestForm } from '../contest-form';
 import TagChips from './TagChips.vue';
 
 const form = defineModel<ContestForm>({ required: true });
-const props = defineProps<{ errors: FieldErrors; isCreate: boolean }>();
+const props = defineProps<{ errors: FieldErrors }>();
 const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
 </script>
 
@@ -17,41 +17,6 @@ const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
     :title="$t('admin.contests.general.sections.info')"
     :description="$t('admin.contests.general.sectionLeads.info')"
   >
-    <AdminField
-      input-id="contest-key"
-      :label="$t('admin.contests.general.fields.key')"
-      :hint="isCreate ? $t('admin.contests.general.hints.key') : undefined"
-      :error="props.errors.key"
-      :required="isCreate"
-    >
-      <template #default="{ id, describedBy, invalid }">
-        <input
-          :id="id"
-          v-model="form.key"
-          :readonly="!isCreate"
-          :class="[INPUT, 'font-mono', !isCreate && 'bg-surface-strong text-muted']"
-          :aria-describedby="describedBy"
-          :aria-invalid="invalid ? 'true' : undefined"
-          autocomplete="off"
-        />
-      </template>
-    </AdminField>
-    <AdminField
-      input-id="contest-name"
-      :label="$t('admin.contests.general.fields.name')"
-      :error="props.errors.name"
-      required
-    >
-      <template #default="{ id, describedBy, invalid }">
-        <input
-          :id="id"
-          v-model="form.name"
-          :class="INPUT"
-          :aria-describedby="describedBy"
-          :aria-invalid="invalid ? 'true' : undefined"
-        />
-      </template>
-    </AdminField>
     <AdminField
       class="lg:col-span-2"
       input-id="contest-summary"
