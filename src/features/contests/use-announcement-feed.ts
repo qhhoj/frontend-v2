@@ -79,9 +79,17 @@ export function useAnnouncementFeed(key: Ref<string>, isStreaming: Ref<boolean>)
     announcement: (data) => void onAnnouncement(data),
     resync: () => void refresh(),
   });
-  watch([key, paused], ([contestKey, isPaused]) => pausedByContest.set(contestKey, isPaused), {
-    immediate: true,
-  });
+  watch(
+    [key, paused],
+    ([contestKey, isPaused], [previousKey]) => {
+      if (previousKey !== undefined && previousKey !== contestKey) {
+        pausedByContest.delete(previousKey);
+        announcedIds.clear();
+      }
+      pausedByContest.set(contestKey, isPaused);
+    },
+    { immediate: true },
+  );
   onScopeDispose(() => pausedByContest.delete(key.value));
   return {
     message,
