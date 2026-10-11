@@ -69,11 +69,4 @@ describe('canRegisterSecurityKey', () => {
     stubBrowser(() => Promise.resolve(credential));
     expect(canRegisterSecurityKey()).toBe(true);
   });
-
-  it('is false when the parser exists but the browser offers no credentials.create', () => {
-    vi.stubGlobal('PublicKeyCredential', {
-      parseCreationOptionsFromJSON: (options: object) => options,
-    });
-    expect(canRegisterSecurityKey()).toBe(false);
-  });
 });

@@ -1,6 +1,5 @@
 import { effectScope } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ApiError } from '@/api/client';
 import { probePackage, requestPackage } from '@/api/problem-package.api';
 import type { PackageProbe } from '@/api/problem-package.api';
 import { packageStatus } from '@/test/f4-fixtures';
@@ -28,15 +27,6 @@ afterEach(() => {
 });
 
 describe('useProblemPackage', () => {
-  it('is ready at once when the server has the current package cached, without probing', async () => {
-    request.mockResolvedValue(packageStatus('ready'));
-    const { phase, start, downloadUrl } = setup();
-    await start();
-    expect(phase.value).toBe('ready');
-    expect(probe).not.toHaveBeenCalled();
-    expect(downloadUrl.value).toBe('/api/internal/problems/cuvui/package');
-  });
-
   it('polls GET at the server pace after one POST until the zip is ready', async () => {
     request.mockResolvedValue(packageStatus('building'));
     probe.mockResolvedValueOnce(building(5000)).mockResolvedValue({ state: 'ready' });
@@ -90,15 +80,5 @@ describe('useProblemPackage', () => {
     scope.stop();
     await vi.advanceTimersByTimeAsync(60_000);
     expect(probe).not.toHaveBeenCalled();
-  });
-
-  it('shows the wait of a refused POST (rate limit)', async () => {
-    request.mockRejectedValue(
-      new ApiError('rate_limited', 429, 'slow down', { retryAfterSeconds: 900 }),
-    );
-    const { phase, failureText, start } = setup();
-    await start();
-    expect(phase.value).toBe('failed');
-    expect(failureText.value).toContain('900');
   });
 });

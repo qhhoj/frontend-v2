@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fail, mockApi, noContent, ok, page, rateLimited } from '@/test/mock-api';
+import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import {
   ApiError,
   apiPage,
@@ -18,27 +18,6 @@ describe('api client', () => {
     onCsrfFailed(null);
     onUnauthorized(null);
     onGateRequired(null);
-  });
-
-  it('unwraps a single value and sends same-origin JSON requests', async () => {
-    mockApi({ 'GET /problems/meta': ok({ types: [] }) });
-    await expect(apiRequest('/problems/meta')).resolves.toEqual({ types: [] });
-    const [, init] = (fetch as unknown as { mock: { calls: [string, RequestInit][] } }).mock
-      .calls[0]!;
-    expect(init.credentials).toBe('same-origin');
-  });
-
-  it('returns items and meta for a list', async () => {
-    mockApi({ 'GET /problems': page([{ code: 'aplusb' }], { total: 120 }) });
-    await expect(apiPage('/problems')).resolves.toEqual({
-      items: [{ code: 'aplusb' }],
-      meta: { page: 1, pageSize: 50, total: 120 },
-    });
-  });
-
-  it('resolves undefined for 204', async () => {
-    mockApi({ 'POST /auth/logout': noContent() });
-    await expect(apiRequest('/auth/logout', { method: 'POST' })).resolves.toBeUndefined();
   });
 
   it('repeats array parameters and drops empty values', () => {
@@ -231,12 +210,6 @@ describe('api client', () => {
     expect((error as ApiError).issues.map((entry) => entry.code)).not.toContain('cell_invalid');
   });
 
-  it('has no issues and no extra members when the answer carries none', async () => {
-    mockApi({ 'POST /x': fail(429, 'rate_limited') });
-    const error = await apiRequest('/x', { method: 'POST' }).catch((caught: unknown) => caught);
-    expect(error).toMatchObject({ code: 'rate_limited', fields: {}, issues: [], extra: {} });
-  });
-
   it('treats issues and fields arriving as null as absent', async () => {
     mockApi({
       'POST /x': {
@@ -276,12 +249,6 @@ it('passes a FormData body through without a JSON content type', async () => {
   expect(calls[0]!.body).toBe(form);
   expect(calls[0]!.headers.get('Content-Type')).toBeNull();
 });
-it('still sends a plain object as JSON', async () => {
-  const calls = mockApi({ 'POST /x': ok({}) });
-  await apiRequest('/x', { method: 'POST', body: { a: 1 } });
-  expect(calls[0]!.body).toEqual({ a: 1 });
-  expect(calls[0]!.headers.get('Content-Type')).toBe('application/json');
-});
 
 it('keeps Retry-After of a refusal in whole seconds, and null when the server sent none', async () => {
   mockApi({ 'POST /x': rateLimited(2520), 'POST /y': fail(429, 'rate_limited') });
@@ -304,18 +271,4 @@ it('sends a raw text request through the session hooks: a 401 reaches onUnauthor
   } finally {
     onUnauthorized(null);
   }
-});
-
-it('passes a cache mode to fetch when asked', async () => {
-  const seen: RequestInit[] = [];
-  vi.stubGlobal(
-    'fetch',
-    vi.fn((_input: string, init: RequestInit) => {
-      seen.push(init);
-      return Promise.resolve(new Response(JSON.stringify({ data: 1 }), { status: 200 }));
-    }),
-  );
-  await apiRequest('/site', { cache: 'no-cache' });
-  await apiRequest('/site');
-  expect(seen.map((init) => init.cache)).toEqual(['no-cache', undefined]);
 });

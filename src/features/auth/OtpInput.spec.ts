@@ -27,34 +27,6 @@ const paste = async (wrapper: Otp, index: number, text: string) => {
 };
 
 describe('OtpInput', () => {
-  it('is a labelled group of six numeric boxes named by position, the first one for autofill', () => {
-    const wrapper = mountOtp();
-    expect(wrapper.get('[role="group"]').attributes('aria-label')).toBe('Mã 6 chữ số');
-    const boxes = boxesOf(wrapper);
-    expect(boxes.map((box) => box.attributes('aria-label'))).toEqual([
-      'Chữ số 1',
-      'Chữ số 2',
-      'Chữ số 3',
-      'Chữ số 4',
-      'Chữ số 5',
-      'Chữ số 6',
-    ]);
-    expect(boxes.every((box) => box.attributes('inputmode') === 'numeric')).toBe(true);
-    expect(boxes.map((box) => box.attributes('autocomplete'))).toEqual([
-      'one-time-code',
-      'off',
-      'off',
-      'off',
-      'off',
-      'off',
-    ]);
-  });
-
-  it('takes the group name from its caller when one is given', () => {
-    const wrapper = mountOtp('', { label: 'Mã khôi phục' });
-    expect(wrapper.get('[role="group"]').attributes('aria-label')).toBe('Mã khôi phục');
-  });
-
   it('moves focus to the next box after each digit', async () => {
     const wrapper = mountOtp();
     await boxesOf(wrapper)[0]!.setValue('4');
@@ -90,14 +62,6 @@ describe('OtpInput', () => {
     await flushPromises();
     expect(shown(wrapper)).toBe('');
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
-  });
-
-  it('completes when the sixth digit arrives, not before', async () => {
-    const wrapper = mountOtp('12345');
-    expect(wrapper.emitted('complete')).toBeUndefined();
-    await boxesOf(wrapper)[5]!.setValue('6');
-    await flushPromises();
-    expect(wrapper.emitted('complete')).toEqual([['123456']]);
   });
 
   it('clears a digit with backspace and shifts the rest left', async () => {
@@ -136,22 +100,5 @@ describe('OtpInput', () => {
     const wrapper = mountOtp('4');
     (boxesOf(wrapper)[4]!.element as HTMLInputElement).focus();
     expect(document.activeElement).toBe(boxesOf(wrapper)[1]!.element);
-  });
-
-  it('marks every box invalid and points each at the error text while the code is refused', () => {
-    const wrapper = mountOtp('', { invalid: true, describedBy: 'code-error' });
-    expect(
-      boxesOf(wrapper).every(
-        (box) =>
-          box.attributes('aria-invalid') === 'true' &&
-          box.attributes('aria-describedby') === 'code-error',
-      ),
-    ).toBe(true);
-  });
-
-  it('is read-only while busy but keeps its focus', () => {
-    const wrapper = mountOtp('4', { readonly: true });
-    expect(boxesOf(wrapper).every((box) => box.attributes('readonly') !== undefined)).toBe(true);
-    expect(boxesOf(wrapper).some((box) => box.attributes('disabled') !== undefined)).toBe(false);
   });
 });

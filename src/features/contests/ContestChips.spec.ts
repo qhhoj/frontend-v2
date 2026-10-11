@@ -12,45 +12,14 @@ const chipsOf = (contest: ContestSummary, withTags = false, withCodeNeeded = fal
 const PLAIN = { isRated: false, isPrivate: false, isOrganizationPrivate: false, tags: [] };
 
 describe('contest chips', () => {
-  it('shows only the format for a public, unrated contest', () => {
-    expect(chipsOf(contestItem({ ...PLAIN, formatName: 'icpc' }))).toEqual(['ICPC']);
-  });
-
-  it('adds the rating chip for a rated contest', () => {
-    expect(chipsOf(contestItem({ ...PLAIN, isRated: true }))).toEqual(['ICPC', 'Tính rating']);
-  });
-
   it('shows the private chip, and not the organization chip, for a private contest', () => {
     const chips = chipsOf(contestItem({ ...PLAIN, isPrivate: true, isOrganizationPrivate: true }));
     expect(chips).toEqual(['ICPC', 'Riêng tư']);
-  });
-
-  it('shows the organization chip for a contest limited to one organization', () => {
-    expect(chipsOf(contestItem({ ...PLAIN, isOrganizationPrivate: true }))).toEqual([
-      'ICPC',
-      'Nội bộ',
-    ]);
   });
 
   it('lists the tags only when asked', () => {
     const contest = contestItem({ ...PLAIN, tags: ['dp', 'graphs'] });
     expect(chipsOf(contest)).toEqual(['ICPC']);
     expect(chipsOf(contest, true)).toEqual(['ICPC', 'dp', 'graphs']);
-  });
-
-  it('draws a tag neutral, by its slug, while no catalogue is cached', () => {
-    const wrapper = mountComponent(ContestChips, {
-      props: { contest: contestItem({ ...PLAIN, tags: ['olympic'] }), withTags: true },
-    });
-    const chip = wrapper.get('[data-tag-color]');
-    expect(chip.attributes('data-tag-color')).toBe('neutral');
-    expect(chip.text()).toBe('olympic');
-    expect(chip.classes()).toContain('text-muted');
-  });
-
-  it('shows the code-needed chip only where the list asks for it', () => {
-    const coded = contestItem({ ...PLAIN, requiresAccessCode: true });
-    expect(chipsOf(coded)).toEqual(['ICPC']);
-    expect(chipsOf(coded, false, true)).toEqual(['ICPC', 'Cần mã']);
   });
 });

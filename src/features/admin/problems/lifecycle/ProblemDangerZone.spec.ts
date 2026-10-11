@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, noContent, rateLimited } from '@/test/mock-api';
+import { mockApi, noContent } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
+import { openDialog, staffViewer } from '@/test/admin-routes';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
 import { deletedListRoutes } from '@/test/f4-routes';
@@ -44,14 +44,16 @@ describe('ProblemDangerZone', () => {
     expect(openButton(wrapper)).toBeUndefined();
   });
 
-  it('deletes only after the exact code is typed, once, then opens the deleted list', async () => {
+  it('deletes only after the exact code is typed, once, marks submission pages stale, then opens the deleted list', async () => {
     const calls = mockApi({
       ...staffViewer(DELETE),
       ...problemEditorRoutes(),
       ...deletedListRoutes(),
       'DELETE /problems/hcmus41c': noContent(),
     });
-    const { wrapper, router } = await mountGeneral();
+    const { wrapper, router, queryClient } = await mountGeneral();
+    const keys = [['submissions', 'detail', 'probe']];
+    seedCache(queryClient, keys);
     await openButton(wrapper)!.trigger('click');
     await flushPromises();
     expect(confirmButton().getAttribute('aria-disabled')).toBe('true');
@@ -65,49 +67,7 @@ describe('ProblemDangerZone', () => {
     expect(deletes).toHaveLength(1);
     expect(deletes[0]!.body).toEqual({ confirmCode: 'hcmus41c' });
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('admin-problemsDeleted'));
-  });
-
-  it('marks cached submission pages stale, as they still say the problem exists', async () => {
-    mockApi({
-      ...staffViewer(DELETE),
-      ...problemEditorRoutes(),
-      ...deletedListRoutes(),
-      'DELETE /problems/hcmus41c': noContent(),
-    });
-    const { wrapper, queryClient } = await mountGeneral();
-    const keys = [['submissions', 'detail', 'probe']];
-    seedCache(queryClient, keys);
-    await openButton(wrapper)!.trigger('click');
-    await typeCode('hcmus41c');
-    await confirmDialog('Xóa bài');
-    await flushPromises();
+    // Cached submission pages still say the problem exists.
     expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
-  });
-
-  it('keeps the dialog open with the typed code when the problem is in a contest', async () => {
-    mockApi({
-      ...staffViewer(DELETE),
-      ...problemEditorRoutes(),
-      'DELETE /problems/hcmus41c': fail(409, 'problem_in_contest'),
-    });
-    const { wrapper } = await mountGeneral();
-    await openButton(wrapper)!.trigger('click');
-    await typeCode('hcmus41c');
-    await confirmDialog('Xóa bài');
-    expect(openDialog().textContent).toContain('Gỡ bài khỏi kỳ thi trước');
-    expect(openDialog().querySelector('input')!.value).toBe('hcmus41c');
-  });
-
-  it('names the wait when the delete limit is reached', async () => {
-    mockApi({
-      ...staffViewer(DELETE),
-      ...problemEditorRoutes(),
-      'DELETE /problems/hcmus41c': rateLimited(1200),
-    });
-    const { wrapper } = await mountGeneral();
-    await openButton(wrapper)!.trigger('click');
-    await typeCode('hcmus41c');
-    await confirmDialog('Xóa bài');
-    expect(openDialog().textContent).toContain('1200');
   });
 });

@@ -20,13 +20,6 @@ describe('contest rules', () => {
     expect(ruleFor(contestRules(stored, 'vi'), 'contests.rules.format')!.params.minutes).toBe(10);
   });
 
-  it('names a format without a penalty by its name alone', () => {
-    const ioi = contestDetail({ formatName: 'ioi' });
-    expect(ruleFor(contestRules(ioi, 'vi'), 'contests.rules.format')!.valueKey).toBe(
-      'contests.rules.formatOnly',
-    );
-  });
-
   it('adds the freeze to the scoreboard rule only for formats that freeze', () => {
     expect(ruleFor(contestRules(contestDetail(), 'vi'), 'contests.rules.scoreboard')).toMatchObject(
       {

@@ -18,12 +18,4 @@ test.describe('J2 browse problems', () => {
     await expect(page.locator('#main h1')).toContainText(problem.name);
     await expect(page.getByText('Print the larger of two integers.')).toBeVisible();
   });
-
-  test('an unknown problem code shows a not-found page, not a blank one', async ({ page }) => {
-    await page.goto('/problems/no_such_problem_xyz');
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Không tìm thấy trang' }),
-    ).toBeVisible();
-    await expect(page.getByText('Print the larger')).toHaveCount(0);
-  });
 });

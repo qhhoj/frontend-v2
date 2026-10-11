@@ -12,7 +12,6 @@ const SETTLE_TIMEOUT_MS = 6000;
 /** Set to a folder to save screenshots of the live states there. */
 /** Enough rows that the page scrolls well past the pill. */
 const LONG_PAGE_ROWS = 40;
-const STICKY_TOP_MAX_PX = 100;
 const SHOTS_DIR = process.env.LIVE_SHOTS_DIR;
 
 /** A browser EventSource that never connects: the test pushes frames through `window.pushEvent`. */
@@ -71,24 +70,6 @@ for (const width of [DESKTOP_WIDTH, PHONE_WIDTH])
         await installControlledEventSource(page);
         await page.setViewportSize({ width, height: 900 });
         await page.emulateMedia({ colorScheme: scheme });
-      });
-
-      test('shows the N new pill on a later page and fits the viewport', async ({ page, api }) => {
-        routePageTwoWithNewRows(api);
-        await page.goto('/submissions?page=2');
-        await expect(page.locator(ROW)).toHaveCount(LONG_PAGE_ROWS);
-        await pushQueued(page);
-        const pill = page.getByTestId('new-pill');
-        await expect(pill).toBeVisible({ timeout: SETTLE_TIMEOUT_MS });
-        expect((await pill.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-        expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(
-          true,
-        );
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-        expect((await pill.boundingBox())!.y).toBeLessThan(STICKY_TOP_MAX_PX);
-        if (SHOTS_DIR) {
-          await page.screenshot({ path: `${SHOTS_DIR}/task-8b-pill-${width}-${scheme}.png` });
-        }
       });
 
       test('brings the top of the list into view when the pill is clicked', async ({

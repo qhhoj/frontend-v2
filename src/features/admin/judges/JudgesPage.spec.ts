@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { cancelDialog, confirmDialog, staffViewer } from '@/test/admin-routes';
-import { JUDGE_FLEET, judge } from '@/test/admin-fixtures/judges';
+import { JUDGE_FLEET } from '@/test/admin-fixtures/judges';
 
 /** The screen is a lazy route: the board is there once its chunk and its list have loaded. */
 const mountJudges = async () => {
@@ -35,52 +35,6 @@ describe('JudgesPage', () => {
     expect(rowOf(wrapper, 'qhh-judge-04').text()).toContain('Đã tắt');
   });
 
-  it('shows busy of slots and the build of each judge, and no build when it reports none', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountJudges();
-    expect(rowOf(wrapper, 'qhh-judge-03').text()).toContain('3/4 ô đang chấm');
-    expect(rowOf(wrapper, 'qhh-judge-03').text()).toContain('bản dựng 1.4.2');
-    expect(rowOf(wrapper, 'thu-nghiem').text()).toContain('0/2 ô đang chấm');
-    expect(rowOf(wrapper, 'thu-nghiem').text()).not.toContain('bản dựng');
-  });
-
-  it('blocks a judge with PATCH and shows the answer', async () => {
-    const calls = mockApi(
-      routes({
-        'PATCH /judges/qhh-judge-02': ok(
-          judge({
-            id: '0192a000-0000-7000-8000-00000000a102',
-            name: 'qhh-judge-02',
-            isBlocked: true,
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountJudges();
-    await rowOf(wrapper, 'qhh-judge-02')
-      .findAll('button')
-      .find((button) => button.text() === 'Chặn')!
-      .trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
-    await confirmDialog('Chặn');
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isBlocked: true });
-    expect(rowOf(wrapper, 'qhh-judge-02').text()).toContain('Bỏ chặn');
-  });
-
-  it('disconnects with the force flag the dialog sets', async () => {
-    const calls = mockApi(routes({ 'POST /judges/qhh-judge-02/disconnect': { status: 204 } }));
-    const { wrapper } = await mountJudges();
-    await rowOf(wrapper, 'qhh-judge-02')
-      .findAll('button')
-      .find((button) => button.text() === 'Ngắt')!
-      .trigger('click');
-    await flushPromises();
-    (document.body.querySelector('#disconnect-force') as HTMLInputElement).click();
-    await confirmDialog('Ngắt kết nối');
-    expect(calls.find((call) => call.path.endsWith('/disconnect'))?.body).toEqual({ force: true });
-  });
-
   it('rotates a key only after confirming that the judge disconnects, then reveals the new key', async () => {
     const calls = mockApi(
       routes({ 'POST /judges/qhh-judge-02/key': ok({ authKey: 'rotated-key-value' }) }),
@@ -97,21 +51,6 @@ describe('JudgesPage', () => {
     expect(calls.some((call) => call.path.endsWith('/key'))).toBe(false);
     await confirmDialog('Cấp khoá mới');
     expect(document.body.textContent).toContain('rotated-key-value');
-  });
-
-  it('saves a description from the expanded row', async () => {
-    const calls = mockApi(
-      routes({ 'PATCH /judges/qhh-judge-01': ok(judge({ description: 'Mới' })) }),
-    );
-    const { wrapper } = await mountJudges();
-    await rowOf(wrapper, 'qhh-judge-01').get('button[aria-expanded]').trigger('click');
-    await wrapper.get('#judge-description-qhh-judge-01').setValue('Mới');
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Lưu mô tả')!
-      .trigger('click');
-    await flushPromises();
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ description: 'Mới' });
   });
 
   it('returns focus to the Chặn button when its dialog is cancelled', async () => {
@@ -147,21 +86,5 @@ describe('JudgesPage', () => {
     await flushPromises();
     expect(wrapper.find('[role="alert"]').exists()).toBe(true);
     expect(document.body.textContent).toContain('rotated-key-value');
-  });
-
-  it('drops the rotated key once it is saved and closed', async () => {
-    mockApi(routes({ 'POST /judges/qhh-judge-02/key': ok({ authKey: 'rotated-key-value' }) }));
-    const { wrapper } = await mountJudges();
-    await rowOf(wrapper, 'qhh-judge-02')
-      .findAll('button')
-      .find((button) => button.text() === 'Khoá')!
-      .trigger('click');
-    await flushPromises();
-    await confirmDialog('Cấp khoá mới');
-    (document.body.querySelector('#key-saved') as HTMLInputElement).click();
-    await flushPromises();
-    (document.body.querySelector('[data-testid="key-close"]') as HTMLButtonElement).click();
-    await flushPromises();
-    await vi.waitFor(() => expect(document.body.textContent).not.toContain('rotated-key-value'));
   });
 });

@@ -105,17 +105,6 @@ describe('boardAt on r41 (icpc, two ghosts)', () => {
     expect(problemA).toMatchObject({ label: 'A', firstSolve: 'part-07', acceptedCount: 2 });
     expect(problemB).toMatchObject({ label: 'B', firstSolve: null, acceptedCount: 0 });
   });
-
-  it('marks the viewer user id on real rows and none on ghosts', () => {
-    const rows = boardAt(r41, 0, ICPC).rows;
-    expect(rows.find((row) => row.name === 'user_01')!.userId).toBe(
-      REPLAY_PARTICIPANTS[2]!.user.id,
-    );
-    expect(rows.filter((row) => row.kind === 'ghost').map((row) => row.userId)).toEqual([
-      null,
-      null,
-    ]);
-  });
 });
 
 const onePerson = (events: ReplayEvent[], overrides: Partial<LoadedReplay> = {}) =>

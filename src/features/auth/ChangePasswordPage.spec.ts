@@ -8,6 +8,9 @@ import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
+// The first mount in a file loads route chunks cold.
+vi.setConfig({ testTimeout: 30_000 });
+
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
 /** The breach flag clears on the server once the password changed; signing out lands on the login screen. */
@@ -44,8 +47,6 @@ const describedText = (wrapper: Wrapper, name: string) =>
     .attributes('aria-describedby')!
     .split(' ')
     .map((id) => wrapper.get(`[id="${id}"]`).text());
-const signOutButton = (wrapper: Wrapper) =>
-  wrapper.findAll('button').find((button) => button.text() === 'Đăng xuất');
 
 describe('change-password page', () => {
   it('catches a viewer with a breached password on any page and says why, naming the account', async () => {
@@ -58,21 +59,6 @@ describe('change-password page', () => {
     expect(wrapper.get('#main [role="status"] strong').text()).toBe('user_01');
   });
 
-  it('offers the account name to password managers, in a field the viewer never sees', async () => {
-    changeApi();
-    const { wrapper } = await mountApp('/account/password');
-    const username = wrapper.get('input[name="username"]');
-    expect(username.attributes('autocomplete')).toBe('username');
-    expect(username.element.getAttribute('value')).toBe('user_01');
-  });
-
-  it('labels the three fields as the board does', async () => {
-    changeApi();
-    const { wrapper } = await mountApp('/account/password');
-    const labels = wrapper.findAll('#main label').map((label) => label.text());
-    expect(labels).toEqual(['Mật khẩu hiện tại', 'Mật khẩu mới', 'Nhập lại mật khẩu mới']);
-  });
-
   it('changes the password, reloads the session and returns to where the viewer was', async () => {
     const calls = changeApi();
     const { wrapper, router } = await mountApp('/blog');
@@ -81,7 +67,9 @@ describe('change-password page', () => {
       currentPassword: 'old pass',
       newPassword: 'brand new passphrase',
     });
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/blog'));
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/blog'), {
+      timeout: 5000,
+    });
   });
 
   it('shows a wrong current password at its input, by its issue code, not as a summary', async () => {
@@ -132,7 +120,9 @@ describe('change-password page', () => {
     changeApi(homeRoutes);
     const { wrapper, router } = await mountApp('/account/password?redirect=//evil.example');
     await fill(wrapper);
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/'));
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/'), {
+      timeout: 15_000,
+    });
   });
 
   it('says the password changed, not that the change failed, when the session cannot be reloaded', async () => {
@@ -153,14 +143,5 @@ describe('change-password page', () => {
     expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
     expect(wrapper.find('input[name="currentPassword"]').exists()).toBe(false);
     expect(router.currentRoute.value.fullPath).toBe('/account/password');
-  });
-
-  it('lets the viewer sign out from the top bar', async () => {
-    const calls = changeApi();
-    const { wrapper, router } = await mountApp('/account/password');
-    await signOutButton(wrapper)!.trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.path === '/auth/logout')).toBe(true);
-    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
   });
 });

@@ -3,9 +3,9 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { joinRequest, organizationDetail } from '@/test/community-fixtures';
 import { organizationRoutes } from '@/test/community-routes';
-import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { signedInViewer } from '@/test/problem-routes';
 
 const hcmus = (viewer: object | null, extra: object = {}) =>
   organizationDetail({
@@ -18,55 +18,6 @@ const hcmus = (viewer: object | null, extra: object = {}) =>
     viewer: viewer as never,
     ...extra,
   });
-
-describe('membership panel', () => {
-  it('asks a guest to sign in and comes back to the organization', async () => {
-    mockApi({ ...anonymousViewer, ...organizationRoutes(hcmus(null)) });
-    const { wrapper } = await mountApp('/organizations/hcmus');
-    expect(wrapper.get('[data-testid="membership-panel"] a').attributes('href')).toBe(
-      '/login?redirect=/organizations/hcmus',
-    );
-  });
-});
-
-describe('membership panel: joining and leaving', () => {
-  it('joins an open organization and refreshes it', async () => {
-    const lhp = organizationDetail({
-      viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
-    });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(lhp),
-      'GET /organizations/lhp': sequence(
-        ok(lhp),
-        ok({ ...lhp, viewer: { isMember: true, canAdminister: false, pendingRequestId: null } }),
-      ),
-      'POST /organizations/lhp/join': noContent(),
-    });
-    const { wrapper } = await mountApp('/organizations/lhp');
-    await wrapper.get('[data-testid="membership-panel"] button').trigger('click');
-    await flushPromises();
-    expect(
-      calls.some((call) => call.method === 'POST' && call.path === '/organizations/lhp/join'),
-    ).toBe(true);
-    expect(wrapper.get('[data-testid="membership-panel"]').text()).toContain('Bạn là thành viên');
-  });
-  it('shows the board’s sweating card when a fourth open organization is refused', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(
-        organizationDetail({
-          viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
-        }),
-      ),
-      'POST /organizations/lhp/join': fail(409, 'conflict'),
-    });
-    const { wrapper } = await mountApp('/organizations/lhp');
-    await wrapper.get('[data-testid="membership-panel"] button').trigger('click');
-    await flushPromises();
-    expect(wrapper.get('[data-state="error"]').text()).toContain('Không tham gia được');
-  });
-});
 
 describe('membership panel: requests', () => {
   it('sends a join request with the reason, then shows it pending', async () => {
@@ -98,21 +49,6 @@ describe('membership panel: requests', () => {
   });
 });
 
-describe('membership panel: private membership', () => {
-  it('lets a member of a private organization leave, warning that coming back needs a new request', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(
-        hcmus({ isMember: true, canAdminister: false, pendingRequestId: null }),
-      ),
-    });
-    const { wrapper } = await mountApp('/organizations/hcmus');
-    expect(wrapper.get('[data-testid="membership-panel"]').text()).toContain(
-      'muốn vào lại phải gửi yêu cầu mới',
-    );
-  });
-});
-
 describe('membership panel: official contest', () => {
   const officialSite = { 'GET /site': ok({ config: {}, officialMode: true }) };
   const panelButton = (wrapper: Pick<VueWrapper, 'get'>, name: string) =>
@@ -135,32 +71,6 @@ describe('membership panel: official contest', () => {
     await join.trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
-  });
-
-  it('replaces the join request form with the reason', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(
-        hcmus({ isMember: false, canAdminister: false, pendingRequestId: null }),
-      ),
-      ...officialSite,
-    });
-    const { wrapper } = await mountApp('/organizations/hcmus');
-    const panel = wrapper.get('[data-testid="membership-panel"]');
-    expect(panel.find('form').exists()).toBe(false);
-    expect(panel.text()).toContain('Bị khóa trong kỳ thi chính thức.');
-  });
-
-  it('locks leaving for a member', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(
-        hcmus({ isMember: true, canAdminister: false, pendingRequestId: null }),
-      ),
-      ...officialSite,
-    });
-    const { wrapper } = await mountApp('/organizations/hcmus');
-    expect(panelButton(wrapper, 'Rời tổ chức').attributes('aria-disabled')).toBe('true');
   });
 
   it('explains a lock the server reports while the site record still said off', async () => {

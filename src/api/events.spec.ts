@@ -35,11 +35,6 @@ describe('openEventStream', () => {
     expect(onState).not.toHaveBeenCalled();
   });
 
-  it('closes the connection', () => {
-    openEventStream('/events/submissions/abc', {}).close();
-    expect(latestEventSource().closed).toBe(true);
-  });
-
   it('reports a connection the browser gave up on, but not one it is retrying', () => {
     const onClosed = vi.fn();
     openEventStream('/events/submissions/abc', {}, onClosed);

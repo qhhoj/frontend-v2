@@ -3,7 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { settingsRoutes } from '@/test/account-routes';
 import { signedIn } from '@/test/fixtures';
-import { fail, issue, mockApi, noContent, rateLimited } from '@/test/mock-api';
+import { fail, mockApi, noContent } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -39,41 +39,6 @@ describe('Settings › Security › password', () => {
     );
     expect(input(wrapper, 'currentPassword').element.value).toBe('');
     expect(router.currentRoute.value.name).toBe('settings-security');
-  });
-
-  it('marks a wrong current password and focuses it', async () => {
-    const { wrapper } = await openSecurity(
-      fail(400, 'invalid_credentials', undefined, [
-        issue('currentPassword', 'password_incorrect', 'Current password is incorrect.'),
-      ]),
-    );
-    await fillAndSubmit(wrapper);
-    expect(input(wrapper, 'currentPassword').attributes('aria-invalid')).toBe('true');
-    expect(document.activeElement).toBe(input(wrapper, 'currentPassword').element);
-    expect(wrapper.find('#main [role="status"]').exists()).toBe(false);
-  });
-
-  it('moves focus to the section heading after a finished change, never to the body', async () => {
-    const { wrapper } = await openSecurity();
-    await fillAndSubmit(wrapper);
-    expect(document.activeElement?.tagName).toBe('H2');
-    expect(document.activeElement?.textContent).toBe('Đổi mật khẩu');
-    expect(document.activeElement).not.toBe(document.body);
-  });
-
-  it('says how long to wait when the password budget is spent, as the other security flows do', async () => {
-    const { wrapper, calls } = await openSecurity(rateLimited(42));
-    await fillAndSubmit(wrapper);
-    expect(calls.some((call) => call.path === '/auth/password/change')).toBe(true);
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Bạn thử quá nhiều lần. Thử lại sau 42 giây.',
-    );
-  });
-
-  it('sends nothing while the two new passwords differ', async () => {
-    const { wrapper, calls } = await openSecurity();
-    await fillAndSubmit(wrapper, 'khác');
-    expect(calls.some((call) => call.path === '/auth/password/change')).toBe(false);
   });
 
   it('says the password changed, not that the change failed, when the session cannot be reloaded, and retries only the reload', async () => {

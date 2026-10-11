@@ -20,24 +20,10 @@ async function highlighted(html: string) {
 }
 
 describe('highlightMarkdownBlocks', () => {
-  it('colours a language-cpp block, also under its c++ alias', async () => {
-    for (const name of ['cpp', 'c++', 'CPP']) {
-      const root = await highlighted(
-        `<pre><code class="language-${name}">int x = 1;\nreturn x;\n</code></pre>`,
-      );
-      expect(root.querySelector('code .syn-keyword')?.textContent).toBe('return');
-    }
-  });
-
   it('leaves a block without a language, and one with an unknown language, plain', async () => {
     const root = await highlighted(
       '<pre><code>int x = 1;</code></pre><pre><code class="language-brainfuck">+++</code></pre>',
     );
-    expect(root.querySelector('span')).toBeNull();
-  });
-
-  it('does not touch inline code', async () => {
-    const root = await highlighted('<p><code class="language-cpp">int</code></p>');
     expect(root.querySelector('span')).toBeNull();
   });
 

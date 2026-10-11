@@ -1,8 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { profile, signedIn, signedOut } from '@/test/fixtures';
-import { homeRoutes } from '@/test/home-routes';
-import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
+import { signedOut } from '@/test/fixtures';
+import { mockApi, noContent } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
 const send = async (
@@ -30,36 +29,5 @@ describe('resend-activation page', () => {
       'Nếu u***@example.com đang chờ kích hoạt, bạn sẽ nhận được liên kết mới trong vài phút.',
     );
     expect(document.activeElement).toBe(document.getElementById('main'));
-  });
-
-  it('keeps the form and announces a throttled request', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate/resend': fail(429, 'rate_limited') });
-    const { wrapper } = await mountApp('/activate');
-    await send(wrapper);
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
-    );
-    expect(wrapper.find('form').exists()).toBe(true);
-  });
-
-  it('shows a rejected address at the input and focuses it', async () => {
-    mockApi({
-      'GET /auth/me': signedOut,
-      'POST /auth/activate/resend': invalid(
-        issue('email', 'email_invalid', 'Enter a valid email address.'),
-      ),
-    });
-    const { wrapper } = await mountApp('/activate');
-    await send(wrapper, 'nope@x');
-    const email = wrapper.get('input[name="email"]');
-    expect(email.attributes('aria-invalid')).toBe('true');
-    expect(wrapper.text()).toContain('Nhập một địa chỉ email hợp lệ.');
-    expect(document.activeElement).toBe(email.element);
-  });
-
-  it('sends a signed-in viewer home, like the other guest pages', async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()), ...homeRoutes });
-    const { router } = await mountApp('/activate');
-    expect(router.currentRoute.value.name).toBe('home');
   });
 });

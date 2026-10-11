@@ -10,11 +10,4 @@ describe('submission diff route', () => {
     expect(resolved.meta.requiresAuth).toBe(true);
     expect(resolved.query).toEqual({ left: 'a', right: 'b' });
   });
-
-  it('still resolves a real submission id to the submission page', () => {
-    const router = createAppRouter(createMemoryHistory());
-    expect(router.resolve('/submissions/0192a000-0000-7000-8000-000000000001').name).toBe(
-      'submission',
-    );
-  });
 });

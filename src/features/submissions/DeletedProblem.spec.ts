@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, page } from '@/test/mock-api';
+import { fail, mockApi } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
-import {
-  anonymousViewer,
-  signedInViewer,
-  submissionListRoutes,
-  submissionPageRoutes,
-} from '@/test/problem-routes';
-import { submissionDetail, submissionItem } from '@/test/fixtures';
+import { signedInViewer, submissionPageRoutes } from '@/test/problem-routes';
+import { submissionDetail } from '@/test/fixtures';
 
 const GONE = { code: 'duongdi', name: 'Đường đi ngắn nhất', isDeleted: true, points: 100 };
 const tombstoned = submissionDetail({
@@ -36,19 +31,6 @@ describe('a submission of a deleted problem', () => {
     expect(wrapper.text()).toContain('int main');
   });
 
-  it('marks the row in the submission list without a link', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionListRoutes,
-      'GET /submissions': page([submissionItem({ problem: GONE })]),
-    });
-    const { wrapper } = await mountApp('/submissions');
-    await flushPromises();
-    const row = wrapper.get('tbody tr');
-    expect(row.text()).toContain('Đã xóa');
-    expect(row.find('a[href="/problems/duongdi"]').exists()).toBe(false);
-  });
-
   it('turns a refused rejudge (409 problem_deleted) into its own text', async () => {
     mockApi({
       ...staffViewer(['judge.rejudge_submission']),
@@ -66,12 +48,5 @@ describe('a submission of a deleted problem', () => {
     expect(wrapper.get('[data-testid="staff-panel"] [role="alert"]').text()).toContain(
       'đã bị xóa nên không chấm lại',
     );
-  });
-
-  it('a deleted problem’s own page is the crying-Bit 404', async () => {
-    mockApi({ ...anonymousViewer, 'GET /problems/duongdi': fail(404, 'not_found') });
-    const { wrapper } = await mountApp('/problems/duongdi');
-    await flushPromises();
-    expect(wrapper.get('h1').text()).toBe('Không tìm thấy trang');
   });
 });

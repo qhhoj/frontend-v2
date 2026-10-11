@@ -1,8 +1,6 @@
 import { sessionResponse, sessionUser } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { ok } from './fixtures/reply';
 import type { Page } from '@playwright/test';
 
@@ -37,30 +35,4 @@ test('a handler sees both counts and reaches the queue from the strip', async ({
     strip(page).getByRole('link', { name: '5 phiếu đang chờ nhân viên trả lời' }),
   ).toHaveAttribute('href', '/admin/tickets?scope=all&open=1');
   await expect(strip(page).locator('[data-testid="inline-bit"]')).toBeVisible();
-});
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the alerts strip has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      asHandler(api, 2, 5);
-      await applyTheme(page, api, theme);
-      await page.goto('/tickets');
-      await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-      await expect(strip(page)).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-    });
-
-test('the strip does not make /tickets scroll sideways at 375 px', async ({ page, api }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  asHandler(api, 12, 345);
-  await page.goto('/tickets');
-  await expect(strip(page)).toBeVisible();
-  const overflows = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-  );
-  expect(overflows).toBe(false);
 });

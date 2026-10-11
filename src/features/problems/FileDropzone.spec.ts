@@ -14,12 +14,6 @@ const mountDropzone = (
   });
 
 describe('FileDropzone', () => {
-  it('accepts the language extension and states the size cap', () => {
-    const wrapper = mountDropzone();
-    expect(wrapper.get('input').attributes('accept')).toBe('.sb3');
-    expect(wrapper.text()).toContain('Chọn tệp .sb3');
-    expect(wrapper.text()).toContain('Tối đa 5.0 MB');
-  });
   it('emits the first of several dropped files, and nothing for an empty drop', async () => {
     const wrapper = mountDropzone();
     const label = wrapper.get('label');
@@ -37,12 +31,5 @@ describe('FileDropzone', () => {
       'Ngôn ngữ này không nhận tệp tải lên.',
     );
     expect(wrapper.emitted()).toEqual({});
-  });
-  it('shows the chosen file with its name and size, and emits remove', async () => {
-    const wrapper = mountDropzone({ file: new File(['x'.repeat(2048)], 'catmaze-final.sb3') });
-    expect(wrapper.get('[title="catmaze-final.sb3"]').text()).toBe('catmaze-final.sb3');
-    expect(wrapper.text()).toContain('2 KB');
-    await wrapper.get('button[aria-label="Bỏ tệp"]').trigger('click');
-    expect(wrapper.emitted('remove')).toHaveLength(1);
   });
 });

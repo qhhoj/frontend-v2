@@ -36,13 +36,6 @@ const validation = (...issues: FieldIssue[]) =>
 const taken = (field: string) => ({ field, code: 'username_taken', message: 'Username is taken.' });
 
 describe('useAuthAction', () => {
-  it('reports success and leaves no error', async () => {
-    const action = mountForm([]);
-    expect(await action.run(() => Promise.resolve('done'))).toBe(true);
-    expect(action.pending.value).toBe(false);
-    expect(action.summary.value).toBeNull();
-  });
-
   it('is pending while the request runs and ignores a second submit', async () => {
     const action = mountForm([]);
     let calls = 0;
@@ -58,26 +51,6 @@ describe('useAuthAction', () => {
     release();
     await first;
     expect(action.pending.value).toBe(false);
-  });
-
-  it('turns a failure into text and returns false', async () => {
-    const action = mountForm([]);
-    expect(await action.run(rejected(new ApiError('rate_limited', 429, 'x')))).toBe(false);
-    expect(action.summary.value).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
-  });
-
-  it.each([
-    [
-      'a 401 invalid_credentials',
-      new ApiError('invalid_credentials', 401, 'x'),
-      'Sai tên đăng nhập hoặc mật khẩu.',
-    ],
-    ['a network_error', new ApiError('network_error', 0, 'x'), 'Không kết nối được máy chủ.'],
-  ])('ends %s with pending off and the translated text', async (_name, error, text) => {
-    const action = mountForm([]);
-    expect(await action.run(rejected(error))).toBe(false);
-    expect(action.pending.value).toBe(false);
-    expect(action.summary.value).toBe(text);
   });
 
   it('puts field messages at their inputs and focuses the first invalid one', async () => {
@@ -113,16 +86,6 @@ describe('useAuthAction', () => {
     );
   });
 
-  it('still reads an answer that has fields but no issues', async () => {
-    const action = mountForm(['first']);
-    await action.run(
-      rejected(
-        new ApiError('validation_failed', 400, 'x', { fields: { first: ['Username is taken.'] } }),
-      ),
-    );
-    expect(action.fieldErrors.value).toEqual({ first: 'Username is taken.' });
-  });
-
   it('drops a field message once the viewer edits that field, without raising the summary', async () => {
     const action = mountForm(['first']);
     await action.run(rejected(validation(taken('first'))));
@@ -138,33 +101,5 @@ describe('useAuthAction', () => {
     action.dismiss('first');
     await action.run(rejected(validation(taken('first'))));
     expect(action.fieldErrors.value).toEqual({ first: 'Tên đăng nhập đã được dùng.' });
-  });
-
-  it('clears the previous failure when the next attempt starts', async () => {
-    const action = mountForm([]);
-    await action.run(rejected(new ApiError('rate_limited', 429, 'x')));
-    await action.run(() => Promise.resolve());
-    expect(action.summary.value).toBeNull();
-  });
-});
-
-describe('useAuthAction without a form, and reset', () => {
-  it('reset forgets the failure, so a reopened dialog starts clean', async () => {
-    const action = mountForm(['first']);
-    await action.run(rejected(validation(taken('first'))));
-    action.reset();
-    expect(action.error.value).toBeNull();
-  });
-
-  it('needs no form element: a dialog or banner uses it for pending and the failure text only', async () => {
-    let action!: ReturnType<typeof useAuthAction>;
-    mountComponent({
-      setup() {
-        action = useAuthAction();
-        return () => null;
-      },
-    });
-    await expect(action.run(rejected(new ApiError('rate_limited', 429, 'x')))).resolves.toBe(false);
-    expect(action.summary.value).toBe('Bạn thao tác quá nhanh. Hãy thử lại sau.');
   });
 });

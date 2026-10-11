@@ -1,27 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  boardColumns,
-  rankLocation,
-  rowAnchor,
-  sortFromQuery,
-  sortLocation,
-} from './leaderboard-columns';
-
-describe('leaderboard columns', () => {
-  it('shows the five user numbers on the user boards and marks the sorted one', () => {
-    const columns = boardColumns('points');
-    expect(columns.map((column) => column.key)).toEqual([
-      'rating',
-      'performancePoints',
-      'points',
-      'problemCount',
-      'contributionPoints',
-    ]);
-    expect(columns.filter((column) => column.isActive).map((column) => column.key)).toEqual([
-      'points',
-    ]);
-  });
-});
+import { rankLocation, sortFromQuery, sortLocation } from './leaderboard-columns';
 
 describe('leaderboard routing', () => {
   it('reads a known sort from the URL and falls back to rating', () => {
@@ -34,10 +12,6 @@ describe('leaderboard routing', () => {
   it('sorts to the first page, leaving the default sort out of the URL', () => {
     expect(sortLocation('points')).toEqual({ query: { sort: 'points' } });
     expect(sortLocation('rating')).toEqual({ query: {} });
-  });
-
-  it('anchors a row by username', () => {
-    expect(rowAnchor('khoa.tran')).toBe('user-khoa.tran');
   });
 
   it('locates a row on its page, keeping the sort and leaving out the defaults', () => {

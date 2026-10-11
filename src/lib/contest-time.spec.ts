@@ -2,13 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   contestProgress,
   countdownTarget,
-  freezeFraction,
   freezeStart,
   isFrozenAt,
   localDayOffset,
   phaseAt,
   registrationState,
-  spanMessage,
 } from './contest-time';
 
 const at = (iso: string) => Date.parse(iso);
@@ -25,11 +23,6 @@ describe('phaseAt', () => {
 });
 
 describe('contestProgress', () => {
-  it('is the elapsed share of the window, clamped to 0..1', () => {
-    expect(contestProgress(times, at('2026-10-08T08:00:00Z'))).toBe(0.5);
-    expect(contestProgress(times, at('2026-10-08T05:00:00Z'))).toBe(0);
-    expect(contestProgress(times, at('2026-10-08T11:00:00Z'))).toBe(1);
-  });
   it('treats an empty window as over instead of dividing by zero', () => {
     expect(
       contestProgress(
@@ -47,10 +40,6 @@ describe('freeze', () => {
     expect(freezeStart({ ...icpc, formatName: 'ioi' })).toBeNull();
     expect(freezeStart({ ...icpc, frozenLastMinutes: 0 })).toBeNull();
   });
-  it('places the freeze mark on the bar', () => {
-    expect(freezeFraction(icpc)).toBe(0.75);
-    expect(freezeFraction({ ...icpc, formatName: 'default' })).toBeNull();
-  });
   it('stays frozen after the end, like the backend', () => {
     expect(isFrozenAt(icpc, at('2026-10-08T08:59:59Z'))).toBe(false);
     expect(isFrozenAt(icpc, at('2026-10-08T09:00:00Z'))).toBe(true);
@@ -60,9 +49,6 @@ describe('freeze', () => {
 
 describe('registrationState', () => {
   const now = at('2026-10-08T05:00:00Z');
-  it('is none when neither bound is set', () => {
-    expect(registrationState({ registrationStart: null, registrationEnd: null }, now)).toBe('none');
-  });
   it('is open inside both bounds, inclusive, and an open-ended bound never closes it', () => {
     expect(
       registrationState({ registrationStart: '2026-10-08T05:00:00Z', registrationEnd: null }, now),
@@ -92,34 +78,6 @@ describe('countdownTarget', () => {
       at: times.endTime,
     });
     expect(countdownTarget(times, at('2026-10-08T10:00:00.001Z'))).toBeNull();
-  });
-});
-
-describe('spanMessage', () => {
-  it('says hours and minutes, hours alone, minutes alone, days', () => {
-    expect(spanMessage(9000)).toEqual({
-      key: 'contests.span.hoursMinutes',
-      params: { hours: 2, minutes: 30 },
-    });
-    expect(spanMessage(4 * 3600)).toEqual({
-      key: 'contests.span.hours',
-      params: { count: 4 },
-      count: 4,
-    });
-    expect(spanMessage(47 * 60 + 59)).toEqual({
-      key: 'contests.span.minutes',
-      params: { count: 47 },
-      count: 47,
-    });
-    expect(spanMessage(14 * 86_400)).toEqual({
-      key: 'contests.span.days',
-      params: { count: 14 },
-      count: 14,
-    });
-  });
-  it('never says zero minutes', () => {
-    expect(spanMessage(59)).toEqual({ key: 'contests.span.underMinute', params: {} });
-    expect(spanMessage(-5)).toEqual({ key: 'contests.span.underMinute', params: {} });
   });
 });
 

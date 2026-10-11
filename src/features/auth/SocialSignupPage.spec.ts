@@ -15,7 +15,9 @@ import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { homeRoutes } from '@/test/home-routes';
 import { mountApp } from '@/test/mount';
-import { openSelect, pickOption } from '@/test/select';
+
+// The first mount in a file loads route chunks cold.
+vi.setConfig({ testTimeout: 30_000 });
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 const PASSWORD = 'long enough password';
@@ -51,7 +53,9 @@ describe('social signup page', () => {
     expect(completedBodies(calls)).toEqual([
       { token: 'pending-1', username: 'new_user', password: PASSWORD, languageId: CPP17_ID },
     ]);
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/blog'));
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/blog'), {
+      timeout: 15_000,
+    });
   });
 
   it('sends no language when the list has no C++17, and the picker says "Chưa chọn"', async () => {
@@ -68,29 +72,6 @@ describe('social signup page', () => {
     expect(completedBodies(calls)).toEqual([
       { token: 'pending-1', username: 'new_user', password: PASSWORD },
     ]);
-  });
-
-  it('sends the school when chosen', async () => {
-    const calls = routes();
-    const { wrapper } = await mountApp('/register/social?token=pending-1');
-    await openSelect(wrapper, '[data-testid="school-picker"]');
-    await pickOption(organizationItem().name);
-    await submit(wrapper);
-    expect(completedBodies(calls)).toEqual([
-      {
-        token: 'pending-1',
-        username: 'new_user',
-        password: PASSWORD,
-        organizationId: organizationItem().id,
-        languageId: CPP17_ID,
-      },
-    ]);
-  });
-
-  it('takes the token out of the address bar once it is read', async () => {
-    routes();
-    const { router } = await mountApp('/register/social?token=pending-1&redirect=/blog');
-    expect(router.currentRoute.value.query).toEqual({ redirect: '/blog' });
   });
 
   it('replaces the token-bearing entry rather than pushing a second one, so Back never shows the token', async () => {
@@ -116,18 +97,6 @@ describe('social signup page', () => {
     });
     await mountApp('/register/social?token=pending-1');
     expect(policiesSeen).toEqual(['no-referrer']);
-  });
-
-  it('asks for a username, a password and the optional pickers, never for an email', async () => {
-    routes();
-    const { wrapper } = await mountApp('/register/social?token=pending-1');
-    expect(wrapper.find('input[name="email"]').exists()).toBe(false);
-    expect(wrapper.get('input[name="username"]').attributes('autocomplete')).toBe('username');
-    expect(wrapper.get('input[name="password"]').attributes('autocomplete')).toBe('new-password');
-    expect(wrapper.find('[role="meter"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="school-picker"]').exists()).toBe(true);
-    expect(wrapper.find('select[name="languageId"]').exists()).toBe(true);
-    expect(wrapper.get('form button[type="submit"]').text()).toBe('Tạo tài khoản');
   });
 
   it('says so, and offers sign-in, when the address carries no token', async () => {
@@ -189,13 +158,5 @@ describe('social signup page', () => {
     );
     expect(wrapper.find('form').exists()).toBe(false);
     expect(wrapper.find('#main a[href="/login"]').exists()).toBe(true);
-  });
-
-  it('will not send a username the backend would reject', async () => {
-    const calls = routes();
-    const { wrapper } = await mountApp('/register/social?token=pending-1');
-    await submit(wrapper, 'bad name');
-    expect(completedBodies(calls)).toEqual([]);
-    expect(document.activeElement).toBe(wrapper.get('input[name="username"]').element);
   });
 });

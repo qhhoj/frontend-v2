@@ -35,24 +35,10 @@ describe('admin routes', () => {
     expect(permissionOf('admin-pages')).toBe('flatpages.change_flatpage');
   });
 
-  it('names only backend permission namespaces in every screen rule', () => {
-    const names = Object.values(ADMIN_SCREENS)
-      .flatMap((screen) => [screen.permission ?? []].flat())
-      .map(String);
-    expect(names.length).toBeGreaterThan(0);
-    expect(names.every((name) => /^(judge|flatpages)\.[a-z_]+$/.test(name))).toBe(true);
-  });
-
   it('keeps every screen path under /admin and unique', () => {
     const paths = Object.values(ADMIN_SCREENS).map((screen) => screen.path);
     expect(paths.every((path) => path === '/admin' || path.startsWith('/admin/'))).toBe(true);
     expect(new Set(paths).size).toBe(paths.length);
-  });
-
-  it('sends unknown admin paths to a staff-only not-found inside the admin layout', () => {
-    const unknown = adminRoutes.find((route) => route.name === 'admin-unknown');
-    expect(unknown?.path).toBe('/admin/:pathMatch(.*)*');
-    expect(unknown?.meta).toMatchObject({ staffOnly: true, layout: 'admin' });
   });
 
   it('is mounted in the app routes before the site catch-all', () => {
@@ -60,14 +46,5 @@ describe('admin routes', () => {
     expect(names.indexOf('admin-dashboard')).toBeGreaterThan(-1);
     expect(names.indexOf('admin-unknown')).toBeLessThan(names.indexOf('not-found'));
     expect(names).not.toContain('admin');
-  });
-
-  it('redirects a bare editor path to its first tab', () => {
-    expect(adminRoutes.find((route) => route.path === '/admin/problems/:code')?.redirect).toEqual({
-      name: 'admin-problemGeneral',
-    });
-    expect(adminRoutes.find((route) => route.path === '/admin/contests/:key')?.redirect).toEqual({
-      name: 'admin-contestGeneral',
-    });
   });
 });

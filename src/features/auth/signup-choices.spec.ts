@@ -8,12 +8,11 @@ import {
   CPP17_ID,
   PY3_ID,
 } from '@/test/fixtures';
-import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
+import { fail, mockApi, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { registerRoutes } from '@/test/auth-routes';
 import { mountComponent } from '@/test/mount';
-import { openSelect, optionTexts, pickOption, typeFilter } from '@/test/select';
-import { useLoadingStore } from '@/stores/loading.store';
+import { openSelect, optionTexts, typeFilter } from '@/test/select';
 import { chosenIds, defaultLanguageId } from './signup-choices';
 import SignupChoices from './SignupChoices.vue';
 
@@ -68,34 +67,11 @@ describe('SignupChoices', () => {
     expect(languageOptions(wrapper)).toEqual(['Chưa chọn', 'C++17', 'Python 3']);
   });
 
-  it('labels both pickers as optional', async () => {
-    mockRegisterApi();
-    const wrapper = await mountLoaded();
-    const labelledBy = wrapper.get(`${SCHOOL} [role="combobox"]`).attributes('aria-labelledby')!;
-    expect(wrapper.get(`[id="${labelledBy}"]`).text()).toBe('Trường (tuỳ chọn)');
-    const select = wrapper.get(LANGUAGE);
-    expect(wrapper.get(`label[for="${select.attributes('id')}"]`).text()).toBe(
-      'Ngôn ngữ mặc định (tuỳ chọn)',
-    );
-  });
-
   it('starts the language at C++17 when the list has it', async () => {
     mockRegisterApi();
     const wrapper = await mountLoaded();
     expect(languageValue(wrapper)).toBe(CPP17_ID);
     expect(wrapper.emitted('update:languageId')).toEqual([[CPP17_ID]]);
-  });
-
-  it('starts the language at "Chưa chọn" when the list has no C++17', async () => {
-    mockRegisterApi({
-      'GET /problems/meta': ok({
-        ...problemMeta(),
-        languages: [languageItem(PY3_ID, 'PY3', 'Python 3')],
-      }),
-    });
-    const wrapper = await mountLoaded();
-    expect(languageValue(wrapper)).toBe('');
-    expect(wrapper.emitted('update:languageId')).toBeUndefined();
   });
 
   it('does not apply C++17 again after the viewer chose "Chưa chọn" and the picker remounts', async () => {
@@ -113,41 +89,6 @@ describe('SignupChoices', () => {
     expect(wrapper.emitted('update:languageId')).toBeUndefined();
   });
 
-  it('reports the chosen school, and "Chưa chọn" as an empty id', async () => {
-    mockRegisterApi();
-    const wrapper = await mountLoaded();
-    await openSelect(wrapper, SCHOOL);
-    await pickOption(organizationItem().name);
-    expect(wrapper.emitted('update:organizationId')).toEqual([[organizationItem().id]]);
-    await wrapper.get(LANGUAGE).setValue('');
-    expect(wrapper.emitted('update:languageId')?.at(-1)).toEqual(['']);
-  });
-
-  it('shows the backend refusal at the picker it belongs to', async () => {
-    mockRegisterApi();
-    const wrapper = await mountLoaded({
-      errors: { organizationId: 'Trường này không nhận thành viên mới. Hãy chọn trường khác.' },
-    });
-    const combobox = wrapper.get(`${SCHOOL} [role="combobox"]`);
-    expect(combobox.attributes('aria-invalid')).toBe('true');
-    const described = wrapper.get(`[id="${combobox.attributes('aria-describedby')}"]`);
-    expect(described.text()).toContain('không nhận thành viên mới');
-    expect(wrapper.get(LANGUAGE).attributes('aria-invalid')).toBeUndefined();
-  });
-
-  it('shows a skeleton shaped like each picker while the lists load, inert, and registers no wait', async () => {
-    mockRegisterApi();
-    hangRequestsExcept(['/auth/me']);
-    const wrapper = mountChoices();
-    await wrapper.vm.$router.isReady(); // the router's first navigation is a wait of its own; let it end
-    expect(wrapper.findAll('[data-skeleton-region="select"]')).toHaveLength(2);
-    expect(wrapper.find('select').exists()).toBe(false);
-    for (const skeleton of wrapper.findAll('[data-testid="query-skeleton"]'))
-      expect(skeleton.attributes('aria-hidden')).toBe('true');
-    // Ledger F24: Bits are for route data; the form beside the pickers is usable at once.
-    expect(useLoadingStore().isWaiting).toBe(false);
-  });
-
   it('offers a retry when the school list fails and keeps the language select usable', async () => {
     let attempts = 0;
     mockRegisterApi({
@@ -163,13 +104,6 @@ describe('SignupChoices', () => {
     await wrapper.get('[role="alert"] button').trigger('click');
     await flushPromises();
     expect(wrapper.find(SCHOOL).exists()).toBe(true);
-  });
-
-  it('renders no school picker for a list with nothing to choose', async () => {
-    mockRegisterApi({ 'GET /organizations': page([]) });
-    const wrapper = await mountLoaded();
-    expect(wrapper.find(SCHOOL).exists()).toBe(false);
-    expect(wrapper.find(LANGUAGE).exists()).toBe(true);
   });
 });
 

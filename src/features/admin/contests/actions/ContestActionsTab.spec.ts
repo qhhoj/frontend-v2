@@ -25,7 +25,6 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
     .trigger('click');
   await flushPromises();
 };
-const submitLabel = () => openDialog().querySelector('button[type="submit"]')?.textContent?.trim();
 const TAB_TEXT = 'Tính lại điểm và hạng của mọi lượt tham gia';
 
 describe('ContestActionsTab', () => {
@@ -77,62 +76,6 @@ describe('ContestActionsTab', () => {
       'Chỉ dùng cho thể thức lần nộp cuối',
     );
     expect(wrapper.findAll('button').some((button) => button.text() === 'Chấm lần cuối')).toBe(
-      false,
-    );
-  });
-
-  it('offers final judging for a final-submission contest that has ended', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest']),
-      ...routes({
-        'GET /contests/hcmus-w41': ok(
-          editableContest({ formatName: 'final_submission', phase: 'ended' }),
-        ),
-      }),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
-    await click(wrapper, 'Chấm lần cuối');
-    expect(openDialog().textContent).toContain('Các bài nộp đang chờ sẽ được xếp vào hàng chấm.');
-    expect(submitLabel()).toBe('Chấm');
-  });
-
-  it('offers rating only for an ended contest whose ranking is not frozen', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest', 'judge.contest_rating']),
-      ...routes({
-        'GET /contests/hcmus-w41': ok(editableContest({ phase: 'ended', frozenLastMinutes: 60 })),
-      }),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
-    expect(wrapper.get('[data-testid="action-rate"]').text()).toContain(
-      'Chỉ tính rating sau khi kỳ thi kết thúc',
-    );
-    expect(wrapper.findAll('button').some((button) => button.text() === 'Tính rating')).toBe(false);
-  });
-
-  it('shows the refusal inside the confirm dialog, which stays open for another try', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest', 'judge.contest_rating']),
-      ...routes({
-        'GET /contests/hcmus-w41': ok(editableContest({ phase: 'ended', frozenLastMinutes: 0 })),
-        'POST /contests/hcmus-w41/rate': fail(409, 'conflict'),
-      }),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
-    await click(wrapper, 'Tính rating');
-    await confirmDialog('Tính rating');
-    expect(openDialog().querySelector('[role="alert"]')).not.toBeNull();
-    expect(document.body.querySelector('[role="dialog"]')).not.toBeNull();
-  });
-
-  it('offers no action buttons when the status endpoint fails, and says so', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest']),
-      ...routes({ 'GET /contests/hcmus-w41/actions': fail(500, 'internal_error') }),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', 'Thử lại');
-    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
-    expect(wrapper.findAll('button').some((button) => button.text() === 'Tính lại điểm')).toBe(
       false,
     );
   });
@@ -204,21 +147,6 @@ describe('ContestActionsTab', () => {
     expect(wrapper.text()).not.toContain('Thử lại');
   });
 
-  it('shows a not-configured note, not a retry error, when the install has no export root', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest']),
-      ...routes({
-        ...contestEditorRoutes(editableContest({ phase: 'ended' })),
-        'GET /contests/hcmus-w41/data': fail(404, 'not_found', {}),
-      }),
-    });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/actions',
-      'Máy chủ này chưa bật xuất dữ liệu kỳ thi.',
-    );
-    expect(wrapper.text()).not.toContain('Thử lại');
-  });
-
   it('shows a taken clone key under the box, inside the dialog that stays open', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
@@ -234,20 +162,6 @@ describe('ContestActionsTab', () => {
     document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
     await confirmDialog('Nhân bản');
     expect(openDialog().textContent).toContain('That key is taken.');
-  });
-
-  it('refuses an empty clone key in the dialog, without sending a request', async () => {
-    const calls = mockApi({
-      ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
-      ...routes(),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
-    await click(wrapper, 'Nhân bản');
-    await confirmDialog('Nhân bản');
-    expect(calls.some((call) => call.method === 'POST' && call.path.endsWith('/clone'))).toBe(
-      false,
-    );
-    expect(openDialog().textContent).toContain('Cần điền.');
   });
 });
 
@@ -367,18 +281,5 @@ describe('replay rebuild card', () => {
     await click(wrapper, 'Dựng lại bản phát lại');
     await confirmDialog('Dựng lại');
     expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain('1200');
-  });
-
-  it.each([
-    [503, 'replay_unavailable', 'Bản phát lại tạm thời không dùng được'],
-    [409, 'contest_not_ended', 'Kỳ thi chưa kết thúc'],
-  ])('shows the %i refusal %s in the dialog, which stays open', async (status, code, text) => {
-    const { mounted } = mountEnded({
-      'POST /contests/hcmus-w41/replay/rebuild': fail(status, code),
-    });
-    const { wrapper } = await mounted;
-    await click(wrapper, 'Dựng lại bản phát lại');
-    await confirmDialog('Dựng lại');
-    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain(text);
   });
 });

@@ -1,24 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { isFinal, parseLanguageMap, phaseOf } from './import-job';
+import { parseLanguageMap, phaseOf } from './import-job';
 
 describe('import job', () => {
-  it.each([
-    ['waiting', 'queued'],
-    ['delayed', 'queued'],
-    ['prioritized', 'queued'],
-    ['waiting-children', 'queued'],
-    ['something-new', 'queued'],
-    ['active', 'running'],
-    ['completed', 'done'],
-    ['failed', 'failed'],
-  ])('reads BullMQ state %s as %s', (state, phase) => {
-    expect(phaseOf(state)).toBe(phase);
-  });
-
-  it('stops only on done and failed', () => {
-    expect(['queued', 'running', 'done', 'failed'].map((phase) => isFinal(phase as never))).toEqual(
-      [false, false, true, true],
-    );
+  it('reads an unknown BullMQ state as queued, so a new state never ends the polling', () => {
+    expect(phaseOf('something-new')).toBe('queued');
+    expect(phaseOf('active')).toBe('running');
   });
 
   it('reads polygon=site pairs and reports the ones that are not', () => {

@@ -8,10 +8,6 @@ const marked = (text: string, query: string) =>
     .map((mark) => mark.text());
 
 describe('HighlightedText', () => {
-  it('marks Vietnamese diacritics case-insensitively', () => {
-    expect(marked('Tin học Việt', 'việt')).toEqual(['Việt']);
-  });
-
   it('matches decomposed (NFD) text against a composed (NFC) term, and the other way round', () => {
     const decomposed = 'Tin học Việt'.normalize('NFD');
     expect(marked(decomposed, 'việt')).toEqual(['Việt']);

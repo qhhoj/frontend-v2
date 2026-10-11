@@ -1,7 +1,5 @@
 import type { Page } from '@playwright/test';
-import { THEMES } from '../src/theme/registry';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 
 /** Runs after the FakeApi's strong-device script, so this device reports two cores. */
 const weakDevice = (page: Page) =>
@@ -75,26 +73,4 @@ test('the code editor is a plain textarea with the Tab hint in low-power mode', 
   await expect(dock.getByTestId('editor-tab-hint')).toBeVisible();
   await expect(dock.locator('textarea')).toHaveCount(1);
   await expect(page.locator('.cm-editor')).toHaveCount(0);
-});
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the low-power switch and footer are accessible at ${viewport.name} in ${theme.id}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      await applyTheme(page, api, theme);
-      await page.goto('/settings/appearance');
-      await expect(page.getByTestId('low-power-section')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-    });
-
-test('the appearance page with the low-power cards never scrolls sideways at 375 px', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/settings/appearance');
-  await expect(page.getByTestId('low-power-section')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

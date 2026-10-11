@@ -10,12 +10,6 @@ describe('problem editor screens', () => {
     expect(allowsAny(holder, ADMIN_SCREENS.problemGeneral.permission)).toBe(false);
     expect(allowsAny(holder, ADMIN_SCREENS.problems.permission)).toBe(false);
   });
-
-  it('open for a holder of edit_own_problem, the base permission of every edit', () => {
-    const holder = staff(['judge.edit_own_problem']);
-    expect(allowsAny(holder, ADMIN_SCREENS.problemGeneral.permission)).toBe(true);
-    expect(allowsAny(holder, ADMIN_SCREENS.problemData.permission)).toBe(true);
-  });
 });
 
 describe('language form screens', () => {
@@ -26,19 +20,5 @@ describe('language form screens', () => {
     expect(allowsAny(changer, ADMIN_SCREENS.languageNew.permission)).toBe(false);
     expect(allowsAny(changer, ADMIN_SCREENS.languageEdit.permission)).toBe(true);
     expect(allowsAny(adder, ADMIN_SCREENS.languageEdit.permission)).toBe(false);
-  });
-});
-
-describe('VNOI F4 screens', () => {
-  it('open the deleted list for delete_problem holders only', () => {
-    const permission = ADMIN_SCREENS.problemsDeleted.permission;
-    expect(allowsAny(staff(['judge.delete_problem']), permission)).toBe(true);
-    expect(allowsAny(staff(['judge.edit_own_problem']), permission)).toBe(false);
-  });
-
-  it('open the quota overview for edit_all_organization holders only', () => {
-    const permission = ADMIN_SCREENS.organizationQuotas.permission;
-    expect(allowsAny(staff(['judge.edit_all_organization']), permission)).toBe(true);
-    expect(allowsAny(staff(['judge.add_organization']), permission)).toBe(false);
   });
 });

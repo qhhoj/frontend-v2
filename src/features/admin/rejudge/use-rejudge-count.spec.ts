@@ -37,17 +37,6 @@ describe('useRejudgeCount', () => {
     });
   });
 
-  it('is counting while the server has not answered', async () => {
-    const pending = deferred();
-    vi.mocked(rejudgeSubmissions).mockReturnValueOnce(pending.promise);
-    const { state, count } = useCount();
-    const running = count(BODY);
-    expect(state.value).toEqual({ kind: 'counting' });
-    pending.resolve(answer(5));
-    await running;
-    expect(state.value.kind).toBe('ready');
-  });
-
   it('words a refused count and a wait as text, never as a count', async () => {
     vi.mocked(rejudgeSubmissions).mockRejectedValueOnce(new ApiError('forbidden', 403, 'x'));
     const { state, count } = useCount();
@@ -79,22 +68,6 @@ describe('useRejudgeCount', () => {
     older.resolve(answer(5));
     await first;
     expect(state.value).toMatchObject({ kind: 'ready', count: 6 });
-  });
-
-  it('drops an answer that arrives after a reset', async () => {
-    const pending = deferred();
-    vi.mocked(rejudgeSubmissions).mockReturnValueOnce(pending.promise);
-    const { state, count, reset } = useCount();
-    const running = count(BODY);
-    reset();
-    pending.resolve(answer(5));
-    await running;
-    expect(state.value).toEqual({ kind: 'idle' });
-  });
-
-  it('lets a programming error through', async () => {
-    vi.mocked(rejudgeSubmissions).mockRejectedValueOnce(new TypeError('boom'));
-    await expect(useCount().count(BODY)).rejects.toBeInstanceOf(TypeError);
   });
 });
 

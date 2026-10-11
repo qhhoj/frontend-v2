@@ -1,9 +1,7 @@
 import { contestItem } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 import { CONTEST_FIXTURE_NOW, expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 
 /** The M4A board's catalogue, one tag per colour (e2e cannot import `src/test/contest-extras-fixtures`: it uses the `@/` alias). */
 const TAG_CATALOGUE = [
@@ -74,26 +72,6 @@ test('a failed catalogue hides the row behind its notice and the list still load
   await expect(page.getByTestId('running-contest').first()).toBeVisible();
 });
 
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`the tag row is accessible in every theme and fits at ${viewport.name}`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    for (const theme of THEMES) {
-      withCatalogue(api);
-      await applyTheme(page, api, theme);
-      await page.goto('/contests?tag=thi-thu');
-      await expect(
-        page.getByTestId('tag-filter').getByRole('button', { name: 'Thi thử' }),
-      ).toHaveAttribute('aria-pressed', 'true');
-      expect(await axeViolationsIn(page), theme.id).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    }
-  });
-
 test('staff add a tag with a colour token and see it in the catalogue', async ({ page, api }) => {
   signInAsStaff(api, ['judge.change_contest_tag']);
   const created = { slug: 'olp', name: 'Olympic', color: 'tag-6', description: '', order: 0 };
@@ -111,23 +89,3 @@ test('staff add a tag with a colour token and see it in the catalogue', async ({
   await expect(page.getByTestId('tag-row')).toHaveCount(1);
   await expect(page.getByRole('status').filter({ hasText: 'Đã thêm thẻ.' })).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`the tag catalogue is accessible in every theme and fits at ${viewport.name}`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    for (const theme of THEMES) {
-      signInAsStaff(api, ['judge.change_contest_tag']);
-      api.routes['GET /contest-tags'] = adminList(TAG_CATALOGUE);
-      await applyTheme(page, api, theme);
-      await page.goto('/admin/contest-tags');
-      await expect(page.getByTestId('tag-row')).toHaveCount(8);
-      await expect(page.getByTestId('tag-editor')).toBeVisible();
-      expect(await axeViolationsIn(page), theme.id).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    }
-  });

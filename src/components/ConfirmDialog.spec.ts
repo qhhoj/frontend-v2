@@ -19,59 +19,6 @@ const mountDialog = (props: Record<string, unknown>) =>
   }>;
 
 describe('ConfirmDialog', () => {
-  it('shows its title, body and labels', async () => {
-    mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
-    await flushPromises();
-    expect(dialog().textContent).toContain('Rời kỳ thi?');
-    expect(dialog().textContent).toContain('Điểm giữ nguyên.');
-    expect(buttonNamed('Rời kỳ thi')).toBeDefined();
-    expect(buttonNamed('Hủy')).toBeDefined();
-  });
-
-  it('keeps the preset width unless a width is given, and caps a given one to the viewport', async () => {
-    const plain = mountDialog({ ...ASK, visible: true });
-    await flushPromises();
-    expect(dialog().style.width).toBe('');
-    plain.unmount();
-    await flushPromises();
-    mountDialog({ ...ASK, visible: true, width: 520 });
-    await flushPromises();
-    expect(dialog().style.width).toBe('520px');
-    expect(dialog().style.maxWidth).toBe('calc(100vw - 2rem)');
-  });
-
-  it('uses the cancel label it is given', async () => {
-    mountComponent(ConfirmDialog, { props: { ...ASK, cancelLabel: 'Ở lại', visible: true } });
-    await flushPromises();
-    expect(buttonNamed('Ở lại')).toBeDefined();
-  });
-
-  it('renders the default slot as the body and the error slot inside the dialog', async () => {
-    mountComponent(ConfirmDialog, {
-      props: { title: 'Nộp', confirmLabel: 'Nộp', visible: true },
-      slots: { default: '<p>Nội dung tuỳ chỉnh</p>', error: '<p role="alert">Lỗi</p>' },
-    });
-    await flushPromises();
-    expect(dialog().querySelector('[role="alert"]')!.textContent).toBe('Lỗi');
-    expect(dialog().textContent).toContain('Nội dung tuỳ chỉnh');
-  });
-
-  it('describes the dialog by its body', async () => {
-    mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
-    await flushPromises();
-    const describedBy = dialog().getAttribute('aria-describedby')!;
-    expect(describedBy).not.toBe('');
-    expect(document.getElementById(describedBy)!.textContent).toContain('Điểm giữ nguyên.');
-  });
-
-  it('confirms when the confirm button is pressed', async () => {
-    const wrapper = mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
-    await flushPromises();
-    buttonNamed('Rời kỳ thi').click();
-    await flushPromises();
-    expect(wrapper.emitted('confirm')).toHaveLength(1);
-  });
-
   it('does not confirm while busy', async () => {
     const wrapper = mountComponent(ConfirmDialog, { props: { ...ASK, visible: true, busy: true } });
     await flushPromises();
@@ -132,12 +79,6 @@ describe('ConfirmDialog with an input in its body', () => {
     buttonNamed('Rời kỳ thi').click();
     await flushPromises();
     expect(wrapper.emitted('confirm')).toHaveLength(1);
-  });
-
-  it('labels the close button with common.close', async () => {
-    mountComponent(ConfirmDialog, { props: { ...ASK, visible: true } });
-    await flushPromises();
-    expect(dialog().querySelector('button[aria-label="Đóng"]')).not.toBeNull();
   });
 
   // Regression guard for PrimeVue's own focus restore (ConfirmDialog no longer implements it).

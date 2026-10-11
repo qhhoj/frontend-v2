@@ -7,7 +7,7 @@ import { judge } from '@/test/admin-fixtures/judges';
 
 const KEY = 'k7Qm2xV9aR4tLw0ZpB8sNf3YcHu5JdEe6GiTo1XvMqA=';
 /** Lets a hidden dialog's leave transition finish (it runs on animation frames, so flushing promises is not enough). */
-const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+const settle = () => new Promise((resolve) => setTimeout(resolve, 100));
 /** The key is on screen. A closed PrimeVue dialog can linger in jsdom (its leave transition never finishes there), so the key's text is the test. */
 const keyShown = () => document.body.textContent?.includes(KEY) ?? false;
 const storedValues = (storage: Storage) =>

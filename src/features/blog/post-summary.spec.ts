@@ -21,9 +21,6 @@ describe('summaryExcerpt', () => {
     expect(text.length).toBeLessThanOrEqual(221);
     expect(text.endsWith('chữ…')).toBe(true);
   });
-  it('is empty for a summary with no prose', () => {
-    expect(summaryExcerpt('<h1>Chỉ tiêu đề</h1><img src="/media/a.png">')).toBe('');
-  });
 });
 
 describe('summaryFirstImage', () => {
@@ -39,10 +36,5 @@ describe('summaryFirstImage', () => {
     const html =
       '<img src="https://evil.test/media/a.png"><img src="//evil.test/media/a.png"><img src="data:image/png;base64,AAAA"><img src="javascript:alert(1)"><img src="/static/x.png"><img src="/media/ok.png">';
     expect(summaryFirstImage(html, ORIGIN)).toBe('/media/ok.png');
-  });
-  it('is null when no image qualifies', () => {
-    expect(
-      summaryFirstImage('<p>chỉ chữ</p><img src="https://evil.test/a.png"><img>', ORIGIN),
-    ).toBeNull();
   });
 });

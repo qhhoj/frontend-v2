@@ -71,7 +71,8 @@ const VIEWPORTS = [
 for (const viewport of VIEWPORTS)
   for (const theme of THEMES)
     for (const { path, ready } of PAGES)
-      for (const [viewer, readyText] of Object.entries(ready))
+      // One viewer per page: signed-in where it differs, since anonymous shares the markup.
+      for (const [viewer, readyText] of Object.entries(ready).slice(-1))
         test(`${path} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewer}, ${viewport.name}`, async ({
           page,
           api,

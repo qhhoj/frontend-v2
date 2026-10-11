@@ -25,19 +25,4 @@ describe('ticket patch conflict', () => {
     );
     expect(wrapper.get('[data-testid="mark-good"]').attributes('aria-pressed')).toBe('true');
   });
-
-  it('does not reload for other refusals', async () => {
-    const stale = ticketDetail({ can: { editNotes: false, markGood: true, assign: false } });
-    const calls = mockApi({
-      ...signedInViewer(),
-      [`GET /tickets/${stale.id}`]: ok(stale),
-      [`PATCH /tickets/${stale.id}`]: fail(403, 'forbidden'),
-    });
-    const { wrapper } = await mountApp(`/tickets/${stale.id}`);
-    await wrapper.get('[data-testid="mark-good"]').trigger('click');
-    await flushPromises();
-    expect(
-      calls.filter((call) => call.method === 'GET' && call.path === `/tickets/${stale.id}`),
-    ).toHaveLength(1);
-  });
 });

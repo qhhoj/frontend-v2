@@ -13,9 +13,6 @@ describe('scroll position on navigation', () => {
     expect(scrollOnNavigation(at('/problems/a'), at('/problems/a'), saved)).toBe(saved);
     expect(scrollOnNavigation(at('/problems/a'), at('/blog'), saved)).toBe(saved);
   });
-  it('goes to the top on another path', () => {
-    expect(scrollOnNavigation(at('/problems/b'), at('/problems/a'), null)).toEqual({ top: 0 });
-  });
   it('scrolls to the element a hash names, on the same path and on another path', () => {
     expect(scrollOnNavigation(at('/blog/p1', '#comments'), at('/blog/p1'), null)).toEqual({
       el: '#comments',

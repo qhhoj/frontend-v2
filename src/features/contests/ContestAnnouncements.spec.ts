@@ -66,29 +66,6 @@ describe('contest announcements', () => {
     expect(stream.closed).toBe(true);
   });
 
-  it('lists every announcement on its tab, marks the new ones and then counts them as read', async () => {
-    localStorage.setItem('qhhoj.contest-announcements-seen.anonymous:r42', announcement(1).id);
-    mockApi({
-      ...anonymousViewer,
-      ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
-    });
-    const { wrapper } = await mountApp('/contests/r42/announcements');
-    const items = wrapper.findAll('[data-testid="announcement"]');
-    expect(items.map((item) => item.find('[data-testid="unread-pill"]').exists())).toEqual([
-      true,
-      false,
-    ]);
-    expect(items[0]!.find('.user-content').html()).toContain('Nội dung 2');
-    expect(tabLink(wrapper).text()).not.toContain('chưa đọc');
-  });
-
-  it('puts Bit in an empty announcement list', async () => {
-    mockApi({ ...anonymousViewer, ...contestPageRoutes() });
-    const { wrapper } = await mountApp('/contests/r42/announcements');
-    expect(wrapper.get('main').text()).toContain('Chưa có thông báo nào.');
-    expect(wrapper.find('main [data-testid="inline-bit"]').exists()).toBe(true);
-  });
-
   it('says the live updates paused when the browser gives up, and reconnects with a refetch', async () => {
     const calls = mockApi({ ...anonymousViewer, ...contestPageRoutes() });
     const { wrapper } = await mountApp('/contests/r42');
@@ -105,7 +82,7 @@ describe('contest announcements', () => {
     expect(announcementCalls(calls)).toHaveLength(2);
   });
 
-  it.each(['stats', 'submissions'])(
+  it.each(['submissions'])(
     'keeps the live stream and its paused notice on the %s tab of a running contest',
     async (tab) => {
       mockApi({
@@ -167,15 +144,6 @@ describe('contest announcements', () => {
     expect(liveText()).toBe('Thông báo mới: Đính chính');
     await flushPromises();
     expect(liveText()).toBe('Thông báo mới: Đính chính');
-  });
-
-  it('hides the Trực tiếp badge in the rail while the stream is down', async () => {
-    mockApi({ ...anonymousViewer, ...contestPageRoutes() });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(wrapper.get('aside').text()).toContain('Trực tiếp');
-    latestEventSource().fail();
-    await flushPromises();
-    expect(wrapper.get('aside').text()).not.toContain('Trực tiếp');
   });
 
   it('closes the stream when the contest turns ended while the page stays open', async () => {

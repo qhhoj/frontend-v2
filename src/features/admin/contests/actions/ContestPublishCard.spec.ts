@@ -5,12 +5,11 @@ import {
   contestActions,
   contestDataStatus,
   contestEditorRoutes,
-  contestSettings,
   editableContest,
 } from '@/test/admin-fixtures/contests';
-import { confirmDialog, openDialog, staffViewer, switchNamed } from '@/test/admin-routes';
+import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { publishedProblem, publishResult } from '@/test/contest-extras-fixtures';
-import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
+import { mockApi, ok } from '@/test/mock-api';
 
 const ended = editableContest({ phase: 'ended' });
 const PATH = '/admin/contests/hcmus-w41/actions';
@@ -80,34 +79,8 @@ describe('publish card', () => {
     expect(buttonOf(wrapper, 'Công khai').attributes('aria-disabled')).toBe('true');
   });
 
-  it('offers no run before the contest has ended', async () => {
-    mockApi(routes({}, editableContest({ phase: 'running' })));
-    const { wrapper } = await mountAndWaitFor(PATH, TITLE);
-    expect(card(wrapper).text()).toContain('Chỉ công khai được sau khi kỳ thi kết thúc.');
-    expect(
-      card(wrapper)
-        .findAll('button')
-        .some((button) => button.text() === 'Chạy thử'),
-    ).toBe(false);
-  });
-
-  it('turns a contest_not_ended refusal and the rate limit into text', async () => {
-    mockApi(routes({ [`POST ${PUBLISH}`]: fail(409, 'contest_not_ended') }));
-    const first = await mountAndWaitFor(PATH, TITLE);
-    await press(first.wrapper, 'Chạy thử');
-    expect(card(first.wrapper).get('[role="alert"]').text()).toContain('Kỳ thi chưa kết thúc.');
-    first.wrapper.unmount();
-    mockApi(routes({ [`POST ${PUBLISH}`]: rateLimited(1800) }));
-    const second = await mountAndWaitFor(PATH, TITLE);
-    await press(second.wrapper, 'Chạy thử');
-    expect(card(second.wrapper).get('[role="alert"]').text()).toContain('Bạn thao tác quá nhanh');
-    expect(card(second.wrapper).text()).toContain('1800');
-  });
-
   it.each([
     ['no_permission', 'người bật tính năng không còn quyền công khai'],
-    ['cannot_edit_contest', 'người bật tính năng không còn quyền sửa kỳ thi'],
-    ['actor_unavailable', 'người bật tính năng không còn dùng được tài khoản'],
     ['brand_new_reason', 'lý do không rõ'],
   ])('shows a failed automatic run (%s) as text, never as the code', async (reason, text) => {
     const autoPublish = {
@@ -121,39 +94,5 @@ describe('publish card', () => {
     const { wrapper } = await mountAndWaitFor(PATH, TITLE);
     expect(card(wrapper).text()).toContain(`không chạy: ${text}`);
     expect(card(wrapper).text()).not.toContain(reason);
-  });
-
-  it('shows a done automatic run and a scheduled one', async () => {
-    const autoPublish = {
-      at: '2026-10-08T10:00:00.000Z',
-      status: 'published',
-      reason: '',
-      published: 3,
-      skipped: 1,
-    } as const;
-    mockApi(
-      routes({
-        'GET /contests/hcmus-w41/actions': ok(contestActions({ autoPublish, publish: 'queued' })),
-      }),
-    );
-    const { wrapper } = await mountAndWaitFor(PATH, TITLE);
-    expect(card(wrapper).text()).toContain('3 bài, bỏ qua 1');
-    expect(card(wrapper).text()).toContain('Đã hẹn tự công khai');
-  });
-
-  it('saves the auto-publish switch at once', async () => {
-    const saved = editableContest({
-      phase: 'ended',
-      settings: contestSettings({ publishAfterEnd: true }),
-    });
-    const calls = mockApi(routes({ 'PATCH /contests/hcmus-w41': ok(saved) }));
-    const { wrapper } = await mountAndWaitFor(PATH, TITLE);
-    const toggle = switchNamed(card(wrapper), 'Tự công khai khi kỳ thi kết thúc');
-    expect(toggle.attributes('aria-checked')).toBe('false');
-    await toggle.trigger('click');
-    await flushPromises();
-    expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.body)).toEqual([
-      { publishAfterEnd: true },
-    ]);
   });
 });

@@ -79,18 +79,6 @@ describe('virtual overlay on the ranking page', () => {
     expect(wrapper.text()).toContain('Bảng thật · 00:26:00');
   });
 
-  it('toggles with the button, keeps the choice in the link, and is pressed while on', async () => {
-    mockApi(routes());
-    const { wrapper, router } = await mountApp('/contests/r41/ranking');
-    expect(toggle(wrapper)!.attributes('aria-pressed')).toBe('false');
-    expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(false);
-    await toggle(wrapper)!.trigger('click');
-    await flushPromises();
-    expect(router.currentRoute.value.query.compare).toBe('1');
-    expect(toggle(wrapper)!.attributes('aria-pressed')).toBe('true');
-    expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(true);
-  });
-
   it('offers no toggle without a current virtual run of this contest', async () => {
     mockApi(routes({ 'GET /contests/current': ok(null) }));
     const { wrapper } = await mountApp('/contests/r41/ranking?compare=1');

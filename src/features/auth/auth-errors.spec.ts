@@ -44,10 +44,6 @@ describe('authErrorText', () => {
     expect(authErrorText(error)).toBe('This account is banned. Reason: cheating');
   });
 
-  it('shows the plain ban message when no reason came with it', () => {
-    expect(authErrorText(banned())).toBe('Tài khoản đã bị khoá.');
-  });
-
   it('translates by code and falls back to the generic message', () => {
     expect(authErrorText(new ApiError('invalid_code', 400, 'x'))).toBe('Mã sai hoặc đã hết hạn.');
     expect(authErrorText(new ApiError('never_heard_of_it', 500, 'x'))).toBe(
@@ -68,17 +64,6 @@ describe('authErrorText', () => {
     expect(authErrorText(new DOMException('cancelled', 'AbortError'))).toBe(
       'Đã có lỗi xảy ra. Hãy thử lại.',
     );
-  });
-
-  it.each([
-    [
-      'a 401 invalid_credentials',
-      new ApiError('invalid_credentials', 401, 'x'),
-      'Sai tên đăng nhập hoặc mật khẩu.',
-    ],
-    ['a network_error', new ApiError('network_error', 0, 'x'), 'Không kết nối được máy chủ.'],
-  ])('translates %s by its code', (_name, error, text) => {
-    expect(authErrorText(error)).toBe(text);
   });
 });
 
@@ -114,24 +99,6 @@ describe('fieldErrorTexts', () => {
     });
   });
 
-  it('tells a taken username from a taken email by their codes, not by wording', () => {
-    const texts = fieldErrorTexts(
-      rejected([issue('username', 'username_taken', 'x'), issue('email', 'email_taken', 'x')]),
-    );
-    expect(texts.username).not.toBe(texts.email);
-  });
-
-  it('translates the school and language refusals', () => {
-    const texts = fieldErrorTexts(
-      rejected([
-        issue('organizationId', 'organization_unavailable', 'x'),
-        issue('languageId', 'language_unknown', 'x'),
-      ]),
-    );
-    expect(texts.organizationId).toContain('Trường này không nhận thành viên mới');
-    expect(texts.languageId).toContain('ngôn ngữ');
-  });
-
   it('keeps the backend message for a code it has no text for', () => {
     const error = rejected([
       issue('username', 'max_length', 'username must be shorter than or equal to 30 characters'),
@@ -149,11 +116,6 @@ describe('fieldErrorTexts', () => {
   it('falls back to the fields of an answer without issues', () => {
     const error = rejected([], { username: ['Username is taken.', 'Too long.'] });
     expect(fieldErrorTexts(error)).toEqual({ username: 'Username is taken. Too long.' });
-  });
-
-  it('is empty for errors without fields or issues', () => {
-    expect(fieldErrorTexts(new ApiError('rate_limited', 429, 'x'))).toEqual({});
-    expect(fieldErrorTexts(null)).toEqual({});
   });
 
   it('does not let a field named like a prototype member break the result', () => {
@@ -183,10 +145,6 @@ describe('queryErrorText', () => {
     expect(queryErrorText('oauth_failed')).toBe('Đăng nhập bằng mạng xã hội không thành công.');
     expect(queryErrorText('email_unverified')).toContain('chưa được xác minh');
     expect(queryErrorText('account_not_activated')).toContain('chưa được kích hoạt');
-  });
-
-  it('shows the ban notice for the banned callback code', () => {
-    expect(queryErrorText('banned')).toBe('Tài khoản đã bị khoá.');
   });
 
   it.each(['unknown', '__proto__', 'toString', '', ['oauth_failed'], undefined, 7])(

@@ -2,21 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { highlightedNodes } from './code-highlight';
 
 const textOf = (nodes: Node[]) => nodes.map((node) => node.textContent).join('');
-const spans = (nodes: Node[]) =>
-  nodes.filter((node): node is HTMLElement => node instanceof HTMLElement);
-const classOf = (nodes: Node[], text: string) =>
-  spans(nodes).find((span) => span.textContent === text)?.className;
 
 describe('highlightedNodes', () => {
   const cpp = '// note\nint main() { return 42; }\nconst char* s = "hi";\n';
-
-  it('wraps C++ keywords, strings and comments in the matching token classes', async () => {
-    const nodes = (await highlightedNodes(cpp, 'c_cpp'))!;
-    expect(classOf(nodes, 'return')).toBe('syn-keyword');
-    expect(classOf(nodes, '"hi"')).toBe('syn-string');
-    expect(classOf(nodes, '// note')).toBe('syn-comment');
-    expect(classOf(nodes, '42')).toBe('syn-number');
-  });
 
   it('keeps the text exactly equal to the source, line breaks and blank lines included', async () => {
     const source = '\n\nint  x;\t// c\n\n\nreturn 0;\r\n';

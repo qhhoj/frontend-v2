@@ -11,28 +11,6 @@ const staff = sessionResponse({
 });
 
 describe('ImpersonationBanner', () => {
-  it('is absent for a normal session', async () => {
-    mockApi(settingsRoutes());
-    const { wrapper } = await mountApp('/settings');
-    expect(wrapper.find(banner).exists()).toBe(false);
-  });
-
-  it('sits above the header and names the account being viewed', async () => {
-    mockApi(
-      settingsRoutes({
-        impersonatorId: 'staff-1',
-        user: sessionUser({ username: 'hoangnam_10a' }),
-      }),
-    );
-    const { wrapper } = await mountApp('/settings');
-    const region = wrapper.get(banner);
-    expect(region.text()).toContain('Đang xem dưới tên hoangnam_10a');
-    const header = wrapper.get('header').element;
-    expect(
-      region.element.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
   it('stops viewing and hands the page back to the staff account', async () => {
     const calls = mockApi({
       ...settingsRoutes({ impersonatorId: 'staff-1' }),

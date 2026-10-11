@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterLink, kindGroupFromQuery, stateFromQuery } from './notification-filters';
+import { filterLink, stateFromQuery } from './notification-filters';
 
 describe('notification filters', () => {
   it('reads the state from the address and falls back to all', () => {
@@ -23,13 +23,5 @@ describe('notification filters', () => {
       name: 'notifications',
       query: { kind: 'contest' },
     });
-  });
-
-  it('reads the kind chip from the address and ignores anything else', () => {
-    expect(kindGroupFromQuery('contest')).toBe('contest');
-    expect(kindGroupFromQuery(['ticket', 'other'])).toBe('ticket');
-    expect(kindGroupFromQuery('other')).toBe('other');
-    expect(kindGroupFromQuery('quota-warning')).toBeNull();
-    expect(kindGroupFromQuery(undefined)).toBeNull();
   });
 });

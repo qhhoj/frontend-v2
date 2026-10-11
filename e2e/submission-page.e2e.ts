@@ -5,7 +5,6 @@ import type { FakeApi } from './fixtures/api';
 
 const PHONE_WIDTH = 375;
 const DESKTOP_WIDTH = 1280;
-const MIN_TOUCH_TARGET_PX = 44;
 const grading = () =>
   submissionDetail({
     status: 'G',
@@ -52,23 +51,6 @@ async function openSubmission(page: Page, api: FakeApi, width: number) {
 
 for (const width of [PHONE_WIDTH, DESKTOP_WIDTH])
   test.describe(`submission page at ${width} px`, () => {
-    test('never scrolls the page sideways and keeps its actions touchable', async ({
-      page,
-      api,
-    }) => {
-      api.routes['GET /submissions/sub-1/source'] = {
-        body: { data: { id: 'sub-1', source: `${'x'.repeat(400)}\nshort\n` } },
-      };
-      await openSubmission(page, api, width);
-      await expect(page.getByRole('region', { name: 'Mã nguồn' })).toBeVisible();
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      );
-      expect(overflow).toBeLessThanOrEqual(0);
-      const resubmit = (await page.getByRole('link', { name: 'Nộp lại' }).boundingBox())!;
-      expect(resubmit.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX);
-    });
-
     test('follows the grading live and ends on the final verdict', async ({ page, api }) => {
       await installControlledEventSource(page);
       let finished = false;

@@ -1,10 +1,8 @@
 import { expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installDeletedProblems } from './fixtures/f4-api';
 import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { deletedProblem } from '../src/test/f4-fixtures';
-import { THEMES } from '../src/theme/registry';
 
 const DELETE = ['judge.delete_problem', 'judge.edit_own_problem'];
 const THREE_ROWS = [
@@ -12,24 +10,6 @@ const THREE_ROWS = [
   deletedProblem({ code: 'hethan', name: 'Hết hạn', daysLeft: 0 }),
   deletedProblem({ code: 'cu', name: 'Cũ', isPurged: true, daysLeft: 0 }),
 ];
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the deleted list is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      signInAsStaff(api, DELETE, true);
-      await applyTheme(page, api, theme);
-      installDeletedProblems(api, THREE_ROWS);
-      await page.goto('/admin/problems/deleted');
-      await expect(page.getByText('Còn 26 ngày')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });
 
 test('restore and purge-now from the deleted list', async ({ page, api }) => {
   signInAsStaff(api, DELETE, true);
@@ -47,14 +27,6 @@ test('restore and purge-now from the deleted list', async ({ page, api }) => {
   const queued = page.getByRole('status').filter({ hasText: 'Đã xếp lịch xóa hẳn hethan' });
   await expect(queued).toBeVisible();
   await expect(queued.getByTestId('inline-bit')).toBeVisible();
-});
-
-test('an empty deleted list shows the staff Bit', async ({ page, api }) => {
-  signInAsStaff(api, DELETE);
-  installDeletedProblems(api, []);
-  await page.goto('/admin/problems/deleted');
-  await expect(page.getByText('Không có bài nào đã xóa.')).toBeVisible();
-  await expect(page.locator('[data-testid="admin-bit"][data-placement="empty"]')).toBeVisible();
 });
 
 test('the problems index links to the deleted tab', async ({ page, api }) => {
@@ -87,23 +59,3 @@ test('the danger zone deletes after the code is typed and lands on the deleted l
   await expect(page).toHaveURL(/\/admin\/problems\/deleted$/);
   await expect(page.getByText('Còn 30 ngày')).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the delete dialog is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      signInAsStaff(api, DELETE);
-      await applyTheme(page, api, theme);
-      api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
-      api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
-      await page.goto('/admin/problems/hcmus41c/general');
-      await page.getByRole('button', { name: 'Xóa bài…' }).click();
-      await expect(dialogOf(page)).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });

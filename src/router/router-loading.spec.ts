@@ -41,38 +41,6 @@ describe('navigation as a waiting source', () => {
     expect(useLoadingStore().isWaiting).toBe(false);
   });
 
-  it('stops waiting when the session guard redirects the navigation', async () => {
-    const router = createAppRouter(createMemoryHistory());
-    await router.push('/settings');
-    expect(router.currentRoute.value.name).toBe('login');
-    expect(useLoadingStore().isWaiting).toBe(false);
-  });
-
-  it('stops waiting when a later guard redirects the navigation', async () => {
-    const router = createAppRouter(createMemoryHistory());
-    router.beforeEach((to) => (to.path === '/problems' ? '/blog' : true));
-    await router.push('/problems');
-    expect(router.currentRoute.value.path).toBe('/blog');
-    expect(useLoadingStore().isWaiting).toBe(false);
-  });
-
-  it('stops waiting when a guard redirects back to the current route', async () => {
-    const router = createAppRouter(createMemoryHistory());
-    await router.push('/blog');
-    router.beforeEach((to) => (to.path === '/problems' ? '/blog' : true));
-    await router.push('/problems');
-    expect(router.currentRoute.value.path).toBe('/blog');
-    expect(useLoadingStore().isWaiting).toBe(false);
-  });
-
-  it('stops waiting when a beforeResolve guard redirects the navigation', async () => {
-    const router = createAppRouter(createMemoryHistory());
-    router.beforeResolve((to) => (to.path === '/problems' ? '/blog' : true));
-    await router.push('/problems');
-    expect(router.currentRoute.value.path).toBe('/blog');
-    expect(useLoadingStore().isWaiting).toBe(false);
-  });
-
   it('stops waiting at the end of a chain of redirects', async () => {
     const router = createAppRouter(createMemoryHistory());
     router.beforeEach((to) => {

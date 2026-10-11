@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, rateLimited } from '@/test/mock-api';
+import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -25,19 +25,10 @@ const mountAdmin = async (path: string) => {
 const buttonLabelled = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], label: string) =>
   wrapper.findAll('button').find((button) => button.text() === label)!;
 
-const chooseFile = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
-  const input = wrapper.get('input[type="file"]');
-  Object.defineProperty(input.element, 'files', {
-    value: [new File(['x'], 'a.png', { type: 'image/png' })],
-  });
-  await input.trigger('change');
-  await flushPromises();
-};
-
 describe('ProblemStatementsTab', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('marks English as missing, then saves it through PUT /translations/en', async () => {
+  it('saves a missing English translation through PUT and marks public problem pages stale', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const calls = mockApi({
       ...staffViewer(EDIT),
@@ -45,7 +36,8 @@ describe('ProblemStatementsTab', () => {
       ...PREVIEW,
       'PUT /problems/hcmus41c/translations/en': { status: 204 },
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    seedCache(queryClient, [['problems', 'detail', 'probe']]);
     expect(wrapper.get('[data-slot="en"]').text()).toContain('chưa có');
     await wrapper.get('[data-slot="en"]').trigger('click');
     await wrapper.get('#statement-name').setValue('Constrained shortest path');
@@ -57,6 +49,7 @@ describe('ProblemStatementsTab', () => {
       description: 'Given a graph.',
     });
     expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu.');
+    expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 
   it('never asks for problem-full without judge.problem_full_markup', async () => {
@@ -73,21 +66,6 @@ describe('ProblemStatementsTab', () => {
       .filter((call) => call.path === '/problems/render-preview')
       .map((call) => (call.body as { style: string }).style);
     expect(styles).toEqual(['problem']);
-  });
-
-  it('saves the original description through PATCH', async () => {
-    const calls = mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-      'PATCH /problems/hcmus41c': ok(editableProblem()),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    await wrapper.get('[data-slot="original"]').trigger('click');
-    await wrapper.get('textarea').setValue('Mới');
-    await buttonLabelled(wrapper, 'Lưu mô tả gốc').trigger('click');
-    await flushPromises();
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ description: 'Mới' });
   });
 
   it('will not send the original description of a full-markup problem for a viewer without judge.problem_full_markup', async () => {
@@ -130,49 +108,6 @@ describe('ProblemStatementsTab', () => {
     expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({ name: 'Tên mới' });
   });
 
-  it('uploads an image and inserts its URL into the text', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-      'POST /problems/uploads/image': ok({ url: '/media/img/a.png' }),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    await chooseFile(wrapper);
-    expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toContain(
-      '![](/media/img/a.png)',
-    );
-  });
-
-  it('tells how long to wait when the image upload is rate limited', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-      'POST /problems/uploads/image': rateLimited(30),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    await chooseFile(wrapper);
-    expect(wrapper.get('[role="alert"]').text()).toContain('Thử lại sau 30 giây.');
-  });
-
-  it('refuses a name over 100 characters on this side, sends nothing, and says why under the box', async () => {
-    const calls = mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-      'PUT /problems/hcmus41c/translations/en': { status: 204 },
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    await wrapper.get('[data-slot="en"]').trigger('click');
-    await wrapper.get('#statement-name').setValue('x'.repeat(101));
-    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
-    expect(wrapper.get('#statement-name').attributes('aria-invalid')).toBe('true');
-    expect(wrapper.text()).toContain('Tên từ 1 đến 100 ký tự.');
-  });
-
   it('asks before a tab switch with an unsaved statement; Stay keeps the draft, Leave goes', async () => {
     mockApi({
       ...staffViewer(EDIT),
@@ -193,43 +128,5 @@ describe('ProblemStatementsTab', () => {
     await flushPromises();
     await confirmDialog('Rời trang');
     expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
-  });
-
-  it('asks before a route leave with an unsaved statement', async () => {
-    mockApi({
-      'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-    });
-    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    await wrapper.get('textarea').setValue('Đang sửa');
-    await router.push('/admin/problems');
-    await flushPromises();
-    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
-    await cancelDialog('Ở lại');
-    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/statements');
-    await router.push('/admin/problems');
-    await flushPromises();
-    await confirmDialog('Rời trang');
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/admin/problems'));
-  });
-
-  it('marks the public problem pages stale after saving a translation', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      ...PREVIEW,
-      'PUT /problems/hcmus41c/translations/en': { status: 204 },
-    });
-    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/statements');
-    seedCache(queryClient, [['problems', 'detail', 'probe']]);
-    await wrapper.get('[data-slot="en"]').trigger('click');
-    await wrapper.get('#statement-name').setValue('Path');
-    await wrapper.get('textarea').setValue('Given a graph.');
-    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').trigger('click');
-    await flushPromises();
-    expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 });

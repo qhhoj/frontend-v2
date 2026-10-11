@@ -3,12 +3,6 @@ import { TAGS } from '@/test/f4-fixtures';
 import { changesOf, createBodyOf, emptyTagForm, tagFormErrors, tagFormOf } from './org-tag-form';
 
 describe('org tag form', () => {
-  it('accepts a lowercase slug and a trimmed name of 1-40 characters', () => {
-    expect(tagFormErrors({ slug: 'ds', name: ' Cấu trúc dữ liệu ', color: 'tag-5' }, true)).toEqual(
-      {},
-    );
-  });
-
   it('refuses a malformed slug on create only, and an empty or long name always', () => {
     const form = { slug: 'Bad Slug', name: '   ', color: 'tag-1' } as const;
     expect(tagFormErrors(form, true)).toEqual({

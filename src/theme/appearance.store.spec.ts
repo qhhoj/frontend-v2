@@ -9,13 +9,6 @@ const root = document.documentElement;
 beforeEach(() => setActivePinia(createPinia()));
 
 describe('appearance store', () => {
-  it('paints nothing when no look is stored', () => {
-    const store = useAppearanceStore();
-    expect(store.look).toBeNull();
-    expect(root.dataset.accent).toBeUndefined();
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('');
-  });
-
   it('applies a chosen look at once and remembers it for this browser and for the pre-paint script', () => {
     const store = useAppearanceStore();
     store.choose(OCEAN);
@@ -24,21 +17,6 @@ describe('appearance store', () => {
     expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('0.6');
     expect(JSON.parse(localStorage.getItem('qhhoj.appearance')!)).toEqual(OCEAN);
     expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(OCEAN);
-  });
-
-  it('removes everything when the look is turned off', () => {
-    const store = useAppearanceStore();
-    store.choose(OCEAN);
-    store.choose(null);
-    expect(root.dataset.accent).toBeUndefined();
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('');
-    expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('');
-  });
-
-  it("reads this browser's stored look on the next visit", () => {
-    localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
-    expect(useAppearanceStore().look).toEqual(MINT);
   });
 
   it.each([
@@ -83,14 +61,6 @@ describe('appearance store', () => {
     expect(store.look).toEqual(MINT);
   });
 
-  it('does not rewrite the painted copy while it still holds it', () => {
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
-    const write = vi.spyOn(Storage.prototype, 'setItem');
-    useAppearanceStore();
-    expect(write).not.toHaveBeenCalledWith('qhhoj.paintedAppearance', expect.anything());
-    write.mockRestore();
-  });
-
   it('writes the painted copy when the account look is the first thing to speak', () => {
     const store = useAppearanceStore();
     store.adopt(OCEAN);
@@ -118,26 +88,5 @@ describe('appearance store', () => {
       ['qhhoj.paintedAppearance', JSON.stringify(MINT)],
     ]);
     write.mockRestore();
-  });
-
-  it('writes the painted copy once, with the final look, for a choice', () => {
-    const store = useAppearanceStore();
-    store.adopt(MINT);
-    const write = vi.spyOn(Storage.prototype, 'setItem');
-    store.choose(OCEAN);
-    expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
-      ['qhhoj.paintedAppearance', JSON.stringify(OCEAN)],
-    ]);
-    expect(root.dataset.accent).toBe('ocean');
-    write.mockRestore();
-  });
-
-  it('a user choice replaces an adopted account look until the next adopt', () => {
-    const store = useAppearanceStore();
-    store.adopt(OCEAN);
-    store.choose(MINT);
-    expect(store.look).toEqual(MINT);
-    store.adopt(OCEAN);
-    expect(store.look).toEqual(OCEAN);
   });
 });

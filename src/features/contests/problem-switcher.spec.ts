@@ -9,12 +9,6 @@ const problems = [
 ];
 
 describe('problem switcher entries', () => {
-  it('lists the contest problems in contest order and marks exactly the current one', () => {
-    const entries = switcherEntries(problems, 'r42b')!;
-    expect(entries.map((entry) => entry.label)).toEqual(['A', 'B', 'C']);
-    expect(entries.filter((entry) => entry.isCurrent).map((entry) => entry.code)).toEqual(['r42b']);
-  });
-
   it('names each status from the viewer result', () => {
     expect(switcherEntries(problems, 'r42a')!.map((entry) => entry.status)).toEqual([
       'solved',

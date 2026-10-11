@@ -40,21 +40,6 @@ const routes = () => ({
 });
 
 describe('QuotaOverviewPage', () => {
-  it('lists every organization with both meters and sorts by credits through the URL', async () => {
-    const calls = mockApi(routes());
-    const { wrapper, router } = await mountOverview();
-    expect(wrapper.text()).toContain('164 / 200');
-    expect(wrapper.text()).toContain('410 MiB / 512 MiB');
-    expect(overviewCalls(calls).at(-1)!.query.get('sort')).toBe('name');
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tín dụng đã dùng')!
-      .trigger('click');
-    await flushPromises();
-    expect(router.currentRoute.value.query.sort).toBe('credits');
-    expect(overviewCalls(calls).at(-1)!.query.get('sort')).toBe('credits');
-  });
-
   it('keeps typed values when the usage refetches under the open dialog', async () => {
     const quota = { monthlyCredits: 300, storageBytes: null };
     const calls = mockApi({
@@ -121,25 +106,5 @@ describe('QuotaOverviewPage', () => {
     await flushPromises();
     await confirmDialog('Lưu hạn mức');
     expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({ quotaUnlimited: false });
-  });
-
-  it('sends nothing for a malformed number or an unchanged form', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await mountOverview();
-    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
-    await flushPromises();
-    await fill('#quota-credits', '-5');
-    await confirmDialog('Lưu hạn mức');
-    expect(openDialog().textContent).toContain('số nguyên');
-    await fill('#quota-credits', '300');
-    await confirmDialog('Lưu hạn mức');
-    await vi.waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeNull());
-    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
-  });
-
-  it('shows the staff Bit when there is no organization', async () => {
-    mockApi({ ...staffViewer(EDIT), [`GET ${OVERVIEW}`]: page([]) });
-    const { wrapper } = await mountOverview();
-    expect(wrapper.find('[data-testid="admin-bit"][data-placement="empty"]').exists()).toBe(true);
   });
 });

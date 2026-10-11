@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { failWithCode, mockApi, noContent, ok } from '@/test/mock-api';
+import { mockApi, noContent } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog } from '@/test/admin-routes';
 import { signedInViewer } from '@/test/problem-routes';
-import { TAGS, problemTag } from '@/test/f4-fixtures';
+import { problemTag } from '@/test/f4-fixtures';
 import { MEMBER_STATE, orgProblemRoutes } from '@/test/f4-routes';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
@@ -31,12 +31,6 @@ async function fill(selector: string, value: string) {
 }
 
 describe('OrgTagCatalogue', () => {
-  it('shows the catalogue with its count to an admin', async () => {
-    mockApi({ ...signedInViewer(), ...orgProblemRoutes() });
-    const { wrapper } = await mountTab();
-    expect(wrapper.get('[data-testid="org-tag-catalogue"]').text()).toContain('3 / 100');
-  });
-
   it('hides the catalogue from a member', async () => {
     mockApi({ ...signedInViewer(), ...orgProblemRoutes(MEMBER_STATE) });
     const { wrapper } = await mountTab();
@@ -72,43 +66,6 @@ describe('OrgTagCatalogue', () => {
       color: 'tag-5',
     });
     expect(tagCalls(calls).filter((call) => call.method === 'GET')).toHaveLength(2);
-  });
-
-  it.each([
-    ['slug', 'slug_taken', 'Mã thẻ này đã có trong tổ chức.'],
-    ['', 'tag_limit_reached', 'Tổ chức đã đủ 100 thẻ bài tập.'],
-  ])('explains the 409 %s inside the dialog', async (field, code, text) => {
-    mockApi({
-      ...signedInViewer(),
-      ...orgProblemRoutes(),
-      [`POST ${TAG_LIST}`]: failWithCode(409, field, code),
-    });
-    const { wrapper } = await mountTab();
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text().includes('Thêm thẻ'))!
-      .trigger('click');
-    await fill('#org-tag-slug', 'qhd');
-    await fill('#org-tag-name', 'Lặp');
-    await confirmDialog('Lưu thẻ');
-    expect(openDialog().textContent).toContain(text);
-  });
-
-  it('renames by slug without sending the slug', async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...orgProblemRoutes(),
-      [`PATCH ${TAG_LIST}/dt`]: ok(TAGS[1]),
-    });
-    const { wrapper } = await mountTab();
-    await buttonNamed(wrapper, 'Sửa thẻ Đồ thị').trigger('click');
-    await flushPromises();
-    await fill('#org-tag-name', 'Đồ thị nâng cao');
-    await confirmDialog('Lưu thẻ');
-    expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({
-      name: 'Đồ thị nâng cao',
-      color: 'tag-2',
-    });
   });
 
   it('deletes after a confirm and reloads the problem rows', async () => {

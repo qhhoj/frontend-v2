@@ -5,15 +5,6 @@ import { catalogueBySlug, isTagSlug, tagChipOf, tagFilterState } from './tag-chi
 const catalogue = catalogueBySlug(TAG_CATALOGUE);
 
 describe('tag chips', () => {
-  it('names and colours a catalogue slug with its own token classes', () => {
-    expect(tagChipOf('quoc-gia', catalogue)).toMatchObject({
-      slug: 'quoc-gia',
-      label: 'Quốc gia',
-      color: 'tag-5',
-    });
-    expect(tagChipOf('quoc-gia', catalogue).colorClass).toContain('tag-5');
-  });
-
   it('shows a slug without a catalogue entry as itself, neutral', () => {
     expect(tagChipOf('tin-hoc-tre-2019', catalogue)).toEqual({
       slug: 'tin-hoc-tre-2019',

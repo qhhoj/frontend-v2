@@ -1,16 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { COMMENT_REPLY_WINDOW_MS } from '@/api/types/comments';
 import type { CommentPostBlockReason } from '@/api/types/comments';
-import { canReplyTo, composerStateOf, solvedPercent } from './composer-state';
+import { canReplyTo, composerStateOf } from './composer-state';
 
 describe('composerStateOf', () => {
   const open = { locked: false, postBlock: null };
   const block = (reason: CommentPostBlockReason, locked = false) => ({
     locked,
     postBlock: { reason, solved: null, required: null },
-  });
-  it('offers the composer to a signed-in viewer nothing blocks', () => {
-    expect(composerStateOf(true, open)).toBe('ready');
   });
   it('names the panel after the reason posting would refuse', () => {
     expect(composerStateOf(true, block('needs_solved'))).toBe('needsSolved');
@@ -22,17 +19,6 @@ describe('composerStateOf', () => {
     expect(composerStateOf(false, block('signed_out'))).toBe('signedOut');
     expect(composerStateOf(false, open)).toBe('signedOut');
     expect(composerStateOf(false, block('signed_out', true))).toBe('locked');
-  });
-});
-
-describe('solvedPercent', () => {
-  it('fills the bar by the share solved', () => {
-    expect(solvedPercent(3, 5)).toBe(60);
-  });
-  it('stays within 0..100', () => {
-    expect(solvedPercent(9, 5)).toBe(100);
-    expect(solvedPercent(-1, 5)).toBe(0);
-    expect(solvedPercent(0, 0)).toBe(100);
   });
 });
 

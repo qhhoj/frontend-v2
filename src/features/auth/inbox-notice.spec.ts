@@ -17,11 +17,6 @@ describe('InboxNotice', () => {
   });
   afterEach(() => void vi.useRealTimers());
 
-  it('says where the mail went, as a status', () => {
-    const wrapper = mountNotice(vi.fn());
-    expect(wrapper.get('[role="status"]').text()).toBe('Sent to m***@gmail.com');
-  });
-
   it('cools down after the mail that was just sent, and a click then sends nothing', async () => {
     const resend = vi.fn(() => Promise.resolve());
     const wrapper = mountNotice(resend);

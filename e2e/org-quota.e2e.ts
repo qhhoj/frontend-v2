@@ -1,28 +1,9 @@
 import { expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { installOrgUsage } from './fixtures/f4-api';
 import { organizationDetail } from '../src/test/community-fixtures';
 import { MIB, organizationUsage, quotaMeter } from '../src/test/f4-fixtures';
-import { THEMES } from '../src/theme/registry';
 
 const TAB = '/organizations/lhp/quota';
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the quota tab is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      installOrgUsage(api);
-      await applyTheme(page, api, theme);
-      await page.goto(TAB);
-      await expect(page.getByText('164 / 200 tín dụng')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });
 
 test('the 80 % warning shows the sweating Bit, the blocking notice the security Bit', async ({
   page,

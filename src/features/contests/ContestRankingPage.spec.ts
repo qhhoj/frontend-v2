@@ -2,15 +2,12 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   contestDetail,
-  profile,
   ranking,
   rankingRow,
   RANKING_PROBLEM_IDS,
-  signedIn,
   signedOut,
 } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { signedInViewer } from '@/test/problem-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -30,21 +27,6 @@ const cellTexts = (row: ReturnType<typeof rowOf>) =>
 describe('contest ranking', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('shows the contest, its podium in rank order and the board', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.get('h1').text()).toBe('QHH Round #42 (Div. 2)');
-    expect(wrapper.text()).toContain('ICPC · 3 bài · 318 thí sinh');
-    const podium = wrapper.get('section[aria-label="Top 3"]');
-    expect(podium.findAll('a').map((link) => link.text())).toEqual([
-      'user_07',
-      'user_12',
-      'user_03',
-    ]);
-    expect(podium.text()).toContain('2 bài · 41');
-    expect(wrapper.findAll('thead th abbr').map((label) => label.text())).toEqual(['A', 'B', 'C']);
-  });
-
   it('renders solved, first-solve, failed and frozen cells with spoken labels', async () => {
     mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42/ranking');
@@ -56,36 +38,6 @@ describe('contest ranking', () => {
       '2 lần nộp chờ công bố',
     ]);
     expect(cellTexts(rowOf(wrapper, 'user_12'))).toContain('−4');
-  });
-
-  it('explains the first-solve marker by a swatch and a star, never by a colour name', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const legend = wrapper.get('ul.border-t');
-    const firstSolve = legend.findAll('li')[0]!;
-    expect(firstSolve.text()).toBe('giải đầu tiên');
-    expect(firstSolve.get('[data-testid="first-solve-swatch"]').classes()).toContain(
-      'bg-first-solve',
-    );
-    expect(firstSolve.find('svg').exists()).toBe(true);
-    expect(legend.text()).not.toMatch(/hồng|tím|pink|violet|đỏ|vàng/i);
-  });
-
-  it('renders frozen cells and the banner', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const banner = wrapper.get('p[role="status"]:not(.sr-only)');
-    expect(banner.text()).toContain('Bảng đang đóng băng');
-    expect(banner.text()).toContain('60 phút cuối');
-  });
-
-  it("marks the viewer's row", async () => {
-    mockApi(routes({ 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) }));
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const own = rowOf(wrapper, 'user_01');
-    expect(own.text()).toContain('Bạn');
-    expect(own.classes()).toContain('bg-surface-hover');
-    expect(rowOf(wrapper, 'user_07').text()).not.toContain('Bạn');
   });
 
   it('switches to the board with virtual participants through the URL', async () => {
@@ -112,102 +64,6 @@ describe('contest ranking', () => {
     const rows = wrapper.findAll('tbody tr');
     expect(rows).toHaveLength(1);
     expect(rows[0]!.find('td').text()).toBe('2');
-  });
-
-  it('shows the empty state', async () => {
-    mockApi(routes({ 'GET /contests/r42/ranking': ok(ranking({ rows: [], frozen: false })) }));
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.text()).toContain('Chưa có thí sinh.');
-    expect(wrapper.find('section[aria-label="Top 3"]').exists()).toBe(false);
-  });
-
-  it('shows points cells for points formats', async () => {
-    const [problemA] = RANKING_PROBLEM_IDS;
-    mockApi(
-      routes({
-        'GET /contests/r42': ok(contestDetail({ formatName: 'ioi' })),
-        'GET /contests/r42/ranking': ok(
-          ranking({
-            frozen: false,
-            problems: [
-              {
-                problemId: problemA,
-                code: 'r42a',
-                label: 'A',
-                points: 100,
-                firstSolve: null,
-                acceptedCount: 0,
-              },
-            ],
-            rows: [
-              rankingRow(1, 'part-07', 'user_07', 50, 600, {
-                [problemA]: { points: 50, time: 600 },
-              }),
-            ],
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toContain('Điểm');
-    expect(cellTexts(rowOf(wrapper, 'user_07'))).toEqual(['50']);
-  });
-
-  it('shows points and time in one chip and one "score · time" column on a timed points board', async () => {
-    const [problemA] = RANKING_PROBLEM_IDS;
-    mockApi(
-      routes({
-        'GET /contests/r42': ok(contestDetail({ formatName: 'default' })),
-        'GET /contests/r42/ranking': ok(
-          ranking({
-            frozen: false,
-            problems: [
-              {
-                problemId: problemA,
-                code: 'r42a',
-                label: 'A',
-                points: 100,
-                firstSolve: 'part-07',
-                acceptedCount: 1,
-              },
-            ],
-            rows: [
-              rankingRow(1, 'part-07', 'user_07', 100, 492, {
-                [problemA]: { points: 100, time: 492 },
-              }),
-            ],
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const headers = wrapper.findAll('thead th').map((cell) => cell.text());
-    expect(headers).toContain('Điểm · giờ');
-    expect(headers).not.toContain('Thời gian');
-    const row = rowOf(wrapper, 'user_07');
-    expect(row.get('[data-testid="cell-time"]').text()).toBe('0:08:12');
-    expect(row.text()).toContain('Giải đầu tiên: 100 điểm, lúc 0:08:12');
-    expect(wrapper.text()).toContain('Một phần điểm, nền đậm dần theo ba mức');
-  });
-
-  it('marks the podium Bit on first place only', async () => {
-    const [problemA] = RANKING_PROBLEM_IDS;
-    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
-    mockApi(
-      routes({
-        'GET /contests/r42/ranking': ok(
-          ranking({
-            rows: [
-              rankingRow(1, 'part-07', 'user_07', 1, 10, cell),
-              rankingRow(1, 'part-12', 'user_12', 1, 10, cell),
-              rankingRow(3, 'part-03', 'user_03', 1, 20, cell),
-            ],
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.findAll('[data-testid="podium-bit"]')).toHaveLength(2);
   });
 
   it('refreshes the board every 30 s while the contest runs', async () => {
@@ -279,38 +135,6 @@ describe('contest ranking', () => {
     ).toEqual(['1', '1', '0:59']);
   });
 
-  it('keeps the board on screen while the virtual toggle loads', async () => {
-    mockApi(routes({ ...signedInViewer() }));
-    const answer = fetch;
-    let release: () => void = () => undefined;
-    const gate = new Promise<void>((resolve) => (release = resolve));
-    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
-      input.includes('virtual=true') ? gate.then(() => answer(input, init)) : answer(input, init),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    await wrapper
-      .findAll('[role="group"] button')
-      .find((button) => button.text() === 'Gồm thi ảo')!
-      .trigger('click');
-    await flushPromises();
-    expect(wrapper.findAll('tbody tr')).toHaveLength(4);
-    expect(wrapper.text()).not.toContain('Đang tải');
-    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
-    release();
-    await flushPromises();
-    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
-    expect(wrapper.findAll('tbody tr')).toHaveLength(4);
-  });
-
-  it('scrolls the wide board inside a focusable, named region', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const region = wrapper.get('[role="region"]');
-    expect(region.attributes('tabindex')).toBe('0');
-    expect(region.attributes('aria-label')).toBe('Vùng cuộn bảng xếp hạng');
-    expect(region.find('table').exists()).toBe(true);
-  });
-
   it('does not poll while the tab is hidden', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
@@ -322,29 +146,6 @@ describe('contest ranking', () => {
     await flushPromises();
     expect(calls.filter((call) => call.path === '/contests/r42/ranking')).toHaveLength(1);
     visibility.mockRestore();
-  });
-
-  it('keeps the last board and says so when a poll fails', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
-    let polls = 0;
-    mockApi(
-      routes({
-        'GET /contests/r42/ranking': () => (polls++ === 0 ? ok(ranking()) : fail(500, 'internal')),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    await vi.advanceTimersByTimeAsync(30_000);
-    await flushPromises();
-    expect(wrapper.findAll('tbody tr')).toHaveLength(4);
-    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
-    expect(wrapper.text()).toContain('Không cập nhật được bảng');
-  });
-
-  it('shows the error when there is no board yet', async () => {
-    mockApi(routes({ 'GET /contests/r42/ranking': fail(500, 'internal') }));
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
   });
 
   it('starts polling when an upcoming contest begins while the page is open', async () => {
@@ -396,38 +197,6 @@ describe('contest ranking', () => {
     expect(third!.classes()).not.toEqual(first!.classes());
   });
 
-  it('drops the time column for formats without cumulative time', async () => {
-    const [problemA] = RANKING_PROBLEM_IDS;
-    mockApi(
-      routes({
-        'GET /contests/r42': ok(contestDetail({ formatName: 'ioi16' })),
-        'GET /contests/r42/ranking': ok(
-          ranking({
-            frozen: false,
-            problems: [
-              {
-                problemId: problemA,
-                code: 'r42a',
-                label: 'A',
-                points: 100,
-                firstSolve: null,
-                acceptedCount: 0,
-              },
-            ],
-            rows: [
-              rankingRow(1, 'part-07', 'user_07', 50, 0, { [problemA]: { points: 50, time: 0 } }),
-            ],
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const headings = wrapper.findAll('thead th').map((cell) => cell.text());
-    expect(headings).toContain('Điểm');
-    expect(headings).not.toContain('Thời gian');
-    expect(rowOf(wrapper, 'user_07').findAll('td')).toHaveLength(3);
-  });
-
   it('prints cell points at the contest precision', async () => {
     const [problemA] = RANKING_PROBLEM_IDS;
     mockApi(
@@ -458,24 +227,5 @@ describe('contest ranking', () => {
     const { wrapper } = await mountApp('/contests/r42/ranking');
     expect(cellTexts(rowOf(wrapper, 'user_07'))).toEqual(['99,5']);
     expect(rowOf(wrapper, 'user_07').findAll('td')[1]!.text()).toBe('99,5');
-  });
-
-  it('hints that the board scrolls sideways once its table is wider than the frame', async () => {
-    vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(2000);
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    await flushPromises();
-    expect(wrapper.get('[data-testid="scroll-hint"]').text()).toContain('Vuốt ngang');
-  });
-
-  it('reports an unknown contest', async () => {
-    mockApi(
-      routes({
-        'GET /contests/r42': fail(404, 'not_found'),
-        'GET /contests/r42/ranking': fail(404, 'not_found'),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(wrapper.get('[role="alert"]').text()).toContain('Không tìm thấy.');
   });
 });

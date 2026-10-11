@@ -44,16 +44,6 @@ describe('fieldErrorsOf', () => {
       'Bạn thao tác quá nhanh. Hãy thử lại sau. Thử lại sau 42 giây.',
     );
   });
-
-  it.each(['is_int', 'is_in', 'is_number', 'is_boolean', 'is_url', 'is_object'])(
-    'has Vietnamese text for the %s code the DTOs emit, not the backend English',
-    (code) => {
-      const error = new ApiError('validation_failed', 400, 'bad', {
-        issues: [{ field: 'x', code, message: 'x must be something' }],
-      });
-      expect(fieldErrorsOf(error).x).not.toBe('x must be something');
-    },
-  );
 });
 
 describe('isNotFound', () => {

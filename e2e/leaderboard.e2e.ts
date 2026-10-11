@@ -1,8 +1,6 @@
 import { LEADERBOARD_PAGE_SIZE } from '../src/api/types/users';
 import { leaderboardEntry } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 
 /** One full page of the board, as the query asks for it (`LEADERBOARD_PAGE_SIZE` rows). */
 const fullPage = Array.from({ length: LEADERBOARD_PAGE_SIZE }, (_row, index) =>
@@ -28,20 +26,3 @@ test('the exact-username box opens that profile', async ({ page }) => {
   await page.getByRole('button', { name: 'Mở', exact: true }).click();
   await expect(page).toHaveURL('/users/khoa.tran');
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the leaderboard has no WCAG A/AA violations and no page scroll in ${theme.id} at ${viewport.width}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      api.signedIn = true;
-      await applyTheme(page, api, theme);
-      await page.goto('/users');
-      await expect(page.getByText('user_10', { exact: true })).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });

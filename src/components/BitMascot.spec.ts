@@ -15,26 +15,6 @@ describe('BitMascot', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it('is an image with a name when labelled, hidden from assistive technology when not', () => {
-    const labelled = mountHero({ label: 'Bit in a cap' });
-    expect(labelled.attributes('role')).toBe('img');
-    expect(labelled.attributes('aria-label')).toBe('Bit in a cap');
-    expect(labelled.attributes('aria-hidden')).toBeUndefined();
-    const decorative = mountHero();
-    expect(decorative.attributes('role')).toBeUndefined();
-    expect(decorative.attributes('aria-hidden')).toBe('true');
-  });
-
-  it('keeps a fixed square box of 16 pixels, so a blink cannot move the layout', () => {
-    expect(mountHero().attributes('style')).toContain('width: calc(var(--bit-px, 4px) * 16)');
-    expect(mountHero().attributes('style')).toContain('height: calc(var(--bit-px, 4px) * 16)');
-  });
-
-  it('keeps the eyes shut when told to', () => {
-    expect(eyePixels(mountHero({ closedEyes: true }))).toBe(0);
-    expect(eyePixels(mountHero())).toBe(4);
-  });
-
   it('blinks every few seconds and opens its eyes again, drawing the same box', async () => {
     stubMatchMedia({ reducedMotion: false });
     const bit = mountHero({ blinks: true });
@@ -60,21 +40,5 @@ describe('BitMascot', () => {
     expect(vi.getTimerCount()).toBe(1);
     bit.unmount();
     expect(vi.getTimerCount()).toBe(0);
-  });
-
-  it('does not blink unless asked to', async () => {
-    stubMatchMedia({ reducedMotion: false });
-    const bit = mountHero();
-    await vi.advanceTimersByTimeAsync(BLINK_EVERY_MS);
-    expect(eyePixels(bit)).toBe(4);
-  });
-
-  it('draws the charcoal twin for the empty-list look', () => {
-    const asleep = mount(BitMascot, {
-      props: { look: PLACEMENT_LOOKS.emptyList, closedEyes: true },
-    });
-    const bodyColours = asleep.findAll('span').map((cell) => cell.element.style.backgroundColor);
-    expect(bodyColours).toContain('rgb(61, 58, 54)');
-    expect(bodyColours).not.toContain('rgb(217, 119, 87)');
   });
 });

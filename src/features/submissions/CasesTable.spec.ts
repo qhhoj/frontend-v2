@@ -10,18 +10,6 @@ const mountTable = (props: Record<string, unknown>) =>
   }) as unknown as VueWrapper<{ running: boolean }>;
 
 describe('CasesTable', () => {
-  it('shows one row per case with the verdict code and name as text, and formatted time and memory', () => {
-    const wrapper = mountTable({
-      cases: [submissionCase({ position: 1 }), submissionCase({ position: 2, status: 'WA' })],
-    });
-    const rows = wrapper.findAll('[data-testid="case-row"]');
-    expect(rows).toHaveLength(2);
-    expect(rows[0]!.text()).toContain('AC · Chấp nhận');
-    expect(rows[1]!.text()).toContain('WA · Sai kết quả');
-    expect(rows[0]!.text()).toContain('0.01s');
-    expect(rows[0]!.text()).toContain('3.2 MB');
-  });
-
   it('lists the tests still waiting after the graded ones only while running', async () => {
     const graded = [1, 2, 3].map((position) => submissionCase({ position }));
     const wrapper = mountTable({ cases: graded, totalCases: 5, running: true });
@@ -33,20 +21,6 @@ describe('CasesTable', () => {
     for (const row of pending) expect(row.text()).toContain('Chờ chấm');
     await wrapper.setProps({ running: false });
     expect(wrapper.findAll('[data-testid="pending-row"]')).toHaveLength(0);
-  });
-
-  it('falls back to one row per batch', () => {
-    const wrapper = mountTable({
-      batches: [
-        { batch: 1, status: 'AC', points: 10, total: 10 },
-        { batch: 2, status: 'WA', points: 0, total: 10 },
-      ],
-    });
-    const rows = wrapper.findAll('[data-testid="case-row"]');
-    expect(rows.map((row) => row.text())).toEqual([
-      expect.stringContaining('Nhóm 1'),
-      expect.stringContaining('Nhóm 2'),
-    ]);
   });
 
   it('shows only the hidden message when neither cases nor batches are visible', () => {

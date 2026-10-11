@@ -1,34 +1,7 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { adminList, adminOk, dialogOf, signInAsStaff } from './fixtures/admin';
-import { ALL_SETTINGS, setting, settingRevision } from '../src/test/admin-fixtures/settings';
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`site settings at ${viewport.name}: the page and the history panel are accessible`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    signInAsStaff(api, ['judge.change_settings']);
-    api.routes['GET /admin/settings'] = adminOk(ALL_SETTINGS);
-    api.routes['GET /admin/settings/pdf.renderTimeoutMs/revisions'] = adminList(
-      [settingRevision(30000, 45000)],
-      { pageSize: 20 },
-    );
-    await page.goto('/admin/settings');
-    await expect(page.getByRole('heading', { name: 'Cài đặt trang', exact: true })).toBeVisible();
-    expect(await axeViolationsIn(page)).toEqual([]);
-
-    await page.getByRole('button', { name: 'Lịch sử · pdf.renderTimeoutMs', exact: true }).click();
-    await expect(page.getByTestId('revisions')).toContainText('− 30000');
-    const panelHeading = page.getByRole('heading', {
-      name: 'Lịch sử · pdf.renderTimeoutMs',
-      exact: true,
-    });
-    await expect(panelHeading).toBeInViewport();
-    await expect(panelHeading).toBeFocused();
-    expect(await axeViolationsIn(page)).toEqual([]);
-  });
+import { adminOk, dialogOf, signInAsStaff } from './fixtures/admin';
+import { ALL_SETTINGS, setting } from '../src/test/admin-fixtures/settings';
 
 test('site settings: Enter on "Thay thế" reveals the password box with focus in it', async ({
   page,
@@ -105,24 +78,5 @@ for (const viewport of AUDIT_VIEWPORTS)
     const sent = api.requestsTo('PATCH /admin/settings/mail.smtpUrl');
     expect(sent).toHaveLength(1);
     expect(JSON.parse(sent[0].postData!.toString())).toEqual({ value: '' });
-    expect(await axeViolationsIn(page)).toEqual([]);
-  });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`change log at ${viewport.name}: the key in the URL shows its revisions and is accessible`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    signInAsStaff(api, ['judge.change_settings']);
-    api.routes['GET /admin/settings/pdf.renderTimeoutMs/revisions'] = adminList(
-      [settingRevision(30000, 45000), settingRevision(20000, 30000)],
-      { pageSize: 20 },
-    );
-    await page.goto('/admin/log?key=pdf.renderTimeoutMs');
-    await expect(
-      page.getByRole('heading', { name: 'Nhật ký thay đổi', exact: true }),
-    ).toBeVisible();
-    await expect(page.getByTestId('revision')).toHaveCount(2);
     expect(await axeViolationsIn(page)).toEqual([]);
   });

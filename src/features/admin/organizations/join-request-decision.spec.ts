@@ -8,25 +8,16 @@ const refusal = (status: number, field: string, code: string) =>
   });
 
 describe('decisionFailureText', () => {
-  it('says another staff member decided the request first', () => {
-    const error = refusal(409, 'state', 'request_already_decided');
-    expect(isAlreadyDecided(error)).toBe(true);
-    expect(decisionFailureText(error)).toBe('Yêu cầu này đã được người khác xử lý.');
-  });
-
-  it('says the organization is full only for the full code', () => {
+  it('words each 409 by its code alone, never calling the decision-lock "full" or "already decided"', () => {
+    const decided = refusal(409, 'state', 'request_already_decided');
+    expect(isAlreadyDecided(decided)).toBe(true);
+    expect(decisionFailureText(decided)).toBe('Yêu cầu này đã được người khác xử lý.');
     expect(decisionFailureText(refusal(409, 'organization', 'organization_full'))).toBe(
       'Tổ chức đã đủ chỗ.',
     );
-  });
-
-  it('does not call the decision-lock 409 "full" or "already decided"', () => {
     const busy = refusal(409, 'lock', 'busy');
     expect(isAlreadyDecided(busy)).toBe(false);
     expect(decisionFailureText(busy)).toBe('Đang có thao tác khác chạy; hãy chờ xong rồi thử lại.');
-  });
-
-  it('ignores the English message: the code alone decides', () => {
     const lookalike = new ApiError('conflict', 409, 'This request has already been decided');
     expect(isAlreadyDecided(lookalike)).toBe(false);
   });

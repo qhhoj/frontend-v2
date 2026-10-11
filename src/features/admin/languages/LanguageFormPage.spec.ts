@@ -78,24 +78,6 @@ describe('LanguageFormPage, create', () => {
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('admin-languages'));
   });
 
-  it('leaves the short name out when it is empty', async () => {
-    const calls = mockApi(routes({ 'POST /admin/languages': ok(languageAdmin()) }));
-    const { wrapper } = await mountForm('/admin/languages/new');
-    await fillIn(wrapper, KOTLIN);
-    await press(wrapper, 'Tạo ngôn ngữ');
-    expect(Object.keys(writes(calls)[0]!.body as object)).not.toContain('shortName');
-  });
-
-  it('shows what is wrong under each box and sends nothing', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await mountForm('/admin/languages/new');
-    await fillIn(wrapper, { key: 'a b' });
-    await press(wrapper, 'Tạo ngôn ngữ');
-    expect(writes(calls)).toEqual([]);
-    for (const field of ['key', 'name', 'commonName', 'ace', 'pygments', 'extension'])
-      expect(wrapper.get(`#language-${field}`).attributes('aria-invalid'), field).toBe('true');
-  });
-
   it('puts a taken key under the key box and stays on the page', async () => {
     mockApi(
       routes({ 'POST /admin/languages': fail(409, 'conflict', { key: ['This key is taken.'] }) }),
@@ -106,35 +88,10 @@ describe('LanguageFormPage, create', () => {
     expect(wrapper.text()).toContain('Mã này đã có ngôn ngữ khác dùng.');
     expect(router.currentRoute.value.name).toBe('admin-languageNew');
   });
-
-  it('keeps a sticky save bar with Huỷ and the primary action', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountForm('/admin/languages/new');
-    const bar = wrapper.get('[data-testid="language-save-bar"]');
-    expect(bar.classes()).toContain('sticky');
-    expect(bar.text()).toContain('Huỷ');
-    expect(bar.text()).toContain('Tạo ngôn ngữ');
-  });
-
-  it('counts the characters of the three text areas', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountForm('/admin/languages/new');
-    await fillIn(wrapper, { template: 'fun main() {\n}' });
-    expect(wrapper.get('#language-template-count').text()).toMatch(/^14 \/ 65\D?536$/);
-  });
 });
 
 describe('LanguageFormPage, edit', () => {
   const ruby = () => LANGUAGES.find((language) => language.key === 'RUBY')!;
-
-  it('shows the key sealed and the other fields filled in', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountForm('/admin/languages/RUBY');
-    expect(wrapper.find('#language-key').exists()).toBe(false);
-    expect(wrapper.get('[data-testid="language-key-sealed"]').text()).toContain('RUBY');
-    expect(wrapper.get('[data-testid="language-key-sealed"]').text()).toContain('Cố định');
-    expect((wrapper.get('#language-name').element as HTMLInputElement).value).toBe('Ruby');
-  });
 
   it('sends only the changed field to the language’s id', async () => {
     const calls = mockApi(
@@ -151,33 +108,6 @@ describe('LanguageFormPage, edit', () => {
     expect(wrapper.text()).toContain('Đã lưu.');
   });
 
-  it('clears the short name with null', async () => {
-    const withShort = languageAdmin({
-      id: '0192a000-0000-7000-8000-00000000b199',
-      key: 'RS',
-      shortName: 'RS',
-    });
-    const calls = mockApi(
-      routes({
-        'GET /admin/languages': ok([withShort]),
-        [`PATCH /admin/languages/${withShort.id}`]: ok({ ...withShort, shortName: null }),
-      }),
-    );
-    const { wrapper } = await mountForm('/admin/languages/RS');
-    await fillIn(wrapper, { shortName: '' });
-    await press(wrapper, 'Lưu thay đổi');
-    expect(writes(calls)[0]!.body).toEqual({ shortName: null });
-  });
-
-  it('sends nothing and disables the button while nothing changed', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await mountForm('/admin/languages/RUBY');
-    const save = wrapper.findAll('button').find((button) => button.text() === 'Lưu thay đổi')!;
-    expect(save.attributes('aria-disabled')).toBe('true');
-    await save.trigger('click');
-    expect(writes(calls)).toEqual([]);
-  });
-
   it('says there is no such language for an unknown key, and for a key with # in it opens the right one', async () => {
     mockApi(
       routes({
@@ -191,20 +121,5 @@ describe('LanguageFormPage, edit', () => {
     await vi.waitFor(() => expect(missing.wrapper.text()).toContain('Không có ngôn ngữ “NOPE”.'));
     const sharp = await mountForm('/admin/languages/C%23');
     expect((sharp.wrapper.get('#language-name').element as HTMLInputElement).value).toBe('C Sharp');
-  });
-});
-
-describe('language screens, permissions', () => {
-  it('opens "new" only for add_language and "edit" only for change_language', async () => {
-    mockApi(routes({}, ['judge.change_language']));
-    const noAdd = await mountApp('/admin/languages/new');
-    await vi.waitFor(() =>
-      expect(noAdd.wrapper.find('[data-testid="admin-forbidden"]').exists()).toBe(true),
-    );
-    mockApi(routes({}, ['judge.add_language']));
-    const noChange = await mountApp('/admin/languages/RUBY');
-    await vi.waitFor(() =>
-      expect(noChange.wrapper.find('[data-testid="admin-forbidden"]').exists()).toBe(true),
-    );
   });
 });

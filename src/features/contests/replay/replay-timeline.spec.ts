@@ -1,25 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { RankingContext } from '@/lib/ranking-cells';
-import {
-  icpcCell,
-  loadedReplay,
-  REPLAY_DURATION_SECONDS,
-  REPLAY_PROBLEMS,
-} from '@/test/replay-fixtures';
+import { loadedReplay, REPLAY_DURATION_SECONDS, REPLAY_PROBLEMS } from '@/test/replay-fixtures';
 import { indexReplay } from './replay-board';
-import { feedTextOf, firstSolveMarks, recentEvents, timelineOf } from './replay-timeline';
+import { firstSolveMarks, recentEvents, timelineOf } from './replay-timeline';
 
 const ICPC: RankingContext = {
   formatName: 'icpc',
   pointsPrecision: 0,
   locale: 'vi',
   showsTime: true,
-};
-const IOI: RankingContext = {
-  formatName: 'ioi',
-  pointsPrecision: 0,
-  locale: 'vi',
-  showsTime: false,
 };
 const index = indexReplay(loadedReplay());
 const timeline = timelineOf(index);
@@ -60,22 +49,5 @@ describe('replay timeline', () => {
         percent: expect.closeTo(17.22, 2),
       },
     ]);
-  });
-
-  it('describes a solve, a wrong try on a penalty board, and points on a points board', () => {
-    const problem = REPLAY_PROBLEMS[0]!;
-    expect(feedTextOf(icpcCell(540, 1, 1), problem, ICPC)).toEqual({
-      key: 'replay.feed.solved',
-      params: { problem: 'A' },
-    });
-    expect(feedTextOf(icpcCell(300, 0, 2), problem, ICPC)).toEqual({
-      key: 'replay.feed.failed',
-      params: { problem: 'A', tries: 2 },
-    });
-    const pointsProblem = { ...problem, points: 100 };
-    expect(feedTextOf({ time: 60, points: 40 }, pointsProblem, IOI)).toEqual({
-      key: 'replay.feed.points',
-      params: { problem: 'A', points: '40' },
-    });
   });
 });

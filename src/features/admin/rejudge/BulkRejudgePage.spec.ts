@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
+import { fail, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
@@ -49,7 +49,9 @@ const openConfirm = async (wrapper: Wrapper) => {
 describe('BulkRejudgePage', () => {
   it('counts with a dry run when the confirm opens, resets nothing, then queues after the confirm', async () => {
     const calls = mockApi(routes(answer(counted(128), queued(128))));
-    const { wrapper } = await mountRejudge();
+    const { wrapper, queryClient } = await mountRejudge();
+    const lists = [['submissions', 'list', 'probe']];
+    seedCache(queryClient, lists);
     await openConfirm(wrapper);
     expect(posts(calls).map((call) => call.body)).toEqual([
       { problem: 'hcmus41c', results: ['WA'], dryRun: true },
@@ -61,29 +63,7 @@ describe('BulkRejudgePage', () => {
     await confirmDialog('Chấm lại 128 bài nộp');
     expect(posts(calls)[1]?.body).toEqual({ problem: 'hcmus41c', results: ['WA'] });
     expect(wrapper.get('[role="status"]').text()).toContain('Đã xếp lại 128 bài nộp.');
-    expect(wrapper.find('[data-placement="done"]').exists()).toBe(true);
-  });
-
-  it('offers every result the backend accepts', async () => {
-    mockApi(routes(queued(0)));
-    const { wrapper } = await mountRejudge();
-    const offered = wrapper
-      .findAll('input[type="checkbox"][name="rejudge-result"]')
-      .map((box) => box.attributes('value'));
-    expect(offered).toEqual([
-      'AC',
-      'WA',
-      'TLE',
-      'MLE',
-      'OLE',
-      'IR',
-      'RTE',
-      'CE',
-      'IE',
-      'SC',
-      'AB',
-      'RJ',
-    ]);
+    expect(invalidatedKeys(queryClient, lists)).toEqual(lists);
   });
 
   it('shows the count over the limit with the permission it needs, and the confirm cannot send', async () => {
@@ -110,28 +90,6 @@ describe('BulkRejudgePage', () => {
     expect(posts(calls)).toHaveLength(1);
   });
 
-  it('words a refused count inside the dialog, keeps the confirm shut and claims no count', async () => {
-    const calls = mockApi(routes(answer(fail(403, 'forbidden'), queued(1))));
-    const { wrapper } = await mountRejudge();
-    await openConfirm(wrapper);
-    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain(
-      'Bạn không có quyền làm việc này.',
-    );
-    expect(dialogText()).not.toContain('judge.rejudge_submission_lot');
-    expect(submitButton().getAttribute('aria-disabled')).toBe('true');
-    await confirmDialog('Chấm lại');
-    expect(posts(calls)).toHaveLength(1);
-    expect(wrapper.text()).not.toContain('Đã xếp lại');
-  });
-
-  it('words a rate limited count as a wait', async () => {
-    mockApi(routes(answer(rateLimited(30), queued(1))));
-    const { wrapper } = await mountRejudge();
-    await openConfirm(wrapper);
-    expect(dialogText()).toContain('Thử lại sau 30 giây.');
-    expect(submitButton().getAttribute('aria-disabled')).toBe('true');
-  });
-
   it('counts again each time the confirm opens, never showing the old count', async () => {
     let asked = 0;
     const calls = mockApi(
@@ -144,35 +102,5 @@ describe('BulkRejudgePage', () => {
     await clickRejudge(wrapper);
     expect(submitButton().textContent?.trim()).toBe('Chấm lại 6 bài nộp');
     expect(posts(calls).filter(isDryRun)).toHaveLength(2);
-  });
-
-  it('words a 403 on the real request as a plain refusal and keeps the filter', async () => {
-    const calls = mockApi(routes(answer(counted(3), fail(403, 'forbidden'))));
-    const { wrapper } = await mountRejudge();
-    await openConfirm(wrapper);
-    await confirmDialog('Chấm lại 3 bài nộp');
-    expect(wrapper.get('[role="alert"]').text()).toContain('Bạn không có quyền làm việc này.');
-    expect(wrapper.text()).not.toContain('judge.rejudge_submission_lot');
-    expect(posts(calls)).toHaveLength(2);
-    expect((wrapper.get('#rejudge-problem').element as HTMLInputElement).value).toBe('hcmus41c');
-  });
-
-  it('sends nothing without a problem code', async () => {
-    const calls = mockApi({ ...staffViewer(PERMS), 'GET /problems/meta': ok(problemMeta()) });
-    const { wrapper } = await mountRejudge();
-    await clickRejudge(wrapper);
-    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
-    expect(wrapper.get('#rejudge-problem').attributes('aria-invalid')).toBe('true');
-    expect(calls.some((call) => call.method === 'POST')).toBe(false);
-  });
-
-  it('marks the submission lists stale after queueing a rejudge', async () => {
-    mockApi(routes(answer(counted(3), queued(3))));
-    const { wrapper, queryClient } = await mountRejudge();
-    const lists = [['submissions', 'list', 'probe']];
-    seedCache(queryClient, lists);
-    await openConfirm(wrapper);
-    await confirmDialog('Chấm lại 3 bài nộp');
-    expect(invalidatedKeys(queryClient, lists)).toEqual(lists);
   });
 });

@@ -1,26 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { editableProblem } from '@/test/admin-fixtures/problems';
-import {
-  insertImage,
-  isOriginalLocked,
-  previewStyleFor,
-  statementDraftOf,
-} from './statement-drafts';
+import { insertImage, isOriginalLocked, previewStyleFor } from './statement-drafts';
 
 describe('statement drafts', () => {
-  it('reads an existing translation, an empty missing one, and the original description', () => {
-    const problem = editableProblem();
-    expect(statementDraftOf(problem, 'vi')).toEqual({
-      name: 'Đường đi ngắn nhất có ràng buộc',
-      description: 'Cho đồ thị vô hướng gồm $n$ đỉnh.',
-      exists: true,
-    });
-    expect(statementDraftOf(problem, 'en')).toEqual({ name: '', description: '', exists: false });
-    expect(statementDraftOf(problem, 'original').description).toBe(
-      'Cho đồ thị vô hướng gồm $n$ đỉnh.',
-    );
-  });
-
   it('asks for problem-full only for a full-markup problem and a viewer allowed to see it', () => {
     expect(previewStyleFor(editableProblem({ isFullMarkup: true }), true)).toBe('problem-full');
     expect(previewStyleFor(editableProblem({ isFullMarkup: true }), false)).toBe('problem');

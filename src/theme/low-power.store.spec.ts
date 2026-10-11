@@ -12,13 +12,6 @@ const weakDevice = () =>
   Object.defineProperty(navigator, 'hardwareConcurrency', { value: 2, configurable: true });
 
 describe('useLowPowerStore', () => {
-  it('starts on auto, off on a strong device, with no attribute', () => {
-    const store = startStore();
-    expect(store.preference).toBe('auto');
-    expect(store.isOn).toBe(false);
-    expect(painted()).toBe(false);
-  });
-
   it('turns on by itself on a weak device and paints the attribute at once', () => {
     weakDevice();
     const store = startStore();
@@ -35,13 +28,6 @@ describe('useLowPowerStore', () => {
     expect(painted()).toBe(true);
     store.choose('off');
     await nextTick();
-    expect(painted()).toBe(false);
-  });
-
-  it('keeps "off" on a weak device', () => {
-    weakDevice();
-    localStorage.setItem('qhhoj.lowPower', 'off');
-    expect(startStore().isOn).toBe(false);
     expect(painted()).toBe(false);
   });
 

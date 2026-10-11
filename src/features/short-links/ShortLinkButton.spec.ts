@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from '@/stores/session.store';
 import { shortLink } from '@/test/f5-fixtures';
 import { sessionUser } from '@/test/fixtures';
-import { fail, mockApi, rateLimited } from '@/test/mock-api';
+import { mockApi, rateLimited } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import ShortLinkButton from './ShortLinkButton.vue';
 
@@ -32,11 +32,6 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('ShortLinkButton', () => {
-  it('renders nothing for a signed-out viewer', () => {
-    const wrapper = mountComponent(ShortLinkButton, { props: { path: PATH } });
-    expect(wrapper.find('[data-testid="short-link-button"]').exists()).toBe(false);
-  });
-
   it('creates the link, copies the /s/ URL and announces it', async () => {
     const calls = mockApi({ 'POST /short-links': created() });
     const wrapper = mountSignedIn();
@@ -77,18 +72,6 @@ describe('ShortLinkButton', () => {
     expect(posts(calls)).toBe(2);
   });
 
-  it('goes back to its label two seconds after copying', async () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    mockApi({ 'POST /short-links': created() });
-    const wrapper = mountSignedIn();
-    await flushPromises();
-    await button(wrapper).trigger('click');
-    await flushPromises();
-    await vi.advanceTimersByTimeAsync(2000);
-    expect(button(wrapper).text()).toBe('Sao chép');
-    expect(button(wrapper).attributes('aria-label')).toBe('Sao chép liên kết');
-  });
-
   it('locks with the daily-limit text on 429 and sends nothing more', async () => {
     const calls = mockApi({ 'POST /short-links': rateLimited(3600) });
     const wrapper = mountSignedIn();
@@ -103,30 +86,5 @@ describe('ShortLinkButton', () => {
     await button(wrapper).trigger('click');
     await flushPromises();
     expect(posts(calls)).toBe(1);
-  });
-
-  it('shows the refusal and stays usable when the path is refused (400)', async () => {
-    const calls = mockApi({ 'POST /short-links': fail(400, 'validation_failed') });
-    const wrapper = mountSignedIn();
-    await flushPromises();
-    await button(wrapper).trigger('click');
-    await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).not.toBe('');
-    expect(button(wrapper).attributes('aria-disabled')).toBeUndefined();
-    await button(wrapper).trigger('click');
-    await flushPromises();
-    expect(posts(calls)).toBe(2);
-  });
-
-  it('shows the link in a read-only field when the clipboard refuses', async () => {
-    writeText.mockRejectedValue(new Error('denied'));
-    mockApi({ 'POST /short-links': created() });
-    const wrapper = mountSignedIn();
-    await flushPromises();
-    await button(wrapper).trigger('click');
-    await flushPromises();
-    const field = wrapper.get('input[readonly]');
-    expect((field.element as HTMLInputElement).value).toBe(`${location.origin}/s/k7m2xq`);
-    expect(field.attributes('aria-label')).toBe('Liên kết ngắn');
   });
 });

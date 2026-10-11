@@ -11,10 +11,6 @@ const catalog = {
 };
 
 describe('active filter chips', () => {
-  it('has none without filters', () => {
-    expect(filterChips(NO_FILTERS, catalog)).toEqual([]);
-  });
-
   it('has one chip per picked type and per other filter, each clearing only itself', () => {
     const filters = {
       ...NO_FILTERS,

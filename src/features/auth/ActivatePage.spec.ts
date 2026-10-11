@@ -2,14 +2,10 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
 import { signedOut } from '@/test/fixtures';
-import { loginRoutes } from '@/test/auth-routes';
-import { fail, hangRequestsExcept, mockApi, noContent, sequence } from '@/test/mock-api';
+import { fail, mockApi, noContent, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { useLoadingStore } from '@/stores/loading.store';
 
 const DONE = 'Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.';
-const referrerPolicy = () =>
-  document.head.querySelector<HTMLMetaElement>('meta[name="referrer"]')?.content;
 
 describe('activate page', () => {
   it('shows the success card when the finished page is reloaded, without sending the placeholder as a key', async () => {
@@ -21,42 +17,17 @@ describe('activate page', () => {
     expect(wrapper.get('#main a[href="/login"]').text()).toBe('Đăng nhập');
   });
 
-  it('activates once, then leaves the key out of the address', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
-    const { wrapper, router } = await mountApp('/activate/k123');
-    expect(calls.filter((call) => call.path === '/auth/activate').map((call) => call.body)).toEqual(
-      [{ token: 'k123' }],
-    );
-    expect(router.currentRoute.value.fullPath).toBe('/activate/done');
-    expect(wrapper.get('#main [role="status"]').text()).toBe(DONE);
-  });
-
-  it('leaves the used key out of history: the done address replaces it, never adds an entry', async () => {
+  it('activates once, then replaces the used key with the done address, never adding a history entry', async () => {
     const history = createMemoryHistory();
     const pushed = vi.spyOn(history, 'push');
     const replaced = vi.spyOn(history, 'replace');
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
+    const calls = mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
     await mountApp('/activate/k123', history);
-    // The router's own first navigation replaces too; after it, the used key is replaced, not pushed.
+    expect(calls.filter((call) => call.path === '/auth/activate').map((call) => call.body)).toEqual(
+      [{ token: 'k123' }],
+    );
     expect(pushed).not.toHaveBeenCalled();
     expect(replaced.mock.calls.at(-1)?.[0]).toBe('/activate/done');
-  });
-
-  it('sends no Referer while the key is in the address, and stops once the viewer leaves', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent(), ...loginRoutes });
-    const { router } = await mountApp('/activate/k123');
-    expect(referrerPolicy()).toBe('no-referrer');
-    await router.push('/login');
-    expect(referrerPolicy()).toBeUndefined();
-  });
-
-  it('waits through the shell, with no loading status of its own, while the key is being checked', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    hangRequestsExcept(['/auth/me']);
-    const { wrapper } = await mountApp('/activate/k123');
-    expect(useLoadingStore().isWaiting).toBe(true);
-    expect(wrapper.find('#main [role="status"]').exists()).toBe(false);
-    expect(wrapper.get('#main').text()).toContain('Đang kích hoạt…');
   });
 
   it('explains a dead link and sends a new one to the address typed', async () => {

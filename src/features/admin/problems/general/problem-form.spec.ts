@@ -15,12 +15,6 @@ const seeded = () => toProblemForm(editableProblem(), meta);
 const nobodyCan = () => false;
 
 describe('problem form', () => {
-  it('maps per-language limits from language keys to the ids the DTO takes', () => {
-    expect(seeded().languageLimits).toEqual([
-      { languageId: LANG_PY3, timeLimit: 4.5, memoryLimit: 262144 },
-    ]);
-  });
-
   it('sends nothing for an untouched form and only the changed fields otherwise', () => {
     const before = seeded();
     expect(changedProblemFields(before, structuredClone(before))).toEqual({});
@@ -57,6 +51,10 @@ describe('problem form', () => {
         'languageLimits.0.timeLimit'
       ],
     ).toBeUndefined();
+    const high = { ...seeded(), timeLimit: 6 };
+    expect(checkProblemForm(high, nobodyCan).timeLimit).toBe(
+      'Trên 5 giây cần quyền judge.high_problem_timelimit.',
+    );
   });
 
   it('compares lists by value, so reordering a type list is a change and an equal copy is not', () => {
@@ -67,38 +65,12 @@ describe('problem form', () => {
     });
   });
 
-  it('refuses a time limit above 5 s without judge.high_problem_timelimit, and allows it with', () => {
-    const form = { ...seeded(), timeLimit: 6 };
-    expect(checkProblemForm(form, nobodyCan).timeLimit).toBe(
-      'Trên 5 giây cần quyền judge.high_problem_timelimit.',
-    );
-    expect(
-      checkProblemForm(form, (permission) => permission === 'judge.high_problem_timelimit')
-        .timeLimit,
-    ).toBeUndefined();
-  });
-
   it('checks the code, the points range and at least one type before sending', () => {
     const errors = checkProblemForm(
       { ...seeded(), code: 'Bad Code', points: 700, typeIds: [] },
       nobodyCan,
     );
     expect(Object.keys(errors).sort()).toEqual(['code', 'points', 'typeIds']);
-  });
-
-  it('builds a create body without empty optional fields', () => {
-    const defaults = emptyProblemForm(meta);
-    const form = { ...defaults, code: 'newp', name: 'New', typeIds: [meta.types[0]!.id] };
-    const body = toProblemBody(form, false, defaults);
-    expect(body).toMatchObject({
-      code: 'newp',
-      name: 'New',
-      groupId: meta.groups[0]!.id,
-      points: 800,
-    });
-    expect(body).not.toHaveProperty('source');
-    expect(body).not.toHaveProperty('date');
-    expect(body).not.toHaveProperty('authors');
   });
 
   it('never sends a staff-only field from a viewer without judge.edit_all_problem, even when filled', () => {

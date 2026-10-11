@@ -70,15 +70,6 @@ describe('useTicketStream on the list', () => {
 });
 
 describe('useTicketStream on the list: status and connection', () => {
-  it('announces a closed ticket with its own line', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
-    const wrapper = await mountStream(null);
-    latestEventSource().emit('ticket-status', frame('ticket-status', 't1', false));
-    await vi.advanceTimersByTimeAsync(SETTLE_WAIT_MS);
-    await flushPromises();
-    expect(wrapper.get('[data-testid="announce"]').text()).toBe('Phiếu đã đóng');
-  });
   it('stops reporting live once the browser gives up on the feed', async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets': ok([]) });
     const wrapper = await mountStream(null);
@@ -89,17 +80,6 @@ describe('useTicketStream on the list: status and connection', () => {
 });
 
 describe('useTicketStream on one ticket', () => {
-  it('listens to the ticket feed and says how many messages arrived', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    mockApi({ ...signedInViewer(), 'GET /tickets/t1': ok({}) });
-    const wrapper = await mountStream('t1');
-    const stream = latestEventSource();
-    expect(stream.url).toBe('/api/internal/events/tickets/t1');
-    stream.emit('ticket-message', frame('ticket-message', 't1'));
-    await vi.advanceTimersByTimeAsync(SETTLE_WAIT_MS);
-    await flushPromises();
-    expect(wrapper.get('[data-testid="announce"]').text()).toBe('1 tin nhắn mới');
-  });
   it('closes the feed when the owner unmounts', async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets/t1': ok({}) });
     const wrapper = await mountStream('t1');

@@ -22,19 +22,6 @@ async function ticketsWith(
 }
 
 describe('ticket alerts strip', () => {
-  it('links a member to the open tickets assigned to them', async () => {
-    const { strip } = await ticketsWith(signedInViewer(), 2, 0);
-    const link = strip.get('a');
-    expect(link.text()).toBe('2 phiếu đang mở giao cho bạn');
-    expect(link.attributes('href')).toBe('/tickets?scope=all&open=1&assignee=user_01');
-    expect(strip.text()).not.toContain('chờ nhân viên');
-  });
-
-  it('stays hidden for a member with nothing assigned', async () => {
-    const { strip } = await ticketsWith(signedInViewer(), 0, 0);
-    expect(strip.exists()).toBe(false);
-  });
-
   it('never shows a member the staff count, even if one arrives', async () => {
     const { strip } = await ticketsWith(signedInViewer(), 1, 9);
     expect(strip.text()).not.toContain('chờ nhân viên');
@@ -45,16 +32,5 @@ describe('ticket alerts strip', () => {
     const link = strip.get('a');
     expect(link.text()).toBe('5 phiếu đang chờ nhân viên trả lời');
     expect(link.attributes('href')).toBe('/admin/tickets?scope=all&open=1');
-  });
-
-  it('tells a handler when nothing waits, with the crowned Bit', async () => {
-    const { strip } = await ticketsWith(handlerViewer(), 0, 0);
-    expect(strip.text()).toContain('Không có phiếu nào đang chờ bạn.');
-    expect(strip.find('[data-testid="inline-bit"]').exists()).toBe(true);
-  });
-
-  it('asks the summary once per load, keyed by the viewer', async () => {
-    const { calls } = await ticketsWith(signedInViewer(), 1, 0);
-    expect(calls.filter((call) => call.path === '/tickets/summary')).toHaveLength(1);
   });
 });

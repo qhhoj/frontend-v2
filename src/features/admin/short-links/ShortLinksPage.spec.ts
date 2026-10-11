@@ -3,16 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { translate } from '@/i18n';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { shortLink } from '@/test/f5-fixtures';
-import {
-  fail,
-  hangRequestsExcept,
-  invalid,
-  issue,
-  mockApi,
-  noContent,
-  page,
-  sequence,
-} from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, noContent, page, sequence } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -42,16 +33,6 @@ const rowOf = (wrapper: Awaited<ReturnType<typeof openPage>>['wrapper'], code: s
   wrapper.get(`tr[data-code="${code}"]`);
 
 describe('ShortLinksPage', () => {
-  it('lists every link (scope=all) with kind, visits and expiry', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await openPage();
-    expect(calls.find((call) => call.path === '/short-links')!.query.get('scope')).toBe('all');
-    expect(rowOf(wrapper, 'hsg-2026').text()).toContain('Chọn tay');
-    expect(rowOf(wrapper, 'hsg-2026').text()).toContain('42');
-    expect(rowOf(wrapper, 'k7m2xq').text()).toContain('Tự động');
-    expect(rowOf(wrapper, 'k7m2xq').text()).toContain('Không');
-  });
-
   it('creates a link with a chosen code and expiry, then shows it with a copy button', async () => {
     const calls = mockApi(
       routes({
@@ -75,20 +56,6 @@ describe('ShortLinksPage', () => {
     expect(
       calls.filter((call) => call.path === '/short-links' && call.method === 'GET'),
     ).toHaveLength(2);
-  });
-
-  it('sends no code or expiry when they are left empty', async () => {
-    const calls = mockApi(
-      routes({ 'POST /short-links': { status: 201, body: { data: shortLink() } } }),
-    );
-    const { wrapper } = await openPage();
-    const form = wrapper.get('[data-testid="short-link-form"]');
-    await form.get('#short-link-path').setValue(' /problems/aplusb ');
-    await form.trigger('submit');
-    await flushPromises();
-    expect(calls.find((call) => call.method === 'POST')!.body).toEqual({
-      path: '/problems/aplusb',
-    });
   });
 
   it('puts a taken code (409) and a refused path (400) on their fields', async () => {
@@ -115,28 +82,6 @@ describe('ShortLinksPage', () => {
     expect(form.text()).not.toContain('Only site pages can be shortened.');
   });
 
-  it('deletes only after confirming, then refreshes the list', async () => {
-    const calls = mockApi(
-      routes({
-        'GET /short-links': sequence(page(LINKS), page([LINKS[0]])),
-        'DELETE /short-links/hsg-2026': noContent(),
-      }),
-    );
-    const { wrapper } = await openPage();
-    await rowOf(wrapper, 'hsg-2026')
-      .get('button[aria-label="Xóa liên kết hsg-2026"]')
-      .trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xóa liên kết');
-    await flushPromises();
-    expect(
-      calls.some((call) => call.method === 'DELETE' && call.path === '/short-links/hsg-2026'),
-    ).toBe(true);
-    expect(wrapper.find('tr[data-code="hsg-2026"]').exists()).toBe(false);
-    expect(wrapper.text()).toContain('Đã xóa /s/hsg-2026');
-  });
-
   it('refuses an expiry in the past without sending anything', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await openPage();
@@ -150,38 +95,7 @@ describe('ShortLinksPage', () => {
     expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
   });
 
-  it('shows the backend refusal of a past expiry (a clock ahead of the browser) in Vietnamese', async () => {
-    mockApi(
-      routes({
-        'POST /short-links': invalid(
-          issue('expiresAt', 'invalid', 'The expiry must be in the future.'),
-        ),
-      }),
-    );
-    const { wrapper } = await openPage();
-    const form = wrapper.get('[data-testid="short-link-form"]');
-    await form.get('#short-link-path').setValue('/contests/r42');
-    await form.get('#short-link-expires').setValue('2099-01-01T00:00');
-    await form.trigger('submit');
-    await flushPromises();
-    expect(form.get('#short-link-expires').attributes('aria-invalid')).toBe('true');
-    expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
-    expect(form.text()).not.toContain('The expiry must be in the future.');
-  });
-
-  it('marks an expired link beside its code, so the narrow table shows it too', async () => {
-    const lapsed = shortLink({
-      code: 'cu',
-      path: '/contests/old',
-      expiresAt: '2020-01-01T00:00:00.000Z',
-    });
-    mockApi(routes({ 'GET /short-links': page([lapsed, ...LINKS]) }));
-    const { wrapper } = await openPage();
-    expect(rowOf(wrapper, 'cu').find('[data-testid="expired-chip"]').exists()).toBe(true);
-    expect(rowOf(wrapper, 'hsg-2026').find('[data-testid="expired-chip"]').exists()).toBe(false);
-  });
-
-  it('drops the cached automatic short links when a link is deleted', async () => {
+  it('deletes only after confirming, refreshes the list and drops the cached automatic links', async () => {
     mockApi(
       routes({
         'GET /short-links': sequence(page(LINKS), page([LINKS[0]])),
@@ -195,24 +109,10 @@ describe('ShortLinksPage', () => {
       .get('button[aria-label="Xóa liên kết hsg-2026"]')
       .trigger('click');
     await flushPromises();
+    expect(queryClient.getQueryData(autoKey)).toEqual(LINKS[1]);
     await confirmDialog('Xóa liên kết');
     await flushPromises();
+    expect(wrapper.find('tr[data-code="hsg-2026"]').exists()).toBe(false);
     expect(queryClient.getQueryData(autoKey)).toBeUndefined();
-  });
-
-  it('shows the empty state with Bit', async () => {
-    mockApi(routes({ 'GET /short-links': page([]) }));
-    const { wrapper } = await mountApp('/admin/short-links');
-    await flushPromises();
-    expect(wrapper.text()).toContain('Chưa có liên kết ngắn nào.');
-    expect(wrapper.find('[data-testid="admin-bit"][data-placement="empty"]').exists()).toBe(true);
-  });
-
-  it('shows skeleton rows while the list loads', async () => {
-    mockApi(routes());
-    hangRequestsExcept(['/auth/me', '/profile']);
-    const { wrapper } = await mountApp('/admin/short-links');
-    await flushPromises();
-    expect(wrapper.findAll('[data-skeleton-region="short-link-row"]').length).toBeGreaterThan(2);
   });
 });

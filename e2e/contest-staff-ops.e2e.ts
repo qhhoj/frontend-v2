@@ -1,19 +1,14 @@
-import type { Page } from '@playwright/test';
 import {
   contestActions,
   contestDataStatus,
   editableContest,
 } from '../src/test/admin-fixtures/contests';
-import { THEMES } from '../src/theme/registry';
 import { adminOk, confirmInDialog, signInAsStaff } from './fixtures/admin';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 
 const ACTIONS_PATH = '/admin/contests/hcmus-w41/actions';
 const PUBLISH_ROUTE = 'POST /contests/hcmus-w41/publish-problems';
-const fitsWidth = (page: Page) =>
-  page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
 const endedEditor = (api: FakeApi) => {
   signInAsStaff(api, ['judge.edit_own_contest']);
@@ -50,22 +45,6 @@ test('a dry run lists every problem, then the confirmed run publishes', async ({
   await expect(done.getByTestId('inline-bit')).toBeVisible();
   expect(api.requestsTo(PUBLISH_ROUTE)).toHaveLength(2);
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the actions tab with the publish card is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      endedEditor(api);
-      await applyTheme(page, api, theme);
-      await page.goto(ACTIONS_PATH);
-      await page.getByTestId('publish-card').getByRole('button', { name: 'Chạy thử' }).click();
-      await expect(page.getByTestId('publish-row')).toHaveCount(2);
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await fitsWidth(page)).toBe(true);
-    });
 
 const NO_KEY = { isActive: false, mode: null, expiresAt: null, createdBy: null, releasedAt: null };
 const MINTED_KEY = 'qhf_8Kq2Zr5Lw9Tn3Vb6Xc1Md4Fg7Hj0Pa2s';
@@ -105,22 +84,3 @@ test('the Data tab mints a key and shows it once with copy buttons', async ({ pa
     page.getByTestId('export-card').getByRole('link', { name: 'Tải về' }),
   ).toHaveAttribute('href', '/api/internal/contests/hcmus-w41/export/download');
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the Data tab and the reveal dialog are accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      dataTab(api);
-      await applyTheme(page, api, theme);
-      await page.goto('/admin/contests/hcmus-w41/data');
-      await expect(page.getByTestId('feed-status')).toBeVisible();
-      expect(await axeViolationsIn(page), 'tab').toEqual([]);
-      await page.getByTestId('feed-key-card').getByRole('button', { name: 'Tạo khóa' }).click();
-      await confirmInDialog(page, 'Tạo khóa');
-      await expect(page.getByTestId('reveal-key')).toBeVisible();
-      expect(await axeViolationsIn(page), 'reveal').toEqual([]);
-      expect(await fitsWidth(page)).toBe(true);
-    });

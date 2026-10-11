@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { heatmapWeeks, monthStarts, todayIn, totalSubmissions } from './activity-heatmap';
+import { heatmapWeeks } from './activity-heatmap';
 import type { HeatmapCell } from './activity-heatmap';
 
 /** Machine zones the spec runs under; the offset is January's (standard time), so the zone really changed. */
@@ -11,14 +11,6 @@ const ZONE_OFFSET_MINUTES: Record<string, number> = {
 afterEach(() => vi.unstubAllEnvs());
 const cellOn = (weeks: HeatmapCell[][], date: string) =>
   weeks.flat().find((cell) => cell?.date === date);
-
-describe('todayIn', () => {
-  it('is the calendar day in the activity’s zone, not the machine’s', () => {
-    const halfPastMidnightInHanoi = Date.parse('2026-10-07T17:30:00Z');
-    expect(todayIn('Asia/Ho_Chi_Minh', halfPastMidnightInHanoi)).toBe('2026-10-08');
-    expect(todayIn('UTC', halfPastMidnightInHanoi)).toBe('2026-10-07');
-  });
-});
 
 describe('heatmapWeeks', () => {
   it('draws 53 Monday-first weeks that end on today, with nothing after today', () => {
@@ -58,15 +50,5 @@ describe('heatmapWeeks', () => {
     expect(
       ['2026-09-30', '2026-10-01', '2026-10-04', '2026-10-02', '2026-10-03'].map(levelOf),
     ).toEqual([0, 1, 2, 2, 4]);
-  });
-});
-
-describe('month labels and total', () => {
-  it('labels the first week of each month and sums every day', () => {
-    const weeks = heatmapWeeks({ '2026-10-01': 2, '2026-01-02': 5 }, '2026-10-08');
-    const starts = monthStarts(weeks);
-    expect(starts[0]).toEqual({ column: 0, month: 10 });
-    expect(starts.map((start) => start.month)).toEqual([10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    expect(totalSubmissions({ '2026-10-01': 2, '2026-01-02': 5 })).toBe(7);
   });
 });

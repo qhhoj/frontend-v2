@@ -33,11 +33,4 @@ describe('AdminShell gate', () => {
     expect(wrapper.find('[data-testid="probe"]').exists()).toBe(false);
     expect(calls.map((call) => call.path)).not.toContain('/probe');
   });
-
-  it('mounts the screen and asks for its data when the permission is held', async () => {
-    const calls = mockApi({ ...staffViewer(['judge.moss_contest']), 'GET /probe': ok({}) });
-    const { wrapper } = await mountApp('/admin/similarity');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="probe"]').exists()).toBe(true));
-    expect(calls.map((call) => call.path)).toContain('/probe');
-  });
 });

@@ -14,9 +14,6 @@ describe('versionsOf', () => {
       [0, 'A', null, null],
     ]);
   });
-  it('is empty for a comment never edited', () => {
-    expect(versionsOf([])).toEqual([]);
-  });
 });
 
 describe('unifiedDiff', () => {

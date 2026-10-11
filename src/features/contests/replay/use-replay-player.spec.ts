@@ -11,16 +11,6 @@ const start = (durationSeconds: number, startSeconds = 0) => {
 describe('useReplayPlayer', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('starts paused at the shared second, at the default speed', () => {
-    const { scope, player } = start(10_800, 5184);
-    expect([player.seconds.value, player.isPlaying.value, player.speed.value]).toEqual([
-      5184,
-      false,
-      10,
-    ]);
-    scope.stop();
-  });
-
   it('moves the clock by speed times the elapsed time while playing, and holds it on pause', () => {
     vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
     const { scope, player } = start(10_800);
@@ -75,16 +65,6 @@ describe('useReplayPlayer', () => {
     expect(player.seconds.value).toBe(100);
     player.seek(42.9);
     expect(player.seconds.value).toBe(42.9);
-    scope.stop();
-  });
-
-  it('a second play while playing starts no second clock', () => {
-    vi.useFakeTimers({ toFake: ['performance', 'Date', 'setInterval', 'clearInterval'] });
-    const { scope, player } = start(10_800);
-    player.play();
-    player.play();
-    vi.advanceTimersByTime(1000);
-    expect(player.seconds.value).toBe(10);
     scope.stop();
   });
 

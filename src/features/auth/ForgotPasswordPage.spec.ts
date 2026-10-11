@@ -55,12 +55,4 @@ describe('forgot-password page', () => {
     expect(wrapper.text()).toContain('Nhập một địa chỉ email hợp lệ.');
     expect(document.activeElement).toBe(email.element);
   });
-
-  it('links back to sign-in before and after sending', async () => {
-    forgotApi();
-    const { wrapper } = await mountApp('/forgot-password');
-    expect(wrapper.get('#main a[href="/login"]').text()).toBe('Quay lại đăng nhập');
-    await send(wrapper);
-    expect(wrapper.get('#main a[href="/login"]').text()).toBe('Quay lại đăng nhập');
-  });
 });

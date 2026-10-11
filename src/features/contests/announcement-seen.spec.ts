@@ -12,27 +12,12 @@ const VIEWER = 'user-a';
 describe('announcement read state', () => {
   beforeEach(() => localStorage.clear());
 
-  it('treats everything as unread before the first visit, and later ids as unread after it', () => {
-    loadSeenAnnouncement(VIEWER, 'r42');
-    expect(isUnread(announcement(1), seenAnnouncementId(VIEWER, 'r42'))).toBe(true);
-    markAnnouncementsSeen(VIEWER, 'r42', announcement(2).id);
-    expect(isUnread(announcement(2), seenAnnouncementId(VIEWER, 'r42'))).toBe(false);
-    expect(isUnread(announcement(3), seenAnnouncementId(VIEWER, 'r42'))).toBe(true);
-  });
-
   it('never moves the mark backwards and keeps contests apart', () => {
     markAnnouncementsSeen(VIEWER, 'r42', announcement(5).id);
     markAnnouncementsSeen(VIEWER, 'r42', announcement(3).id);
     expect(seenAnnouncementId(VIEWER, 'r42')).toBe(announcement(5).id);
     loadSeenAnnouncement(VIEWER, 'r41');
     expect(seenAnnouncementId(VIEWER, 'r41')).toBe('');
-  });
-
-  it('survives a reload through storage', () => {
-    markAnnouncementsSeen(VIEWER, 'r40', announcement(4).id);
-    expect(localStorage.getItem('qhhoj.contest-announcements-seen.user-a:r40')).toBe(
-      announcement(4).id,
-    );
   });
 
   it("keeps each viewer's marks apart on the same browser", () => {

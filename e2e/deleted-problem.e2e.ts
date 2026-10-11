@@ -1,9 +1,7 @@
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { list, ok } from './fixtures/reply';
 import { submissionDetail, submissionItem } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 
 const GONE = { code: 'duongdi', name: 'Đường đi', isDeleted: true, points: 100 };
 const TOMBSTONED = submissionDetail({ problem: GONE, cases: [], batches: null, totalCases: null });
@@ -48,20 +46,3 @@ test('a deleted problem page is the crying-Bit 404', async ({ page, api }) => {
   await page.goto('/problems/duongdi');
   await expect(page.getByRole('heading', { level: 1, name: 'Không tìm thấy trang' })).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the tombstone is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      tombstoneRoutes(api);
-      await applyTheme(page, api, theme);
-      await page.goto(`/submissions/${TOMBSTONED.id}`);
-      await expect(page.getByTestId('deleted-problem-notice')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });

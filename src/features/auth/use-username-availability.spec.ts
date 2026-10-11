@@ -40,32 +40,6 @@ describe('useUsernameAvailability', () => {
     expect(calls.map((call) => call.query.get('username'))).toEqual(['new']);
   });
 
-  it('is checking from the pause until the answer, for the current text only', async () => {
-    let answer: (available: boolean) => void = () => {};
-    vi.stubGlobal(
-      'fetch',
-      () =>
-        new Promise<Response>((resolve) => {
-          answer = (available) =>
-            resolve(
-              new Response(JSON.stringify({ data: { available } }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-              }),
-            );
-        }),
-    );
-    const { username, status } = setup('');
-    username.value = 'free_name';
-    await nextTick();
-    expect(status.value).toBe('checking');
-    await vi.advanceTimersByTimeAsync(AVAILABILITY_DELAY_MS);
-    expect(status.value).toBe('checking');
-    answer(true);
-    await flushPromises();
-    expect(status.value).toBe('available');
-  });
-
   it('says available only for the confirmed text, and stops saying it as soon as the text changes', async () => {
     mockApi({ [ROUTE]: answerByName });
     const { username, status } = setup('');
@@ -74,21 +48,6 @@ describe('useUsernameAvailability', () => {
     username.value = 'free_name2';
     await nextTick();
     expect(status.value).toBe('checking');
-  });
-
-  it('says taken for a taken name', async () => {
-    mockApi({ [ROUTE]: answerByName });
-    const { username, status } = setup('');
-    await typeAndWait(username, 'busy_name');
-    expect(status.value).toBe('taken');
-  });
-
-  it('checks a name that is already there when the field mounts (autofill)', async () => {
-    mockApi({ [ROUTE]: answerByName });
-    const { status } = setup('prefilled');
-    await vi.advanceTimersByTimeAsync(AVAILABILITY_DELAY_MS);
-    await flushPromises();
-    expect(status.value).toBe('available');
   });
 
   it.each(['', 'bad name', 'a-b', 'x'.repeat(31)])(

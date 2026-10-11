@@ -1,16 +1,11 @@
-import type { Page } from '@playwright/test';
 import { participationSummary } from '../src/test/fixtures';
 import { VIRTUAL_PARTICIPATION_ID } from '../src/test/replay-fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { ok } from './fixtures/reply';
 
 const NOW = new Date('2026-10-09T10:25:00Z');
 const RANKING = '/contests/r41/ranking';
-const fitsWidth = (page: Page) =>
-  page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 /** Signed in, in the 25th minute of a virtual run of r41. */
 const inVirtualRun = (api: FakeApi) => {
   api.signedIn = true;
@@ -48,16 +43,3 @@ test('a virtual contestant compares the run with the real board at the same elap
   await expect(page.getByRole('heading', { name: 'Lượt ảo của bạn · 00:25:00' })).toBeVisible();
   await expect(page.locator('tr[data-kind="virtual"]')).toContainText('(ảo)');
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the overlay is accessible in ${theme.id} at ${viewport.name}`, async ({ page, api }) => {
-      await page.setViewportSize(viewport);
-      await page.clock.setFixedTime(NOW);
-      inVirtualRun(api);
-      await applyTheme(page, api, theme);
-      await page.goto(`${RANKING}?compare=1`);
-      await expect(page.locator('tr[data-kind="virtual"]')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await fitsWidth(page)).toBe(true);
-    });

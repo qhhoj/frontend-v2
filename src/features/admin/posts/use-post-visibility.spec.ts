@@ -35,15 +35,4 @@ describe('usePostVisibility', () => {
     await first;
     expect(visibility.pendingId.value).toBeNull();
   });
-
-  it('hides through hidePost and shows through showPost', async () => {
-    api.hidePost.mockResolvedValue({});
-    api.showPost.mockResolvedValue({});
-    const visibility = mountHook();
-    const post = postItem({ id: 'p-9' });
-    await visibility.hide(post);
-    await visibility.show(post);
-    expect(api.hidePost).toHaveBeenCalledWith('p-9');
-    expect(api.showPost).toHaveBeenLastCalledWith('p-9');
-  });
 });

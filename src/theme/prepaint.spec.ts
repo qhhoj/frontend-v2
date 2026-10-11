@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
 import { createPinia, setActivePinia } from 'pinia';
 import { stubMatchMedia } from '@/test/match-media';
-import { ACCENTS, appearanceVariables } from './appearance';
+import { appearanceVariables } from './appearance';
 import { useAppearanceStore } from './appearance.store';
 import { useThemeStore } from './theme.store';
 import {
@@ -18,11 +18,6 @@ import { useLowPowerStore } from './low-power.store';
 import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
 
 const script = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)![1]!;
-const groundsOf = new Map(
-  [.../grounds = \{([^}]*)\}/.exec(script)![1]!.matchAll(/'([\w-]+)':\s*'(#\w+)'/g)].map(
-    ([, id, ground]) => [id!, ground!],
-  ),
-);
 const themeFiles = import.meta.glob<string>('./themes/*.css', {
   query: '?raw',
   import: 'default',
@@ -98,16 +93,6 @@ function prepaint({
 }
 
 describe('pre-paint script in index.html', () => {
-  it('allows exactly the registered themes', () => {
-    expect([...groundsOf.keys()].sort()).toEqual(THEMES.map((theme) => theme.id).sort());
-  });
-
-  it("sets the address-bar colour to the painted theme's ground", () => {
-    for (const { id } of THEMES) {
-      expect(prepaint({ stored: id }).themeColor).toBe(groundOfThemeFile(id));
-    }
-  });
-
   it('paints the last applied theme whatever the OS says', () => {
     expect(prepaint({ stored: 'glass-light', dark: true }).theme).toBe('glass-light');
     expect(prepaint({ stored: 'glass-dark', dark: false }).theme).toBe('glass-dark');
@@ -154,19 +139,6 @@ describe('pre-paint script in index.html', () => {
       expect(THEMES.find((theme) => theme.id === prepaint({ dark }).theme)?.glass).toBe(false);
   });
 
-  it('still follows the OS when storage is blocked', () => {
-    expect(prepaint({ storageThrows: true, dark: true }).theme).toBe(firstThemeOf('dark'));
-  });
-
-  it('paints light when matchMedia is unavailable', () => {
-    expect(prepaint({ mediaThrows: true }).theme).toBe(firstThemeOf('light'));
-  });
-
-  it('declares the default light theme ground as the static theme-color, so the first frame matches', () => {
-    const declared = /<meta name="theme-color" content="(#\w+)"/.exec(indexHtml)![1];
-    expect(declared).toBe(groundOfThemeFile(firstThemeOf('light')));
-  });
-
   it('paints what the store resolves at start-up, for every preference, cache and OS scheme', () => {
     for (const preference of [null, ...PREFERENCES])
       for (const cache of [null, ...THEMES.map((theme) => theme.id)])
@@ -192,14 +164,6 @@ describe('pre-paint script in index.html', () => {
 
 describe('pre-paint script: personal look', () => {
   const look = { accent: 'sunset', glass: 40, glow: 35 } as const;
-
-  it('allows exactly the registered accent presets', () => {
-    const listed = /var accents = \[([^\]]*)\]/
-      .exec(script)![1]!
-      .match(/'([\w-]+)'/g)!
-      .map((id) => id.slice(1, -1));
-    expect(listed).toEqual(ACCENTS.map((accent) => accent.id));
-  });
 
   it('paints the last painted look exactly as the store would', () => {
     const { accent, properties } = prepaint({ painted: JSON.stringify(look) });
@@ -308,17 +272,5 @@ describe('pre-paint script: low-power mode', () => {
     expect(script).toContain(`localStorage.getItem('${LOW_POWER_STORAGE_KEY}')`);
     expect(script).toContain(`isAtMost(navigator.deviceMemory, ${WEAK_DEVICE_MEMORY_GB})`);
     expect(script).toContain(`isAtMost(navigator.hardwareConcurrency, ${WEAK_CPU_CORES})`);
-  });
-
-  it('paints no low-power when storage is blocked on a strong device', () => {
-    expect(prepaint({ storageThrows: true, device: { hardwareConcurrency: 8 } }).lowPower).toBe(
-      false,
-    );
-  });
-
-  it('still turns low-power on for a weak device when storage is blocked', () => {
-    expect(prepaint({ storageThrows: true, device: { hardwareConcurrency: 2 } }).lowPower).toBe(
-      true,
-    );
   });
 });

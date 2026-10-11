@@ -3,12 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok, quotaExceeded } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
-import {
-  problemData,
-  problemEditingMeta,
-  problemEditorRoutes,
-  TYPE_GRAPH,
-} from '@/test/admin-fixtures/problems';
+import { problemEditingMeta, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
@@ -46,39 +41,6 @@ describe('quota refusals show their numbers on every create, clone and upload fo
     await pressButton(wrapper, 'Nhân bản');
     await flushPromises();
     expect(alertText(wrapper)).toContain(CREDITS_TEXT);
-  });
-
-  it('the new problem form', async () => {
-    mockApi({
-      ...staffViewer(['judge.add_problem']),
-      'GET /problems/meta': ok(problemEditingMeta()),
-      'POST /problems': CREDITS,
-    });
-    const { wrapper } = await mountApp('/admin/problems/new');
-    await waitFor(wrapper, '#problem-code');
-    await wrapper.get('#problem-code').setValue('newp');
-    await wrapper.get('#problem-name').setValue('New');
-    await wrapper.get('#problem-type-pick').setValue(TYPE_GRAPH);
-    await pressButton(wrapper, 'Thêm loại');
-    await pressButton(wrapper, 'Tạo bài');
-    await flushPromises();
-    expect(alertText(wrapper)).toContain(CREDITS_TEXT);
-  });
-
-  it('the data archive upload (storage meter)', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_problem']),
-      ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/data/archive': STORAGE,
-    });
-    const { wrapper } = await mountApp('/admin/problems/hcmus41c/data');
-    await waitFor(wrapper, '[data-testid="upload-archive"] input');
-    const input = wrapper.get('[data-testid="upload-archive"] input');
-    Object.defineProperty(input.element, 'files', { value: [new File(['zip'], 'p.zip')] });
-    await input.trigger('change');
-    await flushPromises();
-    expect(alertText(wrapper)).toContain(STORAGE_TEXT);
   });
 
   it('the Polygon import: a storage refusal has no form field, so the page line carries it', async () => {

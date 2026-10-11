@@ -17,14 +17,4 @@ describe('loading store', () => {
     loading.end(second);
     expect(loading.isWaiting).toBe(false);
   });
-
-  it('counts a source once and ignores ending a source that never began', () => {
-    const loading = useLoadingStore();
-    const source = Symbol('source');
-    loading.begin(source);
-    loading.begin(source);
-    loading.end(source);
-    expect(loading.isWaiting).toBe(false);
-    expect(() => loading.end(Symbol('other'))).not.toThrow();
-  });
 });

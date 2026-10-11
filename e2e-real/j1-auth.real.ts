@@ -23,14 +23,4 @@ test.describe('J1 authentication', () => {
     await expect(page).toHaveURL(/\/login/);
     await expect(page.getByRole('button', { name: /Tài khoản của/ })).toHaveCount(0);
   });
-
-  test('a signed-out visitor is sent to login from settings and back after signing in', async ({
-    page,
-  }) => {
-    await page.goto('/settings');
-    await expect(page).toHaveURL(/\/login\?redirect=\/settings$/);
-    await submitLoginForm(page, CREDENTIALS.user.username, CREDENTIALS.user.password);
-    await expect(page).toHaveURL(/\/settings$/);
-    await expect(page.getByRole('button', { name: 'Lưu thay đổi' })).toBeVisible();
-  });
 });

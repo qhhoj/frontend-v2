@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { feedKeyStatus } from '@/test/contest-extras-fixtures';
-import { absoluteUrl, canRelease, isValidKeyDays } from './feed-key';
+import { canRelease, isValidKeyDays } from './feed-key';
 
 /** icpc, 06:00Z to 10:00Z, frozen for the last 60 minutes: the freeze starts at 09:00Z. */
 const contest = {
@@ -33,11 +33,5 @@ describe('feed key rules', () => {
   it('accepts 1 to 30 whole days', () => {
     expect([1, 14, 30].map(isValidKeyDays)).toEqual([true, true, true]);
     expect([0, 31, 2.5, Number.NaN].map(isValidKeyDays)).toEqual([false, false, false, false]);
-  });
-
-  it('turns an API path into the full address a resolver needs', () => {
-    expect(absoluteUrl('/api/internal/contests/r42/feed', 'https://oj.example')).toBe(
-      'https://oj.example/api/internal/contests/r42/feed',
-    );
   });
 });

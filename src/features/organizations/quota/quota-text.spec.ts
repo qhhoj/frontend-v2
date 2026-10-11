@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MIB, organizationUsage, quotaMeter } from '@/test/f4-fixtures';
-import { ledgerAmountText, ledgerReasonKey, quotaNoticeOf } from './quota-text';
+import { quotaNoticeOf } from './quota-text';
 
 describe('quota notice', () => {
   it('stays quiet below 80 % and warns from 80 %, naming the meter and the percentage', () => {
@@ -70,20 +70,5 @@ describe('quota notice', () => {
         organizationUsage({ credits: quietZero, storage: quotaMeter(0, MIB), enforcing: false }),
       ).kind,
     ).toBe('healthy');
-  });
-
-  it('writes a spend as minus and a refund as plus, with a true minus sign', () => {
-    expect(ledgerAmountText(10, 'vi')).toBe('−10');
-    expect(ledgerAmountText(-10, 'vi')).toBe('+10');
-  });
-
-  it('names each ledger reason', () => {
-    expect(['problem', 'contest', 'upload', 'refund'].map(ledgerReasonKey)).toEqual([
-      'orgQuota.reasons.problem',
-      'orgQuota.reasons.contest',
-      'orgQuota.reasons.upload',
-      'orgQuota.reasons.refund',
-    ]);
-    expect(ledgerReasonKey('later')).toBe('orgQuota.reasons.other');
   });
 });

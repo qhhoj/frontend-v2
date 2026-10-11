@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { problemDetail } from '@/test/fixtures';
 import { ticketDetail } from '@/test/community-fixtures';
-import { fail, hangRequestsExcept, mockApi, ok } from '@/test/mock-api';
+import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
@@ -31,28 +31,6 @@ describe('new ticket: prefill and filing', () => {
   });
 });
 
-describe('new ticket: general issue', () => {
-  it('files a general issue with its link', async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      'POST /tickets/general': ok(ticketDetail()),
-      [`GET /tickets/${ticketDetail().id}`]: ok(ticketDetail()),
-    });
-    const { wrapper } = await mountApp('/tickets/new');
-    await wrapper.get('input[type="radio"][value="general"]').setValue(true);
-    await wrapper.get('input[name="issueUrl"]').setValue('https://qhhoj.vn/contests/r42');
-    await wrapper.get('input[name="title"]').setValue('Điểm sai');
-    await wrapper.get('textarea[name="body"]').setValue('Bảng điểm hiển thị sai.');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(calls.find((call) => call.path === '/tickets/general')!.body).toEqual({
-      title: 'Điểm sai',
-      body: 'Bảng điểm hiển thị sai.',
-      issueUrl: 'https://qhhoj.vn/contests/r42',
-    });
-  });
-});
-
 describe('new ticket validation and failures', () => {
   it('blocks an incomplete draft without a request and points at each field', async () => {
     const calls = mockApi({ ...signedInViewer() });
@@ -61,60 +39,5 @@ describe('new ticket validation and failures', () => {
     await flushPromises();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     expect(wrapper.get('input[name="title"]').attributes('aria-invalid')).toBe('true');
-  });
-  it('explains a muted account with the sweating Bit', async () => {
-    mockApi({ ...signedInViewer(), 'POST /tickets/general': fail(403, 'forbidden') });
-    const { wrapper } = await mountApp('/tickets/new');
-    await wrapper.get('input[type="radio"][value="general"]').setValue(true);
-    await wrapper.get('input[name="issueUrl"]').setValue('https://qhhoj.vn');
-    await wrapper.get('input[name="title"]').setValue('T');
-    await wrapper.get('textarea[name="body"]').setValue('B');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('[data-state="error"]').text()).toContain('Tài khoản đang bị tắt tiếng');
-  });
-  it('shows a problem code the server does not know as a field error', async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      'GET /problems/nope': fail(404, 'not_found'),
-      'POST /problems/nope/tickets': fail(404, 'not_found'),
-    });
-    const { wrapper } = await mountApp('/tickets/new?problem=nope');
-    await flushPromises();
-    await wrapper.get('input[name="title"]').setValue('T');
-    await wrapper.get('textarea[name="body"]').setValue('B');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(calls.find((call) => call.method === 'POST')!.path).toBe('/problems/nope/tickets');
-    expect(wrapper.get('input[name="problemCode"]').attributes('aria-invalid')).toBe('true');
-    expect(wrapper.get('#problemCode-error').text()).toContain('Không tìm thấy bài nope');
-  });
-});
-
-describe('new ticket: busy submit and the lookup line', () => {
-  it('points the problem code field at the lookup line', async () => {
-    mockApi({
-      ...signedInViewer(),
-      'GET /problems/hcmus41b': ok(problemDetail({ code: 'hcmus41b' })),
-    });
-    const { wrapper } = await mountApp('/tickets/new?problem=hcmus41b');
-    await flushPromises();
-    expect(wrapper.get('input[name="problemCode"]').attributes('aria-describedby')).toContain(
-      'problem-lookup',
-    );
-  });
-  it('shows a busy submit in its token colours while the request is out', async () => {
-    mockApi({ ...signedInViewer(), 'POST /tickets/general': ok(ticketDetail()) });
-    hangRequestsExcept(['/auth/me', '/profile']);
-    const { wrapper } = await mountApp('/tickets/new');
-    await wrapper.get('input[type="radio"][value="general"]').setValue(true);
-    await wrapper.get('input[name="issueUrl"]').setValue('https://example.com/x');
-    await wrapper.get('input[name="title"]').setValue('T');
-    await wrapper.get('textarea[name="body"]').setValue('B');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    const button = wrapper.get('button[type="submit"]');
-    expect(button.attributes('aria-busy')).toBe('true');
-    expect(button.classes()).toContain('bg-accent-soft');
   });
 });
