@@ -3,10 +3,9 @@ import { computed, ref, watch } from 'vue';
 import { Check, X } from 'lucide-vue-next';
 import type { ImportJob } from '@/api/types/problem-imports';
 import { formatFileSize } from '@/lib/format';
-import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import type { ImportPhase, PollStop } from './import-job';
 import { downloadProgressOf, failedRowOf, importStepsOf, isRunningStep } from './import-steps';
 import type { ImportSource, RunningStep, StepStatus } from './import-steps';
@@ -64,15 +63,12 @@ const labelKey = (key: string, status: StepStatus) =>
 
 <template>
   <section
-    class="glass flex flex-col gap-5 rounded-panel p-5"
+    :class="[CARD, 'flex flex-col gap-4 p-4 md:p-5']"
     aria-labelledby="import-progress-title"
   >
-    <div class="flex items-center justify-between gap-3">
-      <h2 id="import-progress-title" class="text-base font-bold">
-        {{ $t('admin.polygon.progress.title', { code }) }}
-      </h2>
-      <AdminBit v-if="!isFinished" placement="queued" />
-    </div>
+    <h2 id="import-progress-title" class="font-display text-base font-semibold">
+      {{ $t('admin.polygon.progress.title', { code }) }}
+    </h2>
     <p v-if="job" class="text-sm text-muted">
       {{ $t('admin.polygon.progress.state') }}: <span class="font-mono">{{ job.state }}</span>
       <template v-if="!isFinished"> · {{ $t('admin.polygon.progress.runningHint') }}</template>
@@ -117,7 +113,7 @@ const labelKey = (key: string, status: StepStatus) =>
               class="h-1.5 w-full max-w-80 overflow-hidden rounded-pill bg-surface-strong"
             >
               <span
-                class="block h-full rounded-pill bg-gradient-accent"
+                class="block h-full rounded-pill bg-accent"
                 :style="{ width: `${download.share * 100}%` }"
               />
             </span>
@@ -126,10 +122,11 @@ const labelKey = (key: string, status: StepStatus) =>
       </li>
     </ol>
 
-    <div v-if="phase === 'done' && job?.result" class="flex items-start gap-3">
-      <AdminStatus kind="done" :text="$t('admin.polygon.progress.doneText')" />
-      <AdminBit placement="done" />
-    </div>
+    <AdminStatus
+      v-if="phase === 'done' && job?.result"
+      kind="done"
+      :text="$t('admin.polygon.progress.doneText')"
+    />
     <AdminStatus
       v-if="phase === 'failed'"
       kind="refused"
@@ -150,7 +147,7 @@ const labelKey = (key: string, status: StepStatus) =>
       <RouterLink
         v-if="phase === 'done' && job?.result"
         :to="{ name: 'admin-problemGeneral', params: { code: job.result.code } }"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="buttonClass('primary')"
         >{{ $t('admin.polygon.progress.open', { code: job.result.code }) }}</RouterLink
       >
       <slot name="actions" :phase="phase" />

@@ -7,7 +7,7 @@ import type { WizardStep } from './polygon-wizard';
 defineProps<{ current: WizardStep }>();
 const MARK_CLASS = {
   done: 'bg-verdict-ac-bg text-verdict-ac',
-  current: 'bg-gradient-accent text-on-accent',
+  current: 'bg-accent text-on-accent',
   upcoming: 'bg-surface-strong text-muted',
 } as const;
 </script>
@@ -18,7 +18,7 @@ const MARK_CLASS = {
       v-for="(step, index) in WIZARD_STEPS"
       :key="step"
       :aria-current="stepStatusOf(step, current) === 'current' ? 'step' : undefined"
-      class="flex min-h-11 items-center gap-2 rounded-pill border px-3 text-sm font-semibold"
+      class="flex min-h-9 items-center gap-2 rounded-pill border px-3 text-sm font-semibold pointer-coarse:min-h-11"
       :class="
         stepStatusOf(step, current) === 'current'
           ? 'border-accent text-accent-text'

@@ -4,8 +4,7 @@ import { startZipImport } from '@/api/problem-imports.api';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS } from '../../admin-screens';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
-import AdminBit from '../../shell/AdminBit.vue';
+import { buttonClass } from '../../ui/controls';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -44,31 +43,26 @@ const refusal = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <AdminPageHeader :title="$t('admin.polygon.title')" :lead="$t('admin.polygon.lead')">
       <template #actions>
         <RouterLink
           v-if="canAny(ADMIN_SCREENS.polygonImport.permission)"
           :to="{ name: 'admin-polygonImport' }"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary')"
           >{{ $t('admin.polygonLink.wizard.fromPolygon') }}</RouterLink
         >
       </template>
     </AdminPageHeader>
-    <div class="grid gap-5 lg:grid-cols-2">
-      <ImportOptionsForm :is-pending="isPending" :server-errors="fieldErrors" @start="run" />
-      <ImportProgress
-        v-if="jobId"
-        :code="submittedCode"
-        :phase="phase"
-        :job="job"
-        :poll-failure="pollFailure"
-        :stop="stop"
-      />
-    </div>
-    <div v-if="refusal" class="flex items-start gap-3">
-      <AdminStatus kind="refused" :text="refusal" />
-      <AdminBit placement="refused" />
-    </div>
+    <ImportProgress
+      v-if="jobId"
+      :code="submittedCode"
+      :phase="phase"
+      :job="job"
+      :poll-failure="pollFailure"
+      :stop="stop"
+    />
+    <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
+    <ImportOptionsForm :is-pending="isPending" :server-errors="fieldErrors" @start="run" />
   </div>
 </template>

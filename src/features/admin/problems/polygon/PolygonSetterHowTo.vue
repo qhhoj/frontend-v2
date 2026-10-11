@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import CopyButton from '@/components/CopyButton.vue';
 
-/** What a problem setter does: share the problem with the account, build a full package, paste its link; shared by the settings block and the link step. */
-defineProps<{ accountName: string }>();
+/**
+ * What a problem setter does: share the problem with the account, build a package, paste its link; shared by the settings
+ * block and the link step (`headless` there: the notice around it carries the title).
+ */
+defineProps<{ accountName: string; headless?: boolean }>();
 const STEPS = ['access', 'package', 'paste'] as const;
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 rounded-row bg-surface-strong p-4">
-    <h3 class="font-semibold">{{ $t('admin.polygonLink.howTo.title') }}</h3>
+  <div class="flex flex-col gap-3" :class="!headless && 'rounded-row bg-surface-strong p-4'">
+    <h3 v-if="!headless" class="font-semibold">{{ $t('admin.polygonLink.howTo.title') }}</h3>
     <ol class="flex list-decimal flex-col gap-1.5 pl-5 text-sm">
       <li v-for="step in STEPS" :key="step">
         <i18n-t :keypath="`admin.polygonLink.howTo.steps.${step}`" tag="span">

@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { ChevronRight } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import PolygonConfigureStep from './PolygonConfigureStep.vue';
 import PolygonLinkStep from './PolygonLinkStep.vue';
 import PolygonNotConnected from './PolygonNotConnected.vue';
@@ -60,20 +61,13 @@ const LEAD_KEYS = {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <AdminPageHeader
       :title="$t(TITLE_KEYS[state.step])"
       :lead="$t(LEAD_KEYS[state.step], { account: accountName || 'qhhoj' })"
     >
       <template #actions>
-        <span
-          class="self-center rounded-pill bg-surface-strong px-2.5 py-1 font-mono text-xs text-muted"
-        >
-          {{
-            $t('admin.polygon.form.permissionChip', { permission: 'judge.import_polygon_package' })
-          }}
-        </span>
-        <RouterLink :to="{ name: 'admin-problemImport' }" :class="ADMIN_BUTTON_CLASS">{{
+        <RouterLink :to="{ name: 'admin-problemImport' }" :class="buttonClass('secondary')">{{
           $t('admin.polygonLink.wizard.zipFile')
         }}</RouterLink>
       </template>
@@ -95,7 +89,7 @@ const LEAD_KEYS = {
       @retry="status.refetch()"
     >
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="polygon-status" class="h-96 w-full rounded-card" />
+        <SkeletonBlock data-skeleton-region="polygon-status" class="h-96 w-full rounded-row" />
       </template>
       <PolygonNotConnected v-if="status.data.value && !status.data.value.connected" />
       <PolygonLinkStep
@@ -114,14 +108,19 @@ const LEAD_KEYS = {
     </QueryState>
     <details
       v-if="state.step === 'link' && can('judge.edit_all_problem')"
-      class="glass rounded-panel p-5"
+      :class="[CARD, 'group px-4 py-1 md:px-5']"
       data-testid="polygon-all-syncs"
       @toggle="onHistoryToggle"
     >
-      <summary class="min-h-11 cursor-pointer font-semibold">
+      <summary class="flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
+        <ChevronRight
+          aria-hidden="true"
+          class="size-4 text-muted transition-transform group-open:rotate-90"
+          :stroke-width="1.75"
+        />
         {{ $t('admin.polygonLink.history.showAll') }}
       </summary>
-      <PolygonSyncHistory v-if="isHistoryOpen" :code="null" class="mt-3" />
+      <PolygonSyncHistory v-if="isHistoryOpen" :code="null" class="mb-4" />
     </details>
   </div>
 </template>

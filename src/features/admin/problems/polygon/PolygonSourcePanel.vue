@@ -13,13 +13,13 @@ const locale = useLocaleStore();
 
 <template>
   <aside
-    class="flex flex-col gap-4 rounded-card border border-line bg-surface-strong p-5 lg:sticky lg:top-4"
+    class="flex flex-col gap-4 rounded-row border border-line bg-surface p-4 md:p-5 xl:sticky xl:top-4"
   >
     <div>
       <p class="text-xs font-bold tracking-wide text-muted uppercase">
         {{ $t('admin.polygonLink.source.label') }}
       </p>
-      <h2 class="font-display text-lg font-bold break-words">
+      <h2 class="font-display text-base font-semibold break-words">
         {{ problem.title ?? problem.name }}
       </h2>
     </div>

@@ -19,7 +19,6 @@
   "editTitle": "Edit “{name}”",
   "noAdd": "You can edit existing rows but not add new ones.",
   "empty": "Nothing here yet.",
-  "actions": "Actions",
   "edit": "Edit",
   "create": "Add",
   "save": "Save",
@@ -45,5 +44,8 @@
     "key": "Use 1 to 20 letters, digits, “.”, “_” or “-”.",
     "url": "Use an http:// or https:// address, or leave it empty.",
     "taken": "Already used (ignoring case)."
-  }
+  },
+  "editLabel": "Edit “{name}”",
+  "created": "Added “{name}”.",
+  "saved": "Saved “{name}”."
 }

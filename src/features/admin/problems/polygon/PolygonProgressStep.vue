@@ -3,7 +3,7 @@ import { computed, toRef } from 'vue';
 import { startPolygonLinkImport } from '@/api/polygon.api';
 import type { PolygonImportBody } from '@/api/types/polygon';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportProgress from '../import/ImportProgress.vue';
 import { importRefusalText } from '../import/import-refusal';
@@ -41,7 +41,7 @@ const retryRefusal = computed(() =>
         <button
           v-if="phase === 'failed' && body"
           type="button"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-busy="retry.isPending.value || undefined"
           @click="retry.run(body)"
         >
@@ -50,7 +50,7 @@ const retryRefusal = computed(() =>
         <button
           v-if="isFinished"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary')"
           @click="emit('restart')"
         >
           {{ $t('admin.polygonLink.progress.another') }}

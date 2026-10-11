@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import AdminBit from '../../shell/AdminBit.vue';
+import { TriangleAlert } from 'lucide-vue-next';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { buttonClass } from '../../ui/controls';
 import type { LinkRefusal } from './polygon-problem-link';
 
 /** Why the pasted link cannot be imported, with what to change on Polygon; "Kiểm tra lại" where waiting can help. */
@@ -16,7 +16,7 @@ const canCheckAgain = computed(() => ['noPackage', 'notReady'].includes(props.re
   <AdminStatus v-if="refusal.kind === 'other'" kind="refused" :text="failureTextOf(refusal.error)">
     <button
       type="button"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="buttonClass('secondary', 'sm')"
       :aria-busy="isChecking || undefined"
       @click="emit('checkAgain')"
     >
@@ -28,9 +28,13 @@ const canCheckAgain = computed(() => ['noPackage', 'notReady'].includes(props.re
     role="alert"
     data-testid="polygon-link-refusal"
     :data-refusal="refusal.kind"
-    class="flex items-start gap-3 rounded-row border border-line bg-surface-strong p-4"
+    class="flex items-start gap-2.5 rounded-cell bg-verdict-tle-bg px-3 py-2.5 text-sm"
   >
-    <AdminBit placement="refused" />
+    <TriangleAlert
+      aria-hidden="true"
+      class="mt-0.5 size-4 shrink-0 text-verdict-tle"
+      :stroke-width="1.75"
+    />
     <div class="flex min-w-0 flex-col gap-1">
       <h3 class="font-semibold">
         {{
@@ -39,7 +43,7 @@ const canCheckAgain = computed(() => ['noPackage', 'notReady'].includes(props.re
           })
         }}
       </h3>
-      <p v-if="refusal.kind === 'linked'" class="text-sm text-muted">
+      <p v-if="refusal.kind === 'linked'">
         <template v-if="refusal.code">
           {{ $t('admin.polygonLink.refusal.linked.withCode', { code: refusal.code }) }}
           <RouterLink
@@ -50,13 +54,13 @@ const canCheckAgain = computed(() => ['noPackage', 'notReady'].includes(props.re
         </template>
         <template v-else>{{ $t('admin.polygonLink.refusal.linked.hidden') }}</template>
       </p>
-      <p v-else class="text-sm text-muted">
+      <p v-else>
         {{ $t(`admin.polygonLink.refusal.${refusal.kind}.body`, { account: accountName }) }}
       </p>
-      <div v-if="canCheckAgain" class="mt-2">
+      <div v-if="canCheckAgain" class="mt-1">
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary', 'sm')"
           :aria-busy="isChecking || undefined"
           @click="emit('checkAgain')"
         >

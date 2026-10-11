@@ -6,14 +6,14 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { INPUT, buttonClass } from '../ui/controls';
 import { checkTaxonForm, emptyTaxonForm, taxonFormOf } from './catalog-forms';
 import { META_KEYS, taxaKey } from './catalogs.queries';
 import { useCatalogEditor } from './use-catalog-editor';
 
-/** Create (`row` null) or edit one problem type or group; `done` leaves edit mode. */
+/** The drawer body that creates (`row` null) or edits one problem type or group; `done` after a save, `cancel` to close. */
 const props = defineProps<{ kind: TaxonKind; row: TaxonAdmin | null }>();
-const emit = defineEmits<{ done: [] }>();
+const emit = defineEmits<{ done: []; cancel: [] }>();
 const { can } = usePermissions();
 const ADD_PERMISSION = {
   'problem-types': 'judge.add_problemtype',
@@ -28,6 +28,7 @@ const { form, isCreate, errors, mutation, isTaken, save } = useCatalogEditor({
   update: (row, patch) => updateTaxon(props.kind, row.id, patch),
   invalidates: [taxaKey(props.kind), ...META_KEYS],
   uniqueField: 'name',
+  nameOf: (sent) => sent.fullName,
   onDone: () => emit('done'),
 });
 const canWrite = computed(() => !isCreate.value || can(ADD_PERMISSION[props.kind]));
@@ -35,16 +36,9 @@ const idPrefix = computed(() => `catalog-${props.kind}`);
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-4 rounded-panel p-5">
-    <h2 class="font-display text-base font-bold">
-      {{
-        row
-          ? $t('admin.catalogs.editTitle', { name: row.fullName })
-          : $t(`admin.catalogs.${kind}.createTitle`)
-      }}
-    </h2>
+  <div class="flex flex-col gap-4">
     <p v-if="!canWrite" class="text-sm text-muted">{{ $t('admin.catalogs.noAdd') }}</p>
-    <form v-else class="grid gap-4 md:grid-cols-2" novalidate @submit.prevent="save">
+    <form v-else class="flex flex-col gap-4" novalidate @submit.prevent="save">
       <AdminField
         :input-id="`${idPrefix}-name`"
         :label="$t('admin.catalogs.fields.name')"
@@ -57,7 +51,8 @@ const idPrefix = computed(() => `catalog-${props.kind}`);
             v-model="form.name"
             maxlength="20"
             autocomplete="off"
-            :class="[ADMIN_INPUT_CLASS, 'font-mono']"
+            autofocus
+            :class="[INPUT, 'font-mono']"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
@@ -73,30 +68,29 @@ const idPrefix = computed(() => `catalog-${props.kind}`);
             :id="id"
             v-model="form.fullName"
             maxlength="100"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
         </template>
       </AdminField>
-      <div class="flex flex-wrap items-center gap-3 md:col-span-2">
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
+        <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
+          {{ $t('admin.catalogs.cancel') }}
+        </button>
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-busy="mutation.isPending.value || undefined"
         >
           {{ isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save') }}
         </button>
-        <button v-if="!isCreate" type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('done')">
-          {{ $t('admin.catalogs.cancel') }}
-        </button>
       </div>
     </form>
-    <AdminStatus v-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
     <AdminStatus
       v-if="mutation.failure.value && !isTaken"
       kind="refused"
       :text="failureTextOf(mutation.failure.value)"
     />
-  </section>
+  </div>
 </template>

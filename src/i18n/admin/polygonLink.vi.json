@@ -170,8 +170,6 @@
     "title": "Các lượt nhập và đồng bộ, mới nhất trước",
     "empty": "Chưa có lượt nhập hay đồng bộ nào được ghi lại.",
     "total": "{total} lượt",
-    "previous": "Trang trước",
-    "next": "Trang sau",
     "builtAt": "dựng lúc {date}",
     "results": {
       "ok": "Thành công",
@@ -184,6 +182,14 @@
     "triggers": {
       "manual": "Thủ công",
       "auto": "Tự động"
+    },
+    "columns": {
+      "when": "Lúc",
+      "result": "Kết quả",
+      "problem": "Bài",
+      "package": "Gói",
+      "how": "Cách chạy",
+      "by": "Người yêu cầu"
     }
   }
 }

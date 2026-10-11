@@ -18,10 +18,12 @@ interface CatalogEditorOptions<Row, Form extends object> {
   invalidates: AdminQueryKey[];
   /** The unique field a 409 `conflict` names (`name` or `key`). */
   uniqueField: keyof Form & string;
+  /** The row's display name in the success toast ("Đã lưu “Đồ thị”"). */
+  nameOf: (form: Form) => string;
   onDone: () => void;
 }
 
-/** Create-or-edit form of one catalog row: local checks after the first try, the PATCH sends only changed fields. */
+/** Create-or-edit form of one catalog row: local checks after the first try, the PATCH sends only changed fields, a toast on success. */
 export function useCatalogEditor<Row, Form extends object>(
   options: CatalogEditorOptions<Row, Form>,
 ) {
@@ -32,7 +34,7 @@ export function useCatalogEditor<Row, Form extends object>(
   watch(options.row, (row) => {
     form.value = formFor(row);
     hasTried.value = false;
-    // Opening another row drops the last save's status; leaving edit mode after a save keeps its "saved".
+    // Opening another row drops the last save's refusal.
     if (row) mutation.reset();
   });
 
@@ -44,6 +46,10 @@ export function useCatalogEditor<Row, Form extends object>(
         : options.create(trimmedForm(sent));
     },
     invalidates: () => options.invalidates,
+    successText: (_result, sent) =>
+      translate(isCreate.value ? 'admin.catalogs.created' : 'admin.catalogs.saved', {
+        name: options.nameOf(sent).trim(),
+      }),
     onDone: () => {
       form.value = options.empty();
       hasTried.value = false;

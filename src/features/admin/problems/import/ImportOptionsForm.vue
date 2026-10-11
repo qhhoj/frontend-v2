@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FileArchive } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { formatFileSize } from '@/lib/format';
@@ -6,12 +7,14 @@ import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
+import AdminCheckChips from '../../ui/AdminCheckChips.vue';
 import UploadButton from '../../ui/UploadButton.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
+import { needsPermissionText } from '../../ui/permission-text';
 import { UPLOAD_LIMITS, tooLargeFor } from '../../ui/upload-limits';
+import ImportCheckbox from './ImportCheckbox.vue';
 import {
   IMPORT_MODES,
   IMPORT_MODE_PERMISSION,
@@ -42,7 +45,9 @@ const form = ref<ImportForm>({ ...emptyImportForm(), ...props.initial });
 const localErrors = ref<FieldErrors>({});
 const { data: meta } = useProblemEditingMetaQuery();
 const groups = computed(() => meta.value?.groups ?? []);
-const types = computed(() => meta.value?.types ?? []);
+const typeOptions = computed(() =>
+  (meta.value?.types ?? []).map((type) => ({ value: type.id, label: type.fullName })),
+);
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isSubmitBlocked = computed(() => props.isPending || (props.withFile && !form.value.file));
 const { canAny } = usePermissions();
@@ -75,29 +80,23 @@ function submit() {
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-5 rounded-panel p-5">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="text-base font-bold">{{ title ?? $t('admin.polygon.form.board') }}</h2>
-      <span
-        v-if="withFile"
-        class="rounded-pill border border-line-strong px-2.5 py-1 font-mono text-xs text-muted"
-      >
-        {{
-          $t('admin.polygon.form.permissionChip', { permission: 'judge.import_polygon_package' })
-        }}
-      </span>
-    </div>
+  <section :class="[CARD, 'flex flex-col gap-4 p-4 md:p-5']">
+    <h2 class="font-display text-base font-semibold">
+      {{ title ?? $t('admin.polygon.form.board') }}
+    </h2>
 
     <form class="@container flex flex-col gap-5" @submit.prevent="submit">
       <div
         v-if="withFile"
         data-testid="polygon-file"
-        class="flex flex-col gap-3 rounded-panel border border-dashed border-line-strong p-4"
+        class="flex flex-col items-center gap-2 rounded-row border-2 border-dashed border-line-strong bg-surface-strong px-4 py-6 text-center"
+        :class="errorOf('file') && 'border-negative'"
         @dragover.prevent
         @drop.prevent="onDrop"
       >
+        <FileArchive aria-hidden="true" class="size-6 text-muted" :stroke-width="1.75" />
         <p class="font-semibold">{{ $t('admin.polygon.form.drop') }}</p>
-        <p v-if="form.file" class="text-sm text-muted">
+        <p v-if="form.file" class="font-mono text-sm">
           {{
             $t('admin.polygon.form.pickedFile', {
               name: form.file.name,
@@ -112,7 +111,9 @@ function submit() {
           :is-pending="isPending"
           @picked="chooseFile"
         />
-        <p v-if="errorOf('file')" class="text-sm text-negative">{{ errorOf('file') }}</p>
+        <p v-if="errorOf('file')" role="alert" class="text-sm text-negative">
+          {{ errorOf('file') }}
+        </p>
       </div>
 
       <div class="grid gap-5 @lg:grid-cols-2">
@@ -125,7 +126,7 @@ function submit() {
           <input
             :id="id"
             v-model="form.code"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             autocomplete="off"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
@@ -139,18 +140,19 @@ function submit() {
           <label
             v-for="mode in IMPORT_MODES"
             :key="mode"
-            class="flex min-h-11 flex-wrap items-center gap-2"
+            class="flex min-h-9 flex-wrap items-center gap-2 pointer-coarse:min-h-11"
           >
             <input
               v-model="form.mode"
               type="radio"
               name="import-mode"
+              class="size-4 accent-[var(--qh-accent)]"
               :value="mode"
               :disabled="!canUseMode(mode)"
             />
             {{ $t(`admin.polygon.form.mode.${mode}`) }}
             <span v-if="!canUseMode(mode)" class="basis-full pl-6 text-sm text-muted">
-              {{ $t('admin.ui.needsPermission', { permission: IMPORT_MODE_PERMISSION[mode] }) }}
+              {{ needsPermissionText(IMPORT_MODE_PERMISSION[mode]) }}
             </span>
           </label>
           <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>
@@ -161,12 +163,7 @@ function submit() {
           :label="$t('admin.polygon.form.group')"
           :error="errorOf('groupId')"
         >
-          <select
-            :id="id"
-            v-model="form.groupId"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-          >
+          <select :id="id" v-model="form.groupId" :class="INPUT" :aria-describedby="describedBy">
             <option value="">{{ $t('admin.polygon.form.groupDefault') }}</option>
             <option v-for="group in groups" :key="group.id" :value="group.id">
               {{ group.fullName }}
@@ -187,7 +184,7 @@ function submit() {
             inputmode="numeric"
             min="800"
             max="3500"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
@@ -196,10 +193,7 @@ function submit() {
         <fieldset class="flex flex-col gap-2 @lg:col-span-2">
           <legend class="mb-1.5 text-sm font-semibold">{{ $t('admin.polygon.form.types') }}</legend>
           <p v-if="errorOf('typeIds')" class="text-sm text-negative">{{ errorOf('typeIds') }}</p>
-          <label v-for="type in types" :key="type.id" class="flex min-h-11 items-center gap-2">
-            <input v-model="form.typeIds" type="checkbox" :value="type.id" />
-            {{ type.fullName }}
-          </label>
+          <AdminCheckChips v-model="form.typeIds" :options="typeOptions" name="import-types" />
         </fieldset>
 
         <UsernameChips
@@ -222,7 +216,7 @@ function submit() {
           <input
             :id="id"
             v-model="form.mainStatementLanguage"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             autocomplete="off"
             :aria-describedby="describedBy"
           />
@@ -233,12 +227,7 @@ function submit() {
           :label="$t('admin.polygon.form.solutionLanguage')"
           :error="errorOf('tutorialLanguage')"
         >
-          <input
-            :id="id"
-            v-model="form.tutorialLanguage"
-            :class="ADMIN_INPUT_CLASS"
-            autocomplete="off"
-          />
+          <input :id="id" v-model="form.tutorialLanguage" :class="INPUT" autocomplete="off" />
         </AdminField>
 
         <AdminField
@@ -252,43 +241,46 @@ function submit() {
             :id="id"
             v-model="form.languageMapText"
             rows="3"
-            :class="[ADMIN_INPUT_CLASS, 'py-2']"
+            :class="[INPUT, 'py-2']"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
         </AdminField>
       </div>
 
-      <div class="flex flex-col gap-4">
-        <AdminSwitch
+      <div class="grid gap-3 border-t border-line pt-4 @lg:grid-cols-2">
+        <ImportCheckbox
           v-model="form.ignoreZeroPointBatches"
           :label="$t('admin.polygon.form.ignoreBatches')"
         />
-        <AdminSwitch
+        <ImportCheckbox
           v-model="form.ignoreZeroPointCases"
           :label="$t('admin.polygon.form.ignoreCases')"
         />
-        <AdminSwitch
+        <ImportCheckbox
           v-model="form.appendMainSolution"
           :label="$t('admin.polygon.form.appendSolution')"
         />
+        <slot name="extra" />
       </div>
-
-      <slot name="extra" />
 
       <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
         <slot name="actions" />
+        <p
+          v-if="withFile && !form.file"
+          id="import-submit-reason"
+          class="ml-auto text-sm text-muted"
+        >
+          {{ $t('admin.polygon.form.submitNeedsFile') }}
+        </p>
         <button
           type="submit"
-          class="ml-auto"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="[buttonClass('primary'), !(withFile && !form.file) && 'ml-auto']"
           :aria-disabled="isSubmitBlocked || undefined"
+          :aria-describedby="withFile && !form.file ? 'import-submit-reason' : undefined"
         >
           {{ $t('admin.polygon.form.submit') }}
         </button>
-        <p v-if="withFile && !form.file" class="basis-full text-sm text-muted">
-          {{ $t('admin.polygon.form.submitNeedsFile') }}
-        </p>
       </div>
     </form>
   </section>
