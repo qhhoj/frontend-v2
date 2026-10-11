@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OrganizationLogo from '@/features/organizations/OrganizationLogo.vue';
 import { computed } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -88,15 +89,18 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
       </GlassCard>
       <GlassCard v-if="user.organizations.length" class="p-5">
         <h2 class="font-display text-base font-bold">{{ $t('profile.organizations') }}</h2>
-        <ul class="mt-3 flex flex-col gap-2">
+        <ul class="mt-3 flex flex-col gap-1">
           <li v-for="organization in user.organizations" :key="organization.id">
             <RouterLink
               :to="{ name: 'organization', params: { slug: organization.slug } }"
-              class="font-semibold hover:underline"
+              class="flex min-w-0 items-center gap-3 rounded-row p-1.5 hover:bg-surface-hover"
             >
-              {{ organization.name }}
+              <OrganizationLogo :organization="organization" />
+              <span class="flex min-w-0 flex-col">
+                <span class="break-words font-semibold">{{ organization.name }}</span>
+                <span class="truncate text-sm text-muted">{{ organization.shortName }}</span>
+              </span>
             </RouterLink>
-            <span class="text-sm text-muted">{{ organization.shortName }}</span>
           </li>
         </ul>
       </GlassCard>

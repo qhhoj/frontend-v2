@@ -13,7 +13,9 @@ const props = withDefaults(
 );
 
 const look = computed(() => avatarLook(props.username, props.status));
-const rects = computed(() => avatarRects(avatarPixels(look.value), props.size));
+/** Profile sizes inset the sprite by 8 px so its hat and antenna stay inside the rounded tile; list sizes fill it. */
+const inset = computed(() => (props.size >= 96 ? 8 : 0));
+const rects = computed(() => avatarRects(avatarPixels(look.value), props.size - 2 * inset.value));
 /** The tile is 22 % of the size as a corner radius, rounded to whole pixels. */
 const radius = computed(() => `${Math.round(props.size * 0.22)}px`);
 </script>
@@ -33,14 +35,16 @@ const radius = computed(() => `${Math.round(props.size * 0.22)}px`);
       imageRendering: 'pixelated',
     }"
   >
-    <rect
-      v-for="(rect, index) in rects"
-      :key="index"
-      :x="rect.x"
-      :y="rect.y"
-      :width="rect.width"
-      :height="rect.height"
-      :fill="rect.colour"
-    />
+    <g :transform="`translate(${inset} ${inset})`">
+      <rect
+        v-for="(rect, index) in rects"
+        :key="index"
+        :x="rect.x"
+        :y="rect.y"
+        :width="rect.width"
+        :height="rect.height"
+        :fill="rect.colour"
+      />
+    </g>
   </svg>
 </template>
