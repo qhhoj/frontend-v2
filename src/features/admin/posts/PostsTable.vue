@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue';
+import { computed, onUnmounted, watchEffect } from 'vue';
 import type { PostListItem } from '@/api/types/blog';
 import { hasPermission } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
@@ -43,6 +43,10 @@ const selection = usePostSelection();
 watchEffect(() => {
   if (selection)
     selection.shown.value = props.posts.filter((post) => post.visible).map((post) => post.id);
+});
+/** A tab with no table (empty, loading, failed) shows no rows to tick. */
+onUnmounted(() => {
+  if (selection) selection.shown.value = [];
 });
 </script>
 

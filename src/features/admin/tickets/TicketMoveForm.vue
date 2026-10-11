@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { updateTicket } from '@/api/tickets.api';
 import type { TicketDetail, TicketPatch } from '@/api/types/tickets';
 import { TICKET_TITLE_MAX_LENGTH } from '@/api/types/tickets';
@@ -14,8 +14,23 @@ import { movePatchOf } from './ticket-queue';
 /** Staff retitle a ticket or link it to another problem (legacy `TicketAdmin`); only changed fields are sent. */
 const props = defineProps<{ ticket: TicketDetail }>();
 const queryClient = useQueryClient();
+const problemOf = (ticket: TicketDetail) =>
+  ticket.link.type === 'problem' ? (ticket.link.key ?? '') : '';
 const title = ref(props.ticket.title);
-const problem = ref(props.ticket.link.type === 'problem' ? (props.ticket.link.key ?? '') : '');
+const problem = ref(problemOf(props.ticket));
+/** Another staff member's change shows in a field this form has not touched, so saving never reverts it. */
+watch(
+  () => props.ticket.title,
+  (next, previous) => {
+    if (title.value === previous) title.value = next;
+  },
+);
+watch(
+  () => problemOf(props.ticket),
+  (next, previous) => {
+    if (problem.value === previous) problem.value = next;
+  },
+);
 
 const save = useAdminMutation({
   mutate: (patch: TicketPatch) => updateTicket(props.ticket.id, patch),

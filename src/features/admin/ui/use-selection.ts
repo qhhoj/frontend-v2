@@ -3,13 +3,16 @@ import type { MaybeRefOrGetter } from 'vue';
 
 /**
  * Row selection for a list's bulk bar: the selectable ids of the shown page, at most `max` picked by "select page".
- * A new page of rows starts with nothing selected.
+ * When the rows change (refetch, another page or tab), only the ticks of rows still shown are kept.
  */
 export function useSelection(ids: MaybeRefOrGetter<readonly string[]>, max: number) {
   const selected = ref(new Set<string>());
   watch(
     () => toValue(ids),
-    () => (selected.value = new Set()),
+    (shown) => {
+      const kept = new Set(shown);
+      selected.value = new Set([...selected.value].filter((id) => kept.has(id)));
+    },
   );
   const allSelected = computed(
     () => toValue(ids).length > 0 && selected.value.size === Math.min(toValue(ids).length, max),

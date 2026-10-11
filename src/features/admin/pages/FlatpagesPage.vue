@@ -95,24 +95,24 @@ async function loadRevision(revision: FlatpageRevision) {
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start">
       <section class="flex min-w-0 flex-col gap-3" :aria-label="$t('admin.shell.screens.pages')">
+        <form role="search" class="flex gap-2" @submit.prevent="searchList">
+          <input
+            v-model="searchText"
+            type="search"
+            autocomplete="off"
+            :aria-label="t('admin.pages.list.search')"
+            :placeholder="t('admin.pages.list.searchPlaceholder')"
+            :class="ADMIN_INPUT_CLASS"
+          />
+          <button type="submit" :class="ADMIN_BUTTON_CLASS">
+            {{ t('admin.pages.list.searchSubmit') }}
+          </button>
+        </form>
         <QueryState
           :loading="list.isPending.value"
           :error="list.error.value"
           @retry="list.refetch()"
         >
-          <form role="search" class="flex gap-2" @submit.prevent="searchList">
-            <input
-              v-model="searchText"
-              type="search"
-              autocomplete="off"
-              :aria-label="t('admin.pages.list.search')"
-              :placeholder="t('admin.pages.list.searchPlaceholder')"
-              :class="ADMIN_INPUT_CLASS"
-            />
-            <button type="submit" :class="ADMIN_BUTTON_CLASS">
-              {{ t('admin.pages.list.searchSubmit') }}
-            </button>
-          </form>
           <p class="text-sm text-muted">{{ t('admin.pages.list.total', { total }) }}</p>
           <ul class="flex flex-col gap-2">
             <li v-for="item in list.data.value?.items ?? []" :key="item.id">

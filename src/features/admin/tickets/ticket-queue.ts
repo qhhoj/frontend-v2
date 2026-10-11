@@ -23,6 +23,8 @@ export const statusOf = (query: TicketListQuery): QueueStatus => {
 export const withStatus = (query: TicketListQuery, status: QueueStatus): TicketListQuery => ({
   ...query,
   open: OPEN_FLAG[status],
+  // Waiting for staff are open tickets only: another status drops it.
+  awaiting: status === 'open' ? query.awaiting : undefined,
   page: 1,
 });
 

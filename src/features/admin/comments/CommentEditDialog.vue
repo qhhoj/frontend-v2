@@ -21,18 +21,17 @@ const localError = ref<string | null>(null);
 
 const save = useAdminMutation({
   mutate: ({ id, text }: { id: string; text: string }) => editComment(id, text),
-  invalidates: () => [
-    ['admin', 'comments'],
-    ['admin', 'comment-reports'],
-  ],
+  invalidates: () => [['admin', 'comments'], ['admin', 'comment-reports'], ['comments']],
   onDone: () => {
     emit('saved');
     visible.value = false;
   },
 });
 
-/** Each open starts from the stored text, never a draft left from the last comment. */
+/** Each open starts from the stored text, never a draft left from the last comment; a late answer for an earlier open is dropped. */
+let openCount = 0;
 watch(visible, async (isOpen) => {
+  const thisOpen = ++openCount;
   if (!isOpen || !props.commentId) return;
   save.reset();
   localError.value = null;
@@ -40,11 +39,12 @@ watch(visible, async (isOpen) => {
   body.value = '';
   isLoading.value = true;
   try {
-    body.value = (await fetchComment(props.commentId)).body ?? '';
+    const text = (await fetchComment(props.commentId)).body ?? '';
+    if (thisOpen === openCount) body.value = text;
   } catch {
-    loadError.value = translate('admin.comments.edit.loadFailed');
+    if (thisOpen === openCount) loadError.value = translate('admin.comments.edit.loadFailed');
   } finally {
-    isLoading.value = false;
+    if (thisOpen === openCount) isLoading.value = false;
   }
 });
 

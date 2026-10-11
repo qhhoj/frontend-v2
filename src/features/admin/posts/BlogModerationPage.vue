@@ -25,10 +25,10 @@ import { useBulkHidePosts } from './use-bulk-hide-posts';
 import type { BulkHideOutcome } from './use-bulk-hide-posts';
 import AdminBulkBar from '../ui/AdminBulkBar.vue';
 import { useSelection } from '../ui/use-selection';
+import type { PostFlags, RowFailure } from './moderation';
 
 /** Ticked rows hidden in one go: one page of the table at most. */
 const BULK_HIDE_POSTS_MAX = 50;
-import type { PostFlags, RowFailure } from './moderation';
 
 const route = useRoute();
 const router = useRouter();
@@ -71,8 +71,12 @@ const bulkResult = ref<BulkHideOutcome | null>(null);
 async function confirmBulkHide() {
   beginChange();
   bulkResult.value = null;
-  const outcome = await bulkHide.run([...selection.selected.value]);
-  isBulkConfirmOpen.value = false;
+  let outcome: BulkHideOutcome | undefined;
+  try {
+    outcome = await bulkHide.run([...selection.selected.value]);
+  } finally {
+    isBulkConfirmOpen.value = false;
+  }
   if (!outcome) return;
   bulkResult.value = outcome;
   selection.clear();
