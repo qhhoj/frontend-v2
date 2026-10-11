@@ -91,9 +91,9 @@ const columns = computed(() =>
 );
 const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
 const shownKeys = computed(() => columns.value.map((column) => column.key));
-/** Only the full table has fixed column widths and tiers. */
 const isOwn = (row: SubmissionListItem) =>
   props.ownUsername !== undefined && row.user?.username === props.ownUsername;
+/** Only the full table has fixed column widths and tiers. */
 const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
 const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
 </script>
