@@ -307,8 +307,6 @@
       "points": "{points} điểm"
     },
     "best": {
-      "column": "Xếp hạng",
-      "button": "Top bài nộp",
       "title": "Bài nộp tốt nhất · {problem}",
       "back": "Về danh sách bài",
       "problems": "Chọn bài",
