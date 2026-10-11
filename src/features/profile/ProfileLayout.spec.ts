@@ -200,3 +200,19 @@ it('shows a failed ban inside the dialog and keeps the dialog open', async () =>
   expect(document.querySelector('[role="dialog"]')).not.toBeNull();
   expect(wrapper.find('[data-state="success"]').exists()).toBe(false);
 });
+
+it('moves the URL to the current name when an old, renamed username is opened', async () => {
+  mockApi({
+    ...anonymousViewer,
+    ...profileRoutes(other),
+    // The old name answers with the same, renamed user.
+    ...Object.fromEntries(
+      Object.entries(profileRoutes(other)).map(([key, answer]) => [
+        key.replace('/ngoc_anh', '/ngoc_anh_old'),
+        answer,
+      ]),
+    ),
+  });
+  const { router } = await mountApp('/users/ngoc_anh_old?tab=x');
+  await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/users/ngoc_anh?tab=x'));
+});

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -16,6 +17,19 @@ const isMissing = computed(
   () => error.value instanceof ApiError && error.value.code === 'not_found',
 );
 usePageTitle(() => user.value?.username);
+
+/** A staff rename keeps the old name answering (backend `previousUsernames`): move the URL to the current name, same tab and query. */
+const route = useRoute();
+const router = useRouter();
+watch(user, (shown) => {
+  if (shown && shown.username.toLowerCase() !== username.value.toLowerCase())
+    void router.replace({
+      name: route.name!,
+      params: { ...route.params, username: shown.username },
+      query: route.query,
+      hash: route.hash,
+    });
+});
 </script>
 
 <template>
