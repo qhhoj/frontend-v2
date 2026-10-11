@@ -45,3 +45,10 @@ export const fetchContestSubmissions = (
   apiGetPage('/contests/{key}/submissions', { path: { key }, query });
 export const fetchContestStats = (key: string) =>
   apiGet('/contests/{key}/stats', { path: { key } });
+/** Each user's best submission on one contest problem, best first (contest submissions only; the ranking's visibility and freeze apply). */
+export const fetchContestBestSubmissions = (
+  key: string,
+  code: string,
+  query: { page: number; pageSize: number },
+): Promise<Page<SubmissionListItem>> =>
+  apiGetPage('/contests/{key}/problems/{code}/best-submissions', { path: { key, code }, query });

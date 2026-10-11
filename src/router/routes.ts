@@ -77,6 +77,18 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.contestBalloonsPrint', requiresAuth: true, layout: 'auth' },
   },
   {
+    path: '/contests/:key/all',
+    name: 'contest-all',
+    component: () => import('@/features/contests/print/ContestPrintPage.vue'),
+    meta: { titleKey: 'pages.contestAll' },
+  },
+  {
+    path: '/contests/:key/problems/:code/best',
+    name: 'contest-problem-best',
+    component: () => import('@/features/contests/best/ContestBestPage.vue'),
+    meta: { titleKey: 'pages.contestProblemBest' },
+  },
+  {
     path: '/contests/:key/announcements',
     name: 'contest-announcements',
     component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),

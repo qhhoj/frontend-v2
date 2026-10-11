@@ -23,6 +23,7 @@ const props = defineProps<{
   problemLabels: Record<string, string>;
   pickedIds?: readonly string[];
   rankStart?: number;
+  ownUsername?: string;
 }>();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const locale = useLocaleStore();
@@ -43,7 +44,10 @@ const costOf = (row: SubmissionListItem) =>
       :key="row.id"
       :data-id="row.id"
       class="flex cursor-pointer items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0 hover:bg-surface-hover"
-      :class="{ 'row-added': highlightIds.has(row.id) }"
+      :class="{
+        'row-added': highlightIds.has(row.id),
+        'bg-accent-soft': ownUsername !== undefined && row.user?.username === ownUsername,
+      }"
       @click="openRow($event, row.id)"
       @auxclick="openRowInTab($event, row.id)"
     >

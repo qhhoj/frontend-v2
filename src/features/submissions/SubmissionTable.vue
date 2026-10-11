@@ -43,6 +43,8 @@ const props = withDefaults(
     pickedIds?: readonly string[];
     /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
     rankStart?: number;
+    /** The viewer's username: their rows are tinted (the best-submissions ranking). */
+    ownUsername?: string;
     /** One-line 42px rows (the list's "Gọn" density); the phone's stacked rows are the same either way. */
     dense?: boolean;
     /** The problem code after its name, in muted mono. */
@@ -55,6 +57,7 @@ const props = withDefaults(
     columnKeys: undefined,
     pickedIds: undefined,
     rankStart: undefined,
+    ownUsername: undefined,
     dense: false,
     showProblemCode: false,
   },
@@ -89,6 +92,8 @@ const columns = computed(() =>
 const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
 const shownKeys = computed(() => columns.value.map((column) => column.key));
 /** Only the full table has fixed column widths and tiers. */
+const isOwn = (row: SubmissionListItem) =>
+  props.ownUsername !== undefined && row.user?.username === props.ownUsername;
 const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
 const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
 </script>
@@ -103,6 +108,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
       :problem-labels="problemLabels"
       :picked-ids="pickedIds"
       :rank-start="rankStart"
+      :own-username="ownUsername"
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
@@ -143,7 +149,10 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             :key="row.id"
             :data-id="row.id"
             class="cursor-pointer border-t border-line hover:bg-surface-hover"
-            :class="{ 'row-added': highlightIds.has(row.id) }"
+            :class="{
+              'row-added': highlightIds.has(row.id),
+              'bg-accent-soft': isOwn(row),
+            }"
             @click="openRow($event, row.id)"
             @auxclick="openRowInTab($event, row.id)"
           >

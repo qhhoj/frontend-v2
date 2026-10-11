@@ -5,7 +5,8 @@ import AnnouncementLiveRegion from './AnnouncementLiveRegion.vue';
 import { useUnreadAnnouncementCount } from './announcement-seen';
 import { useContestQuery } from './contests.queries';
 
-const props = defineProps<{ contestKey: string; phase?: ContestPhase }>();
+/** `current` names the tab to light up on a page that is not a tab's own route (a problem's best submissions lights `contest`). */
+const props = defineProps<{ contestKey: string; phase?: ContestPhase; current?: string }>();
 interface ContestTab {
   name: string;
   labelKey: string;
@@ -40,6 +41,7 @@ const isStreaming = computed(() => props.phase !== undefined && props.phase !== 
       v-for="tab in visibleTabs"
       :key="tab.name"
       :to="{ name: tab.name, params: { key: contestKey } }"
+      :aria-current="tab.name === current ? 'page' : undefined"
       :class="LINK"
     >
       {{ $t(tab.labelKey) }}
