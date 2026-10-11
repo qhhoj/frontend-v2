@@ -152,6 +152,7 @@
       "current": "Your own password",
       "currentHint": "Confirms it is you making the change.",
       "submit": "Set password",
+      "submitting": "Setting password…",
       "done": "Password set for {username}; they were signed out everywhere."
     },
     "reset": {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { setUserPassword } from '@/api/users-admin.api';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
@@ -14,7 +14,13 @@ const { t } = useI18n();
 const newPassword = ref('');
 const confirmation = ref('');
 const currentPassword = ref('');
-const mismatch = ref(false);
+/** Set by the first submit: from then on the confirm field says at once whether the two copies match. */
+const attempted = ref(false);
+const inputs = {
+  newPassword: useTemplateRef<HTMLInputElement>('newInput'),
+  confirmation: useTemplateRef<HTMLInputElement>('confirmInput'),
+  currentPassword: useTemplateRef<HTMLInputElement>('adminInput'),
+};
 
 const set = useAdminMutation({
   mutate: () =>
@@ -24,11 +30,13 @@ const set = useAdminMutation({
     }),
   onSuccess: () => {
     newPassword.value = confirmation.value = currentPassword.value = '';
+    attempted.value = false;
   },
 });
 const errors = set.fieldErrors;
+const isMismatch = computed(() => newPassword.value !== confirmation.value);
 const confirmError = computed(() =>
-  mismatch.value ? t('admin.users.edit.password.mismatch') : undefined,
+  attempted.value && isMismatch.value ? t('admin.users.edit.password.mismatch') : undefined,
 );
 const isFilled = computed(() =>
   [newPassword, confirmation, currentPassword].every((field) => field.value !== ''),
@@ -40,11 +48,22 @@ const refusal = computed(() =>
     : null,
 );
 
-/** The two copies must match before anything is sent; the admin's own password is checked by the server. */
-function submit() {
-  if (!isFilled.value) return;
-  mismatch.value = newPassword.value !== confirmation.value;
-  if (!mismatch.value) void set.run(undefined);
+/** After a failed submit the first field in error takes focus, in form order. */
+async function focusFirstInvalid(fields: (keyof typeof inputs)[]) {
+  await nextTick();
+  inputs[fields[0]!]?.value?.focus();
+}
+
+/** The two copies must match before anything is sent; the policy, breach check and the admin's own password are the server's. */
+async function submit() {
+  if (!isFilled.value || set.isPending.value) return;
+  attempted.value = true;
+  if (isMismatch.value) return void focusFirstInvalid(['confirmation']);
+  await set.run(undefined);
+  const invalid = (['newPassword', 'currentPassword'] as const).filter(
+    (field) => errors.value[field],
+  );
+  if (invalid.length) void focusFirstInvalid(invalid);
 }
 </script>
 
@@ -68,6 +87,7 @@ function submit() {
       >
         <input
           :id="id"
+          ref="newInput"
           v-model="newPassword"
           type="password"
           autocomplete="new-password"
@@ -84,6 +104,7 @@ function submit() {
       >
         <input
           :id="id"
+          ref="confirmInput"
           v-model="confirmation"
           type="password"
           autocomplete="new-password"
@@ -102,6 +123,7 @@ function submit() {
     >
       <input
         :id="id"
+        ref="adminInput"
         v-model="currentPassword"
         type="password"
         autocomplete="current-password"
@@ -117,7 +139,11 @@ function submit() {
       :aria-disabled="!isFilled || set.isPending.value || undefined"
       :aria-busy="set.isPending.value || undefined"
     >
-      {{ $t('admin.users.edit.password.submit') }}
+      {{
+        set.isPending.value
+          ? $t('admin.users.edit.password.submitting')
+          : $t('admin.users.edit.password.submit')
+      }}
     </button>
     <AdminStatus
       v-if="set.isDone.value"
