@@ -41,35 +41,35 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
     class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
   >
     <div class="flex min-w-0 flex-col gap-4">
-      <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
+      <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <UserAvatar :username="user.username" :size="96" />
-        <div class="flex min-w-0 flex-col gap-2">
-          <p class="flex flex-wrap items-center gap-2 text-sm">
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 :class="tierClass" class="page-title break-all">
+              {{ user.username }}
+            </h1>
             <span
               :class="tierClass"
-              class="rounded-pill border border-line px-3 py-0.5 font-semibold"
+              class="rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold"
             >
               {{ $t(tierLabelKey) }}
             </span>
             <span
               v-if="isOwn"
-              class="rounded-pill bg-accent-soft px-3 py-0.5 font-semibold text-accent-soft-text"
+              class="rounded-pill bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-soft-text"
             >
               {{ $t('profile.own') }}
             </span>
-          </p>
-          <h1 :class="tierClass" class="page-title break-all">
-            {{ user.username }}
-          </h1>
+          </div>
           <p class="text-muted">
             {{ $t('profile.joined', { name: user.displayName, date: joinedDate }) }}
           </p>
-          <ul v-if="user.organizations.length" class="flex flex-wrap gap-2">
+          <ul v-if="user.organizations.length" class="mt-1 flex flex-wrap gap-1.5">
             <li v-for="organization in user.organizations" :key="organization.id">
               <RouterLink
                 :to="{ name: 'organization', params: { slug: organization.slug } }"
                 :title="organization.name"
-                class="inline-flex min-h-8 items-center rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover"
+                class="inline-flex items-center rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold hover:bg-surface-hover"
               >
                 {{ organization.shortName }}
               </RouterLink>
