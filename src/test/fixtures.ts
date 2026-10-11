@@ -239,7 +239,6 @@ export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestLi
   formatName: 'icpc',
   isRated: true,
   tags: [],
-  organizations: [],
   userCount: 318,
   virtualCount: 0,
   organizations: [],
@@ -637,7 +636,6 @@ export const submissionStats = (overrides: Partial<SubmissionStats> = {}): Submi
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,
-  verdictsToday: [],
   ...overrides,
 });
 
