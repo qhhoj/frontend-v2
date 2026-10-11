@@ -42,8 +42,8 @@ export const BUTTON = {
   danger: buttonClass('danger'),
 } as const;
 
-/** Text inputs, selects and textareas. Text stays at the inherited 16 px, so iOS does not zoom. */
-export const INPUT = `${CONTROL_HEIGHT} w-full rounded-cell border border-line-strong bg-surface-solid px-3 text-content aria-invalid:border-negative aria-invalid:inset-ring aria-invalid:inset-ring-negative`;
+/** Text inputs, selects and textareas. Text stays at the inherited 16 px, so iOS does not zoom. Disabled: muted pair, no opacity. */
+export const INPUT = `${CONTROL_HEIGHT} w-full rounded-cell border border-line-strong bg-surface-solid px-3 text-content aria-invalid:border-negative aria-invalid:inset-ring aria-invalid:inset-ring-negative disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-strong disabled:text-muted`;
 
 /** A checkbox styled as a pill: language and verdict pickers. */
 export const CHECK_CHIP = `inline-flex ${CONTROL_HEIGHT} items-center gap-2 rounded-pill border border-line px-3 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text`;
