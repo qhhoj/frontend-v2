@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
+import RankingProblemHeader from '../RankingProblemHeader.vue';
 import { Ghost } from 'lucide-vue-next';
 import { computed, ref, toRef, TransitionGroup } from 'vue';
 import UserName from '@/components/UserName.vue';
@@ -90,7 +91,7 @@ defineExpose({ focusRow });
             scope="col"
             class="px-1.5 py-3.5 font-bold text-content"
           >
-            <abbr :title="problem.code" class="no-underline">{{ problem.label }}</abbr>
+            <RankingProblemHeader :problem="problem" />
           </th>
         </tr>
       </thead>
