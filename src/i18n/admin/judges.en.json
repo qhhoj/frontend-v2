@@ -5,8 +5,7 @@
     "empty": "No judges yet.",
     "emptyAdd": "Add judge",
     "search": "Find a judge",
-    "searchPlaceholder": "Name or IP",
-    "noMatch": "No judge matches."
+    "searchPlaceholder": "Name or IP"
   },
   "stats": {
     "online": "online",
@@ -27,20 +26,16 @@
   },
   "row": {
     "ping": "{ms} ms",
-    "languages": "{count} languages",
-    "slots": "{busy}/{slots} slots busy",
-    "build": "build {build}",
     "disable": "Disable",
     "enable": "Enable again",
     "block": "Block",
     "unblock": "Unblock",
-    "rotate": "Key",
+    "rotate": "Rotate key",
     "disconnect": "Disconnect",
-    "details": "Details",
+    "details": "Judge info",
     "started": "Started {time} · ping is the mean of the last 6 measurements.",
     "descriptionLabel": "Description (shown to staff)",
     "saveDescription": "Save description",
-    "loadLabel": "Load",
     "delete": "Delete",
     "protocol": "Protocol",
     "features": "Features",
@@ -117,5 +112,25 @@
       "pinnedOffline": "{count} submissions are waiting for judge {subject} alone, which is not working.",
       "stale": "The oldest waiting submission has waited over 5 minutes: the queue may be stuck."
     }
+  },
+  "table": {
+    "caption": "Judges",
+    "name": "Judge",
+    "status": "Status",
+    "load": "Load",
+    "ping": "Ping",
+    "busy": "Grading",
+    "build": "Build",
+    "languages": "Languages",
+    "ip": "IP"
+  },
+  "toast": {
+    "disabled": "{name} disabled",
+    "enabled": "{name} enabled",
+    "blocked": "{name} blocked",
+    "unblocked": "{name} unblocked",
+    "description": "Description of {name} saved",
+    "disconnected": "{name} disconnected",
+    "deleted": "{name} deleted"
   }
 }

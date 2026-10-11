@@ -32,6 +32,7 @@ const fileSizeHint = computed(() => {
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.ace')"
+        required
         input-id="language-ace"
         :hint="$t('admin.languages.form.hints.editor')"
         :error="errors.ace"
@@ -49,6 +50,7 @@ const fileSizeHint = computed(() => {
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.pygments')"
+        required
         input-id="language-pygments"
         :hint="$t('admin.languages.form.hints.editor')"
         :error="errors.pygments"
@@ -66,6 +68,7 @@ const fileSizeHint = computed(() => {
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.extension')"
+        required
         input-id="language-extension"
         :hint="$t('admin.languages.form.hints.extension')"
         :error="errors.extension"

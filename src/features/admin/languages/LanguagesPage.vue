@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { buttonClass } from '../ui/controls';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import { useJudgesQuery } from '../judges/judges.queries';
-import {
-  hasVersionDrift,
-  singleJudgeLanguages,
-  unservedLanguages,
-  withCoverage,
-} from './languages';
+import LanguagesTable from './LanguagesTable.vue';
+import { singleJudgeLanguages, unservedLanguages, withCoverage } from './languages';
+import type { LanguageRow } from './languages';
 import { useLanguagesAdminQuery } from './languages.queries';
 
+const { t } = useI18n();
 const { can } = usePermissions();
 const canSeeJudges = computed(() => can('judge.change_judge'));
 const canAdd = computed(() => can('judge.add_language'));
@@ -30,16 +29,26 @@ const rows = computed(() => withCoverage(data.value ?? [], judges.value));
 const singles = computed(() => singleJudgeLanguages(rows.value));
 const unserved = computed(() => unservedLanguages(rows.value));
 const onlineJudgeCount = computed(() => judges.value?.filter((judge) => judge.online).length ?? 0);
-const judgeTotal = computed(() => judges.value?.length ?? 0);
-const percentOf = (count: number) =>
-  judgeTotal.value === 0 ? 0 : (count / judgeTotal.value) * 100;
+const judgeTotal = computed(() => judges.value?.length ?? null);
+/** One caution notice for the single points of failure: one language is named in the title, several are counted. */
+const singleTitle = computed(() =>
+  singles.value.length === 1
+    ? t('admin.languages.single.title', { key: singles.value[0]!.key })
+    : t('admin.languages.single.many', { count: singles.value.length }),
+);
+const singleBody = (row: LanguageRow) =>
+  t('admin.languages.single.body', { key: row.key, judge: row.judges?.[0] ?? '' });
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader :title="$t('admin.languages.title')" :lead="$t('admin.languages.lead')">
       <template #actions>
-        <RouterLink v-if="canAdd" :to="{ name: 'admin-languageNew' }" :class="ADMIN_PRIMARY_CLASS">
+        <RouterLink
+          v-if="canAdd"
+          :to="{ name: 'admin-languageNew' }"
+          :class="buttonClass('primary')"
+        >
           {{ $t('admin.languages.actions.add') }}
         </RouterLink>
       </template>
@@ -47,21 +56,8 @@ const percentOf = (count: number) =>
     <AdminNotice v-if="!canEdit && canAdd" :title="$t('admin.languages.addOnly')" />
     <QueryState v-if="canEdit" :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <div class="flex flex-col gap-4">
-          <SkeletonBlock class="h-20 w-full" />
-          <SkeletonBlock class="h-64 w-full" />
-        </div>
+        <SkeletonBlock class="h-64 w-full" />
       </template>
-      <section class="glass flex flex-wrap gap-x-8 gap-y-2 rounded-panel p-5 text-sm">
-        <p class="font-semibold">{{ $t('admin.languages.stats.count', { count: rows.length }) }}</p>
-        <template v-if="judges">
-          <p class="flex items-center gap-1.5">
-            <AdminBit v-if="onlineJudgeCount > 0" placement="queued" />
-            {{ $t('admin.languages.stats.online', { online: onlineJudgeCount }) }}
-          </p>
-          <p>{{ $t('admin.languages.stats.single', { single: singles.length }) }}</p>
-        </template>
-      </section>
       <AdminNotice
         v-if="hasJudgesError"
         tone="caution"
@@ -75,123 +71,39 @@ const percentOf = (count: number) =>
         :summary="$t('admin.languages.unserved.body', { name: row.name })"
       />
       <AdminNotice
-        v-for="single in singles"
-        :key="single.key"
+        v-if="singles.length === 1"
         tone="caution"
-        :title="$t('admin.languages.single.title', { key: single.key })"
-        :summary="
-          $t('admin.languages.single.body', { key: single.key, judge: single.judges?.[0] ?? '' })
-        "
+        :title="singleTitle"
+        :summary="singleBody(singles[0]!)"
       />
-      <div v-if="rows.length > 0" class="glass overflow-x-auto rounded-panel p-5">
-        <table class="w-full min-w-max text-left text-sm">
-          <thead>
-            <tr class="border-b border-line text-muted">
-              <th scope="col" class="py-2 pr-4 font-semibold">
-                {{ $t('admin.languages.table.key') }}
-              </th>
-              <th scope="col" class="py-2 pr-4 font-semibold">
-                {{ $t('admin.languages.table.name') }}
-              </th>
-              <th scope="col" class="py-2 pr-4 font-semibold">
-                {{ $t('admin.languages.table.extension') }}
-              </th>
-              <th scope="col" class="py-2 pr-4 font-semibold">
-                {{ $t('admin.languages.table.inProblem') }}
-              </th>
-              <th v-if="judges" scope="col" class="py-2 pr-4 font-semibold">
-                {{ $t('admin.languages.table.coverage') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in rows" :key="row.key" class="border-b border-line align-top">
-              <td class="py-3 pr-4">
-                <RouterLink
-                  v-if="canEdit"
-                  :to="{ name: 'admin-languageEdit', params: { key: row.key } }"
-                  class="font-mono underline-offset-2 hover:underline"
-                  >{{ row.key }}</RouterLink
-                >
-                <span v-else class="font-mono">{{ row.key }}</span>
-              </td>
-              <td class="py-3 pr-4">
-                {{ row.name }}
-                <span
-                  v-if="row.fileOnly"
-                  class="ml-1.5 rounded-pill border border-line px-2 text-xs text-muted"
-                >
-                  {{ $t('admin.languages.table.fileOnly') }}
-                </span>
-              </td>
-              <td class="py-3 pr-4 font-mono">.{{ row.extension }}</td>
-              <td class="py-3 pr-4">
-                {{
-                  row.includeInProblem
-                    ? $t('admin.languages.table.yes')
-                    : $t('admin.languages.table.no')
-                }}
-              </td>
-              <td v-if="judges" class="py-3 pr-4">
-                <div class="flex flex-col gap-2">
-                  <p>
-                    {{
-                      $t('admin.languages.table.judgesCount', {
-                        count: row.judges?.length ?? 0,
-                        total: judgeTotal,
-                      })
-                    }}
-                    <span
-                      :class="
-                        row.onlineJudges?.length ? 'text-muted' : 'font-semibold text-negative'
-                      "
-                    >
-                      ·
-                      {{
-                        $t('admin.languages.table.onlineCount', {
-                          count: row.onlineJudges?.length ?? 0,
-                        })
-                      }}
-                    </span>
-                  </p>
-                  <span
-                    v-if="hasVersionDrift(row)"
-                    class="self-start rounded-pill border border-line-strong px-2 text-xs font-semibold"
-                  >
-                    {{ $t('admin.languages.table.versionDrift') }}
-                  </span>
-                  <div aria-hidden="true" class="h-2 w-28 rounded-pill bg-surface-hover">
-                    <div
-                      class="h-2 rounded-pill bg-accent"
-                      :style="{ width: `${percentOf(row.judges?.length ?? 0)}%` }"
-                    />
-                  </div>
-                  <details>
-                    <summary class="cursor-pointer text-accent-text">
-                      {{ $t('admin.languages.table.showJudges') }}
-                    </summary>
-                    <ul class="mt-1 font-mono">
-                      <li v-for="version in row.versions ?? []" :key="version.judge">
-                        <RouterLink :to="{ name: 'admin-judges' }" class="hover:underline">{{
-                          version.judge
-                        }}</RouterLink>
-                        <span class="text-muted"> · {{ version.runtime }}</span>
-                      </li>
-                    </ul>
-                  </details>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <section v-else class="glass flex flex-col items-center gap-3 rounded-panel p-6 text-center">
-        <AdminBit placement="empty" />
-        <p>{{ $t('admin.languages.empty') }}</p>
-        <RouterLink v-if="canAdd" :to="{ name: 'admin-languageNew' }" :class="ADMIN_PRIMARY_CLASS">
-          {{ $t('admin.languages.actions.add') }}
-        </RouterLink>
-      </section>
+      <AdminNotice v-else-if="singles.length > 1" tone="caution" :title="singleTitle">
+        <p v-for="single in singles" :key="single.key" class="m-0">{{ singleBody(single) }}</p>
+      </AdminNotice>
+      <LanguagesTable :rows="rows" :judge-total="judgeTotal" :can-edit="canEdit">
+        <template #empty>
+          <div class="flex flex-col items-center gap-3 px-4 py-8 text-center">
+            <AdminBit placement="empty" />
+            <p>{{ $t('admin.languages.empty') }}</p>
+            <RouterLink
+              v-if="canAdd"
+              :to="{ name: 'admin-languageNew' }"
+              :class="buttonClass('secondary')"
+            >
+              {{ $t('admin.languages.actions.add') }}
+            </RouterLink>
+          </div>
+        </template>
+        <template #footer>
+          {{
+            judges
+              ? $t('admin.languages.table.summary', {
+                  count: rows.length,
+                  online: onlineJudgeCount,
+                })
+              : $t('admin.languages.table.summaryNoJudges', { count: rows.length })
+          }}
+        </template>
+      </LanguagesTable>
     </QueryState>
   </div>
 </template>

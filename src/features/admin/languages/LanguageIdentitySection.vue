@@ -17,6 +17,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
         v-if="mode === 'create'"
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.key')"
+        required
         input-id="language-key"
         :hint="$t('admin.languages.form.hints.key')"
         :error="errors.key"
@@ -46,6 +47,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.name')"
+        required
         input-id="language-name"
         :hint="$t('admin.languages.form.hints.name')"
         :error="errors.name"
@@ -82,6 +84,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.languages.form.labels.commonName')"
+        required
         input-id="language-commonName"
         :error="errors.commonName"
       >

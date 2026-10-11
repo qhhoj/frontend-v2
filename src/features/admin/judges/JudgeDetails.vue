@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT, buttonClass } from '../ui/controls';
 import type { Judge } from '@/api/types/judges-admin';
 import JudgeRuntimes from './JudgeRuntimes.vue';
 import { JUDGE_DESCRIPTION_MAX, trimmedDescription } from './judge-stats';
@@ -25,7 +25,7 @@ function save() {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 border-t border-line pt-4">
+  <div class="flex flex-col gap-5">
     <p v-if="judge.startTime" class="text-sm text-muted">
       {{
         $t('admin.judges.row.started', {
@@ -54,11 +54,11 @@ function save() {
           v-model="draft"
           rows="2"
           :aria-describedby="describedBy"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <div>
-        <button type="submit" :class="ADMIN_BUTTON_CLASS" :aria-busy="isSaving || undefined">
+        <button type="submit" :class="buttonClass()" :aria-busy="isSaving || undefined">
           {{ $t('admin.judges.row.saveDescription') }}
         </button>
       </div>

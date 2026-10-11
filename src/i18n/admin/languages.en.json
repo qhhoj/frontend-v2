@@ -1,28 +1,27 @@
 {
   "title": "Programming languages",
   "lead": "The languages submissions can use, and the judges that run them.",
-  "stats": {
-    "count": "{count} languages",
-    "online": "{online} judges online",
-    "single": "{single} run on one judge only"
-  },
   "single": {
     "title": "{key} runs on one judge only",
-    "body": "Submissions in {key} wait if judge {judge} is turned off or blocked."
+    "body": "Submissions in {key} wait if judge {judge} is turned off or blocked.",
+    "many": "{count} languages run on one judge only"
   },
   "table": {
     "key": "Key",
     "name": "Name",
     "extension": "Extension",
-    "inProblem": "In new problems",
-    "coverage": "Judges running it",
+    "inProblem": "New problems",
+    "coverage": "Judges",
     "judgesCount": "{count} / {total}",
     "showJudges": "Show judges",
     "fileOnly": "file upload only",
-    "yes": "Yes",
-    "no": "No",
     "onlineCount": "{count} online",
-    "versionDrift": "Versions differ"
+    "versionDrift": "Versions differ",
+    "caption": "Languages",
+    "summary": "{count} languages · {online} judges online",
+    "summaryNoJudges": "{count} languages",
+    "inProblemChip": "In new problems",
+    "versions": "Run by"
   },
   "empty": "No languages yet.",
   "form": {
@@ -36,13 +35,13 @@
       "content": "Shown to users"
     },
     "labels": {
-      "key": "Key *",
-      "name": "Name *",
+      "key": "Key",
+      "name": "Name",
       "shortName": "Short name",
-      "commonName": "Common name *",
-      "ace": "Ace mode *",
-      "pygments": "Pygments *",
-      "extension": "File extension *",
+      "commonName": "Common name",
+      "ace": "Ace mode",
+      "pygments": "Pygments",
+      "extension": "File extension",
       "fileSize": "File size limit (bytes)",
       "fileOnly": "Accept file uploads only",
       "includeInProblem": "Included in new problems",

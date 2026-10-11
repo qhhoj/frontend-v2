@@ -22,7 +22,7 @@ describe('LanguagesPage', () => {
     const { wrapper } = await mountLanguages();
     expect(wrapper.findAll('tbody tr')).toHaveLength(5);
     expect(calls.some((call) => call.path === '/judges')).toBe(false);
-    expect(wrapper.text()).not.toContain('Máy chấm hỗ trợ');
+    expect(wrapper.text()).not.toContain('trực tuyến');
     expect(wrapper.text()).not.toContain('chỉ chạy trên một máy');
   });
 

@@ -9,7 +9,7 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf, hasIssueCode } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { CARD, INPUT, buttonClass } from '../ui/controls';
 import JudgeKeyDialog from './JudgeKeyDialog.vue';
 import { JUDGE_DESCRIPTION_MAX, JUDGE_NAME_PATTERN, trimmedDescription } from './judge-stats';
 import { useJudgesCache } from './judges.queries';
@@ -66,11 +66,12 @@ function leaveAfterKey() {
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader :title="$t('admin.judges.add.title')" />
-    <form class="glass flex max-w-2xl flex-col gap-5 rounded-panel p-5" @submit.prevent="submit">
+    <form :class="[CARD, 'flex max-w-[55rem] flex-col gap-5 p-5']" @submit.prevent="submit">
       <AdminField
         v-slot="{ id, describedBy, invalid }"
         :label="$t('admin.judges.add.nameLabel')"
         input-id="judge-name"
+        required
         :hint="$t('admin.judges.add.nameHint')"
         :error="nameError ?? undefined"
       >
@@ -81,7 +82,7 @@ function leaveAfterKey() {
           autocomplete="off"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminField
@@ -96,17 +97,17 @@ function leaveAfterKey() {
           v-model="description"
           rows="3"
           :aria-describedby="describedBy"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
-      <div class="flex flex-wrap gap-3">
-        <RouterLink :to="{ name: 'admin-judges' }" :class="ADMIN_BUTTON_CLASS">
+      <div class="flex flex-wrap justify-end gap-3">
+        <RouterLink :to="{ name: 'admin-judges' }" :class="buttonClass('ghost')">
           {{ $t('admin.judges.add.cancel') }}
         </RouterLink>
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-busy="create.isPending.value || undefined"
         >
           {{ $t('admin.judges.add.submit') }}
