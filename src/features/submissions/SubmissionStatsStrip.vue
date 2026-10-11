@@ -70,7 +70,12 @@ const figures = computed(() => {
         <div v-for="figure in figures" :key="figure.id" class="flex items-baseline gap-1.5">
           <dt class="order-2">{{ $t(figure.labelKey) }}</dt>
           <dd class="order-1 m-0 font-mono text-[15px] font-bold text-content tabular-nums">
-            <SkeletonBlock v-if="pending && !stats" text class="w-10" />
+            <SkeletonBlock
+              v-if="pending && !stats"
+              data-skeleton-region="value"
+              text
+              class="w-10"
+            />
             <template v-else>{{ figure.value ?? NO_VALUE }}</template>
           </dd>
           <!-- Said in words as well: colour alone is not a message. -->
