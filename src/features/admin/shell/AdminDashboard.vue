@@ -65,11 +65,11 @@ const actions = computed(() =>
     <RecentChangesCard />
     <section v-for="entry in sections" :key="entry.id" class="flex flex-col gap-3">
       <h2 class="font-display text-base font-bold">{{ $t(entry.labelKey) }}</h2>
-      <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <ul class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <li v-for="item in entry.items" :key="item.id">
           <RouterLink
             :to="{ name: item.routeName }"
-            class="glass flex h-full flex-col gap-2 rounded-card p-4 hover:bg-surface-hover"
+            class="glass flex h-full min-w-0 flex-col gap-2 rounded-card p-4 wrap-anywhere hover:bg-surface-hover"
           >
             <component :is="item.icon" aria-hidden="true" class="size-5 text-accent" />
             <span class="font-semibold">{{ $t(item.labelKey) }}</span>
