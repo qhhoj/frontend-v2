@@ -17,7 +17,7 @@ import TestStrip from './TestStrip.vue';
 
 /**
  * The list's roomy ("Rộng") rows as cards: score ring; problem, then submitter and age, then the per-test strip; verdict and
- * time, memory and language on the right. `columns` hides what the table would hide (the contest's own-only list keeps
+ * time, memory and language in a fixed-width right column (md+), so every card's strip has the same width. `columns` hides what the table would hide (the contest's own-only list keeps
  * verdict, problem and age). A row without `testSummary` (hidden from this viewer, or an older backend) has no strip.
  */
 const props = defineProps<{
@@ -44,7 +44,9 @@ const rowLabel = (row: SubmissionListItem) =>
     problem: row.problem?.name ?? NO_VALUE,
     verdict: translate(verdictOf(row).labelKey),
   });
-const PILL = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitespace-nowrap';
+/** On md+ each chip fills a fixed slot with right-aligned tabular figures, so time, memory and language line up across cards. */
+const PILL =
+  'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitespace-nowrap tabular-nums md:text-right';
 </script>
 
 <template>
@@ -60,8 +62,8 @@ const PILL = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitesp
       class="@container grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-tile border border-line bg-surface-solid px-4 py-3.5 hover:bg-surface-hover md:px-5"
       :class="[
         pickedIds
-          ? 'md:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]'
-          : 'md:grid-cols-[auto_minmax(0,1fr)_auto_auto]',
+          ? 'md:grid-cols-[auto_auto_minmax(0,1fr)_15rem_auto]'
+          : 'md:grid-cols-[auto_minmax(0,1fr)_15rem_auto]',
         { 'row-added': highlightIds.has(row.id) },
       ]"
       @click="openRow($event, row.id)"
@@ -105,16 +107,16 @@ const PILL = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitesp
         />
       </div>
       <div
-        class="col-span-2 flex flex-wrap items-center justify-between gap-2 md:col-span-1 md:flex-col md:items-end"
+        class="col-span-2 flex flex-wrap items-center justify-between gap-2 md:col-span-1 md:grid md:grid-cols-1 md:gap-1.5"
       >
         <RouterLink
           :to="{ name: 'submission', params: { id: row.id } }"
           :aria-label="rowLabel(row)"
-          class="inline-flex min-h-11 items-center rounded-pill px-3 font-mono text-xs font-bold whitespace-nowrap hover:brightness-95 md:min-h-8"
+          class="inline-flex min-h-11 items-center rounded-pill px-3 font-mono text-xs font-bold whitespace-nowrap hover:brightness-95 md:min-h-8 md:justify-center"
           :class="VERDICT_TONE_CLASSES[verdictOf(row).tone]"
           >{{ verdictOf(row).code }} · {{ $t(verdictOf(row).labelKey) }}</RouterLink
         >
-        <div class="flex flex-wrap gap-1.5 md:justify-end">
+        <div class="flex flex-wrap gap-1.5 md:grid md:grid-cols-[3.75rem_4.75rem_minmax(0,1fr)]">
           <template v-if="hasCost(row)">
             <span :class="[PILL, 'bg-limit-time-bg text-limit-time']">{{
               formatCaseTime(row.time!)
@@ -125,7 +127,8 @@ const PILL = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitesp
           </template>
           <span
             v-if="isShown('language') && row.language"
-            :class="[PILL, 'bg-surface-strong text-muted']"
+            :title="row.language.name"
+            :class="[PILL, 'truncate bg-surface-strong text-muted md:col-start-3']"
             >{{ row.language.name }}</span
           >
         </div>
