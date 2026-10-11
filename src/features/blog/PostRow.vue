@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
@@ -41,7 +41,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         </RouterLink>
       </h2>
       <footer class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted">
-        <UserName
+        <UserLink
           v-for="author in post.authors"
           :key="author.id"
           :username="author.username"

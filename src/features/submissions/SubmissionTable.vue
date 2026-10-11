@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { formatDateTime, formatAgoCompact } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -143,13 +143,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               />
             </td>
             <td v-if="isShown('user')" :class="[BODY_CELL_CLASSES, 'max-w-0']">
-              <UserName
-                v-if="row.user"
-                :username="row.user.username"
-                :rating="row.user.rating"
-                :title="row.user.username"
-                class="block truncate"
-              />
+              <UserLink v-if="row.user" :username="row.user.username" :rating="row.user.rating" />
               <template v-else>{{ NO_VALUE }}</template>
             </td>
             <td

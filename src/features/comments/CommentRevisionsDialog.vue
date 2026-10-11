@@ -3,7 +3,7 @@ import Dialog from 'primevue/dialog';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRevisionsQuery } from './comments.queries';
@@ -84,7 +84,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
                 <span v-if="version.at" class="text-xs text-muted">
                   {{ formatNumericDateTime(version.at, locale.locale) }}
                 </span>
-                <UserName
+                <UserLink
                   v-if="version.editor"
                   :username="version.editor.username"
                   :rating="version.editor.rating"

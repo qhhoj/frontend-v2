@@ -2,14 +2,13 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserContent from '@/components/UserContent.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import type { PostDetail } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -51,14 +50,13 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
         data-testid="post-byline"
         class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted"
       >
-        <span
+        <UserLink
           v-for="author in post.authors"
           :key="author.id"
-          class="inline-flex items-center gap-2"
-        >
-          <UserAvatar :username="author.username" :size="28" />
-          <UserName :username="author.username" :rating="author.rating" />
-        </span>
+          :username="author.username"
+          :rating="author.rating"
+          size="sm"
+        />
         <time :datetime="post.publishOn">{{ publishedOn }}</time>
       </div>
     </header>

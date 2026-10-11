@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SubmissionDetail } from '@/api/types/submissions';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { verdictOf } from '@/lib/verdicts';
 import { submissionShortId } from './submission-short-id';
@@ -22,7 +22,7 @@ defineProps<{ label: string; id: string; detail: SubmissionDetail | undefined }>
         >{{ submissionShortId(id) }}</RouterLink
       >
       <VerdictBadge v-if="detail" :verdict="verdictOf(detail)" size="sm" />
-      <UserName v-if="detail?.user" :username="detail.user.username" :rating="detail.user.rating" />
+      <UserLink v-if="detail?.user" :username="detail.user.username" :rating="detail.user.rating" />
     </p>
     <p v-if="detail" class="truncate text-sm text-muted">
       {{ detail.problem?.name ?? '—' }} · {{ detail.language?.name ?? '—' }}

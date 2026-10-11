@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -151,10 +150,12 @@ const facts = computed(() => [
         </dd>
         <dt data-fact="user" class="text-[13px] text-muted">{{ $t('submission.facts.user') }}</dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
-          <span v-if="submission.user" class="flex items-center gap-2.5">
-            <UserAvatar :username="submission.user.username" :size="32" />
-            <UserName :username="submission.user.username" :rating="submission.user.rating" />
-          </span>
+          <UserLink
+            v-if="submission.user"
+            :username="submission.user.username"
+            :rating="submission.user.rating"
+            size="md"
+          />
           <template v-else>{{ NO_VALUE }}</template>
         </dd>
         <dt data-fact="submitted" class="text-[13px] text-muted">

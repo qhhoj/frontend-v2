@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { medalClass } from '@/lib/medal';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
 import {
   formatCumtime,
@@ -119,13 +118,7 @@ const scoreHeaderKey = computed(() => {
           </td>
           <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
             <span class="flex items-center gap-2">
-              <UserAvatar :username="row.user.username" :size="24" class="shrink-0" />
-              <UserName
-                :username="row.user.username"
-                :rating="row.user.rating"
-                :title="row.user.username"
-                class="min-w-0 truncate"
-              />
+              <UserLink :username="row.user.username" :rating="row.user.rating" />
               <span
                 v-if="row.user.id === viewerId"
                 class="shrink-0 rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"
