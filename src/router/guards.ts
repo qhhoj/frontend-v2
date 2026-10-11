@@ -1,4 +1,5 @@
 import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
+import { canEnterAdmin } from '@/features/admin/admin-access';
 import type { useSessionStore } from '@/stores/session.store';
 import { safeRedirect } from './safe-redirect';
 
@@ -78,11 +79,11 @@ const passwordChangeRule: Rule = (to, session) => {
   };
 };
 
-/** Who may open the page: signed-in only, guests only, staff only. */
+/** Who may open the page: signed-in only, guests only, the admin area only for who can use it. */
 const accessRule: Rule = (to, session) => {
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
   if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
-  if (to.meta.staffOnly && !session.isStaff) return notFound(to);
+  if (to.meta.adminArea && !canEnterAdmin(session.user)) return notFound(to);
   return null;
 };
 
@@ -101,8 +102,8 @@ export async function resolveNavigation(
   try {
     await session.ensureLoaded();
   } catch {
-    // Without a session the staff-only and password rules cannot run: send those routes to sign-in rather than skip them.
-    return to.meta.requiresAuth || to.meta.staffOnly ? toLogin(to) : true;
+    // Without a session the admin-area and password rules cannot run: send those routes to sign-in rather than skip them.
+    return to.meta.requiresAuth || to.meta.adminArea ? toLogin(to) : true;
   }
   for (const rule of RULES) {
     const result = rule(to, session);

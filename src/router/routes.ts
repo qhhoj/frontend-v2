@@ -57,7 +57,7 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.contest' },
   },
   {
-    // Balloon volunteers in `balloonStaff` may be non-staff: no `staffOnly`, the server answers 403/404.
+    // Balloon volunteers in `balloonStaff` may be non-staff: no `adminArea`, the server answers 403/404.
     path: '/contests/:key/balloons',
     name: 'contest-balloons',
     component: () => import('@/features/contests/balloons/BalloonsPage.vue'),

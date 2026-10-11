@@ -2,7 +2,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
 import { onCsrfFailed, onUnauthorized } from '@/api/client';
-import { signedIn, signedOut } from '@/test/fixtures';
+import { sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { createAppRouter } from './index';
@@ -94,10 +94,21 @@ describe('navigation guards', () => {
     expect(route.query.redirect).toBe('/problems');
   });
 
-  it('shows not-found to non-staff on admin routes and keeps the URL', async () => {
+  it('shows not-found on admin routes to a viewer who may use no admin screen, and keeps the URL', async () => {
     const { route } = await navigate('/admin/judges', signedIn());
     expect(route.name).toBe('not-found');
     expect(route.path).toBe('/admin/judges');
+  });
+
+  it('opens the admin area to authors and organization admins who are not staff', async () => {
+    const author = signedIn({ user: sessionUser({ permissions: ['judge.edit_own_problem'] }) });
+    expect((await navigate('/admin/problems', author)).route.name).toBe('admin-problems');
+    const organizationAdmin = signedIn({
+      user: sessionUser({ adminCapabilities: { organizations: true } }),
+    });
+    expect((await navigate('/admin/organizations', organizationAdmin)).route.name).toBe(
+      'admin-organizations',
+    );
   });
 
   it('keeps encoded characters of a hidden admin URL as they were', async () => {
@@ -124,7 +135,7 @@ describe('navigation guards', () => {
     expect(calls).toHaveLength(1);
   });
 
-  it('sends staff-only pages to login when the session cannot be loaded', async () => {
+  it('sends admin pages to login when the session cannot be loaded', async () => {
     vi.stubGlobal('fetch', () => Promise.reject(new TypeError('offline')));
     const router = createAppRouter(createMemoryHistory());
     await router.push('/admin/judges');

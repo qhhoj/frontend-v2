@@ -4,6 +4,7 @@ import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
 import { ratingTextClass } from '@/lib/tier-classes';
 import { useRoute, useRouter } from 'vue-router';
+import { canEnterAdmin } from '@/features/admin/admin-access';
 import { useLogout } from '@/features/auth/use-logout';
 import { translate } from '@/i18n';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -18,7 +19,7 @@ const isOpen = ref(false);
 
 const items = computed<MenuItem[]>(() => [
   { label: translate('account.settings'), command: () => void router.push({ name: 'settings' }) },
-  ...(session.isStaff
+  ...(canEnterAdmin(session.user)
     ? [{ label: translate('account.admin'), command: () => void router.push('/admin') }]
     : []),
   { separator: true },

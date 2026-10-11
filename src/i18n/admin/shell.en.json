@@ -1,7 +1,7 @@
 {
   "placeholder": "This screen has no approved drawing yet.",
   "title": "Admin",
-  "staffOnly": "Staff only",
+  "staffOnly": "Admin area",
   "backToSite": "Back to the site",
   "navLabel": "Admin",
   "navToggle": "Admin sections",

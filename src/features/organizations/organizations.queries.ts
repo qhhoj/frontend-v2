@@ -12,11 +12,12 @@ import {
 import type { JoinRequestState, MemberSort } from '@/api/types/organizations';
 import { useViewerId } from '@/stores/use-viewer-id';
 
-/** The search term joins the key only when it is set, so the plain list keeps its key. */
+/** The search term and `administered` join the key only when set, so the plain list keeps its key. */
 export const useOrganizationsQuery = (
   page: MaybeRefOrGetter<number>,
   search?: MaybeRefOrGetter<string | undefined>,
   enabled: MaybeRefOrGetter<boolean> = true,
+  administered: MaybeRefOrGetter<boolean> = false,
 ) => {
   const viewer = useViewerId();
   const term = () => (search === undefined ? '' : (toValue(search) ?? '').trim());
@@ -27,8 +28,9 @@ export const useOrganizationsQuery = (
       toValue(page),
       viewer.value,
       ...(term() ? [term()] : []),
+      ...(toValue(administered) ? ['administered'] : []),
     ]),
-    queryFn: () => fetchOrganizations(toValue(page), term()),
+    queryFn: () => fetchOrganizations(toValue(page), term(), toValue(administered)),
     placeholderData: keepPreviousData,
     enabled: () => toValue(enabled),
   });

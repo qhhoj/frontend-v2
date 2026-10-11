@@ -25,19 +25,20 @@ import {
   Trophy,
   Users,
 } from 'lucide-vue-next';
-import { allowsAny, hasPermission } from '@/lib/permissions';
+import { hasPermission } from '@/lib/permissions';
 import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
+import { canUseAdmin } from '../admin-access';
+import type { AdminAccess, AdminViewer } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
-import type { AdminScreenId } from '../admin-screens';
+import type { AdminScreen, AdminScreenId } from '../admin-screens';
 
 export type AdminNavId = AdminScreenId;
-export interface AdminNavItem {
+export interface AdminNavItem extends AdminAccess {
   id: AdminNavId;
   labelKey: string;
   icon: Component;
   routeName: string;
   path: string;
-  permission: PermissionRule | null;
 }
 export interface AdminNavGroup {
   id: 'content' | 'contests' | 'users' | 'site' | 'judging';
@@ -45,14 +46,18 @@ export interface AdminNavGroup {
   items: AdminNavItem[];
 }
 
-const screenItem = (id: AdminScreenId, icon: Component): AdminNavItem => ({
-  id,
-  labelKey: `admin.shell.screens.${id}`,
-  icon,
-  routeName: adminRouteName(id),
-  path: ADMIN_SCREENS[id].path,
-  permission: ADMIN_SCREENS[id].permission,
-});
+const screenItem = (id: AdminScreenId, icon: Component): AdminNavItem => {
+  const screen: AdminScreen = ADMIN_SCREENS[id];
+  return {
+    id,
+    labelKey: `admin.shell.screens.${id}`,
+    icon,
+    routeName: adminRouteName(id),
+    path: screen.path,
+    permission: screen.permission,
+    capability: screen.capability,
+  };
+};
 
 const group = (id: AdminNavGroup['id'], items: AdminNavItem[]): AdminNavGroup => ({
   id,
@@ -98,14 +103,11 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   ]),
 ];
 
-export function visibleNav(
-  groups: AdminNavGroup[],
-  user: PermissionHolder | null,
-): AdminNavGroup[] {
+export function visibleNav(groups: AdminNavGroup[], user: AdminViewer | null): AdminNavGroup[] {
   return groups
     .map((navGroup) => ({
       ...navGroup,
-      items: navGroup.items.filter((item) => allowsAny(user, item.permission)),
+      items: navGroup.items.filter((item) => canUseAdmin(user, item)),
     }))
     .filter((navGroup) => navGroup.items.length > 0);
 }
@@ -154,10 +156,10 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
   section('people', ['users', 'activity', 'settings', 'pages', 'tickets']),
 ];
 
-export const visibleDashboard = (user: PermissionHolder | null) =>
+export const visibleDashboard = (user: AdminViewer | null) =>
   DASHBOARD_SECTIONS.map((entry) => ({
     ...entry,
-    items: entry.items.filter((item) => allowsAny(user, item.permission)),
+    items: entry.items.filter((item) => canUseAdmin(user, item)),
   })).filter((entry) => entry.items.length > 0);
 
 /** The greeting card's three actions; each shows only with its screen's permission. */

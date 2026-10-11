@@ -31,6 +31,13 @@ describe('admin nav', () => {
   });
 });
 
+describe('admin nav for object rights', () => {
+  it('shows an organization admin without permissions only the organizations item', () => {
+    const organizationAdmin = { ...staff([]), adminCapabilities: { organizations: true } };
+    expect(idsOf(visibleNav(ADMIN_NAV, organizationAdmin))).toEqual(['organizations']);
+  });
+});
+
 describe('admin nav per permission', () => {
   it('shows every item to a superuser, none twice, each linking to a route that exists', () => {
     const shown = visibleNav(ADMIN_NAV, staff([], true)).flatMap((group) => group.items);

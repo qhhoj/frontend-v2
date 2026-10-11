@@ -1,9 +1,12 @@
 import type { PermissionRule } from '@/lib/permissions';
+import type { AdminCapability } from './admin-access';
 
 export interface AdminScreen {
   path: string;
-  /** `null`: any staff member. */
+  /** `null`: anyone who may enter `/admin` (`canEnterAdmin`). */
   permission: PermissionRule | null;
+  /** An object right that also opens the screen, for viewers without the permission. */
+  capability?: AdminCapability;
 }
 
 /** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
@@ -77,6 +80,7 @@ export const ADMIN_SCREENS = {
   organizations: {
     path: '/admin/organizations',
     permission: ['judge.edit_all_organization', 'judge.add_organization'],
+    capability: 'organizations',
   },
   posts: { path: '/admin/posts', permission: 'judge.edit_all_post' },
   commentReports: { path: '/admin/comments/reports', permission: 'judge.change_comment' },

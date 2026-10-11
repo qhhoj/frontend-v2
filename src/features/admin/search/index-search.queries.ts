@@ -57,6 +57,7 @@ export function useAdminContestSearchQuery(
         phase: phase.value ?? undefined,
         page: page.value,
         pageSize: INDEX_PAGE_SIZE,
+        editable: true,
       }),
     placeholderData: keepPreviousData,
   });
