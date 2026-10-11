@@ -15,10 +15,13 @@ test('staff add a tag with a colour token and see it in the catalogue', async ({
     return adminOk(created);
   };
   await page.goto('/admin/contest-tags');
-  await page.getByLabel('Mã thẻ').fill('olp');
-  await page.getByLabel('Tên hiển thị').fill('Olympic');
-  await page.locator('[data-color="tag-6"]').click();
-  await page.getByRole('button', { name: 'Thêm thẻ', exact: true }).click();
+  await page.getByTestId('tag-create').click();
+  const editor = page.getByRole('dialog', { name: 'Thêm thẻ' });
+  await editor.getByLabel('Mã thẻ').fill('olp');
+  await editor.getByLabel('Tên hiển thị').fill('Olympic');
+  await editor.locator('[data-color="tag-6"]').click();
+  await editor.getByRole('button', { name: 'Thêm thẻ', exact: true }).click();
+  await expect(editor).toBeHidden();
   await expect(page.getByTestId('tag-row')).toHaveCount(1);
   await expect(page.getByRole('status').filter({ hasText: 'Đã thêm thẻ.' })).toBeVisible();
 });

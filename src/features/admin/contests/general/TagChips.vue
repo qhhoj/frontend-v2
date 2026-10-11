@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue';
 import { X } from 'lucide-vue-next';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import { needsPermissionText } from '../../ui/permission-text';
 
 /** Free-text chips (tags, judge names): Enter adds, a repeat is ignored, the list is capped at `max`. */
 const tags = defineModel<string[]>({ required: true });
@@ -29,29 +30,28 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
 <template>
   <div class="flex flex-col gap-1.5">
     <label :for="id" class="text-sm font-semibold">{{ label }}</label>
-    <ul class="flex flex-wrap gap-2">
+    <ul v-if="tags.length" class="m-0 flex list-none flex-wrap gap-1.5 p-0">
       <li
         v-for="tag in tags"
         :key="tag"
-        class="inline-flex items-center gap-1 rounded-pill border border-line py-0.5 pl-3 text-sm"
+        class="inline-flex min-h-[var(--qa-chip,1.5rem)] items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-xs font-semibold"
       >
         <span>{{ tag }}</span>
         <button
           v-if="!lockedBy"
           type="button"
-          class="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover"
+          class="inline-flex size-6 items-center justify-center rounded-full text-muted hover:bg-surface-hover hover:text-content pointer-coarse:size-9"
           :aria-label="$t('admin.ui.removeChip', { name: tag })"
           @click="remove(tag)"
         >
-          <X aria-hidden="true" class="size-4" />
+          <X aria-hidden="true" class="size-3.5" :stroke-width="1.75" />
         </button>
       </li>
-      <li v-if="tags.length === 0" class="text-sm text-muted">{{ $t('admin.ui.nobody') }}</li>
     </ul>
     <input
       :id="id"
       v-model="typed"
-      :class="ADMIN_INPUT_CLASS"
+      :class="INPUT"
       :placeholder="placeholder"
       :disabled="isFull || Boolean(lockedBy)"
       :aria-invalid="error ? 'true' : undefined"
@@ -61,7 +61,7 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
     />
     <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
     <p v-if="lockedBy" class="text-xs text-muted">
-      {{ $t('admin.ui.needsPermission', { permission: lockedBy }) }}
+      {{ needsPermissionText(lockedBy) }}
     </p>
   </div>
 </template>

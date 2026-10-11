@@ -1,19 +1,24 @@
 <script setup lang="ts">
+import { ExternalLink, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatDateTime, formatNumber } from '@/lib/format';
-import { translate } from '@/i18n';
+import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import { routeTabs } from '../ui/admin-tabs';
-import { useEditableContestQuery } from './contest-editing.queries';
-import { CONTEST_TABS, contestTabComponent, contestTabOf } from './contest-tabs';
 import { isNotFound } from '../ui/admin-errors';
+import { CARD, buttonClass } from '../ui/controls';
+import { useEditableContestQuery } from './contest-editing.queries';
+import { CONTEST_TABS, contestTabComponent, contestTabCount, contestTabOf } from './contest-tabs';
+import ContestPhaseChip from './list/ContestPhaseChip.vue';
+import ContestWindowText from './list/ContestWindowText.vue';
 
+/** One contest's editor: a header with its phase, format, window and size, sticky section tabs, then the open tab. */
 const route = useRoute();
 const locale = useLocaleStore();
 const key = computed(() => String(route.params.key));
@@ -26,17 +31,15 @@ const tabComponent = computed(() => {
   const tab = contestTabOf(route.name);
   return tab ? contestTabComponent(tab) : null;
 });
-
-const summaryLine = computed(() => {
-  if (!contest.value) return '';
-  const { formatName, startTime, endTime, userCount } = contest.value;
-  return translate('admin.contests.summaryLine', {
-    format: translate(`admin.contests.formats.${formatName}`),
-    start: formatDateTime(startTime, locale.locale),
-    end: formatDateTime(endTime, locale.locale),
-    count: formatNumber(userCount, locale.locale),
-  });
+const tabs = computed(() => {
+  const loaded = contest.value;
+  if (!loaded) return [];
+  return routeTabs(CONTEST_TABS, { key: loaded.key }).map((tab, index) => ({
+    ...tab,
+    count: contestTabCount(CONTEST_TABS[index]!.id, loaded),
+  }));
 });
+const LIST = { name: 'admin-contests' } as const;
 </script>
 
 <template>
@@ -50,31 +53,47 @@ const summaryLine = computed(() => {
         <SkeletonBlock data-skeleton-region="contest-editor-body" class="h-64 w-full" />
       </div>
     </template>
-    <p v-if="isMissing">{{ $t('admin.contests.notFound', { key }) }}</p>
-    <div v-else-if="contest" class="flex flex-col gap-6">
+    <div v-if="isMissing" :class="[CARD, 'flex flex-col items-start gap-3 p-6']">
+      <p class="m-0 font-semibold">{{ $t('admin.contests.notFound', { key }) }}</p>
+      <RouterLink :to="LIST" :class="buttonClass('secondary')">
+        {{ $t('admin.contests.backToList') }}
+      </RouterLink>
+    </div>
+    <div v-else-if="contest" class="flex flex-col gap-4">
       <AdminPageHeader
         :trail="[{ label: contest.key, mono: true }]"
         :title="contest.name"
-        :lead="summaryLine"
+        :back="{ to: LIST, label: $t('admin.contests.backToList') }"
       >
+        <template #meta>
+          <ContestPhaseChip :phase="contest.phase" />
+          <AdminChip>{{ $t(`admin.contests.formats.${contest.formatName}`) }}</AdminChip>
+          <ContestWindowText :start-time="contest.startTime" :end-time="contest.endTime" />
+          <span class="inline-flex items-center gap-1 whitespace-nowrap">
+            <Users aria-hidden="true" class="size-3.5" :stroke-width="1.75" />
+            {{
+              $t('admin.contests.participantCount', {
+                count: formatNumber(contest.userCount, locale.locale),
+              })
+            }}
+          </span>
+        </template>
         <template #actions>
           <RouterLink
             :to="{ name: 'contest', params: { key: contest.key } }"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line-strong px-4 font-semibold hover:bg-surface-hover"
+            :class="buttonClass('secondary')"
           >
+            <ExternalLink aria-hidden="true" class="size-4" :stroke-width="1.75" />
             {{ $t('admin.contests.view') }}
           </RouterLink>
         </template>
       </AdminPageHeader>
-      <p v-if="!isEditable" class="glass flex flex-wrap items-center gap-3 rounded-panel p-5">
+      <div v-if="!isEditable" :class="[CARD, 'flex flex-wrap items-center gap-3 p-5']">
         <AdminBit placement="forbidden" />
-        <span>{{ $t('admin.contests.cannotEdit', { key: contest.key }) }}</span>
-      </p>
+        <p class="m-0">{{ $t('admin.contests.cannotEdit', { key: contest.key }) }}</p>
+      </div>
       <template v-else>
-        <AdminTabs
-          :tabs="routeTabs(CONTEST_TABS, { key: contest.key })"
-          :label="$t('admin.contests.tabsLabel')"
-        />
+        <AdminTabs :tabs="tabs" :label="$t('admin.contests.tabsLabel')" sticky />
         <component :is="tabComponent" v-if="tabComponent" :contest="contest" />
       </template>
     </div>

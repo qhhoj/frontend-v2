@@ -12,7 +12,6 @@ import type {
 } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
-import { fromLocalInput, toLocalInput } from '../ui/datetime';
 import { configFor, FORMAT_FIELDS } from './format-config';
 
 export interface ContestForm {
@@ -28,6 +27,7 @@ export interface ContestForm {
   authors: UserChip[];
   curators: UserChip[];
   testers: UserChip[];
+  /** The five times are ISO instants (`toISOString`, so equal instants compare equal); '' is unset. */
   startTime: string;
   endTime: string;
   timeLimit: number | null;
@@ -171,6 +171,9 @@ function basicsOf(
   };
 }
 
+/** An API instant in one spelling (`…T06:00:00.000Z`), so a retyped time equal to the stored one is no change; null is ''. */
+const instantOf = (iso: string | null): string => (iso ? new Date(iso).toISOString() : '');
+
 function timesOf(
   contest: EditableContest,
   settings: ContestSettings,
@@ -185,12 +188,12 @@ function timesOf(
   | 'disallowVirtual'
 > {
   return {
-    startTime: toLocalInput(contest.startTime),
-    endTime: toLocalInput(contest.endTime),
+    startTime: instantOf(contest.startTime),
+    endTime: instantOf(contest.endTime),
     timeLimit: contest.timeLimit,
-    registrationStart: toLocalInput(contest.registrationStart),
-    registrationEnd: toLocalInput(contest.registrationEnd),
-    lockedAfter: toLocalInput(settings.lockedAfter),
+    registrationStart: instantOf(contest.registrationStart),
+    registrationEnd: instantOf(contest.registrationEnd),
+    lockedAfter: instantOf(settings.lockedAfter),
     frozenLastMinutes: contest.frozenLastMinutes,
     disallowVirtual: contest.disallowVirtual,
   };
@@ -448,10 +451,8 @@ const isEmptyValue = (value: unknown): boolean =>
 function sentValue(key: keyof ContestForm, value: unknown): unknown {
   if ((CHIP_FIELDS as readonly string[]).includes(key))
     return (value as UserChip[]).map((chip) => chip.id);
-  if ((DATE_FIELDS as readonly string[]).includes(key)) {
-    const iso = fromLocalInput(value as string);
-    return iso ?? (isNullable(key) ? null : undefined);
-  }
+  if ((DATE_FIELDS as readonly string[]).includes(key))
+    return value || (isNullable(key) ? null : undefined);
   if (typeof value === 'number' && Number.isNaN(value)) return undefined;
   if (value === null) return isNullable(key) ? null : undefined;
   return value;
@@ -513,8 +514,8 @@ export function toContestBody(
 const requiredContestFields = (form: ContestForm): RequiredPart<ContestBody> => ({
   key: form.key,
   name: form.name,
-  startTime: fromLocalInput(form.startTime) ?? '',
-  endTime: fromLocalInput(form.endTime) ?? '',
+  startTime: form.startTime,
+  endTime: form.endTime,
 });
 
 /** A whole number in range; a cleared number box is '' or NaN, and neither may reach the server. */
@@ -529,7 +530,7 @@ function checkWindow(form: ContestForm, message: Message): FieldErrors {
   const errors: FieldErrors = {};
   if (!form.startTime) errors.startTime = message('required');
   if (!form.endTime) errors.endTime = message('required');
-  else if (form.startTime && form.endTime <= form.startTime)
+  else if (form.startTime && Date.parse(form.endTime) <= Date.parse(form.startTime))
     errors.endTime = message('endBeforeStart');
   return errors;
 }

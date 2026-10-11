@@ -1,9 +1,10 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import type { ContestListQuery } from '@/api/types/contests';
+import { isTagSlug } from '@/features/contests/tag-chips';
 import { valuesOf } from '@/features/problems/use-problem-filters';
 import { pageFromQuery } from '@/lib/paging';
-import { CONTEST_PHASE_FILTERS, SEARCH_MAX_LENGTH } from './index-search';
-import type { ContestPhaseFilter } from './index-search';
+import { CONTEST_PHASE_FILTERS, SEARCH_MAX_LENGTH } from '../../search/index-search';
+import type { ContestPhaseFilter } from '../../search/index-search';
 
 /** Which of the editable contests the staff list shows: every one, those the viewer works on, or hidden ones. */
 export const CONTEST_SCOPE_FILTERS = ['all', 'mine', 'hidden'] as const;
@@ -11,6 +12,9 @@ export type ContestScopeFilter = (typeof CONTEST_SCOPE_FILTERS)[number];
 /** Without a sort the backend shows upcoming contests soonest first and the rest newest first. */
 export const CONTEST_SORTS = ['', 'newest', 'oldest', 'name', 'users'] as const;
 export type ContestSortFilter = (typeof CONTEST_SORTS)[number];
+/** Rated contests only, unrated only, or both (`''`). */
+export const CONTEST_RATED_FILTERS = ['', 'yes', 'no'] as const;
+export type ContestRatedFilter = (typeof CONTEST_RATED_FILTERS)[number];
 
 /** Everything the staff contest list reads from the address; empty strings mean "not filtered". */
 export interface ContestListFilters {
@@ -18,11 +22,18 @@ export interface ContestListFilters {
   phase: ContestPhaseFilter;
   scope: ContestScopeFilter;
   sort: ContestSortFilter;
+  /** A contest tag slug. */
+  tag: string;
+  rated: ContestRatedFilter;
   /** `YYYY-MM-DD` dates from the date inputs: starts on or after `from`, and before `before`. */
   from: string;
   before: string;
   page: number;
 }
+
+/** The filters behind "Bộ lọc" (not the search box, the phase tabs or the sort), each one a removable chip. */
+export const PANEL_FILTERS = ['scope', 'tag', 'rated', 'from', 'before'] as const;
+export type PanelFilter = (typeof PANEL_FILTERS)[number];
 
 const firstOf = (value: LocationQuery[string] | undefined): string => valuesOf(value)[0] ?? '';
 const oneOf = <T extends string>(options: readonly T[], value: string, fallback: T): T =>
@@ -32,11 +43,14 @@ const dateOf = (value: string) =>
   DATE.test(value) && !Number.isNaN(Date.parse(value)) ? value : '';
 
 export function filtersFromQuery(query: LocationQuery): ContestListFilters {
+  const tag = firstOf(query.tag);
   return {
     q: firstOf(query.q).slice(0, SEARCH_MAX_LENGTH),
     phase: oneOf(CONTEST_PHASE_FILTERS, firstOf(query.phase), 'all'),
     scope: oneOf(CONTEST_SCOPE_FILTERS, firstOf(query.scope), 'all'),
     sort: oneOf(CONTEST_SORTS, firstOf(query.sort), ''),
+    tag: isTagSlug(tag) ? tag : '',
+    rated: oneOf(CONTEST_RATED_FILTERS, firstOf(query.rated), ''),
     from: dateOf(firstOf(query.from)),
     before: dateOf(firstOf(query.before)),
     page: pageFromQuery(query.page),
@@ -44,6 +58,14 @@ export function filtersFromQuery(query: LocationQuery): ContestListFilters {
 }
 
 export type ContestFilterPatch = Partial<Omit<ContestListFilters, 'page'>>;
+
+/** The panel filters that differ from their default: the "Bộ lọc (2)" count and the chips. */
+export const activePanelFilters = (filters: ContestListFilters): PanelFilter[] =>
+  PANEL_FILTERS.filter((key) => filters[key] !== '' && filters[key] !== 'all');
+
+/** The patch that puts every panel filter back to its default. */
+export const clearedPanelFilters = (): ContestFilterPatch =>
+  Object.fromEntries(PANEL_FILTERS.map((key) => [key, '']));
 
 /** The address after a filter change: defaults leave it, and the page starts again at 1. */
 export function contestFilterQueryOf(
@@ -59,6 +81,11 @@ export function contestFilterQueryOf(
 
 /** Local midnight of a `YYYY-MM-DD` date, as the ISO instant the backend compares start times with. */
 const startOfDay = (date: string) => new Date(`${date}T00:00:00`).toISOString();
+const RATED_QUERY: Record<ContestRatedFilter, boolean | undefined> = {
+  '': undefined,
+  yes: true,
+  no: false,
+};
 
 /** The `GET /contests` query of the staff list: always only contests the viewer may edit. */
 export function contestListQueryOf(filters: ContestListFilters): ContestListQuery {
@@ -69,6 +96,8 @@ export function contestListQueryOf(filters: ContestListFilters): ContestListQuer
     mine: filters.scope === 'mine' || undefined,
     visible: filters.scope === 'hidden' ? false : undefined,
     sort: filters.sort || undefined,
+    tag: filters.tag || undefined,
+    rated: RATED_QUERY[filters.rated],
     startFrom: filters.from ? startOfDay(filters.from) : undefined,
     startBefore: filters.before ? startOfDay(filters.before) : undefined,
     page: filters.page,

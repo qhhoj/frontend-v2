@@ -1,6 +1,6 @@
 {
   "title": "Contest tags",
-  "lead": "The tag catalogue shown on the contest list. A colour is a theme token key, not a colour code.",
+  "lead": "Tags shown on the contest list. The colour is one of the theme's colours.",
   "caption": "Contest tag catalogue",
   "createTitle": "Add a tag",
   "editTitle": "Edit tag “{name}”",
@@ -27,10 +27,10 @@
   },
   "create": "Add tag",
   "save": "Save tag",
-  "cancel": "Stop editing",
+  "cancel": "Cancel",
   "created": "Tag added.",
   "saved": "Tag saved.",
-  "empty": "No tags yet. Add the first one above.",
+  "empty": "No tags yet. Press “Add tag” to create the first one.",
   "columns": {
     "tag": "Tag",
     "slug": "Key",
@@ -40,10 +40,10 @@
     "contests": "Contests"
   },
   "edit": "Edit",
-  "remove": "Delete",
+  "remove": "Delete tag",
   "removeTitle": "Delete tag “{name}”?",
   "removeBody": "Contests tagged {slug} keep the tag and show it as a neutral chip.",
-  "removeConfirm": "Delete tag",
+  "removeConfirm": "Delete tag {name}",
   "manageContests": "Assign contests",
   "contests": {
     "title": "Contests tagged {name}",
@@ -54,6 +54,11 @@
     "none": "No contest you may edit carries this tag yet.",
     "listed": "{count} contests you may edit carry this tag",
     "removeSelected": "Remove the tag from {count}",
-    "tooMany": "{count} keys: at most {max} at a time."
-  }
+    "tooMany": "{count} keys: at most {max} at a time.",
+    "done": "Updated {done} contests."
+  },
+  "fullTitle": "The catalogue is full",
+  "removed": "Deleted tag {name}.",
+  "editLabel": "Edit tag {name}",
+  "more": "More actions for tag {name}"
 }

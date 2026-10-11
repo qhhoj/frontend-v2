@@ -23,14 +23,32 @@ const newContest = () => ({
   ...emptyContestForm(),
   key: 'w42',
   name: 'W42',
-  startTime: '2026-10-15T13:00',
-  endTime: '2026-10-15T17:00',
+  startTime: '2026-10-15T06:00:00.000Z',
+  endTime: '2026-10-15T10:00:00.000Z',
 });
 
 describe('contest form', () => {
   it('sends nothing for an untouched form, the push switch and the codes included', () => {
     const before = seeded();
     expect(changedContestFields(before, structuredClone(before))).toEqual({});
+  });
+
+  it('spells every stored time one way, so retyping the same instant is no change', () => {
+    const form = toContestForm(editableContest({ startTime: '2026-10-08T06:00:00Z' }));
+    expect(form.startTime).toBe('2026-10-08T06:00:00.000Z');
+    expect(
+      changedContestFields(form, {
+        ...structuredClone(form),
+        startTime: new Date(form.startTime).toISOString(),
+      }),
+    ).toEqual({});
+  });
+
+  it('sends the create times as the instants typed', () => {
+    expect(toContestBody(newContest(), () => true)).toMatchObject({
+      startTime: '2026-10-15T06:00:00.000Z',
+      endTime: '2026-10-15T10:00:00.000Z',
+    });
   });
 
   it('sends null when a nullable field is cleared', () => {
@@ -90,8 +108,8 @@ describe('contest form', () => {
   it('refuses an end before the start and a rating floor above the ceiling', () => {
     const form = {
       ...seeded(),
-      endTime: '2026-10-08T12:00',
-      startTime: '2026-10-08T13:00',
+      endTime: '2026-10-08T05:00:00.000Z',
+      startTime: '2026-10-08T06:00:00.000Z',
       ratingFloor: 2000,
       ratingCeiling: 1000,
     };
@@ -107,7 +125,7 @@ describe('contest form', () => {
       isPrivate: true,
       accessCode: 'secret',
       isVisible: true,
-      lockedAfter: '2026-10-15T18:00',
+      lockedAfter: '2026-10-15T11:00:00.000Z',
       isOrganizationPrivate: true,
     };
     const body = toContestBody(filled, () => false);

@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { tagContests } from '@/api/contest-admin.api';
 import { fetchContests } from '@/api/contests.api';
 import type { BulkContestResult } from '@/api/types/contest-editing';
 import type { ContestTag } from '@/api/types/contest-tags';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import ContestBulkResult from '../contests/ContestBulkResult.vue';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contests/contest-editing.queries';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import AdminDrawer from '../ui/AdminDrawer.vue';
+import { INPUT, buttonClass } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { checked, MAX_BULK_ROWS, useRowSelection } from '../ui/use-row-selection';
 
-/** The contests carrying `tag` that the viewer may edit: add more by key, or take the tag off ticked ones. */
+/** A drawer with the contests carrying `tag` that the viewer may edit: add more by key, or take the tag off ticked ones. */
 const props = defineProps<{ tag: ContestTag }>();
-const emit = defineEmits<{ close: [] }>();
+const visible = defineModel<boolean>('visible', { required: true });
 const viewerId = useViewerId();
 const { data, isPending, error, refetch } = useQuery({
   queryKey: computed(() => [...CONTEST_INDEX_KEY, viewerId.value, 'tag', props.tag.slug]),
@@ -27,14 +29,9 @@ const tagged = computed(() => data.value?.items ?? []);
 const selection = useRowSelection(computed(() => tagged.value.map((contest) => contest.key)));
 const keysText = ref('');
 const lastResult = ref<BulkContestResult | null>(null);
-/** The panel opens above the table: bring it into view (on phones it starts off screen). */
-const addInput = ref<HTMLInputElement | null>(null);
-const focusPanel = () => void nextTick(() => addInput.value?.focus());
-onMounted(focusPanel);
 watch(
   () => props.tag.slug,
   () => {
-    focusPanel();
     keysText.value = '';
     lastResult.value = null;
     selection.clear();
@@ -49,6 +46,8 @@ const mutation = useAdminMutation({
   mutate: (change: { keys: string[]; assigned: boolean }) =>
     tagContests({ ...change, tag: props.tag.slug }),
   invalidates: () => [CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY, ['admin', 'contest']],
+  successText: (result: BulkContestResult) =>
+    translate('admin.contestTags.contests.done', { done: result.done }),
   onDone: (result: BulkContestResult, change) => {
     lastResult.value = result;
     if (change.assigned) keysText.value = '';
@@ -61,22 +60,20 @@ const add = () =>
   typedKeys.value.length > 0 &&
   !isTooMany.value &&
   mutation.run({ keys: typedKeys.value, assigned: true });
-const removeSelected = () => mutation.run({ keys: selection.selected.value, assigned: false });
+const removeSelected = () =>
+  selection.selected.value.length > 0 &&
+  mutation.run({ keys: selection.selected.value, assigned: false });
 const resultRows = computed(() =>
   (lastResult.value?.results ?? []).map((item) => ({ ...item, name: item.key })),
 );
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-4 rounded-panel p-5" aria-labelledby="tag-contests-title">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <h2 id="tag-contests-title" class="font-display text-lg font-semibold">
-        {{ $t('admin.contestTags.contests.title', { name: tag.name }) }}
-      </h2>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('close')">
-        {{ $t('admin.contestTags.contests.close') }}
-      </button>
-    </div>
+  <AdminDrawer
+    v-model:visible="visible"
+    :title="$t('admin.contestTags.contests.title', { name: tag.name })"
+    :subtitle="tag.slug"
+  >
     <form class="flex flex-col gap-2" @submit.prevent="add">
       <label for="tag-contests-add" class="text-sm font-semibold">
         {{ $t('admin.contestTags.contests.addLabel') }}
@@ -84,18 +81,19 @@ const resultRows = computed(() =>
       <div class="flex flex-wrap gap-2">
         <input
           id="tag-contests-add"
-          ref="addInput"
           v-model="keysText"
-          :class="ADMIN_INPUT_CLASS"
-          class="min-w-0 flex-1"
+          autofocus
+          :class="[INPUT, 'min-w-0 flex-1 basis-56 font-mono']"
           :placeholder="$t('admin.contestTags.contests.addPlaceholder')"
           autocomplete="off"
           spellcheck="false"
         />
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
-          :disabled="typedKeys.length === 0 || isTooMany || mutation.isPending.value"
+          :class="buttonClass('primary')"
+          :aria-disabled="
+            typedKeys.length === 0 || isTooMany || mutation.isPending.value || undefined
+          "
         >
           {{ $t('admin.contestTags.contests.add') }}
         </button>
@@ -110,7 +108,7 @@ const resultRows = computed(() =>
       {{ failureTextOf(mutation.failure.value) }}
     </p>
     <ContestBulkResult
-      v-if="lastResult"
+      v-if="lastResult && lastResult.failed > 0"
       :results="resultRows"
       reason-prefix="admin.contests.bulk.reasons"
     />
@@ -122,22 +120,26 @@ const resultRows = computed(() =>
         {{ $t('admin.contestTags.contests.none') }}
       </p>
       <div v-else class="flex flex-col gap-2">
-        <label class="flex min-h-11 items-center gap-3 text-sm font-semibold">
+        <label class="flex min-h-10 items-center gap-3 text-sm font-semibold">
           <input
             type="checkbox"
-            class="size-5"
+            class="size-4 accent-[var(--qh-accent)]"
             :checked="selection.isAllSelected.value"
             :indeterminate="selection.isSomeSelected.value"
             @change="selection.toggleAll(checked($event))"
           />
           {{ $t('admin.contestTags.contests.listed', { count: data?.meta.total ?? 0 }) }}
         </label>
-        <ul class="flex flex-col divide-y divide-line rounded-row border border-line">
+        <ul
+          class="m-0 flex list-none flex-col divide-y divide-line rounded-row border border-line p-0"
+        >
           <li v-for="contest in tagged" :key="contest.key">
-            <label class="flex min-h-11 items-center gap-3 px-3 py-2 text-sm">
+            <label
+              class="flex min-h-10 items-center gap-3 px-3 py-2 text-sm hover:bg-surface-hover"
+            >
               <input
                 type="checkbox"
-                class="size-5 shrink-0"
+                class="size-4 shrink-0 accent-[var(--qh-accent)]"
                 :checked="selection.isSelected(contest.key)"
                 @change="selection.toggle(contest.key, checked($event))"
               />
@@ -146,21 +148,23 @@ const resultRows = computed(() =>
             </label>
           </li>
         </ul>
-        <div>
-          <button
-            type="button"
-            :class="ADMIN_BUTTON_CLASS"
-            :disabled="selection.selected.value.length === 0 || mutation.isPending.value"
-            @click="removeSelected"
-          >
-            {{
-              $t('admin.contestTags.contests.removeSelected', {
-                count: selection.selected.value.length,
-              })
-            }}
-          </button>
-        </div>
       </div>
     </QueryState>
-  </section>
+    <template v-if="tagged.length > 0" #footer>
+      <button
+        type="button"
+        :class="[buttonClass('secondary'), 'ml-auto']"
+        :aria-disabled="
+          selection.selected.value.length === 0 || mutation.isPending.value || undefined
+        "
+        @click="removeSelected"
+      >
+        {{
+          $t('admin.contestTags.contests.removeSelected', {
+            count: selection.selected.value.length,
+          })
+        }}
+      </button>
+    </template>
+  </AdminDrawer>
 </template>

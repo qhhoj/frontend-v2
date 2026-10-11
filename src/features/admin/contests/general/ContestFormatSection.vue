@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import type { ContestFormatName, LabelStyle } from '@/api/types/contest-editing';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { FORMAT_DEFAULTS, FORMAT_FIELDS } from '../format-config';
 import type { ContestForm } from '../contest-form';
+import ContestCheck from './ContestCheck.vue';
 import { numberOrNaN, textOf } from './input-values';
 
 const form = defineModel<ContestForm>({ required: true });
@@ -21,6 +21,16 @@ const FORMAT_NAMES: ContestFormatName[] = [
   'ultimate',
 ];
 const LABEL_STYLES: LabelStyle[] = ['alpha', 'numeric'];
+/** The contest-wide switches, saved with the form: two columns of checkboxes. */
+const OPTIONS = [
+  { field: 'runPretestsOnly', hint: 'runPretestsOnlyHint' },
+  { field: 'hideProblemTags', hint: 'hideProblemTagsHint' },
+  { field: 'hideProblemAuthors', hint: undefined },
+  { field: 'showShortDisplay', hint: undefined },
+  { field: 'showSubmissionList', hint: 'showSubmissionListHint' },
+  { field: 'pushAnnouncements', hint: 'pushHint' },
+] as const;
+const optionLabel = (field: string) => (field === 'pushAnnouncements' ? 'pushLabel' : field);
 
 /** Changing the format puts the new format's own defaults in its config (the backend refuses keys it does not know). */
 function chooseFormat(event: Event) {
@@ -31,8 +41,12 @@ function chooseFormat(event: Event) {
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.contests.general.sections.format')">
-    <div class="grid gap-5 sm:grid-cols-2">
+  <AdminFormSection
+    id="contest-section-format"
+    :title="$t('admin.contests.general.sections.format')"
+    :description="$t('admin.contests.general.fields.formatConfigNote')"
+  >
+    <div class="grid gap-4 sm:grid-cols-3 lg:col-span-2">
       <AdminField
         input-id="contest-formatName"
         :label="$t('admin.contests.general.fields.formatName')"
@@ -41,7 +55,7 @@ function chooseFormat(event: Event) {
           <select
             :id="id"
             :value="form.formatName"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             @change="chooseFormat"
           >
@@ -56,12 +70,7 @@ function chooseFormat(event: Event) {
         :label="$t('admin.contests.general.fields.labelStyle')"
       >
         <template #default="{ id, describedBy }">
-          <select
-            :id="id"
-            v-model="form.labelStyle"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-          >
+          <select :id="id" v-model="form.labelStyle" :class="INPUT" :aria-describedby="describedBy">
             <option v-for="style in LABEL_STYLES" :key="style" :value="style">
               {{
                 style === 'alpha'
@@ -85,22 +94,21 @@ function chooseFormat(event: Event) {
             type="number"
             min="0"
             max="10"
-            :class="ADMIN_INPUT_CLASS"
+            :class="[INPUT, 'font-mono tabular-nums']"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
         </template>
       </AdminField>
     </div>
-    <fieldset class="flex flex-col gap-4 rounded-row border border-line p-4">
-      <legend class="px-1 font-semibold">
+    <fieldset class="m-0 grid min-w-0 gap-4 border-0 p-0 lg:col-span-2 lg:grid-cols-2">
+      <legend class="mb-3 text-sm font-semibold">
         {{
           $t('admin.contests.general.fields.formatConfigTitle', {
             format: $t(`admin.contests.formats.${form.formatName}`),
           })
         }}
       </legend>
-      <p class="text-sm text-muted">{{ $t('admin.contests.general.fields.formatConfigNote') }}</p>
       <p v-if="FORMAT_FIELDS[form.formatName].length === 0" class="text-sm text-muted">
         {{ $t('admin.contests.general.fields.formatNoOptions') }}
       </p>
@@ -117,45 +125,33 @@ function chooseFormat(event: Event) {
               :value="form.formatConfig[field.name]"
               type="number"
               min="0"
-              :class="ADMIN_INPUT_CLASS"
+              :class="[INPUT, 'font-mono tabular-nums']"
               :aria-describedby="describedBy"
               @input="form.formatConfig[field.name] = numberOrNaN(textOf($event))"
             />
           </template>
         </AdminField>
-        <AdminSwitch
+        <ContestCheck
           v-else
           :model-value="Boolean(form.formatConfig[field.name])"
+          :input-id="`contest-format-${field.name}`"
           :label="$t(field.labelKey)"
           @update:model-value="form.formatConfig[field.name] = $event"
         />
       </template>
     </fieldset>
-    <AdminSwitch
-      v-model="form.runPretestsOnly"
-      :label="$t('admin.contests.general.fields.runPretestsOnly')"
-    />
-    <AdminSwitch
-      v-model="form.hideProblemTags"
-      :label="$t('admin.contests.general.fields.hideProblemTags')"
-    />
-    <AdminSwitch
-      v-model="form.hideProblemAuthors"
-      :label="$t('admin.contests.general.fields.hideProblemAuthors')"
-    />
-    <AdminSwitch
-      v-model="form.showShortDisplay"
-      :label="$t('admin.contests.general.fields.showShortDisplay')"
-    />
-    <AdminSwitch
-      v-model="form.showSubmissionList"
-      :label="$t('admin.contests.general.fields.showSubmissionList')"
-      :description="$t('admin.contests.general.fields.showSubmissionListHint')"
-    />
-    <AdminSwitch
-      v-model="form.pushAnnouncements"
-      :label="$t('admin.contests.general.fields.pushLabel')"
-      :description="$t('admin.contests.general.fields.pushHint')"
-    />
-  </SettingsCard>
+    <fieldset class="m-0 grid min-w-0 gap-4 border-0 p-0 lg:col-span-2 lg:grid-cols-2">
+      <legend class="mb-3 text-sm font-semibold">
+        {{ $t('admin.contests.general.fields.optionsTitle') }}
+      </legend>
+      <ContestCheck
+        v-for="option in OPTIONS"
+        :key="option.field"
+        v-model="form[option.field]"
+        :input-id="`contest-${option.field}`"
+        :label="$t(`admin.contests.general.fields.${optionLabel(option.field)}`)"
+        :description="option.hint ? $t(`admin.contests.general.fields.${option.hint}`) : undefined"
+      />
+    </fieldset>
+  </AdminFormSection>
 </template>

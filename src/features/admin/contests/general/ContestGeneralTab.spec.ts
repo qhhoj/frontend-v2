@@ -35,13 +35,8 @@ describe('ContestGeneralTab', () => {
       'judge.lock_contest',
       'judge.contest_rating',
     ])
-      // Switches name the permission in words; the other locks still show the codename until the contest screen PR.
-      expect(
-        [needsPermissionText(permission), `Cần quyền ${permission}`].some((text) =>
-          wrapper.text().includes(text),
-        ),
-        permission,
-      ).toBe(true);
+      expect(wrapper.text(), permission).toContain(needsPermissionText(permission));
+    expect(wrapper.text()).not.toContain('judge.');
     expect(wrapper.get('#contest-accessCode').attributes('disabled')).toBeDefined();
   });
 
@@ -83,8 +78,8 @@ describe('ContestGeneralTab', () => {
     seedCache(created.queryClient, STALE_AFTER_WRITE);
     await created.wrapper.get('#contest-key').setValue('w42');
     await created.wrapper.get('#contest-name').setValue('W42');
-    await created.wrapper.get('#contest-startTime').setValue('2026-10-15T13:00');
-    await created.wrapper.get('#contest-endTime').setValue('2026-10-15T17:00');
+    await created.wrapper.get('#contest-startTime').setValue('15/10/2026 13:00');
+    await created.wrapper.get('#contest-endTime').setValue('15/10/2026 17:00');
     await created.wrapper
       .findAll('button')
       .find((button) => button.text() === 'Tạo kỳ thi')!

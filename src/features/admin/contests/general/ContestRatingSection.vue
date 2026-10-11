@@ -1,71 +1,69 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
+import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
+import ContestCheck from './ContestCheck.vue';
+import LockedFieldset from './LockedFieldset.vue';
 import { nullableNumber, textOf } from './input-values';
 import { usePermissionLocks } from './permission-locks';
 
+/** Whether and for whom the contest counts towards rating. */
 const form = defineModel<ContestForm>({ required: true });
+defineProps<{ errors: FieldErrors }>();
 const { lockedBy, hintOf } = usePermissionLocks();
+const RATING = 'judge.contest_rating';
+const BOUNDS = ['ratingFloor', 'ratingCeiling'] as const;
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.contests.general.sections.rating')">
-    <AdminSwitch
+  <AdminFormSection
+    id="contest-section-rating"
+    :title="$t('admin.contests.general.sections.rating')"
+    :description="$t('admin.contests.general.sectionLeads.rating')"
+  >
+    <ContestCheck
       v-model="form.isRated"
+      input-id="contest-isRated"
       :label="$t('admin.contests.general.fields.isRated')"
-      :locked-by="lockedBy('judge.contest_rating')"
+      :locked-by="lockedBy(RATING)"
     />
-    <AdminSwitch
+    <ContestCheck
       v-model="form.rateAll"
+      input-id="contest-rateAll"
       :label="$t('admin.contests.general.fields.rateAll')"
       :description="$t('admin.contests.general.fields.rateAllHint')"
-      :locked-by="lockedBy('judge.contest_rating')"
+      :locked-by="lockedBy(RATING)"
     />
-    <div class="grid gap-5 sm:grid-cols-2">
-      <AdminField
-        input-id="contest-ratingFloor"
-        :label="$t('admin.contests.general.fields.ratingFloor')"
-        :hint="hintOf('judge.contest_rating')"
-      >
-        <template #default="{ id, describedBy }">
-          <input
-            :id="id"
-            :value="form.ratingFloor ?? ''"
-            type="number"
-            :disabled="Boolean(lockedBy('judge.contest_rating'))"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-            @input="form.ratingFloor = nullableNumber(textOf($event))"
-          />
-        </template>
-      </AdminField>
-      <AdminField
-        input-id="contest-ratingCeiling"
-        :label="$t('admin.contests.general.fields.ratingCeiling')"
-        :hint="hintOf('judge.contest_rating')"
-      >
-        <template #default="{ id, describedBy, invalid }">
-          <input
-            :id="id"
-            :value="form.ratingCeiling ?? ''"
-            type="number"
-            :disabled="Boolean(lockedBy('judge.contest_rating'))"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-            @input="form.ratingCeiling = nullableNumber(textOf($event))"
-          />
-        </template>
-      </AdminField>
-    </div>
-    <UsernameChips
-      v-model="form.rateExclude"
-      :label="$t('admin.contests.general.fields.rateExclude')"
-      :locked-by="lockedBy('judge.contest_rating')"
-    />
-  </SettingsCard>
+    <AdminField
+      v-for="bound in BOUNDS"
+      :key="bound"
+      :input-id="`contest-${bound}`"
+      :label="$t(`admin.contests.general.fields.${bound}`)"
+      :hint="hintOf(RATING)"
+      :error="errors[bound]"
+    >
+      <template #default="{ id, describedBy, invalid }">
+        <input
+          :id="id"
+          :value="form[bound] ?? ''"
+          type="number"
+          inputmode="numeric"
+          :disabled="Boolean(lockedBy(RATING))"
+          :class="[INPUT, 'font-mono tabular-nums']"
+          :aria-describedby="describedBy"
+          :aria-invalid="invalid ? 'true' : undefined"
+          @input="form[bound] = nullableNumber(textOf($event))"
+        />
+      </template>
+    </AdminField>
+    <LockedFieldset class="lg:col-span-2" :locked-by="lockedBy(RATING)">
+      <UsernameChips
+        v-model="form.rateExclude"
+        :label="$t('admin.contests.general.fields.rateExclude')"
+      />
+    </LockedFieldset>
+  </AdminFormSection>
 </template>
