@@ -2072,6 +2072,9 @@
     "footerChangeLabel": "Change low-power mode",
     "title": "Low-power mode"
   },
+  "adminEdit": {
+    "label": "Edit in admin"
+  },
   "shortLink": {
     "notFoundHint": "You may not have permission to view this page.",
     "copy": "Copy",

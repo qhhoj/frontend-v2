@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
+import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { userEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import GlassCard from '@/components/GlassCard.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumericDate } from '@/lib/format';
@@ -21,6 +23,7 @@ const locale = useLocaleStore();
 const tier = computed(() => ratingTier(props.user.rating));
 const tierClass = computed(() => TIER_TEXT_CLASSES[tierColor(tier.value)]);
 const tierLabelKey = computed(() => `tiers.${tier.value ?? 'unrated'}`);
+const editTarget = computed(() => userEditTarget(session.user, props.user.username));
 const isOwn = computed(() => props.user.username === session.user?.username);
 const banReason = computed(() => props.user.staff?.banReason ?? null);
 /** The backend refuses to ban a superuser, an account already banned (409) or oneself: offer the action only where it can work. */
@@ -77,7 +80,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
           </ul>
         </div>
       </div>
-      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap gap-2.5">
+      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap items-center gap-2.5">
         <template v-if="isOwn">
           <RouterLink
             to="/settings"
@@ -93,6 +96,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
           </RouterLink>
         </template>
         <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
+        <AdminEditLink :to="editTarget" />
         <ShortLinkButton :path="shortLinkPath({ kind: 'user', username: user.username })" />
       </div>
       <p v-if="banReason" data-testid="ban-status" class="text-sm text-negative">
