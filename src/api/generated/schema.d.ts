@@ -10488,6 +10488,8 @@ export interface components {
             bannedUsers: components["schemas"]["UserSummaryResponse"][];
             /** @description The base (default-language) name, whatever `lang` the detail was read in; the detail's own `name` follows `lang`. */
             baseName: string;
+            /** @description The viewer may set `isPublic` without `judge.change_public_visibility`: the problem is organization-private and they may create problems for every one of its organizations (it then only reaches members). */
+            canPublishToMembers: boolean;
             /** @description Users who can edit the problem. */
             curators: components["schemas"]["UserSummaryResponse"][];
             /** @description Base-language statement in markdown. */
