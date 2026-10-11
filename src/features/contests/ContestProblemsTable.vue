@@ -50,6 +50,14 @@ const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts
 const formatCount = (count: number) => formatNumber(count, locale.locale);
 /** The cap line, with the attempts the viewer has left once they have a result. */
 const leftText = (count: number) => t('contests.problems.left', { count }, count);
+/** The attempt cap line, with the attempts the viewer has left once they have a result. */
+const capLine = (problem: ContestProblem) => {
+  if (!problem.maxSubmissions) return '';
+  const cap = capText(problem.maxSubmissions);
+  if (!problem.viewerResult) return cap;
+  const left = attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult.attempts);
+  return `${cap} · ${leftText(left)}`;
+};
 </script>
 
 <template>
@@ -124,23 +132,22 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             <th scope="row" class="px-5 py-3 text-left font-display text-xl font-bold">
               {{ problem.label }}
             </th>
-            <td class="px-3 py-3">
-              <RouterLink :to="problemLink(problem)" class="font-semibold hover:text-accent-text">{{
-                problem.name
-              }}</RouterLink>
-              <span class="block font-mono text-[12.5px] text-muted">
-                {{ problem.code
-                }}<template v-if="problem.maxSubmissions">
-                  · {{ capText(problem.maxSubmissions) }}</template
-                ><template v-if="problem.viewerResult && problem.maxSubmissions !== null">
-                  ·
-                  {{
-                    leftText(
-                      attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult.attempts),
-                    )
-                  }}</template
-                >
+            <td class="w-full max-w-0 min-w-28 px-3 py-3">
+              <RouterLink
+                :to="problemLink(problem)"
+                :title="problem.name"
+                class="block truncate font-semibold hover:text-accent-text"
+                >{{ problem.name }}</RouterLink
+              >
+              <span :title="problem.code" class="block truncate font-mono text-[12.5px] text-muted">
+                {{ problem.code }}
               </span>
+              <span
+                v-if="problem.maxSubmissions"
+                class="block truncate text-[12.5px] text-muted"
+                :title="capLine(problem)"
+                >{{ capLine(problem) }}</span
+              >
             </td>
             <td class="px-3 py-3 font-mono text-[13px] whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
@@ -149,16 +156,17 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             <td v-if="hasSolverCounts" class="px-3 py-3 text-right font-mono tabular-nums">
               {{ problem.solverCount === null ? '—' : formatCount(problem.solverCount) }}
             </td>
-            <td v-if="hasOwnResults" class="px-3 py-3">
+            <td v-if="hasOwnResults" class="max-w-40 px-3 py-3">
               <OwnResultChip :problem="problem" :context="context" />
             </td>
             <td class="px-5 py-3 text-right">
               <RouterLink
                 :to="problemLink(problem)"
-                class="inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
+                class="inline-flex size-11 items-center justify-center rounded-pill border border-line hover:bg-surface-hover"
+                :title="$t('contests.problems.open')"
               >
-                {{ $t('contests.problems.open')
-                }}<span class="sr-only"> {{ problem.label }}. {{ problem.name }}</span
+                <span class="sr-only"
+                  >{{ $t('contests.problems.open') }} {{ problem.label }}. {{ problem.name }}</span
                 ><ExternalLink class="size-4" aria-hidden="true" />
               </RouterLink>
             </td>
