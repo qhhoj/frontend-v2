@@ -71,7 +71,7 @@ const verdictFor = (result: string | null): Verdict =>
             <table class="w-full border-collapse text-[15px]">
               <thead>
                 <tr class="text-[13px] text-muted">
-                  <th scope="col" :class="HEADER_LEFT">{{ $t('profileTabs.columns.rank') }}</th>
+                  <th scope="col" :class="HEADER_RIGHT">{{ $t('profileTabs.columns.rank') }}</th>
                   <th scope="col" :class="HEADER_LEFT">{{ $t('profileTabs.columns.problem') }}</th>
                   <th scope="col" :class="[HEADER_RIGHT, HIDDEN_ON_PHONE]">
                     {{ $t('profileTabs.columns.weight') }}
@@ -89,7 +89,9 @@ const verdictFor = (result: string | null): Verdict =>
               </thead>
               <tbody>
                 <tr v-for="entry in entries" :key="entry.rank" class="border-t border-line">
-                  <td :class="[BODY_CELL_CLASSES, 'font-mono']">{{ entry.rank }}</td>
+                  <td :class="[BODY_CELL_CLASSES, 'font-mono tabular-nums text-right']">
+                    {{ entry.rank }}
+                  </td>
                   <td :class="BODY_CELL_CLASSES">
                     <RouterLink
                       :to="{ name: 'problem', params: { code: entry.problem.code } }"
@@ -99,25 +101,41 @@ const verdictFor = (result: string | null): Verdict =>
                     </RouterLink>
                     <div class="font-mono text-xs text-muted">{{ entry.problem.code }}</div>
                   </td>
-                  <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE, 'text-right font-mono']">
+                  <td
+                    :class="[
+                      BODY_CELL_CLASSES,
+                      HIDDEN_ON_PHONE,
+                      'text-right font-mono tabular-nums',
+                    ]"
+                  >
                     {{ formatFixed(entry.weight, locale.locale, 1) }}%
                   </td>
-                  <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE, 'text-right font-mono']">
+                  <td
+                    :class="[
+                      BODY_CELL_CLASSES,
+                      HIDDEN_ON_PHONE,
+                      'text-right font-mono tabular-nums',
+                    ]"
+                  >
                     {{ formatNumber(entry.points, locale.locale, 1) }}
                   </td>
-                  <td :class="[BODY_CELL_CLASSES, 'text-right font-mono font-semibold']">
+                  <td
+                    :class="[BODY_CELL_CLASSES, 'text-right font-mono font-semibold tabular-nums']"
+                  >
                     {{ formatFixed(entry.scaledPoints, locale.locale, 1) }}
                   </td>
                   <td :class="[BODY_CELL_CLASSES, HIDDEN_ON_PHONE]">
                     <RouterLink
                       :to="{ name: 'submission', params: { id: entry.submission.id } }"
-                      class="flex flex-col items-start gap-1 hover:underline"
+                      class="flex flex-col items-start gap-0.5 hover:underline"
                     >
-                      <VerdictLabel :verdict="verdictFor(entry.submission.result)" />
-                      <span class="font-mono text-xs">
-                        {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
+                      <span class="flex items-center gap-2">
+                        <VerdictLabel :verdict="verdictFor(entry.submission.result)" short />
+                        <span class="font-mono text-[13px] tabular-nums">
+                          {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
+                        </span>
                       </span>
-                      <span class="text-xs text-muted">
+                      <span class="text-xs whitespace-nowrap text-muted">
                         {{ entry.submission.language }} ·
                         {{ formatDate(entry.submission.date, locale.locale) }}
                       </span>
