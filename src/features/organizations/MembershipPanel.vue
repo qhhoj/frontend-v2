@@ -56,7 +56,7 @@ const retry = () => {
     ref="panel"
     data-testid="membership-panel"
     tabindex="-1"
-    class="flex w-full flex-col gap-3 md:w-72"
+    :class="['flex flex-col gap-3', state === 'administrator' ? 'w-fit' : 'w-full md:w-72']"
   >
     <StatePanel
       v-if="joined"
@@ -140,18 +140,12 @@ const retry = () => {
     </template>
 
     <template v-else-if="state === 'administrator'">
+      <!-- Managing lives on the Quản lý tab and the overview card; the header only names the role. -->
       <span
         class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
       >
         {{ $t('orgMembership.administrator') }}
       </span>
-      <p class="text-sm text-muted">{{ $t('orgMembership.adminLine') }}</p>
-      <RouterLink
-        :to="{ name: 'organization-manage', params: { slug: organization.slug } }"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >
-        {{ $t('orgMembership.edit') }}
-      </RouterLink>
     </template>
   </section>
 </template>

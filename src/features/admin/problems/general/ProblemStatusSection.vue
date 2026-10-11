@@ -56,9 +56,7 @@ function setDateToNow() {
       input-id="problem-isPublic"
       :label="$t('admin.problems.status.public')"
       :description="props.canPublishToMembers ? $t('admin.creation.publishToMembers') : undefined"
-      :locked-by="
-        props.canPublishToMembers ? undefined : lockFor('judge.change_public_visibility')
-      "
+      :locked-by="props.canPublishToMembers ? undefined : lockFor('judge.change_public_visibility')"
     />
     <PublishReadinessNote
       v-if="privateCode && form.isPublic"

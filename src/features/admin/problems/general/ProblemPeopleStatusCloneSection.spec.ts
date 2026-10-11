@@ -4,7 +4,7 @@ import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
-import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
+import { editableProblem, problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
 const mountedApps: Mounted[] = [];
@@ -85,6 +85,7 @@ describe('problem people, status and clone', () => {
           ? fail(400, 'validation_failed', { code: ['That code is taken.'] })
           : ok(editableProblem({ code: 'hcmus41c_copy' })),
       'GET /problems/hcmus41c_copy': ok(editableProblem({ code: 'hcmus41c_copy' })),
+      'GET /problems/hcmus41c_copy/data': ok(problemData()),
     });
     const { wrapper, queryClient, router } = await mountAdmin('/admin/problems/hcmus41c/general');
     const keys = [
@@ -114,6 +115,7 @@ describe('problem people, status and clone', () => {
       ...problemEditorRoutes(),
       'POST /problems/hcmus41c/clone': ok(editableProblem({ code: 'hcmus41c_copy' })),
       'GET /problems/hcmus41c_copy': ok(editableProblem({ code: 'hcmus41c_copy' })),
+      'GET /problems/hcmus41c_copy/data': ok(problemData()),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
     await openClone(wrapper);

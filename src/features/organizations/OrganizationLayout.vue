@@ -33,10 +33,10 @@ usePageTitle(() => organization.value?.name);
   </div>
   <div v-else class="flex flex-col">
     <div class="border-b border-line bg-surface-solid">
-      <div class="page-gutter flex flex-col gap-5 pt-7">
+      <div class="page-gutter flex flex-col gap-2 pt-4">
         <RouterLink
           :to="{ name: 'organizations' }"
-          class="w-fit text-sm text-accent-text hover:underline"
+          class="w-fit text-xs text-accent-text hover:underline"
         >
           {{ $t('orgs.back') }}
         </RouterLink>

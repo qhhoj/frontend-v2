@@ -229,18 +229,18 @@ describe('ProblemGeneralTab', () => {
         'PATCH /problems/hcmus41c': ok(editableProblem({ isPublic: true })),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      expect(publicSwitch(wrapper).attributes('aria-disabled')).toBeUndefined();
+      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
       expect(wrapper.text()).toContain('chỉ thành viên tổ chức thấy');
-      await publicSwitch(wrapper).trigger('click');
+      await tickPublic(wrapper);
       await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
       await flushPromises();
       expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
     });
 
-    it('keeps the switch locked without the permission or the flag', async () => {
+    it('keeps Public locked without the permission or the flag', async () => {
       mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes() });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      expect(publicSwitch(wrapper).attributes('aria-disabled')).toBe('true');
+      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeDefined();
     });
 
     it('says nothing when the cases carry points', async () => {
