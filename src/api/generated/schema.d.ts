@@ -3869,6 +3869,32 @@ export interface paths {
         patch: operations["OrganizationEditingController_update"];
         trace?: never;
     };
+    "/api/internal/organizations/{slug}/contests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a contest for an organization
+         * @description Organization administrators (or `judge.edit_all_organization` holders)
+         *     who hold `judge.create_private_contest`; no `judge.add_contest` needed.
+         *     The contest is private to this organization: `organizations` and
+         *     `isOrganizationPrivate` in the body are ignored and set by the server.
+         *     Every other rule of `POST /contests` applies: the creator becomes an
+         *     author, gated fields stay gated, and the organization's quota is charged.
+         *     404 for an unknown organization, 403 `forbidden` without the rights.
+         */
+        post: operations["OrganizationContestCreationController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/organizations/{slug}/join": {
         parameters: {
             query?: never;
@@ -4061,7 +4087,21 @@ export interface paths {
          */
         get: operations["OrganizationProblemsController_list"];
         put?: never;
-        post?: never;
+        /**
+         * Create a problem for an organization
+         * @description Organization administrators (or `judge.edit_all_organization` holders)
+         *     who hold `judge.create_organization_problem`; no `judge.add_problem`
+         *     needed. The problem is private to this organization: `organizations` and
+         *     `isOrganizationPrivate` in the body are ignored and set by the server, and
+         *     `isPublic` (members only) needs no extra permission. The code must start
+         *     with the organization prefix — the slug's lowercase letters and digits
+         *     followed by `_` — else 400 `organization_code_prefix` (superusers are
+         *     exempt). Every other rule of `POST /problems` applies: the creator becomes
+         *     a curator, staff fields stay gated, and the organization's quota is
+         *     charged. 404 for an unknown organization, 403 `forbidden` without the
+         *     rights.
+         */
+        post: operations["OrganizationProblemCreationController_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5683,7 +5723,7 @@ export interface paths {
         };
         /**
          * Get my profile
-         * @description Signed-in callers only. Returns the editable profile of the caller: about text (source and rendered HTML), display name, time zone, default programming language, editor and site themes, appearance, math engine, user script, owned badges with the displayed one, and the organizations the caller belongs to in display order.
+         * @description Signed-in callers only. Returns the editable profile of the caller: about text (source and rendered HTML), display name, time zone, default programming language, site theme, appearance, and the organizations the caller belongs to in display order.
          */
         get: operations["ProfileController_get"];
         put?: never;
@@ -5693,8 +5733,8 @@ export interface paths {
         head?: never;
         /**
          * Update my profile
-         * @description Signed-in callers only. Partial update: send only the fields to change and read the full profile back. `null` is accepted only for `displayBadgeId` (no badge) and `appearance` (the site look); `appearance` replaces the stored look as a whole.
-         *     `organizations` may only reorder or shorten the current memberships (join from the organization page). Errors: 400 `unknown_language`, 400 `not_your_badge`, 400 `organizations_not_editable`; 403 `forbidden` when editing `about` or `firstName` during the official contest (superusers excepted) or when editing `about` while muted or before solving 5 problems (staff excepted); 409 `conflict` when leaving an organization the caller administers or when memberships changed meanwhile. The badge and organization order are also frozen in official contest mode.
+         * @description Signed-in callers only. Partial update: send only the fields to change and read the full profile back. `null` is accepted only for `appearance` (the site look); `appearance` replaces the stored look as a whole.
+         *     `organizations` may only reorder or shorten the current memberships (join from the organization page). Errors: 400 `unknown_language`, 400 `organizations_not_editable`; 403 `forbidden` when editing `about` or `firstName` during the official contest (superusers excepted) or when editing `about` while muted or before solving 5 problems (staff excepted); 409 `conflict` when leaving an organization the caller administers or when memberships changed meanwhile. The organization order is also frozen in official contest mode.
          */
         patch: operations["ProfileController_update"];
         trace?: never;
@@ -6029,7 +6069,7 @@ export interface paths {
         };
         /**
          * Get the site shell data
-         * @description Public. Returns what the web app needs on every load: the navigation bar entries (hidden ones included, flagged), the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.
+         * @description Public. Returns what the web app needs on every load: the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.
          */
         get: operations["SiteController_site"];
         put?: never;
@@ -7142,8 +7182,12 @@ export interface components {
             user: string;
         };
         AdminCapabilitiesResponse: {
+            /** @description Where the user may create contests. */
+            contestCreation: components["schemas"]["CreationScopeResponse"];
             /** @description Whether the user may administer at least one organization: an admin of one, or a holder of `judge.edit_all_organization`. */
             organizations: boolean;
+            /** @description Where the user may create problems. */
+            problemCreation: components["schemas"]["CreationScopeResponse"];
         };
         AdminCommentItemResponse: {
             /** @description The comment. */
@@ -8715,6 +8759,12 @@ export interface components {
             /** @description Up to 100 accounts; each row is created or refused on its own. */
             users: components["schemas"]["NewUserDto"][];
         };
+        CreationScopeResponse: {
+            /** @description For at least one organization they administer: `judge.create_organization_problem` or `judge.create_private_contest` (`GET /organizations?administered=true` lists them). */
+            organizations: boolean;
+            /** @description Site-wide: `judge.add_problem` for problems, `judge.add_contest` for contests. */
+            site: boolean;
+        };
         CreditActorResponse: {
             /** @description Id of the user. */
             id: string;
@@ -9725,6 +9775,8 @@ export interface components {
             name: string;
             /** @description Combined performance points of the members. */
             performancePoints: number;
+            /** @description What the code of a problem created for the organization must start with (`thpt-demo` → `thptdemo_`). */
+            problemCodePrefix: string;
             /** @description Short name shown beside members, at most 20 characters. */
             shortName: string;
             /** @description Most members the organization may have; null for no limit. */
@@ -9745,6 +9797,8 @@ export interface components {
             name: string;
             /** @description Combined performance points of the members. */
             performancePoints: number;
+            /** @description What the code of a problem created for the organization must start with (`thpt-demo` → `thptdemo_`). */
+            problemCodePrefix: string;
             /** @description Short name shown beside members, at most 20 characters. */
             shortName: string;
             /** @description Most members the organization may have; null for no limit. */
@@ -9862,6 +9916,10 @@ export interface components {
         OrganizationViewerResponse: {
             /** @description The viewer is an admin or holds judge.edit_all_organization. */
             canAdminister: boolean;
+            /** @description The viewer may create contests for the organization (`POST /organizations/{slug}/contests`): an administrator holding `judge.create_private_contest`. */
+            canCreateContest: boolean;
+            /** @description The viewer may create problems for the organization (`POST /organizations/{slug}/problems`): an administrator holding `judge.create_organization_problem`. */
+            canCreateProblem: boolean;
             /** @description The viewer belongs to the organization. */
             isMember: boolean;
             /** @description The viewer's pending join request (Task 6), else null. */
@@ -10293,7 +10351,7 @@ export interface components {
              * @description Problem-wide checker.
              * @enum {string}
              */
-            checker: "bridged" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
             /** @description Arguments of the checker; null for none. */
             checkerArgs: {
                 [key: string]: unknown;
@@ -10555,28 +10613,18 @@ export interface components {
             about: string;
             /** @description Rendered, sanitised HTML of `about`. */
             aboutHtml: string;
-            /** @description Code editor theme. */
-            aceTheme: string;
             /** @description Custom accent and glass settings; null for the site look. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
-            /** @description Ids of the badges the user owns. */
-            badges: string[];
-            /** @description Id of the displayed badge; null for none. */
-            displayBadgeId: string | null;
             /** @description Display first name. */
             firstName: string;
             /** @description Default programming language id; null when none. */
             languageId: string | null;
-            /** @description How math is rendered. */
-            mathEngine: string;
             /** @description Organizations the user belongs to, in display order. */
             organizations: components["schemas"]["ProfileOrganizationResponse"][];
             /** @description Site theme id. */
             siteTheme: string;
             /** @description IANA time zone name used to show dates. */
             timezone: string;
-            /** @description Custom JavaScript run on the site for this user. */
-            userScript: string;
         };
         PublicRankingContestResponse: {
             /** @description When the contest ends, ISO 8601. */
@@ -10666,12 +10714,12 @@ export interface components {
             /** @description Every test case, in judging order. */
             cases: components["schemas"]["TestCaseDto"][];
             /**
-             * @description Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical` or `linecount`.
+             * @description Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical`, `linecount`, `rstripped`, `sorted`, `unordered`, `easy` or `linematches`.
              * @enum {string}
              */
-            checker: "bridged" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
             /**
-             * @description Arguments of the checker; null for none.
+             * @description Arguments of the checker; null for none. floats*: `precision` (0-20), `error_mode`; identical: `pe_allowed`; rstripped: `filter_new_line`; sorted: `split_on` (`lines`/`whitespace`); linematches: `point_distribution`, `filler_lines_required`; bridged: `type` (`testlib`, `themis`, `default`), `treat_checker_points_as_percentage` (testlib). Others take none; anything else is 400.
              * @default null
              */
             checkerArgs: {
@@ -10683,7 +10731,7 @@ export interface components {
              */
             grader: "interactive" | "output_only" | "signature" | "standard";
             /**
-             * @description Arguments of the grader; null for none.
+             * @description Arguments of the grader; null for none. standard: `io_method` (`standard`/`file`), `io_input_file`, `io_output_file`; signature: `allow_main`. Others take none; anything else is 400.
              * @default null
              */
             graderArgs: {
@@ -11663,6 +11711,8 @@ export interface components {
             result: components["schemas"]["SubmissionResult"] | null;
             /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
+            /** @description The first test results, only on the submission lists and only when the viewer could see them on the submission page (signed in; another user's contest submission only for the problem's editors and `judge.view_all_submission`); null otherwise. */
+            testSummary: components["schemas"]["SubmissionTestSummaryResponse"] | null;
             /** @description Seconds (largest case). */
             time: number | null;
             /** @description The problem's test case count; null whenever the viewer may not see case results. */
@@ -11749,6 +11799,8 @@ export interface components {
             result: components["schemas"]["SubmissionResult"] | null;
             /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
+            /** @description The first test results, only on the submission lists and only when the viewer could see them on the submission page (signed in; another user's contest submission only for the problem's editors and `judge.view_all_submission`); null otherwise. */
+            testSummary: components["schemas"]["SubmissionTestSummaryResponse"] | null;
             /** @description Seconds (largest case). */
             time: number | null;
             /** @description The submitter; null if the account no longer exists. */
@@ -11852,6 +11904,21 @@ export interface components {
          * @enum {string}
          */
         SubmissionStatus: "AB" | "CE" | "D" | "G" | "IE" | "P" | "PD" | "QU";
+        SubmissionTestSummaryResponse: {
+            /** @description Batch number of each entry, from 1; null for a case outside any batch. Same length as `statuses`. */
+            batches: (number | null)[];
+            /** @description Judged cases past the first 100, not in `statuses`. */
+            more: number;
+            /** @description Verdict of each entry, at most 100: `AC`, `WA`, `TLE`, `MLE`, `OLE`, `IR`, `RTE` or `SC`. For `batch`, the first non-accepted case of each batch among the first 100 cases. */
+            statuses: ("AC" | "IR" | "MLE" | "OLE" | "RTE" | "SC" | "TLE" | "WA")[];
+            /** @description The problem's test case count for `case` (the rest are not judged yet); null for `batch`. */
+            total: number | null;
+            /**
+             * @description `case`: one entry per test case in judging order; `batch`: one entry per batch (the problem shows only batch results).
+             * @enum {string}
+             */
+            unit: "batch" | "case";
+        };
         SubmissionViewerResponse: {
             /** @description Whether `POST /submissions/{id}/abort` is allowed. */
             canAbort: boolean;
@@ -12038,7 +12105,7 @@ export interface components {
              * @default
              * @enum {string}
              */
-            checker: "" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            checker: "" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
             /**
              * @description Arguments of the case checker; null for none.
              * @default null
@@ -12092,7 +12159,7 @@ export interface components {
              * @description Per-case checker override; empty for the problem-wide checker.
              * @enum {string}
              */
-            checker: "" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "standard";
+            checker: "" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
             /** @description Arguments of the case checker; null for none. */
             checkerArgs: {
                 [key: string]: unknown;
@@ -12637,18 +12704,8 @@ export interface components {
         UpdateProfileDto: {
             /** @description About-me text in Markdown, rendered and sanitised on save. */
             about?: string;
-            /**
-             * @description Code editor theme.
-             * @enum {string}
-             */
-            aceTheme?: "ambiance" | "auto" | "chaos" | "chrome" | "clouds" | "clouds_midnight" | "cobalt" | "crimson_editor" | "dawn" | "dreamweaver" | "eclipse" | "github" | "idle_fingers" | "katzenmilch" | "kr_theme" | "kuroir" | "merbivore" | "merbivore_soft" | "mono_industrial" | "monokai" | "pastel_on_dark" | "solarized_dark" | "solarized_light" | "terminal" | "textmate" | "tomorrow" | "tomorrow_night" | "tomorrow_night_blue" | "tomorrow_night_bright" | "tomorrow_night_eighties" | "twilight" | "vibrant_ink" | "xcode";
             /** @description The whole look replaces the stored one; `null` clears it (the site's look). */
             appearance?: components["schemas"]["AppearanceDto"] | null;
-            /**
-             * Format: uuid
-             * @description Id of one of the user's badges to display; `null` shows none.
-             */
-            displayBadgeId?: string | null;
             /** @description Display first name, up to 30 characters. */
             firstName?: string;
             /**
@@ -12656,19 +12713,12 @@ export interface components {
              * @description Id of the default programming language.
              */
             languageId?: string;
-            /**
-             * @description How math is rendered.
-             * @enum {string}
-             */
-            mathEngine?: "auto" | "jax" | "mml" | "svg" | "tex";
             /** @description The current memberships reordered or shortened. */
             organizations?: string[];
             /** @description Site theme id; unknown ids fall back to the operating system scheme. */
             siteTheme?: string;
             /** @description IANA time zone name used to show dates, for example `Asia/Ho_Chi_Minh`. */
             timezone?: string;
-            /** @description Custom JavaScript run on the site for this user, up to 65536 characters. */
-            userScript?: string;
         };
         UpdateQuotaDto: {
             /**
@@ -20331,6 +20381,45 @@ export interface operations {
             };
         };
     };
+    OrganizationContestCreationController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContestDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContestDetailResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     MembershipController_join: {
         parameters: {
             query?: never;
@@ -20697,6 +20786,45 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["OrganizationProblemResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationProblemCreationController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProblemDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemDetailResponse"];
                     };
                 };
             };

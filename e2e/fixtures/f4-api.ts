@@ -20,7 +20,13 @@ export function installOrgProblems(
   api.signedIn = true;
   api.routes['GET /organizations/lhp'] = ok(
     organizationDetail({
-      viewer: { isMember: true, canAdminister: options.canAdminister, pendingRequestId: null },
+      viewer: {
+        isMember: true,
+        canAdminister: options.canAdminister,
+        canCreateProblem: false,
+        canCreateContest: false,
+        pendingRequestId: null,
+      },
     }),
   );
   api.routes['GET /organizations/lhp/problems'] = list(options.rows ?? ORG_PROBLEMS);
@@ -33,7 +39,13 @@ export function installOrgUsage(api: FakeApi, usage: OrganizationUsage = organiz
   api.signedIn = true;
   api.routes['GET /organizations/lhp'] = ok(
     organizationDetail({
-      viewer: { isMember: true, canAdminister: true, pendingRequestId: null },
+      viewer: {
+        isMember: true,
+        canAdminister: true,
+        canCreateProblem: false,
+        canCreateContest: false,
+        pendingRequestId: null,
+      },
     }),
   );
   api.routes['GET /organizations/lhp/usage'] = ok(usage);

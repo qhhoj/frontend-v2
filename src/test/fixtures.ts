@@ -44,7 +44,11 @@ export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser =
   siteTheme: 'auto',
   appearance: null,
   languageId: null,
-  adminCapabilities: { organizations: false },
+  adminCapabilities: {
+    organizations: false,
+    problemCreation: { site: false, organizations: false },
+    contestCreation: { site: false, organizations: false },
+  },
   ...overrides,
 });
 
@@ -80,13 +84,8 @@ export const profile = (overrides: Partial<Profile> = {}): Profile => ({
   firstName: '',
   timezone: 'Asia/Ho_Chi_Minh',
   languageId: '0192a000-0000-7000-8000-00000000c017',
-  aceTheme: 'auto',
   siteTheme: 'auto',
   appearance: null,
-  mathEngine: 'auto',
-  userScript: '',
-  badges: [],
-  displayBadgeId: null,
   organizations: [],
   ...overrides,
 });
@@ -225,6 +224,7 @@ export const submissionItem = (
   points: 100,
   casePoints: 10,
   caseTotal: 10,
+  testSummary: null,
   time: 0.04,
   memory: 1024,
   ...overrides,
@@ -666,6 +666,7 @@ export const organizationItem = (
   memberCount: 120,
   performancePoints: 4200,
   slots: null,
+  problemCodePrefix: 'thpta_',
   ...overrides,
 });
 

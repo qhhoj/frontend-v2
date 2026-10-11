@@ -11,16 +11,22 @@ type ViewerState = NonNullable<OrganizationDetail['viewer']>;
 export const ADMIN_STATE: ViewerState = {
   isMember: true,
   canAdminister: true,
+  canCreateProblem: false,
+  canCreateContest: false,
   pendingRequestId: null,
 };
 export const MEMBER_STATE: ViewerState = {
   isMember: true,
   canAdminister: false,
+  canCreateProblem: false,
+  canCreateContest: false,
   pendingRequestId: null,
 };
 export const STRANGER_STATE: ViewerState = {
   isMember: false,
   canAdminister: false,
+  canCreateProblem: false,
+  canCreateContest: false,
   pendingRequestId: null,
 };
 

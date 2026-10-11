@@ -18,7 +18,13 @@ const QUEUE = '/admin/organization-requests';
 const detail = organizationDetail({
   about: 'Trường THPT chuyên…',
   slots: 200,
-  viewer: { isMember: false, canAdminister: true, pendingRequestId: null },
+  viewer: {
+    isMember: false,
+    canAdminister: true,
+    canCreateProblem: false,
+    canCreateContest: false,
+    pendingRequestId: null,
+  },
 });
 const request = joinRequest({ organizationSlug: 'lhp' });
 const ngocanh = member(1, 'ngocanh');
@@ -157,7 +163,13 @@ describe('OrganizationsPage', () => {
       routes({
         'GET /organizations/lhp': ok({
           ...detail,
-          viewer: { isMember: true, canAdminister: false, pendingRequestId: null },
+          viewer: {
+            isMember: true,
+            canAdminister: false,
+            canCreateProblem: false,
+            canCreateContest: false,
+            pendingRequestId: null,
+          },
         }),
       }),
     );

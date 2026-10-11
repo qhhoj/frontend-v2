@@ -51,6 +51,7 @@ export const organizationItem = (
   memberCount: 842,
   performancePoints: 481230,
   slots: null,
+  problemCodePrefix: 'lhp_',
   ...overrides,
 });
 export const organizationDetail = (
@@ -63,7 +64,13 @@ export const organizationDetail = (
   logoOverrideImage: '',
   createdAt: '2019-08-20T02:00:00Z',
   admins: [ADMIN_USER],
-  viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
+  viewer: {
+    isMember: false,
+    canAdminister: false,
+    canCreateProblem: false,
+    canCreateContest: false,
+    pendingRequestId: null,
+  },
   ...overrides,
 });
 export const member = (
