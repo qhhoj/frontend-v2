@@ -152,6 +152,19 @@ describe('problem page', () => {
     );
   });
 
+  it('offers one PDF control: the uploaded statement when there is one', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail({ pdfStatementUrl: '/pdf/a.pdf' })),
+    });
+    const { wrapper } = await openProblem();
+    const link = wrapper.get('[data-testid="pdf-statement-link"]');
+    expect(link.attributes('href')).toBe('/pdf/a.pdf');
+    expect(link.attributes('aria-label')).toBe('Đề bài PDF');
+    expect(link.text()).toBe('PDF');
+    expect(wrapper.find('[data-testid="pdf-button"]').exists()).toBe(false);
+  });
+
   it('offers no rendered PDF when the statement is only an uploaded PDF', async () => {
     mockApi({
       ...anonymousViewer,
@@ -164,7 +177,9 @@ describe('problem page', () => {
   it('offers the rendered PDF for a text statement without an uploaded PDF', async () => {
     mockApi({ ...anonymousViewer, ...problemPageRoutes(problemDetail({ pdfStatementUrl: null })) });
     const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="header-actions"] button').text()).toBe('Tải đề dạng PDF');
+    expect(wrapper.get('[data-testid="pdf-button"]').attributes('aria-label')).toBe(
+      'Tải đề dạng PDF',
+    );
   });
 
   it('shows the uploaded PDF statement inside the statement card', async () => {
