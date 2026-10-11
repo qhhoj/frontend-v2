@@ -38,8 +38,12 @@ export const profileTabRoutes = (username = 'user_01'): Routes => ({
 });
 /** `/home` for the community screens: recent comments, new problems and the top users. */
 export const communityHomeRoutes: Routes = { 'GET /home': ok(homeResponse()) };
-/** Answers for any screen that renders the blog list (`/blog`): its empty newsfeed and the rail's home data. */
-export const blogListRoutes: Routes = { ...communityHomeRoutes, 'GET /posts': page([]) };
+/** Answers for any screen that renders the blog list (`/blog`): its empty newsfeed, the rail's home data and (signed in) no drafts. */
+export const blogListRoutes: Routes = {
+  ...communityHomeRoutes,
+  'GET /posts': page([]),
+  'GET /posts/drafts': page([]),
+};
 /** The organization layout and its about tab. */
 export const organizationRoutes = (detail: OrganizationDetail = organizationDetail()): Routes => ({
   'GET /organizations': page([organizationItem()], { pageSize: 100 }),
@@ -77,3 +81,11 @@ export const commentPageRoute = (
     }),
   ),
 });
+/** The post editor (`/blog/new`) of a viewer who may write a personal post and no organization post. */
+export const postEditorRoutes: Routes = {
+  'GET /posts/compose-options': ok({
+    canWritePersonal: true,
+    minSolvedProblems: 10,
+    organizations: [],
+  }),
+};

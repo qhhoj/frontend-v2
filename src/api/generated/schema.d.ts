@@ -4021,6 +4021,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/organizations/{slug}/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the submissions of an organization's members
+         * @description Members, administrators and holders of `judge.view_all_submission` only
+         *     (403 `forbidden`). Returns the members' submissions newest first, with
+         *     the filters and visibility rules of the site's submission list: only
+         *     problems the viewer may see, and other users' submissions of a contest
+         *     whose list is closed to the viewer are left out.
+         */
+        get: operations["OrganizationSubmissionsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/organizations/{slug}/usage": {
         parameters: {
             query?: never;
@@ -19917,6 +19941,57 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationRevisionResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationSubmissionsController_list: {
+        parameters: {
+            query?: {
+                /** @description Language ids; repeat the parameter. */
+                language?: string[];
+                /** @description Page number, from 1. */
+                page?: number;
+                /** @description Items per page, 1 to 100. */
+                pageSize?: number;
+                /** @description Problem code. */
+                problem?: string;
+                /** @description Only submissions with these verdicts (`AC`, `WA`, `TLE`, ...); repeat the parameter. `IE`, `SC` are staff only. */
+                result?: components["schemas"]["SubmissionResult"][];
+                /** @description Only submissions in these judging states (`QU`, `P`, `G`, `D`, `IE`, `CE`, `AB`, `PD`); repeat the parameter. `IE`, `QU`, `P`, `G`, `D` are staff only. */
+                status?: components["schemas"]["SubmissionStatus"][];
+                /** @description Username. */
+                user?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SubmissionListItemResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
                     };
                 };

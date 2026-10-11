@@ -5,6 +5,7 @@ import { mockApi, noContent, page } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { notificationItem } from '@/test/notification-fixtures';
+import { postEditorRoutes } from '@/test/community-routes';
 import { signedInViewer } from '@/test/problem-routes';
 
 const START = '/blog/new';
@@ -26,6 +27,7 @@ describe('HighPriorityBanner', () => {
     let isRead = false;
     const calls = mockApi({
       ...signedInViewer(),
+      ...postEditorRoutes,
       'GET /notifications': inbox(() => isRead),
       'POST /notifications/n-high/read': () => {
         isRead = true;
@@ -44,6 +46,7 @@ describe('HighPriorityBanner', () => {
   it('offers no mark-read button while viewing as another user', async () => {
     mockApi({
       ...signedInViewer({ impersonatorId: '0192a000-0000-7000-8000-00000000a001' }),
+      ...postEditorRoutes,
       'GET /notifications': inbox(() => false),
     });
     await mountApp(START);
@@ -51,7 +54,10 @@ describe('HighPriorityBanner', () => {
   });
 
   it('stays off the admin layout', async () => {
-    mockApi({ ...staffViewer(['judge.change_ticket']), 'GET /notifications': inbox(() => false) });
+    mockApi({
+      ...staffViewer(['judge.change_ticket']),
+      'GET /notifications': inbox(() => false),
+    });
     const { wrapper } = await mountApp('/admin');
     await vi.waitFor(() => {
       if (!wrapper.find('[data-testid="admin-topbar"]').exists()) throw new Error('shell not yet');

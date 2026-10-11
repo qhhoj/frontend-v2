@@ -35,6 +35,12 @@ const userAndContentRoutes = (): Record<string, Handler> => ({
     postItem(),
     postItem({ id: 'post-2', title: 'Mẹo tối ưu đọc ghi nhanh', sticky: true }),
   ]),
+  'GET /posts/drafts': list([]),
+  'GET /posts/compose-options': ok({
+    canWritePersonal: true,
+    minSolvedProblems: 10,
+    organizations: [],
+  }),
   'GET /posts/:id': ({ params }) => ok(postDetail({ id: params.id })),
   'PUT /posts/:id/vote': ok({ score: 59, viewerVote: 1 }),
   'GET /comments/pages/:type/:key': ({ params }) =>

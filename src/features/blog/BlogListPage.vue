@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Pencil, Rss } from 'lucide-vue-next';
+import { ChevronRight, FilePen, Pencil, Rss } from 'lucide-vue-next';
 import type { RouteLocationRaw } from 'vue-router';
 import { computed, ref, watch } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
@@ -16,7 +16,8 @@ import PostCard from './PostCard.vue';
 import PostCardSkeleton from './PostCardSkeleton.vue';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
-import { usePostsQuery } from './blog.queries';
+import { useMyDraftsQuery, usePostsQuery } from './blog.queries';
+import { WRITE_BUTTON_CLASS } from './post-state';
 import { useBlogRoute } from './use-blog-route';
 
 const { feed, page } = useBlogRoute();
@@ -29,6 +30,9 @@ const posts = computed(() => items.value.filter((post) => !post.sticky));
 /** Only the first page of the newsfeed can open with pinned cards. */
 const expectsPinned = computed(() => feed.value === 'global' && page.value === 1);
 const meta = computed(() => data.value?.meta);
+/** The signed-in viewer's unpublished posts: a link to them while there are any. */
+const drafts = useMyDraftsQuery(1);
+const draftCount = computed(() => (session.user ? (drafts.data.value?.meta.total ?? 0) : 0));
 const FEED_TABS: { feed: PostFeed; to: RouteLocationRaw }[] = [
   { feed: 'global', to: { name: 'blog' } },
   { feed: 'all', to: { name: 'blog', query: { feed: 'all' } } },
@@ -70,7 +74,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         </template>
       </nav>
       <div class="flex flex-wrap items-center gap-2.5">
-        <RouterLink v-if="session.user" :to="{ name: 'post-new' }" :class="TOOL">
+        <RouterLink v-if="session.user" :to="{ name: 'post-new' }" :class="WRITE_BUTTON_CLASS">
           <Pencil aria-hidden="true" class="size-4" />
           {{ $t('blog.write') }}
         </RouterLink>
@@ -90,6 +94,19 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
       </template>
       <PostCard v-for="post in pinned" v-else :key="post.id" :post="post" />
     </section>
+    <RouterLink
+      v-if="draftCount > 0"
+      :to="{ name: 'post-drafts' }"
+      data-testid="my-drafts"
+      class="glass flex min-h-14 items-center gap-3 rounded-card px-4 font-semibold hover:bg-surface-hover sm:px-5"
+    >
+      <FilePen aria-hidden="true" class="size-5 text-accent-text" />
+      <span class="flex-1">{{ $t('blog.myDrafts') }}</span>
+      <span class="rounded-pill bg-surface-hover px-2.5 py-0.5 text-sm text-muted">
+        {{ draftCount }}
+      </span>
+      <ChevronRight aria-hidden="true" class="size-4 text-muted" />
+    </RouterLink>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="scroll-mt-20">
         <GlassCard as="div" data-testid="post-list" class="overflow-hidden">

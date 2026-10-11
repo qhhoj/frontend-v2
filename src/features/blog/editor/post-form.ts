@@ -47,7 +47,8 @@ export const postFormOf = (post: PostDetail): PostForm => ({
   authors: post.authors.map((author) => ({ id: author.id, username: author.username })),
 });
 
-export function checkPostForm(form: PostForm): FieldErrors {
+/** `mode` is the visibility chosen: a scheduled post needs a time ahead. */
+export function checkPostForm(form: PostForm, mode: PublishMode): FieldErrors {
   const errors: FieldErrors = {};
   const title = form.title.trim();
   if (title.length === 0 || title.length > POST_LIMITS.title)
@@ -58,7 +59,43 @@ export function checkPostForm(form: PostForm): FieldErrors {
     errors.ogImage = translate('admin.postEditor.errors.ogImage');
   if (form.publishOn && fromLocalInput(form.publishOn) === null)
     errors.publishOn = translate('admin.postEditor.errors.publishOn');
+  else if (mode === 'scheduled' && !isAhead(form.publishOn, Date.now()))
+    errors.publishOn = translate('postEditor.errors.scheduleAhead');
   return errors;
+}
+
+/** The editor's visibility choice: a draft, public from its time (now when empty), or public later. */
+export type PublishMode = 'draft' | 'public' | 'scheduled';
+
+const isAhead = (publishOn: string, now: number) => {
+  const at = fromLocalInput(publishOn);
+  return at !== null && new Date(at).getTime() > now;
+};
+
+export const publishModeOf = (form: PostForm, now = Date.now()): PublishMode => {
+  if (!form.visible) return 'draft';
+  return isAhead(form.publishOn, now) ? 'scheduled' : 'public';
+};
+
+/** An hour from now, on the minute: the time a newly scheduled post starts with. */
+const nextHour = (now: number) => toLocalInput(new Date(now + 3_600_000).toISOString());
+
+/**
+ * The visibility fields for `mode`. Making a post public keeps the time it went live (`liveSince`, for an edit of a live
+ * post) or dates it now (an empty time); scheduling keeps a time ahead or proposes one an hour away.
+ */
+export function publishFieldsFor(
+  form: PostForm,
+  mode: PublishMode,
+  liveSince: string | null,
+  now = Date.now(),
+): Pick<PostForm, 'visible' | 'publishOn'> {
+  if (mode === 'draft') return { visible: false, publishOn: form.publishOn };
+  if (mode === 'public') return { visible: true, publishOn: liveSince ?? '' };
+  return {
+    visible: true,
+    publishOn: isAhead(form.publishOn, now) ? form.publishOn : nextHour(now),
+  };
 }
 
 /** What the viewer may set beyond title, content, time and visibility (the backend refuses the rest with 403). */

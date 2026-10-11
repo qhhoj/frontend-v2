@@ -57,7 +57,8 @@
     "contestBalloons": "Bóng bay",
     "contestBalloonsPrint": "Phiếu bóng bay",
     "problemBest": "Bài nộp tốt nhất",
-    "runtimes": "Máy chấm và ngôn ngữ"
+    "runtimes": "Máy chấm và ngôn ngữ",
+    "postDrafts": "Bài nháp của tôi"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -1604,7 +1605,11 @@
     "membersPager": "Trang thành viên",
     "noMembers": "Tổ chức chưa có thành viên.",
     "postsPager": "Trang bài viết",
-    "noPosts": "Chưa có bài viết."
+    "noPosts": "Chưa có bài viết.",
+    "postsTitle": "Bài viết của tổ chức",
+    "writePost": "Viết bài cho tổ chức",
+    "writeFirstPost": "Viết bài đầu tiên",
+    "noPostsBody": "Quản trị viên đăng bài cho tổ chức tại đây; thành viên đọc được."
   },
   "blog": {
     "lead": "Thông báo, hướng dẫn và chia sẻ từ cộng đồng. Bài ghim luôn nằm đầu bảng tin.",
@@ -1628,7 +1633,18 @@
     "problemPoints": "{points} điểm",
     "topContributors": "Top đóng góp",
     "toLeaderboard": "Bảng xếp hạng",
-    "title": "Blog"
+    "title": "Blog",
+    "myDrafts": "Bài nháp của tôi",
+    "drafts": {
+      "title": "Bài nháp của tôi",
+      "lead": "Bài nháp và bài hẹn giờ của bạn. Chỉ bạn và ban quản trị thấy cho đến khi đăng.",
+      "empty": "Chưa có bài nháp nào",
+      "state": {
+        "draft": "Nháp",
+        "scheduled": "Hẹn giờ"
+      },
+      "publishesAt": "Đăng lúc {time}"
+    }
   },
   "blogPost": {
     "breadcrumb": "Đường dẫn",
@@ -1641,7 +1657,17 @@
     "noMorePosts": "Chưa có bài viết khác.",
     "notFoundTitle": "Không tìm thấy bài viết",
     "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
-    "backToBlog": "Về blog"
+    "backToBlog": "Về blog",
+    "edit": "Sửa",
+    "pin": "Ghim",
+    "unpin": "Bỏ ghim",
+    "actions": "Thao tác với bài viết",
+    "delete": {
+      "action": "Xóa",
+      "title": "Xóa bài viết này?",
+      "body": "“{title}” cùng bình luận và bình chọn sẽ bị xóa vĩnh viễn. Không thể hoàn tác.",
+      "confirm": "Xóa bài"
+    }
   },
   "comments": {
     "deletedAccount": "Tài khoản đã xóa",
@@ -2500,5 +2526,66 @@
     "extension": "Đuôi file",
     "perJudge": "Phiên bản trên từng máy chấm",
     "notInstalled": "chưa cài"
+  },
+  "postEditor": {
+    "newTitle": "Viết bài mới",
+    "editTitle": "Sửa bài viết",
+    "backToPost": "Về bài viết",
+    "body": {
+      "label": "Nội dung (Markdown)",
+      "write": "Soạn",
+      "preview": "Xem trước",
+      "toolbar": "Định dạng",
+      "empty": "Bản xem trước hiện ở đây khi bạn viết.",
+      "tools": {
+        "bold": "In đậm",
+        "italic": "In nghiêng",
+        "code": "Mã",
+        "link": "Liên kết",
+        "bullet": "Danh sách",
+        "numbered": "Danh sách đánh số",
+        "math": "Công thức"
+      }
+    },
+    "settings": {
+      "title": "Đăng bài",
+      "toggle": "Cài đặt đăng bài",
+      "postAs": "Đăng với tư cách",
+      "self": "Cá nhân",
+      "organization": "Tổ chức",
+      "organizationHint": "Chỉ hiện tổ chức bạn quản trị. Thành viên tổ chức đọc được bài.",
+      "visibility": "Hiển thị",
+      "publishOn": "Thời điểm đăng",
+      "summary": "Tóm tắt",
+      "summaryHint": "Hiện trên thẻ bài viết. Để trống sẽ lấy đoạn đầu bài.",
+      "summaryLocked": "Chỉ nhân viên sửa được tóm tắt. Để trống sẽ lấy đoạn đầu bài.",
+      "sticky": "Ghim lên bảng tin",
+      "stickyHint": "Luôn nằm đầu danh sách. Chỉ nhân viên."
+    },
+    "mode": {
+      "draft": "Nháp",
+      "public": "Công khai",
+      "scheduled": "Hẹn giờ"
+    },
+    "modeHint": {
+      "draft": "Chỉ bạn và ban quản trị thấy",
+      "public": "Mọi người đọc được; bài của tổ chức chỉ thành viên",
+      "scheduled": "Tự đăng vào thời điểm chọn"
+    },
+    "bar": {
+      "saveDraft": "Lưu nháp",
+      "publish": "Đăng bài",
+      "schedule": "Hẹn giờ đăng",
+      "update": "Cập nhật",
+      "unsaved": "Có thay đổi chưa lưu",
+      "clean": "Chưa có thay đổi"
+    },
+    "refused": {
+      "title": "Bạn chưa viết bài được",
+      "body": "Viết bài cá nhân cần giải ít nhất {count} bài và không bị cấm nói. Quản trị viên tổ chức có thể đăng bài cho tổ chức của mình."
+    },
+    "errors": {
+      "scheduleAhead": "Chọn một thời điểm trong tương lai."
+    }
   }
 }

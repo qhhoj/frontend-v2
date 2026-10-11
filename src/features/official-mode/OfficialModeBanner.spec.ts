@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { postEditorRoutes } from '@/test/community-routes';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
 const START = '/blog/new';
@@ -15,6 +16,7 @@ describe('official mode in the shell', () => {
   it('trusts officialMode false over an end time that is still in the future', async () => {
     mockApi({
       ...signedInViewer(),
+      ...postEditorRoutes,
       'GET /site': ok({
         navigation: [],
         config: {},

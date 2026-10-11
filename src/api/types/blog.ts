@@ -9,3 +9,5 @@ export const BLOG_PAGE_SIZE = 10;
 export type PostListItem = Schemas['PostListItemResponse'];
 /** backend: post.response.ts (PostDetailResponse) */
 export type PostDetail = Schemas['PostDetailResponse'];
+/** backend: blog/drafts/dto/post-compose.response.ts */
+export type PostComposeOptions = Schemas['PostComposeOptionsResponse'];

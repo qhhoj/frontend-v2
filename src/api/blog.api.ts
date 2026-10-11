@@ -6,6 +6,10 @@ import type { JsonBodyOf } from './typed';
 export const fetchPosts = (feed: PostFeed, page: number) =>
   apiGetPage('/posts', { query: { feed, page } });
 export const fetchPost = (id: string) => apiGet('/posts/{id}', { path: { id } });
+/** The caller's own drafts and scheduled posts they may still edit. */
+export const fetchMyDrafts = (page: number) => apiGetPage('/posts/drafts', { query: { page } });
+/** Whether the caller may write a personal post, and the organizations they may post for. */
+export const fetchComposeOptions = () => apiGet('/posts/compose-options');
 export const votePost = (id: string, score: VoteScore) =>
   apiSend('put', '/posts/{id}/vote', { path: { id }, body: { score } });
 
