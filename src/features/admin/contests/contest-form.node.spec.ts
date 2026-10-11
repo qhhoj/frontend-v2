@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { contestSettings, editableContest } from '@/test/admin-fixtures/contests';
 import {
+  canSetVisible,
   changedContestFields,
   checkContestForm,
   emptyContestForm,
@@ -188,5 +189,37 @@ describe('contest form operations fields', () => {
     const form = { ...newContest(), rules: 'x'.repeat(8193) };
     expect(checkContestForm(form)).toHaveProperty('rules');
     expect(checkContestForm({ ...form, rules: 'x'.repeat(8192) })).not.toHaveProperty('rules');
+  });
+
+  describe('who may set isVisible', () => {
+    const PRIVATE = 'judge.create_private_contest';
+    const only = (permission: string) => (asked: string) => asked === permission;
+    const form = (flags: { isPrivate?: boolean; isOrganizationPrivate?: boolean }) => ({
+      isPrivate: false,
+      isOrganizationPrivate: false,
+      ...flags,
+    });
+
+    it('lets an org admin show a private or organization-private contest, never a public one', () => {
+      expect(canSetVisible(form({ isOrganizationPrivate: true }), only(PRIVATE))).toBe(true);
+      expect(canSetVisible(form({ isPrivate: true }), only(PRIVATE))).toBe(true);
+      expect(canSetVisible(form({}), only(PRIVATE))).toBe(false);
+      expect(canSetVisible(form({}), only(PRIVATE), true)).toBe(true);
+    });
+
+    it('leaves staff holding change_contest_visibility free on any contest, and others locked', () => {
+      expect(canSetVisible(form({}), only('judge.change_contest_visibility'))).toBe(true);
+      expect(canSetVisible(form({ isPrivate: true }), () => false)).toBe(false);
+    });
+
+    it('sends isVisible on create exactly when canSetVisible allows it', () => {
+      const shown = { ...newContest(), isVisible: true };
+      expect(toContestBody(shown, only(PRIVATE), true)).toHaveProperty('isVisible', true);
+      expect(toContestBody(shown, only(PRIVATE))).not.toHaveProperty('isVisible');
+      expect(toContestBody(shown, only('judge.change_contest_visibility'))).toHaveProperty(
+        'isVisible',
+        true,
+      );
+    });
   });
 });

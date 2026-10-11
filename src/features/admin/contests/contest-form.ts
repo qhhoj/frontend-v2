@@ -481,19 +481,41 @@ export function changedContestFields(before: ContestForm, after: ContestForm): C
   return patch;
 }
 
-const isGatedOff = (key: keyof ContestForm, can: (permission: string) => boolean) =>
-  Object.entries(GATED_CONTEST_FIELDS).some(
+/**
+ * Mirrors the backend: `judge.change_contest_visibility` shows any contest; `judge.create_private_contest` only a private or
+ * organization-private one (`inOrganization`: a contest created for an organization, which the server makes private).
+ */
+export function canSetVisible(
+  form: Pick<ContestForm, 'isPrivate' | 'isOrganizationPrivate'>,
+  can: (permission: string) => boolean,
+  inOrganization = false,
+): boolean {
+  if (can('judge.change_contest_visibility')) return true;
+  const isPrivately = form.isPrivate || form.isOrganizationPrivate || inOrganization;
+  return isPrivately && can('judge.create_private_contest');
+}
+
+const isGatedOff = (
+  key: keyof ContestForm,
+  form: ContestForm,
+  can: (permission: string) => boolean,
+  inOrganization: boolean,
+) => {
+  if (key === 'isVisible') return !canSetVisible(form, can, inOrganization);
+  return Object.entries(GATED_CONTEST_FIELDS).some(
     ([permission, fields]) => fields.includes(key) && !can(permission),
   );
+};
 
 /** The create body's optional members that are filled and that `can` lets through (a gated group needs its permission). */
 function filledFields(
   form: ContestForm,
   can: (permission: string) => boolean,
+  inOrganization: boolean,
 ): Record<string, unknown> {
   const fields: Record<string, unknown> = {};
   for (const key of Object.keys(form) as (keyof ContestForm)[]) {
-    if (SPECIAL.includes(key) || isGatedOff(key, can)) continue;
+    if (SPECIAL.includes(key) || isGatedOff(key, form, can, inOrganization)) continue;
     const value = sentValue(key, form[key]);
     if (!isEmptyValue(value)) fields[key] = value;
   }
@@ -504,8 +526,12 @@ function filledFields(
 export function toContestBody(
   form: ContestForm,
   can: (permission: string) => boolean,
+  inOrganization = false,
 ): ContestBody {
-  const optional = { ...specialFields(emptyContestForm(), form), ...filledFields(form, can) };
+  const optional = {
+    ...specialFields(emptyContestForm(), form),
+    ...filledFields(form, can, inOrganization),
+  };
   if (!can('judge.contest_access_code')) delete optional.accessCode;
   return { ...optional, ...requiredContestFields(form) };
 }
