@@ -17,8 +17,14 @@ export function useProblemDataQuery(
     queryKey: computed(() => problemDataKey(toValue(code), viewer.value)),
     queryFn: () => fetchProblemData(toValue(code)),
     enabled: computed(() => toValue(enabled)),
+    refetchInterval: (query) => (isChecking(query.state.data) ? CHECK_POLL_MS : false),
   });
 }
+
+/** While a judge compiles an upload, the configuration is read again this often (the form keeps its edits). */
+const CHECK_POLL_MS = 3000;
+const isChecking = (data: ProblemData | undefined) =>
+  Object.values(data?.sourceChecks ?? {}).some((check) => check?.status === 'pending');
 
 /** init.yml is fetched only while its dialog is open. */
 export function useInitYamlQuery(

@@ -6,6 +6,8 @@ export type Checker = ProblemData['checker'];
 export type Grader = ProblemData['grader'];
 export type JsonObject = NonNullable<ProblemData['checkerArgs']>;
 export type TestCase = Schemas['TestCaseResponse'];
+/** A judge's compile check of an uploaded checker or interactor. */
+export type SourceCheck = Schemas['SourceCheckResponse'];
 /** A test's own checker: the custom bridged checker is problem-wide only. */
 export type CaseChecker = TestCase['checker'];
 /** `C` a single test, `S` opens a scored group, `E` closes it. */
