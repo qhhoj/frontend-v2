@@ -427,7 +427,7 @@
     },
     "password": {
       "title": "Đổi mật khẩu",
-      "lead": "Sau khi đổi, mọi thiết bị khác sẽ bị đăng xuất; phiên hiện tại được giữ. API token không thay đổi.",
+      "lead": "Sau khi đổi, mọi thiết bị khác sẽ bị đăng xuất; phiên hiện tại được giữ. API token cũng bị thu hồi.",
       "changed": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất."
     },
     "token": {
@@ -436,9 +436,9 @@
       "create": "Tạo token mới",
       "copyNow": "Hãy sao chép ngay. Rời trang này là bạn sẽ không xem lại được token. Token cũ đã hết hiệu lực.",
       "copy": "Sao chép API token",
-      "risk": "Ai có token đều nộp bài được dưới tên bạn. Đổi mật khẩu không làm token mất hiệu lực; hãy tạo token mới nếu nghi ngờ bị lộ.",
+      "risk": "Ai có token đều nộp bài được dưới tên bạn. Token bị thu hồi khi bạn đổi mật khẩu hoặc đăng xuất mọi thiết bị; hãy tạo token mới nếu nghi ngờ bị lộ.",
       "confirmTitle": "Tạo token mới?",
-      "confirmBody": "Token hiện tại sẽ hết hiệu lực ngay. Mọi script đang dùng nó sẽ lỗi cho đến khi bạn thay token mới. Token mới chỉ hiện một lần."
+      "confirmBody": "Token hiện tại sẽ hết hiệu lực ngay. Mọi script đang dùng nó sẽ lỗi cho đến khi bạn thay token mới. Token mới chỉ hiện một lần. Nhập mật khẩu hiện tại để xác nhận."
     },
     "logoutAll": {
       "title": "Đăng xuất mọi nơi",
@@ -1618,6 +1618,7 @@
     "count": "{count} bình luận",
     "pageOf": "trang {page} / {last}",
     "timeOrder": "cũ nhất trước",
+    "truncatedReplies": "Một số phản hồi đã bị ẩn bớt.",
     "pager": "Trang bình luận",
     "permalink": "Liên kết tới bình luận số {number}",
     "edited": "đã sửa",

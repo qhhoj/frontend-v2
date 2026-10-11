@@ -241,6 +241,7 @@ export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestLi
   tags: [],
   userCount: 318,
   virtualCount: 0,
+  organizations: [],
   isPrivate: false,
   isOrganizationPrivate: false,
   requiresAccessCode: false,
@@ -628,6 +629,7 @@ export const submissionStats = (overrides: Partial<SubmissionStats> = {}): Submi
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,
+  verdictsToday: [],
   ...overrides,
 });
 

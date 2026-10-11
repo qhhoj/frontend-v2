@@ -3,7 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { settingsRoutes } from '@/test/account-routes';
 import { loginRoutes } from '@/test/auth-routes';
-import { mockApi, noContent, ok } from '@/test/mock-api';
+import { fail, issue, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -14,6 +14,16 @@ const dialogButton = (text: string) =>
   [...document.body.querySelectorAll<HTMLButtonElement>('[role="dialog"] button')].find(
     (button) => button.textContent?.trim() === text,
   )!;
+
+async function typePassword(value: string) {
+  const field = document.body.querySelector<HTMLInputElement>(
+    '[role="dialog"] input[name="tokenPassword"]',
+  )!;
+  field.value = value;
+  field.dispatchEvent(new Event('input'));
+  await flushPromises();
+  return field;
+}
 
 async function openSecurity(routes: Record<string, MockHandler>) {
   const calls = mockApi({ ...settingsRoutes(), ...loginRoutes, ...routes });
@@ -28,6 +38,7 @@ describe('Settings › Security › API token', () => {
     });
     await pageButton(wrapper, 'Tạo token mới').trigger('click');
     await flushPromises();
+    await typePassword('mật khẩu');
     dialogButton('Tạo token mới').click();
     await flushPromises();
     expect(wrapper.get('#main code').text()).toBe(TOKEN);
@@ -38,6 +49,32 @@ describe('Settings › Security › API token', () => {
     await router.push('/settings/security');
     await flushPromises();
     expect(wrapper.text()).not.toContain(TOKEN);
+  });
+});
+
+describe('Settings › Security › API token › password', () => {
+  it('sends the current password and marks a wrong one on its field', async () => {
+    const { wrapper, calls } = await openSecurity({
+      'POST /auth/token/regenerate': sequence(
+        fail(400, 'invalid_credentials', undefined, [
+          issue('currentPassword', 'password_incorrect', 'x'),
+        ]),
+        ok({ token: TOKEN }),
+      ),
+    });
+    await pageButton(wrapper, 'Tạo token mới').trigger('click');
+    await flushPromises();
+    const field = await typePassword('sai');
+    dialogButton('Tạo token mới').click();
+    await flushPromises();
+    expect(field.getAttribute('aria-invalid')).toBe('true');
+    await typePassword('đúng');
+    dialogButton('Tạo token mới').click();
+    await flushPromises();
+    expect(
+      calls.filter((call) => call.path === '/auth/token/regenerate').map((sent) => sent.body),
+    ).toEqual([{ currentPassword: 'sai' }, { currentPassword: 'đúng' }]);
+    expect(wrapper.get('#main code').text()).toBe(TOKEN);
   });
 });
 

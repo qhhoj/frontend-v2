@@ -42,9 +42,9 @@ export const removeSecurityKey = (id: string, currentPassword: string): Promise<
 export const fetchSecurityKeys = (): Promise<SecurityKey[]> =>
   apiGet('/auth/2fa/webauthn/credentials');
 
-/** The old token stops working at once; the new one is shown once. */
-export const regenerateApiToken = (): Promise<ApiToken> =>
-  apiSend('post', '/auth/token/regenerate');
+/** The old token stops working at once; the new one is shown once. The backend wants the current password. */
+export const regenerateApiToken = (currentPassword: string): Promise<ApiToken> =>
+  apiSend('post', '/auth/token/regenerate', { body: { currentPassword } });
 
 export const fetchDataExportStatus = (): Promise<DataExportStatus> => apiGet('/profile/data');
 export const requestDataExport = (): Promise<Schemas['QueuedResponse']> =>
