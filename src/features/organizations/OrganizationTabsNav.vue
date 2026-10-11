@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick, onMounted, useTemplateRef, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -45,10 +46,24 @@ const tabs = computed<OrganizationTab[]>(() => {
   if (viewer?.isMember) return [about, members, problems, contests, posts, submissions];
   return [about, members, contests, posts];
 });
+
+/** On a phone the row scrolls; the current tab (often "Quản lý", the last one) is brought into view. */
+const nav = useTemplateRef<HTMLElement>('nav');
+const route = useRoute();
+async function revealCurrentTab() {
+  await nextTick();
+  const row = nav.value;
+  const current = row?.querySelector<HTMLElement>('[aria-current="page"]');
+  if (!row || !current) return;
+  const overflow = current.offsetLeft + current.offsetWidth - row.clientWidth;
+  if (overflow > row.scrollLeft) row.scrollLeft = overflow;
+}
+onMounted(revealCurrentTab);
+watch(() => route.name, revealCurrentTab);
 </script>
 
 <template>
-  <nav :aria-label="$t('orgs.tabsLabel')" class="flex gap-1 overflow-x-auto">
+  <nav ref="nav" :aria-label="$t('orgs.tabsLabel')" class="relative flex gap-1 overflow-x-auto">
     <RouterLink
       v-for="tab in tabs"
       :key="tab.routeName"

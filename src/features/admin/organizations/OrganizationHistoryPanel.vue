@@ -14,8 +14,11 @@ import { CARD } from '../ui/controls';
 import { changeLabelOf, changesOf } from './organization-history';
 import { useOrganizationHistoryQuery } from './organization-history.queries';
 
-/** Legacy `VersionAdmin` history: who created, edited or removed a member, and what changed. */
-const props = defineProps<{ slug: string }>();
+/**
+ * Legacy `VersionAdmin` history: who created, edited or removed a member, and what changed.
+ * `embedded`: the parent (the Quản lý page's fold) shows the title and frame, so the panel drops its own.
+ */
+const props = defineProps<{ slug: string; embedded?: boolean }>();
 const route = useRoute();
 const locale = useLocaleStore();
 const page = computed(() => pageFromQuery(route.query.history));
@@ -32,16 +35,16 @@ const ACTION_TONE: Record<string, ChipTone> = {
 <template>
   <section
     data-testid="org-history"
-    :aria-labelledby="`org-history-${slug}`"
+    :aria-labelledby="embedded ? undefined : `org-history-${slug}`"
     class="flex min-w-0 flex-col gap-3"
   >
-    <header>
+    <header v-if="!embedded">
       <h3 :id="`org-history-${slug}`" class="font-display text-base font-semibold">
         {{ $t('admin.organizations.history.title') }}
       </h3>
       <p class="m-0 text-sm text-muted">{{ $t('admin.organizations.history.lead') }}</p>
     </header>
-    <div :class="[CARD, 'px-4']">
+    <div :class="embedded ? '' : [CARD, 'px-4']">
       <QueryState
         :loading="history.isPending.value"
         :error="history.error.value"
@@ -77,13 +80,13 @@ const ACTION_TONE: Record<string, ChipTone> = {
                   <span
                     v-for="(text, index) in change.removed"
                     :key="`removed-${index}`"
-                    class="rounded-row bg-verdict-wa-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-wa"
+                    class="w-fit max-w-full rounded-row bg-verdict-wa-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-wa"
                     >− {{ text }}</span
                   >
                   <span
                     v-for="(text, index) in change.added"
                     :key="`added-${index}`"
-                    class="rounded-row bg-verdict-ac-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-ac"
+                    class="w-fit max-w-full rounded-row bg-verdict-ac-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-ac"
                     >+ {{ text }}</span
                   >
                   <span v-if="change.hidden > 0" class="text-xs text-muted">{{

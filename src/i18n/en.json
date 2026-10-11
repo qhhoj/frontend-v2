@@ -1636,6 +1636,34 @@
       "contests": "The organization's contests",
       "requests": "Join requests",
       "pending": "{count} waiting"
+    },
+    "manage": {
+      "title": "Manage {name}",
+      "pendingLead": "{count} join requests waiting",
+      "noPending": "No join requests waiting",
+      "tiles": {
+        "label": "Organization numbers",
+        "members": "Members",
+        "pending": "Waiting",
+        "problems": "Problems",
+        "contests": "Contests"
+      },
+      "problems": {
+        "title": "Problems",
+        "all": "All {count} problems",
+        "empty": "No problems yet.",
+        "shown": "Shown",
+        "hidden": "Hidden"
+      },
+      "contests": {
+        "title": "Contests",
+        "all": "All {count} contests",
+        "empty": "No contests yet."
+      },
+      "settings": {
+        "title": "Settings",
+        "lead": "Logo, name, address, about, joining"
+      }
     }
   },
   "orgMembership": {
@@ -2665,14 +2693,12 @@
   "orgAdmin": {
     "pendingBadge": "{count} pending requests",
     "info": {
-      "title": "Organization details",
       "name": "Name",
       "slug": "Address",
       "slugHint": "Changing the address breaks old links.",
       "about": "About (Markdown)",
       "aboutPreview": "About preview",
       "save": "Save changes",
-      "reset": "Cancel",
       "staffLink": "Open in the admin pages (quota, places, visibility)"
     },
     "joinMode": {
