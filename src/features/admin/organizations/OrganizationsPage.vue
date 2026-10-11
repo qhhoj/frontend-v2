@@ -13,6 +13,7 @@ import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import AllRequestsPanel from './AllRequestsPanel.vue';
 import OrganizationAdminPanels from './OrganizationAdminPanels.vue';
+import OrganizationDeleteCard from './OrganizationDeleteCard.vue';
 import OrganizationEditor from './OrganizationEditor.vue';
 import OrganizationList from './OrganizationList.vue';
 import { useAdminOrganizationsQuery } from './organization-list.queries';
@@ -27,7 +28,7 @@ import { useOrganizationViewTabs } from './use-organization-view-tabs';
 const NEW_ORGANIZATION = 'new';
 const route = useRoute();
 const router = useRouter();
-const { can } = usePermissions();
+const { can, isSuperuser } = usePermissions();
 const { tabs: viewTabs, canSeeQueue } = useOrganizationViewTabs();
 const view = computed(() => organizationsViewOf(route.query, canSeeQueue.value));
 const orgParam = computed(() => (typeof route.query.org === 'string' ? route.query.org : null));
@@ -45,6 +46,10 @@ const organizations = useAdminOrganizationsQuery(
   () => view.value === 'organizations',
 );
 const canAdd = computed(() => can('judge.add_organization'));
+/** Back to the list, so the deleted slug is not refetched into a 404. */
+async function onDeleted() {
+  await router.push({ query: { ...route.query, org: undefined } });
+}
 
 function startCreate() {
   void router.push({ query: { ...route.query, org: NEW_ORGANIZATION } });
@@ -101,6 +106,12 @@ function searchFor(text: string) {
       <section v-if="orgParam !== null" class="flex min-w-0 flex-col gap-6">
         <OrganizationEditor :key="orgParam" :slug="editedSlug" @saved="onSaved" />
         <OrganizationAdminPanels v-if="editedSlug !== null" :key="editedSlug" :slug="editedSlug" />
+        <OrganizationDeleteCard
+          v-if="isSuperuser && editedSlug !== null"
+          :key="`delete-${editedSlug}`"
+          :slug="editedSlug"
+          :on-deleted="onDeleted"
+        />
       </section>
     </div>
   </QueryState>

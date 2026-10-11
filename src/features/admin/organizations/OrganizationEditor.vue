@@ -37,6 +37,7 @@ function reset() {
   editor.reset();
 }
 const isSaved = ref(false);
+const isLogoUploading = ref(false);
 const staffLock = computed(() => (canEditAll.value ? undefined : 'judge.edit_all_organization'));
 const titleKey = isCreate
   ? 'admin.organizations.editor.createTitle'
@@ -51,6 +52,7 @@ const slotsText = computed({
 });
 
 async function submit() {
+  if (isLogoUploading.value) return;
   isSaved.value = false;
   isSaved.value = await editor.save();
 }
@@ -150,7 +152,11 @@ async function submit() {
         preview-style="organization"
         :preview-label="$t('admin.organizations.editor.aboutPreview')"
       />
-      <OrganizationLogoField v-model="form.logoOverrideImage" :error="errors.logoOverrideImage" />
+      <OrganizationLogoField
+        v-model="form.logoOverrideImage"
+        v-model:uploading="isLogoUploading"
+        :error="errors.logoOverrideImage"
+      />
       <UsernameChips
         v-model="form.admins"
         :label="$t('admin.organizations.editor.admins', { max: MAX_ORGANIZATION_ADMINS })"
@@ -172,6 +178,7 @@ async function submit() {
           type="submit"
           :class="ADMIN_PRIMARY_CLASS"
           :aria-busy="mutation.isPending.value || undefined"
+          :disabled="isLogoUploading"
         >
           {{
             isCreate

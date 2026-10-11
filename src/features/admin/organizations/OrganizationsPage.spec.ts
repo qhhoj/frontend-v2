@@ -99,6 +99,42 @@ describe('OrganizationsPage', () => {
     expect(openDialog().querySelector('[role="alert"]')).toBeNull();
   });
 
+  it('offers the delete to superusers only, not to staff who may edit every organization', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
+    await vi.waitFor(() => {
+      if (!wrapper.find<HTMLInputElement>('#org-name').element.value) throw new Error('no detail');
+    });
+    await flushPromises();
+    expect(wrapper.find('[data-testid="delete-organization"]').exists()).toBe(false);
+  });
+
+  it('deletes only once the address is typed, then leaves the editor', async () => {
+    const calls = mockApi(
+      routes(
+        { 'DELETE /organizations/lhp': { status: 204 } },
+        staffViewer(ALL, { isSuperuser: true }),
+      ),
+    );
+    const { wrapper, router } = await mountWithButton(
+      '/admin/organizations?org=lhp',
+      'Xoá tổ chức',
+    );
+    await wrapper.get('[data-testid="delete-organization"]').trigger('click');
+    await flushPromises();
+    await confirmDialog('Xoá');
+    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
+    const input = openDialog().querySelector<HTMLInputElement>('#org-delete-slug')!;
+    input.value = 'lhp';
+    input.dispatchEvent(new Event('input'));
+    await flushPromises();
+    await confirmDialog('Xoá');
+    expect(calls.filter((call) => call.method === 'DELETE').map((call) => call.path)).toEqual([
+      '/organizations/lhp',
+    ]);
+    expect(router.currentRoute.value.query.org).toBeUndefined();
+  });
+
   it('shows no join requests or members to a member who may not administer the organization', async () => {
     const calls = mockApi(
       routes({
