@@ -37,8 +37,8 @@ describe('serverFieldErrors', () => {
   });
 
   it('falls back to the backend message for a field the form does not know', () => {
-    expect(serverFieldErrors(fieldsError({ userScript: ['Too long.'] }))).toEqual({
-      userScript: 'Too long.',
+    expect(serverFieldErrors(fieldsError({ unknownField: ['Too long.'] }))).toEqual({
+      unknownField: 'Too long.',
     });
   });
 });
