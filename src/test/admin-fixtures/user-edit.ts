@@ -1,4 +1,5 @@
 import type { UserEdit } from '../../api/types/users-admin';
+import { ok } from '../mock-api';
 
 /** The staff edit view of one account (`GET /admin/users/:username/profile`). */
 export const userEdit = (overrides: Partial<UserEdit> = {}): UserEdit => ({
@@ -31,4 +32,18 @@ export const userEdit = (overrides: Partial<UserEdit> = {}): UserEdit => ({
     },
   ],
   ...overrides,
+});
+
+/** The access section's reads for a user with no roles or permissions, viewed read-only. */
+export const emptyAccessRoutes = (username: string) => ({
+  'GET /admin/permissions': ok([]),
+  'GET /admin/groups': ok([]),
+  [`GET /admin/users/${username}/access`]: ok({
+    isStaff: false,
+    isSuperuser: false,
+    groups: [],
+    permissions: [],
+    effective: [],
+    canEdit: false,
+  }),
 });

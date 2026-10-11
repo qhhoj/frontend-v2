@@ -12,3 +12,11 @@ export type SetUserPasswordBody = JsonBodyOf<'/admin/users/{username}/password',
 export type CreateUsersBody = JsonBodyOf<'/admin/users', 'post'>;
 export type NewUserRow = CreateUsersBody['users'][number];
 export type CreatedUser = Schemas['CreatedUserResponse'];
+
+export type PermissionEntry = Schemas['PermissionResponse'];
+export type PermissionCategory = PermissionEntry['category'];
+export type Role = Schemas['GroupResponse'];
+export type RoleBody = JsonBodyOf<'/admin/groups', 'post'>;
+export type UserAccess = Schemas['UserAccessResponse'];
+export type RoleChange = JsonBodyOf<'/admin/groups/{id}', 'patch'>;
+export type UserAccessChange = JsonBodyOf<'/admin/users/{username}/access', 'patch'>;

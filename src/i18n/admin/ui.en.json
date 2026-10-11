@@ -98,7 +98,11 @@
     "invite_needs_email_only": "An invite needs an e-mail and no password.",
     "password_required": "Enter your own password to change the e-mail.",
     "row_failed": "The account could not be created; try this row again.",
-    "invite_not_sent": "Created, but the invite mail failed; send a reset link later."
+    "invite_not_sent": "Created, but the invite mail failed; send a reset link later.",
+    "permission_unknown": "Unknown permission.",
+    "group_unknown": "Choose existing roles.",
+    "group_name_taken": "Another role has this name.",
+    "added_and_removed": "An item cannot be added and removed at once."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",
