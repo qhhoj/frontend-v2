@@ -243,7 +243,8 @@ export class FakeApi {
     'GET /submissions': list([submissionItem()]),
     'GET /submissions/stats': ok(submissionStats()),
     'GET /submissions/:id': ({ params }) => ok(submissionDetail({ id: params.id })),
-    'GET /submissions/:id/source': ({ params }) => ok({ id: params.id, source: 'int main() {}\n' }),
+    'GET /submissions/:id/source': ({ params }) =>
+      ok({ id: params.id, source: 'int main() {}\n', filename: `${params.id}.cpp` }),
     'GET /events/submissions/:id': eventStream(),
     'GET /events/submissions': eventStream(),
     // Plan F1: the shell's own reads on every signed-in public page; specs replace single keys.

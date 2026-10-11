@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-import CopyButton from '@/components/CopyButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -10,6 +9,7 @@ import { showCode } from '@/components/code-highlight';
 import { translate } from '@/i18n';
 import { sourceLineCount } from '@/lib/source';
 import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
+import SourceFileBar from './SourceFileBar.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
@@ -19,6 +19,7 @@ const props = defineProps<{
   problemCode: string | null;
   isOwn: boolean;
   languageKey: string | null;
+  languageName: string | null;
 }>();
 const route = useRoute();
 /** "View source" in a submission list links here: the page loads before this card exists, so the hash is applied on mount. */
@@ -65,7 +66,6 @@ const isExpanded = ref(route.hash === '#source');
         >
           {{ $t('submission.source.collapse') }}
         </button>
-        <CopyButton v-if="data" :text="source" :label="$t('submission.source.copy')" />
         <RouterLink
           v-if="isOwn && problemCode && !forbiddenText"
           :to="{ name: 'problem', params: { code: problemCode }, query: { resubmit: id } }"
@@ -104,6 +104,13 @@ const isExpanded = ref(route.hash === '#source');
           {{ $t('submission.source.expand', { count: lineCount }) }}
         </button>
       </div>
+      <SourceFileBar
+        v-if="data"
+        :id="id"
+        :filename="data.filename"
+        :language-name="languageName"
+        :text="source"
+      />
     </QueryState>
   </GlassCard>
 </template>

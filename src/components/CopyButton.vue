@@ -3,7 +3,8 @@ import { onBeforeUnmount, ref } from 'vue';
 import { Copy } from 'lucide-vue-next';
 import { COPIED_FEEDBACK_MS, clipboardAvailable, copyText } from '@/lib/clipboard';
 
-const props = defineProps<{ text: string; label: string }>();
+/** `iconOnlyOnPhone` drops the visible word below `sm`; the label stays for assistive tech. */
+const props = defineProps<{ text: string; label: string; iconOnlyOnPhone?: boolean }>();
 const copied = ref(false);
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -26,7 +27,7 @@ onBeforeUnmount(() => clearTimeout(resetTimer));
       @click="copy"
     >
       <Copy aria-hidden="true" class="size-4" />
-      <span>{{ $t('common.copy') }}</span>
+      <span :class="{ 'max-sm:sr-only': iconOnlyOnPhone }">{{ $t('common.copy') }}</span>
     </button>
     <span class="text-sm text-muted" aria-live="polite">{{
       copied ? $t('common.copied') : ''

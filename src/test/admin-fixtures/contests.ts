@@ -110,6 +110,8 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
     contestProblem('C', 'hcmus41c', 'Đường đi ngắn nhất có ràng buộc', { maxSubmissions: 20 }),
   ],
   viewer: {
+    boardFrozenAt: null,
+    canSeeFullScoreboard: true,
     canEdit: true,
     isEditor: true,
     isTester: false,

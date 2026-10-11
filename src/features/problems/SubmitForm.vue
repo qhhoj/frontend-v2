@@ -86,6 +86,12 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         :is-sheet="isSheet"
         @pick="state.setLanguage"
       />
+      <RouterLink
+        :to="{ name: 'runtimes' }"
+        data-testid="runtimes-link"
+        class="inline-flex min-h-11 shrink-0 items-center text-sm text-accent-text underline"
+        >{{ $t('submit.versions') }}</RouterLink
+      >
       <SourceUploadButton
         v-if="isSheet && hasSourceUpload"
         icon-only

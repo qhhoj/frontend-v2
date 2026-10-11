@@ -56,7 +56,8 @@
     "contestReplay": "Replay",
     "contestBalloons": "Balloons",
     "contestBalloonsPrint": "Balloon run sheet",
-    "problemBest": "Best submissions"
+    "problemBest": "Best submissions",
+    "runtimes": "Judges and languages"
   },
   "contests": {
     "title": "Contests",
@@ -1255,7 +1256,8 @@
       "fileUploadDisabled": "Uploads are turned off for this language.",
       "fileRejected": "The file was rejected.",
       "sourceLength": "The source is longer than {max} characters."
-    }
+    },
+    "versions": "View versions"
   },
   "submission": {
     "ringLabel": "Graded {graded} of {total} tests",
@@ -1310,7 +1312,12 @@
       "copy": "Copy the source code",
       "resubmit": "Resubmit",
       "collapse": "Collapse",
-      "expand": "Show source ({count} lines)"
+      "expand": "Show source ({count} lines)",
+      "lines": "{count} lines",
+      "raw": "View raw source",
+      "rawShort": "Raw",
+      "download": "Download the source",
+      "downloadShort": "Download"
     },
     "forbidden": {
       "solve_first": "Solve this problem first to see the submission",
@@ -2461,6 +2468,37 @@
   },
   "footer": {
     "versionTitle": "Frontend build being served (commit and date)",
-    "source": "Source code (AGPL)"
+    "source": "Source code (AGPL)",
+    "runtimes": "Judges"
+  },
+  "runtimes": {
+    "title": "Judges and languages",
+    "lead": "Refreshes every 5 seconds.",
+    "tiles": {
+      "online": "Judges online",
+      "busy": "Judging slots busy",
+      "queue": "Submissions waiting",
+      "ping": "Mean ping"
+    },
+    "online": "Online",
+    "offline": "Offline",
+    "load": "Load: {busy}/{slots} slots",
+    "loadLabel": "Judging slots in use",
+    "ping": "Ping",
+    "uptime": "Uptime",
+    "uptimeUnit": {
+      "day": "{n} day | {n} days",
+      "hour": "{n} hour | {n} hours",
+      "minute": "{n} minute | {n} minutes"
+    },
+    "asleep": "Asleep. Submissions are routed to another judge.",
+    "languages": "Programming languages",
+    "search": "Find a language",
+    "noMatch": "No language matches.",
+    "noJudge": "No judge yet",
+    "mismatch": "{count} on another version",
+    "extension": "File extension",
+    "perJudge": "Version on each judge",
+    "notInstalled": "not installed"
   }
 }

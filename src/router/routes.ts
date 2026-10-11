@@ -45,6 +45,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.submission', requiresAuth: true },
   },
   {
+    path: '/runtimes',
+    name: 'runtimes',
+    component: () => import('@/features/runtimes/RuntimesPage.vue'),
+    meta: { titleKey: 'pages.runtimes' },
+  },
+  {
     path: '/contests',
     name: 'contests',
     component: () => import('@/features/contests/ContestsPage.vue'),
