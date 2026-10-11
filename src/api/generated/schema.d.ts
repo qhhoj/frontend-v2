@@ -3573,7 +3573,20 @@ export interface paths {
         get: operations["OrganizationsController_detail"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete an organization
+         * @description Superusers only (403 `forbidden`; no permission grants it). A soft delete:
+         *     the organization disappears from every read and its slug stays reserved.
+         *     Its problems and contests are kept and unlinked, keeping their privacy
+         *     flags (an organization-private one left with no organization is visible
+         *     only to its editors). Its posts are kept, unlinked and hidden. Members
+         *     lose the membership, pending join requests are rejected, and the
+         *     organization's problem tags are removed. Recorded in the revision log
+         *     (its history page is gone with it). Returns 204, also when repeated on
+         *     a deleted slug (which finishes an interrupted delete); 404 `not_found`
+         *     for an unknown slug.
+         */
+        delete: operations["OrganizationEditingController_remove"];
         options?: never;
         head?: never;
         /**
@@ -4326,6 +4339,51 @@ export interface paths {
          *     comments. Votes change the author's contribution points.
          */
         put: operations["BlogVotesController_vote"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/posts/compose-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get where I may post
+         * @description Whether the caller may write a personal post (unmuted, with
+         *     `minSolvedProblems` solved problems) and the organizations they may post
+         *     for (their admin, unmuted, with `judge.edit_organization_post`). Creating
+         *     a post applies the same rules.
+         */
+        get: operations["BlogDraftsController_composeOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/posts/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List my drafts
+         * @description The caller's own posts that are not public yet: drafts and posts
+         *     scheduled for later, personal and organization ones, limited to those the
+         *     caller may still edit. Newest publish time first. Paged with `page`.
+         */
+        get: operations["BlogDraftsController_list"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -6200,6 +6258,26 @@ export interface paths {
          *     seconds.
          */
         get: operations["TicketSummaryController_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/user-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Suggest users by username prefix
+         * @description Signed-in callers only (the admin username pickers). Returns up to 10 users whose username starts with `prefix`, ignoring case, in username order, with only their id and username. Banned and unlisted users are included, as their profile pages are. 60 requests per user per minute, then 429 `rate_limited` with `Retry-After`.
+         */
+        get: operations["UserSuggestionsController_suggest"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9052,12 +9130,12 @@ export interface components {
          */
         OrganizationRequestState: "A" | "P" | "R";
         /**
-         * @description `create`, `edit`, or `kick` (a member removed; `changes.member.before` is their username).
+         * @description `create`, `edit`, `kick` (a member removed; `changes.member.before` is their username) or `delete` (`changes.deleted.after` is true).
          * @enum {string}
          */
-        OrganizationRevisionAction: "create" | "edit" | "kick";
+        OrganizationRevisionAction: "create" | "delete" | "edit" | "kick";
         OrganizationRevisionResponse: {
-            /** @description `create`, `edit`, or `kick` (a member removed; `changes.member.before` is their username). */
+            /** @description `create`, `edit`, `kick` (a member removed; `changes.member.before` is their username) or `delete` (`changes.deleted.after` is true). */
             action: components["schemas"]["OrganizationRevisionAction"];
             /**
              * Format: date-time
@@ -9383,6 +9461,14 @@ export interface components {
             ok: boolean;
             /** @description Problems the account can read. */
             problemCount: number;
+        };
+        PostComposeOptionsResponse: {
+            /** @description The viewer may write a personal post: not muted, and enough solved problems (superusers need none). */
+            canWritePersonal: boolean;
+            /** @description Solved problems a personal post needs. */
+            minSolvedProblems: number;
+            /** @description Organizations the viewer may post for: an admin of each, unmuted, with judge.edit_organization_post. */
+            organizations: components["schemas"]["OrganizationSummaryResponse"][];
         };
         PostDetailResponse: {
             /** @description The post's authors. */
@@ -12068,6 +12154,12 @@ export interface components {
             code: string;
             field: string;
             message: string;
+        };
+        UserSuggestionResponse: {
+            /** @description User id. */
+            id: string;
+            /** @description Login name. */
+            username: string;
         };
         UserSummaryResponse: {
             /** @description User id. */
@@ -18977,6 +19069,37 @@ export interface operations {
             };
         };
     };
+    OrganizationEditingController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     OrganizationEditingController_update: {
         parameters: {
             query?: never;
@@ -20333,6 +20456,74 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["VoteResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BlogDraftsController_composeOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PostComposeOptionsResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BlogDraftsController_list: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PostListItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
                     };
                 };
             };
@@ -23782,6 +23973,41 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["TicketSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserSuggestionsController_suggest: {
+        parameters: {
+            query: {
+                /** @description Case-insensitive username prefix (letters, digits, underscores; 1-30 characters); surrounding spaces are dropped. */
+                prefix: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserSuggestionResponse"][];
                     };
                 };
             };

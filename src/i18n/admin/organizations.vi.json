@@ -46,7 +46,9 @@
     "adminsHint": "Quản trị viên mới tự thành thành viên và được thêm vào nhóm Org Admin. Mỗi người quản trị tối đa 3 tổ chức.",
     "createNote": "Tổ chức mới được tạo ở trạng thái đóng và ẩn khỏi danh sách cho đến khi nhân viên hiển thị nó. Bạn là quản trị viên đầu tiên.",
     "createNoteStaff": "Mặc định tổ chức mới đóng và ẩn khỏi danh sách; bỏ chọn \"Ẩn\" để hiển thị ngay. Bạn là quản trị viên đầu tiên.",
-    "aboutPreview": "Xem trước"
+    "aboutPreview": "Xem trước",
+    "logoUpload": "Tải ảnh lên",
+    "logoUploadHint": "URL http(s) hoặc đường dẫn trong trang, hoặc tải lên ảnh JPG, PNG, GIF, SVG (tối đa 5 MB); bấm lưu để giữ."
   },
   "errors": {
     "name": "Tên từ 1 đến 128 ký tự.",
@@ -184,7 +186,8 @@
     "actions": {
       "create": "Tạo",
       "edit": "Sửa",
-      "kick": "Đuổi"
+      "kick": "Đuổi",
+      "delete": "Xoá"
     },
     "fields": {
       "name": "Tên",
@@ -199,5 +202,16 @@
       "member": "Thành viên bị đuổi"
     },
     "moreLines": "… và {n} dòng nữa"
+  },
+  "delete": {
+    "title": "Xoá tổ chức",
+    "lead": "Chỉ superuser. Tổ chức biến mất khỏi trang; địa chỉ của nó vẫn được giữ.",
+    "keepsContent": "Bài tập và kỳ thi được giữ lại và gỡ liên kết; những cái riêng tư của tổ chức chỉ người soạn còn thấy.",
+    "hidesPosts": "Bài đăng được giữ lại, gỡ liên kết và ẩn đi.",
+    "releasesMembers": "Thành viên rời tổ chức, yêu cầu tham gia đang chờ bị từ chối, thẻ bài tập của tổ chức bị xoá.",
+    "button": "Xoá tổ chức",
+    "dialogTitle": "Xoá {name}?",
+    "typeSlug": "Nhập địa chỉ {slug} để xác nhận",
+    "confirm": "Xoá"
   }
 }

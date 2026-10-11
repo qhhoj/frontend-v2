@@ -46,7 +46,9 @@
     "adminsHint": "New admins become members and join the Org Admin group. A person may administer at most 3 organizations.",
     "createNote": "New organizations start closed and hidden from the list until staff list them. You are the first administrator.",
     "createNoteStaff": "New organizations default to closed and hidden; untick \"Hidden\" to list it now. You are the first administrator.",
-    "aboutPreview": "Preview"
+    "aboutPreview": "Preview",
+    "logoUpload": "Upload image",
+    "logoUploadHint": "An http(s) URL or a site path, or upload a JPG, PNG, GIF or SVG (up to 5 MB); save to keep it."
   },
   "errors": {
     "name": "Name is 1 to 128 characters.",
@@ -184,7 +186,8 @@
     "actions": {
       "create": "Created",
       "edit": "Edited",
-      "kick": "Removed"
+      "kick": "Removed",
+      "delete": "Deleted"
     },
     "fields": {
       "name": "Name",
@@ -199,5 +202,16 @@
       "member": "Removed member"
     },
     "moreLines": "… and {n} more lines"
+  },
+  "delete": {
+    "title": "Delete organization",
+    "lead": "Superusers only. The organization disappears from the site; its address stays reserved.",
+    "keepsContent": "Its problems and contests are kept and unlinked; organization-private ones stay visible only to their editors.",
+    "hidesPosts": "Its posts are kept, unlinked and hidden.",
+    "releasesMembers": "Members leave it, pending join requests are refused and its problem tags are removed.",
+    "button": "Delete organization",
+    "dialogTitle": "Delete {name}?",
+    "typeSlug": "Type the address {slug} to confirm",
+    "confirm": "Delete"
   }
 }

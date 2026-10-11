@@ -11,6 +11,10 @@ export const createOrganization = (body: OrganizationBody) =>
 export const updateOrganization = (slug: string, patch: Partial<OrganizationBody>) =>
   apiSend('patch', '/organizations/{slug}', { path: { slug }, body: patch });
 
+/** Superusers only: a soft delete that keeps the organization's problems, contests and posts, unlinked. */
+export const deleteOrganization = (slug: string): Promise<void> =>
+  apiSend('delete', '/organizations/{slug}', { path: { slug } });
+
 export const kickMember = (slug: string, userId: string) =>
   apiSend('post', '/organizations/{slug}/kick', { path: { slug }, body: { userId } });
 

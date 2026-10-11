@@ -23,6 +23,7 @@ const ACTION_CLASS = {
   create: 'bg-verdict-ac-bg text-verdict-ac',
   edit: 'bg-accent-soft text-accent-soft-text',
   kick: 'bg-verdict-wa-bg text-verdict-wa',
+  delete: 'bg-verdict-wa-bg text-verdict-wa',
 } as const;
 </script>
 
