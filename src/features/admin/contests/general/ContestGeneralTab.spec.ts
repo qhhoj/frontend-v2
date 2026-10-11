@@ -6,6 +6,7 @@ import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
+import { needsPermissionText } from '../../ui/permission-text';
 
 const EDIT = ['judge.edit_own_contest'];
 const STALE_AFTER_WRITE = [
@@ -34,7 +35,13 @@ describe('ContestGeneralTab', () => {
       'judge.lock_contest',
       'judge.contest_rating',
     ])
-      expect(wrapper.text(), permission).toContain(`Cần quyền ${permission}`);
+      // Switches name the permission in words; the other locks still show the codename until the contest screen PR.
+      expect(
+        [needsPermissionText(permission), `Cần quyền ${permission}`].some((text) =>
+          wrapper.text().includes(text),
+        ),
+        permission,
+      ).toBe(true);
     expect(wrapper.get('#contest-accessCode').attributes('disabled')).toBeDefined();
   });
 

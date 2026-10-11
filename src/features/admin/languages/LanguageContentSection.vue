@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
+import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
@@ -17,7 +17,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.languages.form.groups.content')">
+  <AdminFormSection :title="$t('admin.languages.form.groups.content')" :columns="1">
     <div class="flex flex-col gap-5">
       <AdminField
         v-slot="{ id, describedBy, invalid }"
@@ -76,5 +76,5 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
         </span>
       </AdminField>
     </div>
-  </SettingsCard>
+  </AdminFormSection>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
+import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
@@ -27,7 +27,7 @@ const fileSizeHint = computed(() => {
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.languages.form.groups.editor')">
+  <AdminFormSection :title="$t('admin.languages.form.groups.editor')" :columns="1">
     <div class="grid gap-5 md:grid-cols-2">
       <AdminField
         v-slot="{ id, describedBy, invalid }"
@@ -113,5 +113,5 @@ const fileSizeHint = computed(() => {
         </label>
       </div>
     </div>
-  </SettingsCard>
+  </AdminFormSection>
 </template>

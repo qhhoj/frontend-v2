@@ -56,8 +56,17 @@ export function useLanguageForm(initial: LanguageAdmin | null) {
     stored.value ? Object.keys(patchOf(stored.value, form)).length : 0,
   );
   const save = useLanguageSave(stored, form, () => void router.push({ name: 'admin-languages' }));
+  const savedAt = ref<Date | null>(null);
+  watch(save.isDone, (isDone) => {
+    if (isDone) savedAt.value = new Date();
+  });
   const errors = computed<FieldErrors>(() => ({ ...serverErrorsOf(save), ...clientErrors.value }));
   watch(form, () => (clientErrors.value = {}), { deep: true });
+
+  /** Puts the form back to the stored language (edit only). */
+  function discard() {
+    if (stored.value) Object.assign(form, formOf(stored.value));
+  }
 
   async function submit() {
     clientErrors.value = checkLanguageForm(form, mode);
@@ -72,8 +81,10 @@ export function useLanguageForm(initial: LanguageAdmin | null) {
     errors,
     changeCount,
     saved: save.isDone,
+    savedAt,
     isPending: save.isPending,
     failure: save.failure,
     submit,
+    discard,
   };
 }

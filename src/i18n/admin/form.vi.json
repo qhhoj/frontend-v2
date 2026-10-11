@@ -1,0 +1,29 @@
+{
+  "required": "bắt buộc",
+  "needsPermission": "Cần quyền “{permission}”",
+  "saveBar": {
+    "unsaved": "{count} thay đổi chưa lưu | {count} thay đổi chưa lưu",
+    "savedAt": "Đã lưu lúc {time}",
+    "clean": "Chưa có thay đổi nào để lưu.",
+    "discard": "Huỷ thay đổi",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu…"
+  },
+  "leave": {
+    "title": "Rời trang?",
+    "body": "{count} thay đổi chưa lưu sẽ mất. | {count} thay đổi chưa lưu sẽ mất.",
+    "bodyUncounted": "Các thay đổi chưa lưu sẽ mất.",
+    "leave": "Rời trang",
+    "stay": "Ở lại"
+  },
+  "dateTime": {
+    "placeholder": "dd/mm/yyyy hh:mm",
+    "now": "Bây giờ",
+    "nowLabel": "Đặt {label} là bây giờ",
+    "invalid": "Nhập theo dạng dd/mm/yyyy hh:mm, ví dụ 08/10/2026 13:00.",
+    "zoneHint": "Giờ {zone}"
+  },
+  "section": {
+    "jumpTo": "Đi tới mục"
+  }
+}
