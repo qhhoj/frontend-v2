@@ -65,6 +65,7 @@ export const contestSettings = (overrides: Partial<ContestSettings> = {}): Conte
 
 const contestBasics = (): Omit<EditableContest, 'problems' | 'viewer' | 'settings'> => ({
   virtualCount: 0,
+  organizations: [],
   descriptionHtml: '<p>Mỗi bài có đủ test ẩn.</p>',
   rules: '',
   rulesHtml: '',
