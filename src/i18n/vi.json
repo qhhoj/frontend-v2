@@ -316,7 +316,9 @@
       "rule": "Xếp theo điểm, rồi thời gian chạy, bộ nhớ, thời điểm nộp. Chỉ tính bài nộp trong kỳ thi.",
       "forbiddenTitle": "Danh sách này đang ẩn",
       "forbiddenBody": "Bảng xếp hạng của kỳ thi chưa mở cho bạn, nên bài nộp tốt nhất cũng chưa.",
-      "missingTitle": "Không tìm thấy bài này trong kỳ thi"
+      "missingTitle": "Không tìm thấy bài này trong kỳ thi",
+      "loadFailed": "Không tải được kỳ thi",
+      "retry": "Thử lại"
     }
   },
   "placeholder": {

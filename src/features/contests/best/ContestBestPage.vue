@@ -32,7 +32,7 @@ const session = useSessionStore();
 const key = computed(() => String(route.params.key));
 const code = computed(() => String(route.params.code));
 const page = computed(() => pageFromQuery(route.query.page));
-const { data: contest, error: contestError } = useContestQuery(key);
+const { data: contest, error: contestError, refetch: refetchContest } = useContestQuery(key);
 const { data: list, isPending, error, refetch } = useContestBestSubmissionsQuery(key, code, page);
 const problems = computed(() => contest.value?.problems ?? []);
 const current = computed(() => problems.value.find((problem) => problem.code === code.value));
@@ -55,7 +55,16 @@ const CHIP =
 
 <template>
   <div class="page-column">
-    <ContestNotFound v-if="isMissing && statusOf(contestError) === 404" />
+    <ContestNotFound v-if="statusOf(contestError) === 404" />
+    <StatePanel v-else-if="contestError" kind="error" :title="$t('contests.best.loadFailed')"
+      ><button
+        type="button"
+        class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold"
+        @click="refetchContest()"
+      >
+        {{ $t('contests.best.retry') }}
+      </button></StatePanel
+    >
     <template v-else>
       <ContestTabs :contest-key="key" :phase="contest?.phase" current="contest" />
       <header class="flex flex-wrap items-start justify-between gap-3">

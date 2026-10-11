@@ -151,7 +151,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             class="cursor-pointer border-t border-line hover:bg-surface-hover"
             :class="{
               'row-added': highlightIds.has(row.id),
-              'bg-accent-soft': isOwn(row),
+              'bg-accent-soft hover:bg-accent-soft': isOwn(row),
             }"
             @click="openRow($event, row.id)"
             @auxclick="openRowInTab($event, row.id)"

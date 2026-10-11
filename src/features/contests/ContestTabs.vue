@@ -41,7 +41,7 @@ const isStreaming = computed(() => props.phase !== undefined && props.phase !== 
       v-for="tab in visibleTabs"
       :key="tab.name"
       :to="{ name: tab.name, params: { key: contestKey } }"
-      :aria-current="tab.name === current ? 'page' : undefined"
+      v-bind="tab.name === current ? { 'aria-current': 'page' } : {}"
       :class="LINK"
     >
       {{ $t(tab.labelKey) }}

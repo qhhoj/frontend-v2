@@ -46,7 +46,8 @@ const costOf = (row: SubmissionListItem) =>
       class="flex cursor-pointer items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0 hover:bg-surface-hover"
       :class="{
         'row-added': highlightIds.has(row.id),
-        'bg-accent-soft': ownUsername !== undefined && row.user?.username === ownUsername,
+        'bg-accent-soft hover:bg-accent-soft':
+          ownUsername !== undefined && row.user?.username === ownUsername,
       }"
       @click="openRow($event, row.id)"
       @auxclick="openRowInTab($event, row.id)"

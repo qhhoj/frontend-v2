@@ -77,7 +77,6 @@ const CHIP =
         </StatePanel>
         <template v-else>
           <div
-            role="toolbar"
             :aria-label="$t('contests.print.toolbar')"
             class="glass sticky top-2 z-10 flex flex-wrap items-center gap-3 rounded-panel px-3.5 py-2.5 print:hidden"
           >

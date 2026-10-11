@@ -79,7 +79,7 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
       {{ $t(HIDDEN_KEYS[contest.phase]) }}
     </p>
     <template v-else>
-      <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
         <h2 class="min-w-0 font-display text-lg font-bold whitespace-nowrap">
           {{ $t('contests.problems.heading') }}
           <span class="text-sm font-normal text-muted">({{ problems.length }})</span>

@@ -106,7 +106,13 @@ export const useContestBestSubmissionsQuery = (
         page: page.value,
         pageSize: SUBMISSION_PAGE_SIZE,
       }),
-    placeholderData: keepPreviousData,
+    /** Another page of the same problem keeps its rows on screen; another problem or viewer never does. */
+    placeholderData: (previous, previousQuery) =>
+      previousQuery?.queryKey[2] === viewerId.value &&
+      previousQuery.queryKey[3] === key.value &&
+      previousQuery.queryKey[4] === code.value
+        ? previous
+        : undefined,
   });
 };
 

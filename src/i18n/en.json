@@ -316,7 +316,9 @@
       "rule": "Ordered by points, then run time, memory, submission time. Only submissions made in the contest count.",
       "forbiddenTitle": "This list is hidden",
       "forbiddenBody": "The contest ranking is not open to you, so neither are its best submissions.",
-      "missingTitle": "This problem is not in the contest"
+      "missingTitle": "This problem is not in the contest",
+      "loadFailed": "The contest could not be loaded",
+      "retry": "Retry"
     }
   },
   "placeholder": {

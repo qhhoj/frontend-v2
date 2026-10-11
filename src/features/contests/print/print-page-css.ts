@@ -13,7 +13,7 @@ export interface PrintPageLabels {
 
 /** A CSS string literal for any text: quotes, backslashes and line breaks cannot end it early. */
 export const cssString = (text: string): string =>
-  `"${text.replace(/[\\"]/g, '\\$&').replace(/\r?\n/g, ' ')}"`;
+  `"${text.replace(/[\\"]/g, '\\$&').replace(/[\r\n\f]+/g, ' ')}"`;
 
 /**
  * The `@page` rule of the "all statements" sheet: A4 with a running header and a numbered footer in the margin boxes
