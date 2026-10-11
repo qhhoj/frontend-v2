@@ -907,49 +907,6 @@
         ],
         "type": "object"
       },
-      "BulkSettleOutcomeResponse": {
-        "properties": {
-          "code": {
-            "description": "Null when its open reports were settled; otherwise the error code that refused it (`not_found`).",
-            "nullable": true,
-            "type": "string"
-          },
-          "id": {
-            "description": "Id of the comment.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "code"
-        ],
-        "type": "object"
-      },
-      "BulkSettleReportsDto": {
-        "properties": {
-          "ids": {
-            "description": "Ids of the reported comments, at most 50; duplicates count once.",
-            "items": {
-              "type": "string"
-            },
-            "minItems": 1,
-            "type": "array"
-          },
-          "outcome": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommentReportOutcome"
-              }
-            ],
-            "description": "`resolved` when the reports led to action, `dismissed` when they did not."
-          }
-        },
-        "required": [
-          "outcome",
-          "ids"
-        ],
-        "type": "object"
-      },
       "BulkVisibilityDto": {
         "properties": {
           "changeMessage": {
@@ -1612,13 +1569,6 @@
         ],
         "type": "string"
       },
-      "CommentReportQueue": {
-        "enum": [
-          "open",
-          "settled"
-        ],
-        "type": "string"
-      },
       "CommentReportQueueItemResponse": {
         "properties": {
           "comment": {
@@ -1678,15 +1628,6 @@
           "other",
           "spam",
           "spoiler"
-        ],
-        "type": "string"
-      },
-      "CommentReportStatus": {
-        "description": "`open`, or how a moderator settled it.",
-        "enum": [
-          "dismissed",
-          "open",
-          "resolved"
         ],
         "type": "string"
       },
@@ -16061,6 +16002,65 @@
           "submittedAt"
         ],
         "type": "object"
+      },
+      "CommentReportStatus": {
+        "description": "`open`, or how a moderator settled it.",
+        "enum": [
+          "dismissed",
+          "open",
+          "resolved"
+        ],
+        "type": "string"
+      },
+      "CommentReportQueue": {
+        "enum": [
+          "open",
+          "settled"
+        ],
+        "type": "string"
+      },
+      "BulkSettleOutcomeResponse": {
+        "properties": {
+          "code": {
+            "description": "Null when its open reports were settled; otherwise the error code that refused it (`not_found`).",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "Id of the comment.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code"
+        ],
+        "type": "object"
+      },
+      "BulkSettleReportsDto": {
+        "properties": {
+          "ids": {
+            "description": "Ids of the reported comments, at most 50; duplicates count once.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "outcome": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommentReportOutcome"
+              }
+            ],
+            "description": "`resolved` when the reports led to action, `dismissed` when they did not."
+          }
+        },
+        "required": [
+          "outcome",
+          "ids"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -18180,89 +18180,6 @@
         "tags": [
           "Admin: site & settings"
         ]
-      }
-    },
-    "/api/internal/admin/site/config/{key}/revisions": {
-      "get": {
-        "description": "Requires `judge.change_miscconfig`. The key's changes (creation, edits, deletion), newest first, 20 per page, with the editor and the value before and after. Still readable after the key is deleted; an unknown key has an empty history.",
-        "operationId": "MiscConfigAdminController_revisions",
-        "parameters": [
-          {
-            "description": "Config key, 1-64 characters without control characters.",
-            "in": "path",
-            "name": "key",
-            "required": true,
-            "schema": {
-              "maxLength": 30,
-              "minLength": 1,
-              "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Page number, starting at 1.",
-            "in": "query",
-            "name": "page",
-            "required": false,
-            "schema": {
-              "default": 1,
-              "maximum": 10000,
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/FlatpageRevisionResponse"
-                      },
-                      "type": "array"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/PageMetaResponse"
-                    }
-                  },
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": ""
-          },
-          "default": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
-            "headers": {
-              "Retry-After": {
-                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
-                "schema": {
-                  "minimum": 1,
-                  "type": "integer"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Show the history of a config key",
-        "tags": [
-          "Admin: site & settings"
-        ],
-        "x-enveloped": true
       }
     },
     "/api/internal/admin/site/pages": {
@@ -21445,77 +21362,6 @@
         ]
       }
     },
-    "/api/internal/comments/locks": {
-      "get": {
-        "description": "Requires `judge.change_comment`. The pages whose comments are locked, the\nnewest lock first, 50 per page. Pages the moderator cannot read are left\nout of the page (still counted in `total`).",
-        "operationId": "CommentModerationController_lockedPages",
-        "parameters": [
-          {
-            "description": "1-based page number of threads.",
-            "in": "query",
-            "name": "page",
-            "required": false,
-            "schema": {
-              "default": 1,
-              "maximum": 10000,
-              "minimum": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/CommentPageLinkResponse"
-                      },
-                      "type": "array"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/PageMetaResponse"
-                    }
-                  },
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": ""
-          },
-          "default": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
-            "headers": {
-              "Retry-After": {
-                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
-                "schema": {
-                  "minimum": 1,
-                  "type": "integer"
-                }
-              }
-            }
-          }
-        },
-        "summary": "List the pages with locked comments",
-        "tags": [
-          "Comments"
-        ],
-        "x-enveloped": true
-      }
-    },
     "/api/internal/comments/pages/{type}/{key}": {
       "get": {
         "description": "Public. Returns one page of threads (20 top-level comments with all their\nreplies) of a commentable page, addressed by `type` (problem, editorial,\ncontest, blog or tagProblem) and its natural `key` (problem code, contest\nkey, post id). Also reports the page's lock (`pageLocked`), whether it is\nlocked for the viewer (`locked`), and whether the viewer can comment\n(`canComment`) or why not (`postBlock`: `signed_out`, `contest`,\n`locked`, `muted`, or `needs_solved` with `solved` and `required`).\nHidden comments are returned only to holders of `judge.change_comment`,\nflagged `hidden` with the moderator in `hiddenBy`; deleted comments stay\nas placeholders (`deleted`, empty `bodyHtml`). Fails with 404\n`not_found` when the page is unknown or unreadable, and 403 `forbidden`\nwhile an official contest closes comments. Contest problem threads are\nempty for contestants who are in the contest.",
@@ -21918,69 +21764,6 @@
           "Comments"
         ],
         "x-enveloped": true
-      }
-    },
-    "/api/internal/comments/reports/settle": {
-      "post": {
-        "description": "Requires `judge.change_comment`. Settles the open reports of up to 50\ncomments with one `outcome`, each like the single settle. Returns one\nentry per distinct id: `code` is null when settled, or the error code\nthat refused it (`not_found`: unreadable, or no open reports). A refusal\nnever stops the rest.",
-        "operationId": "CommentReportsController_settleMany",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BulkSettleReportsDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/BulkSettleOutcomeResponse"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": ""
-          },
-          "default": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
-            "headers": {
-              "Retry-After": {
-                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
-                "schema": {
-                  "minimum": 1,
-                  "type": "integer"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Settle the reports of several comments",
-        "tags": [
-          "Comments"
-        ]
       }
     },
     "/api/internal/comments/{id}": {
@@ -39543,6 +39326,223 @@
         "tags": [
           "Short links"
         ]
+      }
+    },
+    "/api/internal/admin/site/config/{key}/revisions": {
+      "get": {
+        "description": "Requires `judge.change_miscconfig`. The key's changes (creation, edits, deletion), newest first, 20 per page, with the editor and the value before and after. Still readable after the key is deleted; an unknown key has an empty history.",
+        "operationId": "MiscConfigAdminController_revisions",
+        "parameters": [
+          {
+            "description": "Config key, 1-64 characters without control characters.",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 30,
+              "minLength": 1,
+              "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Page number, starting at 1.",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/FlatpageRevisionResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Show the history of a config key",
+        "tags": [
+          "Admin: site & settings"
+        ],
+        "x-enveloped": true
+      }
+    },
+    "/api/internal/comments/reports/settle": {
+      "post": {
+        "description": "Requires `judge.change_comment`. Settles the open reports of up to 50\ncomments with one `outcome`, each like the single settle. Returns one\nentry per distinct id: `code` is null when settled, or the error code\nthat refused it (`not_found`: unreadable, or no open reports). A refusal\nnever stops the rest.",
+        "operationId": "CommentReportsController_settleMany",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkSettleReportsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/BulkSettleOutcomeResponse"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Settle the reports of several comments",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/api/internal/comments/locks": {
+      "get": {
+        "description": "Requires `judge.change_comment`. The pages whose comments are locked, the\nnewest lock first, 50 per page. Pages the moderator cannot read are left\nout of the page (still counted in `total`).",
+        "operationId": "CommentModerationController_lockedPages",
+        "parameters": [
+          {
+            "description": "1-based page number of threads.",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/CommentPageLinkResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List the pages with locked comments",
+        "tags": [
+          "Comments"
+        ],
+        "x-enveloped": true
       }
     }
   },
