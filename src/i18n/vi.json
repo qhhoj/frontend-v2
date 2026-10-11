@@ -121,6 +121,7 @@
         "label": "Bài",
         "name": "Đề bài",
         "points": "Điểm",
+        "submissions": "Lượt nộp",
         "maxSubmissions": "Số lần nộp tối đa",
         "own": "Của bạn",
         "open": "Mở đề"

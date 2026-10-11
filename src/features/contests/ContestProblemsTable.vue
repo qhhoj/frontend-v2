@@ -110,13 +110,17 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
             <th scope="col" class="px-3 py-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
-            <th scope="col" class="px-3 py-3 text-right font-semibold">
-              {{ $t('contests.problems.columns.maxSubmissions') }}
+            <th
+              scope="col"
+              class="px-3 py-3 text-right font-semibold whitespace-nowrap"
+              :title="$t('contests.problems.columns.maxSubmissions')"
+            >
+              {{ $t('contests.problems.columns.submissions') }}
             </th>
-            <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold">
+            <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold whitespace-nowrap">
               {{ $t('contests.problems.columns.own') }}
             </th>
-            <th scope="col" class="px-5 py-3">
+            <th scope="col" class="px-3 py-3">
               <span class="sr-only">{{ $t('contests.problems.columns.open') }}</span>
             </th>
           </tr>
@@ -151,10 +155,10 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
               }}</span>
               <span class="sr-only">{{ maxSubmissionsLabel(problem) }}</span>
             </td>
-            <td v-if="hasOwnResults" class="max-w-40 px-3 py-3">
+            <td v-if="hasOwnResults" class="max-w-40 px-3 py-3 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
             </td>
-            <td class="px-5 py-3 text-right">
+            <td class="px-3 py-3 text-right">
               <RouterLink
                 :to="problemLink(problem)"
                 class="inline-flex size-11 items-center justify-center rounded-pill border border-line hover:bg-surface-hover"

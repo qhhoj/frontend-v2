@@ -35,7 +35,10 @@ const cellLabel = computed(() => {
       >
       <span class="sr-only">{{ cellLabel }}</span>
     </span>
-    <span aria-hidden="true" class="mt-1 block max-w-[200px] text-[12px] text-muted">
+    <span
+      aria-hidden="true"
+      class="mt-1 block text-[12px] leading-snug text-muted xl:whitespace-nowrap"
+    >
       {{ cellLabel }}
     </span>
   </span>
@@ -50,5 +53,7 @@ const cellLabel = computed(() => {
   <span v-else-if="view.kind === 'attempted'" class="text-[13px] whitespace-nowrap text-muted">
     {{ $t('contests.problems.attempted', { count: view.attempts }, view.attempts) }}
   </span>
-  <span v-else class="text-[13px] text-muted">{{ $t('ranking.cell.empty') }}</span>
+  <span v-else class="text-[13px] whitespace-nowrap text-muted">{{
+    $t('ranking.cell.empty')
+  }}</span>
 </template>
