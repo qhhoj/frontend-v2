@@ -12,6 +12,10 @@ export interface AdminTab {
   to: RouteLocationRaw;
   /** A count chip after the label; hidden while null or absent. */
   count?: number | null;
+  /** Read instead of the bare number ("3 yêu cầu chờ duyệt"). */
+  countLabel?: string;
+  countTestid?: string;
+  testid?: string;
 }
 
 /**
@@ -101,12 +105,15 @@ const moreItems = computed(() =>
             <RouterLink
               :to="tab.to"
               :data-tab-key="tab.key"
+              :data-testid="tab.testid"
               class="-mb-px inline-flex min-h-(--qa-control) items-center gap-2 border-b-2 border-transparent px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content focus-visible:-outline-offset-2 aria-[current=page]:border-accent aria-[current=page]:text-content"
               :aria-current="tab.key === currentKey ? 'page' : undefined"
             >
               {{ $t(tab.labelKey) }}
               <span
                 v-if="tab.count !== undefined && tab.count !== null"
+                :data-testid="tab.countTestid"
+                :aria-label="tab.countLabel"
                 class="rounded-pill bg-surface-strong px-2 font-mono text-xs text-muted tabular-nums"
                 >{{ tab.count }}</span
               >
