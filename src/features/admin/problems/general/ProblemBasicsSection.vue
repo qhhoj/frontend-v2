@@ -24,40 +24,6 @@ const isStaffLocked = computed(() => !can(EDIT_ALL_PROBLEM));
   >
     <AdminField
       v-slot="{ id, describedBy, invalid }"
-      input-id="problem-code"
-      :label="$t('admin.problems.general.basics.code')"
-      :hint="$t('admin.problems.general.basics.codeHint')"
-      :error="errors.code"
-      required
-    >
-      <input
-        :id="id"
-        v-model="form.code"
-        :class="[INPUT, 'font-mono']"
-        autocomplete="off"
-        spellcheck="false"
-        :aria-describedby="describedBy"
-        :aria-invalid="invalid === 'true'"
-      />
-    </AdminField>
-    <AdminField
-      v-slot="{ id, describedBy, invalid }"
-      input-id="problem-name"
-      :label="$t('admin.problems.general.basics.name')"
-      :hint="$t('admin.problems.general.basics.nameHint')"
-      :error="errors.name"
-      required
-    >
-      <input
-        :id="id"
-        v-model="form.name"
-        :class="INPUT"
-        :aria-describedby="describedBy"
-        :aria-invalid="invalid === 'true'"
-      />
-    </AdminField>
-    <AdminField
-      v-slot="{ id, describedBy, invalid }"
       input-id="problem-source"
       :label="$t('admin.problems.general.basics.source')"
       :error="errors.source"

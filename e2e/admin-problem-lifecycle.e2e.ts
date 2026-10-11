@@ -1,7 +1,11 @@
 import { expect, test } from './fixtures/api';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installDeletedProblems } from './fixtures/f4-api';
-import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
+import {
+  editableProblem,
+  problemData,
+  problemEditingMeta,
+} from '../src/test/admin-fixtures/problems';
 import { deletedProblem } from '../src/test/f4-fixtures';
 
 const DELETE = ['judge.delete_problem', 'judge.edit_own_problem'];
@@ -43,9 +47,10 @@ test('the danger zone deletes after the code is typed and lands on the deleted l
   signInAsStaff(api, DELETE);
   api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
   api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
+  api.routes['GET /problems/hcmus41c/data'] = adminOk(problemData());
   api.routes['DELETE /problems/hcmus41c'] = { status: 204 };
   installDeletedProblems(api, [deletedProblem({ code: 'hcmus41c', daysLeft: 30 })]);
-  await page.goto('/admin/problems/hcmus41c/general');
+  await page.goto('/admin/problems/hcmus41c/general?view=advanced');
   await expect(page.getByRole('heading', { name: 'Vùng nguy hiểm' })).toBeVisible();
   await page.getByRole('button', { name: 'Xóa bài…' }).click();
   await expect(

@@ -35,8 +35,8 @@
       "cancel": "Cancel"
     },
     "sections": {
-      "basics": "Basics",
-      "limits": "Limits and points",
+      "basics": "More details",
+      "limits": "Detailed limits",
       "classes": "Classification",
       "visibility": "Visible to contestants",
       "people": "People",
@@ -119,14 +119,24 @@
     "changeMessage": "Reason",
     "changeMessagePlaceholder": "Optional, kept in the history",
     "descriptions": {
-      "basics": "Code and name show in the problem list.",
-      "limits": "Apply to every language unless a language has its own limit below.",
+      "basics": "Source, publish date and the problem's preview.",
+      "limits": "Partial scoring and per-language limits.",
       "classes": "Used by the public filters and for which languages can submit.",
       "visibility": "What contestants see after they submit.",
       "people": "Who edits, tests and sees the problem.",
       "status": "Saved with the sections above."
     },
-    "savedToast": "Saved {code}."
+    "savedToast": "Saved {code}.",
+    "basic": {
+      "sections": {
+        "info": "Code, name and limits",
+        "publish": "Show to contestants"
+      },
+      "leads": {
+        "info": "The code and name show in the problem list. Limits apply to every language.",
+        "publish": "Off: only the problem's staff see it."
+      }
+    }
   },
   "people": {
     "title": "People in charge",
@@ -232,7 +242,7 @@
       "jsonHint": "Leave empty when there are no arguments. Must be a JSON object."
     },
     "checkers": {
-      "standard": "Standard (token match)",
+      "standard": "Match answer (ignore extra whitespace)",
       "bridged": "The problem's own checker",
       "floats": "Floats",
       "floatsabs": "Floats, absolute error",
@@ -319,7 +329,8 @@
       "family": {
         "stock": {
           "label": "Built-in",
-          "description": "A built-in comparison rule, no file needed."
+          "description": "Right for most problems; no file to upload.",
+          "otherRule": "A built-in rule. Change the rule on the Advanced tab."
         },
         "testlib": {
           "label": "Testlib",
@@ -337,7 +348,7 @@
       "stockLabel": "Comparison rule",
       "stock": {
         "standard": {
-          "label": "Standard",
+          "label": "Match answer (ignore extra whitespace)",
           "hint": "Compares word by word, ignoring extra whitespace and blank lines."
         },
         "floats": {
@@ -459,7 +470,16 @@
         "unavailable": "No judge could check it. The problem still saves; any error shows when submissions are judged.",
         "log": "Compile log",
         "reason": "Reason"
-      }
+      },
+      "checkerOptionsTitle": "Checker details",
+      "checkerOptionsDescription": "The comparison rule and its options; the checker type is picked on the Basic tab.",
+      "checkerNoOptions": "This checker type has no further options.",
+      "ioOtherGrader": "A “{grader}” problem does not read input this way. Change the problem kind on the Advanced tab."
+    },
+    "basic": {
+      "summary": "{count} tests · {points} points in total",
+      "summaryEmpty": "No tests yet. Upload a zip, then press “Create tests from the zip”.",
+      "summaryMore": "Edit single tests, batches and pretests on the Advanced tab."
     }
   },
   "uploads": {

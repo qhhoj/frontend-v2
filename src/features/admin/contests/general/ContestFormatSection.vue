@@ -5,7 +5,7 @@ import { INPUT } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { FORMAT_DEFAULTS, FORMAT_FIELDS } from '../format-config';
+import { chooseFormat, FORMAT_FIELDS } from '../format-config';
 import type { ContestForm } from '../contest-form';
 import { numberOrNaN, textOf } from './input-values';
 
@@ -32,12 +32,7 @@ const OPTIONS = [
 ] as const;
 const optionLabel = (field: string) => (field === 'pushAnnouncements' ? 'pushLabel' : field);
 
-/** Changing the format puts the new format's own defaults in its config (the backend refuses keys it does not know). */
-function chooseFormat(event: Event) {
-  const name = textOf(event) as ContestFormatName;
-  form.value.formatName = name;
-  form.value.formatConfig = { ...FORMAT_DEFAULTS[name] };
-}
+const pickFormat = (event: Event) => chooseFormat(form.value, textOf(event) as ContestFormatName);
 </script>
 
 <template>
@@ -57,7 +52,7 @@ function chooseFormat(event: Event) {
             :value="form.formatName"
             :class="INPUT"
             :aria-describedby="describedBy"
-            @change="chooseFormat"
+            @change="pickFormat"
           >
             <option v-for="name in FORMAT_NAMES" :key="name" :value="name">
               {{ $t(`admin.contests.formats.${name}`) }}

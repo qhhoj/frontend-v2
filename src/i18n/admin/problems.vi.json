@@ -35,8 +35,8 @@
       "cancel": "Huỷ"
     },
     "sections": {
-      "basics": "Thông tin cơ bản",
-      "limits": "Giới hạn và điểm",
+      "basics": "Thông tin thêm",
+      "limits": "Giới hạn chi tiết",
       "classes": "Phân loại",
       "visibility": "Hiển thị với thí sinh",
       "people": "Người phụ trách",
@@ -119,14 +119,24 @@
     "changeMessage": "Lý do",
     "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử",
     "descriptions": {
-      "basics": "Mã và tên hiện ở danh sách bài.",
-      "limits": "Áp dụng cho mọi ngôn ngữ, trừ khi có giới hạn riêng bên dưới.",
+      "basics": "Nguồn, ngày đăng và phần giới thiệu bài.",
+      "limits": "Chấm điểm từng phần và giới hạn riêng theo ngôn ngữ.",
       "classes": "Dùng cho bộ lọc công khai và ngôn ngữ được nộp.",
       "visibility": "Thí sinh thấy gì sau khi nộp.",
       "people": "Ai sửa, thử và được thấy bài.",
       "status": "Lưu cùng các mục trên."
     },
-    "savedToast": "Đã lưu bài {code}."
+    "savedToast": "Đã lưu bài {code}.",
+    "basic": {
+      "sections": {
+        "info": "Mã, tên và giới hạn",
+        "publish": "Hiện cho thí sinh"
+      },
+      "leads": {
+        "info": "Mã và tên hiện ở danh sách bài. Giới hạn áp dụng cho mọi ngôn ngữ.",
+        "publish": "Tắt: chỉ người phụ trách bài thấy."
+      }
+    }
   },
   "people": {
     "title": "Người phụ trách",
@@ -232,7 +242,7 @@
       "jsonHint": "Để trống nếu không có tham số. Phải là một đối tượng JSON."
     },
     "checkers": {
-      "standard": "Chuẩn (so khớp token)",
+      "standard": "So khớp đáp án (bỏ qua khoảng trắng thừa)",
       "bridged": "Checker riêng của bài",
       "floats": "Số thực",
       "floatsabs": "Số thực, sai số tuyệt đối",
@@ -319,7 +329,8 @@
       "family": {
         "stock": {
           "label": "Có sẵn",
-          "description": "Một quy tắc so sánh dựng sẵn, không cần tải tệp."
+          "description": "Đúng với hầu hết bài; không cần tải tệp.",
+          "otherRule": "Quy tắc có sẵn. Đổi quy tắc ở tab Nâng cao."
         },
         "testlib": {
           "label": "Testlib",
@@ -337,7 +348,7 @@
       "stockLabel": "Quy tắc so sánh",
       "stock": {
         "standard": {
-          "label": "Chuẩn",
+          "label": "So khớp đáp án (bỏ qua khoảng trắng thừa)",
           "hint": "So từng từ, bỏ qua khoảng trắng và dòng trống thừa."
         },
         "floats": {
@@ -459,7 +470,16 @@
         "unavailable": "Chưa kiểm tra được bằng máy chấm. Bài vẫn lưu được; lỗi (nếu có) sẽ hiện khi chấm.",
         "log": "Nhật ký biên dịch",
         "reason": "Lý do"
-      }
+      },
+      "checkerOptionsTitle": "Trình chấm chi tiết",
+      "checkerOptionsDescription": "Quy tắc so sánh và các tuỳ chọn của nó; loại trình chấm chọn ở tab Cơ bản.",
+      "checkerNoOptions": "Loại trình chấm này không có tuỳ chọn thêm.",
+      "ioOtherGrader": "Bài kiểu “{grader}” không đọc input theo cách này. Đổi kiểu bài ở tab Nâng cao."
+    },
+    "basic": {
+      "summary": "{count} test · tổng {points} điểm",
+      "summaryEmpty": "Chưa có test. Tải gói zip rồi bấm “Tạo test từ gói zip”.",
+      "summaryMore": "Sửa từng test, nhóm test và pretest ở tab Nâng cao."
     }
   },
   "uploads": {

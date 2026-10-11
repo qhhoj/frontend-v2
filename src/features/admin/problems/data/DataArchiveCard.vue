@@ -61,6 +61,7 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
       </button>
     </div>
     <p class="text-xs text-muted">{{ $t('admin.problems.data.archive.note') }}</p>
+    <slot name="summary" />
     <InitYamlDialog v-model:visible="isInitShown" :code="code" />
   </AdminFormSection>
 </template>

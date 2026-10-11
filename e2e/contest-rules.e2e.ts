@@ -75,7 +75,7 @@ test('an editor writes the rules and sees accepted revisions in the participatio
   api.routes['GET /contests/hcmus-w41/participations'] = adminList([
     participation({ rulesAcceptedAt: '2026-10-08T05:58:00.000Z', rulesAcceptedRevision: 3 }),
   ]);
-  await page.goto('/admin/contests/hcmus-w41/general');
+  await page.goto('/admin/contests/hcmus-w41/general?view=advanced');
   await page.getByLabel('Quy định kỳ thi').fill('Tự làm bài.');
   await page.getByRole('button', { name: 'Lưu thay đổi' }).click();
   await expect.poll(() => api.requestsTo('PATCH /contests/hcmus-w41').length).toBe(1);

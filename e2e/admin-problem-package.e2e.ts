@@ -28,7 +28,7 @@ test('builds the package, polls, and offers the zip link', async ({ page, api })
       ? { status: 202, headers: { 'Retry-After': '3' }, body: { data: { status: 'building' } } }
       : { status: 200, contentType: 'application/zip', raw: Buffer.from('PK') };
   };
-  await page.goto('/admin/problems/hcmus41c/data');
+  await page.goto('/admin/problems/hcmus41c/data?view=advanced');
   await page.getByRole('button', { name: 'Tải gói đề' }).click();
   await expect(page.getByText('Đang đóng gói', { exact: false })).toBeVisible();
   await expect(page.getByTestId('problem-package').getByRole('status')).toBeVisible();
@@ -50,7 +50,7 @@ test('a package over the cap says so', async ({ page, api }) => {
     status: 409,
     body: { error: { code: 'package_too_large', message: 'too large' } },
   };
-  await page.goto('/admin/problems/hcmus41c/data');
+  await page.goto('/admin/problems/hcmus41c/data?view=advanced');
   await page.getByRole('button', { name: 'Tải gói đề' }).click();
   await expect(page.getByRole('alert').filter({ hasText: '512 MiB' })).toBeVisible({
     timeout: 10_000,

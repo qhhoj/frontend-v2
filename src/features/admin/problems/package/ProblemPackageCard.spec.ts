@@ -8,7 +8,7 @@ import { packageStatus } from '@/test/f4-fixtures';
 
 const EDIT = ['judge.edit_own_problem'];
 const mountData = async () => {
-  const mounted = await mountApp('/admin/problems/hcmus41c/data');
+  const mounted = await mountApp('/admin/problems/hcmus41c/data?view=advanced');
   await vi.waitFor(
     () => {
       if (!mounted.wrapper.find('[data-testid="problem-package"]').exists())

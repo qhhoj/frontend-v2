@@ -1,47 +1,19 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminField from '../../ui/AdminField.vue';
-import { INPUT, buttonClass } from '../../ui/controls';
-import AdminNotice from '../../ui/feedback/AdminNotice.vue';
+import { INPUT } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
-import { EDIT_ALL_PROBLEM, permissionLock } from './field-lock';
+import { permissionLock } from './field-lock';
 import type { ProblemForm } from './problem-form';
-import PublishReadinessNote from './PublishReadinessNote.vue';
 
+/** The Advanced view's status: manual management, full markup, and the revision comment ("Công khai" is in Basic). */
 const form = defineModel<ProblemForm>({ required: true });
-/** The revision comment of the next save (edit only; the create form leaves it out). */
+/** The revision comment of the next save (edit only). */
 const changeMessage = defineModel<string>('changeMessage');
-/** `privateCode`: the saved problem's code while it is still private, so publishing it can be checked; unset on create and once public. */
-/** `canPublishToMembers`: the API's `editor.canPublishToMembers` (an organization creator may show an organization-private problem to its members without `judge.change_public_visibility`). */
-const props = defineProps<{
-  privateCode?: string;
-  sectionId?: string;
-  hasChangeMessage?: boolean;
-  canPublishToMembers?: boolean;
-}>();
+defineProps<{ sectionId?: string; hasChangeMessage?: boolean }>();
 const { can } = usePermissions();
 const lockFor = (permission: string) => permissionLock(can, permission);
-/** Legacy "make public and update publish date": ticking Public offers today's date, so the problem lists as new. */
-const isDateOffered = ref(false);
-watch(
-  () => form.value.isPublic,
-  (isPublic, wasPublic) => {
-    if (isPublic !== wasPublic) isDateOffered.value = isPublic && can(EDIT_ALL_PROBLEM);
-  },
-);
-// A re-seeded form (save, refetch, another problem) is the server's state, not a toggle: the offer goes.
-watch(
-  () => form.value,
-  () => (isDateOffered.value = false),
-);
-function setDateToNow() {
-  const now = new Date();
-  now.setSeconds(0, 0);
-  form.value.date = now.toISOString();
-  isDateOffered.value = false;
-}
 </script>
 
 <template>
@@ -51,29 +23,6 @@ function setDateToNow() {
     :description="$t('admin.problems.general.descriptions.status')"
     :columns="1"
   >
-    <AdminCheckbox
-      v-model="form.isPublic"
-      input-id="problem-isPublic"
-      :label="$t('admin.problems.status.public')"
-      :description="props.canPublishToMembers ? $t('admin.creation.publishToMembers') : undefined"
-      :locked-by="props.canPublishToMembers ? undefined : lockFor('judge.change_public_visibility')"
-    />
-    <PublishReadinessNote
-      v-if="privateCode && form.isPublic"
-      :code="privateCode"
-      :points="form.points"
-    />
-    <AdminNotice v-if="isDateOffered" :title="$t('admin.problems.status.dateOffer')">
-      <template #action>
-        <button
-          type="button"
-          :class="[buttonClass('secondary', 'sm'), 'mt-2']"
-          @click="setDateToNow"
-        >
-          {{ $t('admin.problems.status.dateNow') }}
-        </button>
-      </template>
-    </AdminNotice>
     <AdminCheckbox
       v-model="form.isManuallyManaged"
       input-id="problem-isManuallyManaged"

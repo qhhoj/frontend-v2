@@ -10,6 +10,8 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD } from '../../ui/controls';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import EditorViewTabs from '../../ui/form/EditorViewTabs.vue';
+import { useEditorView } from '../../ui/form/use-editor-view';
 import UploadButton from '../../ui/UploadButton.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -22,17 +24,23 @@ import DataArchiveCard from './DataArchiveCard.vue';
 import DataFeedback from './DataFeedback.vue';
 import DataSourceFiles from './DataSourceFiles.vue';
 import { useKeepDataAnswer } from './problem-data.queries';
+import CasesAutofill from './CasesAutofill.vue';
+import CasesSummary from './CasesSummary.vue';
+import { DATA_BASIC_FIELDS, dataAdvancedCount } from './data-views';
+import { toDataForm } from './test-cases';
 import { useDataForm } from './use-data-form';
 
 /**
- * Polygon link (when linked), the checker's complaints, then three cards: the archive and full package, the source files,
- * and the judging form (checker/grader and the test list) with its save bar.
+ * The checker's complaints, the Basic/Advanced switch, then per view: Basic has the archive (upload, tests from the zip,
+ * the test count) and the checker type with the input/output method; Advanced has the Polygon link, the full package, the
+ * source files, the checker and grader details and the test list. One save bar saves the judging form of both views.
  */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { can } = usePermissions();
 const {
   query,
   form,
+  saved,
   errors,
   dirtyCount,
   savedAt,
@@ -53,10 +61,22 @@ const blockedReason = computed(() =>
     : undefined,
 );
 const FORM_ID = 'problem-data-form';
+/** A row whose args box does not parse blocks the save like an error in the Advanced test list. */
+const viewErrors = computed(() =>
+  blockedReason.value ? { ...errors.value, cases: blockedReason.value } : errors.value,
+);
+const { view, errorViews, revealErrors } = useEditorView(() => viewErrors.value, DATA_BASIC_FIELDS);
+const advancedCount = computed(() =>
+  form.value && saved.value ? dataAdvancedCount(form.value, toDataForm(saved.value)) : 0,
+);
+/** One save for both views; an error in the view out of sight brings that view up. */
+async function submit() {
+  save();
+  await revealErrors();
+}
 </script>
 
 <template>
-  <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
   <QueryState
     :loading="query.isPending.value"
     :error="query.error.value"
@@ -74,39 +94,54 @@ const FORM_ID = 'problem-data-form';
         :text="$t('admin.externalJudge.dataNote', { oj: problem.externalJudge.oj })"
       />
       <DataFeedback :feedback="query.data.value.feedback" />
-      <div class="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
-        <div :class="CARD">
-          <DataArchiveCard :code="problem.code" :data="query.data.value">
-            <template #upload>
-              <UploadButton
-                data-testid="upload-archive"
-                :label="$t('admin.problems.uploads.archive.upload')"
-                accept=".zip"
-                :max-bytes="UPLOAD_LIMITS.archive"
-                :is-pending="archive.isPending.value"
-                @picked="archive.run"
-              />
-            </template>
-          </DataArchiveCard>
-          <div v-if="archive.failure.value" class="px-4 pb-4 sm:px-5">
-            <AdminStatus kind="refused" :text="failureReasonOf(archive.failure.value)" />
-          </div>
-          <ProblemPackageCard :code="problem.code" />
+      <EditorViewTabs :view="view" :advanced-count="advancedCount" :error-views="errorViews" />
+      <div v-if="view === 'basic'" :class="CARD">
+        <DataArchiveCard :code="problem.code" :data="query.data.value">
+          <template #upload>
+            <UploadButton
+              data-testid="upload-archive"
+              :label="$t('admin.problems.uploads.archive.upload')"
+              accept=".zip"
+              :max-bytes="UPLOAD_LIMITS.archive"
+              :is-pending="archive.isPending.value"
+              @picked="archive.run"
+            />
+            <CasesAutofill
+              v-model="form.cases"
+              :archive-files="query.data.value.archiveFiles"
+              :problem-points="problem.points"
+              @invalid="markInvalid"
+            />
+          </template>
+          <template #summary>
+            <CasesSummary :cases="form.cases" />
+          </template>
+        </DataArchiveCard>
+        <div v-if="archive.failure.value" class="px-4 pb-4 sm:px-5">
+          <AdminStatus kind="refused" :text="failureReasonOf(archive.failure.value)" />
         </div>
-        <DataSourceFiles :code="problem.code" :data="query.data.value" />
       </div>
-      <form :id="FORM_ID" novalidate @submit.prevent="save">
+      <template v-else>
+        <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
+        <div class="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
+          <div :class="CARD"><ProblemPackageCard :code="problem.code" /></div>
+          <DataSourceFiles :code="problem.code" :data="query.data.value" />
+        </div>
+      </template>
+      <form :id="FORM_ID" novalidate @submit.prevent="submit">
         <fieldset
           :disabled="mutation.isPending.value"
           :class="[CARD, 'm-0 flex min-w-0 flex-col p-0']"
         >
           <CheckerSection
             v-model="form"
+            :view="view"
             :code="problem.code"
             :data="query.data.value"
             :errors="errors"
           />
           <CasesEditor
+            v-if="view === 'advanced'"
             v-model="form.cases"
             :data="query.data.value"
             :errors="errors"
