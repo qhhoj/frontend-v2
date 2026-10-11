@@ -52,6 +52,18 @@ const mountList = (path: string) =>
   mountScreen(path, (wrapper) => hasButton(wrapper, 'Tạo tổ chức'));
 const mountWithButton = (path: string, text: string) =>
   mountScreen(path, (wrapper) => hasButton(wrapper, text));
+const mountWithMemberMenu = (path: string) =>
+  mountScreen(path, (wrapper) => wrapper.find('[data-testid="member-actions"]').exists());
+/** Opens the member row's ⋮ menu (teleported to the body) and picks `text`. */
+const pickMemberAction = async (wrapper: Mounted['wrapper'], text: string) => {
+  await wrapper.get('[data-testid="member-actions"]').trigger('click');
+  await flushPromises();
+  const item = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
+    (element) => element.textContent?.trim() === text,
+  );
+  item!.querySelector<HTMLElement>('[data-pc-section="itemcontent"]')!.click();
+  await flushPromises();
+};
 const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], text: string) => {
   await wrapper
     .findAll('button')
@@ -79,8 +91,8 @@ describe('OrganizationsPage', () => {
 
   it('kicks a member only after confirming', async () => {
     const calls = mockApi(routes({ 'POST /organizations/lhp/kick': { status: 204 } }));
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
-    await click(wrapper, 'Đuổi');
+    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
+    await pickMemberAction(wrapper, 'Đuổi');
     expect(calls.some((call) => call.path.endsWith('/kick'))).toBe(false);
     await confirmDialog('Đuổi');
     expect(calls.find((call) => call.path.endsWith('/kick'))?.body).toEqual({
@@ -90,12 +102,12 @@ describe('OrganizationsPage', () => {
 
   it('does not show an earlier kick error when the dialog opens for another member', async () => {
     mockApi(routes({ 'POST /organizations/lhp/kick': fail(409, 'conflict') }));
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
-    await click(wrapper, 'Đuổi');
+    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
+    await pickMemberAction(wrapper, 'Đuổi');
     await confirmDialog('Đuổi');
     expect(openDialog().querySelector('[role="alert"]')).not.toBeNull();
     await cancelDialog('Hủy');
-    await click(wrapper, 'Đuổi');
+    await pickMemberAction(wrapper, 'Đuổi');
     expect(openDialog().querySelector('[role="alert"]')).toBeNull();
   });
 

@@ -45,7 +45,6 @@
     "contestAnnouncements": "Thông báo kỳ thi",
     "contestSubmissions": "Bài nộp kỳ thi",
     "contestStats": "Thống kê kỳ thi",
-    "joinRequests": "Yêu cầu tham gia",
     "postNew": "Viết bài",
     "postEdit": "Sửa bài viết",
     "tickets": "Phiếu hỗ trợ",
@@ -1519,11 +1518,11 @@
       "about": "Tổng quan",
       "members": "Thành viên",
       "posts": "Bài viết",
-      "requests": "Yêu cầu tham gia",
       "problems": "Bài tập",
       "contests": "Kỳ thi",
       "quota": "Hạn mức",
-      "manage": "Quản lý"
+      "manage": "Quản lý",
+      "submissions": "Bài nộp"
     },
     "noContests": "Tổ chức chưa có kỳ thi nào",
     "noAbout": "Tổ chức chưa có giới thiệu.",
@@ -1592,29 +1591,9 @@
     "joined": "Đã tham gia {name}",
     "joinFailedTitle": "Không tham gia được",
     "joinFailedBody": "Bạn đã ở 3 tổ chức mở, đó là mức tối đa. Hãy rời một tổ chức mở trước khi tham gia.",
-    "fullTitle": "Tổ chức đã đủ chỗ",
-    "fullBody": "Không duyệt được: tổ chức đã hết chỗ, hoặc yêu cầu này đã được xử lý trước đó. Danh sách đã được tải lại.",
-    "decidedTitle": "Yêu cầu đã được xử lý",
-    "decidedBody": "Yêu cầu này đã được duyệt hoặc từ chối trước đó. Danh sách đã được tải lại.",
     "failedTitle": "Không thực hiện được",
     "retry": "Thử lại",
-    "requests": "Yêu cầu tham gia",
-    "statesLabel": "Trạng thái yêu cầu",
-    "states": {
-      "P": "Đang chờ",
-      "A": "Đã duyệt",
-      "R": "Đã từ chối"
-    },
-    "approve": "Duyệt",
-    "reject": "Từ chối",
-    "approvedBy": "duyệt bởi {admin}",
-    "rejectedBy": "từ chối bởi {admin}",
-    "anAdmin": "quản trị viên",
-    "emptyTitle": "Không có yêu cầu nào đang chờ",
-    "emptyBody": "Khi có người xin vào tổ chức, yêu cầu sẽ hiện ở đây để bạn duyệt.",
-    "emptyDecided": "Chưa có yêu cầu nào trong mục này.",
     "forbiddenTitle": "Chỉ quản trị viên xem được yêu cầu tham gia",
-    "requestsPager": "Trang yêu cầu",
     "sortLabel": "Sắp xếp thành viên",
     "membersFooter": "Hạng {first} – {last} trong {total} · 100 người mỗi trang",
     "membersPager": "Trang thành viên",
@@ -2618,5 +2597,56 @@
   "siteNotice": {
     "region": "Thông báo trang",
     "dismiss": "Đóng thông báo"
+  },
+  "orgAdmin": {
+    "pendingBadge": "{count} yêu cầu đang chờ",
+    "info": {
+      "title": "Thông tin tổ chức",
+      "name": "Tên tổ chức",
+      "slug": "Đường dẫn",
+      "slugHint": "Đổi đường dẫn sẽ làm các liên kết cũ không mở được.",
+      "about": "Giới thiệu (Markdown)",
+      "aboutPreview": "Xem trước phần giới thiệu",
+      "save": "Lưu thay đổi",
+      "reset": "Hủy",
+      "staffLink": "Mở trong trang quản trị (hạn mức, chỗ, ẩn hiện)"
+    },
+    "joinMode": {
+      "label": "Tham gia",
+      "open": "Mở",
+      "approval": "Cần duyệt",
+      "hint": "Mở: vào ngay · Cần duyệt: quản trị viên duyệt từng yêu cầu"
+    },
+    "members": {
+      "promote": "Đặt làm quản trị viên",
+      "demote": "Bỏ quyền quản trị",
+      "promoteTitle": "Đặt {username} làm quản trị viên?",
+      "promoteBody": "Quản trị viên sửa được thông tin tổ chức, duyệt yêu cầu và xóa thành viên. Một người quản trị tối đa ba tổ chức.",
+      "demoteTitle": "Bỏ quyền quản trị của {username}?",
+      "demoteBody": "Người này vẫn là thành viên của tổ chức.",
+      "lastAdmin": "Tổ chức cần ít nhất một quản trị viên.",
+      "actionsNamed": "Thao tác với {username}"
+    },
+    "create": {
+      "open": "Tạo tổ chức",
+      "openShort": "Tạo",
+      "title": "Tạo tổ chức",
+      "lead": "Bạn sẽ là quản trị viên đầu tiên.",
+      "name": "Tên tổ chức",
+      "slug": "Đường dẫn",
+      "slugHint": "/organizations/{slug} · không nên đổi sau này",
+      "about": "Giới thiệu (tùy chọn)",
+      "submit": "Tạo tổ chức",
+      "unlistedNote": "Tổ chức mới chưa hiện trong danh sách công khai cho đến khi ban quản trị duyệt."
+    },
+    "submissions": {
+      "problemLabel": "Bài của tổ chức",
+      "anyProblem": "Mọi bài",
+      "anyProblemCount": "Mọi bài ({count})",
+      "problemSearch": "Tìm mã hoặc tên bài",
+      "empty": "Thành viên tổ chức chưa nộp bài nào.",
+      "emptyFiltered": "Thành viên tổ chức chưa nộp bài với bộ lọc này.",
+      "forbiddenTitle": "Chỉ thành viên xem được bài nộp của tổ chức"
+    }
   }
 }

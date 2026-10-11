@@ -5,10 +5,8 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import { kickMember } from '@/api/organizations-admin.api';
 import type { OrganizationMember } from '@/api/types/organizations';
-import {
-  useMembersQuery,
-  useOrganizationQuery,
-} from '@/features/organizations/organizations.queries';
+import { useMembersQuery } from '@/features/organizations/organizations.queries';
+import { translate } from '@/i18n';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { pageFromQuery } from '@/lib/paging';
 import IndexSearchBox from '../search/IndexSearchBox.vue';
@@ -18,6 +16,8 @@ import MemberAdminRow from './MemberAdminRow.vue';
 import { organizationHistoryKey } from './organization-history.queries';
 import { memberSearchOf } from './organization-search';
 import { useOrganizationWrite } from './organization-write';
+import { useAdminRole } from './use-admin-role';
+import type { RoleChange } from './use-admin-role';
 
 const MEMBERS_PAGE_SIZE = 50;
 const props = defineProps<{ slug: string }>();
@@ -34,9 +34,22 @@ const members = useMembersQuery(
     ...(search.value ? { search: search.value } : {}),
   }),
 );
-const detail = useOrganizationQuery(() => props.slug);
-/** Admins cannot be removed (backend `admin_not_kickable`): their rows say so instead of offering the button. */
-const adminIds = computed(() => new Set(detail.data.value?.admins.map((admin) => admin.id) ?? []));
+/** Admins cannot be removed (backend `admin_not_kickable`): their rows offer stepping down instead. */
+const role = useAdminRole(() => props.slug);
+const adminIds = computed(() => new Set(role.adminIds.value));
+const canDemote = computed(() => adminIds.value.size > 1);
+const roleChange = ref<RoleChange | null>(null);
+const isRoleDialogOpen = ref(false);
+const roleText = computed(() => {
+  const change = roleChange.value;
+  const key = change?.makeAdmin ? 'promote' : 'demote';
+  const username = change?.member.username ?? '';
+  return {
+    title: translate(`orgAdmin.members.${key}Title`, { username }),
+    body: translate(`orgAdmin.members.${key}Body`),
+    confirm: translate(`orgAdmin.members.${key}`),
+  };
+});
 
 const isDialogOpen = ref(false);
 const section = ref<HTMLElement | null>(null);
@@ -74,6 +87,17 @@ function askKick(member: OrganizationMember) {
   isDialogOpen.value = true;
 }
 
+function askRole(member: OrganizationMember, makeAdmin: boolean) {
+  role.write.reset();
+  roleChange.value = { member, makeAdmin };
+  isRoleDialogOpen.value = true;
+}
+
+async function confirmRole() {
+  if (roleChange.value === null) return;
+  if (await role.write.run(roleChange.value)) isRoleDialogOpen.value = false;
+}
+
 async function confirmKick() {
   if (target.value === null) return;
   const isKicked = await kick.run(target.value);
@@ -106,7 +130,10 @@ async function confirmKick() {
           :key="row.id"
           :member="row"
           :is-admin="adminIds.has(row.id)"
+          :can-demote="canDemote"
           @kick="askKick(row)"
+          @promote="askRole(row, true)"
+          @demote="askRole(row, false)"
         />
       </ul>
       <p v-else class="text-sm text-muted">
@@ -143,6 +170,23 @@ async function confirmKick() {
           v-if="kick.failure.value"
           kind="refused"
           :text="failureTextOf(kick.failure.value)"
+        />
+      </template>
+    </ConfirmDialog>
+    <ConfirmDialog
+      v-model:visible="isRoleDialogOpen"
+      :return-focus-to="focusPanel"
+      :title="roleText.title"
+      :body="roleText.body"
+      :confirm-label="roleText.confirm"
+      :busy="role.write.isPending.value"
+      @confirm="confirmRole"
+    >
+      <template #error>
+        <AdminStatus
+          v-if="role.write.failure.value"
+          kind="refused"
+          :text="failureTextOf(role.write.failure.value)"
         />
       </template>
     </ConfirmDialog>

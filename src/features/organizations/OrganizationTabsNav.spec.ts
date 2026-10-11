@@ -12,17 +12,18 @@ const labelsFor = (viewer: typeof ADMIN_STATE | null) =>
   linksFor(viewer).map((link) => link.text().replace(/\s+\d[\d.,]*$/, ''));
 
 describe('organization tabs', () => {
-  it('shows "Bài tập" to members and both new tabs to administrators', () => {
-    expect(labelsFor(MEMBER_STATE)).toContain('Bài tập');
-    expect(labelsFor(MEMBER_STATE)).not.toContain('Hạn mức');
+  it('shows "Bài tập" and "Bài nộp" to members, and "Hạn mức" and "Quản lý" to administrators', () => {
+    expect(labelsFor(MEMBER_STATE)).toEqual(expect.arrayContaining(['Bài tập', 'Bài nộp']));
+    expect(labelsFor(MEMBER_STATE)).not.toContain('Quản lý');
     expect(labelsFor(ADMIN_STATE)).toEqual(
-      expect.arrayContaining(['Bài tập', 'Yêu cầu tham gia', 'Hạn mức']),
+      expect.arrayContaining(['Bài tập', 'Bài nộp', 'Hạn mức', 'Quản lý']),
     );
   });
 
   it('shows neither to a stranger or an anonymous visitor', () => {
     for (const viewer of [STRANGER_STATE, null]) {
       expect(labelsFor(viewer)).not.toContain('Bài tập');
+      expect(labelsFor(viewer)).not.toContain('Bài nộp');
       expect(labelsFor(viewer)).not.toContain('Hạn mức');
     }
   });

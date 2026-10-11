@@ -50,6 +50,10 @@ export const organizationRoutes = (detail: OrganizationDetail = organizationDeta
   [`GET /organizations/${detail.slug}`]: ok(detail),
   [`GET /organizations/${detail.slug}/members`]: page([], { pageSize: 5 }),
   [`GET /organizations/${detail.slug}/posts`]: page([], { pageSize: 10 }),
+  // The tabs count an administrator's pending requests.
+  ...(detail.viewer?.canAdminister
+    ? { [`GET /organizations/${detail.slug}/requests`]: page([], { pageSize: 50 }) }
+    : {}),
 });
 export const organizationListRoutes: Routes = {
   'GET /organizations': page([organizationItem()], { pageSize: 100 }),
