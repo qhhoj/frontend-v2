@@ -59,6 +59,6 @@ const ACTION =
         <span class="max-sm:sr-only">{{ $t('submission.source.downloadShort') }}</span>
       </a>
     </template>
-    <CopyButton :text="text" :label="$t('submission.source.copy')" />
+    <CopyButton :text="text" :label="$t('submission.source.copy')" icon-only-on-phone />
   </div>
 </template>
