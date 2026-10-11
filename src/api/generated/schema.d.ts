@@ -4454,10 +4454,12 @@ export interface paths {
          * @description Needs `judge.import_polygon_package`, plus `judge.add_problem` to create a
          *     problem or write access to the problem to update it. The body takes the
          *     problem `link` (checked again as on `POST /polygon/resolve`, with the same
-         *     errors), the zip import's options (`code`, `mode`, authors, curators,
-         *     group, types, points, statement languages, zero-point and main-solution
-         *     switches) and `autoSync`. A created problem is private, with the importer
-         *     as a curator. The server downloads the newest full package itself and the
+         *     errors), the zip import's options (`code`, `mode`, `organization`,
+         *     authors, curators, group, types, points, statement languages, zero-point
+         *     and main-solution switches) and `autoSync`. A created problem is private,
+         *     with the importer as a curator; with `organization` it belongs to that
+         *     organization as in the zip import (its creation rights replace
+         *     `judge.add_problem`, code prefix, credits). The server downloads the newest full package itself and the
          *     same background job as the zip import applies it, then links the problem
          *     to Polygon and records the import in the sync history. Answers 202 with a
          *     `jobId` to poll at `GET /problems/imports/{jobId}` (its `step` goes queued,
@@ -5559,8 +5561,14 @@ export interface paths {
          *     `judge.add_problem`, updating needs write access to the problem's test data.
          *     Send the Polygon package as a multipart `file` (a zip with `problem.xml` at
          *     its root, up to 512 MiB) and the options in the query string: `code`, `mode`
-         *     (`create` or `update`), authors, curators, group, types, points, statement
-         *     language mapping and the zero-point and main-solution switches. The package
+         *     (`create` or `update`), `organization`, authors, curators, group, types,
+         *     points, statement language mapping and the zero-point and main-solution
+         *     switches. A create with `organization` (a slug) makes the problem private
+         *     to that organization under the rules of
+         *     `POST /organizations/{slug}/problems` instead of `judge.add_problem`: its
+         *     rights (404 unknown organization, 403 `forbidden`), the code prefix (400
+         *     `organization_code_prefix`), its credits (spent when the job is queued,
+         *     kept if the job fails later) and its storage. The package
          *     is checked, then imported by a background job; the answer is 202 with a
          *     `jobId` to poll at `GET /problems/imports/{jobId}`. Limited to 10 imports
          *     per hour per user. Errors: 400 `code_taken`, 400 for a bad package
@@ -10095,6 +10103,8 @@ export interface components {
              * @enum {string}
              */
             mode: "create" | "update";
+            /** @description Slug of the organization a created problem belongs to: private to it, code with its prefix, charged to its quota; needs the rights of `POST /organizations/{slug}/problems` instead of `judge.add_problem`. Ignored by `update`. */
+            organization?: string;
             /** @description Points the problem is worth, 800 to 3500. */
             points?: number;
             /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */
@@ -23574,6 +23584,8 @@ export interface operations {
                 mainStatementLanguage?: string;
                 /** @description `create` (default) makes a new problem; `update` replaces the data and statement of an existing one. */
                 mode?: "create" | "update";
+                /** @description Slug of the organization a created problem belongs to: private to it, code with its prefix, charged to its quota; needs the rights of `POST /organizations/{slug}/problems` instead of `judge.add_problem`. Ignored by `update`. */
+                organization?: string;
                 /** @description Points the problem is worth, 800 to 3500. */
                 points?: number;
                 /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */

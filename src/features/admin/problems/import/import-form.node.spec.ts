@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { codeFromPolygonName, emptyImportForm, importFormErrors } from './import-form';
+import {
+  canCreateFor,
+  codeFromPolygonName,
+  emptyImportForm,
+  importFormErrors,
+  toImportOptions,
+} from './import-form';
 
 const readyForm = () => ({
   ...emptyImportForm(),
@@ -67,5 +73,30 @@ describe('codeFromPolygonName', () => {
     ['---', ''],
   ])('turns %s into %s', (name, code) => {
     expect(codeFromPolygonName(name)).toBe(code);
+  });
+});
+
+describe('import owner', () => {
+  const school = { slug: 'thpt-a', name: 'THPT A', shortName: 'A', problemCodePrefix: 'thpta_' };
+
+  it.each([
+    [
+      'an organization with the organization scope',
+      school,
+      { site: false, organizations: true },
+      true,
+    ],
+    ['an organization without it', school, { site: true, organizations: false }, false],
+    ['the site with judge.add_problem', null, { site: true, organizations: false }, true],
+    ['the site without it', null, { site: false, organizations: true }, false],
+  ])('creating for %s is allowed: %s', (_case, owner, scope, allowed) => {
+    expect(canCreateFor(owner, scope)).toBe(allowed);
+  });
+
+  it('sends the owner organization on create only, and nothing for the site', () => {
+    const form = { ...emptyImportForm(), code: 'thpta_sum', owner: school };
+    expect(toImportOptions(form).organization).toBe('thpt-a');
+    expect(toImportOptions({ ...form, mode: 'update' }).organization).toBeUndefined();
+    expect(toImportOptions({ ...form, owner: null }).organization).toBeUndefined();
   });
 });

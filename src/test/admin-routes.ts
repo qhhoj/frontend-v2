@@ -5,6 +5,19 @@ import { profile, sessionUser, signedIn } from './fixtures';
 
 export const STAFF_ID = '0192a000-0000-7000-8000-00000000a001';
 
+/** The backend's site-wide creation scopes for these rights (`OrganizationCreationRights.scopes`); no administered organization. */
+const siteCreation = (permissions: string[], isSuperuser: boolean) => ({
+  organizations: false,
+  problemCreation: {
+    site: isSuperuser || permissions.includes('judge.add_problem'),
+    organizations: false,
+  },
+  contestCreation: {
+    site: isSuperuser || permissions.includes('judge.add_contest'),
+    organizations: false,
+  },
+});
+
 /** A signed-in staff member holding exactly `permissions` (the shell reads them from /auth/me). */
 export const staffViewer = (
   permissions: string[] = [],
@@ -16,6 +29,7 @@ export const staffViewer = (
       username: 'minhthu',
       isStaff: true,
       permissions,
+      adminCapabilities: siteCreation(permissions, overrides.isSuperuser ?? false),
       ...overrides,
     }),
   }),

@@ -7,7 +7,10 @@ import AdminField from '../../ui/AdminField.vue';
  * prefix + what is typed; the rule is said under the field. Switching owners keeps the typed part.
  */
 const code = defineModel<string>({ required: true });
-const props = defineProps<{ prefix: string; error?: string }>();
+const props = withDefaults(
+  defineProps<{ prefix: string; error?: string; inputId?: string; hint?: string }>(),
+  { error: undefined, inputId: 'problem-code', hint: undefined },
+);
 
 const suffixOf = (value: string, prefix: string) =>
   prefix && value.startsWith(prefix) ? value.slice(prefix.length) : value;
@@ -28,12 +31,12 @@ watch(
 <template>
   <AdminField
     v-slot="{ id, describedBy }"
-    input-id="problem-code"
+    :input-id="inputId"
     :label="$t('admin.problems.general.basics.code')"
     :hint="
       prefix
         ? $t('admin.creation.problem.prefixHint', { prefix, example: `${prefix}bai1` })
-        : $t('admin.problems.general.basics.codeHint')
+        : (hint ?? $t('admin.problems.general.basics.codeHint'))
     "
     :error="error"
     required
