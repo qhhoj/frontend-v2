@@ -139,7 +139,11 @@ const clearTagTarget = computed(() => ({
           />
         </ul>
       </GlassCard>
-      <EndedContestTable v-else :contests="shownContests" />
+      <EndedContestTable
+        v-else
+        :contests="shownContests"
+        :is-organization-scoped="Boolean(organizationId)"
+      />
       <SubmissionPager
         v-if="isSingleGroup"
         :page="filters.page"

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Building2, Lock, TrendingUp } from 'lucide-vue-next';
+import { Lock, TrendingUp } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ContestSummary } from '@/api/types/contests';
+import ContestOrganizationChips from './ContestOrganizationChips.vue';
 import { useContestTagsCache } from './contest-extras.queries';
 import { catalogueBySlug, tagChipOf } from './tag-chips';
 
@@ -9,6 +10,8 @@ const props = defineProps<{
   contest: ContestSummary;
   withTags?: boolean;
   withCodeNeeded?: boolean;
+  /** Leave the restricting-organization links out: the caller shows them elsewhere. */
+  hideOrganizations?: boolean;
 }>();
 const CHIP =
   'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-[12.5px] font-medium whitespace-nowrap';
@@ -42,16 +45,7 @@ const showOrganizations = computed(() => props.withTags && props.contest.organiz
     >{{ $t('contests.organizationPrivate') }}</span
   >
   <template v-if="withTags">
-    <template v-if="showOrganizations">
-      <RouterLink
-        v-for="organization in contest.organizations"
-        :key="organization.slug"
-        :to="{ name: 'organization', params: { slug: organization.slug } }"
-        data-testid="contest-organization-chip"
-        :class="[CHIP, 'bg-surface-strong text-content hover:border-accent hover:text-accent-text']"
-        ><Building2 class="size-3" aria-hidden="true" />{{ organization.name }}</RouterLink
-      >
-    </template>
+    <ContestOrganizationChips v-if="showOrganizations && !hideOrganizations" :contest="contest" />
     <span
       v-for="chip in tagChips"
       :key="chip.slug"
