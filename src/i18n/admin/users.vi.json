@@ -113,5 +113,116 @@
     "staff": "Nhân viên",
     "admin": "Quản trị viên",
     "banned": "Bị cấm"
+  },
+  "edit": {
+    "open": "Sửa",
+    "title": "Sửa {username}",
+    "credentialsLocked": "Đổi email, đặt mật khẩu hoặc gửi liên kết đặt lại cần quyền auth.change_user.",
+    "profile": {
+      "title": "Hồ sơ",
+      "displayName": "Tên hiển thị",
+      "displayNameHint": "Hiện thay cho tên đăng nhập; để trống để hiện tên đăng nhập.",
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "emailLocked": "Đổi email cần quyền auth.change_user.",
+      "about": "Giới thiệu (Markdown)",
+      "organizations": "Tổ chức",
+      "save": "Lưu hồ sơ",
+      "noChanges": "Chưa có thay đổi.",
+      "saved": "Đã lưu hồ sơ.",
+      "displayRank": "Danh hiệu",
+      "displayRankHint": "Danh hiệu cạnh tên; “banned” chỉ đặt khi cấm.",
+      "unlisted": "Ẩn khỏi danh sách",
+      "unlistedHint": "Không hiện trên bảng xếp hạng và danh sách thành viên.",
+      "mute": "Tắt tiếng",
+      "muteHint": "Không thể viết bình luận hay bài đăng.",
+      "allowTagging": "Được gắn thẻ bài",
+      "notes": "Ghi chú nội bộ",
+      "notesHint": "Chỉ ban quản trị thấy, người dùng không thấy.",
+      "leaveContest": "Đưa người dùng ra khỏi kỳ thi đang tham gia",
+      "emailPasswordHint": "Đổi email cần mật khẩu của bạn, như khi đặt mật khẩu."
+    },
+    "password": {
+      "title": "Đặt mật khẩu mới",
+      "warning": "Đặt mật khẩu sẽ đăng xuất người dùng khỏi mọi phiên và thu hồi API token của họ.",
+      "new": "Mật khẩu mới",
+      "newHint": "Ít nhất 8 ký tự, không chỉ gồm chữ số, không giống tên đăng nhập hay email.",
+      "confirm": "Nhập lại mật khẩu mới",
+      "mismatch": "Hai mật khẩu không khớp.",
+      "current": "Mật khẩu của bạn",
+      "currentHint": "Xác nhận chính bạn thực hiện thay đổi.",
+      "submit": "Đặt mật khẩu",
+      "done": "Đã đặt mật khẩu cho {username}; họ đã bị đăng xuất khỏi mọi phiên."
+    },
+    "reset": {
+      "title": "Gửi liên kết đặt lại mật khẩu",
+      "note": "Liên kết được gửi tới {email} và hết hạn sau 3 ngày.",
+      "noEmail": "Tài khoản không có địa chỉ email.",
+      "send": "Gửi liên kết đặt lại mật khẩu",
+      "sent": "Đã gửi liên kết đặt lại tới {email}."
+    },
+    "ranks": {
+      "user": "Người dùng",
+      "setter": "Người ra đề",
+      "daor": "Đội Bedao",
+      "staff": "Nhân sự",
+      "admin": "Quản trị",
+      "teacher": "Giáo viên"
+    },
+    "account": {
+      "title": "Tài khoản",
+      "active": "Tài khoản đang hoạt động.",
+      "inactive": "Tài khoản đang bị vô hiệu hoá: người dùng không thể đăng nhập.",
+      "banned": "Tài khoản đang bị cấm; bỏ cấm để kích hoạt lại.",
+      "deactivate": "Vô hiệu hoá tài khoản",
+      "activate": "Kích hoạt tài khoản",
+      "deactivateDialog": {
+        "title": "Vô hiệu hoá {username}?",
+        "body": "Người dùng bị đăng xuất khỏi mọi phiên, API token bị thu hồi và không thể đăng nhập cho tới khi tài khoản được kích hoạt lại."
+      },
+      "rename": "Tên đăng nhập",
+      "renameHint": "Chữ, số và dấu gạch dưới, tối đa 30 ký tự. Tên cũ vẫn mở được trang hồ sơ.",
+      "renameSubmit": "Đổi tên",
+      "twoFactor": "Đặt lại xác thực hai bước",
+      "twoFactorNote": "Dành cho người dùng mất ứng dụng xác thực hoặc khoá bảo mật.",
+      "twoFactorDialog": {
+        "title": "Đặt lại xác thực hai bước cho {username}?",
+        "body": "Gỡ ứng dụng xác thực và mọi khoá bảo mật, đồng thời đăng xuất người dùng khỏi mọi phiên."
+      },
+      "twoFactorDone": "Đã đặt lại xác thực hai bước."
+    }
+  },
+  "create": {
+    "open": "Tạo tài khoản",
+    "title": "Tạo tài khoản",
+    "mode": "Cách tạo",
+    "modes": {
+      "single": "Một tài khoản",
+      "csv": "Nhập CSV"
+    },
+    "username": "Tên đăng nhập",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "passwordHint": "Để trống để tạo tự động, chỉ hiện một lần sau khi tạo.",
+    "invite": "Gửi email mời tự chọn mật khẩu thay vì đặt sẵn",
+    "csvHint": "Một dòng tiêu đề, sau đó mỗi dòng một tài khoản: username, có thể thêm fullname, email, password và invite (yes). Tài khoản hoạt động ngay; mật khẩu trống sẽ được tạo tự động.",
+    "pickFile": "Chọn tệp CSV",
+    "csvLabel": "CSV",
+    "missingUsername": "Dòng tiêu đề cần có cột “username”.",
+    "rowCount": "Sẵn sàng {count} tài khoản.",
+    "organization": "Tổ chức (không bắt buộc)",
+    "submit": "Tạo {count} tài khoản",
+    "results": {
+      "caption": "Tài khoản đã tạo",
+      "username": "Tên đăng nhập",
+      "status": "Kết quả",
+      "detail": "Mật khẩu hoặc lý do",
+      "created": "Đã tạo",
+      "rejected": "Bị từ chối",
+      "invited": "Đã gửi lời mời",
+      "summary": "Đã tạo {created}/{total}. Mật khẩu tạo tự động chỉ hiện lúc này: hãy tải xuống hoặc in trước khi đóng.",
+      "download": "Tải kết quả (CSV)"
+    }
   }
 }

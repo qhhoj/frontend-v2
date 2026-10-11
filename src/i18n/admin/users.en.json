@@ -113,5 +113,116 @@
     "staff": "Staff",
     "admin": "Administrator",
     "banned": "Banned"
+  },
+  "edit": {
+    "open": "Edit",
+    "title": "Edit {username}",
+    "credentialsLocked": "Changing the e-mail, the password or sending a reset link needs the auth.change_user permission.",
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display name",
+      "displayNameHint": "Shown in place of the username; leave empty to show the username.",
+      "fullName": "Full name",
+      "email": "E-mail",
+      "emailLocked": "Changing the e-mail needs the auth.change_user permission.",
+      "about": "About (Markdown)",
+      "organizations": "Organizations",
+      "save": "Save profile",
+      "noChanges": "No changes yet.",
+      "saved": "Profile saved.",
+      "displayRank": "Display rank",
+      "displayRankHint": "The title beside the name; “banned” is set by banning.",
+      "unlisted": "Unlisted",
+      "unlistedHint": "Hidden from the leaderboards and member lists.",
+      "mute": "Muted",
+      "muteHint": "Cannot write comments or posts.",
+      "allowTagging": "May tag problems",
+      "notes": "Staff notes",
+      "notesHint": "Seen by staff only, never by the user.",
+      "leaveContest": "Take the user out of the contest they are in",
+      "emailPasswordHint": "Changing the e-mail needs your own password, like setting a password."
+    },
+    "password": {
+      "title": "Set a new password",
+      "warning": "Setting a password signs the user out of every session and revokes their API token.",
+      "new": "New password",
+      "newHint": "At least 8 characters, not only digits, not like the username or e-mail.",
+      "confirm": "Repeat the new password",
+      "mismatch": "The two passwords do not match.",
+      "current": "Your own password",
+      "currentHint": "Confirms it is you making the change.",
+      "submit": "Set password",
+      "done": "Password set for {username}; they were signed out everywhere."
+    },
+    "reset": {
+      "title": "Send a password reset link",
+      "note": "The link goes to {email} and expires in 3 days.",
+      "noEmail": "The account has no e-mail address.",
+      "send": "Send reset link",
+      "sent": "Reset link sent to {email}."
+    },
+    "ranks": {
+      "user": "User",
+      "setter": "Problem setter",
+      "daor": "Bedao team",
+      "staff": "Staff",
+      "admin": "Admin",
+      "teacher": "Teacher"
+    },
+    "account": {
+      "title": "Account",
+      "active": "The account is active.",
+      "inactive": "The account is inactive: the user cannot sign in.",
+      "banned": "The account is banned; unban it to reactivate it.",
+      "deactivate": "Deactivate account",
+      "activate": "Activate account",
+      "deactivateDialog": {
+        "title": "Deactivate {username}?",
+        "body": "The user is signed out of every session, their API token is revoked and they cannot sign in until the account is activated again."
+      },
+      "rename": "Username",
+      "renameHint": "Letters, digits and underscores, up to 30 characters. The old name keeps opening the profile.",
+      "renameSubmit": "Rename",
+      "twoFactor": "Reset two-factor sign-in",
+      "twoFactorNote": "For a user locked out of their authenticator app or security key.",
+      "twoFactorDialog": {
+        "title": "Reset two-factor sign-in for {username}?",
+        "body": "Removes their authenticator app and every security key and signs them out everywhere."
+      },
+      "twoFactorDone": "Two-factor sign-in reset."
+    }
+  },
+  "create": {
+    "open": "Create accounts",
+    "title": "Create accounts",
+    "mode": "How to create",
+    "modes": {
+      "single": "One account",
+      "csv": "Import CSV"
+    },
+    "username": "Username",
+    "fullName": "Full name",
+    "email": "E-mail",
+    "password": "Password",
+    "passwordHint": "Leave empty to generate one, shown once after creating.",
+    "invite": "E-mail an invite to choose a password instead",
+    "csvHint": "A header line, then one account per line: username, and optionally fullname, email, password and invite (yes). Accounts are active at once; empty passwords are generated.",
+    "pickFile": "Choose a CSV file",
+    "csvLabel": "CSV",
+    "missingUsername": "The header line needs a “username” column.",
+    "rowCount": "{count} accounts ready.",
+    "organization": "Organization (optional)",
+    "submit": "Create {count} account | Create {count} accounts",
+    "results": {
+      "caption": "Created accounts",
+      "username": "Username",
+      "status": "Result",
+      "detail": "Password or reason",
+      "created": "Created",
+      "rejected": "Refused",
+      "invited": "Invite sent",
+      "summary": "{created} of {total} created. Generated passwords are shown only now: download or print them before closing.",
+      "download": "Download results (CSV)"
+    }
   }
 }

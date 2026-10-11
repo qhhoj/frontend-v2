@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { STAFF_USERS_PAGE_SIZE } from '@/api/users-admin.api';
@@ -11,6 +11,8 @@ import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import ExactLookup from '../ui/ExactLookup.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { usePermissions } from '@/stores/use-permissions';
+import UserCreateDialog from './UserCreateDialog.vue';
 import UserLookupCard from './UserLookupCard.vue';
 import UsersFilters from './UsersFilters.vue';
 import UsersTable from './UsersTable.vue';
@@ -54,6 +56,8 @@ const setView = (patch: Partial<UsersListView>) =>
 /** Opening a user (the lookup or a row) only sets `?user=`; the list's place stays in the URL. */
 const openUser = (username: string) =>
   router.push({ name: 'admin-users', query: { ...route.query, user: username } });
+const { can } = usePermissions();
+const isCreateOpen = ref(false);
 </script>
 
 <template>
@@ -63,7 +67,17 @@ const openUser = (username: string) =>
       :title="$t('admin.shell.screens.users')"
       :lead="$t('admin.users.lead')"
     >
-      <template #actions><AdminBit placement="people" /></template>
+      <template #actions>
+        <button
+          v-if="can('auth.add_user')"
+          type="button"
+          :class="ADMIN_BUTTON_CLASS"
+          @click="isCreateOpen = true"
+        >
+          {{ $t('admin.users.create.open') }}
+        </button>
+        <AdminBit placement="people" />
+      </template>
     </AdminPageHeader>
     <section class="glass rounded-panel p-5">
       <ExactLookup
@@ -123,5 +137,6 @@ const openUser = (username: string) =>
       </div>
     </section>
     <UserLookupCard v-if="opened" :key="opened" :username="opened" />
+    <UserCreateDialog v-if="isCreateOpen" v-model:visible="isCreateOpen" />
   </div>
 </template>

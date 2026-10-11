@@ -742,7 +742,101 @@ export interface paths {
          */
         get: operations["UserAdminController_list"];
         put?: never;
+        /**
+         * Create user accounts
+         * @description Requires `auth.add_user` and a browser session. Creates up to 100 active accounts (no activation mail), optionally all in one organization (`organizationId`, 400 `validation_failed` issue `organization_unknown`). Each row is created or refused on its own, in request order: issues `username_invalid_characters`, `username_taken` (also a name repeated in the request), `email_invalid`, `email_taken`, `invite_needs_email_only` and the signup password policy codes on `password`.
+         *     A row without a password gets a generated one, returned only in this response; a row with `invite` gets an unusable password and a reset-link mail (503 `mail_unavailable` for the whole request when mail is off). Every created account is a `user` revision `staff_create`.
+         */
+        post: operations["UserCreationController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set a user's password
+         * @description Requires `auth.change_user`, a browser session, and your own current password (`currentPassword`; wrong attempts share the 10 in 15 minutes budget with other password confirmations: 400 `invalid_credentials`, then 429 `rate_limited`). At most 10 credential changes (password sets and e-mail changes) per admin per hour (429 `rate_limited`).
+         *     The new password must pass the signup policy and not appear in a known breach (400 `validation_failed`, issues on `newPassword`). Signs the user out everywhere and revokes their API token; recorded as a `user` revision `staff_set_password` without the password.
+         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`, 409 `conflict` on a concurrent change. Returns 204.
+         */
+        post: operations["UserEditingController_setPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a password reset link
+         * @description Requires `auth.change_user` and a browser session. Mails the user the same link as the public reset form, sharing its per-address budget (3 per hour, then 429 `rate_limited`); recorded as a `user` revision `staff_send_reset_link`.
+         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`, 409 `conflict` with issue `account_inactive` or `email_missing`, 503 `mail_unavailable` when mail is not configured. Returns 204.
+         */
+        post: operations["UserEditingController_sendResetLink"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's editable profile
+         * @description Requires `judge.change_profile` and a browser session. Returns the display name, full name, about text, e-mail and organizations. Errors: 403 `forbidden` for a superuser unless you are one, 404 `not_found`.
+         */
+        get: operations["UserEditingController_get"];
+        put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit a user's profile
+         * @description Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change keeps the user's sessions and reset links already sent: to recover a hijacked account, set a password. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token. Every change is recorded as a `user` revision `staff_edit`.
+         *     Errors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.
+         */
+        patch: operations["UserEditingController_update"];
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rename a user
+         * @description Requires `auth.change_user` and a browser session; not yourself. Changes the login name (a case-only change is allowed); the old name keeps opening the profile while no account holds it. Recorded as a `user` revision `staff_rename`.
+         *     Errors: 400 `validation_failed` with issue `username_invalid_characters` or `username_taken`; 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` when renamed meanwhile.
+         */
+        post: operations["UserEditingController_rename"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7527,6 +7621,21 @@ export interface components {
             /** @description The registered judge. */
             judge: components["schemas"]["JudgeResponse"];
         };
+        CreatedUserResponse: {
+            /** @description A generated password, shown only in this response; null when the row gave one, sent an invite or was rejected. */
+            generatedPassword: string | null;
+            /** @description The new account id; null when rejected. */
+            id: string | null;
+            /** @description Whether an invite mail was sent. */
+            invited: boolean;
+            issues: components["schemas"]["UserRowIssueResponse"][];
+            /**
+             * @description `created`, or `rejected` with `issues`.
+             * @enum {string}
+             */
+            status: "created" | "rejected";
+            username: string;
+        };
         CreateFlatpageDto: {
             /** @description Markdown, rendered and sanitised on save in the `blog` style. */
             content: string;
@@ -7745,6 +7854,15 @@ export interface components {
             fullName: string;
             /** @description Short name, unique ignoring case, up to 20 characters. */
             name: string;
+        };
+        CreateUsersDto: {
+            /**
+             * Format: uuid
+             * @description An organization every new account joins (a school import).
+             */
+            organizationId?: string;
+            /** @description Up to 100 accounts; each row is created or refused on its own. */
+            users: components["schemas"]["NewUserDto"][];
         };
         CreditActorResponse: {
             /** @description Id of the user. */
@@ -8508,6 +8626,18 @@ export interface components {
         NewTicketMessageDto: {
             /** @description Message text in Markdown. */
             body: string;
+        };
+        NewUserDto: {
+            /** @description E-mail address; required for an invite. */
+            email?: string;
+            /** @description Full name, up to 30 characters. */
+            fullName?: string;
+            /** @description Mail a link to choose a password instead of setting one (needs `email`, no `password`). */
+            invite?: boolean;
+            /** @description Initial password; it must pass the signup policy. Absent: one is generated (and returned once), unless `invite` is set. */
+            password?: string;
+            /** @description Login name: letters, digits and underscores, up to 30 characters. */
+            username: string;
         };
         NotificationEventResponse: {
             /** @description Id of the notification row that was created or merged. */
@@ -9761,6 +9891,14 @@ export interface components {
             /** @description Desired login name: letters, digits and underscores, up to 30 characters. */
             username: string;
         };
+        RenamedUserResponse: {
+            /** @description The login name now. */
+            username: string;
+        };
+        RenameUserDto: {
+            /** @description The new login name: letters, digits and underscores, up to 30 characters. */
+            username: string;
+        };
         RenderPreviewDto: {
             /** @description Markdown to render. */
             markdown: string;
@@ -9961,6 +10099,12 @@ export interface components {
         SettleCommentReportsDto: {
             /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
             outcome: components["schemas"]["CommentReportOutcome"];
+        };
+        SetUserPasswordDto: {
+            /** @description The account password, re-entered to confirm the change. */
+            currentPassword: string;
+            /** @description The user's new password; it must pass the password policy. */
+            newPassword: string;
         };
         SetWebhookDto: {
             /**
@@ -10225,6 +10369,11 @@ export interface components {
             /** @description Groups sorted by name. */
             groups: components["schemas"]["SolvedGroupResponse"][];
         };
+        /**
+         * @description Rank title shown beside the name; `banned` is set by the ban route only.
+         * @enum {string}
+         */
+        StaffDisplayRank: "admin" | "daor" | "setter" | "staff" | "teacher" | "user";
         StaffUserResponse: {
             /** @description Null unless banned. */
             banReason: string | null;
@@ -11423,6 +11572,34 @@ export interface components {
             /** @description Assignees and `change_ticket` only; `''` clears. */
             notes?: string;
         };
+        UpdateUserByStaffDto: {
+            /** @description About-me text in Markdown, rendered and sanitised on save. */
+            about?: string;
+            /** @description Whether the user may tag problems they solved. */
+            allowTagging?: boolean;
+            /** @description Your own password; required with an `email` change, like a password set. */
+            currentPassword?: string;
+            /** @description Name shown in place of the username, up to 100 characters; empty shows the username. */
+            displayName?: string;
+            /** @description Rank title shown beside the name; `banned` is set by the ban route only. */
+            displayRank?: components["schemas"]["StaffDisplayRank"];
+            /** @description New e-mail address (needs `auth.change_user`); surrounding spaces are dropped and the domain lower-cased. */
+            email?: string;
+            /** @description The user's full name, up to 30 characters. */
+            fullName?: string;
+            /** @description Activate or deactivate the account (needs `auth.change_user`); deactivating signs the user out everywhere and revokes the API token. A banned account is unbanned through its own route. */
+            isActive?: boolean;
+            /** @description Hidden from the leaderboards and member lists. */
+            isUnlisted?: boolean;
+            /** @description `true` takes the user out of the contest they are in (legacy `current_contest` cleared). */
+            leaveCurrentContest?: boolean;
+            /** @description Muted users cannot write comments or posts. */
+            mute?: boolean;
+            /** @description Notes for staff only, up to 4096 characters; never shown to the user. */
+            notes?: string;
+            /** @description The complete, ordered list of organization ids the user belongs to. */
+            organizations?: string[];
+        };
         UploadedFileResponse: {
             /** @description Public URL of the stored file. */
             url: string;
@@ -11472,6 +11649,39 @@ export interface components {
             size: number | null;
             /** @enum {string} */
             state: "none" | "preparing" | "ready";
+        };
+        UserEditResponse: {
+            /** @description About-me Markdown. */
+            about: string;
+            allowTagging: boolean;
+            /** @description Null unless banned. */
+            banReason: string | null;
+            /** Format: date-time */
+            dateJoined: string;
+            /** @description Staff-set name shown in place of the username; empty when unset. */
+            displayName: string;
+            /** @description Rank title such as `user`, `admin` or `banned`. */
+            displayRank: string;
+            email: string;
+            /** @description The user's full name. */
+            fullName: string;
+            /** @description Whether TOTP or a security key is set up (reset through `reset-two-factor`). */
+            hasTwoFactor: boolean;
+            id: string;
+            /** @description Whether the user is in a contest now (it may have ended; cleared lazily). */
+            inContest: boolean;
+            isActive: boolean;
+            isStaff: boolean;
+            isSuperuser: boolean;
+            isUnlisted: boolean;
+            /** Format: date-time */
+            lastLogin: string | null;
+            mute: boolean;
+            /** @description Staff-only notes; empty when unset. */
+            notes: string;
+            /** @description Memberships in the user's order. */
+            organizations: components["schemas"]["OrganizationSummaryResponse"][];
+            username: string;
         };
         UsernameAvailableResponse: {
             /** @description True when the username can be registered now. */
@@ -11549,6 +11759,11 @@ export interface components {
             siteTheme: string;
             /** @description Unique login name. */
             username: string;
+        };
+        UserRowIssueResponse: {
+            code: string;
+            field: string;
+            message: string;
         };
         UserSummaryResponse: {
             /** @description User id. */
@@ -13125,6 +13340,221 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["StaffUserResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserCreationController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUsersDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CreatedUserResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserEditingController_setPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetUserPasswordDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserEditingController_sendResetLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserEditingController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserEditResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserEditingController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserByStaffDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserEditResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    UserEditingController_rename: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameUserDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RenamedUserResponse"];
                     };
                 };
             };
