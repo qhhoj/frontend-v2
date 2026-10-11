@@ -998,6 +998,7 @@
       },
       "links": {
         "label": "Problem links",
+        "title": "Links",
         "submissions": "All submissions",
         "best": "Best submissions",
         "pdfStatement": "PDF statement",

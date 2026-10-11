@@ -3,6 +3,8 @@ import { ExternalLink, FileText } from 'lucide-vue-next';
 import { computed, onScopeDispose, ref, toRef, watch } from 'vue';
 import { problemPdfUrl } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
+import { translate } from '@/i18n';
+import { HEADER_BUTTON_IDLE_CLASS, PDF_PILL_CLASS } from './links-card-classes';
 import { usePdfStatement } from './use-pdf-statement';
 import type { PdfFailure } from './use-pdf-statement';
 
@@ -48,7 +50,16 @@ const unavailable = computed(() => busy.value || mustWait.value);
 const buttonClass = computed(() => {
   if (busy.value) return 'border-line-accent bg-accent-soft text-accent-soft-text';
   if (mustWait.value) return 'cursor-not-allowed border-line bg-surface text-muted';
-  return 'border-line bg-surface';
+  if (phase.value === 'failed')
+    return 'cursor-pointer border-line bg-surface text-negative hover:bg-surface-hover';
+  return HEADER_BUTTON_IDLE_CLASS;
+});
+/** The pill shows only "PDF", so its name and tooltip say what it does in the current phase. */
+const name = computed(() => {
+  if (busy.value) return translate('problem.pdfPreparing');
+  if (mustWait.value) return translate('problem.pdfRetryIn', { seconds: secondsToRetry.value });
+  if (phase.value === 'failed') return translate('problem.pdfRetry');
+  return translate('problem.pdfRender');
 });
 
 const onClick = () => {
@@ -76,44 +87,43 @@ watch(
 </script>
 
 <template>
-  <div ref="root" class="flex w-full flex-col gap-2">
+  <div ref="root" class="relative">
     <a
       v-if="phase === 'ready'"
       ref="link"
       :href="href"
       target="_blank"
       rel="noopener"
-      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill bg-gradient-accent px-4 text-sm font-semibold text-on-accent"
+      :title="$t('problem.pdfOpen')"
+      :aria-label="$t('problem.pdfOpen')"
+      :class="PDF_PILL_CLASS"
+      class="border-transparent bg-gradient-accent text-on-accent"
     >
-      <ExternalLink class="size-4" aria-hidden="true" />
-      {{ $t('problem.pdfOpen') }}
+      <ExternalLink class="size-4" aria-hidden="true" />PDF
     </a>
     <button
       v-else
       ref="button"
       type="button"
       data-testid="pdf-button"
+      :title="name"
+      :aria-label="name"
       :aria-busy="busy ? 'true' : undefined"
       :aria-disabled="unavailable"
-      :class="buttonClass"
-      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border px-4 text-sm font-semibold"
+      :class="[PDF_PILL_CLASS, buttonClass]"
       @click="onClick"
     >
       <span v-if="busy" class="pdf-ring" aria-hidden="true" />
-      <FileText v-else class="size-4" aria-hidden="true" />
-      {{
-        busy
-          ? $t('problem.pdfPreparing')
-          : mustWait
-            ? $t('problem.pdfRetryIn', { seconds: secondsToRetry })
-            : phase === 'failed'
-              ? $t('problem.pdfRetry')
-              : $t('problem.pdfRender')
+      <FileText v-else class="size-4" aria-hidden="true" />{{
+        mustWait ? `${secondsToRetry}s` : 'PDF'
       }}
     </button>
-    <span v-if="phase === 'failed'" class="text-center text-sm text-negative" aria-hidden="true">{{
-      $t(failureKey)
-    }}</span>
+    <span
+      v-if="phase === 'failed'"
+      class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm text-negative"
+      aria-hidden="true"
+      >{{ $t(failureKey) }}</span
+    >
     <span class="sr-only" role="status">{{
       phase === 'ready' ? $t('problem.pdfReady') : phase === 'failed' ? $t(failureKey) : ''
     }}</span>

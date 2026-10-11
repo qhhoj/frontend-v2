@@ -35,7 +35,8 @@ afterEach(() => {
 describe('PdfButton', () => {
   it('shows a plain PDF button and an empty status region before any click', () => {
     const wrapper = open();
-    expect(wrapper.get('button').text()).toBe('Tải đề dạng PDF');
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Tải đề dạng PDF');
+    expect(wrapper.get('button').text()).toBe('PDF');
     expect(wrapper.get('[role="status"]').text()).toBe('');
   });
   it('starts no countdown timer until the server asks the viewer to wait', () => {
@@ -48,7 +49,7 @@ describe('PdfButton', () => {
     await wrapper.get('button').trigger('click');
     await flushPromises();
     const busy = wrapper.get('button[aria-busy="true"]');
-    expect(busy.text()).toContain('Đang chuẩn bị PDF');
+    expect(busy.attributes('aria-label')).toBe('Đang chuẩn bị PDF…');
     expect(busy.text()).not.toMatch(/%/);
     expect(busy.attributes('aria-disabled')).toBe('true');
     expect(wrapper.find('a').exists()).toBe(false);
@@ -108,7 +109,7 @@ describe('PdfButton', () => {
     expect(wrapper.text()).toContain('Không thể chuẩn bị PDF');
     expect(wrapper.get('[role="status"]').text()).toBe('Không thể chuẩn bị PDF');
     await vi.advanceTimersByTimeAsync(3000);
-    expect(wrapper.get('button').text()).toBe('Thử lại');
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Thử lại');
     await wrapper.get('button').trigger('click');
     await flushPromises();
     expect(wrapper.find('button[aria-busy="true"]').exists()).toBe(true);
@@ -158,7 +159,7 @@ describe('PdfButton', () => {
     await vi.advanceTimersByTimeAsync(30_000);
     expect(retry().attributes('aria-disabled')).toBe('false');
     expect(retry().classes()).not.toContain('cursor-not-allowed');
-    expect(retry().text()).toBe('Thử lại');
+    expect(retry().attributes('aria-label')).toBe('Thử lại');
     expect(vi.getTimerCount()).toBe(0);
   });
   it('aborts the probe in flight when the language changes', async () => {

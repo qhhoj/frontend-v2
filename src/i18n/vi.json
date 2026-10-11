@@ -998,6 +998,7 @@
       },
       "links": {
         "label": "Liên kết của bài",
+        "title": "Liên kết",
         "submissions": "Tất cả bài nộp",
         "best": "Bài nộp tốt nhất",
         "pdfStatement": "Đề bài PDF",
