@@ -8,6 +8,7 @@ import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { inboxSample, NOTIFICATION_NOW, notificationItem } from '@/test/notification-fixtures';
+import { postEditorRoutes } from '@/test/community-routes';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import { notificationsKey } from './notifications.queries';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -15,6 +16,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 const START = '/blog/new';
 const routesWith = (extra: Record<string, MockHandler> = {}) => ({
   ...signedInViewer(),
+  ...postEditorRoutes,
   'GET /notifications/unread-count': ok({ count: 3 }),
   'GET /notifications': page(inboxSample(), { pageSize: 20 }),
   ...extra,

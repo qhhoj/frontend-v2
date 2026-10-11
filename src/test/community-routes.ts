@@ -81,3 +81,11 @@ export const commentPageRoute = (
     }),
   ),
 });
+/** The post editor (`/blog/new`) of a viewer who may write a personal post and no organization post. */
+export const postEditorRoutes: Routes = {
+  'GET /posts/compose-options': ok({
+    canWritePersonal: true,
+    minSolvedProblems: 10,
+    organizations: [],
+  }),
+};
