@@ -241,13 +241,31 @@
       },
       "AdminCapabilitiesResponse": {
         "properties": {
+          "contestCreation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreationScopeResponse"
+              }
+            ],
+            "description": "Where the user may create contests."
+          },
           "organizations": {
             "description": "Whether the user may administer at least one organization: an admin of one, or a holder of `judge.edit_all_organization`.",
             "type": "boolean"
+          },
+          "problemCreation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreationScopeResponse"
+              }
+            ],
+            "description": "Where the user may create problems."
           }
         },
         "required": [
-          "organizations"
+          "organizations",
+          "problemCreation",
+          "contestCreation"
         ],
         "type": "object"
       },
@@ -4708,6 +4726,23 @@
         ],
         "type": "object"
       },
+      "CreationScopeResponse": {
+        "properties": {
+          "organizations": {
+            "description": "For at least one organization they administer: `judge.create_organization_problem` or `judge.create_private_contest` (`GET /organizations?administered=true` lists them).",
+            "type": "boolean"
+          },
+          "site": {
+            "description": "Site-wide: `judge.add_problem` for problems, `judge.add_contest` for contests.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "site",
+          "organizations"
+        ],
+        "type": "object"
+      },
       "CreditActorResponse": {
         "properties": {
           "id": {
@@ -7483,6 +7518,10 @@
             "description": "Combined performance points of the members.",
             "type": "number"
           },
+          "problemCodePrefix": {
+            "description": "What the code of a problem created for the organization must start with (`thpt-demo` → `thptdemo_`).",
+            "type": "string"
+          },
           "shortName": {
             "description": "Short name shown beside members, at most 20 characters.",
             "type": "string"
@@ -7517,6 +7556,7 @@
           "memberCount",
           "performancePoints",
           "slots",
+          "problemCodePrefix",
           "aboutHtml",
           "about",
           "logoOverrideImage",
@@ -7550,6 +7590,10 @@
             "description": "Combined performance points of the members.",
             "type": "number"
           },
+          "problemCodePrefix": {
+            "description": "What the code of a problem created for the organization must start with (`thpt-demo` → `thptdemo_`).",
+            "type": "string"
+          },
           "shortName": {
             "description": "Short name shown beside members, at most 20 characters.",
             "type": "string"
@@ -7573,7 +7617,8 @@
           "isUnlisted",
           "memberCount",
           "performancePoints",
-          "slots"
+          "slots",
+          "problemCodePrefix"
         ],
         "type": "object"
       },
@@ -7877,6 +7922,14 @@
             "description": "The viewer is an admin or holds judge.edit_all_organization.",
             "type": "boolean"
           },
+          "canCreateContest": {
+            "description": "The viewer may create contests for the organization (`POST /organizations/{slug}/contests`): an administrator holding `judge.create_private_contest`.",
+            "type": "boolean"
+          },
+          "canCreateProblem": {
+            "description": "The viewer may create problems for the organization (`POST /organizations/{slug}/problems`): an administrator holding `judge.create_organization_problem`.",
+            "type": "boolean"
+          },
           "isMember": {
             "description": "The viewer belongs to the organization.",
             "type": "boolean"
@@ -7890,6 +7943,8 @@
         "required": [
           "isMember",
           "canAdminister",
+          "canCreateProblem",
+          "canCreateContest",
           "pendingRequestId"
         ],
         "type": "object"
@@ -9065,12 +9120,17 @@
             "description": "Problem-wide checker.",
             "enum": [
               "bridged",
+              "easy",
               "floats",
               "floatsabs",
               "floatsrel",
               "identical",
               "linecount",
-              "standard"
+              "linematches",
+              "rstripped",
+              "sorted",
+              "standard",
+              "unordered"
             ],
             "type": "string"
           },
@@ -9467,6 +9527,10 @@
             "description": "The base (default-language) name, whatever `lang` the detail was read in; the detail's own `name` follows `lang`.",
             "type": "string"
           },
+          "canPublishToMembers": {
+            "description": "The viewer may set `isPublic` without `judge.change_public_visibility`: the problem is organization-private and they may create problems for every one of its organizations (it then only reaches members).",
+            "type": "boolean"
+          },
           "curators": {
             "description": "Users who can edit the problem.",
             "items": {
@@ -9554,7 +9618,8 @@
           "licenseId",
           "allowedLanguageIds",
           "organizations",
-          "ogImage"
+          "ogImage",
+          "canPublishToMembers"
         ],
         "type": "object"
       },
@@ -9905,10 +9970,6 @@
             "description": "Rendered, sanitised HTML of `about`.",
             "type": "string"
           },
-          "aceTheme": {
-            "description": "Code editor theme.",
-            "type": "string"
-          },
           "appearance": {
             "allOf": [
               {
@@ -9919,18 +9980,6 @@
             "nullable": true,
             "type": "object"
           },
-          "badges": {
-            "description": "Ids of the badges the user owns.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "displayBadgeId": {
-            "description": "Id of the displayed badge; null for none.",
-            "nullable": true,
-            "type": "string"
-          },
           "firstName": {
             "description": "Display first name.",
             "type": "string"
@@ -9938,10 +9987,6 @@
           "languageId": {
             "description": "Default programming language id; null when none.",
             "nullable": true,
-            "type": "string"
-          },
-          "mathEngine": {
-            "description": "How math is rendered.",
             "type": "string"
           },
           "organizations": {
@@ -9958,10 +10003,6 @@
           "timezone": {
             "description": "IANA time zone name used to show dates.",
             "type": "string"
-          },
-          "userScript": {
-            "description": "Custom JavaScript run on the site for this user.",
-            "type": "string"
           }
         },
         "required": [
@@ -9970,13 +10011,8 @@
           "firstName",
           "timezone",
           "languageId",
-          "aceTheme",
           "siteTheme",
           "appearance",
-          "mathEngine",
-          "userScript",
-          "badges",
-          "displayBadgeId",
           "organizations"
         ],
         "type": "object"
@@ -10255,22 +10291,27 @@
             "type": "array"
           },
           "checker": {
-            "description": "Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical` or `linecount`.",
+            "description": "Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical`, `linecount`, `rstripped`, `sorted`, `unordered`, `easy` or `linematches`.",
             "enum": [
               "bridged",
+              "easy",
               "floats",
               "floatsabs",
               "floatsrel",
               "identical",
               "linecount",
-              "standard"
+              "linematches",
+              "rstripped",
+              "sorted",
+              "standard",
+              "unordered"
             ],
             "type": "string"
           },
           "checkerArgs": {
             "additionalProperties": true,
             "default": null,
-            "description": "Arguments of the checker; null for none.",
+            "description": "Arguments of the checker; null for none. floats*: `precision` (0-20), `error_mode`; identical: `pe_allowed`; rstripped: `filter_new_line`; sorted: `split_on` (`lines`/`whitespace`); linematches: `point_distribution`, `filler_lines_required`; bridged: `type` (`testlib`, `themis`, `default`), `treat_checker_points_as_percentage` (testlib). Others take none; anything else is 400.",
             "nullable": true,
             "type": "object"
           },
@@ -10287,7 +10328,7 @@
           "graderArgs": {
             "additionalProperties": true,
             "default": null,
-            "description": "Arguments of the grader; null for none.",
+            "description": "Arguments of the grader; null for none. standard: `io_method` (`standard`/`file`), `io_input_file`, `io_output_file`; signature: `allow_main`. Others take none; anything else is 400.",
             "nullable": true,
             "type": "object"
           },
@@ -12915,6 +12956,16 @@
             ],
             "description": "Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end."
           },
+          "testSummary": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionTestSummaryResponse"
+              }
+            ],
+            "description": "The first test results, only on the submission lists and only when the viewer could see them on the submission page (signed in; another user's contest submission only for the problem's editors and `judge.view_all_submission`); null otherwise.",
+            "nullable": true,
+            "type": "object"
+          },
           "time": {
             "description": "Seconds (largest case).",
             "nullable": true,
@@ -12957,6 +13008,7 @@
           "caseTotal",
           "time",
           "memory",
+          "testSummary",
           "error",
           "currentTestcase",
           "isPretested",
@@ -13181,6 +13233,16 @@
             ],
             "description": "Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end."
           },
+          "testSummary": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionTestSummaryResponse"
+              }
+            ],
+            "description": "The first test results, only on the submission lists and only when the viewer could see them on the submission page (signed in; another user's contest submission only for the problem's editors and `judge.view_all_submission`); null otherwise.",
+            "nullable": true,
+            "type": "object"
+          },
           "time": {
             "description": "Seconds (largest case).",
             "nullable": true,
@@ -13209,7 +13271,8 @@
           "casePoints",
           "caseTotal",
           "time",
-          "memory"
+          "memory",
+          "testSummary"
         ],
         "type": "object"
       },
@@ -13497,6 +13560,60 @@
           "QU"
         ],
         "type": "string"
+      },
+      "SubmissionTestSummaryResponse": {
+        "properties": {
+          "batches": {
+            "description": "Batch number of each entry, from 1; null for a case outside any batch. Same length as `statuses`.",
+            "items": {
+              "nullable": true,
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "more": {
+            "description": "Judged cases past the first 100, not in `statuses`.",
+            "type": "number"
+          },
+          "statuses": {
+            "description": "Verdict of each entry, at most 100: `AC`, `WA`, `TLE`, `MLE`, `OLE`, `IR`, `RTE` or `SC`. For `batch`, the first non-accepted case of each batch among the first 100 cases.",
+            "items": {
+              "enum": [
+                "AC",
+                "IR",
+                "MLE",
+                "OLE",
+                "RTE",
+                "SC",
+                "TLE",
+                "WA"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "total": {
+            "description": "The problem's test case count for `case` (the rest are not judged yet); null for `batch`.",
+            "nullable": true,
+            "type": "number"
+          },
+          "unit": {
+            "description": "`case`: one entry per test case in judging order; `batch`: one entry per batch (the problem shows only batch results).",
+            "enum": [
+              "batch",
+              "case"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "unit",
+          "statuses",
+          "batches",
+          "more",
+          "total"
+        ],
+        "type": "object"
       },
       "SubmissionViewerResponse": {
         "properties": {
@@ -13996,12 +14113,17 @@
             "description": "Never `bridged`: a custom checker is problem-wide only.",
             "enum": [
               "",
+              "easy",
               "floats",
               "floatsabs",
               "floatsrel",
               "identical",
               "linecount",
-              "standard"
+              "linematches",
+              "rstripped",
+              "sorted",
+              "standard",
+              "unordered"
             ],
             "type": "string"
           },
@@ -14072,12 +14194,17 @@
             "description": "Per-case checker override; empty for the problem-wide checker.",
             "enum": [
               "",
+              "easy",
               "floats",
               "floatsabs",
               "floatsrel",
               "identical",
               "linecount",
-              "standard"
+              "linematches",
+              "rstripped",
+              "sorted",
+              "standard",
+              "unordered"
             ],
             "type": "string"
           },
@@ -15521,45 +15648,6 @@
             "maxLength": 65536,
             "type": "string"
           },
-          "aceTheme": {
-            "description": "Code editor theme.",
-            "enum": [
-              "ambiance",
-              "auto",
-              "chaos",
-              "chrome",
-              "clouds",
-              "clouds_midnight",
-              "cobalt",
-              "crimson_editor",
-              "dawn",
-              "dreamweaver",
-              "eclipse",
-              "github",
-              "idle_fingers",
-              "katzenmilch",
-              "kr_theme",
-              "kuroir",
-              "merbivore",
-              "merbivore_soft",
-              "mono_industrial",
-              "monokai",
-              "pastel_on_dark",
-              "solarized_dark",
-              "solarized_light",
-              "terminal",
-              "textmate",
-              "tomorrow",
-              "tomorrow_night",
-              "tomorrow_night_blue",
-              "tomorrow_night_bright",
-              "tomorrow_night_eighties",
-              "twilight",
-              "vibrant_ink",
-              "xcode"
-            ],
-            "type": "string"
-          },
           "appearance": {
             "allOf": [
               {
@@ -15570,12 +15658,6 @@
             "nullable": true,
             "type": "object"
           },
-          "displayBadgeId": {
-            "description": "Id of one of the user's badges to display; `null` shows none.",
-            "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
           "firstName": {
             "description": "Display first name, up to 30 characters.",
             "maxLength": 30,
@@ -15584,17 +15666,6 @@
           "languageId": {
             "description": "Id of the default programming language.",
             "format": "uuid",
-            "type": "string"
-          },
-          "mathEngine": {
-            "description": "How math is rendered.",
-            "enum": [
-              "auto",
-              "jax",
-              "mml",
-              "svg",
-              "tex"
-            ],
             "type": "string"
           },
           "organizations": {
@@ -15613,11 +15684,6 @@
           },
           "timezone": {
             "description": "IANA time zone name used to show dates, for example `Asia/Ho_Chi_Minh`.",
-            "type": "string"
-          },
-          "userScript": {
-            "description": "Custom JavaScript run on the site for this user, up to 65536 characters.",
-            "maxLength": 65536,
             "type": "string"
           }
         },
@@ -29760,6 +29826,76 @@
         ]
       }
     },
+    "/api/internal/organizations/{slug}/contests": {
+      "post": {
+        "description": "Organization administrators (or `judge.edit_all_organization` holders)\nwho hold `judge.create_private_contest`; no `judge.add_contest` needed.\nThe contest is private to this organization: `organizations` and\n`isOrganizationPrivate` in the body are ignored and set by the server.\nEvery other rule of `POST /contests` applies: the creator becomes an\nauthor, gated fields stay gated, and the organization's quota is charged.\n404 for an unknown organization, 403 `forbidden` without the rights.",
+        "operationId": "OrganizationContestCreationController_create",
+        "parameters": [
+          {
+            "description": "Slug of the organization.",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ContestDetailResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a contest for an organization",
+        "tags": [
+          "Contest editing"
+        ]
+      }
+    },
     "/api/internal/organizations/{slug}/join": {
       "post": {
         "description": "Adds the signed-in user to an organization that is open. A user may be in\nat most three open organizations (private ones do not count). Returns 204.\nRefusals are 409 `conflict` for a private organization (send a join\nrequest instead), an organization already joined, or the open-organization\ncap; 409 `organization_full` when the organization has no free slot; and\n403 `locked_in_official_contest` while an official contest locks it.",
@@ -30514,6 +30650,74 @@
           "Organizations"
         ],
         "x-enveloped": true
+      },
+      "post": {
+        "description": "Organization administrators (or `judge.edit_all_organization` holders)\nwho hold `judge.create_organization_problem`; no `judge.add_problem`\nneeded. The problem is private to this organization: `organizations` and\n`isOrganizationPrivate` in the body are ignored and set by the server, and\n`isPublic` (members only) needs no extra permission. The code must start\nwith the organization prefix — the slug's lowercase letters and digits\nfollowed by `_` — else 400 `organization_code_prefix` (superusers are\nexempt). Every other rule of `POST /problems` applies: the creator becomes\na curator, staff fields stay gated, and the organization's quota is\ncharged. 404 for an unknown organization, 403 `forbidden` without the\nrights.",
+        "operationId": "OrganizationProblemCreationController_create",
+        "parameters": [
+          {
+            "description": "Slug of the organization.",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProblemDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProblemDetailResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a problem for an organization",
+        "tags": [
+          "Problem editing"
+        ]
       }
     },
     "/api/internal/organizations/{slug}/problems/bulk": {
@@ -36031,7 +36235,7 @@
     },
     "/api/internal/profile": {
       "get": {
-        "description": "Signed-in callers only. Returns the editable profile of the caller: about text (source and rendered HTML), display name, time zone, default programming language, editor and site themes, appearance, math engine, user script, owned badges with the displayed one, and the organizations the caller belongs to in display order.",
+        "description": "Signed-in callers only. Returns the editable profile of the caller: about text (source and rendered HTML), display name, time zone, default programming language, site theme, appearance, and the organizations the caller belongs to in display order.",
         "operationId": "ProfileController_get",
         "parameters": [],
         "responses": {
@@ -36079,7 +36283,7 @@
         ]
       },
       "patch": {
-        "description": "Signed-in callers only. Partial update: send only the fields to change and read the full profile back. `null` is accepted only for `displayBadgeId` (no badge) and `appearance` (the site look); `appearance` replaces the stored look as a whole.\n`organizations` may only reorder or shorten the current memberships (join from the organization page). Errors: 400 `unknown_language`, 400 `not_your_badge`, 400 `organizations_not_editable`; 403 `forbidden` when editing `about` or `firstName` during the official contest (superusers excepted) or when editing `about` while muted or before solving 5 problems (staff excepted); 409 `conflict` when leaving an organization the caller administers or when memberships changed meanwhile. The badge and organization order are also frozen in official contest mode.",
+        "description": "Signed-in callers only. Partial update: send only the fields to change and read the full profile back. `null` is accepted only for `appearance` (the site look); `appearance` replaces the stored look as a whole.\n`organizations` may only reorder or shorten the current memberships (join from the organization page). Errors: 400 `unknown_language`, 400 `organizations_not_editable`; 403 `forbidden` when editing `about` or `firstName` during the official contest (superusers excepted) or when editing `about` while muted or before solving 5 problems (staff excepted); 409 `conflict` when leaving an organization the caller administers or when memberships changed meanwhile. The organization order is also frozen in official contest mode.",
         "operationId": "ProfileController_update",
         "parameters": [],
         "requestBody": {
@@ -37169,7 +37373,7 @@
     },
     "/api/internal/site": {
       "get": {
-        "description": "Public. Returns what the web app needs on every load: the navigation bar entries (hidden ones included, flagged), the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.",
+        "description": "Public. Returns what the web app needs on every load: the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.",
         "operationId": "SiteController_site",
         "parameters": [],
         "responses": {
@@ -40495,7 +40699,7 @@
       "name": "Admin: users"
     },
     {
-      "description": "Staff tools for site settings, navigation, public config and static pages.",
+      "description": "Staff tools for site settings, public config and static pages.",
       "name": "Admin: site & settings"
     },
     {

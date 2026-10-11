@@ -63,6 +63,7 @@ export const problemEditor = (): ProblemEditor => ({
   allowedLanguageIds: [LANG_CPP20, LANG_PY3],
   organizations: [],
   ogImage: '',
+  canPublishToMembers: false,
 });
 
 export const editableProblem = (overrides: Partial<EditableProblem> = {}): EditableProblem => ({

@@ -104,7 +104,9 @@ describe('navigation guards', () => {
     const author = signedIn({ user: sessionUser({ permissions: ['judge.edit_own_problem'] }) });
     expect((await navigate('/admin/problems', author)).route.name).toBe('admin-problems');
     const organizationAdmin = signedIn({
-      user: sessionUser({ adminCapabilities: { organizations: true } }),
+      user: sessionUser({
+        adminCapabilities: { ...sessionUser().adminCapabilities, organizations: true },
+      }),
     });
     expect((await navigate('/admin/organizations', organizationAdmin)).route.name).toBe(
       'admin-organizations',
