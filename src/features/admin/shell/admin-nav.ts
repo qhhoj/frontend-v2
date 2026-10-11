@@ -1,4 +1,5 @@
 import type { Component } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import {
   Activity,
   Braces,
@@ -41,7 +42,7 @@ export interface AdminNavItem extends AdminAccess {
   path: string;
 }
 export interface AdminNavGroup {
-  id: 'content' | 'contests' | 'users' | 'site' | 'judging';
+  id: 'problems' | 'contests' | 'judging' | 'community' | 'users' | 'site';
   labelKey: string;
   items: AdminNavItem[];
 }
@@ -66,40 +67,42 @@ const group = (id: AdminNavGroup['id'], items: AdminNavItem[]): AdminNavGroup =>
 });
 
 export const ADMIN_NAV: AdminNavGroup[] = [
-  group('content', [
+  group('problems', [
     screenItem('problems', FileText),
     screenItem('polygonImport', CloudDownload),
     screenItem('problemImport', Download),
     screenItem('types', Tags),
-    screenItem('posts', Newspaper),
-    screenItem('commentReports', Flag),
-    screenItem('comments', MessagesSquare),
   ]),
   group('contests', [
     screenItem('contests', Trophy),
     screenItem('contestTags', Tags),
     screenItem('similarity', GitCompare),
   ]),
+  group('judging', [
+    screenItem('submissions', ListChecks),
+    screenItem('rejudge', RotateCcw),
+    screenItem('judges', Server),
+    screenItem('languages', Code),
+  ]),
+  group('community', [
+    screenItem('posts', Newspaper),
+    screenItem('commentReports', Flag),
+    screenItem('comments', MessagesSquare),
+    screenItem('tickets', LifeBuoy),
+  ]),
   group('users', [
     screenItem('users', Users),
     screenItem('organizations', Building2),
     screenItem('organizationQuotas', Gauge),
-    screenItem('tickets', LifeBuoy),
     screenItem('activity', Activity),
   ]),
   group('site', [
     screenItem('settings', Settings),
     screenItem('config', Braces),
     screenItem('pages', Files),
-    screenItem('log', History),
     screenItem('shortLinks', Link),
     screenItem('integrations', Plug),
-  ]),
-  group('judging', [
-    screenItem('judges', Server),
-    screenItem('languages', Code),
-    screenItem('rejudge', RotateCcw),
-    screenItem('submissions', ListChecks),
+    screenItem('log', History),
   ]),
 ];
 
@@ -126,6 +129,35 @@ export function isCurrentNav(
 ): boolean {
   if (!isWithin(itemPath, routePath)) return false;
   return !navPaths.some((path) => path.length > itemPath.length && isWithin(path, routePath));
+}
+
+/** The nav group and item that hold a route path; `null` outside the nav (the dashboard). */
+export function navPlaceOf(routePath: string): { group: AdminNavGroup; item: AdminNavItem } | null {
+  for (const navGroup of ADMIN_NAV) {
+    const item = navGroup.items.find((entry) => isCurrentNav(entry.path, routePath));
+    if (item) return { group: navGroup, item };
+  }
+  return null;
+}
+
+export interface AdminCrumb {
+  label: string;
+  to?: RouteLocationRaw;
+  /** A code or key, set in monospace. */
+  mono?: boolean;
+}
+
+/**
+ * Every admin header's leading crumbs, taken from the nav so they always match it: the group, then the screen as a link
+ * when the page sits below it (an editor, a create form). A group named like its screen ("Contests / Contests") shows once.
+ */
+export function navCrumbsOf(routePath: string, translate: (key: string) => string): AdminCrumb[] {
+  const place = navPlaceOf(routePath);
+  if (!place) return [];
+  const groupCrumb: AdminCrumb = { label: translate(place.group.labelKey) };
+  if (routePath === place.item.path) return [groupCrumb];
+  const screenCrumb = { label: translate(place.item.labelKey), to: { name: place.item.routeName } };
+  return groupCrumb.label === screenCrumb.label ? [screenCrumb] : [groupCrumb, screenCrumb];
 }
 
 /** The first permission of a rule that this viewer holds: a card names what the viewer can use, never a permission they lack. */

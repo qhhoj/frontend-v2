@@ -62,10 +62,6 @@ const HEAD = 'whitespace-nowrap py-2 pr-3 align-middle';
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.shell.groups.content') },
-        { label: $t('admin.shell.screens.problems'), to: { name: 'admin-problems' } },
-      ]"
       :title="$t('admin.shell.screens.problemsDeleted')"
       :lead="$t('admin.lifecycle.deletedLead')"
     />

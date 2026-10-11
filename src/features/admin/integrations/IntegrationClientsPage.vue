@@ -66,10 +66,6 @@ const tableRegion = () => document.getElementById('integration-table');
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.shell.groups.site') },
-        { label: $t('admin.integrations.title') },
-      ]"
       :title="$t('admin.shell.screens.integrations')"
       :lead="$t('admin.integrations.lead')"
     >

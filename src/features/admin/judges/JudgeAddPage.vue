@@ -65,14 +65,7 @@ function leaveAfterKey() {
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.judges.crumbs.group') },
-        { label: $t('admin.judges.crumbs.judges'), to: { name: 'admin-judges' } },
-        { label: $t('admin.judges.crumbs.add') },
-      ]"
-      :title="$t('admin.judges.add.title')"
-    />
+    <AdminPageHeader :title="$t('admin.judges.add.title')" />
     <form class="glass flex max-w-2xl flex-col gap-5 rounded-panel p-5" @submit.prevent="submit">
       <AdminField
         v-slot="{ id, describedBy, invalid }"

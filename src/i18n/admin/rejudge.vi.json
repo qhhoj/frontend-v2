@@ -1,7 +1,4 @@
 {
-  "crumbs": {
-    "judging": "Chấm bài"
-  },
   "lead": "Chấm lại hoặc tính lại điểm nhiều bài nộp theo bộ lọc: một bài, một kỳ thi, một người dùng, một máy chấm hay cả trang.",
   "filter": {
     "title": "Bộ lọc bài nộp",

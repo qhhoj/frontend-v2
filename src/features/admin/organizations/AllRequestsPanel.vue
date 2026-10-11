@@ -17,6 +17,8 @@ import { searchQueryOf } from '../search/index-search';
 import IndexSearchBox from '../search/IndexSearchBox.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import {
   decisionFailureText,
@@ -76,6 +78,13 @@ const stateLink = (next: JoinRequestState) => ({
     ...(search.value ? { q: search.value } : {}),
   },
 });
+const stateTabs = computed<AdminFilterTab[]>(() =>
+  STATE_TABS.map((tab) => ({
+    key: tab,
+    label: t(`admin.organizations.queue.states.${tab}`),
+    to: stateLink(tab),
+  })),
+);
 </script>
 
 <template>
@@ -88,17 +97,11 @@ const stateLink = (next: JoinRequestState) => ({
         judge.edit_all_organization
       </span>
     </header>
-    <nav :aria-label="$t('admin.organizations.queue.states.label')" class="flex flex-wrap gap-2">
-      <RouterLink
-        v-for="tab in STATE_TABS"
-        :key="tab"
-        :to="stateLink(tab)"
-        :class="ADMIN_BUTTON_CLASS"
-        :aria-current="state === tab ? 'page' : undefined"
-      >
-        {{ $t(`admin.organizations.queue.states.${tab}`) }}
-      </RouterLink>
-    </nav>
+    <AdminFilterTabs
+      :tabs="stateTabs"
+      :current="state"
+      :label="$t('admin.organizations.queue.states.label')"
+    />
     <IndexSearchBox
       :value="search"
       :label="$t('admin.organizations.queue.search.label')"

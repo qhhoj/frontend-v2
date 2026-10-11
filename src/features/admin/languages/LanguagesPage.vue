@@ -38,14 +38,7 @@ const percentOf = (count: number) =>
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.languages.crumbs.group') },
-        { label: $t('admin.languages.crumbs.languages') },
-      ]"
-      :title="$t('admin.languages.title')"
-      :lead="$t('admin.languages.lead')"
-    >
+    <AdminPageHeader :title="$t('admin.languages.title')" :lead="$t('admin.languages.lead')">
       <template #actions>
         <RouterLink v-if="canAdd" :to="{ name: 'admin-languageNew' }" :class="ADMIN_PRIMARY_CLASS">
           {{ $t('admin.languages.actions.add') }}

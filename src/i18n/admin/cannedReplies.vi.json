@@ -1,11 +1,15 @@
 {
   "title": "Mẫu trả lời phiếu",
   "lead": "Câu trả lời soạn sẵn cho người xử lý phiếu. Khi chèn, {'{'}tên{'}'} thành tên người tạo phiếu và {'{'}bài{'}'} thành tên bài.",
-  "crumbs": "Phiếu hỗ trợ",
   "add": "Thêm mẫu",
   "count": "{count} / {max} mẫu",
   "caption": "Danh sách mẫu trả lời",
-  "columns": { "order": "Thứ tự", "title": "Tiêu đề", "body": "Nội dung", "actions": "Thao tác" },
+  "columns": {
+    "order": "Thứ tự",
+    "title": "Tiêu đề",
+    "body": "Nội dung",
+    "actions": "Thao tác"
+  },
   "edit": "Sửa",
   "editNamed": "Sửa mẫu {title}",
   "delete": "Xóa",

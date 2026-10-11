@@ -39,11 +39,7 @@ const viewScope = (next: SimilarityScope) =>
 </script>
 
 <template>
-  <AdminPageHeader
-    :crumbs="[{ label: $t('admin.similarity.title') }]"
-    :title="$t('admin.similarity.title')"
-    :lead="$t('admin.similarity.lead')"
-  />
+  <AdminPageHeader :title="$t('admin.similarity.title')" :lead="$t('admin.similarity.lead')" />
   <SimilarityScopeForm :scope="scope" :is-pending="isPending" @view="viewScope" @start="startRun" />
   <SimilarityNotFoundCard v-if="scope && isMissing" />
   <template v-else-if="scope">

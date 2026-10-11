@@ -36,14 +36,7 @@ const { isLive, announcement } = useTicketStream(null);
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.shell.screens.users'), to: { name: 'admin-users' } },
-        { label: $t('admin.shell.screens.tickets') },
-      ]"
-      :title="$t('admin.tickets.title')"
-      :lead="$t('admin.tickets.lead')"
-    >
+    <AdminPageHeader :title="$t('admin.tickets.title')" :lead="$t('admin.tickets.lead')">
       <template #actions>
         <RouterLink :to="{ name: adminRouteName('cannedReplies') }" :class="ADMIN_BUTTON_CLASS">
           {{ $t('admin.cannedReplies.openFromQueue') }}

@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { allowsAny } from '@/lib/permissions';
 import { routes } from '@/router/routes';
-import { ADMIN_NAV, heldPermission, isCurrentNav, visibleDashboard, visibleNav } from './admin-nav';
+import {
+  ADMIN_NAV,
+  heldPermission,
+  isCurrentNav,
+  navCrumbsOf,
+  visibleDashboard,
+  visibleNav,
+} from './admin-nav';
 
 const staff = (permissions: string[], isSuperuser = false) => ({ isSuperuser, permissions });
 const idsOf = (groups: ReturnType<typeof visibleNav>) =>
@@ -87,5 +94,32 @@ describe('admin nav current section and dashboard', () => {
     ).toBe('judge.edit_own_contest');
     expect(heldPermission(['judge.add_contest', 'judge.edit_own_contest'], staff([]))).toBeNull();
     expect(heldPermission(null, staff([], true))).toBeNull();
+  });
+});
+
+describe('admin header crumbs', () => {
+  const LABELS: Record<string, string> = {
+    'admin.shell.groups.judging': 'Judging',
+    'admin.shell.groups.contests': 'Contests',
+    'admin.shell.groups.users': 'Users',
+    'admin.shell.screens.judges': 'Judges',
+    'admin.shell.screens.contests': 'Contests',
+  };
+  const translate = (key: string) => LABELS[key] ?? key;
+
+  it('names the nav group on a screen of its own, and links the screen from a page below it', () => {
+    expect(navCrumbsOf('/admin/judges', translate)).toEqual([{ label: 'Judging' }]);
+    expect(navCrumbsOf('/admin/judges/new', translate)).toEqual([
+      { label: 'Judging' },
+      { label: 'Judges', to: { name: 'admin-judges' } },
+    ]);
+  });
+
+  it('shows a group named like its screen once, keeps nested nav items their own, and has none on the dashboard', () => {
+    expect(navCrumbsOf('/admin/contests/r41/general', translate)).toEqual([
+      { label: 'Contests', to: { name: 'admin-contests' } },
+    ]);
+    expect(navCrumbsOf('/admin/organizations/quotas', translate)).toEqual([{ label: 'Users' }]);
+    expect(navCrumbsOf('/admin', translate)).toEqual([]);
   });
 });

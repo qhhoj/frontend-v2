@@ -67,14 +67,8 @@ function onDeleted(key: string) {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.site.config.crumbs') },
-        { label: $t('admin.site.config.title') },
-      ]"
-      :title="$t('admin.site.config.title')"
-    >
+  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.site.config.title')">
       <template #actions>
         <button ref="addButton" type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey">
           {{ $t('admin.site.config.add') }}

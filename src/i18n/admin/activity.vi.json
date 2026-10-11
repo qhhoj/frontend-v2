@@ -1,10 +1,6 @@
 {
   "title": "Hoạt động người dùng",
   "lead": "Nhật ký yêu cầu, người đang truy cập và tóm tắt theo người dùng.",
-  "crumbs": {
-    "users": "Người dùng",
-    "activity": "Hoạt động"
-  },
   "note": "Xoá nhật ký là thao tác không hoàn tác — “Xoá nhật ký của …” xoá mọi dòng và phiên của người này; “Xoá nhật ký khách” xoá toàn bộ dòng của khách. Nhật ký giữ tối đa 90 ngày; xuất CSV tối đa 100 000 dòng, mới nhất trước.",
   "anonymousDelete": "Xoá nhật ký khách",
   "filters": {

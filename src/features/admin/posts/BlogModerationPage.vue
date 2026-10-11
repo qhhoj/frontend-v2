@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import type { RouteLocationRaw } from 'vue-router';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { PostListItem } from '@/api/types/blog';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import { translate } from '@/i18n';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -18,7 +20,7 @@ import { usePostVisibility } from './use-post-visibility';
 import { useModerationPostsQuery } from './posts.queries';
 import { pageFromQuery } from '@/lib/paging';
 import { MODERATION_FEEDS, feedFromQuery, isQueueFeed, searchFeedOf } from './moderation';
-import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
+import type { PostFlags, RowFailure } from './moderation';
 
 const route = useRoute();
 const router = useRouter();
@@ -27,10 +29,6 @@ const page = computed(() => pageFromQuery(route.query.page));
 const search = computed(() => (typeof route.query.search === 'string' ? route.query.search : ''));
 const searchText = ref(search.value);
 watch(search, (value) => (searchText.value = value));
-const TABS: { feed: ModerationFeed; to: RouteLocationRaw }[] = MODERATION_FEEDS.map((tabFeed) => ({
-  feed: tabFeed,
-  to: { name: adminRouteName('posts'), query: tabFeed === 'all' ? {} : { feed: tabFeed } },
-}));
 
 /** A search lands on a moderation queue (from a public feed: every post), first page. */
 function runSearch() {
@@ -41,8 +39,6 @@ function runSearch() {
     query: { ...(target === 'all' ? {} : { feed: target }), ...(text ? { search: text } : {}) },
   });
 }
-const TAB =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
 const feedNav = ref<HTMLElement | null>(null);
 
 /** A moderated post leaves its row (the dialog's opener); the open feed's tab is the stable place left. A refused change keeps its row and the usual return. */
@@ -55,6 +51,15 @@ const visibility = usePostVisibility();
 /** The hidden queue's total, on every tab: the same cache entry as the list when that tab is open. */
 const hiddenQuery = useModerationPostsQuery('hidden', 1);
 const hiddenTotal = computed(() => hiddenQuery.data.value?.meta.total ?? 0);
+const feedTabs = computed<AdminFilterTab[]>(() =>
+  MODERATION_FEEDS.map((tabFeed) => ({
+    key: tabFeed,
+    label: translate(`admin.posts.feeds.${tabFeed}`),
+    to: { name: adminRouteName('posts'), query: tabFeed === 'all' ? {} : { feed: tabFeed } },
+    count: tabFeed === 'hidden' ? hiddenTotal.value : 0,
+    countTestid: 'hidden-count',
+  })),
+);
 
 const hidingPost = ref<PostListItem | null>(null);
 const unhidingPost = ref<PostListItem | null>(null);
@@ -127,45 +132,15 @@ async function confirmUnhide() {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.posts.crumbs.content') },
-        { label: $t('admin.posts.crumbs.blog') },
-      ]"
-      :title="$t('admin.posts.title')"
-    >
+  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.posts.title')">
       <template #actions><AdminBit placement="composing" /></template>
     </AdminPageHeader>
 
     <div class="flex flex-col gap-2">
-      <nav ref="feedNav" :aria-label="$t('admin.posts.feeds.label')">
-        <div class="glass flex flex-wrap gap-1 rounded-pill p-1">
-          <RouterLink
-            v-for="tab in TABS"
-            :key="tab.feed"
-            v-slot="{ href, navigate }"
-            custom
-            :to="tab.to"
-          >
-            <a
-              :href="href"
-              :aria-current="feed === tab.feed ? 'page' : undefined"
-              :class="TAB"
-              @click="navigate"
-            >
-              {{ $t(`admin.posts.feeds.${tab.feed}`) }}
-              <span
-                v-if="tab.feed === 'hidden' && hiddenTotal > 0"
-                data-testid="hidden-count"
-                class="rounded-pill bg-surface-hover px-2 text-xs"
-              >
-                {{ hiddenTotal }}
-              </span>
-            </a>
-          </RouterLink>
-        </div>
-      </nav>
+      <div ref="feedNav">
+        <AdminFilterTabs :tabs="feedTabs" :current="feed" :label="$t('admin.posts.feeds.label')" />
+      </div>
       <p class="text-sm text-muted">{{ $t('admin.posts.feeds.note') }}</p>
     </div>
 

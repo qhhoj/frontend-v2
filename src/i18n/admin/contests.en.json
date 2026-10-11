@@ -19,7 +19,6 @@
   },
   "view": "View contest",
   "tabsLabel": "Parts of the contest",
-  "crumb": "Contests",
   "summaryLine": "{format} · {start} to {end} · {count} participants",
   "formats": {
     "default": "Default",

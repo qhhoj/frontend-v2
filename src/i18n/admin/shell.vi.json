@@ -7,11 +7,12 @@
   "navToggle": "Mục quản trị",
   "navNote": "Mục chỉ hiện khi tài khoản có quyền tương ứng. Người không phải nhân viên mở /admin sẽ thấy trang không tồn tại.",
   "groups": {
-    "content": "Nội dung",
+    "problems": "Bài tập",
     "contests": "Kỳ thi",
+    "judging": "Chấm bài",
+    "community": "Cộng đồng",
     "users": "Người dùng",
-    "site": "Trang web",
-    "judging": "Chấm bài"
+    "site": "Trang web"
   },
   "forbidden": {
     "title": "Bạn chưa có quyền mở mục này",
@@ -88,8 +89,8 @@
     "commentReports": "Bình luận bị báo cáo",
     "comments": "Mọi bình luận",
     "tickets": "Phiếu hỗ trợ",
-    "activity": "Nhật ký hoạt động",
-    "settings": "Cấu hình hệ thống",
+    "activity": "Hoạt động người dùng",
+    "settings": "Cài đặt trang",
     "config": "Cấu hình thô",
     "pages": "Trang tĩnh",
     "log": "Nhật ký thay đổi",

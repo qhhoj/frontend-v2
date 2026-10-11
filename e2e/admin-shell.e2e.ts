@@ -3,6 +3,7 @@ import type { FakeApi } from './fixtures/api';
 import { AUDIT_THEMES, AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
 import { problemItem } from '../src/test/fixtures';
+import { EMPTY_JUDGE_QUEUE } from '../src/test/admin-fixtures/judges';
 
 /** A superuser: every tile, badge and search source shows. */
 function signInAsSuperuser(api: FakeApi) {
@@ -10,6 +11,7 @@ function signInAsSuperuser(api: FakeApi) {
   api.routes['GET /tickets/summary'] = adminOk({ assignedOpen: 1, awaitingStaff: 3 });
   api.routes['GET /comments/reports'] = adminList([], { total: 2 });
   api.routes['GET /admin/organization-requests'] = adminList([], { total: 4 });
+  api.routes['GET /judges/queue'] = adminOk(EMPTY_JUDGE_QUEUE);
 }
 
 for (const viewport of AUDIT_VIEWPORTS)

@@ -24,7 +24,6 @@
   "general": {
     "create": {
       "title": "Create problem",
-      "crumb": "Create problem",
       "lead": "A viewer without the right to add problems sends a suggestion; staff review it later.",
       "block": "New problem",
       "createButton": "Create problem",

@@ -1,9 +1,6 @@
 {
   "title": "Tổ chức",
   "lead": "Danh sách tổ chức, sửa thông tin, yêu cầu tham gia và thành viên.",
-  "crumbs": {
-    "people": "Người dùng"
-  },
   "actions": {
     "create": "Tạo tổ chức"
   },

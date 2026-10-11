@@ -3,6 +3,11 @@ import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminOk, dialogOf, signInAsStaff } from './fixtures/admin';
 import { ALL_SETTINGS, setting } from '../src/test/admin-fixtures/settings';
 
+/** The Discord block reads its own webhook list. */
+test.beforeEach(({ api }) => {
+  api.routes['GET /admin/discord-webhooks'] = adminOk([]);
+});
+
 test('site settings: Enter on "Thay thế" reveals the password box with focus in it', async ({
   page,
   api,

@@ -14,7 +14,6 @@ const openContest = (key: string) => router.push({ name: 'admin-contestGeneral',
 <template>
   <div class="flex flex-col gap-6">
     <AdminPageHeader
-      :crumbs="[{ label: $t('admin.contests.crumb') }]"
       :title="$t('admin.contests.index.title')"
       :lead="$t('admin.contests.index.lead')"
     >

@@ -9,6 +9,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
+import { routeTabs } from '../ui/admin-tabs';
 import { useEditableContestQuery } from './contest-editing.queries';
 import { CONTEST_TABS, contestTabComponent, contestTabOf } from './contest-tabs';
 import { isNotFound } from '../ui/admin-errors';
@@ -52,10 +53,7 @@ const summaryLine = computed(() => {
     <p v-if="isMissing">{{ $t('admin.contests.notFound', { key }) }}</p>
     <div v-else-if="contest" class="flex flex-col gap-6">
       <AdminPageHeader
-        :crumbs="[
-          { label: $t('admin.contests.crumb'), to: { name: 'admin-contests' } },
-          { label: contest.key },
-        ]"
+        :trail="[{ label: contest.key, mono: true }]"
         :title="contest.name"
         :lead="summaryLine"
       >
@@ -74,8 +72,7 @@ const summaryLine = computed(() => {
       </p>
       <template v-else>
         <AdminTabs
-          :tabs="CONTEST_TABS"
-          :params="{ key: contest.key }"
+          :tabs="routeTabs(CONTEST_TABS, { key: contest.key })"
           :label="$t('admin.contests.tabsLabel')"
         />
         <component :is="tabComponent" v-if="tabComponent" :contest="contest" />

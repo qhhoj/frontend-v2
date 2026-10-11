@@ -62,7 +62,6 @@ const LEAD_KEYS = {
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[{ label: $t('admin.shell.groups.content') }]"
       :title="$t(TITLE_KEYS[state.step])"
       :lead="$t(LEAD_KEYS[state.step], { account: accountName || 'qhhoj' })"
     >

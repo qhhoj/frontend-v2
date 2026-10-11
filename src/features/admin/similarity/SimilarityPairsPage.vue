@@ -41,15 +41,15 @@ const summaryTo = computed<RouteLocationRaw | null>(() =>
     ? { name: 'admin-similarity', query: { problem: problemCode.value, run: runId.value } }
     : null,
 );
-const crumbs = computed(() => [
-  { label: translate('admin.similarity.title'), to: { name: 'admin-similarity' } },
+const trail = computed(() => [
   problemCode.value
     ? {
         label: problemCode.value,
         to: { name: 'admin-similarity', query: { problem: problemCode.value } },
+        mono: true,
       }
     : { label: translate('admin.similarity.pairs.contestCrumb') },
-  { label: shortId(runId.value) },
+  { label: shortId(runId.value), mono: true },
 ]);
 const lead = computed(() => {
   const finishedAt = run.data.value?.finishedAt;
@@ -71,7 +71,7 @@ const showFilter = (next: PairFilter | null) =>
 </script>
 
 <template>
-  <AdminPageHeader :crumbs="crumbs" :title="$t('admin.similarity.pairs.title')" :lead="lead">
+  <AdminPageHeader :trail="trail" :title="$t('admin.similarity.pairs.title')" :lead="lead">
     <template #actions>
       <RouterLink
         v-if="summaryTo"

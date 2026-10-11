@@ -1,11 +1,15 @@
 {
   "title": "Ticket reply templates",
   "lead": "Ready-made replies for ticket handlers. On insert, {'{'}tên{'}'} becomes the ticket author's name and {'{'}bài{'}'} the problem name.",
-  "crumbs": "Tickets",
   "add": "Add template",
   "count": "{count} / {max} templates",
   "caption": "Reply templates",
-  "columns": { "order": "Order", "title": "Title", "body": "Text", "actions": "Actions" },
+  "columns": {
+    "order": "Order",
+    "title": "Title",
+    "body": "Text",
+    "actions": "Actions"
+  },
   "edit": "Edit",
   "editNamed": "Edit template {title}",
   "delete": "Delete",

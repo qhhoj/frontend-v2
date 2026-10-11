@@ -17,7 +17,7 @@ import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS, ADMIN_TOGGLE_CLASS } from '../ui/classes';
 import { shortId } from '../ui/short-id';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import BulkDecisionBar from './BulkDecisionBar.vue';
@@ -101,7 +101,7 @@ async function decide(request: JoinRequest, next: 'A' | 'R') {
           v-for="tab in STATE_TABS"
           :key="tab.state"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="ADMIN_TOGGLE_CLASS"
           :aria-pressed="state === tab.state"
           @click="state = tab.state"
         >

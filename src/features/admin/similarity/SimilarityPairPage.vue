@@ -26,9 +26,8 @@ const activeFragment = ref<number | null>(null);
 const leftFragmentOf = computed(() => fragmentOfLine(detail.value?.fragments ?? [], 'left'));
 const rightFragmentOf = computed(() => fragmentOfLine(detail.value?.fragments ?? [], 'right'));
 const count = (value: number) => formatNumber(value, locale.locale);
-const crumbs = computed(() => [
-  { label: translate('admin.similarity.title'), to: { name: 'admin-similarity' } },
-  { label: detail.value?.problemCode ?? '' },
+const trail = computed(() => [
+  { label: detail.value?.problemCode ?? '', mono: true },
   { label: translate('admin.similarity.pair.crumbPair') },
 ]);
 
@@ -60,7 +59,7 @@ function selectFragment(index: number) {
     <template #skeleton><SkeletonBlock class="h-96 w-full" /></template>
     <template v-if="detail">
       <AdminPageHeader
-        :crumbs="crumbs"
+        :trail="trail"
         :title="`${detail.left.username} ↔ ${detail.right.username}`"
         :lead="
           $t('admin.similarity.pair.lead', {

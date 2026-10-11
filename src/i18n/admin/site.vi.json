@@ -1,6 +1,5 @@
 {
   "config": {
-    "crumbs": "Trang web",
     "title": "Cấu hình thô",
     "warning": "Cấu hình thô: HTML của nhân viên, quyền ở mức vận hành — Mọi giá trị đều công khai (trả về cho mọi người ở GET /site) nên tuyệt đối không đặt bí mật ở đây; bí mật dùng trang Cài đặt. Thông báo và chân trang là HTML do nhân viên viết và được làm sạch trước khi hiện; mã theo dõi chỉ chấp nhận đúng đoạn mẫu của nhà vận hành. Chỉ người có quyền “Sửa cấu hình thô”.",
     "listNote": "Danh sách lấy từ GET /site; trang quản trị đọc với cache: no-cache.",

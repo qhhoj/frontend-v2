@@ -45,15 +45,8 @@ function resetFilter() {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.rejudge.crumbs.judging') },
-        { label: $t('admin.shell.screens.rejudge') },
-      ]"
-      :title="$t('admin.shell.screens.rejudge')"
-      :lead="$t('admin.rejudge.lead')"
-    />
+  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.shell.screens.rejudge')" :lead="$t('admin.rejudge.lead')" />
     <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
       <RejudgeFilterForm
         v-model:filter="filter"

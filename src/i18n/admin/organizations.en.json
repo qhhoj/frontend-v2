@@ -1,9 +1,6 @@
 {
   "title": "Organizations",
   "lead": "The organization list, edits, join requests and members.",
-  "crumbs": {
-    "people": "Users"
-  },
   "actions": {
     "create": "Create organization"
   },
