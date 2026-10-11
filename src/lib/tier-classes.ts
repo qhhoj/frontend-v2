@@ -24,6 +24,17 @@ export const TIER_FILL_CLASSES: Record<TierColor, string> = {
   master: 'fill-tier-master',
   grandmaster: 'fill-tier-grandmaster',
 };
+/** SVG stroke of each tier (written out in full for the same reason as the fills). */
+export const TIER_STROKE_CLASSES: Record<TierColor, string> = {
+  none: 'stroke-tier-none',
+  newbie: 'stroke-tier-newbie',
+  pupil: 'stroke-tier-pupil',
+  specialist: 'stroke-tier-specialist',
+  expert: 'stroke-tier-expert',
+  'candidate-master': 'stroke-tier-candidate-master',
+  master: 'stroke-tier-master',
+  grandmaster: 'stroke-tier-grandmaster',
+};
 /** Colour class of a username: undefined rating (not known) keeps the body colour, null (unrated) the unrated tier colour. */
 export const ratingTextClass = (rating: number | null | undefined): string =>
   rating === undefined ? 'text-content' : TIER_TEXT_CLASSES[tierColor(ratingTier(rating))];
