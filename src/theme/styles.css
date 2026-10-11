@@ -287,6 +287,34 @@
     outline: 2px solid var(--qh-focus-ring);
     outline-offset: 2px;
   }
+  /* Tailwind 4 preflight no longer gives buttons a pointer: every clickable control gets one here, every disabled one a not-allowed. */
+  button:not(:disabled),
+  [role='button'],
+  [role='tab'],
+  [role='option'],
+  [role='menuitem'],
+  [role='switch'],
+  [role='checkbox'],
+  [role='radio'],
+  summary,
+  label[for],
+  select,
+  input:is(
+    [type='checkbox'],
+    [type='radio'],
+    [type='submit'],
+    [type='button'],
+    [type='reset'],
+    [type='file']
+  ) {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'],
+  input:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
   button,
   a {
     transition:
