@@ -1,6 +1,6 @@
 {
   "title": "Thẻ kỳ thi",
-  "lead": "Danh mục thẻ hiện trên danh sách kỳ thi. Màu là khóa token của giao diện, không phải mã màu.",
+  "lead": "Thẻ hiện trên danh sách kỳ thi. Màu là một màu có sẵn của giao diện.",
   "caption": "Danh mục thẻ kỳ thi",
   "createTitle": "Thêm thẻ",
   "editTitle": "Sửa thẻ “{name}”",
@@ -27,10 +27,10 @@
   },
   "create": "Thêm thẻ",
   "save": "Lưu thẻ",
-  "cancel": "Thôi sửa",
+  "cancel": "Huỷ",
   "created": "Đã thêm thẻ.",
   "saved": "Đã lưu thẻ.",
-  "empty": "Chưa có thẻ nào. Thêm thẻ đầu tiên ở trên.",
+  "empty": "Chưa có thẻ nào. Bấm “Thêm thẻ” để tạo thẻ đầu tiên.",
   "columns": {
     "tag": "Thẻ",
     "slug": "Mã",
@@ -40,10 +40,10 @@
     "contests": "Kỳ thi"
   },
   "edit": "Sửa",
-  "remove": "Xóa",
-  "removeTitle": "Xóa thẻ “{name}”?",
+  "remove": "Xoá thẻ",
+  "removeTitle": "Xoá thẻ “{name}”?",
   "removeBody": "Các kỳ thi đang gắn thẻ {slug} vẫn giữ thẻ đó và hiện nó bằng chip màu trung tính.",
-  "removeConfirm": "Xóa thẻ",
+  "removeConfirm": "Xoá thẻ {name}",
   "manageContests": "Gắn kỳ thi",
   "contests": {
     "title": "Kỳ thi gắn thẻ {name}",
@@ -54,6 +54,11 @@
     "none": "Chưa có kỳ thi nào bạn sửa được mang thẻ này.",
     "listed": "{count} kỳ thi bạn sửa được mang thẻ này",
     "removeSelected": "Gỡ thẻ khỏi {count} kỳ thi",
-    "tooMany": "{count} mã: mỗi lần tối đa {max}."
-  }
+    "tooMany": "{count} mã: mỗi lần tối đa {max}.",
+    "done": "Đã cập nhật {done} kỳ thi."
+  },
+  "fullTitle": "Danh mục đã đủ thẻ",
+  "removed": "Đã xoá thẻ {name}.",
+  "editLabel": "Sửa thẻ {name}",
+  "more": "Thao tác khác với thẻ {name}"
 }

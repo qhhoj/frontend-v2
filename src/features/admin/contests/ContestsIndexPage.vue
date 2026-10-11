@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { Plus } from 'lucide-vue-next';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS } from '../admin-screens';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import ExactLookup from '../ui/ExactLookup.vue';
-import ContestSearchList from '../search/ContestSearchList.vue';
+import { buttonClass } from '../ui/controls';
+import ContestList from './list/ContestList.vue';
 
-const router = useRouter();
 const { canAny } = usePermissions();
-const openContest = (key: string) => router.push({ name: 'admin-contestGeneral', params: { key } });
 </script>
 
 <template>
@@ -21,22 +19,13 @@ const openContest = (key: string) => router.push({ name: 'admin-contestGeneral',
         <RouterLink
           v-if="canAny(ADMIN_SCREENS.contestNew.permission)"
           :to="{ name: 'admin-contestNew' }"
-          class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
+          :class="buttonClass('primary')"
         >
+          <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
           {{ $t('admin.contests.index.create') }}
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <div class="grid gap-5 xl:grid-cols-[18rem_minmax(0,1fr)] xl:items-start">
-      <section class="glass rounded-panel p-5">
-        <ExactLookup
-          :label="$t('admin.contests.index.lookupLabel')"
-          :submit-label="$t('admin.contests.index.openLabel')"
-          :hint="$t('admin.contests.index.lookupHint')"
-          @open="openContest"
-        />
-      </section>
-      <ContestSearchList />
-    </div>
+    <ContestList />
   </div>
 </template>

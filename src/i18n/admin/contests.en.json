@@ -33,11 +33,83 @@
   "cannotEdit": "This account cannot edit contest {key}.",
   "index": {
     "title": "Contests",
-    "lead": "Open by key or search the list.",
-    "lookupLabel": "Contest key",
-    "openLabel": "Open contest",
-    "lookupHint": "Paste a key to open the editor directly, without the list.",
+    "lead": "Find, filter and open the contests you manage.",
     "create": "Create contest"
+  },
+  "list": {
+    "searchLabel": "Search by contest key or name",
+    "count": "{total} contests",
+    "range": "{from}–{to} / {total}",
+    "open": "Open {key}",
+    "tableLabel": "Contests you can manage",
+    "phaseLabel": "Phase",
+    "all": "All",
+    "empty": "No contests yet.",
+    "columns": {
+      "contest": "Contest",
+      "phase": "Phase",
+      "time": "Time",
+      "users": "Participants",
+      "flags": "Status"
+    },
+    "window": "{start} → {end}",
+    "scopeLabel": "Scope",
+    "scopes": {
+      "all": "All",
+      "mine": "Mine",
+      "hidden": "Hidden"
+    },
+    "tagLabel": "Tag",
+    "anyTag": "Any tag",
+    "ratedLabel": "Rating",
+    "rated": {
+      "any": "All",
+      "yes": "Rated",
+      "no": "Unrated"
+    },
+    "sort": "Sort",
+    "sorts": {
+      "default": "Default (upcoming first)",
+      "newest": "Newest start",
+      "oldest": "Oldest start",
+      "name": "Name A–Z",
+      "users": "Most participants"
+    },
+    "from": "Starts on or after",
+    "before": "Starts before",
+    "chips": {
+      "scope": "Scope: {value}",
+      "tag": "Tag: {value}",
+      "rated": "{value}",
+      "from": "From {value}",
+      "before": "Before {value}"
+    },
+    "badges": {
+      "hidden": "Hidden",
+      "private": "Private",
+      "organization": "Organization",
+      "locked": "Judging locked",
+      "rated": "Rated",
+      "pending": "{count} pending"
+    },
+    "edit": "Edit",
+    "editLabel": "Edit {name}",
+    "more": "More actions for {name}",
+    "ranking": "Ranking",
+    "view": "View contest",
+    "rate": "Rate",
+    "pager": "Contest list pages",
+    "bulk": {
+      "show": "Show",
+      "hide": "Hide",
+      "showTitle": "Show {count} contests?",
+      "hideTitle": "Hide {count} contests?",
+      "showConfirm": "Show selected contests",
+      "hideConfirm": "Hide selected contests",
+      "showBody": "The contests appear to everyone allowed to see them. Showing a public contest needs the visibility permission.",
+      "hideBody": "The contests leave the lists and public pages; only their editors still see them. You can show them again at any time.",
+      "done": "Changed {done} contests."
+    }
   },
   "general": {
     "errors": {
@@ -148,7 +220,11 @@
   },
   "create": {
     "title": "Create contest",
-    "submit": "Create contest"
+    "submit": "Create contest",
+    "lead": "Fill in the details and the times; everything else can be changed later.",
+    "required": "Fields marked * are required.",
+    "cancel": "Cancel",
+    "done": "Created contest {key}."
   },
   "problems": {
     "columns": {

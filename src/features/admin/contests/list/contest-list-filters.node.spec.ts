@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { contestFilterQueryOf, contestListQueryOf, filtersFromQuery } from './contest-list-filters';
+import {
+  activePanelFilters,
+  contestFilterQueryOf,
+  contestListQueryOf,
+  filtersFromQuery,
+} from './contest-list-filters';
 
 describe('staff contest list filters', () => {
   it('reads the address, dropping unknown values and malformed dates', () => {
@@ -44,5 +49,28 @@ describe('staff contest list filters', () => {
     expect(
       contestFilterQueryOf({ page: '3', scope: 'mine' }, { scope: 'all', sort: 'name' }),
     ).toEqual({ page: undefined, scope: undefined, sort: 'name' });
+  });
+
+  it('maps the tag and rated filters and refuses a malformed tag', () => {
+    expect(contestListQueryOf(filtersFromQuery({ tag: 'cup', rated: 'no' }))).toMatchObject({
+      tag: 'cup',
+      rated: false,
+    });
+    expect(contestListQueryOf(filtersFromQuery({ rated: 'yes' })).rated).toBe(true);
+    expect(filtersFromQuery({ tag: 'Quốc gia', rated: 'maybe' })).toMatchObject({
+      tag: '',
+      rated: '',
+    });
+  });
+
+  it('counts only the panel filters that differ from their default', () => {
+    const filters = filtersFromQuery({
+      q: 'x',
+      phase: 'ended',
+      sort: 'name',
+      scope: 'mine',
+      tag: 'cup',
+    });
+    expect(activePanelFilters(filters)).toEqual(['scope', 'tag']);
   });
 });

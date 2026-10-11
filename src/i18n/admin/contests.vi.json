@@ -33,11 +33,83 @@
   "cannotEdit": "Tài khoản này không sửa được kỳ thi {key}.",
   "index": {
     "title": "Kỳ thi",
-    "lead": "Mở nhanh theo khóa hoặc tìm trong danh sách.",
-    "lookupLabel": "Khóa kỳ thi",
-    "openLabel": "Mở kỳ thi",
-    "lookupHint": "Dán khóa là mở thẳng trình sửa, không qua danh sách.",
+    "lead": "Tìm, lọc và mở kỳ thi bạn quản trị.",
     "create": "Tạo kỳ thi"
+  },
+  "list": {
+    "searchLabel": "Tìm theo khóa hoặc tên kỳ thi",
+    "count": "{total} kỳ thi",
+    "range": "{from}–{to} / {total}",
+    "open": "Mở {key}",
+    "tableLabel": "Kỳ thi quản trị được",
+    "phaseLabel": "Giai đoạn",
+    "all": "Tất cả",
+    "empty": "Chưa có kỳ thi nào.",
+    "columns": {
+      "contest": "Kỳ thi",
+      "phase": "Giai đoạn",
+      "time": "Thời gian",
+      "users": "Thí sinh",
+      "flags": "Trạng thái"
+    },
+    "window": "{start} → {end}",
+    "scopeLabel": "Phạm vi",
+    "scopes": {
+      "all": "Tất cả",
+      "mine": "Của tôi",
+      "hidden": "Đang ẩn"
+    },
+    "tagLabel": "Thẻ",
+    "anyTag": "Mọi thẻ",
+    "ratedLabel": "Rating",
+    "rated": {
+      "any": "Tất cả",
+      "yes": "Có rating",
+      "no": "Không rating"
+    },
+    "sort": "Sắp xếp",
+    "sorts": {
+      "default": "Mặc định (sắp tới trước)",
+      "newest": "Bắt đầu mới nhất",
+      "oldest": "Bắt đầu cũ nhất",
+      "name": "Tên A–Z",
+      "users": "Nhiều thí sinh nhất"
+    },
+    "from": "Bắt đầu từ ngày",
+    "before": "Bắt đầu trước ngày",
+    "chips": {
+      "scope": "Phạm vi: {value}",
+      "tag": "Thẻ: {value}",
+      "rated": "{value}",
+      "from": "Từ {value}",
+      "before": "Trước {value}"
+    },
+    "badges": {
+      "hidden": "Đang ẩn",
+      "private": "Riêng tư",
+      "organization": "Tổ chức",
+      "locked": "Đã khoá chấm",
+      "rated": "Có rating",
+      "pending": "{count} chờ chấm"
+    },
+    "edit": "Sửa",
+    "editLabel": "Sửa {name}",
+    "more": "Thao tác khác với {name}",
+    "ranking": "Bảng xếp hạng",
+    "view": "Xem kỳ thi",
+    "rate": "Tính rating",
+    "pager": "Trang danh sách kỳ thi",
+    "bulk": {
+      "show": "Hiện",
+      "hide": "Ẩn",
+      "showTitle": "Hiện {count} kỳ thi?",
+      "hideTitle": "Ẩn {count} kỳ thi?",
+      "showConfirm": "Hiện các kỳ thi đã chọn",
+      "hideConfirm": "Ẩn các kỳ thi đã chọn",
+      "showBody": "Các kỳ thi hiện ra với người được phép xem. Hiện kỳ thi công khai cần quyền đổi trạng thái hiển thị.",
+      "hideBody": "Các kỳ thi bị ẩn khỏi danh sách và trang công khai; chỉ người chỉnh sửa còn thấy. Có thể hiện lại bất cứ lúc nào.",
+      "done": "Đã đổi {done} kỳ thi."
+    }
   },
   "general": {
     "errors": {
@@ -148,7 +220,11 @@
   },
   "create": {
     "title": "Tạo kỳ thi",
-    "submit": "Tạo kỳ thi"
+    "submit": "Tạo kỳ thi",
+    "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau.",
+    "required": "Trường có dấu * là bắt buộc.",
+    "cancel": "Huỷ",
+    "done": "Đã tạo kỳ thi {key}."
   },
   "problems": {
     "columns": {
