@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next';
 import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
+import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import AdminNav from './AdminNav.vue';
 import type { AdminNavId } from './admin-nav';
 
@@ -54,14 +55,17 @@ onBeforeUnmount(() => {
         <h2 :id="titleId" class="font-display text-lg font-semibold">
           {{ $t('admin.shell.navLabel') }}
         </h2>
-        <button
-          type="button"
-          :aria-label="$t('admin.shell.navClose')"
-          class="flex size-11 items-center justify-center rounded-cell text-muted hover:bg-surface-hover hover:text-content"
-          @click="open = false"
-        >
-          <X aria-hidden="true" class="size-5" />
-        </button>
+        <div class="flex items-center gap-2">
+          <LocaleToggle />
+          <button
+            type="button"
+            :aria-label="$t('admin.shell.navClose')"
+            class="flex size-11 items-center justify-center rounded-cell text-muted hover:bg-surface-hover hover:text-content"
+            @click="open = false"
+          >
+            <X aria-hidden="true" class="size-5" />
+          </button>
+        </div>
       </div>
       <AdminNav
         :counts="counts"

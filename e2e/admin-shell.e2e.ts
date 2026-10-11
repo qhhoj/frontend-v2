@@ -94,3 +94,27 @@ test('the phone menu sheet traps focus, marks the screen and closes after a choi
     'page',
   );
 });
+
+test('the language switch in the top bar flips the admin shell to English and back', async ({
+  page,
+  api,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  signInAsSuperuser(api);
+  await page.goto('/admin');
+  await page.getByRole('button', { name: 'Switch to English' }).click();
+  await expect(page.getByRole('link', { name: 'Back to the site' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await page.getByRole('button', { name: /Chuyển sang/ }).click();
+  await expect(page.getByRole('link', { name: 'Về trang chính' })).toBeVisible();
+});
+
+test('the phone nav sheet carries the language switch', async ({ page, api }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  signInAsSuperuser(api);
+  await page.goto('/admin');
+  await page.getByTestId('admin-nav-open').click();
+  const sheet = page.getByTestId('admin-nav-sheet');
+  await sheet.getByRole('button', { name: 'Switch to English' }).click();
+  await expect(sheet.getByRole('button', { name: 'Close the admin menu' })).toBeVisible();
+});
