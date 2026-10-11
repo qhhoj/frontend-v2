@@ -42,6 +42,14 @@ const heading = computed(() =>
   }),
 );
 usePageTitle(() => (contest.value ? `${heading.value} · ${contest.value.name}` : null));
+/** The rows score in the contest's points, so the denominator is the contest problem's, not the problem's own. */
+const rows = computed(() =>
+  (list.value?.items ?? []).map((row) =>
+    row.problem && current.value
+      ? { ...row, problem: { ...row.problem, points: current.value.points } }
+      : row,
+  ),
+);
 const rankStart = computed(() => ((list.value?.meta.page ?? 1) - 1) * SUBMISSION_PAGE_SIZE + 1);
 const frozenAt = computed(() => contest.value?.viewer.boardFrozenAt ?? null);
 const statusOf = (failure: unknown) => (failure instanceof ApiError ? failure.status : null);
@@ -108,10 +116,10 @@ const CHIP =
               $t('contests.best.frozen', { time: formatDateTime(frozenAt, locale.locale) })
             }}
           </p>
-          <EmptyState v-if="!list?.items.length">{{ $t('submissions.best.empty') }}</EmptyState>
+          <EmptyState v-if="!rows.length">{{ $t('submissions.best.empty') }}</EmptyState>
           <template v-else>
             <SubmissionTable
-              :submissions="list.items"
+              :submissions="rows"
               :show-problem="false"
               :rank-start="rankStart"
               :own-username="session.user?.username"
