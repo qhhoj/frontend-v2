@@ -2,12 +2,14 @@
 import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
 import { useRouter } from 'vue-router';
-import { createContest } from '@/api/contest-editing.api';
+import { createContest, createOrganizationContest } from '@/api/contest-editing.api';
 import type { ContestBody, EditableContest } from '@/api/types/contest-editing';
+import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
+import type { CreationOwner } from '../../creation/creation-owners';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { buttonClass } from '../../ui/controls';
+import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
@@ -18,11 +20,15 @@ import ContestGeneralForm from './ContestGeneralForm.vue';
 const router = useRouter();
 const { can } = usePermissions();
 const form = ref(emptyContestForm());
+/** Mock-up 2C: an owning organization makes the contest its members-only one; the server sets those fields. */
+const owner = ref<CreationOwner | null>(null);
+const isOwnerReady = ref(false);
 const localErrors = computed(() => checkContestForm(form.value));
 /** Errors show once a save was tried, not while the first field is still being typed. */
 const hasTried = ref(false);
 const mutation = useAdminMutation({
-  mutate: (body: ContestBody) => createContest(body),
+  mutate: (body: ContestBody) =>
+    owner.value ? createOrganizationContest(owner.value.slug, body) : createContest(body),
   invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
   successText: (created: EditableContest) =>
     translate('admin.contests.create.done', { key: created.key }),
@@ -38,7 +44,7 @@ const shownErrors = computed(() => ({
 /** Nothing is sent while a local check fails; the create body keeps out every group the account may not set. */
 async function create() {
   hasTried.value = true;
-  if (Object.keys(localErrors.value).length > 0) return;
+  if (Object.keys(localErrors.value).length > 0 || !isOwnerReady.value) return;
   await mutation.run(toContestBody(form.value, can));
 }
 </script>
@@ -51,11 +57,15 @@ async function create() {
       :back="{ to: { name: 'admin-contests' }, label: $t('admin.contests.index.title') }"
     />
     <form class="flex flex-col gap-6" novalidate @submit.prevent="create">
+      <section :class="CARD" class="p-4 sm:p-5">
+        <CreationOwnerPicker v-model="owner" v-model:ready="isOwnerReady" kind="contest" />
+      </section>
       <ContestGeneralForm
         v-model="form"
         :errors="shownErrors"
         :is-create="true"
         :has-codes="{ access: false, ranking: false }"
+        :owner="owner"
       />
       <AdminStatus
         v-if="mutation.failure.value"

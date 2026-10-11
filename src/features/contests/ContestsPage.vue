@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ToolbarSearch from '@/components/ToolbarSearch.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import { computed } from 'vue';
 import { translate } from '@/i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
@@ -61,6 +62,7 @@ const tagName = computed(() => {
           :options="ratedOptions"
           :active="ratedChoice !== 'any'"
         />
+        <CreateShortcut kind="contest" />
       </div>
     </header>
     <ContestTagFilter

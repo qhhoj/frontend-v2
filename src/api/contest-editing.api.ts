@@ -9,6 +9,9 @@ import type {
 
 export const fetchEditableContest = (key: string) => apiGet('/contests/{key}', { path: { key } });
 export const createContest = (body: ContestBody) => apiSend('post', '/contests', { body });
+/** An organization-private contest of `slug` (organization administrators with `create_private_contest`). */
+export const createOrganizationContest = (slug: string, body: ContestBody) =>
+  apiSend('post', '/organizations/{slug}/contests', { path: { slug }, body });
 export const updateContest = (key: string, patch: ContestPatch) =>
   apiSend('patch', '/contests/{key}', { path: { key }, body: patch });
 export const cloneContest = (key: string, newKey: string) =>

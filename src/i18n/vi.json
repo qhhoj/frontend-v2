@@ -1627,7 +1627,16 @@
     "joinPolicyOpen": "Mở tự do khi tham gia",
     "joinPolicyApproval": "Cần duyệt khi tham gia",
     "ppMeta": "{pp} điểm thành tích",
-    "membersMeta": "{count} thành viên"
+    "membersMeta": "{count} thành viên",
+    "manageCard": {
+      "title": "Quản lý tổ chức",
+      "lead": "Bạn là quản trị viên",
+      "shortcuts": "Lối tắt quản lý",
+      "problems": "Bài tập của tổ chức",
+      "contests": "Kỳ thi của tổ chức",
+      "requests": "Yêu cầu tham gia",
+      "pending": "{count} chờ"
+    }
   },
   "orgMembership": {
     "signIn": "Đăng nhập để tham gia",
@@ -2700,5 +2709,9 @@
       "empty": "Thành viên tổ chức chưa nộp bài nào.",
       "forbiddenTitle": "Chỉ thành viên xem được bài nộp của tổ chức"
     }
+  },
+  "create": {
+    "problem": "Tạo bài tập",
+    "contest": "Tạo kỳ thi"
   }
 }

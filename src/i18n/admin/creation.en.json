@@ -1,0 +1,63 @@
+{
+  "owner": {
+    "label": "Belongs to",
+    "loading": "Loading organizations…",
+    "orgPrivate": "members only",
+    "fixed": "Fixed",
+    "site": "No organization",
+    "privateHint": "Only the organization's members see it, until you publish it.",
+    "siteHint": "A site problem, hidden until you publish it."
+  },
+  "problem": {
+    "timeHint": "Seconds, e.g. 1.",
+    "memoryHint": "KB, e.g. 262144 (256 MB).",
+    "pointsHint": "From 800 to 3500.",
+    "type": "Type",
+    "pickType": "Pick a type",
+    "statement": "Statement",
+    "statementHint": "You can leave it empty and write it later.",
+    "nextNote": "After creating: upload tests, pick the checker and points, try a submission.",
+    "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest."
+  },
+  "steps": {
+    "label": "Problem setup steps",
+    "heading": "Set up the problem",
+    "next": "Next:",
+    "done": "Done",
+    "todo": "To do",
+    "info": {
+      "title": "Problem info",
+      "hint": "Code, name, limits and points.",
+      "action": "Edit info"
+    },
+    "statement": {
+      "title": "Write the statement",
+      "hint": "Statement, input, output and samples.",
+      "action": "Write statement"
+    },
+    "tests": {
+      "title": "Upload tests",
+      "hint": "One zip of input/output pairs.",
+      "action": "Upload tests"
+    },
+    "scoring": {
+      "title": "Checker and points",
+      "hint": "Pick the checker, give tests points.",
+      "action": "Edit scoring"
+    },
+    "trial": {
+      "title": "Try a submission",
+      "hint": "Submit a solution to check the tests.",
+      "action": "Try it"
+    },
+    "publish": {
+      "members": "Show to members",
+      "everyone": "Publish the problem",
+      "hint": "Turn on “Public” when the problem is ready.",
+      "action": "Publish"
+    }
+  },
+  "contest": {
+    "ownerAccess": "Only members of {name} see this contest (fixed when created in an organization)."
+  }
+}

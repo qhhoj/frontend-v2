@@ -70,3 +70,55 @@ describe('organization access and states', () => {
     expect(wrapper.get('nav[aria-label="Mục tổ chức"]').text()).not.toContain('Yêu cầu tham gia');
   });
 });
+
+describe('organization manage card (1B)', () => {
+  const viewerWith = (flags: { canAdminister: boolean; canCreateProblem: boolean }) => ({
+    isMember: true,
+    canCreateContest: false,
+    pendingRequestId: null,
+    ...flags,
+  });
+
+  it('offers "Tạo bài tập" to an administrator the API lets create, linked to the form for this organization', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        organizationDetail({ viewer: viewerWith({ canAdminister: true, canCreateProblem: true }) }),
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    const card = wrapper.get('[data-testid="organization-manage-card"]');
+    expect(card.get('[data-testid="org-create-problem"]').attributes('href')).toBe(
+      '/admin/problems/new?organization=lhp',
+    );
+    expect(card.find('[data-testid="org-create-contest"]').exists()).toBe(false);
+    expect(card.text()).toContain('Yêu cầu tham gia');
+  });
+
+  it('keeps the card for an administrator without create rights, with no create button', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        organizationDetail({
+          viewer: viewerWith({ canAdminister: true, canCreateProblem: false }),
+        }),
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.find('[data-testid="organization-manage-card"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="org-create-problem"]').exists()).toBe(false);
+  });
+
+  it('shows no card to a plain member', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(
+        organizationDetail({
+          viewer: viewerWith({ canAdminister: false, canCreateProblem: false }),
+        }),
+      ),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.find('[data-testid="organization-manage-card"]').exists()).toBe(false);
+  });
+});

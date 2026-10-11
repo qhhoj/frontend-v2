@@ -1627,7 +1627,16 @@
     "joinPolicyOpen": "Anyone can join",
     "joinPolicyApproval": "Joining needs approval",
     "ppMeta": "{pp} performance points",
-    "membersMeta": "{count} members"
+    "membersMeta": "{count} members",
+    "manageCard": {
+      "title": "Manage organization",
+      "lead": "You are an administrator",
+      "shortcuts": "Management shortcuts",
+      "problems": "The organization's problems",
+      "contests": "The organization's contests",
+      "requests": "Join requests",
+      "pending": "{count} waiting"
+    }
   },
   "orgMembership": {
     "signIn": "Sign in to join",
@@ -2700,5 +2709,9 @@
       "empty": "The organization's members have no submissions yet.",
       "forbiddenTitle": "Only members can see the organization's submissions"
     }
+  },
+  "create": {
+    "problem": "Create problem",
+    "contest": "Create contest"
   }
 }

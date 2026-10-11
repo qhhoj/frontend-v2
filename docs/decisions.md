@@ -431,6 +431,10 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 ## Problem lifecycle and organizations (VNOI F4)
 
+- Org create shortcuts: mock-ups 1B, 2C and 3C picked by the user (2026-10-11). 1B: a "Quản lý tổ chức" card on the organization overview (right column; first under the header on a phone) with "Tạo bài tập" / "Tạo kỳ thi" and shortcuts to the org's problems, contests and join requests. 2C: "Tạo bài tập" on `/problems` and "Tạo kỳ thi" on `/contests`, and the create forms start with a "Thuộc về" owner picker (`?organization=<slug>` preselects). 3C: a short problem create form, then a setup checklist on the editor ("Tiếp theo: …") until the problem is shown to members or published.
+- Every create button follows a backend flag (`viewer.canCreateProblem|canCreateContest` on the organization, `adminCapabilities.problemCreation|contestCreation` in the session); the SPA derives no rule and shows no disabled button.
+- An organization problem's code prefix is shown as a fixed part before the code input (`problemCodePrefix` from the API); only the rest is typed.
+- The organization Manage tab is not restyled yet: its redesign waits for the user's pick of mock-up section 4.
 - Deleted problems are a screen of their own, `/admin/problems/deleted`, shown as the "Đã xóa" tab of the Problems index (`judge.delete_problem`): `deleted` is a reserved code, so the static path never meets a problem.
 - Delete and purge-now confirm with the typed problem code (`TypedCodeDialog`, exact match); restore has no confirm because it is reversible.
 - The danger-zone card is the last card of the General tab; after a delete the editor opens the deleted list, since the problem's own page now answers 404.

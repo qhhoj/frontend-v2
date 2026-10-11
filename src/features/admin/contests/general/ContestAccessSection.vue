@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Lock } from 'lucide-vue-next';
+import type { CreationOwner } from '../../creation/creation-owners';
 import AdminField from '../../ui/AdminField.vue';
 import OrganizationChips from '../../ui/OrganizationChips.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
@@ -13,7 +15,12 @@ import { usePermissionLocks } from './permission-locks';
 
 /** Who sees the contest and its scoreboard: visibility, privacy, entry codes and bans. */
 const form = defineModel<ContestForm>({ required: true });
-defineProps<{ errors: FieldErrors; hasCodes: { access: boolean; ranking: boolean } }>();
+defineProps<{
+  errors: FieldErrors;
+  hasCodes: { access: boolean; ranking: boolean };
+  /** Set on create in an organization: members-only access is fixed, so its controls give way to one line. */
+  owner?: CreationOwner | null;
+}>();
 const { lockedBy, hintOf } = usePermissionLocks();
 const SCOREBOARD_OPTIONS = ['V', 'H', 'C', 'P'] as const;
 const PRIVATE = 'judge.create_private_contest';
@@ -47,7 +54,16 @@ const ACCESS_CODE = 'judge.contest_access_code';
       :label="$t('admin.contests.general.fields.privateContestants')"
       :locked-by="lockedBy(PRIVATE)"
     />
+    <p
+      v-if="owner"
+      class="m-0 flex items-center gap-2 text-sm lg:col-span-2"
+      data-testid="contest-owner-access"
+    >
+      <Lock class="size-4 shrink-0 text-muted" aria-hidden="true" />
+      {{ $t('admin.creation.contest.ownerAccess', { name: owner.name }) }}
+    </p>
     <AdminCheckbox
+      v-else
       v-model="form.isOrganizationPrivate"
       class="lg:col-span-2"
       input-id="contest-isOrganizationPrivate"
@@ -56,7 +72,7 @@ const ACCESS_CODE = 'judge.contest_access_code';
       :locked-by="lockedBy(PRIVATE)"
     />
     <OrganizationChips
-      v-if="form.isOrganizationPrivate"
+      v-if="!owner && form.isOrganizationPrivate"
       v-model="form.organizations"
       class="lg:col-span-2"
       :label="$t('admin.contests.general.fields.organizations')"

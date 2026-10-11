@@ -8,11 +8,15 @@ import { useViewerId } from '@/stores/use-viewer-id';
 export const problemDataKey = (code: string, viewer: string) =>
   ['admin', 'problem-data', code, viewer] as const;
 
-export function useProblemDataQuery(code: MaybeRefOrGetter<string>) {
+export function useProblemDataQuery(
+  code: MaybeRefOrGetter<string>,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => problemDataKey(toValue(code), viewer.value)),
     queryFn: () => fetchProblemData(toValue(code)),
+    enabled: computed(() => toValue(enabled)),
   });
 }
 
