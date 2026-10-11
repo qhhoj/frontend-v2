@@ -165,8 +165,6 @@
     "doneToast": "Cloned as {code}."
   },
   "statements": {
-    "title": "Statements by language",
-    "lead": "Each language is saved on its own with PUT /translations/:lang.",
     "slotsLabel": "Statement language",
     "slots": {
       "vi": "Tiếng Việt",
@@ -178,9 +176,8 @@
     "nameHint": "Up to 100 characters.",
     "contentLabel": "Content (Markdown)",
     "imageButton": "Insert image",
-    "imageHint": "Images upload through /problems/uploads/image; the URL goes into the text.",
-    "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack judge.problem_full_markup.",
-    "discard": "Discard changes",
+    "imageHint": "An uploaded image is inserted at the cursor.",
+    "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack the “Use unsanitised problem markup” permission.",
     "save": {
       "vi": "Save Vietnamese translation",
       "en": "Save English translation",
@@ -190,18 +187,18 @@
       "nameLength": "Name is 1 to {max} characters.",
       "descriptionLength": "Content is at most {max} characters.",
       "character": "Do not use the character {character}; use a plain one instead."
-    }
+    },
+    "savedToast": "Saved {slot}."
   },
   "editorial": {
-    "title": "Editorial",
-    "lead": "The editorial, its publication and authors.",
     "public": "Publish the editorial",
     "publicHint": "When off, only staff and the authors see it.",
     "publishOn": "Publish from",
     "publishOnHint": "The editorial opens to everyone at this time (when publishing is on).",
     "authors": "Editorial authors",
     "content": "Content (Markdown)",
-    "save": "Save editorial"
+    "save": "Save editorial",
+    "savedToast": "Editorial saved."
   },
   "data": {
     "save": "Save configuration",
@@ -253,7 +250,7 @@
       "title": "Test list",
       "count": "{count} tests",
       "countOver": "{count} tests, over the advised {soft}.",
-      "hardLimit": "Hard limit {max} tests needs judge.create_mass_testcases; this account has the normal limit.",
+      "hardLimit": "The “{permission}” permission allows up to {max} tests; this account has the usual limit.",
       "legend": "C: single test · S: open a scored group · E: close the group. A group's points are the whole group's.",
       "addCase": "Add test",
       "addBatch": "Add group",
@@ -293,7 +290,8 @@
       "generatorArgs": "Generator arguments are at most 1000 characters.",
       "count": "Must be a whole number, zero or more.",
       "argsTotal": "All test arguments together are over 1 MiB; shorten them."
-    }
+    },
+    "savedToast": "Saved the judging setup of {code}."
   },
   "uploads": {
     "archive": {
@@ -317,31 +315,21 @@
   "files": {
     "image": {
       "title": "Images in the statement",
-      "lead": "Images pasted into the statement box; the address is returned to insert.",
-      "button": "Choose image"
+      "lead": "Each upload returns an address to paste into the statement."
     },
     "pdf": {
       "title": "Statement PDF",
-      "lead": "One PDF for the whole problem; replaces the old one.",
-      "button": "Choose PDF"
+      "lead": "One PDF for the whole problem; a new upload replaces it."
     },
     "material": {
       "title": "Attached material",
-      "lead": "A material pack contestants download.",
-      "button": "Choose material"
+      "lead": "A material pack contestants download."
     },
-    "attachments": {
-      "title": "Attachments",
-      "lead": "One file at a time; replaces the old one. Only images for the statement box are accepted there.",
-      "pdfButton": "Upload statement PDF",
-      "materialButton": "Upload material"
-    },
-    "uploaded": "Uploaded: {url}",
-    "current": "Current:",
     "none": "No file yet",
     "open": "Open",
     "copy": "Copy address",
-    "footer": "Each upload returns one address; the system keeps no list of uploads, so save the address in the statement or in the problem's PDF and material fields."
+    "upload": "Upload",
+    "replace": "Replace"
   },
   "header": {
     "public": "Public",

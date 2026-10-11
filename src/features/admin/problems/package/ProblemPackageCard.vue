@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { buttonClass } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import { useProblemPackage } from './use-problem-package';
 
 /** "Tải gói đề": build the full package, then offer it as a download link (no automatic navigation). */
@@ -12,12 +12,16 @@ const isBusy = computed(() => phase.value === 'requesting' || phase.value === 'b
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.package.title')" :lead="$t('admin.package.lead')">
+  <AdminFormSection
+    :title="$t('admin.package.title')"
+    :description="$t('admin.package.lead')"
+    :columns="1"
+  >
     <div data-testid="problem-package" class="flex flex-col gap-3">
       <div>
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary')"
           :aria-disabled="isBusy ? 'true' : undefined"
           :aria-busy="isBusy || undefined"
           @click="start"
@@ -30,11 +34,11 @@ const isBusy = computed(() => phase.value === 'requesting' || phase.value === 'b
         <a
           :href="downloadUrl"
           :download="`${code}.zip`"
-          class="inline-flex min-h-11 items-center font-semibold text-accent-text underline"
+          class="inline-flex min-h-8 items-center font-semibold text-accent-text underline"
           >{{ $t('admin.package.download', { code }) }}</a
         >
       </AdminStatus>
       <AdminStatus v-else-if="phase === 'failed'" kind="refused" :text="failureText" />
     </div>
-  </SettingsCard>
+  </AdminFormSection>
 </template>

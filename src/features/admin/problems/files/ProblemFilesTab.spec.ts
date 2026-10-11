@@ -43,7 +43,7 @@ describe('ProblemFilesTab', () => {
       'Tệp quá lớn (tối đa 5.0 MB).',
     );
     expect(wrapper.get('[data-testid="upload-material"]').text()).toContain(
-      'Cần quyền judge.upload_problem_material',
+      'Cần quyền “Tải lên tài liệu của bài”',
     );
   });
 
@@ -56,7 +56,7 @@ describe('ProblemFilesTab', () => {
     const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/files');
     seedCache(queryClient, [['problems', 'detail', 'probe']]);
     await pick(wrapper, 'upload-pdf', new File(['%PDF'], 'new.pdf'));
-    expect(wrapper.get('[data-testid="upload-pdf"]').text()).toContain(
+    expect(wrapper.get('[data-testid="upload-pdf"] a').attributes('href')).toBe(
       '/media/pdf/hcmus41c-v2.pdf',
     );
     expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
