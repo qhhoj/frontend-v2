@@ -155,5 +155,6 @@ export const problemData = (overrides: Partial<ProblemData> = {}): ProblemData =
   archiveFiles: ['1.in', '1.out', 'sub1/01.in', 'sub1/01.out', 'sub1/02.in', 'sub1/02.out'],
   hasInit: true,
   limits: { softCases: 50, maxCases: 300 },
+  sourceChecks: { customChecker: null, customGrader: null },
   ...overrides,
 });
