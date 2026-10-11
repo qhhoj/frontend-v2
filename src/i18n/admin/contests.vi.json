@@ -380,7 +380,8 @@
       "preview": {
         "M": "Hết hạn sau {amount} phút kể từ lần tạo lại liên kết gần nhất, tức {date} lúc {time}.",
         "D": "Hết hạn sau {amount} ngày kể từ lần tạo lại liên kết gần nhất, tức {date}."
-      }
+      },
+      "saved": "Đã lưu liên kết bảng xếp hạng."
     }
   },
   "actions": {
@@ -442,6 +443,13 @@
       "confirm": "Nhân bản",
       "done": "Đã tạo {key}.",
       "open": "Mở kỳ thi vừa tạo"
+    },
+    "queuedToast": "Đã xếp hàng: {action}.",
+    "groups": {
+      "jobs": "Chấm và tính điểm",
+      "board": "Bảng xếp hạng và công bố",
+      "copy": "Dữ liệu và sao chép",
+      "danger": "Vùng nguy hiểm"
     }
   },
   "participants": {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { needsPermissionText } from '../../ui/permission-text';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
@@ -9,9 +10,8 @@ import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
-import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { freezeStateOf, isLockedNow } from '../contest-admin';
 import {
@@ -51,6 +51,7 @@ const isOpen = computed({
 const mutation = useAdminMutation({
   mutate: (patch: ContestPatch) => updateContest(props.contest.key, patch),
   invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
+  successText: () => translate('admin.ui.saved'),
   onSuccess: (saved: EditableContest) =>
     queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved),
   onDone: () => {
@@ -90,8 +91,8 @@ const isFreezeValid = computed(
 </script>
 
 <template>
-  <section data-testid="action-freeze-lock" class="glass flex flex-col gap-4 rounded-panel p-5">
-    <h3 class="font-display text-lg font-semibold">
+  <section data-testid="action-freeze-lock" :class="[CARD, 'flex flex-col gap-4 p-5']">
+    <h3 class="m-0 text-base font-semibold">
       {{ $t('admin.contestOps.freezeLock.title') }}
     </h3>
     <div class="grid gap-5 md:grid-cols-2">
@@ -101,7 +102,7 @@ const isFreezeValid = computed(
         <button
           v-if="freeze.kind === 'frozen' || freeze.kind === 'scheduled'"
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          :class="buttonClass('secondary')"
           class="self-start"
           @click="ask({ frozenLastMinutes: 0 }, 'unfreeze')"
         >
@@ -117,13 +118,13 @@ const isFreezeValid = computed(
               v-model.number="freezeMinutes"
               type="number"
               min="1"
-              :class="ADMIN_INPUT_CLASS"
+              :class="INPUT"
               class="w-28"
             />
           </div>
           <button
             type="button"
-            :class="ADMIN_BUTTON_CLASS"
+            :class="buttonClass('secondary')"
             :aria-disabled="!isFreezeValid || undefined"
             @click="isFreezeValid && ask({ frozenLastMinutes: freezeMinutes }, 'refreeze')"
           >
@@ -136,12 +137,12 @@ const isFreezeValid = computed(
         <h4 class="font-semibold">{{ $t('admin.contestOps.freezeLock.lockHeading') }}</h4>
         <p class="text-sm">{{ lockLine }}</p>
         <p v-if="!can('judge.lock_contest')" class="text-sm text-muted">
-          {{ $t('admin.ui.needsPermission', { permission: 'judge.lock_contest' }) }}
+          {{ needsPermissionText('judge.lock_contest') }}
         </p>
         <button
           v-else-if="lockedAfter !== null"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary')"
           class="self-start"
           @click="ask({ lockedAfter: null }, 'unlock')"
         >
@@ -150,7 +151,7 @@ const isFreezeValid = computed(
         <button
           v-if="can('judge.lock_contest') && !isLocked"
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          :class="buttonClass('secondary')"
           class="self-start"
           @click="ask({ lockedAfter: new Date().toISOString() }, 'lock')"
         >
@@ -158,14 +159,13 @@ const isFreezeValid = computed(
         </button>
       </div>
     </div>
-    <AdminStatus v-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
 
     <ConfirmDialog
       v-model:visible="isOpen"
       :title="pending?.title ?? ''"
       :body="pending?.body"
       :confirm-label="pending?.label ?? ''"
-      tone="danger"
+      tone="neutral"
       :busy="mutation.isPending.value"
       @confirm="pending && mutation.run(pending.patch)"
     >

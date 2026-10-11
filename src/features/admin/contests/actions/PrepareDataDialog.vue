@@ -6,7 +6,7 @@ import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import type { SubmissionResult } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 /** Asks for a problem glob and result filters, then queues the export; empty fields are left out of the body. */
@@ -47,7 +47,7 @@ function submit() {
       <input
         id="prepare-glob"
         v-model="glob"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         aria-describedby="prepare-glob-hint"
         autocomplete="off"
       />

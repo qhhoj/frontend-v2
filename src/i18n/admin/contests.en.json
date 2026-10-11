@@ -380,7 +380,8 @@
       "preview": {
         "M": "Expires {amount} minutes after the last regeneration, that is {date} at {time}.",
         "D": "Expires {amount} days after the last regeneration, that is {date}."
-      }
+      },
+      "saved": "Ranking link saved."
     }
   },
   "actions": {
@@ -442,6 +443,13 @@
       "confirm": "Clone",
       "done": "Created {key}.",
       "open": "Open the new contest"
+    },
+    "queuedToast": "Queued: {action}.",
+    "groups": {
+      "jobs": "Judging and scoring",
+      "board": "Scoreboard and publishing",
+      "copy": "Data and copies",
+      "danger": "Danger zone"
     }
   },
   "participants": {

@@ -1,3 +1,4 @@
+import { needsPermissionText } from '../../ui/permission-text';
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
@@ -47,7 +48,6 @@ describe('ContestActionsTab', () => {
     expect(calls.some((call) => call.path.endsWith('/rescore'))).toBe(true);
     const card = wrapper.get('[data-testid="action-rescore"]');
     expect(card.get('[role="status"]').text()).toContain('Đang chờ trong hàng chạy nền');
-    expect(card.find('[data-placement="queued"]').exists()).toBe(true);
     expect(card.text()).not.toContain('Không có trạng thái tiến trình');
   });
 
@@ -82,16 +82,13 @@ describe('ContestActionsTab', () => {
 
   it('hides rating and clone without their permissions', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_contest']), ...routes() });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/actions',
-      'Cần quyền judge.contest_rating',
-    );
-    expect(wrapper.get('[data-testid="action-rate"]').text()).toContain(
-      'Cần quyền judge.contest_rating',
-    );
+    const rating = needsPermissionText('judge.contest_rating');
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', rating);
+    expect(wrapper.get('[data-testid="action-rate"]').text()).toContain(rating);
     expect(wrapper.get('[data-testid="action-clone"]').text()).toContain(
-      'Cần quyền judge.clone_contest',
+      needsPermissionText('judge.clone_contest'),
     );
+    expect(wrapper.text()).not.toContain('judge.');
   });
 
   it('prepares the export with a glob and results, offers every backend result, and links the download when ready', async () => {
@@ -240,7 +237,6 @@ describe('replay rebuild card', () => {
     expect(rebuildCalls(calls)).toHaveLength(1);
     const card = wrapper.get('[data-testid="action-replay"]');
     expect(card.get('[role="status"]').text()).toContain('Đang chờ trong hàng chạy nền');
-    expect(card.find('[data-placement="queued"]').exists()).toBe(true);
   });
 
   it.each([

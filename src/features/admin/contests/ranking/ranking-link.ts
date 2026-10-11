@@ -1,7 +1,6 @@
 import type { RankingLinkPatch } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
-import { fromLocalInput } from '../../ui/datetime';
 
 export const OFFICIAL_CSV_MAX_BYTES = 1024 * 1024;
 /** Backend `RankingLinkDto.expiryAmount` `@Max`. */
@@ -11,6 +10,7 @@ export interface LinkForm {
   status: 'public' | 'private';
   expiryMode: 'U' | 'M' | 'D' | 'A';
   expiryAmount: number | null;
+  /** An ISO instant, '' while unset. */
   expiresAt: string;
 }
 
@@ -25,9 +25,8 @@ export function toLinkPatch(form: LinkForm): RankingLinkPatch | { error: string 
   const base = { status: form.status, expiryMode: form.expiryMode };
   if (form.expiryMode === 'U') return base;
   if (form.expiryMode === 'A') {
-    const expiresAt = fromLocalInput(form.expiresAt);
-    return expiresAt
-      ? { ...base, expiresAt }
+    return form.expiresAt
+      ? { ...base, expiresAt: form.expiresAt }
       : { error: translate('admin.contests.ranking.link.needsDate') };
   }
   return isWholeAmount(form.expiryAmount)
