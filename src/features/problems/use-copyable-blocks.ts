@@ -6,6 +6,7 @@ import { COPIED_FEEDBACK_MS, clipboardAvailable, copyText } from '@/lib/clipboar
 /** One copy bar: the button and its polite live region. `copied` is the 2 s confirmation. */
 interface CopyBar {
   button: HTMLButtonElement;
+  text: HTMLElement;
   status: HTMLElement;
   copied: boolean;
   resetTimer?: ReturnType<typeof setTimeout>;
@@ -26,6 +27,20 @@ function titleRowOf(block: HTMLElement): HTMLElement | null {
     BOLD_TAGS.includes(bold?.tagName ?? '') &&
     previous.textContent?.trim() === bold?.textContent?.trim();
   return isBoldLine ? previous : null;
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** The two-sheets "copy" glyph, drawn in the button's text colour. */
+function copyIcon(): SVGElement {
+  const icon = document.createElementNS(SVG_NS, 'svg');
+  icon.setAttribute('viewBox', '0 0 16 16');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.setAttribute('class', 'copy-icon');
+  const back = document.createElementNS(SVG_NS, 'path');
+  back.setAttribute('d', 'M5.5 2.5h7v8h-7zM3.5 5.5v8h7');
+  icon.append(back);
+  return icon;
 }
 
 /** Wraps every titled `pre` (title row + block) in `.sample`, and each two neighbouring samples (input, output) in `.sample-pair`, so CSS can lay them side by side. */
@@ -65,7 +80,7 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
 
   /** Visible text and accessible name agree (WCAG 2.5.3): the idle name only extends the visible "Copy". */
   const label = (bar: CopyBar) => {
-    bar.button.textContent = translate(bar.copied ? 'common.copied' : 'common.copy');
+    bar.text.textContent = translate(bar.copied ? 'common.copied' : 'common.copy');
     if (bar.copied) bar.button.removeAttribute('aria-label');
     else bar.button.setAttribute('aria-label', translate('problem.copySample'));
     bar.status.textContent = bar.copied ? translate('common.copied') : '';
@@ -78,6 +93,7 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     element.className = titleRow ? 'copy-bar-inline' : 'copy-bar';
     const bar: CopyBar = {
       button: document.createElement('button'),
+      text: document.createElement('span'),
       status: document.createElement('span'),
       copied: false,
     };
@@ -85,6 +101,7 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     bar.status.setAttribute('aria-live', 'polite');
     bar.button.type = 'button';
     bar.button.className = 'copy-block';
+    bar.button.append(copyIcon(), bar.text);
     const copyAndConfirm = async () => {
       if (!(await copyText(text))) return;
       bar.copied = true;
