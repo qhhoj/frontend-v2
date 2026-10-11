@@ -1,0 +1,126 @@
+{
+  "unsaved": "Có thay đổi chưa lưu.",
+  "cancel": "Hủy",
+  "general": {
+    "rescoreNotice": "Lưu các thay đổi này sẽ tính lại điểm của cả {count} lượt tham gia (chạy nền), và tính lại rating nếu kỳ thi đã có rating."
+  },
+  "rate": {
+    "notEnded": "Chỉ tính rating được sau khi kỳ thi kết thúc.",
+    "frozen": "Bảng xếp hạng vẫn đang đóng băng. Hãy bỏ đóng băng ở bên dưới để tính rating."
+  },
+  "judgeFinal": {
+    "pending": "Còn {count} bài nộp đang chờ chấm."
+  },
+  "problemOps": {
+    "title": "Chấm lại hoặc tính lại điểm một bài",
+    "description": "Chấm lại sẽ đặt lại các bài nộp của bài này trong kỳ thi và chấm lại từ đầu. Tính lại điểm chỉ tính lại điểm của các bài nộp và các lượt tham gia liên quan, không chấm lại, nhanh hơn tính lại cả kỳ thi.",
+    "noProblems": "Hãy lưu ít nhất một bài trước.",
+    "problemLabel": "Bài",
+    "rescore": "Tính lại điểm bài",
+    "rejudge": "Chấm lại bài…",
+    "rescoreQueued": "Đã xếp hàng tính lại điểm bài {code}.",
+    "rejudged": "Đã xếp hàng chấm lại {count} bài nộp của {code}.",
+    "rejudgeTitle": "Chấm lại bài {label}?",
+    "rejudgeConfirm": "Chấm lại",
+    "counting": "Đang đếm bài nộp…",
+    "willRejudge": "{count} bài nộp của {code} trong kỳ thi sẽ được chấm lại. Kết quả thay đổi dần khi chấm xong.",
+    "includeLocked": "Chấm lại cả bài nộp đã khóa"
+  },
+  "freezeLock": {
+    "title": "Đóng băng bảng xếp hạng và khóa bài nộp",
+    "freezeHeading": "Đóng băng bảng xếp hạng",
+    "lockHeading": "Khóa bài nộp",
+    "minutesLabel": "Số phút cuối",
+    "freezeState": {
+      "unsupported": "Thể thức này không đóng băng bảng xếp hạng.",
+      "off": "Không đóng băng.",
+      "scheduled": "Đóng băng lúc {time}.",
+      "frozen": "Đang đóng băng từ {time}. Bảng vẫn đóng băng sau khi kết thúc cho đến khi bạn bỏ đóng băng."
+    },
+    "lockState": {
+      "off": "Chưa khóa. Có thể chấm lại bài nộp.",
+      "scheduled": "Khóa lúc {time}.",
+      "locked": "Đã khóa từ {time}. Bài nộp không được chấm lại trừ khi chọn chấm cả bài đã khóa."
+    },
+    "unfreeze": {
+      "button": "Bỏ đóng băng ngay",
+      "title": "Bỏ đóng băng bảng xếp hạng?",
+      "body": "Mọi người sẽ thấy bảng xếp hạng thật. Kỳ thi được tính lại điểm, và tính lại rating nếu đã có rating.",
+      "confirm": "Bỏ đóng băng"
+    },
+    "refreeze": {
+      "button": "Đóng băng",
+      "title": "Đóng băng bảng xếp hạng?",
+      "body": "Bảng xếp hạng công khai ngừng cập nhật trong những phút cuối kỳ thi. Kỳ thi được tính lại điểm.",
+      "confirm": "Đóng băng"
+    },
+    "lock": {
+      "button": "Khóa ngay",
+      "title": "Khóa bài nộp ngay?",
+      "body": "Các bài nộp trực tiếp hiện có cũng bị khóa và không được chấm lại trừ khi chọn chấm cả bài đã khóa.",
+      "confirm": "Khóa"
+    },
+    "unlock": {
+      "button": "Mở khóa",
+      "title": "Bỏ khóa?",
+      "body": "Các bài nộp trực tiếp lại có thể được chấm lại.",
+      "confirm": "Mở khóa"
+    }
+  },
+  "delete": {
+    "title": "Xóa kỳ thi",
+    "description": "Xóa một kỳ thi đang ẩn và chưa có rating. Lượt tham gia, thông báo, link bảng xếp hạng, đội ảo, replay và bảng xếp hạng chính thức sẽ bị xóa. Bài nộp được giữ lại nhưng không còn thuộc kỳ thi nào. Không thể hoàn tác.",
+    "visible": "Hãy ẩn kỳ thi ở tab Thông tin chung trước khi xóa.",
+    "button": "Xóa kỳ thi…",
+    "confirmTitle": "Xóa kỳ thi {key}?",
+    "confirmBody": "Mọi thứ thuộc kỳ thi này sẽ bị xóa. Không thể hoàn tác.",
+    "keyLabel": "Gõ {key} để xác nhận",
+    "confirm": "Xóa"
+  },
+  "participants": {
+    "add": "Thêm lượt tham gia",
+    "addTitle": "Thêm một lượt tham gia",
+    "userLabel": "Tên đăng nhập",
+    "kindLabel": "Loại",
+    "kindLive": "Trực tiếp (mỗi người một lượt)",
+    "kindVirtual": "Thi ảo (một lượt mới)",
+    "startLabel": "Bắt đầu",
+    "startHint": "Để trống: lấy thời điểm hiện tại khi kỳ thi đang diễn ra, nếu không thì lấy giờ bắt đầu kỳ thi (trực tiếp) hoặc hiện tại (thi ảo).",
+    "manage": "Quản lý",
+    "tiebreaker": "Phân định hòa",
+    "end": "Kết thúc",
+    "moveStart": "Đổi giờ bắt đầu",
+    "moveStartTitle": "Đổi giờ bắt đầu của {username}?",
+    "moveStartBody": "Thí sinh thi có giới hạn thời gian sẽ có khung giờ mới từ thời điểm này. Lượt tham gia được tính lại.",
+    "recompute": "Tính lại",
+    "recomputeQueued": "Đã xếp hàng tính lại.",
+    "delete": "Xóa",
+    "deleteTitle": "Xóa lượt tham gia của {username}?",
+    "deleteBody": "Chỉ xóa được lượt tham gia chưa có bài nộp. Với người đã nộp bài, hãy loại khỏi bảng.",
+    "filters": {
+      "sortLabel": "Sắp xếp",
+      "kind": {
+        "all": "Mọi loại",
+        "live": "Trực tiếp",
+        "virtual": "Thi ảo",
+        "spectate": "Theo dõi"
+      },
+      "status": {
+        "all": "Mọi trạng thái",
+        "valid": "Hợp lệ",
+        "disqualified": "Bị loại"
+      },
+      "sort": {
+        "all": "Thứ tự tham gia",
+        "score": "Điểm (cao trước)"
+      }
+    }
+  },
+  "announcements": {
+    "edit": "Sửa",
+    "editNote": "Bản sửa giữ nguyên thời gian đăng và không được gửi lại. Dùng gửi lại để thông báo.",
+    "previewLabel": "Xem trước",
+    "previewEmpty": "Chưa có gì để xem trước.",
+    "resendHidden": "Nút gửi lại bị ẩn vì kỳ thi chưa bật gửi qua kênh trực tiếp (tab Thông tin chung)."
+  }
+}

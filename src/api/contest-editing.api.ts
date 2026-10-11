@@ -67,10 +67,18 @@ export const contestDataDownloadUrl = (key: string) =>
   apiUrl('/contests/{key}/data/download', { path: { key } });
 
 export const PARTICIPATIONS_PAGE_SIZE = 50;
-export const fetchParticipations = (key: string, query: { page: number; user: string }) =>
+/** The editor's list filters; an empty username, kind or sort is no filter. */
+export interface ParticipationQuery {
+  page: number;
+  user: string;
+  kind?: 'live' | 'virtual' | 'spectate';
+  disqualified?: boolean;
+  sort?: 'score';
+}
+export const fetchParticipations = (key: string, { user, ...query }: ParticipationQuery) =>
   apiGetPage('/contests/{key}/participations', {
     path: { key },
-    query: { ...query, pageSize: PARTICIPATIONS_PAGE_SIZE },
+    query: { ...query, user: user || undefined, pageSize: PARTICIPATIONS_PAGE_SIZE },
   });
 export const setDisqualified = (key: string, id: string, disqualified: boolean) =>
   apiSend('post', '/contests/{key}/participations/{id}/disqualify', {

@@ -20,6 +20,8 @@ import { contestActionsKey } from '../contest-ops.queries';
 import ContestActionCard from './ContestActionCard.vue';
 import ContestCloneCard from './ContestCloneCard.vue';
 import ContestDataCard from './ContestDataCard.vue';
+import ContestDeleteCard from './ContestDeleteCard.vue';
+import ContestFreezeLockCard from './ContestFreezeLockCard.vue';
 import ContestPublishCard from './ContestPublishCard.vue';
 import { isBoardFrozen, isBusy } from './contest-actions';
 
@@ -72,11 +74,20 @@ const judgeFinalLock = computed(() =>
     ? undefined
     : translate('admin.contests.actions.judgeFinal.unavailable'),
 );
-const rateLock = computed(() =>
-  hasEnded.value && !isBoardFrozen(props.contest)
-    ? undefined
-    : translate('admin.contests.actions.rate.unavailable'),
-);
+/** Two separate causes, each named: not ended yet, or ended with the ranking still frozen. */
+const rateLock = computed(() => {
+  if (!hasEnded.value) return translate('admin.contestOps.rate.notEnded');
+  return isBoardFrozen(props.contest) ? translate('admin.contestOps.rate.frozen') : undefined;
+});
+/** How many pending final submissions are left, for a final-submission contest. */
+const judgeFinalDescription = computed(() => {
+  const base = translate('admin.contests.actions.judgeFinal.description');
+  if (props.contest.formatName !== 'final_submission' || !actions.value) return base;
+  const pending = translate('admin.contestOps.judgeFinal.pending', {
+    count: formatNumber(actions.value.pendingCount, locale.locale),
+  });
+  return `${base} ${pending}`;
+});
 /** The server refuses a rebuild before the end (409) and has no replay for final-submission contests. */
 const replayLock = computed(() =>
   hasEnded.value && props.contest.formatName !== 'final_submission'
@@ -125,7 +136,7 @@ const runReplayRebuild = () => runAction(rebuildReplay);
         <ContestActionCard
           id="judgeFinal"
           :title="$t('admin.contests.actions.judgeFinal.title')"
-          :description="$t('admin.contests.actions.judgeFinal.description')"
+          :description="judgeFinalDescription"
           :button-label="$t('admin.contests.actions.judgeFinal.button')"
           :confirm-title="$t('admin.contests.actions.judgeFinal.confirmTitle')"
           :confirm-label="$t('admin.contests.actions.judgeFinal.confirm')"
@@ -170,8 +181,10 @@ const runReplayRebuild = () => runAction(rebuildReplay);
         </ContestActionCard>
       </div>
     </QueryState>
+    <ContestFreezeLockCard :contest="contest" />
     <ContestPublishCard :contest="contest" :actions="actions" />
     <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
     <ContestCloneCard :contest-key="contest.key" />
+    <ContestDeleteCard :contest="contest" />
   </div>
 </template>

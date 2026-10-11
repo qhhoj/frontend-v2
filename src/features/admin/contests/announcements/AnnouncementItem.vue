@@ -10,6 +10,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import AnnouncementEditForm from './AnnouncementEditForm.vue';
 import { composeHeading } from './composer-heading';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import type { AdminQueryKey } from '../../ui/use-admin-mutation';
@@ -23,6 +24,7 @@ const props = defineProps<{
 }>();
 const locale = useLocaleStore();
 const isConfirmOpen = ref(false);
+const isEditing = ref(false);
 const isResent = ref(false);
 const listKey = (): AdminQueryKey => ['admin', 'contest-announcements', props.contestKey];
 const when = computed(() =>
@@ -57,8 +59,17 @@ async function resendNow() {
       <h3 class="font-display text-lg font-semibold">{{ announcement.title }}</h3>
       <time class="text-sm text-muted" :datetime="announcement.createdAt">{{ when }}</time>
     </header>
-    <UserContent :html="announcement.descriptionHtml" />
-    <div class="flex flex-wrap items-center gap-3">
+    <AnnouncementEditForm
+      v-if="isEditing"
+      :contest-key="contestKey"
+      :announcement="announcement"
+      @close="isEditing = false"
+    />
+    <UserContent v-else :html="announcement.descriptionHtml" />
+    <div v-if="!isEditing" class="flex flex-wrap items-center gap-3">
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="isEditing = true">
+        {{ $t('admin.contestOps.announcements.edit') }}
+      </button>
       <button v-if="isPushedLive" type="button" :class="ADMIN_BUTTON_CLASS" @click="resendNow">
         {{ $t('admin.contests.announcements.resend') }}
       </button>
@@ -71,6 +82,9 @@ async function resendNow() {
         kind="refused"
         :text="failureTextOf(resend.failure.value)"
       />
+      <p v-if="!isPushedLive" class="basis-full text-xs text-muted">
+        {{ $t('admin.contestOps.announcements.resendHidden') }}
+      </p>
     </div>
     <ConfirmDialog
       v-model:visible="isConfirmOpen"

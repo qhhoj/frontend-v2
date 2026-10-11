@@ -1,0 +1,126 @@
+{
+  "unsaved": "Unsaved changes.",
+  "cancel": "Cancel",
+  "general": {
+    "rescoreNotice": "Saving these changes rescores all {count} participations in the background, and re-rates the contest if it has ratings."
+  },
+  "rate": {
+    "notEnded": "Rating is available once the contest has ended.",
+    "frozen": "The ranking is still frozen. Unfreeze it below to rate the contest."
+  },
+  "judgeFinal": {
+    "pending": "{count} pending submissions left to judge."
+  },
+  "problemOps": {
+    "title": "Rejudge or rescore one problem",
+    "description": "Rejudge resets this problem's submissions in this contest and judges them again. Rescore recomputes their points and the affected participations without judging, which is faster than rescoring the whole contest.",
+    "noProblems": "Save at least one problem first.",
+    "problemLabel": "Problem",
+    "rescore": "Rescore problem",
+    "rejudge": "Rejudge problem…",
+    "rescoreQueued": "Rescore of {code} queued.",
+    "rejudged": "{count} submissions of {code} queued for judging.",
+    "rejudgeTitle": "Rejudge problem {label}?",
+    "rejudgeConfirm": "Rejudge",
+    "counting": "Counting submissions…",
+    "willRejudge": "{count} submissions of {code} in this contest will be judged again. Results change as they finish.",
+    "includeLocked": "Also rejudge locked submissions"
+  },
+  "freezeLock": {
+    "title": "Ranking freeze and submission lock",
+    "freezeHeading": "Ranking freeze",
+    "lockHeading": "Submission lock",
+    "minutesLabel": "Last minutes",
+    "freezeState": {
+      "unsupported": "This contest format never freezes its ranking.",
+      "off": "Not frozen.",
+      "scheduled": "Freezes at {time}.",
+      "frozen": "Frozen since {time}. It stays frozen after the end until you unfreeze it."
+    },
+    "lockState": {
+      "off": "Not locked. Submissions can be rejudged.",
+      "scheduled": "Locks at {time}.",
+      "locked": "Locked since {time}. Submissions are not rejudged unless forced."
+    },
+    "unfreeze": {
+      "button": "Unfreeze now",
+      "title": "Unfreeze the ranking?",
+      "body": "Everyone will see the live ranking. The contest is rescored, and re-rated if it has ratings.",
+      "confirm": "Unfreeze"
+    },
+    "refreeze": {
+      "button": "Freeze",
+      "title": "Freeze the ranking?",
+      "body": "The public ranking stops updating for the last minutes of the contest. The contest is rescored.",
+      "confirm": "Freeze"
+    },
+    "lock": {
+      "button": "Lock now",
+      "title": "Lock submissions now?",
+      "body": "Existing live submissions are locked too and are not rejudged unless forced.",
+      "confirm": "Lock"
+    },
+    "unlock": {
+      "button": "Unlock",
+      "title": "Remove the lock?",
+      "body": "Live submissions can be rejudged again.",
+      "confirm": "Unlock"
+    }
+  },
+  "delete": {
+    "title": "Delete contest",
+    "description": "Deletes a hidden contest that has no ratings. Its participations, announcements, ranking link, ghosts, replay and official ranking are deleted. Its submissions are kept outside any contest. This cannot be undone.",
+    "visible": "Hide the contest on the General tab before deleting it.",
+    "button": "Delete contest…",
+    "confirmTitle": "Delete contest {key}?",
+    "confirmBody": "Everything that belongs to this contest is deleted. This cannot be undone.",
+    "keyLabel": "Type {key} to confirm",
+    "confirm": "Delete"
+  },
+  "participants": {
+    "add": "Add participation",
+    "addTitle": "Add a participation",
+    "userLabel": "Username",
+    "kindLabel": "Kind",
+    "kindLive": "Live (one per user)",
+    "kindVirtual": "Virtual (a new run)",
+    "startLabel": "Start",
+    "startHint": "Leave empty for now while the contest runs, else the contest start (live) or now (virtual).",
+    "manage": "Manage",
+    "tiebreaker": "Tiebreaker",
+    "end": "Ends",
+    "moveStart": "Change start",
+    "moveStartTitle": "Change the start of {username}?",
+    "moveStartBody": "A timed participant gets a new window from this time. The participation is recomputed.",
+    "recompute": "Recompute",
+    "recomputeQueued": "Recompute queued.",
+    "delete": "Delete",
+    "deleteTitle": "Delete the participation of {username}?",
+    "deleteBody": "Only a participation without submissions can be deleted. To remove someone with submissions, take them off the board instead.",
+    "filters": {
+      "sortLabel": "Order",
+      "kind": {
+        "all": "All kinds",
+        "live": "Live",
+        "virtual": "Virtual",
+        "spectate": "Spectating"
+      },
+      "status": {
+        "all": "Any status",
+        "valid": "Valid",
+        "disqualified": "Disqualified"
+      },
+      "sort": {
+        "all": "Join order",
+        "score": "Score (best first)"
+      }
+    }
+  },
+  "announcements": {
+    "edit": "Edit",
+    "editNote": "Edits keep the original post time and are not sent again. Use resend to notify.",
+    "previewLabel": "Preview",
+    "previewEmpty": "Nothing to preview yet.",
+    "resendHidden": "Resend is hidden because live sending is off for this contest (General tab)."
+  }
+}

@@ -6,6 +6,19 @@ import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, participation } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
+/** The row's editor actions sit in its detail row, opened by the "Quản lý" disclosure. */
+async function openManage(wrapper: {
+  findAll: (
+    selector: string,
+  ) => { text: () => string; trigger: (event: string) => Promise<unknown> }[];
+}) {
+  await wrapper
+    .findAll('button')
+    .find((button) => button.text().startsWith('Quản lý'))!
+    .trigger('click');
+  await flushPromises();
+}
+
 describe('ContestParticipantsTab', () => {
   afterEach(() => vi.useRealTimers());
 
@@ -33,6 +46,7 @@ describe('ContestParticipantsTab', () => {
     );
     expect(wrapper.text()).toContain('214 lượt tham gia · 50 mỗi trang');
     expect(wrapper.get('tbody tr').text()).toContain('Trực tiếp');
+    await openManage(wrapper);
     await wrapper
       .findAll('button')
       .find((button) => button.text() === 'Loại khỏi bảng')!
@@ -79,6 +93,7 @@ describe('ContestParticipantsTab', () => {
     const before = contestReads();
     const ranking = [['contests', 'ranking', 'probe', 'hcmus-w41']];
     seedCache(queryClient, ranking);
+    await openManage(wrapper);
     await disqualifyButton(wrapper).trigger('click');
     await confirmDialog('Loại khỏi bảng');
     await flushPromises();

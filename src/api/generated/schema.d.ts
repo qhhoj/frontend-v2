@@ -1488,7 +1488,16 @@ export interface paths {
         get: operations["ContestsController_detail"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete a contest
+         * @description Contest editors only, with the key typed again in `confirm` (400
+         *     `confirmation_mismatch` otherwise). Only a hidden contest without ratings
+         *     or pending final submissions can be deleted (409 `contest_not_deletable`).
+         *     Its participations, announcements, ranking link, ghosts, balloons, feed
+         *     keys, replay and official ranking are deleted; its submissions are kept
+         *     outside any contest. Returns 204.
+         */
+        delete: operations["ContestEditingController_remove"];
         options?: never;
         head?: never;
         /**
@@ -1573,7 +1582,14 @@ export interface paths {
         delete: operations["ContestAnnouncementsController_remove"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Edit a contest announcement
+         * @description Contest editors only. Replaces the title and Markdown body (re-rendered)
+         *     and keeps the original post time; the edit is not pushed again (resend
+         *     does that). Fails with 404 `not_found` for an unknown announcement and 400
+         *     `validation_failed` when the text cannot be rendered.
+         */
+        patch: operations["ContestAnnouncementsController_update"];
         trace?: never;
     };
     "/api/internal/contests/{key}/announcements/{id}/resend": {
@@ -1593,6 +1609,28 @@ export interface paths {
          *     for an unknown announcement.
          */
         post: operations["ContestAnnouncementsController_resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/announcements/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview an announcement
+         * @description Contest editors only. Renders the Markdown exactly as posting would and
+         *     returns the HTML; nothing is stored. Fails with 400 `validation_failed`
+         *     when the text cannot be rendered.
+         */
+        post: operations["ContestAnnouncementsController_preview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2058,11 +2096,49 @@ export interface paths {
          */
         get: operations["ContestParticipationController_participations"];
         put?: never;
-        post?: never;
+        /**
+         * Add a participation
+         * @description Contest editors only. Adds a live participation (409
+         *     `already_participating` when the user has one) or a new virtual run for
+         *     the user, starting at `realStart` (default: now while the contest runs,
+         *     else the contest start for a live row and now for a virtual one). The
+         *     user's current contest is not changed. Fails with 400 `validation_failed`
+         *     (issue `user_unknown`) and 409 `banned_from_contest`.
+         */
+        post: operations["ParticipationAdminController_add"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/participations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a participation
+         * @description Contest editors only. Deletes a participation that has no submissions
+         *     (409 `participation_has_submissions` otherwise: disqualify it instead) and
+         *     clears the user's current contest when it pointed there. Returns 204;
+         *     404 `not_found` for an unknown participation.
+         */
+        delete: operations["ParticipationAdminController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Change a participation's start
+         * @description Contest editors only. Sets `realStart` (a pending registration counts as
+         *     started), purges the ranking cache and queues a recompute of the
+         *     participation. Fails with 404 `not_found`.
+         */
+        patch: operations["ParticipationAdminController_update"];
         trace?: never;
     };
     "/api/internal/contests/{key}/participations/{id}/disqualify": {
@@ -2086,6 +2162,76 @@ export interface paths {
          *     editors.
          */
         post: operations["ContestParticipationController_disqualify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/participations/{id}/recompute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Recompute a participation
+         * @description Contest editors only. Queues a rescore of the participation's submissions
+         *     and results, for one stale score; returns 202 with `queued` true.
+         */
+        post: operations["ParticipationAdminController_recompute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/problems/{code}/rejudge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rejudge a contest problem's submissions
+         * @description Contest editors with `judge.rejudge_submission` (403 `forbidden`
+         *     otherwise). Rejudges the submissions sent to the problem inside this
+         *     contest only; submissions a judge holds and pending final-submission rows
+         *     are skipped, and locked ones unless `force` is set. More than 10 matches
+         *     also need `judge.rejudge_submission_lot` (403 `forbidden`). With `dryRun`
+         *     nothing changes and `count` and `allowed` report what would happen. Fails
+         *     with 404 `not_found` when the problem is not in the contest.
+         */
+        post: operations["ContestProblemOpsController_rejudge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/contests/{key}/problems/{code}/rescore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rescore a contest problem
+         * @description Contest editors only. Queues a rescore of the problem's submissions in
+         *     this contest and of the participations that sent one, cheaper than a full
+         *     contest rescore; returns 202 with `queued` true. Fails with 404
+         *     `not_found` when the problem is not in the contest.
+         */
+        post: operations["ContestProblemOpsController_rescore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5718,6 +5864,28 @@ export interface components {
             /** @description Username the summary is for. */
             username: string;
         };
+        AddParticipationDto: {
+            /**
+             * @description `live` (one per user) or a new `virtual` run.
+             * @enum {string}
+             */
+            kind: "live" | "virtual";
+            /**
+             * Format: date-time
+             * @description When the participation starts, ISO 8601; defaults to now while the contest runs, else to the contest start (live) or now (virtual).
+             */
+            realStart?: string;
+            /** @description Username of the participant. */
+            user: string;
+        };
+        AnnouncementPreviewDto: {
+            /** @description Markdown to render, as the announcement body would be. */
+            description: string;
+        };
+        AnnouncementPreviewResponse: {
+            /** @description The Markdown rendered to HTML. */
+            html: string;
+        };
         AnnouncementResponse: {
             /** @description When the announcement was posted, ISO 8601. */
             createdAt: string;
@@ -6122,6 +6290,8 @@ export interface components {
             autoPublish: components["schemas"]["ContestAutoPublishResponse"] | null;
             export: components["schemas"]["ContestActionState"];
             judgeFinal: components["schemas"]["ContestActionState"];
+            /** @description Pending final submissions still to be judged (final-submission contests; 0 otherwise). */
+            pendingCount: number;
             publish: components["schemas"]["ContestActionState"];
             rate: components["schemas"]["ContestActionState"];
             replay: components["schemas"]["ContestActionState"];
@@ -6393,6 +6563,12 @@ export interface components {
             outputPrefixOverride: number | null;
             /** @description Id of the problem. */
             problemId: string;
+        };
+        ContestProblemRejudgeDto: {
+            /** @description Count what would be rejudged and change nothing. */
+            dryRun?: boolean;
+            /** @description Also rejudge locked submissions. */
+            force?: boolean;
         };
         ContestProblemResponse: {
             /** @description Problem code. */
@@ -10220,6 +10396,13 @@ export interface components {
              */
             slug?: string;
         };
+        UpdateParticipationDto: {
+            /**
+             * Format: date-time
+             * @description New start, ISO 8601: moves a timed participant's window.
+             */
+            realStart: string;
+        };
         UpdatePolygonLinkDto: {
             autoSync: boolean;
         };
@@ -13423,6 +13606,40 @@ export interface operations {
             };
         };
     };
+    ContestEditingController_remove: {
+        parameters: {
+            query: {
+                /** @description The contest key typed again, to confirm the delete. */
+                confirm: string;
+            };
+            header?: never;
+            path: {
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestEditingController_update: {
         parameters: {
             query?: never;
@@ -13610,6 +13827,47 @@ export interface operations {
             };
         };
     };
+    ContestAnnouncementsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the announcement. */
+                id: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAnnouncementDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AnnouncementResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ContestAnnouncementsController_resend: {
         parameters: {
             query?: never;
@@ -13629,6 +13887,45 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestAnnouncementsController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnouncementPreviewDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AnnouncementPreviewResponse"];
+                    };
+                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
@@ -14529,10 +14826,16 @@ export interface operations {
     ContestParticipationController_participations: {
         parameters: {
             query?: {
+                /** @description Only disqualified (true) or only valid (false) rows. */
+                disqualified?: boolean;
+                /** @description Only live, virtual or spectating rows; default live and virtual. */
+                kind?: "live" | "spectate" | "virtual";
                 /** @description 1-based page number. */
                 page?: number;
                 /** @description Participations per page, 1 to 100. */
                 pageSize?: number;
+                /** @description `score`: best first (score, then time, then tiebreaker); default: live before virtual, oldest first. */
+                sort?: "score";
                 /** @description Username; others than the viewer need edit rights. */
                 user?: string;
             };
@@ -14553,6 +14856,119 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["ParticipationResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ParticipationAdminController_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddParticipationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ParticipationSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ParticipationAdminController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the participation. */
+                id: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ParticipationAdminController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the participation. */
+                id: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateParticipationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ParticipationSummaryResponse"];
                     };
                 };
             };
@@ -14594,6 +15010,121 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ParticipationSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ParticipationAdminController_recompute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the participation. */
+                id: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["QueuedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestProblemOpsController_rejudge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Code of a problem in the contest. */
+                code: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContestProblemRejudgeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BulkRejudgeResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ContestProblemOpsController_rescore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Code of a problem in the contest. */
+                code: string;
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["QueuedResponse"];
                     };
                 };
             };

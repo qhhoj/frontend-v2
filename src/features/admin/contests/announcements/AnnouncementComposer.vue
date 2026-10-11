@@ -7,6 +7,7 @@ import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import AnnouncementPreview from './AnnouncementPreview.vue';
 import { COMPOSE_HEADING_ID } from './composer-heading';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
@@ -73,6 +74,11 @@ const submit = () => post.run({ title: title.value, description: description.val
         />
       </template>
     </AdminField>
+    <AnnouncementPreview
+      v-if="description.trim()"
+      :contest-key="contestKey"
+      :markdown="description"
+    />
     <p class="text-sm text-muted">
       {{
         isPushedLive
