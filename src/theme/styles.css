@@ -531,19 +531,23 @@
   margin-block: 0;
 }
 
+/* A code block's copy bar takes no row: it is a zero-height anchor and the button floats over the block's top-right corner. The block reserves room for it on the right, so no text is covered. */
 @utility copy-bar {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px 8px 0;
-  background-color: var(--qh-surface-strong);
-  border: 1px solid var(--qh-line);
-  border-bottom: 0;
-  border-radius: var(--qh-radius-cell) var(--qh-radius-cell) 0 0;
+  position: relative;
+  z-index: 1;
+  height: 0;
+}
+@utility copy-bar-float {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
 }
 .user-content.statement .copy-bar + pre {
+  display: grid;
+  align-content: center;
+  min-height: 3.5rem;
   margin-top: 0;
-  border-top: 0;
-  border-radius: 0 0 var(--qh-radius-cell) var(--qh-radius-cell);
+  padding-right: 6rem;
 }
 
 /* A sample's title row ("Ví dụ vào") is a small muted label with its copy button: one line, no bar above the box. Wins over the section heading rules by specificity. */

@@ -97,6 +97,7 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     };
     bar.button.addEventListener('click', () => void copyAndConfirm());
     label(bar);
+    if (!titleRow) bar.button.classList.add('copy-bar-float');
     element.append(bar.button, bar.status);
     if (titleRow) {
       titleRow.classList.add('sample-title');
