@@ -56,23 +56,32 @@ function measure() {
     .map((tab) => tab.dataset.tabKey ?? '');
 }
 
-/** Brings the current tab fully into view inside the strip, never scrolling the page. */
+/** Width of the edge fade: a tab behind it is as good as clipped. */
+const FADE_PX = 32;
+
+/** Brings the current tab fully into view, clear of the edge fades, inside the strip, never scrolling the page. */
 function revealCurrent() {
   const el = scroller.value;
   const tab = el?.querySelector<HTMLElement>('[aria-current="page"]');
   if (!el || !tab) return;
-  if (tab.offsetLeft < el.scrollLeft) el.scrollLeft = tab.offsetLeft;
-  else if (tab.offsetLeft + tab.offsetWidth > el.scrollLeft + el.clientWidth)
-    el.scrollLeft = tab.offsetLeft + tab.offsetWidth - el.clientWidth;
+  const start = tab.offsetLeft;
+  const end = start + tab.offsetWidth;
+  const hasLeftFade = el.scrollLeft > SLACK_PX;
+  const hasRightFade = el.scrollWidth - (el.scrollLeft + el.clientWidth) > SLACK_PX;
+  if (start < el.scrollLeft + (hasLeftFade ? FADE_PX : 0)) el.scrollLeft = start - FADE_PX;
+  else if (end > el.scrollLeft + el.clientWidth - (hasRightFade ? FADE_PX : 0))
+    el.scrollLeft = end - el.clientWidth + FADE_PX;
   measure();
 }
 
+/** The strip or its tabs changing size (a drawer finishing its layout, a font loading, a count appearing) re-fits the current tab. */
 let observer: ResizeObserver | undefined;
 onMounted(() => {
   revealCurrent();
   if (typeof ResizeObserver === 'undefined' || !scroller.value) return;
-  observer = new ResizeObserver(measure);
+  observer = new ResizeObserver(revealCurrent);
   observer.observe(scroller.value);
+  if (scroller.value.firstElementChild) observer.observe(scroller.value.firstElementChild);
 });
 onBeforeUnmount(() => observer?.disconnect());
 watch([currentKey, () => props.tabs.length], () => nextTick(revealCurrent));

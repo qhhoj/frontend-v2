@@ -12,6 +12,8 @@ import { SITE_TIME_ZONE } from './site-time';
  * While there is nothing to save (no change, `pending`, or a `blockedReason`) both buttons are `aria-disabled`, keep focus,
  * and a click does nothing. `allowClean` (create forms) lets a form with no change be saved and hides the discard button.
  * The page's `scroll-padding-bottom` follows the bar's height, so a focused field is never hidden under it.
+ * `variant="footer"` is for an `AdminDrawer` footer slot: the footer already pins, pads and rules the row, so the bar drops
+ * its sticky frame (and the page scroll padding) and just fills the row.
  */
 const props = withDefaults(
   defineProps<{
@@ -22,6 +24,7 @@ const props = withDefaults(
     blockedReason?: string;
     saveLabel?: string;
     form?: string;
+    variant?: 'page' | 'footer';
   }>(),
   {
     pending: false,
@@ -30,6 +33,7 @@ const props = withDefaults(
     blockedReason: undefined,
     saveLabel: undefined,
     form: undefined,
+    variant: 'page',
   },
 );
 const emit = defineEmits<{ discard: [] }>();
@@ -70,6 +74,7 @@ const root = document.documentElement;
 const previousPadding = root.style.scrollPaddingBottom;
 let observer: ResizeObserver | undefined;
 onMounted(() => {
+  if (props.variant === 'footer') return;
   const follow = () =>
     (root.style.scrollPaddingBottom = `${(bar.value?.offsetHeight ?? 0) + 16}px`);
   follow();
@@ -87,7 +92,13 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="bar"
-    class="sticky bottom-0 z-30 -mx-[var(--qa-gutter,1rem)] flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+    :data-variant="variant"
+    class="flex flex-wrap items-center gap-x-3 gap-y-2"
+    :class="
+      variant === 'footer'
+        ? 'flex-auto'
+        : 'sticky bottom-0 z-30 -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+    "
   >
     <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
       <span v-if="isDirty" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import Drawer from 'primevue/drawer';
 import { X } from 'lucide-vue-next';
-import { computed, nextTick, useId, useSlots, useTemplateRef } from 'vue';
+import { computed, nextTick, onBeforeUnmount, useId, useSlots, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { iconButtonClass } from './controls';
 
 /**
  * A right-hand panel for editing one object (user, judge, ticket, page): 560 px, the full screen under 768 px.
- * `role="dialog"` and `aria-modal` (PrimeVue Drawer), named by its title; focus is trapped, Escape and a scrim click close it,
+ * `role="dialog"` and `aria-modal` (PrimeVue Drawer), named by its title; focus is trapped, Escape and a scrim click close it
+ * (Escape only while the drawer is the topmost modal: a confirm dialog opened over it takes the key alone),
  * and focus returns to the opener. On open, focus goes to the first `[autofocus]` element, else to the title.
  * Slots: `meta` (chips under the title), `tabs` (fixed under the header), default (the scrolling body), `footer` (fixed,
  * e.g. an `AdminSaveBar`-style row). `width` (px) overrides 560 from 768 px up.
@@ -42,14 +43,32 @@ const pt = computed(() => ({
   },
 }));
 
+/**
+ * PrimeVue listens for Escape on the whole document, so it would close this drawer under a dialog opened over it. Its own
+ * listener is off; this one closes only when no later modal (teleported after the drawer) is open.
+ */
+function isTopmostModal() {
+  const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+  const self = heading.value?.closest('[role="dialog"]');
+  return !!self && dialogs[dialogs.length - 1] === self;
+}
+function onEscape(event: KeyboardEvent) {
+  if (event.code === 'Escape' && isTopmostModal()) visible.value = false;
+}
 function onShow() {
+  document.addEventListener('keydown', onEscape);
   opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   void nextTick(() => {
     const field = body.value?.querySelector<HTMLElement>('[autofocus]');
     (field ?? heading.value)?.focus();
   });
 }
+function stopEscape() {
+  document.removeEventListener('keydown', onEscape);
+}
+onBeforeUnmount(stopEscape);
 function onAfterHide() {
+  stopEscape();
   if (opener?.isConnected) opener.focus();
   opener = null;
   emit('hide');
@@ -61,6 +80,7 @@ function onAfterHide() {
     v-model:visible="visible"
     position="right"
     block-scroll
+    :close-on-escape="false"
     :pt="pt"
     @show="onShow"
     @after-hide="onAfterHide"

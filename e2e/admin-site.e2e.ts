@@ -1,9 +1,15 @@
 import { expect, test } from './fixtures/api';
+import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
+import { adminList, adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { siteData } from '../src/test/admin-fixtures/site';
 
 const CONFIG_PERMS = ['judge.change_miscconfig'];
+
+/** Opening a key also loads its revision history. */
+function mockEmptyRevisions(api: FakeApi, key: string) {
+  api.routes[`GET /admin/site/config/${key}/revisions`] = adminList([]);
+}
 
 for (const viewport of AUDIT_VIEWPORTS)
   test(`raw config at ${viewport.name}: the HTML preview is sandboxed and a script value never runs`, async ({
@@ -13,6 +19,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.setViewportSize(viewport);
     signInAsStaff(api, CONFIG_PERMS);
     api.routes['GET /site'] = adminOk(siteData());
+    mockEmptyRevisions(api, 'announcement');
     api.routes['PUT /admin/site/config/announcement'] = adminOk({
       key: 'announcement',
       value: '<script>window.ran = true</script>',
@@ -46,6 +53,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.setViewportSize(viewport);
     signInAsStaff(api, CONFIG_PERMS);
     api.routes['GET /site'] = adminOk(siteData());
+    mockEmptyRevisions(api, 'discord_invite_link');
 
     await page.goto('/admin/config');
     await page.getByRole('button', { name: 'discord_invite_link' }).click();
@@ -61,6 +69,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.setViewportSize(viewport);
     signInAsStaff(api, CONFIG_PERMS);
     api.routes['GET /site'] = adminOk(siteData());
+    mockEmptyRevisions(api, 'contact_email');
     api.routes['DELETE /admin/site/config/contact_email'] = { status: 204 };
 
     await page.goto('/admin/config');
