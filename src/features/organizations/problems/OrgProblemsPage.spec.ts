@@ -206,7 +206,7 @@ describe('org bulk actions', () => {
     await tick(wrapper, 'lhp_lis');
     await barButton(wrapper, 'Lưu trữ').trigger('click');
     await flushPromises();
-    expect(wrapper.get('[data-testid="org-bulk-failure"]').text()).toContain('600');
+    expect(wrapper.get('[data-testid="org-bulk-failure"]').text()).toContain('10 phút');
     expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 1 bài');
   });
 
