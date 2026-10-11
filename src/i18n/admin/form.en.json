@@ -27,5 +27,16 @@
     "jumpTo": "Jump to section",
     "onThisPage": "On this page",
     "pick": "Choose a section"
+  },
+  "view": {
+    "label": "Form view",
+    "basic": "Basic",
+    "advanced": "Advanced",
+    "changedCount": "{count} advanced option differs from the default or is unsaved | {count} advanced options differ from the default or are unsaved",
+    "hasErrors": "Has something to fix",
+    "lead": {
+      "basic": "Only the fields used most. Both tabs share one Save button.",
+      "advanced": "Every other option. Both tabs share one Save button."
+    }
   }
 }

@@ -11211,7 +11211,7 @@ export interface components {
          * @description Setting key.
          * @enum {string}
          */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;

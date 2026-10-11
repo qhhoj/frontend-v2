@@ -238,6 +238,32 @@
       "participants": "Participants",
       "virtual": "plus {count} virtual",
       "problems": "Problems"
+    },
+    "basic": {
+      "sections": {
+        "info": "Contest",
+        "time": "Time",
+        "format": "Scoring",
+        "access": "Who sees it"
+      },
+      "leads": {
+        "info": "The key is used in the contest page address.",
+        "time": "Vietnam time (UTC+7).",
+        "access": "Who sees the contest and its scoreboard."
+      },
+      "quickLegend": "Lasts",
+      "quick": "+{n} min",
+      "quickHint": "Sets the end from the start.",
+      "formatLegend": "Format",
+      "formats": {
+        "ioi": "Partial points per test; the best submission counts.",
+        "icpc": "Whole problem right or wrong; ranked by solved count and penalty time.",
+        "default": "Adds the best score of each problem; ties go to who finished first."
+      },
+      "otherFormat": "This contest uses the {format} format. Pick another format on the Advanced tab.",
+      "moreFormats": "VNOJ, IOI 2016, Ultimate, Final submission and the format settings are on the Advanced tab.",
+      "problems": "Problems: {count}.",
+      "problemsLink": "Edit on the Problems tab"
     }
   },
   "format": {

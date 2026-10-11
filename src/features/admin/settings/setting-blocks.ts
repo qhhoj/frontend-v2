@@ -18,6 +18,7 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'contest.officialMode': { kind: 'boolean' },
   'contest.officialModeEndsAt': { kind: 'text' },
   'contest.banAfterDisqualifications': { kind: 'integer', min: 0, max: 1000 },
+  'organization.adminRoleId': { kind: 'text' },
   'problem.deleteGraceDays': { kind: 'integer', min: 1, max: 365 },
   'discord.webhooks': { kind: 'webhooks' },
   'mail.from': { kind: 'text' },
@@ -50,6 +51,7 @@ export type SettingGroup =
   | 'site'
   | 'contest'
   | 'problem'
+  | 'organization'
   | 'polygon'
   | 'externalJudge'
   | 'mail'
@@ -63,6 +65,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
   'site',
   'contest',
   'problem',
+  'organization',
   'polygon',
   'externalJudge',
   'mail',
@@ -90,6 +93,7 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
     ],
   },
   { id: 'problem', group: 'problem', keys: ['problem.deleteGraceDays'] },
+  { id: 'organization', group: 'organization', keys: ['organization.adminRoleId'] },
   {
     id: 'polygon',
     group: 'polygon',

@@ -16,7 +16,8 @@ const mountAdmin = async (path: string) => {
   mountedApps.push(mounted);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
+      if (!mounted.wrapper.find('#problem-code, [data-testid="editor-view-basic"]').exists())
+        throw new Error('form not yet');
     },
     { timeout: 5000 },
   );
@@ -52,7 +53,7 @@ async function typeCloneCode(code: string) {
 describe('problem people, status and clone', () => {
   it('locks authors, curators, banned users and organizations without judge.edit_all_problem', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_problem']), ...problemEditorRoutes() });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general?view=advanced');
     for (const list of ['authors', 'curators', 'bannedUsers', 'organizations'])
       expect(
         wrapper.get(`[data-testid="people-${list}"] input`).attributes('disabled'),
@@ -68,10 +69,12 @@ describe('problem people, status and clone', () => {
       ...staffViewer(['judge.edit_own_problem', 'judge.change_public_visibility']),
       ...problemEditorRoutes(),
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-    expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/general?view=advanced');
     expect(wrapper.get('#problem-isManuallyManaged').attributes('disabled')).toBeDefined();
     expect(wrapper.get('#problem-isFullMarkup').attributes('disabled')).toBeDefined();
+    await router.push('/admin/problems/hcmus41c/general');
+    await flushPromises();
+    expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
   });
 
   it('clones under a new code from the header menu and opens the copy; a taken code shows under the box', async () => {

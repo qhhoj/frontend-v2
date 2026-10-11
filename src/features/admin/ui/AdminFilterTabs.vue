@@ -11,6 +11,8 @@ export interface AdminFilterTab {
   count?: number;
   countLabel?: string;
   countTestid?: string;
+  /** A red dot after the label, read as this text: the view holds something to fix (a field error). */
+  alertLabel?: string;
   testid?: string;
 }
 
@@ -38,6 +40,7 @@ watch(
 const PILL =
   'inline-flex min-h-7 shrink-0 items-center gap-1.5 rounded-pill px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content pointer-coarse:min-h-9 aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
 const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums';
+const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
 </script>
 
 <template>
@@ -62,6 +65,9 @@ const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-n
           :class="COUNT"
           >{{ tab.count }}</span
         >
+        <span v-if="tab.alertLabel" :data-testid="`${tab.testid}-alert`" :class="ALERT">
+          <span class="sr-only">{{ tab.alertLabel }}</span>
+        </span>
       </RouterLink>
       <button
         v-else
@@ -79,6 +85,9 @@ const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-n
           :class="COUNT"
           >{{ tab.count }}</span
         >
+        <span v-if="tab.alertLabel" :data-testid="`${tab.testid}-alert`" :class="ALERT">
+          <span class="sr-only">{{ tab.alertLabel }}</span>
+        </span>
       </button>
     </template>
   </nav>

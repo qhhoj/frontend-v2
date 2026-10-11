@@ -14,6 +14,8 @@ import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { needsPermissionText } from '../../ui/permission-text';
 
 const EDIT = ['judge.edit_own_contest'];
+/** A heading only the Basic view has. */
+const BASIC_MARK = 'Cách tính điểm';
 const STALE_AFTER_WRITE = [
   ['contests', 'list', 'probe'],
   ['admin', 'index', 'contests', 'probe'],
@@ -29,12 +31,11 @@ const save = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
 describe('ContestGeneralTab', () => {
   it('locks visibility, privacy, the access code, locking and rating behind their permissions', async () => {
     mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/general',
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general?view=advanced',
       'Thông tin kỳ thi',
     );
     for (const permission of [
-      'judge.change_contest_visibility',
       'judge.create_private_contest',
       'judge.contest_access_code',
       'judge.lock_contest',
@@ -43,6 +44,9 @@ describe('ContestGeneralTab', () => {
       expect(wrapper.text(), permission).toContain(needsPermissionText(permission));
     expect(wrapper.text()).not.toContain('judge.');
     expect(wrapper.get('#contest-accessCode').attributes('disabled')).toBeDefined();
+    await router.push('/admin/contests/hcmus-w41/general');
+    await flushPromises();
+    expect(wrapper.text()).toContain(needsPermissionText('judge.change_contest_visibility'));
   });
 
   it('shows a server field error next to its own field', async () => {
@@ -51,10 +55,7 @@ describe('ContestGeneralTab', () => {
       ...contestEditorRoutes(),
       'PATCH /contests/hcmus-w41': invalid(issue('endTime', 'is_timestamp', 'bad')),
     });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/general',
-      'Thông tin kỳ thi',
-    );
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
     await wrapper.get('#contest-name').setValue('Tuần 41');
     await save(wrapper);
     expect(wrapper.get('#contest-endTime').attributes('aria-invalid')).toBe('true');
@@ -67,7 +68,10 @@ describe('ContestGeneralTab', () => {
       ...contestEditorRoutes(editableContest({ timeLimit: 3600 })),
       'PATCH /contests/hcmus-w41': ok(editableContest()),
     });
-    const saved = await mountAndWaitFor('/admin/contests/hcmus-w41/general', 'Thông tin kỳ thi');
+    const saved = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general?view=advanced',
+      'Thông tin kỳ thi',
+    );
     seedCache(saved.queryClient, STALE_AFTER_WRITE);
     await saved.wrapper.get('#contest-timeLimit').setValue('');
     await save(saved.wrapper);
@@ -103,7 +107,7 @@ describe('ContestGeneralTab', () => {
       ]),
     });
     const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/general',
+      '/admin/contests/hcmus-w41/general?view=advanced',
       'Thông tin kỳ thi',
     );
     await wrapper.get('#contest-rules').setValue('x');
@@ -125,10 +129,7 @@ describe('ContestGeneralTab', () => {
     });
     const openVisibility = async (contest: ReturnType<typeof editableContest>) => {
       mockApi({ ...orgAdmin(), ...contestEditorRoutes(contest) });
-      const { wrapper } = await mountAndWaitFor(
-        '/admin/contests/hcmus-w41/general',
-        'Thông tin kỳ thi',
-      );
+      const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
       return wrapper.get('#contest-isVisible');
     };
 
@@ -155,10 +156,7 @@ describe('ContestGeneralTab', () => {
       ...staffViewer([...EDIT, 'judge.change_contest_visibility']),
       ...contestEditorRoutes(editableContest({ settings: contestSettings({ isVisible: false }) })),
     });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/general',
-      'Thông tin kỳ thi',
-    );
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
     expect(wrapper.get('#contest-isVisible').attributes('disabled')).toBeUndefined();
   });
 
@@ -175,12 +173,99 @@ describe('ContestGeneralTab', () => {
       'GET /organizations': page([organizationItem({ id: orgId, name: 'THPT Hùng Vương' })]),
     });
     const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/general',
+      '/admin/contests/hcmus-w41/general?view=advanced',
       'Thông tin kỳ thi',
     );
     await flushPromises();
     const chip = wrapper.get('[data-testid="organization-chip"]');
     expect(chip.text()).toContain('THPT Hùng Vương');
     expect(chip.text()).not.toContain('01a1');
+  });
+
+  it('keeps the view in the URL: the Advanced tab shows the other fields and the link reopens them', async () => {
+    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      BASIC_MARK,
+    );
+    expect(wrapper.find('#contest-rules').exists()).toBe(false);
+    await wrapper.get('[data-testid="editor-view-advanced"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.view).toBe('advanced');
+    expect(wrapper.find('#contest-rules').exists()).toBe(true);
+    expect(wrapper.find('#contest-name').exists()).toBe(false);
+    wrapper.unmount();
+
+    const reopened = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general?view=advanced',
+      'Thông tin kỳ thi',
+    );
+    expect(reopened.wrapper.find('#contest-rules').exists()).toBe(true);
+  });
+
+  it('keeps an edit made in one view when the other view is shown, and saves both with one PATCH', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      BASIC_MARK,
+    );
+    await wrapper.get('#contest-name').setValue('Tuần 41');
+    await router.push('/admin/contests/hcmus-w41/general?view=advanced');
+    await flushPromises();
+    await wrapper.get('#contest-rules').setValue('Không dùng tài liệu.');
+    await save(wrapper);
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toMatchObject({
+      name: 'Tuần 41',
+      rules: 'Không dùng tài liệu.',
+    });
+  });
+
+  it('brings the Advanced view up, flagged, when a save is refused for one of its fields', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'PATCH /contests/hcmus-w41': invalid(issue('frozenLastMinutes', 'min', 'too small')),
+    });
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      BASIC_MARK,
+    );
+    await wrapper.get('#contest-name').setValue('Tuần 41');
+    await save(wrapper);
+    expect(router.currentRoute.value.query.view).toBe('advanced');
+    expect(wrapper.get('#contest-frozenLastMinutes').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.find('[data-testid="editor-view-advanced-alert"]').exists()).toBe(true);
+  });
+
+  it('brings the Basic view up on create when the start and end are missing', async () => {
+    mockApi({ ...staffViewer(['judge.add_contest']) });
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/new?view=advanced',
+      'Tạo kỳ thi',
+    );
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Tạo kỳ thi')!
+      .trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query.view).toBeUndefined();
+    expect(wrapper.get('#contest-startTime').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.find('[data-testid="editor-view-basic-alert"]').exists()).toBe(true);
+  });
+
+  it('counts an unsaved Advanced edit on the Advanced tab', async () => {
+    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general?view=advanced',
+      'Thông tin kỳ thi',
+    );
+    const count = () => Number(wrapper.get('[data-testid="editor-view-advanced-count"]').text());
+    const before = count();
+    await wrapper.get('#contest-rules').setValue('Không dùng tài liệu.');
+    expect(count()).toBe(before + 1);
   });
 });

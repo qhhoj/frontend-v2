@@ -52,7 +52,7 @@ test('fills the test list from an uploaded zip and saves it through the save bar
   await dialog.getByRole('button', { name: 'Thêm 3 test' }).click();
   await expect(dialog).toBeHidden();
 
-  await expect(page.getByText('3 test', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('data-cases-summary')).toContainText('3 test · tổng 100 điểm');
   await expect(page.getByTestId('autofill-applied')).toContainText('Đã thêm 3 test');
   expect(api.requestsTo('PUT /problems/hcmus41c/data')).toHaveLength(0);
   await page.getByTestId('data-save-bar').getByRole('button', { name: 'Lưu cấu hình' }).click();

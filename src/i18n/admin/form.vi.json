@@ -27,5 +27,16 @@
     "jumpTo": "Đi tới mục",
     "onThisPage": "Trên trang này",
     "pick": "Chọn một mục"
+  },
+  "view": {
+    "label": "Chế độ xem biểu mẫu",
+    "basic": "Cơ bản",
+    "advanced": "Nâng cao",
+    "changedCount": "{count} tuỳ chọn nâng cao khác mặc định hoặc chưa lưu | {count} tuỳ chọn nâng cao khác mặc định hoặc chưa lưu",
+    "hasErrors": "Có lỗi cần sửa ở đây",
+    "lead": {
+      "basic": "Chỉ những mục hay dùng. Hai tab dùng chung một nút Lưu.",
+      "advanced": "Mọi tuỳ chọn khác. Hai tab dùng chung một nút Lưu."
+    }
   }
 }

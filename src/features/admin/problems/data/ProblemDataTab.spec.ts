@@ -13,7 +13,7 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('[data-testid="data-checker-family-stock"]').exists())
+      if (!mounted.wrapper.find('[data-testid="data-save-bar"]').exists())
         throw new Error('tab not yet');
     },
     { timeout: 5000 },
@@ -42,7 +42,7 @@ describe('ProblemDataTab', () => {
       'GET /problems/hcmus41c/data': ok(problemData()),
       'PUT /problems/hcmus41c/data': ok(problemData({ unicode: true })),
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
     await wrapper.get('#data-unicode').setValue(true);
     await saveConfig(wrapper);
     const body = calls.find((call) => call.method === 'PUT')!.body as {
@@ -68,7 +68,7 @@ describe('ProblemDataTab', () => {
       'GET /problems/hcmus41c/data': ok(migrated),
       'PUT /problems/hcmus41c/data': ok(migrated),
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
     await wrapper.get('#data-unicode').setValue(true);
     await saveConfig(wrapper);
     const body = calls.find((call) => call.method === 'PUT')!.body;
@@ -126,18 +126,47 @@ describe('ProblemDataTab', () => {
       ...problemEditorRoutes(),
       'GET /problems/hcmus41c/data': ok(problemData()),
     });
-    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/data');
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
     await wrapper.get('#data-unicode').setValue(true);
     await router.push('/admin/problems');
     await flushPromises();
     expect(openDialog().textContent).toContain('Rời trang?');
     await cancelDialog('Ở lại');
-    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data?view=advanced');
     await router.push('/admin/problems');
     await flushPromises();
     await confirmDialog('Rời trang');
     await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/admin/problems'), {
       timeout: 10_000,
     });
+  });
+
+  it('brings the Advanced view up when a save is blocked by one of its options, and flags it', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(
+        problemData({ checker: 'floats', checkerArgs: { precision: 99 } }),
+      ),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await wrapper.get('[data-testid="data-io-method-file"] input').setValue(true);
+    await wrapper.get('#data-io_input_file').setValue('BAI.INP');
+    await wrapper.get('#data-io_output_file').setValue('BAI.OUT');
+    await saveConfig(wrapper);
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+    expect(router.currentRoute.value.query.view).toBe('advanced');
+    expect(wrapper.get('#data-checker-precision').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.find('[data-testid="editor-view-advanced-alert"]').exists()).toBe(true);
+  });
+
+  it('counts a non-default Advanced option on the Advanced tab while showing the Basic view', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData({ unicode: true })),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    expect(wrapper.get('[data-testid="editor-view-advanced-count"]').text()).toBe('1');
   });
 });
