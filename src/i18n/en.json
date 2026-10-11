@@ -1321,6 +1321,7 @@
     "jumpPlaceholder": "Go to a profile by username",
     "jumpSubmit": "Open",
     "pagerLabel": "Leaderboard pages",
+    "scrollRegion": "Leaderboard (scrollable)",
     "empty": "Nobody is on this board yet.",
     "title": "Leaderboard"
   },
