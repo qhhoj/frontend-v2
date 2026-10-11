@@ -13,7 +13,8 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('#data-checkerArgs').exists()) throw new Error('tab not yet');
+      if (!mounted.wrapper.find('[data-testid="data-checker-family-stock"]').exists())
+        throw new Error('tab not yet');
     },
     { timeout: 5000 },
   );
@@ -35,7 +36,9 @@ describe('test data uploads', () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
       ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData({ customChecker: 'checker.cpp' })),
+      'GET /problems/hcmus41c/data': ok(
+        problemData({ customChecker: 'checker.cpp', checker: 'bridged' }),
+      ),
       'DELETE /problems/hcmus41c/data/files/customChecker': ok(
         problemData({ customChecker: null }),
       ),

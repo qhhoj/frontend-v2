@@ -8,6 +8,7 @@ import type { FieldErrors } from '../../ui/admin-errors';
 import { countChanges } from '../../ui/form/dirty-form';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { problemDataKey, useProblemDataQuery } from './problem-data.queries';
+import { configErrors } from './checker-config';
 import { checkDataForm, dataSnapshot, toDataBody, toDataForm } from './test-cases';
 import type { DataForm } from './test-cases';
 import { useInvalidArgs } from './use-invalid-args';
@@ -31,7 +32,9 @@ export function useDataForm(code: () => string) {
       ? countChanges(sentShape(form.value), sentShape(toDataForm(saved.value)))
       : 0,
   );
-  const errors = computed<FieldErrors>(() => (form.value ? checkDataForm(form.value) : {}));
+  const errors = computed<FieldErrors>(() =>
+    form.value ? { ...checkDataForm(form.value), ...configErrors(form.value) } : {},
+  );
   const { badRowNumbers, markInvalid } = useInvalidArgs(form);
 
   const mutation = useAdminMutation({

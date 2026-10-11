@@ -102,8 +102,9 @@ const FORM_ID = 'problem-data-form';
         >
           <CheckerSection
             v-model="form"
+            :code="problem.code"
+            :data="query.data.value"
             :errors="errors"
-            :has-custom-checker="query.data.value.customChecker !== null"
           />
           <CasesEditor
             v-model="form.cases"

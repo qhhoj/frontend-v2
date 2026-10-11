@@ -311,6 +311,147 @@
       "others": "{count} tệp khác (không phải input/output)",
       "apply": "Thêm {count} test",
       "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu."
+    },
+    "config": {
+      "checkerTitle": "Trình chấm",
+      "checkerDescription": "Cách so output của bài nộp với đáp án của từng test.",
+      "familyLegend": "Loại trình chấm",
+      "family": {
+        "stock": {
+          "label": "Có sẵn",
+          "description": "Một quy tắc so sánh dựng sẵn, không cần tải tệp."
+        },
+        "testlib": {
+          "label": "Testlib",
+          "description": "Checker C++ viết bằng testlib.h (registerTestlibCmd)."
+        },
+        "themis": {
+          "label": "Themis",
+          "description": "Đọc thư mục test và thư mục bài làm từ stdin, in điểm 0–1 ở dòng cuối."
+        },
+        "default": {
+          "label": "Mã thoát",
+          "description": "Nhận input, output, đáp án; thoát 0 là đúng, 1 là sai."
+        }
+      },
+      "stockLabel": "Quy tắc so sánh",
+      "stock": {
+        "standard": {
+          "label": "Chuẩn",
+          "hint": "So từng từ, bỏ qua khoảng trắng và dòng trống thừa."
+        },
+        "floats": {
+          "label": "Số thực",
+          "hint": "Số thực đúng khi sai số tuyệt đối hoặc tương đối đủ nhỏ."
+        },
+        "floatsabs": {
+          "label": "Số thực, sai số tuyệt đối",
+          "hint": "Số thực đúng khi hiệu output và đáp án đủ nhỏ."
+        },
+        "floatsrel": {
+          "label": "Số thực, sai số tương đối",
+          "hint": "Số thực đúng khi sai số tương đối đủ nhỏ."
+        },
+        "identical": {
+          "label": "Giống hệt",
+          "hint": "Output phải giống đáp án từng byte."
+        },
+        "linecount": {
+          "label": "Từng dòng",
+          "hint": "So từng dòng; mỗi dòng so theo từ."
+        },
+        "rstripped": {
+          "label": "Từng dòng, bỏ khoảng trắng cuối",
+          "hint": "Các dòng phải giống nhau sau khi bỏ khoảng trắng cuối dòng."
+        },
+        "sorted": {
+          "label": "Không theo thứ tự",
+          "hint": "So sau khi sắp xếp các dòng (hoặc các từ)."
+        },
+        "unordered": {
+          "label": "Tập các từ",
+          "hint": "Đúng khi output có đúng các từ của đáp án, thứ tự bất kỳ."
+        },
+        "easy": {
+          "label": "Dễ",
+          "hint": "Bỏ mọi khoảng trắng, không phân biệt hoa thường, thứ tự ký tự bất kỳ."
+        },
+        "linematches": {
+          "label": "Điểm theo dòng",
+          "hint": "Mỗi dòng trùng đáp án được phần điểm của dòng đó."
+        }
+      },
+      "precision": "Số chữ số sau dấu phẩy",
+      "precisionHint": "Sai số cho phép là 10^-{n}. Để trống: 6.",
+      "splitOn": "Sắp xếp theo",
+      "splitLines": "Từng dòng",
+      "splitWhitespace": "Từng từ",
+      "weights": "Điểm của từng dòng",
+      "weightsHint": "Các số nguyên cách nhau bởi dấu cách, ví dụ 1 1 2; số lượng bằng số dòng của đáp án.",
+      "peAllowed": "Báo lỗi trình bày khi chỉ khác khoảng trắng",
+      "peAllowedHint": "Tắt: chỉ báo sai.",
+      "filterNewLine": "Bỏ qua dòng trống",
+      "fillerLines": "Bắt buộc đủ số dòng",
+      "fillerLinesHint": "Bật: output thiếu hoặc thừa dòng là sai.",
+      "checkerFile": "Tệp checker (.cpp, .pas, .java)",
+      "checkerFileMissing": "Chưa có tệp checker. Bài sẽ không chấm được cho tới khi tải lên.",
+      "percentage": "Điểm checker là phần trăm",
+      "percentageHint": "Bật: \"points 50\" là 50% điểm test. Tắt: \"points N\" là N điểm của test.",
+      "themisHint": "Checker tìm file theo tên trong mã nguồn của nó và theo tên file vào/ra bên dưới. Nếu checker dùng tên file của bài, chọn \"Qua file\".",
+      "graderTitle": "Cách chạy bài",
+      "graderDescription": "Bài nộp đọc dữ liệu và trả kết quả như thế nào.",
+      "graderLegend": "Kiểu bài",
+      "grader": {
+        "standard": {
+          "label": "Chuẩn",
+          "description": "Chương trình đọc input và in output."
+        },
+        "interactive": {
+          "label": "Tương tác",
+          "description": "Chương trình trao đổi với interactor (testlib) của bài."
+        },
+        "signature": {
+          "label": "Chỉ viết hàm",
+          "description": "Thí sinh viết hàm; ghép với grader và header của bài."
+        },
+        "output_only": {
+          "label": "Chỉ nộp output",
+          "description": "Thí sinh nộp file kết quả, không nộp mã nguồn."
+        }
+      },
+      "ioLegend": "Nhập/xuất",
+      "io": {
+        "standard": {
+          "label": "stdin / stdout",
+          "description": "Đọc từ bàn phím, in ra màn hình."
+        },
+        "file": {
+          "label": "Qua file",
+          "description": "Đọc và ghi các file có tên cố định."
+        }
+      },
+      "io_input_file": "Tên file input",
+      "io_input_fileHint": "Ví dụ: SUM.INP",
+      "io_output_file": "Tên file output",
+      "io_output_fileHint": "Ví dụ: SUM.OUT",
+      "interactorFile": "Interactor (.cpp, testlib)",
+      "interactorMissing": "Chưa có interactor. Bài sẽ không chấm được cho tới khi tải lên.",
+      "graderFile": "Grader (.cpp, có hàm main)",
+      "headerFile": "Header (.h)",
+      "allowMain": "Cho phép thí sinh tự viết main",
+      "allowMainHint": "Tắt: bài nộp có hàm main sẽ bị từ chối.",
+      "advancedTitle": "Tuỳ chọn nâng cao",
+      "advancedDescription": "Hiếm khi cần đổi.",
+      "outputLimitHint": "Số byte output tối đa. Để trống: mặc định của máy chấm.",
+      "outputPrefixHint": "Số byte đầu của output được lưu để xem lại.",
+      "unicodeHint": "Coi khoảng trắng Unicode là khoảng trắng khi so sánh.",
+      "nobigmathHint": "Máy chấm hiện tại chưa hỗ trợ; bài bật tuỳ chọn này sẽ không chấm được.",
+      "errors": {
+        "precision": "Nhập số nguyên từ 0 đến {max}.",
+        "weights": "Cần ít nhất một dòng có điểm lớn hơn 0.",
+        "weightsFormat": "Chỉ nhập các số nguyên không âm, cách nhau bởi dấu cách.",
+        "fileName": "Nhập tên file, không có / hay \\, không bắt đầu bằng dấu chấm, khác input, output, main."
+      }
     }
   },
   "uploads": {
