@@ -124,6 +124,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/admin/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List roles
+         * @description Requires `judge.change_profile`. Roles (legacy groups) by name, with their permissions and member count.
+         */
+        get: operations["AccessController_listGroups"];
+        put?: never;
+        /**
+         * Create a role
+         * @description Superuser only. Members gain its permissions on their next request. Errors: 400 `validation_failed` with issue `permission_unknown`; 403 `forbidden` unless you are a superuser; 409 `conflict` with issue `group_name_taken`, or `busy` while another access change is saved.
+         */
+        post: operations["AccessController_createGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit a role
+         * @description Superuser only. Renames the role, adds and removes permissions; members see the change on their next request. Errors: 400 `validation_failed` with issues `permission_unknown`, `added_and_removed`; 403 `forbidden` unless you are a superuser; 404 `not_found`; 409 `conflict` with issue `group_name_taken`.
+         */
+        patch: operations["AccessController_updateGroup"];
+        trace?: never;
+    };
     "/api/internal/admin/languages": {
         parameters: {
             query?: never;
@@ -241,6 +285,26 @@ export interface paths {
          *     text (any case).
          */
         get: operations["OrganizationRequestQueueController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List grantable permissions
+         * @description Requires `judge.change_profile`. Every permission the site checks, with a category and an English label, in catalog order.
+         */
+        get: operations["AccessController_permissions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -752,6 +816,30 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's roles and permissions
+         * @description Requires `judge.change_profile`. The flags, roles, direct permissions and every effective permission with its source; `canEdit` says whether you may change them. Errors: 403 `forbidden` for a superuser unless you are one; 404 `not_found`.
+         */
+        get: operations["AccessController_getAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change a user's roles and permissions
+         * @description Superuser only, never on your own account. Adds and removes roles and direct permissions and sets the staff and superuser flags; absent fields stay, and a role granted meanwhile elsewhere is kept. Applies on the user's next request. Errors: 400 `validation_failed` with issues `permission_unknown` (a codename outside the catalog the user does not already hold), `group_unknown`, `added_and_removed`; 403 `forbidden` unless you are still a superuser, or for yourself; 404 `not_found`; 409 `conflict` with issue `busy` while another access change is saved.
+         */
+        patch: operations["AccessController_changeAccess"];
         trace?: never;
     };
     "/api/internal/admin/users/{username}/password": {
@@ -6766,6 +6854,18 @@ export interface components {
             /** @description The new password; it must pass the password policy. */
             newPassword: string;
         };
+        ChangeUserAccessDto: {
+            addGroups?: string[];
+            /** @description Codenames to grant; one the catalog lacks is refused. */
+            addPermissions?: string[];
+            /** @description Opens the staff screens; what they allow still comes from the permissions. */
+            isStaff?: boolean;
+            /** @description Holds every permission. */
+            isSuperuser?: boolean;
+            removeGroups?: string[];
+            /** @description Codenames to take away, legacy ones included. */
+            removePermissions?: string[];
+        };
         CloneContestDto: {
             /**
              * @description Key of the new contest: lowercase letters, digits and underscores, at most
@@ -7646,6 +7746,11 @@ export interface components {
             /** @description Canonicalised on save (`about/` becomes `/about`). */
             url: string;
         };
+        CreateGroupDto: {
+            name: string;
+            /** @description Codenames from the catalog; none when absent. */
+            permissions?: string[];
+        };
         CreateIntegrationClientDto: {
             /** @description Username of the user the client acts as. */
             actsAs: string;
@@ -7979,6 +8084,13 @@ export interface components {
             /** @description When it becomes readable by everyone (ISO 8601). */
             publishOn: string;
         };
+        EffectivePermissionResponse: {
+            codename: string;
+            /** @description True when held directly. */
+            direct: boolean;
+            /** @description Names of the groups granting it. */
+            viaGroups: string[];
+        };
         ErrorBodyResponse: {
             /** @description Machine code, snake_case (`validation_failed`, `not_found`, ...). */
             code: string;
@@ -8166,6 +8278,18 @@ export interface components {
             isUnranked: boolean;
             /** @description Name shown for the ghost. */
             label: string;
+        };
+        GroupResponse: {
+            id: string;
+            /** @description Users in the group. */
+            memberCount: number;
+            name: string;
+            /** @description Codenames, including legacy ones the catalog no longer lists. */
+            permissions: string[];
+        };
+        GroupSummaryResponse: {
+            id: string;
+            name: string;
         };
         HasMorePageMetaResponse: {
             hasMore: boolean;
@@ -8983,6 +9107,15 @@ export interface components {
         PdfRenderingResponse: {
             /** @description Always `rendering`. */
             status: string;
+        };
+        /** @enum {string} */
+        PermissionCategory: "community" | "contests" | "judging" | "organizations" | "problems" | "site" | "submissions" | "users";
+        PermissionResponse: {
+            category: components["schemas"]["PermissionCategory"];
+            /** @description Legacy Django codename such as `judge.edit_all_problem`. */
+            codename: string;
+            /** @description English label; the frontend may translate by codename. */
+            label: string;
         };
         PolygonLatestPackageResponse: {
             /**
@@ -11307,6 +11440,13 @@ export interface components {
             /** @description Canonicalised on save (`about/` becomes `/about`). */
             url?: string;
         };
+        UpdateGroupDto: {
+            /** @description Codenames to grant; one the catalog lacks is refused. */
+            addPermissions?: string[];
+            name?: string;
+            /** @description Codenames to take away, legacy ones included. */
+            removePermissions?: string[];
+        };
         UpdateJudgeDto: {
             /** @description Free-form notes about the judge, up to 10000 characters. */
             description?: string;
@@ -11633,6 +11773,18 @@ export interface components {
             monthlyCredits: number | null;
             /** @description Staff-set storage cap in bytes; null for the site default. */
             storageBytes: number | null;
+        };
+        UserAccessResponse: {
+            /** @description Whether you may change this access: only a superuser grants or revokes, and never on their own account. */
+            canEdit: boolean;
+            /** @description Every codename held directly or through a group, by codename. */
+            effective: components["schemas"]["EffectivePermissionResponse"][];
+            groups: components["schemas"]["GroupSummaryResponse"][];
+            isStaff: boolean;
+            /** @description A superuser holds every permission whatever the lists say. */
+            isSuperuser: boolean;
+            /** @description Codenames held directly. */
+            permissions: string[];
         };
         UserDataStatusResponse: {
             /** @description A prepare would be accepted now: no job running, the once-a-day rule met and the three-a-day limit not used up. */
@@ -12035,6 +12187,113 @@ export interface operations {
             };
         };
     };
+    AccessController_listGroups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["GroupResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AccessController_createGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGroupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["GroupResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AccessController_updateGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the role. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGroupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["GroupResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     LanguagesAdminController_list: {
         parameters: {
             query?: never;
@@ -12273,6 +12532,38 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["OrganizationRequestResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AccessController_permissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PermissionResponse"][];
                     };
                 };
             };
@@ -13376,6 +13667,80 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["CreatedUserResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AccessController_getAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserAccessResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AccessController_changeAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeUserAccessDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserAccessResponse"];
                     };
                 };
             };

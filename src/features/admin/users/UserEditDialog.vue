@@ -3,6 +3,7 @@ import Dialog from 'primevue/dialog';
 import { computed, ref, watch } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import { usePermissions } from '@/stores/use-permissions';
+import UserAccessSection from './UserAccessSection.vue';
 import UserAccountSection from './UserAccountSection.vue';
 import UserPasswordForm from './UserPasswordForm.vue';
 import UserProfileForm from './UserProfileForm.vue';
@@ -62,6 +63,8 @@ const showsAccount = computed(
           <UserResetLink :username="user.username" :email="user.email" />
         </template>
         <p v-else class="text-sm text-muted">{{ $t('admin.users.edit.credentialsLocked') }}</p>
+        <hr class="border-line" />
+        <UserAccessSection :username="user.username" />
       </div>
     </QueryState>
   </Dialog>

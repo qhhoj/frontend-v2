@@ -224,5 +224,55 @@
       "summary": "Đã tạo {created}/{total}. Mật khẩu tạo tự động chỉ hiện lúc này: hãy tải xuống hoặc in trước khi đóng.",
       "download": "Tải kết quả (CSV)"
     }
+  },
+  "access": {
+    "title": "Vai trò & quyền",
+    "readOnly": "Chỉ superuser mới cấp hoặc thu hồi vai trò và quyền; bạn chỉ xem được.",
+    "isStaff": "Nhân viên",
+    "isStaffHint": "Mở các trang quản trị; được làm gì vẫn do quyền quyết định.",
+    "isSuperuser": "Superuser",
+    "isSuperuserHint": "Có mọi quyền và được cấp quyền cho người khác.",
+    "superuserHoldsAll": "Superuser có mọi quyền, bất kể các ô bên dưới.",
+    "staffYes": "Nhân viên",
+    "staffNo": "Không phải nhân viên",
+    "superuserYes": "Superuser",
+    "superuserNo": "Không phải superuser",
+    "roles": "Vai trò",
+    "noRoles": "Chưa có vai trò nào.",
+    "noRolesHeld": "Không có vai trò.",
+    "permissions": "Quyền",
+    "permissionsHint": "Ô được chọn: cấp trực tiếp. Nhãn vai trò: cấp qua vai trò đó.",
+    "search": "Tìm quyền",
+    "noMatch": "Không có quyền nào khớp.",
+    "noneHeld": "Không có quyền.",
+    "direct": "Trực tiếp",
+    "via": "qua {role}",
+    "save": "Lưu quyền",
+    "saved": "Đã lưu; áp dụng từ yêu cầu tiếp theo của người dùng.",
+    "categories": {
+      "problems": "Bài tập",
+      "contests": "Kỳ thi",
+      "submissions": "Bài nộp",
+      "organizations": "Tổ chức",
+      "users": "Người dùng",
+      "community": "Cộng đồng",
+      "site": "Trang web",
+      "judging": "Chấm bài",
+      "other": "Khác (cũ)"
+    }
+  },
+  "roles": {
+    "open": "Vai trò",
+    "title": "Vai trò",
+    "lead": "Vai trò là một nhóm quyền có tên; thành viên nhận quyền từ yêu cầu tiếp theo.",
+    "readOnly": "Chỉ superuser mới tạo hoặc sửa vai trò.",
+    "new": "Vai trò mới",
+    "name": "Tên",
+    "create": "Tạo vai trò",
+    "save": "Lưu vai trò",
+    "edit": "Sửa",
+    "show": "Quyền",
+    "counts": "{members} thành viên · {permissions} quyền",
+    "orgAdminNote": "Quản trị viên tổ chức mới được thêm vào vai trò này theo tên; đổi tên sẽ ngừng việc đó."
   }
 }

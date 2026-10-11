@@ -98,7 +98,11 @@
     "invite_needs_email_only": "Lời mời cần email và không có mật khẩu.",
     "password_required": "Nhập mật khẩu của bạn để đổi email.",
     "row_failed": "Không tạo được tài khoản; hãy thử lại dòng này.",
-    "invite_not_sent": "Đã tạo nhưng gửi email mời thất bại; hãy gửi liên kết đặt lại sau."
+    "invite_not_sent": "Đã tạo nhưng gửi email mời thất bại; hãy gửi liên kết đặt lại sau.",
+    "permission_unknown": "Quyền không tồn tại.",
+    "group_unknown": "Hãy chọn vai trò có sẵn.",
+    "group_name_taken": "Đã có vai trò trùng tên.",
+    "added_and_removed": "Không thể vừa thêm vừa bỏ cùng một mục."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

@@ -12,6 +12,7 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import ExactLookup from '../ui/ExactLookup.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { usePermissions } from '@/stores/use-permissions';
+import RolesDialog from './RolesDialog.vue';
 import UserCreateDialog from './UserCreateDialog.vue';
 import UserLookupCard from './UserLookupCard.vue';
 import UsersFilters from './UsersFilters.vue';
@@ -58,6 +59,7 @@ const openUser = (username: string) =>
   router.push({ name: 'admin-users', query: { ...route.query, user: username } });
 const { can } = usePermissions();
 const isCreateOpen = ref(false);
+const isRolesOpen = ref(false);
 </script>
 
 <template>
@@ -68,6 +70,14 @@ const isCreateOpen = ref(false);
       :lead="$t('admin.users.lead')"
     >
       <template #actions>
+        <button
+          v-if="can('judge.change_profile')"
+          type="button"
+          :class="ADMIN_BUTTON_CLASS"
+          @click="isRolesOpen = true"
+        >
+          {{ $t('admin.users.roles.open') }}
+        </button>
         <button
           v-if="can('auth.add_user')"
           type="button"
@@ -138,5 +148,6 @@ const isCreateOpen = ref(false);
     </section>
     <UserLookupCard v-if="opened" :key="opened" :username="opened" />
     <UserCreateDialog v-if="isCreateOpen" v-model:visible="isCreateOpen" />
+    <RolesDialog v-if="isRolesOpen" v-model:visible="isRolesOpen" />
   </div>
 </template>

@@ -224,5 +224,55 @@
       "summary": "{created} of {total} created. Generated passwords are shown only now: download or print them before closing.",
       "download": "Download results (CSV)"
     }
+  },
+  "access": {
+    "title": "Roles & permissions",
+    "readOnly": "Only a superuser can grant or revoke roles and permissions; you can view them.",
+    "isStaff": "Staff",
+    "isStaffHint": "Opens the admin screens; what they allow comes from the permissions.",
+    "isSuperuser": "Superuser",
+    "isSuperuserHint": "Holds every permission and can grant them.",
+    "superuserHoldsAll": "A superuser holds every permission, whatever is ticked below.",
+    "staffYes": "Staff",
+    "staffNo": "Not staff",
+    "superuserYes": "Superuser",
+    "superuserNo": "Not a superuser",
+    "roles": "Roles",
+    "noRoles": "No roles yet.",
+    "noRolesHeld": "No roles.",
+    "permissions": "Permissions",
+    "permissionsHint": "Ticked: granted directly. A role tag: granted through that role.",
+    "search": "Search permissions",
+    "noMatch": "No permission matches.",
+    "noneHeld": "No permissions.",
+    "direct": "Direct",
+    "via": "via {role}",
+    "save": "Save access",
+    "saved": "Access saved; it applies on the user's next request.",
+    "categories": {
+      "problems": "Problems",
+      "contests": "Contests",
+      "submissions": "Submissions",
+      "organizations": "Organizations",
+      "users": "Users",
+      "community": "Community",
+      "site": "Site",
+      "judging": "Judging",
+      "other": "Other (legacy)"
+    }
+  },
+  "roles": {
+    "open": "Roles",
+    "title": "Roles",
+    "lead": "A role is a named set of permissions; members gain them on their next request.",
+    "readOnly": "Only a superuser can create or edit roles.",
+    "new": "New role",
+    "name": "Name",
+    "create": "Create role",
+    "save": "Save role",
+    "edit": "Edit",
+    "show": "Permissions",
+    "counts": "{members} members · {permissions} permissions",
+    "orgAdminNote": "New organization admins join this role by its name; renaming it stops that."
   }
 }

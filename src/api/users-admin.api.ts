@@ -1,8 +1,11 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
 import type {
   CreateUsersBody,
+  RoleBody,
+  RoleChange,
   SetUserPasswordBody,
   StaffUserQuery,
+  UserAccessChange,
   UserEditBody,
 } from './types/users-admin';
 
@@ -38,3 +41,18 @@ export const resetUserTwoFactor = (username: string) =>
 /** `auth.add_user`: up to `USER_CREATE_BATCH` rows; each row is created or refused on its own. */
 export const createUsers = (body: CreateUsersBody) => apiSend('post', '/admin/users', { body });
 export const USER_CREATE_BATCH = 100;
+/** backend `AccessController` (`judge.change_profile`): every permission the site checks, with a category. */
+export const fetchPermissionCatalog = () => apiGet('/admin/permissions');
+/** Roles (legacy groups) by name with their permissions and member counts. */
+export const fetchRoles = () => apiGet('/admin/groups');
+/** Superuser only: a new role. */
+export const createRole = (body: RoleBody) => apiSend('post', '/admin/groups', { body });
+/** Superuser only: rename a role, add and remove permissions. */
+export const updateRole = (id: string, body: RoleChange) =>
+  apiSend('patch', '/admin/groups/{id}', { path: { id }, body });
+/** A user's flags, roles, direct and effective permissions; `canEdit` is false unless the viewer is a superuser and not the user. */
+export const fetchUserAccess = (username: string) =>
+  apiGet('/admin/users/{username}/access', { path: { username } });
+/** Superuser only: adds and removes roles and direct permissions, sets the flags; applies on the user's next request. */
+export const changeUserAccess = (username: string, body: UserAccessChange) =>
+  apiSend('patch', '/admin/users/{username}/access', { path: { username }, body });

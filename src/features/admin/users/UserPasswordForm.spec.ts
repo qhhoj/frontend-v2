@@ -4,7 +4,7 @@ import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { openDialog, staffViewer } from '@/test/admin-routes';
 import { userPage } from '@/test/fixtures';
-import { userEdit } from '@/test/admin-fixtures/user-edit';
+import { emptyAccessRoutes, userEdit } from '@/test/admin-fixtures/user-edit';
 
 const PASSWORD_URL = '/admin/users/tuan_k/password';
 const routes = (passwordAnswer: ReturnType<typeof ok>) => ({
@@ -17,6 +17,7 @@ const routes = (passwordAnswer: ReturnType<typeof ok>) => ({
     }),
   ),
   'GET /admin/users/tuan_k/profile': ok(userEdit()),
+  ...emptyAccessRoutes('tuan_k'),
   [`POST ${PASSWORD_URL}`]: passwordAnswer,
 });
 
