@@ -1700,7 +1700,8 @@
     },
     "hidden": {
       "badge": "Đã ẩn",
-      "by": "bởi {name}"
+      "by": "bởi {name}",
+      "notice": "Người dùng không thấy bình luận này; chỉ người kiểm duyệt thấy."
     },
     "deleted": {
       "placeholder": "Bình luận này đã bị xoá.",

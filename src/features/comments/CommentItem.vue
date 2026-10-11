@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronRight, MoreHorizontal } from 'lucide-vue-next';
+import { ChevronRight, EyeOff, MoreHorizontal } from 'lucide-vue-next';
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
@@ -18,8 +18,9 @@ import type { CommentQuote } from './comment-quote';
 /**
  * One comment of the flat list (layout C2): author, time, permalink and vote in the header; the quote of the comment it answers;
  * the body (or the edit form, the default slot, while `isEditing`); the actions. A folded comment (low score) is one line until shown.
- * On a phone the actions past Reply move into a "more" menu. Moderators also get hidden comments (a muted card naming who hid it,
- * with Unhide); a deleted comment stays as a placeholder so the replies quoting it keep their context.
+ * On a phone the actions past Reply move into a "more" menu. Moderators also get hidden comments (a dashed, muted card with a
+ * "hidden" badge naming who hid it, a line saying users no longer see it, and Unhide); a deleted comment stays as a placeholder
+ * so the replies quoting it keep their context.
  */
 const props = defineProps<{
   entry: NumberedComment;
@@ -141,8 +142,16 @@ const TEXT_BUTTON =
       :aria-labelledby="`${anchor}-h`"
       :data-hidden="comment.hidden || undefined"
       class="rounded-card border border-line px-4 pt-3 pb-1 sm:px-5 sm:pt-4"
-      :class="comment.hidden ? 'bg-surface-strong' : 'bg-surface-solid'"
+      :class="comment.hidden ? 'border-dashed bg-surface-strong' : 'bg-surface-solid'"
     >
+      <p
+        v-if="comment.hidden"
+        data-testid="comment-hidden-notice"
+        class="mb-2 flex items-center gap-2 text-sm text-muted"
+      >
+        <EyeOff aria-hidden="true" class="size-4 shrink-0" />
+        {{ $t('comments.hidden.notice') }}
+      </p>
       <header class="flex flex-wrap items-center gap-2">
         <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
           <UserName

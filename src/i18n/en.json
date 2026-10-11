@@ -1700,7 +1700,8 @@
     },
     "hidden": {
       "badge": "Hidden",
-      "by": "by {name}"
+      "by": "by {name}",
+      "notice": "Users no longer see this comment; only moderators do."
     },
     "deleted": {
       "placeholder": "This comment was deleted.",
