@@ -14,7 +14,6 @@ import type {
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { PROBLEM_CODE_PATTERN } from '../problem-code';
-import { fromLocalInput, toLocalInput } from '../../ui/datetime';
 
 export const PROBLEM_LIMITS = {
   timeLimit: { min: 0.01, max: 60, highAbove: 5 },
@@ -33,8 +32,8 @@ export interface ProblemForm {
   name: string;
   source: string;
   summary: string;
-  /** `datetime-local` value; '' = no date. */
-  date: string;
+  /** ISO instant (UTC); null = no date. */
+  date: string | null;
   /** Image URL for link previews; '' = none. */
   ogImage: string;
   timeLimit: number;
@@ -78,7 +77,7 @@ const basicsOf = (problem: EditableProblem, editor: ProblemEditor) => ({
   name: editor.baseName,
   source: problem.source,
   summary: problem.summary,
-  date: toLocalInput(problem.date),
+  date: problem.date,
   ogImage: editor.ogImage,
 });
 
@@ -139,7 +138,7 @@ export function emptyProblemForm(meta: ProblemEditingMeta): ProblemForm {
     name: '',
     source: '',
     summary: '',
-    date: '',
+    date: null,
     ogImage: '',
     timeLimit: 1,
     memoryLimit: 262144,
@@ -172,14 +171,13 @@ export const cloneForm = (form: ProblemForm): ProblemForm =>
 
 const idsOf = (chips: unknown) => (chips as { id: string }[]).map((chip) => chip.id);
 
-/** How each form field becomes a DTO value: user chips become ids, the wall-clock date an ISO instant. */
+/** How each form field becomes a DTO value: user chips become ids. */
 const SEND: Partial<Record<keyof ProblemForm, (value: unknown) => unknown>> = {
   authors: idsOf,
   curators: idsOf,
   testers: idsOf,
   bannedUsers: idsOf,
   organizations: idsOf,
-  date: (value) => fromLocalInput(value as string),
 };
 const toSent = (key: keyof ProblemForm, value: unknown): unknown => {
   const convert = SEND[key];

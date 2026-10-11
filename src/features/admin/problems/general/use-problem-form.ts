@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
 import { updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
+import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
@@ -19,16 +20,17 @@ import type { ProblemForm } from './problem-form';
 function useFormSeed(problem: () => EditableProblem, meta: () => ProblemEditingMeta) {
   const seed = ref<ProblemForm>(toProblemForm(problem(), meta()));
   const form = ref<ProblemForm>(cloneForm(seed.value));
-  const isDirty = computed(
-    () => Object.keys(changedProblemFields(seed.value, form.value)).length > 0,
+  const dirtyCount = computed(
+    () => Object.keys(changedProblemFields(seed.value, form.value)).length,
   );
+  const isDirty = computed(() => dirtyCount.value > 0);
   // A clean form follows the server: the seed and the form move together, so a later save never sends the old values back.
   watch(problem, (next) => {
     if (isDirty.value) return;
     seed.value = toProblemForm(next, meta());
     form.value = cloneForm(seed.value);
   });
-  return { seed, form, isDirty };
+  return { seed, form, dirtyCount, isDirty };
 }
 
 /** The general tab's form: seeded from the detail, PATCHes only what changed, re-seeded from the answer. */
@@ -38,10 +40,11 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   const queryClient = useQueryClient();
   const viewer = useViewerId();
   const { can } = usePermissions();
-  const { seed, form, isDirty } = useFormSeed(problem, meta);
+  const { seed, form, dirtyCount, isDirty } = useFormSeed(problem, meta);
   const localErrors = ref<FieldErrors>({});
   /** Why this save is made: the revision comment, never stored on the problem; cleared after each save. */
   const changeMessage = ref('');
+  const savedAt = ref<Date | null>(null);
 
   const mutation = useAdminMutation({
     mutate: (code: string) =>
@@ -50,6 +53,9 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
         changeMessage: changeMessage.value.trim() || undefined,
       }),
     invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
+    successText: (saved: EditableProblem) =>
+      translate('admin.problems.general.savedToast', { code: saved.code }),
+    onSuccess: () => (savedAt.value = new Date()),
     onDone: (saved: EditableProblem, code: string) => {
       queryClient.setQueryData(editableProblemKey(saved.code, viewer.value), saved);
       seed.value = toProblemForm(saved, meta());
@@ -59,6 +65,12 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
         void router.replace({ name: route.name!, params: { code: saved.code } });
     },
   });
+
+  /** Puts the form back to what the server last said. */
+  function discard() {
+    form.value = cloneForm(seed.value);
+    changeMessage.value = '';
+  }
 
   async function save() {
     localErrors.value = checkProblemForm(form.value, can);
@@ -81,5 +93,5 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
     ...mutation.fieldErrors.value,
     ...localErrors.value,
   }));
-  return { form, isDirty, save, errors, mutation, changeMessage };
+  return { form, dirtyCount, isDirty, savedAt, save, discard, errors, mutation, changeMessage };
 }

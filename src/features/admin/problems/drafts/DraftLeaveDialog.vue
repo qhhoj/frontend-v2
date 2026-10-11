@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AdminLeaveDialog from '../../ui/form/AdminLeaveDialog.vue';
 
+/** Deprecated: `AdminLeaveDialog` (ui/form) without a count; kept for the tabs not yet on `AdminLeaveGuard`. */
 const isOpen = defineModel<boolean>('visible', { required: true });
 defineEmits<{ leave: [] }>();
 </script>
 
 <template>
-  <ConfirmDialog
-    v-model:visible="isOpen"
-    :title="$t('admin.problems.drafts.leaveTitle')"
-    :body="$t('admin.problems.drafts.leaveBody')"
-    :confirm-label="$t('admin.problems.drafts.leave')"
-    :cancel-label="$t('admin.problems.drafts.stay')"
-    @confirm="$emit('leave')"
-  />
+  <AdminLeaveDialog v-model:visible="isOpen" @leave="$emit('leave')" />
 </template>

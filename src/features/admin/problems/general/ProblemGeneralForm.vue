@@ -8,8 +8,11 @@ import ProblemPeopleSection from './ProblemPeopleSection.vue';
 import ProblemStatusSection from './ProblemStatusSection.vue';
 import ProblemVisibilitySection from './ProblemVisibilitySection.vue';
 import type { ProblemForm } from './problem-form';
+import { PROBLEM_SECTION_IDS } from './problem-sections';
 
 const form = defineModel<ProblemForm>({ required: true });
+/** The revision comment; bound only by the edit form. */
+const changeMessage = defineModel<string>('changeMessage');
 /** `suggester`: who suggested an existing problem (read-only); `privateCode`: see `ProblemStatusSection`. The create form leaves both out. */
 defineProps<{
   meta: ProblemEditingMeta;
@@ -17,21 +20,41 @@ defineProps<{
   suggester?: UserSummaryView | null;
   isSuggestionPending?: boolean;
   privateCode?: string;
+  hasChangeMessage?: boolean;
 }>();
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <ProblemBasicsSection v-model="form" :errors="errors" />
-    <ProblemLimitsSection v-model="form" :meta="meta" :errors="errors" />
-    <ProblemClassSection v-model="form" :meta="meta" :errors="errors" />
-    <ProblemVisibilitySection v-model="form" :errors="errors" />
-    <ProblemPeopleSection
-      v-model="form"
-      :errors="errors"
-      :suggester="suggester ?? null"
-      :is-suggestion-pending="isSuggestionPending ?? false"
-    />
-    <ProblemStatusSection v-model="form" :private-code="privateCode" />
-  </div>
+  <ProblemBasicsSection v-model="form" :errors="errors" :section-id="PROBLEM_SECTION_IDS.basics" />
+  <ProblemLimitsSection
+    v-model="form"
+    :meta="meta"
+    :errors="errors"
+    :section-id="PROBLEM_SECTION_IDS.limits"
+  />
+  <ProblemClassSection
+    v-model="form"
+    :meta="meta"
+    :errors="errors"
+    :section-id="PROBLEM_SECTION_IDS.classes"
+  />
+  <ProblemVisibilitySection
+    v-model="form"
+    :errors="errors"
+    :section-id="PROBLEM_SECTION_IDS.visibility"
+  />
+  <ProblemPeopleSection
+    v-model="form"
+    :errors="errors"
+    :suggester="suggester ?? null"
+    :is-suggestion-pending="isSuggestionPending ?? false"
+    :section-id="PROBLEM_SECTION_IDS.people"
+  />
+  <ProblemStatusSection
+    v-model="form"
+    v-model:change-message="changeMessage"
+    :private-code="privateCode"
+    :has-change-message="hasChangeMessage"
+    :section-id="PROBLEM_SECTION_IDS.status"
+  />
 </template>

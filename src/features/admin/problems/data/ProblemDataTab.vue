@@ -19,11 +19,14 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UploadButton from '../../ui/UploadButton.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 import ProblemPackageCard from '../package/ProblemPackageCard.vue';
+import PolygonLinkPanel from '../polygon/PolygonLinkPanel.vue';
+import { usePermissions } from '@/stores/use-permissions';
 
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { query, form, errors, isDirty, badRowNumbers, markInvalid, save, mutation } = useDataForm(
   () => props.problem.code,
 );
+const { can } = usePermissions();
 const keepAnswer = useKeepDataAnswer(() => props.problem.code);
 const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
 const archive = useAdminMutation({
@@ -33,6 +36,7 @@ const archive = useAdminMutation({
 </script>
 
 <template>
+  <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
   <QueryState
     :loading="query.isPending.value"
     :error="query.error.value"

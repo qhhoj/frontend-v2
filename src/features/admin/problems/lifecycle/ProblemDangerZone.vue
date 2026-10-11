@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import AdminBit from '../../shell/AdminBit.vue';
-import { buttonClass } from '../../ui/controls';
+import { CARD, buttonClass } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import DeleteProblemDialog from './DeleteProblemDialog.vue';
 
-/** The last card of the General tab: delete the problem after typing its code; the editor then shows the deleted list. */
+/** The General tab's last card (danger section): delete the problem after typing its code; the editor then shows the deleted list. */
 defineProps<{ code: string }>();
 const router = useRouter();
 const isOpen = ref(false);
@@ -14,17 +13,26 @@ const showDeleted = () => void router.push({ name: 'admin-problemsDeleted' });
 </script>
 
 <template>
-  <SettingsCard
-    :title="$t('admin.lifecycle.danger.title')"
-    :lead="$t('admin.lifecycle.danger.lead')"
-  >
-    <div class="flex flex-wrap items-center gap-3 rounded-row border border-negative p-4">
-      <AdminBit placement="security" />
-      <p class="min-w-0 flex-1 text-sm">{{ $t('admin.lifecycle.danger.body') }}</p>
-      <button type="button" :class="buttonClass('danger')" @click="isOpen = true">
-        {{ $t('admin.lifecycle.danger.open') }}
-      </button>
-    </div>
+  <div :class="CARD">
+    <AdminFormSection
+      :title="$t('admin.lifecycle.danger.title')"
+      :description="$t('admin.lifecycle.danger.lead')"
+      :columns="1"
+      danger
+    >
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="min-w-0 text-sm text-muted sm:max-w-xl">
+          {{ $t('admin.lifecycle.danger.body') }}
+        </p>
+        <button
+          type="button"
+          :class="[buttonClass('danger'), 'self-start sm:self-auto']"
+          @click="isOpen = true"
+        >
+          {{ $t('admin.lifecycle.danger.open') }}
+        </button>
+      </div>
+    </AdminFormSection>
     <DeleteProblemDialog v-model:visible="isOpen" :code="code" @deleted="showDeleted" />
-  </SettingsCard>
+  </div>
 </template>

@@ -22,19 +22,19 @@ describe('problem form', () => {
     expect(changedProblemFields(before, after)).toEqual({ points: 1500, partial: false });
   });
 
-  it('sends user lists as ids and the date as an ISO instant', () => {
+  it('sends user lists as ids and the date as the ISO instant it holds', () => {
     const before = seeded();
     const after = structuredClone(before);
     after.testers = [...after.testers, { id: 'new-id', username: 'ngocanh' }];
-    after.date = '2026-10-08T13:00';
+    after.date = '2026-10-08T06:00:00.000Z';
     const patch = changedProblemFields(before, after);
     expect(patch.testers).toEqual(['0192a000-0000-7000-8000-0000000000bb', 'new-id']);
-    expect(patch.date).toMatch(/^2026-10-0\dT\d\d:00:00\.000Z$/);
+    expect(patch.date).toBe('2026-10-08T06:00:00.000Z');
   });
 
   it('sends a cleared date as null so it is unset', () => {
-    const before = { ...seeded(), date: '2026-10-08T13:00' };
-    expect(changedProblemFields(before, { ...before, date: '', points: 1500 })).toEqual({
+    const before = { ...seeded(), date: '2026-10-08T06:00:00.000Z' };
+    expect(changedProblemFields(before, { ...before, date: null, points: 1500 })).toEqual({
       date: null,
       points: 1500,
     });
@@ -44,7 +44,7 @@ describe('problem form', () => {
     const form = seeded();
     form.languageLimits = [{ ...form.languageLimits[0]!, timeLimit: 6 }];
     expect(checkProblemForm(form, nobodyCan)['languageLimits.0.timeLimit']).toBe(
-      'Trên 5 giây cần quyền judge.high_problem_timelimit.',
+      'Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.',
     );
     expect(
       checkProblemForm(form, (permission) => permission === 'judge.high_problem_timelimit')[
@@ -53,7 +53,7 @@ describe('problem form', () => {
     ).toBeUndefined();
     const high = { ...seeded(), timeLimit: 6 };
     expect(checkProblemForm(high, nobodyCan).timeLimit).toBe(
-      'Trên 5 giây cần quyền judge.high_problem_timelimit.',
+      'Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.',
     );
   });
 
@@ -91,7 +91,7 @@ describe('problem form', () => {
       isOrganizationPrivate: true,
       testcaseResultVisibility: 'S',
       allowViewFeedback: true,
-      date: '2026-10-08T13:00',
+      date: '2026-10-08T06:00:00.000Z',
     };
     const body = toProblemBody(filled, false, defaults);
     for (const field of STAFF_ONLY_FIELDS) expect(body, field).not.toHaveProperty(field);

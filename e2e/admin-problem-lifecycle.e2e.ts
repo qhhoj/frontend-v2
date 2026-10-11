@@ -47,7 +47,6 @@ test('the danger zone deletes after the code is typed and lands on the deleted l
   installDeletedProblems(api, [deletedProblem({ code: 'hcmus41c', daysLeft: 30 })]);
   await page.goto('/admin/problems/hcmus41c/general');
   await expect(page.getByRole('heading', { name: 'Vùng nguy hiểm' })).toBeVisible();
-  await expect(page.locator('[data-testid="admin-bit"][data-placement="security"]')).toBeVisible();
   await page.getByRole('button', { name: 'Xóa bài…' }).click();
   await expect(
     dialogOf(page).getByRole('button', { name: 'Xóa bài', exact: true }),

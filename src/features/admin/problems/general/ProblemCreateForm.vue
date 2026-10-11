@@ -3,18 +3,21 @@ import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { createProblem, suggestProblem } from '@/api/problem-editing.api';
 import type { EditableProblem, ProblemBody, ProblemEditingMeta } from '@/api/types/problem-editing';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
+import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import AdminSectionNav from '../../ui/form/AdminSectionNav.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { translate } from '@/i18n';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { EDIT_ALL_PROBLEM } from './field-lock';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
 import { checkProblemForm, cloneForm, emptyProblemForm, toProblemBody } from './problem-form';
 import type { ProblemForm } from './problem-form';
+import { problemSections } from './problem-sections';
 
 const props = defineProps<{ meta: ProblemEditingMeta }>();
 const router = useRouter();
@@ -27,6 +30,8 @@ const suggestedCode = ref('');
 const createMutation = useAdminMutation({
   mutate: (body: ProblemBody) => createProblem(body),
   invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
+  successText: (created: EditableProblem) =>
+    translate('admin.problems.general.create.createdToast', { code: created.code }),
   onDone: (created: EditableProblem) => {
     void router.push({ name: 'admin-problemGeneral', params: { code: created.code } });
   },
@@ -50,9 +55,20 @@ function checkedBody(): ProblemBody | null {
   return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
 }
 
+const canCreate = computed(() => can('judge.add_problem'));
+const canSuggest = computed(() => can('judge.suggest_new_problem'));
+const isPending = computed(() => createMutation.isPending.value || suggestMutation.isPending.value);
+const failure = computed(() => createMutation.failure.value ?? suggestMutation.failure.value);
+const sections = problemSections(false);
+
 async function create() {
   const body = checkedBody();
-  if (body && can('judge.add_problem')) await createMutation.run(body);
+  if (body && canCreate.value) await createMutation.run(body);
+}
+
+/** The save bar's submit: create with `judge.add_problem`, else suggest. */
+function submit() {
+  return canCreate.value ? create() : suggest();
 }
 
 async function suggest() {
@@ -73,46 +89,48 @@ watch(
 </script>
 
 <template>
-  <form class="flex flex-col gap-5" novalidate @submit.prevent="create">
-    <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
-    <SettingsCard
-      :title="$t('admin.problems.general.create.block')"
-      :lead="$t('admin.problems.general.create.lead')"
+  <form class="flex flex-col gap-4" novalidate @submit.prevent="submit">
+    <AdminSectionNav :sections="sections" mode="select" class="max-w-xs xl:hidden" />
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,55rem)_15rem] xl:items-start">
+      <fieldset :disabled="isPending" :class="[CARD, 'm-0 flex min-w-0 flex-col p-0']">
+        <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
+      </fieldset>
+      <AdminSectionNav :sections="sections" class="hidden xl:flex" />
+    </div>
+    <AdminStatus v-if="failure" kind="refused" :text="failureTextOf(failure)" />
+    <AdminStatus
+      v-else-if="suggestMutation.isDone.value"
+      kind="done"
+      :text="$t('admin.problems.general.create.suggested', { code: suggestedCode })"
+    />
+    <AdminSaveBar
+      data-testid="problem-create-bar"
+      :dirty-count="0"
+      allow-clean
+      :pending="isPending"
+      :save-label="
+        canCreate
+          ? $t('admin.problems.general.create.createButton')
+          : $t('admin.problems.general.create.suggestButton')
+      "
     >
-      <div class="flex flex-wrap items-center gap-3">
+      <template #status>
+        <span class="text-muted">{{ $t('admin.problems.general.create.required') }}</span>
+      </template>
+      <template #actions>
+        <RouterLink :to="{ name: 'admin-problems' }" :class="buttonClass('ghost')">
+          {{ $t('admin.problems.general.create.cancel') }}
+        </RouterLink>
         <button
-          v-if="can('judge.add_problem')"
-          type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
-          :aria-disabled="createMutation.isPending.value ? 'true' : undefined"
-        >
-          {{ $t('admin.problems.general.create.createButton') }}
-        </button>
-        <button
-          v-if="can('judge.suggest_new_problem')"
+          v-if="canCreate && canSuggest"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
-          :aria-disabled="suggestMutation.isPending.value ? 'true' : undefined"
+          :class="buttonClass('secondary')"
+          :aria-disabled="isPending || undefined"
           @click="suggest"
         >
           {{ $t('admin.problems.general.create.suggestButton') }}
         </button>
-      </div>
-      <AdminStatus
-        v-if="createMutation.failure.value"
-        kind="refused"
-        :text="failureTextOf(createMutation.failure.value)"
-      />
-      <AdminStatus
-        v-else-if="suggestMutation.failure.value"
-        kind="refused"
-        :text="failureTextOf(suggestMutation.failure.value)"
-      />
-      <AdminStatus
-        v-else-if="suggestMutation.isDone.value"
-        kind="done"
-        :text="$t('admin.problems.general.create.suggested', { code: suggestedCode })"
-      />
-    </SettingsCard>
+      </template>
+    </AdminSaveBar>
   </form>
 </template>

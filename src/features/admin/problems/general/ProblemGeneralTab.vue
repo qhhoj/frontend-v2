@@ -1,77 +1,77 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
-import ProblemCloneSection from './ProblemCloneSection.vue';
-import ProblemAttachmentsSection from '../files/ProblemAttachmentsSection.vue';
-import ProblemGeneralForm from './ProblemGeneralForm.vue';
-import { useProblemForm } from './use-problem-form';
+import { CARD } from '../../ui/controls';
+import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
+import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import AdminSectionNav from '../../ui/form/AdminSectionNav.vue';
 import ProblemDangerZone from '../lifecycle/ProblemDangerZone.vue';
-import PolygonLinkPanel from '../polygon/PolygonLinkPanel.vue';
-import DraftLeaveDialog from '../drafts/DraftLeaveDialog.vue';
-import { useDraftLeaveGuard } from '../drafts/use-draft-leave-guard';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import ProblemGeneralForm from './ProblemGeneralForm.vue';
+import { PROBLEM_SECTION_IDS, problemSections } from './problem-sections';
+import { useProblemForm } from './use-problem-form';
 
+/**
+ * One form card (six sections), the danger zone under it, a section rail from 1280 px ("Đi tới mục" below), and the save
+ * bar. Attachments live on the Files tab, Polygon on the Data tab, clone in the header's "Thêm" menu.
+ */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
-const { form, save, errors, mutation, isDirty, changeMessage } = useProblemForm(
-  () => props.problem,
-  () => props.meta,
-);
+const { form, dirtyCount, savedAt, save, discard, errors, mutation, changeMessage } =
+  useProblemForm(
+    () => props.problem,
+    () => props.meta,
+  );
 const { can } = usePermissions();
-const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
+const canDelete = computed(() => can('judge.delete_problem'));
+const sections = computed(() => problemSections(canDelete.value));
+/** A refusal no field shows (a field error is already under its box) goes above the save bar. */
+const pageFailure = computed(() =>
+  mutation.failure.value && Object.keys(mutation.fieldErrors.value).length === 0
+    ? failureTextOf(mutation.failure.value)
+    : null,
+);
+const FORM_ID = 'problem-general-form';
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
-    <form class="flex flex-col gap-5" novalidate @submit.prevent="save">
-      <fieldset
-        :disabled="mutation.isPending.value"
-        class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
-      >
-        <ProblemGeneralForm
-          v-model="form"
-          :meta="meta"
-          :errors="errors"
-          :suggester="problem.editor?.suggester ?? null"
-          :is-suggestion-pending="!problem.isPublic"
-          :private-code="problem.isPublic ? undefined : problem.code"
-        />
-      </fieldset>
-      <div
-        class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
-      >
-        <AdminStatus
-          v-if="mutation.failure.value"
-          kind="refused"
-          :text="failureTextOf(mutation.failure.value)"
-        />
-        <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
-        <label v-if="isDirty" class="flex min-w-60 flex-1 items-center gap-2 text-sm font-semibold">
-          <span class="shrink-0">{{ $t('admin.problems.general.changeMessage') }}</span>
-          <input
-            v-model="changeMessage"
-            type="text"
-            maxlength="500"
-            :placeholder="$t('admin.problems.general.changeMessagePlaceholder')"
-            :class="[ADMIN_INPUT_CLASS, 'font-normal']"
-          />
-        </label>
-        <button
-          type="submit"
-          class="ml-auto"
-          :class="ADMIN_PRIMARY_CLASS"
-          :aria-disabled="!isDirty || mutation.isPending.value ? 'true' : undefined"
-        >
-          {{ $t('admin.ui.save') }}
-        </button>
+  <div class="flex flex-col gap-4">
+    <AdminSectionNav :sections="sections" mode="select" class="max-w-xs xl:hidden" />
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,55rem)_15rem] xl:items-start">
+      <div class="flex min-w-0 flex-col gap-6">
+        <form :id="FORM_ID" novalidate @submit.prevent="save">
+          <fieldset
+            :disabled="mutation.isPending.value"
+            :class="[CARD, 'm-0 flex min-w-0 flex-col p-0']"
+          >
+            <ProblemGeneralForm
+              v-model="form"
+              v-model:change-message="changeMessage"
+              :meta="meta"
+              :errors="errors"
+              :suggester="problem.editor?.suggester ?? null"
+              :is-suggestion-pending="!problem.isPublic"
+              :private-code="problem.isPublic ? undefined : problem.code"
+              has-change-message
+            />
+          </fieldset>
+        </form>
+        <div v-if="canDelete" :id="PROBLEM_SECTION_IDS.danger">
+          <ProblemDangerZone :code="problem.code" />
+        </div>
       </div>
-    </form>
-    <ProblemAttachmentsSection :problem="problem" />
-    <ProblemCloneSection v-if="can('judge.clone_problem')" :code="problem.code" />
-    <ProblemDangerZone v-if="can('judge.delete_problem')" :code="problem.code" />
-    <DraftLeaveDialog v-model:visible="isLeaveOpen" @leave="leaveAnyway" />
+      <AdminSectionNav :sections="sections" class="hidden xl:flex" />
+    </div>
+    <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
+    <AdminSaveBar
+      data-testid="problem-save-bar"
+      :form="FORM_ID"
+      :dirty-count="dirtyCount"
+      :pending="mutation.isPending.value"
+      :saved-at="savedAt"
+      @discard="discard"
+    />
+    <AdminLeaveGuard :dirty-count="dirtyCount" />
   </div>
 </template>

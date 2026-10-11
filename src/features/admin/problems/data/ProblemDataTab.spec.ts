@@ -70,7 +70,7 @@ describe('ProblemDataTab', () => {
     await switchNamed(wrapper, 'Chấp nhận Unicode').trigger('click');
     await router.push('/admin/problems');
     await flushPromises();
-    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
+    expect(openDialog().textContent).toContain('Rời trang?');
     await cancelDialog('Ở lại');
     expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
     await router.push('/admin/problems');
