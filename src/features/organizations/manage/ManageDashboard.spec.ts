@@ -4,7 +4,7 @@ import { contestItem } from '@/test/fixtures';
 import { joinRequest, member, organizationDetail } from '@/test/community-fixtures';
 import { organizationRoutes } from '@/test/community-routes';
 import { orgProblem } from '@/test/f4-fixtures';
-import { mockApi, page } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
@@ -20,6 +20,7 @@ const SLUG = detail.slug;
 
 async function mountManage(requests: ReturnType<typeof joinRequest>[]) {
   const calls = mockApi({
+    [`POST /organizations/${SLUG}/requests/${requests[0]?.id}/decide`]: ok(requests[0]),
     ...signedInViewer(),
     ...organizationRoutes(detail),
     [`GET /organizations/${SLUG}/requests`]: page(requests, { pageSize: 50 }),
@@ -57,6 +58,19 @@ describe('organization Quản lý dashboard (4A)', () => {
     const { wrapper } = await mountManage([joinRequest({ organizationSlug: SLUG })]);
     expect(wrapper.find('[data-testid="requests-fold"]').exists()).toBe(false);
     expect(wrapper.get('[data-testid="join-requests"]').text()).toContain('hieu_cpp');
+  });
+
+  it('rejects a waiting request from its own row button', async () => {
+    const request = joinRequest({ organizationSlug: SLUG });
+    const { wrapper, calls } = await mountManage([request]);
+    const reject = wrapper
+      .get('[data-testid="queue-row"]')
+      .findAll('button')
+      .find((button) => button.text() === 'Từ chối')!;
+    await reject.trigger('click');
+    await flushPromises();
+    const decide = calls.find((call) => call.path.endsWith('/decide'));
+    expect(decide?.body).toEqual({ state: 'R' });
   });
 
   it('folds the requests into one line when none is waiting', async () => {

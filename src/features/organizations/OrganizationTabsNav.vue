@@ -48,6 +48,8 @@ const tabs = computed<OrganizationTab[]>(() => {
 });
 
 /** On a phone the row scrolls; the current tab (often "Quản lý", the last one) is brought into view. */
+/** Room left after the revealed tab, so its badge never touches the edge. */
+const TAB_REVEAL_MARGIN = 24;
 const nav = useTemplateRef<HTMLElement>('nav');
 const route = useRoute();
 async function revealCurrentTab() {
@@ -55,11 +57,12 @@ async function revealCurrentTab() {
   const row = nav.value;
   const current = row?.querySelector<HTMLElement>('[aria-current="page"]');
   if (!row || !current) return;
-  const overflow = current.offsetLeft + current.offsetWidth - row.clientWidth;
+  const overflow = current.offsetLeft + current.offsetWidth - row.clientWidth + TAB_REVEAL_MARGIN;
   if (overflow > row.scrollLeft) row.scrollLeft = overflow;
 }
 onMounted(revealCurrentTab);
-watch(() => route.name, revealCurrentTab);
+// The pending badge arrives later and widens the "Quản lý" tab.
+watch([() => route.name, pendingTotal], revealCurrentTab);
 </script>
 
 <template>
