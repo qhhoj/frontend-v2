@@ -980,6 +980,13 @@
             "description": "Why the viewer cannot comment, by the same rule posting enforces; null when they can.",
             "nullable": true,
             "type": "object"
+          },
+          "truncatedThreads": {
+            "description": "Roots whose thread has more than `COMMENT_THREAD_REPLY_LIMIT` (100) replies: only the first 100 in tree order are listed.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
@@ -989,6 +996,7 @@
           "canComment",
           "postBlock",
           "comments",
+          "truncatedThreads",
           "pagination"
         ],
         "type": "object"
@@ -1643,6 +1651,13 @@
           "name": {
             "type": "string"
           },
+          "organizations": {
+            "description": "The organizations the contest is restricted to, empty unless it is organization-private; unlisted ones show only to viewers who may list them.",
+            "items": {
+              "$ref": "#/components/schemas/ContestOrganizationResponse"
+            },
+            "type": "array"
+          },
           "phase": {
             "allOf": [
               {
@@ -1795,6 +1810,7 @@
           "virtualCount",
           "isPrivate",
           "isOrganizationPrivate",
+          "organizations",
           "requiresAccessCode",
           "requiresRankingAccessCode",
           "disallowVirtual",
@@ -1929,6 +1945,13 @@
           "name": {
             "type": "string"
           },
+          "organizations": {
+            "description": "The organizations the contest is restricted to, empty unless it is organization-private; unlisted ones show only to viewers who may list them.",
+            "items": {
+              "$ref": "#/components/schemas/ContestOrganizationResponse"
+            },
+            "type": "array"
+          },
           "phase": {
             "allOf": [
               {
@@ -2012,6 +2035,7 @@
           "virtualCount",
           "isPrivate",
           "isOrganizationPrivate",
+          "organizations",
           "requiresAccessCode",
           "requiresRankingAccessCode",
           "disallowVirtual",
@@ -2040,6 +2064,22 @@
         "required": [
           "liveStatus",
           "isCurrent"
+        ],
+        "type": "object"
+      },
+      "ContestOrganizationResponse": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "description": "Unique identifier used in the organization's URL.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
         ],
         "type": "object"
       },
@@ -10171,7 +10211,8 @@
             "type": "array"
           },
           "currentTestcase": {
-            "description": "Number of the case being judged while the submission runs.",
+            "description": "Number of the case being judged while the submission runs; null unless the viewer sees every case result (it would tell where judging stopped).",
+            "nullable": true,
             "type": "number"
           },
           "date": {
@@ -10753,11 +10794,19 @@
           "queueLength": {
             "description": "Submissions queued or being judged now.",
             "type": "number"
+          },
+          "verdictsToday": {
+            "description": "Today's judged submissions by result, most frequent first; their counts add up to `judgedToday`.",
+            "items": {
+              "$ref": "#/components/schemas/VerdictCountResponse"
+            },
+            "type": "array"
           }
         },
         "required": [
           "judgedToday",
           "acceptedToday",
+          "verdictsToday",
           "queueLength",
           "judgesOnline",
           "judgesTotal"
@@ -13272,6 +13321,23 @@
         },
         "required": [
           "available"
+        ],
+        "type": "object"
+      },
+      "VerdictCountResponse": {
+        "properties": {
+          "count": {
+            "description": "Submissions judged today with this result.",
+            "type": "number"
+          },
+          "result": {
+            "description": "Result code, such as `AC` or `WA`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "count"
         ],
         "type": "object"
       },
@@ -16147,7 +16213,7 @@
     },
     "/api/internal/auth/login": {
       "post": {
-        "description": "Public. Verifies the credentials and opens a browser session: the `qhhoj_session` cookie is set and any session the browser already held is replaced. Send the returned `csrfToken` in the `X-CSRF-Token` header on every later non-GET request.\nWhen the account has TOTP or a security key, `twoFactorRequired` is true and `user` is null until the second factor is passed. When the password appears in a known breach, `passwordChangeRequired` is true and only the password change works.\nFailed attempts are limited per IP and per account (10 in 15 minutes, then 429 `rate_limited`). Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.",
+        "description": "Public. Verifies the credentials and opens a browser session: the `qhhoj_session` cookie is set and any session the browser already held is replaced. Send the returned `csrfToken` in the `X-CSRF-Token` header on every later non-GET request.\nWhen the account has TOTP or a security key, `twoFactorRequired` is true and `user` is null until the second factor is passed. When the password appears in a known breach, `passwordChangeRequired` is true and only the password change works.\nFailed attempts are limited per IP and per account from that IP (10 in 15 minutes, then 429 `rate_limited`), so failures from elsewhere never lock the owner out. Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.",
         "operationId": "AuthController_login",
         "parameters": [],
         "requestBody": {
@@ -16242,7 +16308,7 @@
     },
     "/api/internal/auth/logout-all": {
       "post": {
-        "description": "Browser session only (API tokens get 403) and not while impersonating. Destroys all sessions of the user, including the current one, and clears the cookie. Returns 204.",
+        "description": "Browser session only (API tokens get 403) and not while impersonating. Destroys all sessions of the user, including the current one, revokes the API token and clears the cookie. Returns 204.",
         "operationId": "AuthController_logoutAll",
         "parameters": [],
         "responses": {
@@ -16327,7 +16393,7 @@
     },
     "/api/internal/auth/password/change": {
       "post": {
-        "description": "Browser session only, not while impersonating; reachable while the password is flagged as breached. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).\nThe new password must pass the password policy, differ from the current one and not appear in a known breach, otherwise 400 `validation_failed` with per-field issues on `newPassword`. All other sessions are signed out; the API token stays valid. A concurrent change gives 409 `conflict`. Returns 204.",
+        "description": "Browser session only, not while impersonating; reachable while the password is flagged as breached. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).\nThe new password must pass the password policy, differ from the current one and not appear in a known breach, otherwise 400 `validation_failed` with per-field issues on `newPassword`. All other sessions are signed out and the API token is revoked. A concurrent change gives 409 `conflict`. Returns 204.",
         "operationId": "AuthController_changePassword",
         "parameters": [],
         "requestBody": {
@@ -16707,9 +16773,19 @@
     },
     "/api/internal/auth/token/regenerate": {
       "post": {
-        "description": "Browser session only, not while impersonating. Issues a new personal API token for `Authorization: Bearer`, replacing the previous one, which stops working at once. The token is shown only in this response.",
+        "description": "Browser session only, not while impersonating. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).\nIssues a new personal API token for `Authorization: Bearer`, replacing the previous one, which stops working at once. The token is shown only in this response. A password change, a password reset and signing out everywhere revoke it.",
         "operationId": "AuthController_regenerateToken",
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
             "content": {

@@ -4,6 +4,7 @@ import { regenerateApiToken } from '@/api/account.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
+import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
@@ -12,17 +13,25 @@ import { BUTTON } from '../settings/buttons';
 /** The new token lives in this component only: leaving the page drops it for good (board SetSecurityA). */
 const token = ref<string | null>(null);
 const confirming = ref(false);
-const { pending, summary, run, reset } = useAuthAction();
+const password = ref('');
+/** A wrapper around the field, so a refused password gets the focus (the dialog's own form is not reachable from here). */
+const fieldsElement = ref<HTMLElement | null>(null);
+const { pending, fieldErrors, summary, run, dismiss, reset } = useAuthAction(fieldsElement, [
+  'currentPassword',
+]);
 
 function open() {
   reset();
+  password.value = '';
   confirming.value = true;
 }
 async function regenerate() {
   const created = await run(async () => {
-    token.value = (await regenerateApiToken()).token;
+    token.value = (await regenerateApiToken(password.value)).token;
   });
-  if (created) confirming.value = false;
+  if (!created) return;
+  password.value = '';
+  confirming.value = false;
 }
 </script>
 
@@ -50,8 +59,20 @@ async function regenerate() {
       :body="$t('settings.token.confirmBody')"
       :confirm-label="$t('settings.token.create')"
       :busy="pending"
+      :can-confirm="password !== ''"
       @confirm="regenerate"
     >
+      <div ref="fieldsElement">
+        <AuthField
+          v-model="password"
+          type="password"
+          name="tokenPassword"
+          autocomplete="current-password"
+          :label="$t('auth.changePassword.currentPassword')"
+          :error="fieldErrors.currentPassword"
+          @input="dismiss('currentPassword')"
+        />
+      </div>
       <template #error><AuthError :text="summary" /></template>
     </ConfirmDialog>
   </SettingsCard>

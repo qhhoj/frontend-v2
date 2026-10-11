@@ -427,7 +427,7 @@
     },
     "password": {
       "title": "Change password",
-      "lead": "Every other device is signed out after the change; this session stays. The API token does not change.",
+      "lead": "Every other device is signed out after the change; this session stays. The API token is revoked too.",
       "changed": "Password changed. Other devices were signed out."
     },
     "token": {
@@ -436,9 +436,9 @@
       "create": "Create a new token",
       "copyNow": "Copy it now. Once you leave this page the token cannot be shown again. The old token no longer works.",
       "copy": "Copy the API token",
-      "risk": "Anyone holding the token can submit as you. Changing the password does not revoke it; create a new token if it may have leaked.",
+      "risk": "Anyone holding the token can submit as you. The token is revoked when you change your password or sign out of all devices; create a new token if it may have leaked.",
       "confirmTitle": "Create a new token?",
-      "confirmBody": "The current token stops working at once. Scripts using it fail until you give them the new one. The new token is shown once."
+      "confirmBody": "The current token stops working at once. Scripts using it fail until you give them the new one. The new token is shown once. Enter your current password to confirm."
     },
     "logoutAll": {
       "title": "Sign out everywhere",
@@ -1613,6 +1613,7 @@
     "count": "{count} comment | {count} comments",
     "pageOf": "page {page} / {last}",
     "timeOrder": "oldest first",
+    "truncatedReplies": "Some replies are hidden.",
     "pager": "Comment pages",
     "permalink": "Link to comment number {number}",
     "edited": "edited",

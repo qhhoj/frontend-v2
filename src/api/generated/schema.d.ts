@@ -790,7 +790,7 @@ export interface paths {
          * Sign in with a username and password
          * @description Public. Verifies the credentials and opens a browser session: the `qhhoj_session` cookie is set and any session the browser already held is replaced. Send the returned `csrfToken` in the `X-CSRF-Token` header on every later non-GET request.
          *     When the account has TOTP or a security key, `twoFactorRequired` is true and `user` is null until the second factor is passed. When the password appears in a known breach, `passwordChangeRequired` is true and only the password change works.
-         *     Failed attempts are limited per IP and per account (10 in 15 minutes, then 429 `rate_limited`). Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.
+         *     Failed attempts are limited per IP and per account from that IP (10 in 15 minutes, then 429 `rate_limited`), so failures from elsewhere never lock the owner out. Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.
          */
         post: operations["AuthController_login"];
         delete?: never;
@@ -830,7 +830,7 @@ export interface paths {
         put?: never;
         /**
          * Sign out of every session
-         * @description Browser session only (API tokens get 403) and not while impersonating. Destroys all sessions of the user, including the current one, and clears the cookie. Returns 204.
+         * @description Browser session only (API tokens get 403) and not while impersonating. Destroys all sessions of the user, including the current one, revokes the API token and clears the cookie. Returns 204.
          */
         post: operations["AuthController_logoutAll"];
         delete?: never;
@@ -872,7 +872,7 @@ export interface paths {
         /**
          * Change the account password
          * @description Browser session only, not while impersonating; reachable while the password is flagged as breached. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).
-         *     The new password must pass the password policy, differ from the current one and not appear in a known breach, otherwise 400 `validation_failed` with per-field issues on `newPassword`. All other sessions are signed out; the API token stays valid. A concurrent change gives 409 `conflict`. Returns 204.
+         *     The new password must pass the password policy, differ from the current one and not appear in a known breach, otherwise 400 `validation_failed` with per-field issues on `newPassword`. All other sessions are signed out and the API token is revoked. A concurrent change gives 409 `conflict`. Returns 204.
          */
         post: operations["AuthController_changePassword"];
         delete?: never;
@@ -1035,7 +1035,8 @@ export interface paths {
         put?: never;
         /**
          * Create a new API token
-         * @description Browser session only, not while impersonating. Issues a new personal API token for `Authorization: Bearer`, replacing the previous one, which stops working at once. The token is shown only in this response.
+         * @description Browser session only, not while impersonating. Requires the current password; wrong attempts share the 10 in 15 minutes budget with other password confirmations (400 `invalid_credentials`, then 429 `rate_limited`).
+         *     Issues a new personal API token for `Authorization: Bearer`, replacing the previous one, which stops working at once. The token is shown only in this response. A password change, a password reset and signing out everywhere revoke it.
          */
         post: operations["AuthController_regenerateToken"];
         delete?: never;
@@ -5851,6 +5852,8 @@ export interface components {
             pagination: components["schemas"]["CommentPaginationResponse"];
             /** @description Why the viewer cannot comment, by the same rule posting enforces; null when they can. */
             postBlock: components["schemas"]["CommentPostBlockResponse"] | null;
+            /** @description Roots whose thread has more than `COMMENT_THREAD_REPLY_LIMIT` (100) replies: only the first 100 in tree order are listed. */
+            truncatedThreads: string[];
         };
         /**
          * @description Kind of page.
@@ -6081,6 +6084,8 @@ export interface components {
             key: string;
             labelStyle: components["schemas"]["ContestLabelStyle"];
             name: string;
+            /** @description The organizations the contest is restricted to, empty unless it is organization-private; unlisted ones show only to viewers who may list them. */
+            organizations: components["schemas"]["ContestOrganizationResponse"][];
             /** @description Where the contest is now relative to its start and end. */
             phase: components["schemas"]["ContestPhase"];
             /** @description Decimal places shown in scores. */
@@ -6184,6 +6189,8 @@ export interface components {
             /** @description Unique short identifier used in URLs. */
             key: string;
             name: string;
+            /** @description The organizations the contest is restricted to, empty unless it is organization-private; unlisted ones show only to viewers who may list them. */
+            organizations: components["schemas"]["ContestOrganizationResponse"][];
             /** @description Where the contest is now relative to its start and end. */
             phase: components["schemas"]["ContestPhase"];
             /** Format: date-time */
@@ -6223,6 +6230,11 @@ export interface components {
              * @enum {string|null}
              */
             liveStatus: "finished" | "participating" | "registered" | null;
+        };
+        ContestOrganizationResponse: {
+            name: string;
+            /** @description Unique identifier used in the organization's URL. */
+            slug: string;
         };
         /**
          * @description Where the contest is now relative to its start and end.
@@ -9168,8 +9180,8 @@ export interface components {
             cases: components["schemas"]["SubmissionCaseResponse"][] | null;
             /** @description Points available over all test cases. */
             caseTotal: number;
-            /** @description Number of the case being judged while the submission runs. */
-            currentTestcase: number;
+            /** @description Number of the case being judged while the submission runs; null unless the viewer sees every case result (it would tell where judging stopped). */
+            currentTestcase: number | null;
             /**
              * Format: date-time
              * @description When the submission was made.
@@ -9368,6 +9380,8 @@ export interface components {
             judgesTotal: number;
             /** @description Submissions queued or being judged now. */
             queueLength: number;
+            /** @description Today's judged submissions by result, most frequent first; their counts add up to `judgedToday`. */
+            verdictsToday: components["schemas"]["VerdictCountResponse"][];
         };
         /**
          * @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end.
@@ -10322,6 +10336,12 @@ export interface components {
             rating: number | null;
             /** @description Username. */
             username: string;
+        };
+        VerdictCountResponse: {
+            /** @description Submissions judged today with this result. */
+            count: number;
+            /** @description Result code, such as `AC` or `WA`. */
+            result: string;
         };
         VoteDto: {
             score: components["schemas"]["VoteScore"];
@@ -12289,7 +12309,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CurrentPasswordDto"];
+            };
+        };
         responses: {
             201: {
                 headers: {

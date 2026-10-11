@@ -150,6 +150,7 @@ export const commentThreadPage = (
   pageLocked: false,
   canComment: true,
   postBlock: null,
+  truncatedThreads: [],
   comments: [comment()],
   pagination: { page: 1, pageSize: 20, total: 1 },
   ...overrides,

@@ -342,6 +342,9 @@ useCommentJump({
               </span>
             </EmptyState>
           </div>
+          <p v-if="data.truncatedThreads.length" class="text-sm text-muted">
+            {{ $t('comments.truncatedReplies') }}
+          </p>
           <NumberedPager
             :meta="data.pagination"
             :label="$t('comments.pager')"
