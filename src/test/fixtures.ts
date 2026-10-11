@@ -244,6 +244,7 @@ export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestLi
   organizations: [],
   isPrivate: false,
   isOrganizationPrivate: false,
+  organizations: [],
   requiresAccessCode: false,
   requiresRankingAccessCode: false,
   disallowVirtual: false,
@@ -636,6 +637,7 @@ export const submissionStats = (overrides: Partial<SubmissionStats> = {}): Submi
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,
+  verdictsToday: [],
   ...overrides,
 });
 
