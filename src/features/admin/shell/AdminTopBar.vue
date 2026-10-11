@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { House, Menu, Search, ShieldCheck } from 'lucide-vue-next';
+import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import UserMenu from '@/features/shell/UserMenu.vue';
 import { shortcutHint } from './search/use-palette-shortcut';
 
@@ -49,6 +50,8 @@ defineEmits<{ search: []; menu: [] }>();
       <House aria-hidden="true" class="size-4 sm:hidden" />
       <span class="sr-only sm:not-sr-only">{{ $t('admin.shell.backToSite') }}</span>
     </RouterLink>
+    <!-- Below `sm` the switch lives in the phone nav sheet. -->
+    <span class="hidden sm:block"><LocaleToggle /></span>
     <UserMenu />
     <button
       type="button"
