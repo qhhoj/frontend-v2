@@ -10385,6 +10385,8 @@ export interface components {
             outputLimit: number | null;
             /** @description Leading output bytes kept for display (`output_prefix_length`); null for the default. */
             outputPrefix: number | null;
+            /** @description Compile checks of the uploaded checker and interactor, run on a judge after each upload. */
+            sourceChecks: components["schemas"]["SourceChecksResponse"];
             /** @description Judge `unicode` flag: output is read as Unicode text. */
             unicode: boolean;
         };
@@ -11520,6 +11522,28 @@ export interface components {
         SolvedResponse: {
             /** @description Groups sorted by name. */
             groups: components["schemas"]["SolvedGroupResponse"][];
+        };
+        SourceCheckResponse: {
+            /**
+             * Format: date-time
+             * @description When the judge answered; null while pending.
+             */
+            checkedAt: string | null;
+            /** @description The uploaded file this check is about. */
+            file: string;
+            /** @description Compile log of an `error`, reason of an `unavailable`; empty otherwise. */
+            log: string;
+            /**
+             * @description `pending` (queued or compiling on a judge), `ok`, `error` (see `log`) or `unavailable` (no judge with `generate.compile` could compile it; `log` says why).
+             * @enum {string}
+             */
+            status: "error" | "ok" | "pending" | "unavailable";
+        };
+        SourceChecksResponse: {
+            /** @description Compile check of the uploaded checker; null when there is none. */
+            customChecker: components["schemas"]["SourceCheckResponse"] | null;
+            /** @description Compile check of the uploaded interactor (interactive grader only); null otherwise. */
+            customGrader: components["schemas"]["SourceCheckResponse"] | null;
         };
         /**
          * @description Rank title shown beside the name; `banned` is set by the ban route only.

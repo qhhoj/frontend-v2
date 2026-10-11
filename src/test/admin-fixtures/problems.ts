@@ -112,9 +112,11 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
 export const problemEditorRoutes = (problem: EditableProblem = editableProblem()) => ({
   [`GET /problems/${problem.code}`]: ok(problem),
   'GET /problems/meta': ok(problemEditingMeta()),
+  // The setup checklist of a private problem reads its test data.
+  [`GET /problems/${problem.code}/data`]: ok(problemData()),
 });
 
-const testCase = (overrides: Partial<TestCase>): TestCase => ({
+export const testCase = (overrides: Partial<TestCase>): TestCase => ({
   type: 'C',
   input: '',
   output: '',
@@ -153,5 +155,6 @@ export const problemData = (overrides: Partial<ProblemData> = {}): ProblemData =
   archiveFiles: ['1.in', '1.out', 'sub1/01.in', 'sub1/01.out', 'sub1/02.in', 'sub1/02.out'],
   hasInit: true,
   limits: { softCases: 50, maxCases: 300 },
+  sourceChecks: { customChecker: null, customGrader: null },
   ...overrides,
 });

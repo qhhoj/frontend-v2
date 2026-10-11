@@ -1,0 +1,65 @@
+{
+  "owner": {
+    "label": "Thuộc về",
+    "loading": "Đang tải tổ chức…",
+    "orgPrivate": "chỉ thành viên thấy",
+    "fixed": "Cố định",
+    "site": "Không thuộc tổ chức",
+    "privateHint": "Chỉ thành viên tổ chức thấy, cho đến khi bạn công khai.",
+    "siteHint": "Bài của trang, ẩn cho đến khi bạn công khai."
+  },
+  "problem": {
+    "timeHint": "Giây, ví dụ 1.",
+    "memoryHint": "KiB, ví dụ 262144 (256 MiB).",
+    "pointsHint": "Từ 800 đến 3500.",
+    "type": "Dạng bài",
+    "pickType": "Chọn dạng bài",
+    "statement": "Đề bài",
+    "statementHint": "Có thể để trống và viết sau.",
+    "nextNote": "Sau khi tạo: tải test lên, chọn trình chấm và điểm, nộp thử.",
+    "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau.",
+    "statementPreview": "Xem trước"
+  },
+  "steps": {
+    "label": "Các bước chuẩn bị bài",
+    "heading": "Chuẩn bị bài tập",
+    "next": "Tiếp theo:",
+    "done": "Xong",
+    "todo": "Chưa xong",
+    "info": {
+      "title": "Thông tin bài",
+      "hint": "Mã, tên, giới hạn và điểm.",
+      "action": "Sửa thông tin"
+    },
+    "statement": {
+      "title": "Viết đề bài",
+      "hint": "Đề, input, output và ví dụ.",
+      "action": "Viết đề"
+    },
+    "tests": {
+      "title": "Tải test lên",
+      "hint": "Một tệp zip chứa các cặp input/output.",
+      "action": "Tải test lên"
+    },
+    "scoring": {
+      "title": "Trình chấm và điểm",
+      "hint": "Chọn trình chấm, gán điểm cho test.",
+      "action": "Chỉnh chấm điểm"
+    },
+    "trial": {
+      "title": "Nộp thử",
+      "hint": "Nộp một lời giải để chắc test đúng.",
+      "action": "Nộp thử"
+    },
+    "publish": {
+      "members": "Hiện cho thành viên",
+      "everyone": "Công khai bài",
+      "hint": "Bật “Công khai” khi bài đã sẵn sàng.",
+      "action": "Công khai"
+    }
+  },
+  "contest": {
+    "ownerAccess": "Chỉ thành viên {name} thấy kỳ thi này (cố định khi tạo trong tổ chức)."
+  },
+  "publishToMembers": "Bài riêng của tổ chức: bật lên thì chỉ thành viên tổ chức thấy."
+}

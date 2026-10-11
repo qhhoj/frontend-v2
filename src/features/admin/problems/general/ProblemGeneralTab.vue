@@ -53,6 +53,7 @@ const FORM_ID = 'problem-general-form';
               :suggester="problem.editor?.suggester ?? null"
               :is-suggestion-pending="!problem.isPublic"
               :private-code="problem.isPublic ? undefined : problem.code"
+              :can-publish-to-members="problem.editor?.canPublishToMembers ?? false"
               has-change-message
             />
           </fieldset>

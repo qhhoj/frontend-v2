@@ -5,6 +5,7 @@ import {
   problemItem,
   problemMeta,
   profile,
+  sessionUser,
   signedIn,
   signedOut,
   userPage,
@@ -259,5 +260,39 @@ describe('problem list', () => {
       '2000',
     ]);
     expect(wrapper.get('[data-testid="random-status"]').text()).toBe('');
+  });
+});
+
+describe('"Tạo bài tập" on the list (2C)', () => {
+  const viewerWho = (problemCreation: { site: boolean; organizations: boolean }) => ({
+    'GET /auth/me': signedIn({
+      user: sessionUser({
+        adminCapabilities: {
+          ...sessionUser().adminCapabilities,
+          problemCreation,
+        },
+      }),
+    }),
+    'GET /profile': ok(profile()),
+    'GET /problems/meta': ok(problemMeta()),
+    'GET /problems': page(threeProblems),
+    'GET /users/user_01': ok(userPage()),
+  });
+
+  it('shows the button to an organization admin the session lets create there, linked to the create form', async () => {
+    mockApi(viewerWho({ site: false, organizations: true }));
+    const { wrapper } = await mountApp('/problems');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="create-problem"]').attributes('href')).toBe(
+      '/admin/problems/new',
+    );
+  });
+
+  it('shows nothing, not even a disabled button, to a viewer who may not create', async () => {
+    mockApi(viewerWho({ site: false, organizations: false }));
+    const { wrapper } = await mountApp('/problems');
+    await flushPromises();
+    expect(wrapper.find('[data-testid="create-problem"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Tạo bài tập');
   });
 });

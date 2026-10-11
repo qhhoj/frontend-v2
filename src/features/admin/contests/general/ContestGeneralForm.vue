@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CreationOwner } from '../../creation/creation-owners';
 import { CARD } from '../../ui/controls';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
@@ -21,6 +22,8 @@ defineProps<{
   isCreate: boolean;
   hasCodes: { access: boolean; ranking: boolean };
   hasRail?: boolean;
+  /** The organization a new contest is created in; it fixes the organization access fields. */
+  owner?: CreationOwner | null;
 }>();
 </script>
 
@@ -32,7 +35,7 @@ defineProps<{
       <ContestPeopleSection v-model="form" />
       <ContestTimeSection v-model="form" :errors="errors" />
       <ContestFormatSection v-model="form" :errors="errors" />
-      <ContestAccessSection v-model="form" :errors="errors" :has-codes="hasCodes" />
+      <ContestAccessSection v-model="form" :errors="errors" :has-codes="hasCodes" :owner="owner" />
       <ContestRatingSection v-model="form" :errors="errors" />
       <ContestOperationsSection v-model="form" :errors="errors" />
     </div>

@@ -31,6 +31,7 @@ export const ADMIN_SCREENS = {
   problemNew: {
     path: '/admin/problems/new',
     permission: ['judge.add_problem', 'judge.suggest_new_problem'],
+    capability: 'problemCreation',
   },
   polygonImport: { path: '/admin/problems/polygon', permission: 'judge.import_polygon_package' },
   problemImport: { path: '/admin/problems/import', permission: 'judge.import_polygon_package' },
@@ -45,7 +46,11 @@ export const ADMIN_SCREENS = {
     permission: ['judge.change_problemtype', 'judge.change_problemgroup', 'judge.change_license'],
   },
   contests: { path: '/admin/contests', permission: ['judge.add_contest', ...CONTEST_EDIT] },
-  contestNew: { path: '/admin/contests/new', permission: 'judge.add_contest' },
+  contestNew: {
+    path: '/admin/contests/new',
+    permission: 'judge.add_contest',
+    capability: 'contestCreation',
+  },
   contestTags: { path: '/admin/contest-tags', permission: 'judge.change_contest_tag' },
   contestGeneral: contestTab('general'),
   contestProblems: contestTab('problems'),

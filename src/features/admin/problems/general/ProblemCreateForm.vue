@@ -1,39 +1,73 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { createProblem, suggestProblem } from '@/api/problem-editing.api';
+import {
+  createOrganizationProblem,
+  createProblem,
+  suggestProblem,
+} from '@/api/problem-editing.api';
 import type { EditableProblem, ProblemBody, ProblemEditingMeta } from '@/api/types/problem-editing';
 import { usePermissions } from '@/stores/use-permissions';
+import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
+import type { CreationOwner } from '../../creation/creation-owners';
+import { useCreationScope } from '../../creation/creation-scope';
+import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
+import MarkdownField from '../../ui/MarkdownField.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { failureTextOf } from '../../ui/admin-errors';
-import { CARD, buttonClass } from '../../ui/controls';
-import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
-import AdminSectionNav from '../../ui/form/AdminSectionNav.vue';
+import { BUTTON, CARD, INPUT } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { translate } from '@/i18n';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { EDIT_ALL_PROBLEM } from './field-lock';
-import ProblemGeneralForm from './ProblemGeneralForm.vue';
+import ProblemCodeField from './ProblemCodeField.vue';
 import { checkProblemForm, cloneForm, emptyProblemForm, toProblemBody } from './problem-form';
 import type { ProblemForm } from './problem-form';
-import { problemSections } from './problem-sections';
 
+/**
+ * Mock-up 3C, the short create form: owner, code (with the organization prefix), name, limits, points, type, group and an
+ * optional statement. Every other setting lives on the editor tabs, where the setup checklist leads next.
+ */
 const props = defineProps<{ meta: ProblemEditingMeta }>();
 const router = useRouter();
 const { can } = usePermissions();
+const { scope } = useCreationScope('problem');
 const defaults = emptyProblemForm(props.meta);
-const form = ref<ProblemForm>(cloneForm(defaults));
+const uncategorized = props.meta.types.find((type) => type.name === 'uncategorized');
+const form = ref<ProblemForm>({
+  ...cloneForm(defaults),
+  typeIds: uncategorized ? [uncategorized.id] : [],
+});
+const description = ref('');
+const owner = ref<CreationOwner | null>(null);
+const isOwnerReady = ref(false);
 const localErrors = ref<FieldErrors>({});
 const suggestedCode = ref('');
 
+const typeId = computed({
+  get: () => form.value.typeIds[0] ?? '',
+  set: (id: string) => {
+    form.value.typeIds = id ? [id] : [];
+  },
+});
+const canCreate = computed(() =>
+  owner.value ? scope.value.organizations : can('judge.add_problem'),
+);
+const canSuggest = computed(() => !owner.value && can('judge.suggest_new_problem'));
+
+const afterCreate = (created: EditableProblem) => {
+  void router.push({ name: 'admin-problemGeneral', params: { code: created.code } });
+};
 const createMutation = useAdminMutation({
-  mutate: (body: ProblemBody) => createProblem(body),
+  mutate: (body: ProblemBody) =>
+    owner.value ? createOrganizationProblem(owner.value.slug, body) : createProblem(body),
   invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
-  successText: (created: EditableProblem) =>
-    translate('admin.problems.general.create.createdToast', { code: created.code }),
-  onDone: (created: EditableProblem) => {
-    void router.push({ name: 'admin-problemGeneral', params: { code: created.code } });
+  onDone: afterCreate,
+});
+const suggestMutation = useAdminMutation({
+  mutate: (body: ProblemBody) => suggestProblem(body),
+  onDone: (suggested: EditableProblem) => {
+    suggestedCode.value = suggested.code;
   },
 });
 const errors = computed<FieldErrors>(() => ({
@@ -41,34 +75,18 @@ const errors = computed<FieldErrors>(() => ({
   ...createMutation.fieldErrors.value,
   ...suggestMutation.fieldErrors.value,
 }));
-const suggestMutation = useAdminMutation({
-  mutate: (body: ProblemBody) => suggestProblem(body),
-  onDone: (suggested: EditableProblem) => {
-    suggestedCode.value = suggested.code;
-  },
-});
 
-/** The body, or null when a local check fails. A staff-only field goes out only for `judge.edit_all_problem`. */
+/** The body, or null when a local check fails. Organization fields are set by the server, so they are never sent. */
 function checkedBody(): ProblemBody | null {
   localErrors.value = checkProblemForm(form.value, can);
   if (Object.keys(localErrors.value).length > 0) return null;
-  return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
+  const body = toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
+  return description.value.trim() ? { ...body, description: description.value } : body;
 }
-
-const canCreate = computed(() => can('judge.add_problem'));
-const canSuggest = computed(() => can('judge.suggest_new_problem'));
-const isPending = computed(() => createMutation.isPending.value || suggestMutation.isPending.value);
-const failure = computed(() => createMutation.failure.value ?? suggestMutation.failure.value);
-const sections = problemSections(false);
 
 async function create() {
   const body = checkedBody();
-  if (body && canCreate.value) await createMutation.run(body);
-}
-
-/** The save bar's submit: create with `judge.add_problem`, else suggest. */
-function submit() {
-  return canCreate.value ? create() : suggest();
+  if (body && canCreate.value && isOwnerReady.value) await createMutation.run(body);
 }
 
 async function suggest() {
@@ -78,7 +96,7 @@ async function suggest() {
 
 // A message describes the values it was made from: editing a field retires it until the next submit.
 watch(
-  form,
+  [form, description, owner],
   () => {
     localErrors.value = {};
     createMutation.fieldErrors.value = {};
@@ -89,48 +107,164 @@ watch(
 </script>
 
 <template>
-  <form class="flex flex-col gap-4" novalidate @submit.prevent="submit">
-    <AdminSectionNav :sections="sections" mode="select" class="max-w-xs xl:hidden" />
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,55rem)_15rem] xl:items-start">
-      <fieldset :disabled="isPending" :class="[CARD, 'm-0 flex min-w-0 flex-col p-0']">
-        <ProblemGeneralForm v-model="form" :meta="meta" :errors="errors" />
-      </fieldset>
-      <AdminSectionNav :sections="sections" class="hidden xl:flex" />
-    </div>
-    <AdminStatus v-if="failure" kind="refused" :text="failureTextOf(failure)" />
-    <AdminStatus
-      v-else-if="suggestMutation.isDone.value"
-      kind="done"
-      :text="$t('admin.problems.general.create.suggested', { code: suggestedCode })"
-    />
-    <AdminSaveBar
-      data-testid="problem-create-bar"
-      :dirty-count="0"
-      allow-clean
-      :pending="isPending"
-      :save-label="
-        canCreate
-          ? $t('admin.problems.general.create.createButton')
-          : $t('admin.problems.general.create.suggestButton')
-      "
-    >
-      <template #status>
-        <span class="text-muted">{{ $t('admin.problems.general.create.required') }}</span>
-      </template>
-      <template #actions>
-        <RouterLink :to="{ name: 'admin-problems' }" :class="buttonClass('ghost')">
-          {{ $t('admin.problems.general.create.cancel') }}
-        </RouterLink>
+  <form class="flex max-w-3xl flex-col gap-5" novalidate @submit.prevent="create">
+    <section :class="CARD" class="flex flex-col gap-5 p-4 sm:p-5">
+      <CreationOwnerPicker v-model="owner" v-model:ready="isOwnerReady" kind="problem" />
+      <div class="grid gap-5 sm:grid-cols-2">
+        <ProblemCodeField
+          v-model="form.code"
+          :prefix="owner?.problemCodePrefix ?? ''"
+          :error="errors.code"
+        />
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-name"
+          :label="$t('admin.problems.general.basics.name')"
+          :error="errors.name"
+          required
+        >
+          <input
+            :id="id"
+            v-model="form.name"
+            :class="INPUT"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors.name ? 'true' : undefined"
+          />
+        </AdminField>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-3">
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-timeLimit"
+          :label="$t('admin.problems.general.limits.timeLimit')"
+          :hint="$t('admin.creation.problem.timeHint')"
+          :error="errors.timeLimit"
+        >
+          <input
+            :id="id"
+            v-model.number="form.timeLimit"
+            type="number"
+            step="0.01"
+            inputmode="decimal"
+            :class="INPUT"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors.timeLimit ? 'true' : undefined"
+          />
+        </AdminField>
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-memoryLimit"
+          :label="$t('admin.problems.general.limits.memoryLimit')"
+          :hint="$t('admin.creation.problem.memoryHint')"
+          :error="errors.memoryLimit"
+        >
+          <input
+            :id="id"
+            v-model.number="form.memoryLimit"
+            type="number"
+            step="1"
+            inputmode="numeric"
+            :class="INPUT"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors.memoryLimit ? 'true' : undefined"
+          />
+        </AdminField>
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-points"
+          :label="$t('admin.problems.general.limits.points')"
+          :hint="$t('admin.creation.problem.pointsHint')"
+          :error="errors.points"
+        >
+          <input
+            :id="id"
+            v-model.number="form.points"
+            type="number"
+            step="1"
+            inputmode="numeric"
+            :class="INPUT"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors.points ? 'true' : undefined"
+          />
+        </AdminField>
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-type"
+          :label="$t('admin.creation.problem.type')"
+          :error="errors.typeIds"
+          required
+        >
+          <select
+            :id="id"
+            v-model="typeId"
+            :class="INPUT"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors.typeIds ? 'true' : undefined"
+          >
+            <option value="">{{ $t('admin.creation.problem.pickType') }}</option>
+            <option v-for="type in meta.types" :key="type.id" :value="type.id">
+              {{ type.fullName }}
+            </option>
+          </select>
+        </AdminField>
+        <AdminField
+          v-slot="{ id, describedBy }"
+          input-id="problem-group"
+          :label="$t('admin.problems.general.classes.group')"
+        >
+          <select :id="id" v-model="form.groupId" :class="INPUT" :aria-describedby="describedBy">
+            <option v-for="group in meta.groups" :key="group.id" :value="group.id">
+              {{ group.fullName }}
+            </option>
+          </select>
+        </AdminField>
+      </div>
+      <MarkdownField
+        v-model="description"
+        :label="$t('admin.creation.problem.statement')"
+        :hint="$t('admin.creation.problem.statementHint')"
+        preview-style="problem"
+        :preview-label="$t('admin.creation.problem.statementPreview')"
+      />
+    </section>
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <button
-          v-if="canCreate && canSuggest"
+          v-if="canCreate"
+          type="submit"
+          :class="BUTTON.primary"
+          :aria-disabled="createMutation.isPending.value || !isOwnerReady ? 'true' : undefined"
+        >
+          {{ $t('admin.problems.general.create.createButton') }}
+        </button>
+        <button
+          v-if="canSuggest"
           type="button"
-          :class="buttonClass('secondary')"
-          :aria-disabled="isPending || undefined"
+          :class="BUTTON.secondary"
+          :aria-disabled="suggestMutation.isPending.value ? 'true' : undefined"
           @click="suggest"
         >
           {{ $t('admin.problems.general.create.suggestButton') }}
         </button>
-      </template>
-    </AdminSaveBar>
+      </div>
+      <p class="text-sm text-muted">{{ $t('admin.creation.problem.nextNote') }}</p>
+      <AdminStatus
+        v-if="createMutation.failure.value"
+        kind="refused"
+        :text="failureTextOf(createMutation.failure.value)"
+      />
+      <AdminStatus
+        v-else-if="suggestMutation.failure.value"
+        kind="refused"
+        :text="failureTextOf(suggestMutation.failure.value)"
+      />
+      <AdminStatus
+        v-else-if="suggestMutation.isDone.value"
+        kind="done"
+        :text="$t('admin.problems.general.create.suggested', { code: suggestedCode })"
+      />
+    </div>
   </form>
 </template>

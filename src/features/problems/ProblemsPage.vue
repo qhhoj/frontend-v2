@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
+import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -70,6 +71,7 @@ const summary = computed(() => {
     <header class="flex flex-wrap items-baseline gap-x-3">
       <h1 class="page-title">{{ $t('problems.title') }}</h1>
       <p class="min-h-6 text-sm text-muted">{{ summary }}</p>
+      <CreateShortcut kind="problem" class="ml-auto self-center" />
     </header>
     <ProblemFilters
       :filters="filters"

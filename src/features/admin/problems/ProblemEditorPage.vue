@@ -11,6 +11,7 @@ import AdminChip from '../ui/AdminChip.vue';
 import type { ChipTone } from '../ui/AdminChip.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
+import ProblemSetupChecklist from './ProblemSetupChecklist.vue';
 import { routeTabs } from '../ui/admin-tabs';
 import { buttonClass } from '../ui/controls';
 import { isNotFound } from '../ui/admin-errors';
@@ -103,6 +104,7 @@ function openClone(close: () => void) {
             </button>
           </template>
         </AdminPageHeader>
+        <ProblemSetupChecklist v-if="canEdit" :problem="problem.data.value" />
         <AdminTabs
           sticky
           :tabs="routeTabs(PROBLEM_TABS, { code })"

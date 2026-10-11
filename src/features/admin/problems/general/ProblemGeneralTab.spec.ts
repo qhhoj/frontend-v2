@@ -1,13 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
+import { organizationItem, profile, sessionUser, signedIn } from '@/test/fixtures';
 import {
   editableProblem,
   problemEditingMeta,
   problemData,
+  problemEditor,
   problemEditorRoutes,
   TYPE_GRAPH,
 } from '@/test/admin-fixtures/problems';
@@ -94,6 +96,7 @@ describe('ProblemGeneralTab', () => {
       ...problemEditorRoutes(),
       'PATCH /problems/hcmus41c': ok(editableProblem({ code: 'hcmus41c2' })),
       'GET /problems/hcmus41c2': ok(editableProblem({ code: 'hcmus41c2' })),
+      'GET /problems/hcmus41c2/data': ok(problemData()),
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/general');
     await wrapper.get('#problem-code').setValue('hcmus41c2');
@@ -112,8 +115,7 @@ describe('ProblemGeneralTab', () => {
     expect(wrapper.findAll('button').some((button) => button.text() === 'Tạo bài')).toBe(false);
     await wrapper.get('#problem-code').setValue('newp');
     await wrapper.get('#problem-name').setValue('New');
-    await wrapper.get('#problem-type-pick').setValue(TYPE_GRAPH);
-    await buttonLabelled(wrapper, 'Thêm loại').trigger('click');
+    await wrapper.get('#problem-type').setValue(TYPE_GRAPH);
     await buttonLabelled(wrapper, 'Gửi đề xuất bài').trigger('click');
     await flushPromises();
     const body = calls.find((call) => call.path === '/problems/suggest')?.body;
@@ -130,6 +132,42 @@ describe('ProblemGeneralTab', () => {
     ])
       expect(body, field).not.toHaveProperty(field);
     expect(wrapper.text()).toContain('Đã gửi đề xuất newp.');
+  });
+
+  it('creates an organization problem for an org admin without judge.add_problem: fixed prefix, org route', async () => {
+    const orgAdmin = sessionUser({
+      permissions: ['judge.create_organization_problem', 'judge.edit_own_problem'],
+      adminCapabilities: {
+        organizations: true,
+        problemCreation: { site: false, organizations: true },
+        contestCreation: { site: false, organizations: false },
+      },
+    });
+    const calls = mockApi({
+      'GET /auth/me': signedIn({ user: orgAdmin }),
+      'GET /organizations': page([organizationItem({ problemCodePrefix: 'thpta_' })]),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /organizations/thpt-a/problems': ok(editableProblem({ code: 'thpta_bai1' })),
+      'GET /problems/thpta_bai1': ok(editableProblem({ code: 'thpta_bai1' })),
+      'GET /problems/thpta_bai1/data': ok(problemData({ cases: [] })),
+      'GET /profile': ok(profile()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/new?organization=thpt-a');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="problem-code-prefix"]').text()).toBe('thpta_');
+    expect(wrapper.text()).not.toContain('Không thuộc tổ chức');
+    expect(wrapper.text()).not.toContain('Gửi đề xuất bài');
+    await wrapper.get('#problem-code').setValue('bai1');
+    await wrapper.get('#problem-name').setValue('Bài 1');
+    await wrapper.get('#problem-type').setValue(TYPE_GRAPH);
+    await buttonLabelled(wrapper, 'Tạo bài').trigger('click');
+    await flushPromises();
+    const post = calls.find((call) => call.method === 'POST');
+    expect(post?.path).toBe('/organizations/thpt-a/problems');
+    expect(post?.body).toMatchObject({ code: 'thpta_bai1', name: 'Bài 1', typeIds: [TYPE_GRAPH] });
+    expect(post?.body).not.toHaveProperty('organizations');
+    // The editor opens on the new problem with the setup checklist pointing at the next step.
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Tiếp theo:'));
   });
 
   it('marks the public problem pages and the admin index stale after a save and after a create', async () => {
@@ -155,8 +193,7 @@ describe('ProblemGeneralTab', () => {
     seedCache(created.queryClient, STALE_AFTER_WRITE);
     await created.wrapper.get('#problem-code').setValue('newp');
     await created.wrapper.get('#problem-name').setValue('New');
-    await created.wrapper.get('#problem-type-pick').setValue(TYPE_GRAPH);
-    await buttonLabelled(created.wrapper, 'Thêm loại').trigger('click');
+    await created.wrapper.get('#problem-type').setValue(TYPE_GRAPH);
     await buttonLabelled(created.wrapper, 'Tạo bài').trigger('click');
     await flushPromises();
     expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
@@ -168,18 +205,42 @@ describe('ProblemGeneralTab', () => {
       wrapper.get('#problem-isPublic').setValue(true);
 
     it('warns when the problem has no test cases, without blocking the save', async () => {
-      const calls = mockApi({
+      mockApi({
         ...staffViewer(PUBLISH),
         ...problemEditorRoutes(),
         'GET /problems/hcmus41c/data': ok(problemData({ cases: [] })),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      expect(calls.some((call) => call.path.endsWith('/data'))).toBe(false);
       await tickPublic(wrapper);
       await flushPromises();
       const note = wrapper.get('[data-testid="publish-readiness"]');
       expect(note.text()).toContain('chưa có test nào');
       expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('aria-disabled')).toBeUndefined();
+    });
+
+    it('lets an organization creator show an organization-private problem to members without the permission', async () => {
+      const orgProblem = editableProblem({
+        isOrganizationPrivate: true,
+        editor: { ...problemEditor(), canPublishToMembers: true },
+      });
+      const calls = mockApi({
+        ...staffViewer(EDIT),
+        ...problemEditorRoutes(orgProblem),
+        'PATCH /problems/hcmus41c': ok(editableProblem({ isPublic: true })),
+      });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
+      expect(wrapper.text()).toContain('chỉ thành viên tổ chức thấy');
+      await tickPublic(wrapper);
+      await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+      await flushPromises();
+      expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
+    });
+
+    it('keeps Public locked without the permission or the flag', async () => {
+      mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes() });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeDefined();
     });
 
     it('says nothing when the cases carry points', async () => {

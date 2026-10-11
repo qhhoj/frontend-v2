@@ -18,6 +18,12 @@ export const fetchEditableProblem = (code: string): Promise<EditableProblem> =>
 export const fetchProblemEditingMeta = (): Promise<ProblemEditingMeta> => apiGet('/problems/meta');
 export const createProblem = (body: ProblemBody): Promise<EditableProblem> =>
   apiSend('post', '/problems', { body });
+/** An organization-private problem of `slug` (organization administrators with `create_organization_problem`). */
+export const createOrganizationProblem = (
+  slug: string,
+  body: ProblemBody,
+): Promise<EditableProblem> =>
+  apiSend('post', '/organizations/{slug}/problems', { path: { slug }, body });
 export const suggestProblem = (body: ProblemBody): Promise<EditableProblem> =>
   apiSend('post', '/problems/suggest', { body });
 export const updateProblem = (code: string, patch: ProblemPatch): Promise<EditableProblem> =>

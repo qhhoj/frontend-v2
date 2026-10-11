@@ -14,7 +14,13 @@ const form = defineModel<ProblemForm>({ required: true });
 /** The revision comment of the next save (edit only; the create form leaves it out). */
 const changeMessage = defineModel<string>('changeMessage');
 /** `privateCode`: the saved problem's code while it is still private, so publishing it can be checked; unset on create and once public. */
-defineProps<{ privateCode?: string; sectionId?: string; hasChangeMessage?: boolean }>();
+/** `canPublishToMembers`: the API's `editor.canPublishToMembers` (an organization creator may show an organization-private problem to its members without `judge.change_public_visibility`). */
+const props = defineProps<{
+  privateCode?: string;
+  sectionId?: string;
+  hasChangeMessage?: boolean;
+  canPublishToMembers?: boolean;
+}>();
 const { can } = usePermissions();
 const lockFor = (permission: string) => permissionLock(can, permission);
 /** Legacy "make public and update publish date": ticking Public offers today's date, so the problem lists as new. */
@@ -49,7 +55,8 @@ function setDateToNow() {
       v-model="form.isPublic"
       input-id="problem-isPublic"
       :label="$t('admin.problems.status.public')"
-      :locked-by="lockFor('judge.change_public_visibility')"
+      :description="props.canPublishToMembers ? $t('admin.creation.publishToMembers') : undefined"
+      :locked-by="props.canPublishToMembers ? undefined : lockFor('judge.change_public_visibility')"
     />
     <PublishReadinessNote
       v-if="privateCode && form.isPublic"
