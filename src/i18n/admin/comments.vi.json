@@ -5,7 +5,8 @@
   "reporters": "{count} người báo cáo",
   "chips": {
     "hidden": "Đã ẩn",
-    "deleted": "Đã xoá"
+    "deleted": "Đã xoá",
+    "visible": "Đang hiện"
   },
   "resolve": "Đã xử lý",
   "dismiss": "Bỏ qua",
@@ -31,8 +32,7 @@
       "author": "Tác giả",
       "authorPlaceholder": "Đúng tên đăng nhập",
       "state": "Trạng thái",
-      "pageType": "Trang",
-      "submit": "Tìm"
+      "pageType": "Trang"
     },
     "states": {
       "all": "Tất cả",
@@ -47,14 +47,10 @@
       "blog": "Bài viết",
       "tagProblem": "Bài gắn thẻ"
     },
-    "select": "Chọn bình luận ở {page}",
     "hiddenBy": "Ẩn bởi {name}",
     "hide": "Ẩn",
     "show": "Hiện",
     "bulk": {
-      "label": "Bình luận đã chọn",
-      "selectPage": "Chọn cả trang",
-      "count": "Đã chọn {count} bình luận",
       "hide": "Ẩn mục đã chọn",
       "show": "Hiện mục đã chọn"
     },
@@ -67,9 +63,12 @@
       "gone": "Không còn hoặc ngoài quyền của bạn."
     },
     "empty": "Không có bình luận nào khớp.",
-    "pager": "Trang bình luận"
+    "pager": "Trang bình luận",
+    "chips": {
+      "author": "Tác giả: {name}"
+    },
+    "total": "{count} bình luận"
   },
-  "select": "Chọn bình luận ở {page}",
   "settledBy": "bởi {name}",
   "outcome": {
     "resolved": "Đã xử lý",
@@ -82,7 +81,6 @@
   },
   "emptySettled": "Chưa có báo cáo nào được xử lý.",
   "bulk": {
-    "label": "Các bình luận bị báo cáo đã chọn",
     "resolve": "Xử lý mục đã chọn",
     "dismiss": "Bỏ qua mục đã chọn",
     "result": {
@@ -108,6 +106,21 @@
     "empty": "Không trang nào đang khoá bình luận.",
     "unlock": "Mở khoá",
     "unlocked": "Đã mở lại bình luận ở “{title}”.",
-    "pager": "Trang danh sách khoá"
-  }
+    "pager": "Trang danh sách khoá",
+    "columns": {
+      "page": "Trang",
+      "type": "Loại",
+      "key": "Mã"
+    },
+    "unlockNamed": "Mở khoá {title}"
+  },
+  "columns": {
+    "comment": "Bình luận",
+    "state": "Trạng thái",
+    "page": "Ở trang",
+    "createdAt": "Viết lúc",
+    "reports": "Báo cáo",
+    "when": "Gần nhất"
+  },
+  "rowName": "bình luận ở {page}"
 }

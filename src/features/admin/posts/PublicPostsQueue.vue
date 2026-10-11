@@ -2,7 +2,7 @@
 import type { PostListItem } from '@/api/types/blog';
 import { usePostsQuery } from '@/features/blog/blog.queries';
 import type { PostFlags, PublicFeed, RowFailure } from './moderation';
-import PostsQueueView from './PostsQueueView.vue';
+import PostsTable from './PostsTable.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -10,9 +10,11 @@ const props = withDefaults(
     page: number;
     rowFailure: RowFailure | null;
     pendingPostId?: string | null;
+    selectable?: boolean;
   }>(),
-  { pendingPostId: null },
+  { pendingPostId: null, selectable: false },
 );
+const selected = defineModel<Set<string>>('selected', { default: () => new Set<string>() });
 defineEmits<{ hide: [post: PostListItem]; flag: [post: PostListItem, patch: PostFlags] }>();
 const { data, isPending, error, refetch } = usePostsQuery(
   () => props.feed,
@@ -21,16 +23,20 @@ const { data, isPending, error, refetch } = usePostsQuery(
 </script>
 
 <template>
-  <PostsQueueView
+  <PostsTable
+    v-model:selected="selected"
     :feed="feed"
     :posts="data?.items ?? []"
     :meta="data?.meta"
-    :is-pending="isPending"
+    :loading="isPending"
     :error="error"
     :row-failure="rowFailure"
     :pending-post-id="pendingPostId"
+    :selectable="selectable"
     @retry="refetch()"
     @hide="$emit('hide', $event)"
     @flag="(post, patch) => $emit('flag', post, patch)"
-  />
+  >
+    <template #bulk="{ count }"><slot name="bulk" :count="count" /></template>
+  </PostsTable>
 </template>

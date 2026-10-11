@@ -14,7 +14,7 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { isNotFound } from '../ui/admin-errors';
 import type { FieldErrors } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import {
   cannedReplySave,
@@ -96,7 +96,7 @@ const pageLine = computed(() =>
       <input
         :id="id"
         v-model="form.title"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="errorOf('title') ? 'true' : undefined"
         autocomplete="off"
@@ -113,7 +113,7 @@ const pageLine = computed(() =>
         :id="id"
         v-model="form.body"
         rows="6"
-        :class="[ADMIN_INPUT_CLASS, 'min-h-32 resize-y']"
+        :class="[INPUT, 'min-h-32 resize-y']"
         :aria-describedby="describedBy"
         :aria-invalid="errorOf('body') ? 'true' : undefined"
       />
@@ -129,7 +129,7 @@ const pageLine = computed(() =>
         :id="id"
         v-model="form.order"
         inputmode="numeric"
-        :class="[ADMIN_INPUT_CLASS, 'tabular-nums']"
+        :class="[INPUT, 'tabular-nums']"
         :aria-describedby="describedBy"
         :aria-invalid="errorOf('order') ? 'true' : undefined"
       />

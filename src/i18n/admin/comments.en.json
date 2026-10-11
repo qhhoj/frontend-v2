@@ -5,7 +5,8 @@
   "reporters": "{count} reporter | {count} reporters",
   "chips": {
     "hidden": "Hidden",
-    "deleted": "Deleted"
+    "deleted": "Deleted",
+    "visible": "Visible"
   },
   "resolve": "Resolve",
   "dismiss": "Dismiss",
@@ -31,8 +32,7 @@
       "author": "Author",
       "authorPlaceholder": "Exact username",
       "state": "State",
-      "pageType": "Page",
-      "submit": "Search"
+      "pageType": "Page"
     },
     "states": {
       "all": "All",
@@ -47,14 +47,10 @@
       "blog": "Blog post",
       "tagProblem": "Tagged problem"
     },
-    "select": "Select the comment on {page}",
     "hiddenBy": "Hidden by {name}",
     "hide": "Hide",
     "show": "Show",
     "bulk": {
-      "label": "Selected comments",
-      "selectPage": "Select this page",
-      "count": "{count} comments selected | {count} comment selected | {count} comments selected",
       "hide": "Hide selected",
       "show": "Show selected"
     },
@@ -67,9 +63,12 @@
       "gone": "Gone or out of your reach."
     },
     "empty": "No comment matches.",
-    "pager": "Comment pages"
+    "pager": "Comment pages",
+    "chips": {
+      "author": "Author: {name}"
+    },
+    "total": "{count} comment | {count} comments"
   },
-  "select": "Select the comment on {page}",
   "settledBy": "by {name}",
   "outcome": {
     "resolved": "Resolved",
@@ -82,7 +81,6 @@
   },
   "emptySettled": "No settled reports yet.",
   "bulk": {
-    "label": "Selected reported comments",
     "resolve": "Resolve selected",
     "dismiss": "Dismiss selected",
     "result": {
@@ -108,6 +106,21 @@
     "empty": "No page has its comments locked.",
     "unlock": "Unlock",
     "unlocked": "Comments on “{title}” are open again.",
-    "pager": "Locked page pages"
-  }
+    "pager": "Locked page pages",
+    "columns": {
+      "page": "Page",
+      "type": "Kind",
+      "key": "Key"
+    },
+    "unlockNamed": "Unlock {title}"
+  },
+  "columns": {
+    "comment": "Comment",
+    "state": "State",
+    "page": "Page",
+    "createdAt": "Written",
+    "reports": "Reports",
+    "when": "Latest"
+  },
+  "rowName": "comment on {page}"
 }

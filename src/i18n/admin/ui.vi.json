@@ -108,9 +108,6 @@
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",
   "maxReached": "Đã đủ {max} mục.",
-  "bulk": {
-    "selectPage": "Chọn cả trang"
-  },
   "markdownPane": {
     "write": "Soạn",
     "preview": "Xem trước"

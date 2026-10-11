@@ -28,7 +28,7 @@ test('a handler adds a canned reply and sees it saved', async ({ page, api }) =>
     .fill('Chào {tên}, cảm ơn bạn đã báo lỗi ở bài {bài}.');
   await confirmInDialog(page, 'Lưu mẫu');
   await expect(page.getByText('Đã lưu mẫu “Đã nhận phiếu”.')).toBeVisible();
-  await expect(page.getByRole('rowheader', { name: 'Đã nhận phiếu' })).toBeVisible();
+  await expect(page.locator('#canned-replies-table')).toContainText('Đã nhận phiếu');
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
@@ -44,7 +44,13 @@ for (const viewport of AUDIT_VIEWPORTS)
         await page.goto(PATH);
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-        await expect(page.locator('[data-testid="admin-bit"]').first()).toBeVisible();
+        await expect(page.locator('#canned-replies-table')).toContainText(
+          state === 'list' ? 'Mẫu 1' : 'Chưa có mẫu trả lời nào.',
+        );
+        // One Bit at most, and only in the empty state (pages/admin.md, "Bit in admin").
+        await expect(page.locator('[data-testid="admin-bit"]')).toHaveCount(
+          state === 'empty' ? 1 : 0,
+        );
         expect(await axeViolationsIn(page)).toEqual([]);
       });
 

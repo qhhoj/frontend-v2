@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import TicketAlertsStrip from '@/features/tickets/TicketAlertsStrip.vue';
 import { ticketQueryFromRoute } from '@/features/tickets/ticket-filters';
 import { useTicketsQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
 import { adminRouteName } from '../admin-screens';
-import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { buttonClass } from '../ui/controls';
 import TicketQueueDetail from './TicketQueueDetail.vue';
 import TicketQueueFilters from './TicketQueueFilters.vue';
 import TicketQueueTable from './TicketQueueTable.vue';
@@ -32,43 +30,43 @@ watch(
 const ticketId = computed(() => ticketIdOf(route.query));
 const { data, error, isPending, refetch } = useTicketsQuery(filters);
 const { isLive, announcement } = useTicketStream(null);
+const { t } = useI18n();
+const resultText = computed(() => {
+  const meta = data.value?.meta;
+  return meta && 'total' in meta ? t('admin.tickets.total', { count: meta.total }) : undefined;
+});
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex w-full flex-col gap-4">
     <AdminPageHeader :title="$t('admin.tickets.title')" :lead="$t('admin.tickets.lead')">
       <template #actions>
-        <RouterLink :to="{ name: adminRouteName('cannedReplies') }" :class="ADMIN_BUTTON_CLASS">
+        <RouterLink :to="{ name: adminRouteName('cannedReplies') }" :class="buttonClass()">
           {{ $t('admin.cannedReplies.openFromQueue') }}
         </RouterLink>
-        <AdminBit placement="people" />
       </template>
     </AdminPageHeader>
     <TicketAlertsStrip />
-    <p v-if="isLive" class="flex items-center gap-2 text-[13px] text-muted">
+    <p v-if="isLive" class="m-0 flex items-center gap-2 text-[13px] text-muted">
       <span aria-hidden="true" class="inline-block size-2 rounded-full bg-accent"></span>
       {{ $t('admin.tickets.live') }}
     </p>
     <p class="sr-only" aria-live="polite" data-testid="queue-live">{{ announcement }}</p>
+    <TicketQueueFilters :filters="filters" :ticket-id="ticketId" :result-text="resultText" />
     <div
-      class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] min-[1800px]:grid-cols-[18rem_minmax(0,1fr)_minmax(0,1.2fr)]"
+      class="grid items-start gap-4"
+      :class="ticketId && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'"
     >
-      <TicketQueueFilters
-        :key="route.fullPath"
+      <TicketQueueTable
+        :items="data?.items ?? []"
+        :meta="data?.meta"
+        :loading="isPending"
+        :error="error"
         :filters="filters"
         :ticket-id="ticketId"
-        class="xl:col-span-2 min-[1800px]:col-span-1"
+        :narrow="ticketId !== null"
+        @retry="refetch()"
       />
-      <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton><SkeletonBlock class="h-80 w-full" /></template>
-        <TicketQueueTable
-          v-if="data"
-          :items="data.items"
-          :meta="data.meta"
-          :filters="filters"
-          :ticket-id="ticketId"
-        />
-      </QueryState>
       <TicketQueueDetail v-if="ticketId" :key="ticketId" :ticket-id="ticketId" />
     </div>
   </div>

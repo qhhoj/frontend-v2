@@ -15,6 +15,7 @@ import { useTicketQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { buttonClass } from '../ui/controls';
 import TicketMoveForm from './TicketMoveForm.vue';
 
 /** The open ticket beside the list. Mounted only while a ticket is open, so its live feed closes with it. */
@@ -24,8 +25,6 @@ const { data: ticket, error, isPending, refetch } = useTicketQuery(props.ticketI
 const { isLive, announcement } = useTicketStream(props.ticketId);
 const { isPending: isSaving, failureKey, patch } = useTicketPatch(props.ticketId);
 const closeAfterReply = ref(false);
-const BUTTON =
-  'inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold';
 
 /** The reply went through; with the box checked, the ticket closes too, one PATCH after the message. */
 const onSent = () => {
@@ -59,7 +58,7 @@ const toggleOpen = () => {
             <button
               type="button"
               data-testid="toggle-status"
-              :class="BUTTON"
+              :class="buttonClass()"
               :aria-busy="isSaving ? 'true' : undefined"
               @click="toggleOpen"
             >

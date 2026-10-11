@@ -108,9 +108,6 @@
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",
   "maxReached": "Limit of {max} reached.",
-  "bulk": {
-    "selectPage": "Select this page"
-  },
   "markdownPane": {
     "write": "Write",
     "preview": "Preview"

@@ -1,35 +1,32 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import type { LocationQueryRaw } from 'vue-router';
 import type { PostListItem } from '@/api/types/blog';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { pageFromQuery } from '@/lib/paging';
 import { adminRouteName } from '../admin-screens';
-import AdminBit from '../shell/AdminBit.vue';
+import AdminField from '../ui/AdminField.vue';
 import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { translate } from '@/i18n';
-import AdminStatus from '../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { INPUT, buttonClass } from '../ui/controls';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
+import { useAdminToast } from '../ui/feedback/use-admin-toast';
+import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import ModerationPostsQueue from './ModerationPostsQueue.vue';
 import PublicPostsQueue from './PublicPostsQueue.vue';
 import UnhideDialog from './UnhideDialog.vue';
 import { visibilityFailureText } from './post-visibility';
 import { usePostVisibility } from './use-post-visibility';
 import { useModerationPostsQuery } from './posts.queries';
-import { pageFromQuery } from '@/lib/paging';
 import { MODERATION_FEEDS, feedFromQuery, isQueueFeed, searchFeedOf } from './moderation';
-import { providePostSelection } from './post-selection';
+import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
 import { useBulkHidePosts } from './use-bulk-hide-posts';
-import type { BulkHideOutcome } from './use-bulk-hide-posts';
-import AdminBulkBar from '../ui/AdminBulkBar.vue';
-import { useSelection } from '../ui/use-selection';
-import type { PostFlags, RowFailure } from './moderation';
 
-/** Ticked rows hidden in one go: one page of the table at most. */
-const BULK_HIDE_POSTS_MAX = 50;
-
+const { t } = useI18n();
+const toast = useAdminToast();
 const route = useRoute();
 const router = useRouter();
 const feed = computed(() => feedFromQuery(route.query.feed));
@@ -37,57 +34,67 @@ const page = computed(() => pageFromQuery(route.query.page));
 const textOf = (value: unknown) => (typeof value === 'string' ? value : '');
 const search = computed(() => textOf(route.query.search));
 const organization = computed(() => textOf(route.query.organization));
-const searchText = ref(search.value);
-const organizationText = ref(organization.value);
-watch(search, (value) => (searchText.value = value));
-watch(organization, (value) => (organizationText.value = value));
 
 /** A search lands on a moderation queue (from a public feed: every post), first page. */
-function runSearch() {
-  const text = searchText.value.trim();
-  const slug = organizationText.value.trim();
-  const target = text || slug ? searchFeedOf(feed.value) : feed.value;
-  void router.push({
-    name: adminRouteName('posts'),
-    query: {
-      ...(target === 'all' ? {} : { feed: target }),
-      ...(text ? { search: text } : {}),
-      ...(slug ? { organization: slug } : {}),
-    },
-  });
+function showFound(text: string, slug: string) {
+  const target: ModerationFeed = text || slug ? searchFeedOf(feed.value) : feed.value;
+  const query: LocationQueryRaw = {
+    ...(target === 'all' ? {} : { feed: target }),
+    ...(text ? { search: text } : {}),
+    ...(slug ? { organization: slug } : {}),
+  };
+  void router.push({ name: adminRouteName('posts'), query });
 }
-
-/** Ticked visible posts of the shown tab, hidden in one go. */
-const shownPosts = ref<string[]>([]);
-const selection = useSelection(shownPosts, BULK_HIDE_POSTS_MAX);
-providePostSelection({
-  shown: shownPosts,
-  isSelected: (id) => selection.selected.value.has(id),
-  setSelected: selection.setSelected,
+const searchModel = computed({
+  get: () => search.value,
+  set: (text: string) => showFound(text.trim(), organization.value),
 });
+const organizationText = ref(organization.value);
+watch(organization, (value) => (organizationText.value = value));
+const applyOrganization = () => {
+  const slug = organizationText.value.trim();
+  if (slug !== organization.value) showFound(search.value, slug);
+};
+const chips = computed(() =>
+  organization.value
+    ? [
+        {
+          key: 'organization',
+          label: t('admin.posts.search.organizationSummary', { slug: organization.value }),
+        },
+      ]
+    : [],
+);
+
+/** Ticked posts of the shown tab, hidden in one go; a new tab, page or search starts with none. */
+const selected = ref(new Set<string>());
+watch(
+  () => route.query,
+  () => (selected.value = new Set()),
+);
 const bulkHide = useBulkHidePosts();
 const isBulkConfirmOpen = ref(false);
-const bulkResult = ref<BulkHideOutcome | null>(null);
 async function confirmBulkHide() {
   beginChange();
-  bulkResult.value = null;
-  let outcome: BulkHideOutcome | undefined;
   try {
-    outcome = await bulkHide.run([...selection.selected.value]);
+    const outcome = await bulkHide.run([...selected.value]);
+    if (!outcome) return;
+    toast.show({
+      text: t('admin.posts.bulk.result', { ...outcome }),
+      tone: outcome.refused ? 'error' : 'success',
+    });
+    selected.value = new Set();
   } finally {
     isBulkConfirmOpen.value = false;
   }
-  if (!outcome) return;
-  bulkResult.value = outcome;
-  selection.clear();
 }
 const feedNav = ref<HTMLElement | null>(null);
 
 /** A moderated post leaves its row (the dialog's opener); the open feed's tab is the stable place left. A refused change keeps its row and the usual return. */
 const focusCurrentFeed = () =>
-  lastChange.value === null
-    ? null
-    : feedNav.value?.querySelector<HTMLElement>('[aria-current="page"]');
+  rowFailure.value === null
+    ? feedNav.value?.querySelector<HTMLElement>('[aria-current="page"]')
+    : null;
 
 const visibility = usePostVisibility();
 /** The hidden queue's total, on every tab: the same cache entry as the list when that tab is open. */
@@ -96,7 +103,7 @@ const hiddenTotal = computed(() => hiddenQuery.data.value?.meta.total ?? 0);
 const feedTabs = computed<AdminFilterTab[]>(() =>
   MODERATION_FEEDS.map((tabFeed) => ({
     key: tabFeed,
-    label: translate(`admin.posts.feeds.${tabFeed}`),
+    label: t(`admin.posts.feeds.${tabFeed}`),
     to: { name: adminRouteName('posts'), query: tabFeed === 'all' ? {} : { feed: tabFeed } },
     count: tabFeed === 'hidden' ? hiddenTotal.value : 0,
     countTestid: 'hidden-count',
@@ -108,17 +115,20 @@ const unhidingPost = ref<PostListItem | null>(null);
 const isHideOpen = ref(false);
 const isUnhideOpen = ref(false);
 const rowFailure = ref<RowFailure | null>(null);
-const lastChange = ref<'hidden' | 'shown' | 'flagged' | null>(null);
 const unhideFailureText = computed(
   () => visibility.failure.value && visibilityFailureText(visibility.failure.value),
 );
 
-/** A new action starts with no leftover result, refusal or failure from the last one. */
+/** A new action starts with no leftover refusal or failure from the last one. */
 function beginChange() {
   visibility.reset();
   rowFailure.value = null;
-  lastChange.value = null;
 }
+const keepRefusal = (post: PostListItem) =>
+  (rowFailure.value = visibility.failure.value && {
+    postId: post.id,
+    text: visibilityFailureText(visibility.failure.value),
+  });
 
 function openHide(post: PostListItem) {
   beginChange();
@@ -137,29 +147,17 @@ async function confirmHide() {
   const post = hidingPost.value;
   if (post === null) return;
   const done = await visibility.hide(post);
+  if (done === undefined) keepRefusal(post);
   isHideOpen.value = false;
-  if (done !== undefined) {
-    lastChange.value = 'hidden';
-    return;
-  }
-  rowFailure.value = visibility.failure.value && {
-    postId: post.id,
-    text: visibilityFailureText(visibility.failure.value),
-  };
+  if (done !== undefined) toast.show({ text: t('admin.posts.hide.done') });
 }
 
 /** A pin or newsfeed change needs no confirm (it is undone the same way); a refusal stays on its row. */
 async function changeFlag(post: PostListItem, patch: PostFlags) {
   beginChange();
   const done = await visibility.flag(post, patch);
-  if (done !== undefined) {
-    lastChange.value = 'flagged';
-    return;
-  }
-  rowFailure.value = visibility.failure.value && {
-    postId: post.id,
-    text: visibilityFailureText(visibility.failure.value),
-  };
+  if (done === undefined) keepRefusal(post);
+  else toast.show({ text: t('admin.posts.flagged') });
 }
 
 /** A refused show keeps the dialog open, with the reason in it. */
@@ -169,115 +167,101 @@ async function confirmUnhide() {
   const done = await visibility.show(post);
   if (done === undefined) return;
   isUnhideOpen.value = false;
-  lastChange.value = 'shown';
+  toast.show({ text: t('admin.posts.unhide.done') });
 }
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader :title="$t('admin.posts.title')">
-      <template #actions><AdminBit placement="composing" /></template>
-    </AdminPageHeader>
+  <div class="flex w-full flex-col gap-4">
+    <AdminPageHeader :title="$t('admin.posts.title')" :lead="$t('admin.posts.feeds.note')" />
 
-    <div class="flex flex-col gap-2">
-      <div ref="feedNav">
-        <AdminFilterTabs :tabs="feedTabs" :current="feed" :label="$t('admin.posts.feeds.label')" />
-      </div>
-      <p class="text-sm text-muted">{{ $t('admin.posts.feeds.note') }}</p>
-    </div>
-
-    <form role="search" class="flex flex-wrap items-end gap-2" @submit.prevent="runSearch">
-      <label class="flex min-w-[min(100%,20rem)] flex-1 flex-col gap-1.5">
-        <span class="text-sm font-semibold">{{ $t('admin.posts.search.label') }}</span>
-        <input
-          v-model="searchText"
-          type="search"
-          :class="ADMIN_INPUT_CLASS"
-          :placeholder="$t('admin.posts.search.placeholder')"
-        />
-      </label>
-      <label class="flex min-w-[min(100%,14rem)] flex-col gap-1.5">
-        <span class="text-sm font-semibold">{{ $t('admin.posts.search.organization') }}</span>
-        <input
-          v-model="organizationText"
-          type="search"
-          autocomplete="off"
-          spellcheck="false"
-          :class="[ADMIN_INPUT_CLASS, 'font-mono']"
-          :placeholder="$t('admin.posts.search.organizationPlaceholder')"
-        />
-      </label>
-      <button type="submit" :class="ADMIN_BUTTON_CLASS">
-        {{ $t('admin.posts.search.submit') }}
-      </button>
-    </form>
+    <AdminFilterBar
+      v-model:search="searchModel"
+      :search-label="$t('admin.posts.search.placeholder')"
+      :chips="chips"
+      :filter-count="organization ? 1 : 0"
+      @remove="showFound(search, '')"
+      @clear-all="showFound('', '')"
+    >
+      <template #view>
+        <div ref="feedNav" class="min-w-0">
+          <AdminFilterTabs
+            :tabs="feedTabs"
+            :current="feed"
+            :label="$t('admin.posts.feeds.label')"
+          />
+        </div>
+      </template>
+      <template #filters>
+        <form class="contents" @submit.prevent="applyOrganization">
+          <AdminField :label="$t('admin.posts.search.organization')" input-id="posts-organization">
+            <input
+              id="posts-organization"
+              v-model="organizationText"
+              type="search"
+              autocomplete="off"
+              spellcheck="false"
+              :class="[INPUT, 'font-mono']"
+              :placeholder="$t('admin.posts.search.organizationPlaceholder')"
+              @change="applyOrganization"
+            />
+          </AdminField>
+        </form>
+      </template>
+    </AdminFilterBar>
     <p v-if="search && isQueueFeed(feed)" class="text-sm text-muted" data-testid="search-summary">
       {{ $t('admin.posts.search.summary', { text: search }) }}
     </p>
-    <p v-if="organization && isQueueFeed(feed)" class="text-sm text-muted">
-      {{ $t('admin.posts.search.organizationSummary', { slug: organization }) }}
-    </p>
 
-    <AdminBulkBar
-      :label="$t('admin.posts.bulk.label')"
-      :count-text="
-        $t(
-          'admin.posts.bulk.count',
-          { count: selection.selected.value.size },
-          selection.selected.value.size,
-        )
-      "
-      :all-selected="selection.allSelected.value"
-      :can-select="shownPosts.length > 0"
-      @toggle-all="selection.toggleAll()"
-    >
-      <button
-        type="button"
-        :class="ADMIN_BUTTON_CLASS"
-        :aria-disabled="
-          selection.selected.value.size === 0 || bulkHide.isPending.value || undefined
-        "
-        @click="
-          selection.selected.value.size && !bulkHide.isPending.value && (isBulkConfirmOpen = true)
-        "
-      >
-        {{ $t('admin.posts.bulk.hide') }}
-      </button>
-    </AdminBulkBar>
-    <AdminStatus
-      v-if="bulkResult"
-      :kind="bulkResult.refused ? 'refused' : 'done'"
-      :text="$t('admin.posts.bulk.result', { done: bulkResult.done, refused: bulkResult.refused })"
-    />
-
-    <SettingsNotice v-if="feed === 'hidden'" tone="info">{{
-      $t('admin.posts.hiddenNote')
-    }}</SettingsNotice>
-    <AdminStatus v-if="lastChange === 'hidden'" kind="done" :text="$t('admin.posts.hide.done')" />
-    <AdminStatus v-if="lastChange === 'shown'" kind="done" :text="$t('admin.posts.unhide.done')" />
-    <AdminStatus v-if="lastChange === 'flagged'" kind="done" :text="$t('admin.posts.flagged')" />
+    <AdminNotice v-if="feed === 'hidden'" :title="$t('admin.posts.hiddenNote')" />
 
     <ModerationPostsQueue
       v-if="isQueueFeed(feed)"
+      v-model:selected="selected"
       :feed="feed"
       :page="page"
       :search="search"
       :organization="organization"
       :row-failure="rowFailure"
       :pending-post-id="visibility.pendingId.value"
+      :selectable="feed !== 'hidden'"
       @hide="openHide"
       @show="openUnhide"
       @flag="changeFlag"
-    />
+    >
+      <template #bulk>
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-disabled="bulkHide.isPending.value || undefined"
+          @click="bulkHide.isPending.value || (isBulkConfirmOpen = true)"
+        >
+          {{ $t('admin.posts.bulk.hide') }}
+        </button>
+      </template>
+    </ModerationPostsQueue>
     <PublicPostsQueue
       v-else
+      v-model:selected="selected"
       :feed="feed"
       :page="page"
       :row-failure="rowFailure"
       :pending-post-id="visibility.pendingId.value"
+      selectable
       @hide="openHide"
       @flag="changeFlag"
-    />
+    >
+      <template #bulk>
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-disabled="bulkHide.isPending.value || undefined"
+          @click="bulkHide.isPending.value || (isBulkConfirmOpen = true)"
+        >
+          {{ $t('admin.posts.bulk.hide') }}
+        </button>
+      </template>
+    </PublicPostsQueue>
 
     <ConfirmDialog
       v-model:visible="isHideOpen"
@@ -301,13 +285,7 @@ async function confirmUnhide() {
     <ConfirmDialog
       v-model:visible="isBulkConfirmOpen"
       tone="danger"
-      :title="
-        $t(
-          'admin.posts.bulk.confirmTitle',
-          { count: selection.selected.value.size },
-          selection.selected.value.size,
-        )
-      "
+      :title="$t('admin.posts.bulk.confirmTitle', { count: selected.size }, selected.size)"
       :body="$t('admin.posts.bulk.confirmBody')"
       :confirm-label="$t('admin.posts.bulk.hide')"
       :busy="bulkHide.isPending.value"

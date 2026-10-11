@@ -62,7 +62,7 @@ describe('canned replies screen', () => {
       body: 'Đã sửa bài {bài}.',
     });
     expect(wrapper.findAll('tbody tr')).toHaveLength(2);
-    expect(wrapper.text()).toContain('Đã lưu mẫu “Đã sửa test”.');
+    expect(document.body.textContent).toContain('Đã lưu mẫu “Đã sửa test”.');
   });
 
   it('keeps the dialog open with field texts when the input is refused here or by the server', async () => {
@@ -90,7 +90,12 @@ describe('canned replies screen', () => {
       [`DELETE /ticket-canned-replies/${FIRST.id}`]: fail(404, 'not_found'),
       [`DELETE /ticket-canned-replies/${SECOND.id}`]: noContent(),
     });
-    await wrapper.get(`[aria-label="Xóa mẫu ${FIRST.title}"]`).trigger('click');
+    await wrapper.get(`[aria-label="Thao tác khác cho ${FIRST.title}"]`).trigger('click');
+    await flushPromises();
+    const deleteItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
+      item.textContent?.includes('Xóa'),
+    );
+    (deleteItem!.querySelector('a') as HTMLElement).click();
     await flushPromises();
     await confirmDialog('Xóa mẫu');
     expect(wrapper.text()).toContain('Mẫu này đã bị xóa ở nơi khác.');

@@ -7,13 +7,11 @@
   "columns": {
     "order": "Thứ tự",
     "title": "Tiêu đề",
-    "body": "Nội dung",
-    "actions": "Thao tác"
+    "body": "Nội dung"
   },
   "edit": "Sửa",
   "editNamed": "Sửa mẫu {title}",
   "delete": "Xóa",
-  "deleteNamed": "Xóa mẫu {title}",
   "deleteTitle": "Xóa mẫu “{title}”?",
   "deleteBody": "Người xử lý sẽ không chọn được mẫu này nữa. Tin nhắn đã gửi không đổi.",
   "deleteConfirm": "Xóa mẫu",
