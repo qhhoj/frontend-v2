@@ -2,13 +2,18 @@ import { apiText } from './client';
 import { previewComment } from './comments.api';
 import { fetchOrganization } from './organizations.api';
 import type { OrganizationChip, PreviewSource, UserChip } from './types/admin-common';
-import { apiSend } from './typed';
+import { apiGet, apiSend } from './typed';
 import { fetchUserPage } from './users.api';
 
 /** An exact username as the id the DTOs take (`GET /users/:username`); only the id and the name are kept. */
 export async function lookupUser(username: string): Promise<UserChip> {
   const page = await fetchUserPage(username);
   return { id: page.id, username: page.username };
+}
+
+/** Up to 10 users whose username starts with `prefix` (`GET /user-suggestions`, signed in, 60 a minute). */
+export async function suggestUsers(prefix: string): Promise<UserChip[]> {
+  return apiGet('/user-suggestions', { query: { prefix } });
 }
 
 /** An exact slug as the id the DTOs take (`GET /organizations/:slug`). */

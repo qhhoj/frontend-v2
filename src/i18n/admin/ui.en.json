@@ -3,7 +3,7 @@
   "saved": "Saved.",
   "needsPermission": "Needs {permission}",
   "nobody": "Nobody.",
-  "addByUsername": "Add by exact username, press Enter",
+  "addByUsername": "Type to search, Enter to add",
   "noSuchUser": "No account \"{name}\".",
   "addBySlug": "Add by exact organization slug, press Enter",
   "noSuchOrganization": "No organization \"{name}\".",
