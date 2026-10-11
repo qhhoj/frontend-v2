@@ -11,10 +11,8 @@ import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
 import SubmissionTableSkeleton from '@/features/submissions/SubmissionTableSkeleton.vue';
-import {
-  SUBMISSION_PAGE_SIZE,
-  useContestBestSubmissionsQuery,
-} from '@/features/submissions/submissions.queries';
+import { SUBMISSION_PAGE_SIZE } from '@/features/submissions/list/submission-scope';
+import { useContestBestSubmissionsQuery } from '@/features/submissions/submissions.queries';
 import { formatDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { usePageTitle } from '@/router/page-title';

@@ -14,10 +14,18 @@ export const primeVuePreset: PrimeVuePTOptions = {
     },
     listContainer: { class: 'max-h-72 overflow-auto' },
     header: { class: 'p-1 pb-2' },
+    /** The overlay's search box: PrimeVue wraps it with its magnifier in an icon field, which unstyled lays out as two blocks. */
+    pcFilterContainer: { root: { class: 'relative block' } },
     pcFilter: {
       root: {
         class:
-          'h-11 w-full rounded-row border border-line-strong bg-surface-solid px-3 text-sm text-content placeholder:text-muted',
+          'h-11 w-full rounded-row border border-line-strong bg-surface-solid pr-3 pl-10 text-sm text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus',
+      },
+    },
+    pcFilterIconContainer: {
+      root: {
+        class:
+          'pointer-events-none absolute top-1/2 left-3.5 flex size-4 -translate-y-1/2 items-center text-muted',
       },
     },
     emptyMessage: { class: 'px-3 py-2 text-sm text-muted' },

@@ -32,7 +32,7 @@ const announcement = (wrapper: { find: (selector: string) => { text: () => strin
   wrapper.find('#main [role="status"][aria-live="polite"]').text();
 async function openList(path = '/submissions') {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => expect(mounted.wrapper.find('tbody tr').exists()).toBe(true));
+  await vi.waitFor(() => expect(mounted.wrapper.find('[data-id]').exists()).toBe(true));
   return mounted;
 }
 /** Page 2 of 100 rows, and the page-1 probe (`pageSize=1`) answering `probeTotal`. */
@@ -68,7 +68,7 @@ describe('live updates on the submission list', () => {
     await vi.advanceTimersByTimeAsync(1);
     await flushPromises();
     expect(listCalls(calls)).toHaveLength(2);
-    expect(wrapper.findAll('tbody tr').map((tr) => tr.attributes('data-id'))).toEqual(['new', 'a']);
+    expect(wrapper.findAll('[data-id]').map((tr) => tr.attributes('data-id'))).toEqual(['new', 'a']);
   });
   it('ignores a progress frame of a submission that is not on the page', async () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
@@ -84,7 +84,7 @@ describe('live updates on the submission list', () => {
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
     await flushPromises();
     expect(wrapper.get('[data-testid="new-pill"]').text()).toContain('5');
-    expect(wrapper.findAll('tbody tr').map((tr) => tr.attributes('data-id'))).toEqual(['p2']);
+    expect(wrapper.findAll('[data-id]').map((tr) => tr.attributes('data-id'))).toEqual(['p2']);
     const probe = calls.at(-1)!;
     expect([probe.query.get('page'), probe.query.get('pageSize')]).toEqual(['1', '1']);
   });

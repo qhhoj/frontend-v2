@@ -7,7 +7,8 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
-import { useSubmissionListQuery } from '@/features/submissions/submissions.queries';
+import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
+import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
 import { formatAgoCompact, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
@@ -31,7 +32,12 @@ const filters = computed<SubmissionFilters>(() => ({
   page: 1,
   live: false,
 }));
-const { data: list, isPending, error, refetch } = useSubmissionListQuery(filters);
+const {
+  data: list,
+  isPending,
+  error,
+  refetch,
+} = useScopedSubmissionListQuery(GLOBAL_SCOPE, filters);
 const latest = computed(() => list.value?.items.slice(0, SHOWN) ?? []);
 const isJudging = computed(() => {
   const first = latest.value[0];

@@ -5,7 +5,8 @@ import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
 import SubmissionTableSkeleton from '@/features/submissions/SubmissionTableSkeleton.vue';
-import { useSubmissionListQuery } from '@/features/submissions/submissions.queries';
+import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
+import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
 import { useSessionStore } from '@/stores/session.store';
 import SubmitSignInLink from './SubmitSignInLink.vue';
@@ -24,7 +25,12 @@ const filters = computed<SubmissionFilters>(() => ({
   page: 1,
   live: false,
 }));
-const { data: list, isPending, error, refetch } = useSubmissionListQuery(filters, isSignedIn);
+const {
+  data: list,
+  isPending,
+  error,
+  refetch,
+} = useScopedSubmissionListQuery(GLOBAL_SCOPE, filters, isSignedIn);
 </script>
 
 <template>

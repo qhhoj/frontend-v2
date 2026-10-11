@@ -8,17 +8,17 @@ afterEach(() => {
 });
 
 describe('useListDensity', () => {
-  it('starts compact, and remembers the choice for the next visit', async () => {
+  it('starts with the cards, and remembers the choice for the next visit', async () => {
     const density = useListDensity();
-    expect(density.value).toBe('compact');
-    density.value = 'comfortable';
+    expect(density.value).toBe('comfortable');
+    density.value = 'compact';
     await nextTick();
-    expect(useListDensity().value).toBe('comfortable');
+    expect(useListDensity().value).toBe('compact');
   });
 
   it('ignores a stored value it does not know', () => {
     localStorage.setItem(DENSITY_STORAGE_KEY, 'huge');
-    expect(useListDensity().value).toBe('compact');
+    expect(useListDensity().value).toBe('comfortable');
   });
 
   it('still switches when the browser refuses storage', async () => {
@@ -29,8 +29,8 @@ describe('useListDensity', () => {
       throw new Error('denied');
     });
     const density = useListDensity();
-    density.value = 'comfortable';
+    density.value = 'compact';
     await nextTick();
-    expect(density.value).toBe('comfortable');
+    expect(density.value).toBe('compact');
   });
 });

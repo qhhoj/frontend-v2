@@ -3,8 +3,9 @@ import { problemMeta } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
-import SubmissionFilterRail from './SubmissionFilterRail.vue';
-import { parseSubmissionFilters } from './use-submission-filters';
+import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
+import { parseSubmissionFilters } from '../use-submission-filters';
+import SubmissionFilterPanel from './SubmissionFilterPanel.vue';
 
 beforeEach(() => {
   mockApi({ ...anonymousViewer });
@@ -12,14 +13,19 @@ beforeEach(() => {
 });
 afterEach(() => vi.useRealTimers());
 
-const mountRail = () =>
-  mountComponent(SubmissionFilterRail, {
-    props: { filters: parseSubmissionFilters({}), languages: problemMeta().languages },
+const mountPanel = (showStatusGroups = false) =>
+  mountComponent(SubmissionFilterPanel, {
+    props: {
+      filters: parseSubmissionFilters({}),
+      problemSource: { kind: 'code' as const },
+      showUser: true,
+      showStatusGroups,
+    },
   });
 
-describe('the submission filter rail', () => {
+describe('the submission filter panel', () => {
   it('emits one update 300 ms after the last key of a burst, and no timer left after unmount', async () => {
-    const wrapper = mountRail();
+    const wrapper = mountPanel();
     const field = wrapper.get('input[name="user"]');
     await field.setValue('u');
     await vi.advanceTimersByTimeAsync(200);
@@ -34,24 +40,30 @@ describe('the submission filter rail', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it('emits the judging-state box ticked, and only in the contest rail', async () => {
-    const wrapper = mountComponent(SubmissionFilterRail, {
+  it('emits the judging-state box ticked, and only where the scope shows those boxes', async () => {
+    const wrapper = mountPanel(true);
+    await wrapper.get('input[type="checkbox"][value="grading"]').setValue(true);
+    expect(wrapper.emitted('update')).toEqual([[{ statusGroups: ['grading'] }]]);
+    expect(mountPanel().find('input[value="grading"]').exists()).toBe(false);
+  });
+});
+
+describe('the quick filters language box', () => {
+  it('emits the chosen language as a one-element list and an empty list for "any"', async () => {
+    const [first] = problemMeta().languages;
+    const wrapper = mountComponent(SubmissionQuickFilters, {
       props: {
         filters: parseSubmissionFilters({}),
         languages: problemMeta().languages,
-        showStatusGroups: true,
+        username: null,
+        gradingCount: undefined,
+        advancedOpen: false,
+        advancedCount: 0,
+        panelId: 'panel',
       },
     });
-    await wrapper.get('input[type="checkbox"][value="grading"]').setValue(true);
-    expect(wrapper.emitted('update')).toEqual([[{ statusGroups: ['grading'] }]]);
-    expect(mountRail().find('input[value="grading"]').exists()).toBe(false);
-  });
-
-  it('emits the chosen language as a one-element list and an empty list for "any"', () => {
-    const wrapper = mountRail();
-    const [first] = problemMeta().languages;
-    wrapper.getComponent({ name: 'Select' }).vm.$emit('update:modelValue', first!.id);
-    wrapper.getComponent({ name: 'Select' }).vm.$emit('update:modelValue', '');
+    await wrapper.get('select').setValue(first!.id);
+    await wrapper.get('select').setValue('');
     expect(wrapper.emitted('update')).toEqual([
       [{ languageIds: [first!.id] }],
       [{ languageIds: [] }],

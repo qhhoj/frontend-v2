@@ -11,7 +11,7 @@ const CHOICES: readonly ListDensity[] = ['compact', 'comfortable'];
   <div
     role="group"
     :aria-label="$t('submissions.density.label')"
-    class="inline-flex h-10 shrink-0 overflow-hidden rounded-row border border-line-strong"
+    class="inline-flex h-10 shrink-0 overflow-hidden pointer-coarse:h-11 rounded-row border border-line-strong"
   >
     <button
       v-for="choice in CHOICES"
