@@ -59,5 +59,6 @@
   },
   "contest": {
     "ownerAccess": "Only members of {name} see this contest (fixed when created in an organization)."
-  }
+  },
+  "publishToMembers": "An organization-private problem: turned on, only the organization's members see it."
 }

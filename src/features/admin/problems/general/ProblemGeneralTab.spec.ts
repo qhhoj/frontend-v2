@@ -9,6 +9,7 @@ import {
   editableProblem,
   problemEditingMeta,
   problemData,
+  problemEditor,
   problemEditorRoutes,
   TYPE_GRAPH,
 } from '@/test/admin-fixtures/problems';
@@ -215,6 +216,31 @@ describe('ProblemGeneralTab', () => {
       const note = wrapper.get('[data-testid="publish-readiness"]');
       expect(note.text()).toContain('chưa có test nào');
       expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('aria-disabled')).toBeUndefined();
+    });
+
+    it('lets an organization creator show an organization-private problem to members without the permission', async () => {
+      const orgProblem = editableProblem({
+        isOrganizationPrivate: true,
+        editor: { ...problemEditor(), canPublishToMembers: true },
+      });
+      const calls = mockApi({
+        ...staffViewer(EDIT),
+        ...problemEditorRoutes(orgProblem),
+        'PATCH /problems/hcmus41c': ok(editableProblem({ isPublic: true })),
+      });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      expect(publicSwitch(wrapper).attributes('aria-disabled')).toBeUndefined();
+      expect(wrapper.text()).toContain('chỉ thành viên tổ chức thấy');
+      await publicSwitch(wrapper).trigger('click');
+      await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+      await flushPromises();
+      expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
+    });
+
+    it('keeps the switch locked without the permission or the flag', async () => {
+      mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes() });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      expect(publicSwitch(wrapper).attributes('aria-disabled')).toBe('true');
     });
 
     it('says nothing when the cases carry points', async () => {

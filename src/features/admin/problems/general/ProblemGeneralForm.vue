@@ -21,6 +21,7 @@ defineProps<{
   isSuggestionPending?: boolean;
   privateCode?: string;
   hasChangeMessage?: boolean;
+  canPublishToMembers?: boolean;
 }>();
 </script>
 
@@ -56,5 +57,6 @@ defineProps<{
     :private-code="privateCode"
     :has-change-message="hasChangeMessage"
     :section-id="PROBLEM_SECTION_IDS.status"
+    :can-publish-to-members="canPublishToMembers"
   />
 </template>

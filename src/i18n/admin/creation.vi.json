@@ -59,5 +59,6 @@
   },
   "contest": {
     "ownerAccess": "Chỉ thành viên {name} thấy kỳ thi này (cố định khi tạo trong tổ chức)."
-  }
+  },
+  "publishToMembers": "Bài riêng của tổ chức: bật lên thì chỉ thành viên tổ chức thấy."
 }
