@@ -1,57 +1,75 @@
 <script setup lang="ts">
-import ScrollRegion from '@/components/ScrollRegion.vue';
-import { computed } from 'vue';
+import BulkSelectionBar from '../ui/BulkSelectionBar.vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import type { BulkContestResult } from '@/api/types/contest-editing';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { valuesOf } from '@/features/problems/use-problem-filters';
-import { formatDateTime, formatNumber } from '@/lib/format';
-import { pageFromQuery } from '@/lib/paging';
+import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
-import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
+import ContestBulkResult from '../contests/ContestBulkResult.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import HighlightedText from './HighlightedText.vue';
+import { useRowSelection } from '../ui/use-row-selection';
+import ContestBulkVisibilityDialog from './ContestBulkVisibilityDialog.vue';
+import ContestListFilters from './ContestListFilters.vue';
+import ContestListTable from './ContestListTable.vue';
 import IndexSearchBox from './IndexSearchBox.vue';
-import {
-  CONTEST_PHASE_FILTERS,
-  SEARCH_MAX_LENGTH,
-  phaseFromQuery,
-  searchQueryOf,
-} from './index-search';
+import { contestFilterQueryOf, contestListQueryOf, filtersFromQuery } from './contest-list-filters';
+import type { ContestFilterPatch } from './contest-list-filters';
 import { useAdminContestSearchQuery } from './index-search.queries';
 
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
-const search = computed(() => (valuesOf(route.query.q)[0] ?? '').slice(0, SEARCH_MAX_LENGTH));
-const phase = computed(() => phaseFromQuery(route.query.phase));
-const page = computed(() => pageFromQuery(route.query.page));
-const { data, isPending, error, refetch } = useAdminContestSearchQuery(search, phase, page);
-const commit = (text: string) =>
-  void router.replace({ query: searchQueryOf(route.query, { q: text }) });
-
-const shownText = computed(() => formatNumber(data.value?.items.length ?? 0, locale.locale));
-const totalText = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
 const { t } = useI18n();
-const phaseTabs = computed<AdminFilterTab[]>(() =>
-  CONTEST_PHASE_FILTERS.map((filter) => ({
-    key: filter,
-    label: filter === 'all' ? t('admin.search.contests.all') : t(`contests.phase.${filter}`),
-    to: { query: searchQueryOf(route.query, { phase: filter }) },
-  })),
+const filters = computed(() => filtersFromQuery(route.query));
+const listQuery = computed(() => contestListQueryOf(filters.value));
+const { data, isPending, error, refetch } = useAdminContestSearchQuery(listQuery);
+const change = (patch: ContestFilterPatch) =>
+  void router.replace({ query: contestFilterQueryOf(route.query, patch) });
+
+/** Every listed row is editable (`editable: true`), so each one may be ticked; the backend still checks per contest. */
+const selection = useRowSelection(
+  computed(() => (data.value?.items ?? []).map((item) => item.key)),
 );
+const lastResult = ref<BulkContestResult | null>(null);
+watch(
+  listQuery,
+  () => {
+    selection.clear();
+    lastResult.value = null;
+  },
+  { deep: true },
+);
+const isBulkOpen = ref(false);
+/** Kept after the dialog closes, so its wording does not flip while it fades out. */
+const isBulkVisible = ref(true);
+function openBulk(isVisible: boolean) {
+  isBulkVisible.value = isVisible;
+  isBulkOpen.value = true;
+}
+function onBulkDone(result: BulkContestResult) {
+  lastResult.value = result;
+  selection.clear();
+}
+const resultRows = computed(() =>
+  (lastResult.value?.results ?? []).map((item) => ({ ...item, name: item.key })),
+);
+
 const countText = computed(() => {
   const values = {
-    shown: shownText.value,
-    total: totalText.value,
-    q: search.value,
+    shown: formatNumber(data.value?.items.length ?? 0, locale.locale),
+    total: formatNumber(data.value?.meta.total ?? 0, locale.locale),
+    q: filters.value.q,
   };
-  if (!search.value) return t('admin.search.contests.count', values);
-  return t('admin.search.contests.countFor', values);
+  return t(
+    filters.value.q ? 'admin.search.contests.countFor' : 'admin.search.contests.count',
+    values,
+  );
 });
 </script>
 
@@ -64,18 +82,27 @@ const countText = computed(() => {
       {{ $t('admin.search.contests.title') }}
     </h2>
     <IndexSearchBox
-      :value="search"
+      :value="filters.q"
       :label="$t('admin.search.contests.label')"
       :placeholder="$t('admin.search.contests.placeholder')"
       :clear-label="$t('admin.search.clear')"
       :hint="$t('admin.search.contests.hint')"
       :status="data ? countText : ''"
-      @commit="commit"
+      @commit="(q: string) => change({ q })"
     />
-    <AdminFilterTabs
-      :tabs="phaseTabs"
-      :current="phase ?? 'all'"
-      :label="$t('admin.search.contests.phaseLabel')"
+    <ContestListFilters :filters="filters" @change="change" />
+    <BulkSelectionBar :count="selection.selected.value.length" @clear="selection.clear">
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openBulk(true)">
+        {{ $t('admin.search.contests.bulk.show') }}
+      </button>
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openBulk(false)">
+        {{ $t('admin.search.contests.bulk.hide') }}
+      </button>
+    </BulkSelectionBar>
+    <ContestBulkResult
+      v-if="lastResult"
+      :results="resultRows"
+      reason-prefix="admin.contests.bulk.reasons"
     />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
@@ -87,8 +114,8 @@ const countText = computed(() => {
       <EmptyState v-if="data && data.items.length === 0" compact>
         <strong>
           {{
-            search
-              ? $t('admin.search.contests.emptyFor', { q: search })
+            filters.q
+              ? $t('admin.search.contests.emptyFor', { q: filters.q })
               : $t('admin.search.contests.empty')
           }}
         </strong>
@@ -96,63 +123,15 @@ const countText = computed(() => {
       </EmptyState>
       <div v-else-if="data">
         <ScrollRegion :label="$t('admin.search.contests.title')">
-          <table class="w-full text-left text-sm">
-            <caption class="sr-only">
-              {{
-                $t('admin.search.contests.title')
-              }}
-            </caption>
-            <thead class="text-xs text-muted uppercase">
-              <tr>
-                <th scope="col" class="px-3 py-2">
-                  {{ $t('admin.search.contests.columns.contest') }}
-                </th>
-                <th scope="col" class="px-3 py-2">
-                  {{ $t('admin.search.contests.columns.time') }}
-                </th>
-                <th scope="col" class="px-3 py-2">
-                  {{ $t('admin.search.contests.columns.phase') }}
-                </th>
-                <th scope="col" class="px-3 py-2">
-                  {{ $t('admin.search.contests.columns.users') }}
-                </th>
-                <th scope="col" class="px-3 py-2">
-                  <span class="sr-only">{{ $t('admin.search.edit') }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="contest in data.items" :key="contest.key" class="border-t border-line">
-                <td class="px-3 py-3">
-                  <RouterLink
-                    :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
-                    class="font-semibold text-accent hover:underline"
-                  >
-                    <HighlightedText :text="contest.name" :query="search" />
-                  </RouterLink>
-                  <div class="font-mono text-xs text-muted">
-                    <HighlightedText :text="contest.key" :query="search" />
-                  </div>
-                </td>
-                <td class="px-3 py-3 text-sm">
-                  {{ formatDateTime(contest.startTime, locale.locale) }} –
-                  {{ formatDateTime(contest.endTime, locale.locale) }}
-                  <span v-if="contest.isRated"> · {{ $t('admin.search.contests.rated') }}</span>
-                </td>
-                <td class="px-3 py-3">{{ $t(`contests.phase.${contest.phase}`) }}</td>
-                <td class="px-3 py-3 font-mono">
-                  {{ formatNumber(contest.userCount, locale.locale) }}
-                </td>
-                <td class="px-3 py-3 text-right">
-                  <RouterLink
-                    :to="{ name: 'admin-contestGeneral', params: { key: contest.key } }"
-                    :class="ADMIN_BUTTON_CLASS"
-                    >{{ $t('admin.search.edit') }}</RouterLink
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <ContestListTable
+            :items="data.items"
+            :search="filters.q"
+            :is-selected="selection.isSelected"
+            :is-all-selected="selection.isAllSelected.value"
+            :is-some-selected="selection.isSomeSelected.value"
+            @toggle="selection.toggle"
+            @toggle-all="selection.toggleAll"
+          />
         </ScrollRegion>
         <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
           <p class="text-sm text-muted">{{ countText }}</p>
@@ -160,5 +139,11 @@ const countText = computed(() => {
         </div>
       </div>
     </QueryState>
+    <ContestBulkVisibilityDialog
+      v-model:visible="isBulkOpen"
+      :keys="selection.selected.value"
+      :is-visible="isBulkVisible"
+      @done="onBulkDone"
+    />
   </section>
 </template>

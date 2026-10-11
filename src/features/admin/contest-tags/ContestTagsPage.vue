@@ -13,6 +13,7 @@ import { failureTextOf } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import ContestTagEditor from './ContestTagEditor.vue';
+import TagContestsPanel from './TagContestsPanel.vue';
 
 const SKELETON_ROWS = 4;
 const { data: tags, isPending, error, refetch } = useContestTagsQuery();
@@ -20,6 +21,8 @@ const rows = computed(() => tags.value ?? []);
 const isFull = computed(() => rows.value.length >= CONTEST_TAG_PAGE_SIZE);
 const editing = ref<ContestTag | null>(null);
 const removing = ref<ContestTag | null>(null);
+/** The tag whose contests the panel above the table manages. */
+const assigning = ref<ContestTag | null>(null);
 const isRemoveOpen = computed({
   get: () => removing.value !== null,
   set: (isOpen: boolean) => {
@@ -31,6 +34,7 @@ const removal = useAdminMutation({
   invalidates: () => [CONTEST_TAGS_KEY],
   onDone: (_result, tag) => {
     if (editing.value?.slug === tag.slug) editing.value = null;
+    if (assigning.value?.slug === tag.slug) assigning.value = null;
     removing.value = null;
   },
 });
@@ -46,6 +50,7 @@ function askRemove(tag: ContestTag) {
       <template #actions><AdminBit placement="header" /></template>
     </AdminPageHeader>
     <ContestTagEditor :tag="editing" :is-full="isFull" @done="editing = null" />
+    <TagContestsPanel v-if="assigning" :tag="assigning" @close="assigning = null" />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="glass flex flex-col gap-3 rounded-panel p-3">
@@ -79,6 +84,9 @@ function askRemove(tag: ContestTag) {
               <th scope="col" class="hidden px-2 py-2 md:table-cell">
                 {{ $t('admin.contestTags.columns.order') }}
               </th>
+              <th scope="col" class="px-2 py-2">
+                {{ $t('admin.contestTags.columns.contests') }}
+              </th>
               <th scope="col" class="hidden px-2 py-2 lg:table-cell">
                 {{ $t('admin.contestTags.columns.description') }}
               </th>
@@ -106,9 +114,14 @@ function askRemove(tag: ContestTag) {
               </td>
               <td class="hidden px-2 py-3 font-mono md:table-cell">{{ tag.slug }}</td>
               <td class="hidden px-2 py-3 md:table-cell">{{ tag.order }}</td>
+              <td class="px-2 py-3 font-mono">{{ tag.contestCount }}</td>
               <td class="hidden px-2 py-3 text-muted lg:table-cell">{{ tag.description }}</td>
               <td class="px-2 py-3">
-                <div class="flex justify-end gap-2">
+                <div class="flex flex-wrap justify-end gap-2">
+                  <button type="button" :class="ADMIN_BUTTON_CLASS" @click="assigning = tag">
+                    {{ $t('admin.contestTags.manageContests')
+                    }}<span class="sr-only">{{ ' ' + tag.name }}</span>
+                  </button>
                   <button type="button" :class="ADMIN_BUTTON_CLASS" @click="editing = tag">
                     {{ $t('admin.contestTags.edit')
                     }}<span class="sr-only">{{ ' ' + tag.name }}</span>

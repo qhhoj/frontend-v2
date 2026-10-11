@@ -1,7 +1,6 @@
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchProblem } from '@/api/problems.api';
-import type { ProblemDetail } from '@/api/types/problems';
 import { translate } from '@/i18n';
 import { failureTextOf, isNotFound } from '../../ui/admin-errors';
 import { MAX_CONTEST_PROBLEMS, newProblemRow } from './contest-problems';
@@ -18,7 +17,13 @@ export function useAddProblem(rows: Ref<ProblemRow[]>) {
   const isAdding = ref(false);
   const isFull = computed(() => rows.value.length >= MAX_CONTEST_PROBLEMS);
 
-  function addFound(problem: ProblemDetail): boolean {
+  /** A problem picked from the search results or found by code; one already listed is refused with a message. */
+  function addFound(problem: { id: string; code: string; name: string }): boolean {
+    addError.value = '';
+    if (isFull.value) {
+      addError.value = translate('admin.contests.problems.full');
+      return false;
+    }
     if (rows.value.some((row) => row.problemId === problem.id)) {
       addError.value = translate('admin.contests.problems.alreadyListed', { code: problem.code });
       return false;
@@ -42,5 +47,5 @@ export function useAddProblem(rows: Ref<ProblemRow[]>) {
     }
   }
 
-  return { addError, isAdding, isFull, addByCode };
+  return { addError, isAdding, isFull, addByCode, addFound };
 }

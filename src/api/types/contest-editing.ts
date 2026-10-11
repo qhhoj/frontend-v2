@@ -74,3 +74,10 @@ export type Participation = Schemas['ParticipationResponse'];
 
 /** backend: `PrepareDataDto`: the submissions export filter; empty fields are left out. */
 export type PrepareDataBody = JsonBodyOf<'/contests/{key}/data', 'post'>;
+
+/** backend: contest-bulk.response.ts BulkContestResponse: per-key outcomes of a bulk show/hide or tag run. */
+export type BulkContestResult = Schemas['BulkContestResponse'];
+/** backend: participation.response.ts BulkDisqualifyResponse: per-id outcomes of a bulk disqualify. */
+export type BulkDisqualifyResult = Schemas['BulkDisqualifyResponse'];
+/** backend: contest-list.response.ts ContestListEditorResponse: what only editors see on a list row. */
+export type ContestListEditor = Schemas['ContestListEditorResponse'];

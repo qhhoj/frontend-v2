@@ -6,7 +6,15 @@ import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { editableContestKey, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
-import { isPointsValid, moveRow, toProblemRows, toProblemsBody } from './contest-problems';
+import {
+  isPointsValid,
+  mergeRows,
+  moveRow,
+  moveRowTo,
+  toProblemRows,
+  toProblemsBody,
+  withPoints,
+} from './contest-problems';
 import type { ProblemRow } from './contest-problems';
 import { useAddProblem } from './use-add-problem';
 
@@ -25,7 +33,7 @@ function rowIssueOf(
   )?.[1];
 }
 
-/** The contest's ordered problem list as an editor works on it: add by code, reorder, remove, then one PATCH of the whole list. */
+/** The contest's ordered problem list as an editor works on it: add, copy, reorder, set points, remove, then one PATCH of the whole list. */
 export function useContestProblemRows(contest: () => EditableContest) {
   const viewer = useViewerId();
   const queryClient = useQueryClient();
@@ -66,6 +74,14 @@ export function useContestProblemRows(contest: () => EditableContest) {
     mutation,
     issueFor: issueOf,
     move: (index: number, delta: -1 | 1) => (rows.value = moveRow(rows.value, index, delta)),
+    moveTo: (index: number, target: number) => (rows.value = moveRowTo(rows.value, index, target)),
+    setPoints: (problemIds: string[], points: number) =>
+      (rows.value = withPoints(rows.value, problemIds, points)),
+    copyRows: (incoming: ProblemRow[]) => {
+      const merged = mergeRows(rows.value, incoming);
+      rows.value = merged.rows;
+      return { added: merged.added, skipped: merged.skipped };
+    },
     remove: (index: number) =>
       (rows.value = rows.value.filter((_row, position) => position !== index)),
     save,

@@ -100,4 +100,29 @@ describe('ContestParticipantsTab', () => {
     expect(contestReads()).toBeGreaterThan(before);
     expect(invalidatedKeys(queryClient, ranking)).toHaveLength(1);
   });
+
+  it('disqualifies the ticked rows in one call and reports the refused ones by username', async () => {
+    const calls = mockApi({
+      ...disqualifyRoutes(),
+      'POST /contests/hcmus-w41/participations/disqualify': ok({
+        results: [{ id: 'p-1', outcome: 'failed', reason: 'not_found' }],
+        done: 0,
+        failed: 1,
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', COUNT_LINE);
+    await wrapper.get('tbody input[type="checkbox"]').setValue(true);
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Loại các dòng đã chọn')!
+      .trigger('click');
+    await confirmDialog('Loại các dòng đã chọn');
+    await flushPromises();
+    expect(calls.find((call) => call.path.endsWith('/participations/disqualify'))?.body).toEqual({
+      ids: ['p-1'],
+      disqualified: true,
+    });
+    expect(wrapper.text()).toContain('Đã đổi 0');
+    expect(wrapper.text()).toContain(participation().user.username);
+  });
 });

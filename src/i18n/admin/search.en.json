@@ -30,12 +30,46 @@
       "contest": "Contest",
       "time": "Time",
       "phase": "Phase",
-      "users": "Participants"
+      "users": "Participants",
+      "pending": "Pending",
+      "actions": "Actions"
     },
     "count": "{shown} / {total} contests",
     "countFor": "{shown} / {total} contests match “{q}”",
     "empty": "No contests yet.",
     "emptyFor": "No contest matches “{q}”",
-    "emptyAdvice": "Try a shorter part of the key or name, or switch to “All” to see every phase."
+    "emptyAdvice": "Try a shorter part of the key or name, or switch to “All” to see every phase.",
+    "scopeLabel": "Scope",
+    "scopes": {
+      "all": "All",
+      "mine": "Mine",
+      "hidden": "Hidden"
+    },
+    "sort": "Sort",
+    "sorts": {
+      "default": "Default (upcoming first)",
+      "newest": "Newest start",
+      "oldest": "Oldest start",
+      "name": "Name A–Z",
+      "users": "Most participants"
+    },
+    "from": "Starts on or after",
+    "before": "Starts before",
+    "badges": {
+      "hidden": "Hidden",
+      "private": "Private",
+      "organization": "Organization",
+      "locked": "Locked"
+    },
+    "ranking": "Ranking",
+    "rate": "Rate",
+    "bulk": {
+      "show": "Show selected",
+      "hide": "Hide selected",
+      "showTitle": "Show {count} contests?",
+      "hideTitle": "Hide {count} contests?",
+      "showBody": "The contests appear to everyone allowed to see them. Showing a public contest needs the visibility permission.",
+      "hideBody": "The contests leave the lists and public pages; only their editors still see them."
+    }
   }
 }

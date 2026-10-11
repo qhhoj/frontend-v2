@@ -48,7 +48,8 @@
       "ratingRange": "The maximum rating cannot be below the minimum.",
       "tags": "At most 20 tags.",
       "pointsPrecision": "From 0 to 10.",
-      "penalty": "Enter a whole number, not negative."
+      "penalty": "Enter a whole number, not negative.",
+      "imageUrl": "Use an http(s) address or a path starting with /, at most 150 characters."
     },
     "sections": {
       "info": "Contest information",
@@ -111,7 +112,9 @@
       "rateAllHint": "Off: rate only those who registered.",
       "ratingFloor": "Minimum rating",
       "ratingCeiling": "Maximum rating",
-      "rateExclude": "Excluded from rating"
+      "rateExclude": "Excluded from rating",
+      "ogImage": "Link preview image",
+      "logoOverrideImage": "Logo inside the contest"
     },
     "hints": {
       "key": "Cannot change after creation.",
@@ -121,7 +124,9 @@
       "scoreboardCacheTimeout": "0 turns the cache off. At most 86400.",
       "accessCodeSet": "A code is set (stored hashed). Type a new one to replace it; leave empty to keep it.",
       "accessCodeNone": "No code yet. Type one to set it.",
-      "rankingCodeSet": "A code is set. Type a new one to replace it; leave empty to keep it."
+      "rankingCodeSet": "A code is set. Type a new one to replace it; leave empty to keep it.",
+      "ogImage": "Shown when the contest link is shared (Discord, Facebook). An http(s) address or a path starting with /. Empty: the site image.",
+      "logoOverrideImage": "Shown beside the contest name at the top of the contest page. An http(s) address or a path starting with /. Empty: no logo."
     },
     "scoreboardOptions": {
       "V": "Public",
@@ -129,7 +134,8 @@
       "C": "Hidden during the contest",
       "P": "Hidden during the participation"
     },
-    "tagPlaceholder": "Type a tag and press Enter"
+    "tagPlaceholder": "Type a tag and press Enter",
+    "jumpLabel": "Jump to section"
   },
   "format": {
     "fields": {
@@ -155,12 +161,12 @@
       "maxSubmissions": "Maximum submissions",
       "order": "Order"
     },
-    "addLabel": "Add a problem by code",
-    "addPlaceholder": "Add a problem by code…",
+    "addLabel": "Add a problem",
+    "addPlaceholder": "Problem code or name…",
     "full": "At most 100 problems.",
     "notFound": "There is no problem {code}.",
     "alreadyListed": "Problem {code} is already in the contest.",
-    "orderLine": "The table order is the contest order (at most 100 problems). Use the up and down buttons to change it.",
+    "orderLine": "The table order is the contest order (at most 100 problems). Type a new position or use the up and down buttons to change it.",
     "prefixLine": "Output cut: leave empty for the judge's default.",
     "rescoreWarning": "Changing points or scoring after submissions exist does not rescore them automatically.",
     "rescoreLink": "Use Rescore on the Actions tab.",
@@ -175,7 +181,20 @@
     "moveUp": "Move {code} up",
     "moveDown": "Move {code} down",
     "remove": "Remove {code} from the contest",
-    "pointsRange": "Points from 0 to 3500, a whole number."
+    "pointsRange": "Points from 0 to 3500, a whole number.",
+    "addHint": "Type to search codes and names, then pick; Enter adds the exact code typed.",
+    "matches": "Matching problems",
+    "noMatch": "No problem matches “{q}”.",
+    "listed": "listed",
+    "copyLabel": "Copy problems from another contest",
+    "copyPlaceholder": "Contest key",
+    "copy": "Copy problems",
+    "copySelf": "That is this contest.",
+    "copyNotFound": "There is no contest {key}.",
+    "copied": "Added {added} problems from {key} ({skipped} skipped); save to keep them.",
+    "bulkPoints": "Points for the selected",
+    "applyPoints": "Set points",
+    "positionFor": "Position of {code}"
   },
   "announcements": {
     "composeTitle": "Post an announcement",
@@ -266,10 +285,11 @@
       "title": "Final judging",
       "description": "For the final-submission format: queue the pending submissions for judging when the contest ends. Runs in the background.",
       "button": "Final judging",
-      "unavailable": "Only for the final-submission format, after the contest has ended.",
+      "unavailable": "Only for the final-submission format, once the contest has started.",
       "confirmBody": "The pending submissions will be queued for judging.",
       "confirm": "Judge",
-      "confirmTitle": "Judge the final submissions?"
+      "confirmTitle": "Judge the final submissions?",
+      "earlyWarning": "The contest has not ended: contestants see their results at once. Submissions made after this run wait for the end."
     },
     "rate": {
       "title": "Rating",
@@ -321,7 +341,7 @@
     },
     "penalty": "{hours} h {minutes} min",
     "countLine": "{total} participations · 50 per page",
-    "userLabel": "Username…",
+    "userLabel": "Search usernames",
     "columns": {
       "user": "User",
       "kind": "Kind",
@@ -340,6 +360,30 @@
     "footnote": "Disqualified users still see their own submissions, but are taken off the ranking.",
     "previous": "Previous page",
     "next": "Next page",
-    "pager": "Page {page} of {pages}"
+    "pager": "Page {page} of {pages}",
+    "searchPlaceholder": "Part of a username…",
+    "bulk": {
+      "disqualify": "Disqualify selected",
+      "reinstate": "Reinstate selected",
+      "disqualifyTitle": "Disqualify {count} participations?",
+      "reinstateTitle": "Reinstate {count} participations?",
+      "disqualifyBody": "Each contestant is banned from the contest and moved out of it; the ranking is recomputed once.",
+      "reinstateBody": "The contestants return to the board and their contest ban is lifted; the ranking is recomputed once."
+    },
+    "onlyUser": "Only {name} — clear"
+  },
+  "bulk": {
+    "summary": "{done} changed · {unchanged} unchanged · {failed} refused",
+    "reasons": {
+      "forbidden": "You lack the right for this contest.",
+      "not_found": "Not found (or not yours to edit).",
+      "conflict": "The contest changed meanwhile; try again.",
+      "too_many_tags": "The contest already has 20 tags.",
+      "unknown_tag": "No such tag."
+    },
+    "selected": "{count} selected",
+    "clear": "Clear selection",
+    "selectPage": "Select the whole page",
+    "selectRow": "Select {name}"
   }
 }

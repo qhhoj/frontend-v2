@@ -45,7 +45,15 @@ const phoneLine = computed(
         <ContestChips :contest="contest" with-tags />
       </div>
       <div>
-        <h1 class="font-display text-2xl leading-tight font-bold tracking-tight md:text-4xl">
+        <h1
+          class="flex items-center gap-3 font-display text-2xl leading-tight font-bold tracking-tight md:text-4xl"
+        >
+          <img
+            v-if="contest.logoOverrideImage"
+            :src="contest.logoOverrideImage"
+            alt=""
+            class="size-10 shrink-0 rounded-cell object-contain md:size-14"
+          />
           {{ contest.name }}
         </h1>
         <p class="font-mono text-[12px] text-muted md:hidden">{{ phoneLine }}</p>

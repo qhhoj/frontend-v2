@@ -9,6 +9,7 @@ import TagChips from './TagChips.vue';
 
 const form = defineModel<ContestForm>({ required: true });
 const props = defineProps<{ errors: FieldErrors; isCreate: boolean }>();
+const IMAGE_FIELDS = ['ogImage', 'logoOverrideImage'] as const;
 </script>
 
 <template>
@@ -75,6 +76,30 @@ const props = defineProps<{ errors: FieldErrors; isCreate: boolean }>();
           :class="ADMIN_INPUT_CLASS"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
+        />
+      </template>
+    </AdminField>
+    <AdminField
+      v-for="field in IMAGE_FIELDS"
+      :key="field"
+      :input-id="`contest-${field}`"
+      :label="$t(`admin.contests.general.fields.${field}`)"
+      :hint="$t(`admin.contests.general.hints.${field}`)"
+      :error="props.errors[field]"
+    >
+      <template #default="{ id, describedBy, invalid }">
+        <input
+          :id="id"
+          v-model.trim="form[field]"
+          type="text"
+          inputmode="url"
+          maxlength="150"
+          placeholder="https://… /media/…"
+          :class="ADMIN_INPUT_CLASS"
+          :aria-describedby="describedBy"
+          :aria-invalid="invalid ? 'true' : undefined"
+          autocomplete="off"
+          spellcheck="false"
         />
       </template>
     </AdminField>

@@ -36,11 +36,24 @@
     "slug": "Key",
     "order": "Order",
     "description": "Description",
-    "actions": "Actions"
+    "actions": "Actions",
+    "contests": "Contests"
   },
   "edit": "Edit",
   "remove": "Delete",
   "removeTitle": "Delete tag “{name}”?",
   "removeBody": "Contests tagged {slug} keep the tag and show it as a neutral chip.",
-  "removeConfirm": "Delete tag"
+  "removeConfirm": "Delete tag",
+  "manageContests": "Assign contests",
+  "contests": {
+    "title": "Contests tagged {name}",
+    "close": "Close",
+    "addLabel": "Tag contests (keys, separated by spaces or commas)",
+    "addPlaceholder": "e.g. hcmus-w41 hcmus-w42",
+    "add": "Tag them",
+    "none": "No contest you may edit carries this tag yet.",
+    "listed": "{count} contests you may edit carry this tag",
+    "removeSelected": "Remove the tag from {count}",
+    "tooMany": "{count} keys: at most {max} at a time."
+  }
 }

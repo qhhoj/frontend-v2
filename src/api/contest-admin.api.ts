@@ -35,3 +35,18 @@ export const previewAnnouncement = (key: string, description: string) =>
     path: { key },
     body: { description },
   });
+
+export type BulkContestVisibilityBody = JsonBodyOf<'/contests/bulk/visibility', 'post'>;
+/** Show or hide up to 100 contests; each key is reported `done`, `unchanged` or `failed`. */
+export const setContestsVisibility = (body: BulkContestVisibilityBody) =>
+  apiSend('post', '/contests/bulk/visibility', { body });
+export type BulkContestTagBody = JsonBodyOf<'/contests/bulk/tag', 'post'>;
+/** Add (`assigned`) or remove one tag on up to 100 contests. */
+export const tagContests = (body: BulkContestTagBody) =>
+  apiSend('post', '/contests/bulk/tag', { body });
+/** Disqualify or reinstate up to 100 participations of one contest. */
+export const disqualifyParticipations = (key: string, ids: string[], disqualified: boolean) =>
+  apiSend('post', '/contests/{key}/participations/disqualify', {
+    path: { key },
+    body: { ids, disqualified },
+  });
