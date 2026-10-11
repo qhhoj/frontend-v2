@@ -7,17 +7,23 @@ import type {
 /** Remote language id to the chosen site language id; `''` means "not used". */
 export type LanguageMapping = Record<string, string>;
 
-/** The site language of a suggestion, unless an earlier remote language already took it. */
+/** A language the setter already chose stays; the others take their suggestion unless that site language is taken. */
 export function mappingFromVerified(
   languages: ExternalJudgeVerifiedLanguage[],
   current: LanguageMapping = {},
 ): LanguageMapping {
   const mapping: LanguageMapping = {};
   const taken = new Set<string>();
-  for (const language of languages) {
-    const chosen = current[language.remoteId] ?? language.suggestedLanguageId ?? '';
-    mapping[language.remoteId] = chosen !== '' && !taken.has(chosen) ? chosen : '';
-    if (mapping[language.remoteId] !== '') taken.add(chosen);
+  for (const { remoteId } of languages) {
+    const chosen = current[remoteId] ?? '';
+    mapping[remoteId] = chosen;
+    if (chosen !== '') taken.add(chosen);
+  }
+  for (const { remoteId, suggestedLanguageId } of languages) {
+    if (mapping[remoteId] !== '' || suggestedLanguageId === null) continue;
+    if (taken.has(suggestedLanguageId)) continue;
+    mapping[remoteId] = suggestedLanguageId;
+    taken.add(suggestedLanguageId);
   }
   return mapping;
 }

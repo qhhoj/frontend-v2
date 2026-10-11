@@ -71,4 +71,12 @@ describe('setting values', () => {
     expect(checkDraft(pdf, { value: 1.5 })).toMatch(outOfRange);
     expect(checkDraft(pdf, { value: 10 })).toBeNull();
   });
+
+  it('accepts a plain http address only where the key allows it', () => {
+    const judge = setting('externalJudge.baseUrl', '');
+    expect(checkDraft(judge, { value: 'http://pcd.example:8080' })).toBeNull();
+    expect(checkDraft(judge, { value: 'ftp://pcd.example' })).not.toBeNull();
+    const pwned = setting('auth.pwnedApiUrl', '');
+    expect(checkDraft(pwned, { value: 'http://pwned.example' })).not.toBeNull();
+  });
 });
