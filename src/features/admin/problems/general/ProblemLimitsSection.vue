@@ -1,74 +1,56 @@
 <script setup lang="ts">
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import LanguageLimitsTable from './LanguageLimitsTable.vue';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
-defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors }>();
+defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors; sectionId?: string }>();
+
+const NUMBER_FIELDS = [
+  { key: 'timeLimit', step: '0.01' },
+  { key: 'memoryLimit', step: '1' },
+  { key: 'points', step: '1' },
+] as const;
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.problems.general.sections.limits')">
-    <div class="grid gap-5 sm:grid-cols-3">
+  <AdminFormSection
+    :id="sectionId"
+    :title="$t('admin.problems.general.sections.limits')"
+    :description="$t('admin.problems.general.descriptions.limits')"
+    :columns="1"
+  >
+    <div class="grid gap-4 sm:grid-cols-3">
       <AdminField
-        v-slot="{ id, describedBy }"
-        input-id="problem-timeLimit"
-        :label="$t('admin.problems.general.limits.timeLimit')"
-        :hint="$t('admin.problems.general.limits.timeLimitHint')"
-        :error="errors.timeLimit"
+        v-for="field in NUMBER_FIELDS"
+        :key="field.key"
+        v-slot="{ id, describedBy, invalid }"
+        :input-id="`problem-${field.key}`"
+        :label="$t(`admin.problems.general.limits.${field.key}`)"
+        :hint="$t(`admin.problems.general.limits.${field.key}Hint`)"
+        :error="errors[field.key]"
+        required
       >
         <input
           :id="id"
-          v-model.number="form.timeLimit"
+          v-model.number="form[field.key]"
           type="number"
-          step="0.01"
-          :class="ADMIN_INPUT_CLASS"
+          inputmode="decimal"
+          :step="field.step"
+          :class="[INPUT, 'font-mono tabular-nums']"
           :aria-describedby="describedBy"
-          :aria-invalid="errors.timeLimit ? 'true' : undefined"
-        />
-      </AdminField>
-      <AdminField
-        v-slot="{ id, describedBy }"
-        input-id="problem-memoryLimit"
-        :label="$t('admin.problems.general.limits.memoryLimit')"
-        :hint="$t('admin.problems.general.limits.memoryLimitHint')"
-        :error="errors.memoryLimit"
-      >
-        <input
-          :id="id"
-          v-model.number="form.memoryLimit"
-          type="number"
-          step="1"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-          :aria-invalid="errors.memoryLimit ? 'true' : undefined"
-        />
-      </AdminField>
-      <AdminField
-        v-slot="{ id, describedBy }"
-        input-id="problem-points"
-        :label="$t('admin.problems.general.limits.points')"
-        :hint="$t('admin.problems.general.limits.pointsHint')"
-        :error="errors.points"
-      >
-        <input
-          :id="id"
-          v-model.number="form.points"
-          type="number"
-          step="1"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-          :aria-invalid="errors.points ? 'true' : undefined"
+          :aria-invalid="invalid === 'true'"
         />
       </AdminField>
     </div>
-    <AdminSwitch
+    <AdminCheckbox
       v-model="form.partial"
+      input-id="problem-partial"
       :label="$t('admin.problems.general.limits.partial')"
       :description="$t('admin.problems.general.limits.partialHint')"
     />
@@ -79,5 +61,5 @@ defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors }>();
       :default-time-limit="form.timeLimit"
       :default-memory-limit="form.memoryLimit"
     />
-  </SettingsCard>
+  </AdminFormSection>
 </template>

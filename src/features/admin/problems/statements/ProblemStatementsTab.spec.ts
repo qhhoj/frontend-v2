@@ -120,7 +120,7 @@ describe('ProblemStatementsTab', () => {
     const toData = () => wrapper.get('a[href="/admin/problems/hcmus41c/data"]');
     await toData().trigger('click');
     await flushPromises();
-    expect(openDialog().textContent).toContain('Rời khỏi bản nháp chưa lưu?');
+    expect(openDialog().textContent).toContain('Rời trang?');
     await cancelDialog('Ở lại');
     expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/statements');
     expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('Đang sửa');
