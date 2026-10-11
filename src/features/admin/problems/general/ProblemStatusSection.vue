@@ -7,8 +7,11 @@ import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
 import { toLocalInput } from '../../ui/datetime';
 import { EDIT_ALL_PROBLEM, permissionLock } from './field-lock';
 import type { ProblemForm } from './problem-form';
+import PublishReadinessNote from './PublishReadinessNote.vue';
 
 const form = defineModel<ProblemForm>({ required: true });
+/** `privateCode`: the saved problem's code while it is still private, so publishing it can be checked; unset on create and once public. */
+defineProps<{ privateCode?: string }>();
 const { can } = usePermissions();
 const lockFor = (permission: string) => permissionLock(can, permission);
 /** Legacy "make public and update publish date": turning the switch on offers today's date, so the problem lists as new. */
@@ -36,12 +39,17 @@ function setDateToNow() {
         :locked-by="lockFor('judge.change_public_visibility')"
         @update:model-value="onPublicToggled"
       />
+      <PublishReadinessNote
+        v-if="privateCode && form.isPublic"
+        :code="privateCode"
+        :points="form.points"
+      />
       <div
         v-if="isDateOffered"
         role="status"
         class="flex flex-wrap items-center gap-3 rounded-row border border-line-strong p-3 text-sm"
       >
-        <span class="min-w-0 flex-1">{{ $t('admin.problems.status.dateOffer') }}</span>
+        <span class="min-w-48 flex-1">{{ $t('admin.problems.status.dateOffer') }}</span>
         <button type="button" :class="ADMIN_BUTTON_CLASS" @click="setDateToNow">
           {{ $t('admin.problems.status.dateNow') }}
         </button>

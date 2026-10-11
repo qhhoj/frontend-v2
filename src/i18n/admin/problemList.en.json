@@ -47,7 +47,8 @@
     "reasons": {
       "not_found": "not found or hidden from you",
       "forbidden": "you cannot edit it or change this field",
-      "unknown": "refused"
+      "unknown": "refused",
+      "internal_error": "server error; open the problem to check it"
     }
   }
 }

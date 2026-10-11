@@ -7,6 +7,7 @@ import { staffViewer } from '@/test/admin-routes';
 import {
   editableProblem,
   problemEditingMeta,
+  problemData,
   problemEditorRoutes,
   TYPE_GRAPH,
 } from '@/test/admin-fixtures/problems';
@@ -159,5 +160,40 @@ describe('ProblemGeneralTab', () => {
     await buttonLabelled(created.wrapper, 'Tạo bài').trigger('click');
     await flushPromises();
     expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
+  });
+
+  describe('publishing a private problem', () => {
+    const PUBLISH = [...EDIT, 'judge.change_public_visibility'];
+    const publicSwitch = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+      wrapper
+        .findAll('[role="switch"]')
+        .find((item) => item.element.parentElement?.textContent?.trim().startsWith('Công khai'))!;
+
+    it('warns when the problem has no test cases, without blocking the save', async () => {
+      const calls = mockApi({
+        ...staffViewer(PUBLISH),
+        ...problemEditorRoutes(),
+        'GET /problems/hcmus41c/data': ok(problemData({ cases: [] })),
+      });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      expect(calls.some((call) => call.path.endsWith('/data'))).toBe(false);
+      await publicSwitch(wrapper).trigger('click');
+      await flushPromises();
+      const note = wrapper.get('[data-testid="publish-readiness"]');
+      expect(note.text()).toContain('chưa có test nào');
+      expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('disabled')).toBeUndefined();
+    });
+
+    it('says nothing when the cases carry points', async () => {
+      mockApi({
+        ...staffViewer(PUBLISH),
+        ...problemEditorRoutes(),
+        'GET /problems/hcmus41c/data': ok(problemData()),
+      });
+      const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+      await publicSwitch(wrapper).trigger('click');
+      await flushPromises();
+      expect(wrapper.find('[data-testid="publish-readiness"]').exists()).toBe(false);
+    });
   });
 });
