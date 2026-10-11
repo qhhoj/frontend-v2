@@ -113,7 +113,7 @@ describe('OrganizationsPage', () => {
 
   it('offers the delete to superusers only, not to staff who may edit every organization', async () => {
     mockApi(routes());
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
+    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
     await vi.waitFor(() => {
       if (!wrapper.find<HTMLInputElement>('#org-name').element.value) throw new Error('no detail');
     });
