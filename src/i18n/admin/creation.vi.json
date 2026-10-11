@@ -53,7 +53,11 @@
       "everyone": "Công khai bài",
       "hint": "Bật “Công khai” khi bài đã sẵn sàng.",
       "action": "Công khai"
-    }
+    },
+    "showSteps": "Xem các bước",
+    "hideSteps": "Ẩn các bước",
+    "progress": "Đã xong {done}/{total} bước",
+    "ready": "Bài đã sẵn sàng"
   },
   "contest": {
     "ownerAccess": "Chỉ thành viên {name} thấy kỳ thi này (cố định khi tạo trong tổ chức)."
