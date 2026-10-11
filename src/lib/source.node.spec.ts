@@ -6,10 +6,20 @@ import {
   checkUploadFile,
   codePointCount,
   readSourceFile,
+  sourceLineCount,
   submitErrorKey,
 } from './source';
 
 const MEGABYTE = 1024 * 1024;
+
+describe('sourceLineCount', () => {
+  it('numbers no phantom line after a final newline, and keeps a blank line the author typed', () => {
+    expect(sourceLineCount('int main() {}\n')).toBe(1);
+    expect(sourceLineCount('int main() {}')).toBe(1);
+    expect(sourceLineCount('a\n\n')).toBe(2);
+    expect(sourceLineCount('')).toBe(1);
+  });
+});
 
 describe('codePointCount', () => {
   it('accepts exactly the maximum and no more', () => {

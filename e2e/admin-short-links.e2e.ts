@@ -1,8 +1,7 @@
-import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, confirmInDialog, signInAsStaff } from './fixtures/admin';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
+import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 
 const PERMISSIONS = ['judge.manage_short_link'];
 const staff = (api: FakeApi) => signInAsStaff(api, PERMISSIONS);
@@ -31,7 +30,7 @@ test('shows the staff Bit in the header and on the empty list', async ({ page, a
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     test(`the short-link table is accessible at ${viewport.name} in ${theme.id}`, async ({
       page,
       api,

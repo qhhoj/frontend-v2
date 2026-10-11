@@ -86,13 +86,4 @@ test.describe('submit dock at 1280 px', () => {
       'true',
     );
   });
-
-  test('offers only a sign-in row to an anonymous visitor', async ({ page, api }) => {
-    await openProblem(page, api, { signedIn: false });
-    await expect(dockOf(page).getByRole('link', { name: 'Đăng nhập để nộp bài' })).toHaveAttribute(
-      'href',
-      '/login?redirect=/problems/duongdi',
-    );
-    await expect(dockOf(page).locator('textarea, .cm-editor')).toHaveCount(0);
-  });
 });

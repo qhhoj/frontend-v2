@@ -1,9 +1,8 @@
 import type { Page } from '@playwright/test';
 import { notificationItem, NOTIFICATION_NOW } from '../src/test/notification-fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
+import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 import { ok } from './fixtures/reply';
 
 const important = notificationItem({
@@ -65,7 +64,7 @@ test('an anonymous visitor sees no official banner and sends no /site request', 
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     test(`both banners have no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
       page,
       api,

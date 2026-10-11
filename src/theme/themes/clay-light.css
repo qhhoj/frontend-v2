@@ -1,4 +1,4 @@
-/* Clay light: ivory paper, white opaque surfaces, hairline borders, solid clay buttons. No blur, no blobs. Every text pair is checked by themes.spec.ts. */
+/* Clay light: ivory paper, white opaque surfaces, hairline borders, solid clay buttons. No blur, no blobs. Every text pair is checked by themes.node.spec.ts. */
 :root,
 :root[data-theme='clay-light'] {
   color-scheme: light;
@@ -106,7 +106,7 @@
   --qh-on-coin: #141413;
 }
 
-/* Accent presets, one rule per id in src/theme/appearance.ts; the clay rule repeats the base above. Every rule keeps the theme flat (opaque hover, transparent blobs, one-colour gradient, invisible glow). Checked by themes.spec.ts. */
+/* Accent presets, one rule per id in src/theme/appearance.ts; the clay rule repeats the base above. Every rule keeps the theme flat (opaque hover, transparent blobs, one-colour gradient, invisible glow). Checked by themes.node.spec.ts. */
 :root[data-theme='clay-light'][data-accent='clay'],
 :root[data-theme='clay-light'] [data-accent='clay'] {
   --qh-surface-hover: #f1ede4;

@@ -1,4 +1,4 @@
-/* Glass dark: deep violet-black ground, pink/violet blobs behind frosted glass. Every text pair is checked by themes.spec.ts. */
+/* Glass dark: deep violet-black ground, pink/violet blobs behind frosted glass. Every text pair is checked by themes.node.spec.ts. */
 :root[data-theme='glass-dark'] {
   color-scheme: dark;
   --qh-blur: 24px;
@@ -105,7 +105,7 @@
   --qh-on-coin: #140a1f;
 }
 
-/* Accent presets, one rule per id in src/theme/appearance.ts; the first repeats the base above. Dark presets lighten the accent for text and keep blobs weak enough for 4.5:1 body text. Every preset is checked by themes.spec.ts. */
+/* Accent presets, one rule per id in src/theme/appearance.ts; the first repeats the base above. Dark presets lighten the accent for text and keep blobs weak enough for 4.5:1 body text. Every preset is checked by themes.node.spec.ts. */
 :root[data-theme='glass-dark'][data-accent='orchid'],
 :root[data-theme='glass-dark'] [data-accent='orchid'] {
   --qh-surface-hover: rgba(255, 255, 255, 0.08);

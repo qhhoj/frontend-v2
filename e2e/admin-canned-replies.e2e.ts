@@ -1,9 +1,8 @@
 import { cannedReply } from '../src/test/community-fixtures';
-import { THEMES } from '../src/theme/registry';
 import { adminList, adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
+import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 
 const PATH = '/admin/tickets/canned';
 const FIVE = Array.from({ length: 5 }, (_item, index) =>
@@ -33,7 +32,7 @@ test('a handler adds a canned reply and sees it saved', async ({ page, api }) =>
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     for (const state of ['list', 'empty'] as const)
       test(`the ${state} canned-reply screen has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
         page,

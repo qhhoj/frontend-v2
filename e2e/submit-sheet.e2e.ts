@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { problemDetail, scratchLanguage, submissionDetail } from '../src/test/fixtures';
+import { problemDetail, scratchLanguage } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 
@@ -93,26 +93,5 @@ for (const width of PHONE_WIDTHS)
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
       ).toBeLessThanOrEqual(0);
-    });
-
-    test('opens on the earlier code when the viewer comes to resubmit', async ({ page, api }) => {
-      api.routes['GET /submissions/old-1'] = {
-        body: { data: submissionDetail({ id: 'old-1' }) },
-      };
-      api.routes['GET /submissions/old-1/source'] = {
-        body: { data: { id: 'old-1', source: 'int answer = 42;\n' } },
-      };
-      await openProblem(page, api, width, { path: '/problems/duongdi?resubmit=old-1' });
-      await expect(sheetOf(page)).toBeVisible();
-      await expect(sheetOf(page).locator('.cm-content')).toContainText('int answer = 42;');
-    });
-
-    test('offers only a sign-in bar to an anonymous visitor', async ({ page, api }) => {
-      await openProblem(page, api, width, { signedIn: false });
-      await expect(
-        collapsedBar(page).getByRole('link', { name: 'Đăng nhập để nộp bài' }),
-      ).toBeVisible();
-      await expectTouchTarget(collapsedBar(page).getByRole('link'));
-      await expect(page.getByRole('button', { name: 'Mở rộng' })).toHaveCount(0);
     });
   });

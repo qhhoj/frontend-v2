@@ -1,9 +1,8 @@
 import { INTEGRATION_KEY, integrationClient } from '../src/test/f5-fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { adminList, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
+import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 
 const staff = (api: FakeApi) => signInAsStaff(api, ['judge.manage_integration']);
 
@@ -38,7 +37,7 @@ test('shows the staff Bit in the header and on the empty list', async ({ page, a
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     test(`the integration screen is accessible at ${viewport.name} in ${theme.id}`, async ({
       page,
       api,

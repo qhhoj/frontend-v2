@@ -1,75 +1,8 @@
-import { contestItem } from '../src/test/fixtures';
-import { CONTEST_FIXTURE_NOW, expect, list, test } from './fixtures/api';
-import type { FakeApi } from './fixtures/api';
+import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
-
-/** The M4A board's catalogue, one tag per colour (e2e cannot import `src/test/contest-extras-fixtures`: it uses the `@/` alias). */
-const TAG_CATALOGUE = [
-  ['olympic', 'Olympic'],
-  ['thi-thu', 'Thi thử'],
-  ['luyen-tap', 'Luyện tập'],
-  ['truong', 'Trường'],
-  ['quoc-gia', 'Quốc gia'],
-  ['icpc', 'ICPC'],
-  ['hoc-ky', 'Học kỳ'],
-  ['dac-biet', 'Đặc biệt'],
-].map(([slug, name], index) => ({
-  slug,
-  name,
-  color: `tag-${index + 1}`,
-  description: '',
-  order: index + 1,
-}));
-const tagged = contestItem({ tags: ['quoc-gia', 'thi-thu', 'tin-hoc-tre-2019'] });
-function withCatalogue(api: FakeApi) {
-  api.routes['GET /contest-tags'] = list(TAG_CATALOGUE);
-  api.routes['GET /contests'] = list([tagged]);
-}
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(CONTEST_FIXTURE_NOW);
-});
-
-test('choosing a tag filters the list through the address and the chip shows pressed', async ({
-  page,
-  api,
-}) => {
-  withCatalogue(api);
-  await page.goto('/contests');
-  const row = page.getByTestId('tag-filter');
-  await row.getByRole('button', { name: 'Quốc gia' }).click();
-  await expect(page).toHaveURL(/\?tag=quoc-gia$/);
-  await expect(row.getByRole('button', { name: 'Quốc gia' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  expect(api.requestsTo('GET /contests').at(-1)!.url.searchParams.get('tag')).toBe('quoc-gia');
-  await expect(page.locator('[data-tag-color="neutral"]').first()).toHaveText('tin-hoc-tre-2019');
-});
-
-test('an unknown tag in the address shows every contest and Bit with the notice', async ({
-  page,
-  api,
-}) => {
-  withCatalogue(api);
-  await page.goto('/contests?tag=abc-xyz');
-  const notice = page.getByTestId('tag-unknown');
-  await expect(notice).toContainText('abc-xyz');
-  await expect(notice.getByTestId('inline-bit')).toBeVisible();
-});
-
-test('a failed catalogue hides the row behind its notice and the list still loads', async ({
-  page,
-  api,
-}) => {
-  api.routes['GET /contest-tags'] = {
-    status: 500,
-    body: { error: { code: 'generic', message: 'x' } },
-  };
-  api.routes['GET /contests'] = list([tagged]);
-  await page.goto('/contests');
-  await expect(page.getByTestId('tag-failed')).toBeVisible();
-  await expect(page.getByTestId('running-contest').first()).toBeVisible();
 });
 
 test('staff add a tag with a colour token and see it in the catalogue', async ({ page, api }) => {

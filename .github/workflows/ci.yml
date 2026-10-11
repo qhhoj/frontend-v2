@@ -10,6 +10,9 @@ on:
   # Playwright runs locally before every merge (.batch/gates_fe.sh); on GitHub only when started by hand.
   workflow_dispatch:
 
+env:
+  BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+
 jobs:
   # Pushes that touch only docs or deploy scripts skip the heavy jobs below; a skipped job counts as a
   # pass, so the run (and the deploy gate waiting on it) stays green. scripts always runs.
@@ -18,47 +21,118 @@ jobs:
     timeout-minutes: 5
     outputs:
       code: ${{ steps.diff.outputs.code }}
+      scripts: ${{ steps.scripts.outputs.scripts }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - id: diff
         env:
-          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           CI_LIGHT_PATHS: '^(.*[.]md|docs/.*|scripts/deploy/.*)$'
         run: bash scripts/deploy/code-changed.sh "$BASE" >> "$GITHUB_OUTPUT"
+      # scripts=true when scripts/ changed (or the base is unknown): only then do the CLI specs run.
+      - id: scripts
+        run: |
+          if [ -z "$BASE" ] || [[ $BASE =~ ^0+$ ]] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null \
+            || git diff --name-only "$BASE" HEAD -- scripts | grep -q .; then
+            echo scripts=true >> "$GITHUB_OUTPUT"
+          else
+            echo scripts=false >> "$GITHUB_OUTPUT"
+          fi
 
+  # Deploy-script tests always; the api-gen and build-script specs (slow: each spawns node) only when scripts/ changed.
   scripts:
+    needs: changes
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - run: bash scripts/deploy/ci-scripts.test.sh
+      - uses: actions/setup-node@v4
+        if: needs.changes.outputs.scripts == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - if: needs.changes.outputs.scripts == 'true'
+        run: npm ci && npm run test:scripts
 
-  check:
+  # lint, typecheck and test run in parallel; each skips (a pass) on docs-only pushes.
+  lint:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run api:check
-      - run: npm run lint
+      # vue-tsc --build is incremental: the newest build info for these dependencies and configs skips unchanged files.
+      - uses: actions/cache@v4
+        with:
+          path: .tsbuild
+          key: tsbuild-${{ hashFiles('package-lock.json', 'tsconfig*.json') }}-${{ github.sha }}
+          restore-keys: tsbuild-${{ hashFiles('package-lock.json', 'tsconfig*.json') }}-
       - run: npm run typecheck
-      # Pull requests: only specs whose import graph touches a file changed since the base. Pushes to main,
-      # the nightly run and manual runs: the full suite.
+
+  # Pull requests: one runner, only specs whose import graph touches a file changed since the base. Pushes to main,
+  # the nightly run and manual runs: the full suite in three shards.
+  test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(github.event_name == 'pull_request' && '[1]' || '[1, 2, 3]') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event_name != 'pull_request' && 1 || 0 }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - name: unit tests
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
         run: |
-          if [ -n "$BASE_SHA" ]; then npx vitest run --changed "$BASE_SHA" --passWithNoTests; else npm test; fi
+          if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests; else npm test -- --shard="$SHARD"; fi
+
+  # The required status check: green when lint, typecheck and test passed or were skipped.
+  check:
+    needs: [changes, lint, typecheck, test]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          for result in $RESULTS; do
+            case "$result" in success | skipped) ;; *) exit 1 ;; esac
+          done
 
   # Playwright in 4 shards, by hand only (Actions -> CI -> Run workflow); each builds and previews dist/ through the
   # config's webServer. Pushes and the deploy gate rely on the local run.
@@ -78,7 +152,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      # The full accessibility matrix: every theme, and the page audit at phone width too (e2e/fixtures/audit.ts).
       - run: npx playwright test --shard=${{ matrix.shard }}/4
+        env:
+          E2E_FULL: '1'
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

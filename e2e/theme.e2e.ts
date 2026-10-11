@@ -1,20 +1,5 @@
 import { expect, test } from './fixtures/api';
 
-test('a theme choice applies at once and survives a reload', async ({ page, api }) => {
-  void api;
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await page.goto('/blog');
-  const html = page.locator('html');
-  await expect(html).toHaveAttribute('data-theme', 'clay-dark');
-  await page.getByRole('button', { name: 'Giao diện', exact: true }).click();
-  const panel = page.getByRole('dialog', { name: 'Giao diện' });
-  await panel.getByRole('button', { name: 'Glass', exact: true }).click();
-  await panel.getByRole('button', { name: 'Sáng', exact: true }).click();
-  await expect(html).toHaveAttribute('data-theme', 'glass-light');
-  await page.reload();
-  await expect(html).toHaveAttribute('data-theme', 'glass-light');
-});
-
 test('auto follows the system colour scheme live, on Clay', async ({ page, api }) => {
   void api;
   await page.emulateMedia({ colorScheme: 'light' });

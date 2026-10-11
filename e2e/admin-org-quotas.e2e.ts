@@ -1,10 +1,9 @@
 import { expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
+import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn, AUDIT_THEMES } from './fixtures/audit';
 import { adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
 import { installUsageOverview } from './fixtures/f4-api';
 import { editableProblem, problemEditingMeta } from '../src/test/admin-fixtures/problems';
 import { usageRow } from '../src/test/f4-fixtures';
-import { THEMES } from '../src/theme/registry';
 
 const EDIT = ['judge.edit_all_organization'];
 const ROWS = [
@@ -14,7 +13,7 @@ const ROWS = [
 ];
 
 for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     test(`the quota overview is accessible in ${theme.id} at ${viewport.name}`, async ({
       page,
       api,

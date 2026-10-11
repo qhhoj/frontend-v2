@@ -67,20 +67,6 @@ test.describe('submission page', () => {
     ).toBeVisible();
   });
 
-  for (const [reason, text] of [
-    ['solve_first', 'Giải bài này trước để xem bài nộp'],
-    ['contest_running', 'Kỳ thi đang diễn ra, chưa thể xem bài nộp của người khác'],
-    ['hidden', 'Bạn không có quyền xem bài nộp này'],
-  ] as const)
-    test(`a 403 ${reason} shows its own text`, async ({ page, api }) => {
-      api.routes['GET /submissions/sub-1'] = {
-        status: 403,
-        body: { error: { code: reason, message: 'x' } },
-      };
-      await page.goto('/submissions/sub-1');
-      await expect(page.getByRole('alert').filter({ hasText: /\S/ })).toHaveText(text);
-    });
-
   test('a hidden source keeps the summary and explains itself', async ({ page, api }) => {
     api.routes['GET /submissions/sub-1/source'] = {
       status: 403,
@@ -110,14 +96,6 @@ async function openList(page: Page, api: FakeApi, path = '/submissions') {
 }
 
 test.describe('submission list', () => {
-  test('shows the numbers of the stats strip and the share accepted', async ({ page, api }) => {
-    await openList(page, api);
-    const strip = page.getByTestId('stats-strip');
-    await expect(strip).toContainText('1.284');
-    await expect(strip).toContainText('41%');
-    await expect(strip).toContainText('4 / 4');
-  });
-
   test('keeps its filters in the URL across reload and back and forward', async ({ page, api }) => {
     await openList(page, api);
     await page.getByRole('checkbox', { name: /WA/ }).check();

@@ -8,6 +8,7 @@ import QueryState from '@/components/QueryState.vue';
 import { aceForSubmissionKey } from '@/components/code-language-keys';
 import { showCode } from '@/components/code-highlight';
 import { translate } from '@/i18n';
+import { sourceLineCount } from '@/lib/source';
 import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
@@ -33,8 +34,6 @@ const forbiddenText = computed(() => {
     (isForbidden(error.value) ? 'submission.sourceHidden' : null);
   return key === null ? null : translate(key);
 });
-/** A source ending in a newline has no empty last line to number. */
-const TRAILING_NEWLINE = /\n$/;
 const source = computed(() => data.value?.source ?? '');
 /** Plain text first, coloured once the language's parser has loaded; the text itself never changes. */
 const sourceBlock = ref<HTMLElement | null>(null);
@@ -43,7 +42,7 @@ watchEffect(() => {
   if (sourceBlock.value) void showCode(sourceBlock.value, source.value, ace);
 });
 /** One text node for the whole gutter, so a 65 536-line source adds one element, not thousands. */
-const lineCount = computed(() => source.value.replace(TRAILING_NEWLINE, '').split('\n').length);
+const lineCount = computed(() => sourceLineCount(source.value));
 const lineNumbers = computed(() =>
   Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );

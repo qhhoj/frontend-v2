@@ -6,7 +6,7 @@
   /* Headings keep Space Grotesk (product owner's decision). */
   --qh-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --qh-font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  /* Limit chips by meaning: time blue, memory violet, points amber. They reuse the tag colours, so their contrast is the tag pairs' (themes.spec.ts). */
+  /* Limit chips by meaning: time blue, memory violet, points amber. They reuse the tag colours, so their contrast is the tag pairs' (themes.node.spec.ts). */
   --qh-limit-time: var(--qh-tag-5);
   --qh-limit-time-bg: var(--qh-tag-5-bg);
   --qh-limit-memory: var(--qh-tag-6);
