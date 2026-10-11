@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import type { PostListItem } from '@/api/types/blog';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
+import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import ModerationPostsQueue from './ModerationPostsQueue.vue';
 import PublicPostsQueue from './PublicPostsQueue.vue';
@@ -16,16 +17,30 @@ import { visibilityFailureText } from './post-visibility';
 import { usePostVisibility } from './use-post-visibility';
 import { useModerationPostsQuery } from './posts.queries';
 import { pageFromQuery } from '@/lib/paging';
-import { MODERATION_FEEDS, feedFromQuery, isQueueFeed } from './moderation';
-import type { ModerationFeed, RowFailure } from './moderation';
+import { MODERATION_FEEDS, feedFromQuery, isQueueFeed, searchFeedOf } from './moderation';
+import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
 
 const route = useRoute();
+const router = useRouter();
 const feed = computed(() => feedFromQuery(route.query.feed));
 const page = computed(() => pageFromQuery(route.query.page));
+const search = computed(() => (typeof route.query.search === 'string' ? route.query.search : ''));
+const searchText = ref(search.value);
+watch(search, (value) => (searchText.value = value));
 const TABS: { feed: ModerationFeed; to: RouteLocationRaw }[] = MODERATION_FEEDS.map((tabFeed) => ({
   feed: tabFeed,
   to: { name: adminRouteName('posts'), query: tabFeed === 'all' ? {} : { feed: tabFeed } },
 }));
+
+/** A search lands on a moderation queue (from a public feed: every post), first page. */
+function runSearch() {
+  const text = searchText.value.trim();
+  const target = text ? searchFeedOf(feed.value) : feed.value;
+  void router.push({
+    name: adminRouteName('posts'),
+    query: { ...(target === 'all' ? {} : { feed: target }), ...(text ? { search: text } : {}) },
+  });
+}
 const TAB =
   'inline-flex min-h-11 items-center gap-2 rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
 const feedNav = ref<HTMLElement | null>(null);
@@ -46,7 +61,7 @@ const unhidingPost = ref<PostListItem | null>(null);
 const isHideOpen = ref(false);
 const isUnhideOpen = ref(false);
 const rowFailure = ref<RowFailure | null>(null);
-const lastChange = ref<'hidden' | 'shown' | null>(null);
+const lastChange = ref<'hidden' | 'shown' | 'flagged' | null>(null);
 const unhideFailureText = computed(
   () => visibility.failure.value && visibilityFailureText(visibility.failure.value),
 );
@@ -78,6 +93,20 @@ async function confirmHide() {
   isHideOpen.value = false;
   if (done !== undefined) {
     lastChange.value = 'hidden';
+    return;
+  }
+  rowFailure.value = visibility.failure.value && {
+    postId: post.id,
+    text: visibilityFailureText(visibility.failure.value),
+  };
+}
+
+/** A pin or newsfeed change needs no confirm (it is undone the same way); a refusal stays on its row. */
+async function changeFlag(post: PostListItem, patch: PostFlags) {
+  beginChange();
+  const done = await visibility.flag(post, patch);
+  if (done !== undefined) {
+    lastChange.value = 'flagged';
     return;
   }
   rowFailure.value = visibility.failure.value && {
@@ -140,23 +169,51 @@ async function confirmUnhide() {
       <p class="text-sm text-muted">{{ $t('admin.posts.feeds.note') }}</p>
     </div>
 
+    <form role="search" class="flex flex-wrap items-end gap-2" @submit.prevent="runSearch">
+      <label class="flex min-w-[min(100%,20rem)] flex-1 flex-col gap-1.5">
+        <span class="text-sm font-semibold">{{ $t('admin.posts.search.label') }}</span>
+        <input
+          v-model="searchText"
+          type="search"
+          :class="ADMIN_INPUT_CLASS"
+          :placeholder="$t('admin.posts.search.placeholder')"
+        />
+      </label>
+      <button type="submit" :class="ADMIN_BUTTON_CLASS">
+        {{ $t('admin.posts.search.submit') }}
+      </button>
+    </form>
+    <p v-if="search && isQueueFeed(feed)" class="text-sm text-muted" data-testid="search-summary">
+      {{ $t('admin.posts.search.summary', { text: search }) }}
+    </p>
+
     <SettingsNotice v-if="feed === 'hidden'" tone="info">{{
       $t('admin.posts.hiddenNote')
     }}</SettingsNotice>
     <AdminStatus v-if="lastChange === 'hidden'" kind="done" :text="$t('admin.posts.hide.done')" />
     <AdminStatus v-if="lastChange === 'shown'" kind="done" :text="$t('admin.posts.unhide.done')" />
-    <SettingsNotice tone="info">{{ $t('admin.posts.gap') }}</SettingsNotice>
+    <AdminStatus v-if="lastChange === 'flagged'" kind="done" :text="$t('admin.posts.flagged')" />
 
     <ModerationPostsQueue
       v-if="isQueueFeed(feed)"
       :feed="feed"
       :page="page"
+      :search="search"
       :row-failure="rowFailure"
       :pending-post-id="visibility.pendingId.value"
       @hide="openHide"
       @show="openUnhide"
+      @flag="changeFlag"
     />
-    <PublicPostsQueue v-else :feed="feed" :page="page" :row-failure="rowFailure" @hide="openHide" />
+    <PublicPostsQueue
+      v-else
+      :feed="feed"
+      :page="page"
+      :row-failure="rowFailure"
+      :pending-post-id="visibility.pendingId.value"
+      @hide="openHide"
+      @flag="changeFlag"
+    />
 
     <ConfirmDialog
       v-model:visible="isHideOpen"

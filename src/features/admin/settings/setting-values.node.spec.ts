@@ -51,42 +51,6 @@ describe('setting values', () => {
       ).toBeNull();
   });
 
-  it('sends one https URL per event, the shape the backend parses', () => {
-    const hooks = setting('discord.webhooks', { set: false });
-    const draft = {
-      isSet: false,
-      isReplacing: true,
-      rows: [
-        { event: 'default', url: ' https://d/1 ' },
-        { event: 'on_new_ticket', url: 'https://d/3' },
-      ],
-    } as ReturnType<typeof draftOf>;
-    expect(valueToSend(hooks, draft)).toEqual({
-      value: { default: 'https://d/1', on_new_ticket: 'https://d/3' },
-    });
-    expect(checkDraft(hooks, { ...draft, rows: [{ event: 'default', url: 'http://d' }] })).toBe(
-      'Chỉ nhận địa chỉ https.',
-    );
-  });
-
-  it('refuses two URLs for one event before sending', () => {
-    const hooks = setting('discord.webhooks', { set: false });
-    const rows = [
-      { event: 'default', url: 'https://d/1' },
-      { event: 'default', url: 'https://d/2' },
-    ];
-    expect(checkDraft(hooks, { isSet: false, isReplacing: true, rows })).toBe(
-      'Mỗi sự kiện chỉ nhận một địa chỉ.',
-    );
-  });
-
-  it('sends nothing when "Thay thế" leaves only blank webhook rows, so the list is never wiped', () => {
-    const hooks = setting('discord.webhooks', { set: true });
-    const blankRows = { isSet: true, isReplacing: true, rows: [{ event: 'default', url: '  ' }] };
-    expect(valueToSend(hooks, blankRows as ReturnType<typeof draftOf>)).toBeNull();
-    expect(valueToSend(hooks, { isSet: true, isReplacing: true, rows: [] })).toBeNull();
-  });
-
   it('trims a typed OAuth client secret and sends nothing for a blank one', () => {
     const google = setting('auth.google', {
       enabled: true,

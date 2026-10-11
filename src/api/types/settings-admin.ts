@@ -11,3 +11,8 @@ export interface Sealed {
 export type Setting = Schemas['SettingResponse'];
 
 export type SettingRevision = Schemas['SettingRevisionResponse'];
+
+/** backend: settings/webhooks/dto/discord-webhook.dto.ts */
+export type DiscordWebhook = Schemas['DiscordWebhookResponse'];
+export type DiscordWebhookSlot = Schemas['DiscordWebhookSlot'];
+export type DiscordEvent = Schemas['DiscordEvent'];

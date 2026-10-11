@@ -1,9 +1,10 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
-import { fetchCommentReports, settleCommentReports } from '@/api/comments.api';
+import { fetchCommentReports, setCommentHidden, settleCommentReports } from '@/api/comments.api';
 import type { CommentReportOutcome } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { useAdminMutation } from '../ui/use-admin-mutation';
 
 const REPORTS_KEY = ['admin', 'comment-reports'] as const;
 
@@ -28,5 +29,22 @@ export function useSettleReports() {
     mutationFn: ({ id, outcome }: { id: string; outcome: CommentReportOutcome }) =>
       settleCommentReports(id, outcome),
     onSettled: () => queryClient.invalidateQueries({ queryKey: REPORTS_KEY }),
+  });
+}
+
+/** Hide or show the reported comment from its card; `resolve` also settles its reports (one action for the common case). */
+export function useReportedCommentHide() {
+  const queryClient = useQueryClient();
+  return useAdminMutation({
+    /** Two writes: the queue is fetched again even when the settle fails after the hide went through. */
+    mutate: async ({ id, hidden, resolve }: { id: string; hidden: boolean; resolve: boolean }) => {
+      try {
+        await setCommentHidden(id, hidden);
+        if (resolve) await settleCommentReports(id, 'resolved');
+      } finally {
+        void queryClient.invalidateQueries({ queryKey: REPORTS_KEY });
+      }
+    },
+    invalidates: () => [['admin', 'comments']],
   });
 }

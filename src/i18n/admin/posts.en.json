@@ -10,7 +10,9 @@
     "global": "Global feed",
     "hidden": "Hidden",
     "scheduled": "Scheduled",
-    "note": "Pinning and marking a post global need their own permissions."
+    "note": "Pin and newsfeed buttons appear for staff who hold those permissions.",
+    "organization": "Organization posts",
+    "any": "Every post"
   },
   "table": {
     "caption": "Posts in the selected list",
@@ -38,7 +40,6 @@
     "done": "Post hidden."
   },
   "contestLocked": "The official contest is running and the blog is locked, so posts cannot be hidden or shown yet.",
-  "gap": "No API yet — the abuse-report queue (there is no report model yet), search and bulk actions. A post whose content needs fixing opens by its link, then the edit screen.",
   "empty": "No posts.",
   "footer": "{shown} / {total} posts",
   "pager": "Post pages",
@@ -53,7 +54,19 @@
   },
   "row": {
     "unhide": "Show again",
-    "unhiding": "Showing again…"
+    "unhiding": "Showing again…",
+    "edit": "Edit",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "markGlobal": "Add to newsfeed",
+    "unmarkGlobal": "Remove from newsfeed"
   },
-  "hiddenNote": "Hidden posts are not in the feed; only their authors and staff can open them."
+  "hiddenNote": "Hidden posts are not in the feed; only their authors and staff can open them.",
+  "flagged": "Post updated.",
+  "search": {
+    "label": "Search posts",
+    "placeholder": "Title text or exact author username",
+    "submit": "Search",
+    "summary": "Results for “{text}”."
+  }
 }

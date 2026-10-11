@@ -14,8 +14,13 @@ import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import { useCommentReportsQuery, useSettleReports } from './comment-reports.queries';
+import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import {
+  useCommentReportsQuery,
+  useReportedCommentHide,
+  useSettleReports,
+} from './comment-reports.queries';
+import { failureTextOf } from '../ui/admin-errors';
 
 /** The moderators' queue of reported comments (`judge.change_comment`): newest report first; open the comment, then resolve or dismiss its reports. */
 const route = useRoute();
@@ -35,6 +40,29 @@ async function settleReports(item: CommentReportQueueItem, outcome: CommentRepor
     result.value = { kind: 'refused', key: 'admin.comments.settleFailed' };
   }
 }
+const hider = useReportedCommentHide();
+const hidingId = ref<string | null>(null);
+/** Hide (and maybe resolve) or show the comment from its card, without opening its page. */
+async function changeHidden(item: CommentReportQueueItem, hidden: boolean, resolve: boolean) {
+  result.value = null;
+  hidingId.value = item.comment.id;
+  try {
+    await hider.run({ id: item.comment.id, hidden, resolve });
+  } finally {
+    hidingId.value = null;
+  }
+  if (hider.isDone.value)
+    result.value = {
+      kind: 'done',
+      key: resolve
+        ? 'admin.comments.hiddenResolved'
+        : hidden
+          ? 'admin.comments.hidden'
+          : 'admin.comments.shown',
+    };
+}
+const isBusy = (item: CommentReportQueueItem) =>
+  isSettling(item) || hidingId.value === item.comment.id;
 const isSettling = (item: CommentReportQueueItem) =>
   settle.isPending.value && settle.variables.value?.id === item.comment.id;
 const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold';
@@ -51,6 +79,11 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
       :lead="$t('admin.comments.lead')"
     />
     <AdminStatus v-if="result" :kind="result.kind" :text="$t(result.key)" />
+    <AdminStatus
+      v-if="hider.failure.value"
+      kind="refused"
+      :text="failureTextOf(hider.failure.value)"
+    />
 
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SkeletonBlock class="h-48 w-full" /></template>
@@ -113,6 +146,25 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
               </li>
             </ul>
             <div class="flex flex-wrap gap-2">
+              <template v-if="!item.comment.deleted">
+                <button
+                  v-if="!item.comment.hidden"
+                  type="button"
+                  :class="ADMIN_PRIMARY_CLASS"
+                  :aria-disabled="isBusy(item) || undefined"
+                  @click="isBusy(item) || changeHidden(item, true, true)"
+                >
+                  {{ $t('admin.comments.hideAndResolve') }}
+                </button>
+                <button
+                  type="button"
+                  :class="ADMIN_BUTTON_CLASS"
+                  :aria-disabled="isBusy(item) || undefined"
+                  @click="isBusy(item) || changeHidden(item, !item.comment.hidden, false)"
+                >
+                  {{ item.comment.hidden ? $t('admin.comments.show') : $t('admin.comments.hide') }}
+                </button>
+              </template>
               <button
                 type="button"
                 :class="ADMIN_BUTTON_CLASS"

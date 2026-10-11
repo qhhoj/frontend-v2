@@ -1,9 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { adminRoutes } from '@/features/admin/admin-routes';
 
-/** Screens without an approved mock-up render this until their plan lands. */
-const PlaceholderPage = () => import('@/components/PlaceholderPage.vue');
-
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -222,8 +219,14 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/blog/new',
     name: 'post-new',
-    component: PlaceholderPage,
+    component: () => import('@/features/blog/editor/PostEditorPage.vue'),
     meta: { titleKey: 'pages.postNew', requiresAuth: true },
+  },
+  {
+    path: '/blog/:id/edit',
+    name: 'post-edit',
+    component: () => import('@/features/blog/editor/PostEditorPage.vue'),
+    meta: { titleKey: 'pages.postEdit', requiresAuth: true },
   },
   {
     path: '/blog/:id',

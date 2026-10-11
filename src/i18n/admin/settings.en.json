@@ -50,7 +50,7 @@
     },
     "discord": {
       "title": "Discord webhooks",
-      "help": "The whole list is a secret: written, never read back. Saving replaces the whole list."
+      "help": "Each event is set, removed and tested on its own row; changes apply at once, no Save needed."
     },
     "pdf": {
       "title": "PDF export",
@@ -182,13 +182,30 @@
     "secretHint": "The value is encrypted on save and never shown again. Leave empty to keep it."
   },
   "webhooks": {
-    "title": "Webhook list",
+    "note": "Each event goes to its own address, else to Default. Addresses are secret: only the host and the last 4 characters are shown.",
+    "set": "Set",
     "replace": "Replace",
-    "note": "Up to 20 addresses, one per event, https only.",
-    "event": "Event",
+    "remove": "Remove",
+    "test": "Send test",
+    "save": "Save address",
     "url": "https address",
-    "removeRow": "Remove row",
-    "addRow": "+ Add event"
+    "usesDefault": "Uses Default",
+    "off": "Off",
+    "events": {
+      "default": "Default (any event without its own)",
+      "on_new_comment": "New comment",
+      "on_new_blogpost": "New blog post",
+      "on_new_problem": "New problem",
+      "on_new_suggested_problem": "New suggested problem",
+      "on_new_ticket": "New ticket",
+      "on_new_ticket_message": "New ticket message"
+    },
+    "saved": "Address saved for {event}.",
+    "removed": "Address removed for {event}.",
+    "testQueued": "Test message queued for {event}. Check the Discord channel; a bad address shows only there.",
+    "removeTitle": "Remove the address of {event}?",
+    "removeBody": "The address cannot be shown again; to restore it, paste it anew. Events without their own address then use Default.",
+    "httpsOnly": "Only https addresses are accepted."
   },
   "values": {
     "set": "set",
@@ -197,10 +214,7 @@
   },
   "errors": {
     "integer": "Must be a whole number from {min} to {max}.",
-    "httpsOnly": "Only https addresses are accepted.",
-    "httpsOrEmpty": "Leave empty or use https.",
-    "tooManyHooks": "At most 20 webhooks.",
-    "oneUrlPerEvent": "Each event takes one address."
+    "httpsOrEmpty": "Leave empty or use https."
   },
   "save": "Save",
   "discard": "Discard edits",
@@ -265,7 +279,6 @@
       "mailOff": "Email goes back to “not configured” (empty URL).",
       "notRestorable": "The old value is not kept in the history: it cannot be restored.",
       "senderKept": "The sender (mail.from) stays the same.",
-      "notificationsOff": "Discord notifications are off for every event (empty list).",
       "providerOff": "Sign-in with this provider is switched off at the same time, because the server refuses an enabled provider without a secret.",
       "clientIdKept": "The OAuth client id stays the same.",
       "polygonOff": "The Polygon connection stops: no listing, importing or syncing from Polygon until it is set again."

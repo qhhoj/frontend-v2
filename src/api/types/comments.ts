@@ -52,3 +52,8 @@ export const COMMENT_REPORT_REASONS = [
 ] as const satisfies readonly CommentReportReason[];
 /** backend: comments/reports/dto/report-comment.dto.ts REPORT_NOTE_MAX_LENGTH */
 export const COMMENT_REPORT_NOTE_MAX_LENGTH = 500;
+/** backend: comments/moderation/dto/admin-comment.dto.ts (AdminCommentItemResponse) */
+export type AdminCommentItem = Schemas['AdminCommentItemResponse'];
+export type AdminCommentState = Schemas['AdminCommentState'];
+/** backend: comments/moderation/dto/bulk-hide-comments.dto.ts (BULK_HIDE_MAX) */
+export const BULK_HIDE_MAX = 50;

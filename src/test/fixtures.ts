@@ -276,6 +276,7 @@ export const problemItem = (overrides: Partial<ProblemListItem> = {}): ProblemLi
   code: 'lis',
   name: 'Dãy con tăng dài nhất',
   group: null,
+  authors: [],
   types: [{ id: TYPE_DP_ID, name: 'dp', fullName: 'Quy hoạch động' }],
   points: 1400,
   partial: false,

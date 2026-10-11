@@ -50,7 +50,7 @@
     },
     "discord": {
       "title": "Webhook Discord",
-      "help": "Toàn bộ danh sách là bí mật: chỉ ghi, không đọc lại. Lưu sẽ thay thế cả danh sách."
+      "help": "Mỗi sự kiện được đặt, gỡ và gửi thử riêng; thay đổi có hiệu lực ngay, không cần bấm Lưu."
     },
     "pdf": {
       "title": "Xuất PDF",
@@ -182,13 +182,30 @@
     "secretHint": "Giá trị được mã hoá khi lưu và không bao giờ hiện lại. Để trống để giữ nguyên."
   },
   "webhooks": {
-    "title": "Danh sách webhook",
+    "note": "Mỗi sự kiện gửi tới địa chỉ riêng, nếu không có thì tới Mặc định. Địa chỉ là bí mật: chỉ hiện tên miền và 4 ký tự cuối.",
+    "set": "Đặt",
     "replace": "Thay thế",
-    "note": "Tối đa 20 địa chỉ, mỗi sự kiện một địa chỉ, chỉ https.",
-    "event": "Sự kiện",
+    "remove": "Gỡ",
+    "test": "Gửi thử",
+    "save": "Lưu địa chỉ",
     "url": "Địa chỉ https",
-    "removeRow": "Bỏ dòng",
-    "addRow": "+ Thêm sự kiện"
+    "usesDefault": "Dùng Mặc định",
+    "off": "Tắt",
+    "events": {
+      "default": "Mặc định (sự kiện chưa có địa chỉ riêng)",
+      "on_new_comment": "Bình luận mới",
+      "on_new_blogpost": "Bài blog mới",
+      "on_new_problem": "Bài tập mới",
+      "on_new_suggested_problem": "Bài tập đề xuất mới",
+      "on_new_ticket": "Yêu cầu hỗ trợ mới",
+      "on_new_ticket_message": "Tin nhắn hỗ trợ mới"
+    },
+    "saved": "Đã lưu địa chỉ cho {event}.",
+    "removed": "Đã gỡ địa chỉ của {event}.",
+    "testQueued": "Đã xếp hàng tin thử cho {event}. Hãy xem kênh Discord; địa chỉ sai chỉ lộ ra ở đó.",
+    "removeTitle": "Gỡ địa chỉ của {event}?",
+    "removeBody": "Địa chỉ không hiện lại được; muốn khôi phục phải dán lại. Sự kiện không có địa chỉ riêng sẽ dùng Mặc định.",
+    "httpsOnly": "Chỉ nhận địa chỉ https."
   },
   "values": {
     "set": "đã đặt",
@@ -197,10 +214,7 @@
   },
   "errors": {
     "integer": "Phải là số nguyên từ {min} đến {max}.",
-    "httpsOnly": "Chỉ nhận địa chỉ https.",
-    "httpsOrEmpty": "Để trống hoặc dùng https.",
-    "tooManyHooks": "Tối đa 20 webhook.",
-    "oneUrlPerEvent": "Mỗi sự kiện chỉ nhận một địa chỉ."
+    "httpsOrEmpty": "Để trống hoặc dùng https."
   },
   "save": "Lưu",
   "discard": "Đặt lại",
@@ -265,7 +279,6 @@
       "mailOff": "Thư điện tử trở về “chưa cấu hình” (URL rỗng).",
       "notRestorable": "Giá trị cũ không được lưu trong lịch sử: không khôi phục được.",
       "senderKept": "Người gửi (mail.from) không đổi.",
-      "notificationsOff": "Thông báo Discord tắt cho mọi sự kiện (danh sách rỗng).",
       "providerOff": "Đăng nhập bằng nhà cung cấp này bị tắt cùng lúc, vì máy chủ không nhận nhà cung cấp đã bật mà thiếu bí mật.",
       "clientIdKept": "Mã khách OAuth không đổi.",
       "polygonOff": "Kết nối Polygon tắt: không liệt kê, nhập hay đồng bộ được bài từ Polygon cho tới khi đặt lại."

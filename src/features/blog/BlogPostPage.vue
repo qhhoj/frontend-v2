@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft } from 'lucide-vue-next';
+import { ArrowLeft, Pencil } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -51,13 +51,23 @@ usePageTitle(() => post.value?.title);
             <span aria-hidden="true">/</span>
             <span class="truncate text-content">{{ post.title }}</span>
           </nav>
-          <RouterLink
-            :to="{ name: 'blog' }"
-            class="inline-flex w-fit items-center gap-2 font-semibold text-accent-text hover:underline"
-          >
-            <ArrowLeft aria-hidden="true" class="size-4" />
-            {{ $t('blogPost.back') }}
-          </RouterLink>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <RouterLink
+              :to="{ name: 'blog' }"
+              class="inline-flex w-fit items-center gap-2 font-semibold text-accent-text hover:underline"
+            >
+              <ArrowLeft aria-hidden="true" class="size-4" />
+              {{ $t('blogPost.back') }}
+            </RouterLink>
+            <RouterLink
+              v-if="post.canEdit"
+              :to="{ name: 'post-edit', params: { id: post.id } }"
+              class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
+            >
+              <Pencil aria-hidden="true" class="size-4" />
+              {{ $t('admin.postEditor.editTitle') }}
+            </RouterLink>
+          </div>
           <PostArticle :post="post" />
           <CommentsSection type="blog" :page-key="post.id" class="mt-8" />
         </div>

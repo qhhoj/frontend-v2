@@ -1,7 +1,7 @@
 import type { CommentPageType, CommentReportOutcome } from './types/comments';
 import type { VoteScore } from './types/votes';
 import { apiGet, apiGetPage, apiSend } from './typed';
-import type { JsonBodyOf } from './typed';
+import type { JsonBodyOf, QueryOf } from './typed';
 
 export type CommentDraft = JsonBodyOf<'/comments/pages/{type}/{key}', 'post'>;
 export type CommentReportDraft = JsonBodyOf<'/comments/{id}/reports', 'post'>;
@@ -33,3 +33,11 @@ export const fetchCommentReports = (page: number) =>
   apiGetPage('/comments/reports', { query: { page } });
 export const settleCommentReports = (id: string, outcome: CommentReportOutcome) =>
   apiSend('post', '/comments/{id}/reports/settle', { path: { id }, body: { outcome } });
+
+export type AdminCommentQuery = NonNullable<QueryOf<'/admin/comments'>>;
+/** Backend `CommentAdminController` (`judge.change_comment`): every comment of the site, newest first, 30 a page. */
+export const fetchAdminComments = (query: AdminCommentQuery) =>
+  apiGetPage('/admin/comments', { query });
+/** Up to 50 at once; each id answers `code` null (done) or the refusal's code. */
+export const setCommentsHidden = (ids: string[], hidden: boolean) =>
+  apiSend('post', '/admin/comments/hidden', { body: { ids, hidden } });

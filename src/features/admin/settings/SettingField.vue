@@ -9,13 +9,7 @@ import WebhooksField from './WebhooksField.vue';
 import ClearSecretButton from './ClearSecretButton.vue';
 import { SETTING_KINDS } from './setting-blocks';
 import { isClearable } from './setting-clear';
-import type {
-  OAuthDraft,
-  ScalarDraft,
-  SecretDraft,
-  SettingDraft,
-  WebhooksDraft,
-} from './setting-values';
+import type { OAuthDraft, ScalarDraft, SecretDraft, SettingDraft } from './setting-values';
 
 /** Picks the control for a key's kind; each control owns its own draft shape. */
 const props = defineProps<{ setting: Setting }>();
@@ -71,9 +65,5 @@ const onCleared = (answer: Setting) => emit('cleared', answer);
       <ClearSecretButton v-if="canClear" :setting="setting" @cleared="onCleared" />
     </template>
   </OAuthClientField>
-  <WebhooksField v-else :model-value="draft as WebhooksDraft" @update:model-value="draft = $event">
-    <template #actions>
-      <ClearSecretButton v-if="canClear" :setting="setting" @cleared="onCleared" />
-    </template>
-  </WebhooksField>
+  <WebhooksField v-else />
 </template>

@@ -10,7 +10,9 @@
     "global": "Bảng tin chung",
     "hidden": "Đã ẩn",
     "scheduled": "Hẹn giờ",
-    "note": "Ghim và đánh dấu toàn trang cần quyền riêng."
+    "note": "Nút ghim và bảng tin chỉ hiện với nhân viên có quyền tương ứng.",
+    "organization": "Bài của tổ chức",
+    "any": "Mọi bài"
   },
   "table": {
     "caption": "Bài viết theo danh sách đang chọn",
@@ -38,7 +40,6 @@
     "done": "Đã ẩn bài."
   },
   "contestLocked": "Đang trong chế độ thi chính thức: blog bị khoá, chưa ẩn hay hiện bài được.",
-  "gap": "Chưa có API — Hàng đợi báo cáo vi phạm (chưa có mô hình báo cáo), tìm kiếm và thao tác hàng loạt. Bài cần sửa nội dung mở bằng đường dẫn rồi dùng màn sửa bài.",
   "empty": "Không có bài nào.",
   "footer": "{shown} / {total} bài",
   "pager": "Trang bài viết",
@@ -53,7 +54,19 @@
   },
   "row": {
     "unhide": "Hiện lại",
-    "unhiding": "Đang hiện lại"
+    "unhiding": "Đang hiện lại",
+    "edit": "Sửa",
+    "pin": "Ghim",
+    "unpin": "Bỏ ghim",
+    "markGlobal": "Đưa lên bảng tin",
+    "unmarkGlobal": "Gỡ khỏi bảng tin"
   },
-  "hiddenNote": "Bài ẩn không hiện ở bảng tin; chỉ tác giả và nhân viên mở được."
+  "hiddenNote": "Bài ẩn không hiện ở bảng tin; chỉ tác giả và nhân viên mở được.",
+  "flagged": "Đã cập nhật bài viết.",
+  "search": {
+    "label": "Tìm bài viết",
+    "placeholder": "Chữ trong tiêu đề hoặc đúng tên tác giả",
+    "submit": "Tìm",
+    "summary": "Kết quả cho “{text}”."
+  }
 }

@@ -4,7 +4,7 @@
     "reports": "Reported comments"
   },
   "title": "Reported comments",
-  "lead": "Each row is a comment with open reports, newest first. Open the comment to hide or delete it, then resolve or dismiss its reports.",
+  "lead": "Each card is a comment with open reports, newest first. Hide it here, or hide and resolve in one step; dismiss reports that need no action.",
   "empty": "No open reports.",
   "reporters": "{count} reporter | {count} reporters",
   "chips": {
@@ -18,5 +18,60 @@
     "dismissed": "Reports dismissed."
   },
   "settleFailed": "Could not update the reports. They may be settled already; reload.",
-  "pager": "Report pages"
+  "pager": "Report pages",
+  "hide": "Hide comment",
+  "show": "Show comment",
+  "hideAndResolve": "Hide and resolve",
+  "hidden": "Comment hidden.",
+  "shown": "Comment shown again.",
+  "hiddenResolved": "Comment hidden and its reports resolved.",
+  "all": {
+    "crumb": "All comments",
+    "title": "All comments",
+    "lead": "Every comment on the site, newest first. Search by text or author, then hide or show one or many.",
+    "reportsLink": "Reported comments",
+    "filters": {
+      "search": "Text",
+      "searchPlaceholder": "Words in the comment",
+      "author": "Author",
+      "authorPlaceholder": "Exact username",
+      "state": "State",
+      "pageType": "Page",
+      "submit": "Search"
+    },
+    "states": {
+      "all": "All",
+      "visible": "Visible",
+      "hidden": "Hidden"
+    },
+    "pageTypes": {
+      "any": "Any page",
+      "problem": "Problem",
+      "editorial": "Editorial",
+      "contest": "Contest",
+      "blog": "Blog post",
+      "tagProblem": "Tagged problem"
+    },
+    "select": "Select the comment on {page}",
+    "hiddenBy": "Hidden by {name}",
+    "hide": "Hide",
+    "show": "Show",
+    "bulk": {
+      "label": "Selected comments",
+      "selectPage": "Select this page",
+      "count": "{count} comments selected | {count} comment selected | {count} comments selected",
+      "hide": "Hide selected",
+      "show": "Show selected"
+    },
+    "result": {
+      "hidden": "{done} hidden, {refused} refused.",
+      "shown": "{done} shown, {refused} refused."
+    },
+    "refused": {
+      "parentHidden": "Its parent is hidden: show the parent first.",
+      "gone": "Gone or out of your reach."
+    },
+    "empty": "No comment matches.",
+    "pager": "Comment pages"
+  }
 }
