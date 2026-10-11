@@ -1,6 +1,6 @@
 import type { ApiError } from '@/api/client';
 import { translate } from '@/i18n';
-import { failureTextOf } from '../../ui/admin-errors';
+import { failureTextOf, formatWait } from '../../ui/admin-errors';
 
 /** A 429 says the hourly limit (shared by the zip import, the Polygon import and sync) and, with `Retry-After`, the wait. */
 export function importRefusalText(error: ApiError): string {
@@ -8,6 +8,6 @@ export function importRefusalText(error: ApiError): string {
   const wait =
     error.retryAfterSeconds === null
       ? ''
-      : ` ${translate('admin.ui.retryIn', { seconds: error.retryAfterSeconds })}`;
+      : ` ${translate('admin.ui.retryIn', { wait: formatWait(error.retryAfterSeconds) })}`;
   return `${translate('admin.polygon.rateLimited')}${wait}`;
 }

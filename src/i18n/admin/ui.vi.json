@@ -8,7 +8,14 @@
   "addBySlug": "Thêm theo mã tổ chức (slug) chính xác, nhấn Enter",
   "noSuchOrganization": "Không có tổ chức \"{name}\".",
   "removeChip": "Bỏ {name}",
-  "retryIn": "Thử lại sau {seconds} giây.",
+  "retryIn": "Thử lại sau {wait}.",
+  "rateLimitedWait": "Bạn thao tác quá nhanh. Thử lại sau {wait}.",
+  "duration": {
+    "seconds": "{count} giây",
+    "minutes": "{count} phút",
+    "hours": "{count} giờ",
+    "hoursMinutes": "{hours} giờ {minutes} phút"
+  },
   "tooLarge": "Tệp quá lớn (tối đa {max}).",
   "preview": "Xem trước ({style})",
   "previewHint": "Cập nhật sau khi ngừng gõ 0,5 giây; kết quả đã lọc an toàn.",

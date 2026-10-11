@@ -79,7 +79,7 @@ describe('UserPasswordForm', () => {
   it('shows the hourly limit as a line under the button, with the wait', async () => {
     mockApi(routes(rateLimited(120)));
     const dialog = await openPasswordForm();
-    expect(dialog.querySelector('[role="alert"]')?.textContent).toContain('120');
+    expect(dialog.querySelector('[role="alert"]')?.textContent).toContain('2 phút');
     expect(dialog.querySelector('#edit-admin-password')?.getAttribute('aria-invalid')).toBe(
       'false',
     );

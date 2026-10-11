@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { failureTextOf, fieldErrorsOf, isConflict, isNotFound } from './admin-errors';
+import { failureTextOf, fieldErrorsOf, formatWait, isConflict, isNotFound } from './admin-errors';
 
 describe('fieldErrorsOf', () => {
   it('turns issues into one text per field, with the SPA text when it has one', () => {
@@ -49,7 +49,17 @@ describe('fieldErrorsOf', () => {
       'Bạn thao tác quá nhanh. Hãy thử lại sau.',
     );
     expect(failureTextOf(new ApiError('rate_limited', 429, 'x', { retryAfterSeconds: 42 }))).toBe(
-      'Bạn thao tác quá nhanh. Hãy thử lại sau. Thử lại sau 42 giây.',
+      'Bạn thao tác quá nhanh. Thử lại sau 42 giây.',
+    );
+  });
+
+  it('words the wait as seconds, minutes, or hours and minutes, rounding minutes up', () => {
+    expect(formatWait(45)).toBe('45 giây');
+    expect(formatWait(2557)).toBe('43 phút');
+    expect(formatWait(3600)).toBe('1 giờ');
+    expect(formatWait(3900)).toBe('1 giờ 5 phút');
+    expect(failureTextOf(new ApiError('rate_limited', 429, 'x', { retryAfterSeconds: 2557 }))).toBe(
+      'Bạn thao tác quá nhanh. Thử lại sau 43 phút.',
     );
   });
 });

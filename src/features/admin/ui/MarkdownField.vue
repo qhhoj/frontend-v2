@@ -3,7 +3,7 @@ import { computed, ref, useId } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import type { PreviewSource } from '@/api/types/admin-common';
 import { INPUT, TOGGLE } from './controls';
-import { failureTextOf } from './admin-errors';
+import { failureTextOf, formatWait } from './admin-errors';
 import { useI18n } from 'vue-i18n';
 import { useRenderPreview } from './use-render-preview';
 
@@ -74,7 +74,7 @@ const describedBy = computed(() =>
         <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
           {{ $t('admin.ui.previewRateLimited') }}
           <template v-if="preview.retryAfterSeconds.value">
-            {{ $t('admin.ui.retryIn', { seconds: preview.retryAfterSeconds.value }) }}
+            {{ $t('admin.ui.retryIn', { wait: formatWait(preview.retryAfterSeconds.value) }) }}
           </template>
         </p>
         <p v-if="preview.failure.value" class="text-sm text-negative">
