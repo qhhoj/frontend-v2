@@ -9,7 +9,7 @@ import type { CreationOwner } from '../../creation/creation-owners';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { CARD, buttonClass } from '../../ui/controls';
+import { buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { useEditorView } from '../../ui/form/use-editor-view';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -73,9 +73,9 @@ async function create() {
       :back="{ to: { name: 'admin-contests' }, label: $t('admin.contests.index.title') }"
     />
     <form class="flex flex-col gap-6" novalidate @submit.prevent="create">
-      <section :class="CARD" class="p-4 sm:p-5">
+      <div class="rounded-row border border-line bg-surface px-4 py-2.5">
         <CreationOwnerPicker v-model="owner" v-model:ready="isOwnerReady" kind="contest" />
-      </section>
+      </div>
       <ContestGeneralForm
         v-model="form"
         :errors="shownErrors"
