@@ -42,6 +42,9 @@ export type CommentLocation = Schemas['CommentLocationResponse'];
 export type CommentReportQueueItem = Schemas['CommentReportQueueItemResponse'];
 export type CommentReportReason = Schemas['CommentReportReason'];
 export type CommentReportOutcome = Schemas['CommentReportOutcome'];
+export type CommentReportQueue = Schemas['CommentReportQueue'];
+/** backend: comments/reports/dto/bulk-settle-reports.dto.ts (BULK_SETTLE_MAX) */
+export const BULK_SETTLE_MAX = 50;
 /** backend: libs/database comment-report.schema.ts COMMENT_REPORT_REASONS */
 export const COMMENT_REPORT_REASONS = [
   'spam',

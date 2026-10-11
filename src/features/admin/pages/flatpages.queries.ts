@@ -4,18 +4,22 @@ import type { MaybeRefOrGetter } from 'vue';
 import { fetchDeletedFlatpages, fetchFlatpage, fetchFlatpages } from '@/api/flatpages-admin.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 
-export const flatpagesKey = (page: number, viewer: string) =>
-  ['admin', 'flatpages', page, viewer] as const;
+export const flatpagesKey = (page: number, viewer: string, search = '') =>
+  ['admin', 'flatpages', page, viewer, search] as const;
 export const deletedFlatpagesKey = (page: number, viewer: string) =>
   ['admin', 'flatpages-deleted', page, viewer] as const;
 export const flatpageKey = (id: string, viewer: string) =>
   ['admin', 'flatpage', id, viewer] as const;
 
-export function useFlatpagesQuery(page: MaybeRefOrGetter<number>) {
+/** `search`: the url or the title contains it. */
+export function useFlatpagesQuery(
+  page: MaybeRefOrGetter<number>,
+  search: MaybeRefOrGetter<string> = '',
+) {
   const viewer = useViewerId();
   return useQuery({
-    queryKey: computed(() => flatpagesKey(toValue(page), viewer.value)),
-    queryFn: () => fetchFlatpages(toValue(page)),
+    queryKey: computed(() => flatpagesKey(toValue(page), viewer.value, toValue(search))),
+    queryFn: () => fetchFlatpages(toValue(page), toValue(search)),
   });
 }
 

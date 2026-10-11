@@ -5,7 +5,7 @@ import { fieldErrorsOf } from './admin-errors';
 import type { FieldErrors } from './admin-errors';
 
 /** The public features whose caches an admin write may refresh (their query keys start with these roots). */
-export type PublicQueryRoot = 'problems' | 'contests' | 'flatpages' | 'submissions';
+export type PublicQueryRoot = 'problems' | 'contests' | 'flatpages' | 'submissions' | 'comments';
 
 /** Every key an admin write invalidates: an admin key (`'admin'`, then the viewer id) or a public feature's prefix. */
 export type AdminQueryKey = readonly ['admin' | PublicQueryRoot, ...unknown[]];

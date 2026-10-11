@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -8,7 +8,7 @@ import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import DeletedFlatpagesList from './DeletedFlatpagesList.vue';
 import FlatpageEditor from './FlatpageEditor.vue';
 import FlatpageEditorTabs from './FlatpageEditorTabs.vue';
@@ -28,7 +28,15 @@ interface FlatpageEditorHandle {
 }
 const editor = ref<FlatpageEditorHandle | null>(null);
 const listPage = computed(() => positivePageOf(route.query.lp));
-const list = useFlatpagesQuery(listPage);
+/** `?ps=`: the list's search, kept beside the open page so a pick does not clear it. */
+const listSearch = computed(() => (typeof route.query.ps === 'string' ? route.query.ps : ''));
+const searchText = ref(listSearch.value);
+watch(listSearch, (value) => (searchText.value = value));
+const list = useFlatpagesQuery(listPage, listSearch);
+function searchList() {
+  const text = searchText.value.trim();
+  void router.replace({ query: { ...route.query, ps: text || undefined, lp: undefined } });
+}
 const pageParam = computed(() => (typeof route.query.page === 'string' ? route.query.page : null));
 /** A deleted page has no editor: `?deleted=<id>` opens only its history, read-only. */
 const deletedId = computed(() =>
@@ -87,6 +95,19 @@ async function loadRevision(revision: FlatpageRevision) {
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start">
       <section class="flex min-w-0 flex-col gap-3" :aria-label="$t('admin.shell.screens.pages')">
+        <form role="search" class="flex gap-2" @submit.prevent="searchList">
+          <input
+            v-model="searchText"
+            type="search"
+            autocomplete="off"
+            :aria-label="t('admin.pages.list.search')"
+            :placeholder="t('admin.pages.list.searchPlaceholder')"
+            :class="ADMIN_INPUT_CLASS"
+          />
+          <button type="submit" :class="ADMIN_BUTTON_CLASS">
+            {{ t('admin.pages.list.searchSubmit') }}
+          </button>
+        </form>
         <QueryState
           :loading="list.isPending.value"
           :error="list.error.value"

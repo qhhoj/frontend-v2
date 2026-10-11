@@ -63,6 +63,19 @@
     "label": "Search posts",
     "placeholder": "Title text or exact author username",
     "submit": "Search",
-    "summary": "Results for “{text}”."
+    "summary": "Results for “{text}”.",
+    "organization": "Organization",
+    "organizationPlaceholder": "Organization slug",
+    "organizationSummary": "Posts of the organization “{slug}” only."
+  },
+  "bulk": {
+    "label": "Selected posts",
+    "column": "Select",
+    "select": "Select “{title}”",
+    "count": "{count} posts selected | {count} post selected | {count} posts selected",
+    "hide": "Hide selected",
+    "confirmTitle": "Hide {count} posts? | Hide {count} post? | Hide {count} posts?",
+    "confirmBody": "They leave every list but stay reachable by link for their authors and staff. Each can be shown again from the hidden list.",
+    "result": "{done} hidden, {refused} refused."
   }
 }

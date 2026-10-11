@@ -7,6 +7,7 @@ import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue';
 import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
+import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
@@ -41,6 +42,7 @@ const route = useRoute();
     <template v-else>
       <template v-if="route.meta.layout !== 'auth'">
         <AppHeader />
+        <SiteNoticeBanner />
         <OfficialModeBanner />
         <HighPriorityBanner />
       </template>

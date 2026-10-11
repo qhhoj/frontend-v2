@@ -16,7 +16,9 @@ import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import HtmlPreview from './HtmlPreview.vue';
 import { CONFIG_KEY_PATTERN, checkConfigValue, configKindOf } from './config-kinds';
-import { writeConfig } from './site.queries';
+import ConfigHistory from './ConfigHistory.vue';
+import { knownConfigKey } from './config-registry';
+import { refreshAfterConfigWrite, writeConfig } from './site.queries';
 
 const props = defineProps<{
   configKey: string;
@@ -53,6 +55,7 @@ const save = useAdminMutation({
   mutate: ({ key, text }: { key: string; text: string }) => putConfig(key, text),
   onDone: (result) => {
     writeConfig(queryClient, result.key, result.value);
+    refreshAfterConfigWrite(queryClient);
     isCreating.value = false;
   },
 });
@@ -67,6 +70,7 @@ const remove = useAdminMutation({
   mutate: (key: string) => deleteConfig(key),
   onDone: (_result, key) => {
     writeConfig(queryClient, key, null);
+    refreshAfterConfigWrite(queryClient);
     emit('deleted', key);
   },
 });
@@ -102,6 +106,9 @@ const errorOf = (field: string): string | undefined =>
         />
       </AdminField>
       <p v-else class="font-mono text-sm font-semibold">{{ keyName }}</p>
+      <p v-if="knownConfigKey(keyName)" class="text-sm text-muted">
+        {{ $t(`admin.site.config.known.${keyName}`) }}
+      </p>
 
       <div class="flex flex-wrap items-center gap-2">
         <span class="rounded-pill bg-surface-hover px-3 py-1 text-xs font-semibold">
@@ -169,6 +176,8 @@ const errorOf = (field: string): string | undefined =>
         </button>
       </div>
     </form>
+
+    <ConfigHistory v-if="!isCreating" :config-key="keyName" />
 
     <ConfirmDialog
       v-model:visible="isDeleteOpen"

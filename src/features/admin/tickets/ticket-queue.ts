@@ -1,11 +1,11 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
-import type { TicketListQuery } from '@/api/types/tickets';
+import type { TicketDetail, TicketListQuery, TicketPatch } from '@/api/types/tickets';
 import { routeQueryFromFilters } from '@/features/tickets/ticket-filters';
 
 export type QueueStatus = 'open' | 'closed' | 'all';
 
 /** The keys of 8e's ticket-list URL format that filter the list (`?ticket=` only picks one ticket). */
-const FILTER_KEYS = ['scope', 'open', 'user', 'assignee'] as const;
+const FILTER_KEYS = ['scope', 'open', 'awaiting', 'user', 'assignee'] as const;
 
 /** Backend: `open=true` lists open tickets, `open=false` closed ones, and an unset flag lists both. */
 const OPEN_FLAG: Record<QueueStatus, boolean | undefined> = {
@@ -23,6 +23,8 @@ export const statusOf = (query: TicketListQuery): QueueStatus => {
 export const withStatus = (query: TicketListQuery, status: QueueStatus): TicketListQuery => ({
   ...query,
   open: OPEN_FLAG[status],
+  // Waiting for staff are open tickets only: another status drops it.
+  awaiting: status === 'open' ? query.awaiting : undefined,
   page: 1,
 });
 
@@ -55,3 +57,17 @@ export const ticketIdOf = (query: LocationQuery): string | null => {
   const value = Array.isArray(query.ticket) ? query.ticket[0] : query.ticket;
   return value || null;
 };
+
+/** The retitle and relink a staff form asks for, only what differs from the ticket; null when nothing does. A blank code keeps the link. */
+export function movePatchOf(
+  ticket: Pick<TicketDetail, 'title' | 'link'>,
+  draft: { title: string; problem: string },
+): TicketPatch | null {
+  const patch: TicketPatch = {};
+  const title = draft.title.trim();
+  if (title && title !== ticket.title) patch.title = title;
+  const code = draft.problem.trim();
+  const linked = ticket.link.type === 'problem' ? ticket.link.key : null;
+  if (code && code !== linked) patch.problem = code;
+  return Object.keys(patch).length ? patch : null;
+}

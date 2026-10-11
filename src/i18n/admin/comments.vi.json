@@ -1,6 +1,6 @@
 {
   "title": "Bình luận bị báo cáo",
-  "lead": "Mỗi thẻ là một bình luận có báo cáo đang mở, mới nhất trước. Ẩn ngay tại đây, hoặc ẩn và xử lý trong một bước; bỏ qua báo cáo không cần xử lý.",
+  "lead": "Báo cáo đang mở, mới nhất trước: ẩn bình luận ngay tại đây, hoặc ẩn và xử lý trong một bước; bỏ qua báo cáo không cần xử lý. Đánh dấu nhiều thẻ để xử lý cùng lúc.",
   "empty": "Không còn báo cáo nào cần xử lý.",
   "reporters": "{count} người báo cáo",
   "chips": {
@@ -68,5 +68,46 @@
     },
     "empty": "Không có bình luận nào khớp.",
     "pager": "Trang bình luận"
+  },
+  "select": "Chọn bình luận ở {page}",
+  "settledBy": "bởi {name}",
+  "outcome": {
+    "resolved": "Đã xử lý",
+    "dismissed": "Đã bỏ qua"
+  },
+  "tabs": {
+    "label": "Danh sách báo cáo",
+    "open": "Đang mở",
+    "settled": "Đã xử lý"
+  },
+  "emptySettled": "Chưa có báo cáo nào được xử lý.",
+  "bulk": {
+    "label": "Các bình luận bị báo cáo đã chọn",
+    "resolve": "Xử lý mục đã chọn",
+    "dismiss": "Bỏ qua mục đã chọn",
+    "result": {
+      "resolved": "Đã xử lý {done}, từ chối {refused} (đã xử lý trước đó hoặc ngoài quyền).",
+      "dismissed": "Đã bỏ qua {done}, từ chối {refused} (đã xử lý trước đó hoặc ngoài quyền)."
+    }
+  },
+  "edit": {
+    "action": "Sửa",
+    "title": "Sửa bình luận",
+    "label": "Nội dung bình luận (Markdown)",
+    "hint": "Lưu thành một phiên bản mới: tác giả và người kiểm duyệt xem được lịch sử.",
+    "save": "Lưu",
+    "loading": "Đang tải bình luận…",
+    "loadFailed": "Không tải được bình luận. Có thể nó đã bị xoá hoặc ngoài quyền của bạn.",
+    "blank": "Bình luận không được để trống.",
+    "tooLong": "Tối đa {max} ký tự.",
+    "done": "Đã sửa bình luận."
+  },
+  "locks": {
+    "title": "Trang khoá bình luận",
+    "lead": "Các trang chỉ người có quyền vượt khoá mới bình luận được, khoá mới nhất trước. Mở khoá để thảo luận lại.",
+    "empty": "Không trang nào đang khoá bình luận.",
+    "unlock": "Mở khoá",
+    "unlocked": "Đã mở lại bình luận ở “{title}”.",
+    "pager": "Trang danh sách khoá"
   }
 }

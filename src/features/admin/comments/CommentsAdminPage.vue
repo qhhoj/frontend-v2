@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { BULK_HIDE_MAX } from '@/api/types/comments';
@@ -12,8 +12,11 @@ import { adminRouteName } from '../admin-screens';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
+import AdminBulkBar from '../ui/AdminBulkBar.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { useSelection } from '../ui/use-selection';
 import AdminCommentCard from './AdminCommentCard.vue';
+import CommentEditDialog from './CommentEditDialog.vue';
 import CommentFiltersForm from './CommentFiltersForm.vue';
 import { apiQueryOf, filtersFromQuery, queryOfFilters } from './admin-comments';
 import type { CommentFilters } from './admin-comments';
@@ -26,28 +29,15 @@ const router = useRouter();
 const filters = computed(() => filtersFromQuery(route.query));
 const { data, isPending, error, refetch } = useAdminCommentsQuery(() => apiQueryOf(route.query));
 const items = computed(() => data.value?.items ?? []);
-const selectable = computed(() => items.value.filter((item) => !item.comment.deleted));
-const selected = ref(new Set<string>());
-watch(items, () => (selected.value = new Set()));
+const selection = useSelection(
+  () => items.value.filter((item) => !item.comment.deleted).map((item) => item.comment.id),
+  BULK_HIDE_MAX,
+);
+const { selected } = selection;
 
 const bulk = useBulkHide();
 /** The last bulk run: how many were changed, and each refused id with the reason code. */
 const outcome = ref<{ hidden: boolean; done: number; refused: Map<string, string> } | null>(null);
-
-const allSelected = computed(
-  () => selectable.value.length > 0 && selected.value.size === selectable.value.length,
-);
-function toggleAll() {
-  selected.value = allSelected.value
-    ? new Set()
-    : new Set(selectable.value.slice(0, BULK_HIDE_MAX).map((item) => item.comment.id));
-}
-function setSelected(id: string, isOn: boolean) {
-  const next = new Set(selected.value);
-  if (isOn) next.add(id);
-  else next.delete(id);
-  selected.value = next;
-}
 
 function applyFilters(next: CommentFilters) {
   void router.push({ name: adminRouteName('comments'), query: queryOfFilters(next) });
@@ -60,6 +50,15 @@ async function setHidden(ids: string[], hidden: boolean) {
   const refused = new Map(results.filter((row) => row.code).map((row) => [row.id, row.code!]));
   outcome.value = { hidden, done: results.length - refused.size, refused };
 }
+const editingId = ref<string | null>(null);
+const isEditOpen = ref(false);
+const isEdited = ref(false);
+function openEdit(id: string) {
+  isEdited.value = false;
+  editingId.value = id;
+  isEditOpen.value = true;
+}
+
 /** A refused comment's reason, on its card: a hidden parent (409), else gone or unreadable (404). */
 const refusalOf = (id: string) => {
   const code = outcome.value?.refused.get(id);
@@ -84,43 +83,30 @@ const refusalOf = (id: string) => {
 
     <CommentFiltersForm :filters="filters" @apply="applyFilters" />
 
-    <div
-      class="sticky top-2 z-10 flex flex-wrap items-center gap-3 rounded-panel border border-line bg-surface-solid p-3 shadow-lg"
-      role="group"
-      :aria-label="$t('admin.comments.all.bulk.label')"
+    <AdminBulkBar
+      :label="$t('admin.comments.all.bulk.label')"
+      :count-text="$t('admin.comments.all.bulk.count', { count: selected.size }, selected.size)"
+      :all-selected="selection.allSelected.value"
+      :can-select="items.some((item) => !item.comment.deleted)"
+      @toggle-all="selection.toggleAll()"
     >
-      <label class="inline-flex min-h-11 items-center gap-2 font-semibold">
-        <input
-          type="checkbox"
-          class="size-5 accent-[var(--qh-accent)]"
-          :checked="allSelected"
-          :disabled="selectable.length === 0"
-          @change="toggleAll"
-        />
-        {{ $t('admin.comments.all.bulk.selectPage') }}
-      </label>
-      <span class="text-sm text-muted" aria-live="polite">
-        {{ $t('admin.comments.all.bulk.count', { count: selected.size }, selected.size) }}
-      </span>
-      <div class="ml-auto flex flex-wrap gap-2">
-        <button
-          type="button"
-          :class="ADMIN_BUTTON_CLASS"
-          :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
-          @click="selected.size && !bulk.isPending.value && setHidden([...selected], true)"
-        >
-          {{ $t('admin.comments.all.bulk.hide') }}
-        </button>
-        <button
-          type="button"
-          :class="ADMIN_BUTTON_CLASS"
-          :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
-          @click="selected.size && !bulk.isPending.value && setHidden([...selected], false)"
-        >
-          {{ $t('admin.comments.all.bulk.show') }}
-        </button>
-      </div>
-    </div>
+      <button
+        type="button"
+        :class="ADMIN_BUTTON_CLASS"
+        :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
+        @click="selected.size && !bulk.isPending.value && setHidden([...selected], true)"
+      >
+        {{ $t('admin.comments.all.bulk.hide') }}
+      </button>
+      <button
+        type="button"
+        :class="ADMIN_BUTTON_CLASS"
+        :aria-disabled="selected.size === 0 || bulk.isPending.value || undefined"
+        @click="selected.size && !bulk.isPending.value && setHidden([...selected], false)"
+      >
+        {{ $t('admin.comments.all.bulk.show') }}
+      </button>
+    </AdminBulkBar>
 
     <AdminStatus
       v-if="outcome"
@@ -132,6 +118,7 @@ const refusalOf = (id: string) => {
         )
       "
     />
+    <AdminStatus v-if="isEdited" kind="done" :text="$t('admin.comments.edit.done')" />
     <AdminStatus
       v-if="bulk.failure.value"
       kind="refused"
@@ -150,12 +137,18 @@ const refusalOf = (id: string) => {
             :selected="selected.has(item.comment.id)"
             :busy="bulk.isPending.value"
             :refusal="refusalOf(item.comment.id)"
-            @update:selected="setSelected(item.comment.id, $event)"
+            @update:selected="selection.setSelected(item.comment.id, $event)"
             @set-hidden="setHidden([item.comment.id], $event)"
+            @edit="openEdit(item.comment.id)"
           />
         </li>
       </ol>
       <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.comments.all.pager')" />
     </QueryState>
+    <CommentEditDialog
+      v-model:visible="isEditOpen"
+      :comment-id="editingId"
+      @saved="isEdited = true"
+    />
   </div>
 </template>

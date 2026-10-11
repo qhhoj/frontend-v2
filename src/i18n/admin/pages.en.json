@@ -4,7 +4,10 @@
   "list": {
     "total": "{total} pages",
     "loginChip": "Login required",
-    "pager": "Static pages pager"
+    "pager": "Static pages pager",
+    "search": "Search pages",
+    "searchPlaceholder": "URL or title",
+    "searchSubmit": "Search"
   },
   "pick": "Pick a page or create a new one.",
   "field": {

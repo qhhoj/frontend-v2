@@ -102,9 +102,13 @@
     "permission_unknown": "Quyền không tồn tại.",
     "group_unknown": "Hãy chọn vai trò có sẵn.",
     "group_name_taken": "Đã có vai trò trùng tên.",
-    "added_and_removed": "Không thể vừa thêm vừa bỏ cùng một mục."
+    "added_and_removed": "Không thể vừa thêm vừa bỏ cùng một mục.",
+    "problem_unknown": "Không có bài nào mang mã này."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",
-  "maxReached": "Đã đủ {max} mục."
+  "maxReached": "Đã đủ {max} mục.",
+  "bulk": {
+    "selectPage": "Chọn cả trang"
+  }
 }

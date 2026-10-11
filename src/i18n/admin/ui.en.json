@@ -102,9 +102,13 @@
     "permission_unknown": "Unknown permission.",
     "group_unknown": "Choose existing roles.",
     "group_name_taken": "Another role has this name.",
-    "added_and_removed": "An item cannot be added and removed at once."
+    "added_and_removed": "An item cannot be added and removed at once.",
+    "problem_unknown": "No problem has this code."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",
-  "maxReached": "Limit of {max} reached."
+  "maxReached": "Limit of {max} reached.",
+  "bulk": {
+    "selectPage": "Select this page"
+  }
 }

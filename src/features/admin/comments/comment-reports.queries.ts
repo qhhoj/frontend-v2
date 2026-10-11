@@ -1,8 +1,13 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
-import { fetchCommentReports, setCommentHidden, settleCommentReports } from '@/api/comments.api';
-import type { CommentReportOutcome } from '@/api/types/comments';
+import {
+  fetchCommentReports,
+  setCommentHidden,
+  settleCommentReports,
+  settleManyCommentReports,
+} from '@/api/comments.api';
+import type { CommentReportOutcome, CommentReportQueue } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
@@ -12,11 +17,12 @@ const REPORTS_KEY = ['admin', 'comment-reports'] as const;
 export const useCommentReportsQuery = (
   page: MaybeRefOrGetter<number>,
   isEnabled: MaybeRefOrGetter<boolean> = true,
+  status: MaybeRefOrGetter<CommentReportQueue> = 'open',
 ) => {
   const viewer = useViewerId();
   return useQuery({
-    queryKey: computed(() => [...REPORTS_KEY, toValue(page), viewer.value]),
-    queryFn: () => fetchCommentReports(toValue(page)),
+    queryKey: computed(() => [...REPORTS_KEY, toValue(status), toValue(page), viewer.value]),
+    queryFn: () => fetchCommentReports(toValue(page), toValue(status)),
     enabled: computed(() => toValue(isEnabled)),
     placeholderData: keepPreviousData,
   });
@@ -48,3 +54,11 @@ export function useReportedCommentHide() {
     invalidates: () => [['admin', 'comments']],
   });
 }
+
+/** Settle the reports of many comments with one outcome; each id answers `code` null or the refusal's code. */
+export const useBulkSettle = () =>
+  useAdminMutation({
+    mutate: ({ ids, outcome }: { ids: string[]; outcome: CommentReportOutcome }) =>
+      settleManyCommentReports(ids, outcome),
+    invalidates: () => [[...REPORTS_KEY]],
+  });

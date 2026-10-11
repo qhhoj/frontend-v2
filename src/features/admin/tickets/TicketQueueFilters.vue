@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { TicketListQuery } from '@/api/types/tickets';
 import { parseUsernames } from '@/features/tickets/ticket-filters';
+import { useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { queueLocation, seedQueueQuery, statusOf, withStatus } from './ticket-queue';
 import type { QueueStatus } from './ticket-queue';
 
@@ -13,6 +14,7 @@ const STATUSES: { value: QueueStatus; labelKey: string }[] = [
   { value: 'closed', labelKey: 'admin.tickets.filters.closed' },
   { value: 'all', labelKey: 'admin.tickets.filters.all' },
 ];
+const summary = useTicketSummaryQuery();
 const creatorText = ref(props.filters.user.join(', '));
 const assigneeText = ref(props.filters.assignee.join(', '));
 const BUTTON =
@@ -24,6 +26,16 @@ const INPUT = 'min-h-11 rounded-lg border border-line bg-surface px-3 text-base 
 const show = (next: TicketListQuery) =>
   router.replace({ query: queueLocation(next, props.ticketId) });
 const chooseStatus = (status: QueueStatus) => show(withStatus(props.filters, status));
+/** Waiting for staff are open tickets only, so the status follows. */
+const chooseAwaiting = (event: Event) => {
+  const isOn = (event.target as HTMLInputElement).checked;
+  void show({
+    ...props.filters,
+    awaiting: isOn || undefined,
+    open: isOn ? true : props.filters.open,
+    page: 1,
+  });
+};
 const chooseOwn = (event: Event) =>
   show({ ...props.filters, own: (event.target as HTMLInputElement).checked, page: 1 });
 const applyPeople = () =>
@@ -72,6 +84,21 @@ const reset = () =>
         {{ $t(status.labelKey) }}
       </label>
     </fieldset>
+    <label class="flex min-h-11 items-center gap-2 text-sm font-medium">
+      <input
+        type="checkbox"
+        name="awaiting"
+        :checked="filters.awaiting === true"
+        class="size-5"
+        @change="chooseAwaiting"
+      />
+      {{ $t('admin.tickets.filters.awaiting') }}
+      <span
+        v-if="summary.data.value?.awaitingStaff"
+        class="rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
+        >{{ summary.data.value.awaitingStaff }}</span
+      >
+    </label>
     <label class="flex min-h-11 items-center gap-2 text-sm font-medium">
       <input type="checkbox" name="own" :checked="filters.own" class="size-5" @change="chooseOwn" />
       {{ $t('admin.tickets.filters.own') }}

@@ -8,10 +8,10 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 
-/** One comment of the moderation list: select box, where it is, who wrote it, the excerpt, and its own hide or show. */
+/** One comment of the moderation list: select box, where it is, who wrote it, the excerpt, and its own hide or show and edit. */
 defineProps<{ item: AdminCommentItem; busy: boolean; refusal: string | null }>();
 const selected = defineModel<boolean>('selected', { required: true });
-defineEmits<{ setHidden: [hidden: boolean] }>();
+defineEmits<{ setHidden: [hidden: boolean]; edit: [] }>();
 const locale = useLocaleStore();
 const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold';
 </script>
@@ -68,6 +68,9 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
           @click="busy || $emit('setHidden', !item.comment.hidden)"
         >
           {{ item.comment.hidden ? $t('admin.comments.all.show') : $t('admin.comments.all.hide') }}
+        </button>
+        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="$emit('edit')">
+          {{ $t('admin.comments.edit.action') }}
         </button>
         <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
       </div>

@@ -10,9 +10,10 @@
     "problems": "Bài tập",
     "contests": "Kỳ thi",
     "judging": "Chấm bài",
-    "community": "Cộng đồng",
+    "community": "Kiểm duyệt",
     "users": "Người dùng",
-    "site": "Trang web"
+    "site": "Trang web",
+    "content": "Nội dung"
   },
   "forbidden": {
     "title": "Bạn chưa có quyền mở mục này",
@@ -106,7 +107,8 @@
     "organizationQuotas": "Hạn mức tổ chức",
     "cannedReplies": "Mẫu trả lời phiếu",
     "polygonImport": "Nhập từ Polygon",
-    "problemExternal": "Sửa bài: máy chấm ngoài"
+    "problemExternal": "Sửa bài: máy chấm ngoài",
+    "commentLocks": "Trang khoá bình luận"
   },
   "waiting": "đang chờ xử lý",
   "search": {
