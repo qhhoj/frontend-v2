@@ -97,6 +97,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 
 - Assert behaviour (rendered text, attributes, requests sent, invariants, errors), never replay constants
 - A spec that needs no DOM (no mount, `document`, `window`, `localStorage`, `DOMParser`, no `setup.ts`) is named `<file>.node.spec.ts` and runs in plain Node (vitest project `node`, about three times faster per file); everything else is `<file>.spec.ts` in jsdom (project `dom`). Specs of `scripts/` run with `npm run test:scripts`, in CI only when `scripts/` changed
+- A spec that scans the source tree with `import.meta.glob` instead of importing it (a scanner spec) is never picked by `vitest --changed`; PR CI runs every such spec via `npm run test:scanners`, so keep the glob in the spec itself
 - One spec file per page: each extra file for the same page pays the jsdom start and the page's first import again
 - Components and pages: `mountApp(path)` (whole app, memory router) or `mountComponent(component)`; stub the API with `mockApi({ 'GET /path': ok(data) })`; any unmocked request fails the test
 - Fixtures in `src/test/fixtures.ts` are plain data with relative imports; e2e reuses them
