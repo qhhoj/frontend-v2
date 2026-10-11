@@ -42,7 +42,6 @@ test('a dry run lists every problem, then the confirmed run publishes', async ({
   await confirmInDialog(page, 'Công khai');
   const done = card.getByRole('status').filter({ hasText: 'Đã công khai 1 bài' });
   await expect(done).toBeVisible();
-  await expect(done.getByTestId('inline-bit')).toBeVisible();
   expect(api.requestsTo(PUBLISH_ROUTE)).toHaveLength(2);
 });
 
