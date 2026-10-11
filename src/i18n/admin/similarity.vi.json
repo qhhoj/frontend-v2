@@ -15,12 +15,12 @@
     "noScope": "Chọn một bài hoặc một kỳ thi để xem các lượt chạy."
   },
   "start": {
-    "queued": "202 · Đã xếp hàng — Lượt chạy mới đã vào hàng đợi. Danh sách tự cập nhật, mở lượt đó để xem tiến trình.",
-    "conflict": "409 · Đang có lượt chạy — Phạm vi này đang có một lượt chưa xong. Chờ lượt đó kết thúc rồi chạy lại.",
+    "queued": "Lượt chạy mới đã vào hàng đợi. Danh sách tự cập nhật, mở lượt đó để xem tiến trình.",
+    "conflict": "Phạm vi này đang có một lượt chưa xong. Chờ lượt đó kết thúc rồi chạy lại.",
     "openRunning": "Mở lượt đang chạy",
-    "rateLimited": "429 · Quá nhiều lượt chạy — Tối đa 10 lượt mỗi giờ cho mỗi tài khoản.",
+    "rateLimited": "Quá nhiều lượt chạy: tối đa 10 lượt mỗi giờ cho mỗi tài khoản.",
     "retryWithoutHeader": "Hãy thử lại sau.",
-    "retryAfter": "Thử lại sau {count} {unit} (theo Retry-After)."
+    "retryAfter": "Thử lại sau {count} {unit}."
   },
   "units": {
     "seconds": "giây",
@@ -30,7 +30,6 @@
   "runs": {
     "ofProblem": "Các lượt chạy của bài {code}",
     "ofContest": "Các lượt chạy của kỳ thi {key}",
-    "note": "Danh sách không phân trang.",
     "empty": "Chưa có lượt chạy nào cho phạm vi này.",
     "columns": {
       "id": "Mã lượt",
@@ -62,7 +61,7 @@
   },
   "notFound": {
     "title": "Không tìm thấy",
-    "body": "Khóa kỳ thi hoặc lượt chạy này không tồn tại, hoặc bạn không có quyền sửa. Hệ thống trả về 404 trong cả hai trường hợp nên không có lời giải thích thêm.",
+    "body": "Khóa kỳ thi hoặc lượt chạy này không tồn tại, hoặc bạn không có quyền sửa.",
     "back": "Về danh sách"
   },
   "summary": {
@@ -104,22 +103,22 @@
       "language": "Họ ngôn ngữ",
       "allLanguages": "Tất cả",
       "minPercent": "Độ tương đồng tối thiểu",
-      "minPercentHint": "Giá trị gửi là {fraction} (từ 0 đến 1). Ngưỡng của lượt chạy là {minPercent}%, thấp hơn mức đó không có cặp.",
+      "minPercentHint": "Ngưỡng của lượt chạy là {minPercent}%; thấp hơn mức đó không có cặp.",
       "reset": "Đặt lại",
       "hiddenNote": "Cặp thuộc bài bạn không xem được sẽ bị ẩn, nên tổng ở đây có thể nhỏ hơn tổng của lượt chạy."
     },
     "count": "{count} cặp",
     "countAbove": "{count} cặp, độ tương đồng từ {percent}%",
-    "sortNote": "Sắp xếp theo độ tương đồng giảm dần",
     "columns": {
       "longest": "Dài nhất",
       "overlap": "Trùng",
-      "fragments": "Đoạn"
+      "fragments": "Đoạn",
+      "similarity": "Tương đồng",
+      "authors": "Người nộp",
+      "problem": "Bài",
+      "language": "Ngôn ngữ"
     },
     "open": "So sánh",
-    "showing": "Hiện {from} đến {to} trong {total} cặp",
-    "previous": "Trước",
-    "next": "Sau",
     "emptyAbove": "Không có cặp nào từ {percent}% trở lên",
     "emptyAny": "Chưa có cặp nào trong lượt chạy này.",
     "emptyHint": "Hạ ngưỡng tương đồng hoặc đổi bài để xem thêm cặp.",

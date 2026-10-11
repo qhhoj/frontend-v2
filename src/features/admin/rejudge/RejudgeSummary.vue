@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import AdminStatus from '../ui/AdminStatus.vue';
+import { CARD } from '../ui/controls';
 import QueuedProgress from './QueuedProgress.vue';
 import type { RejudgeFilter } from './rejudge-filter';
 import { describeRejudgeFilter } from './rejudge-filter';
@@ -27,14 +28,11 @@ const ROW_KEYS = [
 
 <template>
   <div class="flex flex-col gap-5">
-    <section
-      class="glass flex flex-col gap-4 rounded-panel p-5 sm:p-6"
-      aria-labelledby="rejudge-summary-title"
-    >
-      <h2 id="rejudge-summary-title" class="font-display text-xl font-semibold">
+    <section :class="[CARD, 'flex flex-col gap-4 p-5']" aria-labelledby="rejudge-summary-title">
+      <h2 id="rejudge-summary-title" class="font-display text-base font-semibold">
         {{ $t('admin.rejudge.summary.title') }}
       </h2>
-      <dl class="grid gap-3 text-sm sm:grid-cols-[max-content_1fr]">
+      <dl class="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
         <template v-for="key in ROW_KEYS" :key="key">
           <dt class="text-muted">{{ $t(`admin.rejudge.summary.${key}`) }}</dt>
           <dd class="min-w-0 font-medium break-words">{{ text[key] }}</dd>

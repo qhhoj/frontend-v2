@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useId } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT, buttonClass } from '../ui/controls';
 import type { PairFilter, ProblemOption } from './similarity-pairs';
 
 const props = defineProps<{
@@ -40,7 +40,7 @@ const onMinPercentChange = (event: Event) => {
         <select
           :id="problemInputId"
           :value="filter.problemId"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           @change="onProblemChange"
         >
           <option value="">
@@ -58,7 +58,7 @@ const onMinPercentChange = (event: Event) => {
         <select
           :id="languageInputId"
           :value="filter.language"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           @change="onLanguageChange"
         >
           <option value="">{{ $t('admin.similarity.pairs.filters.allLanguages') }}</option>
@@ -79,7 +79,7 @@ const onMinPercentChange = (event: Event) => {
           max="100"
           step="1"
           inputmode="numeric"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="`${minPercentInputId}-hint`"
           @change="onMinPercentChange"
         />
@@ -93,7 +93,7 @@ const onMinPercentChange = (event: Event) => {
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-3 sm:col-span-3">
-        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('reset')">
+        <button type="button" :class="buttonClass()" @click="emit('reset')">
           {{ $t('admin.similarity.pairs.filters.reset') }}
         </button>
         <p class="text-sm text-muted">{{ $t('admin.similarity.pairs.filters.hiddenNote') }}</p>

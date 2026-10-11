@@ -5,18 +5,13 @@
   "empty": "No submission matches the filter.",
   "pager": "Submission pages",
   "filters": {
-    "title": "Submission filter",
     "problem": "Problem code",
     "user": "Username",
     "language": "Language",
     "status": "Judging state",
-    "result": "Result",
-    "apply": "Filter",
-    "reset": "Clear filter"
+    "result": "Result"
   },
   "table": {
-    "selectPage": "Select the whole page",
-    "select": "Select submission {id}",
     "id": "Id",
     "user": "User",
     "problem": "Problem",
@@ -28,11 +23,8 @@
     "date": "Submitted"
   },
   "bulk": {
-    "label": "Bulk actions",
-    "selected": "{count} submissions selected",
     "allSelected": "All {count} matching submissions selected",
     "selectAll": "Select all {total} matching submissions",
-    "clear": "Clear selection",
     "rejudge": "Rejudge",
     "lineSelected": "{count} selected submissions.",
     "lineAll": "Every submission matching the list filter (except the state filter)."

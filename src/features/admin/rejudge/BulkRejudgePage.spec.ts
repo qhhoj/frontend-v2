@@ -74,7 +74,8 @@ describe('BulkRejudgePage', () => {
     await openConfirm(wrapper);
     expect(dialogText()).toContain('1.340');
     expect(dialogText()).toContain('Cần quyền riêng');
-    expect(dialogText()).toContain('judge.rejudge_submission_lot');
+    expect(dialogText()).toContain('Cần quyền “Chấm lại hàng loạt”');
+    expect(dialogText()).not.toContain('judge.');
     expect(submitButton().getAttribute('aria-disabled')).toBe('true');
     expect(submitButton().textContent?.trim()).toBe('Chấm lại');
 

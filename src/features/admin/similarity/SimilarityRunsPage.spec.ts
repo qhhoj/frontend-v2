@@ -39,8 +39,9 @@ describe('SimilarityRunsPage', () => {
     const { wrapper } = await mountScene('/admin/similarity?contest=hcmus-w41');
     await start(wrapper);
     const alert = wrapper.get('[role="alert"]').text();
-    expect(alert).toContain('Tối đa 10 lượt mỗi giờ cho mỗi tài khoản.');
-    expect(alert).toContain('Thử lại sau 42 phút (theo Retry-After)');
+    expect(alert).toContain('tối đa 10 lượt mỗi giờ cho mỗi tài khoản.');
+    expect(alert).toContain('Thử lại sau 42 phút.');
+    expect(alert).not.toContain('429');
     expect(startButton(wrapper).attributes('aria-disabled')).toBeUndefined();
   });
 

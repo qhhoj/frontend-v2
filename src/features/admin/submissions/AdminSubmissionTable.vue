@@ -1,99 +1,83 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { SubmissionListItem } from '@/api/types/submissions';
-import ScrollRegion from '@/components/ScrollRegion.vue';
 import UserName from '@/components/UserName.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { formatCaseMemory, formatCaseTime, formatNumericDateTime } from '@/lib/format';
 import { verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { shortId } from '../ui/short-id';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../ui/table/table-columns';
 
-/** Staff columns of the old changelist (time, memory, points, language). With `selectable`, a checkbox column drives `selected`. */
-const props = defineProps<{ items: SubmissionListItem[]; label: string; selectable?: boolean }>();
-const selected = defineModel<string[]>('selected', { default: () => [] });
+/**
+ * Staff columns of the old changelist (time, memory, points, language); cards below 768 px. With `selectable`, the checkbox
+ * column drives `selected` and the `bulk` slot replaces the toolbar while rows are picked.
+ */
+defineProps<{ items: SubmissionListItem[]; label: string; selectable?: boolean }>();
+const selected = defineModel<Set<string>>('selected', { default: () => new Set<string>() });
+defineSlots<{ bulk?: () => unknown; footer?: () => unknown; empty?: () => unknown }>();
+const { t } = useI18n();
 const locale = useLocaleStore();
-const pageIds = computed(() => props.items.map((item) => item.id));
-const isPageSelected = computed(
-  () => pageIds.value.length > 0 && pageIds.value.every((id) => selected.value.includes(id)),
-);
-function togglePage() {
-  selected.value = isPageSelected.value
-    ? selected.value.filter((id) => !pageIds.value.includes(id))
-    : [...new Set([...selected.value, ...pageIds.value])];
-}
+
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'id', label: t('admin.submissions.table.id'), priority: 'primary' },
+  { key: 'verdict', label: t('admin.submissions.table.verdict'), priority: 'badge' },
+  { key: 'user', label: t('admin.submissions.table.user') },
+  { key: 'problem', label: t('admin.submissions.table.problem') },
+  { key: 'points', label: t('admin.submissions.table.points'), align: 'end' },
+  { key: 'time', label: t('admin.submissions.table.time'), align: 'end', priority: 'meta' },
+  { key: 'memory', label: t('admin.submissions.table.memory'), align: 'end', priority: 'meta' },
+  { key: 'language', label: t('admin.submissions.table.language'), priority: 'meta' },
+  { key: 'date', label: t('admin.submissions.table.date'), priority: 'meta' },
+]);
 const pointsText = (item: SubmissionListItem) =>
   item.points === null || !item.problem ? '—' : `${item.points} / ${item.problem.points}`;
-const CELL = 'px-3 py-2 whitespace-nowrap';
 </script>
 
 <template>
-  <ScrollRegion :label="label">
-    <table class="w-full text-left text-sm">
-      <thead class="text-xs text-muted">
-        <tr class="border-b border-line">
-          <th v-if="selectable" :class="CELL" scope="col">
-            <input
-              type="checkbox"
-              class="size-5"
-              :checked="isPageSelected"
-              :aria-label="$t('admin.submissions.table.selectPage')"
-              @change="togglePage"
-            />
-          </th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.id') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.user') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.problem') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.verdict') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.points') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.time') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.memory') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.language') }}</th>
-          <th :class="CELL" scope="col">{{ $t('admin.submissions.table.date') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="item in items"
-          :key="item.id"
-          class="border-b border-line last:border-0"
-          :class="selected.includes(item.id) ? 'bg-accent-soft' : 'hover:bg-surface-hover'"
-        >
-          <td v-if="selectable" :class="CELL">
-            <input
-              v-model="selected"
-              type="checkbox"
-              class="size-5"
-              :value="item.id"
-              :aria-label="$t('admin.submissions.table.select', { id: shortId(item.id) })"
-            />
-          </td>
-          <td :class="CELL">
-            <RouterLink
-              :to="{ name: 'submission', params: { id: item.id } }"
-              class="font-mono text-accent-text hover:underline"
-              >{{ shortId(item.id) }}</RouterLink
-            >
-          </td>
-          <td :class="CELL">
-            <UserName v-if="item.user" :username="item.user.username" />
-            <span v-else class="text-muted">—</span>
-          </td>
-          <td :class="CELL" class="font-mono">{{ item.problem?.code ?? '—' }}</td>
-          <td :class="CELL"><VerdictBadge :verdict="verdictOf(item)" size="sm" /></td>
-          <td :class="CELL" class="font-mono">{{ pointsText(item) }}</td>
-          <td :class="CELL" class="font-mono">
-            {{ item.time === null ? '—' : formatCaseTime(item.time) }}
-          </td>
-          <td :class="CELL" class="font-mono">
-            {{ item.memory === null ? '—' : formatCaseMemory(item.memory) }}
-          </td>
-          <td :class="CELL">{{ item.language?.name ?? '—' }}</td>
-          <td :class="CELL" class="text-muted">
-            {{ formatNumericDateTime(item.date, locale.locale) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </ScrollRegion>
+  <AdminDataTable
+    v-model:selected="selected"
+    :columns="columns"
+    :rows="items"
+    :row-key="(item) => item.id"
+    :row-label="(item) => shortId(item.id)"
+    :label="label"
+    :selectable="selectable"
+  >
+    <template #bulk><slot name="bulk" /></template>
+    <template #cell-id="{ row }">
+      <RouterLink
+        :to="{ name: 'submission', params: { id: row.id } }"
+        class="font-mono font-semibold text-accent-text hover:underline"
+        >{{ shortId(row.id) }}</RouterLink
+      >
+    </template>
+    <template #cell-verdict="{ row }"
+      ><VerdictBadge :verdict="verdictOf(row)" size="sm"
+    /></template>
+    <template #cell-user="{ row }">
+      <UserName v-if="row.user" :username="row.user.username" />
+      <span v-else class="text-muted">—</span>
+    </template>
+    <template #cell-problem="{ row }">
+      <span class="font-mono">{{ row.problem?.code ?? '—' }}</span>
+    </template>
+    <template #cell-points="{ row }">{{ pointsText(row) }}</template>
+    <template #cell-time="{ row }">{{
+      row.time === null ? '—' : formatCaseTime(row.time)
+    }}</template>
+    <template #cell-memory="{ row }">
+      {{ row.memory === null ? '—' : formatCaseMemory(row.memory) }}
+    </template>
+    <template #cell-language="{ row }">{{ row.language?.name ?? '—' }}</template>
+    <template #cell-date="{ row }">
+      <span class="whitespace-nowrap text-muted">{{
+        formatNumericDateTime(row.date, locale.locale)
+      }}</span>
+    </template>
+    <template v-if="$slots.empty" #empty><slot name="empty" /></template>
+    <template v-if="$slots.footer" #footer><slot name="footer" /></template>
+  </AdminDataTable>
 </template>

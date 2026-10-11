@@ -5,9 +5,10 @@ import type { RouteLocationRaw } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import { buttonClass } from '../ui/controls';
 import { shortId } from '../ui/short-id';
 import PairFilters from './PairFilters.vue';
 import PairsTable from './PairsTable.vue';
@@ -61,6 +62,14 @@ const lead = computed(() => {
     : shortId(runId.value);
 });
 
+const countLine = computed(() => {
+  const total = formatNumber(pairs.data.value?.meta.total ?? 0, locale.locale);
+  const minPercent = filter.value.minPercent;
+  return minPercent === null
+    ? translate('admin.similarity.pairs.count', { count: total })
+    : translate('admin.similarity.pairs.countAbove', { count: total, percent: minPercent });
+});
+
 /** Moves to the list for `next`; `null` clears every filter. */
 const showFilter = (next: PairFilter | null) =>
   router.replace({
@@ -73,11 +82,7 @@ const showFilter = (next: PairFilter | null) =>
 <template>
   <AdminPageHeader :trail="trail" :title="$t('admin.similarity.pairs.title')" :lead="lead">
     <template #actions>
-      <RouterLink
-        v-if="summaryTo"
-        :to="summaryTo"
-        class="inline-flex min-h-11 items-center font-semibold underline"
-      >
+      <RouterLink v-if="summaryTo" :to="summaryTo" :class="buttonClass('secondary')">
         {{ $t('admin.similarity.pairs.backToSummary') }}
       </RouterLink>
     </template>
@@ -92,8 +97,8 @@ const showFilter = (next: PairFilter | null) =>
   />
   <QueryState :loading="pairs.isPending.value" :error="pairs.error.value" @retry="pairs.refetch()">
     <template #skeleton><SkeletonBlock class="h-60 w-full" /></template>
+    <p class="m-0 text-sm font-semibold" aria-live="polite">{{ countLine }}</p>
     <PairsTable
-      :run-id="runId"
       :pairs="pairs.data.value?.items ?? []"
       :total="pairs.data.value?.meta.total ?? 0"
       :filter="filter"

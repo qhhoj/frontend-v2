@@ -45,9 +45,9 @@ function resetFilter() {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+  <div class="flex flex-col gap-6">
     <AdminPageHeader :title="$t('admin.shell.screens.rejudge')" :lead="$t('admin.rejudge.lead')" />
-    <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:items-start">
       <RejudgeFilterForm
         v-model:filter="filter"
         :languages="languages"
@@ -56,11 +56,14 @@ function resetFilter() {
         @rescore="ask('rescore')"
         @reset="resetFilter"
       />
-      <div class="flex flex-col gap-6">
-        <RejudgeSummary :filter="filter" :languages="languages" :outcome="outcome" />
-        <RecentBatches />
-      </div>
+      <RejudgeSummary
+        class="lg:sticky lg:top-4"
+        :filter="filter"
+        :languages="languages"
+        :outcome="outcome"
+      />
     </div>
+    <RecentBatches />
     <BatchActionDialogs
       ref="dialogs"
       :body="body"
