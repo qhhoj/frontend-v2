@@ -49,8 +49,19 @@ export const requestSearchOf = (query: LocationQuery): string => boundedSearch(q
 /** The member panel's `?mq=` search (its own key: the organization list owns `q`). */
 export const memberSearchOf = (query: LocationQuery): string => boundedSearch(query.mq);
 
+/** The tabs of an open organization (`?panel=`); no or an unknown value is the info tab. */
+export const ORGANIZATION_PANELS = ['info', 'members', 'requests', 'history'] as const;
+export type OrganizationPanel = (typeof ORGANIZATION_PANELS)[number];
+export const organizationPanelOf = (query: LocationQuery): OrganizationPanel => {
+  const panel = first(query.panel);
+  return (ORGANIZATION_PANELS as readonly string[]).includes(panel)
+    ? (panel as OrganizationPanel)
+    : 'info';
+};
+
 /** Query keys that describe one organization's panels; opening another organization drops them. */
 export const PER_ORGANIZATION_RESET = {
+  panel: undefined,
   mq: undefined,
   members: undefined,
   requests: undefined,

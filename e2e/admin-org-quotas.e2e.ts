@@ -30,25 +30,24 @@ for (const viewport of AUDIT_VIEWPORTS)
       );
     });
 
-test('edits a quota and says so with the crown Bit', async ({ page, api }) => {
+test('edits a quota and says so in a toast', async ({ page, api }) => {
   signInAsStaff(api, EDIT);
   installUsageOverview(api, ROWS);
   api.routes['PATCH /organizations/lhp/quota'] = { body: { data: {} } };
   await page.goto('/admin/organizations/quotas');
-  await expect(page.locator('[data-testid="admin-bit"][data-placement="people"]')).toBeVisible();
   await page.getByRole('button', { name: 'Sửa hạn mức THPT chuyên Lê Hồng Phong' }).click();
   await dialogOf(page).getByLabel('Tín dụng mỗi tháng').fill('300');
   await confirmInDialog(page, 'Lưu hạn mức');
-  const saved = page.getByRole('status').filter({ hasText: 'Đã lưu hạn mức' });
-  await expect(saved).toBeVisible();
-  await expect(saved.getByTestId('inline-bit')).toBeVisible();
+  await expect(page.getByTestId('admin-toasts')).toContainText(
+    'Đã lưu hạn mức của THPT chuyên Lê Hồng Phong',
+  );
 });
 
 test('the admin nav links the overview', async ({ page, api }) => {
   signInAsStaff(api, EDIT);
   installUsageOverview(api, ROWS);
   await page.goto('/admin');
-  await page.getByRole('link', { name: 'Hạn mức tổ chức' }).click();
+  await page.getByTestId('admin-nav').getByRole('link', { name: 'Hạn mức tổ chức' }).click();
   await expect(page).toHaveURL(/\/admin\/organizations\/quotas$/);
 });
 

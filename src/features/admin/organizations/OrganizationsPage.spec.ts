@@ -54,9 +54,9 @@ const mountWithButton = (path: string, text: string) =>
   mountScreen(path, (wrapper) => hasButton(wrapper, text));
 const mountWithMemberMenu = (path: string) =>
   mountScreen(path, (wrapper) => wrapper.find('[data-testid="member-actions"]').exists());
-/** Opens the member row's ⋮ menu (teleported to the body) and picks `text`. */
+/** Opens the member row's ⋯ menu (teleported to the body) and picks `text`. */
 const pickMemberAction = async (wrapper: Mounted['wrapper'], text: string) => {
-  await wrapper.get('[data-testid="member-actions"]').trigger('click');
+  await wrapper.get('[data-testid="member-actions"] button').trigger('click');
   await flushPromises();
   const item = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
     (element) => element.textContent?.trim() === text,
@@ -79,7 +79,10 @@ describe('OrganizationsPage', () => {
         [`POST /organizations/lhp/requests/${request.id}/decide`]: DECIDED_CODE,
       }),
     );
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
+    const { wrapper } = await mountWithButton(
+      '/admin/organizations?org=lhp&panel=requests',
+      'Chấp nhận',
+    );
     const requestLoads = () => calls.filter((call) => call.path === '/organizations/lhp/requests');
     const before = requestLoads().length;
     await click(wrapper, 'Chấp nhận');
@@ -91,7 +94,7 @@ describe('OrganizationsPage', () => {
 
   it('kicks a member only after confirming', async () => {
     const calls = mockApi(routes({ 'POST /organizations/lhp/kick': { status: 204 } }));
-    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
+    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp&panel=members');
     await pickMemberAction(wrapper, 'Đuổi');
     expect(calls.some((call) => call.path.endsWith('/kick'))).toBe(false);
     await confirmDialog('Đuổi');
@@ -102,7 +105,7 @@ describe('OrganizationsPage', () => {
 
   it('does not show an earlier kick error when the dialog opens for another member', async () => {
     mockApi(routes({ 'POST /organizations/lhp/kick': fail(409, 'conflict') }));
-    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
+    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp&panel=members');
     await pickMemberAction(wrapper, 'Đuổi');
     await confirmDialog('Đuổi');
     expect(openDialog().querySelector('[role="alert"]')).not.toBeNull();
@@ -113,7 +116,9 @@ describe('OrganizationsPage', () => {
 
   it('offers the delete to superusers only, not to staff who may edit every organization', async () => {
     mockApi(routes());
-    const { wrapper } = await mountWithMemberMenu('/admin/organizations?org=lhp');
+    const { wrapper } = await mountScreen('/admin/organizations?org=lhp', (mounted) =>
+      mounted.find('#org-name').exists(),
+    );
     await vi.waitFor(() => {
       if (!wrapper.find<HTMLInputElement>('#org-name').element.value) throw new Error('no detail');
     });

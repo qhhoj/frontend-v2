@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query';
+import { X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { deleteUserActivity, fetchActivitySummary } from '@/api/activity-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { formatNumber, formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_DANGER_CLASS } from '../ui/classes';
+import { CARD, buttonClass, iconButtonClass } from '../ui/controls';
+import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import DailyBars from './DailyBars.vue';
 
 const props = defineProps<{ username: string; days: number }>();
-const emit = defineEmits<{ deleted: [] }>();
+const emit = defineEmits<{ deleted: []; close: [] }>();
 const locale = useLocaleStore();
 const viewer = useViewerId();
 
@@ -38,6 +39,7 @@ const isConfirmOpen = ref(false);
 const removal = useAdminMutation<void, void>({
   mutate: () => deleteUserActivity(props.username),
   invalidates: () => [['admin', 'activity'] as const],
+  successText: () => translate('admin.activity.toast.userDeleted', { username: props.username }),
   onDone: () => {
     isConfirmOpen.value = false;
     emit('deleted');
@@ -45,6 +47,7 @@ const removal = useAdminMutation<void, void>({
 });
 
 const numberOf = (value: number) => formatNumber(value, locale.locale);
+const timeOf = (value: string) => formatNumericDateTime(value, locale.locale);
 const DEVICE_LABEL_KEYS: Record<string, string> = {
   mobile: 'admin.activity.summary.mobile',
   desktop: 'admin.activity.summary.desktop',
@@ -54,11 +57,32 @@ const deviceText = (deviceType: string) => {
   const key = DEVICE_LABEL_KEYS[deviceType];
   return key ? translate(key) : deviceType;
 };
+const tops = computed(() =>
+  data.value
+    ? [
+        { key: 'topIps', entries: data.value.topIps },
+        { key: 'topPaths', entries: data.value.topPaths },
+      ]
+    : [],
+);
 </script>
 
 <template>
-  <section data-testid="user-summary" class="min-w-0">
-    <SettingsCard :title="$t('admin.activity.summary.heading', { username, days })">
+  <section data-testid="user-summary" :class="[CARD, 'relative min-w-0 @container']">
+    <button
+      type="button"
+      :class="[iconButtonClass('ghost', 'sm'), 'absolute top-3 right-3']"
+      :aria-label="$t('admin.activity.summary.close')"
+      :title="$t('admin.activity.summary.close')"
+      @click="emit('close')"
+    >
+      <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
+    </button>
+    <AdminFormSection
+      class="pr-12"
+      :title="$t('admin.activity.summary.heading', { username, days })"
+      :columns="1"
+    >
       <QueryState
         :loading="summary.isPending.value"
         :error="summary.error.value"
@@ -66,99 +90,66 @@ const deviceText = (deviceType: string) => {
       >
         <template #skeleton><SkeletonBlock class="h-72 w-full" /></template>
         <template v-if="data">
-          <p class="text-lg font-semibold">
+          <p class="m-0 text-lg font-semibold tabular-nums">
             {{ $t('admin.activity.summary.total', { total: numberOf(data.total) }) }}
           </p>
           <DailyBars :daily="data.daily" />
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <h3 class="mb-1 text-sm font-semibold">{{ $t('admin.activity.summary.topIps') }}</h3>
-              <ul class="flex flex-col gap-1 text-sm">
-                <li
-                  v-for="entry in data.topIps"
-                  :key="entry.value"
-                  class="flex justify-between gap-2"
-                >
-                  <span class="font-mono">{{ entry.value }}</span>
-                  <span class="font-mono text-muted">{{ numberOf(entry.count) }}</span>
-                </li>
-              </ul>
-            </div>
-            <div>
+          <div class="grid gap-4 @md:grid-cols-2">
+            <div v-for="top in tops" :key="top.key" class="min-w-0">
               <h3 class="mb-1 text-sm font-semibold">
-                {{ $t('admin.activity.summary.topPaths') }}
+                {{ $t(`admin.activity.summary.${top.key}`) }}
               </h3>
-              <ul class="flex flex-col gap-1 text-sm">
+              <ul class="m-0 flex list-none flex-col gap-1 p-0 text-sm">
                 <li
-                  v-for="entry in data.topPaths"
+                  v-for="entry in top.entries"
                   :key="entry.value"
                   class="flex justify-between gap-2"
                 >
-                  <span class="break-all font-mono">{{ entry.value }}</span>
-                  <span class="font-mono text-muted">{{ numberOf(entry.count) }}</span>
+                  <span class="min-w-0 font-mono break-all">{{ entry.value }}</span>
+                  <span class="font-mono text-muted tabular-nums">{{ numberOf(entry.count) }}</span>
                 </li>
               </ul>
             </div>
-          </div>
-          <h3 class="text-sm font-semibold">{{ $t('admin.activity.summary.sessions') }}</h3>
-          <div
-            class="overflow-x-auto"
-            role="region"
-            tabindex="0"
-            :aria-label="$t('admin.activity.summary.sessions')"
-          >
-            <table class="w-full text-left text-sm">
-              <thead class="text-muted">
-                <tr>
-                  <th scope="col" class="py-1 pr-3 font-semibold">
-                    {{ $t('admin.activity.summary.sessionIp') }}
-                  </th>
-                  <th scope="col" class="py-1 pr-3 font-semibold">
-                    {{ $t('admin.activity.summary.sessionDevice') }}
-                  </th>
-                  <th scope="col" class="py-1 pr-3 font-semibold">
-                    {{ $t('admin.activity.summary.sessionBrowser') }}
-                  </th>
-                  <th scope="col" class="py-1 pr-3 font-semibold">
-                    {{ $t('admin.activity.summary.sessionCreated') }}
-                  </th>
-                  <th scope="col" class="py-1 font-semibold">
-                    {{ $t('admin.activity.summary.sessionLast') }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="session in data.sessions"
-                  :key="session.id"
-                  class="border-t border-line align-top"
-                >
-                  <td class="py-2 pr-3 font-mono">{{ session.ip }}</td>
-                  <td class="py-2 pr-3">{{ deviceText(session.deviceType) }}</td>
-                  <td class="py-2 pr-3">{{ session.browser }} · {{ session.os }}</td>
-                  <td class="whitespace-nowrap py-2 pr-3">
-                    {{ formatNumericDateTime(session.createdAt, locale.locale) }}
-                  </td>
-                  <td class="whitespace-nowrap py-2">
-                    {{ formatNumericDateTime(session.lastActivityAt, locale.locale) }}
-                  </td>
-                </tr>
-                <tr v-if="data.sessions.length === 0">
-                  <td colspan="5" class="py-3 text-muted">
-                    {{ $t('admin.activity.summary.noSessions') }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="flex justify-end">
-            <button type="button" :class="ADMIN_DANGER_CLASS" @click="isConfirmOpen = true">
-              {{ $t('admin.activity.summary.delete', { username }) }}
-            </button>
           </div>
         </template>
       </QueryState>
-    </SettingsCard>
+    </AdminFormSection>
+    <AdminFormSection v-if="data" :title="$t('admin.activity.summary.sessions')" :columns="1">
+      <ul
+        v-if="data.sessions.length > 0"
+        class="m-0 flex list-none flex-col divide-y divide-line p-0 text-sm"
+      >
+        <li v-for="session in data.sessions" :key="session.id" class="flex flex-col gap-0.5 py-2">
+          <span class="flex flex-wrap items-baseline justify-between gap-x-2">
+            <span class="font-mono font-semibold">{{ session.ip }}</span>
+            <span class="text-muted">{{ deviceText(session.deviceType) }}</span>
+          </span>
+          <span>{{ session.browser }} · {{ session.os }}</span>
+          <span class="font-mono text-xs text-muted tabular-nums">
+            {{
+              $t('admin.activity.summary.sessionSpan', {
+                created: timeOf(session.createdAt),
+                last: timeOf(session.lastActivityAt),
+              })
+            }}
+          </span>
+        </li>
+      </ul>
+      <p v-else class="m-0 text-sm text-muted">{{ $t('admin.activity.summary.noSessions') }}</p>
+    </AdminFormSection>
+    <AdminFormSection
+      v-if="data"
+      :title="$t('admin.activity.summary.dangerTitle')"
+      :description="$t('admin.activity.confirm.userBody')"
+      :columns="1"
+      danger
+    >
+      <div>
+        <button type="button" :class="buttonClass('danger')" @click="isConfirmOpen = true">
+          {{ $t('admin.activity.summary.delete', { username }) }}
+        </button>
+      </div>
+    </AdminFormSection>
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
       :title="$t('admin.activity.confirm.userTitle', { username })"

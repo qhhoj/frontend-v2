@@ -1,24 +1,29 @@
 <script setup lang="ts">
 import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchActivityLogs } from '@/api/activity-admin.api';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import type { ActivityLog } from '@/api/types/activity-admin';
 import { formatNumericDateTimeSeconds } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import AdminBit from '../shell/AdminBit.vue';
+import AdminChip from '../ui/AdminChip.vue';
+import type { ChipTone } from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import { toActivityRequest } from './activity';
+import { buttonClass } from '../ui/controls';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../ui/table/table-columns';
+import { isFilteredActivity, toActivityRequest } from './activity';
 import type { ActivityFilter } from './activity';
 
 const props = defineProps<{ filter: ActivityFilter }>();
+defineEmits<{ 'clear-filters': [] }>();
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
 const viewer = useViewerId();
+const { t } = useI18n();
 /** Backend `@Max(200)` on `page`: a request for page 201 is a 400. */
 const MAX_ACTIVITY_PAGE = 200;
 const page = ref(1);
@@ -39,110 +44,88 @@ watch(
 );
 
 const rows = computed(() => logs.data.value?.items ?? []);
-const meta = computed(() => logs.data.value?.meta);
+const hasNext = computed(() => !!logs.data.value?.meta.hasMore && page.value < MAX_ACTIVITY_PAGE);
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'user', label: t('admin.activity.table.user'), priority: 'primary' },
+  { key: 'at', label: t('admin.activity.table.at'), cellClass: 'whitespace-nowrap' },
+  { key: 'ip', label: t('admin.activity.table.ip'), priority: 'meta', cellClass: 'font-mono' },
+  {
+    key: 'request',
+    label: t('admin.activity.table.request'),
+    cellClass: 'font-mono break-all min-w-48',
+  },
+  { key: 'status', label: t('admin.activity.table.status'), priority: 'badge' },
+]);
 
 /** A name opens that user's summary beside the table; the rest of the URL (the filter) stays. */
 function openSummary(username: string) {
   void router.replace({ query: { ...route.query, summary: username } });
 }
 
-const isErrorStatus = (statusCode: number) => statusCode >= 400;
+/** Server errors and refusals stand out; the text (the code) carries the meaning. */
+const toneOf = (statusCode: number): ChipTone =>
+  statusCode >= 500 ? 'negative' : statusCode >= 400 ? 'caution' : 'neutral';
+const goTo = (next: number) => (page.value = next);
 </script>
 
 <template>
-  <section data-testid="activity-table" class="flex min-w-0 flex-col gap-3">
-    <QueryState :loading="logs.isPending.value" :error="logs.error.value" @retry="logs.refetch()">
-      <template #skeleton
-        ><SkeletonBlock
-          data-skeleton-region="activity-table"
-          class="h-[63rem] w-full sm:h-[13.8rem]"
-      /></template>
-      <div
-        class="overflow-x-auto rounded-row border border-line"
-        role="region"
-        tabindex="0"
-        :aria-label="$t('admin.activity.table.caption')"
+  <AdminDataTable
+    data-testid="activity-table"
+    :columns="columns"
+    :rows="rows"
+    :row-key="(row: ActivityLog) => row.id"
+    :label="$t('admin.activity.table.caption')"
+    :loading="logs.isPending.value"
+    :error="logs.error.value"
+    :filtered="isFilteredActivity(filter)"
+    :empty-text="$t('admin.activity.table.empty')"
+    :skeleton-rows="6"
+    @retry="logs.refetch()"
+    @clear-filters="$emit('clear-filters')"
+  >
+    <template #cell-user="{ row }">
+      <button
+        v-if="row.username"
+        type="button"
+        class="max-w-full rounded-cell text-left"
+        :aria-label="$t('admin.activity.table.openSummary', { username: row.username })"
+        @click="openSummary(row.username)"
       >
-        <table class="w-full text-left text-sm">
-          <caption class="sr-only">
-            {{
-              $t('admin.activity.table.caption')
-            }}
-          </caption>
-          <thead class="bg-surface-solid text-muted">
-            <tr>
-              <th scope="col" class="px-3 py-2 font-semibold">
-                {{ $t('admin.activity.table.at') }}
-              </th>
-              <th scope="col" class="px-3 py-2 font-semibold">
-                {{ $t('admin.activity.table.user') }}
-              </th>
-              <th scope="col" class="px-3 py-2 font-semibold">
-                {{ $t('admin.activity.table.ip') }}
-              </th>
-              <th scope="col" class="px-3 py-2 font-semibold">
-                {{ $t('admin.activity.table.request') }}
-              </th>
-              <th scope="col" class="px-3 py-2 font-semibold">
-                {{ $t('admin.activity.table.status') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in rows" :key="row.id" class="border-t border-line align-top">
-              <td class="whitespace-nowrap px-3 py-2">
-                {{ formatNumericDateTimeSeconds(row.at, locale.locale) }}
-              </td>
-              <td class="px-3 py-2">
-                <button
-                  v-if="row.username"
-                  type="button"
-                  class="min-h-11 max-w-full text-left"
-                  @click="openSummary(row.username)"
-                >
-                  <AdminUserLabel :username="row.username" :link="false" />
-                </button>
-                <span v-else class="text-muted">{{ $t('admin.activity.table.guest') }}</span>
-              </td>
-              <td class="px-3 py-2 font-mono">{{ row.ip }}</td>
-              <td class="px-3 py-2 font-mono break-all">{{ row.method }} {{ row.path }}</td>
-              <td
-                class="px-3 py-2 font-mono"
-                :class="isErrorStatus(row.statusCode) ? 'text-negative' : ''"
-              >
-                {{ row.statusCode }}
-              </td>
-            </tr>
-            <tr v-if="rows.length === 0">
-              <td colspan="5" class="px-3 py-6 text-center text-muted">
-                <AdminBit placement="empty" />
-                {{ $t('admin.activity.table.empty') }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <nav class="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <span class="text-muted">{{ $t('admin.activity.table.page', { page }) }}</span>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            :class="ADMIN_BUTTON_CLASS"
-            :disabled="page <= 1"
-            @click="page -= 1"
-          >
-            {{ $t('admin.activity.table.previous') }}
-          </button>
-          <button
-            v-if="meta?.hasMore && page < MAX_ACTIVITY_PAGE"
-            type="button"
-            :class="ADMIN_BUTTON_CLASS"
-            @click="page += 1"
-          >
-            {{ $t('admin.activity.table.next') }}
-          </button>
-        </div>
-      </nav>
-    </QueryState>
-  </section>
+        <AdminUserLabel :username="row.username" :link="false" />
+      </button>
+      <span v-else class="text-muted">{{ $t('admin.activity.table.guest') }}</span>
+    </template>
+    <template #cell-status="{ row }">
+      <AdminChip :tone="toneOf(row.statusCode)" class="font-mono">{{ row.statusCode }}</AdminChip>
+    </template>
+    <template #cell-at="{ row }">
+      <time :datetime="row.at" class="font-mono text-sm tabular-nums">{{
+        formatNumericDateTimeSeconds(row.at, locale.locale)
+      }}</time>
+    </template>
+    <template #cell-request="{ row }">
+      <span class="text-muted">{{ row.method }}</span> {{ row.path }}
+    </template>
+    <template #footer>
+      <span>{{ $t('admin.activity.table.page', { page }) }}</span>
+      <span class="ml-auto flex gap-2">
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-disabled="page <= 1 || undefined"
+          @click="page > 1 && goTo(page - 1)"
+        >
+          {{ $t('admin.activity.table.previous') }}
+        </button>
+        <button
+          v-if="hasNext"
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          @click="goTo(page + 1)"
+        >
+          {{ $t('admin.activity.table.next') }}
+        </button>
+      </span>
+    </template>
+  </AdminDataTable>
 </template>

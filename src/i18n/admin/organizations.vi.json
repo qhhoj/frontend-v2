@@ -8,21 +8,18 @@
     "label": "Danh sách tổ chức",
     "name": "Tổ chức",
     "state": "Trạng thái",
-    "members": "Thành viên",
     "points": "PP",
     "open": "Mở",
     "closed": "Đóng",
     "hidden": "Ẩn",
-    "footer": "{shown} / {total} tổ chức",
     "pager": "Trang tổ chức",
-    "countMatch": "{shown} / {total} tổ chức khớp “{search}”",
-    "emptySearch": "Không có tổ chức nào khớp “{search}”. Thử rút gọn từ khóa.",
     "empty": "Chưa có tổ chức nào.",
-    "seats": "Thành viên / suất"
+    "seats": "Thành viên / suất",
+    "count": "{total} tổ chức",
+    "countMatchShort": "{total} kết quả"
   },
   "editor": {
     "createTitle": "Tạo tổ chức",
-    "editTitle": "Sửa tổ chức",
     "name": "Tên",
     "slug": "Địa chỉ (slug)",
     "slugHint": "Bắt đầu bằng chữ; chữ, số, - và _.",
@@ -33,13 +30,11 @@
     "about": "Giới thiệu (Markdown)",
     "logo": "Ảnh đại diện (URL hoặc đường dẫn)",
     "admins": "Quản trị viên (tối đa {max})",
-    "open": "Mở: ai cũng vào được",
-    "unlisted": "Ẩn khỏi danh sách (nhân viên)",
+    "open": "Mở",
+    "unlisted": "Ẩn khỏi danh sách",
     "notYours": "Bạn không quản trị tổ chức này nên không sửa được.",
-    "staffOnly": "Ẩn và số suất chỉ dành cho nhân viên có quyền sửa mọi tổ chức.",
     "createSubmit": "Tạo tổ chức mới",
     "save": "Lưu thay đổi",
-    "reset": "Huỷ",
     "logoHint": "URL http(s) hoặc đường dẫn trên trang; ảnh xem trước nằm bên trái.",
     "logoBroken": "Không tải được ảnh này. Kiểm tra lại đường dẫn trước khi lưu.",
     "logoPreview": "Xem trước ảnh đại diện",
@@ -48,7 +43,15 @@
     "createNoteStaff": "Mặc định tổ chức mới đóng và ẩn khỏi danh sách; bỏ chọn \"Ẩn\" để hiển thị ngay. Bạn là quản trị viên đầu tiên.",
     "aboutPreview": "Xem trước",
     "logoUpload": "Tải ảnh lên",
-    "logoUploadHint": "URL http(s) hoặc đường dẫn trong trang, hoặc tải lên ảnh JPG, PNG, GIF, SVG (tối đa 5 MB); bấm lưu để giữ."
+    "logoUploadHint": "URL http(s) hoặc đường dẫn trong trang, hoặc tải lên ảnh JPG, PNG, GIF, SVG (tối đa 5 MB); bấm lưu để giữ.",
+    "logoUploading": "Đang tải ảnh lên…",
+    "openHint": "Ai cũng vào được ngay, không cần xin duyệt.",
+    "saved": "Đã lưu {name}",
+    "sections": {
+      "identity": "Hồ sơ tổ chức",
+      "access": "Thành viên và hiển thị"
+    },
+    "unlistedHint": "Chỉ thành viên, quản trị viên và nhân viên thấy tổ chức trong danh sách."
   },
   "errors": {
     "name": "Tên từ 1 đến 128 ký tự.",
@@ -60,46 +63,38 @@
   },
   "requests": {
     "title": "Yêu cầu tham gia",
-    "note": "Danh sách theo từng tổ chức.",
-    "pending": "Chờ duyệt",
-    "accepted": "Đã chấp nhận",
-    "refused": "Đã từ chối",
-    "pendingCount": "{count} chờ duyệt",
-    "refuse": "Từ chối",
-    "accept": "Chấp nhận",
-    "decidedBy": "duyệt bởi {name}",
-    "empty": "Không có yêu cầu nào.",
     "pager": "Trang yêu cầu",
     "seats": "{members} / {slots} suất · còn {left}",
     "seatsOpen": "{members} thành viên · không giới hạn suất"
   },
   "members": {
     "title": "Thành viên",
-    "count": "{count} người · sắp theo điểm hiệu suất",
+    "count": "{count} thành viên",
     "kick": "Đuổi",
     "kickTitle": "Đuổi {username} khỏi {organization}?",
     "kickBody": "Người này rời tổ chức ngay; có thể xin vào lại.",
     "pager": "Trang thành viên",
-    "countMatch": "{count} người khớp “{search}”",
     "search": "Tìm thành viên",
-    "searchPlaceholder": "Tìm theo tên đăng nhập…",
     "admin": "Quản trị viên",
     "openUser": "Hồ sơ quản trị",
-    "openUserNamed": "Mở {username} trong trang người dùng",
     "empty": "Chưa có thành viên nào.",
-    "emptySearch": "Không có thành viên nào khớp “{search}”."
+    "countMatchShort": "{count} kết quả",
+    "kicked": "Đã đuổi {username}",
+    "promoted": "{username} đã là quản trị viên",
+    "demoted": "Đã bỏ quyền quản trị của {username}",
+    "points": "PP",
+    "rank": "#",
+    "role": "Vai trò"
   },
   "views": {
     "label": "Mục",
     "organizations": "Tổ chức",
-    "requests": "Yêu cầu tham gia · tất cả tổ chức",
+    "requests": "Yêu cầu tham gia",
     "pending": "{count} đang chờ duyệt",
     "quotas": "Hạn mức"
   },
   "search": {
-    "label": "Tìm tổ chức",
-    "placeholder": "Tìm tổ chức…",
-    "hint": "Khớp một phần tên, tên ngắn hoặc địa chỉ."
+    "label": "Tìm tổ chức"
   },
   "queue": {
     "title": "Yêu cầu tham gia của mọi tổ chức",
@@ -114,9 +109,8 @@
       "user": "Người xin",
       "reason": "Lý do",
       "sentAt": "Gửi lúc",
-      "actions": "Thao tác"
+      "decided": "Kết quả"
     },
-    "region": "Yêu cầu tham gia",
     "reject": "Từ chối",
     "accept": "Chấp nhận",
     "decided": {
@@ -134,9 +128,11 @@
     "alreadyDecided": "Yêu cầu này đã được người khác xử lý.",
     "decidedBy": "bởi {name}",
     "search": {
-      "label": "Tìm yêu cầu",
-      "placeholder": "Tên đăng nhập hoặc tổ chức…",
-      "hint": "Khớp một phần tên đăng nhập người xin, hoặc tên, tên ngắn, địa chỉ tổ chức."
+      "label": "Tìm yêu cầu"
+    },
+    "toast": {
+      "A": "Đã chấp nhận {name}",
+      "R": "Đã từ chối {name}"
     }
   },
   "filters": {
@@ -164,10 +160,6 @@
     "recalculateQueued": "Đã xếp hàng tính lại; số liệu cập nhật sau ít phút."
   },
   "bulk": {
-    "selectPage": "Chọn cả trang",
-    "selectColumn": "Chọn",
-    "selectNamed": "Chọn yêu cầu của {username}",
-    "selected": "Đã chọn {count}",
     "accept": "Chấp nhận đã chọn",
     "reject": "Từ chối đã chọn",
     "done": "Đã xử lý {count} yêu cầu.",
@@ -210,6 +202,18 @@
     "button": "Xoá tổ chức",
     "dialogTitle": "Xoá {name}?",
     "typeSlug": "Nhập địa chỉ {slug} để xác nhận",
-    "confirm": "Xoá"
+    "confirm": "Xoá",
+    "done": "Đã xoá tổ chức {slug}"
+  },
+  "detail": {
+    "back": "Tất cả tổ chức",
+    "close": "Đóng tổ chức"
+  },
+  "panels": {
+    "label": "Mục của tổ chức",
+    "info": "Thông tin",
+    "members": "Thành viên",
+    "requests": "Yêu cầu",
+    "history": "Lịch sử"
   }
 }

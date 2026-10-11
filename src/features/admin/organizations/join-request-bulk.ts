@@ -35,27 +35,17 @@ export async function decideInTurn<Item>(
   return outcome;
 }
 
-/** The ticked requests of the visible page; a page change or a refresh drops ticks on rows that are gone. */
+/**
+ * The ticked requests of the visible page (`ticked` is the table's selection model); a page change or a refresh drops ticks
+ * on rows that are gone, and only pending requests count.
+ */
 export function useJoinRequestSelection(rows: () => readonly JoinRequest[]) {
   const ticked = ref<Set<string>>(new Set());
   const pending = computed(() => rows().filter((row) => row.state === 'P'));
   const selected = computed(() => pending.value.filter((row) => ticked.value.has(row.id)));
-  const isAllTicked = computed(
-    () => pending.value.length > 0 && selected.value.length === pending.value.length,
-  );
-
-  function toggle(id: string) {
-    const next = new Set(ticked.value);
-    if (!next.delete(id)) next.add(id);
-    ticked.value = next;
-  }
-  function toggleAll() {
-    ticked.value = isAllTicked.value ? new Set() : new Set(pending.value.map((row) => row.id));
-  }
   const clear = () => (ticked.value = new Set());
-
   const hasPending = computed(() => pending.value.length > 0);
-  return { ticked, selected, isAllTicked, hasPending, toggle, toggleAll, clear };
+  return { ticked, selected, hasPending, clear };
 }
 
 /** Decides every selected request through its own organization's endpoint. */

@@ -81,7 +81,7 @@ describe('QuotaOverviewPage', () => {
       quotaMonthlyCredits: null,
       quotaStorageBytes: 1024 * MIB,
     });
-    expect(wrapper.get('[role="status"]').text()).toContain(
+    expect(document.querySelector('[data-testid="admin-toasts"]')?.textContent).toContain(
       'Đã lưu hạn mức của THPT chuyên Lê Hồng Phong',
     );
     expect(overviewCalls(calls).length).toBeGreaterThan(1);

@@ -32,6 +32,10 @@ export function useOrganizationEditor(
   const { baseline, form, seed } = useOrganizationFormState(() => detail?.data.value);
   const write = useOrganizationSave(seed, onSaved);
   const clientErrors = ref<FieldErrors>({});
+  /** The fields a save would send: the save bar's "3 thay đổi chưa lưu". */
+  const dirtyCount = computed(
+    () => Object.keys(changedOrganizationFields(baseline.value, form, canEditAll.value)).length,
+  );
 
   /** What a save would send, or null when an edit changed nothing. */
   function requestOf(): SaveRequest | null {
@@ -60,6 +64,7 @@ export function useOrganizationEditor(
     isCreate,
     canEditAll,
     isReadOnly,
+    dirtyCount,
     errors: computed<FieldErrors>(() => ({
       ...clientErrors.value,
       ...write.fieldErrors.value,

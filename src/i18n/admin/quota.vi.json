@@ -2,10 +2,17 @@
   "lead": "Tín dụng tháng này và dung lượng dữ liệu của từng tổ chức. Để trống một hạn mức để dùng mặc định của site.",
   "tableCaption": "Hạn mức các tổ chức",
   "sortLabel": "Sắp xếp",
-  "sortName": "Tên tổ chức",
-  "sortCredits": "Tín dụng đã dùng",
-  "columns": { "organization": "Tổ chức", "credits": "Tín dụng tháng", "storage": "Dung lượng" },
+  "sort": {
+    "name": "Tên",
+    "credits": "Tín dụng đã dùng"
+  },
+  "columns": {
+    "organization": "Tổ chức",
+    "credits": "Tín dụng tháng",
+    "storage": "Dung lượng"
+  },
   "percent": "{percent}%",
+  "meterLabel": "{meter} của {name}",
   "edit": "Sửa",
   "editLabel": "Sửa hạn mức {name}",
   "editTitle": "Hạn mức của {name}",

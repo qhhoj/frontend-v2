@@ -1,35 +1,38 @@
 import { computed } from 'vue';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
-import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
+import type { AdminTab } from '../ui/AdminTabs.vue';
 import { ORGANIZATION_QUEUE_PERMISSION, useAllJoinRequestsQuery } from './join-requests.queries';
 
-/** The organizations, join-request queue and quotas views: one tab row on the organizations page and the quotas page. */
+/**
+ * The page tabs shared by the organizations page and the quotas page: Tổ chức · Yêu cầu (pending count) · Hạn mức.
+ * A tab the viewer may not open is left out.
+ */
 export function useOrganizationViewTabs() {
   const { can } = usePermissions();
   const canSeeQueue = computed(() => can(ORGANIZATION_QUEUE_PERMISSION));
   const canSeeQuotas = computed(() => can('judge.edit_all_organization'));
   const pending = useAllJoinRequestsQuery('P', 1);
   const pendingTotal = computed(() => pending.data.value?.meta.total ?? 0);
-  const requestsTab = (): AdminFilterTab => ({
+  const requestsTab = (): AdminTab => ({
     key: 'requests',
-    label: translate('admin.organizations.views.requests'),
+    labelKey: 'admin.organizations.views.requests',
     to: { name: 'admin-organizations', query: { view: 'requests' } },
     testid: 'view-requests',
-    count: pendingTotal.value,
+    count: pendingTotal.value > 0 ? pendingTotal.value : null,
     countLabel: translate('admin.organizations.views.pending', { count: pendingTotal.value }),
     countTestid: 'pending-count',
   });
-  const quotasTab = (): AdminFilterTab => ({
+  const quotasTab = (): AdminTab => ({
     key: 'quotas',
-    label: translate('admin.organizations.views.quotas'),
+    labelKey: 'admin.organizations.views.quotas',
     to: { name: 'admin-organizationQuotas' },
     testid: 'view-quotas',
   });
-  const tabs = computed<AdminFilterTab[]>(() => [
+  const tabs = computed<AdminTab[]>(() => [
     {
       key: 'organizations',
-      label: translate('admin.organizations.views.organizations'),
+      labelKey: 'admin.organizations.views.organizations',
       to: { name: 'admin-organizations' },
       testid: 'view-organizations',
     },

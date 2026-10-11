@@ -37,6 +37,10 @@ const filledText = (filter: ActivityFilter): Record<string, string> =>
       .map((field) => [field, filter[field]]),
   );
 
+/** Any text field is set: an empty log is then the filter's doing. */
+export const isFilteredActivity = (filter: ActivityFilter) =>
+  Object.keys(filledText(filter)).length > 0;
+
 /** The request for the API: empty text fields are left out; the key order is user, ip, path, days. */
 export const toActivityRequest = (filter: ActivityFilter) => ({
   ...filledText(filter),
