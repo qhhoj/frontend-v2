@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pencil, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { deleteAnnouncement, resendAnnouncement } from '@/api/contest-editing.api';
 import type { Announcement } from '@/api/types/contest-editing';
@@ -8,8 +9,10 @@ import { formatDateTime } from '@/lib/format';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
 import { failureTextOf } from '../../ui/admin-errors';
+import { CARD, buttonClass } from '../../ui/controls';
+import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
+import type { RowMenuItem } from '../../ui/table/AdminRowMenu.vue';
 import AnnouncementEditForm from './AnnouncementEditForm.vue';
 import { composeHeading } from './composer-heading';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -25,7 +28,6 @@ const props = defineProps<{
 const locale = useLocaleStore();
 const isConfirmOpen = ref(false);
 const isEditing = ref(false);
-const isResent = ref(false);
 const listKey = (): AdminQueryKey => ['admin', 'contest-announcements', props.contestKey];
 const when = computed(() =>
   props.isJustPosted
@@ -35,29 +37,58 @@ const when = computed(() =>
 
 const resend = useAdminMutation({
   mutate: () => resendAnnouncement(props.contestKey, props.announcement.id),
-  onDone: () => {
-    isResent.value = true;
-  },
+  successText: () => translate('admin.contests.announcements.resent'),
 });
 const remove = useAdminMutation({
   mutate: () => deleteAnnouncement(props.contestKey, props.announcement.id),
   invalidates: () => [listKey(), ['contests', 'announcements']],
+  successText: () =>
+    translate('admin.contestOps.announcements.deleted', { title: props.announcement.title }),
   onDone: () => {
     isConfirmOpen.value = false;
   },
 });
 
-async function resendNow() {
-  isResent.value = false;
-  await resend.run(undefined);
-}
+/** Resend only exists with the live channel on; delete is last (destructive, confirmed). */
+const menuItems = computed<RowMenuItem[]>(() => [
+  ...(props.isPushedLive
+    ? [
+        {
+          label: translate('admin.contests.announcements.resend'),
+          icon: Send,
+          run: () => void resend.run(undefined),
+        },
+      ]
+    : []),
+  {
+    label: translate('admin.contests.announcements.delete'),
+    icon: Trash2,
+    danger: true,
+    run: () => {
+      remove.reset();
+      isConfirmOpen.value = true;
+    },
+  },
+]);
 </script>
 
 <template>
-  <article class="glass flex flex-col gap-3 rounded-panel p-5">
-    <header class="flex flex-wrap items-baseline justify-between gap-2">
-      <h3 class="font-display text-lg font-semibold">{{ announcement.title }}</h3>
-      <time class="text-sm text-muted" :datetime="announcement.createdAt">{{ when }}</time>
+  <article :class="[CARD, 'flex flex-col gap-3 p-5']">
+    <header class="flex items-start justify-between gap-3">
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <h3 class="m-0 text-base font-semibold break-words">{{ announcement.title }}</h3>
+        <time class="text-xs text-muted" :datetime="announcement.createdAt">{{ when }}</time>
+      </div>
+      <div v-if="!isEditing" class="flex shrink-0 items-center gap-1">
+        <button type="button" :class="buttonClass('ghost', 'sm')" @click="isEditing = true">
+          <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
+          {{ $t('admin.contestOps.announcements.edit') }}
+        </button>
+        <AdminRowMenu
+          :items="menuItems"
+          :label="$t('admin.contestOps.announcements.more', { title: announcement.title })"
+        />
+      </div>
     </header>
     <AnnouncementEditForm
       v-if="isEditing"
@@ -66,26 +97,11 @@ async function resendNow() {
       @close="isEditing = false"
     />
     <UserContent v-else :html="announcement.descriptionHtml" />
-    <div v-if="!isEditing" class="flex flex-wrap items-center gap-3">
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="isEditing = true">
-        {{ $t('admin.contestOps.announcements.edit') }}
-      </button>
-      <button v-if="isPushedLive" type="button" :class="ADMIN_BUTTON_CLASS" @click="resendNow">
-        {{ $t('admin.contests.announcements.resend') }}
-      </button>
-      <button type="button" :class="ADMIN_DANGER_CLASS" @click="isConfirmOpen = true">
-        {{ $t('admin.contests.announcements.delete') }}
-      </button>
-      <AdminStatus v-if="isResent" kind="done" :text="$t('admin.contests.announcements.resent')" />
-      <AdminStatus
-        v-if="resend.failure.value"
-        kind="refused"
-        :text="failureTextOf(resend.failure.value)"
-      />
-      <p v-if="!isPushedLive" class="basis-full text-xs text-muted">
-        {{ $t('admin.contestOps.announcements.resendHidden') }}
-      </p>
-    </div>
+    <AdminStatus
+      v-if="resend.failure.value"
+      kind="refused"
+      :text="failureTextOf(resend.failure.value)"
+    />
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
       :title="$t('admin.contests.announcements.deleteTitle', { title: announcement.title })"

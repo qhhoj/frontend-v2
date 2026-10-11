@@ -3,10 +3,11 @@ import { ref, watch } from 'vue';
 import { addParticipation } from '@/api/contest-admin.api';
 import type { AddParticipationBody } from '@/api/contest-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { translate } from '@/i18n';
 import AdminField from '../../ui/AdminField.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
-import { fromLocalInput } from '../../ui/datetime';
+import { INPUT } from '../../ui/controls';
+import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 /** Adds a user's live participation or a new virtual run by hand; an empty start lets the server pick its default. */
@@ -15,15 +16,17 @@ const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ added: [username: string] }>();
 const username = ref('');
 const kind = ref<AddParticipationBody['kind']>('live');
-const typedStart = ref('');
+const start = ref<string | null>(null);
 
 const mutation = useAdminMutation({
   mutate: () =>
     addParticipation(props.contestKey, {
       user: username.value.trim(),
       kind: kind.value,
-      realStart: fromLocalInput(typedStart.value) ?? undefined,
+      realStart: start.value ?? undefined,
     }),
+  successText: () =>
+    translate('admin.contestOps.participants.added', { username: username.value.trim() }),
   invalidates: () => [
     ['admin', 'participations', props.contestKey],
     ['admin', 'contest', props.contestKey],
@@ -39,7 +42,7 @@ watch(visible, (isOpen) => {
   mutation.reset();
   username.value = '';
   kind.value = 'live';
-  typedStart.value = '';
+  start.value = null;
 });
 </script>
 
@@ -63,7 +66,7 @@ watch(visible, (isOpen) => {
           <input
             :id="id"
             v-model="username"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
             autocomplete="off"
@@ -76,29 +79,30 @@ watch(visible, (isOpen) => {
           {{ $t('admin.contestOps.participants.kindLabel') }}
         </legend>
         <label class="flex min-h-11 items-center gap-2">
-          <input v-model="kind" type="radio" value="live" class="size-5" />
+          <input
+            v-model="kind"
+            type="radio"
+            value="live"
+            class="size-4 accent-[var(--qh-accent)]"
+          />
           {{ $t('admin.contestOps.participants.kindLive') }}
         </label>
         <label class="flex min-h-11 items-center gap-2">
-          <input v-model="kind" type="radio" value="virtual" class="size-5" />
+          <input
+            v-model="kind"
+            type="radio"
+            value="virtual"
+            class="size-4 accent-[var(--qh-accent)]"
+          />
           {{ $t('admin.contestOps.participants.kindVirtual') }}
         </label>
       </fieldset>
-      <AdminField
+      <AdminDateTimeField
+        v-model="start"
         input-id="add-participation-start"
         :label="$t('admin.contestOps.participants.startLabel')"
         :hint="$t('admin.contestOps.participants.startHint')"
-      >
-        <template #default="{ id, describedBy }">
-          <input
-            :id="id"
-            v-model="typedStart"
-            type="datetime-local"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-          />
-        </template>
-      </AdminField>
+      />
     </div>
     <template #error>
       <p

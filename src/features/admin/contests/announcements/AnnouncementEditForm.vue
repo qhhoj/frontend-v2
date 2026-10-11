@@ -5,7 +5,8 @@ import type { Announcement } from '@/api/types/contest-editing';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { INPUT, buttonClass } from '../../ui/controls';
+import { translate } from '@/i18n';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import AnnouncementPreview from './AnnouncementPreview.vue';
 
@@ -25,6 +26,7 @@ const save = useAdminMutation({
     ['admin', 'contest-announcements', props.contestKey],
     ['contests', 'announcements'],
   ],
+  successText: () => translate('admin.contestOps.announcements.saved'),
   onDone: () => emit('close'),
 });
 </script>
@@ -40,7 +42,7 @@ const save = useAdminMutation({
         <input
           :id="id"
           v-model="title"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
@@ -56,24 +58,23 @@ const save = useAdminMutation({
           :id="id"
           v-model="description"
           rows="6"
-          :class="ADMIN_INPUT_CLASS"
-          class="py-2"
+          :class="[INPUT, 'py-2']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
       </template>
     </AdminField>
     <AnnouncementPreview :contest-key="contestKey" :markdown="description" />
-    <p class="text-sm text-muted">{{ $t('admin.contestOps.announcements.editNote') }}</p>
+    <p class="m-0 text-sm text-muted">{{ $t('admin.contestOps.announcements.editNote') }}</p>
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="submit"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="buttonClass('primary')"
         :aria-busy="save.isPending.value || undefined"
       >
         {{ $t('admin.ui.save') }}
       </button>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('close')">
+      <button type="button" :class="buttonClass('ghost')" @click="emit('close')">
         {{ $t('admin.contestOps.cancel') }}
       </button>
       <AdminStatus

@@ -4,6 +4,7 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminBit from '../../shell/AdminBit.vue';
+import { CARD } from '../../ui/controls';
 import GhostCurrentCard from './GhostCurrentCard.vue';
 import GhostImportCard from './GhostImportCard.vue';
 import { useGhostsQuery } from './ghosts.queries';
@@ -20,19 +21,19 @@ const ghosts = computed(() => data.value?.ghosts ?? []);
   <p
     v-if="!isSupported"
     data-testid="ghost-unsupported"
-    class="glass flex flex-wrap items-center gap-3 rounded-panel p-5"
+    :class="[CARD, 'flex flex-wrap items-center gap-3 p-5']"
   >
     <AdminBit placement="forbidden" />
     <span>{{ $t('admin.ghosts.unsupported') }}</span>
   </p>
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton>
-      <div data-ghost-part="grid" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div data-ghost-part="grid" class="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
         <SkeletonBlock data-skeleton-region="ghost-import" class="h-80 w-full" />
         <SkeletonBlock data-skeleton-region="ghost-current" class="h-80 w-full" />
       </div>
     </template>
-    <div data-ghost-part="grid" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div data-ghost-part="grid" class="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
       <GhostImportCard :contest-key="contest.key" :current-count="ghosts.length" />
       <GhostCurrentCard :contest-key="contest.key" :ghosts="ghosts" />
     </div>

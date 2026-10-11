@@ -87,14 +87,10 @@
     "kindVirtual": "Thi ảo (một lượt mới)",
     "startLabel": "Bắt đầu",
     "startHint": "Để trống: lấy thời điểm hiện tại khi kỳ thi đang diễn ra, nếu không thì lấy giờ bắt đầu kỳ thi (trực tiếp) hoặc hiện tại (thi ảo).",
-    "manage": "Quản lý",
-    "tiebreaker": "Phân định hòa",
-    "end": "Kết thúc",
     "moveStart": "Đổi giờ bắt đầu",
     "moveStartTitle": "Đổi giờ bắt đầu của {username}?",
     "moveStartBody": "Thí sinh thi có giới hạn thời gian sẽ có khung giờ mới từ thời điểm này. Lượt tham gia được tính lại.",
     "recompute": "Tính lại",
-    "recomputeQueued": "Đã xếp hàng tính lại.",
     "delete": "Xóa",
     "deleteTitle": "Xóa lượt tham gia của {username}?",
     "deleteBody": "Chỉ xóa được lượt tham gia chưa có bài nộp. Với người đã nộp bài, hãy loại khỏi bảng.",
@@ -115,13 +111,30 @@
         "all": "Thứ tự tham gia",
         "score": "Điểm (cao trước)"
       }
-    }
+    },
+    "added": "Đã thêm lượt tham gia của {username}.",
+    "restored": "Đã khôi phục {username}.",
+    "recomputeQueuedFor": "Đã xếp hàng tính lại điểm của {username}.",
+    "disqualified": "Đã loại {username} khỏi bảng.",
+    "startMoved": "Đã đổi giờ bắt đầu của {username}.",
+    "deleted": "Đã xoá lượt tham gia của {username}.",
+    "deleteConfirm": "Xoá lượt tham gia",
+    "more": "Thao tác khác với lượt tham gia của {username}",
+    "chips": {
+      "kind": "Loại: {value}",
+      "status": "Trạng thái: {value}",
+      "sort": "Sắp xếp: {value}",
+      "user": "Chỉ {value}"
+    },
+    "tiebreakerOf": "Phân định hòa: {value}"
   },
   "announcements": {
     "edit": "Sửa",
     "editNote": "Bản sửa giữ nguyên thời gian đăng và không được gửi lại. Dùng gửi lại để thông báo.",
     "previewLabel": "Xem trước",
     "previewEmpty": "Chưa có gì để xem trước.",
-    "resendHidden": "Nút gửi lại bị ẩn vì kỳ thi chưa bật gửi qua kênh trực tiếp (tab Thông tin chung)."
+    "more": "Thao tác khác với thông báo “{title}”",
+    "deleted": "Đã xoá thông báo “{title}”.",
+    "saved": "Đã lưu thông báo."
   }
 }

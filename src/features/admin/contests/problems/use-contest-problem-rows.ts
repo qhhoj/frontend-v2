@@ -20,6 +20,21 @@ import { useAddProblem } from './use-add-problem';
 
 const bodyJson = (rows: ProblemRow[]) => JSON.stringify(toProblemsBody(rows));
 
+/** How many problems differ from the saved list: added, removed, moved or edited, each counted once. */
+export function changedProblemCount(saved: ProblemRow[], current: ProblemRow[]): number {
+  const entryOf = (rows: ProblemRow[]) =>
+    new Map(
+      toProblemsBody(rows).map((entry, index) => [
+        rows[index]!.problemId,
+        JSON.stringify({ ...entry, index }),
+      ]),
+    );
+  const before = entryOf(saved);
+  const after = entryOf(current);
+  const ids = new Set([...before.keys(), ...after.keys()]);
+  return [...ids].filter((id) => before.get(id) !== after.get(id)).length;
+}
+
 /** A row's own refusal first (points cleared or out of range), then the first server message about that row (`problems.<index>.<field>`). */
 function rowIssueOf(
   rows: ProblemRow[],
@@ -38,22 +53,29 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const viewer = useViewerId();
   const queryClient = useQueryClient();
   const rows = ref<ProblemRow[]>(toProblemRows(contest()));
-  const seedJson = ref(bodyJson(rows.value));
+  const seedRows = ref<ProblemRow[]>(toProblemRows(contest()));
+  const seedJson = computed(() => bodyJson(seedRows.value));
   const isDirty = computed(() => bodyJson(rows.value) !== seedJson.value);
+  const dirtyCount = computed(() =>
+    isDirty.value ? Math.max(1, changedProblemCount(seedRows.value, rows.value)) : 0,
+  );
+  const savedAt = ref<Date | null>(null);
   const adding = useAddProblem(rows);
 
   function reseed(saved: EditableContest) {
     rows.value = toProblemRows(saved);
-    seedJson.value = bodyJson(rows.value);
+    seedRows.value = toProblemRows(saved);
   }
 
   const mutation = useAdminMutation({
     mutate: (listed: ProblemRow[]) =>
       updateContest(contest().key, { problems: toProblemsBody(listed) }),
     invalidates: () => [PUBLIC_CONTESTS_KEY],
+    successText: () => translate('admin.contests.problems.saved'),
     onDone: (saved: EditableContest) => {
       queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved);
       reseed(saved);
+      savedAt.value = new Date();
     },
   });
 
@@ -71,7 +93,13 @@ export function useContestProblemRows(contest: () => EditableContest) {
     rows,
     ...adding,
     isDirty,
+    dirtyCount,
+    savedAt,
     mutation,
+    discard: () => {
+      rows.value = seedRows.value.map((row) => ({ ...row }));
+      mutation.reset();
+    },
     issueFor: issueOf,
     move: (index: number, delta: -1 | 1) => (rows.value = moveRow(rows.value, index, delta)),
     moveTo: (index: number, target: number) => (rows.value = moveRowTo(rows.value, index, target)),

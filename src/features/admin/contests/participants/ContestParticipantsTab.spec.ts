@@ -6,16 +6,17 @@ import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { contestEditorRoutes, participation } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
-/** The row's editor actions sit in its detail row, opened by the "Quản lý" disclosure. */
-async function openManage(wrapper: {
-  findAll: (
-    selector: string,
-  ) => { text: () => string; trigger: (event: string) => Promise<unknown> }[];
-}) {
-  await wrapper
-    .findAll('button')
-    .find((button) => button.text().startsWith('Quản lý'))!
-    .trigger('click');
+/** Opens a row's "⋯" menu and picks an item (the menu renders into the body). */
+async function pickRowAction(
+  wrapper: { get: (selector: string) => { trigger: (event: string) => Promise<unknown> } },
+  item: string,
+) {
+  await wrapper.get('button[aria-label^="Thao tác khác với lượt tham gia"]').trigger('click');
+  await flushPromises();
+  const entry = [...document.body.querySelectorAll('[role="menuitem"]')].find((node) =>
+    node.textContent?.includes(item),
+  );
+  (entry!.querySelector('a') as HTMLElement).click();
   await flushPromises();
 }
 
@@ -46,12 +47,8 @@ describe('ContestParticipantsTab', () => {
     );
     expect(wrapper.text()).toContain('214 lượt tham gia · 50 mỗi trang');
     expect(wrapper.get('tbody tr').text()).toContain('Trực tiếp');
-    await openManage(wrapper);
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Loại khỏi bảng')!
-      .trigger('click');
-    await flushPromises();
+    expect(wrapper.get('tbody tr').text()).toContain('Hợp lệ');
+    await pickRowAction(wrapper, 'Loại khỏi bảng');
     expect(calls.some((call) => call.path.endsWith('/disqualify'))).toBe(false);
     await confirmDialog('Loại khỏi bảng');
     expect(calls.find((call) => call.path.endsWith('/disqualify'))?.body).toEqual({
@@ -76,12 +73,6 @@ describe('ContestParticipantsTab', () => {
     }),
   });
   const COUNT_LINE = '214 lượt tham gia · 50 mỗi trang';
-  const disqualifyButton = (wrapper: {
-    findAll: (
-      selector: string,
-    ) => { text: () => string; trigger: (event: string) => Promise<unknown> }[];
-  }) => wrapper.findAll('button').find((button) => button.text() === 'Loại khỏi bảng')!;
-
   it('refetches the contest settings and marks the ranking stale after a disqualify, so a later General save cannot un-ban the user', async () => {
     const calls = mockApi(disqualifyRoutes());
     const { wrapper, queryClient } = await mountAndWaitFor(
@@ -93,8 +84,7 @@ describe('ContestParticipantsTab', () => {
     const before = contestReads();
     const ranking = [['contests', 'ranking', 'probe', 'hcmus-w41']];
     seedCache(queryClient, ranking);
-    await openManage(wrapper);
-    await disqualifyButton(wrapper).trigger('click');
+    await pickRowAction(wrapper, 'Loại khỏi bảng');
     await confirmDialog('Loại khỏi bảng');
     await flushPromises();
     expect(contestReads()).toBeGreaterThan(before);

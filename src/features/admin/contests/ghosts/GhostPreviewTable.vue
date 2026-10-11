@@ -1,37 +1,47 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Ghost } from '@/api/types/contest-ghosts';
+import AdminDataTable from '../../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../../ui/table/table-columns';
 import { ghostStatusKey, PREVIEW_ROW_LIMIT } from './ghost-import';
 
-/** A ghost set as rows: label, caption, filled cells, status (ranked or why not). */
+/** A ghost set as rows: label, caption, filled cells, status (ranked or why not); cards on a phone. */
 const props = defineProps<{ ghosts: Ghost[]; label: string }>();
+const { t } = useI18n();
 const shown = computed(() => props.ghosts.slice(0, PREVIEW_ROW_LIMIT));
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'label', label: t('admin.ghosts.preview.columns.label'), priority: 'primary' },
+  { key: 'caption', label: t('admin.ghosts.preview.columns.caption'), priority: 'secondary' },
+  {
+    key: 'cells',
+    label: t('admin.ghosts.preview.columns.cells'),
+    priority: 'secondary',
+    align: 'end',
+  },
+  { key: 'status', label: t('admin.ghosts.preview.columns.status'), priority: 'secondary' },
+]);
 </script>
 
 <template>
-  <div class="overflow-x-auto" tabindex="0" role="region" :aria-label="label">
-    <table class="w-full min-w-[440px] text-sm">
-      <thead class="text-left text-muted">
-        <tr>
-          <th scope="col" class="px-2 py-2">{{ $t('admin.ghosts.preview.columns.label') }}</th>
-          <th scope="col" class="px-2 py-2">{{ $t('admin.ghosts.preview.columns.caption') }}</th>
-          <th scope="col" class="px-2 py-2">{{ $t('admin.ghosts.preview.columns.cells') }}</th>
-          <th scope="col" class="px-2 py-2">{{ $t('admin.ghosts.preview.columns.status') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="ghost in shown" :key="ghost.label" class="border-t border-line">
-          <td class="px-2 py-2 font-semibold">{{ ghost.label }}</td>
-          <td class="px-2 py-2">{{ ghost.caption }}</td>
-          <td class="px-2 py-2 font-mono">{{ ghost.cells.length }}</td>
-          <td class="px-2 py-2" :class="ghost.isUnranked && 'text-muted'">
-            {{ $t(ghostStatusKey(ghost)) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-if="ghosts.length > shown.length" class="px-2 pt-2 text-sm text-muted">
-      {{ $t('admin.ghosts.preview.more', { shown: shown.length, count: ghosts.length }) }}
-    </p>
-  </div>
+  <AdminDataTable
+    :columns="columns"
+    :rows="shown"
+    :row-key="(ghost: Ghost) => ghost.label"
+    :label="label"
+    max-height="28rem"
+  >
+    <template #cell-label="{ row }"
+      ><span class="font-semibold">{{ row.label }}</span></template
+    >
+    <template #cell-cells="{ row }">{{ row.cells.length }}</template>
+    <template #cell-status="{ row }">
+      <span :class="row.isUnranked && 'text-muted'">{{ $t(ghostStatusKey(row)) }}</span>
+    </template>
+    <template v-if="ghosts.length > shown.length" #footer>
+      <span>{{
+        $t('admin.ghosts.preview.more', { shown: shown.length, count: ghosts.length })
+      }}</span>
+    </template>
+  </AdminDataTable>
 </template>

@@ -8,7 +8,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 /**
@@ -89,8 +89,8 @@ const count = (value: number) => formatNumber(value, locale.locale);
 </script>
 
 <template>
-  <section data-testid="problem-ops" class="glass flex flex-col gap-3 rounded-panel p-5">
-    <h3 class="font-display text-lg font-semibold">
+  <section data-testid="problem-ops" :class="[CARD, 'flex flex-col gap-3 p-5']">
+    <h3 class="m-0 text-base font-semibold">
       {{ $t('admin.contestOps.problemOps.title') }}
     </h3>
     <p class="text-sm text-muted">{{ $t('admin.contestOps.problemOps.description') }}</p>
@@ -102,7 +102,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
         <label for="problem-ops-code" class="text-sm font-semibold">
           {{ $t('admin.contestOps.problemOps.problemLabel') }}
         </label>
-        <select id="problem-ops-code" v-model="selectedCode" :class="ADMIN_INPUT_CLASS">
+        <select id="problem-ops-code" v-model="selectedCode" :class="INPUT">
           <option v-for="entry in problems" :key="entry.code" :value="entry.code">
             {{ entry.label }} · {{ entry.name }} ({{ entry.code }})
           </option>
@@ -110,13 +110,18 @@ const count = (value: number) => formatNumber(value, locale.locale);
       </div>
       <button
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="buttonClass('secondary')"
         :aria-busy="rescore.isPending.value || undefined"
         @click="rescore.run(undefined)"
       >
         {{ $t('admin.contestOps.problemOps.rescore') }}
       </button>
-      <button v-if="canRejudge" type="button" :class="ADMIN_DANGER_CLASS" @click="openRejudge">
+      <button
+        v-if="canRejudge"
+        type="button"
+        :class="buttonClass('secondary')"
+        @click="openRejudge"
+      >
         {{ $t('admin.contestOps.problemOps.rejudge') }}
       </button>
     </div>
@@ -148,7 +153,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
       v-model:visible="isRejudgeOpen"
       :title="$t('admin.contestOps.problemOps.rejudgeTitle', { label: selected?.label ?? '' })"
       :confirm-label="$t('admin.contestOps.problemOps.rejudgeConfirm')"
-      tone="danger"
+      tone="neutral"
       :busy="rejudge.isPending.value"
       :can-confirm="canConfirmRejudge"
       @confirm="rejudge.run(undefined)"

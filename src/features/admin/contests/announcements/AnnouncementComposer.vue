@@ -5,7 +5,8 @@ import type { Announcement } from '@/api/types/contest-editing';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
+import { translate } from '@/i18n';
 import { failureTextOf } from '../../ui/admin-errors';
 import AnnouncementPreview from './AnnouncementPreview.vue';
 import { COMPOSE_HEADING_ID } from './composer-heading';
@@ -23,6 +24,7 @@ const post = useAdminMutation({
     ['admin', 'contest-announcements', props.contestKey],
     ['contests', 'announcements'],
   ],
+  successText: () => translate('admin.contests.announcements.posted'),
   onDone: (created: Announcement) => {
     title.value = '';
     description.value = '';
@@ -35,10 +37,14 @@ const submit = () => post.run({ title: title.value, description: description.val
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-4 rounded-panel p-5">
+  <form
+    :class="[CARD, 'flex flex-col gap-4 p-5 xl:sticky xl:top-16']"
+    novalidate
+    @submit.prevent="submit"
+  >
     <header class="flex items-center gap-3">
       <AdminBit placement="composing" />
-      <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="font-display text-base font-bold">
+      <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="m-0 text-base font-semibold">
         {{ $t('admin.contests.announcements.composeTitle') }}
       </h2>
     </header>
@@ -52,7 +58,7 @@ const submit = () => post.run({ title: title.value, description: description.val
         <input
           :id="id"
           v-model="title"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
@@ -68,7 +74,7 @@ const submit = () => post.run({ title: title.value, description: description.val
           :id="id"
           v-model="description"
           rows="6"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'py-2']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
         />
@@ -79,7 +85,7 @@ const submit = () => post.run({ title: title.value, description: description.val
       :contest-key="contestKey"
       :markdown="description"
     />
-    <p class="text-sm text-muted">
+    <p class="m-0 text-sm text-muted">
       {{
         isPushedLive
           ? $t('admin.contests.announcements.pushOn')
@@ -87,19 +93,18 @@ const submit = () => post.run({ title: title.value, description: description.val
       }}
     </p>
     <div class="flex flex-wrap items-center gap-3">
-      <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="submit">
+      <button
+        type="submit"
+        :class="buttonClass('primary')"
+        :aria-busy="post.isPending.value || undefined"
+      >
         {{ $t('admin.contests.announcements.post') }}
       </button>
-      <AdminStatus
-        v-if="post.isDone.value"
-        kind="done"
-        :text="$t('admin.contests.announcements.posted')"
-      />
       <AdminStatus
         v-if="post.failure.value"
         kind="refused"
         :text="failureTextOf(post.failure.value)"
       />
     </div>
-  </section>
+  </form>
 </template>

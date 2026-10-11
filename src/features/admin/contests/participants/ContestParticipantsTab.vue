@@ -1,33 +1,55 @@
 <script setup lang="ts">
-import BulkSelectionBar from '../../ui/BulkSelectionBar.vue';
-import { computed, ref, watch } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
+import { UserPlus } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { fetchParticipations, PARTICIPATIONS_PAGE_SIZE } from '@/api/contest-editing.api';
-import type { BulkDisqualifyResult, EditableContest } from '@/api/types/contest-editing';
-import EmptyState from '@/components/EmptyState.vue';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { PARTICIPATIONS_PAGE_SIZE, fetchParticipations } from '@/api/contest-editing.api';
+import type {
+  BulkDisqualifyResult,
+  EditableContest,
+  Participation,
+} from '@/api/types/contest-editing';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumber } from '@/lib/format';
+import { formatInZone } from '../../ui/form/site-time';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
-import { checked, useRowSelection } from '../../ui/use-row-selection';
+import AdminChip from '../../ui/AdminChip.vue';
+import AdminStatus from '../../ui/AdminStatus.vue';
+import AdminUserLabel from '../../ui/AdminUserLabel.vue';
+import { failureTextOf } from '../../ui/admin-errors';
+import { buttonClass } from '../../ui/controls';
+import AdminDataTable from '../../ui/table/AdminDataTable.vue';
+import AdminFilterBar from '../../ui/table/AdminFilterBar.vue';
+import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
+import { rangeOf } from '../../ui/table/table-columns';
+import type { AdminColumn } from '../../ui/table/table-columns';
 import ContestBulkResult from '../ContestBulkResult.vue';
 import AddParticipationDialog from './AddParticipationDialog.vue';
 import BulkDisqualifyDialog from './BulkDisqualifyDialog.vue';
-import ParticipantRow from './ParticipantRow.vue';
 import ParticipantsFilters from './ParticipantsFilters.vue';
-import { participationQueryOf } from './participant-filters';
+import ParticipationDialogs from './ParticipationDialogs.vue';
+import {
+  SEARCH_MAX,
+  activePanelFilters,
+  participationQueryOf,
+  participationQueryWith,
+} from './participant-filters';
+import type { PanelFilter } from './participant-filters';
+import { formatPenalty, participationKindKey, rulesAcceptanceText } from './participations';
+import { useParticipationActions } from './use-participation-actions';
 
+/** The participations of one contest: search and filters in the URL, a table with bulk disqualify and a row menu. */
 const props = defineProps<{ contest: EditableContest }>();
 const route = useRoute();
 const router = useRouter();
 const viewer = useViewerId();
 const locale = useLocaleStore();
-const isAddOpen = ref(false);
-const expandedId = ref<string | null>(null);
+const { t } = useI18n();
 const query = computed(() => participationQueryOf(route.query));
+const change = (patch: Record<string, string>) =>
+  void router.replace({ query: participationQueryWith(route.query, patch) });
 
 const { data, error, isPending, refetch } = useQuery({
   queryKey: computed(() => [
@@ -41,18 +63,75 @@ const { data, error, isPending, refetch } = useQuery({
 });
 const rows = computed(() => data.value?.items ?? []);
 const total = computed(() => data.value?.meta.total ?? 0);
-const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PARTICIPATIONS_PAGE_SIZE)));
-const goToPage = (target: number) =>
-  router.push({ query: { ...route.query, page: String(target) } });
-const toggle = (id: string) => (expandedId.value = expandedId.value === id ? null : id);
+
+const search = computed({
+  get: () => query.value.search,
+  set: (text: string) => change({ search: text.trim().slice(0, SEARCH_MAX) }),
+});
+const activeFilters = computed(() => activePanelFilters(route.query));
+const chipValue = (key: PanelFilter) => {
+  const value = String(route.query[key]);
+  if (key === 'user') return value;
+  return t(`admin.contestOps.participants.filters.${key}.${value}`);
+};
+const chips = computed(() =>
+  activeFilters.value.map((key) => ({
+    key,
+    label: t(`admin.contestOps.participants.chips.${key}`, { value: chipValue(key) }),
+  })),
+);
+const isFiltered = computed(() => query.value.search !== '' || activeFilters.value.length > 0);
+const clearAll = () => change({ search: '', kind: '', status: '', sort: '', user: '' });
+const range = computed(() => {
+  const meta = data.value?.meta;
+  return meta ? rangeOf(meta.page, PARTICIPATIONS_PAGE_SIZE, rows.value.length, meta.total) : null;
+});
+
+const kindText = (row: Participation) => {
+  const kind = participationKindKey(row.virtual);
+  return t(kind.key, kind.params ?? {});
+};
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'user', label: t('admin.contests.participants.columns.user'), priority: 'primary' },
+  { key: 'status', label: t('admin.contests.participants.columns.status'), priority: 'badge' },
+  { key: 'kind', label: t('admin.contests.participants.columns.kind'), priority: 'secondary' },
+  {
+    key: 'score',
+    label: t('admin.contests.participants.columns.score'),
+    priority: 'secondary',
+    align: 'end',
+  },
+  {
+    key: 'penalty',
+    label: t('admin.contests.participants.columns.penalty'),
+    priority: 'secondary',
+    align: 'end',
+    cellClass: 'whitespace-nowrap',
+  },
+  {
+    key: 'start',
+    label: t('admin.contests.participants.columns.start'),
+    priority: 'meta',
+    cellClass: 'whitespace-nowrap',
+  },
+  {
+    key: 'rules',
+    label: t('admin.contestRules.column'),
+    priority: 'meta',
+    cellClass: 'whitespace-nowrap',
+  },
+]);
+const actions = useParticipationActions(() => props.contest.key);
+const directFailure = computed(() => actions.directFailure());
 
 /** A selection belongs to its page and filters: any change of either clears it, and the last result with it. */
-const selection = useRowSelection(computed(() => rows.value.map((row) => row.id)));
+const selected = ref(new Set<string>());
 const lastResult = ref<BulkDisqualifyResult | null>(null);
 watch(query, () => {
-  selection.clear();
+  selected.value = new Set();
   lastResult.value = null;
 });
+const selectedIds = computed(() => [...selected.value]);
 const isBulkOpen = ref(false);
 const isBulkDisqualify = ref(true);
 const openBulk = (disqualified: boolean) => {
@@ -60,152 +139,128 @@ const openBulk = (disqualified: boolean) => {
   isBulkOpen.value = true;
 };
 const usernameOf = (id: string) => rows.value.find((row) => row.id === id)?.user.username ?? id;
-const selectedNames = computed(() => selection.selected.value.map(usernameOf));
+const selectedNames = computed(() => selectedIds.value.map(usernameOf));
 const resultRows = computed(() =>
   (lastResult.value?.results ?? []).map((item) => ({ ...item, name: usernameOf(item.id) })),
 );
 function onBulkDone(result: BulkDisqualifyResult) {
   lastResult.value = result;
-  selection.clear();
+  selected.value = new Set();
 }
+
+const isAddOpen = ref(false);
 /** After an add, the list shows every row of that user, whatever kind or status was filtered. */
-const showUser = (username: string) =>
-  router.replace({
-    query: {
-      ...route.query,
-      user: username,
-      search: undefined,
-      kind: undefined,
-      status: undefined,
-      page: undefined,
-    },
-  });
+const showUser = (username: string) => change({ user: username, search: '', kind: '', status: '' });
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-end justify-between gap-3">
-      <ParticipantsFilters />
-      <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="isAddOpen = true">
+  <div class="flex min-w-0 flex-col gap-3">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <p class="m-0 max-w-prose text-sm text-muted">
+        {{ $t('admin.contests.participants.footnote') }}
+      </p>
+      <button type="button" :class="buttonClass('primary')" @click="isAddOpen = true">
+        <UserPlus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.contestOps.participants.add') }}
       </button>
     </div>
-    <p class="text-sm text-muted" aria-live="polite">
-      {{
+    <AdminFilterBar
+      v-model:search="search"
+      :search-label="$t('admin.contests.participants.userLabel')"
+      :result-text="
         $t('admin.contests.participants.countLine', { total: formatNumber(total, locale.locale) })
-      }}
-    </p>
-
-    <BulkSelectionBar :count="selection.selected.value.length" @clear="selection.clear">
-      <button type="button" :class="ADMIN_DANGER_CLASS" @click="openBulk(true)">
-        {{ $t('admin.contests.participants.bulk.disqualify') }}
-      </button>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openBulk(false)">
-        {{ $t('admin.contests.participants.bulk.reinstate') }}
-      </button>
-    </BulkSelectionBar>
+      "
+      :chips="chips"
+      :filter-count="activeFilters.filter((key) => key !== 'user').length"
+      @remove="(key: string) => change({ [key]: '' })"
+      @clear-all="change({ kind: '', status: '', sort: '', user: '' })"
+    >
+      <template #filters><ParticipantsFilters /></template>
+    </AdminFilterBar>
     <ContestBulkResult
       v-if="lastResult"
       :results="resultRows"
       reason-prefix="admin.contests.bulk.reasons"
     />
-
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton>
-        <div class="flex flex-col gap-3">
-          <SkeletonBlock class="h-10 w-full" />
-          <SkeletonBlock class="h-10 w-full" />
-          <SkeletonBlock class="h-10 w-full" />
-        </div>
+    <AdminStatus v-if="directFailure" kind="refused" :text="failureTextOf(directFailure)" />
+    <AdminDataTable
+      v-model:selected="selected"
+      :columns="columns"
+      :rows="rows"
+      :row-key="(row: Participation) => row.id"
+      :row-label="(row: Participation) => row.user.username"
+      :label="$t('admin.contests.participants.tableLabel')"
+      selectable
+      :loading="isPending"
+      :error="error"
+      :skeleton-rows="6"
+      :filtered="isFiltered"
+      :empty-text="$t('admin.contests.participants.empty')"
+      @retry="refetch()"
+      @clear-filters="clearAll"
+    >
+      <template #bulk>
+        <button type="button" :class="buttonClass('secondary', 'sm')" @click="openBulk(false)">
+          {{ $t('admin.contests.participants.bulk.reinstate') }}
+        </button>
+        <button type="button" :class="buttonClass('danger', 'sm')" @click="openBulk(true)">
+          {{ $t('admin.contests.participants.bulk.disqualify') }}
+        </button>
       </template>
-      <EmptyState v-if="rows.length === 0">{{
-        $t('admin.contests.participants.empty')
-      }}</EmptyState>
-      <template v-else>
-        <div class="glass overflow-x-auto rounded-panel p-3">
-          <table class="w-full text-sm">
-            <thead class="text-left text-muted">
-              <tr>
-                <th scope="col" class="w-9 py-2 pr-1 sm:w-11 sm:px-2">
-                  <input
-                    type="checkbox"
-                    class="size-5"
-                    :checked="selection.isAllSelected.value"
-                    :indeterminate="selection.isSomeSelected.value"
-                    :aria-label="$t('admin.contests.bulk.selectPage')"
-                    @change="selection.toggleAll(checked($event))"
-                  />
-                </th>
-                <th scope="col" class="px-2 py-2">
-                  {{ $t('admin.contests.participants.columns.user') }}
-                </th>
-                <th scope="col" class="hidden px-2 py-2 md:table-cell">
-                  {{ $t('admin.contests.participants.columns.kind') }}
-                </th>
-                <th scope="col" class="hidden px-2 py-2 text-right md:table-cell">
-                  {{ $t('admin.contests.participants.columns.score') }}
-                </th>
-                <th scope="col" class="hidden px-2 py-2 text-right md:table-cell">
-                  {{ $t('admin.contests.participants.columns.penalty') }}
-                </th>
-                <th scope="col" class="hidden px-2 py-2 text-right lg:table-cell">
-                  {{ $t('admin.contestOps.participants.tiebreaker') }}
-                </th>
-                <th scope="col" class="hidden px-2 py-2 lg:table-cell">
-                  {{ $t('admin.contests.participants.columns.start') }}
-                </th>
-                <th scope="col" class="px-2 py-2">
-                  {{ $t('admin.contests.participants.columns.status') }}
-                </th>
-                <th scope="col" class="px-2 py-2">
-                  <span class="sr-only">{{ $t('admin.contestOps.participants.manage') }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <ParticipantRow
-                v-for="row in rows"
-                :key="row.id"
-                :contest-key="contest.key"
-                :participation="row"
-                :is-expanded="expandedId === row.id"
-                :is-selected="selection.isSelected(row.id)"
-                @toggle="toggle(row.id)"
-                @select="(isOn: boolean) => selection.toggle(row.id, isOn)"
-              />
-            </tbody>
-          </table>
-        </div>
-        <p class="text-sm text-muted">{{ $t('admin.contests.participants.footnote') }}</p>
-        <footer class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
-          <span>{{
-            $t('admin.contests.participants.pager', { page: query.page, pages: pageCount })
-          }}</span>
-          <div class="flex gap-2">
-            <button
-              type="button"
-              class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-              :disabled="query.page <= 1"
-              @click="goToPage(query.page - 1)"
-            >
-              {{ $t('admin.contests.participants.previous') }}
-            </button>
-            <button
-              type="button"
-              class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-              :disabled="query.page >= pageCount"
-              @click="goToPage(query.page + 1)"
-            >
-              {{ $t('admin.contests.participants.next') }}
-            </button>
-          </div>
-        </footer>
+      <template #cell-user="{ row }">
+        <AdminUserLabel :username="row.user.username" :rating="row.user.rating" :size="24" />
       </template>
-    </QueryState>
+      <template #cell-status="{ row }">
+        <span :id="`participation-status-${row.id}`" tabindex="-1" class="rounded-pill">
+          <AdminChip :tone="row.isDisqualified ? 'negative' : 'positive'">
+            {{
+              row.isDisqualified
+                ? $t('admin.contests.participants.disqualified')
+                : $t('admin.contests.participants.valid')
+            }}
+          </AdminChip>
+        </span>
+      </template>
+      <template #cell-kind="{ row }">{{ kindText(row) }}</template>
+      <template #cell-score="{ row }">
+        <!-- The tiebreaker rarely matters: it rides on the score as a tooltip instead of a column. -->
+        <span
+          :title="
+            $t('admin.contestOps.participants.tiebreakerOf', {
+              value: formatNumber(row.tiebreaker, locale.locale),
+            })
+          "
+          >{{ formatNumber(row.score, locale.locale) }}</span
+        >
+      </template>
+      <template #cell-penalty="{ row }">{{ formatPenalty(row.cumtime, locale.locale) }}</template>
+      <template #cell-start="{ row }">
+        <span class="font-mono text-[13px] tabular-nums">{{ formatInZone(row.realStart) }}</span>
+      </template>
+      <template #cell-rules="{ row }">{{ rulesAcceptanceText(row, locale.locale) }}</template>
+      <template #actions="{ row }">
+        <AdminRowMenu
+          :items="actions.menuOf(row)"
+          :label="$t('admin.contestOps.participants.more', { username: row.user.username })"
+        />
+      </template>
+      <template v-if="data" #footer>
+        <span v-if="range" class="font-mono tabular-nums">
+          {{ $t('admin.contests.participants.range', range) }}
+        </span>
+        <NumberedPager
+          class="ml-auto"
+          :meta="data.meta"
+          :label="$t('admin.contests.participants.pagerLabel')"
+          compact
+        />
+      </template>
+    </AdminDataTable>
+    <ParticipationDialogs :actions="actions" />
     <BulkDisqualifyDialog
       v-model:visible="isBulkOpen"
       :contest-key="contest.key"
-      :ids="selection.selected.value"
+      :ids="selectedIds"
       :usernames="selectedNames"
       :disqualified="isBulkDisqualify"
       @done="onBulkDone"
