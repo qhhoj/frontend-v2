@@ -6,6 +6,7 @@ import { ApiError } from '@/api/client';
 import { mountComponent } from '@/test/mount';
 import { useAdminMutation } from './use-admin-mutation';
 import type { AdminQueryKey } from './use-admin-mutation';
+import { adminToasts, dismissToast } from './feedback/admin-toasts';
 
 const host = (
   mutate: (vars: { name: string }) => Promise<string>,
@@ -101,5 +102,32 @@ describe('useAdminMutation', () => {
     const { api } = host(() => Promise.reject(new TypeError('bug in the page')));
     await expect(api().run({ name: 'a' })).rejects.toThrow('bug in the page');
     expect(api().isPending.value).toBe(false);
+  });
+
+  it('shows the success toast only after a write succeeds, with text from the answer', async () => {
+    for (const toast of [...adminToasts]) dismissToast(toast.id);
+    let api!: ReturnType<typeof useAdminMutation<string, string>>;
+    mountComponent(
+      defineComponent({
+        setup() {
+          api = useAdminMutation({
+            mutate: (code: string) =>
+              code === 'bad'
+                ? Promise.reject(new ApiError('conflict', 409, 'locked'))
+                : Promise.resolve(code.toUpperCase()),
+            successText: (answer, code) => `Đã lưu ${answer} (${code})`,
+          });
+          return () => h('div');
+        },
+      }),
+    );
+    await api.run('bad');
+    expect(adminToasts).toHaveLength(0);
+    await api.run('ab');
+    await flushPromises();
+    expect(adminToasts.map((toast) => toast.text)).toEqual(['Đã lưu AB (ab)']);
+    expect(document.querySelector('[data-testid="admin-toasts"]')?.textContent).toContain(
+      'Đã lưu AB (ab)',
+    );
   });
 });

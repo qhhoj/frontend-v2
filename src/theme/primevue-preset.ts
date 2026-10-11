@@ -56,7 +56,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
   dialog: {
     root: {
       class:
-        'flex max-h-full w-[min(28rem,calc(100vw-2rem))] flex-col rounded-panel border border-line-strong bg-surface-solid text-content',
+        'flex max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] flex-col rounded-panel border border-line-strong bg-surface-solid text-content',
     },
     header: { class: 'flex shrink-0 items-start justify-between gap-3 px-6 pt-5' },
     title: { class: 'font-display text-xl font-semibold' },
@@ -66,7 +66,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
           'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover',
       },
     },
-    /** A dialog taller than the screen scrolls here, so the header (close button) and footer stay on screen. */
+    /** A dialog taller than the screen (root capped at 100dvh - 2rem) scrolls here, so the header (close button) and footer stay on screen. */
     content: { class: 'min-h-0 overflow-y-auto px-6 py-4' },
     footer: { class: 'flex shrink-0 justify-end gap-2.5 px-6 pb-5' },
     mask: { class: 'fixed inset-0 z-50 flex items-center justify-center bg-ground/70 p-4' },

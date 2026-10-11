@@ -1,0 +1,14 @@
+{
+  "toast": {
+    "region": "Thông báo",
+    "undo": "Hoàn tác",
+    "close": "Đóng thông báo"
+  },
+  "notice": {
+    "details": "Chi tiết",
+    "hideDetails": "Ẩn chi tiết"
+  },
+  "drawer": {
+    "close": "Đóng"
+  }
+}

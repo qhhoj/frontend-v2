@@ -2,11 +2,10 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import { useJudgesQuery } from '../judges/judges.queries';
 import {
@@ -45,9 +44,7 @@ const percentOf = (count: number) =>
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <SettingsNotice v-if="!canEdit && canAdd" tone="info">{{
-      $t('admin.languages.addOnly')
-    }}</SettingsNotice>
+    <AdminNotice v-if="!canEdit && canAdd" :title="$t('admin.languages.addOnly')" />
     <QueryState v-if="canEdit" :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-4">
@@ -65,31 +62,27 @@ const percentOf = (count: number) =>
           <p>{{ $t('admin.languages.stats.single', { single: singles.length }) }}</p>
         </template>
       </section>
-      <SettingsNotice v-if="hasJudgesError" tone="warning">{{
-        $t('admin.languages.judgesUnavailable')
-      }}</SettingsNotice>
-      <SettingsNotice
+      <AdminNotice
+        v-if="hasJudgesError"
+        tone="caution"
+        :title="$t('admin.languages.judgesUnavailable')"
+      />
+      <AdminNotice
         v-for="row in unserved"
         :key="`unserved-${row.key}`"
-        tone="error"
-        :bit="ADMIN_BIT_KINDS.refused"
-      >
-        <p class="font-semibold">{{ $t('admin.languages.unserved.title', { key: row.key }) }}</p>
-        <p>{{ $t('admin.languages.unserved.body', { name: row.name }) }}</p>
-      </SettingsNotice>
-      <div v-for="single in singles" :key="single.key">
-        <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.refused">
-          <p class="font-semibold">{{ $t('admin.languages.single.title', { key: single.key }) }}</p>
-          <p>
-            {{
-              $t('admin.languages.single.body', {
-                key: single.key,
-                judge: single.judges?.[0] ?? '',
-              })
-            }}
-          </p>
-        </SettingsNotice>
-      </div>
+        tone="danger"
+        :title="$t('admin.languages.unserved.title', { key: row.key })"
+        :summary="$t('admin.languages.unserved.body', { name: row.name })"
+      />
+      <AdminNotice
+        v-for="single in singles"
+        :key="single.key"
+        tone="caution"
+        :title="$t('admin.languages.single.title', { key: single.key })"
+        :summary="
+          $t('admin.languages.single.body', { key: single.key, judge: single.judges?.[0] ?? '' })
+        "
+      />
       <div v-if="rows.length > 0" class="glass overflow-x-auto rounded-panel p-5">
         <table class="w-full min-w-max text-left text-sm">
           <thead>
