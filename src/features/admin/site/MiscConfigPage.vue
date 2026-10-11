@@ -99,7 +99,7 @@ function onDeleted(key: string) {
       @retry="query.refetch()"
     >
       <SiteNoticeCard :current="notice" />
-      <div class="mt-6 grid gap-6 lg:grid-cols-2 lg:items-start">
+      <div class="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2 lg:items-start">
         <SettingsCard :title="$t('admin.site.config.title')">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
