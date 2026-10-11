@@ -307,8 +307,6 @@
       "points": "{points} points"
     },
     "best": {
-      "column": "Ranking",
-      "button": "Top submissions",
       "title": "Best submissions · {problem}",
       "back": "Back to the problems",
       "problems": "Pick a problem",
