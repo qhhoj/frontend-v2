@@ -65,7 +65,12 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     <table :class="BOARD_TABLE_CLASS">
       <thead :class="BOARD_HEAD_CLASS">
         <tr>
-          <th scope="col" :class="RANK_HEAD_CLASS">{{ $t('leaderboard.columns.rank') }}</th>
+          <th scope="col" :class="RANK_HEAD_CLASS">
+            <span
+              ><span aria-hidden="true">#</span
+              ><span class="sr-only">{{ $t('leaderboard.columns.rank') }}</span></span
+            >
+          </th>
           <th scope="col" :class="USER_HEAD_CLASS">{{ $t('leaderboard.columns.user') }}</th>
           <th scope="col" :class="ORGANIZATION_HEAD_CLASS">
             {{ $t('leaderboard.columns.organization') }}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { Ghost } from 'lucide-vue-next';
 import { computed, ref, toRef, TransitionGroup } from 'vue';
 import UserName from '@/components/UserName.vue';
@@ -73,8 +74,8 @@ defineExpose({ focusRow });
       </caption>
       <thead>
         <tr class="text-center text-[13px] text-muted">
-          <th scope="col" class="px-4 py-3.5 text-left font-medium">
-            {{ $t('ranking.columns.rank') }}
+          <th scope="col" class="w-14 px-3 py-3.5 text-right font-medium">
+            <RankColumnHeader :label="$t('ranking.columns.rank')" />
           </th>
           <th scope="col" class="px-2.5 py-3.5 text-left font-medium">
             {{ $t('ranking.columns.user') }}
@@ -108,7 +109,7 @@ defineExpose({ focusRow });
           class="border-t border-line text-center"
           :class="{ 'bg-surface-hover': isViewerRow(row) }"
         >
-          <td class="px-4 py-2.5 text-left">{{ row.rank ?? '—' }}</td>
+          <td class="w-14 px-3 py-2.5 text-right">{{ row.rank ?? '—' }}</td>
           <th scope="row" tabindex="-1" class="px-2.5 py-2.5 text-left font-body">
             <span
               v-if="row.kind === 'ghost'"

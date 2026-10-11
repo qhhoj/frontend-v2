@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UserLink from '@/components/UserLink.vue';
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { medalClass } from '@/lib/medal';
@@ -81,8 +82,8 @@ const scoreHeaderKey = computed(() => {
       </caption>
       <thead>
         <tr class="text-center text-[13px] text-muted">
-          <th scope="col" class="px-5 py-4 text-left font-medium">
-            {{ $t('ranking.columns.rank') }}
+          <th scope="col" class="w-14 px-3 py-4 text-right font-medium">
+            <RankColumnHeader :label="$t('ranking.columns.rank')" />
           </th>
           <th scope="col" class="px-2.5 py-4 text-left font-medium">
             {{ $t('ranking.columns.user') }}
@@ -111,7 +112,7 @@ const scoreHeaderKey = computed(() => {
           :class="{ 'bg-surface-hover': row.user.id === viewerId }"
         >
           <td
-            class="px-5 py-2.5 text-left"
+            class="w-14 px-3 py-2.5 text-right"
             :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
           >
             {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}

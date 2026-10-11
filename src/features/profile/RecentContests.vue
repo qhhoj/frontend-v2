@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
 import GlassCard from '@/components/GlassCard.vue';
@@ -26,7 +27,9 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
       <thead class="text-muted">
         <tr>
           <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.contest') }}</th>
-          <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.rank') }}</th>
+          <th scope="col" class="py-2 text-right font-semibold">
+            <RankColumnHeader :label="$t('profile.columns.rank')" />
+          </th>
           <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.performance') }}</th>
           <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.rating') }}</th>
           <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.delta') }}</th>
@@ -44,7 +47,7 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
             </RouterLink>
             <span v-else class="text-muted">{{ $t('ratingChart.hiddenContest') }}</span>
           </td>
-          <td class="py-2">{{ orDash(row.rank) }}</td>
+          <td class="py-2 text-right">{{ orDash(row.rank) }}</td>
           <td class="py-2">{{ orDash(row.performance) }}</td>
           <td class="py-2">{{ orDash(row.rating) }}</td>
           <td class="py-2 font-semibold" :class="deltaClass(row.delta)">
