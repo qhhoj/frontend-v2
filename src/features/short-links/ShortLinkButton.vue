@@ -21,6 +21,12 @@ const labelKey = computed(() =>
     ? LABEL_KEYS[state.value]
     : 'shortLink.copy',
 );
+/** The idle name extends the visible "Sao chép" (WCAG 2.5.3); other states show their visible text as the name. */
+const accessibleName = computed(() =>
+  state.value === 'creating' || state.value === 'copied'
+    ? undefined
+    : translate('shortLink.copyAriaLabel'),
+);
 const announcement = computed(() =>
   state.value === 'copied' && url.value
     ? translate('shortLink.copiedAnnounce', { url: displayUrl(url.value) })
@@ -40,6 +46,7 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
           ? 'border-accent bg-accent-soft text-accent-soft-text'
           : 'border-line-strong bg-surface-solid text-content hover:bg-surface-hover'
       "
+      :aria-label="accessibleName"
       :aria-disabled="state === 'limited' || undefined"
       @click="copy"
     >
