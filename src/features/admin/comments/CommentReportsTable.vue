@@ -110,6 +110,9 @@ const rowName = (item: CommentReportQueueItem) =>
       <AdminChip v-else-if="row.comment.hidden" tone="caution" :icon="EyeOff">
         {{ $t('admin.comments.chips.hidden') }}
       </AdminChip>
+      <AdminChip v-else tone="positive" :icon="Eye">
+        {{ $t('admin.comments.chips.visible') }}
+      </AdminChip>
     </template>
     <template #cell-reports="{ row }">
       <ul class="m-0 flex max-w-md list-none flex-col gap-1 p-0 py-2">
