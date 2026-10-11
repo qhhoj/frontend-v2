@@ -80,6 +80,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()): Ro
   installGateSync(router);
   trackFirstPage(router);
   const titleDocument = () => {
+    if (typeof document === 'undefined') return; // hook can fire after the DOM is torn down
     const title =
       pageTitle.value ?? translate(router.currentRoute.value.meta.titleKey ?? 'app.name');
     document.title = `${title} · QHHOJ`;
