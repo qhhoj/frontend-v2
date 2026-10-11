@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
@@ -53,7 +53,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         {{ excerpt }}
       </p>
       <footer class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-sm text-muted">
-        <UserName
+        <UserLink
           v-for="author in post.authors"
           :key="author.id"
           :username="author.username"

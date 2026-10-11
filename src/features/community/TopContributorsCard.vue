@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
@@ -38,8 +37,7 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
         <span class="w-5 shrink-0 text-right font-mono text-sm tabular-nums text-muted">
           {{ index + 1 }}
         </span>
-        <UserAvatar :username="user.username" :size="28" />
-        <UserName :username="user.username" :rating="user.rating" class="min-w-0 flex-1 truncate" />
+        <UserLink :username="user.username" :rating="user.rating" size="sm" class="flex-1" />
         <span class="shrink-0 font-mono text-sm tabular-nums">
           {{ formatNumber(user.contributionPoints, locale.locale) }}
         </span>

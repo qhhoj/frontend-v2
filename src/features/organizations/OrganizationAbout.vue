@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import UserContent from '@/components/UserContent.vue';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import OrganizationRecentPosts from './OrganizationRecentPosts.vue';
 import OrganizationTopMembers from './OrganizationTopMembers.vue';
 import { useOrganization } from './use-organization';
@@ -27,8 +26,7 @@ const organization = computed(() => query.data.value);
         <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.admins') }}</h2>
         <ul class="flex flex-col gap-2">
           <li v-for="admin in organization.admins" :key="admin.id" class="flex items-center gap-2">
-            <UserAvatar :username="admin.username" :size="28" />
-            <UserName :username="admin.username" :rating="admin.rating" />
+            <UserLink :username="admin.username" :rating="admin.rating" size="sm" />
           </li>
         </ul>
       </section>

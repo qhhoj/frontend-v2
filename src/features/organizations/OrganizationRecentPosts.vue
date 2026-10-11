@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { formatNumber, formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useOrganization } from './use-organization';
@@ -39,7 +39,7 @@ const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POS
             {{ post.title }}
           </RouterLink>
           <p class="flex flex-wrap gap-x-3 text-sm text-muted">
-            <UserName
+            <UserLink
               v-if="post.authors[0]"
               :username="post.authors[0].username"
               :rating="post.authors[0].rating"

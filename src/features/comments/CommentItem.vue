@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n';
 import { voteComment } from '@/api/comments.api';
 import type { VoteScore } from '@/api/types/votes';
 import UserContent from '@/components/UserContent.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import { formatAgo, formatNumericDateTime, signedScore } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -144,11 +144,12 @@ const TEXT_BUTTON =
       :class="comment.hidden ? 'bg-surface-strong' : 'bg-surface-solid'"
     >
       <header class="flex flex-wrap items-center gap-2">
-        <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
-          <UserName
+        <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">
+          <UserLink
             v-if="comment.author"
             :username="comment.author.username"
             :rating="comment.author.rating"
+            size="sm"
           />
           <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
           <time

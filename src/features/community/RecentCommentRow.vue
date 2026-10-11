@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { RecentComment } from '@/api/types/comments';
 import UserContent from '@/components/UserContent.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { commentRoute } from '@/lib/comment-links';
 import { formatAgo, signedScore } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -16,14 +16,14 @@ const target = computed(() => commentRoute(props.comment.page, props.comment.id)
 
 <template>
   <article class="flex flex-col gap-1">
-    <p class="text-sm">
-      <UserName
+    <p class="flex flex-wrap items-center gap-x-1 text-sm">
+      <UserLink
         v-if="comment.author"
         :username="comment.author.username"
         :rating="comment.author.rating"
       />
       <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
-      {{ ' ' }}{{ $t('comments.inPage') }}{{ ' ' }}
+      {{ $t('comments.inPage') }}
       <RouterLink v-if="target" :to="target" class="font-semibold text-accent-text hover:underline">
         {{ comment.page.title }}
       </RouterLink>

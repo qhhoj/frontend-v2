@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useTopUsersQuery } from '@/features/users/users.queries';
 
 const { data: users, isPending, error, refetch } = useTopUsersQuery();
@@ -34,8 +33,7 @@ const LIST_MIN_HEIGHT = 'min-h-[6.4rem]';
       }}</EmptyState>
       <ol v-else class="flex flex-col gap-2.5" :class="LIST_MIN_HEIGHT">
         <li v-for="entry in users" :key="entry.id" class="flex items-center gap-2.5">
-          <UserAvatar :username="entry.username" :size="24" />
-          <UserName class="flex-1" :username="entry.username" :rating="entry.rating" />
+          <UserLink class="flex-1" :username="entry.username" :rating="entry.rating" />
           <span class="font-mono tabular-nums">{{ entry.rating ?? '—' }}</span>
         </li>
       </ol>

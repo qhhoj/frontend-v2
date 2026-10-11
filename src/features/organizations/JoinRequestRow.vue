@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import type { JoinRequest } from '@/api/types/organizations';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatAgo } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -26,8 +25,7 @@ const askedAgo = computed(() => formatAgo(props.request.createdAt, Date.now(), l
   >
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
       <div class="flex flex-wrap items-center gap-2">
-        <UserAvatar :username="request.username" :size="28" />
-        <UserName :username="request.username" />
+        <UserLink :username="request.username" size="sm" />
         <span class="text-sm text-muted">{{ askedAgo }}</span>
       </div>
       <p class="whitespace-pre-line break-words text-sm">{{ request.reason }}</p>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { formatAgoCompact, formatDateTime } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -58,12 +58,11 @@ const detailsOf = (row: SubmissionListItem) =>
           :problem="row.problem"
           :label="row.problem ? problemLabels[row.problem.code] : undefined"
         />
-        <div class="flex gap-1.5 text-[13px] whitespace-nowrap text-muted">
-          <UserName
+        <div class="flex items-center gap-1.5 text-[13px] whitespace-nowrap text-muted">
+          <UserLink
             v-if="isShown('user') && row.user"
             :username="row.user.username"
             :rating="row.user.rating"
-            class="min-w-0 truncate"
           />
           <span v-if="isShown('user') && isShown('when')" aria-hidden="true">·</span>
           <time
