@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import CopyButton from '@/components/CopyButton.vue';
 
-/** What a problem setter does on Polygon so a problem shows up here; shared by the settings block and the empty list. */
+/** What a problem setter does: share the problem with the account, build a full package, paste its link; shared by the settings block and the link step. */
 defineProps<{ accountName: string }>();
-const STEPS = ['open', 'access', 'package', 'import'] as const;
+const STEPS = ['access', 'package', 'paste'] as const;
 </script>
 
 <template>

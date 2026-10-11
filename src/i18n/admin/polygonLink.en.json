@@ -8,13 +8,12 @@
   "howTo": {
     "title": "How-to for problem setters",
     "steps": {
-      "open": "Open the problem on polygon.codeforces.com.",
-      "access": "In Manage access, add {account} as a collaborator with Read access.",
-      "package": "Commit your changes and build a package (Packages, Create package); wait until it is READY.",
-      "import": "On QHHOJ open Admin, Import from Polygon: the problem shows in the list."
+      "access": "Open the problem on polygon.codeforces.com; in Manage access, add {account} with Read access.",
+      "package": "Commit your changes and build a full package (Packages, Create package, Full); wait until it is READY.",
+      "paste": "Copy the address of the problem page (https://polygon.codeforces.com/p…/owner/name) and paste it into Import from Polygon on QHHOJ."
     },
     "unnamed": "the QHHOJ account",
-    "readIsEnough": "Read access is enough: QHHOJ changes nothing on Polygon.",
+    "readIsEnough": "Read access is enough: QHHOJ changes nothing on Polygon. Treat the link like a password: anyone who has it and may import on QHHOJ can import the problem.",
     "copy": "Copy the account name {account}"
   },
   "check": {
@@ -25,10 +24,10 @@
   },
   "wizard": {
     "title": "Import from Polygon",
-    "lead": "Every problem shared with the {account} account on Polygon shows here. Pick one, configure it, then follow the import.",
+    "lead": "Give the {account} account Read access on Polygon, paste the problem link, configure it, then follow the import.",
     "stepsLabel": "Import steps",
     "steps": {
-      "pick": "Pick",
+      "link": "Problem",
       "configure": "Configure",
       "progress": "Import"
     },
@@ -36,47 +35,50 @@
     "zipFile": "Import a .zip file",
     "zipInstead": "Import a .zip file instead"
   },
-  "pick": {
-    "title": "Pick a problem on Polygon",
-    "updatedAt": "Updated at {time}",
-    "refresh": "Refresh",
-    "refreshList": "Refresh the list",
-    "search": "Search problems",
-    "searchPlaceholder": "Title, Polygon name or owner",
-    "filterLabel": "Filter by package state",
-    "filters": {
-      "all": "All",
-      "ready": "READY package",
-      "running": "Building",
-      "unavailable": "Failed or no package"
-    },
-    "blocked": {
-      "linked": "Linked to {code}: sync it from that problem's editor.",
-      "running": "Polygon is building the package; try again later.",
-      "failed": "The package build failed: fix it and build again on Polygon.",
-      "noPackage": "No package yet: build one on Polygon first."
-    },
-    "modified": "Has uncommitted changes; the newest READY package still imports.",
-    "noMatch": "No problem matches the search and the filter.",
-    "selected": "Picked:",
-    "noneSelected": "Pick a problem with a READY package to continue.",
+  "link": {
+    "label": "Polygon problem link",
+    "hint": "On Polygon, give {account} Read access to the problem, then paste the address of its page.",
+    "placeholder": "https://polygon.codeforces.com/p…/owner/name",
+    "token": "key",
+    "owner": "owner",
+    "problem": "problem",
+    "checking": "Checking the link…",
+    "verified": "Link verified",
+    "fullReady": "Full package READY",
+    "packageValue": "r{revision}, package #{id}, built {time}",
+    "notLinked": "Not linked to any QHHOJ problem yet.",
+    "checkAgain": "Check again",
     "next": "Continue"
+  },
+  "refusal": {
+    "invalid": {
+      "title": "That is not a Polygon problem link",
+      "body": "Paste the full address of the problem page: https://polygon.codeforces.com/p…/owner/name."
+    },
+    "refused": {
+      "title": "{account} cannot open this link",
+      "body": "Give the {account} account READ access on Polygon (Manage access), then copy the link again from the problem page."
+    },
+    "noPackage": {
+      "title": "Build a package first",
+      "body": "QHHOJ checks the link against the newest package, so the problem needs at least one READY package. Build a full package on Polygon, then check again."
+    },
+    "notFull": {
+      "title": "No full package to import",
+      "body": "The newest package is not a READY full package: a standard package lacks the generated tests, or the package is still building or failed. On Polygon, open Packages and build a full package; if one is RUNNING, wait until it finishes."
+    },
+    "linked": {
+      "title": "Already on QHHOJ",
+      "withCode": "This Polygon problem is linked to {code}. Open it and use Sync.",
+      "open": "Open {code}",
+      "hidden": "This Polygon problem is already linked to a QHHOJ problem."
+    }
   },
   "notConnected": {
     "title": "Polygon is not connected",
-    "bodyAdmin": "The site has no Polygon API key or secret yet, so the problem list cannot be read. A .zip file still imports.",
+    "bodyAdmin": "The site has no Polygon API key or secret yet, so links cannot be checked. You can still import a .zip file.",
     "bodyAsk": "The site has no Polygon API key yet. Ask an administrator to add one; meanwhile a .zip file still imports.",
     "openSettings": "Open the Polygon settings"
-  },
-  "nothingShared": {
-    "title": "No problem is shared with {account} yet",
-    "body": "A Polygon problem shows here once its owner adds {account} as a collaborator with Read access.",
-    "steps": {
-      "access": "Open the problem on Polygon, go to Manage access.",
-      "grant": "Add {account} with Read access.",
-      "package": "Build a package, wait for READY, then refresh this page."
-    },
-    "openPolygon": "Open Polygon"
   },
   "source": {
     "label": "Source",

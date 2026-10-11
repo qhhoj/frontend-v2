@@ -8,13 +8,12 @@
   "howTo": {
     "title": "Hướng dẫn cho người ra đề",
     "steps": {
-      "open": "Mở bài trên polygon.codeforces.com.",
-      "access": "Vào Manage access, thêm {account} làm cộng tác viên với quyền đọc (Read).",
-      "package": "Commit thay đổi và dựng gói (Packages, Create package); chờ gói ở trạng thái READY.",
-      "import": "Trên QHHOJ mở Quản trị, Nhập từ Polygon: bài sẽ hiện trong danh sách."
+      "access": "Mở bài trên polygon.codeforces.com, vào Manage access, thêm {account} với quyền đọc (Read).",
+      "package": "Commit thay đổi và dựng full package (Packages, Create package, Full); chờ gói ở trạng thái READY.",
+      "paste": "Sao chép địa chỉ trang của bài (https://polygon.codeforces.com/p…/chủ-bài/tên-bài) và dán vào Nhập từ Polygon trên QHHOJ."
     },
     "unnamed": "tài khoản của QHHOJ",
-    "readIsEnough": "Quyền đọc là đủ: QHHOJ không sửa gì trên Polygon.",
+    "readIsEnough": "Quyền đọc là đủ: QHHOJ không sửa gì trên Polygon. Giữ liên kết như mật khẩu: ai có liên kết và quyền nhập trên QHHOJ đều nhập được bài.",
     "copy": "Sao chép tên tài khoản {account}"
   },
   "check": {
@@ -25,10 +24,10 @@
   },
   "wizard": {
     "title": "Nhập từ Polygon",
-    "lead": "Bài nào được chia sẻ với tài khoản {account} trên Polygon sẽ hiện ở đây. Chọn một bài, thiết lập, rồi theo dõi tiến trình.",
+    "lead": "Cấp quyền đọc cho tài khoản {account} trên Polygon, dán liên kết của bài, thiết lập, rồi theo dõi tiến trình.",
     "stepsLabel": "Các bước nhập",
     "steps": {
-      "pick": "Chọn bài",
+      "link": "Bài",
       "configure": "Thiết lập",
       "progress": "Nhập"
     },
@@ -36,47 +35,50 @@
     "zipFile": "Nhập tệp .zip",
     "zipInstead": "Nhập tệp .zip thay vì"
   },
-  "pick": {
-    "title": "Chọn bài trên Polygon",
-    "updatedAt": "Cập nhật lúc {time}",
-    "refresh": "Làm mới",
-    "refreshList": "Làm mới danh sách",
-    "search": "Tìm bài",
-    "searchPlaceholder": "Tên, mã Polygon hoặc chủ sở hữu",
-    "filterLabel": "Lọc theo trạng thái gói",
-    "filters": {
-      "all": "Tất cả",
-      "ready": "Có gói READY",
-      "running": "Đang dựng",
-      "unavailable": "Lỗi hoặc chưa có gói"
-    },
-    "blocked": {
-      "linked": "Đã liên kết với {code}: đồng bộ ở trang sửa bài đó.",
-      "running": "Polygon đang dựng gói, thử lại sau.",
-      "failed": "Gói dựng lỗi: sửa và dựng lại trên Polygon.",
-      "noPackage": "Chưa có gói: dựng gói trên Polygon trước."
-    },
-    "modified": "Có thay đổi chưa commit; gói READY mới nhất vẫn nhập được.",
-    "noMatch": "Không có bài nào khớp tìm kiếm và bộ lọc.",
-    "selected": "Đã chọn:",
-    "noneSelected": "Chọn một bài có gói READY để tiếp tục.",
+  "link": {
+    "label": "Liên kết bài trên Polygon",
+    "hint": "Trên Polygon, cấp quyền Read cho {account}, rồi dán địa chỉ trang của bài.",
+    "placeholder": "https://polygon.codeforces.com/p…/chủ-bài/tên-bài",
+    "token": "khoá",
+    "owner": "chủ bài",
+    "problem": "bài",
+    "checking": "Đang kiểm tra liên kết…",
+    "verified": "Đã xác minh liên kết",
+    "fullReady": "Full package READY",
+    "packageValue": "r{revision}, gói #{id}, dựng lúc {time}",
+    "notLinked": "Chưa liên kết với bài nào trên QHHOJ.",
+    "checkAgain": "Kiểm tra lại",
     "next": "Tiếp tục"
+  },
+  "refusal": {
+    "invalid": {
+      "title": "Đây không phải liên kết bài trên Polygon",
+      "body": "Dán đầy đủ địa chỉ trang của bài: https://polygon.codeforces.com/p…/chủ-bài/tên-bài."
+    },
+    "refused": {
+      "title": "{account} không mở được liên kết này",
+      "body": "Hãy cấp quyền READ cho tài khoản {account} trên Polygon (Manage access), rồi sao chép lại liên kết từ trang của bài."
+    },
+    "noPackage": {
+      "title": "Hãy dựng gói trước",
+      "body": "QHHOJ đối chiếu liên kết với gói mới nhất, nên bài cần ít nhất một gói READY. Trên Polygon, dựng full package rồi kiểm tra lại."
+    },
+    "notFull": {
+      "title": "Chưa có full package để nhập",
+      "body": "Gói mới nhất không phải full package READY: gói standard thiếu test sinh tự động, hoặc gói đang dựng hay bị lỗi. Trên Polygon, mở Packages và dựng full package; nếu gói đang RUNNING thì chờ xong."
+    },
+    "linked": {
+      "title": "Bài đã có trên QHHOJ",
+      "withCode": "Bài Polygon này đã liên kết với {code}. Mở bài đó và dùng Đồng bộ.",
+      "open": "Mở {code}",
+      "hidden": "Bài Polygon này đã liên kết với một bài trên QHHOJ."
+    }
   },
   "notConnected": {
     "title": "Chưa kết nối được Polygon",
-    "bodyAdmin": "Trang chưa có khoá API hoặc bí mật của Polygon, nên không lấy được danh sách bài. Vẫn nhập được bằng tệp .zip.",
+    "bodyAdmin": "Trang chưa có khoá API hoặc bí mật của Polygon, nên chưa kiểm tra được liên kết. Vẫn nhập được bằng tệp .zip.",
     "bodyAsk": "Trang chưa có khoá API của Polygon. Nhờ người quản lý cài đặt thêm khoá; trong lúc chờ, nhập được bằng tệp .zip.",
     "openSettings": "Mở cài đặt Polygon"
-  },
-  "nothingShared": {
-    "title": "Chưa có bài nào được chia sẻ với {account}",
-    "body": "Bài trên Polygon chỉ hiện ở đây sau khi chủ bài thêm {account} làm cộng tác viên với quyền đọc.",
-    "steps": {
-      "access": "Mở bài trên Polygon, vào Manage access.",
-      "grant": "Thêm {account} với quyền đọc (Read).",
-      "package": "Dựng gói, chờ READY, rồi làm mới trang này."
-    },
-    "openPolygon": "Mở Polygon"
   },
   "source": {
     "label": "Nguồn",

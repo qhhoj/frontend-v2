@@ -44,6 +44,7 @@ export const sessionUser = (overrides: Partial<SessionUser> = {}): SessionUser =
   siteTheme: 'auto',
   appearance: null,
   languageId: null,
+  adminCapabilities: { organizations: false },
   ...overrides,
 });
 

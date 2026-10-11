@@ -1,15 +1,16 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
-import type { PolygonImportBody, PolygonProblemsQuery } from './types/polygon';
+import type { PolygonImportBody } from './types/polygon';
 
 /** Whether the key and secret are set, and the account name setters share with; no call to Polygon. */
 export const fetchPolygonStatus = () => apiGet('/polygon/status');
 
-/** Every problem shared with the account; `refresh` skips the server's 60 s cache (6 per minute). */
-export const fetchPolygonProblems = (query: PolygonProblemsQuery = {}) =>
-  apiGet('/polygon/problems', { query });
+/** Checks a pasted problem link (its `p…` token against the newest package) and previews the problem; limited per user. */
+export const resolvePolygonLink = (link: string) =>
+  apiSend('post', '/polygon/resolve', { body: { link } });
 
-export const startPolygonLinkImport = (polygonId: number, body: PolygonImportBody) =>
-  apiSend('post', '/polygon/problems/{polygonId}/import', { path: { polygonId }, body });
+/** The body carries the link, checked again by the server. */
+export const startPolygonLinkImport = (body: PolygonImportBody) =>
+  apiSend('post', '/polygon/import', { body });
 
 /** One `problems.list` call with the saved key and secret. */
 export const testPolygonConnection = () => apiSend('post', '/polygon/test');
