@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NewUserRow } from '@/api/types/users-admin';
 import AdminField from '../ui/AdminField.vue';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 
 /** One new account: an empty password means a generated one, unless an invite is mailed. */
 const row = defineModel<NewUserRow>({ required: true });
@@ -22,7 +22,7 @@ const set = (patch: Partial<NewUserRow>) => {
         :value="row.username"
         maxlength="30"
         autocomplete="off"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         @input="set({ username: ($event.target as HTMLInputElement).value })"
       />
@@ -36,7 +36,7 @@ const set = (patch: Partial<NewUserRow>) => {
         :id="id"
         :value="row.fullName ?? ''"
         maxlength="30"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         @input="set({ fullName: ($event.target as HTMLInputElement).value || undefined })"
       />
     </AdminField>
@@ -46,7 +46,7 @@ const set = (patch: Partial<NewUserRow>) => {
         :value="row.email ?? ''"
         type="email"
         autocomplete="off"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         @input="set({ email: ($event.target as HTMLInputElement).value || undefined })"
       />
     </AdminField>
@@ -62,7 +62,7 @@ const set = (patch: Partial<NewUserRow>) => {
         type="password"
         autocomplete="new-password"
         :disabled="row.invite"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         @input="set({ password: ($event.target as HTMLInputElement).value || undefined })"
       />

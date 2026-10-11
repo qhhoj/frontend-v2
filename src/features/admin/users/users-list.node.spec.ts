@@ -9,6 +9,7 @@ import {
   USER_SEARCH_MAX_LENGTH,
   userStatusOf,
   usersViewFromQuery,
+  userLockOf,
   usersViewToQuery,
 } from './users-list';
 
@@ -101,5 +102,33 @@ describe('users list view', () => {
     [{ banReason: null, isActive: true }, 'active'],
   ] as const)('reads the status of %j as %s', (user, status) => {
     expect(userStatusOf({ ...staffUser(), ...user })).toBe(status);
+  });
+});
+
+describe('userLockOf', () => {
+  const viewer = { id: 'me', isSuperuser: false };
+  it('locks your own row, and a superuser row for a viewer who is not one', () => {
+    expect(userLockOf({ id: 'me', isSuperuser: false }, viewer)).toBe('self');
+    expect(userLockOf({ id: 'su', isSuperuser: true }, viewer)).toBe('superuser');
+    expect(userLockOf({ id: 'su', isSuperuser: true }, { ...viewer, isSuperuser: true })).toBe(
+      null,
+    );
+    expect(userLockOf({ id: 'u', isSuperuser: false }, viewer)).toBe(null);
+  });
+});
+
+describe('usersViewToQuery and the drawer keys', () => {
+  it('keeps the open user and its section, and drops a section without a user', () => {
+    const view = { tab: 'banned', sort: 'default', search: '', page: 1 } as const;
+    expect(usersViewToQuery(view, { user: 'tuan_k', section: 'security' })).toEqual({
+      user: 'tuan_k',
+      section: 'security',
+      tab: 'banned',
+    });
+    expect(usersViewToQuery(view, { section: 'security' })).toEqual({ tab: 'banned' });
+    expect(usersViewToQuery(view, { user: 'tuan_k', section: 'bogus' })).toEqual({
+      user: 'tuan_k',
+      tab: 'banned',
+    });
   });
 });

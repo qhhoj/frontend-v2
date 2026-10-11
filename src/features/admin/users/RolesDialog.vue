@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import type { Role } from '@/api/types/users-admin';
 import QueryState from '@/components/QueryState.vue';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import RoleEditor from './RoleEditor.vue';
 import { usePermissionLabel } from './use-permission-label';
 import { usePermissionCatalogQuery, useRolesQuery } from './users.queries';
@@ -22,6 +22,8 @@ const retry = () => Promise.all([rolesQuery.refetch(), catalogQuery.refetch()]);
 const permissionLabel = usePermissionLabel();
 const labelOf = (code: string) =>
   permissionLabel(code, catalogQuery.data.value?.find((entry) => entry.codename === code)?.label);
+/** The custom header slot loses PrimeVue's own label, so the dialog is named by its heading here. */
+const titleId = useId();
 </script>
 
 <template>
@@ -31,9 +33,12 @@ const labelOf = (code: string) =>
     :draggable="false"
     :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
     :close-button-props="{ 'aria-label': $t('common.close') }"
+    :pt="{ root: { 'aria-labelledby': titleId } }"
   >
     <template #header>
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.users.roles.title') }}</h2>
+      <h2 :id="titleId" class="font-display text-lg font-semibold">
+        {{ $t('admin.users.roles.title') }}
+      </h2>
     </template>
     <QueryState
       :loading="rolesQuery.isPending.value || catalogQuery.isPending.value"
@@ -55,7 +60,7 @@ const labelOf = (code: string) =>
         <button
           v-if="isSuperuser"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="BUTTON.secondary"
           class="self-start"
           @click="editing = 'new'"
         >
@@ -79,7 +84,7 @@ const labelOf = (code: string) =>
               <span class="ml-auto flex gap-2">
                 <button
                   type="button"
-                  :class="ADMIN_BUTTON_CLASS"
+                  :class="BUTTON.secondary"
                   :aria-expanded="opened === role.id"
                   @click="opened = opened === role.id ? null : role.id"
                 >
@@ -88,7 +93,7 @@ const labelOf = (code: string) =>
                 <button
                   v-if="isSuperuser"
                   type="button"
-                  :class="ADMIN_BUTTON_CLASS"
+                  :class="BUTTON.secondary"
                   @click="editing = role"
                 >
                   {{ $t('admin.users.roles.edit') }}

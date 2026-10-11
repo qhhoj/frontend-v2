@@ -6,7 +6,7 @@ import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { BUTTON, INPUT } from '../ui/controls';
 import PermissionChecklist from './PermissionChecklist.vue';
 import { setDelta } from './user-access';
 
@@ -62,7 +62,7 @@ const refusal = computed(() => {
         :id="id"
         v-model="name"
         maxlength="150"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
@@ -77,13 +77,13 @@ const refusal = computed(() => {
     <div class="flex flex-wrap gap-2">
       <button
         type="submit"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="BUTTON.primary"
         :aria-disabled="!hasChanges || name.trim() === '' || save.isPending.value || undefined"
         :aria-busy="save.isPending.value || undefined"
       >
         {{ role ? $t('admin.users.roles.save') : $t('admin.users.roles.create') }}
       </button>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('cancel')">
+      <button type="button" :class="BUTTON.secondary" @click="emit('cancel')">
         {{ $t('common.cancel') }}
       </button>
     </div>

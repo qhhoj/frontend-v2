@@ -1,11 +1,42 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { adminList, adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
+import { adminList, adminOk, confirmInDialog, signInAsStaff } from './fixtures/admin';
 import { sessionResponse, sessionUser, userPage } from '../src/test/fixtures';
 import { staffUser } from '../src/test/admin-fixtures/users';
 
 const TARGET_ID = '0192a000-0000-7000-8000-00000000c101';
 const STAFF_ID = '0192a000-0000-7000-8000-00000000a001';
+/** The edit fields of `tuan_k` (`GET /admin/users/:username/profile`). */
+const TARGET_EDIT = {
+  id: TARGET_ID,
+  username: 'tuan_k',
+  displayName: '',
+  fullName: 'Tuấn Khang',
+  about: '',
+  email: 'tuan_k@example.com',
+  displayRank: 'user',
+  isUnlisted: false,
+  mute: false,
+  allowTagging: true,
+  notes: '',
+  inContest: false,
+  hasTwoFactor: false,
+  isActive: true,
+  isStaff: false,
+  isSuperuser: false,
+  banReason: null,
+  dateJoined: '2024-09-01T00:00:00.000Z',
+  lastLogin: null,
+  organizations: [],
+};
+const NO_ACCESS = {
+  isStaff: false,
+  isSuperuser: false,
+  groups: [],
+  permissions: [],
+  effective: [],
+  canEdit: true,
+};
 const target = userPage({
   id: TARGET_ID,
   username: 'tuan_k',
@@ -15,7 +46,7 @@ const target = userPage({
 });
 
 for (const viewport of AUDIT_VIEWPORTS)
-  test(`users at ${viewport.name}: the list, the exact lookup and a ban with its reason, accessible`, async ({
+  test(`users at ${viewport.name}: the list, the exact username opens the drawer, and a ban with its reason, accessible`, async ({
     page,
     api,
   }) => {
@@ -37,15 +68,18 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['POST /users/tuan_k/ban'] = { status: 204 };
     await page.goto('/admin/users');
     await expect(page.getByText('spammer')).toBeVisible();
-    await page.getByLabel('Tên đăng nhập').fill('tuan_k');
-    await page.getByRole('button', { name: 'Tra cứu', exact: true }).click();
-    await expect(page.getByTestId('user-card')).toContainText(TARGET_ID);
+    const search = page.getByLabel('Tìm người dùng');
+    await search.fill('tuan_k');
+    await expect(page.getByRole('link', { name: 'Mở tài khoản “tuan_k”' })).toBeVisible();
+    await search.press('Enter');
+    await expect(page.getByTestId('user-edit')).toContainText(TARGET_ID);
     await page.getByLabel('Lý do (bắt buộc, hiện cho người bị cấm)').fill('Spam blog');
     await page.getByRole('button', { name: 'Cấm người dùng', exact: true }).click();
-    await expect(dialogOf(page)).toBeVisible();
+    const confirm = page.getByRole('dialog', { name: 'Cấm tuan_k?' });
+    await expect(confirm).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
     await confirmInDialog(page, 'Cấm');
-    await expect(dialogOf(page)).toBeHidden();
+    await expect(confirm).toBeHidden();
     expect(api.requestsTo('POST /users/tuan_k/ban')).toHaveLength(1);
   });
 
@@ -77,7 +111,11 @@ test('a superuser views as a user: the bar shows on the home page and its stop b
     api.routes['GET /auth/me'] = adminOk(staff);
     return adminOk(staff);
   };
-  await page.goto('/admin/users?user=tuan_k');
+  api.routes['GET /admin/users/tuan_k/profile'] = adminOk(TARGET_EDIT);
+  api.routes['GET /admin/users/tuan_k/access'] = adminOk(NO_ACCESS);
+  api.routes['GET /admin/permissions'] = adminOk([]);
+  api.routes['GET /admin/groups'] = adminOk([]);
+  await page.goto('/admin/users?user=tuan_k&section=account');
   await page.getByRole('button', { name: 'Đóng vai tuan_k', exact: true }).click();
   await confirmInDialog(page, 'Bắt đầu đóng vai');
   const bar = page.getByRole('region', { name: 'Đang xem dưới tên người khác' });
@@ -87,7 +125,7 @@ test('a superuser views as a user: the bar shows on the home page and its stop b
   expect(api.requestsTo('POST /auth/impersonate/stop')).toHaveLength(1);
 });
 
-test('the staff list filters by the banned tab and a username prefix, and its table is keyboard-scrollable at each width', async ({
+test('the staff list filters by the banned tab and a username prefix; the table scrolls by keyboard, a phone shows cards', async ({
   page,
   api,
 }) => {
@@ -119,13 +157,17 @@ test('the staff list filters by the banned tab and a username prefix, and its ta
   await page.getByLabel('Tìm người dùng').fill('mo');
   await expect(page).toHaveURL(/q=mo/);
   await expect(page.getByTestId('user-row')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Xóa ô tìm' }).click();
+  await page.getByLabel('Tìm người dùng').fill('');
   await expect(page.getByTestId('user-row')).toHaveCount(3);
   for (const viewport of AUDIT_VIEWPORTS) {
     await page.setViewportSize(viewport);
-    const region = page.getByRole('region', { name: 'Danh sách người dùng' });
-    await region.focus();
-    await expect(region).toBeFocused();
+    // A phone shows one card per user instead of the scrolling table.
+    if (viewport.width >= 768) {
+      const region = page.getByRole('region', { name: 'Danh sách người dùng' });
+      await region.focus();
+      await expect(region).toBeFocused();
+    }
+    await expect(page.getByTestId('user-row')).toHaveCount(3);
     expect(await axeViolationsIn(page)).toEqual([]);
   }
 });

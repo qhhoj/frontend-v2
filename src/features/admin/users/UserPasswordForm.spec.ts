@@ -22,11 +22,7 @@ const routes = (passwordAnswer: ReturnType<typeof ok>) => ({
 });
 
 async function openPasswordForm() {
-  const { wrapper } = await mountApp('/admin/users?user=tuan_k');
-  await vi.waitFor(() =>
-    expect(wrapper.find('[data-testid="user-edit-open"]').exists()).toBe(true),
-  );
-  await wrapper.get('[data-testid="user-edit-open"]').trigger('click');
+  await mountApp('/admin/users?user=tuan_k&section=security');
   await vi.waitFor(() => expect(document.body.querySelector('#edit-new-password')).not.toBeNull());
   const dialog = openDialog();
   const fill = (id: string, value: string) => {

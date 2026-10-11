@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue';
 import type { PermissionEntry } from '@/api/types/users-admin';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { usePermissions } from '@/stores/use-permissions';
+import { INPUT } from '../ui/controls';
 import { checklistGroups } from './user-access';
 import { usePermissionLabel } from './use-permission-label';
 
@@ -13,6 +14,8 @@ const props = defineProps<{
   readonly?: boolean;
 }>();
 const permissionLabel = usePermissionLabel();
+/** Codenames are developer text: only a superuser sees them, as a tooltip (pages/admin.md, copy rules). */
+const { isSuperuser } = usePermissions();
 const searchId = useId();
 const search = ref('');
 const labelOf = (entry: { codename: string; label: string }) =>
@@ -41,15 +44,12 @@ const toggle = (code: string, on: boolean) => {
       v-model="search"
       type="search"
       :placeholder="$t('admin.users.access.search')"
-      :class="ADMIN_INPUT_CLASS"
+      :class="INPUT"
     />
     <p v-if="groups.length === 0" class="text-sm text-muted">
       {{ search ? $t('admin.users.access.noMatch') : $t('admin.users.access.noneHeld') }}
     </p>
-    <div
-      class="flex max-h-96 flex-col gap-4 overflow-y-auto pr-1"
-      data-testid="permission-checklist"
-    >
+    <div class="flex flex-col gap-4" data-testid="permission-checklist">
       <fieldset v-for="group in groups" :key="group.category" class="flex flex-col gap-1">
         <legend class="mb-1 text-xs font-semibold tracking-wide text-muted uppercase">
           {{ $t(`admin.users.access.categories.${group.category}`) }}
@@ -57,19 +57,18 @@ const toggle = (code: string, on: boolean) => {
         <label
           v-for="item in group.items"
           :key="item.codename"
-          class="flex min-h-11 items-center gap-3 rounded-row px-2 hover:bg-surface-solid"
+          class="flex min-h-10 items-center gap-3 rounded-cell px-2 hover:bg-surface-hover pointer-coarse:min-h-11"
         >
           <input
             v-if="!readonly && (item.category !== 'other' || selected.includes(item.codename))"
             type="checkbox"
-            class="size-5 shrink-0 accent-accent"
+            class="size-4 shrink-0 accent-accent"
             :checked="selected.includes(item.codename)"
             @change="toggle(item.codename, ($event.target as HTMLInputElement).checked)"
           />
-          <span class="flex min-w-0 flex-1 flex-col">
-            <span class="text-sm">{{ item.label }}</span>
-            <span class="truncate font-mono text-xs text-muted">{{ item.codename }}</span>
-          </span>
+          <span class="min-w-0 flex-1 text-sm" :title="isSuperuser ? item.codename : undefined">{{
+            item.label
+          }}</span>
           <span class="flex shrink-0 flex-wrap justify-end gap-1">
             <span
               v-if="readonly && selected.includes(item.codename)"

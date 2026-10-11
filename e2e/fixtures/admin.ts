@@ -19,7 +19,8 @@ export function signInAsStaff(api: FakeApi, permissions: string[], isSuperuser =
 }
 
 /** The open ConfirmDialog (the shared `src/components/ConfirmDialog.vue` has no test ids). */
-export const dialogOf = (page: Page): Locator => page.getByRole('dialog');
+/** The dialog on top: a confirm opened over a drawer is the last one. */
+export const dialogOf = (page: Page): Locator => page.getByRole('dialog').last();
 
 /** Presses the confirm button of the open ConfirmDialog by its label; cancel is `dialogOf(page).getByRole('button', { name: 'Hủy' })`. */
 export const confirmInDialog = (page: Page, label: string) =>

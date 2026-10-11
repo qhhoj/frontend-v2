@@ -68,11 +68,22 @@ export function usersViewFromQuery(query: LocationQuery): UsersListView {
   };
 }
 
-/** Defaults are left out so the plain list keeps the plain URL; `user` (the opened card) is not a filter and survives. */
+/** The tabs of the user drawer, in order; `?section=` names the open one (the first when absent or unknown). */
+export const USER_SECTIONS = ['profile', 'access', 'security', 'account'] as const;
+export type UserSection = (typeof USER_SECTIONS)[number];
+
+export const userSectionOf = (query: LocationQuery): UserSection | null => {
+  const section = singleText(query.section);
+  return USER_SECTIONS.find((candidate) => candidate === section) ?? null;
+};
+
+/** Defaults are left out so the plain list keeps the plain URL; `user` and `section` (the open drawer) are not filters and survive. */
 export function usersViewToQuery(view: UsersListView, current: LocationQuery): LocationQueryRaw {
   const query: LocationQueryRaw = {};
   const user = singleText(current.user);
   if (user) query.user = user;
+  const section = userSectionOf(current);
+  if (user && section) query.section = section;
   if (view.tab !== 'all') query.tab = view.tab;
   if (view.sort !== 'default') query.sort = view.sort;
   if (view.search) query.q = view.search;
@@ -95,4 +106,14 @@ export type UserStatus = 'banned' | 'inactive' | 'active';
 export const userStatusOf = (user: Pick<StaffUser, 'banReason' | 'isActive'>): UserStatus => {
   if (user.banReason !== null) return 'banned';
   return user.isActive ? 'active' : 'inactive';
+};
+
+/** Who may open the drawer on a row: never yourself, and a superuser only for a superuser. Pure. */
+export type UserLock = 'self' | 'superuser' | null;
+export const userLockOf = (
+  target: { id: string; isSuperuser: boolean },
+  viewer: { id: string | undefined; isSuperuser: boolean },
+): UserLock => {
+  if (target.id === viewer.id) return 'self';
+  return target.isSuperuser && !viewer.isSuperuser ? 'superuser' : null;
 };

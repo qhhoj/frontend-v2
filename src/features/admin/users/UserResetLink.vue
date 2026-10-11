@@ -5,7 +5,7 @@ import { sendUserResetLink } from '@/api/users-admin.api';
 import { adminIssueText, failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 
 const props = defineProps<{ username: string; email: string }>();
 const send = useAdminMutation({ mutate: () => sendUserResetLink(props.username) });
@@ -28,7 +28,7 @@ const refusal = computed(() => {
     </p>
     <button
       type="button"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="BUTTON.secondary"
       class="self-start"
       :aria-disabled="send.isPending.value || undefined"
       :aria-busy="send.isPending.value || undefined"

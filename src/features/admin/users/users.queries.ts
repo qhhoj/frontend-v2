@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/vue-query';
 import type { QueryClient } from '@tanstack/vue-query';
-import { computed } from 'vue';
+import { computed, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 import {
   fetchPermissionCatalog,
   fetchRoles,
@@ -20,12 +21,16 @@ export const useStaffUsersQuery = (query: () => StaffUserQuery) => {
   });
 };
 
-/** The editable fields of one user, for the staff edit dialog. */
-export const useUserEditQuery = (username: () => string) => {
+/** The editable fields of one user, for the staff edit drawer; loaded only while `enabled` (the viewer may edit). */
+export const useUserEditQuery = (
+  username: () => string,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => ['admin', 'users', 'edit', username(), viewer.value]),
     queryFn: () => fetchUserForEdit(username()),
+    enabled: computed(() => toValue(enabled)),
   });
 };
 

@@ -42,16 +42,18 @@ const routes = (viewer: Record<string, unknown>, canEdit: boolean) => ({
 });
 
 async function openAccess() {
-  const { wrapper } = await mountApp('/admin/users?user=tuan_k');
-  await vi.waitFor(() =>
-    expect(wrapper.find('[data-testid="user-edit-open"]').exists()).toBe(true),
-  );
-  await wrapper.get('[data-testid="user-edit-open"]').trigger('click');
+  await mountApp('/admin/users?user=tuan_k&section=access');
   await vi.waitFor(() =>
     expect(document.body.querySelector('[data-testid="user-access"]')).not.toBeNull(),
   );
   return openDialog();
 }
+
+/** The drawer footer's save button, labelled for the open tab. */
+const saveButton = (dialog: HTMLElement) =>
+  [...dialog.querySelectorAll<HTMLButtonElement>('button[type="submit"]')].find(
+    (button) => button.textContent?.trim() === 'Lưu quyền',
+  );
 
 describe('UserAccessSection', () => {
   vi.setConfig({ testTimeout: 20_000 });
@@ -62,12 +64,12 @@ describe('UserAccessSection', () => {
     const access = dialog.querySelector('[data-testid="user-access"]')!;
     expect(access.textContent).toContain('qua Mods');
     const banBox = [...access.querySelectorAll('label')]
-      .find((label) => label.textContent?.includes('judge.ban_user'))!
+      .find((label) => label.textContent?.includes('Cấm người dùng'))!
       .querySelector('input')!;
     banBox.click();
     (access.querySelector('[data-testid="role-chip"]') as HTMLButtonElement).click();
     await flushPromises();
-    (access.querySelector('[data-testid="access-save"]') as HTMLButtonElement).click();
+    saveButton(dialog)!.click();
     await flushPromises();
     expect(calls.find((call) => call.method === 'PATCH' && call.path === ACCESS_URL)?.body).toEqual(
       { addPermissions: ['judge.ban_user'], removeGroups: [MODS.id] },
@@ -82,7 +84,7 @@ describe('UserAccessSection', () => {
     const access = dialog.querySelector('[data-testid="user-access"]')!;
     expect(access.querySelector('[data-testid="access-read-only"]')).not.toBeNull();
     expect(access.querySelector('input[type="checkbox"]')).toBeNull();
-    expect(access.querySelector('[data-testid="access-save"]')).toBeNull();
+    expect(saveButton(dialog)).toBeUndefined();
     expect(access.textContent).toContain('Kiểm duyệt bình luận');
     expect(access.textContent).not.toContain('judge.ban_user');
   });

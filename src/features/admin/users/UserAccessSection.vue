@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import type { UserAccess } from '@/api/types/users-admin';
 import { changeUserAccess } from '@/api/users-admin.api';
@@ -8,7 +9,6 @@ import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
-import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import PermissionChecklist from './PermissionChecklist.vue';
 import { accessChangeOf, accessFormOf, inheritedFrom } from './user-access';
 import type { AccessForm } from './user-access';
@@ -21,6 +21,8 @@ import {
 
 /** Roles, staff/superuser flags and direct permissions. Anyone who opens the dialog reads them; only a superuser (never on their own account) changes them. */
 const props = defineProps<{ username: string }>();
+const { t } = useI18n();
+const FORM_ID = 'user-edit-access';
 const accessQuery = useUserAccessQuery(() => props.username);
 const rolesQuery = useRolesQuery();
 const catalogQuery = usePermissionCatalogQuery();
@@ -54,10 +56,15 @@ const loadError = computed(
   () => accessQuery.error.value ?? rolesQuery.error.value ?? catalogQuery.error.value,
 );
 
+const savedAt = ref<Date | null>(null);
 const save = useAdminMutation({
   mutate: () => changeUserAccess(props.username, change.value),
   invalidates: () => [['admin', 'access']],
-  onSuccess: seed,
+  successText: () => t('admin.users.access.saved'),
+  onSuccess: (saved) => {
+    seed(saved);
+    savedAt.value = new Date();
+  },
   // The flags also show in the staff list and on the opened user's card.
   onDone: () => {
     void invalidateUserModeration(queryClient, props.username);
@@ -74,16 +81,29 @@ const toggleRole = (id: string) => {
   const chosen = form.value.groups;
   form.value.groups = chosen.includes(id) ? chosen.filter((item) => item !== id) : [...chosen, id];
 };
+function discard() {
+  if (basis.value) form.value = accessFormOf(basis.value);
+  save.reset();
+}
+defineExpose({
+  formId: FORM_ID,
+  saveLabel: t('admin.users.access.save'),
+  editable: canEdit,
+  dirtyCount: computed(() => (canEdit.value ? Object.keys(change.value).length : 0)),
+  isPending: save.isPending,
+  savedAt,
+  discard,
+});
 const retry = () =>
   Promise.all([accessQuery.refetch(), rolesQuery.refetch(), catalogQuery.refetch()]);
 </script>
 
 <template>
   <section class="flex flex-col gap-4" :aria-label="$t('admin.users.access.title')">
-    <h3 class="font-display text-base font-semibold">{{ $t('admin.users.access.title') }}</h3>
     <QueryState :loading="isPending" :error="loadError" @retry="retry">
       <form
         v-if="basis && form"
+        :id="FORM_ID"
         class="flex flex-col gap-4"
         data-testid="user-access"
         @submit.prevent="canEdit && hasChanges && save.run(undefined)"
@@ -159,24 +179,7 @@ const retry = () =>
             :readonly="!canEdit"
           />
         </div>
-        <template v-if="canEdit">
-          <button
-            type="submit"
-            :class="ADMIN_PRIMARY_CLASS"
-            class="self-start"
-            :aria-disabled="!hasChanges || save.isPending.value || undefined"
-            :aria-busy="save.isPending.value || undefined"
-            data-testid="access-save"
-          >
-            {{ $t('admin.users.access.save') }}
-          </button>
-          <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
-          <AdminStatus
-            v-else-if="save.isDone.value && !hasChanges"
-            kind="done"
-            :text="$t('admin.users.access.saved')"
-          />
-        </template>
+        <AdminStatus v-if="canEdit && refusal" kind="refused" :text="refusal" />
       </form>
     </QueryState>
   </section>
