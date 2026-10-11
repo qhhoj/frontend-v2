@@ -28,7 +28,7 @@ export const useOrganizationsQuery = (
       toValue(page),
       viewer.value,
       ...(term() ? [term()] : []),
-      ...(toValue(administered) ? ['administered'] : []),
+      ...(toValue(administered) ? [{ administered: true }] : []),
     ]),
     queryFn: () => fetchOrganizations(toValue(page), term(), toValue(administered)),
     placeholderData: keepPreviousData,

@@ -1,4 +1,4 @@
-import type { AdminCapability } from '@/features/admin/admin-access';
+import type { AdminCapability } from '@/features/admin/admin-screens';
 import type { PermissionRule } from '@/lib/permissions';
 import 'vue-router';
 

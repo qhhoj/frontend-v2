@@ -1,9 +1,9 @@
 import { allowsAny } from '@/lib/permissions';
 import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS } from './admin-screens';
+import type { AdminCapability } from './admin-screens';
 
-/** An object right the session reports beside the permission codenames (backend `UserResponse.adminCapabilities`). */
-export type AdminCapability = 'organizations';
+export type { AdminCapability };
 
 /** What the admin checks read; a `SessionUser` is one. */
 export interface AdminViewer extends PermissionHolder {

@@ -14,7 +14,7 @@ export const hasPermission = (user: PermissionHolder | null, code: string): bool
 const asList = (rule: PermissionRule): readonly string[] =>
   typeof rule === 'string' ? [rule] : rule;
 
-/** `null`: no permission needed beyond being signed in (the router already keeps non-staff out of /admin). */
+/** `null`: no permission needed beyond being signed in (in `/admin`, the router already keeps out whoever may use no screen: `canEnterAdmin`). */
 export function allowsAny(user: PermissionHolder | null, rule: PermissionRule | null): boolean {
   if (rule === null) return user !== null;
   return asList(rule).some((permission) => hasPermission(user, permission));

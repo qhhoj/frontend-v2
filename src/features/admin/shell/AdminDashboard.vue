@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { CloudDownload, Plus, Trophy } from 'lucide-vue-next';
-import { allowsAny } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import AdminBit from './AdminBit.vue';
 import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
@@ -17,7 +17,7 @@ const ACTION_ICONS = {
   contestNew: Trophy,
 } as const;
 const actions = computed(() =>
-  QUICK_ACTIONS.filter((id) => allowsAny(session.user, ADMIN_SCREENS[id].permission)),
+  QUICK_ACTIONS.filter((id) => canUseAdmin(session.user, ADMIN_SCREENS[id])),
 );
 </script>
 

@@ -153,7 +153,7 @@ const section = (key: string, ids: AdminNavId[]): DashboardSection => ({
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
   section('content', ['problems', 'polygonImport', 'problemImport', 'posts']),
   section('contests', ['contests', 'similarity', 'rejudge', 'submissions', 'judges']),
-  section('people', ['users', 'activity', 'settings', 'pages', 'tickets']),
+  section('people', ['users', 'organizations', 'activity', 'settings', 'pages', 'tickets']),
 ];
 
 export const visibleDashboard = (user: AdminViewer | null) =>

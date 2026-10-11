@@ -47,6 +47,8 @@
       "activity": "View and export logs, summaries by user.",
       "settings": "Limits, similarity and other settings, and the change history.",
       "pages": "Create and edit about and policy pages.",
+      "organizations": "Edit the organizations you administer, their members and join requests.",
+      "submissions": "Reject, abort or rejudge a single submission.",
       "tickets": "Tickets sent by users.",
       "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import.",
       "submissions": "Filter submissions, select many to rejudge or recalculate points."

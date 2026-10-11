@@ -1,5 +1,8 @@
+import type { Schemas } from '@/api/schemas';
 import type { PermissionRule } from '@/lib/permissions';
-import type { AdminCapability } from './admin-access';
+
+/** An object right the session reports beside the permission codenames (backend `UserResponse.adminCapabilities`). */
+export type AdminCapability = keyof Schemas['AdminCapabilitiesResponse'];
 
 export interface AdminScreen {
   path: string;
