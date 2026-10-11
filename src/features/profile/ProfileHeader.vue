@@ -38,7 +38,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
 <template>
   <GlassCard
     data-testid="profile-header"
-    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
+    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_auto] md:p-8"
   >
     <div class="flex min-w-0 flex-col gap-4">
       <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
@@ -102,7 +102,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
       <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
       <p :class="tierClass" class="font-display text-4xl font-semibold">{{ user.rating ?? '—' }}</p>
-      <p v-if="user.ratingSummary" class="min-h-10 text-sm text-muted">
+      <p v-if="user.ratingSummary" class="text-sm text-muted">
         {{
           $t('profile.ratingSummary', {
             max: user.ratingSummary.max,

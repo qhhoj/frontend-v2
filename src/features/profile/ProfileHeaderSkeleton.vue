@@ -15,7 +15,7 @@ const TAB_COUNT = 5;
   <SkeletonBlock class="h-5 w-40" />
   <GlassCard
     data-testid="profile-header"
-    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
+    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_auto] md:p-8"
   >
     <div data-skeleton-region="header" class="flex min-w-0 flex-col gap-4">
       <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
@@ -27,11 +27,11 @@ const TAB_COUNT = 5;
         </div>
       </div>
     </div>
-    <div data-skeleton-region="rating" class="flex flex-col">
+    <div data-skeleton-region="rating" class="flex flex-col items-start">
       <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
         <SkeletonBlock class="h-5 w-16" />
         <SkeletonBlock class="h-10 w-24" />
-        <SkeletonBlock class="h-10 w-56" />
+        <SkeletonBlock class="h-5 w-56" />
       </div>
     </div>
   </GlassCard>
