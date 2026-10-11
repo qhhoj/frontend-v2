@@ -12,9 +12,12 @@ import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import JoinRequestTable from './JoinRequestTable.vue';
 
-/** One organization's join requests (the admin page's Yêu cầu tab and the organization's own Quản lý tab). */
+/**
+ * One organization's join requests (the admin page's Yêu cầu tab and the organization's own Quản lý tab).
+ * `embedded`: a parent fold already shows the title, so only the seats line stays in the header.
+ */
 const STATES: JoinRequestState[] = ['P', 'A', 'R'];
-const props = defineProps<{ slug: string }>();
+const props = defineProps<{ slug: string; embedded?: boolean }>();
 const route = useRoute();
 const { t } = useI18n();
 const state = ref<JoinRequestState>('P');
@@ -47,11 +50,15 @@ const seatsText = computed(() => {
 <template>
   <section
     data-testid="join-requests"
-    :aria-labelledby="`join-requests-${slug}`"
+    :aria-labelledby="embedded ? undefined : `join-requests-${slug}`"
     class="flex min-w-0 flex-col gap-3"
   >
     <header class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-      <h3 :id="`join-requests-${slug}`" class="font-display text-base font-semibold">
+      <h3
+        v-if="!embedded"
+        :id="`join-requests-${slug}`"
+        class="font-display text-base font-semibold"
+      >
         {{ $t('admin.organizations.requests.title') }}
       </h3>
       <span data-testid="seats-line" class="text-sm text-muted tabular-nums">{{ seatsText }}</span>

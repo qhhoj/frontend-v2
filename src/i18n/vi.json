@@ -1636,6 +1636,34 @@
       "contests": "Kỳ thi của tổ chức",
       "requests": "Yêu cầu tham gia",
       "pending": "{count} chờ"
+    },
+    "manage": {
+      "title": "Quản lý {name}",
+      "pendingLead": "{count} yêu cầu tham gia đang chờ duyệt",
+      "noPending": "Không có yêu cầu chờ duyệt",
+      "tiles": {
+        "label": "Số liệu tổ chức",
+        "members": "Thành viên",
+        "pending": "Chờ duyệt",
+        "problems": "Bài tập",
+        "contests": "Kỳ thi"
+      },
+      "problems": {
+        "title": "Bài tập",
+        "all": "Tất cả {count} bài",
+        "empty": "Chưa có bài tập.",
+        "shown": "Hiện",
+        "hidden": "Ẩn"
+      },
+      "contests": {
+        "title": "Kỳ thi",
+        "all": "Tất cả {count} kỳ thi",
+        "empty": "Chưa có kỳ thi."
+      },
+      "settings": {
+        "title": "Cài đặt",
+        "lead": "Ảnh, tên, đường dẫn, giới thiệu, cách tham gia"
+      }
     }
   },
   "orgMembership": {
@@ -2665,14 +2693,12 @@
   "orgAdmin": {
     "pendingBadge": "{count} yêu cầu đang chờ",
     "info": {
-      "title": "Thông tin tổ chức",
       "name": "Tên tổ chức",
       "slug": "Đường dẫn",
       "slugHint": "Đổi đường dẫn sẽ làm các liên kết cũ không mở được.",
       "about": "Giới thiệu (Markdown)",
       "aboutPreview": "Xem trước phần giới thiệu",
       "save": "Lưu thay đổi",
-      "reset": "Hủy",
       "staffLink": "Mở trong trang quản trị (hạn mức, chỗ, ẩn hiện)"
     },
     "joinMode": {
