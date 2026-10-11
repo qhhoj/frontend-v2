@@ -6,6 +6,7 @@ import { formatNumber, formatShortDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import ContestOrganizationChips from './ContestOrganizationChips.vue';
 import { listCallToAction } from './contest-action';
 import {
   ENDED_CELL,
@@ -16,7 +17,11 @@ import {
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-defineProps<{ contests: ContestListItem[] }>();
+defineProps<{
+  contests: ContestListItem[];
+  /** The list is one organization's: its name is not repeated on every row. */
+  isOrganizationScoped?: boolean;
+}>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Ended rows do not change with the clock, so each render reads it once. */
@@ -68,11 +73,16 @@ const whenText = (contest: ContestListItem) => {
               >{{ contest.name }}</RouterLink
             >
             <span class="block font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
+            <span
+              v-if="!isOrganizationScoped && contest.organizations.length"
+              class="mt-1 flex max-w-full flex-wrap gap-1.5"
+              ><ContestOrganizationChips :contest="contest"
+            /></span>
           </th>
           <td class="whitespace-nowrap" :class="ENDED_CELL.when">{{ whenText(contest) }}</td>
           <td :class="ENDED_CELL.format">
             <span class="flex flex-wrap gap-1.5">
-              <ContestChips :contest="contest" with-tags with-code-needed />
+              <ContestChips :contest="contest" with-tags with-code-needed hide-organizations />
               <ViewerBadge :badge-key="callOf(contest).badgeKey" />
             </span>
           </td>
