@@ -5,10 +5,13 @@ import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
+import { SITE_NOTICE_KEY } from '@/features/site-notice/site-notice';
 import ConfigEditor from './ConfigEditor.vue';
+import SiteNoticeCard from './SiteNoticeCard.vue';
 import { configKindOf } from './config-kinds';
+import { KNOWN_CONFIG_KEYS, knownConfigKey } from './config-registry';
 import type { ConfigKind } from './config-kinds';
 import { useSiteAdminQuery } from './site.queries';
 
@@ -49,10 +52,15 @@ const editRow = (key: string) => {
   deletedText.value = '';
   editing.value = { key, isNew: false };
 };
-const addKey = () => {
+const addKey = (key = '') => {
   deletedText.value = '';
-  editing.value = { key: '', isNew: true };
+  editing.value = { key, isNew: true };
 };
+/** Known keys with no value yet: one click opens the new-key form with the key filled in. */
+const unsetKnown = computed(() =>
+  KNOWN_CONFIG_KEYS.filter(({ key }) => !(key in config.value) && key !== SITE_NOTICE_KEY),
+);
+const notice = computed(() => config.value[SITE_NOTICE_KEY] ?? null);
 const closeEditor = () => (editing.value = null);
 
 /** The editor and its delete dialog unmount with the deleted key, so the result lives in a standing status region. */
@@ -70,7 +78,7 @@ function onDeleted(key: string) {
   <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
     <AdminPageHeader :title="$t('admin.site.config.title')">
       <template #actions>
-        <button ref="addButton" type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey">
+        <button ref="addButton" type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey()">
           {{ $t('admin.site.config.add') }}
         </button>
       </template>
@@ -90,7 +98,8 @@ function onDeleted(key: string) {
       :error="query.error.value"
       @retry="query.refetch()"
     >
-      <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
+      <SiteNoticeCard :current="notice" />
+      <div class="mt-6 grid gap-6 lg:grid-cols-2 lg:items-start">
         <SettingsCard :title="$t('admin.site.config.title')">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
@@ -120,6 +129,17 @@ function onDeleted(key: string) {
                     >
                       {{ row.key }}
                     </button>
+                    <span
+                      v-if="knownConfigKey(row.key)"
+                      class="block text-xs"
+                      :class="knownConfigKey(row.key)!.isUsed ? 'text-positive' : 'text-muted'"
+                    >
+                      {{
+                        knownConfigKey(row.key)!.isUsed
+                          ? $t('admin.site.config.usedChip')
+                          : $t('admin.site.config.unusedChip')
+                      }}
+                    </span>
                   </td>
                   <td class="max-w-[260px] truncate px-2 py-2 font-mono text-xs">
                     {{ row.value }}
@@ -131,6 +151,22 @@ function onDeleted(key: string) {
             </table>
           </div>
           <p class="text-xs text-muted">{{ $t('admin.site.config.listNote') }}</p>
+          <div v-if="unsetKnown.length" class="flex flex-col gap-2 border-t border-line pt-3">
+            <h3 class="text-sm font-semibold">{{ $t('admin.site.config.knownHeading') }}</h3>
+            <ul class="flex flex-col gap-2">
+              <li v-for="entry in unsetKnown" :key="entry.key" class="flex items-start gap-3">
+                <div class="min-w-0 flex-1">
+                  <span class="font-mono text-sm font-semibold">{{ entry.key }}</span>
+                  <span class="block text-xs text-muted">{{
+                    $t(`admin.site.config.known.${entry.key}`)
+                  }}</span>
+                </div>
+                <button type="button" :class="ADMIN_BUTTON_CLASS" @click="addKey(entry.key)">
+                  {{ $t('admin.site.config.setKnown') }}
+                </button>
+              </li>
+            </ul>
+          </div>
         </SettingsCard>
 
         <SettingsCard v-if="editing" :title="editorTitle">

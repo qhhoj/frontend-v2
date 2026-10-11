@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { siteData } from '@/test/admin-fixtures/site';
@@ -25,6 +25,7 @@ describe('MiscConfigPage', () => {
       ...staffViewer(PERMS),
       'GET /site': ok(siteData()),
       'PUT /admin/site/config/announcement': ok({ key: 'announcement', value: '<p>Mới</p>' }),
+      'GET /admin/site/config/announcement/revisions': page([]),
     });
     const wrapper = await mountConfig();
     expect(rowWith(wrapper, 'announcement').text()).toContain('HTML');
@@ -45,6 +46,8 @@ describe('MiscConfigPage', () => {
       'GET /site': ok(siteData()),
       'PUT /admin/site/config/new_key': ok({ key: 'new_key', value: 'x' }),
       'DELETE /admin/site/config/contact_email': { status: 204 },
+      'GET /admin/site/config/contact_email/revisions': page([]),
+      'GET /admin/site/config/new_key/revisions': page([]),
     });
     const wrapper = await mountConfig();
     await buttonNamed(wrapper, 'Thêm khoá').trigger('click');

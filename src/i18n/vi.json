@@ -2614,5 +2614,9 @@
       "unreachable": "Hiện chưa kết nối được",
       "checkedAt": "Kiểm tra lúc {time}"
     }
+  },
+  "siteNotice": {
+    "region": "Thông báo trang",
+    "dismiss": "Đóng thông báo"
   }
 }

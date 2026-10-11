@@ -63,6 +63,19 @@
     "label": "Tìm bài viết",
     "placeholder": "Chữ trong tiêu đề hoặc đúng tên tác giả",
     "submit": "Tìm",
-    "summary": "Kết quả cho “{text}”."
+    "summary": "Kết quả cho “{text}”.",
+    "organization": "Tổ chức",
+    "organizationPlaceholder": "Mã định danh tổ chức",
+    "organizationSummary": "Chỉ bài viết của tổ chức “{slug}”."
+  },
+  "bulk": {
+    "label": "Các bài viết đã chọn",
+    "column": "Chọn",
+    "select": "Chọn “{title}”",
+    "count": "Đã chọn {count} bài viết",
+    "hide": "Ẩn mục đã chọn",
+    "confirmTitle": "Ẩn {count} bài viết?",
+    "confirmBody": "Các bài sẽ rời mọi danh sách nhưng tác giả và ban quản trị vẫn mở được qua liên kết. Có thể hiện lại từng bài từ danh sách đã ẩn.",
+    "result": "Đã ẩn {done}, từ chối {refused}."
   }
 }

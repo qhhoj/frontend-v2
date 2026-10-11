@@ -9,6 +9,7 @@ export const useModerationPostsQuery = (
   state: MaybeRefOrGetter<ModerationState>,
   page: MaybeRefOrGetter<number>,
   search: MaybeRefOrGetter<string> = '',
+  organization: MaybeRefOrGetter<string> = '',
 ) => {
   const viewer = useViewerId();
   return useQuery({
@@ -18,9 +19,14 @@ export const useModerationPostsQuery = (
       toValue(state),
       toValue(page),
       toValue(search),
+      toValue(organization),
       viewer.value,
     ]),
-    queryFn: () => fetchModerationPosts(toValue(state), toValue(page), toValue(search)),
+    queryFn: () =>
+      fetchModerationPosts(toValue(state), toValue(page), {
+        search: toValue(search),
+        organization: toValue(organization),
+      }),
     placeholderData: keepPreviousData,
   });
 };

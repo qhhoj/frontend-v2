@@ -16,6 +16,7 @@ import {
   LifeBuoy,
   Link,
   ListChecks,
+  Lock,
   MessagesSquare,
   Newspaper,
   Plug,
@@ -42,7 +43,7 @@ export interface AdminNavItem extends AdminAccess {
   path: string;
 }
 export interface AdminNavGroup {
-  id: 'problems' | 'contests' | 'judging' | 'community' | 'users' | 'site';
+  id: 'problems' | 'contests' | 'judging' | 'content' | 'community' | 'users' | 'site';
   labelKey: string;
   items: AdminNavItem[];
 }
@@ -84,10 +85,15 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('judges', Server),
     screenItem('languages', Code),
   ]),
-  group('community', [
+  group('content', [
     screenItem('posts', Newspaper),
+    screenItem('pages', Files),
+    screenItem('config', Braces),
+  ]),
+  group('community', [
     screenItem('commentReports', Flag),
     screenItem('comments', MessagesSquare),
+    screenItem('commentLocks', Lock),
     screenItem('tickets', LifeBuoy),
   ]),
   group('users', [
@@ -98,8 +104,6 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   ]),
   group('site', [
     screenItem('settings', Settings),
-    screenItem('config', Braces),
-    screenItem('pages', Files),
     screenItem('shortLinks', Link),
     screenItem('integrations', Plug),
     screenItem('log', History),

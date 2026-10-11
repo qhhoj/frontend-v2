@@ -3,7 +3,9 @@ import type { QueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import { fetchSiteForAdmin } from '@/api/site-admin.api';
 import type { SiteData } from '@/api/types/site-admin';
+import { siteKey } from '@/features/official-mode/official-mode.queries';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { configHistoryKey } from './config-history.queries';
 
 /** The prefix of every `/site` read: a write updates the answer by it. */
 export const siteAdminKey = ['admin', 'site'] as const;
@@ -29,4 +31,10 @@ export function writeConfig(queryClient: QueryClient, key: string, value: string
     else config[key] = value;
     return { ...site, config };
   });
+}
+
+/** After a write: the key's history has a new row, and the public `/site` (the site notice) is stale. */
+export function refreshAfterConfigWrite(queryClient: QueryClient) {
+  void queryClient.invalidateQueries({ queryKey: configHistoryKey });
+  void queryClient.invalidateQueries({ queryKey: siteKey });
 }

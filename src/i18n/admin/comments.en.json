@@ -1,6 +1,6 @@
 {
   "title": "Reported comments",
-  "lead": "Each card is a comment with open reports, newest first. Hide it here, or hide and resolve in one step; dismiss reports that need no action.",
+  "lead": "Open reports, newest first: hide the comment here, or hide and resolve in one step; dismiss reports that need no action. Tick several to settle them at once.",
   "empty": "No open reports.",
   "reporters": "{count} reporter | {count} reporters",
   "chips": {
@@ -68,5 +68,46 @@
     },
     "empty": "No comment matches.",
     "pager": "Comment pages"
+  },
+  "select": "Select the comment on {page}",
+  "settledBy": "by {name}",
+  "outcome": {
+    "resolved": "Resolved",
+    "dismissed": "Dismissed"
+  },
+  "tabs": {
+    "label": "Report lists",
+    "open": "Open",
+    "settled": "Settled"
+  },
+  "emptySettled": "No settled reports yet.",
+  "bulk": {
+    "label": "Selected reported comments",
+    "resolve": "Resolve selected",
+    "dismiss": "Dismiss selected",
+    "result": {
+      "resolved": "{done} resolved, {refused} refused (already settled or out of reach).",
+      "dismissed": "{done} dismissed, {refused} refused (already settled or out of reach)."
+    }
+  },
+  "edit": {
+    "action": "Edit",
+    "title": "Edit the comment",
+    "label": "Comment text (Markdown)",
+    "hint": "Saved as a new version: the author and moderators see the history.",
+    "save": "Save",
+    "loading": "Loading the comment…",
+    "loadFailed": "Could not load the comment. It may be deleted or out of your reach.",
+    "blank": "The comment cannot be empty.",
+    "tooLong": "At most {max} characters.",
+    "done": "Comment edited."
+  },
+  "locks": {
+    "title": "Locked comment pages",
+    "lead": "Pages where nobody but lock overriders can post comments, newest lock first. Unlock a page to open its discussion again.",
+    "empty": "No page has its comments locked.",
+    "unlock": "Unlock",
+    "unlocked": "Comments on “{title}” are open again.",
+    "pager": "Locked page pages"
   }
 }

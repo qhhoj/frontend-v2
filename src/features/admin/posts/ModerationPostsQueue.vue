@@ -9,6 +9,7 @@ const props = withDefaults(
     feed: QueueFeed;
     page: number;
     search: string;
+    organization: string;
     rowFailure: RowFailure | null;
     pendingPostId?: string | null;
   }>(),
@@ -23,6 +24,7 @@ const { data, isPending, error, refetch } = useModerationPostsQuery(
   () => props.feed,
   () => props.page,
   () => props.search,
+  () => props.organization,
 );
 </script>
 

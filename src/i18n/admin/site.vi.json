@@ -40,6 +40,47 @@
       "keyTaken": "Khoá đã có.",
       "tooLong": "Tối đa 20 000 ký tự.",
       "url": "Khoá liên kết chỉ nhận http hoặc https."
+    },
+    "usedChip": "Trang đang dùng",
+    "unusedChip": "Chỉ trang cũ dùng: ở đây không đọc",
+    "knownHeading": "Khoá đã biết chưa đặt",
+    "setKnown": "Đặt",
+    "known": {
+      "top_notification": "Thông báo trang: văn bản thuần hiện trên mọi trang cho mọi người xem, đến khi họ đóng.",
+      "announcement": "Trang cũ: khung thông báo HTML cuối mọi trang.",
+      "home_page_top": "Trang cũ: khối HTML đầu trang chủ.",
+      "footer": "Trang cũ: HTML thêm vào chân trang.",
+      "analytics": "Trang cũ: mã theo dõi trong phần đầu mọi trang.",
+      "meta_description": "Trang cũ: thẻ meta mô tả của trang chủ.",
+      "meta_keywords": "Trang cũ: thẻ meta từ khoá của trang chủ.",
+      "discord_invite_link": "Trang cũ: liên kết mời Discord ở trang chủ và trang đăng nhập.",
+      "discord_invite_shieldio": "Trang cũ: ảnh huy hiệu Discord (shields.io) cạnh liên kết mời."
+    },
+    "history": {
+      "title": "Lịch sử",
+      "empty": "Chưa ghi nhận thay đổi nào.",
+      "actions": {
+        "create": "Tạo",
+        "edit": "Sửa",
+        "delete": "Xoá"
+      },
+      "before": "Trước",
+      "after": "Sau",
+      "emptyValue": "(trống)",
+      "older": "Thay đổi cũ hơn",
+      "newer": "Thay đổi mới hơn"
     }
+  },
+  "notice": {
+    "title": "Thông báo trang",
+    "lead": "Một dòng văn bản thuần trên mọi trang, cho cả người đã và chưa đăng nhập. Mỗi người có thể đóng; đổi nội dung thì thông báo hiện lại.",
+    "label": "Nội dung thông báo",
+    "hint": "Văn bản thuần; giữ xuống dòng, HTML hiện đúng như gõ.",
+    "preview": "Người xem sẽ thấy",
+    "publish": "Đăng thông báo",
+    "update": "Cập nhật thông báo",
+    "takeDown": "Gỡ thông báo",
+    "saved": "Đã đăng thông báo.",
+    "removed": "Đã gỡ thông báo."
   }
 }

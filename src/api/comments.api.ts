@@ -1,4 +1,4 @@
-import type { CommentPageType, CommentReportOutcome } from './types/comments';
+import type { CommentPageType, CommentReportOutcome, CommentReportQueue } from './types/comments';
 import type { VoteScore } from './types/votes';
 import { apiGet, apiGetPage, apiSend } from './typed';
 import type { JsonBodyOf, QueryOf } from './typed';
@@ -29,10 +29,17 @@ export const deleteComment = (id: string) => apiSend('delete', '/comments/{id}',
 export const reportComment = (id: string, report: CommentReportDraft) =>
   apiSend('post', '/comments/{id}/reports', { path: { id }, body: report });
 export const locateComment = (id: string) => apiGet('/comments/{id}/location', { path: { id } });
-export const fetchCommentReports = (page: number) =>
-  apiGetPage('/comments/reports', { query: { page } });
+/** `open`: comments with open reports, newest report first; `settled`: resolved or dismissed ones, newest settlement first. */
+export const fetchCommentReports = (page: number, status: CommentReportQueue = 'open') =>
+  apiGetPage('/comments/reports', { query: { page, status } });
 export const settleCommentReports = (id: string, outcome: CommentReportOutcome) =>
   apiSend('post', '/comments/{id}/reports/settle', { path: { id }, body: { outcome } });
+/** Up to 50 comments, one outcome; each id answers `code` null (settled) or the refusal's code. */
+export const settleManyCommentReports = (ids: string[], outcome: CommentReportOutcome) =>
+  apiSend('post', '/comments/reports/settle', { body: { ids, outcome } });
+/** Backend `CommentModerationController` (`judge.change_comment`): locked pages, newest lock first, 50 a page. */
+export const fetchCommentLocks = (page: number) =>
+  apiGetPage('/comments/locks', { query: { page } });
 
 export type AdminCommentQuery = NonNullable<QueryOf<'/admin/comments'>>;
 /** Backend `CommentAdminController` (`judge.change_comment`): every comment of the site, newest first, 30 a page. */

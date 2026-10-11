@@ -16,6 +16,17 @@ export type PostFlagPatch = Pick<
 export const patchPostFlag = (id: string, patch: PostFlagPatch) =>
   apiSend('patch', '/posts/{id}', { path: { id }, body: patch });
 
-/** Backend `BlogModerationController` (`judge.edit_all_post`): `hidden` = every draft, `scheduled` = visible posts whose publish time is ahead, `organization` = organization posts, `any` = every post; `search` = title text or an author's exact username. */
-export const fetchModerationPosts = (state: ModerationState, page: number, search = '') =>
-  apiGetPage('/admin/posts', { query: { state, page, ...(search ? { search } : {}) } });
+/** Backend `BlogModerationController` (`judge.edit_all_post`): `hidden` = every draft, `scheduled` = visible posts whose publish time is ahead, `organization` = organization posts, `any` = every post; `search` = title text or an author's exact username; `organization` = one organization's slug. */
+export const fetchModerationPosts = (
+  state: ModerationState,
+  page: number,
+  { search = '', organization = '' }: { search?: string; organization?: string } = {},
+) =>
+  apiGetPage('/admin/posts', {
+    query: {
+      state,
+      page,
+      ...(search ? { search } : {}),
+      ...(organization ? { organization } : {}),
+    },
+  });

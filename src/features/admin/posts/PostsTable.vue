@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import type { PostListItem } from '@/api/types/blog';
 import { hasPermission } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
@@ -10,6 +10,7 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { unhidePlanOf } from './post-visibility';
 import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
+import { usePostSelection } from './post-selection';
 
 const props = withDefaults(
   defineProps<{
@@ -37,6 +38,12 @@ const isAheadOfTime = (post: PostListItem) => unhidePlanOf(post, Date.now()).sch
 const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
 /** One post write at a time: while one runs, every row's actions wait. */
 const isBusy = computed(() => props.pendingPostId !== null);
+/** On the moderation page, visible posts get a box for the bulk hide. */
+const selection = usePostSelection();
+watchEffect(() => {
+  if (selection)
+    selection.shown.value = props.posts.filter((post) => post.visible).map((post) => post.id);
+});
 </script>
 
 <template>
@@ -49,6 +56,9 @@ const isBusy = computed(() => props.pendingPostId !== null);
       </caption>
       <thead>
         <tr class="border-b border-line text-left text-muted">
+          <th v-if="selection" scope="col" class="w-10 px-3 py-2">
+            <span class="sr-only">{{ $t('admin.posts.bulk.column') }}</span>
+          </th>
           <th scope="col" class="px-3 py-2 font-semibold">{{ $t('admin.posts.table.post') }}</th>
           <th scope="col" class="px-3 py-2 font-semibold">{{ $t('admin.posts.table.author') }}</th>
           <th scope="col" class="px-3 py-2 font-semibold">
@@ -67,6 +77,16 @@ const isBusy = computed(() => props.pendingPostId !== null);
       </thead>
       <tbody class="divide-y divide-line">
         <tr v-for="post in posts" :key="post.id">
+          <td v-if="selection" :class="`${CELL} w-10`">
+            <input
+              v-if="post.visible"
+              type="checkbox"
+              class="size-5 accent-[var(--qh-accent)]"
+              :checked="selection.isSelected(post.id)"
+              :aria-label="$t('admin.posts.bulk.select', { title: post.title })"
+              @change="selection.setSelected(post.id, ($event.target as HTMLInputElement).checked)"
+            />
+          </td>
           <td :class="CELL">
             <RouterLink
               :to="{ name: 'post', params: { id: post.id } }"

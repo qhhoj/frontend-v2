@@ -10,9 +10,10 @@
     "problems": "Problems",
     "contests": "Contests",
     "judging": "Judging",
-    "community": "Community",
+    "community": "Moderation",
     "users": "Users",
-    "site": "Site"
+    "site": "Site",
+    "content": "Content"
   },
   "forbidden": {
     "title": "You do not have access to this section",
@@ -106,7 +107,8 @@
     "organizationQuotas": "Organization quotas",
     "cannedReplies": "Ticket reply templates",
     "polygonImport": "Import from Polygon",
-    "problemExternal": "Edit problem: external judge"
+    "problemExternal": "Edit problem: external judge",
+    "commentLocks": "Locked comment pages"
   },
   "waiting": "waiting",
   "search": {

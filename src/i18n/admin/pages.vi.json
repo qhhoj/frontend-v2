@@ -4,7 +4,10 @@
   "list": {
     "total": "{total} trang",
     "loginChip": "Cần đăng nhập",
-    "pager": "Phân trang trang tĩnh"
+    "pager": "Phân trang trang tĩnh",
+    "search": "Tìm trang",
+    "searchPlaceholder": "Đường dẫn hoặc tiêu đề",
+    "searchSubmit": "Tìm"
   },
   "pick": "Chọn một trang hoặc tạo trang mới.",
   "field": {

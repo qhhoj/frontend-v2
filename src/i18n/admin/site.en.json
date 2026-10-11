@@ -40,6 +40,47 @@
       "keyTaken": "This key is taken.",
       "tooLong": "Up to 20 000 characters.",
       "url": "A link key accepts only http or https."
+    },
+    "usedChip": "Used by the site",
+    "unusedChip": "Old site only: not read here",
+    "knownHeading": "Known keys not set",
+    "setKnown": "Set",
+    "known": {
+      "top_notification": "Site notice: plain text shown above every page to every visitor until they close it.",
+      "announcement": "Old site: HTML announcement box at the bottom of every page.",
+      "home_page_top": "Old site: HTML block at the top of the home page.",
+      "footer": "Old site: HTML added to the footer.",
+      "analytics": "Old site: tracking script in every page head.",
+      "meta_description": "Old site: the description meta tag of the home page.",
+      "meta_keywords": "Old site: the keywords meta tag of the home page.",
+      "discord_invite_link": "Old site: Discord invite link on the home and login pages.",
+      "discord_invite_shieldio": "Old site: Discord badge image (shields.io) beside the invite."
+    },
+    "history": {
+      "title": "History",
+      "empty": "No change recorded yet.",
+      "actions": {
+        "create": "Created",
+        "edit": "Changed",
+        "delete": "Deleted"
+      },
+      "before": "Before",
+      "after": "After",
+      "emptyValue": "(empty)",
+      "older": "Older changes",
+      "newer": "Newer changes"
     }
+  },
+  "notice": {
+    "title": "Site notice",
+    "lead": "A short plain-text message above every page, for signed-in and signed-out visitors alike. Each visitor can close it; a changed text shows again.",
+    "label": "Notice text",
+    "hint": "Plain text; line breaks are kept, HTML is shown as typed.",
+    "preview": "What visitors see",
+    "publish": "Publish notice",
+    "update": "Update notice",
+    "takeDown": "Take down",
+    "saved": "Notice published.",
+    "removed": "Notice taken down."
   }
 }

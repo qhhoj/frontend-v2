@@ -13,7 +13,8 @@
     "creator": "Người gửi",
     "assignee": "Người phụ trách",
     "peopleHint": "Nhiều tên cách nhau bằng dấu phẩy, áp dụng khi nhấn Enter hoặc rời ô.",
-    "untaggedNote": "Chưa lọc theo nhãn hoặc độ ưu tiên: phiếu không có các trường đó."
+    "untaggedNote": "Chưa lọc theo nhãn hoặc độ ưu tiên: phiếu không có các trường đó.",
+    "awaiting": "Đang chờ ban quản trị trả lời"
   },
   "table": {
     "caption": "Danh sách phiếu",
@@ -36,5 +37,13 @@
     "close": "Đóng phiếu",
     "reopen": "Mở lại phiếu",
     "closeAfterReply": "Đóng phiếu sau khi gửi"
+  },
+  "move": {
+    "heading": "Tiêu đề và bài liên kết",
+    "title": "Tiêu đề",
+    "problem": "Mã bài",
+    "problemHint": "Gắn phiếu sang bài khác; người soạn bài đó sẽ thấy phiếu. Để nguyên nếu giữ liên kết.",
+    "save": "Lưu tiêu đề và liên kết",
+    "saved": "Đã cập nhật phiếu."
   }
 }

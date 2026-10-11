@@ -15,6 +15,7 @@ import { useTicketQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import TicketMoveForm from './TicketMoveForm.vue';
 
 /** The open ticket beside the list. Mounted only while a ticket is open, so its live feed closes with it. */
 const props = defineProps<{ ticketId: string }>();
@@ -82,6 +83,7 @@ const toggleOpen = () => {
           @sent="onSent"
         />
         <TicketStaffActions v-if="ticket.can.markGood || ticket.can.assign" :ticket="ticket" />
+        <TicketMoveForm v-if="ticket.can.assign" :ticket="ticket" />
         <TicketNotes :ticket="ticket" />
         <p class="sr-only" aria-live="polite">{{ announcement }}</p>
       </template>

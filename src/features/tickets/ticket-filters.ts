@@ -21,6 +21,7 @@ const openFromText = (text: string): boolean | undefined => {
 export const ticketQueryFromRoute = (query: LocationQuery): TicketListQuery => ({
   own: singleValue(query.scope) !== 'all',
   open: openFromText(singleValue(query.open)),
+  ...(singleValue(query.awaiting) === '1' ? { awaiting: true } : {}),
   user: parseUsernames(singleValue(query.user)),
   assignee: parseUsernames(singleValue(query.assignee)),
   page: pageFromQuery(query.page),
@@ -31,6 +32,7 @@ export function routeQueryFromFilters(filters: TicketListQuery): LocationQueryRa
   return {
     ...(filters.own ? {} : { scope: 'all' }),
     ...(filters.open === undefined ? {} : { open: filters.open ? '1' : '0' }),
+    ...(filters.awaiting ? { awaiting: '1' } : {}),
     ...(filters.user.length ? { user: filters.user.join(',') } : {}),
     ...(filters.assignee.length ? { assignee: filters.assignee.join(',') } : {}),
     ...(filters.page > 1 ? { page: String(filters.page) } : {}),

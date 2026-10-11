@@ -1,8 +1,9 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
 import type { FlatpageBody } from './types/flatpages-admin';
 
-export const fetchFlatpages = (page: number) =>
-  apiGetPage('/admin/site/pages', { query: { page } });
+/** `search`: the url or the title contains it. */
+export const fetchFlatpages = (page: number, search = '') =>
+  apiGetPage('/admin/site/pages', { query: { page, ...(search ? { search } : {}) } });
 export const fetchFlatpage = (id: string) => apiGet('/admin/site/pages/{id}', { path: { id } });
 export const createFlatpage = (body: FlatpageBody) =>
   apiSend('post', '/admin/site/pages', { body });

@@ -13,7 +13,8 @@
     "creator": "Sender",
     "assignee": "Assignee",
     "peopleHint": "Separate several names with commas. Applied on Enter or when you leave the box.",
-    "untaggedNote": "Not filtered by label or priority: tickets without those fields are not matched by them."
+    "untaggedNote": "Not filtered by label or priority: tickets without those fields are not matched by them.",
+    "awaiting": "Waiting for a staff reply"
   },
   "table": {
     "caption": "Ticket list",
@@ -36,5 +37,13 @@
     "close": "Close ticket",
     "reopen": "Reopen ticket",
     "closeAfterReply": "Close the ticket after sending"
+  },
+  "move": {
+    "heading": "Title and linked problem",
+    "title": "Title",
+    "problem": "Problem code",
+    "problemHint": "Link the ticket to another problem; editors of that problem then see it. Leave as is to keep the link.",
+    "save": "Save title and link",
+    "saved": "Ticket updated."
   }
 }

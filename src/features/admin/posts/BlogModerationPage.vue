@@ -20,24 +20,62 @@ import { usePostVisibility } from './use-post-visibility';
 import { useModerationPostsQuery } from './posts.queries';
 import { pageFromQuery } from '@/lib/paging';
 import { MODERATION_FEEDS, feedFromQuery, isQueueFeed, searchFeedOf } from './moderation';
+import { providePostSelection } from './post-selection';
+import { useBulkHidePosts } from './use-bulk-hide-posts';
+import type { BulkHideOutcome } from './use-bulk-hide-posts';
+import AdminBulkBar from '../ui/AdminBulkBar.vue';
+import { useSelection } from '../ui/use-selection';
+
+/** Ticked rows hidden in one go: one page of the table at most. */
+const BULK_HIDE_POSTS_MAX = 50;
 import type { PostFlags, RowFailure } from './moderation';
 
 const route = useRoute();
 const router = useRouter();
 const feed = computed(() => feedFromQuery(route.query.feed));
 const page = computed(() => pageFromQuery(route.query.page));
-const search = computed(() => (typeof route.query.search === 'string' ? route.query.search : ''));
+const textOf = (value: unknown) => (typeof value === 'string' ? value : '');
+const search = computed(() => textOf(route.query.search));
+const organization = computed(() => textOf(route.query.organization));
 const searchText = ref(search.value);
+const organizationText = ref(organization.value);
 watch(search, (value) => (searchText.value = value));
+watch(organization, (value) => (organizationText.value = value));
 
 /** A search lands on a moderation queue (from a public feed: every post), first page. */
 function runSearch() {
   const text = searchText.value.trim();
-  const target = text ? searchFeedOf(feed.value) : feed.value;
+  const slug = organizationText.value.trim();
+  const target = text || slug ? searchFeedOf(feed.value) : feed.value;
   void router.push({
     name: adminRouteName('posts'),
-    query: { ...(target === 'all' ? {} : { feed: target }), ...(text ? { search: text } : {}) },
+    query: {
+      ...(target === 'all' ? {} : { feed: target }),
+      ...(text ? { search: text } : {}),
+      ...(slug ? { organization: slug } : {}),
+    },
   });
+}
+
+/** Ticked visible posts of the shown tab, hidden in one go. */
+const shownPosts = ref<string[]>([]);
+const selection = useSelection(shownPosts, BULK_HIDE_POSTS_MAX);
+providePostSelection({
+  shown: shownPosts,
+  isSelected: (id) => selection.selected.value.has(id),
+  setSelected: selection.setSelected,
+});
+const bulkHide = useBulkHidePosts();
+const isBulkConfirmOpen = ref(false);
+const bulkResult = ref<BulkHideOutcome | null>(null);
+async function confirmBulkHide() {
+  beginChange();
+  bulkResult.value = null;
+  const outcome = await bulkHide.run([...selection.selected.value]);
+  isBulkConfirmOpen.value = false;
+  if (!outcome) return;
+  bulkResult.value = outcome;
+  selection.clear();
 }
 const feedNav = ref<HTMLElement | null>(null);
 
@@ -154,6 +192,17 @@ async function confirmUnhide() {
           :placeholder="$t('admin.posts.search.placeholder')"
         />
       </label>
+      <label class="flex min-w-[min(100%,14rem)] flex-col gap-1.5">
+        <span class="text-sm font-semibold">{{ $t('admin.posts.search.organization') }}</span>
+        <input
+          v-model="organizationText"
+          type="search"
+          autocomplete="off"
+          spellcheck="false"
+          :class="[ADMIN_INPUT_CLASS, 'font-mono']"
+          :placeholder="$t('admin.posts.search.organizationPlaceholder')"
+        />
+      </label>
       <button type="submit" :class="ADMIN_BUTTON_CLASS">
         {{ $t('admin.posts.search.submit') }}
       </button>
@@ -161,6 +210,41 @@ async function confirmUnhide() {
     <p v-if="search && isQueueFeed(feed)" class="text-sm text-muted" data-testid="search-summary">
       {{ $t('admin.posts.search.summary', { text: search }) }}
     </p>
+    <p v-if="organization && isQueueFeed(feed)" class="text-sm text-muted">
+      {{ $t('admin.posts.search.organizationSummary', { slug: organization }) }}
+    </p>
+
+    <AdminBulkBar
+      :label="$t('admin.posts.bulk.label')"
+      :count-text="
+        $t(
+          'admin.posts.bulk.count',
+          { count: selection.selected.value.size },
+          selection.selected.value.size,
+        )
+      "
+      :all-selected="selection.allSelected.value"
+      :can-select="shownPosts.length > 0"
+      @toggle-all="selection.toggleAll()"
+    >
+      <button
+        type="button"
+        :class="ADMIN_BUTTON_CLASS"
+        :aria-disabled="
+          selection.selected.value.size === 0 || bulkHide.isPending.value || undefined
+        "
+        @click="
+          selection.selected.value.size && !bulkHide.isPending.value && (isBulkConfirmOpen = true)
+        "
+      >
+        {{ $t('admin.posts.bulk.hide') }}
+      </button>
+    </AdminBulkBar>
+    <AdminStatus
+      v-if="bulkResult"
+      :kind="bulkResult.refused ? 'refused' : 'done'"
+      :text="$t('admin.posts.bulk.result', { done: bulkResult.done, refused: bulkResult.refused })"
+    />
 
     <SettingsNotice v-if="feed === 'hidden'" tone="info">{{
       $t('admin.posts.hiddenNote')
@@ -174,6 +258,7 @@ async function confirmUnhide() {
       :feed="feed"
       :page="page"
       :search="search"
+      :organization="organization"
       :row-failure="rowFailure"
       :pending-post-id="visibility.pendingId.value"
       @hide="openHide"
@@ -208,6 +293,21 @@ async function confirmUnhide() {
       :busy="visibility.pendingId.value === unhidingPost.id"
       :failure="unhideFailureText"
       @confirm="confirmUnhide"
+    />
+    <ConfirmDialog
+      v-model:visible="isBulkConfirmOpen"
+      tone="danger"
+      :title="
+        $t(
+          'admin.posts.bulk.confirmTitle',
+          { count: selection.selected.value.size },
+          selection.selected.value.size,
+        )
+      "
+      :body="$t('admin.posts.bulk.confirmBody')"
+      :confirm-label="$t('admin.posts.bulk.hide')"
+      :busy="bulkHide.isPending.value"
+      @confirm="confirmBulkHide"
     />
   </div>
 </template>

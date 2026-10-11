@@ -2614,5 +2614,9 @@
       "unreachable": "Not reachable right now",
       "checkedAt": "Checked {time}"
     }
+  },
+  "siteNotice": {
+    "region": "Site notice",
+    "dismiss": "Close the notice"
   }
 }

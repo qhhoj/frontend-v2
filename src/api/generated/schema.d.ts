@@ -346,7 +346,8 @@ export interface paths {
          *     draft, personal or organization), `scheduled` (visible posts whose
          *     publish time is still ahead), `organization` (every organization post) or
          *     `any` (every post), newest first. `search` keeps posts whose title contains it
-         *     or with an author of that exact username. Paged with `page`.
+         *     or with an author of that exact username; `organization` (a slug) keeps
+         *     that organization's posts. Paged with `page`.
          */
         get: operations["BlogModerationController_list"];
         put?: never;
@@ -547,15 +548,35 @@ export interface paths {
         get?: never;
         /**
          * Set a public config value
-         * @description Requires `judge.change_miscconfig`. Creates or replaces a free-form key/value text served to everyone by `GET /site`, so it must never hold a secret. The empty string is a valid value.
+         * @description Requires `judge.change_miscconfig`. Creates or replaces a free-form key/value text served to everyone by `GET /site`, so it must never hold a secret. The empty string is a valid value. A changed value records a revision.
          */
         put: operations["MiscConfigAdminController_put"];
         post?: never;
         /**
          * Delete a public config value
-         * @description Requires `judge.change_miscconfig`. Removes the key. 404 `not_found` if it does not exist. Returns 204.
+         * @description Requires `judge.change_miscconfig`. Removes the key and records a revision. 404 `not_found` if it does not exist. Returns 204.
          */
         delete: operations["MiscConfigAdminController_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/site/config/{key}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show the history of a config key
+         * @description Requires `judge.change_miscconfig`. The key's changes (creation, edits, deletion), newest first, 20 per page, with the editor and the value before and after. Still readable after the key is deleted; an unknown key has an empty history.
+         */
+        get: operations["MiscConfigAdminController_revisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -570,7 +591,7 @@ export interface paths {
         };
         /**
          * List site pages
-         * @description Requires `flatpages.change_flatpage`. Returns a page of 50 pages with their URL, title and last update.
+         * @description Requires `flatpages.change_flatpage`. Returns a page of 50 pages with their URL, title and last update, by URL; `search` keeps pages whose URL or title contains it.
          */
         get: operations["FlatpagesAdminController_list"];
         put?: never;
@@ -1744,6 +1765,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/comments/locks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the pages with locked comments
+         * @description Requires `judge.change_comment`. The pages whose comments are locked, the
+         *     newest lock first, 50 per page. Pages the moderator cannot read are left
+         *     out of the page (still counted in `total`).
+         */
+        get: operations["CommentModerationController_lockedPages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/comments/pages/{type}/{key}": {
         parameters: {
             query?: never;
@@ -1845,15 +1888,41 @@ export interface paths {
         };
         /**
          * List reported comments
-         * @description Requires `judge.change_comment`. Returns the comments with open reports,
-         *     the most recently reported first, 20 per page: an excerpt, the page link,
-         *     how many users reported it, and each open report with its reason and
-         *     note. Comments on pages the moderator cannot read are left out of the
-         *     page.
+         * @description Requires `judge.change_comment`. With `status=open` (the default),
+         *     returns the comments with open reports, the most recently reported
+         *     first; with `status=settled`, the comments whose reports were resolved or
+         *     dismissed, the most recently settled first. 20 per page: an excerpt, the
+         *     page link, how many users reported it, and each report with its reason,
+         *     note and, once settled, outcome and moderator. Comments on pages the
+         *     moderator cannot read are left out of the page.
          */
         get: operations["CommentReportsController_queue"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/comments/reports/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Settle the reports of several comments
+         * @description Requires `judge.change_comment`. Settles the open reports of up to 50
+         *     comments with one `outcome`, each like the single settle. Returns one
+         *     entry per distinct id: `code` is null when settled, or the error code
+         *     that refused it (`not_found`: unreadable, or no open reports). A refusal
+         *     never stops the rest.
+         */
+        post: operations["CommentReportsController_settleMany"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6324,7 +6393,8 @@ export interface paths {
          * List tickets
          * @description Returns tickets the caller may read: their own and those assigned to them,
          *     tickets of problems they can edit, and every ticket for holders of
-         *     `judge.change_ticket`. Filter with `open`, `own` (only tickets they filed
+         *     `judge.change_ticket`. Filter with `open`, `awaiting` (open tickets whose
+         *     newest message is not from staff), `own` (only tickets they filed
          *     or are assigned to), and repeated `user` and `assignee` usernames (at most
          *     10 each; unknown names match nothing). Paged with `page`.
          */
@@ -6363,7 +6433,10 @@ export interface paths {
          *     (assignees and staff), `isContributive` (staff only, never on their own
          *     ticket, counts toward the creator's contribution points) and `assignees`
          *     (staff only, usernames of active users, replaces the list; 400
-         *     `assignee_unknown` otherwise). Everything is checked before one write, so
+         *     `assignee_unknown` otherwise), `title` and `problem` (staff only: retitle,
+         *     or link the ticket to the problem with that code instead; 400
+         *     `problem_unknown` for no such problem). Everything is checked before one
+         *     write, so
          *     a refused request changes nothing. Fails with 409 `conflict` if the ticket
          *     changed meanwhile.
          */
@@ -7178,6 +7251,18 @@ export interface components {
             /** @description Set when skipped: the code is not a live problem of this organization. */
             reason?: string;
         };
+        BulkSettleOutcomeResponse: {
+            /** @description Null when its open reports were settled; otherwise the error code that refused it (`not_found`). */
+            code: string | null;
+            /** @description Id of the comment. */
+            id: string;
+        };
+        BulkSettleReportsDto: {
+            /** @description Ids of the reported comments, at most 50; duplicates count once. */
+            ids: string[];
+            /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
+            outcome: components["schemas"]["CommentReportOutcome"];
+        };
         BulkVisibilityDto: {
             /** @description Why, kept as the comment of each revision written. Up to 500 characters. */
             changeMessage?: string;
@@ -7393,25 +7478,41 @@ export interface components {
             reason: components["schemas"]["CommentReportReason"];
             /** @description Who reported; null when the account is gone. */
             reporter: components["schemas"]["UserSummaryResponse"] | null;
+            /**
+             * Format: date-time
+             * @description When it was settled, ISO 8601; null while open.
+             */
+            settledAt: string | null;
+            /** @description The moderator who settled it; null while open or when the account is gone. */
+            settledBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description `open`, or how a moderator settled it. */
+            status: components["schemas"]["CommentReportStatus"];
         };
         /**
          * @description `resolved` when the reports led to action, `dismissed` when they did not.
          * @enum {string}
          */
         CommentReportOutcome: "dismissed" | "resolved";
+        /** @enum {string} */
+        CommentReportQueue: "open" | "settled";
         CommentReportQueueItemResponse: {
             /** @description The reported comment. */
             comment: components["schemas"]["ReportedCommentResponse"];
             /**
              * Format: date-time
-             * @description When the newest open report came in, ISO 8601.
+             * @description When the newest of those reports came in, ISO 8601.
              */
             lastReportedAt: string;
+            /**
+             * Format: date-time
+             * @description In the settled list, when the newest of its reports was settled, ISO 8601; null in the open list.
+             */
+            lastSettledAt: string | null;
             /** @description The page it belongs to. */
             page: components["schemas"]["CommentPageLinkResponse"];
-            /** @description Users with an open report on it. */
+            /** @description Users with a report on it in this list (open, or settled). */
             reporterCount: number;
-            /** @description Its open reports, oldest first. */
+            /** @description Its reports in this list, oldest first. */
             reports: components["schemas"]["CommentReportEntryResponse"][];
         };
         /**
@@ -7419,6 +7520,11 @@ export interface components {
          * @enum {string}
          */
         CommentReportReason: "abuse" | "offTopic" | "other" | "spam" | "spoiler";
+        /**
+         * @description `open`, or how a moderator settled it.
+         * @enum {string}
+         */
+        CommentReportStatus: "dismissed" | "open" | "resolved";
         CommentResponse: {
             /** @description Null when the author's account is gone. */
             author: components["schemas"]["UserSummaryResponse"] | null;
@@ -12293,6 +12399,10 @@ export interface components {
             isOpen?: boolean;
             /** @description Assignees and `change_ticket` only; `''` clears. */
             notes?: string;
+            /** @description Code of the problem to link the ticket to instead (legacy admin relink); `change_ticket` only. */
+            problem?: string;
+            /** @description New title; `change_ticket` only. */
+            title?: string;
         };
         UpdateUserByStaffDto: {
             /** @description About-me text in Markdown, rendered and sanitised on save. */
@@ -13216,6 +13326,8 @@ export interface operations {
     BlogModerationController_list: {
         parameters: {
             query: {
+                /** @description Slug of one organization: keeps only its posts. An unknown slug matches nothing. */
+                organization?: string;
                 /** @description 1-based page number. */
                 page?: number;
                 /** @description Text the title contains (case-insensitive), or an author's exact username. */
@@ -13685,11 +13797,52 @@ export interface operations {
             };
         };
     };
+    MiscConfigAdminController_revisions: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Config key, 1-64 characters without control characters. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FlatpageRevisionResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     FlatpagesAdminController_list: {
         parameters: {
             query?: {
                 /** @description Page number, starting at 1. */
                 page?: number;
+                /** @description Keeps pages whose url or title contains this text, any case. */
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -15926,6 +16079,42 @@ export interface operations {
             };
         };
     };
+    CommentModerationController_lockedPages: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number of threads. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentPageLinkResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     CommentsController_page: {
         parameters: {
             query?: {
@@ -16124,8 +16313,10 @@ export interface operations {
     CommentReportsController_queue: {
         parameters: {
             query?: {
-                /** @description 1-based page number of threads. */
+                /** @description 1-based page number. */
                 page?: number;
+                /** @description `open` (the default): comments with open reports. `settled`: comments whose reports were resolved or dismissed, newest settlement first. */
+                status?: components["schemas"]["CommentReportQueue"];
             };
             header?: never;
             path?: never;
@@ -16141,6 +16332,42 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["CommentReportQueueItemResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    CommentReportsController_settleMany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkSettleReportsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BulkSettleOutcomeResponse"][];
                     };
                 };
             };
@@ -24460,6 +24687,8 @@ export interface operations {
             query?: {
                 /** @description Usernames of assignees; repeat the parameter, at most 10. */
                 assignee?: string[];
+                /** @description true keeps open tickets whose newest message is not from staff (what the staff badge counts). */
+                awaiting?: boolean;
                 /** @description true for open tickets only, false for closed only, absent for both. */
                 open?: boolean;
                 /** @description true limits the list to tickets the caller filed or is assigned to. */
