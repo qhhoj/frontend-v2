@@ -29,11 +29,6 @@
       "contestNew": "New contest",
       "polygonImport": "Import from Polygon"
     },
-    "sections": {
-      "content": "Content",
-      "contests": "Contests and judging",
-      "people": "Users and site"
-    },
     "descriptions": {
       "problems": "Edit statements, translations, editorials and test data; clone a problem.",
       "problemImport": "Upload a Polygon .zip package and follow the import progress.",
@@ -51,7 +46,15 @@
       "organizations": "Edit the organizations you administer, their members and join requests.",
       "tickets": "Tickets sent by users.",
       "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import.",
-      "submissions": "Filter submissions, select many to rejudge or recalculate points."
+      "submissions": "Filter submissions, select many to rejudge or recalculate points.",
+      "types": "Problem types, groups and licenses.",
+      "contestTags": "The tag catalogue shown on the contest list.",
+      "languages": "Languages submissions can use, and the judges that run them.",
+      "organizationQuotas": "Each organization's quota and usage.",
+      "config": "Other key–value configuration.",
+      "shortLinks": "Choose codes, set expiry and delete short links.",
+      "integrations": "Keys that let an external system create private contests and read standings.",
+      "log": "Every recorded change: who, what and when."
     }
   },
   "screens": {

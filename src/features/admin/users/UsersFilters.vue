@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import IndexSearchBox from '../search/IndexSearchBox.vue';
 import { ADMIN_INPUT_CLASS } from '../ui/classes';
 import { USERS_SORTS, USERS_TABS, usersViewToQuery } from './users-list';
@@ -8,32 +11,25 @@ import type { UsersListView, UsersSort, UsersTab } from './users-list';
 const props = defineProps<{ view: UsersListView; status: string }>();
 const emit = defineEmits<{ change: [patch: Partial<UsersListView>] }>();
 const route = useRoute();
+const { t } = useI18n();
 
 const tabLocation = (tab: UsersTab) => ({
   name: 'admin-users',
   query: usersViewToQuery({ ...props.view, tab, page: 1 }, route.query),
 });
+const tabs = computed(() =>
+  USERS_TABS.map((tab) => ({
+    key: tab,
+    label: t(`admin.users.list.tabs.${tab}`),
+    to: tabLocation(tab),
+    testid: `tab-${tab}`,
+  })),
+);
 </script>
 
 <template>
   <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-    <nav :aria-label="$t('admin.users.list.tabs.label')" class="flex flex-wrap gap-2">
-      <RouterLink
-        v-for="tab in USERS_TABS"
-        :key="tab"
-        :to="tabLocation(tab)"
-        :data-testid="`tab-${tab}`"
-        :aria-current="tab === view.tab ? 'page' : undefined"
-        class="inline-flex min-h-11 items-center rounded-pill border px-4 text-sm font-semibold"
-        :class="
-          tab === view.tab
-            ? 'border-accent bg-accent-soft text-accent-soft-text'
-            : 'border-line text-muted hover:text-content'
-        "
-      >
-        {{ $t(`admin.users.list.tabs.${tab}`) }}
-      </RouterLink>
-    </nav>
+    <AdminFilterTabs :tabs="tabs" :current="view.tab" :label="$t('admin.users.list.tabs.label')" />
     <label class="flex flex-col gap-1 text-sm text-muted lg:w-48">
       {{ $t('admin.users.list.sort.label') }}
       <select

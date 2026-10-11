@@ -170,29 +170,8 @@ export function heldPermission(
   return permissions.find((permission) => hasPermission(user, permission)) ?? null;
 }
 
-interface DashboardSection {
-  labelKey: string;
-  items: AdminNavItem[];
-}
-const itemById = (id: AdminNavId) =>
-  ADMIN_NAV.flatMap((navGroup) => navGroup.items).find((item) => item.id === id)!;
-const section = (key: string, ids: AdminNavId[]): DashboardSection => ({
-  labelKey: `admin.shell.dashboard.sections.${key}`,
-  items: ids.map(itemById),
-});
-
-/** Board AdminShell: three sections of quick-link cards. */
-export const DASHBOARD_SECTIONS: DashboardSection[] = [
-  section('content', ['problems', 'polygonImport', 'problemImport', 'posts']),
-  section('contests', ['contests', 'similarity', 'rejudge', 'submissions', 'judges']),
-  section('people', ['users', 'organizations', 'activity', 'settings', 'pages', 'tickets']),
-];
-
-export const visibleDashboard = (user: AdminViewer | null) =>
-  DASHBOARD_SECTIONS.map((entry) => ({
-    ...entry,
-    items: entry.items.filter((item) => canUseAdmin(user, item)),
-  })).filter((entry) => entry.items.length > 0);
+/** The dashboard's quick-link cards: the nav's six groups, each with the screens this viewer may open. */
+export const visibleDashboard = (user: AdminViewer | null) => visibleNav(ADMIN_NAV, user);
 
 /** The greeting card's three actions; each shows only with its screen's permission. */
 export const QUICK_ACTIONS: AdminScreenId[] = ['problemNew', 'polygonImport', 'contestNew'];

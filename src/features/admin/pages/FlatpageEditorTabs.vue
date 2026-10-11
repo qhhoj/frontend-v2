@@ -1,40 +1,40 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import AdminTabs from '../ui/AdminTabs.vue';
+import type { AdminTab } from '../ui/AdminTabs.vue';
 
 /** `hasHistory` is false for a page not saved yet; `historyTotal` is null while the count is unknown (loading or failed). */
-defineProps<{ active: 'edit' | 'history'; hasHistory: boolean; historyTotal: number | null }>();
+const props = defineProps<{
+  active: 'edit' | 'history';
+  hasHistory: boolean;
+  historyTotal: number | null;
+}>();
 const route = useRoute();
-const TAB_CLASS =
-  'inline-flex min-h-11 items-center gap-2 border-b-2 border-transparent px-3 text-sm font-semibold text-muted hover:text-content focus-visible:-outline-offset-2 aria-[current=page]:border-accent aria-[current=page]:text-content';
+const tabs = computed<AdminTab[]>(() => [
+  {
+    key: 'edit',
+    labelKey: 'admin.pages.tabs.edit',
+    to: { query: { ...route.query, tab: undefined, hp: undefined } },
+  },
+  ...(props.hasHistory
+    ? [
+        {
+          key: 'history',
+          labelKey: 'admin.pages.tabs.history',
+          to: { query: { ...route.query, tab: 'history' } },
+          count: props.historyTotal,
+        },
+      ]
+    : []),
+]);
 </script>
 
 <template>
-  <nav
+  <AdminTabs
     data-testid="editor-tabs"
-    :aria-label="$t('admin.pages.tabs.label')"
-    class="-mx-4 overflow-x-auto px-4"
-  >
-    <ul class="flex min-w-max gap-1 border-b border-line">
-      <li>
-        <RouterLink
-          :to="{ query: { ...route.query, tab: undefined, hp: undefined } }"
-          :class="TAB_CLASS"
-          :aria-current="active === 'edit' ? 'page' : undefined"
-          >{{ $t('admin.pages.tabs.edit') }}</RouterLink
-        >
-      </li>
-      <li v-if="hasHistory">
-        <RouterLink
-          :to="{ query: { ...route.query, tab: 'history' } }"
-          :class="TAB_CLASS"
-          :aria-current="active === 'history' ? 'page' : undefined"
-        >
-          {{ $t('admin.pages.tabs.history') }}
-          <span v-if="historyTotal !== null" class="rounded-pill bg-surface-strong px-2 text-xs">{{
-            historyTotal
-          }}</span>
-        </RouterLink>
-      </li>
-    </ul>
-  </nav>
+    :tabs="tabs"
+    :current="active"
+    :label="$t('admin.pages.tabs.label')"
+  />
 </template>

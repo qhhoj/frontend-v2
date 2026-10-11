@@ -6,6 +6,7 @@ import { canUseAdmin } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import AdminBit from './AdminBit.vue';
 import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
+import RecentChangesCard from '../audit/RecentChangesCard.vue';
 import OverviewTiles from './overview/OverviewTiles.vue';
 import RecentScreens from './recent/RecentScreens.vue';
 
@@ -61,7 +62,8 @@ const actions = computed(() =>
     </section>
     <OverviewTiles />
     <RecentScreens />
-    <section v-for="entry in sections" :key="entry.labelKey" class="flex flex-col gap-3">
+    <RecentChangesCard />
+    <section v-for="entry in sections" :key="entry.id" class="flex flex-col gap-3">
       <h2 class="font-display text-base font-bold">{{ $t(entry.labelKey) }}</h2>
       <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <li v-for="item in entry.items" :key="item.id">
