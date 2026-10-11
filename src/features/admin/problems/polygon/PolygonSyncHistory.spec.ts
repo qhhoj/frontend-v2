@@ -4,7 +4,6 @@ import type { PolygonSyncRun } from '@/api/types/polygon';
 import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
-import { polygonProblem } from '@/test/admin-fixtures/polygon';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
@@ -29,7 +28,6 @@ const run = (overrides: Partial<PolygonSyncRun> = {}): PolygonSyncRun => ({
 const routes = (permissions: string[]) => ({
   ...staffViewer(['judge.import_polygon_package', ...permissions]),
   'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
-  'GET /polygon/problems': ok([polygonProblem()]),
   'GET /polygon/syncs': page([
     run({
       id: 'run-2',
@@ -43,7 +41,7 @@ const routes = (permissions: string[]) => ({
 });
 const mountWizard = async () => {
   const mounted = await mountApp('/admin/problems/polygon');
-  await vi.waitFor(() => expect(mounted.wrapper.find('[data-polygon-id]').exists()).toBe(true), {
+  await vi.waitFor(() => expect(mounted.wrapper.find('#polygon-link').exists()).toBe(true), {
     timeout: 5000,
   });
   return mounted.wrapper;

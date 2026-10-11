@@ -1125,7 +1125,7 @@ export interface paths {
         };
         /**
          * Get the current session and user
-         * @description Signed-in callers only (cookie session or API token); also served while a second factor or a password change is still pending. Returns the same shape as login: the user with their permission codenames, the CSRF token of the session, and the pending second-factor methods when `twoFactorRequired` is true.
+         * @description Signed-in callers only (cookie session or API token); also served while a second factor or a password change is still pending. Returns the same shape as login: the user with their permission codenames and `adminCapabilities`, the CSRF token of the session, and the pending second-factor methods when `twoFactorRequired` is true.
          *     An API token has no session, so `csrfToken` is null for it.
          */
         get: operations["AuthController_me"];
@@ -1725,6 +1725,7 @@ export interface paths {
          *     contests that are neither private nor organization-private. Filters are
          *     `phase` (upcoming, running or ended), `tag`, `organization`, `rated`, and
          *     `search` or `q` (case-insensitive key or name substring, ANDed together).
+         *     `editable=true` keeps only the contests the viewer may edit.
          *     Upcoming contests are sorted soonest first, all other views newest first.
          *     Paged with `page` and `pageSize` (default 50, at most 100).
          */
@@ -3319,8 +3320,10 @@ export interface paths {
          *     organizations appear only to their members, their admins and holders of
          *     `judge.edit_all_organization`. `search` narrows by a case-insensitive
          *     substring of name, short name or slug; `open` and `unlisted` (true or
-         *     false) keep only organizations in that state. Paged with `page` and
-         *     `pageSize` (default 100, at most 100). Anonymous callers may use it.
+         *     false) keep only organizations in that state; `administered=true` keeps
+         *     only the organizations the viewer may administer (the admin screen's
+         *     list), `false` the others. Paged with `page` and `pageSize` (default 100,
+         *     at most 100). Anonymous callers may use it.
          */
         get: operations["OrganizationsController_list"];
         put?: never;
@@ -3883,35 +3886,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/internal/polygon/problems": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the Polygon problems shared with the QHHOJ account
-         * @description Needs `judge.import_polygon_package`. Every problem the account can read,
-         *     with its newest package (`READY`, `RUNNING`, `FAILED` or `NONE`), its
-         *     statement title and the code of the QHHOJ problem already linked to it.
-         *     `search` matches id, name, title or owner; `state` keeps one package state.
-         *     The list is cached for 60 seconds and titles for a day per revision;
-         *     `refresh=true` skips the list cache and is limited to 6 a minute per user.
-         *     Errors: 409 `polygon_not_connected`, 502 `polygon_unauthorized`,
-         *     `polygon_clock_skew` or `polygon_failed`, 503 `polygon_unavailable`,
-         *     429 `rate_limited`.
-         */
-        get: operations["PolygonController_problems"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/polygon/problems/{polygonId}/import": {
+    "/api/internal/polygon/import": {
         parameters: {
             query?: never;
             header?: never;
@@ -3923,19 +3898,53 @@ export interface paths {
         /**
          * Import a Polygon problem and link it
          * @description Needs `judge.import_polygon_package`, plus `judge.add_problem` to create a
-         *     problem or write access to the problem to update it. The body takes the zip
-         *     import's options (`code`, `mode`, authors, curators, group, types, points,
-         *     statement languages, zero-point and main-solution switches) and `autoSync`.
-         *     The server downloads the newest package itself and the same background job
-         *     as the zip import applies it, then links the problem to Polygon. Answers 202
-         *     with a `jobId` to poll at `GET /problems/imports/{jobId}` (its `step` goes
-         *     queued, downloading, statements, tests, done or failed). Counts towards the
-         *     10 imports an hour per user. Errors: 400 `code_taken`, 404 `not_found` (not
-         *     shared with the account), 409 `polygon_package_not_ready`,
-         *     `polygon_already_linked` or `polygon_not_connected`, 502/503 Polygon errors,
-         *     429 `rate_limited`.
+         *     problem or write access to the problem to update it. The body takes the
+         *     problem `link` (checked again as on `POST /polygon/resolve`, with the same
+         *     errors), the zip import's options (`code`, `mode`, authors, curators,
+         *     group, types, points, statement languages, zero-point and main-solution
+         *     switches) and `autoSync`. A created problem is private, with the importer
+         *     as a curator. The server downloads the newest full package itself and the
+         *     same background job as the zip import applies it, then links the problem
+         *     to Polygon and records the import in the sync history. Answers 202 with a
+         *     `jobId` to poll at `GET /problems/imports/{jobId}` (its `step` goes queued,
+         *     downloading, statements, tests, done or failed). Counts towards the 10
+         *     imports an hour per user. Errors: 400 `code_taken`, the link errors of
+         *     `POST /polygon/resolve`, 429 `rate_limited`.
          */
         post: operations["PolygonController_importProblem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/polygon/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check a Polygon problem link and preview the problem
+         * @description Needs `judge.import_polygon_package`. The body takes the problem page
+         *     address, `https://polygon.codeforces.com/p…/owner/name`; its `p…` part is
+         *     the permission: the server finds `owner/name` among the problems shared
+         *     with the QHHOJ account and compares the token with the `<problem url>` of
+         *     the newest READY package's problem.xml (read once per problem, then
+         *     cached). Answers the problem, its statement title and the newest full
+         *     package. Each check, here or on import, counts towards 20 per 10 minutes
+         *     per user. Errors: 400 `polygon_link_invalid` (not a problem link), 404
+         *     `polygon_link_refused` (not shared with the account, or the token does not
+         *     match: one answer for both), 409 `polygon_no_package` (no READY package to
+         *     check against), `polygon_package_not_ready` (newest package not a READY
+         *     full package), `polygon_already_linked` (names the QHHOJ problem, also as
+         *     `linkedProblemCode`, only to a user who may edit it) or
+         *     `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
+         */
+        post: operations["PolygonController_resolve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4125,7 +4134,9 @@ export interface paths {
          * List problems visible to the viewer
          * @description Public. Returns one page of the problems the viewer may see, a signed-in
          *     viewer's own solved or attempted mark included. `visibility` narrows to
-         *     public, private or all visible problems (default public). `search` splits on
+         *     public, private or all visible problems (default public); `editable=true`
+         *     keeps only the problems the viewer may edit (pair it with `visibility=all`
+         *     for private ones too). `search` splits on
          *     spaces and needs every word inside the code or a title, ignoring case and
          *     Vietnamese accents; `q` is a substring match on the code or any title; `sort`
          *     takes `date`, `code`, `name`, `points`, `acRate` or `userCount`, with a
@@ -6363,6 +6374,10 @@ export interface components {
             realStart?: string;
             /** @description Username of the participant. */
             user: string;
+        };
+        AdminCapabilitiesResponse: {
+            /** @description Whether the user may administer at least one organization: an admin of one, or a holder of `judge.edit_all_organization`. */
+            organizations: boolean;
         };
         AdminCommentItemResponse: {
             /** @description The comment. */
@@ -8878,6 +8893,8 @@ export interface components {
              * @default false
              */
             ignoreZeroPointCases: boolean;
+            /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
+            link: string;
             /** @description Polygon language of the statement stored as the base statement. */
             mainStatementLanguage?: string;
             /**
@@ -8926,12 +8943,15 @@ export interface components {
         };
         /** @enum {string} */
         PolygonPackageState: "FAILED" | "NONE" | "READY" | "RUNNING";
+        PolygonProblemLinkDto: {
+            /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
+            link: string;
+        };
         PolygonProblemResponse: {
             /** @description Polygon problem id. */
             id: number;
+            /** @description The newest full package, READY: the one an import takes. */
             latestPackage: components["schemas"]["PolygonLatestPackageResponse"];
-            /** @description Code of the QHHOJ problem already linked to it, or null. */
-            linkedProblemCode: string | null;
             /** @description The working copy has uncommitted changes. */
             modified: boolean;
             /** @description Polygon short name. */
@@ -11503,6 +11523,8 @@ export interface components {
             isSuperuser: boolean;
         };
         UserResponse: {
+            /** @description Object rights behind the admin screens, beside the permission codenames. */
+            adminCapabilities: components["schemas"]["AdminCapabilitiesResponse"];
             /** @description Custom accent and glass settings; null for the site default. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
             /** @description Account email address. */
@@ -14854,6 +14876,8 @@ export interface operations {
     ContestsController_list: {
         parameters: {
             query?: {
+                /** @description true: only contests the viewer may edit (the admin screen's index); false: only the others. */
+                editable?: boolean;
                 /** @description Only contests of this organization id. */
                 organization?: string;
                 /** @description 1-based page number. */
@@ -17849,6 +17873,8 @@ export interface operations {
     OrganizationsController_list: {
         parameters: {
             query?: {
+                /** @description true: only organizations the viewer may administer (their admin, or every one with `judge.edit_all_organization`); false: only the others. */
+                administered?: boolean;
                 /** @description true: only open organizations; false: only private ones. */
                 open?: boolean;
                 /** @description 1-based page number. */
@@ -18941,28 +18967,26 @@ export interface operations {
             };
         };
     };
-    PolygonController_problems: {
+    PolygonController_importProblem: {
         parameters: {
-            query?: {
-                /** @description Skip the 60-second cache; limited per user. */
-                refresh?: boolean;
-                /** @description Case-insensitive match on id, name, title or owner. */
-                search?: string;
-                state?: components["schemas"]["PolygonPackageState"];
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PolygonLinkImportDto"];
+            };
+        };
         responses: {
-            200: {
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["PolygonProblemResponse"][];
+                        data: components["schemas"]["ImportJobStartedResponse"];
                     };
                 };
             };
@@ -18979,28 +19003,26 @@ export interface operations {
             };
         };
     };
-    PolygonController_importProblem: {
+    PolygonController_resolve: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                polygonId: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PolygonLinkImportDto"];
+                "application/json": components["schemas"]["PolygonProblemLinkDto"];
             };
         };
         responses: {
-            202: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["ImportJobStartedResponse"];
+                        data: components["schemas"]["PolygonProblemResponse"];
                     };
                 };
             };
@@ -19342,6 +19364,8 @@ export interface operations {
             query?: {
                 /** @description Only problems this user authored; viewers with `judge.edit_all_problem` also get the problems the user curates. */
                 authorId?: string;
+                /** @description true: only problems the viewer may edit (the admin screen's index, with `visibility=all`), whatever contest the viewer is in; false: only the others. */
+                editable?: boolean;
                 /** @description Only problems in this problem group (id from `GET /problems/meta`). */
                 groupId?: string;
                 /** @description true: only problems with a published editorial; false: only problems without one. */
@@ -20902,6 +20926,8 @@ export interface operations {
             query?: {
                 /** @description Only problems this user authored; viewers with `judge.edit_all_problem` also get the problems the user curates. */
                 authorId?: string;
+                /** @description true: only problems the viewer may edit (the admin screen's index, with `visibility=all`), whatever contest the viewer is in; false: only the others. */
+                editable?: boolean;
                 /** @description Only problems in this problem group (id from `GET /problems/meta`). */
                 groupId?: string;
                 /** @description true: only problems with a published editorial; false: only problems without one. */

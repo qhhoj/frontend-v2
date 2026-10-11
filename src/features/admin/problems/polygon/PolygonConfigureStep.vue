@@ -13,20 +13,21 @@ import { IMPORT_FORM_FIELDS, codeFromPolygonName } from '../import/import-form';
 import { importRefusalText } from '../import/import-refusal';
 import PolygonSourcePanel from './PolygonSourcePanel.vue';
 
-/** Step 2: the zip import's options for the picked problem, plus auto-sync; "Bắt đầu nhập" starts the job. */
-const props = defineProps<{ problem: PolygonProblem }>();
+/** Step 2: the zip import's options for the checked link's problem, plus auto-sync; "Bắt đầu nhập" starts the job. */
+const props = defineProps<{ link: string; problem: PolygonProblem }>();
 const emit = defineEmits<{ back: []; started: [jobId: string, body: PolygonImportBody] }>();
 const autoSync = ref(false);
 const initial = { code: codeFromPolygonName(props.problem.name) };
 
 const { run, isPending, fieldErrors, failure } = useAdminMutation({
-  mutate: (body: PolygonImportBody) => startPolygonLinkImport(props.problem.id, body),
+  mutate: (body: PolygonImportBody) => startPolygonLinkImport(body),
   onDone: ({ jobId }, body) => emit('started', jobId, body),
 });
 
 function start({ options }: { options: ImportOptions }) {
   const body: PolygonImportBody = {
     ...options,
+    link: props.link,
     mode: options.mode ?? 'create',
     ignoreZeroPointBatches: options.ignoreZeroPointBatches ?? false,
     ignoreZeroPointCases: options.ignoreZeroPointCases ?? false,

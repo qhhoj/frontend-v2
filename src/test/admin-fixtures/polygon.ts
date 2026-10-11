@@ -17,7 +17,6 @@ export const polygonProblem = (overrides: Partial<PolygonProblem> = {}): Polygon
   revision: 11,
   modified: false,
   latestPackage: polygonPackage(),
-  linkedProblemCode: null,
   ...overrides,
 });
 

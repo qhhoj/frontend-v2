@@ -849,10 +849,13 @@
     "polygon_clock_skew": "Polygon từ chối chữ ký: đồng hồ máy chủ lệch quá nhiều so với Polygon.",
     "polygon_failed": "Polygon trả lời lỗi. Thử lại sau.",
     "polygon_unavailable": "Không liên lạc được Polygon lúc này. Thử lại sau.",
-    "polygon_package_not_ready": "Gói mới nhất trên Polygon chưa ở trạng thái READY.",
+    "polygon_package_not_ready": "Gói mới nhất trên Polygon chưa phải full package READY.",
     "polygon_already_linked": "Bài Polygon này đã liên kết với một bài trên QHHOJ.",
     "polygon_not_linked": "Bài này không liên kết với Polygon.",
-    "polygon_package_too_large": "Gói Polygon quá lớn (tối đa 512 MiB)."
+    "polygon_package_too_large": "Gói Polygon quá lớn (tối đa 512 MiB).",
+    "polygon_link_invalid": "Đây không phải liên kết bài trên Polygon.",
+    "polygon_link_refused": "Tài khoản Polygon của QHHOJ không mở được liên kết này. Hãy cấp quyền READ cho tài khoản trên Polygon và sao chép lại liên kết.",
+    "polygon_no_package": "Bài trên Polygon chưa có gói READY nào: hãy dựng full package trước."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",
