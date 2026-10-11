@@ -5,3 +5,6 @@ export const ADMIN_INPUT_CLASS =
 export const ADMIN_BUTTON_CLASS = BUTTON.secondary;
 export const ADMIN_PRIMARY_CLASS = BUTTON.primary;
 export const ADMIN_DANGER_CLASS = BUTTON.danger;
+/** A checkbox styled as a pill: language and verdict pickers. */
+export const ADMIN_CHECK_CHIP_CLASS =
+  'inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-3 has-[:checked]:border-accent has-[:checked]:bg-accent-soft';

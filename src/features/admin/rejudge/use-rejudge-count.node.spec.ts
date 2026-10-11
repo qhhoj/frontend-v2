@@ -9,7 +9,12 @@ vi.mock('@/api/submission-actions.api', () => ({ rejudgeSubmissions: vi.fn() }))
 
 const BODY: RejudgeBody = { problem: 'hcmus41c', results: ['WA'] };
 const NOW = new Date('2026-10-09T07:52:31.000Z');
-const answer = (count: number, allowed = true): RejudgeResult => ({ count, dryRun: true, allowed });
+const answer = (count: number, allowed = true): RejudgeResult => ({
+  count,
+  dryRun: true,
+  allowed,
+  sample: [],
+});
 /** A request the spec settles by hand, so two counts can overlap. */
 function deferred() {
   let resolve!: (value: RejudgeResult) => void;
@@ -34,6 +39,7 @@ describe('useRejudgeCount', () => {
       count: 128,
       allowed: true,
       countedAt: NOW.toISOString(),
+      sample: [],
     });
   });
 
@@ -77,6 +83,7 @@ describe('canConfirmRejudge', () => {
     count,
     allowed,
     countedAt: NOW.toISOString(),
+    sample: [],
   });
   it.each<[RejudgeCountState, boolean]>([
     [{ kind: 'idle' }, false],

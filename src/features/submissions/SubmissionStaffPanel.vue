@@ -7,6 +7,7 @@ import type { SubmissionDetail } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminBit from '@/features/admin/shell/AdminBit.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
+import SubmissionLockControl from './SubmissionLockControl.vue';
 import { ADMIN_DANGER_CLASS } from '@/features/admin/ui/classes';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
@@ -46,7 +47,11 @@ const now = useNow(CLOCK_REFRESH_MS);
 const can = (permission: string) => hasPermission(session.user, permission);
 
 const actions = computed(() => staffActionsFor(props.submission, can, now.value));
-const isVisible = computed(() => holdsAnyStaffPermission(can) && hasAnyStaffAction(actions.value));
+const isVisible = computed(
+  () =>
+    holdsAnyStaffPermission(can) &&
+    (hasAnyStaffAction(actions.value) || props.submission.viewer.canLock),
+);
 /** The board's order: a judging submission offers abort first, a finished one rejudge first. */
 const order = computed<StaffAction[]>(() =>
   isUnfinished(props.submission) ? ['abort', 'rejudge', 'reject'] : ['rejudge', 'reject', 'abort'],
@@ -174,6 +179,10 @@ async function confirmAction() {
       }}
     </p>
 
+    <p v-if="submission.judgedOn" class="text-sm text-muted">
+      {{ $t('admin.staff.judgedOn', { judge: submission.judgedOn }) }}
+    </p>
+
     <div class="flex flex-wrap gap-3">
       <template v-for="action in order" :key="action">
         <button
@@ -193,6 +202,8 @@ async function confirmAction() {
         {{ blocked.reason }}
       </li>
     </ul>
+
+    <SubmissionLockControl v-if="submission.viewer.canLock" :submission="submission" />
 
     <AdminStatus v-if="outcome" :kind="outcome.kind" :text="outcome.text" />
 

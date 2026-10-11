@@ -33,6 +33,14 @@ function save() {
         })
       }}
     </p>
+    <dl class="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[max-content_1fr]">
+      <dt class="text-muted">{{ $t('admin.judges.row.protocol') }}</dt>
+      <dd class="font-mono">v1.{{ judge.protocolMinor }}</dd>
+      <dt class="text-muted">{{ $t('admin.judges.row.features') }}</dt>
+      <dd class="font-mono break-words">{{ judge.features.join(', ') || '—' }}</dd>
+      <dt class="text-muted">{{ $t('admin.judges.row.lastIp') }}</dt>
+      <dd class="font-mono">{{ judge.lastIp ?? '—' }}</dd>
+    </dl>
     <JudgeRuntimes :runtimes="judge.runtimes" />
     <form class="flex flex-col gap-3" @submit.prevent="save">
       <AdminField

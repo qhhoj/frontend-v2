@@ -1,4 +1,4 @@
-import type { Judge } from '../../api/types/judges-admin';
+import type { Judge, JudgeQueue } from '../../api/types/judges-admin';
 
 const RUNTIMES = [
   { language: 'CPP20', name: 'g++', version: '13.2.0', priority: 10 },
@@ -66,3 +66,14 @@ export const JUDGE_FLEET: Judge[] = [
     runtimes: RUNTIMES.slice(0, 2),
   }),
 ];
+
+/** An idle queue: what the judges screen polls next to the fleet. */
+export const EMPTY_JUDGE_QUEUE: JudgeQueue = {
+  queued: 0,
+  processing: 0,
+  grading: 0,
+  oldestQueuedSince: null,
+  byPriority: [],
+  byLanguage: [],
+  pinned: [],
+};

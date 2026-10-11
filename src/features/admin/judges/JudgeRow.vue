@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import type { Judge, JudgePatch } from '@/api/types/judges-admin';
 import { formatNumber } from '@/lib/format';
@@ -11,15 +11,18 @@ import JudgeActions from './JudgeActions.vue';
 import JudgeDetails from './JudgeDetails.vue';
 import { judgeStatus, pingMs } from './judge-stats';
 import { useJudgeWrites } from './judges.mutations';
+import { JUDGE_SEARCH_ID, useJudgesCache } from './judges.queries';
 
 const props = defineProps<{ judge: Judge }>();
 const emit = defineEmits<{ rotated: [judgeName: string, authKey: string] }>();
 const locale = useLocaleStore();
 const writes = useJudgeWrites();
+const cache = useJudgesCache();
 const isDetailsOpen = ref(false);
 const isBlockDialogOpen = ref(false);
 const isRotateDialogOpen = ref(false);
 const isDisconnectDialogOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
 const status = computed(() => judgeStatus(props.judge));
 const pingMsValue = computed(() => pingMs(props.judge.ping));
 const loadText = computed(() =>
@@ -44,6 +47,20 @@ async function rotateKey() {
   if (!result) return;
   isRotateDialogOpen.value = false;
   emit('rotated', props.judge.name, result.authKey);
+}
+function openDeleteDialog() {
+  writes.remove.reset();
+  isDeleteDialogOpen.value = true;
+}
+/** The dialog closes first, then the row leaves the list (and this component with it); focus goes to the search box. */
+async function deleteJudge() {
+  const { name } = props.judge;
+  await writes.remove.run(name);
+  if (!writes.remove.isDone.value) return;
+  isDeleteDialogOpen.value = false;
+  await nextTick();
+  cache.remove(name);
+  document.getElementById(JUDGE_SEARCH_ID)?.focus();
 }
 async function disconnect(force: boolean) {
   await writes.disconnect.run({ name: props.judge.name, force });
@@ -87,6 +104,7 @@ async function disconnect(force: boolean) {
       @ask-block="openBlockDialog"
       @ask-rotate="isRotateDialogOpen = true"
       @ask-disconnect="isDisconnectDialogOpen = true"
+      @ask-delete="openDeleteDialog"
     />
     <AdminStatus
       v-if="writes.patch.failure.value"
@@ -135,6 +153,19 @@ async function disconnect(force: boolean) {
     >
       <template v-if="writes.rotate.failure.value" #error>
         <AdminStatus kind="refused" :text="failureTextOf(writes.rotate.failure.value)" />
+      </template>
+    </ConfirmDialog>
+    <ConfirmDialog
+      v-model:visible="isDeleteDialogOpen"
+      tone="danger"
+      :title="$t('admin.judges.delete.title', { name: judge.name })"
+      :body="$t('admin.judges.delete.body')"
+      :confirm-label="$t('admin.judges.delete.confirm')"
+      :busy="writes.remove.isPending.value"
+      @confirm="deleteJudge"
+    >
+      <template v-if="writes.remove.failure.value" #error>
+        <AdminStatus kind="refused" :text="failureTextOf(writes.remove.failure.value)" />
       </template>
     </ConfirmDialog>
     <DisconnectDialog

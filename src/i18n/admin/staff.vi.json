@@ -44,5 +44,11 @@
     "reject": "Đã từ chối bài nộp.",
     "abort": "Đã gửi yêu cầu hủy."
   },
-  "conflict": "Bài nộp bị khóa, đang chờ chấm cuối kỳ thi hoặc đang được chấm (409). Chấm lại hàng loạt có tùy chọn “cả bài nộp đã bị khóa”; thao tác từng bài thì không."
+  "conflict": "Bài nộp bị khóa, đang chờ chấm cuối kỳ thi hoặc đang được chấm (409). Chấm lại hàng loạt có tùy chọn “cả bài nộp đã bị khóa”; thao tác từng bài thì không.",
+  "judgedOn": "Chấm bởi máy {judge}.",
+  "lockControl": {
+    "lock": "Khóa bài nộp",
+    "unlock": "Mở khóa",
+    "hint": "Bài nộp bị khóa không bị chấm lại, kể cả khi chấm lại hàng loạt (trừ khi chọn cả bài bị khóa)."
+  }
 }

@@ -2,14 +2,14 @@
   "crumbs": {
     "judging": "Chấm bài"
   },
-  "lead": "Đặt lại và chấm lại nhiều bài nộp của một bài theo bộ lọc.",
+  "lead": "Chấm lại hoặc tính lại điểm nhiều bài nộp theo bộ lọc: một bài, một kỳ thi, một người dùng, một máy chấm hay cả trang.",
   "filter": {
     "title": "Bộ lọc bài nộp",
     "problem": "Mã bài",
-    "problemHint": "Bắt buộc. Chỉ chấm lại từng bài một.",
+    "problemHint": "Bỏ trống là mọi bài.",
     "idFrom": "Từ bài nộp (mã)",
     "idTo": "Đến bài nộp (mã)",
-    "idHint": "Mã bài nộp xếp theo thời gian nộp, nên là khoảng thời gian.",
+    "idHint": "Mã bài nộp xếp theo thời gian nộp. Thường dùng khoảng thời gian ở trên là đủ.",
     "languages": "Ngôn ngữ",
     "languagesHint": "Bỏ trống là mọi ngôn ngữ.",
     "results": "Kết quả hiện tại",
@@ -18,13 +18,24 @@
     "forceHint": "Mặc định bỏ qua bài nộp đã qua thời điểm khóa chấm.",
     "lockedNote": "Luôn bỏ qua bài nộp đang được máy chấm giữ và bài nộp chờ chấm lần cuối của kỳ thi.",
     "reset": "Đặt lại",
-    "submit": "Chấm lại các bài nộp này"
+    "submit": "Chấm lại các bài nộp này",
+    "contest": "Mã kỳ thi",
+    "contestHint": "Chỉ bài nộp trong kỳ thi này (người sửa kỳ thi được chạy).",
+    "user": "Tên người dùng",
+    "userHint": "Chỉ bài nộp của người này.",
+    "judgedOn": "Máy chấm",
+    "judgedOnHint": "Chỉ bài nộp do máy chấm này chấm lần cuối.",
+    "idRange": "Khoảng mã bài nộp (nâng cao)",
+    "dateFrom": "Nộp từ",
+    "dateTo": "Nộp trước",
+    "siteWide": "Không có bài hay kỳ thi: thao tác áp dụng cho cả trang và cần quyền judge.edit_all_problem.",
+    "presets": "Chọn nhanh:",
+    "rescore": "Tính lại điểm"
   },
   "summary": {
     "title": "Bộ lọc đã chọn",
-    "problem": "Bài",
-    "from": "Từ mã",
-    "to": "Đến mã",
+    "from": "Từ",
+    "to": "Đến",
     "noLimit": "Không giới hạn",
     "languages": "Ngôn ngữ",
     "allLanguages": "Mọi ngôn ngữ",
@@ -34,14 +45,21 @@
     "lockedSkip": "Bỏ qua",
     "lockedRejudge": "Chấm lại",
     "countNote": "Số bài nộp khớp hiện trong hộp xác nhận: bấm “Chấm lại” sẽ đếm trước, chưa đặt lại gì.",
-    "lastResult": "Kết quả gần nhất"
+    "lastResult": "Kết quả gần nhất",
+    "scope": "Phạm vi",
+    "siteWide": "Cả trang",
+    "contestOnly": "Kỳ thi {contest}",
+    "contestProblem": "Bài {problem} trong kỳ thi {contest}",
+    "user": "Người dùng",
+    "allUsers": "Mọi người dùng",
+    "judge": "Máy chấm",
+    "allJudges": "Mọi máy chấm"
   },
   "done": "Đã xếp lại {count} bài nộp. Chấm ở mức ưu tiên hàng loạt, không phát sự kiện từng bài nên bảng bài nộp tự cập nhật khi máy chấm nhận.",
   "confirm": {
-    "title": "Chấm lại bài nộp của {problem}?",
+    "title": "Chấm lại các bài nộp khớp bộ lọc?",
     "body": "Các bài nộp khớp bộ lọc sẽ được đặt lại về trạng thái chờ chấm: kết quả và điểm hiện tại bị xóa cho đến khi chấm xong. Hành động này không hoàn tác được.",
-    "line": "Bộ lọc: {problem} · {languages} · {results} · từ mã {from} · {locked}",
-    "fromStart": "đầu",
+    "line": "Bộ lọc: {scope} · {user} · {judge} · {languages} · {results} · từ {from} đến {to} · bài bị khóa: {locked}",
     "labelCount": "Chấm lại {count} bài nộp",
     "labelCounting": "Đang đếm",
     "labelPlain": "Chấm lại",
@@ -55,11 +73,34 @@
       "needsLot": "bài nộp khớp, vượt giới hạn {limit}. Cần quyền judge.rejudge_submission_lot; thu hẹp bộ lọc hoặc nhờ người có quyền.",
       "noneChip": "Không khớp",
       "none": "Không có bài nộp nào khớp bộ lọc."
-    }
+    },
+    "sample": "Vài bài nộp khớp mới nhất"
   },
   "errors": {
-    "problem": "Cần mã bài.",
     "id": "Không phải mã bài nộp.",
-    "languages": "Tối đa 50 ngôn ngữ."
+    "languages": "Tối đa 50 ngôn ngữ.",
+    "dateOrder": "Thời điểm kết thúc phải sau thời điểm bắt đầu."
+  },
+  "presets": {
+    "internalErrors": "Mọi IE",
+    "compileErrors": "Mọi CE",
+    "notAccepted": "Mọi bài chưa AC"
+  },
+  "rescore": {
+    "title": "Tính lại điểm các bài nộp khớp?",
+    "confirm": "Tính lại điểm",
+    "preview": "{count} bài nộp đã chấm khớp; tính lại {problems} bài, {contests} kỳ thi.",
+    "body": "Điểm được tính lại từ kết quả từng test theo điểm và chế độ chấm từng phần hiện tại của bài, rồi cập nhật điểm người dùng và kết quả kỳ thi. Dùng sau khi đổi điểm bài.",
+    "done": "Đã xếp lịch tính lại {problems} bài và {contests} kỳ thi ({count} bài nộp khớp)."
+  },
+  "progress": {
+    "waiting": "Còn {count} bài nộp đang chờ chấm.",
+    "open": "Xem các bài nộp đang chờ"
+  },
+  "history": {
+    "title": "Các lần chạy gần đây",
+    "empty": "Chưa có lần chạy nào.",
+    "rejudge": "Chấm lại",
+    "rescore": "Tính lại điểm"
   }
 }

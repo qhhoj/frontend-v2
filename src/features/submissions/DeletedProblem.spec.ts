@@ -12,7 +12,7 @@ const tombstoned = submissionDetail({
   cases: [],
   batches: null,
   totalCases: null,
-  viewer: { canAbort: false, canRejudge: true, canReject: true },
+  viewer: { canAbort: false, canRejudge: true, canReject: true, canLock: false },
 });
 
 describe('a submission of a deleted problem', () => {

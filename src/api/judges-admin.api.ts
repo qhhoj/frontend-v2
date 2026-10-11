@@ -11,3 +11,8 @@ export const rotateJudgeKey = (name: string) =>
   apiSend('post', '/judges/{name}/key', { path: { name } });
 export const disconnectJudge = (name: string, force: boolean) =>
   apiSend('post', '/judges/{name}/disconnect', { path: { name }, body: { force } });
+/** Only an offline judge (409 `judge_online` otherwise). */
+export const deleteJudge = (name: string) =>
+  apiSend('delete', '/judges/{name}', { path: { name } });
+/** QU/P/G counts, per priority, per language with usable online judges, per pinned judge. */
+export const fetchJudgeQueue = () => apiGet('/judges/queue');

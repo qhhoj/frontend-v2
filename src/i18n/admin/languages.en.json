@@ -24,7 +24,9 @@
     "showJudges": "Show judges",
     "fileOnly": "file upload only",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "onlineCount": "{count} online",
+    "versionDrift": "Versions differ"
   },
   "empty": "No languages yet.",
   "form": {
@@ -85,5 +87,9 @@
     "add": "Add language"
   },
   "addOnly": "You can add new languages only; the list of existing languages is not available to you.",
-  "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown."
+  "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown.",
+  "unserved": {
+    "title": "No judge runs {key}",
+    "body": "No online judge (neither blocked nor disabled) runs {name}: submissions in it will wait."
+  }
 }

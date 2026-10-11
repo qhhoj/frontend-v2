@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, mockApi, ok, page } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
@@ -12,8 +12,8 @@ const PERMS = ['judge.rejudge_submission'];
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 const isDryRun = (call: ApiCall) => (call.body as { dryRun?: boolean }).dryRun === true;
 const posts = (calls: ApiCall[]) => calls.filter((call) => call.method === 'POST');
-const counted = (count: number, allowed = true) => ok({ count, dryRun: true, allowed });
-const queued = (count: number) => ok({ count, dryRun: false, allowed: true });
+const counted = (count: number, allowed = true) => ok({ count, dryRun: true, allowed, sample: [] });
+const queued = (count: number) => ok({ count, dryRun: false, allowed: true, sample: [] });
 const submitButton = () => openDialog().querySelector<HTMLButtonElement>('button[type="submit"]')!;
 const dialogText = () => openDialog().textContent ?? '';
 
@@ -26,6 +26,8 @@ const routes = (post: MockHandler) => ({
   ...staffViewer(PERMS),
   'GET /problems/meta': ok(problemMeta()),
   'POST /submissions/rejudge': post,
+  'GET /submissions/batches/recent': ok([]),
+  'GET /submissions': page([]),
 });
 /** The screen is a lazy route: the form is there once its chunk has loaded. */
 const mountRejudge = async () => {

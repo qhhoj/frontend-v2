@@ -5,10 +5,11 @@ import { translate } from '@/i18n';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
-/** `done` is the queued count; `refused` is the text of the page's line. */
+/** `done` is the queued count; `refused` is the text of the page's line. `query` filters the admin list to what the run queued. */
 export interface RejudgeOutcome {
   kind: 'done' | 'refused';
   text: string;
+  query?: Record<string, string>;
 }
 
 /** One bulk rejudge: the request, and the line the page shows for its answer. Never throws; the filter is never cleared here. */
@@ -16,16 +17,17 @@ export function useBulkRejudge() {
   const outcome = ref<RejudgeOutcome | null>(null);
   const mutation = useAdminMutation<RejudgeBody, RejudgeResult>({
     mutate: rejudgeSubmissions,
-    invalidates: () => [['submissions']],
+    invalidates: () => [['submissions'], ['admin', 'submission-batches']],
   });
 
-  async function rejudge(body: RejudgeBody): Promise<void> {
+  async function rejudge(body: RejudgeBody, query?: Record<string, string>): Promise<void> {
     try {
       const result = await mutation.run(body);
       if (result) {
         outcome.value = {
           kind: 'done',
           text: translate('admin.rejudge.done', { count: result.count }),
+          query,
         };
       } else if (mutation.failure.value) {
         outcome.value = { kind: 'refused', text: failureTextOf(mutation.failure.value) };

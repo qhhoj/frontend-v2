@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { cancelDialog, confirmDialog, staffViewer } from '@/test/admin-routes';
-import { JUDGE_FLEET } from '@/test/admin-fixtures/judges';
+import { EMPTY_JUDGE_QUEUE, JUDGE_FLEET } from '@/test/admin-fixtures/judges';
 
 /** The screen is a lazy route: the board is there once its chunk and its list have loaded. */
 const mountJudges = async () => {
@@ -18,6 +18,7 @@ const PERMS = ['judge.change_judge'];
 const routes = (extra = {}) => ({
   ...staffViewer(PERMS),
   'GET /judges': ok(JUDGE_FLEET),
+  'GET /judges/queue': ok(EMPTY_JUDGE_QUEUE),
   ...extra,
 });
 const rowOf = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], name: string) =>

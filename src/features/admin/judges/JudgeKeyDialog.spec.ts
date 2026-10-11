@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { failWithCode, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { openDialog, staffViewer } from '@/test/admin-routes';
-import { judge } from '@/test/admin-fixtures/judges';
+import { EMPTY_JUDGE_QUEUE, judge } from '@/test/admin-fixtures/judges';
 
 const KEY = 'k7Qm2xV9aR4tLw0ZpB8sNf3YcHu5JdEe6GiTo1XvMqA=';
 /** Lets a hidden dialog's leave transition finish (it runs on animation frames, so flushing promises is not enough). */
@@ -34,6 +34,7 @@ describe('judge key reveal', () => {
       ...staffViewer(['judge.change_judge']),
       'POST /judges': ok({ judge: judge({ name: 'qhh-judge-06' }), authKey: KEY }),
       'GET /judges': ok([]),
+      'GET /judges/queue': ok(EMPTY_JUDGE_QUEUE),
     });
     const { wrapper, queryClient } = await mountAddPage();
     await wrapper.get('#judge-name').setValue('qhh-judge-06');

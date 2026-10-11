@@ -1,0 +1,40 @@
+{
+  "lead": "The staff submission list: filter by internal states (QU, P, G, IE), select many, then rejudge or recalculate points.",
+  "toRejudge": "Rejudge by an advanced filter",
+  "total": "{count} matching submissions",
+  "empty": "No submission matches the filter.",
+  "pager": "Submission pages",
+  "filters": {
+    "title": "Submission filter",
+    "problem": "Problem code",
+    "user": "Username",
+    "language": "Language",
+    "status": "Judging state",
+    "result": "Result",
+    "apply": "Filter",
+    "reset": "Clear filter"
+  },
+  "table": {
+    "selectPage": "Select the whole page",
+    "select": "Select submission {id}",
+    "id": "Id",
+    "user": "User",
+    "problem": "Problem",
+    "verdict": "Verdict",
+    "points": "Points",
+    "time": "Time",
+    "memory": "Memory",
+    "language": "Language",
+    "date": "Submitted"
+  },
+  "bulk": {
+    "label": "Bulk actions",
+    "selected": "{count} submissions selected",
+    "allSelected": "All {count} matching submissions selected",
+    "selectAll": "Select all {total} matching submissions",
+    "clear": "Clear selection",
+    "rejudge": "Rejudge",
+    "lineSelected": "{count} selected submissions.",
+    "lineAll": "Every submission matching the list filter (except the state filter)."
+  }
+}

@@ -618,7 +618,7 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
   ],
   batches: null,
   totalCases: 20,
-  viewer: { canAbort: false, canRejudge: false, canReject: false },
+  viewer: { canAbort: false, canRejudge: false, canReject: false, canLock: false },
   lockedAfter: null,
   ...overrides,
 });

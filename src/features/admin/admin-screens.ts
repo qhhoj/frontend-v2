@@ -52,6 +52,14 @@ export const ADMIN_SCREENS = {
   },
   similarityPair: { path: '/admin/similarity/pairs/:pairId', permission: 'judge.moss_contest' },
   rejudge: { path: '/admin/rejudge', permission: 'judge.rejudge_submission' },
+  submissions: {
+    path: '/admin/submissions',
+    permission: [
+      'judge.rejudge_submission',
+      'judge.reject_submission',
+      'judge.abort_any_submission',
+    ],
+  },
   // Plan 8f-2 screens
   judges: { path: '/admin/judges', permission: 'judge.change_judge' },
   judgeNew: { path: '/admin/judges/new', permission: 'judge.change_judge' },

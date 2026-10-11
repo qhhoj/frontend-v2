@@ -24,7 +24,9 @@
     "showJudges": "Xem máy",
     "fileOnly": "chỉ nhận tệp",
     "yes": "Có",
-    "no": "Không"
+    "no": "Không",
+    "onlineCount": "{count} trực tuyến",
+    "versionDrift": "Phiên bản khác nhau"
   },
   "empty": "Chưa có ngôn ngữ nào.",
   "form": {
@@ -85,5 +87,9 @@
     "add": "Thêm ngôn ngữ"
   },
   "addOnly": "Bạn chỉ được thêm ngôn ngữ mới, không xem hay sửa được danh sách ngôn ngữ hiện có.",
-  "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ."
+  "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ.",
+  "unserved": {
+    "title": "Không máy chấm nào chạy {key}",
+    "body": "Không máy chấm trực tuyến (không bị khóa hay tạm dừng) nào chạy {name}: bài nộp bằng ngôn ngữ này sẽ nằm chờ."
+  }
 }

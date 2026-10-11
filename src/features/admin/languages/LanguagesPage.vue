@@ -9,7 +9,12 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import AdminBit from '../shell/AdminBit.vue';
 import { useJudgesQuery } from '../judges/judges.queries';
-import { singleJudgeLanguages, withCoverage } from './languages';
+import {
+  hasVersionDrift,
+  singleJudgeLanguages,
+  unservedLanguages,
+  withCoverage,
+} from './languages';
 import { useLanguagesAdminQuery } from './languages.queries';
 
 const { can } = usePermissions();
@@ -24,6 +29,7 @@ const judges = computed(() => (canSeeJudges.value ? (judgesQuery.data.value ?? n
 const hasJudgesError = computed(() => judgesQuery.isError.value);
 const rows = computed(() => withCoverage(data.value ?? [], judges.value));
 const singles = computed(() => singleJudgeLanguages(rows.value));
+const unserved = computed(() => unservedLanguages(rows.value));
 const onlineJudgeCount = computed(() => judges.value?.filter((judge) => judge.online).length ?? 0);
 const judgeTotal = computed(() => judges.value?.length ?? 0);
 const percentOf = (count: number) =>
@@ -69,6 +75,15 @@ const percentOf = (count: number) =>
       <SettingsNotice v-if="hasJudgesError" tone="warning">{{
         $t('admin.languages.judgesUnavailable')
       }}</SettingsNotice>
+      <SettingsNotice
+        v-for="row in unserved"
+        :key="`unserved-${row.key}`"
+        tone="error"
+        :bit="ADMIN_BIT_KINDS.refused"
+      >
+        <p class="font-semibold">{{ $t('admin.languages.unserved.title', { key: row.key }) }}</p>
+        <p>{{ $t('admin.languages.unserved.body', { name: row.name }) }}</p>
+      </SettingsNotice>
       <div v-for="single in singles" :key="single.key">
         <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.refused">
           <p class="font-semibold">{{ $t('admin.languages.single.title', { key: single.key }) }}</p>
@@ -140,7 +155,25 @@ const percentOf = (count: number) =>
                         total: judgeTotal,
                       })
                     }}
+                    <span
+                      :class="
+                        row.onlineJudges?.length ? 'text-muted' : 'font-semibold text-negative'
+                      "
+                    >
+                      ·
+                      {{
+                        $t('admin.languages.table.onlineCount', {
+                          count: row.onlineJudges?.length ?? 0,
+                        })
+                      }}
+                    </span>
                   </p>
+                  <span
+                    v-if="hasVersionDrift(row)"
+                    class="self-start rounded-pill border border-line-strong px-2 text-xs font-semibold"
+                  >
+                    {{ $t('admin.languages.table.versionDrift') }}
+                  </span>
                   <div aria-hidden="true" class="h-2 w-28 rounded-pill bg-surface-hover">
                     <div
                       class="h-2 rounded-pill bg-accent"
@@ -152,7 +185,12 @@ const percentOf = (count: number) =>
                       {{ $t('admin.languages.table.showJudges') }}
                     </summary>
                     <ul class="mt-1 font-mono">
-                      <li v-for="name in row.judges ?? []" :key="name">{{ name }}</li>
+                      <li v-for="version in row.versions ?? []" :key="version.judge">
+                        <RouterLink :to="{ name: 'admin-judges' }" class="hover:underline">{{
+                          version.judge
+                        }}</RouterLink>
+                        <span class="text-muted"> · {{ version.runtime }}</span>
+                      </li>
                     </ul>
                   </details>
                 </div>

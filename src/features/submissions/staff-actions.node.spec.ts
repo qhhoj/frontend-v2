@@ -8,6 +8,7 @@ const flags = (overrides: Partial<ReturnType<typeof submissionDetail>['viewer']>
   canAbort: false,
   canRejudge: false,
   canReject: false,
+  canLock: false,
   ...overrides,
 });
 const ALL = ['judge.rejudge_submission', 'judge.reject_submission', 'judge.abort_any_submission'];

@@ -2,14 +2,14 @@
   "crumbs": {
     "judging": "Judging"
   },
-  "lead": "Reset and rejudge many submissions of one problem by a filter.",
+  "lead": "Rejudge or rescore many submissions by a filter: one problem, one contest, one user, one judge or the whole site.",
   "filter": {
     "title": "Submission filter",
     "problem": "Problem code",
-    "problemHint": "Required. Rejudge one problem at a time.",
+    "problemHint": "Leave empty for every problem.",
     "idFrom": "From submission (id)",
     "idTo": "To submission (id)",
-    "idHint": "Submission ids follow the submission time, so they form a time range.",
+    "idHint": "Submission ids follow the submission time. The date range above is usually enough.",
     "languages": "Languages",
     "languagesHint": "Leave empty for every language.",
     "results": "Current result",
@@ -18,13 +18,24 @@
     "forceHint": "By default submissions past their lock time are skipped.",
     "lockedNote": "Submissions still held by a judge and the final-judging submissions of a contest are always skipped.",
     "reset": "Reset",
-    "submit": "Rejudge these submissions"
+    "submit": "Rejudge these submissions",
+    "contest": "Contest key",
+    "contestHint": "Only this contest's submissions (its editors may run it).",
+    "user": "Username",
+    "userHint": "Only this user's submissions.",
+    "judgedOn": "Judge",
+    "judgedOnHint": "Only submissions this judge graded last.",
+    "idRange": "Submission id range (advanced)",
+    "dateFrom": "Submitted from",
+    "dateTo": "Submitted before",
+    "siteWide": "No problem or contest: the action covers the whole site and needs judge.edit_all_problem.",
+    "presets": "Quick pick:",
+    "rescore": "Recalculate points"
   },
   "summary": {
     "title": "Selected filter",
-    "problem": "Problem",
-    "from": "From id",
-    "to": "To id",
+    "from": "From",
+    "to": "To",
     "noLimit": "No limit",
     "languages": "Languages",
     "allLanguages": "All languages",
@@ -34,14 +45,21 @@
     "lockedSkip": "Skip",
     "lockedRejudge": "Rejudge",
     "countNote": "The number of matching submissions shows in the confirm: pressing “Rejudge” counts first and resets nothing.",
-    "lastResult": "Last result"
+    "lastResult": "Last result",
+    "scope": "Scope",
+    "siteWide": "Whole site",
+    "contestOnly": "Contest {contest}",
+    "contestProblem": "Problem {problem} in contest {contest}",
+    "user": "User",
+    "allUsers": "All users",
+    "judge": "Judge",
+    "allJudges": "All judges"
   },
   "done": "Queued {count} submissions for rejudging. They run at batch priority and emit no per-submission events, so the submission table updates when a judge picks them up.",
   "confirm": {
-    "title": "Rejudge submissions of {problem}?",
+    "title": "Rejudge the matching submissions?",
     "body": "The submissions that match are reset to waiting: their current result and points are cleared until judging ends. This cannot be undone.",
-    "line": "Filter: {problem} · {languages} · {results} · from {from} · {locked}",
-    "fromStart": "the start",
+    "line": "Filter: {scope} · {user} · {judge} · {languages} · {results} · from {from} to {to} · locked: {locked}",
     "labelCount": "Rejudge {count} submissions",
     "labelCounting": "Counting",
     "labelPlain": "Rejudge",
@@ -55,11 +73,34 @@
       "needsLot": "submissions match, over the limit of {limit}. Needs judge.rejudge_submission_lot; narrow the filter or ask someone who holds it.",
       "noneChip": "No match",
       "none": "No submission matches the filter."
-    }
+    },
+    "sample": "Newest matching submissions"
   },
   "errors": {
-    "problem": "A problem code is required.",
     "id": "Not a submission id.",
-    "languages": "At most 50 languages."
+    "languages": "At most 50 languages.",
+    "dateOrder": "The end must be after the start."
+  },
+  "presets": {
+    "internalErrors": "All IE",
+    "compileErrors": "All CE",
+    "notAccepted": "All non-AC"
+  },
+  "rescore": {
+    "title": "Recalculate points of the matching submissions?",
+    "confirm": "Recalculate points",
+    "preview": "{count} graded submissions match; {problems} problems and {contests} contests will be recalculated.",
+    "body": "Points are recomputed from each test's result with the problem's current points and partial setting, then user points and contest results follow. Use it after changing a problem's points.",
+    "done": "Queued recalculation of {problems} problems and {contests} contests ({count} matching submissions)."
+  },
+  "progress": {
+    "waiting": "{count} submissions still waiting for a judge.",
+    "open": "Open the waiting submissions"
+  },
+  "history": {
+    "title": "Recent runs",
+    "empty": "No runs yet.",
+    "rejudge": "Rejudge",
+    "rescore": "Rescore"
   }
 }
