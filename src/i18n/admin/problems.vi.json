@@ -131,7 +131,14 @@
     "fullMarkup": "Cho phép markup đầy đủ",
     "fullMarkupHint": "HTML không được lọc.",
     "dateOffer": "Đặt ngày đăng là bây giờ để bài hiện như bài mới?",
-    "dateNow": "Dùng ngày hôm nay"
+    "dateNow": "Dùng ngày hôm nay",
+    "readiness": {
+      "title": "Bài này có thể chưa sẵn sàng để công khai:",
+      "noCases": "Bài chưa có test nào, nên mọi bài nộp đều không chấm được.",
+      "noCasePoints": "Các test có tổng 0 điểm, nên không ai ghi được điểm.",
+      "noProblemPoints": "Bài có 0 điểm.",
+      "openData": "Mở dữ liệu test"
+    }
   },
   "clone": {
     "title": "Nhân bản bài",

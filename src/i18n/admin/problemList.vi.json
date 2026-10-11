@@ -47,7 +47,8 @@
     "reasons": {
       "not_found": "không tồn tại hoặc bạn không thấy",
       "forbidden": "bạn không được sửa bài hoặc trường này",
-      "unknown": "bị từ chối"
+      "unknown": "bị từ chối",
+      "internal_error": "lỗi máy chủ; hãy mở bài để kiểm tra"
     }
   }
 }

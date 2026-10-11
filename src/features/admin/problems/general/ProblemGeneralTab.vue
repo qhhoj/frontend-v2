@@ -37,6 +37,7 @@ const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
           :errors="errors"
           :suggester="problem.editor?.suggester ?? null"
           :is-suggestion-pending="!problem.isPublic"
+          :private-code="problem.isPublic ? undefined : problem.code"
         />
       </fieldset>
       <div

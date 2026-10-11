@@ -131,7 +131,14 @@
     "fullMarkup": "Allow full markup",
     "fullMarkupHint": "HTML is not filtered.",
     "dateOffer": "Set the publication date to now, so the problem lists as new?",
-    "dateNow": "Use today’s date"
+    "dateNow": "Use today’s date",
+    "readiness": {
+      "title": "This problem may not be ready to publish:",
+      "noCases": "It has no test cases, so every submission fails to judge.",
+      "noCasePoints": "Its test cases are worth 0 points, so nobody can score.",
+      "noProblemPoints": "The problem is worth 0 points.",
+      "openData": "Open the test data"
+    }
   },
   "clone": {
     "title": "Clone problem",

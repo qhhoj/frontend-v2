@@ -10,12 +10,13 @@ import ProblemVisibilitySection from './ProblemVisibilitySection.vue';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
-/** `suggester`: who suggested an existing problem (read-only); the create form leaves it out. */
+/** `suggester`: who suggested an existing problem (read-only); `privateCode`: see `ProblemStatusSection`. The create form leaves both out. */
 defineProps<{
   meta: ProblemEditingMeta;
   errors: FieldErrors;
   suggester?: UserSummaryView | null;
   isSuggestionPending?: boolean;
+  privateCode?: string;
 }>();
 </script>
 
@@ -31,6 +32,6 @@ defineProps<{
       :suggester="suggester ?? null"
       :is-suggestion-pending="isSuggestionPending ?? false"
     />
-    <ProblemStatusSection v-model="form" />
+    <ProblemStatusSection v-model="form" :private-code="privateCode" />
   </div>
 </template>
