@@ -8,7 +8,7 @@ describe('ranking link form', () => {
         status: 'public',
         expiryMode: 'U',
         expiryAmount: 7,
-        expiresAt: '2026-10-15T13:00',
+        expiresAt: '2026-10-15T06:00:00.000Z',
       }),
     ).toEqual({ status: 'public', expiryMode: 'U' });
     expect(
@@ -19,9 +19,9 @@ describe('ranking link form', () => {
         status: 'public',
         expiryMode: 'A',
         expiryAmount: null,
-        expiresAt: '2026-10-15T13:00',
+        expiresAt: '2026-10-15T06:00:00.000Z',
       }),
-    ).toMatchObject({ expiryMode: 'A', expiresAt: expect.stringMatching(/Z$/) });
+    ).toMatchObject({ expiryMode: 'A', expiresAt: '2026-10-15T06:00:00.000Z' });
   });
 
   it('refuses a missing or fractional amount and a missing date', () => {

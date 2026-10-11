@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { translate } from '@/i18n';
 import { computed, ref, useId, watch } from 'vue';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import {
@@ -15,8 +16,8 @@ import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { toLocalInput } from '../../ui/datetime';
-import { ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { expiryPreview, publicRankingUrl, toLinkPatch } from './ranking-link';
 import type { LinkForm } from './ranking-link';
@@ -50,11 +51,16 @@ const formOf = (stored: RankingLink | null | undefined): LinkForm =>
         status: stored.status,
         expiryMode: stored.expiryMode,
         expiryAmount: stored.expiryAmount,
-        expiresAt: toLocalInput(stored.expiresAt),
+        expiresAt: stored.expiresAt ?? '',
       }
     : blankForm();
 const form = ref<LinkForm>(formOf(link.value));
 watch(link, (next) => (form.value = formOf(next)));
+/** The date field speaks `string | null`; the form keeps '' for an unset expiry. */
+const expiresAt = computed({
+  get: () => form.value.expiresAt || null,
+  set: (iso: string | null) => (form.value.expiresAt = iso ?? ''),
+});
 
 const url = computed(() =>
   link.value ? publicRankingUrl(link.value.token, globalThis.location.origin) : '',
@@ -73,6 +79,7 @@ const create = useAdminMutation({
 const save = useAdminMutation({
   mutate: (patch: Parameters<typeof updateRankingLink>[1]) =>
     updateRankingLink(props.contestKey, patch),
+  successText: () => translate('admin.contests.ranking.link.saved'),
   onDone: storeLink,
 });
 const regenerate = useAdminMutation({
@@ -96,9 +103,9 @@ async function saveLink() {
 </script>
 
 <template>
-  <section class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
+  <section :class="[CARD, 'flex min-w-0 flex-col gap-5 p-5']">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-base font-bold">
+      <h2 class="m-0 text-base font-semibold">
         {{ $t('admin.contests.ranking.link.title') }}
       </h2>
     </header>
@@ -107,7 +114,7 @@ async function saveLink() {
         <p class="text-sm text-muted">{{ $t('admin.contests.ranking.link.none') }}</p>
         <button
           type="button"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           class="self-start"
           @click="create.run(undefined)"
         >
@@ -144,38 +151,38 @@ async function saveLink() {
           <legend class="font-semibold">
             {{ $t('admin.contests.ranking.link.statusLegend') }}
           </legend>
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.status" type="radio" value="public" :name="statusName" />{{
               $t('admin.contests.ranking.link.statusPublic')
             }}</label
           >
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.status" type="radio" value="private" :name="statusName" />{{
               $t('admin.contests.ranking.link.statusPrivate')
             }}</label
           >
         </fieldset>
 
-        <fieldset class="flex flex-col gap-3">
+        <fieldset class="flex flex-col gap-1">
           <legend class="font-semibold">
             {{ $t('admin.contests.ranking.link.expiryLegend') }}
           </legend>
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="U" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryNone')
             }}</label
           >
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="M" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryMinutes')
             }}</label
           >
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="D" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryDays')
             }}</label
           >
-          <label class="flex min-h-11 items-center gap-2"
+          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="A" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryAt')
             }}</label
@@ -192,32 +199,26 @@ async function saveLink() {
               v-model.number="form.expiryAmount"
               type="number"
               min="1"
-              :class="ADMIN_INPUT_CLASS"
+              :class="INPUT"
             />
             <p v-if="preview" class="text-sm text-muted">{{ preview }}</p>
           </div>
-          <div v-if="form.expiryMode === 'A'" class="flex flex-col gap-1">
-            <label for="ranking-expiry-at" class="text-sm font-semibold">{{
-              $t('admin.contests.ranking.link.atLabel')
-            }}</label>
-            <input
-              id="ranking-expiry-at"
-              v-model="form.expiresAt"
-              type="datetime-local"
-              :class="ADMIN_INPUT_CLASS"
-            />
-          </div>
+          <AdminDateTimeField
+            v-if="form.expiryMode === 'A'"
+            v-model="expiresAt"
+            input-id="ranking-expiry-at"
+            :label="$t('admin.contests.ranking.link.atLabel')"
+          />
         </fieldset>
 
         <p v-if="formError" role="alert" class="text-sm text-negative">{{ formError }}</p>
         <div class="flex flex-wrap items-center gap-3">
-          <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="saveLink">
+          <button type="button" :class="buttonClass('primary')" @click="saveLink">
             {{ $t('admin.contests.ranking.link.save') }}
           </button>
-          <button type="button" :class="ADMIN_DANGER_CLASS" @click="isRegenerateOpen = true">
+          <button type="button" :class="buttonClass('danger')" @click="isRegenerateOpen = true">
             {{ $t('admin.contests.ranking.link.regenerate') }}
           </button>
-          <AdminStatus v-if="save.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
           <AdminStatus
             v-if="save.failure.value"
             kind="refused"

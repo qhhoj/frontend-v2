@@ -7,7 +7,7 @@ import { formatDateTime, formatFileSize } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../../shell/AdminBit.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { canPrepareAgain } from './contest-actions';
 import PrepareDataDialog from './PrepareDataDialog.vue';
 import { isNotFound } from '../../ui/admin-errors';
@@ -39,9 +39,9 @@ const isReady = computed(() => status.value?.state === 'ready');
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-4 rounded-panel p-5">
+  <section :class="[CARD, 'flex flex-col gap-4 p-5']">
     <header class="flex flex-col gap-1">
-      <h3 class="font-display text-lg font-semibold">
+      <h3 class="m-0 text-base font-semibold">
         {{ $t('admin.contests.actions.data.title') }}
       </h3>
       <p class="text-sm text-muted">{{ $t('admin.contests.actions.data.description') }}</p>
@@ -77,7 +77,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            :class="ADMIN_PRIMARY_CLASS"
+            :class="buttonClass('primary')"
             :aria-disabled="!mayPrepare || undefined"
             @click="mayPrepare && (isPrepareOpen = true)"
           >
@@ -87,7 +87,7 @@ const isReady = computed(() => status.value?.state === 'ready');
             v-if="isReady"
             :href="contestDataDownloadUrl(contestKey)"
             download
-            :class="ADMIN_BUTTON_CLASS"
+            :class="buttonClass('secondary')"
             >{{ $t('admin.contests.actions.data.download') }}</a
           >
         </div>

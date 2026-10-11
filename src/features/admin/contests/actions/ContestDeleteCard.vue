@@ -8,7 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { translate } from '@/i18n';
 import AdminField from '../../ui/AdminField.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY } from '../contest-editing.queries';
 
@@ -50,14 +50,14 @@ function open() {
 <template>
   <section
     data-testid="action-delete"
-    class="flex flex-col gap-3 rounded-panel border border-negative p-5"
+    class="flex flex-col gap-3 rounded-panel border border-negative bg-surface-solid p-5"
   >
-    <h3 class="font-display text-lg font-semibold text-negative">
+    <h3 class="m-0 text-base font-semibold text-negative">
       {{ $t('admin.contestOps.delete.title') }}
     </h3>
     <p class="text-sm text-muted">{{ $t('admin.contestOps.delete.description') }}</p>
     <p v-if="unavailable" class="text-sm text-muted">{{ unavailable }}</p>
-    <button v-else type="button" :class="ADMIN_DANGER_CLASS" class="self-start" @click="open">
+    <button v-else type="button" :class="buttonClass('danger')" class="self-start" @click="open">
       {{ $t('admin.contestOps.delete.button') }}
     </button>
 
@@ -79,7 +79,7 @@ function open() {
           <input
             :id="id"
             v-model="typedKey"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             autocomplete="off"
             spellcheck="false"

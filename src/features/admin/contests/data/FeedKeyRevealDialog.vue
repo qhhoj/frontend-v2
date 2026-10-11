@@ -39,7 +39,7 @@ const rows = computed(() => [
         <dd class="flex min-w-0 items-center gap-2">
           <code
             :data-testid="`reveal-${row.id}`"
-            class="min-w-0 flex-1 rounded-row bg-surface-strong px-3 py-2 font-mono text-sm break-all"
+            class="min-w-0 flex-1 rounded-cell bg-surface-strong px-3 py-2 font-mono text-sm break-all"
             >{{ row.value }}</code
           >
           <CopyButton

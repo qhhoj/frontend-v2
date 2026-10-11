@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { needsPermissionText } from '../../ui/permission-text';
 import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
 import { cloneContest } from '@/api/contest-editing.api';
@@ -8,7 +9,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 
@@ -39,18 +40,18 @@ const mutation = useAdminMutation({
 </script>
 
 <template>
-  <section data-testid="action-clone" class="glass flex flex-col gap-3 rounded-panel p-5">
-    <h3 class="font-display text-lg font-semibold">
+  <section data-testid="action-clone" :class="[CARD, 'flex flex-col gap-3 p-5']">
+    <h3 class="m-0 text-base font-semibold">
       {{ $t('admin.contests.actions.clone.title') }}
     </h3>
     <p class="text-sm text-muted">{{ $t('admin.contests.actions.clone.description') }}</p>
     <p v-if="isLocked" class="text-sm text-muted">
-      {{ $t('admin.ui.needsPermission', { permission: 'judge.clone_contest' }) }}
+      {{ needsPermissionText('judge.clone_contest') }}
     </p>
     <button
       v-else
       type="button"
-      :class="ADMIN_PRIMARY_CLASS"
+      :class="buttonClass('primary')"
       class="self-start"
       @click="isOpen = true"
     >
@@ -85,7 +86,7 @@ const mutation = useAdminMutation({
           <input
             :id="id"
             v-model="newKey"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
             autocomplete="off"

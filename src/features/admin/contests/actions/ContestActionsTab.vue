@@ -26,13 +26,15 @@ import ContestPublishCard from './ContestPublishCard.vue';
 import { isBoardFrozen, isBusy } from './contest-actions';
 
 const props = defineProps<{ contest: EditableContest }>();
-/** One block per action card, as tall as the loaded card (from `lg` all four are 178 px) so the cards below do not move. */
+/** One block per action card, about as tall as the loaded card so the cards below do not move. */
 const SKELETON_HEIGHTS = [
   'h-[178px]',
   'h-[194px] lg:h-[178px]',
   'h-[154px] lg:h-[178px]',
   'h-[198px] lg:h-[178px]',
 ];
+/** A group heading: the cards are the sections' content, so the heading stays small. */
+const GROUP = 'm-0 text-xs font-semibold tracking-wide text-muted uppercase';
 const queryClient = useQueryClient();
 const viewer = useViewerId();
 const locale = useLocaleStore();
@@ -108,88 +110,112 @@ const runReplayRebuild = () => runAction(rebuildReplay);
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton>
-        <div class="grid gap-5 lg:grid-cols-2">
-          <SkeletonBlock
-            v-for="height in SKELETON_HEIGHTS"
-            :key="height"
-            :class="height"
-            class="w-full"
-          />
+  <div class="flex flex-col gap-8">
+    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-jobs">
+      <h2 id="contest-actions-jobs" :class="GROUP">
+        {{ $t('admin.contests.actions.groups.jobs') }}
+      </h2>
+      <QueryState :loading="isPending" :error="error" @retry="refetch()">
+        <template #skeleton>
+          <div class="grid gap-4 lg:grid-cols-2">
+            <SkeletonBlock
+              v-for="height in SKELETON_HEIGHTS"
+              :key="height"
+              :class="height"
+              class="w-full"
+            />
+          </div>
+        </template>
+        <div class="grid gap-4 lg:grid-cols-2">
+          <ContestActionCard
+            id="rescore"
+            :title="$t('admin.contests.actions.rescore.title')"
+            :description="$t('admin.contests.actions.rescore.description')"
+            :button-label="$t('admin.contests.actions.rescore.button')"
+            :confirm-title="$t('admin.contests.actions.rescore.confirmTitle')"
+            :confirm-label="$t('admin.contests.actions.rescore.confirm')"
+            :state="stateOf('rescore')"
+            :run="runRescore"
+          >
+            <template #confirm-body>
+              <p class="text-muted">{{ rescoreBody }}</p>
+            </template>
+          </ContestActionCard>
+          <ContestActionCard
+            id="judgeFinal"
+            :title="$t('admin.contests.actions.judgeFinal.title')"
+            :description="judgeFinalDescription"
+            :button-label="$t('admin.contests.actions.judgeFinal.button')"
+            :confirm-title="$t('admin.contests.actions.judgeFinal.confirmTitle')"
+            :confirm-label="$t('admin.contests.actions.judgeFinal.confirm')"
+            :unavailable="judgeFinalLock"
+            :state="stateOf('judgeFinal')"
+            :run="runJudgeFinal"
+          >
+            <template #confirm-body>
+              <p class="text-muted">{{ $t('admin.contests.actions.judgeFinal.confirmBody') }}</p>
+              <p v-if="isJudgingEarly" class="font-semibold text-negative">
+                {{ $t('admin.contests.actions.judgeFinal.earlyWarning') }}
+              </p>
+            </template>
+          </ContestActionCard>
+          <ContestActionCard
+            id="rate"
+            permission="judge.contest_rating"
+            :title="$t('admin.contests.actions.rate.title')"
+            :description="$t('admin.contests.actions.rate.description')"
+            :button-label="$t('admin.contests.actions.rate.button')"
+            :confirm-title="$t('admin.contests.actions.rate.confirmTitle')"
+            :confirm-label="$t('admin.contests.actions.rate.confirm')"
+            :unavailable="rateLock"
+            :state="stateOf('rate')"
+            :run="runRate"
+          >
+            <template #confirm-body>
+              <p class="text-muted">{{ $t('admin.contests.actions.rate.confirmBody') }}</p>
+            </template>
+          </ContestActionCard>
+          <ContestActionCard
+            id="replay"
+            :title="$t('admin.replay.rebuild.title')"
+            :description="$t('admin.replay.rebuild.description')"
+            :button-label="$t('admin.replay.rebuild.button')"
+            :confirm-title="$t('admin.replay.rebuild.confirmTitle')"
+            :confirm-label="$t('admin.replay.rebuild.confirm')"
+            :unavailable="replayLock"
+            :state="stateOf('replay')"
+            :run="runReplayRebuild"
+          >
+            <template #confirm-body>
+              <p class="text-muted">{{ $t('admin.replay.rebuild.confirmBody') }}</p>
+            </template>
+          </ContestActionCard>
         </div>
-      </template>
-      <div class="grid gap-5 lg:grid-cols-2">
-        <ContestActionCard
-          id="rescore"
-          :title="$t('admin.contests.actions.rescore.title')"
-          :description="$t('admin.contests.actions.rescore.description')"
-          :button-label="$t('admin.contests.actions.rescore.button')"
-          :confirm-title="$t('admin.contests.actions.rescore.confirmTitle')"
-          :confirm-label="$t('admin.contests.actions.rescore.confirm')"
-          :state="stateOf('rescore')"
-          :run="runRescore"
-        >
-          <template #confirm-body>
-            <p class="text-muted">{{ rescoreBody }}</p>
-          </template>
-        </ContestActionCard>
-        <ContestActionCard
-          id="judgeFinal"
-          :title="$t('admin.contests.actions.judgeFinal.title')"
-          :description="judgeFinalDescription"
-          :button-label="$t('admin.contests.actions.judgeFinal.button')"
-          :confirm-title="$t('admin.contests.actions.judgeFinal.confirmTitle')"
-          :confirm-label="$t('admin.contests.actions.judgeFinal.confirm')"
-          :unavailable="judgeFinalLock"
-          :state="stateOf('judgeFinal')"
-          :run="runJudgeFinal"
-        >
-          <template #confirm-body>
-            <p class="text-muted">{{ $t('admin.contests.actions.judgeFinal.confirmBody') }}</p>
-            <p v-if="isJudgingEarly" class="font-semibold text-negative">
-              {{ $t('admin.contests.actions.judgeFinal.earlyWarning') }}
-            </p>
-          </template>
-        </ContestActionCard>
-        <ContestActionCard
-          id="rate"
-          permission="judge.contest_rating"
-          :title="$t('admin.contests.actions.rate.title')"
-          :description="$t('admin.contests.actions.rate.description')"
-          :button-label="$t('admin.contests.actions.rate.button')"
-          :confirm-title="$t('admin.contests.actions.rate.confirmTitle')"
-          :confirm-label="$t('admin.contests.actions.rate.confirm')"
-          :unavailable="rateLock"
-          :state="stateOf('rate')"
-          :run="runRate"
-        >
-          <template #confirm-body>
-            <p class="text-muted">{{ $t('admin.contests.actions.rate.confirmBody') }}</p>
-          </template>
-        </ContestActionCard>
-        <ContestActionCard
-          id="replay"
-          :title="$t('admin.replay.rebuild.title')"
-          :description="$t('admin.replay.rebuild.description')"
-          :button-label="$t('admin.replay.rebuild.button')"
-          :confirm-title="$t('admin.replay.rebuild.confirmTitle')"
-          :confirm-label="$t('admin.replay.rebuild.confirm')"
-          :unavailable="replayLock"
-          :state="stateOf('replay')"
-          :run="runReplayRebuild"
-        >
-          <template #confirm-body>
-            <p class="text-muted">{{ $t('admin.replay.rebuild.confirmBody') }}</p>
-          </template>
-        </ContestActionCard>
+      </QueryState>
+    </section>
+    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-board">
+      <h2 id="contest-actions-board" :class="GROUP">
+        {{ $t('admin.contests.actions.groups.board') }}
+      </h2>
+      <div class="grid items-start gap-4 xl:grid-cols-2">
+        <ContestFreezeLockCard :contest="contest" />
+        <ContestPublishCard :contest="contest" :actions="actions" />
       </div>
-    </QueryState>
-    <ContestFreezeLockCard :contest="contest" />
-    <ContestPublishCard :contest="contest" :actions="actions" />
-    <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
-    <ContestCloneCard :contest-key="contest.key" />
-    <ContestDeleteCard :contest="contest" />
+    </section>
+    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-copy">
+      <h2 id="contest-actions-copy" :class="GROUP">
+        {{ $t('admin.contests.actions.groups.copy') }}
+      </h2>
+      <div class="grid items-start gap-4 xl:grid-cols-2">
+        <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
+        <ContestCloneCard :contest-key="contest.key" />
+      </div>
+    </section>
+    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-danger">
+      <h2 id="contest-actions-danger" :class="GROUP">
+        {{ $t('admin.contests.actions.groups.danger') }}
+      </h2>
+      <ContestDeleteCard :contest="contest" />
+    </section>
   </div>
 </template>

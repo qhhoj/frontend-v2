@@ -12,7 +12,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { editableContestKey } from '../contest-editing.queries';
 import { contestActionsKey } from '../contest-ops.queries';
@@ -84,9 +84,9 @@ const summaryText = computed(() =>
 </script>
 
 <template>
-  <section data-testid="publish-card" class="glass flex flex-col gap-4 rounded-panel p-5">
+  <section data-testid="publish-card" :class="[CARD, 'flex flex-col gap-4 p-5']">
     <header class="flex flex-col gap-1">
-      <h3 class="font-display text-lg font-semibold">{{ $t('admin.contestPublish.title') }}</h3>
+      <h3 class="m-0 text-base font-semibold">{{ $t('admin.contestPublish.title') }}</h3>
       <p class="text-sm text-muted">{{ $t('admin.contestPublish.description') }}</p>
     </header>
     <AdminSwitch
@@ -112,13 +112,13 @@ const summaryText = computed(() =>
     <p v-if="!hasEnded" class="text-sm text-muted">{{ $t('admin.contestPublish.notEnded') }}</p>
     <template v-else>
       <label class="flex min-h-11 items-center gap-3 font-semibold">
-        <input v-model="withEditorials" type="checkbox" class="size-5" />
+        <input v-model="withEditorials" type="checkbox" class="size-4 accent-[var(--qh-accent)]" />
         {{ $t('admin.contestPublish.withEditorials') }}
       </label>
       <div class="flex flex-wrap gap-3">
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="buttonClass('secondary')"
           :aria-busy="run.isPending.value || undefined"
           @click="runDry"
         >
@@ -126,7 +126,7 @@ const summaryText = computed(() =>
         </button>
         <button
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          :class="buttonClass('primary')"
           :aria-disabled="!mayPublish || undefined"
           @click="openConfirm"
         >
@@ -159,7 +159,7 @@ const summaryText = computed(() =>
       :title="$t('admin.contestPublish.confirmTitle')"
       :body="$t('admin.contestPublish.confirmBody', { count: summary?.published ?? 0 })"
       :confirm-label="$t('admin.contestPublish.publish')"
-      tone="danger"
+      tone="neutral"
       :busy="run.isPending.value"
       @confirm="runReal"
     >

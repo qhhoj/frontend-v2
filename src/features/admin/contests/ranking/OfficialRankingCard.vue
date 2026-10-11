@@ -13,7 +13,7 @@ import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import AdminBit from '../../shell/AdminBit.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
-import { ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import UploadButton from '../../ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { formatFileSize } from '@/lib/format';
@@ -72,9 +72,9 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
 </script>
 
 <template>
-  <section class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
+  <section :class="[CARD, 'flex min-w-0 flex-col gap-5 p-5']">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-base font-bold">
+      <h2 class="m-0 text-base font-semibold">
         {{ $t('admin.contests.ranking.official.title') }}
       </h2>
       <p class="text-sm text-muted">{{ $t('admin.contests.ranking.official.lead') }}</p>
@@ -110,7 +110,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
           </p>
           <button
             type="button"
-            :class="ADMIN_PRIMARY_CLASS"
+            :class="[buttonClass('primary'), 'self-start']"
             :disabled="!pickedFile || upload.isPending.value"
             @click="submitCsv"
           >
@@ -121,10 +121,10 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
           <label for="official-url" class="text-sm font-semibold">{{
             $t('admin.contests.ranking.official.urlLabel')
           }}</label>
-          <input id="official-url" v-model="urlText" type="url" :class="ADMIN_INPUT_CLASS" />
+          <input id="official-url" v-model="urlText" type="url" :class="INPUT" />
           <button
             type="button"
-            :class="ADMIN_PRIMARY_CLASS"
+            :class="[buttonClass('primary'), 'self-start']"
             :disabled="!urlText.trim() || upload.isPending.value"
             @click="submitUrl"
           >
@@ -135,7 +135,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
         <div
           v-if="refusalText"
           role="alert"
-          class="glass flex flex-wrap items-center gap-3 rounded-row border border-negative p-4"
+          class="flex flex-wrap items-center gap-3 rounded-cell border border-negative bg-surface-solid p-4"
         >
           <AdminBit placement="refused" />
           <div>
@@ -194,7 +194,11 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
               </tbody>
             </table>
           </div>
-          <button type="button" :class="ADMIN_DANGER_CLASS" @click="isRemoveOpen = true">
+          <button
+            type="button"
+            :class="[buttonClass('danger'), 'self-start']"
+            @click="isRemoveOpen = true"
+          >
             {{ $t('admin.contests.ranking.official.remove') }}
           </button>
         </template>

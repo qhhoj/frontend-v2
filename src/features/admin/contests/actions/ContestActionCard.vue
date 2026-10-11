@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { needsPermissionText } from '../../ui/permission-text';
 import { computed, ref } from 'vue';
 import type { ContestActionState } from '@/api/types/contest-editing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
-import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_DANGER_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { isBusy } from './contest-actions';
 
@@ -38,6 +38,7 @@ const statusText = computed(() =>
 );
 const mutation = useAdminMutation({
   mutate: () => props.run(),
+  successText: () => translate('admin.contests.actions.queuedToast', { action: props.title }),
   onDone: () => {
     isOpen.value = false;
   },
@@ -52,32 +53,30 @@ function open() {
 </script>
 
 <template>
-  <article :data-testid="`action-${id}`" class="glass flex flex-col gap-3 rounded-panel p-5">
-    <h3 class="font-display text-lg font-semibold">{{ title }}</h3>
+  <article :data-testid="`action-${id}`" :class="[CARD, 'flex flex-col gap-3 p-5']">
+    <h3 class="m-0 text-base font-semibold">{{ title }}</h3>
     <p class="text-sm text-muted">{{ description }}</p>
     <p v-if="isLocked" class="text-sm text-muted">
-      {{ $t('admin.ui.needsPermission', { permission }) }}
+      {{ needsPermissionText(permission!) }}
     </p>
     <p v-else-if="unavailable" class="text-sm text-muted">{{ unavailable }}</p>
     <button
       v-else
       type="button"
-      :class="ADMIN_DANGER_CLASS"
+      :class="buttonClass('secondary')"
       class="self-start"
       :aria-disabled="isBusyNow || undefined"
       @click="open"
     >
       {{ buttonLabel }}
     </button>
-    <AdminStatus v-if="isBusyNow" kind="queued" :text="statusText">
-      <AdminBit placement="queued" />
-    </AdminStatus>
+    <AdminStatus v-if="isBusyNow" kind="queued" :text="statusText" />
 
     <ConfirmDialog
       v-model:visible="isOpen"
       :title="confirmTitle"
       :confirm-label="confirmLabel"
-      tone="danger"
+      tone="neutral"
       :busy="mutation.isPending.value"
       @confirm="mutation.run(undefined)"
     >

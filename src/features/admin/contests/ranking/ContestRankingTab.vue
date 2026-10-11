@@ -8,7 +8,7 @@ const props = defineProps<{ contest: EditableContest }>();
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
     <RankingLinkCard :contest-key="props.contest.key" />
     <OfficialRankingCard :contest-key="props.contest.key" />
   </div>

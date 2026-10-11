@@ -12,7 +12,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf, hasIssueCode } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { canPrepareAgain } from '../actions/contest-actions';
 import { contestActionsKey, contestExportKey, useContestExportQuery } from '../contest-ops.queries';
@@ -52,9 +52,9 @@ const isReady = computed(() => status.value?.state === 'ready');
 </script>
 
 <template>
-  <section data-testid="export-card" class="glass flex flex-col gap-4 rounded-panel p-5">
+  <section data-testid="export-card" :class="[CARD, 'flex flex-col gap-4 p-5']">
     <header class="flex flex-col gap-1">
-      <h3 class="font-display text-lg font-semibold">{{ $t('admin.contestData.export.title') }}</h3>
+      <h3 class="m-0 text-base font-semibold">{{ $t('admin.contestData.export.title') }}</h3>
       <p class="text-sm text-muted">{{ $t('admin.contestData.export.description') }}</p>
     </header>
     <p v-if="!isEnded" class="text-sm text-muted">{{ $t('admin.contestData.export.notEnded') }}</p>
@@ -83,7 +83,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            :class="ADMIN_PRIMARY_CLASS"
+            :class="buttonClass('primary')"
             :aria-disabled="!mayPrepare || prepare.isPending.value || undefined"
             @click="mayPrepare && prepare.run(undefined)"
           >
@@ -93,7 +93,7 @@ const isReady = computed(() => status.value?.state === 'ready');
             v-if="isReady"
             :href="contestExportDownloadUrl(contest.key)"
             download
-            :class="ADMIN_BUTTON_CLASS"
+            :class="buttonClass('secondary')"
             >{{ $t('admin.contestData.export.download') }}</a
           >
         </div>

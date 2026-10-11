@@ -12,12 +12,7 @@ import { useSessionStore } from '@/stores/session.store';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import {
-  ADMIN_BUTTON_CLASS,
-  ADMIN_DANGER_CLASS,
-  ADMIN_INPUT_CLASS,
-  ADMIN_PRIMARY_CLASS,
-} from '../../ui/classes';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useFeedKeyStatusQuery } from '../contest-ops.queries';
 import { canRelease, DEFAULT_FEED_KEY_DAYS, isValidKeyDays, MAX_FEED_KEY_DAYS } from './feed-key';
 import FeedKeyRevealDialog from './FeedKeyRevealDialog.vue';
@@ -72,9 +67,9 @@ const at = (date: string | null) => (date ? formatDateTime(date, locale.locale) 
 </script>
 
 <template>
-  <section data-testid="feed-key-card" class="glass flex flex-col gap-4 rounded-panel p-5">
+  <section data-testid="feed-key-card" :class="[CARD, 'flex flex-col gap-4 p-5']">
     <header class="flex flex-col gap-1">
-      <h3 class="font-display text-lg font-semibold">{{ $t('admin.contestData.feed.title') }}</h3>
+      <h3 class="m-0 text-base font-semibold">{{ $t('admin.contestData.feed.title') }}</h3>
       <p class="text-sm text-muted">{{ $t('admin.contestData.feed.description') }}</p>
     </header>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -135,14 +130,14 @@ const at = (date: string | null) => (date ? formatDateTime(date, locale.locale) 
           min="1"
           :max="MAX_FEED_KEY_DAYS"
           step="1"
-          :class="[ADMIN_INPUT_CLASS, 'max-w-32']"
+          :class="[INPUT, 'max-w-32']"
           :aria-invalid="!isValidKeyDays(days) || undefined"
         />
       </label>
       <div class="flex flex-wrap gap-3">
         <button
           type="button"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-disabled="!isValidKeyDays(days) || undefined"
           @click="ask('mint')"
         >
@@ -155,12 +150,17 @@ const at = (date: string | null) => (date ? formatDateTime(date, locale.locale) 
         <button
           v-if="status?.isActive"
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          :class="buttonClass('danger')"
           @click="ask('revoke')"
         >
           {{ $t('admin.contestData.feed.revoke') }}
         </button>
-        <button v-if="mayRelease" type="button" :class="ADMIN_BUTTON_CLASS" @click="ask('release')">
+        <button
+          v-if="mayRelease"
+          type="button"
+          :class="buttonClass('secondary')"
+          @click="ask('release')"
+        >
           {{ $t('admin.contestData.feed.release') }}
         </button>
       </div>
