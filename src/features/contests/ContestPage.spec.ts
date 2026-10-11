@@ -173,20 +173,21 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     expect(table.text()).not.toContain('Chưa nộp');
   });
 
-  it('draws a dash, never a zero, for a solver count the viewer may not see', async () => {
+  it('shows the submission cap with the attempts left, or ∞ when uncapped', async () => {
     const mixed = contestDetail({
       problems: [
-        contestProblem(0, { solverCount: null, viewerResult: viewerResult() }),
-        contestProblem(1, { solverCount: 6, viewerResult: viewerResult() }),
+        contestProblem(0, { maxSubmissions: 3, viewerResult: viewerResult({ attempts: 2 }) }),
+        contestProblem(1, { maxSubmissions: null, viewerResult: viewerResult() }),
       ],
     });
     mockApi({ ...signedInViewer(), ...contestPageRoutes(mixed) });
     const { wrapper } = await mountApp('/contests/r42');
     const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
-    // Cells: name, limits, points, solvers, own result, open. The own chip also draws a dash, so read the solver cell alone.
-    const SOLVERS_CELL = 3;
-    expect(rows[0]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('—');
-    expect(rows[1]!.findAll('td')[SOLVERS_CELL]!.text()).toBe('6');
+    // Cells: name, limits, points, max submissions, own result, open.
+    const CAP_CELL = 3;
+    expect(rows[0]!.findAll('td')[CAP_CELL]!.text()).toContain('3 (còn 1)');
+    expect(rows[1]!.findAll('td')[CAP_CELL]!.text()).toContain('∞');
+    expect(rows[1]!.findAll('td')[CAP_CELL]!.text()).toContain('Không giới hạn');
   });
 });
 
