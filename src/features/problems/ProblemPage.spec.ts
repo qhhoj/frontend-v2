@@ -73,6 +73,18 @@ describe('problem page', () => {
     expect(wrapper.get('[data-testid="best-submissions-link"]').attributes('href')).toBe(
       '/problems/duongdi/best',
     );
+    expect(wrapper.find('[data-testid="my-submissions-link"]').exists()).toBe(false);
+  });
+
+  it("links a signed-in viewer's own submissions of the problem", async () => {
+    mockApi({ ...signedInViewer(), ...problemPageRoutes() });
+    const { wrapper } = await openProblem();
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="my-submissions-link"]').exists()).toBe(true),
+    );
+    expect(wrapper.get('[data-testid="my-submissions-link"]').attributes('href')).toBe(
+      '/submissions?problem=duongdi&user=user_01',
+    );
   });
 
   it('offers one PDF control: the uploaded statement when there is one', async () => {

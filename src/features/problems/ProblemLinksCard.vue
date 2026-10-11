@@ -8,28 +8,38 @@ import BitMascot from '@/components/BitMascot.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import type { BitLook } from '@/mascot/bit-sprite';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useSessionStore } from '@/stores/session.store';
 import { HEADER_BUTTON_IDLE_CLASS, PDF_PILL_CLASS } from './links-card-classes';
 import PdfButton from './PdfButton.vue';
 import { hasTextStatement } from './statement-presence';
 
 /**
  * Where else this problem leads (board C): a titled card whose header holds the actions (the PDF pill, the copy-link icon)
- * and whose rows are the links, each led by a small Bit in a fitting look. One PDF control: the uploaded statement when there
+ * and whose rows are the links, each led by a small Bit in a fitting look (the viewer's own avatar for their submissions). One PDF control: the uploaded statement when there
  * is one, else the rendered text statement.
  */
 const props = defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
 const route = useRoute();
 const locale = useLocaleStore();
+const session = useSessionStore();
+
+const PLAIN_LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
 
 interface LinkRow {
   key: string;
   to: RouteLocationRaw;
   labelKey: string;
+  /** The row's Bit, or `avatarOf`: the avatar of that username. */
   look: BitLook;
+  avatarOf?: string;
 }
+const viewerName = computed(() =>
+  session.status === 'authenticated' ? (session.user?.username ?? null) : null,
+);
 const rows = computed<LinkRow[]>(() => [
   {
     key: 'all-submissions',
@@ -37,6 +47,20 @@ const rows = computed<LinkRow[]>(() => [
     labelKey: 'problem.rail.links.submissions',
     look: PLACEMENT_LOOKS.hero,
   },
+  ...(viewerName.value
+    ? [
+        {
+          key: 'my-submissions',
+          to: {
+            name: 'submissions',
+            query: { problem: props.problem.code, user: viewerName.value },
+          },
+          labelKey: 'problem.rail.mine.title',
+          look: PLAIN_LOOK,
+          avatarOf: viewerName.value,
+        },
+      ]
+    : []),
   {
     key: 'best-submissions',
     to: { name: 'problem-best', params: { code: props.problem.code } },
@@ -54,7 +78,6 @@ const rows = computed<LinkRow[]>(() => [
       ]
     : []),
 ]);
-const PLAIN_LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
 /** A hairline between rows, as on board C. */
 const DIVIDED = 'border-line not-first:border-t';
 const ROW =
@@ -90,7 +113,8 @@ const ROW =
     <ul class="m-0 list-none border-t border-line p-0 pt-1">
       <li v-for="row in rows" :key="row.key" :class="DIVIDED">
         <RouterLink :to="row.to" :data-testid="`${row.key}-link`" :class="ROW">
-          <BitMascot :look="row.look" class="[--bit-px:2px]" />{{ $t(row.labelKey) }}
+          <UserAvatar v-if="row.avatarOf" :username="row.avatarOf" :size="32" />
+          <BitMascot v-else :look="row.look" class="[--bit-px:2px]" />{{ $t(row.labelKey) }}
         </RouterLink>
       </li>
       <li v-if="problem.materialUrl" :class="DIVIDED">
