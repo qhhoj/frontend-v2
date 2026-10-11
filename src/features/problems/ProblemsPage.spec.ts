@@ -96,7 +96,10 @@ describe('problem list', () => {
       'true',
     ]);
     expect(asked.query.has('page')).toBe(false);
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/lucky'));
+    // The problem page is a lazy route: a cold worker (a CI shard) can take over a second to import it.
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/problems/lucky'), {
+      timeout: 5000,
+    });
   });
 
   it('says so when no problem matches the random pick', async () => {
