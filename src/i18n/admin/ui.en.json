@@ -8,7 +8,14 @@
   "addBySlug": "Add by exact organization slug, press Enter",
   "noSuchOrganization": "No organization \"{name}\".",
   "removeChip": "Remove {name}",
-  "retryIn": "Try again in {seconds} s.",
+  "retryIn": "Try again in {wait}.",
+  "rateLimitedWait": "Too many attempts. Try again in {wait}.",
+  "duration": {
+    "seconds": "{count} s",
+    "minutes": "{count} min",
+    "hours": "{count} h",
+    "hoursMinutes": "{hours} h {minutes} min"
+  },
   "tooLarge": "File too large (max {max}).",
   "preview": "Preview ({style})",
   "previewHint": "Updates 0.5 s after you stop typing; the result is sanitised.",
