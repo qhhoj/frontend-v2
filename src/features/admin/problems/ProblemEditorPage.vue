@@ -6,6 +6,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
+import { routeTabs } from '../ui/admin-tabs';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { useEditableProblemQuery, useProblemEditingMetaQuery } from './problem-editing.queries';
 import { PROBLEM_TABS, problemTabComponent, problemTabOf } from './problem-tabs';
@@ -49,10 +50,7 @@ const retry = () => {
       </template>
       <template v-if="problem.data.value && meta.data.value">
         <AdminPageHeader
-          :crumbs="[
-            { label: $t('admin.shell.screens.problems'), to: { name: 'admin-problems' } },
-            { label: code },
-          ]"
+          :trail="[{ label: code, mono: true }]"
           :title="problem.data.value.name"
           :lead="$t(tab.leadKey)"
         >
@@ -63,8 +61,7 @@ const retry = () => {
           </template>
         </AdminPageHeader>
         <AdminTabs
-          :tabs="[...PROBLEM_TABS]"
-          :params="{ code }"
+          :tabs="routeTabs(PROBLEM_TABS, { code })"
           :label="$t('admin.problems.tabsLabel')"
         />
         <p v-if="!canEdit" role="alert" class="flex items-center gap-3">

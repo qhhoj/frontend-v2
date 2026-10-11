@@ -1,9 +1,4 @@
 {
-  "crumbs": {
-    "group": "Chấm bài",
-    "judges": "Máy chấm",
-    "add": "Thêm"
-  },
   "index": {
     "lead": "Máy chấm đang kết nối, tải và trạng thái. Khoá xác thực chỉ hiện một lần khi tạo hoặc cấp mới.",
     "addButton": "Thêm máy chấm",

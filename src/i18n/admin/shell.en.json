@@ -7,11 +7,12 @@
   "navToggle": "Admin sections",
   "navNote": "Items show only when the account holds the matching permission. Non-staff opening /admin see a not-found page.",
   "groups": {
-    "content": "Content",
+    "problems": "Problems",
     "contests": "Contests",
+    "judging": "Judging",
+    "community": "Community",
     "users": "Users",
-    "site": "Site",
-    "judging": "Judging"
+    "site": "Site"
   },
   "forbidden": {
     "title": "You do not have access to this section",

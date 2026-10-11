@@ -26,14 +26,7 @@ function chooseKey(key: string) {
 </script>
 
 <template>
-  <AdminPageHeader
-    :crumbs="[
-      { label: t('admin.settings.log.crumbs.site') },
-      { label: t('admin.settings.log.crumbs.log') },
-    ]"
-    :title="t('admin.settings.log.title')"
-    :lead="t('admin.settings.log.lead')"
-  />
+  <AdminPageHeader :title="t('admin.settings.log.title')" :lead="t('admin.settings.log.lead')" />
   <div class="flex flex-col gap-1.5">
     <label for="log-key" class="text-sm font-semibold">{{
       t('admin.settings.log.keyLabel')

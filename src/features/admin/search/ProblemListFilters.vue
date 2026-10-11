@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import { ADMIN_INPUT_CLASS } from '../ui/classes';
 import {
   ADMIN_PROBLEM_SORTS,
@@ -9,7 +12,7 @@ import {
   PROBLEM_STATUS_FILTERS,
   sortLabelKey,
 } from './problem-list-filters';
-import type { FilterPatch, ProblemListFilters, ProblemStatusFilter } from './problem-list-filters';
+import type { FilterPatch, ProblemListFilters } from './problem-list-filters';
 
 /** Status tabs, group, type, author and sort of the staff problem list; every change lands in the address. */
 const props = defineProps<{
@@ -25,9 +28,14 @@ watch(
   (author) => (authorText.value = author),
 );
 
-const statusLink = (status: ProblemStatusFilter) => ({
-  query: filterQueryOf(route.query, { status }),
-});
+const { t } = useI18n();
+const statusTabs = computed<AdminFilterTab[]>(() =>
+  PROBLEM_STATUS_FILTERS.map((status) => ({
+    key: status,
+    label: t(`admin.problemList.status.${status}`),
+    to: { query: filterQueryOf(route.query, { status }) },
+  })),
+);
 const commitAuthor = () => {
   const author = authorText.value.trim();
   if (author !== props.filters.author) emit('change', { author });
@@ -37,19 +45,11 @@ const selectValue = (event: Event) => (event.target as HTMLSelectElement).value;
 
 <template>
   <div class="flex flex-col gap-3">
-    <nav
-      :aria-label="$t('admin.problemList.statusLabel')"
-      class="flex max-w-full gap-1 self-start overflow-x-auto rounded-pill border border-line-strong bg-surface-solid p-1"
-    >
-      <RouterLink
-        v-for="status in PROBLEM_STATUS_FILTERS"
-        :key="status"
-        :to="statusLink(status)"
-        :aria-current="filters.status === status ? 'true' : undefined"
-        class="inline-flex min-h-11 shrink-0 items-center rounded-pill px-4 text-sm font-semibold text-muted hover:text-content aria-[current=true]:bg-accent-soft aria-[current=true]:text-accent-soft-text"
-        >{{ $t(`admin.problemList.status.${status}`) }}</RouterLink
-      >
-    </nav>
+    <AdminFilterTabs
+      :tabs="statusTabs"
+      :current="filters.status"
+      :label="$t('admin.problemList.statusLabel')"
+    />
     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <label class="flex flex-col gap-1.5 text-sm font-semibold">
         {{ $t('admin.problemList.group') }}

@@ -1,10 +1,6 @@
 {
   "title": "Site settings",
   "lead": "Typed settings: each key has a default, a kind and a description. Secrets are sealed and never shown again.",
-  "crumbs": {
-    "site": "Site",
-    "settings": "Settings"
-  },
   "groupsLabel": "Setting groups",
   "groups": {
     "site": "Site",
@@ -285,10 +281,6 @@
     }
   },
   "log": {
-    "crumbs": {
-      "site": "Site",
-      "log": "Change log"
-    },
     "title": "Change log",
     "lead": "The history of each setting key, newest first.",
     "keyLabel": "Setting key",

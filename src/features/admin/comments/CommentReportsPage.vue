@@ -69,15 +69,8 @@ const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold'
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1080px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.comments.crumbs.content') },
-        { label: $t('admin.comments.crumbs.reports') },
-      ]"
-      :title="$t('admin.comments.title')"
-      :lead="$t('admin.comments.lead')"
-    />
+  <div class="mx-auto flex w-full max-w-[1080px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.comments.title')" :lead="$t('admin.comments.lead')" />
     <AdminStatus v-if="result" :kind="result.kind" :text="$t(result.key)" />
     <AdminStatus
       v-if="hider.failure.value"

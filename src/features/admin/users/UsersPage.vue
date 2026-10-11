@@ -64,11 +64,7 @@ const isRolesOpen = ref(false);
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[{ label: $t('admin.shell.screens.users') }]"
-      :title="$t('admin.shell.screens.users')"
-      :lead="$t('admin.users.lead')"
-    >
+    <AdminPageHeader :title="$t('admin.shell.screens.users')" :lead="$t('admin.users.lead')">
       <template #actions>
         <button
           v-if="can('judge.change_profile')"

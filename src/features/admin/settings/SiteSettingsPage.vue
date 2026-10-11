@@ -40,14 +40,7 @@ function closeHistory() {
 </script>
 
 <template>
-  <AdminPageHeader
-    :crumbs="[
-      { label: t('admin.settings.crumbs.site') },
-      { label: t('admin.settings.crumbs.settings') },
-    ]"
-    :title="t('admin.settings.title')"
-    :lead="t('admin.settings.lead')"
-  />
+  <AdminPageHeader :title="t('admin.settings.title')" :lead="t('admin.settings.lead')" />
   <nav :aria-label="t('admin.settings.groupsLabel')" class="flex flex-wrap gap-2 text-sm">
     <a
       v-for="entry in groups"

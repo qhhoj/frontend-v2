@@ -18,10 +18,6 @@ const language = computed(() => data.value?.find((entry) => entry.key === routeK
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.languages.crumbs.languages'), to: { name: 'admin-languages' } },
-        { label: isNew ? $t('admin.languages.form.addTitle') : routeKey },
-      ]"
       :title="
         isNew
           ? $t('admin.languages.form.addTitle')

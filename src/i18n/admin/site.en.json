@@ -1,6 +1,5 @@
 {
   "config": {
-    "crumbs": "Website",
     "title": "Raw config",
     "warning": "Raw config: staff-written HTML, operator-level permission — Every value is public (GET /site returns it to everyone), so never put a secret here; secrets go on the Settings page. The announcement and footer are staff-written HTML, cleaned before they show; tracking code accepts only the operator's own pattern. Only those with \"Edit raw config\" permission.",
     "listNote": "The list comes from GET /site; the admin page reads it with cache: no-cache.",

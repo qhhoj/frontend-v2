@@ -1,8 +1,4 @@
 {
-  "crumbs": {
-    "content": "Content",
-    "reports": "Reported comments"
-  },
   "title": "Reported comments",
   "lead": "Each card is a comment with open reports, newest first. Hide it here, or hide and resolve in one step; dismiss reports that need no action.",
   "empty": "No open reports.",
@@ -26,7 +22,6 @@
   "shown": "Comment shown again.",
   "hiddenResolved": "Comment hidden and its reports resolved.",
   "all": {
-    "crumb": "All comments",
     "title": "All comments",
     "lead": "Every comment on the site, newest first. Search by text or author, then hide or show one or many.",
     "reportsLink": "Reported comments",

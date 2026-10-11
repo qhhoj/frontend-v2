@@ -35,10 +35,6 @@ onBeforeRouteLeave(() => {
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.judges.crumbs.group') },
-        { label: $t('admin.judges.crumbs.judges') },
-      ]"
       :title="$t('admin.shell.screens.judges')"
       :lead="$t('admin.judges.index.lead')"
     >

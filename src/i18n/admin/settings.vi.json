@@ -1,10 +1,6 @@
 {
   "title": "Cài đặt trang",
   "lead": "Các cài đặt có kiểu cố định: mỗi khoá có giá trị mặc định, kiểu và mô tả. Bí mật được niêm phong, không hiện lại.",
-  "crumbs": {
-    "site": "Trang web",
-    "settings": "Cài đặt"
-  },
   "groupsLabel": "Nhóm cài đặt",
   "groups": {
     "site": "Trang web",
@@ -285,10 +281,6 @@
     }
   },
   "log": {
-    "crumbs": {
-      "site": "Trang web",
-      "log": "Nhật ký"
-    },
     "title": "Nhật ký thay đổi",
     "lead": "Nhật ký đọc theo từng khoá, mới nhất trước.",
     "keyLabel": "Khoá cài đặt",

@@ -1,8 +1,4 @@
 {
-  "crumbs": {
-    "content": "Nội dung",
-    "reports": "Bình luận bị báo cáo"
-  },
   "title": "Bình luận bị báo cáo",
   "lead": "Mỗi thẻ là một bình luận có báo cáo đang mở, mới nhất trước. Ẩn ngay tại đây, hoặc ẩn và xử lý trong một bước; bỏ qua báo cáo không cần xử lý.",
   "empty": "Không còn báo cáo nào cần xử lý.",
@@ -26,7 +22,6 @@
   "shown": "Đã hiện lại bình luận.",
   "hiddenResolved": "Đã ẩn bình luận và xử lý các báo cáo.",
   "all": {
-    "crumb": "Mọi bình luận",
     "title": "Mọi bình luận",
     "lead": "Mọi bình luận trên trang, mới nhất trước. Tìm theo nội dung hoặc tác giả, rồi ẩn hoặc hiện một hay nhiều bình luận.",
     "reportsLink": "Bình luận bị báo cáo",

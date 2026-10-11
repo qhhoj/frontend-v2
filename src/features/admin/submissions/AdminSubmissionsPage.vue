@@ -66,7 +66,6 @@ const line = computed(() =>
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[{ label: $t('admin.rejudge.crumbs.judging') }]"
       :title="$t('admin.shell.screens.submissions')"
       :lead="$t('admin.submissions.lead')"
     >

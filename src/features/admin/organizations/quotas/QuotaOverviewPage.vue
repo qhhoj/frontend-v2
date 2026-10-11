@@ -11,9 +11,11 @@ import { pageFromQuery } from '@/lib/paging';
 import { formatMebibytes, meterPercent } from '@/lib/quota';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../../shell/AdminBit.vue';
+import AdminFilterTabs from '../../ui/AdminFilterTabs.vue';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { ADMIN_BUTTON_CLASS, ADMIN_TOGGLE_CLASS } from '../../ui/classes';
+import { useOrganizationViewTabs } from '../use-organization-view-tabs';
 import QuotaEditDialog from './QuotaEditDialog.vue';
 import { useUsageOverviewQuery } from './quota-overview.queries';
 
@@ -47,17 +49,19 @@ function openEdit(row: UsageOverviewRow) {
 }
 const onSaved = (name: string) => void (savedText.value = translate('admin.quota.saved', { name }));
 const CELL = 'py-2 pr-3 align-middle';
+const { tabs: viewTabs } = useOrganizationViewTabs();
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.shell.groups.users') },
-        { label: $t('admin.shell.screens.organizations'), to: { name: 'admin-organizations' } },
-      ]"
       :title="$t('admin.shell.screens.organizationQuotas')"
       :lead="$t('admin.quota.lead')"
+    />
+    <AdminFilterTabs
+      :tabs="viewTabs"
+      current="quotas"
+      :label="$t('admin.organizations.views.label')"
     />
     <AdminStatus v-if="savedText" kind="done" :text="savedText" />
     <section data-testid="quota-overview" class="glass flex flex-col gap-4 rounded-panel p-5">
@@ -71,7 +75,7 @@ const CELL = 'py-2 pr-3 align-middle';
           v-for="option in SORTS"
           :key="option.id"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="ADMIN_TOGGLE_CLASS"
           :aria-pressed="sort === option.id"
           @click="chooseSort(option.id)"
         >

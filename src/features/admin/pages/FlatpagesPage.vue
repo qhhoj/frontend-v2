@@ -8,7 +8,7 @@ import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import DeletedFlatpagesList from './DeletedFlatpagesList.vue';
 import FlatpageEditor from './FlatpageEditor.vue';
 import FlatpageEditorTabs from './FlatpageEditorTabs.vue';
@@ -70,21 +70,14 @@ async function loadRevision(revision: FlatpageRevision) {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.pages.crumbs.content') },
-        { label: $t('admin.shell.screens.pages') },
-      ]"
-      :title="$t('admin.shell.screens.pages')"
-      :lead="$t('admin.pages.lead')"
-    >
+  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.shell.screens.pages')" :lead="$t('admin.pages.lead')">
       <template #actions>
         <AdminBit placement="composing" />
         <button
           v-if="can('flatpages.add_flatpage')"
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="ADMIN_PRIMARY_CLASS"
           @click="goTo('new')"
         >
           {{ t('admin.pages.newPage') }}

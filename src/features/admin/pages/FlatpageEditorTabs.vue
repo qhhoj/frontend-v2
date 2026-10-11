@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 defineProps<{ active: 'edit' | 'history'; hasHistory: boolean; historyTotal: number | null }>();
 const route = useRoute();
 const TAB_CLASS =
-  'inline-flex min-h-11 items-center gap-2 border-b-2 border-transparent px-3 text-sm font-semibold text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:text-content';
+  'inline-flex min-h-11 items-center gap-2 border-b-2 border-transparent px-3 text-sm font-semibold text-muted hover:text-content focus-visible:-outline-offset-2 aria-[current=page]:border-accent aria-[current=page]:text-content';
 </script>
 
 <template>

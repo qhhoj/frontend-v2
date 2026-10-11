@@ -19,7 +19,6 @@
   },
   "view": "Xem kỳ thi",
   "tabsLabel": "Các phần của kỳ thi",
-  "crumb": "Kỳ thi",
   "summaryLine": "{format} · {start} đến {end} · {count} thí sinh",
   "formats": {
     "default": "Mặc định",

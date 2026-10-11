@@ -54,7 +54,6 @@ const tableRegion = () => document.getElementById('short-links-table');
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[{ label: $t('admin.shell.groups.site') }, { label: $t('admin.shortlinks.title') }]"
       :title="$t('admin.shell.screens.shortLinks')"
       :lead="$t('admin.shortlinks.lead')"
     >

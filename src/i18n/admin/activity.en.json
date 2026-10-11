@@ -1,10 +1,6 @@
 {
   "title": "User activity",
   "lead": "Request logs, people online now, and a summary per user.",
-  "crumbs": {
-    "users": "Users",
-    "activity": "Activity"
-  },
   "note": "Deleting logs cannot be undone: “Delete logs of …” removes every row and session of this person; “Delete guest logs” removes every guest row. Logs are kept for at most 90 days; a CSV export holds at most 100,000 rows, newest first.",
   "anonymousDelete": "Delete guest logs",
   "filters": {

@@ -16,7 +16,6 @@ const open = (code: string) => router.push({ name: 'admin-problemGeneral', param
 <template>
   <div class="flex flex-col gap-5">
     <AdminPageHeader
-      :crumbs="[{ label: $t('admin.shell.groups.content') }]"
       :title="$t('admin.shell.screens.problems')"
       :lead="$t('admin.problems.indexLead')"
     >

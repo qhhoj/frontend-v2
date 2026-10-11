@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { deleteAnonymousActivity } from '@/api/activity-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
-import { translate } from '@/i18n';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
@@ -24,10 +23,6 @@ const filter = computed(() => activityFilterFromQuery(route.query));
 const summaryUser = computed(() =>
   typeof route.query.summary === 'string' ? route.query.summary : '',
 );
-const crumbs = computed(() => [
-  { label: translate('admin.activity.crumbs.users') },
-  { label: translate('admin.activity.crumbs.activity') },
-]);
 
 /** The summary stays open across filter changes; the URL keeps it. */
 const summaryQuery = () => (summaryUser.value ? { summary: summaryUser.value } : {});
@@ -49,11 +44,7 @@ const anonymousRemoval = useAdminMutation<void, void>({
 </script>
 
 <template>
-  <AdminPageHeader
-    :crumbs="crumbs"
-    :title="$t('admin.activity.title')"
-    :lead="$t('admin.activity.lead')"
-  />
+  <AdminPageHeader :title="$t('admin.activity.title')" :lead="$t('admin.activity.lead')" />
   <SettingsNotice tone="info" :bit="ADMIN_BIT_KINDS.security">
     {{ $t('admin.activity.note') }}
   </SettingsNotice>

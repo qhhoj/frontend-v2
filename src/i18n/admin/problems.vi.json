@@ -24,7 +24,6 @@
   "general": {
     "create": {
       "title": "Tạo bài tập",
-      "crumb": "Tạo bài tập",
       "lead": "Người không có quyền thêm bài gửi dưới dạng đề xuất; nhân viên duyệt sau.",
       "block": "Tạo bài mới",
       "createButton": "Tạo bài",

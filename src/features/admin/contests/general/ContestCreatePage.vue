@@ -35,10 +35,7 @@ async function create() {
 
 <template>
   <div class="flex flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[{ label: $t('admin.contests.crumb'), to: { name: 'admin-contests' } }]"
-      :title="$t('admin.contests.create.title')"
-    />
+    <AdminPageHeader :title="$t('admin.contests.create.title')" />
     <form class="flex flex-col gap-6" @submit.prevent="create">
       <ContestGeneralForm
         v-model="form"

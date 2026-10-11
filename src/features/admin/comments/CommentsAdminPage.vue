@@ -73,15 +73,8 @@ const refusalOf = (id: string) => {
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-[1080px] flex-col gap-6">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.comments.crumbs.content') },
-        { label: $t('admin.comments.all.crumb') },
-      ]"
-      :title="$t('admin.comments.all.title')"
-      :lead="$t('admin.comments.all.lead')"
-    >
+  <div class="mx-auto flex w-full max-w-[1080px] flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.comments.all.title')" :lead="$t('admin.comments.all.lead')">
       <template #actions>
         <RouterLink :to="{ name: adminRouteName('commentReports') }" :class="ADMIN_BUTTON_CLASS">
           {{ $t('admin.comments.all.reportsLink') }}

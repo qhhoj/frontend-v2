@@ -11,6 +11,8 @@ import { valuesOf } from '@/features/problems/use-problem-filters';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import HighlightedText from './HighlightedText.vue';
 import IndexSearchBox from './IndexSearchBox.vue';
@@ -20,7 +22,6 @@ import {
   phaseFromQuery,
   searchQueryOf,
 } from './index-search';
-import type { ContestPhaseFilter } from './index-search';
 import { useAdminContestSearchQuery } from './index-search.queries';
 
 const route = useRoute();
@@ -33,13 +34,16 @@ const { data, isPending, error, refetch } = useAdminContestSearchQuery(search, p
 const commit = (text: string) =>
   void router.replace({ query: searchQueryOf(route.query, { q: text }) });
 
-const isActivePhase = (filter: ContestPhaseFilter) => (phase.value ?? 'all') === filter;
-const phaseLink = (filter: ContestPhaseFilter) => ({
-  query: searchQueryOf(route.query, { phase: filter }),
-});
 const shownText = computed(() => formatNumber(data.value?.items.length ?? 0, locale.locale));
 const totalText = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
 const { t } = useI18n();
+const phaseTabs = computed<AdminFilterTab[]>(() =>
+  CONTEST_PHASE_FILTERS.map((filter) => ({
+    key: filter,
+    label: filter === 'all' ? t('admin.search.contests.all') : t(`contests.phase.${filter}`),
+    to: { query: searchQueryOf(route.query, { phase: filter }) },
+  })),
+);
 const countText = computed(() => {
   const values = {
     shown: shownText.value,
@@ -68,21 +72,11 @@ const countText = computed(() => {
       :status="data ? countText : ''"
       @commit="commit"
     />
-    <nav
-      :aria-label="$t('admin.search.contests.phaseLabel')"
-      class="flex flex-wrap gap-1 self-start rounded-pill border border-line-strong bg-surface-solid p-1"
-    >
-      <RouterLink
-        v-for="filter in CONTEST_PHASE_FILTERS"
-        :key="filter"
-        :to="phaseLink(filter)"
-        :aria-current="isActivePhase(filter) ? 'true' : undefined"
-        class="inline-flex min-h-11 items-center rounded-pill px-4 text-sm font-semibold text-muted hover:text-content aria-[current=true]:bg-accent-soft aria-[current=true]:text-accent-soft-text"
-        >{{
-          filter === 'all' ? $t('admin.search.contests.all') : $t(`contests.phase.${filter}`)
-        }}</RouterLink
-      >
-    </nav>
+    <AdminFilterTabs
+      :tabs="phaseTabs"
+      :current="phase ?? 'all'"
+      :label="$t('admin.search.contests.phaseLabel')"
+    />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <SkeletonBlock

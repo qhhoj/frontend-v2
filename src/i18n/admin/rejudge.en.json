@@ -1,7 +1,4 @@
 {
-  "crumbs": {
-    "judging": "Judging"
-  },
   "lead": "Rejudge or rescore many submissions by a filter: one problem, one contest, one user, one judge or the whole site.",
   "filter": {
     "title": "Submission filter",

@@ -8,7 +8,6 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useCannedRepliesQuery } from '@/features/tickets/tickets.queries';
 import { translate } from '@/i18n';
-import { adminRouteName } from '../admin-screens';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -68,12 +67,8 @@ const onGone = async () => {
 </script>
 
 <template>
-  <div data-testid="canned-replies" class="mx-auto flex max-w-[1280px] flex-col gap-6">
+  <div data-testid="canned-replies" class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
     <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.cannedReplies.crumbs'), to: { name: adminRouteName('tickets') } },
-        { label: $t('admin.cannedReplies.title') },
-      ]"
       :title="$t('admin.cannedReplies.title')"
       :lead="$t('admin.cannedReplies.lead')"
     >

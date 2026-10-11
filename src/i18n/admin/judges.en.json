@@ -1,9 +1,4 @@
 {
-  "crumbs": {
-    "group": "Judging",
-    "judges": "Judges",
-    "add": "Add"
-  },
   "index": {
     "lead": "Connected judges, their load and status. An auth key is shown once, when a judge is created or its key is rotated.",
     "addButton": "Add judge",

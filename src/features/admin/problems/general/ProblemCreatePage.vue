@@ -11,13 +11,7 @@ const retry = () => void meta.refetch();
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[
-        { label: $t('admin.shell.screens.problems'), to: { name: 'admin-problems' } },
-        { label: $t('admin.problems.general.create.crumb') },
-      ]"
-      :title="$t('admin.problems.general.create.title')"
-    />
+    <AdminPageHeader :title="$t('admin.problems.general.create.title')" />
     <QueryState :loading="meta.isPending.value" :error="meta.error.value" @retry="retry">
       <template #skeleton>
         <SkeletonBlock data-skeleton-region="problem-create" class="h-96 w-full rounded-panel" />

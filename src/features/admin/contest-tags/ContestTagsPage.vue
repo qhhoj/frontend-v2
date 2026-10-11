@@ -42,11 +42,7 @@ function askRemove(tag: ContestTag) {
 
 <template>
   <div class="flex flex-col gap-5">
-    <AdminPageHeader
-      :crumbs="[{ label: $t('admin.contestTags.crumb') }, { label: $t('admin.contestTags.title') }]"
-      :title="$t('admin.contestTags.title')"
-      :lead="$t('admin.contestTags.lead')"
-    >
+    <AdminPageHeader :title="$t('admin.contestTags.title')" :lead="$t('admin.contestTags.lead')">
       <template #actions><AdminBit placement="header" /></template>
     </AdminPageHeader>
     <ContestTagEditor :tag="editing" :is-full="isFull" @done="editing = null" />
