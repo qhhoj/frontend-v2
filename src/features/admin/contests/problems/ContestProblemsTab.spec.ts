@@ -3,7 +3,11 @@ import { flushPromises } from '@vue/test-utils';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { staffViewer } from '@/test/admin-routes';
-import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
+import {
+  contestEditorRoutes,
+  contestProblem,
+  editableContest,
+} from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 const EDIT = ['judge.edit_own_contest'];
@@ -79,5 +83,56 @@ describe('ContestProblemsTab', () => {
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
     expect(wrapper.text()).toContain('Điểm từ 0 đến 3500, là số nguyên.');
+  });
+
+  it("sets points on the ticked rows, moves a row by position and copies another contest's problems", async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(),
+      'GET /contests/hcmus-w40': ok(
+        editableContest({
+          key: 'hcmus-w40',
+          problems: [
+            contestProblem('A', 'hcmus41a', 'Dãy số đẹp'),
+            contestProblem('D', 'hcmus40d', 'Cây khung', { points: 300 }),
+          ],
+        }),
+      ),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
+    const boxes = wrapper.findAll('tbody input[type="checkbox"][aria-label^="Chọn"]');
+    await boxes[0]!.setValue(true);
+    await boxes[2]!.setValue(true);
+    await wrapper.get('#contest-bulk-points').setValue('250');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Đặt điểm')!
+      .trigger('click');
+    const position = wrapper.get('input[aria-label="Vị trí của hcmus41c"]');
+    await position.setValue('1');
+    await position.trigger('change');
+    await wrapper.get('#contest-copy-problems').setValue('hcmus-w40');
+    await wrapper
+      .findAll('form')
+      .find((form) => form.find('#contest-copy-problems').exists())!
+      .trigger('submit');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Đã thêm 1 bài từ hcmus-w40 (bỏ qua 1)');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu bài trong kỳ thi')!
+      .trigger('click');
+    await flushPromises();
+    const body = calls.find((call) => call.method === 'PATCH')!.body as {
+      problems: { problem: string; points: number }[];
+    };
+    const [first, second, third] = editableContest().problems!.map((problem) => problem.problemId);
+    expect(body.problems.map((row) => [row.problem, row.points])).toEqual([
+      [third, 250],
+      [first, 250],
+      [second, editableContest().problems![1]!.points],
+      [contestProblem('D', 'hcmus40d', 'Cây khung').problemId, 300],
+    ]);
   });
 });

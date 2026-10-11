@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { checked } from '../../ui/use-row-selection';
 import { computed } from 'vue';
 import { ChevronDown } from 'lucide-vue-next';
 import type { Participation } from '@/api/types/contest-editing';
@@ -18,8 +19,9 @@ const props = defineProps<{
   contestKey: string;
   participation: Participation;
   isExpanded: boolean;
+  isSelected: boolean;
 }>();
-const emit = defineEmits<{ toggle: [] }>();
+const emit = defineEmits<{ toggle: []; select: [isOn: boolean] }>();
 const locale = useLocaleStore();
 const kindText = computed(() => {
   const kind = participationKindKey(props.participation.virtual);
@@ -54,6 +56,15 @@ const facts = computed(() => {
 
 <template>
   <tr class="border-t border-line align-middle">
+    <td class="w-9 py-3 pr-1 sm:w-11 sm:px-2">
+      <input
+        type="checkbox"
+        class="size-5"
+        :checked="isSelected"
+        :aria-label="$t('admin.contests.bulk.selectRow', { name: participation.user.username })"
+        @change="emit('select', checked($event))"
+      />
+    </td>
     <td class="px-2 py-3">
       <AdminUserLabel
         :username="participation.user.username"
@@ -112,7 +123,7 @@ const facts = computed(() => {
     </td>
   </tr>
   <tr v-if="isExpanded" :id="detailId" class="bg-surface-hover">
-    <td colspan="8" class="px-3 py-4">
+    <td colspan="9" class="px-3 py-4">
       <dl class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
         <div v-for="[term, value] in facts" :key="term" class="flex flex-col">
           <dt class="text-xs text-muted">{{ term }}</dt>

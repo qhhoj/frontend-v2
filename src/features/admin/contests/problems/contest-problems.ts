@@ -81,3 +81,31 @@ export const toProblemsBody = (rows: ProblemRow[]): ContestProblemBody[] =>
     maxSubmissions: row.maxSubmissions,
     ...(row.outputPrefix === null ? {} : { outputPrefixOverride: row.outputPrefix }),
   }));
+
+/** The row at `from` moved to `to` (both 0-based, `to` clamped into the list); the others keep their order. */
+export function moveRowTo(rows: ProblemRow[], from: number, to: number): ProblemRow[] {
+  const target = Math.min(Math.max(to, 0), rows.length - 1);
+  if (from === target || !rows[from]) return rows;
+  const moved = rows.filter((_row, position) => position !== from);
+  moved.splice(target, 0, rows[from]);
+  return moved;
+}
+
+/** The same points on every row in `problemIds`. */
+export const withPoints = (rows: ProblemRow[], problemIds: string[], points: number) =>
+  rows.map((row) => (problemIds.includes(row.problemId) ? { ...row, points } : row));
+
+/**
+ * `incoming` (another contest's rows) appended after `rows`, settings and all: a problem already listed is
+ * skipped, and nothing goes past the 100-problem cap.
+ */
+export function mergeRows(rows: ProblemRow[], incoming: ProblemRow[]) {
+  const listed = new Set(rows.map((row) => row.problemId));
+  const fresh = incoming.filter((row) => !listed.has(row.problemId));
+  const added = fresh.slice(0, Math.max(MAX_CONTEST_PROBLEMS - rows.length, 0));
+  return {
+    rows: [...rows, ...added],
+    added: added.length,
+    skipped: incoming.length - added.length,
+  };
+}

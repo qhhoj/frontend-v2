@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { staffViewer } from '@/test/admin-routes';
 import { contestTag } from '@/test/contest-extras-fixtures';
-import { fail, mockApi, page } from '@/test/mock-api';
+import { fail, mockApi, ok, page } from '@/test/mock-api';
+import { adminContestItem } from '@/test/admin-fixtures/index-search';
 
 const PERMISSION = ['judge.change_contest_tag'];
 const TITLE = 'Danh mục thẻ hiện trên danh sách kỳ thi';
@@ -47,5 +48,37 @@ describe('contest tag catalogue screen', () => {
     const { wrapper } = await mountAndWaitFor('/admin/contest-tags', 'judge.change_contest_tag');
     expect(wrapper.find('[data-testid="admin-forbidden"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="tag-editor"]').exists()).toBe(false);
+  });
+
+  it('lists the tagged contests, tags more by key and removes the tag from ticked ones', async () => {
+    const calls = mockApi({
+      ...staffViewer(PERMISSION),
+      'GET /contest-tags': page([contestTag({ slug: 'cup', name: 'Cup', contestCount: 1 })]),
+      'GET /contests': page([adminContestItem({ key: 'cup-1', tags: ['cup'] })]),
+      'POST /contests/bulk/tag': ok({ results: [], done: 0, failed: 0 }),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contest-tags', TITLE);
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().startsWith('Gắn kỳ thi'))!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.path === '/contests')!.query.get('tag')).toBe('cup');
+    await wrapper.get('#tag-contests-add').setValue('w41, w42 w41');
+    await wrapper
+      .findAll('form')
+      .find((form) => form.find('#tag-contests-add').exists())!
+      .trigger('submit');
+    await flushPromises();
+    await wrapper.get('li input[type="checkbox"]').setValue(true);
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().startsWith('Gỡ thẻ khỏi 1'))!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.filter((call) => call.method === 'POST').map((call) => call.body)).toEqual([
+      { keys: ['w41', 'w42'], assigned: true, tag: 'cup' },
+      { keys: ['cup-1'], assigned: false, tag: 'cup' },
+    ]);
   });
 });

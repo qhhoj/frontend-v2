@@ -20,6 +20,10 @@ export interface ContestForm {
   name: string;
   summary: string;
   description: string;
+  /** Link-preview image: an http(s) URL or a site path; '' for the site image. */
+  ogImage: string;
+  /** Shown instead of the site logo inside the contest: an http(s) URL or a site path; '' for none. */
+  logoOverrideImage: string;
   tags: string[];
   authors: UserChip[];
   curators: UserChip[];
@@ -141,12 +145,25 @@ function requireSettings(contest: EditableContest): ContestSettings {
 function basicsOf(
   contest: EditableContest,
   settings: ContestSettings,
-): Part<'key' | 'name' | 'summary' | 'description' | 'tags' | 'authors' | 'curators' | 'testers'> {
+): Part<
+  | 'key'
+  | 'name'
+  | 'summary'
+  | 'description'
+  | 'ogImage'
+  | 'logoOverrideImage'
+  | 'tags'
+  | 'authors'
+  | 'curators'
+  | 'testers'
+> {
   return {
     key: contest.key,
     name: contest.name,
     summary: contest.summary,
     description: contest.description,
+    ogImage: settings.ogImage,
+    logoOverrideImage: contest.logoOverrideImage,
     tags: [...contest.tags],
     authors: nameChips(contest.authors),
     curators: chipsFrom(settings.curators, settings.users),
@@ -293,12 +310,23 @@ export function toContestForm(contest: EditableContest): ContestForm {
 }
 
 const emptyIdentity = (): Part<
-  'key' | 'name' | 'summary' | 'description' | 'tags' | 'authors' | 'curators' | 'testers'
+  | 'key'
+  | 'name'
+  | 'summary'
+  | 'description'
+  | 'ogImage'
+  | 'logoOverrideImage'
+  | 'tags'
+  | 'authors'
+  | 'curators'
+  | 'testers'
 > => ({
   key: '',
   name: '',
   summary: '',
   description: '',
+  ogImage: '',
+  logoOverrideImage: '',
   tags: [],
   authors: [],
   curators: [],
@@ -545,6 +573,20 @@ function checkOperations(form: ContestForm): FieldErrors {
     : {};
 }
 
+/** backend `IMAGE_URL_PATTERN`: empty, an http(s) URL or a site path (not `//host`), at most 150 characters. */
+const IMAGE_URL_PATTERN = /^(|https?:\/\/[^\s"'<>]+|\/(?!\/)[^\s"'<>]*)$/;
+const IMAGE_URL_MAX = 150;
+
+function checkImages(form: ContestForm, message: Message): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const field of ['ogImage', 'logoOverrideImage'] as const) {
+    const value = form[field];
+    if (value.length > IMAGE_URL_MAX || !IMAGE_URL_PATTERN.test(value))
+      errors[field] = message('imageUrl');
+  }
+  return errors;
+}
+
 export function checkContestForm(form: ContestForm): FieldErrors {
   const message: Message = (key) => translate(`admin.contests.general.errors.${key}`);
   return {
@@ -553,5 +595,6 @@ export function checkContestForm(form: ContestForm): FieldErrors {
     ...checkRating(form, message),
     ...checkFormatConfig(form, message),
     ...checkOperations(form),
+    ...checkImages(form, message),
   };
 }

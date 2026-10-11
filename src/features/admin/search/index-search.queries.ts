@@ -6,7 +6,8 @@ import { lookupUser } from '@/api/admin-common.api';
 import type { ProblemListQuery } from '@/api/types/problems';
 import { PROBLEM_INDEX_KEY } from '../problems/problem-editing.queries';
 import { fetchContests } from '@/api/contests.api';
-import type { ContestPhase } from '@/api/types/contests';
+import type { ContestListQuery } from '@/api/types/contests';
+import { CONTEST_INDEX_KEY } from '../contests/contest-editing.queries';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { INDEX_PAGE_SIZE } from './index-search';
@@ -35,30 +36,11 @@ export function useAuthorIdQuery(username: Ref<string>) {
   });
 }
 
-export function useAdminContestSearchQuery(
-  search: Ref<string>,
-  phase: Ref<ContestPhase | null>,
-  page: Ref<number>,
-) {
+export function useAdminContestSearchQuery(query: Ref<ContestListQuery>) {
   const viewerId = useViewerId();
   return useQuery({
-    queryKey: computed(() => [
-      'admin',
-      'index',
-      'contests',
-      viewerId.value,
-      search.value,
-      phase.value,
-      page.value,
-    ]),
-    queryFn: () =>
-      fetchContests({
-        q: search.value || undefined,
-        phase: phase.value ?? undefined,
-        page: page.value,
-        pageSize: INDEX_PAGE_SIZE,
-        editable: true,
-      }),
+    queryKey: computed(() => [...CONTEST_INDEX_KEY, viewerId.value, query.value]),
+    queryFn: () => fetchContests({ ...query.value, pageSize: INDEX_PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
 }

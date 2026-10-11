@@ -66,14 +66,16 @@ async function runAction(start: (key: string) => Promise<unknown>) {
 
 /**
  * The server's own refusal rules, which the status endpoint does not report: final judging is for final-submission
- * contests that have ended (`ContestActionsService`), and rating needs an ended contest whose ranking is not frozen.
+ * contests that have started (`ContestEditingService.judgeFinal`), and rating needs an ended contest whose ranking is not frozen.
  */
 const hasEnded = computed(() => props.contest.phase === 'ended');
+/** Final judging may run once a final-submission contest has started; before the end it is early, and the dialog says so. */
 const judgeFinalLock = computed(() =>
-  props.contest.formatName === 'final_submission' && hasEnded.value
+  props.contest.formatName === 'final_submission' && props.contest.phase !== 'upcoming'
     ? undefined
     : translate('admin.contests.actions.judgeFinal.unavailable'),
 );
+const isJudgingEarly = computed(() => props.contest.phase === 'running');
 /** Two separate causes, each named: not ended yet, or ended with the ranking still frozen. */
 const rateLock = computed(() => {
   if (!hasEnded.value) return translate('admin.contestOps.rate.notEnded');
@@ -146,6 +148,9 @@ const runReplayRebuild = () => runAction(rebuildReplay);
         >
           <template #confirm-body>
             <p class="text-muted">{{ $t('admin.contests.actions.judgeFinal.confirmBody') }}</p>
+            <p v-if="isJudgingEarly" class="font-semibold text-negative">
+              {{ $t('admin.contests.actions.judgeFinal.earlyWarning') }}
+            </p>
           </template>
         </ContestActionCard>
         <ContestActionCard

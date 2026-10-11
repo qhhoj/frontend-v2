@@ -30,12 +30,46 @@
       "contest": "Kỳ thi",
       "time": "Thời gian",
       "phase": "Giai đoạn",
-      "users": "Thí sinh"
+      "users": "Thí sinh",
+      "pending": "Chờ chấm",
+      "actions": "Thao tác"
     },
     "count": "{shown} / {total} kỳ thi",
     "countFor": "{shown} / {total} kỳ thi khớp “{q}”",
     "empty": "Chưa có kỳ thi nào.",
     "emptyFor": "Không có kỳ thi nào khớp “{q}”",
-    "emptyAdvice": "Thử rút gọn từ khóa, hoặc đổi sang “Tất cả” để thấy mọi giai đoạn."
+    "emptyAdvice": "Thử rút gọn từ khóa, hoặc đổi sang “Tất cả” để thấy mọi giai đoạn.",
+    "scopeLabel": "Phạm vi",
+    "scopes": {
+      "all": "Tất cả",
+      "mine": "Của tôi",
+      "hidden": "Đang ẩn"
+    },
+    "sort": "Sắp xếp",
+    "sorts": {
+      "default": "Mặc định (sắp tới trước)",
+      "newest": "Bắt đầu mới nhất",
+      "oldest": "Bắt đầu cũ nhất",
+      "name": "Tên A–Z",
+      "users": "Nhiều thí sinh nhất"
+    },
+    "from": "Bắt đầu từ ngày",
+    "before": "Bắt đầu trước ngày",
+    "badges": {
+      "hidden": "Đang ẩn",
+      "private": "Riêng tư",
+      "organization": "Tổ chức",
+      "locked": "Đã khoá"
+    },
+    "ranking": "Bảng xếp hạng",
+    "rate": "Tính rating",
+    "bulk": {
+      "show": "Hiện các kỳ thi đã chọn",
+      "hide": "Ẩn các kỳ thi đã chọn",
+      "showTitle": "Hiện {count} kỳ thi?",
+      "hideTitle": "Ẩn {count} kỳ thi?",
+      "showBody": "Các kỳ thi hiện ra với người được phép xem. Hiện kỳ thi công khai cần quyền đổi trạng thái hiển thị.",
+      "hideBody": "Các kỳ thi bị ẩn khỏi danh sách và trang công khai; chỉ người chỉnh sửa còn thấy."
+    }
   }
 }

@@ -48,7 +48,8 @@
       "ratingRange": "Rating tối đa phải không nhỏ hơn tối thiểu.",
       "tags": "Tối đa 20 thẻ.",
       "pointsPrecision": "Từ 0 đến 10.",
-      "penalty": "Nhập một số nguyên, không âm."
+      "penalty": "Nhập một số nguyên, không âm.",
+      "imageUrl": "Cần một địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /, tối đa 150 ký tự."
     },
     "sections": {
       "info": "Thông tin kỳ thi",
@@ -111,7 +112,9 @@
       "rateAllHint": "Tắt để chỉ tính người đăng ký.",
       "ratingFloor": "Rating tối thiểu",
       "ratingCeiling": "Rating tối đa",
-      "rateExclude": "Loại khỏi rating"
+      "rateExclude": "Loại khỏi rating",
+      "ogImage": "Ảnh xem trước liên kết",
+      "logoOverrideImage": "Logo trong kỳ thi"
     },
     "hints": {
       "key": "Không đổi được sau khi tạo.",
@@ -121,7 +124,9 @@
       "scoreboardCacheTimeout": "0 là tắt cache. Tối đa 86400.",
       "accessCodeSet": "Đang có mã (lưu dạng băm). Nhập mã mới để thay; để trống để giữ.",
       "accessCodeNone": "Chưa có mã. Nhập để đặt.",
-      "rankingCodeSet": "Đã đặt mã. Nhập mã mới để thay; để trống để giữ."
+      "rankingCodeSet": "Đã đặt mã. Nhập mã mới để thay; để trống để giữ.",
+      "ogImage": "Ảnh hiện khi chia sẻ liên kết kỳ thi (Discord, Facebook). Địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /. Để trống: ảnh chung của trang.",
+      "logoOverrideImage": "Hiện cạnh tên kỳ thi ở đầu trang kỳ thi. Địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /. Để trống: không có logo."
     },
     "scoreboardOptions": {
       "V": "Công khai",
@@ -129,7 +134,8 @@
       "C": "Ẩn trong kỳ thi",
       "P": "Ẩn trong lượt tham gia"
     },
-    "tagPlaceholder": "Nhập thẻ rồi nhấn Enter"
+    "tagPlaceholder": "Nhập thẻ rồi nhấn Enter",
+    "jumpLabel": "Đi tới mục"
   },
   "format": {
     "fields": {
@@ -155,12 +161,12 @@
       "maxSubmissions": "Số lần nộp tối đa",
       "order": "Thứ tự"
     },
-    "addLabel": "Thêm bài theo mã",
-    "addPlaceholder": "Thêm bài theo mã…",
+    "addLabel": "Thêm bài",
+    "addPlaceholder": "Mã hoặc tên bài…",
     "full": "Tối đa 100 bài.",
     "notFound": "Không có bài {code}.",
     "alreadyListed": "Bài {code} đã có trong kỳ thi.",
-    "orderLine": "Thứ tự trong bảng là thứ tự trong kỳ thi (tối đa 100 bài). Dùng nút lên/xuống để đổi.",
+    "orderLine": "Thứ tự trong bảng là thứ tự trong kỳ thi (tối đa 100 bài). Gõ vị trí mới hoặc dùng nút lên, xuống để đổi.",
     "prefixLine": "Cắt output: để trống là dùng mặc định của máy chấm.",
     "rescoreWarning": "Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.",
     "rescoreLink": "Dùng Tính lại điểm ở tab Thao tác.",
@@ -175,7 +181,20 @@
     "moveUp": "Chuyển {code} lên",
     "moveDown": "Chuyển {code} xuống",
     "remove": "Bỏ {code} khỏi kỳ thi",
-    "pointsRange": "Điểm từ 0 đến 3500, là số nguyên."
+    "pointsRange": "Điểm từ 0 đến 3500, là số nguyên.",
+    "addHint": "Gõ để tìm theo mã hoặc tên rồi chọn; Enter thêm đúng mã đã gõ.",
+    "matches": "Bài khớp",
+    "noMatch": "Không có bài nào khớp “{q}”.",
+    "listed": "đã có",
+    "copyLabel": "Chép bài từ kỳ thi khác",
+    "copyPlaceholder": "Mã kỳ thi",
+    "copy": "Chép bài",
+    "copySelf": "Đây là chính kỳ thi này.",
+    "copyNotFound": "Không có kỳ thi {key}.",
+    "copied": "Đã thêm {added} bài từ {key} (bỏ qua {skipped}); bấm Lưu để giữ.",
+    "bulkPoints": "Điểm cho các bài đã chọn",
+    "applyPoints": "Đặt điểm",
+    "positionFor": "Vị trí của {code}"
   },
   "announcements": {
     "composeTitle": "Đăng thông báo",
@@ -266,10 +285,11 @@
       "title": "Chấm lần cuối",
       "description": "Dành cho thể thức lần nộp cuối: xếp các bài nộp đang chờ vào hàng chấm khi kỳ thi kết thúc. Chạy nền.",
       "button": "Chấm lần cuối",
-      "unavailable": "Chỉ dùng cho thể thức lần nộp cuối, sau khi kỳ thi kết thúc.",
+      "unavailable": "Chỉ dùng cho thể thức lần nộp cuối, sau khi kỳ thi bắt đầu.",
       "confirmBody": "Các bài nộp đang chờ sẽ được xếp vào hàng chấm.",
       "confirm": "Chấm",
-      "confirmTitle": "Chấm lần cuối?"
+      "confirmTitle": "Chấm lần cuối?",
+      "earlyWarning": "Kỳ thi chưa kết thúc: thí sinh sẽ thấy kết quả ngay. Bài nộp sau lần chấm này vẫn chờ đến khi kỳ thi kết thúc."
     },
     "rate": {
       "title": "Tính rating",
@@ -321,7 +341,7 @@
     },
     "penalty": "{hours} giờ {minutes} phút",
     "countLine": "{total} lượt tham gia · 50 mỗi trang",
-    "userLabel": "Tên đăng nhập…",
+    "userLabel": "Tìm theo tên đăng nhập",
     "columns": {
       "user": "Người dùng",
       "kind": "Loại tham gia",
@@ -340,6 +360,30 @@
     "footnote": "Người bị loại vẫn thấy bài nộp của mình nhưng bị gỡ khỏi bảng xếp hạng.",
     "previous": "Trang trước",
     "next": "Trang sau",
-    "pager": "Trang {page} của {pages}"
+    "pager": "Trang {page} của {pages}",
+    "searchPlaceholder": "Một phần của tên…",
+    "bulk": {
+      "disqualify": "Loại các dòng đã chọn",
+      "reinstate": "Khôi phục các dòng đã chọn",
+      "disqualifyTitle": "Loại {count} lượt tham gia khỏi bảng?",
+      "reinstateTitle": "Khôi phục {count} lượt tham gia?",
+      "disqualifyBody": "Mỗi thí sinh bị cấm khỏi kỳ thi và đưa ra khỏi kỳ thi; bảng xếp hạng được tính lại một lần.",
+      "reinstateBody": "Các thí sinh được đưa trở lại bảng và bỏ cấm; bảng xếp hạng được tính lại một lần."
+    },
+    "onlyUser": "Chỉ {name} — bỏ lọc"
+  },
+  "bulk": {
+    "summary": "Đã đổi {done} · không đổi {unchanged} · bị từ chối {failed}",
+    "reasons": {
+      "forbidden": "Bạn không có quyền này với kỳ thi.",
+      "not_found": "Không tìm thấy (hoặc bạn không sửa được).",
+      "conflict": "Kỳ thi vừa được sửa ở nơi khác; thử lại.",
+      "too_many_tags": "Kỳ thi đã có 20 nhãn.",
+      "unknown_tag": "Nhãn không tồn tại."
+    },
+    "selected": "Đã chọn {count}",
+    "clear": "Bỏ chọn",
+    "selectPage": "Chọn cả trang",
+    "selectRow": "Chọn {name}"
   }
 }

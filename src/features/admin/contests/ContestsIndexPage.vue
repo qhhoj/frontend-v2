@@ -27,7 +27,7 @@ const openContest = (key: string) => router.push({ name: 'admin-contestGeneral',
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-start">
+    <div class="grid gap-5 xl:grid-cols-[18rem_minmax(0,1fr)] xl:items-start">
       <section class="glass rounded-panel p-5">
         <ExactLookup
           :label="$t('admin.contests.index.lookupLabel')"

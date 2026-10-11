@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import BulkSelectionBar from '../../ui/BulkSelectionBar.vue';
+import { computed, ref } from 'vue';
 import type { EditableContest } from '@/api/types/contest-editing';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
-import { labelFor } from './contest-problems';
+import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { checked, useRowSelection } from '../../ui/use-row-selection';
+import { isPointsValid, labelFor } from './contest-problems';
 import DraftLeaveDialog from '../../problems/drafts/DraftLeaveDialog.vue';
 import { useDraftLeaveGuard } from '../../problems/drafts/use-draft-leave-guard';
 import ContestProblemOpsCard from './ContestProblemOpsCard.vue';
 import ContestProblemRow from './ContestProblemRow.vue';
+import ProblemAddPicker from './ProblemAddPicker.vue';
+import ProblemCopyFrom from './ProblemCopyFrom.vue';
 import { useContestProblemRows } from './use-contest-problem-rows';
 
 const props = defineProps<{ contest: EditableContest }>();
@@ -18,7 +22,11 @@ const {
   isAdding,
   isFull,
   addByCode,
+  addFound,
+  copyRows,
   move,
+  moveTo,
+  setPoints,
   remove,
   save,
   mutation,
@@ -26,40 +34,74 @@ const {
   isDirty,
 } = useContestProblemRows(() => props.contest);
 const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
-const typedCode = ref('');
+const listedIds = computed(() => rows.value.map((row) => row.problemId));
 
-async function submitCode() {
-  const code = typedCode.value.trim();
-  if (code && (await addByCode(code))) typedCode.value = '';
+const selection = useRowSelection(listedIds);
+const bulkPoints = ref<number | ''>('');
+const isBulkPointsValid = computed(() => isPointsValid(bulkPoints.value));
+function applyPoints() {
+  if (typeof bulkPoints.value !== 'number' || !isBulkPointsValid.value) return;
+  setPoints(selection.selected.value, bulkPoints.value);
 }
+function removeAt(index: number) {
+  selection.toggle(rows.value[index]!.problemId, false);
+  remove(index);
+}
+const HEAD = 'px-2 py-2';
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
-    <div class="glass overflow-x-auto rounded-panel p-3">
-      <table class="w-full min-w-[760px] text-sm">
-        <thead class="text-left text-muted">
+    <BulkSelectionBar :count="selection.selected.value.length" @clear="selection.clear">
+      <label class="flex flex-col gap-1 text-sm font-semibold">
+        {{ $t('admin.contests.problems.bulkPoints') }}
+        <input
+          id="contest-bulk-points"
+          v-model.number="bulkPoints"
+          type="number"
+          min="0"
+          :class="ADMIN_INPUT_CLASS"
+          class="max-w-28"
+          :aria-invalid="bulkPoints !== '' && !isBulkPointsValid ? 'true' : undefined"
+          @keydown.enter.prevent="applyPoints"
+        />
+      </label>
+      <button
+        type="button"
+        :class="ADMIN_BUTTON_CLASS"
+        :disabled="!isBulkPointsValid"
+        @click="applyPoints"
+      >
+        {{ $t('admin.contests.problems.applyPoints') }}
+      </button>
+    </BulkSelectionBar>
+
+    <div class="glass rounded-panel p-3 md:overflow-x-auto">
+      <table class="w-full text-sm md:min-w-[760px]">
+        <thead class="text-left text-muted max-md:sr-only">
           <tr>
-            <th scope="col" class="px-2 py-2">{{ $t('admin.contests.problems.columns.label') }}</th>
-            <th scope="col" class="px-2 py-2">
-              {{ $t('admin.contests.problems.columns.problem') }}
+            <th scope="col" :class="HEAD">
+              <span class="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  class="size-5"
+                  :checked="selection.isAllSelected.value"
+                  :indeterminate="selection.isSomeSelected.value"
+                  :aria-label="$t('admin.contests.bulk.selectPage')"
+                  @change="selection.toggleAll(checked($event))"
+                />
+                {{ $t('admin.contests.problems.columns.label') }}
+              </span>
             </th>
-            <th scope="col" class="px-2 py-2">
-              {{ $t('admin.contests.problems.columns.points') }}
-            </th>
-            <th scope="col" class="px-2 py-2">
-              {{ $t('admin.contests.problems.columns.partial') }}
-            </th>
-            <th scope="col" class="px-2 py-2">
-              {{ $t('admin.contests.problems.columns.pretest') }}
-            </th>
-            <th scope="col" class="px-2 py-2">
-              {{ $t('admin.contests.problems.columns.prefix') }}
-            </th>
-            <th scope="col" class="px-2 py-2">
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.problem') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.points') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.partial') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.pretest') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.prefix') }}</th>
+            <th scope="col" :class="HEAD">
               {{ $t('admin.contests.problems.columns.maxSubmissions') }}
             </th>
-            <th scope="col" class="px-2 py-2">{{ $t('admin.contests.problems.columns.order') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.contests.problems.columns.order') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -69,34 +111,28 @@ async function submitCode() {
             v-model="rows[index]!"
             :label="labelFor(index, contest.labelStyle)"
             :issue="issueFor(index)"
-            :is-first="index === 0"
-            :is-last="index === rows.length - 1"
+            :position="index + 1"
+            :count="rows.length"
+            :is-selected="selection.isSelected(row.problemId)"
             @move="(delta) => move(index, delta)"
-            @remove="remove(index)"
+            @move-to="(position) => moveTo(index, position - 1)"
+            @remove="removeAt(index)"
+            @select="(isOn) => selection.toggle(row.problemId, isOn)"
           />
         </tbody>
       </table>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label for="contest-add-problem" class="text-sm font-semibold">{{
-        $t('admin.contests.problems.addLabel')
-      }}</label>
-      <input
-        id="contest-add-problem"
-        v-model="typedCode"
-        :class="ADMIN_INPUT_CLASS"
-        :placeholder="
-          isFull ? $t('admin.contests.problems.full') : $t('admin.contests.problems.addPlaceholder')
-        "
-        :disabled="isFull || isAdding"
-        :aria-describedby="addError ? 'contest-add-problem-error' : undefined"
-        autocomplete="off"
-        @keydown.enter.prevent="submitCode"
+    <div class="grid gap-5 lg:grid-cols-2">
+      <ProblemAddPicker
+        :listed-ids="listedIds"
+        :is-full="isFull"
+        :is-adding="isAdding"
+        :error="addError"
+        :add-by-code="addByCode"
+        @pick="addFound"
       />
-      <p v-if="addError" id="contest-add-problem-error" class="text-sm text-negative">
-        {{ addError }}
-      </p>
+      <ProblemCopyFrom :current-key="contest.key" :copy="copyRows" />
     </div>
 
     <div class="flex flex-col gap-1 text-sm text-muted">

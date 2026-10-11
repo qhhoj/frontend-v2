@@ -36,11 +36,24 @@
     "slug": "Mã",
     "order": "Thứ tự",
     "description": "Mô tả",
-    "actions": "Thao tác"
+    "actions": "Thao tác",
+    "contests": "Kỳ thi"
   },
   "edit": "Sửa",
   "remove": "Xóa",
   "removeTitle": "Xóa thẻ “{name}”?",
   "removeBody": "Các kỳ thi đang gắn thẻ {slug} vẫn giữ thẻ đó và hiện nó bằng chip màu trung tính.",
-  "removeConfirm": "Xóa thẻ"
+  "removeConfirm": "Xóa thẻ",
+  "manageContests": "Gắn kỳ thi",
+  "contests": {
+    "title": "Kỳ thi gắn thẻ {name}",
+    "close": "Đóng",
+    "addLabel": "Gắn thẻ cho kỳ thi (mã, cách nhau bởi dấu cách hoặc phẩy)",
+    "addPlaceholder": "vd. hcmus-w41 hcmus-w42",
+    "add": "Gắn thẻ",
+    "none": "Chưa có kỳ thi nào bạn sửa được mang thẻ này.",
+    "listed": "{count} kỳ thi bạn sửa được mang thẻ này",
+    "removeSelected": "Gỡ thẻ khỏi {count} kỳ thi",
+    "tooMany": "{count} mã: mỗi lần tối đa {max}."
+  }
 }
