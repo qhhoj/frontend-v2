@@ -6,6 +6,8 @@ import { useSessionStore } from '@/stores/session.store';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import AdminBit from './AdminBit.vue';
 import { QUICK_ACTIONS, heldPermission, visibleDashboard } from './admin-nav';
+import OverviewTiles from './overview/OverviewTiles.vue';
+import RecentScreens from './recent/RecentScreens.vue';
 
 const session = useSessionStore();
 const sections = computed(() => visibleDashboard(session.user));
@@ -32,6 +34,9 @@ const actions = computed(() =>
           {{ $t('admin.shell.dashboard.hello', { name: session.user?.username }) }}
         </h2>
         <p class="text-sm text-muted">{{ $t('admin.shell.dashboard.helloBody') }}</p>
+        <p class="mt-1 hidden text-xs text-muted sm:block">
+          {{ $t('admin.shell.search.tip') }}
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
         <RouterLink
@@ -54,6 +59,8 @@ const actions = computed(() =>
         </RouterLink>
       </div>
     </section>
+    <OverviewTiles />
+    <RecentScreens />
     <section v-for="entry in sections" :key="entry.labelKey" class="flex flex-col gap-3">
       <h2 class="font-display text-base font-bold">{{ $t(entry.labelKey) }}</h2>
       <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

@@ -252,6 +252,9 @@ export class FakeApi {
     'GET /notifications': list([]),
     'GET /events/user': eventStream(),
     'GET /tickets/summary': ok({ assignedOpen: 0, awaitingStaff: 0 }),
+    // The admin nav's count badges, for staff holding the screen's permission.
+    'GET /comments/reports': list([]),
+    'GET /admin/organization-requests': list([]),
   };
 
   /** Delays every answer to `key` ("GET /problems") until the returned function is called; teardown releases whatever is left. */

@@ -98,5 +98,44 @@
     "organizationQuotas": "Hạn mức tổ chức",
     "cannedReplies": "Mẫu trả lời phiếu",
     "polygonImport": "Nhập từ Polygon"
+  },
+  "waiting": "đang chờ xử lý",
+  "search": {
+    "open": "Tìm trong quản trị",
+    "title": "Tìm trong quản trị",
+    "label": "Tìm mục, bài tập, kỳ thi, người dùng, tổ chức",
+    "placeholder": "Mã bài, tên kỳ thi, tên đăng nhập…",
+    "searching": "Đang tìm…",
+    "failed": "Có nguồn không tìm được; kết quả có thể thiếu.",
+    "empty": "Không có kết quả.",
+    "emptyAdvice": "Không thấy gì khớp. Thử mã bài, khóa kỳ thi hoặc phần đầu tên đăng nhập.",
+    "tooShort": "Gõ ít nhất {count} ký tự để tìm bài tập, kỳ thi, người dùng và tổ chức.",
+    "count": "{count} kết quả",
+    "keys": "↑ ↓ để chọn · Enter để mở · Esc để đóng",
+    "tip": "Mẹo: nhấn Ctrl K hoặc / ở bất kỳ đâu để tìm nhanh.",
+    "groups": {
+      "screens": "Mục quản trị",
+      "problems": "Bài tập",
+      "contests": "Kỳ thi",
+      "users": "Người dùng",
+      "organizations": "Tổ chức"
+    },
+    "results": "Kết quả tìm kiếm"
+  },
+  "overview": {
+    "title": "Tình hình hiện tại",
+    "queue": "Hàng đợi chấm",
+    "queueDetail": "Bài nộp đang chờ hoặc đang chấm (bài công khai).",
+    "judges": "Máy chấm trực tuyến",
+    "judgesDetail": "Đang kết nối / tổng số máy chấm.",
+    "tickets": "Phiếu chờ trả lời",
+    "ticketsDetail": "Phiếu mở mà tin mới nhất không phải của nhân viên.",
+    "reports": "Bình luận bị báo cáo",
+    "reportsDetail": "Bình luận còn báo cáo chưa xử lý.",
+    "requests": "Yêu cầu vào tổ chức",
+    "requestsDetail": "Yêu cầu đang chờ duyệt ở mọi tổ chức."
+  },
+  "recent": {
+    "title": "Mở gần đây"
   }
 }

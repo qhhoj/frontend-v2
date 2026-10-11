@@ -1,39 +1,69 @@
 <script setup lang="ts">
+import { ChevronDown } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
 import { ADMIN_NAV, isCurrentNav, visibleNav } from './admin-nav';
+import type { AdminNavId } from './admin-nav';
+import { useNavCollapse } from './use-nav-collapse';
+
+/** Badge counts by item; the shell reads them once for both copies of the nav. */
+defineProps<{ counts: Partial<Record<AdminNavId, number | null>> }>();
 
 const route = useRoute();
 const session = useSessionStore();
 const groups = computed(() => visibleNav(ADMIN_NAV, session.user));
+const { isOpen, toggle } = useNavCollapse();
 /** The shell renders two copies of this nav (side column and phone disclosure): ids are per instance, never repeated in the DOM. */
 const idPrefix = useId();
 </script>
 
 <template>
-  <nav data-testid="admin-nav" :aria-label="$t('admin.shell.navLabel')" class="flex flex-col gap-4">
+  <nav data-testid="admin-nav" :aria-label="$t('admin.shell.navLabel')" class="flex flex-col gap-3">
     <section
       v-for="navGroup in groups"
       :key="navGroup.id"
       :aria-labelledby="`${idPrefix}-${navGroup.id}`"
     >
-      <h2
-        :id="`${idPrefix}-${navGroup.id}`"
-        class="px-3 pb-1 text-xs font-bold tracking-wide text-muted uppercase"
-      >
-        {{ $t(navGroup.labelKey) }}
+      <h2>
+        <button
+          :id="`${idPrefix}-${navGroup.id}`"
+          type="button"
+          :aria-expanded="isOpen(navGroup.id)"
+          :aria-controls="`${idPrefix}-${navGroup.id}-items`"
+          class="flex min-h-9 w-full items-center justify-between rounded-row px-3 text-xs font-bold tracking-wide text-muted uppercase hover:bg-surface-hover"
+          @click="toggle(navGroup.id)"
+        >
+          {{ $t(navGroup.labelKey) }}
+          <ChevronDown
+            aria-hidden="true"
+            class="size-3.5 transition-transform motion-reduce:transition-none"
+            :class="isOpen(navGroup.id) ? '' : '-rotate-90'"
+          />
+        </button>
       </h2>
-      <ul class="flex flex-col">
-        <li v-for="item in navGroup.items" :key="item.id">
+      <!-- A folded group still shows the current screen's item, so the nav always says where the viewer is. -->
+      <ul :id="`${idPrefix}-${navGroup.id}-items`" class="flex flex-col">
+        <li
+          v-for="item in navGroup.items"
+          v-show="isOpen(navGroup.id) || isCurrentNav(item.path, route.path)"
+          :key="item.id"
+        >
           <RouterLink
             :to="{ name: item.routeName }"
             :aria-current="isCurrentNav(item.path, route.path) ? 'page' : undefined"
             class="flex min-h-11 items-center gap-2.5 rounded-row px-3 text-sm font-medium hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text"
           >
-            <component :is="item.icon" aria-hidden="true" class="size-4 shrink-0" />{{
-              $t(item.labelKey)
-            }}
+            <component :is="item.icon" aria-hidden="true" class="size-4 shrink-0" />
+            <span class="min-w-0 flex-1">{{ $t(item.labelKey) }}</span>
+            <span
+              v-if="counts[item.id]"
+              data-testid="admin-nav-count"
+              class="rounded-pill bg-content px-2 py-0.5 text-xs font-semibold text-ground tabular-nums"
+            >
+              {{ counts[item.id] }}
+              <span class="sr-only">{{ $t('admin.shell.waiting') }}</span>
+            </span>
           </RouterLink>
         </li>
       </ul>
