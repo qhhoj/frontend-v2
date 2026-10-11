@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ANNOUNCEMENTS_PAGE_SIZE, fetchAnnouncements } from '@/api/contest-editing.api';
 import type { Announcement, EditableContest } from '@/api/types/contest-editing';
 import EmptyState from '@/components/EmptyState.vue';
+import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -45,13 +46,16 @@ watch(data, (answer) => {
 </script>
 
 <template>
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+  <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
     <AnnouncementComposer
       :contest-key="contest.key"
       :is-pushed-live="isPushedLive"
       @posted="(created) => (justPostedId = created.id)"
     />
-    <section class="flex flex-col gap-4">
+    <section
+      class="flex min-w-0 flex-col gap-3"
+      :aria-label="$t('admin.contests.announcements.listLabel')"
+    >
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div class="flex flex-col gap-3">
@@ -76,24 +80,12 @@ watch(data, (answer) => {
             <span>{{
               $t('admin.contests.announcements.pager', { total, page, pages: pageCount })
             }}</span>
-            <div class="flex gap-2">
-              <button
-                type="button"
-                class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-                :disabled="page <= 1"
-                @click="goToPage(page - 1)"
-              >
-                {{ $t('admin.contests.announcements.previous') }}
-              </button>
-              <button
-                type="button"
-                class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-                :disabled="page >= pageCount"
-                @click="goToPage(page + 1)"
-              >
-                {{ $t('admin.contests.announcements.next') }}
-              </button>
-            </div>
+            <NumberedPager
+              v-if="data && pageCount > 1"
+              :meta="data.meta"
+              :label="$t('admin.contests.announcements.pagerLabel')"
+              compact
+            />
           </footer>
         </template>
       </QueryState>

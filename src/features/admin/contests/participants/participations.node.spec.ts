@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateTime } from '@/lib/format';
 import { participation } from '@/test/admin-fixtures/contests';
 import { rulesAcceptanceText } from './participations';
 
@@ -12,6 +11,6 @@ describe('rules acceptance text', () => {
     });
     const text = rulesAcceptanceText(accepted, 'vi');
     expect(text).toContain('bản 3');
-    expect(text).toContain(formatDateTime('2026-10-08T05:58:00.000Z', 'vi'));
+    expect(text).toBe('bản 3 · 08/10/2026 12:58');
   });
 });

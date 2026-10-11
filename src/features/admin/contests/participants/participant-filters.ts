@@ -26,3 +26,22 @@ export function participationQueryOf(query: LocationQuery): ParticipationQuery {
     sort: sort || undefined,
   };
 }
+
+/** The filters behind "Bộ lọc" (and the exact user an add leaves), each shown as a removable chip while set. */
+export const PANEL_FILTERS = ['kind', 'status', 'sort', 'user'] as const;
+export type PanelFilter = (typeof PANEL_FILTERS)[number];
+
+/** The panel filters set in the URL, in panel order. */
+export function activePanelFilters(query: LocationQuery): PanelFilter[] {
+  return PANEL_FILTERS.filter((name) => String(query[name] ?? '') !== '');
+}
+
+/** The URL after setting one filter (an empty value clears it); any change starts again at page 1. */
+export function participationQueryWith(
+  query: LocationQuery,
+  patch: Record<string, string>,
+): LocationQuery {
+  const next: LocationQuery = { ...query, page: null };
+  for (const [name, value] of Object.entries(patch)) next[name] = value || null;
+  return Object.fromEntries(Object.entries(next).filter(([, value]) => value !== null));
+}

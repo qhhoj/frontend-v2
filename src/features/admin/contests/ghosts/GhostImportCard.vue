@@ -10,7 +10,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import UploadButton from '../../ui/UploadButton.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import GhostPreviewTable from './GhostPreviewTable.vue';
 import {
@@ -86,9 +86,9 @@ function startReplace() {
 </script>
 
 <template>
-  <section data-testid="ghost-import" class="glass flex min-w-0 flex-col gap-5 rounded-panel p-5">
+  <section data-testid="ghost-import" :class="[CARD, 'flex min-w-0 flex-col gap-5 p-5']">
     <header class="flex flex-col gap-1">
-      <h2 class="font-display text-base font-bold">{{ $t('admin.ghosts.import.title') }}</h2>
+      <h2 class="text-base font-semibold">{{ $t('admin.ghosts.import.title') }}</h2>
       <p class="text-sm text-muted">{{ $t('admin.ghosts.import.lead') }}</p>
     </header>
     <UploadButton
@@ -110,7 +110,7 @@ function startReplace() {
     <div class="flex flex-wrap gap-3">
       <button
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="buttonClass('secondary')"
         :disabled="!csv || isBusy"
         @click="startPreview"
       >
@@ -118,7 +118,7 @@ function startReplace() {
       </button>
       <button
         type="button"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="buttonClass('primary')"
         :disabled="isBusy"
         :aria-disabled="!preview"
         :aria-describedby="preview ? undefined : needsPreviewId"
@@ -133,7 +133,7 @@ function startReplace() {
     <div
       v-if="refusedRows"
       role="alert"
-      class="glass flex flex-col gap-3 rounded-row border border-negative p-4"
+      class="flex flex-col gap-3 rounded-cell border border-negative bg-surface-solid p-4"
     >
       <p class="flex flex-wrap items-center gap-3 font-semibold">
         <AdminBit placement="refused" />
@@ -157,7 +157,7 @@ function startReplace() {
       <h3 class="font-semibold">
         {{ $t('admin.ghosts.preview.title', { count: preview.ghosts.length }) }}
       </h3>
-      <div v-if="unranked.length" class="flex flex-col gap-2 rounded-row border border-line p-4">
+      <div v-if="unranked.length" class="flex flex-col gap-2 rounded-cell border border-line p-4">
         <p class="flex flex-wrap items-center gap-3 text-sm font-semibold">
           <AdminBit placement="refused" />
           {{ $t('admin.ghosts.preview.unranked', { count: unranked.length }) }}
@@ -188,7 +188,7 @@ function startReplace() {
       <a
         :href="csvUrl"
         download
-        class="inline-flex min-h-11 items-center font-semibold text-accent underline"
+        class="inline-flex min-h-11 items-center font-semibold text-accent-text underline"
         >{{ $t('admin.ghosts.import.download') }}</a
       >
       <template #error>

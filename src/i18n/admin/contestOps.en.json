@@ -87,14 +87,10 @@
     "kindVirtual": "Virtual (a new run)",
     "startLabel": "Start",
     "startHint": "Leave empty for now while the contest runs, else the contest start (live) or now (virtual).",
-    "manage": "Manage",
-    "tiebreaker": "Tiebreaker",
-    "end": "Ends",
     "moveStart": "Change start",
     "moveStartTitle": "Change the start of {username}?",
     "moveStartBody": "A timed participant gets a new window from this time. The participation is recomputed.",
     "recompute": "Recompute",
-    "recomputeQueued": "Recompute queued.",
     "delete": "Delete",
     "deleteTitle": "Delete the participation of {username}?",
     "deleteBody": "Only a participation without submissions can be deleted. To remove someone with submissions, take them off the board instead.",
@@ -115,13 +111,30 @@
         "all": "Join order",
         "score": "Score (best first)"
       }
-    }
+    },
+    "added": "Added a participation for {username}.",
+    "restored": "Restored {username}.",
+    "recomputeQueuedFor": "Queued a recompute for {username}.",
+    "disqualified": "Disqualified {username}.",
+    "startMoved": "Moved the start of {username}.",
+    "deleted": "Deleted the participation of {username}.",
+    "deleteConfirm": "Delete participation",
+    "more": "More actions for {username}'s participation",
+    "chips": {
+      "kind": "Kind: {value}",
+      "status": "Status: {value}",
+      "sort": "Order: {value}",
+      "user": "Only {value}"
+    },
+    "tiebreakerOf": "Tiebreaker: {value}"
   },
   "announcements": {
     "edit": "Edit",
     "editNote": "Edits keep the original post time and are not sent again. Use resend to notify.",
     "previewLabel": "Preview",
     "previewEmpty": "Nothing to preview yet.",
-    "resendHidden": "Resend is hidden because live sending is off for this contest (General tab)."
+    "more": "More actions for “{title}”",
+    "deleted": "Deleted “{title}”.",
+    "saved": "Announcement saved."
   }
 }

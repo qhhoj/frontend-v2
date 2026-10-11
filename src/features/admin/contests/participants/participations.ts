@@ -1,7 +1,7 @@
 import type { Participation } from '@/api/types/contest-editing';
 import type { Locale } from '@/i18n';
 import { translate } from '@/i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatInZone } from '../../ui/form/site-time';
 
 /** The label key of a participation: live (0), spectating (-1) or the number of a virtual one (n). */
 export function participationKindKey(virtual: number): {
@@ -20,12 +20,12 @@ export function formatPenalty(seconds: number, locale: Locale): string {
   return translate('admin.contests.participants.penalty', { hours, minutes }, { locale });
 }
 
-/** "bản 3 · 08/10/2026 12:58", or a dash for a row that accepted nothing (no rules then, or a spectator). */
+/** "bản 3 · 08/10/2026 12:58" (site time), or a dash for a row that accepted nothing (no rules then, or a spectator). */
 export function rulesAcceptanceText(row: Participation, locale: Locale): string {
   if (row.rulesAcceptedAt === null || row.rulesAcceptedRevision === null) return '—';
   return translate(
     'admin.contestRules.accepted',
-    { revision: row.rulesAcceptedRevision, time: formatDateTime(row.rulesAcceptedAt, locale) },
+    { revision: row.rulesAcceptedRevision, time: formatInZone(row.rulesAcceptedAt) },
     { locale },
   );
 }

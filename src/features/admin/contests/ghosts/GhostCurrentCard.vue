@@ -8,7 +8,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import { ADMIN_BIT_KINDS } from '../../shell/admin-bit';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS } from '../../ui/classes';
+import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import GhostPreviewTable from './GhostPreviewTable.vue';
 import { ghostsKey } from './ghosts.queries';
@@ -37,9 +37,9 @@ const removing = useAdminMutation({
 </script>
 
 <template>
-  <section data-testid="ghost-current" class="glass flex min-w-0 flex-col gap-4 rounded-panel p-5">
+  <section data-testid="ghost-current" :class="[CARD, 'flex min-w-0 flex-col gap-4 p-5']">
     <header class="flex flex-wrap items-center justify-between gap-3">
-      <h2 class="font-display text-base font-bold">{{ $t('admin.ghosts.current.title') }}</h2>
+      <h2 class="text-base font-semibold">{{ $t('admin.ghosts.current.title') }}</h2>
       <span v-if="ghosts.length" class="text-sm text-muted">
         {{ $t('admin.ghosts.current.count', { count: ghosts.length }) }}
       </span>
@@ -51,10 +51,10 @@ const removing = useAdminMutation({
     <template v-else>
       <GhostPreviewTable :ghosts="ghosts" :label="$t('admin.ghosts.current.title')" />
       <div class="flex flex-wrap gap-3">
-        <a :href="csvUrl" download :class="ADMIN_BUTTON_CLASS">
+        <a :href="csvUrl" download :class="buttonClass('secondary')">
           {{ $t('admin.ghosts.current.download') }}
         </a>
-        <button type="button" :class="ADMIN_DANGER_CLASS" @click="isDeleteOpen = true">
+        <button type="button" :class="buttonClass('danger')" @click="isDeleteOpen = true">
           {{ $t('admin.ghosts.current.delete') }}
         </button>
       </div>

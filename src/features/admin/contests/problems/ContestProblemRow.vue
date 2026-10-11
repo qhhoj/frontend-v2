@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { checked } from '../../ui/use-row-selection';
 import { ArrowDown, ArrowUp, X } from 'lucide-vue-next';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT, iconButtonClass } from '../../ui/controls';
 import { nullableNumber, textOf } from '../general/input-values';
 import type { ProblemRow } from './contest-problems';
 
@@ -32,8 +32,7 @@ function commitPosition(event: Event) {
 }
 const CELL = 'px-2 py-3 max-md:p-0';
 const CAPTION = 'block text-xs text-muted md:hidden';
-const ICON_BUTTON =
-  'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover disabled:cursor-not-allowed';
+const ICON_BUTTON = iconButtonClass('ghost', 'sm');
 </script>
 
 <template>
@@ -44,7 +43,7 @@ const ICON_BUTTON =
       <div class="flex items-start gap-3">
         <input
           type="checkbox"
-          class="mt-0.5 size-5 shrink-0"
+          class="mt-0.5 size-4 shrink-0 accent-[var(--qh-accent)]"
           :checked="isSelected"
           :aria-label="$t('admin.contests.bulk.selectRow', { name: row.code })"
           @change="emit('select', checked($event))"
@@ -70,8 +69,8 @@ const ICON_BUTTON =
         type="number"
         min="0"
         :aria-label="$t('admin.contests.problems.pointsFor', { code: row.code })"
-        :class="ADMIN_INPUT_CLASS"
-        class="w-24 max-md:w-full"
+        :class="INPUT"
+        class="md:w-24 md:min-w-20"
       />
     </td>
     <td :class="CELL">
@@ -79,7 +78,7 @@ const ICON_BUTTON =
         <input
           v-model="row.partial"
           type="checkbox"
-          class="size-5"
+          class="size-4 accent-[var(--qh-accent)]"
           :aria-label="$t('admin.contests.problems.partialFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.partial') }}</span>
@@ -90,7 +89,7 @@ const ICON_BUTTON =
         <input
           v-model="row.isPretested"
           type="checkbox"
-          class="size-5"
+          class="size-4 accent-[var(--qh-accent)]"
           :aria-label="$t('admin.contests.problems.pretestFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.pretest') }}</span>
@@ -104,8 +103,8 @@ const ICON_BUTTON =
         min="0"
         :placeholder="$t('admin.contests.problems.prefixDefault')"
         :aria-label="$t('admin.contests.problems.prefixFor', { code: row.code })"
-        :class="ADMIN_INPUT_CLASS"
-        class="w-28 max-md:w-full"
+        :class="INPUT"
+        class="md:w-28 md:min-w-24"
         @input="row.outputPrefix = nullableNumber(textOf($event))"
       />
     </td>
@@ -117,8 +116,8 @@ const ICON_BUTTON =
         min="1"
         :placeholder="$t('admin.contests.problems.maxNone')"
         :aria-label="$t('admin.contests.problems.maxFor', { code: row.code })"
-        :class="ADMIN_INPUT_CLASS"
-        class="w-28 max-md:w-full"
+        :class="INPUT"
+        class="md:w-28 md:min-w-24"
         @input="row.maxSubmissions = nullableNumber(textOf($event))"
       />
     </td>
@@ -130,7 +129,7 @@ const ICON_BUTTON =
           min="1"
           :max="count"
           :aria-label="$t('admin.contests.problems.positionFor', { code: row.code })"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           class="max-w-16 shrink-0"
           @change="commitPosition"
           @keydown.enter.prevent="commitPosition"

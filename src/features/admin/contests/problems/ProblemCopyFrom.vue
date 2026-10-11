@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchEditableContest } from '@/api/contest-editing.api';
 import { failureTextOf, isNotFound } from '../../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT, buttonClass } from '../../ui/controls';
 import { toProblemRows } from './contest-problems';
 import type { ProblemRow } from './contest-problems';
 
@@ -53,13 +53,13 @@ async function submit() {
       <input
         id="contest-copy-problems"
         v-model="key"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         class="min-w-0 flex-1"
         :placeholder="$t('admin.contests.problems.copyPlaceholder')"
         autocomplete="off"
         spellcheck="false"
       />
-      <button type="submit" :class="ADMIN_BUTTON_CLASS" :disabled="isLoading">
+      <button type="submit" :class="buttonClass('secondary')" :disabled="isLoading">
         {{ $t('admin.contests.problems.copy') }}
       </button>
     </div>

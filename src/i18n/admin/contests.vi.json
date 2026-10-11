@@ -301,7 +301,11 @@
     "copied": "Đã thêm {added} bài từ {key} (bỏ qua {skipped}); bấm Lưu để giữ.",
     "bulkPoints": "Điểm cho các bài đã chọn",
     "applyPoints": "Đặt điểm",
-    "positionFor": "Vị trí của {code}"
+    "positionFor": "Vị trí của {code}",
+    "saved": "Đã lưu danh sách bài.",
+    "tableLabel": "Các bài trong kỳ thi",
+    "empty": "Chưa có bài nào. Thêm bài ở bên cạnh.",
+    "tools": "Thêm và chấm lại bài"
   },
   "announcements": {
     "composeTitle": "Đăng thông báo",
@@ -320,8 +324,8 @@
     "deleteBody": "Thí sinh không còn thấy thông báo này.",
     "empty": "Chưa có thông báo nào.",
     "pager": "{total} thông báo · trang {page} của {pages}",
-    "previous": "Trang trước",
-    "next": "Trang sau"
+    "pagerLabel": "Trang thông báo",
+    "listLabel": "Các thông báo đã đăng"
   },
   "ranking": {
     "official": {
@@ -465,10 +469,6 @@
     "disqualifyBody": "{kind} lúc {time} sẽ bị đánh dấu loại và gỡ khỏi bảng. Có thể khôi phục lại bất cứ lúc nào.",
     "empty": "Không có lượt tham gia nào khớp.",
     "footnote": "Người bị loại vẫn thấy bài nộp của mình nhưng bị gỡ khỏi bảng xếp hạng.",
-    "previous": "Trang trước",
-    "next": "Trang sau",
-    "pager": "Trang {page} của {pages}",
-    "searchPlaceholder": "Một phần của tên…",
     "bulk": {
       "disqualify": "Loại các dòng đã chọn",
       "reinstate": "Khôi phục các dòng đã chọn",
@@ -477,7 +477,9 @@
       "disqualifyBody": "Mỗi thí sinh bị cấm khỏi kỳ thi và đưa ra khỏi kỳ thi; bảng xếp hạng được tính lại một lần.",
       "reinstateBody": "Các thí sinh được đưa trở lại bảng và bỏ cấm; bảng xếp hạng được tính lại một lần."
     },
-    "onlyUser": "Chỉ {name} — bỏ lọc"
+    "tableLabel": "Các lượt tham gia",
+    "range": "{from}–{to} / {total}",
+    "pagerLabel": "Trang lượt tham gia"
   },
   "bulk": {
     "summary": "Đã đổi {done} · không đổi {unchanged} · bị từ chối {failed}",

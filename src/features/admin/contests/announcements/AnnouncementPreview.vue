@@ -19,7 +19,7 @@ const preview = useDebouncedPreview(
     :aria-busy="preview.isUpdating.value || undefined"
   >
     <p class="text-sm font-semibold">{{ $t('admin.contestOps.announcements.previewLabel') }}</p>
-    <div class="min-h-24 rounded-tile border border-line bg-surface-strong p-4">
+    <div class="min-h-24 rounded-cell border border-line bg-surface-strong p-4">
       <UserContent v-if="preview.html.value" :html="preview.html.value" />
       <p v-else class="text-sm text-muted">
         {{ $t('admin.contestOps.announcements.previewEmpty') }}

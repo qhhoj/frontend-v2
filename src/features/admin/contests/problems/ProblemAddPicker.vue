@@ -4,7 +4,7 @@ import { computed, ref } from 'vue';
 import { fetchAdminProblems } from '@/api/admin-index.api';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useLocaleStore } from '@/stores/locale.store';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 
 /** Shorter text matches too much to be worth a request. */
 const MIN_SEARCH = 2;
@@ -63,7 +63,7 @@ async function submit() {
       id="contest-add-problem"
       v-model="typed"
       type="search"
-      :class="ADMIN_INPUT_CLASS"
+      :class="INPUT"
       :placeholder="
         isFull ? $t('admin.contests.problems.full') : $t('admin.contests.problems.addPlaceholder')
       "

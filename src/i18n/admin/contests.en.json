@@ -301,7 +301,11 @@
     "copied": "Added {added} problems from {key} ({skipped} skipped); save to keep them.",
     "bulkPoints": "Points for the selected",
     "applyPoints": "Set points",
-    "positionFor": "Position of {code}"
+    "positionFor": "Position of {code}",
+    "saved": "Problem list saved.",
+    "tableLabel": "Contest problems",
+    "empty": "No problems yet. Add one alongside.",
+    "tools": "Add and rejudge problems"
   },
   "announcements": {
     "composeTitle": "Post an announcement",
@@ -320,8 +324,8 @@
     "deleteBody": "Participants will no longer see this announcement.",
     "empty": "No announcements yet.",
     "pager": "{total} announcements · page {page} of {pages}",
-    "previous": "Previous page",
-    "next": "Next page"
+    "pagerLabel": "Announcement pages",
+    "listLabel": "Posted announcements"
   },
   "ranking": {
     "official": {
@@ -465,10 +469,6 @@
     "disqualifyBody": "{kind} at {time} will be marked disqualified and taken off the ranking. It can be restored at any time.",
     "empty": "No participations match.",
     "footnote": "Disqualified users still see their own submissions, but are taken off the ranking.",
-    "previous": "Previous page",
-    "next": "Next page",
-    "pager": "Page {page} of {pages}",
-    "searchPlaceholder": "Part of a username…",
     "bulk": {
       "disqualify": "Disqualify selected",
       "reinstate": "Reinstate selected",
@@ -477,7 +477,9 @@
       "disqualifyBody": "Each contestant is banned from the contest and moved out of it; the ranking is recomputed once.",
       "reinstateBody": "The contestants return to the board and their contest ban is lifted; the ranking is recomputed once."
     },
-    "onlyUser": "Only {name} — clear"
+    "tableLabel": "Participations",
+    "range": "{from}–{to} of {total}",
+    "pagerLabel": "Participation pages"
   },
   "bulk": {
     "summary": "{done} changed · {unchanged} unchanged · {failed} refused",
