@@ -72,7 +72,7 @@ function setNow() {
   <AdminField
     v-slot="{ id, describedBy, invalid }"
     :label="label"
-    :hint="hint ?? $t('admin.form.dateTime.zoneHint', { zone: timeZone })"
+    :hint="hint ?? $t('admin.form.dateTime.zoneHint', { zone })"
     :error="shownError"
     :input-id="inputId"
     :required="required"
