@@ -38,9 +38,11 @@ describe('organization tabs', () => {
   it('links each tab to its route with the slug', () => {
     const hrefs = linksFor(ADMIN_STATE).map((link) => link.attributes('href'));
     expect(hrefs).toEqual(
-      expect.arrayContaining(['/organizations/lhp/problems',
+      expect.arrayContaining([
+        '/organizations/lhp/problems',
         '/organizations/lhp/contests',
-        '/organizations/lhp/quota']),
+        '/organizations/lhp/quota',
+      ]),
     );
   });
 });
