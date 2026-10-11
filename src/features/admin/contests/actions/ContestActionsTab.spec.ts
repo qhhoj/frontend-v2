@@ -188,7 +188,7 @@ describe('rating by format and freeze window', () => {
       expect(card.findAll('button').some((button) => button.text() === 'Tính rating')).toBe(
         offered,
       );
-      expect(card.text().includes('Chỉ tính rating sau khi kỳ thi kết thúc')).toBe(!offered);
+      expect(card.text().includes('Bảng xếp hạng vẫn đang đóng băng')).toBe(!offered);
     },
   );
 

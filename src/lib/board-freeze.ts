@@ -3,6 +3,10 @@ import type { ContestFormatName } from '@/api/types/contests';
 /** Mirrors backend `FREEZE_FORMATS` (libs/contests contest-time): only these formats freeze their board. */
 const FREEZE_FORMATS: readonly ContestFormatName[] = ['icpc', 'vnoj'];
 
+/** Whether the format freezes its board at all (with a window set). */
+export const freezesInFormat = (formatName: ContestFormatName): boolean =>
+  FREEZE_FORMATS.includes(formatName);
+
 /**
  * Mirrors backend `frozenTime`/`isFrozen`: a board is frozen only in a freezing format with a freeze window set. The freeze
  * outlives the end until an editor sets the window to 0, so rating and the replay stay refused until then.
@@ -10,4 +14,4 @@ const FREEZE_FORMATS: readonly ContestFormatName[] = ['icpc', 'vnoj'];
 export const isBoardFrozen = (contest: {
   formatName: ContestFormatName;
   frozenLastMinutes: number;
-}): boolean => FREEZE_FORMATS.includes(contest.formatName) && contest.frozenLastMinutes > 0;
+}): boolean => freezesInFormat(contest.formatName) && contest.frozenLastMinutes > 0;

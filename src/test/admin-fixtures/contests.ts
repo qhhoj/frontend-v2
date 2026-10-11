@@ -183,6 +183,7 @@ export const contestActions = (overrides: Partial<ContestActions> = {}): Contest
   publish: 'idle',
   export: 'idle',
   replay: 'idle',
+  pendingCount: 0,
   autoPublish: null,
   ...overrides,
 });

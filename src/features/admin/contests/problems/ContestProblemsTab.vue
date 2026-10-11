@@ -5,12 +5,27 @@ import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import { labelFor } from './contest-problems';
+import DraftLeaveDialog from '../../problems/drafts/DraftLeaveDialog.vue';
+import { useDraftLeaveGuard } from '../../problems/drafts/use-draft-leave-guard';
+import ContestProblemOpsCard from './ContestProblemOpsCard.vue';
 import ContestProblemRow from './ContestProblemRow.vue';
 import { useContestProblemRows } from './use-contest-problem-rows';
 
 const props = defineProps<{ contest: EditableContest }>();
-const { rows, addError, isAdding, isFull, addByCode, move, remove, save, mutation, issueFor } =
-  useContestProblemRows(() => props.contest);
+const {
+  rows,
+  addError,
+  isAdding,
+  isFull,
+  addByCode,
+  move,
+  remove,
+  save,
+  mutation,
+  issueFor,
+  isDirty,
+} = useContestProblemRows(() => props.contest);
+const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
 const typedCode = ref('');
 
 async function submitCode() {
@@ -107,6 +122,10 @@ async function submitCode() {
         kind="refused"
         :text="failureTextOf(mutation.failure.value)"
       />
+      <span v-if="isDirty" class="text-sm text-muted">{{ $t('admin.contestOps.unsaved') }}</span>
     </div>
+
+    <ContestProblemOpsCard :contest="contest" />
+    <DraftLeaveDialog v-model:visible="isLeaveOpen" @leave="leaveAnyway" />
   </div>
 </template>

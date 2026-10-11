@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchParticipations, PARTICIPATIONS_PAGE_SIZE } from '@/api/contest-editing.api';
@@ -7,29 +7,23 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { useDebouncedText } from '@/lib/use-debounced-text';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import AdminUserLabel from '../../ui/AdminUserLabel.vue';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
-import ParticipationDisqualify from './ParticipationDisqualify.vue';
-import { formatPenalty, participationKindKey, rulesAcceptanceText } from './participations';
+import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import AddParticipationDialog from './AddParticipationDialog.vue';
+import ParticipantRow from './ParticipantRow.vue';
+import ParticipantsFilters from './ParticipantsFilters.vue';
+import { participationQueryOf } from './participant-filters';
 
 const props = defineProps<{ contest: EditableContest }>();
 const route = useRoute();
 const router = useRouter();
 const viewer = useViewerId();
 const locale = useLocaleStore();
-const page = computed(() => Math.max(1, Number(route.query.page) || 1));
-const userFilter = computed(() => String(route.query.user ?? ''));
-/** The username box follows the URL (`?user=`) after a short pause; a new filter starts again at page 1. */
-const typedUser = useDebouncedText(
-  () => userFilter.value,
-  (text) => {
-    void router.replace({ query: { ...route.query, user: text || undefined, page: undefined } });
-  },
-);
+const isAddOpen = ref(false);
+const expandedId = ref<string | null>(null);
+const query = computed(() => participationQueryOf(route.query));
 
 const { data, error, isPending, refetch } = useQuery({
   queryKey: computed(() => [
@@ -37,40 +31,36 @@ const { data, error, isPending, refetch } = useQuery({
     'participations',
     props.contest.key,
     viewer.value,
-    page.value,
-    userFilter.value,
+    query.value,
   ]),
-  queryFn: () =>
-    fetchParticipations(props.contest.key, { page: page.value, user: userFilter.value }),
+  queryFn: () => fetchParticipations(props.contest.key, query.value),
 });
 const rows = computed(() => data.value?.items ?? []);
 const total = computed(() => data.value?.meta.total ?? 0);
 const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PARTICIPATIONS_PAGE_SIZE)));
 const goToPage = (target: number) =>
   router.push({ query: { ...route.query, page: String(target) } });
+const toggle = (id: string) => (expandedId.value = expandedId.value === id ? null : id);
+/** After an add, the list shows every row of that user, whatever kind or status was filtered. */
+const showUser = (username: string) =>
+  router.replace({
+    query: { ...route.query, user: username, kind: undefined, status: undefined, page: undefined },
+  });
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
-      <div class="flex flex-col gap-1.5">
-        <label for="participants-user" class="text-sm font-semibold">{{
-          $t('admin.contests.participants.userLabel')
-        }}</label>
-        <input
-          id="participants-user"
-          v-model="typedUser"
-          :class="ADMIN_INPUT_CLASS"
-          :placeholder="$t('admin.contests.participants.userLabel')"
-          autocomplete="off"
-        />
-      </div>
-      <p class="text-sm text-muted">
-        {{
-          $t('admin.contests.participants.countLine', { total: formatNumber(total, locale.locale) })
-        }}
-      </p>
+      <ParticipantsFilters />
+      <button type="button" :class="ADMIN_PRIMARY_CLASS" @click="isAddOpen = true">
+        {{ $t('admin.contestOps.participants.add') }}
+      </button>
     </div>
+    <p class="text-sm text-muted" aria-live="polite">
+      {{
+        $t('admin.contests.participants.countLine', { total: formatNumber(total, locale.locale) })
+      }}
+    </p>
 
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
@@ -85,7 +75,7 @@ const goToPage = (target: number) =>
       }}</EmptyState>
       <template v-else>
         <div class="glass overflow-x-auto rounded-panel p-3">
-          <table class="w-full min-w-[360px] text-sm">
+          <table class="w-full text-sm">
             <thead class="text-left text-muted">
               <tr>
                 <th scope="col" class="px-2 py-2">
@@ -94,90 +84,57 @@ const goToPage = (target: number) =>
                 <th scope="col" class="hidden px-2 py-2 md:table-cell">
                   {{ $t('admin.contests.participants.columns.kind') }}
                 </th>
-                <th scope="col" class="hidden px-2 py-2 md:table-cell">
+                <th scope="col" class="hidden px-2 py-2 text-right md:table-cell">
                   {{ $t('admin.contests.participants.columns.score') }}
                 </th>
-                <th scope="col" class="hidden px-2 py-2 md:table-cell">
+                <th scope="col" class="hidden px-2 py-2 text-right md:table-cell">
                   {{ $t('admin.contests.participants.columns.penalty') }}
                 </th>
-                <th scope="col" class="hidden px-2 py-2 md:table-cell">
-                  {{ $t('admin.contests.participants.columns.start') }}
+                <th scope="col" class="hidden px-2 py-2 text-right lg:table-cell">
+                  {{ $t('admin.contestOps.participants.tiebreaker') }}
                 </th>
                 <th scope="col" class="hidden px-2 py-2 lg:table-cell">
-                  {{ $t('admin.contestRules.column') }}
+                  {{ $t('admin.contests.participants.columns.start') }}
                 </th>
                 <th scope="col" class="px-2 py-2">
                   {{ $t('admin.contests.participants.columns.status') }}
                 </th>
                 <th scope="col" class="px-2 py-2">
-                  <span class="sr-only">{{ $t('admin.contests.participants.disqualify') }}</span>
+                  <span class="sr-only">{{ $t('admin.contestOps.participants.manage') }}</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="row in rows" :key="row.id" class="border-t border-line align-top">
-                <td class="px-2 py-3">
-                  <AdminUserLabel
-                    :username="row.user.username"
-                    :rating="row.user.rating"
-                    :size="24"
-                  />
-                </td>
-                <td class="hidden px-2 py-3 md:table-cell">
-                  {{
-                    $t(
-                      participationKindKey(row.virtual).key,
-                      participationKindKey(row.virtual).params ?? {},
-                    )
-                  }}
-                </td>
-                <td class="hidden px-2 py-3 md:table-cell">
-                  {{ formatNumber(row.score, locale.locale) }}
-                </td>
-                <td class="hidden px-2 py-3 md:table-cell">
-                  {{ formatPenalty(row.cumtime, locale.locale) }}
-                </td>
-                <td class="hidden px-2 py-3 md:table-cell">
-                  {{ formatDateTime(row.realStart, locale.locale) }}
-                </td>
-                <td class="hidden px-2 py-3 lg:table-cell">
-                  {{ rulesAcceptanceText(row, locale.locale) }}
-                </td>
-                <td
-                  :id="`participation-status-${row.id}`"
-                  tabindex="-1"
-                  class="px-2 py-3 font-semibold"
-                >
-                  {{
-                    row.isDisqualified
-                      ? $t('admin.contests.participants.disqualified')
-                      : $t('admin.contests.participants.valid')
-                  }}
-                </td>
-                <td class="px-2 py-3">
-                  <ParticipationDisqualify :contest-key="contest.key" :participation="row" />
-                </td>
-              </tr>
+              <ParticipantRow
+                v-for="row in rows"
+                :key="row.id"
+                :contest-key="contest.key"
+                :participation="row"
+                :is-expanded="expandedId === row.id"
+                @toggle="toggle(row.id)"
+              />
             </tbody>
           </table>
         </div>
         <p class="text-sm text-muted">{{ $t('admin.contests.participants.footnote') }}</p>
         <footer class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
-          <span>{{ $t('admin.contests.participants.pager', { page, pages: pageCount }) }}</span>
+          <span>{{
+            $t('admin.contests.participants.pager', { page: query.page, pages: pageCount })
+          }}</span>
           <div class="flex gap-2">
             <button
               type="button"
               class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-              :disabled="page <= 1"
-              @click="goToPage(page - 1)"
+              :disabled="query.page <= 1"
+              @click="goToPage(query.page - 1)"
             >
               {{ $t('admin.contests.participants.previous') }}
             </button>
             <button
               type="button"
               class="min-h-11 rounded-pill border border-line px-4 font-semibold disabled:cursor-not-allowed"
-              :disabled="page >= pageCount"
-              @click="goToPage(page + 1)"
+              :disabled="query.page >= pageCount"
+              @click="goToPage(query.page + 1)"
             >
               {{ $t('admin.contests.participants.next') }}
             </button>
@@ -185,5 +142,10 @@ const goToPage = (target: number) =>
         </footer>
       </template>
     </QueryState>
+    <AddParticipationDialog
+      v-model:visible="isAddOpen"
+      :contest-key="contest.key"
+      @added="showUser"
+    />
   </div>
 </template>

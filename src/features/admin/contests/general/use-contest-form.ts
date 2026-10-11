@@ -25,7 +25,8 @@ export function useContestForm(contest: () => EditableContest) {
   const form = ref<ContestForm>(toContestForm(contest()));
   /** Local checks gate the save; the server's field errors are shown beside their fields and cleared by the next save. */
   const localErrors = computed(() => checkContestForm(form.value));
-  const isDirty = computed(() => hasKeys(changedContestFields(seed.value, form.value)));
+  const pendingPatch = computed(() => changedContestFields(seed.value, form.value));
+  const isDirty = computed(() => hasKeys(pendingPatch.value));
 
   function reseed(saved: EditableContest) {
     seed.value = toContestForm(saved);
@@ -53,5 +54,5 @@ export function useContestForm(contest: () => EditableContest) {
 
   const errors = computed(() => ({ ...localErrors.value, ...mutation.fieldErrors.value }));
 
-  return { form, errors, isDirty, save, mutation };
+  return { form, errors, isDirty, pendingPatch, save, mutation };
 }

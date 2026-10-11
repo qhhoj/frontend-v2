@@ -67,7 +67,15 @@ export const contestDataDownloadUrl = (key: string) =>
   apiUrl('/contests/{key}/data/download', { path: { key } });
 
 export const PARTICIPATIONS_PAGE_SIZE = 50;
-export const fetchParticipations = (key: string, query: { page: number; user: string }) =>
+/** The editor's list filters; an empty username (dropped by the client) or a missing kind or sort is no filter. */
+export interface ParticipationQuery {
+  page: number;
+  user: string;
+  kind?: 'live' | 'virtual' | 'spectate';
+  disqualified?: boolean;
+  sort?: 'score';
+}
+export const fetchParticipations = (key: string, query: ParticipationQuery) =>
   apiGetPage('/contests/{key}/participations', {
     path: { key },
     query: { ...query, pageSize: PARTICIPATIONS_PAGE_SIZE },
