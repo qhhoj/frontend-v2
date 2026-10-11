@@ -25,13 +25,13 @@ function undo(toast: Toast) {
 <template>
   <div
     data-testid="admin-toasts"
+    role="status"
+    aria-live="polite"
+    :aria-label="translate('admin.feedback.toast.region')"
     class="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[1200] flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
   >
     <TransitionGroup
       tag="ol"
-      role="status"
-      aria-live="polite"
-      :aria-label="translate('admin.feedback.toast.region')"
       class="m-0 flex w-full max-w-sm list-none flex-col gap-2 p-0"
       enter-from-class="translate-y-2 opacity-0"
       enter-active-class="transition-[transform,opacity] duration-(--qh-duration) ease-standard"
