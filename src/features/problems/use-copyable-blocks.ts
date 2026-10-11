@@ -108,6 +108,15 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     bars.add(bar);
   }
 
+  /** A re-render drops the old bars from the page; forget them so their detached nodes can be collected. */
+  function forgetDetachedBars() {
+    for (const bar of bars) {
+      if (bar.button.isConnected) continue;
+      clearTimeout(bar.resetTimer);
+      bars.delete(bar);
+    }
+  }
+
   const addMissingBars = (container: HTMLElement) => {
     for (const block of container.querySelectorAll<HTMLElement>('pre')) {
       const previous = block.previousElementSibling;
@@ -118,6 +127,7 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
   const decorate = () => {
     const container = root.value;
     if (!container) return;
+    forgetDetachedBars();
     if (clipboardAvailable()) addMissingBars(container);
     pairSamples(container);
   };
