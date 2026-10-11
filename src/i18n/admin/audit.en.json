@@ -72,5 +72,6 @@
     "staff_set_password": "Set password",
     "staff_send_reset_link": "Send reset link",
     "staff_set_access": "Change access"
-  }
+  },
+  "loadFailed": "Could not load more. Try again."
 }

@@ -71,12 +71,15 @@ export function toAuditRequest(filter: AuditFilter): AuditRequest {
 }
 
 /**
- * Where an entry's object is edited, or `null` when it cannot be opened: it is gone, or its kind has no screen
+ * Where an entry's object is edited, or `null` when it cannot be opened: it is gone (a deleted page still opens its history), or its kind has no screen
  * (a comment, a batch rejudge, a role). A participation opens its contest's participants.
  */
 export function auditObjectLink(entry: AuditEntry): RouteLocationRaw | null {
   const { label, id, deleted } = entry.object;
-  if (deleted) return null;
+  if (deleted)
+    return entry.type === 'flatpage'
+      ? { name: adminRouteName('pages'), query: { deleted: id } }
+      : null;
   switch (entry.type) {
     case 'problem':
     case 'tagProblem':

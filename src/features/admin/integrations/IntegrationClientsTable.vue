@@ -24,7 +24,8 @@ const stateOf = (client: IntegrationClient): 'revoked' | 'expired' | 'active' =>
   <div
     id="integration-table"
     data-testid="integration-table"
-    class="glass overflow-hidden rounded-card"
+    tabindex="-1"
+    class="glass overflow-hidden rounded-card focus-visible:-outline-offset-2"
   >
     <ScrollRegion :label="$t('admin.integrations.table.region')">
       <table class="w-full border-collapse text-sm">

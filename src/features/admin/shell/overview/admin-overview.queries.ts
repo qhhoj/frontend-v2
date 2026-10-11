@@ -32,11 +32,11 @@ export function useAdminCounts() {
   const tickets = useTicketSummaryQuery();
   const reports = useCommentReportsQuery(1, canReports);
   const requests = useAllJoinRequestsQuery('P', 1);
-  pollWhileVisible(() => {
-    if (canReports.value) void reports.refetch();
-    if (canRequests.value) void requests.refetch();
-  });
   return {
+    refreshQueues: () => {
+      if (canReports.value) void reports.refetch();
+      if (canRequests.value) void requests.refetch();
+    },
     awaitingTickets: computed(() =>
       canTickets.value ? (tickets.data.value?.awaitingStaff ?? null) : null,
     ),
@@ -52,6 +52,8 @@ export function useAdminCounts() {
 /** The nav items that carry a count badge, and which count. */
 export function useNavCounts() {
   const counts = useAdminCounts();
+  // The shell mounts once per admin visit, so this is the one poll.
+  pollWhileVisible(counts.refreshQueues);
   return computed<Partial<Record<AdminNavId, number | null>>>(() => ({
     tickets: counts.awaitingTickets.value,
     commentReports: counts.openReports.value,

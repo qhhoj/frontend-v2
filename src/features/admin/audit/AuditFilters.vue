@@ -20,8 +20,8 @@ const typeOptions = computed(() =>
   AUDIT_TYPES.map((type) => ({ type, label: t(`admin.audit.types.${type}`) })),
 );
 const isFiltered = computed(() => Object.values(props.filter).some((value) => value !== ''));
+/** One change; the actor box follows the URL back to empty, which also drops a pause still pending. */
 function clear() {
-  actor.commitNow('');
   emit('change', { actor: '', type: '', from: '', to: '' });
 }
 </script>

@@ -3,13 +3,16 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { AuditEntry } from '@/api/types/audit-admin';
 import { formatNumericDateTimeSeconds } from '@/lib/format';
+import { useRouter } from 'vue-router';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../admin-access';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
 import { auditObjectLink } from './audit';
 
 /** One change: when, who, what was done to which object, and the fields it touched (names only). */
-const props = defineProps<{ entry: AuditEntry; compact?: boolean }>();
+const props = defineProps<{ entry: AuditEntry }>();
 const i18n = useI18n();
 const locale = useLocaleStore();
 
@@ -21,15 +24,26 @@ const typeLabel = computed(() =>
 const actionLabel = computed(() =>
   labelOr(`admin.audit.actions.${props.entry.action}`, props.entry.action),
 );
-const link = computed(() => auditObjectLink(props.entry));
+const router = useRouter();
+const session = useSessionStore();
+/** An admin screen the viewer may not open shows as plain text, never a link to the forbidden page. */
+const link = computed(() => {
+  const target = auditObjectLink(props.entry);
+  if (!target) return null;
+  const { meta } = router.resolve(target);
+  const isOpenable = canUseAdmin(session.user, {
+    permission: meta.permission ?? null,
+    capability: meta.capability,
+  });
+  return isOpenable ? target : null;
+});
 const objectName = computed(() => props.entry.object.label ?? shortId(props.entry.object.id));
 </script>
 
 <template>
   <li
     data-testid="audit-entry"
-    class="grid gap-x-4 gap-y-1 px-4 py-3"
-    :class="compact ? '' : 'sm:grid-cols-[11rem_minmax(0,12rem)_minmax(0,1fr)]'"
+    class="grid gap-x-4 gap-y-1 px-4 py-3 sm:grid-cols-[11rem_minmax(0,12rem)_minmax(0,1fr)]"
   >
     <time :datetime="entry.at" class="text-sm text-muted tabular-nums">
       {{ formatNumericDateTimeSeconds(entry.at, locale.locale) }}
@@ -63,11 +77,11 @@ const objectName = computed(() => props.entry.object.label ?? shortId(props.entr
           $t('admin.audit.deleted')
         }}</span>
       </p>
-      <p v-if="!compact && entry.changedFields.length > 0" class="text-xs break-words text-muted">
+      <p v-if="entry.changedFields.length > 0" class="text-xs break-words text-muted">
         {{ $t('admin.audit.fields') }}
         <span class="font-mono">{{ entry.changedFields.join(', ') }}</span>
       </p>
-      <p v-if="!compact && entry.comment" class="text-xs text-muted">{{ entry.comment }}</p>
+      <p v-if="entry.comment" class="text-xs text-muted">{{ entry.comment }}</p>
     </div>
   </li>
 </template>

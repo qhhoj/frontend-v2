@@ -72,5 +72,6 @@
     "staff_set_password": "Đặt mật khẩu",
     "staff_send_reset_link": "Gửi liên kết đặt lại mật khẩu",
     "staff_set_access": "Đổi quyền"
-  }
+  },
+  "loadFailed": "Không tải được phần tiếp theo. Hãy thử lại."
 }
