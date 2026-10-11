@@ -110,5 +110,10 @@
   "maxReached": "Limit of {max} reached.",
   "bulk": {
     "selectPage": "Select this page"
-  }
+  },
+  "markdownPane": {
+    "write": "Write",
+    "preview": "Preview"
+  },
+  "markdownPanes": "Write or preview"
 }
