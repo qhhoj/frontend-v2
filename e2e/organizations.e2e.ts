@@ -1,4 +1,4 @@
-import { joinRequest, organizationDetail } from '../src/test/community-fixtures';
+import { joinRequest, member, organizationDetail } from '../src/test/community-fixtures';
 import { expect, list, test } from './fixtures/api';
 import { ok } from './fixtures/reply';
 import { PHONE, DESKTOP } from './fixtures/viewports';
@@ -116,4 +116,42 @@ test('the members table does not scroll the page sideways at 375 px', async ({ p
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );
   expect(overflows).toBe(false);
+});
+
+const LONG_REASON =
+  'Em là học sinh lớp 11 chuyên Tin, muốn tham gia đội tuyển để luyện tập cùng các bạn trước kỳ thi chọn học sinh giỏi cấp tỉnh sắp tới. '.repeat(
+    2,
+  );
+
+test('on "Quản lý" at 1280 px Chấp nhận is in view without scrolling and the ⋯ menu shows its items', async ({
+  page,
+  api,
+}) => {
+  api.signedIn = true;
+  api.routes['GET /organizations/hcmus'] = ok(
+    organizationDetail({ ...HCMUS, viewer: ADMINISTRATOR }),
+  );
+  api.routes['GET /organizations/hcmus/requests'] = list([
+    joinRequest({ id: REQUEST_ID, organizationSlug: 'hcmus', reason: LONG_REASON }),
+  ]);
+  api.routes['GET /organizations/hcmus/members'] = list([
+    member(1, 'a_member_with_a_really_long_username'),
+  ]);
+  api.routes['GET /organizations/hcmus/revisions'] = list([]);
+  api.routes['POST /organizations/render-preview'] = ok({ html: '' });
+  await page.setViewportSize({ width: DESKTOP, height: 900 });
+  await page.goto('/organizations/hcmus/manage');
+  const accept = page.getByRole('button', { name: 'Chấp nhận', exact: true });
+  await expect(accept).toBeVisible();
+  await expect(page.getByTestId('member-row')).toBeVisible();
+  // Neither table (the requests, the members) scrolls sideways inside its card.
+  const scrolls = await page
+    .getByRole('region')
+    .evaluateAll((all) => all.filter((el) => el.scrollWidth > el.clientWidth).length);
+  expect(scrolls).toBe(0);
+  await expect(accept).toBeInViewport({ ratio: 1 });
+  const menuButton = page.getByRole('button', { name: /^Thao tác khác cho/ });
+  await expect(menuButton).toBeInViewport({ ratio: 1 });
+  await menuButton.click();
+  await expect(page.getByRole('menuitem', { name: 'Từ chối' })).toBeVisible();
 });

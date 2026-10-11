@@ -100,7 +100,12 @@ const range = computed(() => {
 });
 const columns = computed<AdminColumn[]>(() => [
   { key: 'rank', label: t('admin.organizations.members.rank'), align: 'end', cellClass: 'w-12' },
-  { key: 'member', label: t('admin.organizations.members.title'), priority: 'primary' },
+  {
+    key: 'member',
+    label: t('admin.organizations.members.title'),
+    priority: 'primary',
+    cellClass: 'w-full max-w-0',
+  },
   { key: 'role', label: t('admin.organizations.members.role'), priority: 'badge' },
   { key: 'points', label: t('admin.organizations.members.points'), align: 'end' },
 ]);

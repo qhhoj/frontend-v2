@@ -28,7 +28,8 @@ import { useOrganizationWrite } from './organization-write';
 type Decision = 'A' | 'R';
 
 /**
- * Join requests of one organization or of every one (`withOrganization`): pending rows offer "Chấp nhận" and, in the ⋯ menu,
+ * Join requests of one organization or of every one (`withOrganization`): the name, the reason (wrapping) and the time stack
+ * in one cell so the table fits a narrow column and the actions stay in view. Pending rows offer "Chấp nhận" and, in the ⋯ menu,
  * "Từ chối"; ticking rows swaps the toolbar for the bulk bar. A refusal shows on its row; a bulk run that partly fails says
  * so above the table. Every decision goes to the request's own organization.
  */
@@ -78,20 +79,15 @@ async function decideSelected(next: Decision) {
 }
 
 const columns = computed<AdminColumn[]>(() => [
-  { key: 'user', label: t('admin.organizations.queue.columns.user'), priority: 'primary' },
+  {
+    key: 'user',
+    label: t('admin.organizations.queue.columns.user'),
+    priority: 'primary',
+    cellClass: 'min-w-0 max-w-0 w-full',
+  },
   ...(props.withOrganization
     ? [{ key: 'organization', label: t('admin.organizations.queue.columns.organization') }]
     : []),
-  {
-    key: 'reason',
-    label: t('admin.organizations.queue.columns.reason'),
-    cellClass: 'min-w-48 max-w-md py-2 whitespace-pre-line',
-  },
-  {
-    key: 'sentAt',
-    label: t('admin.organizations.queue.columns.sentAt'),
-    cellClass: 'whitespace-nowrap',
-  },
   ...(props.state === 'P'
     ? []
     : [{ key: 'decided', label: t('admin.organizations.queue.columns.decided') }]),
@@ -161,7 +157,20 @@ const bulkFailure = computed(() => {
           {{ $t('admin.organizations.bulk.accept') }}
         </button>
       </template>
-      <template #cell-user="{ row }"><AdminUserLabel :username="row.username" /></template>
+      <template #cell-user="{ row }">
+        <div class="flex min-w-0 flex-col items-start gap-1 py-2">
+          <AdminUserLabel :username="row.username" />
+          <p class="m-0 text-sm break-words whitespace-pre-line">{{ row.reason }}</p>
+          <time :datetime="row.createdAt" class="font-mono text-xs text-muted tabular-nums">{{
+            timeOf(row.createdAt)
+          }}</time>
+          <AdminStatus
+            v-if="failedId === row.id && decision.failure.value"
+            kind="refused"
+            :text="decisionFailureText(decision.failure.value)"
+          />
+        </div>
+      </template>
       <template #cell-organization="{ row }">
         <RouterLink
           data-testid="queue-org"
@@ -169,19 +178,6 @@ const bulkFailure = computed(() => {
           class="font-mono text-accent-text hover:underline"
           >{{ row.organizationSlug }}</RouterLink
         >
-      </template>
-      <template #cell-reason="{ row }">
-        <span class="block">{{ row.reason }}</span>
-        <AdminStatus
-          v-if="failedId === row.id && decision.failure.value"
-          kind="refused"
-          :text="decisionFailureText(decision.failure.value)"
-        />
-      </template>
-      <template #cell-sentAt="{ row }">
-        <time :datetime="row.createdAt" class="font-mono text-xs text-muted tabular-nums">{{
-          timeOf(row.createdAt)
-        }}</time>
       </template>
       <template #cell-decided="{ row }">
         <span class="text-sm text-muted">{{ decidedText(row) }}</span>
