@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
+import { X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
@@ -13,6 +14,7 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { useBulkDecisions } from './join-request-bulk';
@@ -105,6 +107,9 @@ function decidedText(request: JoinRequest): string {
     ? `${decided} · ${t('admin.organizations.queue.decidedBy', { name: request.decidedByUsername })}`
     : decided;
 }
+const menuItems = (request: JoinRequest) => [
+  { label: t('admin.organizations.queue.reject'), icon: X, run: () => void decide(request, 'R') },
+];
 const bulkFailure = computed(() => {
   const outcome = bulk.outcome.value;
   if (!outcome || outcome.failed === 0) return '';
@@ -186,14 +191,10 @@ const bulkFailure = computed(() => {
         >
           {{ $t('admin.organizations.queue.accept') }}
         </button>
-        <button
-          type="button"
-          :class="buttonClass('secondary', 'sm')"
-          :aria-disabled="decision.isPending.value || undefined"
-          @click="decide(row, 'R')"
-        >
-          {{ $t('admin.organizations.queue.reject') }}
-        </button>
+        <AdminRowMenu
+          :label="$t('admin.table.rowMenu', { name: row.username })"
+          :items="menuItems(row)"
+        />
       </template>
       <template v-if="meta" #footer>
         <span v-if="range" class="font-mono tabular-nums">{{

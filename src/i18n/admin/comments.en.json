@@ -119,8 +119,7 @@
     "state": "State",
     "page": "Page",
     "createdAt": "Written",
-    "reports": "Reports",
-    "when": "Latest"
+    "reports": "Reports"
   },
   "rowName": "comment on {page}"
 }

@@ -21,6 +21,8 @@ export interface AdminColumn {
   sort?: ColumnSort;
   /** The header text is for screen readers only (an actions or icon column). */
   hideLabel?: boolean;
+  /** Takes the width the other columns leave (content wraps, or clips with `truncate`); one per table. Default: the primary column. */
+  grow?: boolean;
   /** Extra classes on this column's cells (a width, `max-w-48 truncate`). */
   cellClass?: string;
 }

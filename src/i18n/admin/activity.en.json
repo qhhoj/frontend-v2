@@ -16,9 +16,7 @@
   },
   "table": {
     "caption": "Request log",
-    "at": "At",
     "user": "User",
-    "ip": "IP",
     "request": "Request",
     "status": "Code",
     "guest": "guest",
@@ -26,6 +24,7 @@
     "page": "Page {page} · total unknown",
     "previous": "Previous",
     "next": "Next",
+    "copyIp": "Copy IP address {ip}",
     "openSummary": "Show the summary of {username}"
   },
   "live": {

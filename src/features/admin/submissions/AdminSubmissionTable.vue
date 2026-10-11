@@ -70,7 +70,7 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'language',
     label: t('admin.submissions.table.language'),
     priority: 'meta',
-    cellClass: NUMBER_CELL,
+    cellClass: 'max-w-32 truncate',
   },
   {
     key: 'date',

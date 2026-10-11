@@ -77,7 +77,7 @@ const MENU_ITEM =
     >
       <p class="m-0">{{ $t('admin.activity.note') }}</p>
     </AdminNotice>
-    <div class="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_24rem]">
+    <div class="grid items-start gap-5 min-[1440px]:grid-cols-[minmax(0,1fr)_22rem]">
       <div class="flex min-w-0 flex-col gap-3">
         <ActivityFilters :filter="filter" @change="showFilter" />
         <ActivityTable :filter="filter" @clear-filters="clearFilters" />

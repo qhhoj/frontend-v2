@@ -43,7 +43,7 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
     >
       <QueryState :loading="live.isPending.value" :error="live.error.value" @retry="live.refetch()">
         <template #skeleton><SkeletonBlock class="h-32 w-full" /></template>
-        <dl class="m-0 grid grid-cols-3 gap-2">
+        <dl class="m-0 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2">
           <div
             v-for="tile in tiles"
             :key="tile.key"
@@ -61,7 +61,11 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
             :key="entry.user.id"
             class="flex min-h-(--qa-row) flex-wrap items-center justify-between gap-x-2 text-sm"
           >
-            <AdminUserLabel :username="entry.user.username" :rating="entry.user.rating" />
+            <AdminUserLabel
+              :username="entry.user.username"
+              :rating="entry.user.rating"
+              class="max-w-full"
+            />
             <time :datetime="entry.lastSeenAt" class="font-mono text-xs text-muted tabular-nums">
               {{ formatNumericDateTimeSeconds(entry.lastSeenAt, locale.locale) }}
             </time>

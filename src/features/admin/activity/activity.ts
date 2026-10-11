@@ -63,3 +63,33 @@ export function dailyBars(daily: { day: string; count: number }[], width: number
     label: `${entry.day}: ${entry.count}`,
   }));
 }
+
+/** Groups of an IPv6 address kept for display; the first four are the network prefix, the part that tells visitors apart. */
+const IPV6_SHOWN_GROUPS = 4;
+
+/** An IPv6 address cut to its first four groups plus `…` (`2405:4802:6efc:f980:…`); IPv4 and short IPv6 are left whole. */
+export function shortIp(ip: string): string {
+  if (!ip.includes(':')) return ip;
+  const groups = ip.split(':');
+  return groups.length <= IPV6_SHOWN_GROUPS + 1
+    ? ip
+    : `${groups.slice(0, IPV6_SHOWN_GROUPS).join(':')}:…`;
+}
+
+/**
+ * The ids of the rows that open a new calendar day among `rows` (in list order), so the table prints the date only there
+ * and the bare time elsewhere. `dayOf` names the day of a row's instant in the viewer's zone.
+ */
+export function dayStartIds(
+  rows: readonly { id: string; at: string }[],
+  dayOf: (at: string) => string,
+): Set<string> {
+  const starts = new Set<string>();
+  let previous: string | undefined;
+  for (const row of rows) {
+    const day = dayOf(row.at);
+    if (day !== previous) starts.add(row.id);
+    previous = day;
+  }
+  return starts;
+}

@@ -99,12 +99,13 @@ const rowAttrs = (ticket: TicketListItem) => ({
       </AdminChip>
     </template>
     <template #cell-assignees="{ row }">
-      <span v-if="row.assignees.length" class="inline-flex flex-wrap gap-x-2 gap-y-1">
+      <span v-if="row.assignees.length" class="flex max-w-full min-w-0 flex-wrap gap-x-2 gap-y-1">
         <AdminUserLabel
           v-for="assignee in row.assignees"
           :key="assignee.id"
           :username="assignee.username"
           :rating="assignee.rating"
+          class="max-w-full"
         />
       </span>
       <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>

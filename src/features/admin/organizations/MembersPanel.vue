@@ -31,9 +31,7 @@ import { useAdminRole } from './use-admin-role';
 import type { RoleChange } from './use-admin-role';
 
 const MEMBERS_PAGE_SIZE = 50;
-const COMPACT_PAGE_SIZE = 10;
-/** `compact`: the organization's own Quản lý page shows a short list, without rank or points. */
-const props = defineProps<{ slug: string; compact?: boolean }>();
+const props = defineProps<{ slug: string }>();
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -49,7 +47,7 @@ const members = useMembersQuery(
   () => ({
     sort: 'performancePoints',
     page: page.value,
-    pageSize: props.compact ? COMPACT_PAGE_SIZE : MEMBERS_PAGE_SIZE,
+    pageSize: MEMBERS_PAGE_SIZE,
     ...(search.value ? { search: search.value } : {}),
   }),
 );
@@ -100,21 +98,17 @@ const range = computed(() => {
   const meta = members.data.value?.meta;
   return meta ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total) : null;
 });
-const RANKING_KEYS = new Set(['rank', 'points']);
-const columns = computed<AdminColumn[]>(() => {
-  const all: AdminColumn[] = [
-    { key: 'rank', label: t('admin.organizations.members.rank'), align: 'end', cellClass: 'w-12' },
-    {
-      key: 'member',
-      label: t('admin.organizations.members.title'),
-      priority: 'primary',
-      cellClass: 'w-full max-w-0',
-    },
-    { key: 'role', label: t('admin.organizations.members.role'), priority: 'badge' },
-    { key: 'points', label: t('admin.organizations.members.points'), align: 'end' },
-  ];
-  return props.compact ? all.filter((column) => !RANKING_KEYS.has(column.key)) : all;
-});
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'rank', label: t('admin.organizations.members.rank'), align: 'end', cellClass: 'w-12' },
+  {
+    key: 'member',
+    label: t('admin.organizations.members.title'),
+    priority: 'primary',
+    cellClass: 'w-full max-w-0',
+  },
+  { key: 'role', label: t('admin.organizations.members.role'), priority: 'badge' },
+  { key: 'points', label: t('admin.organizations.members.points'), align: 'end' },
+]);
 
 /** A new search starts again from the first page of members. */
 const searchText = computed({

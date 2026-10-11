@@ -5,7 +5,12 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchActivityLogs } from '@/api/activity-admin.api';
 import type { ActivityLog } from '@/api/types/activity-admin';
-import { formatNumericDateTimeSeconds } from '@/lib/format';
+import {
+  formatClockSeconds,
+  formatNumericDate,
+  formatNumericDateTimeSeconds,
+  formatShortDate,
+} from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminChip from '../ui/AdminChip.vue';
@@ -14,7 +19,8 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
-import { isFilteredActivity, toActivityRequest } from './activity';
+import ActivityIp from './ActivityIp.vue';
+import { dayStartIds, isFilteredActivity, toActivityRequest } from './activity';
 import type { ActivityFilter } from './activity';
 
 const props = defineProps<{ filter: ActivityFilter }>();
@@ -45,17 +51,21 @@ watch(
 
 const rows = computed(() => logs.data.value?.items ?? []);
 const hasNext = computed(() => !!logs.data.value?.meta.hasMore && page.value < MAX_ACTIVITY_PAGE);
+/** The time and the address sit under the user and the path, so three columns carry five facts and the table never scrolls sideways. */
 const columns = computed<AdminColumn[]>(() => [
-  { key: 'user', label: t('admin.activity.table.user'), priority: 'primary' },
-  { key: 'at', label: t('admin.activity.table.at'), cellClass: 'whitespace-nowrap' },
-  { key: 'ip', label: t('admin.activity.table.ip'), priority: 'meta', cellClass: 'font-mono' },
   {
-    key: 'request',
-    label: t('admin.activity.table.request'),
-    cellClass: 'font-mono break-all min-w-48',
+    key: 'user',
+    label: t('admin.activity.table.user'),
+    priority: 'primary',
+    cellClass: 'w-56 max-w-56',
   },
+  { key: 'request', label: t('admin.activity.table.request'), grow: true },
   { key: 'status', label: t('admin.activity.table.status'), priority: 'badge' },
 ]);
+/** A time alone says little across a page of days: the first row of each day also carries the date. */
+const dayStarts = computed(() =>
+  dayStartIds(rows.value, (at) => formatNumericDate(at, locale.locale)),
+);
 
 /** A name opens that user's summary beside the table; the rest of the URL (the filter) stays. */
 function openSummary(username: string) {
@@ -84,27 +94,39 @@ const goTo = (next: number) => (page.value = next);
     @clear-filters="$emit('clear-filters')"
   >
     <template #cell-user="{ row }">
-      <button
-        v-if="row.username"
-        type="button"
-        class="max-w-full rounded-cell text-left"
-        :aria-label="$t('admin.activity.table.openSummary', { username: row.username })"
-        @click="openSummary(row.username)"
-      >
-        <AdminUserLabel :username="row.username" :link="false" />
-      </button>
-      <span v-else class="text-muted">{{ $t('admin.activity.table.guest') }}</span>
+      <div class="flex min-w-0 flex-col items-start gap-0.5 py-1">
+        <button
+          v-if="row.username"
+          type="button"
+          class="max-w-full min-w-0 rounded-cell text-left"
+          :aria-label="$t('admin.activity.table.openSummary', { username: row.username })"
+          @click="openSummary(row.username)"
+        >
+          <AdminUserLabel :username="row.username" :link="false" class="max-w-full" />
+        </button>
+        <span v-else class="text-muted">{{ $t('admin.activity.table.guest') }}</span>
+        <time
+          :datetime="row.at"
+          class="font-mono text-xs whitespace-nowrap text-muted tabular-nums"
+          :title="formatNumericDateTimeSeconds(row.at, locale.locale)"
+        >
+          <template v-if="dayStarts.has(row.id)"
+            >{{ formatShortDate(row.at, locale.locale) }} ·
+          </template>
+          {{ formatClockSeconds(row.at, locale.locale) }}
+        </time>
+      </div>
+    </template>
+    <template #cell-request="{ row }">
+      <div class="flex min-w-0 flex-col gap-0.5 py-1 font-mono">
+        <span class="break-all md:truncate" :title="`${row.method} ${row.path}`">
+          <span class="text-muted">{{ row.method }}</span> {{ row.path }}
+        </span>
+        <ActivityIp :ip="row.ip" class="text-xs text-muted" />
+      </div>
     </template>
     <template #cell-status="{ row }">
       <AdminChip :tone="toneOf(row.statusCode)" class="font-mono">{{ row.statusCode }}</AdminChip>
-    </template>
-    <template #cell-at="{ row }">
-      <time :datetime="row.at" class="font-mono text-sm tabular-nums">{{
-        formatNumericDateTimeSeconds(row.at, locale.locale)
-      }}</time>
-    </template>
-    <template #cell-request="{ row }">
-      <span class="text-muted">{{ row.method }}</span> {{ row.path }}
     </template>
     <template #footer>
       <span>{{ $t('admin.activity.table.page', { page }) }}</span>
