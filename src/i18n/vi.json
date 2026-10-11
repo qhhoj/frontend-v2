@@ -1296,6 +1296,7 @@
   },
   "leaderboard": {
     "lead": "{total} người dùng đang hoạt động · 100 người mỗi trang",
+    "sortBy": "Sắp xếp theo",
     "columns": {
       "rank": "Hạng",
       "user": "Người dùng",
@@ -1307,22 +1308,10 @@
       "contributionPoints": "Đóng góp"
     },
     "myRank": "Hạng của bạn",
-    "by": {
-      "rating": "Theo rating",
-      "performancePoints": "Theo điểm PP",
-      "points": "Theo tổng điểm",
-      "problemCount": "Theo số bài giải",
-      "contributionPoints": "Theo đóng góp"
-    },
-    "pageOf": "Trang {page}",
     "findMe": "Tìm hạng của tôi",
-    "notListed": "Tài khoản của bạn không có trên bảng xếp hạng.",
     "jumpLabel": "Tên đăng nhập",
     "jumpPlaceholder": "Đến hồ sơ theo tên đăng nhập",
     "jumpSubmit": "Mở",
-    "legend": "Màu theo rating",
-    "tierAtLeast": "{tier} ≥ {bound}",
-    "tierBelow": "{tier} < {bound}",
     "pagerLabel": "Trang bảng xếp hạng",
     "empty": "Chưa có ai trên bảng xếp hạng này.",
     "title": "Bảng xếp hạng"

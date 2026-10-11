@@ -48,11 +48,10 @@ const rows = Array.from({ length: SKELETON_ROW_COUNT }, (_row, index) => index);
         <tr v-for="row in rows" :key="row" :class="BOARD_ROW_CLASS">
           <td :class="RANK_CELL_CLASS"><SkeletonBlock text class="w-6" /></td>
           <td :class="USER_CELL_CLASS">
-            <span class="flex items-center gap-2.5">
+            <span class="flex min-h-10 items-center gap-2.5">
               <SkeletonBlock round class="size-7" />
               <span class="flex min-w-0 flex-col">
                 <span class="text-sm"><SkeletonBlock text class="w-24" /></span>
-                <span class="text-xs"><SkeletonBlock text class="w-16" /></span>
               </span>
             </span>
           </td>
