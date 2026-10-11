@@ -1,10 +1,9 @@
 {
   "title": "Import a .zip file",
-  "lead": "Upload a Polygon .zip package; it is processed in the background and the state comes from the queued job.",
+  "lead": "Upload a Polygon package as a .zip and follow the import.",
   "rateLimited": "At most 10 imports per hour.",
   "form": {
     "board": "Import a Polygon package",
-    "permissionChip": "Permission: {permission}",
     "drop": "Drop the .zip package here",
     "pickedFile": "{name} · {size}",
     "chooseFile": "Choose file",

@@ -1,27 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { Plus } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { usePermissions } from '@/stores/use-permissions';
-import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import type { AdminTab } from '../ui/AdminTabs.vue';
+import { buttonClass } from '../ui/controls';
 import LicenseCatalogPanel from './LicenseCatalogPanel.vue';
 import TaxonCatalogPanel from './TaxonCatalogPanel.vue';
 
-/** One tab per catalog the viewer may change; the tab lives in `?tab=` so a link opens it. */
+/** One tab per catalog the viewer may change (`?tab=`); "Thêm …" in the header opens the tab's create drawer. */
 const TABS = [
-  { id: 'problem-types', permission: 'judge.change_problemtype' },
-  { id: 'problem-groups', permission: 'judge.change_problemgroup' },
-  { id: 'licenses', permission: 'judge.change_license' },
+  {
+    id: 'problem-types',
+    permission: 'judge.change_problemtype',
+    addPermission: 'judge.add_problemtype',
+  },
+  {
+    id: 'problem-groups',
+    permission: 'judge.change_problemgroup',
+    addPermission: 'judge.add_problemgroup',
+  },
+  { id: 'licenses', permission: 'judge.change_license', addPermission: 'judge.add_license' },
 ] as const;
-type TabId = (typeof TABS)[number]['id'];
 
 const route = useRoute();
 const { can } = usePermissions();
 const tabs = computed(() => TABS.filter((tab) => can(tab.permission)));
-const active = computed<TabId | undefined>(
-  () => tabs.value.find((tab) => tab.id === route.query.tab)?.id ?? tabs.value[0]?.id,
+const active = computed(
+  () => tabs.value.find((tab) => tab.id === route.query.tab) ?? tabs.value[0],
 );
 const tabItems = computed<AdminTab[]>(() =>
   tabs.value.map((tab) => ({
@@ -30,15 +38,31 @@ const tabItems = computed<AdminTab[]>(() =>
     to: { query: { tab: tab.id } },
   })),
 );
+const creating = ref(false);
+watch(active, () => (creating.value = false));
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-4">
     <AdminPageHeader :title="$t('admin.shell.screens.types')" :lead="$t('admin.catalogs.lead')">
-      <template #actions><AdminBit placement="header" /></template>
+      <template v-if="active && can(active.addPermission)" #actions>
+        <button type="button" :class="buttonClass('primary')" @click="creating = true">
+          <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
+          {{ $t(`admin.catalogs.${active.id}.createTitle`) }}
+        </button>
+      </template>
     </AdminPageHeader>
-    <AdminTabs :tabs="tabItems" :current="active ?? ''" :label="$t('admin.catalogs.tabsLabel')" />
-    <LicenseCatalogPanel v-if="active === 'licenses'" />
-    <TaxonCatalogPanel v-else-if="active" :key="active" :kind="active" />
+    <AdminTabs
+      :tabs="tabItems"
+      :current="active?.id ?? ''"
+      :label="$t('admin.catalogs.tabsLabel')"
+    />
+    <LicenseCatalogPanel v-if="active?.id === 'licenses'" v-model:creating="creating" />
+    <TaxonCatalogPanel
+      v-else-if="active"
+      :key="active.id"
+      v-model:creating="creating"
+      :kind="active.id"
+    />
   </div>
 </template>

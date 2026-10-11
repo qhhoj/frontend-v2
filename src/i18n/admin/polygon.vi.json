@@ -1,10 +1,9 @@
 {
   "title": "Nhập tệp .zip",
-  "lead": "Tải gói Polygon dạng .zip lên; gói được xử lý nền, trạng thái lấy từ công việc trong hàng đợi.",
+  "lead": "Tải gói Polygon dạng .zip lên rồi theo dõi tiến trình nhập.",
   "rateLimited": "Tối đa 10 lượt nhập mỗi giờ.",
   "form": {
     "board": "Nhập gói Polygon",
-    "permissionChip": "Quyền: {permission}",
     "drop": "Kéo gói .zip vào đây",
     "pickedFile": "{name} · {size}",
     "chooseFile": "Chọn tệp",

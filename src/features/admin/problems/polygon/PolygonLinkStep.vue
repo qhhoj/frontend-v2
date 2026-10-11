@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { BadgeCheck } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { ApiError } from '@/api/client';
 import { resolvePolygonLink } from '@/api/polygon.api';
 import type { PolygonProblem } from '@/api/types/polygon';
-import GlassCard from '@/components/GlassCard.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import AdminChip from '../../ui/AdminChip.vue';
+import { CARD, INPUT, buttonClass } from '../../ui/controls';
+import AdminNotice from '../../ui/feedback/AdminNotice.vue';
 import PackageStatePill from './PackageStatePill.vue';
 import PackageTypePill from './PackageTypePill.vue';
 import PolygonLinkRefusal from './PolygonLinkRefusal.vue';
@@ -81,8 +83,11 @@ const builtAt = computed(() =>
 </script>
 
 <template>
-  <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
-    <GlassCard class="flex min-w-0 flex-col gap-4 p-5">
+  <div class="flex flex-col gap-4">
+    <AdminNotice :title="$t('admin.polygonLink.howTo.title')">
+      <PolygonSetterHowTo :account-name="accountName" headless />
+    </AdminNotice>
+    <div :class="[CARD, 'flex min-w-0 flex-col gap-4 p-4 md:p-5']">
       <div class="flex flex-col gap-1.5">
         <label for="polygon-link" class="font-semibold">{{
           $t('admin.polygonLink.link.label')
@@ -101,7 +106,7 @@ const builtAt = computed(() =>
           :placeholder="$t('admin.polygonLink.link.placeholder')"
           aria-describedby="polygon-link-hint polygon-link-parts"
           :aria-invalid="isMalformed || undefined"
-          :class="[ADMIN_INPUT_CLASS, 'font-mono text-sm']"
+          :class="[INPUT, 'font-mono text-sm']"
         />
         <p
           id="polygon-link-parts"
@@ -126,11 +131,9 @@ const builtAt = computed(() =>
             <span v-if="isChecking">{{ $t('admin.polygonLink.link.checking') }}</span>
             <template v-else-if="preview">
               <span class="font-mono">→ #{{ preview.id }}</span>
-              <span
-                data-testid="polygon-link-verified"
-                class="inline-flex items-center rounded-pill bg-verdict-ac-bg px-2.5 py-0.5 text-xs font-bold text-verdict-ac"
-                >{{ $t('admin.polygonLink.link.verified') }}</span
-              >
+              <AdminChip tone="positive" :icon="BadgeCheck" data-testid="polygon-link-verified">{{
+                $t('admin.polygonLink.link.verified')
+              }}</AdminChip>
             </template>
           </template>
         </p>
@@ -179,14 +182,13 @@ const builtAt = computed(() =>
       <div class="flex flex-wrap justify-end gap-2">
         <button
           type="button"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-disabled="!preview || undefined"
           @click="preview && emit('resolved', text.trim(), preview)"
         >
           {{ $t('admin.polygonLink.link.next') }}
         </button>
       </div>
-    </GlassCard>
-    <PolygonSetterHowTo :account-name="accountName" />
+    </div>
   </div>
 </template>

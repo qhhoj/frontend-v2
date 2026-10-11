@@ -3,11 +3,10 @@ import { computed, ref } from 'vue';
 import { startPolygonLinkImport } from '@/api/polygon.api';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import type { PolygonImportBody, PolygonProblem } from '@/api/types/polygon';
-import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import ImportCheckbox from '../import/ImportCheckbox.vue';
 import ImportOptionsForm from '../import/ImportOptionsForm.vue';
 import { IMPORT_FORM_FIELDS, codeFromPolygonName } from '../import/import-form';
 import { importRefusalText } from '../import/import-refusal';
@@ -46,7 +45,7 @@ const refusal = computed(() =>
 </script>
 
 <template>
-  <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
+  <div class="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
     <div class="flex min-w-0 flex-col gap-4">
       <ImportOptionsForm
         :with-file="false"
@@ -57,26 +56,21 @@ const refusal = computed(() =>
         @start="start"
       >
         <template #extra>
-          <div class="rounded-row bg-surface-strong p-4">
-            <AdminSwitch
-              v-model="autoSync"
-              :label="$t('admin.polygonLink.configure.autoSync')"
-              :description="
-                $t('admin.polygonLink.configure.autoSyncHint', { revision: problem.revision })
-              "
-            />
-          </div>
+          <ImportCheckbox
+            v-model="autoSync"
+            :label="$t('admin.polygonLink.configure.autoSync')"
+            :description="
+              $t('admin.polygonLink.configure.autoSyncHint', { revision: problem.revision })
+            "
+          />
         </template>
         <template #actions>
-          <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('back')">
+          <button type="button" :class="buttonClass('ghost')" @click="emit('back')">
             {{ $t('admin.polygonLink.configure.back') }}
           </button>
         </template>
       </ImportOptionsForm>
-      <div v-if="refusal" class="flex items-start gap-3">
-        <AdminStatus kind="refused" :text="refusal" />
-        <AdminBit placement="refused" />
-      </div>
+      <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     </div>
     <PolygonSourcePanel :problem="problem" />
   </div>

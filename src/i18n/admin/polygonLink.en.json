@@ -170,8 +170,6 @@
     "title": "Imports and syncs, newest first",
     "empty": "No import or sync has been recorded yet.",
     "total": "{total} runs",
-    "previous": "Previous",
-    "next": "Next",
     "builtAt": "built {date}",
     "results": {
       "ok": "Succeeded",
@@ -184,6 +182,14 @@
     "triggers": {
       "manual": "Manual",
       "auto": "Automatic"
+    },
+    "columns": {
+      "when": "When",
+      "result": "Result",
+      "problem": "Problem",
+      "package": "Package",
+      "how": "How",
+      "by": "Requested by"
     }
   }
 }

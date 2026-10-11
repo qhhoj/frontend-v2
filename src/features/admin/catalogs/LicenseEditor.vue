@@ -7,15 +7,15 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import MarkdownField from '../ui/MarkdownField.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { INPUT, buttonClass } from '../ui/controls';
 import { checkLicenseForm, emptyLicenseForm, licenseFormOf } from './catalog-forms';
 import type { LicenseForm } from './catalog-forms';
 import { LICENSES_ADMIN_KEY, META_KEYS } from './catalogs.queries';
 import { useCatalogEditor } from './use-catalog-editor';
 
-/** Create (`row` null) or edit one license; the text has a live markdown preview. */
+/** The drawer body that creates (`row` null) or edits one license, with a markdown preview; `done` after a save, `cancel` to close. */
 const props = defineProps<{ row: LicenseAdmin | null }>();
-const emit = defineEmits<{ done: [] }>();
+const emit = defineEmits<{ done: []; cancel: [] }>();
 const { can } = usePermissions();
 const { form, isCreate, errors, mutation, isTaken, save } = useCatalogEditor({
   row: () => props.row,
@@ -26,6 +26,7 @@ const { form, isCreate, errors, mutation, isTaken, save } = useCatalogEditor({
   update: (row, patch) => updateLicense(row.id, patch),
   invalidates: [LICENSES_ADMIN_KEY, ...META_KEYS],
   uniqueField: 'key',
+  nameOf: (sent) => sent.name,
   onDone: () => emit('done'),
 });
 const canWrite = computed(() => !isCreate.value || can('judge.add_license'));
@@ -39,16 +40,9 @@ const TEXT_FIELDS = [
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-4 rounded-panel p-5">
-    <h2 class="font-display text-base font-bold">
-      {{
-        row
-          ? $t('admin.catalogs.editTitle', { name: row.name })
-          : $t('admin.catalogs.licenses.createTitle')
-      }}
-    </h2>
+  <div class="flex flex-col gap-4">
     <p v-if="!canWrite" class="text-sm text-muted">{{ $t('admin.catalogs.noAdd') }}</p>
-    <form v-else class="grid gap-4 md:grid-cols-2" novalidate @submit.prevent="save">
+    <form v-else class="flex flex-col gap-4" novalidate @submit.prevent="save">
       <AdminField
         v-for="input in TEXT_FIELDS"
         :key="input.field"
@@ -63,13 +57,14 @@ const TEXT_FIELDS = [
             v-model="form[input.field]"
             :maxlength="input.maxlength"
             autocomplete="off"
-            :class="[ADMIN_INPUT_CLASS, input.mono ? 'font-mono' : '']"
+            :autofocus="input.field === 'key'"
+            :class="[INPUT, input.mono ? 'font-mono' : '']"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
           />
         </template>
       </AdminField>
-      <div class="md:col-span-2">
+      <div>
         <MarkdownField
           v-model="form.text"
           :label="$t('admin.catalogs.fields.text')"
@@ -77,24 +72,23 @@ const TEXT_FIELDS = [
           :error="errors.text"
         />
       </div>
-      <div class="flex flex-wrap items-center gap-3 md:col-span-2">
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
+        <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
+          {{ $t('admin.catalogs.cancel') }}
+        </button>
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="buttonClass('primary')"
           :aria-busy="mutation.isPending.value || undefined"
         >
           {{ isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save') }}
         </button>
-        <button v-if="!isCreate" type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('done')">
-          {{ $t('admin.catalogs.cancel') }}
-        </button>
       </div>
     </form>
-    <AdminStatus v-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
     <AdminStatus
       v-if="mutation.failure.value && !isTaken"
       kind="refused"
       :text="failureTextOf(mutation.failure.value)"
     />
-  </section>
+  </div>
 </template>

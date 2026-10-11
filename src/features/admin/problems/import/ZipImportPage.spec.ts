@@ -111,8 +111,8 @@ describe('ZipImportPage', () => {
       true,
       true,
     ]);
-    expect(wrapper.text()).toContain('Cần quyền judge.add_problem');
-    expect(wrapper.text()).toContain('Cần quyền judge.edit_own_problem');
+    expect(wrapper.text()).toContain('Cần quyền “Tạo bài”');
+    expect(wrapper.text()).toContain('Cần quyền “Sửa bài của mình”');
     await start(wrapper);
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
   });

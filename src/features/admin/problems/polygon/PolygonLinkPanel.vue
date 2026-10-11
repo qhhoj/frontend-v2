@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
-import { ArrowRight, Link2 } from 'lucide-vue-next';
+import { ArrowRight, ChevronRight, Link2 } from 'lucide-vue-next';
 import { ApiError } from '@/api/client';
 import { syncPolygonLink, unlinkPolygon, updatePolygonLink } from '@/api/polygon.api';
 import type { PolygonLink } from '@/api/types/polygon';
@@ -13,7 +13,9 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_DANGER_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import AdminChip from '../../ui/AdminChip.vue';
+import type { ChipTone } from '../../ui/AdminChip.vue';
+import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportProgress from '../import/ImportProgress.vue';
 import { isFinal } from '../import/import-job';
@@ -39,12 +41,12 @@ const state = computed(() => linkQuery.data.value ?? null);
 const status = computed(() => (state.value ? linkStatusOf(state.value) : null));
 const linkKey = () => polygonLinkKey(props.code, viewer.value);
 
-const STATUS_PILL: Record<LinkStatus, string> = {
-  newer: 'bg-verdict-tle-bg text-verdict-tle',
-  upToDate: 'bg-verdict-ac-bg text-verdict-ac',
-  syncFailed: 'bg-verdict-wa-bg text-verdict-wa',
-  notReady: 'bg-surface-strong text-muted',
-  unknown: 'bg-surface-strong text-muted',
+const STATUS_TONE: Record<LinkStatus, ChipTone> = {
+  newer: 'caution',
+  upToDate: 'positive',
+  syncFailed: 'negative',
+  notReady: 'neutral',
+  unknown: 'neutral',
 };
 const dateText = (date: string | null) => (date ? formatNumericDateTime(date, locale.locale) : '');
 const putLink = (link: PolygonLink) =>
@@ -112,9 +114,9 @@ const onHistoryToggle = (event: Event) =>
     <template #header-end>
       <span class="inline-flex items-center gap-2">
         <Link2 aria-hidden="true" class="size-4 text-muted" />
-        <span class="rounded-pill px-2.5 py-0.5 text-xs font-bold" :class="STATUS_PILL[status]">{{
+        <AdminChip :tone="STATUS_TONE[status]">{{
           $t(`admin.polygonLink.panel.status.${status}`)
-        }}</span>
+        }}</AdminChip>
       </span>
     </template>
     <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
@@ -220,7 +222,7 @@ const onHistoryToggle = (event: Event) =>
     <div class="flex flex-wrap items-center gap-4 border-t border-line pt-4">
       <button
         type="button"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="buttonClass('primary')"
         :aria-disabled="!canSyncNow(state) || undefined"
         :aria-describedby="canSyncNow(state) ? undefined : 'polygon-sync-blocked'"
         @click="canSyncNow(state) && openSync()"
@@ -245,7 +247,7 @@ const onHistoryToggle = (event: Event) =>
           )
         "
       />
-      <button type="button" :class="ADMIN_DANGER_CLASS" @click="openUnlink">
+      <button type="button" :class="buttonClass('danger')" @click="openUnlink">
         {{ $t('admin.polygonLink.panel.unlink') }}
       </button>
     </div>
@@ -258,8 +260,13 @@ const onHistoryToggle = (event: Event) =>
       :text="failureTextOf(autoSync.failure.value)"
     />
 
-    <details class="border-t border-line pt-4" @toggle="onHistoryToggle">
-      <summary class="min-h-11 cursor-pointer text-sm font-semibold">
+    <details class="group border-t border-line pt-4" @toggle="onHistoryToggle">
+      <summary class="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold">
+        <ChevronRight
+          aria-hidden="true"
+          class="size-4 text-muted transition-transform group-open:rotate-90"
+          :stroke-width="1.75"
+        />
         {{ $t('admin.polygonLink.history.show') }}
       </summary>
       <PolygonSyncHistory v-if="isHistoryOpen" :code="code" class="mt-3" />
