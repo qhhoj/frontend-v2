@@ -12,7 +12,6 @@
     "result": "Kết quả"
   },
   "table": {
-    "id": "Mã",
     "user": "Người nộp",
     "problem": "Bài",
     "verdict": "Kết quả",
@@ -28,5 +27,12 @@
     "rejudge": "Chấm lại",
     "lineSelected": "{count} bài nộp đã chọn.",
     "lineAll": "Mọi bài nộp khớp bộ lọc của danh sách (trừ bộ lọc trạng thái)."
+  },
+  "menu": {
+    "label": "Tác vụ bài nộp của {user}",
+    "open": "Mở bài nộp",
+    "copyId": "Sao chép mã bài nộp",
+    "copied": "Đã sao chép mã bài nộp",
+    "copyFailed": "Không sao chép được. Hãy chép thủ công."
   }
 }

@@ -12,7 +12,6 @@
     "result": "Result"
   },
   "table": {
-    "id": "Id",
     "user": "User",
     "problem": "Problem",
     "verdict": "Verdict",
@@ -28,5 +27,12 @@
     "rejudge": "Rejudge",
     "lineSelected": "{count} selected submissions.",
     "lineAll": "Every submission matching the list filter (except the state filter)."
+  },
+  "menu": {
+    "label": "Actions for {user}'s submission",
+    "open": "Open submission",
+    "copyId": "Copy submission ID",
+    "copied": "Submission ID copied",
+    "copyFailed": "Could not copy. Copy it by hand."
   }
 }
