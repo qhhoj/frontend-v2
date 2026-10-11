@@ -15,6 +15,7 @@
     "more": "More"
   },
   "pages": {
+    "publicRanking": "Public ranking",
     "submissions": "Submissions",
     "submission": "Submission",
     "submissionDiff": "Compare submissions",
@@ -1149,6 +1150,11 @@
     }
   },
   "ranking": {
+    "public": {
+      "subtitle": "Public ranking · read only",
+      "notFoundTitle": "Ranking not found",
+      "notFoundBody": "This link is wrong, switched off or expired."
+    },
     "summary": "{format} · {problems} problem · {participants} | {format} · {problems} problems · {participants}",
     "viewMode": "Board mode",
     "official": "Official",

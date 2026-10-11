@@ -104,6 +104,12 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.contestReplay' },
   },
   {
+    path: '/public-rankings/:token',
+    name: 'public-ranking',
+    component: () => import('@/features/contests/PublicRankingPage.vue'),
+    meta: { titleKey: 'pages.publicRanking' },
+  },
+  {
     path: '/users',
     name: 'users',
     component: () => import('@/features/leaderboard/LeaderboardPage.vue'),
@@ -346,6 +352,14 @@ export const routes: RouteRecordRaw[] = [
       params: { code: to.params.code },
       query: { tab: 'editorial' },
     }),
+  },
+  {
+    path: '/contest/:key/ranking',
+    redirect: (to) => ({ name: 'contest-ranking', params: { key: to.params.key } }),
+  },
+  {
+    path: '/public-ranking/:token',
+    redirect: (to) => ({ name: 'public-ranking', params: { token: to.params.token } }),
   },
   {
     path: '/contest/:key',
