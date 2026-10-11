@@ -567,15 +567,15 @@
 }
 @utility copy-bar-float {
   position: absolute;
-  top: 0.375rem;
-  right: 0.375rem;
+  top: 0.5rem;
+  right: 0.5rem;
 }
 .user-content.statement .copy-bar + pre {
   display: grid;
   align-content: center;
-  min-height: 3.5rem;
+  min-height: 2.75rem;
   margin-top: 0;
-  padding-right: 6rem;
+  padding-right: 6.5rem;
 }
 
 /* A sample's title row ("Ví dụ vào") is a small muted label with its copy button: one line, no bar above the box. Wins over the section heading rules by specificity. */
@@ -584,6 +584,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  min-height: 1.75rem;
   margin-block: 1em 0.4em;
   padding-bottom: 0;
   font-family: var(--qh-font-body);
@@ -594,21 +595,37 @@
 }
 @utility copy-bar-inline {
   display: flex;
-  margin-block: -0.5rem;
 }
 
 /* The copy button itself. */
+/* Compact (28px) so it fits a title row or a one-line block; ::before widens the touch target to 44px without growing the pill. */
 @utility copy-block {
-  min-width: 2.75rem;
-  min-height: 2.75rem;
-  padding-inline: 0.75rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 1.75rem;
+  padding-inline: 0.6rem;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
+  line-height: 1;
   color: var(--qh-text);
   background-color: var(--qh-surface-solid);
   border: 1px solid var(--qh-line-strong);
   border-radius: var(--qh-radius-pill);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.5rem -0.25rem;
+  }
+}
+@utility copy-icon {
+  width: 0.9em;
+  height: 0.9em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
 }
 
 @keyframes qh-pdf-ring-spin {
