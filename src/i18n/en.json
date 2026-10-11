@@ -53,7 +53,8 @@
     "notifications": "Notifications",
     "contestReplay": "Replay",
     "contestBalloons": "Balloons",
-    "contestBalloonsPrint": "Balloon run sheet"
+    "contestBalloonsPrint": "Balloon run sheet",
+    "problemBest": "Best submissions"
   },
   "contests": {
     "title": "Contests",
@@ -962,7 +963,6 @@
     },
     "untranslated": "This statement has no translation in this language yet; showing the original.",
     "authors": "Authors:",
-    "pdf": "PDF",
     "pdfPreparing": "Preparing PDF…",
     "pdfOpen": "Open PDF",
     "pdfReady": "PDF ready",
@@ -998,12 +998,13 @@
       },
       "links": {
         "label": "Problem links",
-        "submissions": "Submissions",
+        "submissions": "All submissions",
         "best": "Best submissions",
         "pdfStatement": "PDF statement",
         "material": "Attached material"
       }
-    }
+    },
+    "pdfRender": "Download statement as PDF"
   },
   "problems": {
     "title": "Problems",
@@ -1080,7 +1081,8 @@
       "cost": "Time · Memory",
       "language": "Language",
       "when": "When",
-      "source": "Source code"
+      "source": "Source code",
+      "rank": "Rank"
     },
     "rail": {
       "title": "Filters",
@@ -1117,7 +1119,13 @@
     "liveNew": "{count} new submission on the first page | {count} new submissions on the first page",
     "newPill": "{count} new | {count} new",
     "livePaused": "Live updates paused",
-    "liveReload": "Reconnect"
+    "liveReload": "Reconnect",
+    "best": {
+      "title": "Best submissions",
+      "lead": "One per user: most points, then fastest, least memory, earliest.",
+      "empty": "No submission has scored yet.",
+      "pager": "Best submissions pages"
+    }
   },
   "ranking": {
     "summary": "{format} · {problems} problem · {participants} | {format} · {problems} problems · {participants}",

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchContestSubmissions } from '@/api/contests.api';
 import {
+  fetchBestSubmissions,
   fetchSubmission,
   fetchSubmissionSource,
   fetchSubmissionStats,
@@ -68,6 +69,17 @@ export const useSubmissionListQuery = (
     queryKey: computed(() => ['submissions', 'list', viewerId.value, apiQuery.value]),
     queryFn: () => fetchSubmissions(apiQuery.value),
     /** The table stays mounted while the next page or filter loads. */
+    placeholderData: keepPreviousData,
+  });
+};
+
+/** One page of a problem's best submissions per viewer (what a viewer may see depends on who asks). */
+export const useBestSubmissionsQuery = (code: Ref<string>, page: Ref<number>) => {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => ['submissions', 'best', viewerId.value, code.value, page.value]),
+    queryFn: () =>
+      fetchBestSubmissions(code.value, { page: page.value, pageSize: SUBMISSION_PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
 };

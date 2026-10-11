@@ -3673,6 +3673,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/problems/{code}/best-submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the best submission of each user on a problem
+         * @description Public. One row per user: their judged submission with the most points,
+         *     ties broken by less time, then less memory, then the earlier submission.
+         *     Rows are ordered the same way (`page` from 1, `pageSize` 1-100, default
+         *     50); submissions without points, unlisted and banned users are left out.
+         *     Visibility follows the submission list: other users' submissions of a
+         *     contest whose list is closed to the viewer are left out. Unknown or
+         *     invisible problems are 404 `not_found`.
+         */
+        get: operations["BestSubmissionsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/problems/{code}/clone": {
         parameters: {
             query?: never;
@@ -17212,6 +17238,47 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ArchivedInResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BestSubmissionsController_list: {
+        parameters: {
+            query?: {
+                /** @description Page number, from 1. */
+                page?: number;
+                /** @description Items per page, 1 to 100. */
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SubmissionListItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
                     };
                 };
             };

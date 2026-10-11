@@ -76,14 +76,14 @@ watch(
 </script>
 
 <template>
-  <div ref="root" class="flex max-w-full flex-wrap items-center gap-3">
+  <div ref="root" class="flex w-full flex-col gap-2">
     <a
       v-if="phase === 'ready'"
       ref="link"
       :href="href"
       target="_blank"
       rel="noopener"
-      class="inline-flex h-11 items-center gap-2 rounded-pill bg-gradient-accent px-[18px] font-semibold whitespace-nowrap text-on-accent"
+      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill bg-gradient-accent px-4 text-sm font-semibold text-on-accent"
     >
       <ExternalLink class="size-4" aria-hidden="true" />
       {{ $t('problem.pdfOpen') }}
@@ -96,7 +96,7 @@ watch(
       :aria-busy="busy ? 'true' : undefined"
       :aria-disabled="unavailable"
       :class="buttonClass"
-      class="inline-flex h-11 items-center gap-2 rounded-pill border px-[18px] font-semibold whitespace-nowrap"
+      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border px-4 text-sm font-semibold"
       @click="onClick"
     >
       <span v-if="busy" class="pdf-ring" aria-hidden="true" />
@@ -108,10 +108,10 @@ watch(
             ? $t('problem.pdfRetryIn', { seconds: secondsToRetry })
             : phase === 'failed'
               ? $t('problem.pdfRetry')
-              : $t('problem.pdf')
+              : $t('problem.pdfRender')
       }}
     </button>
-    <span v-if="phase === 'failed'" class="text-negative" aria-hidden="true">{{
+    <span v-if="phase === 'failed'" class="text-center text-sm text-negative" aria-hidden="true">{{
       $t(failureKey)
     }}</span>
     <span class="sr-only" role="status">{{

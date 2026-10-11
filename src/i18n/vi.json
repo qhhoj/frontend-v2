@@ -53,7 +53,8 @@
     "notifications": "Thông báo",
     "contestReplay": "Phát lại",
     "contestBalloons": "Bóng bay",
-    "contestBalloonsPrint": "Phiếu bóng bay"
+    "contestBalloonsPrint": "Phiếu bóng bay",
+    "problemBest": "Bài nộp tốt nhất"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -962,7 +963,6 @@
     },
     "untranslated": "Chưa có bản dịch cho ngôn ngữ này; đang hiện bản gốc.",
     "authors": "Tác giả:",
-    "pdf": "PDF",
     "pdfPreparing": "Đang chuẩn bị PDF…",
     "pdfOpen": "Mở PDF",
     "pdfReady": "PDF đã sẵn sàng",
@@ -998,12 +998,13 @@
       },
       "links": {
         "label": "Liên kết của bài",
-        "submissions": "Bài nộp",
+        "submissions": "Tất cả bài nộp",
         "best": "Bài nộp tốt nhất",
         "pdfStatement": "Đề bài PDF",
         "material": "Tài liệu đính kèm"
       }
-    }
+    },
+    "pdfRender": "Tải đề dạng PDF"
   },
   "problems": {
     "title": "Bài tập",
@@ -1080,7 +1081,8 @@
       "cost": "Thời gian · Bộ nhớ",
       "language": "Ngôn ngữ",
       "when": "Lúc",
-      "source": "Mã nguồn"
+      "source": "Mã nguồn",
+      "rank": "Hạng"
     },
     "rail": {
       "title": "Bộ lọc",
@@ -1117,7 +1119,13 @@
     "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",
     "newPill": "{count} bài mới | {count} bài mới",
     "livePaused": "Cập nhật trực tiếp tạm dừng",
-    "liveReload": "Kết nối lại"
+    "liveReload": "Kết nối lại",
+    "best": {
+      "title": "Bài nộp tốt nhất",
+      "lead": "Mỗi người một bài: điểm cao nhất, rồi nhanh nhất, ít bộ nhớ nhất, nộp sớm nhất.",
+      "empty": "Chưa có bài nộp nào được điểm.",
+      "pager": "Trang bài nộp tốt nhất"
+    }
   },
   "ranking": {
     "summary": "{format} · {problems} bài · {participants}",

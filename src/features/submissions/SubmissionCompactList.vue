@@ -22,6 +22,7 @@ const props = defineProps<{
   highlightIds: ReadonlySet<string>;
   problemLabels: Record<string, string>;
   pickedIds?: readonly string[];
+  rankStart?: number;
 }>();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const locale = useLocaleStore();
@@ -43,7 +44,7 @@ const detailsOf = (row: SubmissionListItem) =>
 <template>
   <ul :aria-label="$t('submissions.listName')" class="m-0 list-none p-0">
     <li
-      v-for="row in submissions"
+      v-for="(row, index) in submissions"
       :key="row.id"
       :data-id="row.id"
       class="flex cursor-pointer items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0 hover:bg-surface-hover"
@@ -51,6 +52,11 @@ const detailsOf = (row: SubmissionListItem) =>
       @click="openRow($event, row.id)"
       @auxclick="openRowInTab($event, row.id)"
     >
+      <span
+        v-if="rankStart !== undefined"
+        class="w-6 shrink-0 text-right text-sm font-semibold text-muted tabular-nums"
+        >{{ rankStart + index }}</span
+      >
       <SubmissionVerdictBlock :row="row" compact class="shrink-0" />
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
         <SubmissionProblemName
@@ -58,19 +64,19 @@ const detailsOf = (row: SubmissionListItem) =>
           :problem="row.problem"
           :label="row.problem ? problemLabels[row.problem.code] : undefined"
         />
-        <div class="flex items-center gap-1.5 text-[13px] whitespace-nowrap text-muted">
+        <!-- The age wraps under a name that would otherwise be cut to a letter (a ranked list's extra column). -->
+        <div class="flex flex-wrap items-center gap-x-1.5 text-[13px] text-muted">
           <UserLink
             v-if="isShown('user') && row.user"
             :username="row.user.username"
             :rating="row.user.rating"
           />
-          <span v-if="isShown('user') && isShown('when')" aria-hidden="true">·</span>
-          <time
-            v-if="isShown('when')"
-            :datetime="row.date"
-            :title="formatDateTime(row.date, locale.locale)"
-            >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
-          >
+          <span v-if="isShown('when')" class="whitespace-nowrap">
+            <span v-if="isShown('user')" aria-hidden="true">· </span>
+            <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
+              formatAgoCompact(row.date, now, locale.locale)
+            }}</time>
+          </span>
         </div>
         <div v-if="detailsOf(row)" class="truncate font-mono text-xs text-muted">
           {{ detailsOf(row) }}
