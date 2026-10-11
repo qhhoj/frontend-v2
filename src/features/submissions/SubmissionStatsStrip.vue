@@ -2,11 +2,22 @@
 import { computed } from 'vue';
 import type { SubmissionStats } from '@/api/types/submissions';
 import GlassCard from '@/components/GlassCard.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import LiveToggle from './LiveToggle.vue';
+import VerdictDistributionBar from './VerdictDistributionBar.vue';
 
-/** Keep `SubmissionStatsStripSkeleton.vue` in step: same grid, card and text classes. */
-const props = defineProps<{ stats: SubmissionStats | undefined }>();
+/**
+ * Today's numbers in one slim line ("1.284 đã chấm hôm nay · 61% chấp nhận · 2 chờ · 1/1 máy chấm"), the live pill, and
+ * the bar of today's verdicts. `pending` shows placeholders while the first answer loads; the live pill never waits for it.
+ */
+const props = defineProps<{
+  stats: SubmissionStats | undefined;
+  pending?: boolean;
+  live: boolean;
+}>();
+const emit = defineEmits<{ 'update:live': [live: boolean] }>();
 const locale = useLocaleStore();
 const NO_VALUE = '—';
 const PERCENT = 100;
@@ -19,53 +30,60 @@ const acceptedPercent = (stats: SubmissionStats) =>
   stats.judgedToday > 0
     ? `${Math.round((stats.acceptedToday / stats.judgedToday) * PERCENT)}%`
     : NO_VALUE;
+/** An older backend does not send the verdicts: the bar is left out, not drawn from the loaded page. */
+const verdicts = computed(
+  () => (props.stats as Partial<SubmissionStats> | undefined)?.verdictsToday ?? [],
+);
 
-const tiles = computed(() => {
+const figures = computed(() => {
   const { stats } = props;
   const number = (value: number) => formatNumber(value, locale.locale);
   return [
     {
       id: 'judged',
       labelKey: 'submissions.stats.judgedToday',
-      value: stats ? number(stats.judgedToday) : NO_VALUE,
+      value: stats && number(stats.judgedToday),
     },
     {
       id: 'accepted',
       labelKey: 'submissions.stats.acceptedToday',
-      value: stats ? acceptedPercent(stats) : NO_VALUE,
+      value: stats && acceptedPercent(stats),
     },
-    {
-      id: 'queue',
-      labelKey: 'submissions.stats.queue',
-      value: stats ? number(stats.queueLength) : NO_VALUE,
-    },
+    { id: 'queue', labelKey: 'submissions.stats.queue', value: stats && number(stats.queueLength) },
     {
       id: 'judges',
       labelKey: 'submissions.stats.judges',
-      value: stats ? `${number(stats.judgesOnline)} / ${number(stats.judgesTotal)}` : NO_VALUE,
+      value: stats && `${number(stats.judgesOnline)}/${number(stats.judgesTotal)}`,
     },
   ];
 });
 </script>
 
 <template>
-  <div
-    data-testid="stats-strip"
-    class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 md:grid-cols-[280px_repeat(3,minmax(0,1fr))] md:gap-5"
-  >
-    <p v-if="!stats" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
-    <GlassCard v-for="tile in tiles" :key="tile.id" as="div" class="p-5">
-      <dl class="flex flex-col">
-        <dt class="order-2 text-[13px] text-muted">{{ $t(tile.labelKey) }}</dt>
-        <dd class="order-1 font-mono text-[30px] font-bold tabular-nums">{{ tile.value }}</dd>
-        <!-- Said in words as well: colour alone is not a message. -->
-        <dd
-          v-if="tile.id === 'judges' && hasNoJudge"
-          class="order-3 text-[13px] font-semibold text-negative"
-        >
-          {{ $t('submissions.stats.noJudge') }}
-        </dd>
+  <div data-testid="stats-strip" class="flex flex-col gap-3">
+    <GlassCard
+      as="div"
+      class="flex flex-wrap items-center gap-x-5 gap-y-1 py-1 pr-1.5 pl-4 text-[13px] text-muted"
+    >
+      <p v-if="!stats && !pending" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
+      <dl class="m-0 flex flex-wrap items-center gap-x-5 gap-y-1 py-1.5">
+        <div v-for="figure in figures" :key="figure.id" class="flex items-baseline gap-1.5">
+          <dt class="order-2">{{ $t(figure.labelKey) }}</dt>
+          <dd class="order-1 m-0 font-mono text-[15px] font-bold text-content tabular-nums">
+            <SkeletonBlock v-if="pending && !stats" text class="w-10" />
+            <template v-else>{{ figure.value ?? NO_VALUE }}</template>
+          </dd>
+          <!-- Said in words as well: colour alone is not a message. -->
+          <dd
+            v-if="figure.id === 'judges' && hasNoJudge"
+            class="order-3 m-0 font-semibold text-negative"
+          >
+            {{ $t('submissions.stats.noJudge') }}
+          </dd>
+        </div>
       </dl>
+      <LiveToggle :live="live" class="ml-auto" @update:live="emit('update:live', $event)" />
     </GlassCard>
+    <VerdictDistributionBar v-if="verdicts.length" :verdicts="verdicts" />
   </div>
 </template>

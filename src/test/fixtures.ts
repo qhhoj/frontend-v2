@@ -626,6 +626,13 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
 export const submissionStats = (overrides: Partial<SubmissionStats> = {}): SubmissionStats => ({
   judgedToday: 1284,
   acceptedToday: 526,
+  verdictsToday: [
+    { result: 'AC', count: 526 },
+    { result: 'WA', count: 470 },
+    { result: 'TLE', count: 160 },
+    { result: 'RTE', count: 80 },
+    { result: 'CE', count: 48 },
+  ],
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,

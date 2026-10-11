@@ -5,11 +5,17 @@ import { useRoute } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import { lastPageOf, pageWindow } from '@/lib/paging';
 
-/** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. */
+/** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. `align="end"` puts them at the right (a pager above a list). */
 const props = withDefaults(
-  defineProps<{ meta: NumberedPageMeta; label: string; queryKey?: string }>(),
+  defineProps<{
+    meta: NumberedPageMeta;
+    label: string;
+    queryKey?: string;
+    align?: 'center' | 'end';
+  }>(),
   {
     queryKey: 'page',
+    align: 'center',
   },
 );
 const route = useRoute();
@@ -33,7 +39,8 @@ const ARROW = `${CELL} border border-line text-content hover:bg-surface-hover ar
   <nav
     v-if="last > 1"
     :aria-label="label"
-    class="flex flex-wrap items-center justify-center gap-1.5"
+    class="flex flex-wrap items-center gap-1.5"
+    :class="align === 'end' ? 'justify-end' : 'justify-center'"
   >
     <RouterLink v-if="hasPrevious" v-slot="{ href, navigate }" custom :to="linkTo(meta.page - 1)">
       <a :href="href" :aria-label="$t('pager.previous')" :class="ARROW" @click="navigate">

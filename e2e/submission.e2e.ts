@@ -98,22 +98,25 @@ async function openList(page: Page, api: FakeApi, path = '/submissions') {
 test.describe('submission list', () => {
   test('keeps its filters in the URL across reload and back and forward', async ({ page, api }) => {
     await openList(page, api);
-    await page.getByRole('checkbox', { name: /WA/ }).check();
+    await page.getByTestId('advanced-filters').click();
+    const panel = page.getByRole('region', { name: 'Bộ lọc nâng cao' });
+    await panel.getByRole('checkbox', { name: /WA/ }).check();
     await expect(page).toHaveURL(/result=WA/);
     await expect(rows(page)).toHaveCount(1);
-    await page.getByLabel('Bài', { exact: true }).fill('duongdi');
-    await page.getByLabel('Người nộp', { exact: true }).fill('user_01');
+    await panel.getByLabel('Bài', { exact: true }).fill('duongdi');
+    await panel.getByLabel('Người nộp', { exact: true }).fill('user_01');
     await expect(page).toHaveURL(/problem=duongdi/);
     await expect(page).toHaveURL(/user=user_01/);
-    await page.getByRole('combobox', { name: 'Ngôn ngữ' }).click();
-    await page.getByRole('option', { name: 'Python 3' }).click();
+    const language = page.getByRole('search').getByRole('combobox', { name: /Ngôn ngữ/ });
+    await language.selectOption({ label: 'Python 3' });
     await expect(page).toHaveURL(new RegExp(`language=${PY3_ID}`));
 
+    // The filters only the panel shows open it again after a reload.
     await page.reload();
-    await expect(page.getByRole('checkbox', { name: /WA/ })).toBeChecked();
-    await expect(page.getByLabel('Bài', { exact: true })).toHaveValue('duongdi');
-    await expect(page.getByLabel('Người nộp', { exact: true })).toHaveValue('user_01');
-    await expect(page.getByRole('combobox', { name: 'Ngôn ngữ' })).toContainText('Python 3');
+    await expect(panel.getByRole('checkbox', { name: /WA/ })).toBeChecked();
+    await expect(panel.getByLabel('Bài', { exact: true })).toHaveValue('duongdi');
+    await expect(panel.getByLabel('Người nộp', { exact: true })).toHaveValue('user_01');
+    await expect(language).toHaveValue(PY3_ID);
 
     await page.goBack();
     await expect(page).not.toHaveURL(new RegExp(`language=${PY3_ID}`));
@@ -127,12 +130,12 @@ test.describe('submission list', () => {
   }) => {
     await openList(page, api);
     await expect.poll(() => api.requestsTo('GET /events/submissions').length).toBe(1);
-    await page.getByTestId('live-toggle').uncheck();
+    await page.getByTestId('live-toggle').click();
     await expect(page).toHaveURL(/live=0/);
     api.requests.length = 0;
     await page.reload();
     await expect(rows(page).first()).toBeVisible();
-    await expect(page.getByTestId('live-toggle')).not.toBeChecked();
+    await expect(page.getByTestId('live-toggle')).toHaveAttribute('aria-pressed', 'false');
     expect(api.requestsTo('GET /events/submissions')).toEqual([]);
   });
 
@@ -164,12 +167,12 @@ test.describe('submission list', () => {
   test.describe('at 375 px', () => {
     test.use({ viewport: { width: PHONE_WIDTH, height: 812 } });
 
-    test('stacks the rail above the list, whose rows stack inside the card without scrolling the page', async ({
+    test('puts the filters above the list, whose rows stack inside the card without scrolling the page', async ({
       page,
       api,
     }) => {
       await openList(page, api);
-      const rail = (await page.getByRole('complementary', { name: 'Bộ lọc' }).boundingBox())!;
+      const rail = (await page.getByRole('search').boundingBox())!;
       const card = (await page.getByTestId('submission-table-card').boundingBox())!;
       expect(rail.y + rail.height).toBeLessThanOrEqual(card.y);
       await expect(page.getByTestId('submission-table-card').locator('table')).toHaveCount(0);

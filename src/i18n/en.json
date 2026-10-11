@@ -1107,15 +1107,17 @@
       "previous": "Previous",
       "next": "Next",
       "position": "Page {page} / {total}",
-      "positionOpen": "Page {page}"
+      "positionOpen": "Page {page}",
+      "top": "Pages, top of the list"
     },
     "stats": {
       "judgedToday": "judged today",
-      "acceptedToday": "accepted today",
-      "queue": "waiting in queue",
-      "judges": "judges online",
+      "acceptedToday": "accepted",
+      "queue": "waiting",
+      "judges": "judges",
       "noJudge": "no judge online",
-      "unavailable": "Statistics unavailable"
+      "unavailable": "Statistics unavailable",
+      "distribution": "Today's verdicts by result"
     },
     "queued": "In queue",
     "queuedShort": "Wait",
@@ -1131,6 +1133,19 @@
       "lead": "One per user: most points, then fastest, least memory, earliest.",
       "empty": "No submission has scored yet.",
       "pager": "Best submissions pages"
+    },
+    "live": "Live",
+    "quick": {
+      "mine": "Mine",
+      "accepted": "AC",
+      "errors": "Errors",
+      "grading": "Judging",
+      "advanced": "Advanced filters"
+    },
+    "density": {
+      "label": "Row density",
+      "compact": "Compact",
+      "comfortable": "Roomy"
     }
   },
   "ranking": {

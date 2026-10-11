@@ -15,6 +15,8 @@ import SubmissionVerdictBlock from './SubmissionVerdictBlock.vue';
 import {
   BODY_CELL_CLASSES,
   COLUMN_TIER_CLASS,
+  DENSE_BODY_CELL_CLASSES,
+  HEADER_ROW_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
@@ -41,6 +43,10 @@ const props = withDefaults(
     pickedIds?: readonly string[];
     /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
     rankStart?: number;
+    /** One-line 42px rows (the list's "Gọn" density); the phone's stacked rows are the same either way. */
+    dense?: boolean;
+    /** The problem code after its name, in muted mono. */
+    showProblemCode?: boolean;
   }>(),
   {
     showProblem: true,
@@ -49,8 +55,11 @@ const props = withDefaults(
     columnKeys: undefined,
     pickedIds: undefined,
     rankStart: undefined,
+    dense: false,
+    showProblemCode: false,
   },
 );
+const bodyCell = computed(() => (props.dense ? DENSE_BODY_CELL_CLASSES : BODY_CELL_CLASSES));
 const locale = useLocaleStore();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const { openRow, openRowInTab } = useRowOpen();
@@ -104,7 +113,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
           }}
         </caption>
         <thead>
-          <tr class="text-left text-[13px] text-muted">
+          <tr :class="HEADER_ROW_CLASSES">
             <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
               {{ $t('sourceDiff.select.column') }}
             </th>
@@ -138,9 +147,11 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             @click="openRow($event, row.id)"
             @auxclick="openRowInTab($event, row.id)"
           >
-            <td v-if="isPicking" :class="BODY_CELL_CLASSES">
+            <td v-if="isPicking" :class="bodyCell">
+              <!-- A dense row keeps the 44px target, overlapping the cell's padding instead of growing the row. -->
               <SubmissionPickBox
                 :id="row.id"
+                :class="{ '-my-1': dense }"
                 :order="pickOrder(row.id)"
                 :picked-count="pickedIds?.length ?? 0"
                 @toggle="emit('togglePick', $event)"
@@ -148,25 +159,26 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             </td>
             <td
               v-if="rankStart !== undefined"
-              :class="[BODY_CELL_CLASSES, 'text-right font-semibold text-muted tabular-nums']"
+              :class="[bodyCell, 'text-right font-semibold text-muted tabular-nums']"
             >
               {{ rankStart + index }}
             </td>
-            <td :class="BODY_CELL_CLASSES"><SubmissionVerdictBlock :row="row" /></td>
-            <td v-if="isShown('problem')" :class="[BODY_CELL_CLASSES, 'w-full max-w-0']">
+            <td :class="bodyCell"><SubmissionVerdictBlock :row="row" :dense="dense" /></td>
+            <td v-if="isShown('problem')" :class="[bodyCell, 'w-full max-w-0']">
               <SubmissionProblemName
                 :problem="row.problem"
                 :label="row.problem ? problemLabels[row.problem.code] : undefined"
+                :show-code="showProblemCode"
               />
             </td>
-            <td v-if="isShown('user')" :class="[BODY_CELL_CLASSES, 'max-w-0']">
+            <td v-if="isShown('user')" :class="[bodyCell, 'max-w-0']">
               <UserLink v-if="row.user" :username="row.user.username" :rating="row.user.rating" />
               <template v-else>{{ NO_VALUE }}</template>
             </td>
             <td
               v-if="isShown('cost')"
               :class="[
-                BODY_CELL_CLASSES,
+                bodyCell,
                 tierOf('cost'),
                 'text-right font-mono text-[13px] whitespace-nowrap text-muted tabular-nums',
               ]"
@@ -175,20 +187,20 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             </td>
             <td
               v-if="isShown('language')"
-              :class="[BODY_CELL_CLASSES, tierOf('language'), 'truncate text-muted']"
+              :class="[bodyCell, tierOf('language'), 'truncate text-muted']"
               :title="row.language?.name"
             >
               {{ row.language?.name ?? NO_VALUE }}
             </td>
             <td
               v-if="isShown('when')"
-              :class="[BODY_CELL_CLASSES, tierOf('when'), 'whitespace-nowrap text-muted']"
+              :class="[bodyCell, tierOf('when'), 'whitespace-nowrap text-muted']"
             >
               <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
                 formatAgoCompact(row.date, now, locale.locale)
               }}</time>
             </td>
-            <td :class="BODY_CELL_CLASSES"><SubmissionSourceLink :id="row.id" /></td>
+            <td :class="bodyCell"><SubmissionSourceLink :id="row.id" /></td>
           </tr>
         </tbody>
       </table>

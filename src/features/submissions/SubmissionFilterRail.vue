@@ -11,17 +11,24 @@ import { useDebouncedText } from '@/lib/use-debounced-text';
 import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from './use-submission-filters';
 import type { StatusGroup, SubmissionFilters } from './use-submission-filters';
 
-/** `showLive`, `showUser` and `showStatusGroups` let the contest rail reuse this rail without the controls it lacks. */
+/**
+ * `showLive`, `showUser`, `showLanguage` and `showStatusGroups` let the contest rail and the list's advanced panel reuse
+ * this rail without the controls they lack or show elsewhere. `layout="panel"` lays the same controls out across the
+ * page's width (the submission list's "Bộ lọc nâng cao") instead of as a side rail.
+ */
 const props = withDefaults(
   defineProps<{
     filters: SubmissionFilters;
     languages: Language[];
     showLive?: boolean;
     showUser?: boolean;
+    showLanguage?: boolean;
     showStatusGroups?: boolean;
+    layout?: 'rail' | 'panel';
   }>(),
-  { showLive: true, showUser: true, showStatusGroups: false },
+  { showLive: true, showUser: true, showLanguage: true, showStatusGroups: false, layout: 'rail' },
 );
+const isPanel = computed(() => props.layout === 'panel');
 const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [] }>();
 
 /** The mock-up's six; a URL may carry any other valid result, the table's empty state then names it. */
@@ -63,12 +70,19 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
 
 <template>
   <GlassCard
-    as="aside"
-    :aria-label="$t('submissions.rail.title')"
-    class="flex flex-col gap-4 p-5 md:w-[280px] md:shrink-0"
+    :as="isPanel ? 'section' : 'aside'"
+    :aria-label="$t(isPanel ? 'submissions.quick.advanced' : 'submissions.rail.title')"
+    class="p-5"
+    :class="
+      isPanel
+        ? 'grid gap-x-6 gap-y-4 md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)]'
+        : 'flex flex-col gap-4 md:w-[280px] md:shrink-0'
+    "
   >
-    <div class="flex items-center justify-between">
-      <h2 class="font-display text-base font-bold">{{ $t('submissions.rail.title') }}</h2>
+    <div class="flex items-center justify-between" :class="{ 'md:col-span-2': isPanel }">
+      <h2 class="font-display text-base font-bold">
+        {{ $t(isPanel ? 'submissions.quick.advanced' : 'submissions.rail.title') }}
+      </h2>
       <button
         type="button"
         data-testid="filters-reset"
@@ -78,9 +92,9 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         {{ $t('submissions.rail.reset') }}
       </button>
     </div>
-    <fieldset class="m-0 min-w-0 border-0 p-0">
+    <fieldset class="m-0 min-w-0 border-0 p-0" :class="{ 'md:row-span-3': isPanel }">
       <legend class="mb-1 text-[13px] text-muted">{{ $t('submissions.rail.results') }}</legend>
-      <div class="grid grid-cols-2 gap-x-3 md:grid-cols-1">
+      <div class="grid grid-cols-2 gap-x-3" :class="isPanel ? 'sm:grid-cols-3' : 'md:grid-cols-1'">
         <label v-for="code in RESULT_CHOICES" :key="code" class="flex min-h-11 items-center gap-2">
           <input
             type="checkbox"
@@ -109,7 +123,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         <span class="text-[15px]">{{ $t(`contests.submissions.status.${group}`) }}</span>
       </label>
     </fieldset>
-    <div class="flex flex-col gap-1">
+    <div v-if="showLanguage" class="flex flex-col gap-1">
       <span :id="LANGUAGE_LABEL_ID" class="text-[13px] text-muted">{{
         $t('submissions.rail.language')
       }}</span>

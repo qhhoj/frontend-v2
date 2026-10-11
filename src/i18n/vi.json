@@ -1107,15 +1107,17 @@
       "previous": "Trước",
       "next": "Sau",
       "position": "Trang {page} / {total}",
-      "positionOpen": "Trang {page}"
+      "positionOpen": "Trang {page}",
+      "top": "Trang, đầu danh sách"
     },
     "stats": {
-      "judgedToday": "bài đã chấm hôm nay",
-      "acceptedToday": "được chấp nhận hôm nay",
-      "queue": "đang chờ chấm",
-      "judges": "máy chấm trực tuyến",
+      "judgedToday": "đã chấm hôm nay",
+      "acceptedToday": "chấp nhận",
+      "queue": "chờ",
+      "judges": "máy chấm",
       "noJudge": "không có máy chấm",
-      "unavailable": "Không có số liệu thống kê"
+      "unavailable": "Không có số liệu thống kê",
+      "distribution": "Kết quả chấm hôm nay theo loại"
     },
     "queued": "Trong hàng đợi",
     "queuedShort": "Chờ",
@@ -1131,6 +1133,19 @@
       "lead": "Mỗi người một bài: điểm cao nhất, rồi nhanh nhất, ít bộ nhớ nhất, nộp sớm nhất.",
       "empty": "Chưa có bài nộp nào được điểm.",
       "pager": "Trang bài nộp tốt nhất"
+    },
+    "live": "Trực tiếp",
+    "quick": {
+      "mine": "Của tôi",
+      "accepted": "AC",
+      "errors": "Lỗi",
+      "grading": "Đang chấm",
+      "advanced": "Bộ lọc nâng cao"
+    },
+    "density": {
+      "label": "Mật độ hàng",
+      "compact": "Gọn",
+      "comfortable": "Rộng"
     }
   },
   "ranking": {
