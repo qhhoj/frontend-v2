@@ -13,6 +13,7 @@ export const judge = (overrides: Partial<Judge> = {}): Judge => ({
   online: true,
   isBlocked: false,
   isDisabled: false,
+  blockReason: '',
   startTime: '2026-10-08T00:41:00.000Z',
   ping: 0.011,
   load: 0.62,
@@ -22,6 +23,7 @@ export const judge = (overrides: Partial<Judge> = {}): Judge => ({
   build: '1.4.2',
   protocolMinor: 1,
   features: ['sandbox_isolate'],
+  ipHistory: [],
   runtimes: RUNTIMES,
   ...overrides,
 });

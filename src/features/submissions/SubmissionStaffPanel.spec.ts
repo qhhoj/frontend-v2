@@ -10,7 +10,13 @@ import { problemDetail, submissionDetail } from '@/test/fixtures';
 const finished = submissionDetail({
   status: 'D',
   result: 'TLE',
-  viewer: { canAbort: false, canRejudge: true, canReject: true, canLock: false },
+  viewer: {
+    canAbort: false,
+    canRejudge: true,
+    canReject: true,
+    canLock: false,
+    canOverrideScore: false,
+  },
 });
 const pageRoutes = (detail = finished) => ({
   ...submissionPageRoutes(detail),
@@ -24,7 +30,13 @@ describe('SubmissionStaffPanel', () => {
     const running = submissionDetail({
       status: 'G',
       result: null,
-      viewer: { canAbort: true, canRejudge: false, canReject: false, canLock: false },
+      viewer: {
+        canAbort: true,
+        canRejudge: false,
+        canReject: false,
+        canLock: false,
+        canOverrideScore: false,
+      },
     });
     mockApi({ ...signedInViewer(), ...pageRoutes(running) });
     const { wrapper } = await mountApp(`/submissions/${running.id}`);
@@ -86,7 +98,13 @@ describe('SubmissionStaffPanel', () => {
     status: 'QU',
     result: null,
     points: null,
-    viewer: { canAbort: false, canRejudge: false, canReject: false, canLock: false },
+    viewer: {
+      canAbort: false,
+      canRejudge: false,
+      canReject: false,
+      canLock: false,
+      canOverrideScore: false,
+    },
   });
 
   it('refetches the row after a rejudge, so the panel shows the new state and the live stream follows the queued row', async () => {
