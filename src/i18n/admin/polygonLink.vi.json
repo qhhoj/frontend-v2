@@ -5,6 +5,14 @@
     "FAILED": "FAILED",
     "NONE": "Chưa có gói"
   },
+  "packageType": {
+    "full": "Full package",
+    "standard": "Standard package · test được sinh trên judge",
+    "short": {
+      "full": "full",
+      "standard": "standard"
+    }
+  },
   "howTo": {
     "title": "Hướng dẫn cho người ra đề",
     "steps": {
@@ -44,7 +52,6 @@
     "problem": "bài",
     "checking": "Đang kiểm tra liên kết…",
     "verified": "Đã xác minh liên kết",
-    "fullReady": "Full package READY",
     "packageValue": "r{revision}, gói #{id}, dựng lúc {time}",
     "notLinked": "Chưa liên kết với bài nào trên QHHOJ.",
     "checkAgain": "Kiểm tra lại",
@@ -63,9 +70,9 @@
       "title": "Hãy dựng gói trước",
       "body": "QHHOJ đối chiếu liên kết với gói mới nhất, nên bài cần ít nhất một gói READY. Trên Polygon, dựng full package rồi kiểm tra lại."
     },
-    "notFull": {
-      "title": "Chưa có full package để nhập",
-      "body": "Gói mới nhất không phải full package READY: gói standard thiếu test sinh tự động, hoặc gói đang dựng hay bị lỗi. Trên Polygon, mở Packages và dựng full package; nếu gói đang RUNNING thì chờ xong."
+    "notReady": {
+      "title": "Chưa có gói READY để nhập",
+      "body": "Gói mới nhất chưa ở trạng thái READY: đang dựng hoặc bị lỗi. Trên Polygon, mở Packages và dựng full package hoặc standard package; nếu gói đang RUNNING thì chờ xong."
     },
     "linked": {
       "title": "Bài đã có trên QHHOJ",

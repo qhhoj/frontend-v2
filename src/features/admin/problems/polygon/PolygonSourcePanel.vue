@@ -3,6 +3,7 @@ import type { PolygonProblem } from '@/api/types/polygon';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import PackageStatePill from './PackageStatePill.vue';
+import PackageTypePill from './PackageTypePill.vue';
 
 /** Step 2's side card: the picked Polygon problem, what each sync takes from the package and what QHHOJ keeps. */
 defineProps<{ problem: PolygonProblem }>();
@@ -36,6 +37,7 @@ const locale = useLocaleStore();
           })
         }}</span>
         <PackageStatePill :state="problem.latestPackage.state" />
+        <PackageTypePill :type="problem.latestPackage.type" />
       </dd>
       <template v-if="problem.latestPackage.createdAt">
         <dt class="text-muted">{{ $t('admin.polygonLink.source.built') }}</dt>

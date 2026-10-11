@@ -40,7 +40,7 @@ export type LinkRefusal =
   | { kind: 'invalid' }
   | { kind: 'refused' }
   | { kind: 'noPackage' }
-  | { kind: 'notFull' }
+  | { kind: 'notReady' }
   | { kind: 'linked'; code: string | null }
   | { kind: 'other'; error: unknown };
 
@@ -55,7 +55,7 @@ export function linkRefusalOf(error: unknown): LinkRefusal {
     case 'polygon_no_package':
       return { kind: 'noPackage' };
     case 'polygon_package_not_ready':
-      return { kind: 'notFull' };
+      return { kind: 'notReady' };
     case 'polygon_already_linked': {
       const code = error.extra.linkedProblemCode;
       return { kind: 'linked', code: typeof code === 'string' ? code : null };

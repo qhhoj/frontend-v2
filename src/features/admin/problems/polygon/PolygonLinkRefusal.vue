@@ -9,7 +9,7 @@ import type { LinkRefusal } from './polygon-problem-link';
 /** Why the pasted link cannot be imported, with what to change on Polygon; "Kiểm tra lại" where waiting can help. */
 const props = defineProps<{ refusal: LinkRefusal; accountName: string; isChecking: boolean }>();
 const emit = defineEmits<{ checkAgain: [] }>();
-const canCheckAgain = computed(() => ['noPackage', 'notFull'].includes(props.refusal.kind));
+const canCheckAgain = computed(() => ['noPackage', 'notReady'].includes(props.refusal.kind));
 </script>
 
 <template>

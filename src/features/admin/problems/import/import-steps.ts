@@ -14,7 +14,7 @@ export interface ShownStep {
 
 const RUNNING_STEPS: Record<ImportSource, RunningStep[]> = {
   zip: ['queued', 'statements', 'tests'],
-  polygon: ['queued', 'downloading', 'statements', 'tests'],
+  polygon: ['queued', 'downloading', 'statements', 'generating', 'tests'],
 };
 
 export const isRunningStep = (step: ImportStepKey): step is RunningStep =>
@@ -25,6 +25,7 @@ const FAILED_ROW: Record<PolygonSyncStep, RunningStep | 'end'> = {
   checking: 'queued',
   downloading: 'downloading',
   statements: 'statements',
+  generating: 'generating',
   tests: 'tests',
   saving: 'end',
   finishing: 'end',

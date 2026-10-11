@@ -7,6 +7,8 @@ import GlassCard from '@/components/GlassCard.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
+import PackageStatePill from './PackageStatePill.vue';
+import PackageTypePill from './PackageTypePill.vue';
 import PolygonLinkRefusal from './PolygonLinkRefusal.vue';
 import PolygonSetterHowTo from './PolygonSetterHowTo.vue';
 import { linkRefusalOf, parsePolygonLink } from './polygon-problem-link';
@@ -154,10 +156,7 @@ const builtAt = computed(() =>
               >{{ preview.name }} · #{{ preview.id }}</span
             >
           </h2>
-          <span
-            class="inline-flex items-center rounded-pill bg-verdict-ac-bg px-2.5 py-0.5 font-mono text-xs font-bold text-verdict-ac"
-            >{{ $t('admin.polygonLink.link.fullReady') }}</span
-          >
+          <PackageStatePill state="READY" />
         </div>
         <p class="flex flex-wrap gap-x-2 text-sm text-muted">
           <span
@@ -172,6 +171,7 @@ const builtAt = computed(() =>
               time: builtAt,
             })
           }}</span>
+          <PackageTypePill :type="preview.latestPackage.type" />
         </p>
         <p class="text-sm text-muted">{{ $t('admin.polygonLink.link.notLinked') }}</p>
       </section>

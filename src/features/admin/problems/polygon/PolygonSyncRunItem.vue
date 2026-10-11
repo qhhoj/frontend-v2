@@ -35,6 +35,9 @@ const isFailed = computed(() => props.run.result === 'failed');
           $t('admin.polygonLink.source.packageValue', { revision: run.revision, id: run.packageId })
         }}
       </span>
+      <span class="text-muted">{{
+        $t(`admin.polygonLink.packageType.short.${run.packageType}`)
+      }}</span>
       <span v-if="run.packageCreatedAt" class="text-muted">
         {{ $t('admin.polygonLink.history.builtAt', { date: dateText(run.packageCreatedAt) }) }}
       </span>

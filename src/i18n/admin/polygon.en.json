@@ -48,6 +48,7 @@
       "checking": "checks before the import",
       "downloading": "downloading the package from Polygon",
       "statements": "converting the statements",
+      "generating": "generating the tests on a judge",
       "tests": "uploading the tests",
       "saving": "saving to the database",
       "finishing": "placing the data files after saving"
@@ -63,6 +64,7 @@
       "queued": "Queued",
       "downloading": "Downloading the package from Polygon",
       "statements": "Converting statements",
+      "generating": "Generating tests",
       "tests": "Uploading tests",
       "end": "Done",
       "failed": "Import failed"
