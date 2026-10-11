@@ -12,7 +12,8 @@
     "similarity": "Similarity",
     "quota": "Quota",
     "problem": "Problems",
-    "polygon": "Polygon"
+    "polygon": "Polygon",
+    "externalJudge": "External judge"
   },
   "infoCard": "Values are checked when saved. An error shows right under the wrong block; nothing is saved part-way through a key. Only people with the “Change settings” permission see this page.",
   "blocks": {
@@ -67,6 +68,10 @@
     "polygon": {
       "title": "QHHOJ's Polygon account",
       "help": "QHHOJ reads Polygon problems with this account. Setters share a problem with it, then import it in Import from Polygon. Without a key or secret it is not connected."
+    },
+    "externalJudge": {
+      "title": "External judge (PCD VJudge)",
+      "help": "Problems linked to an external judge are submitted there and the verdict is copied back. Without a base URL and token it is not connected."
     }
   },
   "fields": {
@@ -114,6 +119,12 @@
       "accountName": "Account name",
       "apiKey": "API key",
       "apiSecret": "API secret"
+    },
+    "externalJudge": {
+      "baseUrl": "Base URL",
+      "apiToken": "API token",
+      "maxInFlight": "Runs in flight at once",
+      "maxWaitMinutes": "Minutes to wait for a verdict"
     }
   },
   "hints": {
@@ -156,6 +167,12 @@
       "accountName": "The Polygon account that owns the API key; shown in the how-to for setters.",
       "apiKey": "From Polygon: Settings, API keys. Encrypted when saved, never shown again.",
       "apiSecret": "Encrypted when saved, never shown again. After replacing it, test the connection again."
+    },
+    "externalJudge": {
+      "baseUrl": "http:// or https://. Empty: not connected.",
+      "apiToken": "Sent as a bearer token. Encrypted when saved, never shown again.",
+      "maxInFlight": "A whole number from 1 to 50.",
+      "maxWaitMinutes": "A whole number from 1 to 240. A run still unanswered after this is marked as a judge error."
     }
   },
   "chip": {
@@ -210,7 +227,8 @@
   },
   "errors": {
     "integer": "Must be a whole number from {min} to {max}.",
-    "httpsOrEmpty": "Leave empty or use https."
+    "httpsOrEmpty": "Leave empty or use https.",
+    "httpOrHttpsOrEmpty": "Leave empty or use http:// or https://."
   },
   "save": "Save",
   "discard": "Discard edits",
@@ -269,6 +287,9 @@
       "polygon": {
         "apiKey": "Polygon API key",
         "apiSecret": "Polygon API secret"
+      },
+      "externalJudge": {
+        "apiToken": "External judge API token"
       }
     },
     "consequences": {
@@ -277,7 +298,8 @@
       "senderKept": "The sender (mail.from) stays the same.",
       "providerOff": "Sign-in with this provider is switched off at the same time, because the server refuses an enabled provider without a secret.",
       "clientIdKept": "The OAuth client id stays the same.",
-      "polygonOff": "The Polygon connection stops: no listing, importing or syncing from Polygon until it is set again."
+      "polygonOff": "The Polygon connection stops: no listing, importing or syncing from Polygon until it is set again.",
+      "externalJudgeOff": "The external judge connection stops: no search, verifying or submitting there until it is set again."
     }
   },
   "log": {

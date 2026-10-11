@@ -12,7 +12,8 @@
     "similarity": "Giống nhau",
     "quota": "Hạn mức",
     "problem": "Bài tập",
-    "polygon": "Polygon"
+    "polygon": "Polygon",
+    "externalJudge": "Máy chấm ngoài"
   },
   "infoCard": "Giá trị được kiểm tra khi lưu. Lỗi hiện ngay dưới khối sai; không có gì bị lưu một phần trong một khoá. Chỉ người có quyền “Sửa cài đặt” mới thấy trang này.",
   "blocks": {
@@ -67,6 +68,10 @@
     "polygon": {
       "title": "Tài khoản Polygon của QHHOJ",
       "help": "QHHOJ đọc bài trên Polygon bằng tài khoản này. Người ra đề chia sẻ bài với tài khoản, rồi nhập ở mục Nhập từ Polygon. Thiếu khoá hoặc bí mật là chưa kết nối."
+    },
+    "externalJudge": {
+      "title": "Máy chấm ngoài (PCD VJudge)",
+      "help": "Bài gắn với máy chấm ngoài được nộp sang đó và kết quả được chép về. Thiếu URL gốc và token thì chưa kết nối."
     }
   },
   "fields": {
@@ -114,6 +119,12 @@
       "accountName": "Tên tài khoản",
       "apiKey": "Khoá API",
       "apiSecret": "Bí mật API"
+    },
+    "externalJudge": {
+      "baseUrl": "URL gốc",
+      "apiToken": "API token",
+      "maxInFlight": "Số lượt chấm đồng thời",
+      "maxWaitMinutes": "Số phút chờ kết quả"
     }
   },
   "hints": {
@@ -156,6 +167,12 @@
       "accountName": "Tài khoản Polygon sở hữu khoá API; hiện trong hướng dẫn cho người ra đề.",
       "apiKey": "Lấy ở Polygon: Settings, API keys. Mã hoá khi lưu, không hiện lại.",
       "apiSecret": "Mã hoá khi lưu, không hiện lại. Thay bí mật thì kiểm tra kết nối lại."
+    },
+    "externalJudge": {
+      "baseUrl": "http:// hoặc https://. Để trống: chưa kết nối.",
+      "apiToken": "Gửi dưới dạng bearer token. Được mã hóa khi lưu, không hiện lại.",
+      "maxInFlight": "Số nguyên từ 1 đến 50.",
+      "maxWaitMinutes": "Số nguyên từ 1 đến 240. Lượt chấm quá thời gian này mà chưa có kết quả bị đánh dấu lỗi máy chấm."
     }
   },
   "chip": {
@@ -210,7 +227,8 @@
   },
   "errors": {
     "integer": "Phải là số nguyên từ {min} đến {max}.",
-    "httpsOrEmpty": "Để trống hoặc dùng https."
+    "httpsOrEmpty": "Để trống hoặc dùng https.",
+    "httpOrHttpsOrEmpty": "Để trống hoặc dùng http:// hoặc https://."
   },
   "save": "Lưu",
   "discard": "Đặt lại",
@@ -269,6 +287,9 @@
       "polygon": {
         "apiKey": "khoá API Polygon",
         "apiSecret": "bí mật API Polygon"
+      },
+      "externalJudge": {
+        "apiToken": "API token của máy chấm ngoài"
       }
     },
     "consequences": {
@@ -277,7 +298,8 @@
       "senderKept": "Người gửi (mail.from) không đổi.",
       "providerOff": "Đăng nhập bằng nhà cung cấp này bị tắt cùng lúc, vì máy chủ không nhận nhà cung cấp đã bật mà thiếu bí mật.",
       "clientIdKept": "Mã khách OAuth không đổi.",
-      "polygonOff": "Kết nối Polygon tắt: không liệt kê, nhập hay đồng bộ được bài từ Polygon cho tới khi đặt lại."
+      "polygonOff": "Kết nối Polygon tắt: không liệt kê, nhập hay đồng bộ được bài từ Polygon cho tới khi đặt lại.",
+      "externalJudgeOff": "Kết nối máy chấm ngoài tắt: không tìm, xác minh hay nộp bài sang đó được cho tới khi đặt lại."
     }
   },
   "log": {

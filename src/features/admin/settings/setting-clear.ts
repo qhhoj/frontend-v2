@@ -26,6 +26,7 @@ const PLAIN_CONSEQUENCES: Partial<Record<SettingKey, string[]>> = {
   'mail.smtpUrl': ['mailOff', 'notRestorable', 'senderKept'],
   'polygon.apiKey': ['polygonOff', 'notRestorable'],
   'polygon.apiSecret': ['polygonOff', 'notRestorable'],
+  'externalJudge.apiToken': ['externalJudgeOff', 'notRestorable'],
 };
 
 /** Ids under `admin.settings.clear.consequences`: what stops, that the history keeps no value, what stays. */

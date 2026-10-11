@@ -20,6 +20,7 @@ import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import TestOverview from './TestOverview.vue';
 import SubmissionSummary from './SubmissionSummary.vue';
 import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
+import SubmissionExternalRun from './SubmissionExternalRun.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
@@ -125,6 +126,7 @@ const verdict = computed(() => {
           :problem-points="problemQuery.data.value?.points ?? null"
           :running="isLive"
         />
+        <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
         <SubmissionStaffPanel :submission="row" />
         <SourceView
           :id="row.id"

@@ -857,7 +857,12 @@
     "polygon_package_too_large": "Gói Polygon quá lớn (tối đa 512 MiB).",
     "polygon_link_invalid": "Đây không phải liên kết bài trên Polygon.",
     "polygon_link_refused": "Tài khoản Polygon của QHHOJ không mở được liên kết này. Hãy cấp quyền READ cho tài khoản trên Polygon và sao chép lại liên kết.",
-    "polygon_no_package": "Bài trên Polygon chưa có gói READY nào: hãy dựng full package trước."
+    "polygon_no_package": "Bài trên Polygon chưa có gói READY nào: hãy dựng full package trước.",
+    "external_judge_not_configured": "Chưa thiết lập máy chấm ngoài: hãy lưu URL gốc và token trước.",
+    "external_judge_unauthorized": "Máy chấm ngoài từ chối token.",
+    "external_judge_not_found": "Máy chấm ngoài không có OJ hoặc bài này.",
+    "external_judge_rejected": "Máy chấm ngoài từ chối yêu cầu.",
+    "external_judge_unavailable": "Hiện chưa kết nối được máy chấm ngoài. Thử lại sau."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",
@@ -1017,7 +1022,8 @@
         "material": "Tài liệu đính kèm"
       }
     },
-    "pdfRender": "Tải đề dạng PDF"
+    "pdfRender": "Tải đề dạng PDF",
+    "externalJudge": "Chấm trên {oj}"
   },
   "problems": {
     "title": "Bài tập",
@@ -1326,7 +1332,16 @@
       "hidden": "Bạn không có quyền xem bài nộp này"
     },
     "casesHidden": "Người xem không được xem kết quả từng test",
-    "sourceHidden": "Bạn không xem được mã nguồn của bài nộp này."
+    "sourceHidden": "Bạn không xem được mã nguồn của bài nộp này.",
+    "externalRun": {
+      "title": "Lượt chấm ở máy chấm ngoài",
+      "oj": "Máy chấm",
+      "problem": "Bài",
+      "status": "Trạng thái bên ngoài",
+      "score": "Điểm",
+      "link": "Lượt chấm bên ngoài",
+      "open": "Mở"
+    }
   },
   "states": {
     "title": "Trạng thái"
@@ -2589,6 +2604,15 @@
     },
     "errors": {
       "scheduleAhead": "Chọn một thời điểm trong tương lai."
+    }
+  },
+  "externalJudge": {
+    "status": {
+      "title": "Máy chấm ngoài",
+      "disabled": "Chưa thiết lập máy chấm ngoài.",
+      "reachable": "Đang kết nối được",
+      "unreachable": "Hiện chưa kết nối được",
+      "checkedAt": "Kiểm tra lúc {time}"
     }
   }
 }

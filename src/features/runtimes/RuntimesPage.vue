@@ -7,6 +7,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { useSessionStore } from '@/stores/session.store';
 import { useNow } from '@/lib/use-now';
+import ExternalJudgeStatusCard from '@/features/external-judge/ExternalJudgeStatusCard.vue';
 import JudgeCard from './JudgeCard.vue';
 import LanguageList from './LanguageList.vue';
 import RuntimeTiles from './RuntimeTiles.vue';
@@ -45,6 +46,7 @@ const totals = computed(() => runtimeTotals(data.value?.judges ?? []));
         </div>
         <LanguageList :languages="data.languages" :judges="data.judges" />
       </template>
+      <ExternalJudgeStatusCard />
     </QueryState>
   </div>
 </template>

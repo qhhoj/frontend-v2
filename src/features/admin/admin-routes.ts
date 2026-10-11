@@ -16,6 +16,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   problemEditorial: () => import('./problems/ProblemEditorPage.vue'),
   problemData: () => import('./problems/ProblemEditorPage.vue'),
   problemFiles: () => import('./problems/ProblemEditorPage.vue'),
+  problemExternal: () => import('./problems/ProblemEditorPage.vue'),
   types: () => import('./catalogs/ProblemCatalogsPage.vue'),
   contests: () => import('./contests/ContestsIndexPage.vue'),
   contestNew: () => import('./contests/general/ContestCreatePage.vue'),

@@ -14,7 +14,13 @@ const session = useSessionStore();
   <GlassCard data-testid="problem-header" class="rounded-panel px-6 pt-6 sm:px-8 sm:pt-8">
     <div class="flex items-start gap-3">
       <p class="min-w-0 flex-1 font-mono text-sm text-muted">
-        {{ problem.code }}<template v-if="problem.group"> · {{ problem.group.fullName }}</template>
+        {{ problem.code }}<template v-if="problem.group"> · {{ problem.group.fullName }}</template
+        ><template v-if="problem.externalJudge">
+          ·
+          <span data-testid="external-judge-badge">{{
+            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
+          }}</span></template
+        >
       </p>
       <AdminEditLink :to="problemEditTarget(session.user, props.problem)" />
     </div>

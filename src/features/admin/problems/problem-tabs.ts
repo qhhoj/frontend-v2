@@ -32,6 +32,12 @@ export const PROBLEM_TABS = [
     labelKey: 'admin.problems.tabs.files',
     leadKey: 'admin.problems.leads.files',
   },
+  {
+    id: 'external',
+    routeName: 'admin-problemExternal',
+    labelKey: 'admin.problems.tabs.external',
+    leadKey: 'admin.problems.leads.external',
+  },
 ] as const;
 export type ProblemTabId = (typeof PROBLEM_TABS)[number]['id'];
 
@@ -42,6 +48,7 @@ const TAB_COMPONENTS: Record<ProblemTabId, Component | null> = {
   editorial: defineAsyncComponent(() => import('./editorial/ProblemEditorialTab.vue')),
   data: defineAsyncComponent(() => import('./data/ProblemDataTab.vue')),
   files: defineAsyncComponent(() => import('./files/ProblemFilesTab.vue')),
+  external: defineAsyncComponent(() => import('./external/ProblemExternalTab.vue')),
 };
 
 export const problemTabOf = (routeName: unknown) =>

@@ -3244,6 +3244,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/external-judge/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * External judge status
+         * @description Public. Whether an external judge is configured and whether its OJ list
+         *     could be read, with the OJ ids. The check runs at most once a minute per
+         *     server process; the base URL and the token are never shown.
+         */
+        get: operations["ExternalJudgeStatusController_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/external-judge/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test the external judge connection
+         * @description Needs `judge.change_settings`. Calls the external judge's OJ list with the
+         *     saved base URL and token and answers the OJ ids it serves. Errors: 409
+         *     `external_judge_not_configured`, 502 `external_judge_unauthorized`, 404
+         *     `external_judge_not_found`, 502 `external_judge_rejected`, 503
+         *     `external_judge_unavailable`. Messages never carry the URL or the token.
+         */
+        post: operations["ExternalJudgeConnectionController_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/feeds/{kind}/{format}": {
         parameters: {
             query?: never;
@@ -4757,6 +4803,88 @@ export interface paths {
          */
         put: operations["ProblemEditingController_putEditorial"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/external-judge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a problem's external judge link
+         * @description Needs edit rights on the problem (404 `not_found` when invisible, 403
+         *     `forbidden` when not editable). `connected` tells whether the site has an
+         *     external judge configured; `link` is null when the problem has none.
+         */
+        get: operations["ProblemExternalJudgeController_get"];
+        /**
+         * Set a problem's external judge link
+         * @description Needs edit rights on the problem. Replaces the link: the remote OJ and
+         *     problem and the site-to-remote language mapping. Every language must exist
+         *     and take typed source (400 `validation_failed`). While `isActive`, the
+         *     problem's allowed languages become exactly the mapped ones and its
+         *     submissions are judged by the external judge. Writes a revision.
+         */
+        put: operations["ProblemExternalJudgeController_put"];
+        post?: never;
+        /**
+         * Remove a problem's external judge link
+         * @description Needs edit rights on the problem. The problem is judged by judge-v2 again;
+         *     its allowed languages are left as they are.
+         */
+        delete: operations["ProblemExternalJudgeController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/external-judge/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search the external judge's problems
+         * @description Needs edit rights on the problem. Give an OJ, a problem id or both (400
+         *     `validation_failed` otherwise). Limited to 30 lookups a minute per user
+         *     (429 `rate_limited`). External judge errors: 409
+         *     `external_judge_not_configured`, 502 `external_judge_unauthorized`, 502
+         *     `external_judge_rejected`, 503 `external_judge_unavailable`.
+         */
+        post: operations["ProblemExternalJudgeController_search"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/external-judge/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify a remote problem
+         * @description Needs edit rights on the problem. Reads the remote problem's title and
+         *     languages, each with the site language it most likely maps to (null when
+         *     no good match). Same limit and errors as search; 404
+         *     `external_judge_not_found` when the remote problem does not exist.
+         */
+        post: operations["ProblemExternalJudgeController_verify"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8375,6 +8503,90 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorBodyResponse"];
         };
+        ExternalJudgeLanguageResponse: {
+            /** @description Site language id. */
+            languageId: string;
+            /** @description The remote OJ's language id. */
+            remoteId: string;
+            /** @description The remote OJ's language name. */
+            remoteName: string;
+        };
+        ExternalJudgeLinkResponse: {
+            /** @description Whether submissions go to the external judge. */
+            isActive: boolean;
+            languages: components["schemas"]["ExternalJudgeLanguageResponse"][];
+            oj: string;
+            problemId: string;
+            /** @description Remote title from the last verify. */
+            title: string;
+            /**
+             * Format: date-time
+             * @description When the link was last verified; null if never.
+             */
+            verifiedAt: string | null;
+        };
+        ExternalJudgeSearchDto: {
+            /** @description OJ id to search in. */
+            oj?: string;
+            /** @description Page, from 1. */
+            page?: number;
+            /** @description Problem id (or part of it) to search for. */
+            problemId?: string;
+        };
+        ExternalJudgeSearchItemResponse: {
+            oj: string;
+            problemId: string;
+            source: string;
+            title: string;
+        };
+        ExternalJudgeSearchResponse: {
+            items: components["schemas"]["ExternalJudgeSearchItemResponse"][];
+            page: number;
+            pageSize: number;
+            total: number;
+        };
+        ExternalJudgeStatusResponse: {
+            /** @description When the last check ran (ISO 8601); null when not configured. */
+            checkedAt: string | null;
+            /** @description Whether an external judge is configured. */
+            enabled: boolean;
+            /** @description OJ ids it serves; empty when unreachable. */
+            ojs: string[];
+            /** @description Whether the last check reached it; null when not configured. */
+            reachable: boolean | null;
+        };
+        ExternalJudgeTestResponse: {
+            /** @description OJ ids the external judge serves. */
+            ojs: string[];
+            ok: boolean;
+        };
+        ExternalJudgeVerifyDto: {
+            oj: string;
+            problemId: string;
+        };
+        ExternalJudgeVerifyLanguageResponse: {
+            remoteId: string;
+            remoteName: string;
+            /** @description The site language this one most likely is; null when no good match. */
+            suggestedLanguageId: string | null;
+        };
+        ExternalJudgeVerifyResponse: {
+            languages: components["schemas"]["ExternalJudgeVerifyLanguageResponse"][];
+            oj: string;
+            problemId: string;
+            title: string;
+        };
+        ExternalLanguageDto: {
+            /**
+             * Format: uuid
+             * @description Site language id.
+             */
+            languageId: string;
+            /** @description The remote OJ's language id. */
+            remoteId: string;
+            /** @description The remote OJ's language name, for display. */
+            remoteName?: string;
+        };
         /**
          * @description Mode of the active key; null if none.
          * @enum {string}
@@ -9743,6 +9955,8 @@ export interface components {
             descriptionHtml: string;
             /** @description Raw fields for the editor; null unless `canEdit`. */
             editor: components["schemas"]["ProblemEditorResponse"] | null;
+            /** @description Where the problem is judged when an external judge does it; null for judge-v2. */
+            externalJudge: components["schemas"]["ProblemExternalJudgeBadgeResponse"] | null;
             /** @description Problem group; null when none. */
             group: components["schemas"]["CatalogItemResponse"] | null;
             /** @description Whether the viewer can read an editorial. */
@@ -9840,6 +10054,16 @@ export interface components {
             translations: components["schemas"]["ProblemTranslationResponse"][];
             /** @description Problem type ids. */
             typeIds: string[];
+        };
+        ProblemExternalJudgeBadgeResponse: {
+            /** @description The external judge's OJ the problem is judged on (`CodeForces`, `QOJ`, ...). */
+            oj: string;
+        };
+        ProblemExternalJudgeResponse: {
+            /** @description Whether the site has an external judge connection configured. */
+            connected: boolean;
+            /** @description The problem's link; null when none. */
+            link: components["schemas"]["ExternalJudgeLinkResponse"] | null;
         };
         ProblemListItemResponse: {
             /** @description Percentage of accepted submissions, 0 to 100. */
@@ -10023,6 +10247,18 @@ export interface components {
             isPublic: boolean;
             /** @description When the editorial becomes readable (ISO 8601 with offset). */
             publishOn: string;
+        };
+        PutExternalJudgeDto: {
+            /** @description Whether the problem is judged by the external judge. */
+            isActive: boolean;
+            /** @description Site languages and the remote language each is sent as; at most one entry per site language. */
+            languages: components["schemas"]["ExternalLanguageDto"][];
+            /** @description The external judge's OJ id (`CodeForces`, `QOJ`, ...). */
+            oj: string;
+            /** @description The problem id on that OJ. */
+            problemId: string;
+            /** @description The remote title from a verify; stamps the link as verified. */
+            title?: string;
         };
         PutMiscConfigDto: {
             /** @description Public: served to everyone by `GET /site`. Never put a secret here. `''` is a valid value. */
@@ -10511,7 +10747,7 @@ export interface components {
          * @description Setting key.
          * @enum {string}
          */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -10980,6 +11216,8 @@ export interface components {
             date: string;
             /** @description Compile log or compiler warnings; the judge's internal error message only for editors. */
             error: string | null;
+            /** @description The run on the external judge; only for viewers who may rejudge, and only for the current judging generation. */
+            externalRun: components["schemas"]["SubmissionExternalRunResponse"] | null;
             /** @description Submission id; ids sort by submission time. */
             id: string;
             /** @description Whether only the pretests are judged (contest pretest mode). */
@@ -11021,6 +11259,27 @@ export interface components {
             user: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Which actions the caller may use on this submission. */
             viewer: components["schemas"]["SubmissionViewerResponse"];
+        };
+        SubmissionExternalRunResponse: {
+            /** @description The external judge's OJ. */
+            oj: string;
+            /** @description The problem id on that OJ. */
+            problemId: string;
+            /** @description The external judge's submission id; null until it accepted the submit. */
+            remoteId: string | null;
+            /** @description Link to the run on the remote OJ. */
+            remoteUrl: string | null;
+            /** @description The remote score, as text (`100/100`). */
+            scoreText: string | null;
+            /** @description The remote verdict (`AC`, `WA`, `PENDING`, ...). */
+            statusCanonical: string;
+            /**
+             * Format: date-time
+             * @description When the run was sent; null until then.
+             */
+            submittedAt: string | null;
+            /** @description The external judge's own status (`queued`, `done`, ...). */
+            systemStatus: string;
         };
         SubmissionFeedEventResponse: {
             /** @description Problem id. */
@@ -18536,6 +18795,70 @@ export interface operations {
             };
         };
     };
+    ExternalJudgeStatusController_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExternalJudgeStatusResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ExternalJudgeConnectionController_test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExternalJudgeTestResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     FeedsController_feed: {
         parameters: {
             query?: never;
@@ -21375,6 +21698,193 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemExternalJudgeController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemExternalJudgeResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemExternalJudgeController_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutExternalJudgeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemExternalJudgeResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemExternalJudgeController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemExternalJudgeResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemExternalJudgeController_search: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalJudgeSearchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExternalJudgeSearchResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemExternalJudgeController_verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExternalJudgeVerifyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExternalJudgeVerifyResponse"];
+                    };
+                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
