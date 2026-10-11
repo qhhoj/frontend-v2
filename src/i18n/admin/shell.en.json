@@ -36,7 +36,8 @@
     "descriptions": {
       "problems": "Edit statements, translations, editorials and test data; clone a problem.",
       "problemImport": "Upload a Polygon .zip package and follow the import progress.",
-      "posts": "Review and remove posts and reported comments.",
+      "posts": "Review and remove posts.",
+      "commentReports": "Review reported comments, resolve or dismiss the reports.",
       "contests": "Announcements, official rankings, rejudging and rating.",
       "similarity": "Run a code similarity check by problem or by contest.",
       "rejudge": "Rejudge the submissions of a problem that match a filter.",
@@ -81,6 +82,7 @@
     "users": "Users",
     "organizations": "Organizations",
     "posts": "Posts",
+    "commentReports": "Reported comments",
     "tickets": "Tickets",
     "activity": "User activity",
     "settings": "Site settings",

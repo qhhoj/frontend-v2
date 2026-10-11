@@ -1609,7 +1609,10 @@
       "hide": "Ẩn",
       "more": "Thêm thao tác",
       "lock": "Khoá bình luận",
-      "unlock": "Mở khoá"
+      "unlock": "Mở khoá",
+      "delete": "Xoá",
+      "report": "Báo cáo",
+      "unhide": "Bỏ ẩn"
     },
     "composer": {
       "label": "Viết bình luận",
@@ -1630,22 +1633,33 @@
       "editing": "đang sửa",
       "editHint": "Mỗi lần lưu tạo một phiên bản trong Lịch sử.",
       "markdownHelp": "Hỗ trợ Markdown: **đậm**, `mã`, khối ```cpp và công thức $…$.",
-      "reload": "Tải bản mới nhất"
+      "reload": "Tải bản mới nhất",
+      "views": "Chế độ soạn",
+      "tab": {
+        "write": "Viết",
+        "preview": "Xem trước"
+      }
     },
     "gate": {
       "signedOutTitle": "Bạn cần đăng nhập để tham gia thảo luận.",
       "signIn": "Đăng nhập để bình luận",
       "noAccount": "Chưa có tài khoản?",
       "register": "Đăng ký",
-      "gatedTitle": "Bạn chưa thể bình luận",
-      "gatedBody": "Cần giải ít nhất {count} bài và không bị tắt tiếng để bình luận hay bình chọn. Bạn vẫn đọc được mọi bình luận.",
       "lockedTitle": "Bình luận trên trang này đã bị khoá",
       "lockedBody": "Bạn vẫn đọc được các bình luận cũ, nhưng không thể gửi bình luận hay trả lời mới.",
       "contestTitle": "Bình luận tạm ẩn trong kỳ thi",
       "contestBody": "Bài này thuộc kỳ thi bạn đang tham gia. Có thắc mắc về đề? Hãy xem mục",
       "contestLink": "Thông báo kỳ thi",
       "officialTitle": "Bình luận tạm đóng",
-      "officialBody": "Bình luận tạm đóng trong thời gian diễn ra kỳ thi chính thức."
+      "officialBody": "Bình luận tạm đóng trong thời gian diễn ra kỳ thi chính thức.",
+      "needsSolvedTitle": "Giải ít nhất {count} bài để bình luận",
+      "needsSolvedBody": "Quy định này giúp hạn chế tài khoản rác. Bạn vẫn đọc được mọi bình luận.",
+      "solved": "Đã giải",
+      "solvedLabel": "Số bài đã giải",
+      "easyProblems": "Xem các bài dễ để bắt đầu",
+      "mutedTitle": "Bạn đang bị tắt tiếng",
+      "mutedBody": "Trong thời gian này bạn không thể bình luận, sửa bình luận hay bình chọn. Nếu cho rằng đây là nhầm lẫn, hãy",
+      "mutedLink": "gửi yêu cầu hỗ trợ"
     },
     "failure": {
       "rateLimited": "Bạn đã gửi {limit} bình luận trong {minutes} phút. Hãy đợi một lát rồi thử lại — nội dung vẫn được giữ trong ô soạn.",
@@ -1657,7 +1671,7 @@
     },
     "hide": {
       "title": "Ẩn bình luận của {author}?",
-      "body": "Mọi phản hồi của bình luận này cũng bị ẩn theo. Người dùng sẽ không thấy chúng nữa.",
+      "body": "Mọi phản hồi của bình luận này cũng bị ẩn theo. Người dùng sẽ không thấy chúng nữa; bạn có thể bỏ ẩn sau.",
       "confirm": "Ẩn bình luận",
       "failed": "Không ẩn được bình luận. Hãy thử lại."
     },
@@ -1676,7 +1690,53 @@
       "legend": "Dòng có dấu − đã bị xoá, dấu + là dòng mới. Nội dung Markdown gốc.",
       "diffLabel": "So sánh hai phiên bản",
       "loading": "Đang tải lịch sử…"
-    }
+    },
+    "preview": {
+      "empty": "Chưa có gì để xem trước.",
+      "loading": "Đang tạo bản xem trước…",
+      "failed": "Không tạo được bản xem trước. Bạn vẫn gửi được bình luận.",
+      "rateLimited": "Xem trước quá nhiều lần. Đợi một lát rồi thử lại.",
+      "rateLimitedWait": "Xem trước quá nhiều lần. Thử lại sau {seconds} giây."
+    },
+    "hidden": {
+      "badge": "Đã ẩn",
+      "by": "bởi {name}"
+    },
+    "deleted": {
+      "placeholder": "Bình luận này đã bị xoá.",
+      "quote": "(bình luận đã bị xoá)"
+    },
+    "delete": {
+      "title": "Xoá bình luận #{number}?",
+      "body": "Nội dung sẽ bị gỡ và chỉ còn dòng “đã xoá” để các trả lời giữ ngữ cảnh. Không thể hoàn tác.",
+      "confirm": "Xoá bình luận",
+      "failed": "Không xoá được bình luận. Hãy thử lại."
+    },
+    "report": {
+      "title": "Báo cáo bình luận của {author}",
+      "body": "Quản trị viên sẽ xem xét. Mỗi bình luận bạn chỉ báo cáo được một lần.",
+      "confirm": "Gửi báo cáo",
+      "reasonLabel": "Lý do",
+      "reason": {
+        "spam": "Spam hoặc quảng cáo",
+        "abuse": "Xúc phạm, quấy rối",
+        "spoiler": "Lộ lời giải",
+        "offTopic": "Lạc đề",
+        "other": "Lý do khác"
+      },
+      "noteLabel": "Ghi chú cho quản trị viên (không bắt buộc)",
+      "sent": "Đã gửi báo cáo. Cảm ơn bạn!",
+      "already": "Bạn đã báo cáo bình luận này rồi.",
+      "rateLimited": "Bạn đã gửi quá nhiều báo cáo. Hãy thử lại sau.",
+      "gone": "Bình luận này không còn nữa.",
+      "own": "Bạn không thể báo cáo bình luận của chính mình."
+    },
+    "moderation": {
+      "lockedTitle": "Đã khoá bình luận trang này.",
+      "lockedOverride": "Người dùng thường chỉ đọc được; bạn vẫn bình luận được nhờ quyền vượt khoá.",
+      "lockedBody": "Người dùng thường chỉ đọc được."
+    },
+    "unhideFailed": "Không bỏ ẩn được bình luận. Hãy thử lại."
   },
   "tickets": {
     "lead": "Báo lỗi đề bài, test sai hoặc sự cố trên trang. Quản trị viên sẽ trả lời tại đây.",

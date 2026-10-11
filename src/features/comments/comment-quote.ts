@@ -10,6 +10,8 @@ export interface CommentQuote {
   number: number | null;
   author: string | null;
   excerpt: string;
+  /** The parent was deleted: its place shows "deleted" instead of an excerpt. */
+  isDeleted: boolean;
   /** In-page anchor of the parent. */
   href: string;
 }
@@ -27,6 +29,7 @@ export function quoteOf(
     number: parent?.number ?? null,
     author: parent?.comment.author?.username ?? null,
     excerpt: parent ? htmlExcerpt(parent.comment.bodyHtml, QUOTE_LENGTH) : '',
+    isDeleted: parent?.comment.deleted ?? false,
     href: `#${commentAnchor(parentId)}`,
   };
 }

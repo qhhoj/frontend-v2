@@ -1,20 +1,38 @@
 import { describe, expect, it } from 'vitest';
 import { COMMENT_REPLY_WINDOW_MS } from '@/api/types/comments';
-import { canReplyTo, composerStateOf } from './composer-state';
+import type { CommentPostBlockReason } from '@/api/types/comments';
+import { canReplyTo, composerStateOf, solvedPercent } from './composer-state';
 
 describe('composerStateOf', () => {
-  it('offers the composer to a signed-in viewer the page lets comment', () => {
-    expect(composerStateOf(true, { locked: false, canComment: true })).toBe('ready');
+  const open = { locked: false, postBlock: null };
+  const block = (reason: CommentPostBlockReason, locked = false) => ({
+    locked,
+    postBlock: { reason, solved: null, required: null },
   });
-  it('asks a signed-out viewer to sign in', () => {
-    expect(composerStateOf(false, { locked: false, canComment: false })).toBe('signedOut');
+  it('offers the composer to a signed-in viewer nothing blocks', () => {
+    expect(composerStateOf(true, open)).toBe('ready');
   });
-  it('explains the gate to a signed-in viewer the backend refuses on an open page', () => {
-    expect(composerStateOf(true, { locked: false, canComment: false })).toBe('gated');
+  it('names the panel after the reason posting would refuse', () => {
+    expect(composerStateOf(true, block('needs_solved'))).toBe('needsSolved');
+    expect(composerStateOf(true, block('muted'))).toBe('muted');
+    expect(composerStateOf(true, block('locked', true))).toBe('locked');
+    expect(composerStateOf(true, block('contest', true))).toBe('contest');
   });
-  it('says the page is locked to everyone, signed in or not', () => {
-    expect(composerStateOf(true, { locked: true, canComment: false })).toBe('locked');
-    expect(composerStateOf(false, { locked: true, canComment: false })).toBe('locked');
+  it('asks a signed-out viewer to sign in, unless the page is locked', () => {
+    expect(composerStateOf(false, block('signed_out'))).toBe('signedOut');
+    expect(composerStateOf(false, open)).toBe('signedOut');
+    expect(composerStateOf(false, block('signed_out', true))).toBe('locked');
+  });
+});
+
+describe('solvedPercent', () => {
+  it('fills the bar by the share solved', () => {
+    expect(solvedPercent(3, 5)).toBe(60);
+  });
+  it('stays within 0..100', () => {
+    expect(solvedPercent(9, 5)).toBe(100);
+    expect(solvedPercent(-1, 5)).toBe(0);
+    expect(solvedPercent(0, 0)).toBe(100);
   });
 });
 

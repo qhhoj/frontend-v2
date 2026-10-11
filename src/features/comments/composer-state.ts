@@ -1,23 +1,33 @@
-import type { CommentThreadPage } from '@/api/types/comments';
+import type { CommentPostBlockReason, CommentThreadPage } from '@/api/types/comments';
 import { COMMENT_REPLY_WINDOW_MS } from '@/api/types/comments';
 
 /** What sits where the composer goes: the composer, or the panel saying why there is none. */
-export type ComposerState = 'ready' | 'signedOut' | 'gated' | 'locked';
+export type ComposerState = 'ready' | 'signedOut' | 'needsSolved' | 'muted' | 'locked' | 'contest';
+
+const STATE_OF_BLOCK: Record<CommentPostBlockReason, ComposerState> = {
+  signed_out: 'signedOut',
+  needs_solved: 'needsSolved',
+  muted: 'muted',
+  locked: 'locked',
+  contest: 'contest',
+};
 
 /**
- * A lock (a moderator's, or the viewer's running contest) beats everything: signing in would not help. A signed-in viewer the
- * backend refuses (`canComment` false while unlocked) is under the interaction gate: too few solves, or muted; the session does
- * not say which.
+ * A signed-in viewer gets the panel the backend's `postBlock` names (the rule posting enforces), or the composer. A signed-out
+ * viewer is asked to sign in, unless the page is locked: signing in would not help then.
  */
 export function composerStateOf(
   isSignedIn: boolean,
-  page: Pick<CommentThreadPage, 'locked' | 'canComment'>,
+  page: Pick<CommentThreadPage, 'locked' | 'postBlock'>,
 ): ComposerState {
-  if (page.locked) return 'locked';
-  if (!isSignedIn) return 'signedOut';
-  return page.canComment ? 'ready' : 'gated';
+  if (!isSignedIn) return page.locked ? 'locked' : 'signedOut';
+  return page.postBlock ? STATE_OF_BLOCK[page.postBlock.reason] : 'ready';
 }
 
 /** Legacy reply window: a comment older than a year takes replies only from moderators (`judge.change_comment`). */
 export const canReplyTo = (createdAt: string, now: number, moderates: boolean): boolean =>
   moderates || now - Date.parse(createdAt) < COMMENT_REPLY_WINDOW_MS;
+
+/** "Solved 3 / 5" as a share of the bar, clamped to 0..100. */
+export const solvedPercent = (solved: number, required: number): number =>
+  required <= 0 ? 100 : Math.min(100, Math.max(0, Math.round((solved / required) * 100)));

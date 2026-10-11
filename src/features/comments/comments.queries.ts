@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import {
+  deleteComment,
   editComment,
   fetchComment,
   fetchCommentPage,
@@ -104,6 +105,14 @@ export function useCommentWrites(
     hide: useMutation({
       mutationFn: (id: string) => setCommentHidden(id, true),
       onSettled: () => refresh(),
+    }),
+    unhide: useMutation({
+      mutationFn: (id: string) => setCommentHidden(id, false),
+      onSettled: () => refresh(),
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => deleteComment(id),
+      onSettled: (_answer, _error, id) => refresh(id),
     }),
     setLocked: useMutation({
       mutationFn: (locked: boolean) =>

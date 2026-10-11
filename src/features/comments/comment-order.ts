@@ -1,6 +1,6 @@
 import type { Comment } from '@/api/types/comments';
 
-/** A comment with its display number: its place (1-based) in the page's time order. */
+/** A comment with its display number: its stable per-page `number` from the API, else its place (1-based) in this page's time order. */
 export interface NumberedComment {
   comment: Comment;
   number: number;
@@ -17,5 +17,5 @@ export function flattenInTimeOrder(comments: readonly Comment[]): NumberedCommen
         Date.parse(first.createdAt) - Date.parse(second.createdAt) ||
         first.id.localeCompare(second.id),
     )
-    .map((comment, index) => ({ comment, number: index + 1 }));
+    .map((comment, index) => ({ comment, number: comment.number ?? index + 1 }));
 }

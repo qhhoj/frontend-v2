@@ -40,3 +40,20 @@ export function commentFailureOf(error: unknown): CommentFailure {
       return failure(errorMessageKey(error));
   }
 }
+
+/** The line a refused report shows: already reported (409), too many reports (429), the comment gone (404), one's own (403). */
+export function reportFailureKey(error: unknown): string {
+  if (!(error instanceof ApiError)) return errorMessageKey(error);
+  switch (error.code) {
+    case 'conflict':
+      return 'comments.report.already';
+    case 'rate_limited':
+      return 'comments.report.rateLimited';
+    case 'not_found':
+      return 'comments.report.gone';
+    case 'forbidden':
+      return 'comments.report.own';
+    default:
+      return errorMessageKey(error);
+  }
+}

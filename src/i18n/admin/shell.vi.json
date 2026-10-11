@@ -36,7 +36,8 @@
     "descriptions": {
       "problems": "Sửa đề, bản dịch, lời giải, dữ liệu chấm; nhân bản bài.",
       "problemImport": "Tải gói Polygon dạng .zip lên, theo dõi tiến trình nhập.",
-      "posts": "Duyệt và gỡ bài viết, bình luận bị báo cáo.",
+      "posts": "Duyệt và gỡ bài viết.",
+      "commentReports": "Xem bình luận bị báo cáo, xử lý hoặc bỏ qua báo cáo.",
       "contests": "Thông báo, bảng xếp hạng chính thức, chấm lại, tính rating.",
       "similarity": "Chạy so sánh mã nguồn theo bài hoặc theo kỳ thi.",
       "rejudge": "Xếp lại các bài nộp của một bài theo bộ lọc.",
@@ -81,6 +82,7 @@
     "users": "Người dùng",
     "organizations": "Tổ chức",
     "posts": "Bài viết",
+    "commentReports": "Bình luận bị báo cáo",
     "tickets": "Phiếu hỗ trợ",
     "activity": "Nhật ký hoạt động",
     "settings": "Cấu hình hệ thống",

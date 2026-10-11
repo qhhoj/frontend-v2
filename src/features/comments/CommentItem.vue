@@ -18,7 +18,8 @@ import type { CommentQuote } from './comment-quote';
 /**
  * One comment of the flat list (layout C2): author, time, permalink and vote in the header; the quote of the comment it answers;
  * the body (or the edit form, the default slot, while `isEditing`); the actions. A folded comment (low score) is one line until shown.
- * On a phone the actions past Reply move into a "more" menu.
+ * On a phone the actions past Reply move into a "more" menu. Moderators also get hidden comments (a muted card naming who hid it,
+ * with Unhide); a deleted comment stays as a placeholder so the replies quoting it keep their context.
  */
 const props = defineProps<{
   entry: NumberedComment;
@@ -29,16 +30,29 @@ const props = defineProps<{
   /** Shows "older than a year" where Reply would be. */
   isPastReplyWindow: boolean;
   moderates: boolean;
+  /** Signed in and not the author: may report it (once; the backend says 409 after). */
+  canReport: boolean;
   isEditing: boolean;
   isPhone: boolean;
 }>();
-const emit = defineEmits<{ reply: []; edit: []; history: []; hide: [] }>();
+const emit = defineEmits<{
+  reply: [];
+  edit: [];
+  history: [];
+  hide: [];
+  unhide: [];
+  delete: [];
+  report: [];
+}>();
 const { t } = useI18n();
 const locale = useLocaleStore();
 const comment = computed(() => props.entry.comment);
 const anchor = computed(() => commentAnchor(comment.value.id));
 const isExpanded = ref(false);
-const isFolded = computed(() => comment.value.collapsed && !isExpanded.value && !props.isEditing);
+const isFolded = computed(
+  () => comment.value.collapsed && !comment.value.deleted && !isExpanded.value && !props.isEditing,
+);
+const hiderName = computed(() => comment.value.hiddenBy?.username ?? null);
 const authorName = computed(() => comment.value.author?.username ?? t('comments.deletedAccount'));
 const send = (score: VoteScore) => voteComment(comment.value.id, score);
 
@@ -48,33 +62,42 @@ interface Action {
   run: () => void;
   isModeration?: boolean;
 }
-const actions = computed<Action[]>(() => [
-  ...(comment.value.canEdit && !props.isEditing
-    ? [{ id: 'edit', label: t('comments.action.edit'), run: () => emit('edit') }]
-    : []),
-  ...(comment.value.revisions
-    ? [
-        {
-          id: 'history',
-          label: t('comments.action.history', { count: comment.value.revisions }),
-          run: () => emit('history'),
-        },
-      ]
-    : []),
-  ...(props.moderates
-    ? [
-        {
-          id: 'hide',
-          label: t('comments.action.hide'),
-          run: () => emit('hide'),
-          isModeration: true,
-        },
-      ]
-    : []),
-]);
+const actionOf = (id: string, label: string, run: () => void, isModeration = false): Action => ({
+  id,
+  label,
+  run,
+  isModeration,
+});
+/** Edit, history, delete and report for the viewer; then the moderators' hide or unhide, set apart. */
+const actions = computed<Action[]>(() => {
+  const shown = comment.value;
+  const list: Action[] = [];
+  if (shown.canEdit && !props.isEditing)
+    list.push(actionOf('edit', t('comments.action.edit'), () => emit('edit')));
+  if (shown.revisions && (!shown.deleted || props.moderates))
+    list.push(
+      actionOf('history', t('comments.action.history', { count: shown.revisions }), () =>
+        emit('history'),
+      ),
+    );
+  if (shown.canDelete)
+    list.push(actionOf('delete', t('comments.action.delete'), () => emit('delete')));
+  if (props.canReport && !shown.deleted && !shown.hidden)
+    list.push(actionOf('report', t('comments.action.report'), () => emit('report')));
+  if (props.moderates)
+    list.push(
+      shown.hidden
+        ? actionOf('unhide', t('comments.action.unhide'), () => emit('unhide'), true)
+        : actionOf('hide', t('comments.action.hide'), () => emit('hide'), true),
+    );
+  return list;
+});
 /** No row while editing (the form has its own buttons) or when there is nothing to offer. */
 const hasActionRow = computed(
-  () => !props.isEditing && (props.canReply || props.isPastReplyWindow || actions.value.length > 0),
+  () =>
+    !props.isEditing &&
+    ((!comment.value.deleted && (props.canReply || props.isPastReplyWindow)) ||
+      actions.value.length > 0),
 );
 const menu = ref<InstanceType<typeof Menu>>();
 const isMenuOpen = ref(false);
@@ -116,7 +139,9 @@ const TEXT_BUTTON =
     <article
       v-else
       :aria-labelledby="`${anchor}-h`"
-      class="rounded-card border border-line bg-surface-solid px-4 pt-3 pb-1 sm:px-5 sm:pt-4"
+      :data-hidden="comment.hidden || undefined"
+      class="rounded-card border border-line px-4 pt-3 pb-1 sm:px-5 sm:pt-4"
+      :class="comment.hidden ? 'bg-surface-strong' : 'bg-surface-solid'"
     >
       <header class="flex flex-wrap items-center gap-2">
         <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
@@ -145,6 +170,16 @@ const TEXT_BUTTON =
           <span v-if="isEditing" class="text-sm text-muted"
             >· {{ $t('comments.composer.editing') }}</span
           >
+          <template v-if="comment.hidden">
+            <span
+              data-testid="comment-hidden-badge"
+              class="rounded-pill bg-content px-2 text-xs font-semibold text-ground"
+              >{{ $t('comments.hidden.badge') }}</span
+            >
+            <span v-if="hiderName" class="text-sm text-muted">{{
+              $t('comments.hidden.by', { name: hiderName })
+            }}</span>
+          </template>
           <a
             :href="`#${anchor}`"
             class="font-mono text-xs text-muted hover:underline"
@@ -158,7 +193,7 @@ const TEXT_BUTTON =
           class="-my-1 text-sm"
           :score="comment.score"
           :viewer-vote="comment.viewerVote"
-          :can-vote="canVote"
+          :can-vote="canVote && !comment.deleted && !comment.hidden"
           :send="send"
         />
       </header>
@@ -178,15 +213,33 @@ const TEXT_BUTTON =
               : $t('comments.replyToUnknown')
           }}
         </span>
-        <template v-if="quote.excerpt"> “{{ quote.excerpt }}”</template>
+        <template v-if="quote.isDeleted"> {{ $t('comments.deleted.quote') }}</template>
+        <template v-else-if="quote.excerpt"> “{{ quote.excerpt }}”</template>
       </a>
       <slot v-if="isEditing" />
-      <UserContent v-else :html="comment.bodyHtml" class="mt-1.5 mb-2" />
+      <p
+        v-else-if="comment.deleted"
+        data-testid="comment-deleted"
+        class="mt-1.5 mb-2 text-sm text-muted italic"
+      >
+        {{ $t('comments.deleted.placeholder') }}
+      </p>
+      <UserContent
+        v-else
+        :html="comment.bodyHtml"
+        class="mt-1.5 mb-2"
+        :class="comment.hidden && 'text-muted'"
+      />
       <div v-if="hasActionRow" class="-ml-2.5 flex flex-wrap items-center gap-0.5 py-1">
-        <button v-if="canReply" type="button" :class="TEXT_BUTTON" @click="emit('reply')">
+        <button
+          v-if="canReply && !comment.deleted"
+          type="button"
+          :class="TEXT_BUTTON"
+          @click="emit('reply')"
+        >
           {{ $t('comments.action.reply') }}
         </button>
-        <span v-else-if="isPastReplyWindow" class="px-2.5 text-xs text-muted">
+        <span v-else-if="isPastReplyWindow && !comment.deleted" class="px-2.5 text-xs text-muted">
           {{ $t('comments.tooOld') }}
         </span>
         <template v-if="isPhone && actions.length">

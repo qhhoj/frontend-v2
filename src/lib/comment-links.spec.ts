@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { commentPageRoute } from './comment-links';
+import { commentPageRoute, commentRoute } from './comment-links';
 
 describe('commentPageRoute', () => {
   it('sends each page type to its own screen, by the natural key the backend gives', () => {
@@ -23,5 +23,18 @@ describe('commentPageRoute', () => {
   });
   it('gives no link for a tag problem, which has no screen', () => {
     expect(commentPageRoute({ type: 'tagProblem', key: 'x', title: 'T' })).toBeNull();
+  });
+});
+
+describe('commentRoute', () => {
+  it('adds the comment anchor to its page', () => {
+    expect(commentRoute({ type: 'problem', key: 'aplusb', title: 'T' }, 'c1')).toEqual({
+      name: 'problem',
+      params: { code: 'aplusb' },
+      hash: '#comment-c1',
+    });
+  });
+  it('gives no link for a tag problem', () => {
+    expect(commentRoute({ type: 'tagProblem', key: 'x', title: 'T' }, 'c1')).toBeNull();
   });
 });

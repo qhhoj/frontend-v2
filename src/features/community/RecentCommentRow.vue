@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { RecentComment } from '@/api/types/comments';
 import UserContent from '@/components/UserContent.vue';
 import UserName from '@/components/UserName.vue';
-import { commentPageRoute } from '@/lib/comment-links';
+import { commentRoute } from '@/lib/comment-links';
 import { formatAgo, signedScore } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -11,12 +11,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 const props = defineProps<{ comment: RecentComment; now: number }>();
 const locale = useLocaleStore();
 /** The page's screen with the comment's anchor; null for a tag problem, which has no screen. */
-const target = computed(() => {
-  const route = commentPageRoute(props.comment.page);
-  return route && typeof route === 'object'
-    ? { ...route, hash: `#comment-${props.comment.id}` }
-    : null;
-});
+const target = computed(() => commentRoute(props.comment.page, props.comment.id));
 </script>
 
 <template>
