@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ExternalLink } from 'lucide-vue-next';
+import { ExternalLink, Printer, Trophy } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
@@ -32,6 +32,14 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
 };
 
 const problems = computed(() => props.contest.problems ?? []);
+/** The best-submissions column shows only to viewers the ranking is open to. */
+const hasBestColumn = computed(() => props.contest.viewer.canSeeFullScoreboard);
+const bestLink = (problem: ContestProblem) => ({
+  name: 'contest-problem-best',
+  params: { key: props.contest.key, code: problem.code },
+});
+const BEST_BUTTON =
+  'inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-accent bg-accent-soft px-4 font-semibold text-accent-soft-text hover:bg-surface-hover';
 /** Null solver counts (the viewer may not see the full ranking) draw a dash, never a zero. */
 const hasSolverCounts = computed(() =>
   problems.value.some((problem) => problem.solverCount !== null),
@@ -71,6 +79,19 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
       {{ $t(HIDDEN_KEYS[contest.phase]) }}
     </p>
     <template v-else>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
+        <h2 class="min-w-0 font-display text-lg font-bold whitespace-nowrap">
+          {{ $t('contests.problems.heading') }}
+          <span class="text-sm font-normal text-muted">({{ problems.length }})</span>
+        </h2>
+        <RouterLink
+          :to="{ name: 'contest-all', params: { key: contest.key } }"
+          class="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-pill border border-accent bg-accent-soft px-3.5 text-sm font-semibold whitespace-nowrap text-accent-soft-text hover:bg-surface-hover"
+          ><Printer class="size-4" aria-hidden="true" />{{
+            $t('contests.problems.printAll')
+          }}</RouterLink
+        >
+      </div>
       <table class="hidden w-full border-collapse md:table">
         <caption class="sr-only">
           {{
@@ -96,6 +117,9 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             </th>
             <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold">
               {{ $t('contests.problems.columns.own') }}
+            </th>
+            <th v-if="hasBestColumn" scope="col" class="px-3 py-3 font-semibold">
+              {{ $t('contests.best.column') }}
             </th>
             <th scope="col" class="px-5 py-3">
               <span class="sr-only">{{ $t('contests.problems.columns.open') }}</span>
@@ -138,6 +162,12 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             </td>
             <td v-if="hasOwnResults" class="px-3 py-3">
               <OwnResultChip :problem="problem" :context="context" />
+            </td>
+            <td v-if="hasBestColumn" class="px-3 py-3">
+              <RouterLink :to="bestLink(problem)" :class="BEST_BUTTON"
+                ><Trophy class="size-4" aria-hidden="true" />{{ $t('contests.best.button')
+                }}<span class="sr-only"> {{ problem.label }}</span></RouterLink
+              >
             </td>
             <td class="px-5 py-3 text-right">
               <RouterLink
@@ -189,6 +219,14 @@ const leftText = (count: number) => t('contests.problems.left', { count }, count
             </p>
           </div>
           <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
+          <RouterLink
+            v-if="hasBestColumn"
+            :to="bestLink(problem)"
+            class="inline-flex size-11 shrink-0 items-center justify-center rounded-pill border border-accent bg-accent-soft text-accent-soft-text"
+            ><Trophy class="size-4" aria-hidden="true" /><span class="sr-only"
+              >{{ $t('contests.best.button') }}. {{ problem.label }}</span
+            ></RouterLink
+          >
         </li>
       </ul>
     </template>

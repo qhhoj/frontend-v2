@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
-import { fetchContestSubmissions } from '@/api/contests.api';
+import { fetchContestBestSubmissions, fetchContestSubmissions } from '@/api/contests.api';
 import { fetchOrganizationSubmissions } from '@/api/organizations.api';
 import {
   fetchBestSubmissions,
@@ -82,6 +82,37 @@ export const useBestSubmissionsQuery = (code: Ref<string>, page: Ref<number>) =>
     queryFn: () =>
       fetchBestSubmissions(code.value, { page: page.value, pageSize: SUBMISSION_PAGE_SIZE }),
     placeholderData: keepPreviousData,
+  });
+};
+
+/** One page of a contest problem's best submissions per viewer (the ranking's freeze and visibility depend on who asks). */
+export const useContestBestSubmissionsQuery = (
+  key: Ref<string>,
+  code: Ref<string>,
+  page: Ref<number>,
+) => {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => [
+      'submissions',
+      'contest-best',
+      viewerId.value,
+      key.value,
+      code.value,
+      page.value,
+    ]),
+    queryFn: () =>
+      fetchContestBestSubmissions(key.value, code.value, {
+        page: page.value,
+        pageSize: SUBMISSION_PAGE_SIZE,
+      }),
+    /** Another page of the same problem keeps its rows on screen; another problem or viewer never does. */
+    placeholderData: (previous, previousQuery) =>
+      previousQuery?.queryKey[2] === viewerId.value &&
+      previousQuery.queryKey[3] === key.value &&
+      previousQuery.queryKey[4] === code.value
+        ? previous
+        : undefined,
   });
 };
 

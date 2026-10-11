@@ -57,7 +57,9 @@
     "contestBalloonsPrint": "Phiếu bóng bay",
     "problemBest": "Bài nộp tốt nhất",
     "runtimes": "Máy chấm và ngôn ngữ",
-    "postDrafts": "Bài nháp của tôi"
+    "postDrafts": "Bài nháp của tôi",
+    "contestAll": "Tất cả đề",
+    "contestProblemBest": "Bài nộp tốt nhất của bài"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -133,7 +135,9 @@
       "pointsShort": "{points} điểm",
       "afterStart": "Đề bài sẽ hiện khi kỳ thi bắt đầu và bạn vào thi.",
       "afterJoin": "Đề bài sẽ hiện ngay khi bạn vào thi.",
-      "hidden": "Đề bài chưa được công khai."
+      "hidden": "Đề bài chưa được công khai.",
+      "heading": "Danh sách bài",
+      "printAll": "In tất cả đề"
     },
     "announcements": {
       "arrived": "Thông báo mới: {title}",
@@ -281,6 +285,40 @@
         "pastLastPage": "Trang này không tồn tại.",
         "backToFirstPage": "Về trang 1"
       }
+    },
+    "print": {
+      "toolbar": "Tùy chọn in",
+      "back": "Kỳ thi",
+      "samples": "Ví dụ",
+      "limits": "Giới hạn",
+      "onePerPage": "Mỗi bài một trang",
+      "print": "In / Lưu PDF",
+      "printShort": "In",
+      "loading": "Đang tải đề…",
+      "kicker": "Tất cả đề · {count} bài",
+      "pageBreak": "ngắt trang khi in",
+      "headerRight": "Tất cả đề",
+      "pageNumber": "Trang",
+      "hiddenTitle": "Chưa xem được đề",
+      "missingTitle": "Không tìm thấy kỳ thi",
+      "statementFailed": "Không tải được đề bài này.",
+      "time": "Thời gian {value}",
+      "memory": "Bộ nhớ {value}",
+      "points": "{points} điểm"
+    },
+    "best": {
+      "column": "Xếp hạng",
+      "button": "Top bài nộp",
+      "title": "Bài nộp tốt nhất · {problem}",
+      "back": "Về danh sách bài",
+      "problems": "Chọn bài",
+      "frozen": "Bảng đã đóng băng từ {time}; danh sách này cũng dừng ở thời điểm đó.",
+      "rule": "Xếp theo điểm, rồi thời gian chạy, bộ nhớ, thời điểm nộp. Chỉ tính bài nộp trong kỳ thi.",
+      "forbiddenTitle": "Danh sách này đang ẩn",
+      "forbiddenBody": "Bảng xếp hạng của kỳ thi chưa mở cho bạn, nên bài nộp tốt nhất cũng chưa.",
+      "missingTitle": "Không tìm thấy bài này trong kỳ thi",
+      "loadFailed": "Không tải được kỳ thi",
+      "retry": "Thử lại"
     }
   },
   "placeholder": {

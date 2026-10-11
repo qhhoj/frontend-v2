@@ -26,30 +26,30 @@ const route = useRoute();
   <!-- `isolate` keeps the fixed blobs (-z-10) above this ground and below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
-    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[14px] text-content"
+    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-[14px] text-content print:bg-white print:text-black"
   >
-    <BackgroundBlobs />
+    <BackgroundBlobs class="print:hidden" />
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-pill focus:bg-surface-solid focus:px-4 focus:py-2"
+      class="sr-only print:hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-pill focus:bg-surface-solid focus:px-4 focus:py-2"
     >
       {{ $t('app.skipToContent') }}
     </a>
-    <ImpersonationBanner />
+    <ImpersonationBanner class="print:hidden" />
     <AdminShell v-if="route.meta.layout === 'admin'">
       <slot />
     </AdminShell>
     <template v-else>
       <template v-if="route.meta.layout !== 'auth'">
-        <AppHeader />
-        <SiteNoticeBanner />
-        <OfficialModeBanner />
-        <HighPriorityBanner />
+        <AppHeader class="print:hidden" />
+        <SiteNoticeBanner class="print:hidden" />
+        <OfficialModeBanner class="print:hidden" />
+        <HighPriorityBanner class="print:hidden" />
       </template>
       <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
         <slot />
       </main>
-      <AppFooter v-if="route.meta.layout !== 'auth'" />
+      <AppFooter v-if="route.meta.layout !== 'auth'" class="print:hidden" />
     </template>
     <LoadingLayer />
   </div>

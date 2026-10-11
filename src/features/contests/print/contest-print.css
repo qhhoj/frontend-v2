@@ -1,0 +1,62 @@
+/* The "all statements" sheet (`/contests/:key/all`). On screen it is a card with a dashed marker where a printed page would break; printed, the site chrome is gone (print:hidden in AppShell) and it is black on white. */
+.print-doc .break-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block: 1.25rem;
+  font-size: 12px;
+  color: var(--qh-text-muted);
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px dashed var(--qh-line-strong);
+  }
+}
+.print-doc .print-problem {
+  margin-top: 1.25rem;
+}
+.print-doc.hide-samples .statement :is(.sample, .sample-pair) {
+  display: none;
+}
+
+@media print {
+  .print-doc {
+    page: contest-all;
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: white;
+    color: black;
+  }
+  .print-doc,
+  .print-doc * {
+    color: black !important;
+    background: transparent !important;
+    border-color: black !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .print-doc .break-hint {
+    display: none;
+  }
+  .print-doc.one-per-page .print-problem ~ .print-problem {
+    break-before: page;
+    margin-top: 0;
+  }
+  .print-doc .print-problem h2 {
+    break-after: avoid;
+  }
+  .print-doc :is(pre, .sample, .sample-pair, table, img) {
+    break-inside: avoid;
+  }
+  .print-doc .statement :is(.copy-bar, .copy-bar-inline button) {
+    display: none;
+  }
+  .print-doc .statement pre {
+    border: 1px solid black;
+    white-space: pre-wrap;
+    overflow: visible;
+  }
+}

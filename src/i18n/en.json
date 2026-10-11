@@ -57,7 +57,9 @@
     "contestBalloonsPrint": "Balloon run sheet",
     "problemBest": "Best submissions",
     "runtimes": "Judges and languages",
-    "postDrafts": "My drafts"
+    "postDrafts": "My drafts",
+    "contestAll": "All statements",
+    "contestProblemBest": "Best submissions of a problem"
   },
   "contests": {
     "title": "Contests",
@@ -133,7 +135,9 @@
       "pointsShort": "{points} points",
       "afterStart": "The problems show when the contest starts and you enter.",
       "afterJoin": "The problems show as soon as you enter.",
-      "hidden": "The problems are not public yet."
+      "hidden": "The problems are not public yet.",
+      "heading": "Problems",
+      "printAll": "Print all statements"
     },
     "announcements": {
       "arrived": "New announcement: {title}",
@@ -281,6 +285,40 @@
         "pastLastPage": "This page does not exist.",
         "backToFirstPage": "Back to page 1"
       }
+    },
+    "print": {
+      "toolbar": "Print options",
+      "back": "Contest",
+      "samples": "Samples",
+      "limits": "Limits",
+      "onePerPage": "One problem per page",
+      "print": "Print / Save PDF",
+      "printShort": "Print",
+      "loading": "Loading statements…",
+      "kicker": "All statements · {count} problems",
+      "pageBreak": "page break when printed",
+      "headerRight": "All statements",
+      "pageNumber": "Page",
+      "hiddenTitle": "The statements are not available yet",
+      "missingTitle": "Contest not found",
+      "statementFailed": "This statement could not be loaded.",
+      "time": "Time {value}",
+      "memory": "Memory {value}",
+      "points": "{points} points"
+    },
+    "best": {
+      "column": "Ranking",
+      "button": "Top submissions",
+      "title": "Best submissions · {problem}",
+      "back": "Back to the problems",
+      "problems": "Pick a problem",
+      "frozen": "The ranking froze at {time}; this list stops at that moment too.",
+      "rule": "Ordered by points, then run time, memory, submission time. Only submissions made in the contest count.",
+      "forbiddenTitle": "This list is hidden",
+      "forbiddenBody": "The contest ranking is not open to you, so neither are its best submissions.",
+      "missingTitle": "This problem is not in the contest",
+      "loadFailed": "The contest could not be loaded",
+      "retry": "Retry"
     }
   },
   "placeholder": {
