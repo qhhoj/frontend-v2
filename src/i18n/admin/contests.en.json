@@ -278,8 +278,7 @@
       "button": "Calculate rating",
       "confirmTitle": "Calculate the rating?",
       "confirmBody": "The ratings of the participants in this contest will be updated. Only do this once the ranking is settled and the official ranking is uploaded.",
-      "confirm": "Calculate rating",
-      "unavailable": "Rating is calculated only after the contest ends and the ranking is no longer frozen."
+      "confirm": "Calculate rating"
     },
     "status": {
       "queued": "Waiting in the background queue.",

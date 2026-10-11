@@ -41,9 +41,11 @@ const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PARTICIPATI
 const goToPage = (target: number) =>
   router.push({ query: { ...route.query, page: String(target) } });
 const toggle = (id: string) => (expandedId.value = expandedId.value === id ? null : id);
-/** After an add, the list shows that user's rows. */
+/** After an add, the list shows every row of that user, whatever kind or status was filtered. */
 const showUser = (username: string) =>
-  router.replace({ query: { ...route.query, user: username, page: undefined } });
+  router.replace({
+    query: { ...route.query, user: username, kind: undefined, status: undefined, page: undefined },
+  });
 </script>
 
 <template>

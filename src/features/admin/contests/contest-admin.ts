@@ -1,5 +1,5 @@
 import type { ContestFormatName } from '@/api/types/contests';
-import { isBoardFrozen } from '@/lib/board-freeze';
+import { freezesInFormat } from '@/lib/board-freeze';
 
 /** The contest fields whose change makes the backend rescore every participation (`scoringOf` in the editing service). */
 const SCORING_FIELDS = [
@@ -34,7 +34,7 @@ export function freezeStateOf(
   },
   now: number,
 ): FreezeState {
-  if (!isBoardFrozen({ ...contest, frozenLastMinutes: 1 })) return { kind: 'unsupported' };
+  if (!freezesInFormat(contest.formatName)) return { kind: 'unsupported' };
   if (contest.frozenLastMinutes <= 0) return { kind: 'off' };
   const at = new Date(Date.parse(contest.endTime) - contest.frozenLastMinutes * 60_000);
   return now >= at.getTime() ? { kind: 'frozen', since: at } : { kind: 'scheduled', at };

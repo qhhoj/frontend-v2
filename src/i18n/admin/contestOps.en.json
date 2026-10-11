@@ -2,7 +2,7 @@
   "unsaved": "Unsaved changes.",
   "cancel": "Cancel",
   "general": {
-    "rescoreNotice": "Saving these changes rescores all {count} participations in the background, and re-rates the contest if it has ratings."
+    "rescoreNotice": "Saving these changes rescores every participation in the background, and re-rates the contest if it has ratings."
   },
   "rate": {
     "notEnded": "Rating is available once the contest has ended.",

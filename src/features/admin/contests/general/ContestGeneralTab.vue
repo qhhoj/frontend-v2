@@ -4,8 +4,6 @@ import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import type { EditableContest } from '@/api/types/contest-editing';
-import { formatNumber } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
 import DraftLeaveDialog from '../../problems/drafts/DraftLeaveDialog.vue';
 import { useDraftLeaveGuard } from '../../problems/drafts/use-draft-leave-guard';
 import { rescoresOn } from '../contest-admin';
@@ -13,7 +11,6 @@ import ContestGeneralForm from './ContestGeneralForm.vue';
 import { useContestForm } from './use-contest-form';
 
 const props = defineProps<{ contest: EditableContest }>();
-const locale = useLocaleStore();
 const { form, errors, isDirty, pendingPatch, save, mutation } = useContestForm(() => props.contest);
 const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
 /** The save will queue a rescore of every participation (the backend's scoring fields changed). */
@@ -41,11 +38,7 @@ const hasCodes = computed(() => ({
       class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid py-3"
     >
       <p v-if="willRescore" class="basis-full text-sm text-muted">
-        {{
-          $t('admin.contestOps.general.rescoreNotice', {
-            count: formatNumber(contest.userCount + contest.virtualCount, locale.locale),
-          })
-        }}
+        {{ $t('admin.contestOps.general.rescoreNotice') }}
       </p>
       <button type="submit" :class="ADMIN_PRIMARY_CLASS" :aria-disabled="!isDirty || undefined">
         {{ $t('admin.ui.save') }}

@@ -2,7 +2,7 @@
   "unsaved": "Có thay đổi chưa lưu.",
   "cancel": "Hủy",
   "general": {
-    "rescoreNotice": "Lưu các thay đổi này sẽ tính lại điểm của cả {count} lượt tham gia (chạy nền), và tính lại rating nếu kỳ thi đã có rating."
+    "rescoreNotice": "Lưu các thay đổi này sẽ tính lại điểm của mọi lượt tham gia (chạy nền), và tính lại rating nếu kỳ thi đã có rating."
   },
   "rate": {
     "notEnded": "Chỉ tính rating được sau khi kỳ thi kết thúc.",

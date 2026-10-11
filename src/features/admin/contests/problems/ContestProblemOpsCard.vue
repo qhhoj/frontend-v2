@@ -25,17 +25,24 @@ const isRejudgeOpen = ref(false);
 const canRejudge = computed(() => can('judge.rejudge_submission'));
 const selected = computed(() => problems.value.find((entry) => entry.code === selectedCode.value));
 
-/** The last dry run's answer: how many would be queued and whether the bulk limit lets this editor do it. */
-const lastPreview = ref<{ count: number; allowed: boolean } | null>(null);
+/** The last dry run's answer, with the `force` it was counted for: how many would be queued and whether the bulk limit lets this editor do it. */
+const lastPreview = ref<{ count: number; allowed: boolean; force: boolean } | null>(null);
 const rejudgedCount = ref(0);
 const preview = useAdminMutation({
-  mutate: () =>
-    rejudgeContestProblem(props.contest.key, selectedCode.value, {
+  mutate: async () => {
+    const force = includeLocked.value;
+    const result = await rejudgeContestProblem(props.contest.key, selectedCode.value, {
       dryRun: true,
-      force: includeLocked.value,
-    }),
+      force,
+    });
+    return { ...result, force };
+  },
   onSuccess: (result) => {
     lastPreview.value = result;
+  },
+  // A toggle while counting is dropped by the pending run: count again for the box's current state.
+  onDone: (result) => {
+    if (isRejudgeOpen.value && result.force !== includeLocked.value) void preview.run(undefined);
   },
 });
 const rejudge = useAdminMutation({
@@ -50,7 +57,10 @@ const rejudge = useAdminMutation({
   },
 });
 const canConfirmRejudge = computed(
-  () => !preview.isPending.value && (lastPreview.value?.allowed ?? false),
+  () =>
+    !preview.isPending.value &&
+    lastPreview.value?.force === includeLocked.value &&
+    lastPreview.value.allowed,
 );
 const rescore = useAdminMutation({
   mutate: () => rescoreContestProblem(props.contest.key, selectedCode.value),
@@ -65,6 +75,11 @@ function openRejudge() {
   void preview.run(undefined);
 }
 watch(includeLocked, () => isRejudgeOpen.value && void preview.run(undefined));
+/** A save on this tab can remove the selected problem or add the first one. */
+watch(problems, (listed) => {
+  if (!listed.some((entry) => entry.code === selectedCode.value))
+    selectedCode.value = listed[0]?.code ?? '';
+});
 watch(selectedCode, () => {
   rejudge.reset();
   rescore.reset();

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
@@ -30,7 +30,10 @@ const locale = useLocaleStore();
 const viewer = useViewerId();
 const queryClient = useQueryClient();
 const { can } = usePermissions();
+/** The clock the states are read against, moved on every half minute so a scheduled freeze or lock turns on in place. */
 const now = ref(Date.now());
+const clock = setInterval(() => (now.value = Date.now()), 30_000);
+onBeforeUnmount(() => clearInterval(clock));
 const freeze = computed(() => freezeStateOf(props.contest, now.value));
 const lockedAfter = computed(() => props.contest.settings?.lockedAfter ?? null);
 const isLocked = computed(() => isLockedNow(lockedAfter.value, now.value));

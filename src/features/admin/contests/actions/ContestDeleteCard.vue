@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useQueryClient } from '@tanstack/vue-query';
 import { useRouter } from 'vue-router';
 import { deleteContest } from '@/api/contest-admin.api';
 import type { EditableContest } from '@/api/types/contest-editing';
@@ -9,7 +10,7 @@ import AdminField from '../../ui/AdminField.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
+import { CONTEST_INDEX_KEY } from '../contest-editing.queries';
 
 /**
  * The danger zone: deletes a hidden, unrated contest once its key is typed again. A visible contest is not offered the
@@ -17,6 +18,7 @@ import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queri
  */
 const props = defineProps<{ contest: EditableContest }>();
 const router = useRouter();
+const queryClient = useQueryClient();
 const isOpen = ref(false);
 const typedKey = ref('');
 const isVisible = computed(() => props.contest.settings?.isVisible ?? true);
@@ -26,7 +28,12 @@ const unavailable = computed(() =>
 
 const mutation = useAdminMutation({
   mutate: () => deleteContest(props.contest.key, typedKey.value.trim()),
-  invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
+  invalidates: () => [CONTEST_INDEX_KEY, ['contests', 'list']],
+  // The editor's own caches name a contest that is gone: dropped, not refetched into a 404.
+  onSuccess: () => {
+    queryClient.removeQueries({ queryKey: ['admin', 'contest', props.contest.key] });
+    queryClient.removeQueries({ queryKey: ['admin', 'contest-actions', props.contest.key] });
+  },
   onDone: () => {
     isOpen.value = false;
     void router.push({ name: 'admin-contests' });
