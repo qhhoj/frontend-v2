@@ -2072,6 +2072,9 @@
     "footerChangeLabel": "Đổi chế độ tiết kiệm",
     "title": "Chế độ tiết kiệm"
   },
+  "adminEdit": {
+    "label": "Sửa trong quản trị"
+  },
   "shortLink": {
     "notFoundHint": "Bạn có thể không có quyền xem trang này.",
     "copy": "Sao chép",

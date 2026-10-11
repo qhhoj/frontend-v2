@@ -2,18 +2,22 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
+import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { flatpageEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import QueryState from '@/components/QueryState.vue';
 import UserContent from '@/components/UserContent.vue';
 import { translate } from '@/i18n';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import { useSessionStore } from '@/stores/session.store';
 import { usePageTitle } from '@/router/page-title';
 import { safeRedirect } from '@/router/safe-redirect';
 import { flatpagePath } from './flatpage-path';
 import { useFlatpageQuery } from './flatpages.queries';
 
 const route = useRoute();
+const session = useSessionStore();
 const path = computed(() => flatpagePath(route.params.pathMatch ?? ''));
 const { data: page, isPending, error, refetch } = useFlatpageQuery(path);
 const status = computed(() => (error.value instanceof ApiError ? error.value.status : null));
@@ -55,7 +59,10 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
         <span aria-hidden="true"> / </span>
         <span>{{ page.title }}</span>
       </nav>
-      <h1 class="page-title">{{ page.title }}</h1>
+      <div class="flex items-start gap-3">
+        <h1 class="page-title min-w-0 flex-1">{{ page.title }}</h1>
+        <AdminEditLink :to="flatpageEditTarget(session.user)" />
+      </div>
       <UserContent :html="page.contentHtml" class="overflow-x-auto" />
     </article>
   </QueryState>

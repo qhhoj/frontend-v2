@@ -2,11 +2,14 @@
 import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
+import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import QueryState from '@/components/QueryState.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
+import { useSessionStore } from '@/stores/session.store';
 import { usePageTitle } from '@/router/page-title';
 import ContestActions from './ContestActions.vue';
 import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
@@ -25,6 +28,7 @@ import { useContestQuery } from './contests.queries';
 const SERVER_CATCH_UP_MS = 1500;
 
 const route = useRoute();
+const session = useSessionStore();
 const key = computed(() => String(route.params.key));
 const { data: contest, isPending, error, refetch } = useContestQuery(key);
 usePageTitle(() => contest.value?.name);
@@ -55,7 +59,9 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
         <ContestTabs :contest-key="key" :phase="contest.phase" />
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
           <template #actions
-            ><ContestActions :contest="contest" /><ShortLinkButton
+            ><ContestActions :contest="contest" /><AdminEditLink
+              class="self-end"
+              :to="contestEditTarget(session.user, contest)" /><ShortLinkButton
               :path="shortLinkPath({ kind: 'contest', key: contest.key })"
           /></template>
         </ContestHeaderCard>

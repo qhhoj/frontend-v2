@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
+import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { organizationEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import StateBit from '@/components/StateBit.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { formatNumber, formatNumericDate } from '@/lib/format';
 import { medalClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useSessionStore } from '@/stores/session.store';
 import MembershipPanel from './MembershipPanel.vue';
 import OrganizationLogo from './OrganizationLogo.vue';
 import { slotsLine } from './organization-facts';
@@ -14,6 +17,8 @@ import { slotsLine } from './organization-facts';
 /** The title row of the header band: logo, name, facts and the viewer's membership panel. `rank` is null while unknown. */
 const props = defineProps<{ organization: OrganizationDetail; rank: number | null }>();
 const locale = useLocaleStore();
+const session = useSessionStore();
+const editTarget = computed(() => organizationEditTarget(session.user, props.organization));
 const places = computed(() => slotsLine(props.organization));
 const founded = computed(() => formatNumericDate(props.organization.createdAt, locale.locale));
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
@@ -50,10 +55,13 @@ const joinPolicyKey = computed(() =>
       <p class="text-sm text-muted">
         {{ $t('orgs.founded', { date: founded }) }} · {{ $t(places.key, places.params ?? {}) }}
       </p>
-      <ShortLinkButton
-        class="sm:self-start"
-        :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
-      />
+      <div class="flex flex-wrap items-center gap-2">
+        <AdminEditLink :to="editTarget" />
+        <ShortLinkButton
+          class="sm:self-start"
+          :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
+        />
+      </div>
     </div>
     <MembershipPanel :organization="organization" />
   </section>
