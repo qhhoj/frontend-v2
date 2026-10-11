@@ -58,12 +58,16 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
       <template v-if="contest">
         <ContestTabs :contest-key="key" :phase="contest.phase" />
         <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
-          <template #actions
-            ><ContestActions :contest="contest" /><AdminEditLink
-              class="self-end"
-              :to="contestEditTarget(session.user, contest)" /><ShortLinkButton
-              :path="shortLinkPath({ kind: 'contest', key: contest.key })"
-          /></template>
+          <template #actions>
+            <ContestActions :contest="contest" />
+            <div class="flex items-start gap-2">
+              <ShortLinkButton
+                class="flex-1"
+                :path="shortLinkPath({ kind: 'contest', key: contest.key })"
+              />
+              <AdminEditLink class="mt-1.5" :to="contestEditTarget(session.user, contest)" />
+            </div>
+          </template>
         </ContestHeaderCard>
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
           <div class="flex min-w-0 flex-col gap-6">
