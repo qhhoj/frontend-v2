@@ -37,7 +37,7 @@ interface Screen {
 const rows = <T>(make: (index: number) => T, count = 6) =>
   Array.from({ length: count }, (_unused, index) => stretch(make(index)));
 
-/** A screen whose one list endpoint answers with `make(n)` rows. */
+/** A screen whose one list endpoint answers with `make(index)` rows. */
 function list(
   name: string,
   path: string,
@@ -85,60 +85,60 @@ const SCREENS: Screen[] = [
       api.routes['GET /admin/user-activity/live'] = adminOk(stretch(liveActivity()));
     },
   },
-  list('users', '/admin/users', 'judge.ban_user', 'GET /admin/users', (n) =>
-    staffUser({ id: `u-${n}` }),
+  list('users', '/admin/users', 'judge.ban_user', 'GET /admin/users', (index) =>
+    staffUser({ id: `u-${index}` }),
   ),
   list(
     'organizations',
     '/admin/organizations',
     'judge.edit_all_organization',
     'GET /organizations',
-    (n) => organizationItem({ id: `o-${n}` }),
+    (index) => organizationItem({ id: `o-${index}` }),
   ),
-  list('posts', '/admin/posts', 'judge.edit_all_post', 'GET /admin/posts', (n) =>
-    postItem({ id: `p-${n}` }),
+  list('posts', '/admin/posts', 'judge.edit_all_post', 'GET /admin/posts', (index) =>
+    postItem({ id: `p-${index}` }),
   ),
-  list('judges', '/admin/judges', 'judge.change_judge', 'GET /judges', (n) =>
-    judge({ id: `j-${n}`, name: `judge-${n}` }),
+  list('judges', '/admin/judges', 'judge.change_judge', 'GET /judges', (index) =>
+    judge({ id: `j-${index}`, name: `judge-${index}` }),
   ),
-  list('languages', '/admin/languages', 'judge.change_language', 'GET /admin/languages', (n) =>
-    languageAdmin({ id: `l-${n}`, key: `LANG${n}` }),
+  list('languages', '/admin/languages', 'judge.change_language', 'GET /admin/languages', (index) =>
+    languageAdmin({ id: `l-${index}`, key: `LANG${index}` }),
   ),
-  list('short links', '/admin/short-links', 'judge.manage_short_link', 'GET /short-links', (n) =>
-    shortLink({ code: `code${n}` }),
+  list('short links', '/admin/short-links', 'judge.manage_short_link', 'GET /short-links', (index) =>
+    shortLink({ code: `code${index}` }),
   ),
   list(
     'integrations',
     '/admin/integrations',
     'judge.manage_integration',
     'GET /integration-clients',
-    (n) => integrationClient({ id: `n-${n}` }),
+    (index) => integrationClient({ id: `n-${index}` }),
   ),
   list(
     'canned replies',
     '/admin/tickets/canned',
     'judge.change_ticket',
     'GET /ticket-canned-replies',
-    (n) => cannedReply({ id: `c-${n}` }),
+    (index) => cannedReply({ id: `c-${index}` }),
   ),
-  list('tickets', '/admin/tickets', 'judge.change_ticket', 'GET /tickets', (n) =>
-    ticketItem({ id: `t-${n}` }),
+  list('tickets', '/admin/tickets', 'judge.change_ticket', 'GET /tickets', (index) =>
+    ticketItem({ id: `t-${index}` }),
   ),
-  list('problems', '/admin/problems', 'judge.add_problem', 'GET /problems', (n) =>
-    adminProblemItem({ code: `p${n}` }),
+  list('problems', '/admin/problems', 'judge.add_problem', 'GET /problems', (index) =>
+    adminProblemItem({ code: `p${index}` }),
   ),
-  list('contests', '/admin/contests', 'judge.add_contest', 'GET /contests', (n) =>
-    adminContestItem({ key: `c${n}` }),
+  list('contests', '/admin/contests', 'judge.add_contest', 'GET /contests', (index) =>
+    adminContestItem({ key: `c${index}` }),
   ),
-  list('pages', '/admin/pages', 'flatpages.change_flatpage', 'GET /admin/site/pages', (n) =>
-    flatpageItem({ id: `f${n}` }),
+  list('pages', '/admin/pages', 'flatpages.change_flatpage', 'GET /admin/site/pages', (index) =>
+    flatpageItem({ id: `f${index}` }),
   ),
   list(
     'similarity runs',
     '/admin/similarity?contest=hcmus-w41',
     'judge.moss_contest',
     'GET /similarity/runs',
-    (n) => similarityRun({ id: `r${n}` }),
+    (index) => similarityRun({ id: `r${index}` }),
     /nguyen_van|ngắn nhất|very-long|Chưa|Kiểm tra/,
   ),
   list(
@@ -146,15 +146,15 @@ const SCREENS: Screen[] = [
     '/admin/contest-tags',
     'judge.change_contest_tag',
     'GET /contest-tags',
-    (n) => contestTag({ slug: `tag${n}`, name: `Tag ${n}` }),
+    (index) => contestTag({ slug: `tag${index}`, name: `Tag ${index}` }),
   ),
   list(
     'deleted problems',
     '/admin/problems/deleted',
     'judge.delete_problem',
     'GET /problems/deleted',
-    (n) => ({
-      code: `del${n}`,
+    (index) => ({
+      code: `del${index}`,
       name: 'Bài đã xoá',
       daysLeft: 20,
       deletedAt: '2026-10-01T00:00:00Z',
@@ -167,12 +167,12 @@ const SCREENS: Screen[] = [
     '/admin/organizations/quotas',
     'judge.edit_all_organization',
     'GET /organizations/usage',
-    (n) => ({
+    (index) => ({
       creditsLimit: 100,
       creditsUsed: 40,
       month: '2026-10',
       name: 'Trường THPT',
-      slug: `org${n}`,
+      slug: `org${index}`,
       storageLimit: 1000,
       storageUsed: 100,
       unlimited: false,
@@ -183,13 +183,13 @@ const SCREENS: Screen[] = [
     '/admin/comments/reports',
     'judge.change_comment',
     'GET /comments/reports',
-    (n) => ({
+    (index) => ({
       comment: {
         author: { id: 'u', rating: null, username: 'linhnt' },
         deleted: false,
         excerpt: 'Nội dung bình luận bị báo cáo',
         hidden: false,
-        id: `cm${n}`,
+        id: `cm${index}`,
       },
       lastReportedAt: '2026-10-08T10:00:00Z',
       lastSettledAt: null,
@@ -213,23 +213,23 @@ const SCREENS: Screen[] = [
     '/admin/comments/locks',
     'judge.change_comment',
     'GET /comments/locks',
-    (n) => ({ key: `hcmus${n}`, title: 'Dãy số đẹp', type: 'problem', url: '/problems/x' }),
+    (index) => ({ key: `hcmus${index}`, title: 'Dãy số đẹp', type: 'problem', url: '/problems/x' }),
   ),
-  list('all comments', '/admin/comments', 'judge.change_comment', 'GET /admin/comments', (n) => ({
+  list('all comments', '/admin/comments', 'judge.change_comment', 'GET /admin/comments', (index) => ({
     comment: {
       author: { id: 'u', rating: null, username: 'linhnt' },
       deleted: false,
       excerpt: 'Nội dung bình luận',
       hidden: false,
-      id: `cm${n}`,
+      id: `cm${index}`,
     },
     hiddenBy: null,
     page: { key: 'hcmus41a', title: 'Dãy số đẹp', type: 'problem' },
     pageNumber: 1,
     createdAt: '2026-10-08T10:00:00Z',
   })),
-  list('submissions', '/admin/submissions', 'judge.rejudge_submission', 'GET /submissions', (n) =>
-    submissionItem({ id: `sub-${n}` }),
+  list('submissions', '/admin/submissions', 'judge.rejudge_submission', 'GET /submissions', (index) =>
+    submissionItem({ id: `sub-${index}` }),
   ),
 ];
 
