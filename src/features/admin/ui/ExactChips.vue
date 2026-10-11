@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Chip extends { id: string }">
 import { computed, ref, useId } from 'vue';
 import { failureTextOf, isNotFound } from './admin-errors';
+import { needsPermissionText } from './permission-text';
 import { X } from 'lucide-vue-next';
 import { ADMIN_INPUT_CLASS } from './classes';
 import { useChipSuggestions } from './use-chip-suggestions';
@@ -156,7 +157,7 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
       {{ $t('admin.ui.maxReached', { max }) }}
     </p>
     <p v-if="lockedBy" :id="`${id}-locked`" class="text-xs text-muted">
-      {{ $t('admin.ui.needsPermission', { permission: lockedBy }) }}
+      {{ needsPermissionText(lockedBy) }}
     </p>
   </div>
 </template>
