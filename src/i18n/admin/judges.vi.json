@@ -8,7 +8,10 @@
     "lead": "Máy chấm đang kết nối, tải và trạng thái. Khoá xác thực chỉ hiện một lần khi tạo hoặc cấp mới.",
     "addButton": "Thêm máy chấm",
     "empty": "Chưa có máy chấm nào.",
-    "emptyAdd": "Thêm máy chấm"
+    "emptyAdd": "Thêm máy chấm",
+    "search": "Tìm máy chấm",
+    "searchPlaceholder": "Tên hoặc IP",
+    "noMatch": "Không có máy chấm nào khớp."
   },
   "stats": {
     "online": "đang trực tuyến",
@@ -42,7 +45,11 @@
     "started": "Khởi động lúc {time} · ping là trung bình 6 lần gần nhất.",
     "descriptionLabel": "Mô tả (hiện cho nhân viên)",
     "saveDescription": "Lưu mô tả",
-    "loadLabel": "Tải"
+    "loadLabel": "Tải",
+    "delete": "Xóa",
+    "protocol": "Giao thức",
+    "features": "Tính năng",
+    "lastIp": "IP gần nhất"
   },
   "runtimes": {
     "caption": "Ngôn ngữ máy chấm báo về",
@@ -87,5 +94,33 @@
     "cancel": "Huỷ",
     "submit": "Tạo và lấy khoá",
     "descriptionTooLong": "Tối đa 10 000 ký tự."
+  },
+  "delete": {
+    "title": "Xóa máy chấm {name}?",
+    "body": "Máy chấm đang ngắt kết nối sẽ bị xóa khỏi danh sách cùng khóa của nó. Bài nộp đang chờ riêng máy này sẽ chuyển sang máy chấm khác.",
+    "confirm": "Xóa máy chấm"
+  },
+  "queue": {
+    "title": "Hàng đợi chấm",
+    "openQueued": "Xem bài đang chờ",
+    "queued": "Đang chờ",
+    "processing": "Đã giao máy chấm",
+    "grading": "Đang chấm",
+    "oldest": "Chờ lâu nhất từ",
+    "byPriority": "Theo mức ưu tiên",
+    "byLanguage": "Theo ngôn ngữ",
+    "empty": "Không có bài nộp nào đang chờ.",
+    "judgesOnline": "{count} máy chấm trực tuyến",
+    "priority": {
+      "contest": "Kỳ thi",
+      "normal": "Thường",
+      "rejudge": "Chấm lại",
+      "batch": "Chấm lại hàng loạt"
+    },
+    "alerts": {
+      "noJudge": "{count} bài nộp {subject} đang chờ nhưng không máy chấm trực tuyến nào chạy được ngôn ngữ này.",
+      "pinnedOffline": "{count} bài nộp đang chờ riêng máy chấm {subject}, mà máy này không hoạt động.",
+      "stale": "Bài nộp chờ lâu nhất đã quá 5 phút: hàng đợi có thể đang tắc."
+    }
   }
 }

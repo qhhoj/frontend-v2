@@ -40,14 +40,15 @@
       "commentReports": "Review reported comments, resolve or dismiss the reports.",
       "contests": "Announcements, official rankings, rejudging and rating.",
       "similarity": "Run a code similarity check by problem or by contest.",
-      "rejudge": "Rejudge the submissions of a problem that match a filter.",
+      "rejudge": "Rejudge or rescore by problem, contest, user or judge.",
       "judges": "The list of judges, locking and disconnecting them.",
       "users": "Ban or unban accounts and sign in as a user.",
       "activity": "View and export logs, summaries by user.",
       "settings": "Limits, similarity and other settings, and the change history.",
       "pages": "Create and edit about and policy pages.",
       "tickets": "Tickets sent by users.",
-      "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import."
+      "polygonImport": "Pick a problem shared on Polygon, configure it and follow the import.",
+      "submissions": "Filter submissions, select many to rejudge or recalculate points."
     }
   },
   "screens": {

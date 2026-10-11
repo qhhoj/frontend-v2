@@ -9,6 +9,7 @@ const emit = defineEmits<{
   askBlock: [];
   askRotate: [];
   askDisconnect: [];
+  askDelete: [];
 }>();
 </script>
 
@@ -39,6 +40,14 @@ const emit = defineEmits<{
     </button>
     <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('askDisconnect')">
       {{ $t('admin.judges.row.disconnect') }}
+    </button>
+    <button
+      v-if="!judge.online"
+      type="button"
+      :class="ADMIN_DANGER_CLASS"
+      @click="emit('askDelete')"
+    >
+      {{ $t('admin.judges.row.delete') }}
     </button>
   </div>
 </template>

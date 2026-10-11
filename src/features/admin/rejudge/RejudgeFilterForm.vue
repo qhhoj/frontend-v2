@@ -1,15 +1,37 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import VerdictChips from '../ui/VerdictChips.vue';
+import {
+  ADMIN_BUTTON_CLASS,
+  ADMIN_CHECK_CHIP_CLASS,
+  ADMIN_DANGER_CLASS,
+  ADMIN_INPUT_CLASS,
+} from '../ui/classes';
 import type { FieldErrors } from '../ui/admin-errors';
-import type { RejudgeFilter } from './rejudge-filter';
+import { RESULT_PRESETS, isSiteWide } from './rejudge-filter';
+import type { RejudgeFilter, ResultPreset } from './rejudge-filter';
 
 defineProps<{ languages: Language[]; errors: FieldErrors }>();
 const filter = defineModel<RejudgeFilter>('filter', { required: true });
-defineEmits<{ rejudge: []; reset: [] }>();
+defineEmits<{ rejudge: []; rescore: []; reset: [] }>();
+
+type TextField = 'problem' | 'contest' | 'user' | 'judgedOn' | 'idFrom' | 'idTo';
+type DateField = 'dateFrom' | 'dateTo';
+const TEXT_PAIRS: [TextField, TextField][] = [
+  ['problem', 'contest'],
+  ['user', 'judgedOn'],
+];
+const DATE_FIELDS: DateField[] = ['dateFrom', 'dateTo'];
+const ID_FIELDS: TextField[] = ['idFrom', 'idTo'];
+const PRESETS = Object.keys(RESULT_PRESETS) as ResultPreset[];
+const siteWide = computed(() => isSiteWide(filter.value));
+const applyPreset = (preset: ResultPreset) => {
+  filter.value.results = [...RESULT_PRESETS[preset]];
+};
 </script>
 
 <template>
@@ -26,70 +48,84 @@ defineEmits<{ rejudge: []; reset: [] }>();
       </span>
     </header>
 
-    <AdminField
-      v-slot="{ id, describedBy }"
-      :label="$t('admin.rejudge.filter.problem')"
-      :hint="$t('admin.rejudge.filter.problemHint')"
-      :error="errors.problem"
-      input-id="rejudge-problem"
-    >
-      <input
-        :id="id"
-        v-model="filter.problem"
-        type="text"
-        :class="ADMIN_INPUT_CLASS"
-        :aria-describedby="describedBy"
-        :aria-invalid="errors.problem ? 'true' : undefined"
-        autocomplete="off"
-      />
-    </AdminField>
-
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div v-for="pair in TEXT_PAIRS" :key="pair[0]" class="grid gap-4 sm:grid-cols-2">
       <AdminField
+        v-for="field in pair"
+        :key="field"
         v-slot="{ id, describedBy }"
-        :label="$t('admin.rejudge.filter.idFrom')"
-        :hint="$t('admin.rejudge.filter.idHint')"
-        :error="errors.idFrom"
-        input-id="rejudge-id-from"
+        :label="$t(`admin.rejudge.filter.${field}`)"
+        :hint="$t(`admin.rejudge.filter.${field}Hint`)"
+        :error="errors[field]"
+        :input-id="`rejudge-${field}`"
       >
         <input
           :id="id"
-          v-model="filter.idFrom"
+          v-model="filter[field]"
           type="text"
           :class="ADMIN_INPUT_CLASS"
           :aria-describedby="describedBy"
-          :aria-invalid="errors.idFrom ? 'true' : undefined"
-          autocomplete="off"
-        />
-      </AdminField>
-      <AdminField
-        v-slot="{ id, describedBy }"
-        :label="$t('admin.rejudge.filter.idTo')"
-        :error="errors.idTo"
-        input-id="rejudge-id-to"
-      >
-        <input
-          :id="id"
-          v-model="filter.idTo"
-          type="text"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-          :aria-invalid="errors.idTo ? 'true' : undefined"
+          :aria-invalid="errors[field] ? 'true' : undefined"
           autocomplete="off"
         />
       </AdminField>
     </div>
+    <p v-if="siteWide" class="rounded-row border border-line bg-surface-hover p-3 text-sm">
+      {{ $t('admin.rejudge.filter.siteWide') }}
+    </p>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <AdminField
+        v-for="field in DATE_FIELDS"
+        :key="field"
+        v-slot="{ id, describedBy }"
+        :label="$t(`admin.rejudge.filter.${field}`)"
+        :error="errors[field]"
+        :input-id="`rejudge-${field}`"
+      >
+        <input
+          :id="id"
+          v-model="filter[field]"
+          type="datetime-local"
+          :class="ADMIN_INPUT_CLASS"
+          :aria-describedby="describedBy"
+          :aria-invalid="errors[field] ? 'true' : undefined"
+        />
+      </AdminField>
+    </div>
+
+    <details class="rounded-row border border-line p-3" :open="!!(filter.idFrom || filter.idTo)">
+      <summary class="cursor-pointer text-sm font-semibold">
+        {{ $t('admin.rejudge.filter.idRange') }}
+      </summary>
+      <p class="mt-2 text-xs text-muted">{{ $t('admin.rejudge.filter.idHint') }}</p>
+      <div class="mt-3 grid gap-4 sm:grid-cols-2">
+        <AdminField
+          v-for="field in ID_FIELDS"
+          :key="field"
+          v-slot="{ id, describedBy }"
+          :label="$t(`admin.rejudge.filter.${field}`)"
+          :error="errors[field]"
+          :input-id="`rejudge-${field}`"
+        >
+          <input
+            :id="id"
+            v-model="filter[field]"
+            type="text"
+            :class="`${ADMIN_INPUT_CLASS} font-mono text-sm`"
+            :aria-describedby="describedBy"
+            :aria-invalid="errors[field] ? 'true' : undefined"
+            autocomplete="off"
+          />
+        </AdminField>
+      </div>
+    </details>
 
     <fieldset class="flex flex-col gap-2">
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.languages') }}</legend>
       <p class="text-xs text-muted">{{ $t('admin.rejudge.filter.languagesHint') }}</p>
       <p v-if="errors.languages" class="text-sm text-negative">{{ errors.languages }}</p>
       <div class="flex flex-wrap gap-2">
-        <label
-          v-for="language in languages"
-          :key="language.id"
-          class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-3"
-        >
+        <label v-for="language in languages" :key="language.id" :class="ADMIN_CHECK_CHIP_CLASS">
           <input
             v-model="filter.languageIds"
             type="checkbox"
@@ -104,16 +140,23 @@ defineEmits<{ rejudge: []; reset: [] }>();
     <fieldset class="flex flex-col gap-2">
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.results') }}</legend>
       <p class="text-xs text-muted">{{ $t('admin.rejudge.filter.resultsHint') }}</p>
-      <div class="flex flex-wrap gap-2">
-        <label
-          v-for="code in SUBMISSION_RESULT_CODES"
-          :key="code"
-          class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-3 font-mono"
+      <div class="flex flex-wrap items-center gap-2 text-sm">
+        <span class="text-muted">{{ $t('admin.rejudge.filter.presets') }}</span>
+        <button
+          v-for="preset in PRESETS"
+          :key="preset"
+          type="button"
+          class="min-h-11 rounded-pill border border-line-strong px-3 font-semibold hover:bg-surface-hover"
+          @click="applyPreset(preset)"
         >
-          <input v-model="filter.results" type="checkbox" name="rejudge-result" :value="code" />
-          {{ code }}
-        </label>
+          {{ $t(`admin.rejudge.presets.${preset}`) }}
+        </button>
       </div>
+      <VerdictChips
+        v-model="filter.results"
+        :codes="SUBMISSION_RESULT_CODES"
+        name="rejudge-result"
+      />
     </fieldset>
 
     <AdminSwitch
@@ -126,6 +169,9 @@ defineEmits<{ rejudge: []; reset: [] }>();
     <div class="flex flex-wrap gap-3">
       <button type="button" :class="ADMIN_BUTTON_CLASS" @click="$emit('reset')">
         {{ $t('admin.rejudge.filter.reset') }}
+      </button>
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="$emit('rescore')">
+        {{ $t('admin.rejudge.filter.rescore') }}
       </button>
       <button type="button" :class="ADMIN_DANGER_CLASS" @click="$emit('rejudge')">
         {{ $t('admin.rejudge.filter.submit') }}

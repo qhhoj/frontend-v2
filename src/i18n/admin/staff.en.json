@@ -44,5 +44,11 @@
     "reject": "Submission rejected.",
     "abort": "Abort requested."
   },
-  "conflict": "The submission is locked, waiting for the contest's final judging, or being judged (409). The bulk rejudge has an option to include locked submissions; a single rejudge does not."
+  "conflict": "The submission is locked, waiting for the contest's final judging, or being judged (409). The bulk rejudge has an option to include locked submissions; a single rejudge does not.",
+  "judgedOn": "Graded by judge {judge}.",
+  "lockControl": {
+    "lock": "Lock submission",
+    "unlock": "Unlock",
+    "hint": "A locked submission is never rejudged, not even by a bulk rejudge (unless it includes locked ones)."
+  }
 }

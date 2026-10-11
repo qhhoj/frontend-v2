@@ -38,3 +38,32 @@ export function judgeStats(judges: Judge[]) {
 }
 
 export type JudgeStats = ReturnType<typeof judgeStats>;
+
+/** Legacy changelist order: online first, then by name. */
+export const sortJudges = (judges: Judge[]): Judge[] =>
+  [...judges].sort(
+    (first, second) =>
+      Number(second.online) - Number(first.online) || first.name.localeCompare(second.name),
+  );
+
+export interface JudgeListFilter {
+  status: JudgeStatus | null;
+  /** Part of the name or the last IP. */
+  search: string;
+}
+
+/** Each tile's filter tests the same flag its count does, so pressing a tile lists exactly its number of judges. */
+const HAS_STATUS: Record<JudgeStatus, (judge: Judge) => boolean> = {
+  online: (judge) => judge.online,
+  offline: (judge) => !judge.online,
+  blocked: (judge) => judge.isBlocked,
+  disabled: (judge) => judge.isDisabled,
+};
+
+export function matchesJudge(judge: Judge, { status, search }: JudgeListFilter): boolean {
+  if (status !== null && !HAS_STATUS[status](judge)) return false;
+  const needle = search.trim().toLowerCase();
+  return (
+    !needle || judge.name.toLowerCase().includes(needle) || (judge.lastIp ?? '').includes(needle)
+  );
+}

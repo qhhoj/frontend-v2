@@ -1,71 +1,41 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { computed, ref, useTemplateRef } from 'vue';
+import { useRoute } from 'vue-router';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { translate } from '@/i18n';
-import { formatNumber } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import type { FieldErrors } from '../ui/admin-errors';
-import RejudgeCountPanel from './RejudgeCountPanel.vue';
+import BatchActionDialogs from './BatchActionDialogs.vue';
+import RecentBatches from './RecentBatches.vue';
 import RejudgeFilterForm from './RejudgeFilterForm.vue';
 import RejudgeSummary from './RejudgeSummary.vue';
 import {
   checkRejudgeFilter,
   describeRejudgeFilter,
   emptyRejudgeFilter,
+  filterFromQuery,
   toRejudgeBody,
 } from './rejudge-filter';
 import type { RejudgeFilter } from './rejudge-filter';
-import { useBulkRejudge } from './use-bulk-rejudge';
-import { canConfirmRejudge, useRejudgeCount } from './use-rejudge-count';
+import type { RejudgeOutcome } from './use-bulk-rejudge';
 
-const filter = ref<RejudgeFilter>(emptyRejudgeFilter());
+/** A link from a contest or a problem prefills the scope (`?contest=…&problem=…`). */
+const filter = ref<RejudgeFilter>(filterFromQuery(useRoute().query));
 const errors = ref<FieldErrors>({});
-const isConfirmOpen = ref(false);
-const locale = useLocaleStore();
+const outcome = ref<RejudgeOutcome | null>(null);
+const dialogs = useTemplateRef('dialogs');
 const metaQuery = useProblemMetaQuery();
 const languages = computed(() => metaQuery.data.value?.languages ?? []);
-const { rejudge, outcome, isPending } = useBulkRejudge();
-const { state: countState, count: countMatching, reset: resetCount } = useRejudgeCount();
-const confirmTitle = computed(() =>
-  translate('admin.rejudge.confirm.title', { problem: filter.value.problem.trim() }),
-);
+const body = computed(() => toRejudgeBody(filter.value));
 const confirmLine = computed(() => {
   const text = describeRejudgeFilter(filter.value, languages.value);
-  return translate('admin.rejudge.confirm.line', {
-    problem: text.problem,
-    languages: text.languages,
-    results: text.results,
-    from: filter.value.idFrom.trim() ? text.from : translate('admin.rejudge.confirm.fromStart'),
-    locked: text.locked,
-  });
-});
-/** The button names what it will do: the counted number once known, "counting" while the server counts. */
-const confirmLabel = computed(() => {
-  const state = countState.value;
-  if (state.kind === 'counting') return translate('admin.rejudge.confirm.labelCounting');
-  if (state.kind === 'ready' && canConfirmRejudge(state))
-    return translate('admin.rejudge.confirm.labelCount', {
-      count: formatNumber(state.count, locale.locale),
-    });
-  return translate('admin.rejudge.confirm.labelPlain');
+  return translate('admin.rejudge.confirm.line', { ...text });
 });
 
 /** A filter with errors opens no dialog and sends nothing; a good one opens the dialog, which counts at once (a dry run). */
-function askToConfirm() {
+function ask(action: 'rejudge' | 'rescore') {
   errors.value = checkRejudgeFilter(filter.value);
-  if (Object.keys(errors.value).length > 0) return;
-  isConfirmOpen.value = true;
-  void countMatching(toRejudgeBody(filter.value));
-}
-watch(isConfirmOpen, (isOpen) => {
-  if (!isOpen) resetCount();
-});
-
-async function confirmRejudge() {
-  await rejudge(toRejudgeBody(filter.value));
-  isConfirmOpen.value = false;
+  if (Object.keys(errors.value).length === 0) dialogs.value?.open(action);
 }
 
 function resetFilter() {
@@ -89,24 +59,20 @@ function resetFilter() {
         v-model:filter="filter"
         :languages="languages"
         :errors="errors"
-        @rejudge="askToConfirm"
+        @rejudge="ask('rejudge')"
+        @rescore="ask('rescore')"
         @reset="resetFilter"
       />
-      <RejudgeSummary :filter="filter" :languages="languages" :outcome="outcome" />
+      <div class="flex flex-col gap-6">
+        <RejudgeSummary :filter="filter" :languages="languages" :outcome="outcome" />
+        <RecentBatches />
+      </div>
     </div>
-
-    <ConfirmDialog
-      v-model:visible="isConfirmOpen"
-      tone="danger"
-      :title="confirmTitle"
-      :confirm-label="confirmLabel"
-      :busy="isPending"
-      :can-confirm="canConfirmRejudge(countState)"
-      @confirm="confirmRejudge"
-    >
-      <RejudgeCountPanel :state="countState" />
-      <p class="text-sm">{{ confirmLine }}</p>
-      <p class="text-sm text-muted">{{ $t('admin.rejudge.confirm.body') }}</p>
-    </ConfirmDialog>
+    <BatchActionDialogs
+      ref="dialogs"
+      :body="body"
+      :line="confirmLine"
+      @outcome="(next) => (outcome = next)"
+    />
   </div>
 </template>

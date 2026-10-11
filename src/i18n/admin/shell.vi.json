@@ -40,14 +40,15 @@
       "commentReports": "Xem bình luận bị báo cáo, xử lý hoặc bỏ qua báo cáo.",
       "contests": "Thông báo, bảng xếp hạng chính thức, chấm lại, tính rating.",
       "similarity": "Chạy so sánh mã nguồn theo bài hoặc theo kỳ thi.",
-      "rejudge": "Xếp lại các bài nộp của một bài theo bộ lọc.",
+      "rejudge": "Chấm lại hoặc tính lại điểm theo bộ lọc bài, kỳ thi, người dùng, máy chấm.",
       "judges": "Danh sách máy chấm, khóa, ngắt kết nối.",
       "users": "Cấm hoặc bỏ cấm tài khoản, đăng nhập thay.",
       "activity": "Xem và xuất nhật ký, tóm tắt theo người dùng.",
       "settings": "Giới hạn, tương đồng, cấu hình khác và lịch sử sửa.",
       "pages": "Tạo và sửa trang giới thiệu, quy định.",
       "tickets": "Phiếu do người dùng gửi.",
-      "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập."
+      "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập.",
+      "submissions": "Lọc bài nộp, chọn nhiều bài để chấm lại hoặc tính lại điểm."
     }
   },
   "screens": {

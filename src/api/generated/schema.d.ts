@@ -2862,7 +2862,14 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete a judge server
+         * @description Needs `judge.change_judge`. Only an offline judge can be deleted: 409
+         *     `conflict` (issue `judge_online`) while it is connected, 404 `not_found` for
+         *     an unknown name. Queued submissions pinned to it fall back to any judge.
+         *     Answers 204.
+         */
+        delete: operations["JudgesController_remove"];
         options?: never;
         head?: never;
         /**
@@ -2914,6 +2921,30 @@ export interface paths {
          *     this once. Responds 404 `not_found` for an unknown name.
          */
         post: operations["JudgesController_rotateKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/judges/queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the judging queue's health
+         * @description Needs `judge.change_judge`. Counts queued (QU), handed-out (P) and grading
+         *     (G) submissions; when the longest-waiting queued one was submitted or
+         *     rejudged; queued counts per priority (0 contest, 1 normal, 2 rejudge, 3
+         *     batch rejudge), per language with how many usable online judges run it (0
+         *     means that language cannot drain), and per judge they are pinned to.
+         */
+        get: operations["JudgesController_queueSummary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5110,6 +5141,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/submissions/{id}/lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lock a submission
+         * @description Needs `judge.lock_submission` and edit rights on the problem (403
+         *     `forbidden`). A locked submission is refused by a single rejudge (409
+         *     `conflict`) and skipped by bulk rejudges unless they force it. Logged as a
+         *     submission revision. Answers 204.
+         */
+        post: operations["SubmissionActionsController_lock"];
+        /**
+         * Unlock a submission
+         * @description Same rights as locking. Clears the lock, including one a contest set, so the
+         *     submission can be rejudged again. Answers 204.
+         */
+        delete: operations["SubmissionActionsController_unlock"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/submissions/{id}/reject": {
         parameters: {
             query?: never;
@@ -5180,6 +5239,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/submissions/batches/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List recent bulk rejudges and rescores
+         * @description Needs `judge.rejudge_submission`. The 20 newest runs, newest first, with who
+         *     ran them, the filter and how many submissions they touched. Only holders of
+         *     `judge.edit_all_problem` see everyone's runs; others see their own.
+         */
+        get: operations["SubmissionBatchController_recent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/submissions/rejudge": {
         parameters: {
             query?: never;
@@ -5190,17 +5271,46 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Rejudge many submissions of a problem
-         * @description Needs `judge.rejudge_submission` and edit rights on the problem named by
-         *     `problem` (code). Matches the problem's submissions by optional `idFrom` and
-         *     `idTo`, `languages` and `results`; submissions a judge currently holds and
-         *     pending final-submission rows are skipped, and locked ones unless `force` is
-         *     set. More than 10 matches also need `judge.rejudge_submission_lot` (403
-         *     `forbidden`). With `dryRun` nothing changes and `count` and `allowed` report
-         *     what would happen. Otherwise the matches are queued at batch priority and
-         *     `count` is how many were reset.
+         * Rejudge many submissions
+         * @description Needs `judge.rejudge_submission` plus edit rights on the scope: the contest
+         *     named by `contest` (its submissions only), else the problem named by
+         *     `problem`, else `judge.edit_all_problem` for a site-wide batch (403
+         *     `forbidden`). Narrow it with `user`, `ids`, `idFrom`/`idTo`,
+         *     `dateFrom`/`dateTo`, `languages`, `results` and `judgedOn`. Submissions a
+         *     judge currently holds and pending final-submission rows are skipped, and
+         *     locked ones unless `force` is set. More than 10 matches also need
+         *     `judge.rejudge_submission_lot` (403 `forbidden`). With `dryRun` nothing
+         *     changes: `count`, `allowed` and a `sample` of the newest matches report what
+         *     would happen. Otherwise the matches are queued at batch priority, the run is
+         *     logged and `count` is how many were reset. 404 `not_found` for an unknown
+         *     contest or user or a problem the caller cannot see.
          */
-        post: operations["SubmissionActionsController_bulkRejudge"];
+        post: operations["SubmissionBatchController_rejudge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/submissions/rescore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Recalculate the points of many submissions
+         * @description Same rights and filter as the bulk rejudge, over finished submissions. With
+         *     a `contest` the contest's results are recomputed; otherwise every matched
+         *     problem is rescored (each graded submission's points from its case totals
+         *     and the problem's current points and partial flag, then its users, stats
+         *     and contests). Use it after changing a problem's points or partial flag.
+         *     With `dryRun` nothing is queued. The run is logged.
+         */
+        post: operations["SubmissionBatchController_rescore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6058,26 +6168,38 @@ export interface components {
             skipped: number;
         };
         BulkRejudgeDto: {
+            /** @description Contest key: only that contest's submissions. */
+            contest?: string;
+            /** @description Submitted at or after this time. */
+            dateFrom?: string;
+            /** @description Submitted before this time. */
+            dateTo?: string;
             /** @description Count what would be rejudged and change nothing. */
             dryRun?: boolean;
             /** @description Also rejudge locked submissions. */
             force?: boolean;
             /**
              * Format: uuid
-             * @description Inclusive id range (UUIDv7 ids sort by submission time).
+             * @description Lowest submission id (UUIDv7 ids sort by submission time).
              */
             idFrom?: string;
+            /** @description Only these submissions (a selection from the list). */
+            ids?: string[];
             /**
              * Format: uuid
-             * @description Highest submission id to rejudge.
+             * @description Highest submission id.
              */
             idTo?: string;
+            /** @description Only submissions last graded by this judge. */
+            judgedOn?: string;
             /** @description Only submissions in these language ids. */
             languages?: string[];
-            /** @description Problem code; required. */
-            problem: string;
+            /** @description Problem code. */
+            problem?: string;
             /** @description Only submissions with these verdicts. */
             results?: components["schemas"]["SubmissionResult"][];
+            /** @description Username. */
+            user?: string;
         };
         BulkRejudgeResponse: {
             /** @description The caller may run this rejudge: within `BULK_REJUDGE_LIMIT` or holds `judge.rejudge_submission_lot`. */
@@ -6086,6 +6208,50 @@ export interface components {
             count: number;
             /** @description Whether nothing was changed. */
             dryRun: boolean;
+            /** @description The newest few matches, on a dry run only; empty otherwise. */
+            sample: components["schemas"]["SubmissionListItemResponse"][];
+        };
+        BulkRescoreDto: {
+            /** @description Contest key: only that contest's submissions. */
+            contest?: string;
+            /** @description Submitted at or after this time. */
+            dateFrom?: string;
+            /** @description Submitted before this time. */
+            dateTo?: string;
+            /** @description Count what would be rescored and queue nothing. */
+            dryRun?: boolean;
+            /**
+             * Format: uuid
+             * @description Lowest submission id (UUIDv7 ids sort by submission time).
+             */
+            idFrom?: string;
+            /** @description Only these submissions (a selection from the list). */
+            ids?: string[];
+            /**
+             * Format: uuid
+             * @description Highest submission id.
+             */
+            idTo?: string;
+            /** @description Only submissions last graded by this judge. */
+            judgedOn?: string;
+            /** @description Only submissions in these language ids. */
+            languages?: string[];
+            /** @description Problem code. */
+            problem?: string;
+            /** @description Only submissions with these verdicts. */
+            results?: components["schemas"]["SubmissionResult"][];
+            /** @description Username. */
+            user?: string;
+        };
+        BulkRescoreResponse: {
+            /** @description Contests whose results are recomputed. */
+            contests: number;
+            /** @description Submissions matched. */
+            count: number;
+            /** @description Whether nothing was queued. */
+            dryRun: boolean;
+            /** @description Problems whose submissions are recomputed (outside a contest scope). */
+            problems: number;
         };
         BulkResultResponse: {
             /** @description The problem code from the request. */
@@ -7638,6 +7804,25 @@ export interface components {
             /** @description The new authentication key, shown only this once; only its hash is stored. */
             authKey: string;
         };
+        JudgeQueueResponse: {
+            /** @description Queued submissions per language, largest first. */
+            byLanguage: components["schemas"]["QueueLanguageResponse"][];
+            /** @description Queued submissions per priority, most urgent first. */
+            byPriority: components["schemas"]["QueuePriorityResponse"][];
+            /** @description Being graded (G). */
+            grading: number;
+            /**
+             * Format: date-time
+             * @description When the longest-waiting queued submission was submitted or rejudged; null when none waits.
+             */
+            oldestQueuedSince: string | null;
+            /** @description Queued submissions pinned to one judge, largest first. */
+            pinned: components["schemas"]["QueuePinnedResponse"][];
+            /** @description Handed to a judge, not started (P). */
+            processing: number;
+            /** @description Waiting for a judge (QU). */
+            queued: number;
+        };
         JudgeResponse: {
             /** @description Judge software build identifier. */
             build: string;
@@ -8928,6 +9113,37 @@ export interface components {
             /** @description Always true: the job was queued. */
             queued: boolean;
         };
+        QueueLanguageResponse: {
+            /** @description Queued submissions in this language. */
+            count: number;
+            /** @description Language id. */
+            id: string;
+            /** @description Language key; null when the language is gone. */
+            key: string | null;
+            /** @description Display name; null when the language is gone. */
+            name: string | null;
+            /** @description Connected, usable judges that run it; 0 means the queue cannot drain. */
+            onlineJudges: number;
+        };
+        QueuePinnedResponse: {
+            /** @description Queued submissions pinned to it. */
+            count: number;
+            /** @description Judge name the submissions wait for. */
+            judge: string;
+            /** @description Whether that judge is connected and takes work. */
+            online: boolean;
+        };
+        QueuePriorityResponse: {
+            /** @description Queued submissions at this priority. */
+            count: number;
+            /**
+             * Format: date-time
+             * @description When the longest-waiting one was submitted or rejudged.
+             */
+            oldestSince: string;
+            /** @description 0 contest, 1 normal, 2 rejudge, 3 batch rejudge. */
+            priority: number;
+        };
         QuotaMeterResponse: {
             /** @description Usage is close to the limit. */
             isNearLimit: boolean;
@@ -9606,6 +9822,58 @@ export interface components {
         };
         /** @enum {string} */
         StatementLanguage: "en" | "vi";
+        /**
+         * @description What was run.
+         * @enum {string}
+         */
+        SubmissionBatchAction: "rejudge" | "rescore";
+        SubmissionBatchFilterDto: {
+            /** @description Contest key: only that contest's submissions. */
+            contest?: string;
+            /** @description Submitted at or after this time. */
+            dateFrom?: string;
+            /** @description Submitted before this time. */
+            dateTo?: string;
+            /**
+             * Format: uuid
+             * @description Lowest submission id (UUIDv7 ids sort by submission time).
+             */
+            idFrom?: string;
+            /** @description Only these submissions (a selection from the list). */
+            ids?: string[];
+            /**
+             * Format: uuid
+             * @description Highest submission id.
+             */
+            idTo?: string;
+            /** @description Only submissions last graded by this judge. */
+            judgedOn?: string;
+            /** @description Only submissions in these language ids. */
+            languages?: string[];
+            /** @description Problem code. */
+            problem?: string;
+            /** @description Only submissions with these verdicts. */
+            results?: components["schemas"]["SubmissionResult"][];
+            /** @description Username. */
+            user?: string;
+        };
+        SubmissionBatchLogResponse: {
+            /** @description What was run. */
+            action: components["schemas"]["SubmissionBatchAction"];
+            /** @description Submissions it touched. */
+            count: number;
+            /**
+             * Format: date-time
+             * @description When it ran.
+             */
+            createdAt: string;
+            /** @description The filter it ran with. */
+            filter: components["schemas"]["SubmissionBatchFilterDto"];
+            /** @description Log entry id. */
+            id: string;
+            /** @description Who ran it. */
+            user: components["schemas"]["SubmissionBatchUserResponse"] | null;
+        };
         SubmissionBatchResponse: {
             /** @description Batch number, from 1. */
             batch: number;
@@ -9618,6 +9886,12 @@ export interface components {
             status: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "SC" | "TLE" | "WA";
             /** @description Largest total of the batch's cases. */
             total: number;
+        };
+        SubmissionBatchUserResponse: {
+            /** @description User id. */
+            id: string;
+            /** @description Username; null when the user is gone. */
+            username: string | null;
         };
         SubmissionCaseResponse: {
             /** @description Batch number, from 1; null for a case outside any batch. */
@@ -9677,7 +9951,7 @@ export interface components {
             language: components["schemas"]["SubmissionLanguageResponse"] | null;
             /**
              * Format: date-time
-             * @description Rejudging is refused after this time. Editors only (the contest's lock setting is staff data); null for everyone else and when the submission never locks.
+             * @description Rejudging is refused after this time (a lock). Editors only (the contest's lock setting is staff data); null for everyone else and when the submission never locks.
              */
             lockedAfter: string | null;
             /** @description KiB (largest case). */
@@ -9864,6 +10138,8 @@ export interface components {
         SubmissionViewerResponse: {
             /** @description Whether `POST /submissions/{id}/abort` is allowed. */
             canAbort: boolean;
+            /** @description Whether `POST` and `DELETE /submissions/{id}/lock` are allowed. */
+            canLock: boolean;
             /** @description Whether `POST /submissions/{id}/reject` is allowed. */
             canReject: boolean;
             /** @description Whether `POST /submissions/{id}/rejudge` is allowed. */
@@ -16282,6 +16558,37 @@ export interface operations {
             };
         };
     };
+    JudgesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Judge name. */
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     JudgesController_update: {
         parameters: {
             query?: never;
@@ -16375,6 +16682,38 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["JudgeKeyResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    JudgesController_queueSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JudgeQueueResponse"];
                     };
                 };
             };
@@ -20468,6 +20807,68 @@ export interface operations {
             };
         };
     };
+    SubmissionActionsController_lock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Submission id. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SubmissionActionsController_unlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Submission id. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     SubmissionActionsController_reject: {
         parameters: {
             query?: never;
@@ -20565,7 +20966,39 @@ export interface operations {
             };
         };
     };
-    SubmissionActionsController_bulkRejudge: {
+    SubmissionBatchController_recent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SubmissionBatchLogResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SubmissionBatchController_rejudge: {
         parameters: {
             query?: never;
             header?: never;
@@ -20585,6 +21018,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["BulkRejudgeResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SubmissionBatchController_rescore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkRescoreDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BulkRescoreResponse"];
                     };
                 };
             };

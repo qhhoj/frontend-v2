@@ -29,7 +29,7 @@ import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import type { AdminScreenId } from '../admin-screens';
 
-export type AdminNavId = AdminScreenId | 'submissions';
+export type AdminNavId = AdminScreenId;
 export interface AdminNavItem {
   id: AdminNavId;
   labelKey: string;
@@ -52,16 +52,6 @@ const screenItem = (id: AdminScreenId, icon: Component): AdminNavItem => ({
   path: ADMIN_SCREENS[id].path,
   permission: ADMIN_SCREENS[id].permission,
 });
-
-/** "Bài nộp" opens the public list: staff controls live on each submission page (board SubmissionStaff). */
-const SUBMISSIONS_ITEM: AdminNavItem = {
-  id: 'submissions',
-  labelKey: 'admin.shell.screens.submissions',
-  icon: ListChecks,
-  routeName: 'submissions',
-  path: '/submissions',
-  permission: ['judge.rejudge_submission', 'judge.reject_submission', 'judge.abort_any_submission'],
-};
 
 const group = (id: AdminNavGroup['id'], items: AdminNavItem[]): AdminNavGroup => ({
   id,
@@ -102,7 +92,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('judges', Server),
     screenItem('languages', Code),
     screenItem('rejudge', RotateCcw),
-    SUBMISSIONS_ITEM,
+    screenItem('submissions', ListChecks),
   ]),
 ];
 
@@ -158,7 +148,7 @@ const section = (key: string, ids: AdminNavId[]): DashboardSection => ({
 /** Board AdminShell: three sections of quick-link cards. */
 export const DASHBOARD_SECTIONS: DashboardSection[] = [
   section('content', ['problems', 'polygonImport', 'problemImport', 'posts']),
-  section('contests', ['contests', 'similarity', 'rejudge', 'judges']),
+  section('contests', ['contests', 'similarity', 'rejudge', 'submissions', 'judges']),
   section('people', ['users', 'activity', 'settings', 'pages', 'tickets']),
 ];
 

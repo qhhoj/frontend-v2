@@ -5,16 +5,23 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminBit from '../shell/AdminBit.vue';
-import { ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import JudgeKeyDialog from './JudgeKeyDialog.vue';
+import JudgeQueueCard from './JudgeQueueCard.vue';
 import JudgeRow from './JudgeRow.vue';
 import JudgeStats from './JudgeStats.vue';
-import { judgeStats } from './judge-stats';
-import { useJudgesQuery } from './judges.queries';
+import { judgeStats, matchesJudge, sortJudges } from './judge-stats';
+import type { JudgeListFilter } from './judge-stats';
+import { JUDGE_SEARCH_ID, useJudgesQuery } from './judges.queries';
+import { JUDGE_POLL_MS } from './queue.queries';
 
-const { data, isPending, error, refetch } = useJudgesQuery();
+const { data, isPending, error, refetch } = useJudgesQuery({ pollMs: JUDGE_POLL_MS });
 const judges = computed(() => data.value ?? []);
 const stats = computed(() => judgeStats(judges.value));
+const listFilter = ref<JudgeListFilter>({ status: null, search: '' });
+const shown = computed(() =>
+  sortJudges(judges.value).filter((judge) => matchesJudge(judge, listFilter.value)),
+);
 /**
  * The key shown once after a rotation. It lives here, outside QueryState, so a failed refetch cannot unmount it; it is dropped on
  * close, on route leave, and with this page.
@@ -59,11 +66,25 @@ onBeforeRouteLeave(() => {
           </div>
         </div>
       </template>
-      <JudgeStats :stats="stats" />
+      <JudgeQueueCard />
+      <JudgeStats v-model:status="listFilter.status" :stats="stats" />
       <p class="text-sm text-muted">{{ $t('admin.judges.notes.load') }}</p>
       <p class="text-sm text-muted">{{ $t('admin.judges.notes.rotate') }}</p>
+      <label v-if="judges.length > 0" class="flex max-w-md flex-col gap-1 text-sm font-semibold">
+        {{ $t('admin.judges.index.search') }}
+        <input
+          :id="JUDGE_SEARCH_ID"
+          v-model="listFilter.search"
+          type="search"
+          :class="ADMIN_INPUT_CLASS"
+          :placeholder="$t('admin.judges.index.searchPlaceholder')"
+        />
+      </label>
+      <p v-if="judges.length > 0 && shown.length === 0" class="text-sm text-muted">
+        {{ $t('admin.judges.index.noMatch') }}
+      </p>
       <ul v-if="judges.length > 0" class="flex flex-col gap-3">
-        <li v-for="judge in judges" :key="judge.name">
+        <li v-for="judge in shown" :key="judge.name">
           <JudgeRow
             :judge="judge"
             @rotated="(judgeName, authKey) => (revealed = { judgeName, authKey })"

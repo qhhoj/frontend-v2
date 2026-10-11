@@ -1,0 +1,40 @@
+{
+  "lead": "Danh sách bài nộp cho ban quản trị: lọc theo trạng thái nội bộ (QU, P, G, IE), chọn nhiều bài rồi chấm lại hoặc tính lại điểm.",
+  "toRejudge": "Chấm lại theo bộ lọc nâng cao",
+  "total": "{count} bài nộp khớp",
+  "empty": "Không có bài nộp nào khớp bộ lọc.",
+  "pager": "Trang bài nộp",
+  "filters": {
+    "title": "Bộ lọc bài nộp",
+    "problem": "Mã bài",
+    "user": "Tên người dùng",
+    "language": "Ngôn ngữ",
+    "status": "Trạng thái chấm",
+    "result": "Kết quả",
+    "apply": "Lọc",
+    "reset": "Bỏ lọc"
+  },
+  "table": {
+    "selectPage": "Chọn cả trang",
+    "select": "Chọn bài nộp {id}",
+    "id": "Mã",
+    "user": "Người nộp",
+    "problem": "Bài",
+    "verdict": "Kết quả",
+    "points": "Điểm",
+    "time": "Thời gian",
+    "memory": "Bộ nhớ",
+    "language": "Ngôn ngữ",
+    "date": "Lúc nộp"
+  },
+  "bulk": {
+    "label": "Thao tác hàng loạt",
+    "selected": "Đã chọn {count} bài nộp",
+    "allSelected": "Đã chọn cả {count} bài nộp khớp bộ lọc",
+    "selectAll": "Chọn cả {total} bài nộp khớp",
+    "clear": "Bỏ chọn",
+    "rejudge": "Chấm lại",
+    "lineSelected": "{count} bài nộp đã chọn.",
+    "lineAll": "Mọi bài nộp khớp bộ lọc của danh sách (trừ bộ lọc trạng thái)."
+  }
+}

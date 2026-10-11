@@ -33,6 +33,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   similarityPairs: () => import('./similarity/SimilarityPairsPage.vue'),
   similarityPair: () => import('./similarity/SimilarityPairPage.vue'),
   rejudge: () => import('./rejudge/BulkRejudgePage.vue'),
+  submissions: () => import('./submissions/AdminSubmissionsPage.vue'),
   judges: () => import('./judges/JudgesPage.vue'),
   judgeNew: () => import('./judges/JudgeAddPage.vue'),
   languages: () => import('./languages/LanguagesPage.vue'),

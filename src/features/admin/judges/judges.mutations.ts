@@ -1,4 +1,4 @@
-import { disconnectJudge, rotateJudgeKey, updateJudge } from '@/api/judges-admin.api';
+import { deleteJudge, disconnectJudge, rotateJudgeKey, updateJudge } from '@/api/judges-admin.api';
 import type { Judge, JudgePatch } from '@/api/types/judges-admin';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { useJudgesCache } from './judges.queries';
@@ -16,5 +16,9 @@ export function useJudgeWrites() {
   const disconnect = useAdminMutation<{ name: string; force: boolean }, void>({
     mutate: ({ name, force }) => disconnectJudge(name, force),
   });
-  return { patch, rotate, disconnect };
+  /** The row drops itself from the cache once its dialog has closed. */
+  const remove = useAdminMutation<string, void>({
+    mutate: (name) => deleteJudge(name),
+  });
+  return { patch, rotate, disconnect, remove };
 }

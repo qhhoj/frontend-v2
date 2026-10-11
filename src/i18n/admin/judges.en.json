@@ -8,7 +8,10 @@
     "lead": "Connected judges, their load and status. An auth key is shown once, when a judge is created or its key is rotated.",
     "addButton": "Add judge",
     "empty": "No judges yet.",
-    "emptyAdd": "Add judge"
+    "emptyAdd": "Add judge",
+    "search": "Find a judge",
+    "searchPlaceholder": "Name or IP",
+    "noMatch": "No judge matches."
   },
   "stats": {
     "online": "online",
@@ -42,7 +45,11 @@
     "started": "Started {time} · ping is the mean of the last 6 measurements.",
     "descriptionLabel": "Description (shown to staff)",
     "saveDescription": "Save description",
-    "loadLabel": "Load"
+    "loadLabel": "Load",
+    "delete": "Delete",
+    "protocol": "Protocol",
+    "features": "Features",
+    "lastIp": "Last IP"
   },
   "runtimes": {
     "caption": "Languages the judge reports",
@@ -87,5 +94,33 @@
     "cancel": "Cancel",
     "submit": "Create and get key",
     "descriptionTooLong": "Up to 10,000 characters."
+  },
+  "delete": {
+    "title": "Delete judge {name}?",
+    "body": "The disconnected judge and its key are removed from the list. Submissions waiting for this judge alone move to other judges.",
+    "confirm": "Delete judge"
+  },
+  "queue": {
+    "title": "Judging queue",
+    "openQueued": "Open waiting submissions",
+    "queued": "Waiting",
+    "processing": "Handed to a judge",
+    "grading": "Grading",
+    "oldest": "Oldest waiting since",
+    "byPriority": "By priority",
+    "byLanguage": "By language",
+    "empty": "Nothing is waiting.",
+    "judgesOnline": "{count} judges online",
+    "priority": {
+      "contest": "Contest",
+      "normal": "Normal",
+      "rejudge": "Rejudge",
+      "batch": "Batch rejudge"
+    },
+    "alerts": {
+      "noJudge": "{count} {subject} submissions are waiting but no online judge runs that language.",
+      "pinnedOffline": "{count} submissions are waiting for judge {subject} alone, which is not working.",
+      "stale": "The oldest waiting submission has waited over 5 minutes: the queue may be stuck."
+    }
   }
 }

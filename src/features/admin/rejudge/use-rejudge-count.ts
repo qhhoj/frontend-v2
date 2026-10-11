@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { rejudgeSubmissions } from '@/api/submission-actions.api';
 import type { RejudgeBody } from '@/api/types/submission-actions';
+import type { SubmissionListItem } from '@/api/types/submissions';
 import { failureTextOf } from '../ui/admin-errors';
 
 /** Above this many submissions a rejudge needs `judge.rejudge_submission_lot` (backend `BULK_REJUDGE_LIMIT`). */
@@ -10,7 +11,13 @@ export const BULK_REJUDGE_LIMIT = 10;
 export type RejudgeCountState =
   | { kind: 'idle' }
   | { kind: 'counting' }
-  | { kind: 'ready'; count: number; allowed: boolean; countedAt: string }
+  | {
+      kind: 'ready';
+      count: number;
+      allowed: boolean;
+      countedAt: string;
+      sample: SubmissionListItem[];
+    }
   | { kind: 'failed'; text: string };
 
 /** The confirm opens for a counted, permitted, non-empty rejudge and for nothing else. */
@@ -36,6 +43,7 @@ export function useRejudgeCount(now: () => Date = () => new Date()) {
         count: result.count,
         allowed: result.allowed,
         countedAt: now().toISOString(),
+        sample: result.sample,
       };
     } catch (error) {
       if (mine === latest) state.value = { kind: 'failed', text: failureTextOf(error) };
