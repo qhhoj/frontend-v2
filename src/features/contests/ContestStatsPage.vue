@@ -26,6 +26,12 @@ const isClosed = computed(() => error.value instanceof ApiError && error.value.s
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
+const solverCounts = computed(
+  () =>
+    new Map(
+      (contest.value?.problems ?? []).map((problem) => [problem.problemId, problem.solverCount]),
+    ),
+);
 const tiles = computed(() =>
   stats.value ? statTiles(stats.value, contest.value?.userCount ?? 0, locale.locale) : [],
 );
@@ -78,7 +84,7 @@ const tiles = computed(() =>
               <dd class="font-display text-3xl font-bold">{{ tile.value }}</dd>
             </div>
           </dl>
-          <ProblemResultsTable :problems="stats.problems" />
+          <ProblemResultsTable :problems="stats.problems" :solver-counts="solverCounts" />
           <LanguageStatsTable :languages="stats.languages" />
         </template>
       </QueryState>

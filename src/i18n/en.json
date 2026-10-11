@@ -121,13 +121,13 @@
         "label": "Problem",
         "name": "Name",
         "points": "Points",
-        "solvers": "Solved",
+        "maxSubmissions": "Max submissions",
         "own": "Yours",
         "open": "Open"
       },
       "open": "Open",
       "left": "{count} left",
-      "solvers": "{count} solver | {count} solvers",
+      "unlimited": "No limit",
       "pending": "Being judged",
       "attempted": "{count} submission | {count} submissions",
       "solvedSummary": "You solved {solved}/{total} problems",
@@ -196,6 +196,7 @@
       "columns": {
         "label": "Problem",
         "name": "Name",
+        "solvers": "Solved",
         "results": "Results of every submission",
         "total": "Total",
         "acRate": "AC rate",

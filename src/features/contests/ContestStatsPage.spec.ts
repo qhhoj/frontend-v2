@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { fail, mockApi } from '@/test/mock-api';
+import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { contestDetail, contestProblem, contestStats } from '@/test/fixtures';
 import { anonymousViewer } from '@/test/problem-routes';
 
 /** Longer than the query's first retry delay (1 s), so a retrying query would have asked again. */
@@ -27,5 +28,24 @@ describe('contest stats tab', () => {
       expect(wrapper.find('main a[href="/contests/r42/ranking"]').exists()).toBe(true);
       expect(calls.filter((call) => call.path === '/contests/r42/stats')).toHaveLength(1);
     });
+  });
+
+  it('shows solver counts per problem, with a dash where the viewer may not see them', async () => {
+    const detail = contestDetail({
+      problems: [contestProblem(0, { solverCount: 17 }), contestProblem(1, { solverCount: null })],
+    });
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(detail),
+      'GET /contests/r42/stats': ok(contestStats()),
+    });
+    const { wrapper } = await mountApp('/contests/r42/stats');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="problem-results"]').exists()).toBe(true),
+    );
+    const rows = wrapper.findAll('[data-testid="problem-results"] tbody tr');
+    const SOLVED_CELL = 2;
+    expect(rows[0]!.findAll('td')[SOLVED_CELL]!.text()).toBe('17');
+    expect(rows[1]!.findAll('td')[SOLVED_CELL]!.text()).toBe('—');
   });
 });

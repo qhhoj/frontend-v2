@@ -7,7 +7,15 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { RESULT_ORDER, RESULT_TONES, formatPercent, resultSegments } from './stats-summary';
 import type { ResultCode } from './stats-summary';
 
-defineProps<{ problems: ContestProblemStats[] }>();
+const props = defineProps<{
+  problems: ContestProblemStats[];
+  /** Distinct solvers per problem id; a missing or null entry (ranking hidden from the viewer) draws a dash. */
+  solverCounts: ReadonlyMap<string, number | null>;
+}>();
+const solversOf = (problem: ContestProblemStats) => {
+  const solvers = props.solverCounts.get(problem.problemId);
+  return solvers == null ? '—' : count(solvers);
+};
 /** Solid verdict fills for the stacked bar (no text sits on them); the chips keep the tinted tone classes. */
 const SEGMENT_FILLS: Record<VerdictTone, string> = {
   ac: 'bg-verdict-ac',
@@ -44,6 +52,9 @@ const chipClasses = (code: ResultCode, value: number) =>
             </th>
             <th scope="col" class="px-4 py-3 font-medium">
               {{ $t('contests.stats.columns.results') }}
+            </th>
+            <th scope="col" class="px-4 py-3 text-right font-medium">
+              {{ $t('contests.stats.columns.solvers') }}
             </th>
             <th scope="col" class="px-4 py-3 text-right font-medium">
               {{ $t('contests.stats.columns.total') }}
@@ -87,6 +98,7 @@ const chipClasses = (code: ResultCode, value: number) =>
                 </li>
               </ul>
             </td>
+            <td class="px-4 py-3 text-right font-mono">{{ solversOf(problem) }}</td>
             <td class="px-4 py-3 text-right font-mono">{{ count(problem.total) }}</td>
             <td class="px-4 py-3 text-right font-mono font-semibold">
               {{ formatPercent(problem.acRate, locale.locale) }}

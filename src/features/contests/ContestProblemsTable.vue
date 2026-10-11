@@ -32,10 +32,6 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
 };
 
 const problems = computed(() => props.contest.problems ?? []);
-/** Null solver counts (the viewer may not see the full ranking) draw a dash, never a zero. */
-const hasSolverCounts = computed(() =>
-  problems.value.some((problem) => problem.solverCount !== null),
-);
 const hasOwnResults = computed(() =>
   problems.value.some((problem) => problem.viewerResult !== null),
 );
@@ -47,17 +43,19 @@ const context = computed<RankingContext>(() => ({
 }));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
-const formatCount = (count: number) => formatNumber(count, locale.locale);
 /** The cap line, with the attempts the viewer has left once they have a result. */
 const leftText = (count: number) => t('contests.problems.left', { count }, count);
-/** The attempt cap line, with the attempts the viewer has left once they have a result. */
-const capLine = (problem: ContestProblem) => {
-  if (!problem.maxSubmissions) return '';
-  const cap = capText(problem.maxSubmissions);
-  if (!problem.viewerResult) return cap;
+/** The per-problem submission cap with the viewer's attempts left, or ∞ when uncapped. */
+const maxSubmissionsText = (problem: ContestProblem) => {
+  if (!problem.maxSubmissions) return '∞';
+  const max = formatNumber(problem.maxSubmissions, locale.locale);
+  if (!problem.viewerResult) return max;
   const left = attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult.attempts);
-  return `${cap} · ${leftText(left)}`;
+  return `${max} (${leftText(left)})`;
 };
+/** Spoken form: the symbol alone reads as nothing useful. */
+const maxSubmissionsLabel = (problem: ContestProblem) =>
+  problem.maxSubmissions ? maxSubmissionsText(problem) : t('contests.problems.unlimited');
 </script>
 
 <template>
@@ -112,8 +110,8 @@ const capLine = (problem: ContestProblem) => {
             <th scope="col" class="px-3 py-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
-            <th v-if="hasSolverCounts" scope="col" class="px-3 py-3 text-right font-semibold">
-              {{ $t('contests.problems.columns.solvers') }}
+            <th scope="col" class="px-3 py-3 text-right font-semibold">
+              {{ $t('contests.problems.columns.maxSubmissions') }}
             </th>
             <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold">
               {{ $t('contests.problems.columns.own') }}
@@ -142,19 +140,16 @@ const capLine = (problem: ContestProblem) => {
               <span :title="problem.code" class="block truncate font-mono text-[12.5px] text-muted">
                 {{ problem.code }}
               </span>
-              <span
-                v-if="problem.maxSubmissions"
-                class="block truncate text-[12.5px] text-muted"
-                :title="capLine(problem)"
-                >{{ capLine(problem) }}</span
-              >
             </td>
             <td class="px-3 py-3 font-mono text-[13px] whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
-            <td v-if="hasSolverCounts" class="px-3 py-3 text-right font-mono tabular-nums">
-              {{ problem.solverCount === null ? '—' : formatCount(problem.solverCount) }}
+            <td class="px-3 py-3 text-right font-mono tabular-nums whitespace-nowrap">
+              <span aria-hidden="true" :title="maxSubmissionsLabel(problem)">{{
+                maxSubmissionsText(problem)
+              }}</span>
+              <span class="sr-only">{{ maxSubmissionsLabel(problem) }}</span>
             </td>
             <td v-if="hasOwnResults" class="max-w-40 px-3 py-3">
               <OwnResultChip :problem="problem" :context="context" />
@@ -197,16 +192,6 @@ const capLine = (problem: ContestProblem) => {
               · {{ limitsText(problem) }}
               ·
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
-              <template v-if="problem.solverCount !== null">
-                ·
-                {{
-                  $t(
-                    'contests.problems.solvers',
-                    { count: formatCount(problem.solverCount) },
-                    problem.solverCount,
-                  )
-                }}
-              </template>
             </p>
           </div>
           <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
