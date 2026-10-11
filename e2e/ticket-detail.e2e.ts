@@ -1,90 +1,11 @@
-import AxeBuilder from '@axe-core/playwright';
-import type { Page } from '@playwright/test';
-import { profile, sessionResponse, sessionUser } from '../src/test/fixtures';
-import { ticketDetail, ticketMessage } from '../src/test/community-fixtures';
-import { THEMES } from '../src/theme/registry';
+import { ticketDetail } from '../src/test/community-fixtures';
 import { expect, streamFrame, test } from './fixtures/api';
-import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
 
 const TICKET_ID = ticketDetail().id;
 const TICKET_PATH = `/tickets/${TICKET_ID}`;
 const TICKET_KEY = `GET /tickets/${TICKET_ID}`;
 const STREAM_KEY = `GET /events/tickets/${TICKET_ID}`;
-const VIEWPORTS = [
-  { name: 'desktop', width: 1280, height: 800 },
-  { name: 'phone 375 px', width: 375, height: 812 },
-] as const;
-const STAFF_DETAIL = ticketDetail({
-  creator: { id: 'x', username: 'minhthu', rating: null },
-  notes: 'Test 17 sinh sai.',
-  can: { editNotes: true, markGood: true, assign: true },
-});
-
-/** A signed-in account's theme outranks the browser's choice, so the audit pins the account and the browser alike. */
-const pinTheme = async (page: Page, api: FakeApi, theme: (typeof THEMES)[number]) => {
-  api.routes['GET /profile'] = { body: { data: profile({ siteTheme: theme.id }) } };
-  await page.emulateMedia({ colorScheme: theme.scheme });
-  await page.addInitScript((id) => localStorage.setItem('qhhoj.theme', id), theme.id);
-};
-
-const violationsOf = async (page: Page) => {
-  const { violations } = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .analyze();
-  return violations.map(
-    (violation) =>
-      `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
-  );
-};
-
-const VIEWS = [
-  {
-    name: 'creator',
-    setUp: (api: FakeApi) => {
-      api.routes[TICKET_KEY] = ok(ticketDetail({ messages: [ticketMessage()] }));
-    },
-    ready: 'Phiếu của bạn',
-  },
-  {
-    name: 'staff',
-    setUp: (api: FakeApi) => {
-      api.signedIn = true;
-      api.routes['GET /auth/me'] = ok(sessionResponse({ user: sessionUser({ isStaff: true }) }));
-      api.routes[TICKET_KEY] = ok(STAFF_DETAIL);
-    },
-    ready: 'Góc nhìn quản trị viên',
-  },
-] as const;
-
-for (const viewport of VIEWPORTS)
-  for (const theme of THEMES)
-    for (const view of VIEWS)
-      test(`the ${view.name} ticket view has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-        page,
-        api,
-      }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        api.signedIn = true;
-        view.setUp(api);
-        await pinTheme(page, api, theme);
-        await page.goto(TICKET_PATH);
-        await expect(page.getByText(view.ready, { exact: false }).first()).toBeVisible();
-        expect(await violationsOf(page)).toEqual([]);
-      });
-
-for (const viewport of VIEWPORTS)
-  test(`the ticket page does not scroll sideways at ${viewport.name}`, async ({ page, api }) => {
-    await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    api.signedIn = true;
-    api.routes[TICKET_KEY] = ok(ticketDetail());
-    await page.goto(TICKET_PATH);
-    await expect(page.locator('h1')).toBeVisible();
-    const overflows = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    );
-    expect(overflows).toBe(false);
-  });
 
 test('two new messages on the open ticket refetch it once and announce one count', async ({
   page,

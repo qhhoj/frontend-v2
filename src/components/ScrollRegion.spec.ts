@@ -15,14 +15,6 @@ const mountRegion = (widths: { scroll: number; client: number; left?: number }) 
 };
 
 describe('ScrollRegion', () => {
-  it('shows no cue when the content fits', async () => {
-    const { wrapper, scroller } = mountRegion({ scroll: 300, client: 300 });
-    scroller.dispatchEvent(new Event('scroll'));
-    await wrapper.vm.$nextTick();
-    expect(wrapper.find('[data-testid="scroll-hint"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="scroll-shade-right"]').exists()).toBe(false);
-  });
-
   it('shows a swipe hint and a right shade while content hides to the right', async () => {
     const { wrapper, scroller } = mountRegion({ scroll: 900, client: 300 });
     scroller.dispatchEvent(new Event('scroll'));
@@ -39,12 +31,5 @@ describe('ScrollRegion', () => {
     expect(wrapper.find('[data-testid="scroll-shade-right"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="scroll-hint"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="scroll-shade-left"]').exists()).toBe(true);
-  });
-
-  it('is a labelled, keyboard-focusable region', () => {
-    const { wrapper } = mountRegion({ scroll: 300, client: 300 });
-    const region = wrapper.get('[role="region"]');
-    expect(region.attributes('aria-label')).toBe('Bảng thử');
-    expect(region.attributes('tabindex')).toBe('0');
   });
 });

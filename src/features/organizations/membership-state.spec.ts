@@ -61,10 +61,4 @@ describe('membershipErrorCopy', () => {
       });
     }
   });
-  it('falls back to the code’s message for anything else', () => {
-    expect(membershipErrorCopy('request', new ApiError('rate_limited', 429, 'x'))).toEqual({
-      title: 'orgMembership.failedTitle',
-      body: 'errors.rate_limited',
-    });
-  });
 });

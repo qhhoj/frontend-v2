@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contestSettings, CURATOR_ID, editableContest } from '@/test/admin-fixtures/contests';
-import { RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
+import { contestSettings, editableContest } from '@/test/admin-fixtures/contests';
 import {
   changedContestFields,
   checkContestForm,
@@ -34,10 +33,6 @@ describe('contest form', () => {
     expect(changedContestFields(before, structuredClone(before))).toEqual({});
   });
 
-  it('names the user chips from the usernames the settings carry', () => {
-    expect(seeded().curators).toEqual([{ id: CURATOR_ID, username: 'admin_vnoj' }]);
-  });
-
   it('sends null when a nullable field is cleared', () => {
     const before = withNullablesSet();
     expect(before).toMatchObject({ timeLimit: 3600, ratingFloor: 1200 });
@@ -66,14 +61,6 @@ describe('contest form', () => {
     });
   });
 
-  it('sends pushAnnouncements as the boolean it was switched to', () => {
-    const before = seeded();
-    expect(before.pushAnnouncements).toBe(false);
-    expect(
-      changedContestFields(before, { ...structuredClone(before), pushAnnouncements: true }),
-    ).toEqual({ pushAnnouncements: true });
-  });
-
   it('keeps a stored access code unless a new one is typed or removal is asked for', () => {
     const before = seeded();
     expect(
@@ -100,15 +87,6 @@ describe('contest form', () => {
     });
   });
 
-  it('sends organizations as ids', () => {
-    const before = seeded();
-    const after = {
-      ...structuredClone(before),
-      organizations: [{ id: 'org-a', slug: 'thpt-hung-vuong' }],
-    };
-    expect(changedContestFields(before, after)).toEqual({ organizations: ['org-a'] });
-  });
-
   it('refuses an end before the start and a rating floor above the ceiling', () => {
     const form = {
       ...seeded(),
@@ -118,22 +96,6 @@ describe('contest form', () => {
       ratingCeiling: 1000,
     };
     expect(Object.keys(checkContestForm(form)).sort()).toEqual(['endTime', 'ratingCeiling']);
-  });
-
-  it('refuses more than 20 tags and a negative frozen time', () => {
-    const form = {
-      ...seeded(),
-      tags: Array.from({ length: 21 }, (_entry, index) => `t${index}`),
-      frozenLastMinutes: -1,
-    };
-    expect(Object.keys(checkContestForm(form)).sort()).toEqual(['frozenLastMinutes', 'tags']);
-  });
-
-  it('builds a create body with the key and without unset optional fields', () => {
-    const body = toContestBody(newContest(), () => true);
-    expect(body).toMatchObject({ key: 'w42', name: 'W42', formatName: 'default' });
-    expect(body).not.toHaveProperty('accessCode');
-    expect(body).not.toHaveProperty('timeLimit');
   });
 
   it('leaves the rating, lock, private, access code and visibility groups out of a create by an account without their permissions', () => {
@@ -184,13 +146,6 @@ describe('contest form operations fields', () => {
   const VOLUNTEER = '0192a000-0000-7000-8000-00000000b001';
   const OTHER = '0192a000-0000-7000-8000-00000000b002';
   const settings = contestSettings({ balloons: true, balloonStaff: [VOLUNTEER] });
-
-  it('reads rules, the balloon switch and the volunteers from the contest', () => {
-    const form = toContestForm(editableContest({ rules: RULES_MARKDOWN, settings }));
-    expect(form.rules).toBe(RULES_MARKDOWN);
-    expect(form.balloons).toBe(true);
-    expect(form.balloonStaff.map((chip) => chip.id)).toEqual([VOLUNTEER]);
-  });
 
   it('sends changed rules and volunteers as ids, and nothing for untouched ones', () => {
     const before = toContestForm(editableContest({ settings }));

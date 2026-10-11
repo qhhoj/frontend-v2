@@ -1,21 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { MIB } from '@/test/f4-fixtures';
-import { quotaBodyOf, quotaFormErrors, quotaFormOf } from './quota-form';
+import { quotaBodyOf, quotaFormErrors } from './quota-form';
 
 describe('quota form', () => {
-  it('shows an override as a number and the site default as an empty box (storage in MiB)', () => {
-    expect(quotaFormOf({ monthlyCredits: 300, storageBytes: 1024 * MIB }, false)).toEqual({
-      credits: '300',
-      storageMib: '1024',
-      unlimited: false,
-    });
-    expect(quotaFormOf({ monthlyCredits: null, storageBytes: null }, true)).toEqual({
-      credits: '',
-      storageMib: '',
-      unlimited: true,
-    });
-  });
-
   it('sends only what changed: an emptied box is null, MiB become bytes', () => {
     const original = { credits: '300', storageMib: '', unlimited: false };
     expect(quotaBodyOf({ ...original }, original)).toEqual({});

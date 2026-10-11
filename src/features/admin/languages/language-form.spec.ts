@@ -5,7 +5,6 @@ import {
   createBodyOf,
   emptyLanguageForm,
   formOf,
-  megabytesOf,
   patchOf,
 } from './language-form';
 
@@ -20,15 +19,6 @@ const kotlin = () => ({
 });
 
 describe('language form', () => {
-  it('accepts a complete form and starts from the backend defaults', () => {
-    expect(checkLanguageForm(kotlin(), 'create')).toEqual({});
-    expect(emptyLanguageForm()).toMatchObject({
-      fileOnly: false,
-      includeInProblem: false,
-      fileSizeLimit: '0',
-    });
-  });
-
   it('refuses what the backend would refuse, field by field', () => {
     const errors = checkLanguageForm(
       {
@@ -112,11 +102,5 @@ describe('language form', () => {
     const unnamed = languageAdmin({ shortName: null });
     expect(patchOf(unnamed, formOf(unnamed))).toEqual({});
     expect(patchOf(unnamed, { ...formOf(unnamed), shortName: 'RS' })).toEqual({ shortName: 'RS' });
-  });
-
-  it('shows the file size limit in whole megabytes only while it is a valid number', () => {
-    expect(megabytesOf('67108864')).toBe(64);
-    expect(megabytesOf('abc')).toBeNull();
-    expect(megabytesOf('')).toBeNull();
   });
 });

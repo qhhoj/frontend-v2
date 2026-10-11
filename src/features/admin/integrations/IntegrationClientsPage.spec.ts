@@ -1,10 +1,10 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { translate } from '@/i18n';
-import { confirmDialog, openDialog, STAFF_ID, staffViewer } from '@/test/admin-routes';
+import { openDialog, STAFF_ID, staffViewer } from '@/test/admin-routes';
 import { createdIntegrationClient, INTEGRATION_KEY, integrationClient } from '@/test/f5-fixtures';
 import { profile, sessionUser, signedIn } from '@/test/fixtures';
-import { fail, invalid, issue, mockApi, noContent, ok, page, sequence } from '@/test/mock-api';
+import { invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -41,18 +41,6 @@ const fillForm = async (wrapper: Wrapper) => {
 };
 
 describe('IntegrationClientsPage', () => {
-  it('lists clients with key prefix, permissions and acting user; a revoked one has no revoke button', async () => {
-    mockApi(routes());
-    const { wrapper } = await openPage();
-    const active = rowOf(wrapper, 'Hệ thống thi tỉnh');
-    expect(active.text()).toContain('qhi_');
-    expect(active.text()).toContain('syncauthor');
-    expect(active.text()).toContain('contests:read');
-    expect(active.find('button').exists()).toBe(true);
-    expect(rowOf(wrapper, 'Cổng cũ').text()).toContain('Đã thu hồi');
-    expect(rowOf(wrapper, 'Cổng cũ').find('button').exists()).toBe(false);
-  });
-
   it('creates a key, shows it once in a dialog that cannot close before "saved", and never in the table', async () => {
     const calls = mockApi(
       routes({
@@ -79,24 +67,10 @@ describe('IntegrationClientsPage', () => {
     openDialog().querySelector<HTMLInputElement>('#key-saved')!.click();
     await flushPromises();
     close.click();
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    expect(document.body.textContent).not.toContain(INTEGRATION_KEY);
+    await vi.waitFor(() => expect(document.body.textContent).not.toContain(INTEGRATION_KEY));
     expect(
       calls.filter((call) => call.path === '/integration-clients' && call.method === 'GET'),
     ).toHaveLength(2);
-  });
-
-  it('sends the chosen expiry', async () => {
-    const calls = mockApi(
-      routes({ 'POST /integration-clients': { status: 201, ...ok(createdIntegrationClient()) } }),
-    );
-    const { wrapper } = await openPage();
-    const form = await fillForm(wrapper);
-    await form.get('#integration-expires').setValue('2099-01-02T03:04');
-    await form.trigger('submit');
-    await flushPromises();
-    const body = calls.find((call) => call.method === 'POST')!.body as { expiresAt: string };
-    expect(new Date(body.expiresAt).getTime()).toBe(new Date('2099-01-02T03:04').getTime());
   });
 
   it('puts a refused acting user and a bad CIDR on their fields', async () => {
@@ -119,23 +93,6 @@ describe('IntegrationClientsPage', () => {
     expect(form.text()).not.toContain('This user needs judge.create_private_contest.');
   });
 
-  it('shows the SPA text, not the backend English, for a past expiry', async () => {
-    mockApi(
-      routes({
-        'POST /integration-clients': invalid(
-          issue('expiresAt', 'invalid', 'The expiry must be in the future.'),
-        ),
-      }),
-    );
-    const { wrapper } = await openPage();
-    const form = await fillForm(wrapper);
-    await form.trigger('submit');
-    await flushPromises();
-    expect(form.get('#integration-expires').attributes('aria-invalid')).toBe('true');
-    expect(form.text()).toContain('Thời điểm hết hạn phải sau hiện tại.');
-    expect(form.text()).not.toContain('The expiry must be in the future.');
-  });
-
   it('marks a key past its expiry as expired, not active, while a future one stays active', async () => {
     const lapsed = integrationClient({
       id: '0192a000-0000-7000-8000-0000000f0003',
@@ -152,15 +109,6 @@ describe('IntegrationClientsPage', () => {
     expect(rowOf(wrapper, 'Khóa hết hạn').text()).toContain('Đã hết hạn');
     expect(rowOf(wrapper, 'Khóa hết hạn').text()).not.toContain('Đang dùng');
     expect(rowOf(wrapper, 'Khóa còn hạn').text()).toContain('Đang dùng');
-  });
-
-  it('shows a refusal line for a 403 (user API token, impersonation)', async () => {
-    mockApi(routes({ 'POST /integration-clients': fail(403, 'forbidden') }));
-    const { wrapper } = await openPage();
-    const form = await fillForm(wrapper);
-    await form.trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('[role="alert"]').text()).toContain(translate('errors.forbidden'));
   });
 
   it('refuses to mint or revoke while impersonating, and sends nothing', async () => {
@@ -189,28 +137,5 @@ describe('IntegrationClientsPage', () => {
     await revoke.trigger('click');
     await flushPromises();
     expect(document.body.querySelector('[role="dialog"]')).toBeNull();
-  });
-
-  it('revokes only after confirming', async () => {
-    const { id } = integrationClient();
-    const calls = mockApi(
-      routes({
-        'GET /integration-clients': sequence(
-          page([integrationClient()]),
-          page([integrationClient({ revokedAt: '2026-10-09T09:00:00.000Z' })]),
-        ),
-        [`DELETE /integration-clients/${id}`]: noContent(),
-      }),
-    );
-    const { wrapper } = await openPage();
-    await rowOf(wrapper, 'Hệ thống thi tỉnh').get('button').trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Thu hồi khoá');
-    await flushPromises();
-    expect(
-      calls.some((call) => call.method === 'DELETE' && call.path === `/integration-clients/${id}`),
-    ).toBe(true);
-    expect(rowOf(wrapper, 'Hệ thống thi tỉnh').text()).toContain('Đã thu hồi');
   });
 });

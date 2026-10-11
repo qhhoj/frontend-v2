@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mockApi } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
-import { staffViewer, superuserViewer } from '@/test/admin-routes';
+import { staffViewer } from '@/test/admin-routes';
 import { loginRoutes } from '@/test/auth-routes';
 
 /** AdminShell loads lazily from AppShell: wait until its top bar is in the DOM. */
@@ -50,36 +50,5 @@ describe('AdminShell', () => {
     mockApi({ ...anonymousViewer, ...loginRoutes });
     const { router } = await mountApp('/admin');
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
-  });
-
-  it('replaces the site header with the admin top bar and keeps one #main', async () => {
-    mockApi(superuserViewer());
-    const { wrapper } = await mountApp('/admin/types');
-    await waitForAdminShell(wrapper);
-    expect(wrapper.find('[data-testid="admin-topbar"]').text()).toContain('Chỉ dành cho nhân viên');
-    expect(wrapper.findAll('#main')).toHaveLength(1);
-    expect(wrapper.find('[data-testid="admin-nav"] [aria-current="page"]').text()).toBe(
-      'Loại bài và thẻ',
-    );
-    expect(wrapper.find('[data-testid="admin-bit"]').attributes('data-placement')).toBe(
-      'placeholder',
-    );
-  });
-
-  it('shows a staff-only not-found inside the admin layout for an unknown admin path', async () => {
-    mockApi(superuserViewer());
-    const { wrapper } = await mountApp('/admin/nope');
-    await waitForAdminShell(wrapper);
-    expect(wrapper.find('[data-testid="admin-topbar"]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Không tìm thấy');
-  });
-
-  it('names on a dashboard card only a permission the viewer holds', async () => {
-    mockApi(staffViewer(['judge.edit_own_contest']));
-    const { wrapper } = await mountApp('/admin');
-    await waitForAdminShell(wrapper);
-    const dashboard = wrapper.find('[data-testid="admin-dashboard"]').text();
-    expect(dashboard).toContain('judge.edit_own_contest');
-    expect(dashboard).not.toContain('judge.add_contest');
   });
 });

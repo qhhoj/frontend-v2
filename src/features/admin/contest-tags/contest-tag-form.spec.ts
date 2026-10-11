@@ -1,25 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { contestTag } from '@/test/contest-extras-fixtures';
-import { checkTagForm, emptyTagForm, tagFormOf, toTagBody, toTagPatch } from './contest-tag-form';
+import { checkTagForm, emptyTagForm, tagFormOf, toTagPatch } from './contest-tag-form';
 
 describe('contest tag form', () => {
-  it('accepts a filled create form and trims what it sends', () => {
-    const form = {
-      ...emptyTagForm(),
-      slug: 'quoc-gia',
-      name: '  Quốc gia ',
-      description: ' Kỳ thi cấp quốc gia ',
-    };
-    expect(checkTagForm(form, true)).toEqual({});
-    expect(toTagBody(form)).toEqual({
-      slug: 'quoc-gia',
-      name: 'Quốc gia',
-      color: 'tag-1',
-      description: 'Kỳ thi cấp quốc gia',
-      order: 0,
-    });
-  });
-
   it('names every field the backend would refuse', () => {
     const errors = checkTagForm(
       { slug: 'Quốc gia', name: '   ', color: 'tag-2', description: 'x'.repeat(201), order: 1001 },

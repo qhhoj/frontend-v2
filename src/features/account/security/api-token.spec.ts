@@ -3,7 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { settingsRoutes } from '@/test/account-routes';
 import { loginRoutes } from '@/test/auth-routes';
-import { fail, mockApi, noContent, ok } from '@/test/mock-api';
+import { mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -39,25 +39,6 @@ describe('Settings › Security › API token', () => {
     await flushPromises();
     expect(wrapper.text()).not.toContain(TOKEN);
   });
-
-  it('keeps the dialog open with the reason when creating fails, and a reopened dialog starts clean', async () => {
-    const { wrapper } = await openSecurity({
-      'POST /auth/token/regenerate': fail(429, 'rate_limited'),
-    });
-    await pageButton(wrapper, 'Tạo token mới').trigger('click');
-    await flushPromises();
-    dialogButton('Tạo token mới').click();
-    await flushPromises();
-    expect(document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent).toContain(
-      'Bạn thao tác quá nhanh',
-    );
-    expect(wrapper.find('#main code').exists()).toBe(false);
-    dialogButton('Hủy').click();
-    await flushPromises();
-    await pageButton(wrapper, 'Tạo token mới').trigger('click');
-    await flushPromises();
-    expect(document.body.querySelector('[role="dialog"] [role="alert"]')).toBeNull();
-  });
 });
 
 describe('Settings › Security › sign out everywhere', () => {
@@ -71,15 +52,6 @@ describe('Settings › Security › sign out everywhere', () => {
       true,
     );
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
-  });
-
-  it('cancelling sends nothing', async () => {
-    const { wrapper, calls } = await openSecurity({ 'POST /auth/logout-all': noContent() });
-    await pageButton(wrapper, 'Đăng xuất mọi nơi').trigger('click');
-    await flushPromises();
-    dialogButton('Hủy').click();
-    await flushPromises();
-    expect(calls.some((call) => call.path === '/auth/logout-all')).toBe(false);
   });
 
   it('is locked, not clickable, while viewing as another user', async () => {

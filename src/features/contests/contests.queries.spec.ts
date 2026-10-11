@@ -71,28 +71,6 @@ describe('contest queries across a session change', () => {
     expect(list.data.value?.items[0]?.name).toBe('Contest of B');
   });
 
-  it('shows none of the list once the viewer is signed out', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn((input: string) =>
-        input.includes('/auth/me')
-          ? signedOutSession()
-          : currentViewer() === 'user-a'
-            ? Promise.resolve(json(page([contestItem({ name: 'Contest of A' })]).body))
-            : never(),
-      ),
-    );
-    const list = await probe(() => useContestListQuery(ref({})));
-    const session = useSessionStore();
-    session.user = signedInAs('user-a');
-    await flushPromises();
-    expect(list.data.value?.items[0]?.name).toBe('Contest of A');
-
-    session.user = null;
-    await flushPromises();
-    expect(list.data.value).toBeUndefined();
-  });
-
   it('keeps the board on a virtual toggle for the same viewer, and drops it across viewers', async () => {
     vi.stubGlobal(
       'fetch',

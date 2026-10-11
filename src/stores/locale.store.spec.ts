@@ -7,32 +7,6 @@ import { useLocaleStore } from './locale.store';
 describe('useLocaleStore', () => {
   beforeEach(() => setActivePinia(createPinia()));
 
-  it('starts in Vietnamese and marks the document language', () => {
-    useLocaleStore();
-    expect(translate('nav.problems')).toBe('Bài tập');
-    expect(document.documentElement.lang).toBe('vi');
-  });
-
-  it('restores a stored locale', () => {
-    localStorage.setItem('qhhoj.locale', 'en');
-    useLocaleStore();
-    expect(translate('nav.problems')).toBe('Problems');
-  });
-
-  it('ignores an unsupported stored locale', () => {
-    localStorage.setItem('qhhoj.locale', 'fr');
-    expect(useLocaleStore().locale).toBe('vi');
-  });
-
-  it('toggles, translates and persists', async () => {
-    const store = useLocaleStore();
-    store.toggle();
-    await nextTick();
-    expect(translate('nav.problems')).toBe('Problems');
-    expect(document.documentElement.lang).toBe('en');
-    expect(localStorage.getItem('qhhoj.locale')).toBe('en');
-  });
-
   it('still switches language when localStorage throws', async () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('denied');

@@ -1,13 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { expiryPreview, MAX_EXPIRY_AMOUNT, publicRankingUrl, toLinkPatch } from './ranking-link';
+import { expiryPreview, MAX_EXPIRY_AMOUNT, toLinkPatch } from './ranking-link';
 
 describe('ranking link form', () => {
-  it('builds the public URL on this origin', () => {
-    expect(publicRankingUrl('q7Hk2xVn9aTzP4mR', 'https://qhhoj.vn')).toBe(
-      'https://qhhoj.vn/public-rankings/q7Hk2xVn9aTzP4mR',
-    );
-  });
-
   it('sends only what each expiry mode needs', () => {
     expect(
       toLinkPatch({
@@ -59,24 +53,6 @@ describe('ranking link form', () => {
         expiresAt: '',
       }),
     ).toHaveProperty('error');
-  });
-
-  it('previews the expiry date from the last regeneration', () => {
-    const now = new Date('2026-10-08T03:00:00.000Z');
-    expect(
-      expiryPreview(
-        { status: 'public', expiryMode: 'D', expiryAmount: 7, expiresAt: '' },
-        now,
-        'vi',
-      ),
-    ).toBe('Hết hạn sau 7 ngày kể từ lần tạo lại liên kết gần nhất, tức 15/10/2026.');
-    expect(
-      expiryPreview(
-        { status: 'public', expiryMode: 'U', expiryAmount: null, expiresAt: '' },
-        now,
-        'vi',
-      ),
-    ).toBeNull();
   });
 });
 

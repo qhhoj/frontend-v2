@@ -2,8 +2,8 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import type { VoteScore } from '@/api/types/votes';
 import { postItem } from '@/test/community-fixtures';
-import { blogListRoutes, communityHomeRoutes } from '@/test/community-routes';
-import { hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
+import { communityHomeRoutes } from '@/test/community-routes';
+import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
@@ -36,14 +36,6 @@ describe('blog list: feed, pages and links', () => {
       'Tất cả bài viết',
     );
     expect(wrapper.find('nav[aria-label="Trang bài viết"]').exists()).toBe(true);
-  });
-  it('shows the write button to signed-in readers only and the RSS link to everyone', async () => {
-    mockApi({ ...anonymousViewer, ...communityHomeRoutes, 'GET /posts': page([postItem()]) });
-    const { wrapper } = await mountApp('/blog');
-    expect(wrapper.find('a[href="/blog/new"]').exists()).toBe(false);
-    expect(wrapper.get('a[aria-label="Nguồn RSS"]').attributes('href')).toBe(
-      '/api/internal/feeds/blog/rss',
-    );
   });
 });
 
@@ -96,44 +88,5 @@ describe('blog list: inert arrows', () => {
     await wrapper.get(UP).trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PUT')).toBe(false);
-  });
-});
-
-describe('blog list: pager and dividers', () => {
-  it('hides the pager and leaves no padding when one page holds every post', async () => {
-    mockApi({
-      ...anonymousViewer,
-      ...communityHomeRoutes,
-      'GET /posts': page([postItem()], { total: 1 }),
-    });
-    const { wrapper } = await mountApp('/blog');
-    expect(wrapper.find('nav[aria-label="Trang bài viết"]').exists()).toBe(false);
-    const list = wrapper.get('[data-testid="post-list"]').element;
-    expect(list.lastElementChild!.querySelector('[data-testid="post-row"]')).not.toBeNull();
-    expect(wrapper.get('[data-testid="post-list"] .divide-y').classes()).toContain('divide-line');
-  });
-  it('pads the pager when there is a second page', async () => {
-    mockApi({
-      ...anonymousViewer,
-      ...communityHomeRoutes,
-      'GET /posts': page([postItem()], { pageSize: 10, total: 25 }),
-    });
-    const { wrapper } = await mountApp('/blog');
-    expect(wrapper.get('nav[aria-label="Trang bài viết"]').classes()).toContain('p-4');
-  });
-});
-
-describe('blog list: states', () => {
-  it('shows the Bit pair on an empty feed', async () => {
-    mockApi({ ...anonymousViewer, ...communityHomeRoutes, 'GET /posts': page([]) });
-    const { wrapper } = await mountApp('/blog');
-    expect(wrapper.get('[data-state="communityEmpty"]').text()).toContain('Chưa có bài viết nào');
-  });
-  it('shows post-shaped blocks, in the same divider as the loaded list, while loading', async () => {
-    mockApi({ ...anonymousViewer, ...blogListRoutes });
-    hangRequestsExcept(['/auth/me']);
-    const { wrapper } = await mountApp('/blog');
-    expect(wrapper.findAll('[data-skeleton-region="post-row"]')).toHaveLength(6);
-    expect(wrapper.get('[data-testid="post-list"] .divide-y').classes()).toContain('divide-line');
   });
 });

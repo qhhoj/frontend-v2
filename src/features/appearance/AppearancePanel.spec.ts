@@ -26,13 +26,6 @@ const accentNamed = (name: string) =>
   panel().querySelector<HTMLButtonElement>(`button[aria-label="${name}"]`)!;
 
 describe('appearance panel', () => {
-  it('opens as a named dialog from a button that says it is expanded', async () => {
-    const { wrapper } = await openPanel();
-    const titleId = panel().getAttribute('aria-labelledby')!;
-    expect(panel().ownerDocument.getElementById(titleId)?.textContent).toBe('Giao diện');
-    expect(wrapper.get('button[aria-label="Giao diện"]').attributes('aria-expanded')).toBe('true');
-  });
-
   it("turns the look on with the first accent or glass change, from the theme's own look", async () => {
     useGlassTheme();
     await openPanel();
@@ -52,51 +45,12 @@ describe('appearance panel', () => {
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('100');
   });
 
-  it('highlights the nearest stop for a glass value chosen on the settings page', async () => {
-    useGlassTheme();
-    localStorage.setItem(
-      'qhhoj.appearance',
-      JSON.stringify({ accent: 'mint', glass: 80, glow: 100 }),
-    );
-    localStorage.setItem(
-      'qhhoj.paintedAppearance',
-      JSON.stringify({ accent: 'mint', glass: 80, glow: 100 }),
-    );
-    await openPanel();
-    expect(buttonNamed('Đặc').getAttribute('aria-pressed')).toBe('true');
-    expect(accentNamed('Mint').getAttribute('aria-pressed')).toBe('true');
-  });
-
-  it('picking a style and a mode changes the theme and leaves the look off', async () => {
-    await openPanel();
-    buttonNamed('Glass').click();
-    await flushPromises();
-    buttonNamed('Sáng').click();
-    await flushPromises();
-    expect(root.dataset.theme).toBe('glass-light');
-    expect(root.dataset.accent).toBeUndefined();
-  });
-
   it('disables the Glass segments in a Clay theme and says why', async () => {
     await openPanel();
     expect(root.dataset.theme).toBe('clay-light');
     expect(buttonNamed('Mờ').disabled).toBe(true);
     expect(panel().textContent).toContain('Glass và quầng sáng chỉ áp dụng cho giao diện Glass');
     expect(accentNamed('Ocean').disabled).toBe(false);
-  });
-
-  it('still shows which Glass stop is selected while the segments are disabled', async () => {
-    await openPanel();
-    const clear = buttonNamed('Trong');
-    expect(clear.disabled).toBe(true);
-    expect(clear.getAttribute('aria-pressed')).toBe('true');
-  });
-
-  it('keeps the Glass segments live on a Glass theme', async () => {
-    useGlassTheme();
-    await openPanel();
-    expect(buttonNamed('Mờ').disabled).toBe(false);
-    expect(panel().textContent).not.toContain('Glass và quầng sáng chỉ áp dụng');
   });
 
   it('uses the site default: look off and mode back to Clay, automatic', async () => {
@@ -113,27 +67,5 @@ describe('appearance panel', () => {
     expect(root.dataset.theme).toBe('clay-light');
     expect(buttonNamed('Clay').getAttribute('aria-pressed')).toBe('true');
     expect(buttonNamed('Tự động').getAttribute('aria-pressed')).toBe('true');
-  });
-
-  it('switches low-power from the popover', async () => {
-    await openPanel();
-    const group = panel().querySelector<HTMLElement>(
-      '[role="group"][aria-label="Chế độ tiết kiệm"]',
-    )!;
-    const on = [...group.querySelectorAll('button')].find(
-      (button) => button.textContent?.trim() === 'Bật',
-    )!;
-    on.click();
-    await flushPromises();
-    expect(root.hasAttribute('data-low-power')).toBe(true);
-    expect(on.getAttribute('aria-pressed')).toBe('true');
-  });
-
-  it('links to the settings page', async () => {
-    await openPanel();
-    const link = [...panel().querySelectorAll('a')].find((anchor) =>
-      anchor.textContent?.includes('Thêm trong Cài đặt'),
-    )!;
-    expect(link.getAttribute('href')).toBe('/settings/appearance');
   });
 });

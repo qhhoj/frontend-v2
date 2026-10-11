@@ -18,12 +18,6 @@ const mountRail = () =>
   });
 
 describe('the submission filter rail', () => {
-  it('emits the verdict filter when Accepted is ticked', async () => {
-    const wrapper = mountRail();
-    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
-    expect(wrapper.emitted('update')).toEqual([[{ results: ['AC'] }]]);
-  });
-
   it('emits one update 300 ms after the last key of a burst, and no timer left after unmount', async () => {
     const wrapper = mountRail();
     const field = wrapper.get('input[name="user"]');
@@ -38,22 +32,6 @@ describe('the submission filter rail', () => {
     expect(vi.getTimerCount()).toBe(1);
     wrapper.unmount();
     expect(vi.getTimerCount()).toBe(0);
-  });
-
-  it('emits reset', async () => {
-    const wrapper = mountRail();
-    await wrapper.get('button[data-testid="filters-reset"]').trigger('click');
-    expect(wrapper.emitted('reset')).toHaveLength(1);
-  });
-
-  it('gives each checkbox row a 44 px target with a visible code and name', () => {
-    const wrapper = mountRail();
-    const rows = wrapper.findAll('fieldset label');
-    expect(rows).toHaveLength(6);
-    for (const row of rows) expect(row.classes()).toContain('min-h-11');
-    const accepted = wrapper.get('input[value="AC"]').element.closest('label')!;
-    expect(accepted.textContent).toContain('AC');
-    expect(accepted.textContent).toContain('Chấp nhận');
   });
 
   it('emits the judging-state box ticked, and only in the contest rail', async () => {

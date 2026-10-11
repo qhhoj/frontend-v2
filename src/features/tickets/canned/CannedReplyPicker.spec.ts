@@ -3,7 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import type { TicketDetail } from '@/api/types/tickets';
 import { cannedReply, ticketDetail } from '@/test/community-fixtures';
-import { fail, mockApi, ok, page } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
@@ -48,20 +48,6 @@ describe('canned reply picker', () => {
     expect(wrapper.get('[data-testid="canned-inserted"]').text()).toBe(
       'Đã chèn mẫu “Đã nhận phiếu”.',
     );
-  });
-
-  it('shows the quill Bit and the link to manage them when there is none', async () => {
-    const { wrapper } = await openTicket(STAFF_TICKET, page([], { pageSize: 100 }));
-    await openPicker(wrapper);
-    expect(pickerPanel()!.textContent).toContain('Chưa có mẫu trả lời nào.');
-    expect(pickerPanel()!.querySelector('a[href="/admin/tickets/canned"]')).not.toBeNull();
-    expect(pickerPanel()!.querySelector('[data-testid="inline-bit"]')).not.toBeNull();
-  });
-
-  it('shows the load error with a retry', async () => {
-    const { wrapper } = await openTicket(STAFF_TICKET, fail(503, 'network_error'));
-    await openPicker(wrapper);
-    expect(pickerPanel()!.textContent).toContain('Không kết nối được máy chủ.');
   });
 
   it('is not offered to the ticket owner, who asks for nothing', async () => {

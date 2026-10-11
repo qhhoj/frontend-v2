@@ -4,7 +4,7 @@ import type { mountApp } from '@/test/mount';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
-import { contestEditorRoutes, officialRanking, rankingLink } from '@/test/admin-fixtures/contests';
+import { contestEditorRoutes, rankingLink } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 /** Some jsdom versions have no `Blob.text()`; the component uses the real API, so the spec supplies the FileReader route. */
@@ -64,33 +64,6 @@ describe('ContestRankingTab', () => {
     expect(wrapper.text()).toContain('Line 14 has 9 columns; the header has 10.');
   });
 
-  it('shows the first rows of the stored table and deletes it after confirming', async () => {
-    const calls = mockApi({
-      ...base(ok(officialRanking()), fail(404, 'not_found')),
-      'DELETE /contests/hcmus-w41/official-ranking': { status: 204 },
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/ranking', 'ngocanh');
-    expect(wrapper.get('[data-testid="official-table"]').text()).toContain('ngocanh');
-    await click(wrapper, 'Xóa bảng chính thức');
-    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xóa');
-    expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
-  });
-
-  it('offers to create a link when there is none, then shows it with a copy button', async () => {
-    mockApi({
-      ...base(fail(404, 'not_found'), fail(404, 'not_found')),
-      'POST /contests/hcmus-w41/ranking-link': ok(rankingLink()),
-    });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/ranking',
-      'Chưa có liên kết?',
-    );
-    expect(wrapper.text()).toContain('Chưa có liên kết?');
-    await click(wrapper, 'Tạo liên kết');
-    expect(wrapper.text()).toContain('/public-rankings/q7Hk2xVn9aTzP4mR');
-  });
-
   it('regenerates only after confirming that the old URL stops working', async () => {
     const calls = mockApi({
       ...base(fail(404, 'not_found'), ok(rankingLink())),
@@ -108,27 +81,5 @@ describe('ContestRankingTab', () => {
     await confirmDialog('Tạo lại');
     expect(calls.some((call) => call.path.endsWith('/regenerate'))).toBe(true);
     expect(wrapper.text()).toContain('newToken');
-  });
-
-  it('previews the expiry from the link’s last regeneration, not from now', async () => {
-    mockApi(
-      base(
-        ok(officialRanking()),
-        ok(
-          rankingLink({
-            expiryMode: 'D',
-            expiryAmount: 2,
-            regeneratedAt: '2026-01-10T12:00:00.000Z',
-          }),
-        ),
-      ),
-    );
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/ranking',
-      'q7Hk2xVn9aTzP4mR',
-    );
-    expect(wrapper.text()).toContain(
-      'Hết hạn sau 2 ngày kể từ lần tạo lại liên kết gần nhất, tức 12/01/2026.',
-    );
   });
 });

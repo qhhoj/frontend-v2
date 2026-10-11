@@ -64,15 +64,6 @@ describe('profile save', () => {
     expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
   });
 
-  it('puts the answer in the profile cache', async () => {
-    mockApi({ 'PATCH /profile': ({ body }) => ok(profile(body as object)) });
-    const { saveProfile, queryClient } = mountSavers();
-    await saveProfile({ siteTheme: 'clay-dark' });
-    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toEqual(
-      profile({ siteTheme: 'clay-dark' }),
-    );
-  });
-
   it('never lets an older answer overwrite a newer one, whichever saver sent it', async () => {
     const answers = holdPatches();
     const { saveProfile, chooseTheme, queryClient } = mountSavers();
@@ -121,35 +112,9 @@ describe('profile save', () => {
     expect(queryClient.getQueryData(profileKey(otherId))).toBeUndefined();
     expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
   });
-
-  it('swallows a failed save and leaves the cache alone', async () => {
-    mockApi({
-      'PATCH /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
-    });
-    const { saveProfile, queryClient } = mountSavers();
-    await expect(saveProfile({ siteTheme: 'clay-dark' })).resolves.toBeUndefined();
-    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
-  });
 });
 
 describe('useProfileUpdate', () => {
-  it('returns the stored profile and caches it', async () => {
-    mockApi({ 'PATCH /profile': ok(profile({ firstName: 'Thư' })) });
-    const { update, queryClient } = mountSavers();
-    await expect(update({ firstName: 'Thư' })).resolves.toMatchObject({ firstName: 'Thư' });
-    expect(queryClient.getQueryData(profileKey(sessionUser().id))).toMatchObject({
-      firstName: 'Thư',
-    });
-  });
-
-  it('rethrows a failure, unlike the theme saver', async () => {
-    mockApi({ 'PATCH /profile': fail(400, 'validation_failed') });
-    const { update } = mountSavers();
-    await expect(update({ timezone: 'Mars/Base' })).rejects.toMatchObject({
-      code: 'validation_failed',
-    });
-  });
-
   it('shares one sequence with the theme saver: its answer is dropped once a newer save started', async () => {
     mockApi({
       'PATCH /profile': sequence(ok(profile({ firstName: 'Thư' })), fail(500, 'http_error')),

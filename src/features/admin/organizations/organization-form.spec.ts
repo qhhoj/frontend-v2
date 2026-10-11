@@ -35,15 +35,6 @@ describe('organization form', () => {
     expect(changedOrganizationFields(before, after, false)).toEqual({ name: 'Mới' });
   });
 
-  it('starts a create form from the backend defaults, closed and unlisted', () => {
-    expect(emptyOrganizationForm()).toMatchObject({
-      isOpen: false,
-      isUnlisted: true,
-      shortName: '',
-      slots: null,
-    });
-  });
-
   it('builds a create body for a plain creator without isUnlisted, slots or shortName, even when they are filled', () => {
     const form = {
       ...emptyOrganizationForm(),

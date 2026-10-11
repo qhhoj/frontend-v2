@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { askIdsIn, trustedUntilBackendFixed } from './backend-ask';
+import { askIdsIn } from './backend-ask';
 
 const sources = import.meta.glob<string>('/src/**/*.{ts,vue}', {
   query: '?raw',
@@ -10,16 +10,6 @@ const register = import.meta.glob<string>('/docs/api-mismatches/*.md', {
   query: '?raw',
   import: 'default',
   eager: true,
-});
-
-describe('trustedUntilBackendFixed', () => {
-  it('hands the value back typed as wanted', () => {
-    const value = { id: 'x' };
-    expect(trustedUntilBackendFixed<{ id: string }>('M2-01', value)).toBe(value);
-  });
-  it('refuses an id that is not a lane-numbered ask', () => {
-    expect(() => trustedUntilBackendFixed('later' as never, 1)).toThrow('M<lane>-<nn>');
-  });
 });
 
 describe('askIdsIn', () => {

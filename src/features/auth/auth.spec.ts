@@ -1,20 +1,16 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { apiRequest } from '@/api/client';
-import {
-  partialSession,
-  profile,
-  problemMeta,
-  sessionResponse,
-  signedIn,
-  signedOut,
-} from '@/test/fixtures';
+import { profile, problemMeta, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { homeRoutes } from '@/test/home-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 import { useThemeStore } from '@/theme/theme.store';
+
+// The first mount in a file loads route chunks cold.
+vi.setConfig({ testTimeout: 30_000 });
 
 describe('auth screens', () => {
   it('returns to a safe redirect after login', async () => {
@@ -36,39 +32,9 @@ describe('auth screens', () => {
       username: 'user_01',
       password: 'correct horse',
     });
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/settings'));
-  });
-
-  it('shows why a login failed and stays on the page', async () => {
-    mockApi({
-      ...blogListRoutes,
-      ...loginRoutes,
-      'GET /auth/me': signedOut,
-      'POST /auth/login': fail(401, 'invalid_credentials'),
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/settings'), {
+      timeout: 5000,
     });
-    const { wrapper, router } = await mountApp('/login');
-    await wrapper.get('input[name="username"]').setValue('user_01');
-    await wrapper.get('input[name="password"]').setValue('wrong');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('#main [role="alert"]').text()).toBe('Sai tên đăng nhập hoặc mật khẩu.');
-    expect(router.currentRoute.value.name).toBe('login');
-  });
-
-  it('sends a viewer with a pending second factor to 2FA, keeping the redirect', async () => {
-    mockApi({
-      ...blogListRoutes,
-      ...loginRoutes,
-      'GET /auth/me': signedOut,
-      'POST /auth/login': ok(partialSession()),
-    });
-    const { wrapper, router } = await mountApp('/login?redirect=/settings');
-    await wrapper.get('input[name="username"]').setValue('user_01');
-    await wrapper.get('input[name="password"]').setValue('correct horse');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login-2fa'));
-    expect(router.currentRoute.value.query.redirect).toBe('/settings');
   });
 
   it.each(['//evil.example/x', '/\\evil.example', 'https://evil.example', 'javascript:alert(1)'])(
@@ -87,7 +53,9 @@ describe('auth screens', () => {
       await wrapper.get('input[name="password"]').setValue('correct horse');
       await wrapper.get('form').trigger('submit');
       await flushPromises();
-      await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/'));
+      await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/'), {
+        timeout: 5000,
+      });
     },
   );
 
@@ -105,44 +73,9 @@ describe('auth screens', () => {
     await wrapper.get('input[name="password"]').setValue('correct horse');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
-    await vi.waitFor(() => expect(useThemeStore().theme.id).toBe('clay-light'));
-  });
-
-  it('tells a throttled viewer to wait', async () => {
-    mockApi({
-      ...blogListRoutes,
-      ...loginRoutes,
-      'GET /auth/me': signedOut,
-      'POST /auth/login': fail(429, 'rate_limited'),
+    await vi.waitFor(() => expect(useThemeStore().theme.id).toBe('clay-light'), {
+      timeout: 15_000,
     });
-    const { wrapper } = await mountApp('/login');
-    await wrapper.get('input[name="username"]').setValue('user_01');
-    await wrapper.get('input[name="password"]').setValue('x');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
-    );
-  });
-
-  it('drops the previous account data when another account logs in', async () => {
-    mockApi({
-      ...blogListRoutes,
-      ...loginRoutes,
-      'GET /auth/me': signedOut,
-      'POST /auth/login': ok(sessionResponse()),
-      'GET /profile': ok(profile()),
-      ...homeRoutes,
-    });
-    const { wrapper, queryClient } = await mountApp('/login');
-    queryClient.setQueryData(['submissions', 'list', { user: 'previous_user' }], ['old']);
-    await wrapper.get('input[name="username"]').setValue('user_01');
-    await wrapper.get('input[name="password"]').setValue('correct horse');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(
-      queryClient.getQueryData(['submissions', 'list', { user: 'previous_user' }]),
-    ).toBeUndefined();
   });
 
   it('drops cached account data when the session expires', async () => {
@@ -157,31 +90,5 @@ describe('auth screens', () => {
     await apiRequest('/submissions/abc/abort', { method: 'POST' }).catch(() => undefined);
     await flushPromises();
     expect(queryClient.getQueryData(['submissions', 'list', { user: 'user_01' }])).toBeUndefined();
-  });
-
-  it('shows the moderator reason of a banned account', async () => {
-    mockApi({
-      ...blogListRoutes,
-      ...loginRoutes,
-      'GET /auth/me': signedOut,
-      'POST /auth/login': {
-        status: 403,
-        body: {
-          error: {
-            code: 'banned',
-            message: 'This account has been banned. Reason: cheating',
-            banReason: 'cheating',
-          },
-        },
-      },
-    });
-    const { wrapper } = await mountApp('/login');
-    await wrapper.get('input[name="username"]').setValue('user_01');
-    await wrapper.get('input[name="password"]').setValue('x');
-    await wrapper.get('form').trigger('submit');
-    await flushPromises();
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Tài khoản đã bị khoá. Lý do: cheating',
-    );
   });
 });

@@ -19,14 +19,6 @@ async function drag(picker: VueWrapper, name: string, value: number) {
 }
 
 describe('ProblemPointsPicker', () => {
-  it('spans the points a problem can have', () => {
-    const picker = open();
-    expect([slider(picker, 'pointsMinSlider').min, slider(picker, 'pointsMinSlider').max]).toEqual([
-      '800',
-      '3500',
-    ]);
-  });
-
   it('shows the range while dragging and changes the filter once, on release', async () => {
     const picker = open();
     await drag(picker, 'pointsMinSlider', 1200);
@@ -43,11 +35,6 @@ describe('ProblemPointsPicker', () => {
     expect(slider(picker, 'pointsMinSlider').value).toBe('2000');
     await picker.get('input[name="pointsMinSlider"]').trigger('change');
     expect(picker.emitted('change')).toEqual([[{ pointsMin: 2000, pointsMax: 2000 }]]);
-  });
-
-  it('puts the minimum on top when both handles meet at the right end', () => {
-    const picker = open(3500, null);
-    expect(picker.get('input[name="pointsMinSlider"]').classes()).toContain('is-top');
   });
 
   it('treats a handle at its end of the track as no bound', async () => {

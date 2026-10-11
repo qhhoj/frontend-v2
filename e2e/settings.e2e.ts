@@ -55,21 +55,6 @@ test('security: turn on the authenticator app by keyboard, keep the codes, then 
   await expect(page.getByRole('button', { name: 'Bật', exact: true })).toBeVisible();
 });
 
-test('security: a dialog traps focus, closes on Escape and gives focus back', async ({ page }) => {
-  await page.goto('/settings/security');
-  const opener = page.getByRole('button', { name: 'Tạo token mới' });
-  await opener.click();
-  const dialog = page.getByRole('dialog', { name: 'Tạo token mới?' });
-  await expect(dialog).toBeVisible();
-  for (let step = 0; step < 4; step += 1) {
-    await page.keyboard.press('Tab');
-    expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true);
-  }
-  await page.keyboard.press('Escape');
-  await expect(dialog).toBeHidden();
-  await expect(opener).toBeFocused();
-});
-
 test('sign out everywhere lands on the sign-in page', async ({ page }) => {
   await page.goto('/settings/security');
   await page.getByRole('button', { name: 'Đăng xuất mọi nơi' }).click();

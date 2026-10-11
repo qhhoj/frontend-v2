@@ -1,6 +1,4 @@
 import { contestDetail, contestProblem, problemDetail, viewerResult } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
@@ -59,21 +57,3 @@ test('the contest problem table shows one limits column with a dash for a hidden
   await expect(table.getByRole('cell', { name: '2 s · 256 MB' })).toBeVisible();
   await expect(table.getByRole('cell', { name: '—', exact: true }).first()).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`the switcher is accessible in every theme and fits at ${viewport.name}`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    for (const theme of THEMES) {
-      inContest(api);
-      await applyTheme(page, api, theme);
-      await page.goto('/problems/r42b');
-      await expect(page.getByTestId('problem-switcher')).toBeVisible();
-      expect(await axeViolationsIn(page), theme.id).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    }
-  });

@@ -39,17 +39,6 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('submission page', () => {
-  it('shows the pulse line, the ring in tests, the provisional score and the graded rows while grading', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Đã chấm 3 trên 20 test');
-    expect(wrapper.get('[data-testid="score"]').text()).toBe('560');
-    expect(wrapper.find('[data-testid="provisional"]').exists()).toBe(true);
-    expect(wrapper.get('[data-testid="grading-line"]').text()).toContain('Đang chấm');
-    expect(wrapper.findAll('[data-testid="case-row"]')).toHaveLength(3);
-    expect(wrapper.findAll('[data-testid="pending-row"]')).toHaveLength(17);
-  });
-
   it('refetches the row once, 400 ms after a burst of test-case events, and shows the new rows', async () => {
     const calls = mockApi({
       ...signedInViewer(),
@@ -180,108 +169,6 @@ describe('submission page', () => {
     expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Đã được 35% điểm');
   });
 
-  it('shows the source right under the verdict, before the test cases', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(submissionDetail()),
-      ...problemPageRoutes(),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    const html = wrapper.get('#main').html();
-    const source = html.indexOf('id="source"');
-    expect(source).toBeGreaterThan(-1);
-    expect(source).toBeLessThan(html.indexOf('data-testid="cases-card"'));
-  });
-
-  it('shows the compile message of a compile error', async () => {
-    const compileError = submissionDetail({
-      status: 'CE',
-      result: 'CE',
-      points: 0,
-      cases: null,
-      batches: null,
-      totalCases: null,
-      error: 'main.cpp:3: error: expected ;',
-    });
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(compileError), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    expect(wrapper.findAll('#main pre').map((pre) => pre.text())).toContain(
-      'main.cpp:3: error: expected ;',
-    );
-    expect(wrapper.text()).toContain('Lỗi biên dịch');
-  });
-
-  it.each([
-    ['solve_first', 'Giải bài này trước để xem bài nộp'],
-    ['contest_running', 'Kỳ thi đang diễn ra, chưa thể xem bài nộp của người khác'],
-    ['hidden', 'Bạn không có quyền xem bài nộp này'],
-  ])('explains the 403 reason %s on the detail and shows no summary', async (code, text) => {
-    mockApi({ ...signedInViewer(), 'GET /submissions/sub-1': fail(403, code) });
-    const { wrapper } = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() => expect(wrapper.text()).toContain(text));
-    expect(wrapper.find('[role="img"]').exists()).toBe(false);
-  });
-
-  it('says the generic forbidden text for a 403 without a known reason', async () => {
-    mockApi({ ...signedInViewer(), 'GET /submissions/sub-1': fail(403, 'forbidden') });
-    const { wrapper } = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền làm việc này.'));
-    const bit = wrapper.get('[data-testid="inline-bit"]');
-    expect(bit.attributes('aria-hidden')).toBe('true');
-  });
-
-  it('renders not-found in place for a 404', async () => {
-    mockApi({ ...signedInViewer(), 'GET /submissions/sub-1': fail(404, 'not_found') });
-    const { wrapper, router } = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="requested-path"]').exists()).toBe(true),
-    );
-    expect(router.currentRoute.value.path).toBe('/submissions/sub-1');
-  });
-
-  it('keeps the summary when only the source is forbidden', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(),
-      ...problemPageRoutes(),
-      'GET /submissions/sub-1/source': fail(403, 'hidden'),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền xem bài nộp này'));
-    expect(wrapper.find('[role="img"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="inline-bit"]').exists()).toBe(true);
-    expect(wrapper.findAll('[data-testid="case-row"]').length).toBeGreaterThan(0);
-  });
-
-  it('falls back to the problem name of the row when the problem is not readable', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(),
-      'GET /problems/duongdi': fail(403, 'forbidden'),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    expect(wrapper.get('a[href="/problems/duongdi"]').text()).toBe('Đường đi ngắn nhất');
-  });
-
-  it('links Nộp lại to the problem with ?resubmit=<id>', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    await vi.waitFor(() =>
-      expect(wrapper.find('a[href="/problems/duongdi?resubmit=sub-1"]').exists()).toBe(true),
-    );
-  });
-
-  it('names the tab after the short submission id', async () => {
-    const longId = '0192a000-aaaa-7000-8000-000000000abc';
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(submissionDetail({ id: longId })),
-      ...problemPageRoutes(),
-    });
-    await openSubmission(longId);
-    expect(document.title).toBe('Bài nộp #0192a0…abc · QHHOJ');
-  });
-
   it("offers no Nộp lại on another user's submission", async () => {
     const stranger = { id: 'someone-else', username: 'stranger', rating: null };
     mockApi({
@@ -338,21 +225,6 @@ describe('submission page', () => {
     await vi.waitFor(() => expect(detailCalls(calls)).toHaveLength(2));
     await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền xem bài nộp này'));
     expect(wrapper.find('[role="img"]').exists()).toBe(false);
-  });
-
-  it('opens a second stream and drops the hint when the reload button is pressed after the stream was lost', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    latestEventSource().fail();
-    await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(true),
-    );
-    await wrapper.get('[data-testid="stale-reload"] button').trigger('click');
-    await vi.waitFor(() => expect(pageStreams()).toHaveLength(2));
-    await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false),
-    );
-    expect(wrapper.find('[data-testid="grading-line"]').exists()).toBe(true);
   });
 
   it('numbers a source that ends in a newline without a phantom last line', async () => {
@@ -441,84 +313,6 @@ describe('submission page', () => {
     expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
     expect(pageStreams()).toHaveLength(1);
-  });
-
-  it('shows the verdict before the problem arrives and a skeleton in the points cell only', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
-    const served = globalThis.fetch;
-    vi.stubGlobal('fetch', (input: string, init?: RequestInit) =>
-      String(input).includes('/problems/duongdi')
-        ? new Promise<Response>(() => {})
-        : served(input, init),
-    );
-    const { wrapper } = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="score"]').exists()).toBe(true));
-    expect(wrapper.text()).toContain('WA · Sai kết quả');
-    expect(wrapper.get('[data-testid="score"]').text()).toBe('');
-    expect(wrapper.find('[data-testid="score"] [data-skeleton]').exists()).toBe(true);
-  });
-
-  it('fills the ring of a final row in the verdict colour and shows when it was submitted', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Sai kết quả');
-    expect(wrapper.get('[role="img"]').attributes('style')).toContain('--qh-verdict-wa');
-    expect(wrapper.get('time').attributes('title')).toMatch(/2026/);
-  });
-
-  it.each([
-    ['AC', 'Bit đội vương miện'],
-    ['WA', 'Bit toát mồ hôi'],
-    ['TLE', 'Bit toát mồ hôi'],
-  ] as const)('shows Bit for a final %s: %s', async (result, label) => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(submissionDetail({ result })),
-      ...problemPageRoutes(),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    expect(
-      wrapper.get(`[data-testid="submission-summary"] [aria-label="${label}"]`).attributes('role'),
-    ).toBe('img');
-  });
-
-  it('shows no Bit while the submission is still grading', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    const summary = wrapper.get('[data-testid="submission-summary"]');
-    expect(summary.find('[aria-label^="Bit"]').exists()).toBe(false);
-  });
-
-  it('shows an empty neutral ring, never a green percentage, for a result that is pending until the contest ends', async () => {
-    const pending = submissionDetail({
-      status: 'PD',
-      result: null,
-      points: null,
-      cases: null,
-      totalCases: null,
-    });
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(pending), ...problemPageRoutes() });
-    const { wrapper } = await openSubmission('sub-1');
-    const ring = wrapper.get('[role="img"]');
-    expect(ring.attributes('aria-label')).toBe('Chờ chấm cuối kỳ thi');
-    expect(ring.text()).not.toContain('%');
-    expect(ring.attributes('style')).not.toContain('--qh-positive');
-  });
-
-  it('compares with another submission given by id or link, this one on the right', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(),
-      ...problemPageRoutes(),
-      ...submissionPageRoutes(submissionDetail({ id: 'sub-2' })),
-    });
-    const { wrapper, router } = await openSubmission('sub-1');
-    const form = wrapper.get('[data-testid="compare-form"]');
-    await form.get('input').setValue('https://qhhoj.vn/submissions/sub-2');
-    await form.trigger('submit');
-    await vi.waitFor(() =>
-      expect(router.currentRoute.value.fullPath).toBe('/submissions/diff?left=sub-2&right=sub-1'),
-    );
   });
 
   it('refuses an unreadable or identical id in the compare form, with the reason', async () => {

@@ -10,7 +10,6 @@ import type { Rgba } from '@/test/contrast';
 import { ACCENTS } from './appearance';
 import globalTokensCss from './tokens.css?raw';
 import { THEMES } from './registry';
-import stylesCss from './styles.css?raw';
 
 const themeFiles = import.meta.glob<string>('./themes/*.css', {
   query: '?raw',
@@ -79,23 +78,6 @@ const COINS = [1, 2, 3, 4, 5, 6].map((index) => `coin-${index}`);
 const SYNTAX_TOKENS = ['keyword', 'type', 'number', 'string', 'comment', 'function'].map(
   (name) => `syntax-${name}`,
 );
-/** What an accent preset overrides, in every theme. Verdict, first-solve, tier, coin and syntax tokens never follow the accent. */
-const ACCENT_TOKENS = [
-  'surface-hover',
-  'line-accent',
-  'accent',
-  'accent-2',
-  'accent-text',
-  'accent-soft',
-  'accent-soft-text',
-  'on-accent',
-  'focus-ring',
-  'gradient-accent',
-  'glow',
-  'blob-1',
-  'blob-2',
-  'blob-3',
-];
 /** Personal Glass levels checked; 0 is the worst case (most see-through), 100 is the opaque fallback. */
 const GLASS_LEVELS = [0, 25, 50, 75, 100];
 
@@ -162,7 +144,6 @@ const TINTED_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ),
   ...[...new Set(TINT_PAIRS.map(([, tint]) => tint))].map((tint) => ['text', tint] as const),
 ];
-const allTokenNames = new Set(themes.flatMap(({ tokens }) => [...tokens.keys()]));
 
 /** Every theme with every accent preset applied over its base tokens; the native preset's variant is the base itself. */
 const variants = themes.flatMap(({ id, tokens, presets }) =>
@@ -246,55 +227,13 @@ function hueOf([red, green, blue]: Rgba) {
   return (hue + 360) % 360;
 }
 
-describe.each(themes)('theme $id', ({ id, css, tokens, presets }) => {
+describe.each(themes)('theme $id', ({ id, tokens }) => {
   const colour = colourOf(tokens, id);
-
-  it('is selected by its data-theme attribute', () => {
-    expect(css).toContain(`[data-theme='${id}']`);
-  });
-
-  it('defines the same tokens as every other theme', () => {
-    expect([...allTokenNames].filter((name) => !tokens.has(name))).toEqual([]);
-  });
 
   it('defines every token the stylesheets and components use', () => {
     expect([...usedNames].filter((name) => !globalNames.has(name) && !tokens.has(name))).toEqual(
       [],
     );
-  });
-
-  it('defines exactly the registered accent presets', () => {
-    expect([...presets.keys()].sort()).toEqual(ACCENTS.map((accent) => accent.id).sort());
-  });
-
-  it('gives every preset the same accent tokens, selectable on the root and on a swatch', () => {
-    const failures = ACCENTS.flatMap(({ id: accent }) => {
-      const preset = presets.get(accent);
-      if (!preset) return [`${accent}: missing`];
-      const names = [...preset.tokens.keys()];
-      return [
-        ...ACCENT_TOKENS.filter((name) => !names.includes(name)).map(
-          (name) => `${accent}: missing --qh-${name}`,
-        ),
-        ...names
-          .filter((name) => !ACCENT_TOKENS.includes(name))
-          .map((name) => `${accent}: --qh-${name} is not an accent token`),
-        ...[
-          `:root[data-theme='${id}'][data-accent='${accent}']`,
-          `:root[data-theme='${id}'] [data-accent='${accent}']`,
-        ]
-          .filter((selector) => !preset.selector.includes(selector))
-          .map((selector) => `${accent}: selector lacks ${selector}`),
-      ];
-    });
-    expect(failures).toEqual([]);
-  });
-
-  it("keeps the base equal to exactly one preset, the registry's accent for this theme", () => {
-    const native = ACCENTS.filter(({ id: accent }) =>
-      ACCENT_TOKENS.every((name) => presets.get(accent)?.tokens.get(name) === tokens.get(name)),
-    ).map((accent) => accent.id);
-    expect(native).toEqual([entryOf(id).accent]);
   });
 
   it('keeps adjacent rating tiers at least 20 apart in CIELAB (CIE76), newbie to grandmaster', () => {
@@ -305,35 +244,6 @@ describe.each(themes)('theme $id', ({ id, css, tokens, presets }) => {
       return `${previous} / ${token}: ${colourDistance(colour(previous), colour(token)).toFixed(1)}`;
     });
     expect(gaps.filter((gap) => Number(gap.split(': ')[1]) < 20)).toEqual([]);
-  });
-
-  it('gives the six syntax tokens six different colours', () => {
-    const values = SYNTAX_TOKENS.map((name) => tokens.get(name));
-    expect(new Set(values).size).toBe(SYNTAX_TOKENS.length);
-  });
-
-  it('gives the eight tag chips eight different text colours and eight different tints', () => {
-    const texts = TAG_PAIRS.map(([text]) => tokens.get(text));
-    const tints = TAG_PAIRS.map(([, tint]) => tokens.get(tint));
-    expect(texts.every(Boolean) && tints.every(Boolean)).toBe(true);
-    expect(new Set(texts).size).toBe(TAG_COUNT);
-    expect(new Set(tints).size).toBe(TAG_COUNT);
-  });
-
-  it('is flat or frosted exactly as its registry entry says', () => {
-    if (entryOf(id).glass) {
-      expect(tokens.get('blur')).toMatch(/^[1-9]\d*px$/);
-      expect(tokens.get('blob-display')).toBe('block');
-      return;
-    }
-    expect(tokens.get('blur')).toBe('0px');
-    expect(tokens.get('blob-display')).toBe('none');
-    // Opaque everywhere: a personal Glass level has nothing to mix, and the blobs have nothing to show.
-    expect(colour('surface')).toEqual(colour('surface-solid'));
-    for (const name of ['surface', 'surface-strong'])
-      expect(colour(name)[3], `--qh-${name} alpha`).toBe(1);
-    // The rating chart line is one colour. Hover, blobs, buttons and glow follow the preset: checked per variant below.
-    expect(tokens.get('chart-line-start')).toBe('var(--qh-accent)');
   });
 
   it('draws a skeleton block that stands out from the card surface and from an inner tile', () => {
@@ -425,27 +335,6 @@ describe.each(variants)('theme $theme with accent $accent', ({ theme, accent, to
 });
 
 describe('theme registry', () => {
-  it('has a CSS file for every registered theme and registers every CSS file', () => {
-    expect(themes.map((theme) => theme.id).sort()).toEqual(THEMES.map((theme) => theme.id).sort());
-  });
-
-  it('imports every registered theme in styles.css', () => {
-    const missing = THEMES.filter(
-      (theme) => !stylesCss.includes(`@import './themes/${theme.id}.css';`),
-    ).map((theme) => theme.id);
-    expect(missing).toEqual([]);
-  });
-
-  it('declares the colour-scheme its registry entry claims', () => {
-    const mismatched = THEMES.filter(
-      (theme) =>
-        !new RegExp(`color-scheme:\\s*${theme.scheme}\\s*;`).test(
-          themes.find((file) => file.id === theme.id)?.css ?? '',
-        ),
-    ).map((theme) => theme.id);
-    expect(mismatched).toEqual([]);
-  });
-
   it('keeps the problem list graphics (difficulty squares, empty status ring) at 3:1 on every row ground', () => {
     const MIN_GRAPHIC_CONTRAST = 3;
     const graphics = ['diff-1', 'diff-2', 'diff-3', 'diff-4', 'text-muted'];

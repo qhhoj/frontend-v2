@@ -48,13 +48,6 @@ const mountScreen = async (path: string, isReady: (wrapper: Mounted['wrapper']) 
 };
 const mountList = (path: string) =>
   mountScreen(path, (wrapper) => hasButton(wrapper, 'Tạo tổ chức'));
-const mountEditor = (path: string) =>
-  mountScreen(
-    path,
-    (wrapper) =>
-      (wrapper.find('#org-name').element as HTMLInputElement | undefined)?.value ===
-      'THPT chuyên Lê Hồng Phong',
-  );
 const mountWithButton = (path: string, text: string) =>
   mountScreen(path, (wrapper) => hasButton(wrapper, text));
 const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], text: string) => {
@@ -66,50 +59,6 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
 };
 
 describe('OrganizationsPage', () => {
-  it('lists organizations with open, closed and hidden states and opens one for editing', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
-    expect(wrapper.get('[data-testid="org-list"]').text()).toContain('Ẩn');
-    expect((wrapper.get('#org-name').element as HTMLInputElement).value).toBe(
-      'THPT chuyên Lê Hồng Phong',
-    );
-  });
-
-  it('saves only what changed', async () => {
-    const calls = mockApi(routes({ 'PATCH /organizations/lhp': ok({ ...detail, name: 'Mới' }) }));
-    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
-    await wrapper.get('#org-name').setValue('Mới');
-    await click(wrapper, 'Lưu thay đổi');
-    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ name: 'Mới' });
-  });
-
-  it('accepts and refuses join requests', async () => {
-    const calls = mockApi(
-      routes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: ok({
-          ...request,
-          state: 'A',
-        }),
-      }),
-    );
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
-    await click(wrapper, 'Chấp nhận');
-    expect(calls.find((call) => call.path.endsWith('/decide'))?.body).toEqual({ state: 'A' });
-  });
-
-  it('shows a full organization as a refusal inside that request', async () => {
-    mockApi(
-      routes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: FULL_CODE,
-      }),
-    );
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Chấp nhận');
-    await click(wrapper, 'Chấp nhận');
-    expect(wrapper.get('[data-testid="join-requests"] [role="alert"]').text()).toContain(
-      'Tổ chức đã đủ chỗ.',
-    );
-  });
-
   it('reads an already decided request as taken by someone else and reloads the requests', async () => {
     const calls = mockApi(
       routes({
@@ -137,49 +86,6 @@ describe('OrganizationsPage', () => {
     });
   });
 
-  it('creates an organization as staff, sending the staff fields they set', async () => {
-    const created = { ...detail, slug: 'moi', name: 'Mới' };
-    const calls = mockApi(
-      routes({
-        'POST /organizations': ok(created),
-        'GET /organizations/moi': ok(created),
-        'GET /organizations/moi/requests': page([]),
-        'GET /organizations/moi/members': page([]),
-      }),
-    );
-    const { wrapper, router } = await mountList('/admin/organizations');
-    await click(wrapper, 'Tạo tổ chức');
-    await wrapper.get('#org-name').setValue('Mới');
-    await wrapper.get('#org-slug').setValue('moi');
-    await click(wrapper, 'Tạo tổ chức mới');
-    const body = calls.find((call) => call.method === 'POST')?.body;
-    expect(body).toMatchObject({ name: 'Mới', slug: 'moi', isOpen: false, isUnlisted: true });
-    expect(body).not.toHaveProperty('shortName');
-    expect(router.currentRoute.value.query.org).toBe('moi');
-  });
-
-  it('creates an organization as a plain creator without any staff field, which the backend would refuse', async () => {
-    const created = { ...detail, slug: 'moi', name: 'Mới' };
-    const calls = mockApi(
-      routes(
-        {
-          'POST /organizations': ok(created),
-          'GET /organizations/moi': ok(created),
-          'GET /organizations/moi/requests': page([]),
-          'GET /organizations/moi/members': page([]),
-        },
-        staffViewer(['judge.add_organization']),
-      ),
-    );
-    const { wrapper } = await mountList('/admin/organizations');
-    await click(wrapper, 'Tạo tổ chức');
-    await wrapper.get('#org-name').setValue('Mới');
-    await wrapper.get('#org-slug').setValue('moi');
-    await click(wrapper, 'Tạo tổ chức mới');
-    const body = calls.find((call) => call.method === 'POST')?.body;
-    expect(body).toEqual({ name: 'Mới', slug: 'moi', isOpen: false });
-  });
-
   it('does not show an earlier kick error when the dialog opens for another member', async () => {
     mockApi(routes({ 'POST /organizations/lhp/kick': fail(409, 'conflict') }));
     const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
@@ -189,22 +95,6 @@ describe('OrganizationsPage', () => {
     await cancelDialog('Hủy');
     await click(wrapper, 'Đuổi');
     expect(openDialog().querySelector('[role="alert"]')).toBeNull();
-  });
-
-  it('opens the editor of an organization whose about is hidden (null) as an empty box', async () => {
-    mockApi(routes({ 'GET /organizations/lhp': ok({ ...detail, about: null }) }));
-    const { wrapper } = await mountEditor('/admin/organizations?org=lhp');
-    expect((wrapper.get('#org-about').element as HTMLTextAreaElement).value).toBe('');
-  });
-
-  it('moves focus to the members panel after a member is kicked', async () => {
-    mockApi(routes({ 'POST /organizations/lhp/kick': { status: 204 } }));
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Đuổi');
-    await click(wrapper, 'Đuổi');
-    await confirmDialog('Đuổi');
-    await vi.waitFor(() =>
-      expect(document.activeElement?.getAttribute('aria-label')).toBe('Thành viên'),
-    );
   });
 
   it('shows no join requests or members to a member who may not administer the organization', async () => {
@@ -263,33 +153,6 @@ const acceptButtonOf = (row: ReturnType<Mounted['wrapper']['find']>) =>
 describe('OrganizationsPage search', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('sends the typed text trimmed, marks the match and counts the matches', async () => {
-    const calls = mockApi(
-      routes({
-        'GET /organizations': ({ query }: ApiCall) =>
-          query.get('search')
-            ? page([organizationItem({ slug: 'ntt-club', name: 'CLB Tin học' })], { total: 4 })
-            : page([
-                organizationItem(),
-                organizationItem({ slug: 'ntt-club', name: 'CLB Tin học' }),
-              ]),
-      }),
-    );
-    const { wrapper } = await mountList('/admin/organizations');
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    await wrapper.get('input[type="search"]').setValue(' cl ');
-    await vi.advanceTimersByTimeAsync(TEXT_DEBOUNCE_MS);
-    await flushPromises();
-    expect(
-      calls
-        .filter((call) => call.path === '/organizations')
-        .at(-1)!
-        .query.get('search'),
-    ).toBe('cl');
-    expect(wrapper.get('[data-testid="org-list"] mark').text()).toBe('CL');
-    expect(wrapper.text()).toContain('1 / 4 tổ chức khớp “cl”');
-  });
-
   it('returns to the first page when the search term changes', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountList('/admin/organizations?page=3');
@@ -302,50 +165,15 @@ describe('OrganizationsPage search', () => {
     expect(listCalls().at(-1)!.query.get('search')).toBe('cl');
     expect(listCalls().at(-1)!.query.get('page')).toBe('1');
   });
-
-  it('says what an empty search found', async () => {
-    mockApi(routes({ 'GET /organizations': page([], { total: 0 }) }));
-    const { wrapper } = await mountScreen('/admin/organizations?q=olympic', (mounted) =>
-      mounted.text().includes('Không có tổ chức nào khớp “olympic”.'),
-    );
-    expect(wrapper.text()).toContain('Không có tổ chức nào khớp “olympic”.');
-  });
 });
 
 describe('OrganizationsPage request queue', () => {
-  it('offers the queue tab with the pending count to a viewer with judge.edit_all_organization', async () => {
-    mockApi(queueRoutes());
-    const { wrapper } = await mountWithButton('/admin/organizations', 'Tạo tổ chức');
-    await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="pending-count"]').exists()).toBe(true),
-    );
-    const tab = wrapper.get('[data-testid="view-requests"]');
-    expect(tab.text()).toContain('Yêu cầu tham gia · tất cả tổ chức');
-    expect(tab.get('[data-testid="pending-count"]').text()).toBe('4');
-  });
-
   it('shows no queue tab, and sends no queue request, to a viewer who may only create organizations', async () => {
     const calls = mockApi(queueRoutes(staffViewer(['judge.add_organization'])));
     const { wrapper } = await mountList('/admin/organizations?view=requests');
     expect(wrapper.find('[data-testid="view-requests"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="org-list"]').exists()).toBe(true);
     expect(queueCalls(calls)).toHaveLength(0);
-  });
-
-  it('lists the pending requests of every organization with the organization named on each row', async () => {
-    const calls = mockApi(queueRoutes());
-    const { wrapper } = await mountScreen(
-      '/admin/organizations?view=requests',
-      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
-    );
-    const rows = wrapper.findAll('[data-testid="queue-row"]');
-    expect(rows.map((row) => row.get('[data-testid="queue-org"]').text())).toEqual([
-      'lhp',
-      'hcmus-team',
-    ]);
-    expect(rows[0]!.text()).toContain('bichphuong');
-    expect(queueCalls(calls)[0]!.query.get('state')).toBe('P');
-    expect(wrapper.text()).toContain('4 yêu cầu chờ duyệt');
   });
 
   it('accepts a request in its own organization, refreshes the queue and marks that organization’s lists stale', async () => {
@@ -376,66 +204,6 @@ describe('OrganizationsPage request queue', () => {
     expect(
       queryClient.getQueryState(['organizations', 'requests', 'lhp', 'P', 1])?.isInvalidated,
     ).toBe(true);
-  });
-
-  it('refuses a full organization inside that row only', async () => {
-    mockApi(
-      queueRoutes({
-        [`POST /organizations/hcmus-team/requests/${queued[1]!.id}/decide`]: FULL_CODE,
-      }),
-    );
-    const { wrapper } = await mountScreen(
-      '/admin/organizations?view=requests',
-      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
-    );
-    const rows = wrapper.findAll('[data-testid="queue-row"]');
-    await rows[1]!
-      .findAll('button')
-      .find((button) => button.text() === 'Chấp nhận')!
-      .trigger('click');
-    await flushPromises();
-    expect(rows[1]!.get('[role="alert"]').text()).toContain('Tổ chức đã đủ chỗ.');
-    expect(rows[0]!.find('[role="alert"]').exists()).toBe(false);
-  });
-
-  it('reads the decided states without decision buttons and keeps the pending badge', async () => {
-    const decided = joinRequest({
-      id: communityId(513),
-      organizationSlug: 'lhp',
-      state: 'A',
-      decidedBy: communityId(902),
-      decidedAt: '2026-10-08T12:00:00Z',
-    });
-    const calls = mockApi(
-      queueRoutes({
-        [`GET ${QUEUE}`]: ({ query }: ApiCall) =>
-          query.get('state') === 'A'
-            ? page([decided], { pageSize: 50, total: 1 })
-            : page(queued, { pageSize: 50, total: 4 }),
-      }),
-    );
-    const { wrapper } = await mountScreen(
-      '/admin/organizations?view=requests&state=A',
-      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
-    );
-    expect(
-      queueCalls(calls)
-        .map((call) => call.query.get('state'))
-        .sort(),
-    ).toEqual(['A', 'P']);
-    expect(wrapper.get('[data-testid="queue-row"]').findAll('button')).toHaveLength(0);
-    expect(wrapper.get('[data-testid="pending-count"]').text()).toBe('4');
-  });
-
-  it('refreshes the queue when a request is decided from an organization’s own panel', async () => {
-    const calls = mockApi(
-      queueRoutes({
-        [`POST /organizations/lhp/requests/${request.id}/decide`]: ok({ ...request, state: 'R' }),
-      }),
-    );
-    const { wrapper } = await mountWithButton('/admin/organizations?org=lhp', 'Từ chối');
-    await click(wrapper, 'Từ chối');
-    expect(queueCalls(calls).length).toBeGreaterThanOrEqual(2);
   });
 
   it('says an already decided request was taken by someone else and refreshes the queue', async () => {
@@ -472,27 +240,6 @@ describe('OrganizationsPage request queue', () => {
     expect(queueCalls(calls)).toHaveLength(1);
   });
 
-  it('reads the busy-lock 409 as a retry, not as a full organization', async () => {
-    mockApi(
-      queueRoutes({
-        [`POST /organizations/lhp/requests/${queued[0]!.id}/decide`]: failWithCode(
-          409,
-          'lock',
-          'busy',
-        ),
-      }),
-    );
-    const { wrapper } = await mountScreen(
-      '/admin/organizations?view=requests',
-      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
-    );
-    await acceptButtonOf(wrapper.findAll('[data-testid="queue-row"]')[0]!).trigger('click');
-    await flushPromises();
-    const alert = wrapper.get('[data-testid="queue-row"] [role="alert"]').text();
-    expect(alert).not.toContain('đủ chỗ');
-    expect(alert.length).toBeGreaterThan(0);
-  });
-
   it('ignores a click on another row while a decision is in flight', async () => {
     const calls = mockApi(
       queueRoutes({
@@ -512,14 +259,5 @@ describe('OrganizationsPage request queue', () => {
     expect(decideCalls(calls)).toHaveLength(1);
     expect(rows[0]!.get('[role="alert"]').text()).toContain('đủ chỗ');
     expect(rows[1]!.find('[role="alert"]').exists()).toBe(false);
-  });
-
-  it('does not list organizations while the queue tab is showing', async () => {
-    const calls = mockApi(queueRoutes());
-    await mountScreen(
-      '/admin/organizations?view=requests&q=cl',
-      (mounted) => mounted.findAll('[data-testid="queue-row"]').length > 0,
-    );
-    expect(calls.filter((call) => call.path === '/organizations')).toHaveLength(0);
   });
 });

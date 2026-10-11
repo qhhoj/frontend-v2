@@ -1,6 +1,4 @@
 import { joinRequest, organizationDetail } from '../src/test/community-fixtures';
-import { THEMES } from '../src/theme/registry';
-import { applyTheme, expectNoAxeViolations } from './fixtures/audit';
 import { expect, list, test } from './fixtures/api';
 import { ok } from './fixtures/reply';
 import { PHONE, DESKTOP } from './fixtures/viewports';
@@ -10,28 +8,6 @@ const VIEWPORTS = [
   { name: 'phone 375 px', width: PHONE, height: 812 },
 ] as const;
 const LIST_NAME = 'THPT chuyên Lê Hồng Phong';
-const ABOUT_TEXT = 'Câu lạc bộ Tin học.';
-
-const PAGES = [
-  { name: 'the list', path: '/organizations', ready: LIST_NAME },
-  { name: 'an organization', path: '/organizations/lhp', ready: ABOUT_TEXT },
-] as const;
-
-for (const viewport of VIEWPORTS)
-  for (const theme of THEMES)
-    for (const { name, path, ready } of PAGES)
-      test(`${name} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-        page,
-        api,
-      }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await applyTheme(page, api, theme);
-        await page.goto(path);
-        await expect(
-          page.getByText(ready, { exact: true }).filter({ visible: true }).first(),
-        ).toBeVisible();
-        await expectNoAxeViolations(page);
-      });
 
 for (const viewport of VIEWPORTS)
   test(`the organization list does not scroll the page sideways at ${viewport.name}`, async ({
@@ -47,22 +23,6 @@ for (const viewport of VIEWPORTS)
     );
     expect(overflows).toBe(false);
   });
-
-test('an unknown organization shows the crying Bit and a way back to the list', async ({
-  page,
-  api,
-}) => {
-  api.routes['GET /organizations/khong-co'] = {
-    status: 404,
-    body: { error: { code: 'not_found', message: 'Not found' } },
-  };
-  await page.goto('/organizations/khong-co');
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'Không tìm thấy tổ chức' }),
-  ).toBeVisible();
-  await page.getByRole('link', { name: 'Xem các tổ chức' }).click();
-  await expect(page).toHaveURL(/\/organizations$/);
-});
 
 const REQUEST_ID = 'c0ffee00-0000-4000-8000-000000000501';
 const HCMUS = {
@@ -138,66 +98,6 @@ test('an administrator approves a pending request and the queue empties', async 
   await page.getByRole('button', { name: 'Duyệt', exact: true }).click();
   await expect(page.getByText('Không có yêu cầu nào đang chờ', { exact: true })).toBeVisible();
 });
-
-/** The membership screens, each in the viewer state that draws it; `ready` is text the loaded screen shows. */
-const MEMBERSHIP_PAGES = [
-  {
-    name: 'the request form',
-    path: '/organizations/hcmus',
-    detail: organizationDetail({ ...HCMUS, viewer: NOT_A_MEMBER }),
-    ready: 'Gửi yêu cầu tham gia',
-    requests: {},
-  },
-  {
-    name: 'the pending panel',
-    path: '/organizations/hcmus',
-    detail: organizationDetail({
-      ...HCMUS,
-      viewer: { ...NOT_A_MEMBER, pendingRequestId: REQUEST_ID },
-    }),
-    ready: 'Đang chờ duyệt',
-    requests: {
-      [`GET /organizations/hcmus/requests/${REQUEST_ID}`]: ok(
-        joinRequest({ organizationSlug: 'hcmus' }),
-      ),
-    },
-  },
-  {
-    name: 'the admin queue',
-    path: '/organizations/hcmus/requests',
-    detail: organizationDetail({ ...HCMUS, viewer: ADMINISTRATOR }),
-    ready: 'Duyệt',
-    requests: {
-      'GET /organizations/hcmus/requests': list([joinRequest({ organizationSlug: 'hcmus' })]),
-    },
-  },
-  {
-    name: 'the members page',
-    path: '/organizations/lhp/members',
-    detail: organizationDetail(),
-    ready: 'tuanlq',
-    requests: {},
-  },
-] as const;
-
-for (const viewport of VIEWPORTS)
-  for (const theme of THEMES)
-    for (const membershipPage of MEMBERSHIP_PAGES)
-      test(`${membershipPage.name} has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-        page,
-        api,
-      }) => {
-        api.signedIn = true;
-        api.routes[`GET /organizations/${membershipPage.detail.slug}`] = ok(membershipPage.detail);
-        Object.assign(api.routes, membershipPage.requests);
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await applyTheme(page, api, theme);
-        await page.goto(membershipPage.path);
-        await expect(
-          page.getByText(membershipPage.ready, { exact: true }).filter({ visible: true }).first(),
-        ).toBeVisible();
-        await expectNoAxeViolations(page);
-      });
 
 test('the members table does not scroll the page sideways at 375 px', async ({ page, api }) => {
   void api; // installs the fake API

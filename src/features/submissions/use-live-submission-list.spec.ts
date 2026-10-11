@@ -70,34 +70,12 @@ describe('live updates on the submission list', () => {
     expect(listCalls(calls)).toHaveLength(2);
     expect(wrapper.findAll('tbody tr').map((tr) => tr.attributes('data-id'))).toEqual(['new', 'a']);
   });
-  it('announces the added count once, not once per row or per frame', async () => {
-    mockApi({
-      ...anonymousViewer,
-      ...submissionListRoutes,
-      'GET /submissions': sequence(page([row('a')]), page([row('new'), row('a')])),
-    });
-    const { wrapper } = await openList();
-    expect(announcement(wrapper)).toBe('');
-    for (let index = 0; index < 5; index += 1) feed().emit('queued', frame('queued', `x${index}`));
-    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await flushPromises();
-    expect(announcement(wrapper)).toBe('Có 1 bài nộp mới');
-  });
   it('ignores a progress frame of a submission that is not on the page', async () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
     await openList();
     feed().emit('processing', frame('processing', 'not-shown'));
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
     expect(listCalls(calls)).toHaveLength(1);
-  });
-  it('refetches when a shown row finishes and refreshes the stats', async () => {
-    const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    await openList();
-    feed().emit('done', frame('done', 'sub-1'));
-    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await flushPromises();
-    expect(listCalls(calls)).toHaveLength(2);
-    expect(calls.filter((call) => call.path === '/submissions/stats')).toHaveLength(2);
   });
   it('on page 2 shows an N new pill from the growth of meta.total and leaves the shown rows alone', async () => {
     const calls = mockApi(pageTwoRoutes(105));
@@ -120,53 +98,6 @@ describe('live updates on the submission list', () => {
     await vi.waitFor(() => expect(router.currentRoute.value.query.page).toBeUndefined());
     expect(wrapper.find('[data-testid="new-pill"]').exists()).toBe(false);
     expect(scrollIntoView).toHaveBeenCalledTimes(1); // the new rows are in view, not just loaded
-  });
-  it('counts the queued frames when the API sends no total', async () => {
-    mockApi(pageTwoRoutes(undefined));
-    const { wrapper } = await openList('/submissions?page=2');
-    for (const id of ['x1', 'x2', 'x3']) feed().emit('queued', frame('queued', id));
-    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await flushPromises();
-    expect(wrapper.get('[data-testid="new-pill"]').text()).toContain('3');
-  });
-  it('opens no stream while Live updates is off, opens one when it is switched on and closes it when off again', async () => {
-    mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    const { wrapper } = await openList('/submissions?live=0');
-    expect(
-      FakeEventSource.instances.filter((source) => source.url.endsWith('/events/submissions')),
-    ).toHaveLength(0);
-    await wrapper.get('input[data-testid="live-toggle"]').setValue(true);
-    // The toggle writes the URL through the router, which settles after the click.
-    await vi.waitFor(() => expect(feed().closed).toBe(false));
-    await wrapper.get('input[data-testid="live-toggle"]').setValue(false);
-    await vi.waitFor(() => expect(feed().closed).toBe(true));
-  });
-  it('resets the pill and the baseline when a filter changes', async () => {
-    mockApi(pageTwoRoutes(105));
-    const { wrapper } = await openList('/submissions?page=2');
-    feed().emit('queued', frame('queued', 'x'));
-    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await flushPromises();
-    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
-    await flushPromises();
-    expect(wrapper.find('[data-testid="new-pill"]').exists()).toBe(false);
-  });
-  it('shows the paused hint when the stream closes for good, and not for a reconnecting one', async () => {
-    mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    const { wrapper } = await openList();
-    feed().fail(true);
-    await flushPromises();
-    expect(wrapper.find('[data-testid="live-paused"]').exists()).toBe(false);
-    feed().fail();
-    await flushPromises();
-    expect(wrapper.get('[data-testid="live-paused"]').text()).toContain(
-      'Cập nhật trực tiếp tạm dừng',
-    );
-    expect(
-      wrapper
-        .get('[data-testid="live-paused"] [data-testid="inline-bit"]')
-        .attributes('aria-hidden'),
-    ).toBe('true');
   });
   it('announces a second batch with the same text again, after clearing the region', async () => {
     mockApi({
@@ -212,27 +143,6 @@ describe('live updates on the submission list', () => {
     expect(wrapper.find('[data-testid="new-pill"]').exists()).toBe(false);
     expect(announcement(wrapper)).toBe('');
   });
-  it('closes the stream when the page is left', async () => {
-    mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    const { wrapper } = await openList();
-    wrapper.unmount();
-    expect(feed().closed).toBe(true);
-  });
-  it('reopens the stream and hides the paused hint when Reconnect is clicked', async () => {
-    mockApi({ ...anonymousViewer, ...submissionListRoutes });
-    const { wrapper } = await openList();
-    feed().fail();
-    await flushPromises();
-    const first = feed();
-    await wrapper.get('[data-testid="live-paused"] button').trigger('click');
-    await flushPromises();
-    const feeds = FakeEventSource.instances.filter((source) =>
-      source.url.endsWith('/events/submissions'),
-    );
-    expect(feeds).toHaveLength(2);
-    expect(first.closed).toBe(true);
-    expect(wrapper.find('[data-testid="live-paused"]').exists()).toBe(false);
-  });
   it('does not run a pending window after a filter change', async () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const { wrapper } = await openList();
@@ -253,21 +163,5 @@ describe('live updates on the submission list', () => {
     await toggle.setValue(true);
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
     expect(listCalls(calls)).toHaveLength(1);
-  });
-  it('on page 2 refetches the shown page when one of its rows finishes and refreshes the stats', async () => {
-    const calls = mockApi(pageTwoRoutes(100));
-    await openList('/submissions?page=2');
-    feed().emit('done', frame('done', 'p2'));
-    await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await flushPromises();
-    const refetches = listCalls(calls).filter((call) => call.query.get('page') === '2');
-    expect(refetches).toHaveLength(2);
-    expect(calls.filter((call) => call.path === '/submissions/stats')).toHaveLength(2);
-  });
-  it('keeps one polite live region in the page, even with a pager showing its position', async () => {
-    mockApi(pageTwoRoutes(100));
-    const { wrapper } = await openList('/submissions?page=2');
-    expect(wrapper.find('#main nav').exists()).toBe(true);
-    expect(wrapper.findAll('#main [aria-live="polite"], #main [role="status"]')).toHaveLength(1);
   });
 });

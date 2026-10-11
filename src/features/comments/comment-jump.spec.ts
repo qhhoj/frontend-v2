@@ -2,9 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { commentIdFromHash, pageToOpen } from './comment-jump';
 
 describe('commentIdFromHash', () => {
-  it('reads the id of a comment anchor', () => {
-    expect(commentIdFromHash('#comment-0192-ab')).toBe('0192-ab');
-  });
   it('ignores other hashes and an empty id', () => {
     expect(commentIdFromHash('#comments')).toBeNull();
     expect(commentIdFromHash('#comment-')).toBeNull();

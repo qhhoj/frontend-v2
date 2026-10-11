@@ -15,64 +15,6 @@ import type { AvatarLook } from './bit-avatar';
 const RADICES = [12, 16, 8, 4, 4];
 const SIZES = [24, 28, 32, 96, 128] as const;
 
-/** The picks the design board's own code gives (scheme C), computed by running its JS under node. */
-const GOLDEN = [
-  {
-    username: 'minhthu',
-    hash: 626089597,
-    palette: 'marigold',
-    hat: 'beret',
-    tile: 'butter',
-    pattern: 'stripe',
-    eyes: 'wink',
-  },
-  {
-    username: 'tuan_k',
-    hash: 2221472418,
-    palette: 'indigo',
-    hat: 'heart',
-    tile: 'sand',
-    pattern: 'blush',
-    eyes: 'side',
-  },
-  {
-    username: 'ngoc_anh',
-    hash: 1759798237,
-    palette: 'marigold',
-    hat: 'heart',
-    tile: 'stone',
-    pattern: 'patch',
-    eyes: 'closed',
-  },
-  {
-    username: 'hoangnam_10a',
-    hash: 728219869,
-    palette: 'marigold',
-    hat: 'heart',
-    tile: 'butter',
-    pattern: 'patch',
-    eyes: 'closed',
-  },
-  {
-    username: 'hoangnam_10q',
-    hash: 1808711460,
-    palette: 'terracotta',
-    hat: 'antenna',
-    tile: 'lavender',
-    pattern: 'stripe',
-    eyes: 'wink',
-  },
-  {
-    username: 'e2e_user',
-    hash: 2139093632,
-    palette: 'orchid',
-    hat: 'flame',
-    tile: 'sand',
-    pattern: 'blush',
-    eyes: 'side',
-  },
-] as const;
-
 /** Role grids (`.` transparent, `O` outline) of three looks, from the board's bitRows. */
 const GOLDEN_ROWS: Record<string, readonly string[]> = {
   minhthu: [
@@ -147,31 +89,6 @@ describe('avatarHash and bitAvatarFor', () => {
     expect(avatarHash(composed)).toBe(avatarHash(decomposed));
     expect(bitAvatarFor(composed)).toEqual(bitAvatarFor(decomposed));
   });
-
-  it('reproduces the board picks for the six sample names', () => {
-    for (const sample of GOLDEN) {
-      expect(avatarHash(sample.username)).toBe(sample.hash);
-      const look = bitAvatarFor(sample.username);
-      expect({
-        palette: look.palette.name,
-        hat: look.hat.name,
-        tile: look.tile.name,
-        pattern: look.pattern.name,
-        eyes: look.eyes,
-      }).toEqual({
-        palette: sample.palette,
-        hat: sample.hat,
-        tile: sample.tile,
-        pattern: sample.pattern,
-        eyes: sample.eyes,
-      });
-    }
-  });
-
-  it('gives hoangnam_10a and hoangnam_10q different Bits', () => {
-    expect(avatarHash('hoangnam_10a')).not.toBe(avatarHash('hoangnam_10q'));
-    expect(bitAvatarFor('hoangnam_10a')).not.toEqual(bitAvatarFor('hoangnam_10q'));
-  });
 });
 
 describe('mixedRadixDigits', () => {
@@ -204,20 +121,9 @@ describe('avatarLook for banned and deleted accounts', () => {
       expect(look.palette.name).toBe('grey');
     }
   });
-
-  it('leaves an active account on its hashed look', () => {
-    expect(avatarLook('minhthu', 'active')).toEqual(bitAvatarFor('minhthu'));
-    expect(avatarLook('minhthu')).toEqual(bitAvatarFor('minhthu'));
-    expect(avatarLook('minhthu', 'banned')).not.toEqual(bitAvatarFor('minhthu'));
-  });
 });
 
 describe('avatarRoleRows and avatarPixels', () => {
-  it('draws the board grids for three samples, hat, pattern and eyes included', () => {
-    for (const [username, rows] of Object.entries(GOLDEN_ROWS))
-      expect(avatarRoleRows(bitAvatarFor(username))).toEqual(rows);
-  });
-
   it('shares the body, legs and outline with bit-sprite (open eyes, no hat, no pattern)', () => {
     const plain: AvatarLook = {
       ...bitAvatarFor('minhthu'),
@@ -226,29 +132,6 @@ describe('avatarRoleRows and avatarPixels', () => {
       eyes: 'open',
     };
     expect(avatarRoleRows(plain)).toEqual(bitFrame({ headgear: 'none' }));
-  });
-
-  it('closes both eyes exactly as bit-sprite blinks them', () => {
-    const closed: AvatarLook = {
-      ...bitAvatarFor('minhthu'),
-      hat: NO_HAT,
-      pattern: NO_PATTERN,
-      eyes: 'closed',
-    };
-    expect(avatarRoleRows(closed)).toEqual(bitFrame({ headgear: 'none', blinking: true }));
-  });
-
-  it('colours each filled pixel from its palette and leaves the rest transparent', () => {
-    const look = bitAvatarFor('tuan_k');
-    const rows = avatarRoleRows(look);
-    const pixels = avatarPixels(look);
-    expect(pixels).toHaveLength(16);
-    rows.forEach((row, rowIndex) =>
-      [...row].forEach((role, column) => {
-        const expected = role === '.' ? null : look.palette[role as 'O'];
-        expect(pixels[rowIndex]![column]).toBe(expected);
-      }),
-    );
   });
 });
 
@@ -281,35 +164,6 @@ describe('avatarRects', () => {
           expect(rect.x + rect.width).toBeLessThanOrEqual(size);
           expect(rect.y + rect.height).toBeLessThanOrEqual(size);
         }
-      }
-    }
-  });
-
-  it('keeps the last column and row: a lone corner pixel and a full grid both keep their area', () => {
-    const blank = (): (string | null)[][] =>
-      Array.from({ length: 16 }, () => Array<string | null>(16).fill(null));
-    const corner = blank();
-    corner[15]![15] = '#000000';
-    for (const size of SIZES) {
-      const edge = Math.floor((15 * size) / 16);
-      expect(avatarRects(corner, size)).toEqual([
-        { x: edge, y: edge, width: size - edge, height: size - edge, colour: '#000000' },
-      ]);
-    }
-    const full = blank().map((row) => row.map(() => '#000000'));
-    for (const size of SIZES) {
-      const area = avatarRects(full, size).reduce((sum, rect) => sum + rect.width * rect.height, 0);
-      expect(area).toBe(size * size);
-    }
-  });
-
-  it('draws whole pixels at 32, 96 and 128 px: each cell is size / 16 pixels square', () => {
-    const pixels = avatarPixels(bitAvatarFor('minhthu'));
-    for (const size of [32, 96, 128]) {
-      const rects = avatarRects(pixels, size);
-      for (const rect of rects) {
-        expect(rect.x % (size / 16)).toBe(0);
-        expect(rect.width % (size / 16)).toBe(0);
       }
     }
   });

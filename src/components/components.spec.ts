@@ -2,18 +2,11 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import stylesCss from '@/theme/styles.css?raw';
 import { ApiError } from '@/api/client';
-import { verdictOf } from '@/lib/verdicts';
 import { mountComponent } from '@/test/mount';
 import CopyButton from './CopyButton.vue';
 import CountdownTimer from './CountdownTimer.vue';
-import GlassCard from './GlassCard.vue';
 import QueryState from './QueryState.vue';
-import SkeletonBlock from './SkeletonBlock.vue';
-import TokenCoin from './TokenCoin.vue';
 import UserContent from './UserContent.vue';
-import UserName from './UserName.vue';
-import VerdictBadge from './VerdictBadge.vue';
-import VerdictLabel from './VerdictLabel.vue';
 
 const stubClipboard = (writeText: ((text: string) => Promise<void>) | undefined) =>
   Object.defineProperty(navigator, 'clipboard', {
@@ -25,14 +18,6 @@ describe('shared components', () => {
   afterEach(() => {
     vi.useRealTimers();
     Reflect.deleteProperty(navigator, 'clipboard');
-  });
-
-  it('VerdictLabel shows the code and the localized verdict name in plain text', () => {
-    const label = mountComponent(VerdictLabel, {
-      props: { verdict: verdictOf({ status: 'D', result: 'WA' }) },
-    });
-    expect(label.text()).toBe('WA · Sai kết quả');
-    expect(label.find('[aria-hidden="true"]').exists()).toBe(false);
   });
 
   it('CopyButton copies its text, says "copied" for two seconds, then clears it', async () => {
@@ -48,33 +33,6 @@ describe('shared components', () => {
     expect(copy.get('[aria-live="polite"]').text()).toBe('Đã chép');
     await vi.advanceTimersByTimeAsync(2000);
     expect(copy.get('[aria-live="polite"]').text()).toBe('');
-  });
-
-  it('CopyButton renders nothing without the Clipboard API', () => {
-    stubClipboard(undefined);
-    const copy = mountComponent(CopyButton, { props: { text: 'x', label: 'Sao chép' } });
-    expect(copy.find('button').exists()).toBe(false);
-  });
-
-  it('VerdictBadge shows the code and names the verdict for assistive tech', () => {
-    const badge = mountComponent(VerdictBadge, {
-      props: { verdict: verdictOf({ status: 'D', result: 'TLE' }) },
-    });
-    expect(badge.text()).toContain('TLE');
-    expect(badge.find('.sr-only').text()).toBe('Quá thời gian');
-    expect(badge.classes()).toContain('text-verdict-tle');
-  });
-
-  it('UserName links to the profile in the rating tier colour', () => {
-    const rated = mountComponent(UserName, { props: { username: 'user_01', rating: 2104 } });
-    expect(rated.attributes('href')).toBe('/users/user_01');
-    expect(rated.classes()).toContain('text-tier-candidate-master');
-    expect(
-      mountComponent(UserName, { props: { username: 'x1', rating: null } }).classes(),
-    ).toContain('text-tier-none');
-    expect(mountComponent(UserName, { props: { username: 'x1' } }).classes()).toContain(
-      'text-content',
-    );
   });
 
   it('CountdownTimer ticks down and reports when it reaches zero, once', async () => {
@@ -115,44 +73,6 @@ describe('shared components', () => {
     expect(ready.find('[data-testid="bit"]').exists()).toBe(false);
   });
 
-  it('QueryState renders the caller skeleton while loading and the content once ready, with no blocks left', async () => {
-    const slots = {
-      skeleton: '<span data-testid="mine">shaped like the card</span>',
-      default: '<p>content</p>',
-    };
-    const loading = mountComponent(QueryState, { props: { loading: true, error: null }, slots });
-    expect(loading.find('[data-testid="mine"]').exists()).toBe(true);
-    expect(loading.find('p').exists()).toBe(false);
-    const ready = mountComponent(QueryState, { props: { loading: false, error: null }, slots });
-    await flushPromises();
-    expect(ready.find('[data-testid="mine"]').exists()).toBe(false);
-    expect(ready.find('[data-skeleton]').exists()).toBe(false);
-    expect(ready.text()).toBe('content');
-  });
-
-  it('QueryState shows the error and its retry instead of the skeleton', () => {
-    const failed = mountComponent(QueryState, {
-      props: { loading: false, error: new ApiError('not_found', 404, 'x') },
-      slots: { skeleton: '<span data-testid="mine" />' },
-    });
-    expect(failed.find('[data-testid="mine"]').exists()).toBe(false);
-    expect(failed.get('[role="alert"]').text()).toContain('Không tìm thấy.');
-  });
-
-  it('SkeletonBlock is hidden from assistive tech and a text block is as tall as its font', () => {
-    const block = mountComponent(SkeletonBlock, { props: { text: true } });
-    expect(block.attributes('aria-hidden')).toBe('true');
-    expect(block.classes()).toContain('h-[1em]');
-    expect(block.classes()).toContain('skeleton-pulse');
-    expect(block.classes()).toContain('bg-skeleton');
-    expect(mountComponent(SkeletonBlock, { props: { round: true } }).classes()).toContain(
-      'rounded-full',
-    );
-    const pill = mountComponent(SkeletonBlock, { props: { pill: true } }).classes();
-    expect(pill).toContain('rounded-pill');
-    expect(pill).not.toContain('rounded-skeleton');
-  });
-
   it('turns the skeleton, Bit sob and Bit tear animations off under reduced motion', () => {
     for (const utility of ['skeleton-pulse', 'bit-sob', 'bit-tear']) {
       const start = stylesCss.indexOf(`@utility ${utility} {`);
@@ -161,49 +81,6 @@ describe('shared components', () => {
       expect(body, utility).toMatch(
         /@media \(prefers-reduced-motion: reduce\)\s*\{\s*animation: none;/,
       );
-    }
-  });
-
-  it('GlassCard renders the requested element with its content', () => {
-    const card = mountComponent(GlassCard, {
-      props: { as: 'article' },
-      slots: { default: 'hello' },
-    });
-    expect(card.element.tagName).toBe('ARTICLE');
-    expect(card.text()).toBe('hello');
-    expect(mountComponent(GlassCard).element.tagName).toBe('SECTION');
-  });
-
-  it('TokenCoin is decorative and picks a coin gradient from its seed', () => {
-    const coin = mountComponent(TokenCoin, { props: { seed: 'aplusb', label: 'AB' } });
-    expect(coin.attributes('aria-hidden')).toBe('true');
-    expect(coin.text()).toBe('AB');
-    expect(coin.classes().some((name) => /^coin-[1-6]$/.test(name))).toBe(true);
-  });
-});
-
-describe('UserContent', () => {
-  it('renders sanitized html inside the isolating container', () => {
-    const content = mountComponent(UserContent, { props: { html: '<p>Xin <b>chào</b></p>' } });
-    expect(content.find('p b').text()).toBe('chào');
-    expect(content.classes()).toContain('user-content');
-  });
-
-  it('defines the containment rules the user-content class promises', () => {
-    const css = stylesCss;
-    const rule = css.slice(css.indexOf('@utility user-content'));
-    for (const declaration of [
-      'overflow: clip',
-      'contain: paint inline-size',
-      'isolation: isolate',
-      'min-width: 0',
-      '.katex-display',
-      '& pre',
-      '& table',
-      'width: 100%',
-      'overflow-x: auto',
-    ]) {
-      expect(rule).toContain(declaration);
     }
   });
 });

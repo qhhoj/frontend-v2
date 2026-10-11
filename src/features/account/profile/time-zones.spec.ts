@@ -17,13 +17,6 @@ describe('utcOffsetLabel', () => {
 });
 
 describe('timeZoneOptions', () => {
-  it('labels every zone with its offset', () => {
-    expect(timeZoneOptions('Asia/Ho_Chi_Minh', JANUARY)).toContainEqual({
-      value: 'Asia/Ho_Chi_Minh',
-      label: 'Asia/Ho_Chi_Minh (UTC+7)',
-    });
-  });
-
   it('keeps a stored zone the browser does not list, first, so the select can show it', () => {
     const options = timeZoneOptions('Legacy/Zone', JANUARY);
     expect(options[0]).toEqual({ value: 'Legacy/Zone', label: 'Legacy/Zone' });

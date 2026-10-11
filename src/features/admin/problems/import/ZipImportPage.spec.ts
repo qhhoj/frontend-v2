@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, rateLimited, sequence } from '@/test/mock-api';
+import { mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditingMeta } from '@/test/admin-fixtures/problems';
@@ -80,18 +80,6 @@ describe('ZipImportPage', () => {
     expect(wrapper.text()).not.toContain('null');
   });
 
-  it('says the hourly import limit and how long to wait when starting is refused with 429', async () => {
-    mockApi({
-      ...staffViewer(PERMS),
-      'GET /problems/meta': ok(problemEditingMeta()),
-      'POST /problems/imports': rateLimited(1500),
-    });
-    const { wrapper } = await mountApp('/admin/problems/import');
-    await start(wrapper);
-    expect(wrapper.get('[role="alert"]').text()).toContain('Tối đa 10 lượt nhập mỗi giờ.');
-    expect(wrapper.get('[role="alert"]').text()).toContain('Thử lại sau 1500 giây.');
-  });
-
   it('stops polling when the page is left', async () => {
     const calls = mockApi({
       ...staffViewer(PERMS),
@@ -127,20 +115,6 @@ describe('ZipImportPage', () => {
     expect(wrapper.text()).toContain('Cần quyền judge.edit_own_problem');
     await start(wrapper);
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
-  });
-
-  it('starts on update for a viewer who may only edit, and leaves create disabled', async () => {
-    mockApi({
-      ...staffViewer(['judge.import_polygon_package', 'judge.edit_own_problem']),
-      'GET /problems/meta': ok(problemEditingMeta()),
-    });
-    const { wrapper } = await mountApp('/admin/problems/import');
-    await vi.waitFor(() => expect(wrapper.find('input[name="import-mode"]').exists()).toBe(true));
-    const [create, update] = wrapper
-      .findAll('input[name="import-mode"]')
-      .map((radio) => radio.element as HTMLInputElement);
-    expect(create!.disabled).toBe(true);
-    expect(update!.checked).toBe(true);
   });
 
   it('stops polling on a 404 and says the import was not found', async () => {

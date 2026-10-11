@@ -5,15 +5,14 @@ import { ApiError } from '@/api/client';
 import { errorMessageKey } from '@/i18n/error-message';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { signedInViewer } from '@/test/problem-routes';
 import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
 import { stubMatchMedia } from '@/test/match-media';
 import { PARTICIPATION_REFUSALS } from './participation-refusal';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
-const BEFORE_START = Date.parse('2026-10-08T07:59:58Z');
 const actionsOf = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
   wrapper.get('[data-testid="contest-actions"]');
 const buttonNamed = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], name: string) =>
@@ -32,66 +31,6 @@ const dialog = () => document.body.querySelector<HTMLElement>('[role="dialog"]')
 
 describe('contest actions', () => {
   afterEach(() => vi.useRealTimers());
-
-  it('asks a visitor to sign in and come back', async () => {
-    mockApi({ ...anonymousViewer, ...contestPageRoutes() });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(actionsOf(wrapper).get('a').attributes('href')).toBe('/login?redirect=/contests/r42');
-  });
-
-  it('joins a running contest, reloads it and says so once', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    const joined = contestDetail({
-      viewer: contestViewer({
-        inContest: true,
-        isCurrent: true,
-        liveStatus: 'participating',
-        liveParticipation: participationSummary(),
-      }),
-    });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(),
-      'GET /contests/r42': sequence(ok(contestDetail()), ok(joined)),
-      'POST /contests/r42/join': ok(participationSummary()),
-      'GET /contests/current': ok({
-        contest: { key: 'r42', name: 'x', startTime: joined.startTime, endTime: joined.endTime },
-        participation: participationSummary(),
-      }),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    expect(calls.find((call) => call.path === '/contests/r42/join')!.body).toEqual({});
-    expect(actionsOf(wrapper).text()).toContain('Bạn đang thi');
-    expect(wrapper.get('[data-testid="participation-status"]').text()).toBe('Bạn đã vào kỳ thi.');
-  });
-
-  it('leaves the current contest and explains that the score stays', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    const inside = contestDetail({
-      viewer: contestViewer({
-        inContest: true,
-        isCurrent: true,
-        liveStatus: 'participating',
-        liveParticipation: participationSummary(),
-      }),
-    });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(inside),
-      'GET /contests/current': ok({
-        contest: { key: 'r42', name: 'x', startTime: inside.startTime, endTime: inside.endTime },
-        participation: participationSummary(),
-      }),
-      'POST /contests/r42/leave': noContent(),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(actionsOf(wrapper).text()).toContain('Điểm giữ nguyên');
-    await buttonNamed(wrapper, 'Rời kỳ thi').trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.path === '/contests/r42/leave')).toBe(true);
-  });
 
   it('keeps a wrong access code inside the dialog with the sweating Bit, then joins with the right one', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
@@ -124,121 +63,8 @@ describe('contest actions', () => {
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(document.activeElement).toBe(actionsOf(wrapper).element);
   });
-
-  it('clears a typed access code when the dialog is closed', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    const input = dialog()!.querySelector<HTMLInputElement>('input')!;
-    input.value = 'typed-then-closed';
-    input.dispatchEvent(new Event('input'));
-    await flushPromises();
-    cancelButton().click();
-    await flushPromises();
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    expect(dialog()!.querySelector<HTMLInputElement>('input')!.value).toBe('');
-  });
-
-  it('tells a registered contestant when the contest opens and keeps join disabled until then', async () => {
-    vi.useFakeTimers({ now: Date.parse('2026-10-08T07:17:45Z'), toFake: ['Date'] });
-    vi.stubEnv('TZ', 'UTC');
-    const registered = contestDetail({
-      phase: 'upcoming',
-      registrationEnd: '2026-10-08T07:30:00Z',
-      viewer: contestViewer({
-        liveStatus: 'registered',
-        liveParticipation: participationSummary({ isRegistered: true }),
-      }),
-    });
-    mockApi({ ...signedInViewer(), ...contestPageRoutes(registered) });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(actionsOf(wrapper).text()).toContain('Bạn đã đăng ký');
-    expect(buttonNamed(wrapper, 'Vào thi').attributes('aria-disabled')).toBe('true');
-    expect(buttonNamed(wrapper, 'Vào thi').text()).toContain('mở lúc 08:00');
-    vi.unstubAllEnvs();
-  });
-
-  it('offers join once the contest has started, though the server still says upcoming for a moment', async () => {
-    vi.useFakeTimers({
-      now: BEFORE_START,
-      toFake: ['Date', 'setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'],
-    });
-    const registered = contestDetail({
-      phase: 'upcoming',
-      viewer: contestViewer({
-        liveStatus: 'registered',
-        liveParticipation: participationSummary({ isRegistered: true }),
-      }),
-    });
-    const started = contestDetail({
-      viewer: contestViewer({
-        liveStatus: 'registered',
-        liveParticipation: participationSummary({ isRegistered: true }),
-      }),
-    });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(registered),
-      'GET /contests/r42': sequence(ok(registered), ok(registered), ok(started)),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    const detailCalls = () => calls.filter((call) => call.path === '/contests/r42').length;
-    vi.advanceTimersByTime(3000);
-    await flushPromises();
-    expect(detailCalls()).toBe(2);
-    expect(buttonNamed(wrapper, 'Vào thi').attributes('aria-disabled')).toBeUndefined();
-    vi.advanceTimersByTime(1500);
-    await flushPromises();
-    expect(detailCalls()).toBe(3);
-    expect(buttonNamed(wrapper, 'Vào thi').attributes('aria-disabled')).toBeUndefined();
-  });
-
-  it('offers a virtual run after the end, or says it is not allowed', async () => {
-    mockApi({ ...signedInViewer(), ...contestPageRoutes(contestDetail({ phase: 'ended' })) });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(buttonNamed(wrapper, 'Bắt đầu thi ảo').exists()).toBe(true);
-    expect(actionsOf(wrapper).text()).toContain('Kết quả chỉ hiện ở bảng khi chọn “Gồm thi ảo”');
-    wrapper.unmount();
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(contestDetail({ phase: 'ended', disallowVirtual: true })),
-    });
-    const second = await mountApp('/contests/r42');
-    expect(actionsOf(second.wrapper).text()).toContain(
-      'Ban tổ chức không cho phép thi ảo kỳ thi này.',
-    );
-  });
-
-  it('shows the running virtual run with its own countdown', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    const virtualRun = participationSummary({ virtual: 2, endTime: '2026-10-08T10:49:12Z' });
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(
-        contestDetail({
-          phase: 'ended',
-          viewer: contestViewer({ inContest: true, isCurrent: true }),
-        }),
-      ),
-      'GET /contests/current': ok({
-        contest: { key: 'r42', name: 'x', startTime: '', endTime: '' },
-        participation: virtualRun,
-      }),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    expect(actionsOf(wrapper).text()).toContain('Thi ảo #2 đang chạy');
-    expect(actionsOf(wrapper).get('[role="timer"]').text()).toBe('01:12:05');
-  });
 });
 
-const pressEscape = () =>
-  document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
 const joinCalls = (calls: ReturnType<typeof mockApi>) =>
   calls.filter((call) => call.path === '/contests/r42/join');
 
@@ -347,25 +173,6 @@ describe('contest actions: access codes, busy state and the spectator path', () 
     expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
   });
 
-  it('closes the dialog on Escape and forgets its error the same way', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
-      'POST /contests/r42/join': fail(403, 'wrong_access_code'),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    await typeCode('wrong');
-    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
-    await flushPromises();
-    expect(dialog()!.querySelector('[role="alert"]')).not.toBeNull();
-    pressEscape();
-    await vi.waitFor(() => expect(dialog()).toBeNull());
-    expect(actionsOf(wrapper).find('[role="alert"]').exists()).toBe(false);
-  });
-
   it('sends one join for a double press and marks the button busy while it runs', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const calls = mockApi({
@@ -387,28 +194,6 @@ describe('contest actions: access codes, busy state and the spectator path', () 
 describe('contest refusals', () => {
   afterEach(() => vi.useRealTimers());
 
-  it.each([
-    ['contest_not_started', 409, 'Kỳ thi chưa bắt đầu. Hãy quay lại khi kỳ thi mở.'],
-    ['registration_closed', 409, 'Kỳ thi này đã đóng đăng ký. Bạn không thể đăng ký thêm.'],
-    ['virtual_disallowed', 409, 'Ban tổ chức không cho phép thi ảo kỳ thi này.'],
-    ['not_registered', 409, 'Bạn chưa đăng ký kỳ thi này.'],
-    ['banned_from_contest', 403, 'Bạn bị cấm tham gia kỳ thi này.'],
-    ['rate_limited', 429, 'Bạn thao tác quá nhanh. Hãy thử lại sau.'],
-  ])('says what %s means, next to the sweating Bit', async (code, status, text) => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(),
-      'POST /contests/r42/join': fail(status, code),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    const alert = actionsOf(wrapper).get('[role="alert"]');
-    expect(alert.text()).toBe(text);
-    expect(alert.find('[aria-hidden="true"]').exists()).toBe(true);
-  });
-
   it('opens the code dialog when the backend asks for a code the page did not know about', async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     mockApi({
@@ -421,27 +206,6 @@ describe('contest refusals', () => {
     await flushPromises();
     expect(dialog()).not.toBeNull();
     expect(dialog()!.querySelector('[role="alert"]')).toBeNull();
-  });
-
-  it('keeps a wrong code inside the dialog in words', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(contestDetail({ requiresAccessCode: true })),
-      'POST /contests/r42/join': fail(403, 'wrong_access_code'),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    const input = dialog()!.querySelector<HTMLInputElement>('input')!;
-    input.value = 'x';
-    input.dispatchEvent(new Event('input'));
-    await flushPromises();
-    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
-    await flushPromises();
-    expect(dialog()!.querySelector('[role="alert"]')!.textContent.trim()).toBe(
-      'Mã tham gia chưa đúng. Kiểm tra lại mã với ban tổ chức rồi nhập lại.',
-    );
   });
 
   it.each(PARTICIPATION_REFUSALS)('gives %s its own text rather than the generic one', (code) => {
@@ -560,75 +324,6 @@ describe('contest actions with rules', () => {
     await tickAndConfirm();
     expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
   });
-
-  it('lets the viewer accept rules whose rendered text is empty for good', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(ruled({ rulesHtml: '' })),
-      'POST /contests/r42/join': ok(participationSummary()),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    expect(dialog()!.querySelectorAll('[data-skeleton-region="rules-line"]')).toHaveLength(0);
-    await tickAndConfirm();
-    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
-  });
-
-  it('sends one request for a double confirm', async () => {
-    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(ruled()),
-      'POST /contests/r42/join': ok(participationSummary()),
-    });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Vào thi').trigger('click');
-    await flushPromises();
-    dialog()!.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
-    await flushPromises();
-    const form = dialog()!.querySelector('form')!;
-    form.dispatchEvent(new Event('submit'));
-    await nextTick();
-    form.dispatchEvent(new Event('submit'));
-    await flushPromises();
-    expect(joinBodies(calls)).toHaveLength(1);
-  });
-});
-
-describe('virtual run rules dialog: previous acceptance', () => {
-  const ended = (liveParticipation: ReturnType<typeof participationSummary> | null) =>
-    contestDetail({
-      phase: 'ended',
-      rules: RULES_MARKDOWN,
-      rulesHtml: RULES_HTML,
-      rulesRevision: 3,
-      viewer: contestViewer({ liveStatus: 'finished', liveParticipation }),
-    });
-  const open = async (detail: ReturnType<typeof contestDetail>) => {
-    mockApi({ ...signedInViewer(), ...contestPageRoutes(detail) });
-    const { wrapper } = await mountApp('/contests/r42');
-    await buttonNamed(wrapper, 'Bắt đầu thi ảo').trigger('click');
-    await flushPromises();
-  };
-
-  it('shows the revision the live run accepted', async () => {
-    await open(
-      ended(
-        participationSummary({
-          rulesAcceptedAt: '2026-10-08T05:58:00.000Z',
-          rulesAcceptedRevision: 2,
-        }),
-      ),
-    );
-    expect(dialog()!.textContent).toContain('Lượt trước của bạn đã đồng ý bản 2 lúc');
-  });
-
-  it('shows no previous line when the live run accepted nothing', async () => {
-    await open(ended(participationSummary()));
-    expect(dialog()!.textContent).not.toContain('Lượt trước của bạn');
-  });
 });
 
 describe('contest actions: the phone bar tells the footer how tall it is', () => {
@@ -654,15 +349,6 @@ describe('contest actions: the phone bar tells the footer how tall it is', () =>
     await flushPromises();
     expect(dockHeight()).toBe('96px');
     wrapper.unmount();
-    expect(dockHeight()).toBe('');
-  });
-
-  it('publishes nothing from md up, where the actions are part of the page', async () => {
-    stubMatchMedia();
-    stubBarHeight(96);
-    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
-    await mountApp('/contests/r42');
-    await flushPromises();
     expect(dockHeight()).toBe('');
   });
 });

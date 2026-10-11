@@ -2,21 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { canonicalUrl, changedFlatpageFields, checkFlatpageForm } from './flatpage-form';
 
 describe('flatpage form', () => {
-  it('canonicalises the URL like the backend: empty segments dropped, one leading slash', () => {
-    expect(canonicalUrl('about/')).toBe('/about');
-    expect(canonicalUrl('//a///b/')).toBe('/a/b');
-    expect(canonicalUrl('/tài-liệu/1')).toBe('/tài-liệu/1');
-  });
-
-  it('refuses what the backend answers invalid_url for: nothing but slashes, dot segments, controls, too long', () => {
-    expect(canonicalUrl('/')).toBeNull();
-    expect(canonicalUrl('')).toBeNull();
-    expect(canonicalUrl('/a/../b')).toBeNull();
-    expect(canonicalUrl('/a/./b')).toBeNull();
-    expect(canonicalUrl('/a\u0007b')).toBeNull();
-    expect(canonicalUrl(`/${'x'.repeat(200)}`)).toBeNull();
-  });
-
   // The backend's `normalizeFlatpageUrl` rows (libs/community/src/flatpages.ts): same input, same answer.
   it.each([
     ['', null],

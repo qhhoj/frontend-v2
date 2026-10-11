@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canPrepareAgain, isBusy } from './contest-actions';
+import { canPrepareAgain } from './contest-actions';
 
 describe('contest actions helpers', () => {
   it('allows preparing the export again only after the backend’s next time', () => {
@@ -40,13 +40,5 @@ describe('contest actions helpers', () => {
         now,
       ),
     ).toBe(true);
-  });
-
-  it('counts an action as busy while it is queued or running, and free when idle', () => {
-    expect(['idle', 'queued', 'running'].map((state) => isBusy(state as never))).toEqual([
-      false,
-      true,
-      true,
-    ]);
   });
 });

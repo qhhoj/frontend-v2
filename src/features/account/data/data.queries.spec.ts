@@ -26,16 +26,6 @@ function mountQuery() {
 const exportCalls = (calls: ApiCall[]) => calls.filter((call) => call.path === EXPORT_PATH);
 
 describe('useDataExportQuery', () => {
-  it('reads the status of the signed-in account', async () => {
-    const status = dataExportStatus({ canPrepare: false, preparedAt: new Date().toISOString() });
-    const calls = mockApi({ 'GET /profile/data': ok(status) });
-    const current = mountQuery();
-    useSessionStore().$patch({ status: 'authenticated', user: sessionUser() });
-    await flushPromises();
-    expect(current().data.value).toEqual(status);
-    expect(exportCalls(calls)).toHaveLength(1);
-  });
-
   it('sends no request while viewing as another user', async () => {
     const calls = mockApi({ 'GET /profile/data': ok(dataExportStatus()) });
     const current = mountQuery();

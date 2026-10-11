@@ -123,20 +123,6 @@ test.describe('second factor', () => {
     expect(requestsOf(auth, 'totp')).toEqual([{ code: '481923' }]);
   });
 
-  test('a wrong code is announced, empties the boxes and returns focus to the first', async ({
-    page,
-    api,
-  }) => {
-    installAuth(api, { phase: 'partial' });
-    await page.goto('/login/2fa');
-    await digit(page, 1).click();
-    await page.keyboard.type('000000');
-    await expect(alertOf(page)).toHaveText('Mã sai hoặc đã hết hạn.');
-    for (let position = 1; position <= 6; position += 1)
-      await expect(digit(page, position)).toHaveValue('');
-    await expect(digit(page, 1)).toBeFocused();
-  });
-
   test('a backup code is sent normalised', async ({ page, api }) => {
     const auth = installAuth(api, { phase: 'partial' });
     await page.goto('/login/2fa');

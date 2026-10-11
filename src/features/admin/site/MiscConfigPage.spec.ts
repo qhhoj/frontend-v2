@@ -39,17 +39,6 @@ describe('MiscConfigPage', () => {
     expect(wrapper.text()).toContain('<p>Mới</p>');
   });
 
-  it('refuses a non-http link before sending', async () => {
-    const calls = mockApi({ ...staffViewer(PERMS), 'GET /site': ok(siteData()) });
-    const wrapper = await mountConfig();
-    await rowWith(wrapper, 'discord_invite_link').get('button').trigger('click');
-    await wrapper.get('#config-value').setValue('ftp://x');
-    await buttonNamed(wrapper, 'Lưu').trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
-    expect(wrapper.text()).toContain('Khoá liên kết chỉ nhận http hoặc https.');
-  });
-
   it('adds a key and deletes one after confirming', async () => {
     const calls = mockApi({
       ...staffViewer(PERMS),

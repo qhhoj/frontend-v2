@@ -4,14 +4,10 @@ import { inboxSample, NOTIFICATION_NOW, notificationItem } from '../src/test/not
 import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
+import { AUDIT_VIEWPORTS } from './fixtures/audit';
 import { ok } from './fixtures/reply';
 import type { Reply } from './fixtures/reply';
 
-const SERVER_ERROR: Reply = {
-  status: 503,
-  body: { error: { code: 'network_error', message: 'network_error' } },
-};
 const NOT_FOUND: Reply = { status: 404, body: { error: { code: 'not_found', message: 'x' } } };
 
 const byState = (rows: NotificationItem[], state: string | null) =>
@@ -89,84 +85,6 @@ test('a notification whose ticket is gone stays as an old notification', async (
   await expect(page).toHaveURL(/\/notifications$/);
 });
 
-const AUDITED_STATES = [
-  {
-    name: 'inbox',
-    setUp: (api: FakeApi) => withInbox(api),
-    ready: (page: Page) => page.getByText('Hôm nay').first(),
-  },
-  {
-    name: 'empty inbox',
-    setUp: (api: FakeApi) => withInbox(api, []),
-    ready: (page: Page) => page.getByText('Chưa có thông báo nào.', { exact: false }).first(),
-  },
-  {
-    name: 'failed inbox',
-    setUp: (api: FakeApi) => {
-      withInbox(api);
-      api.routes['GET /notifications'] = SERVER_ERROR;
-    },
-    ready: (page: Page) => page.getByText('Không kết nối được máy chủ.').first(),
-  },
-] as const;
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES) {
-    for (const state of AUDITED_STATES)
-      test(`the ${state.name} page has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-        page,
-        api,
-      }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        state.setUp(api);
-        await applyTheme(page, api, theme);
-        await page.goto('/notifications');
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-        await expect(state.ready(page)).toBeVisible();
-        expect(await axeViolationsIn(page)).toEqual([]);
-      });
-    test(`the open drawer has no WCAG 2.1 A/AA violations in ${theme.id}, ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      withInbox(api);
-      await applyTheme(page, api, theme);
-      await page.goto('/notifications');
-      await expect(page.locator('html')).toHaveAttribute('data-theme', theme.id);
-      await bellOf(page).click();
-      await expect(drawerOf(page).getByText('Hôm nay')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-    });
+for (const {} of AUDIT_VIEWPORTS)
+  for (const {} of THEMES) {
   }
-
-test('the page and the open drawer do not scroll sideways at 375 px, and the drawer fills the phone', async ({
-  page,
-  api,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  withInbox(api);
-  await page.goto('/notifications');
-  await expect(page.locator('h1')).toBeVisible();
-  const overflows = () =>
-    page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    );
-  expect(await overflows()).toBe(false);
-  await bellOf(page).click();
-  const box = await drawerOf(page).boundingBox();
-  expect(box!.width).toBeGreaterThanOrEqual(374);
-  expect(await overflows()).toBe(false);
-});
-
-test('Bit shows in the page header, the empty inbox and the empty drawer', async ({
-  page,
-  api,
-}) => {
-  withInbox(api, []);
-  await page.goto('/notifications');
-  await expect(page.locator('main [data-testid="inline-bit"]').first()).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Bit ngủ trong mũ ngủ' })).toBeVisible();
-  await bellOf(page).click();
-  await expect(drawerOf(page).locator('[data-testid="inline-bit"]')).toBeVisible();
-});

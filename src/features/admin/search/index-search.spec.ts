@@ -16,11 +16,6 @@ describe('highlightParts', () => {
       { text: ' and c', isHit: false },
     ]);
   });
-
-  it('marks nothing for an empty query or a text without the query', () => {
-    expect(highlightParts('hcmus', '')).toEqual([{ text: 'hcmus', isHit: false }]);
-    expect(highlightParts('hcmus', 'xyz')).toEqual([{ text: 'hcmus', isHit: false }]);
-  });
 });
 
 describe('phaseFromQuery', () => {

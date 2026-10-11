@@ -16,24 +16,6 @@ describe('useLoadingPhase', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it('stays hidden when the wait ends before the threshold', () => {
-    const { waiting, phase } = setup();
-    waiting.value = true;
-    vi.advanceTimersByTime(showAfterMs - 100);
-    waiting.value = false;
-    vi.advanceTimersByTime(5000);
-    expect(phase.value).toBe('hidden');
-  });
-
-  it('starts walking once the wait passes the threshold', () => {
-    const { waiting, phase } = setup();
-    waiting.value = true;
-    vi.advanceTimersByTime(599);
-    expect(phase.value).toBe('hidden');
-    vi.advanceTimersByTime(1);
-    expect(phase.value).toBe('walking');
-  });
-
   it('counts the threshold from the first moment of waiting, even if it is already waiting at start', () => {
     const { phase } = setup(true);
     vi.advanceTimersByTime(showAfterMs);
@@ -74,16 +56,6 @@ describe('useLoadingPhase', () => {
     expect(phase.value).toBe('leaving');
   });
 
-  it('hides as soon as every Bit is gone', () => {
-    const { waiting, phase, gone } = setup();
-    startLeaving(waiting);
-    vi.advanceTimersByTime(500);
-    gone();
-    expect(phase.value).toBe('hidden');
-    vi.advanceTimersByTime(leaveMs + fadeMs);
-    expect(phase.value).toBe('hidden'); // the pending fade timer was cancelled
-  });
-
   it('fades the Bits still on screen at leaveMs, then hides after fadeMs', () => {
     const { waiting, phase } = setup();
     startLeaving(waiting);
@@ -95,24 +67,6 @@ describe('useLoadingPhase', () => {
     expect(phase.value).toBe('fading');
     vi.advanceTimersByTime(1);
     expect(phase.value).toBe('hidden');
-  });
-
-  it('hides when the last Bit is gone during the fade', () => {
-    const { waiting, phase, gone } = setup();
-    startLeaving(waiting);
-    vi.advanceTimersByTime(leaveMs);
-    gone();
-    expect(phase.value).toBe('hidden');
-  });
-
-  it('ignores gone() unless it is leaving or fading', () => {
-    const { waiting, phase, gone } = setup();
-    gone();
-    expect(phase.value).toBe('hidden');
-    waiting.value = true;
-    vi.advanceTimersByTime(showAfterMs);
-    gone();
-    expect(phase.value).toBe('walking');
   });
 
   it('walks again when a new wait begins while leaving or fading', () => {

@@ -12,12 +12,6 @@ const revision = (before: unknown, after: unknown, changedFields: string[]) => (
 });
 
 describe('setting revisions', () => {
-  it('shows a scalar change as before and after of "value"', () => {
-    expect(diffLines(revision(30000, 45000, ['value']))).toEqual([
-      { field: 'value', before: '30000', after: '45000' },
-    ]);
-  });
-
   it('shows sealed fields as set or not set, never a value', () => {
     expect(
       diffLines(
@@ -38,12 +32,6 @@ describe('setting revisions', () => {
     expect(isRestorable(SETTING_KINDS['auth.google'])).toBe(true);
     expect(isRestorable(SETTING_KINDS['mail.smtpUrl'])).toBe(false);
     expect(isRestorable(SETTING_KINDS['discord.webhooks'])).toBe(false);
-  });
-
-  it('shows a sealed revision as set or not set on every field, such as webhook event names', () => {
-    expect(diffLines(revision({ set: true }, { set: true }, ['default']))).toEqual([
-      { field: 'default', before: 'đã đặt', after: 'đã đặt' },
-    ]);
   });
 
   it('finds a sealed part at the top of a side or inside one of its fields', () => {

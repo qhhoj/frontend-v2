@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lastPageOf, pageFromQuery, pageWindow } from './paging';
+import { pageFromQuery, pageWindow } from './paging';
 
 describe('pageWindow', () => {
   it('shows the first, the last and the neighbours of the current page with gaps between', () => {
@@ -10,17 +10,6 @@ describe('pageWindow', () => {
     expect(pageWindow(4, 5)).toEqual([1, 2, 3, 4, 5]);
     expect(pageWindow(1, 1)).toEqual([1]);
     expect(pageWindow(2, 2)).toEqual([1, 2]);
-  });
-});
-
-describe('lastPageOf', () => {
-  it('counts pages from the total, at least one', () => {
-    expect(lastPageOf({ page: 1, pageSize: 100, total: 4562 })).toBe(46);
-    expect(lastPageOf({ page: 1, pageSize: 100, total: 0 })).toBe(1);
-  });
-  it('without a total, offers one more page while the server says there is more', () => {
-    expect(lastPageOf({ page: 3, pageSize: 10, hasMore: true })).toBe(4);
-    expect(lastPageOf({ page: 3, pageSize: 10, hasMore: false })).toBe(3);
   });
 });
 

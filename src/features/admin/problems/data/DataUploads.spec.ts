@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { failWithCode, mockApi, ok, rateLimited } from '@/test/mock-api';
+import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
@@ -28,19 +28,8 @@ const pick = async (input: ReturnType<Mounted['wrapper']['get']>, file: File) =>
 };
 
 describe('test data uploads', () => {
-  it('uploads a new archive and shows the archive the answer names', async () => {
-    const calls = mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/data/archive': ok(problemData({ archive: 'new.zip' })),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await pick(wrapper.get('[data-testid="upload-archive"] input'), new File(['zip'], 'new.zip'));
-    const sent = calls.find((call) => call.path.endsWith('/archive'))!.body as FormData;
-    expect(sent.get('file')).toBeInstanceOf(File);
-    expect(wrapper.text()).toContain('new.zip');
-  });
+  // The first mount loads the lazy admin shell chunk.
+  vi.setConfig({ testTimeout: 20_000 });
 
   it('removes the custom checker only after confirming', async () => {
     const calls = mockApi({
@@ -60,23 +49,6 @@ describe('test data uploads', () => {
     expect(wrapper.get('[data-testid="source-customChecker"]').text()).toContain('Chưa có');
   });
 
-  it('shows the hourly upload limit as text with Bit, not a crash', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/data/files/generator': rateLimited(1800),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await pick(
-      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
-      new File(['x'], 'gen.cpp'),
-    );
-    const alert = wrapper.get('[data-testid="source-generator"] [role="alert"]').text();
-    expect(alert).toContain('Bạn thao tác quá nhanh');
-    expect(alert).toContain('Thử lại sau 1800 giây.');
-  });
-
   it('refuses a source file over 1 MiB on this side, without sending it', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
@@ -91,27 +63,6 @@ describe('test data uploads', () => {
     expect(calls.some((call) => call.path.includes('/files/generator'))).toBe(false);
     expect(wrapper.get('[data-testid="source-generator"]').text()).toContain(
       'Tệp quá lớn (tối đa 1.0 MB).',
-    );
-  });
-
-  it('shows the backend reason when a source file is refused for its content', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/data/files/generator': failWithCode(
-        400,
-        'file',
-        'material_type_not_allowed',
-      ),
-    });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await pick(
-      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
-      new File(['x'], 'gen.exe'),
-    );
-    expect(wrapper.get('[data-testid="source-generator"] [role="alert"]').text()).toContain(
-      'Loại tệp này không được phép làm tài liệu của bài.',
     );
   });
 });

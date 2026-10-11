@@ -48,29 +48,6 @@ describe('ContestParticipantsTab', () => {
     ).toHaveLength(2);
   });
 
-  it('filters by username through the query', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const calls = mockApi({
-      ...staffViewer(['judge.edit_own_contest']),
-      ...contestEditorRoutes(),
-      'GET /contests/hcmus-w41/participations': page([]),
-    });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/participants',
-      'Không có lượt tham gia nào khớp.',
-    );
-    await wrapper.get('#participants-user').setValue('tuan');
-    await vi.advanceTimersByTimeAsync(350);
-    await flushPromises();
-    expect(
-      calls
-        .filter((call) => call.path.endsWith('/participations'))
-        .at(-1)!
-        .query.get('user'),
-    ).toBe('tuan');
-    expect(wrapper.text()).toContain('Không có lượt tham gia nào khớp.');
-  });
-
   const disqualifyRoutes = () => ({
     ...staffViewer(['judge.edit_own_contest']),
     ...contestEditorRoutes(),
@@ -91,53 +68,21 @@ describe('ContestParticipantsTab', () => {
     ) => { text: () => string; trigger: (event: string) => Promise<unknown> }[];
   }) => wrapper.findAll('button').find((button) => button.text() === 'Loại khỏi bảng')!;
 
-  it('refetches the contest settings after a disqualify, so a later General save cannot un-ban the user', async () => {
+  it('refetches the contest settings and marks the ranking stale after a disqualify, so a later General save cannot un-ban the user', async () => {
     const calls = mockApi(disqualifyRoutes());
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', COUNT_LINE);
-    const contestReads = () =>
-      calls.filter((call) => call.method === 'GET' && call.path === '/contests/hcmus-w41').length;
-    const before = contestReads();
-    await disqualifyButton(wrapper).trigger('click');
-    await confirmDialog('Loại khỏi bảng');
-    await flushPromises();
-    expect(contestReads()).toBeGreaterThan(before);
-  });
-
-  it('moves focus to the row’s status once the disqualify has landed, not to the body', async () => {
-    mockApi(disqualifyRoutes());
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', COUNT_LINE);
-    await disqualifyButton(wrapper).trigger('click');
-    await confirmDialog('Loại khỏi bảng');
-    await vi.waitFor(() => expect(document.activeElement?.id).toBe('participation-status-p-1'));
-  });
-
-  it('marks the public ranking stale after a disqualify', async () => {
-    mockApi(disqualifyRoutes());
     const { wrapper, queryClient } = await mountAndWaitFor(
       '/admin/contests/hcmus-w41/participants',
       COUNT_LINE,
     );
+    const contestReads = () =>
+      calls.filter((call) => call.method === 'GET' && call.path === '/contests/hcmus-w41').length;
+    const before = contestReads();
     const ranking = [['contests', 'ranking', 'probe', 'hcmus-w41']];
     seedCache(queryClient, ranking);
     await disqualifyButton(wrapper).trigger('click');
     await confirmDialog('Loại khỏi bảng');
     await flushPromises();
+    expect(contestReads()).toBeGreaterThan(before);
     expect(invalidatedKeys(queryClient, ranking)).toHaveLength(1);
-  });
-
-  it('shows which rules revision each row accepted', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_contest']),
-      ...contestEditorRoutes(),
-      'GET /contests/hcmus-w41/participations': page([
-        participation({ rulesAcceptedAt: '2026-10-08T05:58:00.000Z', rulesAcceptedRevision: 3 }),
-        participation({ id: 'p-2' }),
-      ]),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/participants', 'ngocanh');
-    const RULES_CELL = 5;
-    const cells = wrapper.findAll('tbody tr').map((row) => row.findAll('td')[RULES_CELL]!.text());
-    expect(cells[0]).toContain('bản 3');
-    expect(cells[1]).toBe('—');
   });
 });

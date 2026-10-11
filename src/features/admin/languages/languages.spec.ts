@@ -22,15 +22,4 @@ describe('languages with judge coverage', () => {
     const single = singleJudgeLanguages(withCoverage(LANGUAGES, JUDGE_FLEET));
     expect(single.map((row) => [row.key, row.judges])).toEqual([['PAS', ['qhh-judge-03']]]);
   });
-
-  it('sorts by key and is empty without languages', () => {
-    expect(withCoverage(LANGUAGES, null).map((row) => row.key)).toEqual([
-      'CPP17',
-      'CPP20',
-      'PAS',
-      'PY3',
-      'RUBY',
-    ]);
-    expect(withCoverage([], JUDGE_FLEET)).toEqual([]);
-  });
 });

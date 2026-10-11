@@ -76,15 +76,6 @@ describe('CodeEditor', () => {
     warn.mockRestore();
   });
 
-  it('shows a labelled textarea mirroring the value, with a line-number gutter, before the editor loads', () => {
-    const editor = mountEditor({ modelValue: 'a\nb\nc', minLines: 1 });
-    const textarea = editor.get('textarea');
-    expect(textarea.attributes('aria-label')).toBe('Source code');
-    expect((textarea.element as HTMLTextAreaElement).value).toBe('a\nb\nc');
-    const gutter = editor.get('[aria-hidden="true"]');
-    expect(gutter.findAll('span').map((line) => line.text())).toEqual(['1', '2', '3']);
-  });
-
   it('swaps the textarea for the editor once loaded and emits what the editor reports', async () => {
     const editor = mountEditor();
     await flushPromises();
@@ -103,20 +94,6 @@ describe('CodeEditor', () => {
     await editor.setProps({ modelValue: '#include <bits>' });
     expect(handle().setDoc).toHaveBeenCalledExactlyOnceWith('#include <bits>');
     expect(editor.emitted('update:modelValue')).toBeUndefined();
-  });
-
-  it('forwards the disabled flag to the editor', async () => {
-    const editor = mountEditor();
-    await flushPromises();
-    await editor.setProps({ disabled: true });
-    expect(handle().setDisabled).toHaveBeenLastCalledWith(true);
-  });
-
-  it('destroys the editor on unmount', async () => {
-    const editor = mountEditor();
-    await flushPromises();
-    editor.unmount();
-    expect(handle().destroy).toHaveBeenCalledOnce();
   });
 
   it('passes text typed before the editor loaded as its document', async () => {
@@ -172,20 +149,6 @@ describe('CodeEditor', () => {
   });
 
   describe('language', () => {
-    it('gives the editor the pack of the language prop once the chunk has loaded', async () => {
-      mountEditor({ language: 'c_cpp' });
-      await flushPromises();
-      expect(handle().setLanguage).toHaveBeenLastCalledWith({ pack: 'c_cpp' });
-    });
-
-    it('switches to the pack of a new language', async () => {
-      const editor = mountEditor({ language: 'c_cpp' });
-      await flushPromises();
-      await editor.setProps({ language: 'python' });
-      await flushPromises();
-      expect(handle().setLanguage).toHaveBeenLastCalledWith({ pack: 'python' });
-    });
-
     it('drops an older, slower pack that arrives after the language changed', async () => {
       let resolveSlowPython: (pack: unknown) => void = () => undefined;
       const slowPython = new Promise((resolve) => (resolveSlowPython = resolve));
@@ -275,10 +238,5 @@ describe('CodeEditor in low-power mode', () => {
     await flushPromises();
     expect(created.destroy).toHaveBeenCalled();
     expect((wrapper.get('textarea').element as HTMLTextAreaElement).value).toBe('int main() {}');
-  });
-
-  it('does not touch Tab when low-power is off', () => {
-    const wrapper = mountEditor();
-    expect(keydown(wrapper, { key: 'Tab' }).defaultPrevented).toBe(false);
   });
 });

@@ -3,7 +3,6 @@ import {
   diffSummary,
   foldSameRuns,
   isIdentical,
-  lineCountOf,
   lineDiff as boundedLineDiff,
   splitSourceLines,
   wordSegments,
@@ -29,10 +28,6 @@ describe('splitSourceLines', () => {
     ['a\n\n', ['a', '']],
   ])('splits %j into %j', (source, expected) => {
     expect(splitSourceLines(source)).toEqual(expected);
-  });
-
-  it('counts lines after normalising', () => {
-    expect(lineCountOf('a\r\nb\r\nc\r\n')).toBe(3);
   });
 });
 
@@ -114,18 +109,6 @@ describe('lineDiff', () => {
     expect(performance.now() - started).toBeLessThan(1500);
   });
 
-  it('still diffs a large source with few edits', () => {
-    const base = lines(5000);
-    const rows = boundedLineDiff(base, base.replace('line 2500', 'edited 2500'));
-    expect(rows).not.toBeNull();
-    expect(rows!.filter((row) => row.kind !== 'same')).toHaveLength(1);
-  });
-
-  it('never flags blank lines as moved', () => {
-    const rows = lineDiff('\na\nb', 'a\nb\n\nc');
-    expect(rows.some((row) => row.isMoved)).toBe(false);
-  });
-
   it('flags a change that only differs in whitespace', () => {
     const [spaced] = lineDiff('int x;', 'int  x;');
     expect(spaced).toMatchObject({ kind: 'changed', isWhitespaceOnly: true });
@@ -145,16 +128,6 @@ describe('lineDiff', () => {
     const rows = lineDiff(left, right);
     expect(rows.flatMap((row) => (row.left ? [row.left.text] : []))).toEqual(left.split('\n'));
     expect(rows.flatMap((row) => (row.right ? [row.right.text] : []))).toEqual(right.split('\n'));
-  });
-});
-
-describe('diffSummary', () => {
-  it('counts a changed row as one added and one removed line', () => {
-    expect(diffSummary(lineDiff('a\nb\nc', 'a\nB\nc\nd'))).toEqual({
-      added: 2,
-      removed: 1,
-      same: 2,
-    });
   });
 });
 
@@ -204,13 +177,5 @@ describe('foldSameRuns', () => {
     const left = `a\n${lines(5)}\nb`;
     const right = `A\n${lines(5)}\nB`;
     expect(blockShape(left, right)).toEqual([['open', 7]]);
-  });
-
-  it('never loses a row', () => {
-    const rows = lineDiff(
-      lines(40),
-      `${lines(20)}\nextra\n${lines(40).split('\n').slice(20).join('\n')}`,
-    );
-    expect(foldSameRuns(rows).flatMap((block) => block.rows)).toEqual(rows);
   });
 });

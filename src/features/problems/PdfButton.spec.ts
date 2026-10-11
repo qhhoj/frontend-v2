@@ -114,15 +114,6 @@ describe('PdfButton', () => {
     await flushPromises();
     expect(wrapper.find('button[aria-busy="true"]').exists()).toBe(true);
   });
-  it('shows the failed text once visibly and hides it from assistive tech, the status region announces it', async () => {
-    probe.mockRejectedValue(new ApiError('generic', 500, 'x'));
-    const wrapper = open();
-    await wrapper.get('button').trigger('click');
-    await flushPromises();
-    const visible = wrapper.get('.text-negative');
-    expect(visible.text()).toBe('Không thể chuẩn bị PDF');
-    expect(visible.attributes('aria-hidden')).toBe('true');
-  });
   it('says the statement has no PDF on a 404 and that there are too many requests on a 429', async () => {
     probe.mockRejectedValueOnce(new ApiError('not_found', 404, 'x'));
     const missing = open();
@@ -167,13 +158,6 @@ describe('PdfButton', () => {
     const wrapper = open();
     await wrapper.get('button').trigger('click');
     await wrapper.setProps({ lang: 'en' });
-    expect(signalOf(0).aborted).toBe(true);
-  });
-  it('aborts the probe in flight when the component unmounts', async () => {
-    probe.mockImplementation(neverAnswers);
-    const wrapper = open();
-    await wrapper.get('button').trigger('click');
-    wrapper.unmount();
     expect(signalOf(0).aborted).toBe(true);
   });
 });

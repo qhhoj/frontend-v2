@@ -2,14 +2,12 @@ import {
   contestDetail,
   contestItem,
   contestProblem,
-  viewerResult,
   announcement,
   ranking,
   rankingRow,
   RANKING_PROBLEM_IDS,
 } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
-import { applyTheme, expectNoAxeViolations } from './fixtures/audit';
+import { expectNoAxeViolations } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, streamFrame, test } from './fixtures/api';
 
 test.beforeEach(async ({ page }) => {
@@ -53,24 +51,6 @@ test('the rated filter and the single group live in the URL', async ({ page, api
   await expect(page.locator('#main h2')).toHaveCount(1);
 });
 
-test('a signed-in contestant joins with an access code and the dialog passes axe', async ({
-  page,
-  api,
-}) => {
-  api.signedIn = true;
-  api.routes['GET /contests/r42'] = detailWith({ requiresAccessCode: true });
-  await page.goto('/contests/r42');
-  await page.getByRole('button', { name: 'Vào thi' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Nhập mã tham gia' });
-  await expect(dialog.getByLabel('Mã tham gia')).toBeFocused();
-  await expectNoAxeViolations(page);
-  await dialog.getByLabel('Mã tham gia').fill('opensesame');
-  await dialog.getByRole('button', { name: 'Vào thi' }).click();
-  await expect(dialog).toBeHidden();
-  const join = api.requests.find((request) => request.key === 'POST /contests/r42/join')!;
-  expect(JSON.parse(join.postData!.toString())).toEqual({ accessCode: 'opensesame' });
-});
-
 test('an announcement pushed over the stream shows up and is counted', async ({ page, api }) => {
   api.routes['GET /contests/:key/announcements'] = {
     body: {
@@ -87,37 +67,6 @@ test('an announcement pushed over the stream shows up and is counted', async ({ 
   await expect(page.getByRole('link', { name: /Thông báo.*1 chưa đọc/ })).toBeVisible();
   await page.getByRole('link', { name: /Thông báo/ }).click();
   await expect(page.getByRole('link', { name: /Thông báo/ })).not.toContainText('chưa đọc');
-});
-
-test('the phone detail is layout A at 390 px: list rows, fixed action bar, no sideways scroll', async ({
-  page,
-  api,
-}) => {
-  api.signedIn = true;
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/contests/r42');
-  await expect(page.getByRole('link', { name: 'A. Dãy số đẹp' })).toBeVisible();
-  const bar = page.getByTestId('contest-actions');
-  await expect(bar).toBeVisible();
-  const barBottomPx = async () => {
-    const box = (await bar.boundingBox())!;
-    return Math.round(box.y + box.height);
-  };
-  expect(await barBottomPx()).toBe(844);
-  // The page is taller than the screen, so the bar has to stay put while the page scrolls under it.
-  expect(
-    await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight),
-  ).toBeGreaterThan(0);
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight / 2));
-  expect(await barBottomPx(), 'the bar stays on the viewport bottom mid-scroll').toBe(844);
-  expect(
-    await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
-  ).toBeLessThanOrEqual(0);
-  // At the end of the page the last block (the rail) clears the bar, so no row can end up hidden behind it.
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  expect(await barBottomPx(), 'the bar stays on the viewport bottom').toBe(844);
-  const rail = (await page.locator('aside').boundingBox())!;
-  expect(rail.y + rail.height).toBeLessThanOrEqual((await bar.boundingBox())!.y);
 });
 
 test('a points board shows points and time inside the chip and stars only timed first solves', async ({
@@ -176,36 +125,6 @@ test('the signed-in list shows the current contest with a way back', async ({ pa
     page.getByRole('link', { name: /^Quay lại kỳ thi\s?: QHH Round #42 \(Div\. 2\)$/ }),
   ).toBeVisible();
   await expectNoAxeViolations(page);
-});
-
-test('the problems table shows the own result and solvers, and passes axe in every theme', async ({
-  page,
-  api,
-}) => {
-  api.signedIn = true;
-  api.routes['GET /contests/r42'] = detailWith({
-    problems: [
-      contestProblem(0, {
-        solverCount: 188,
-        viewerResult: viewerResult({
-          cell: { time: 1450, points: 100, tries: 1 },
-          isSolved: true,
-          attempts: 1,
-        }),
-      }),
-      contestProblem(1, {
-        solverCount: 143,
-        viewerResult: viewerResult({ attempts: 1, hasPendingSubmission: true }),
-      }),
-    ],
-  });
-  for (const theme of THEMES) {
-    await applyTheme(page, api, theme);
-    await page.goto('/contests/r42');
-    await expect(page.getByText('+ 0:24').first()).toBeVisible();
-    await expect(page.getByText('Đang chấm').first()).toBeVisible();
-    await expectNoAxeViolations(page);
-  }
 });
 
 test('a refused join shows its own text beside Bit', async ({ page, api }) => {

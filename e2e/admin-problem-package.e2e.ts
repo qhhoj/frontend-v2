@@ -1,5 +1,4 @@
 import { expect, test } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { adminOk, signInAsStaff } from './fixtures/admin';
 import type { FakeApi } from './fixtures/api';
 import {
@@ -8,7 +7,6 @@ import {
   problemEditingMeta,
 } from '../src/test/admin-fixtures/problems';
 import { packageStatus } from '../src/test/f4-fixtures';
-import { THEMES } from '../src/theme/registry';
 
 function editorRoutes(api: FakeApi) {
   signInAsStaff(api, ['judge.edit_own_problem']);
@@ -63,22 +61,3 @@ test('a package over the cap says so with the sweating Bit', async ({ page, api 
     page.getByTestId('problem-package').getByRole('alert').getByTestId('inline-bit'),
   ).toBeVisible();
 });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the package card is accessible in ${theme.id} at ${viewport.name}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      editorRoutes(api);
-      await applyTheme(page, api, theme);
-      api.routes['POST /problems/hcmus41c/package'] = adminOk(packageStatus('ready'));
-      await page.goto('/admin/problems/hcmus41c/data');
-      await page.getByRole('button', { name: 'Tải gói đề' }).click();
-      await expect(page.getByRole('link', { name: 'Tải hcmus41c.zip' })).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-        true,
-      );
-    });

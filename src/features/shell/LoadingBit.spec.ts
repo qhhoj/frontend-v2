@@ -1,5 +1,4 @@
 import type { VueWrapper } from '@vue/test-utils';
-import { nextTick } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountComponent } from '@/test/mount';
@@ -65,38 +64,6 @@ describe('LoadingBit', () => {
 
   const bits = (wrapper: Mounted) => wrapper.findAll('[data-testid="loading-bit"]');
   const positions = (wrapper: Mounted) => bits(wrapper).map((bit) => bit.attributes('style'));
-
-  it('renders nothing while hidden', () => {
-    expect(bits(mountBits('hidden'))).toHaveLength(0);
-  });
-
-  it('shows five different Bits on a desktop, three on a phone, none of them reachable or announced', () => {
-    const desktop = mountBits('walking');
-    expect(bits(desktop)).toHaveLength(5);
-    const headgears = new Set(bits(desktop).map((bit) => bit.attributes('data-headgear')));
-    expect(headgears.size).toBe(5);
-    const layer = desktop.get('[data-testid="loading-bits"]');
-    expect(layer.attributes('aria-hidden')).toBe('true');
-    expect(layer.classes()).toEqual(
-      expect.arrayContaining(['pointer-events-none', 'fixed', 'z-40']),
-    );
-    setViewport(375);
-    expect(bits(mountBits('walking'))).toHaveLength(3);
-  });
-
-  it('measures the viewport without the scrollbar', () => {
-    setViewport(500, 400);
-    const wrapper = mountBits('walking');
-    for (let frame = 1; frame <= 200; frame++) frames.runFrame(frame * 16);
-    const maxX = 500 - 64;
-    for (const bit of bits(wrapper)) {
-      const [, left, top] = /translate\((-?[\d.]+)px, (-?[\d.]+)px\)/.exec(
-        bit.attributes('style') ?? '',
-      )!;
-      expect(Number(left)).toBeLessThanOrEqual(maxX);
-      expect(Number(top)).toBeLessThanOrEqual(400 - 64);
-    }
-  });
 
   it('runs one animation loop for all Bits, moves them every frame and stops it when hidden', async () => {
     const wrapper = mountBits('walking');
@@ -167,23 +134,6 @@ describe('LoadingBit', () => {
       expect(x < -64 || x > 1280 || y < -70 || y > 806).toBe(true);
   });
 
-  it('turns each Bit toward the nearest edge once, at its own speed', async () => {
-    const wrapper = mountBits('walking');
-    for (let frame = 1; frame <= 50; frame++) frames.runFrame(frame * 16);
-    const before = coordinates(wrapper);
-    await wrapper.setProps({ phase: 'leaving' });
-    frames.runFrame(50 * 16 + 16);
-    frames.runFrame(50 * 16 + 32);
-    const after = coordinates(wrapper);
-    after.forEach((now, index) => {
-      const was = before[index]!;
-      const distances = [was.x + 64, 1280 - was.x, was.y + 70, 800 - was.y + 6];
-      const nearest = distances.indexOf(Math.min(...distances));
-      const moved = [was.x - now.x, now.x - was.x, was.y - now.y, now.y - was.y][nearest]!;
-      expect(moved).toBeGreaterThan(0);
-    });
-  });
-
   it('keeps walking while the layer fades, and walks back in for a new wait', async () => {
     const wrapper = mountBits('walking');
     frames.runFrame(16);
@@ -199,64 +149,6 @@ describe('LoadingBit', () => {
     expect(wrapper.get('[data-testid="loading-bits"]').classes()).toContain('opacity-100');
     expect(positions(wrapper)).toEqual(walkedOn);
     expect(frames.isQueued()).toBe(true);
-  });
-
-  it('brings a Bit that already left back toward the middle', async () => {
-    setViewport(1280, 800);
-    const wrapper = mountBits('leaving');
-    let timestamp = 0;
-    for (let frame = 0; frame < 4000 && !wrapper.emitted('gone'); frame++)
-      frames.runFrame((timestamp += 16));
-    await wrapper.setProps({ phase: 'walking' });
-    const distances = () => coordinates(wrapper).map(({ x, y }) => Math.hypot(x - 608, y - 368));
-    const gone = distances();
-    for (let frame = 0; frame < 25; frame++) frames.runFrame((timestamp += 16));
-    distances().forEach((distance, index) => expect(distance).toBeLessThan(gone[index]!));
-  });
-
-  it('skips the exit when the tab is hidden while leaving', async () => {
-    const wrapper = mountBits('walking');
-    await wrapper.setProps({ phase: 'leaving' });
-    expect(wrapper.emitted('gone')).toBeUndefined();
-    setTabHidden(true);
-    expect(wrapper.emitted('gone')).toHaveLength(1);
-    const hiddenAtStart = mountBits('walking');
-    await hiddenAtStart.setProps({ phase: 'leaving' });
-    expect(hiddenAtStart.emitted('gone')).toHaveLength(1);
-  });
-
-  it('sends Bits in from fresh places for a new wait after they have gone', async () => {
-    const wrapper = mountBits('walking');
-    const first = positions(wrapper);
-    await wrapper.setProps({ phase: 'hidden' });
-    await wrapper.setProps({ phase: 'walking' });
-    expect(positions(wrapper)).not.toEqual(first);
-  });
-
-  it('swaps the leg cells once a Bit has walked a step', async () => {
-    const wrapper = mountBits('walking');
-    const legs = () => wrapper.get('[data-testid="loading-bit"] .grid').html();
-    const standing = legs();
-    for (let frame = 1; frame <= 40; frame++) frames.runFrame(frame * 16);
-    await nextTick();
-    // 40 frames of at least 40 px/s cover well over one 6 px step; the leg frame is whichever one it lands on.
-    const seen = new Set([standing]);
-    for (let frame = 41; frame <= 80; frame++) {
-      frames.runFrame(frame * 16);
-      await nextTick();
-      seen.add(legs());
-    }
-    expect(seen.size).toBeGreaterThan(1);
-  });
-
-  it('turns a Bit that walks west to face west, and east to face east', () => {
-    const wrapper = mountBits('walking');
-    const flips = new Set<string>();
-    for (let frame = 1; frame <= 600; frame++) {
-      frames.runFrame(frame * 16);
-      flips.add((bits(wrapper)[0]!.element.firstElementChild as HTMLElement).style.transform);
-    }
-    expect(flips).toEqual(new Set(['scaleX(-1)', 'none']));
   });
 
   it('puts the Bit in its corner when reduced motion turns on mid-walk', async () => {

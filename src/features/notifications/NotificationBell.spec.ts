@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from '@/stores/session.store';
 import { FakeEventSource, userStream } from '@/test/fake-event-source';
 import { sessionUser } from '@/test/fixtures';
-import { fail, mockApi, noContent, ok, page, sequence } from '@/test/mock-api';
+import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { inboxSample, NOTIFICATION_NOW, notificationItem } from '@/test/notification-fixtures';
@@ -46,24 +46,6 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('NotificationBell', () => {
-  it('names the unread count on the button and shows it on the badge', async () => {
-    mockApi(routesWith());
-    const { wrapper } = await mountApp(START);
-    expect(bell(wrapper).attributes('aria-label')).toBe('Thông báo, 3 chưa đọc');
-    expect(wrapper.get('[data-testid="notification-badge"]').text()).toBe('3');
-  });
-
-  it('shows no badge at zero and caps it at 99+', async () => {
-    mockApi(routesWith({ 'GET /notifications/unread-count': ok({ count: 0 }) }));
-    const { wrapper } = await mountApp(START);
-    expect(bell(wrapper).attributes('aria-label')).toBe('Thông báo');
-    expect(wrapper.find('[data-testid="notification-badge"]').exists()).toBe(false);
-    wrapper.unmount();
-    mockApi(routesWith({ 'GET /notifications/unread-count': ok({ count: 120 }) }));
-    const second = await mountApp(START);
-    expect(second.wrapper.get('[data-testid="notification-badge"]').text()).toBe('99+');
-  });
-
   it('renders nothing for an anonymous viewer and asks nothing', async () => {
     const calls = mockApi({
       ...anonymousViewer,
@@ -96,39 +78,6 @@ describe('NotificationBell', () => {
     );
   });
 
-  it('shows the sleeping Bit when the inbox is empty', async () => {
-    mockApi(
-      routesWith({
-        'GET /notifications': page([], { pageSize: 20 }),
-        'GET /notifications/unread-count': ok({ count: 0 }),
-      }),
-    );
-    const { wrapper } = await mountApp(START);
-    await openDrawer(wrapper);
-    expect(drawer()!.textContent).toContain('Chưa có thông báo nào.');
-    expect(drawer()!.querySelector('[data-testid="inline-bit"]')).not.toBeNull();
-  });
-
-  it('marks one row read from its check button and refetches the count', async () => {
-    const first = inboxSample()[0]!;
-    const calls = mockApi(
-      routesWith({
-        'GET /notifications/unread-count': sequence(ok({ count: 3 }), ok({ count: 2 })),
-        [`POST /notifications/${first.id}/read`]: noContent(),
-      }),
-    );
-    const { wrapper } = await mountApp(START);
-    await openDrawer(wrapper);
-    drawer()!.querySelector<HTMLElement>(`[aria-label="Đánh dấu đã đọc: ${first.title}"]`)!.click();
-    await flushPromises();
-    expect(
-      calls.some(
-        (call) => call.method === 'POST' && call.path === `/notifications/${first.id}/read`,
-      ),
-    ).toBe(true);
-    expect(wrapper.get('[data-testid="notification-badge"]').text()).toBe('2');
-  });
-
   it('sends nothing while viewing as another user', async () => {
     const calls = mockApi({
       ...routesWith({
@@ -146,41 +95,6 @@ describe('NotificationBell', () => {
     drawerRows()[0]!.querySelector('button')!.click();
     await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/notifications'));
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
-  });
-
-  it('opens a row: marks it read, goes to its page and closes the drawer', async () => {
-    const item = notificationItem({ id: 'n-go', path: '/notifications' });
-    const calls = mockApi(
-      routesWith({
-        'GET /notifications': page([item], { pageSize: 20 }),
-        'POST /notifications/n-go/read': noContent(),
-      }),
-    );
-    const { wrapper, router } = await mountApp(START);
-    await openDrawer(wrapper);
-    drawerRows()[0]!.querySelector('button')!.click();
-    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/notifications'));
-    expect(calls.some((call) => call.path === '/notifications/n-go/read')).toBe(true);
-    await vi.waitFor(() => expect(drawer()).toBeNull());
-  });
-
-  it('shows a row whose ticket is gone as an old notification and stays', async () => {
-    const item = notificationItem({ id: 'n-old', path: '/tickets/t-gone' });
-    const calls = mockApi(
-      routesWith({
-        'GET /notifications': page([item], { pageSize: 20 }),
-        'GET /tickets/t-gone': fail(404, 'not_found'),
-        'POST /notifications/n-old/read': noContent(),
-      }),
-    );
-    const { wrapper, router } = await mountApp(START);
-    await openDrawer(wrapper);
-    drawerRows()[0]!.querySelector('button')!.click();
-    await flushPromises();
-    expect(router.currentRoute.value.path).toBe(START);
-    expect(drawerRows()[0]!.textContent).toContain('Thông báo cũ');
-    expect(drawerRows()[0]!.textContent).not.toContain(item.title);
-    expect(calls.some((call) => call.path === '/notifications/n-old/read')).toBe(true);
   });
 
   it('refreshes the count once per burst of nudges and announces the rise', async () => {

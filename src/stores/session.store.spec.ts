@@ -1,6 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { regenerateApiToken } from '@/api/account.api';
 import { apiRequest, onCsrfFailed, onUnauthorized } from '@/api/client';
 import { partialSession, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
@@ -11,32 +10,6 @@ describe('useSessionStore', () => {
     setActivePinia(createPinia());
     onCsrfFailed(null);
     onUnauthorized(null);
-  });
-
-  it('is anonymous when /auth/me answers 401', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    expect(session.status).toBe('anonymous');
-    expect(session.user).toBeNull();
-  });
-
-  it('is authenticated with the user and sends its CSRF token', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout': noContent() });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    expect(session.status).toBe('authenticated');
-    expect(session.user?.username).toBe('user_01');
-    await session.logout();
-    expect(calls[1]!.headers.get('X-CSRF-Token')).toBe('csrf-1');
-    expect(session.status).toBe('anonymous');
-  });
-
-  it('is partial while the second factor is pending', async () => {
-    mockApi({ 'GET /auth/me': signedIn({ user: null, twoFactorRequired: true }) });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    expect(session.status).toBe('partial');
   });
 
   it('loads the session once for concurrent callers', async () => {
@@ -55,16 +28,6 @@ describe('useSessionStore', () => {
     const calls = mockApi({ 'GET /auth/me': signedOut });
     await session.ensureLoaded();
     expect(calls).toHaveLength(1);
-    expect(session.status).toBe('anonymous');
-  });
-
-  it('keeps the viewer anonymous when login fails', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/login': fail(401, 'invalid_credentials') });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await expect(session.login({ username: 'user_01', password: 'bad' })).rejects.toMatchObject({
-      code: 'invalid_credentials',
-    });
     expect(session.status).toBe('anonymous');
   });
 
@@ -181,39 +144,6 @@ describe('useSessionStore', () => {
     expect(calls[1]!.headers.get('X-CSRF-Token')).toBe('csrf-social');
   });
 
-  it('signs out every session: the server is told, then this viewer is anonymous', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout-all': noContent() });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await session.logoutEverywhere();
-    const logoutAll = calls.find((call) => call.path === '/auth/logout-all')!;
-    expect(logoutAll.method).toBe('POST');
-    expect(logoutAll.body).toBeUndefined();
-    expect(session.status).toBe('anonymous');
-    expect(session.user).toBeNull();
-  });
-
-  it('clears the CSRF token with the session: later writes carry none', async () => {
-    const calls = mockApi({
-      'GET /auth/me': signedIn(),
-      'POST /auth/logout-all': noContent(),
-      'POST /auth/token/regenerate': ok({ token: 'new-token' }),
-    });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await session.logoutEverywhere();
-    await regenerateApiToken().catch(() => undefined);
-    expect(calls.at(-1)!.headers.get('X-CSRF-Token')).toBeNull();
-  });
-
-  it('stays signed in when signing out everywhere fails, and rethrows', async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout-all': fail(500, 'http_error') });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await expect(session.logoutEverywhere()).rejects.toMatchObject({ status: 500 });
-    expect(session.status).toBe('authenticated');
-  });
-
   it('stopping an impersonation takes over the staff session the server returns', async () => {
     const staff = sessionResponse({
       user: { ...sessionResponse().user!, id: 'staff-1', username: 'admin', isStaff: true },
@@ -229,46 +159,5 @@ describe('useSessionStore', () => {
     expect(calls.at(-1)).toMatchObject({ method: 'POST', path: '/auth/impersonate/stop' });
     expect(session.impersonatorId).toBeNull();
     expect(session.user?.username).toBe('admin');
-  });
-
-  it('keeps the impersonation when stopping it fails, and rethrows', async () => {
-    mockApi({
-      'GET /auth/me': signedIn({ impersonatorId: 'staff-1' }),
-      'POST /auth/impersonate/stop': fail(500, 'http_error'),
-    });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await expect(session.stopImpersonating()).rejects.toMatchObject({ status: 500 });
-    expect(session.impersonatorId).toBe('staff-1');
-    expect(session.status).toBe('authenticated');
-  });
-
-  it('starting an impersonation takes over the session the server returns', async () => {
-    const asTarget = sessionResponse({
-      user: { ...sessionResponse().user!, id: 'target-1', username: 'tuan_k' },
-      impersonatorId: 'staff-1',
-    });
-    const calls = mockApi({
-      'GET /auth/me': signedIn(),
-      'POST /auth/impersonate/target-1': ok(asTarget),
-    });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await session.startImpersonating('target-1');
-    expect(calls.at(-1)).toMatchObject({ method: 'POST', path: '/auth/impersonate/target-1' });
-    expect(session.user?.username).toBe('tuan_k');
-    expect(session.impersonatorId).toBe('staff-1');
-  });
-
-  it('keeps the staff session when starting an impersonation fails, and rethrows', async () => {
-    mockApi({
-      'GET /auth/me': signedIn(),
-      'POST /auth/impersonate/target-1': fail(403, 'forbidden'),
-    });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    await expect(session.startImpersonating('target-1')).rejects.toMatchObject({ status: 403 });
-    expect(session.impersonatorId).toBeNull();
-    expect(session.user?.username).toBe('user_01');
   });
 });

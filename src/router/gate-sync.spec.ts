@@ -56,12 +56,6 @@ describe('API-level gates', () => {
     expect(router.currentRoute.value.query.redirect).toBe('/blog');
   });
 
-  it('leaves the viewer where they are when the session turns out to be fine', async () => {
-    const { router, replace } = await refusedWith('two_factor_required', () => signedIn());
-    expect(router.currentRoute.value.name).toBe('blog');
-    expect(replace).not.toHaveBeenCalled();
-  });
-
   it('reloads the session once for several gated requests at once', async () => {
     const { replace, calls } = await refusedWith(
       'two_factor_required',

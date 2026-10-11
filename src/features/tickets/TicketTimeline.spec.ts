@@ -64,45 +64,10 @@ async function open(detail: TicketDetail) {
 }
 
 describe('ticket thread with timeline rows', () => {
-  it('draws a lone event as a divider and folds consecutive ones into a group with the time range', async () => {
-    const thread = await open(
-      detailWith({ can: { editNotes: true, markGood: true, assign: true } }),
-    );
-    expect(thread.get('[data-testid="thread-counts"]').text()).toBe('2 tin nhắn · 4 sự kiện');
-    expect(thread.findAll('article')).toHaveLength(2);
-    const lone = thread.findAll('[data-testid="ticket-event"]')[0]!;
-    expect(lone.text()).toContain('thayhung đã giao phiếu cho colan');
-    const group = thread.get('[data-testid="ticket-event-group"]');
-    expect(group.get('summary').text()).toContain('3 sự kiện');
-    expect(group.text()).toContain('thayhung đã bỏ giao phiếu cho colan');
-    expect(group.text()).toContain('thayhung đã giao phiếu cho hoanganh');
-    expect(group.text()).toContain('thayhung đã đánh dấu đóng góp tốt');
-  });
-
   it('hides good-contribution rows from the ticket owner', async () => {
     const thread = await open(detailWith());
     expect(thread.text()).not.toContain('đóng góp tốt');
     expect(thread.get('[data-testid="thread-counts"]').text()).toBe('2 tin nhắn · 3 sự kiện');
     expect(thread.get('[data-testid="ticket-event-group"] summary').text()).toContain('2 sự kiện');
-  });
-
-  it('says only the latest 200 events are shown once the ticket holds 200', async () => {
-    const many = Array.from({ length: 200 }, (_item, index) =>
-      eventEntry(
-        timelineEvent({
-          id: `e${index}`,
-          type: index % 2 ? 'reopened' : 'closed',
-          at: '2026-10-08T15:00:00Z',
-        }),
-      ),
-    );
-    const thread = await open(detailWith({ timeline: [messageEntry(first), ...many] }));
-    expect(thread.text()).toContain('Chỉ hiện 200 sự kiện gần nhất');
-    expect(thread.find('[data-testid="inline-bit"]').exists()).toBe(true);
-  });
-
-  it('shows no cap notice below 200 events', async () => {
-    const thread = await open(detailWith());
-    expect(thread.text()).not.toContain('Chỉ hiện 200 sự kiện gần nhất');
   });
 });

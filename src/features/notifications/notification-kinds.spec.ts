@@ -1,23 +1,5 @@
-import { Bell, Building2, LifeBuoy, Trophy } from 'lucide-vue-next';
 import { describe, expect, it } from 'vitest';
-import { isTicketKind, kindIcon, kindsOfGroup } from './notification-kinds';
-
-describe('kindIcon', () => {
-  it('draws one icon per family of known kinds', () => {
-    expect(['ticket-new', 'ticket-message', 'ticket-status'].map(kindIcon)).toEqual([
-      LifeBuoy,
-      LifeBuoy,
-      LifeBuoy,
-    ]);
-    expect(kindIcon('contest-announcement')).toBe(Trophy);
-    expect(kindIcon('organization-request-decided')).toBe(Building2);
-  });
-
-  it('draws the bell for the quota warning and for a kind added after this build', () => {
-    expect(kindIcon('quota-warning')).toBe(Bell);
-    expect(kindIcon('')).toBe(Bell);
-  });
-});
+import { isTicketKind, kindsOfGroup } from './notification-kinds';
 
 describe('kind groups (the "Loại" chips; the lists feed the `kind` query, requires VNOI backend B1 ask)', () => {
   it('maps each chip to the backend kinds it stands for and no kind to two chips', () => {

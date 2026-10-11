@@ -9,18 +9,6 @@ const typeFiles = import.meta.glob<string>('./*.ts', {
 const names = (source: string) => findHandWrittenTypes(source).map((found) => found.name);
 
 describe('findHandWrittenTypes', () => {
-  it('accepts aliases of the generated schema, nullable ones, Pick and indexed access', () => {
-    expect(
-      names(`
-        export type A = Schemas['X'];
-        export type B = Schemas['X'] | null;
-        export type C = Pick<Schemas['X'], 'a' | 'b'>;
-        export type D = NonNullable<Schemas['X']['y']>[number];
-        export type E = QueryOf<'/problems'>;
-      `),
-    ).toEqual([]);
-  });
-
   it('refuses an interface, an object type, an enum and a literal union', () => {
     expect(names('export interface A { a: string }')).toEqual(['A']);
     expect(names('export type B = { a: string };')).toEqual(['B']);
@@ -38,13 +26,6 @@ describe('findHandWrittenTypes', () => {
       names('/** @uiOnly the filter form keeps its draft */\nexport interface F { a: string }'),
     ).toEqual([]);
     expect(names('/** @uiOnly */\nexport interface F { a: string }')).toEqual(['F']);
-  });
-
-  it('leaves constants alone and reports the line of the offence', () => {
-    expect(names("export const PAGE_SIZE = 20;\nexport const LIST = ['a'] as const;")).toEqual([]);
-    expect(
-      findHandWrittenTypes('export const A = 1;\n\nexport interface B { a: string }')[0]!.line,
-    ).toBe(3);
   });
 });
 

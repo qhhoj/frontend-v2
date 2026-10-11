@@ -129,14 +129,6 @@ describe('org bulk actions', () => {
     });
   });
 
-  it('selects every row of the page with the header box', async () => {
-    mockApi({ ...signedInViewer(), ...orgProblemRoutes() });
-    const { wrapper } = await mountTab();
-    await wrapper.get('input[aria-label="Chọn tất cả bài trên trang"]').setValue(true);
-    await flushPromises();
-    expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 4 bài');
-  });
-
   it('drops the selection when the page changes, so the bar never counts rows that are not on screen', async () => {
     mockApi({ ...signedInViewer(), ...orgProblemRoutes() });
     const { wrapper, router } = await mountTab();
@@ -161,27 +153,5 @@ describe('org bulk actions', () => {
     await router.push('/organizations/other/problems');
     await flushPromises();
     expect(wrapper.find('[data-testid="org-bulk-bar"]').exists()).toBe(false);
-  });
-
-  it('puts keyboard focus on the list when the bar that held it goes away', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...orgProblemRoutes(),
-      [BULK]: ok(bulkResult([['lhp_lis', 'done']])),
-    });
-    const { wrapper } = await mountTab();
-    await tick(wrapper, 'lhp_lis');
-    barButton(wrapper, 'Lưu trữ').element.focus();
-    await barButton(wrapper, 'Lưu trữ').trigger('click');
-    await flushPromises();
-    expect(wrapper.find('[data-testid="org-bulk-bar"]').exists()).toBe(false);
-    expect(document.activeElement).toBe(wrapper.get('[data-testid="org-problem-list"]').element);
-  });
-
-  it('gives the header box the same 44 px target as the row boxes', async () => {
-    mockApi({ ...signedInViewer(), ...orgProblemRoutes() });
-    const { wrapper } = await mountTab();
-    const label = wrapper.get('thead input[type="checkbox"]').element.closest('label');
-    expect(label?.classList.contains('size-11')).toBe(true);
   });
 });

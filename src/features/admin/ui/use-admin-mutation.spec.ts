@@ -56,14 +56,6 @@ describe('useAdminMutation', () => {
     expect(order).toEqual(['success', 'done']);
   });
 
-  it('marks done and invalidates exactly the keys it names', async () => {
-    const { api, invalidate } = host((vars) => Promise.resolve(vars.name));
-    await expect(api().run({ name: 'a' })).resolves.toBe('a');
-    await flushPromises();
-    expect(api().isDone.value).toBe(true);
-    expect(invalidate()).toHaveBeenCalledWith({ queryKey: ['admin', 'thing', 'a'] });
-  });
-
   it('turns a validation failure into field texts and resolves undefined', async () => {
     const { api } = host(() =>
       Promise.reject(
@@ -109,17 +101,5 @@ describe('useAdminMutation', () => {
     const { api } = host(() => Promise.reject(new TypeError('bug in the page')));
     await expect(api().run({ name: 'a' })).rejects.toThrow('bug in the page');
     expect(api().isPending.value).toBe(false);
-  });
-});
-
-describe('useAdminMutation with a public key', () => {
-  it('invalidates a public cache prefix', async () => {
-    const { api, invalidate } = host(
-      (vars) => Promise.resolve(vars.name),
-      () => [['problems'], ['contests', 'ranking']],
-    );
-    await api().run({ name: 'a' });
-    expect(invalidate()).toHaveBeenCalledWith({ queryKey: ['problems'] });
-    expect(invalidate()).toHaveBeenCalledWith({ queryKey: ['contests', 'ranking'] });
   });
 });

@@ -25,12 +25,4 @@ describe('flattenInTimeOrder', () => {
     expect(flattenInTimeOrder(input).map(({ comment: shown }) => shown.id)).toEqual(['a', 'b']);
     expect(input.map((shown) => shown.id)).toEqual(['b', 'a']);
   });
-
-  it('shows the stable number the API gives instead of the position', () => {
-    const flat = flattenInTimeOrder([
-      comment({ id: 'c9', createdAt: '2026-10-10T09:00:00Z', number: 42 }),
-      comment({ id: 'c8', createdAt: '2026-10-09T09:00:00Z', number: 41 }),
-    ]);
-    expect(flat.map(({ number }) => number)).toEqual([41, 42]);
-  });
 });

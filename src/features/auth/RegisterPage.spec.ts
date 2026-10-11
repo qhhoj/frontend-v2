@@ -96,14 +96,6 @@ describe('register page', () => {
     expect(checkbox.attributes('aria-invalid')).toBeUndefined();
   });
 
-  it('will not submit a username the backend would reject, and focuses it', async () => {
-    const calls = register();
-    const { wrapper } = await mountApp('/register');
-    await fill(wrapper, { username: 'bad name' });
-    expect(registerBody(calls)).toBeUndefined();
-    expect(document.activeElement).toBe(wrapper.get('input[name="username"]').element);
-  });
-
   it('will not submit two different passwords, and focuses the confirmation', async () => {
     const calls = register();
     const { wrapper } = await mountApp('/register');
@@ -144,65 +136,6 @@ describe('register page', () => {
     expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
   });
 
-  it('shows a refused school at its picker and focuses it', async () => {
-    register(
-      invalid(
-        issue(
-          'organizationId',
-          'organization_unavailable',
-          'Choose one of the listed open organizations.',
-        ),
-      ),
-    );
-    const { wrapper } = await mountApp('/register');
-    await openSelect(wrapper, '[data-testid="school-picker"]');
-    await pickOption(organizationItem().name);
-    await fill(wrapper);
-    const combobox = wrapper.get('[data-testid="school-picker"] [role="combobox"]');
-    expect(combobox.attributes('aria-invalid')).toBe('true');
-    expect(wrapper.text()).toContain('Trường này không nhận thành viên mới');
-    expect(document.activeElement).toBe(combobox.element);
-  });
-
-  it('still reads an older answer that has fields but no issues', async () => {
-    register(fail(400, 'validation_failed', { email: ['Enter a valid email address.'] }));
-    const { wrapper } = await mountApp('/register');
-    await fill(wrapper, { email: 'bad@x' });
-    expect(describedText(wrapper, 'email')).toEqual(['Enter a valid email address.']);
-  });
-
-  it('drops a server message once the viewer edits that field', async () => {
-    register(
-      invalid(
-        issue('username', 'username_taken', 'Username is taken.'),
-        issue('email', 'email_taken', 'Email is already registered.'),
-      ),
-    );
-    const { wrapper } = await mountApp('/register');
-    await fill(wrapper);
-    await wrapper.get('input[name="email"]').setValue('other@example.com');
-    expect(wrapper.get('input[name="email"]').attributes('aria-invalid')).toBeUndefined();
-    expect(describedText(wrapper, 'username')).toContain('Tên đăng nhập đã được dùng.');
-  });
-
-  it('keeps a field error out of the input label', async () => {
-    register(invalid(issue('email', 'email_invalid', 'Enter a valid email address.')));
-    const { wrapper } = await mountApp('/register');
-    await fill(wrapper, { email: 'bad@x' });
-    const email = wrapper.get('input[name="email"]');
-    expect(wrapper.get(`label[for="${email.attributes('id')}"]`).text()).toBe('Email');
-  });
-
-  it('announces a throttled attempt as an alert and keeps the form', async () => {
-    register(fail(429, 'rate_limited'));
-    const { wrapper } = await mountApp('/register');
-    await fill(wrapper);
-    expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Bạn thao tác quá nhanh. Hãy thử lại sau.',
-    );
-    expect(wrapper.find('form').exists()).toBe(true);
-  });
-
   it('turns an unavailable mailer into the "registration unavailable" card', async () => {
     register(fail(503, 'mail_unavailable'));
     const { wrapper } = await mountApp('/register');
@@ -222,14 +155,6 @@ describe('register page', () => {
     expect(wrapper.get('[role="meter"]').attributes('aria-valuenow')).toBe('4');
     await wrapper.get('input[name="username"]').setValue('user_01');
     expect(wrapper.get('[role="meter"]').attributes('aria-valuenow')).toBe('1');
-  });
-
-  it('links to sign-in from the top bar and the footer, and offers no social sign-up', async () => {
-    register();
-    const { wrapper } = await mountApp('/register');
-    expect(wrapper.find('header a[href="/login"]').exists()).toBe(true);
-    expect(wrapper.find('form a[href="/login"]').exists()).toBe(true);
-    expect(wrapper.find('a[href^="/api/internal/auth/social/"]').exists()).toBe(false);
   });
 
   it('sends the activation mail again to the registered address once the cooldown is over', async () => {

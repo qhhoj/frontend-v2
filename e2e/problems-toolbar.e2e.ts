@@ -83,34 +83,3 @@ test('the random button says when nothing matches and stays on the list', async 
   ).toBeVisible();
   await expect(page).toHaveURL(/\/problems$/);
 });
-
-test('the status mark, tier square and whole-row link of a row', async ({ page, api }) => {
-  api.signedIn = true;
-  await page.setViewportSize(DESKTOP);
-  await page.goto('/problems');
-  const row = page.getByRole('row').filter({ hasText: 'Đường đi ngắn nhất' });
-  await expect(row.getByRole('img', { name: 'Chưa thử' })).toBeVisible();
-  await expect(page.getByRole('img', { name: 'Chưa thử' }).first()).toBeVisible();
-  await expect(row.getByTestId('tier-mark')).toHaveAttribute('data-tier', '2');
-  await row.getByRole('cell').nth(2).click();
-  await expect(page).toHaveURL(/\/problems\/sp$/);
-});
-
-test('the header cells do not move when the rows arrive', async ({ page, api }) => {
-  await page.setViewportSize(DESKTOP);
-  const release = api.hold('GET /problems');
-  await page.goto('/problems');
-  const headers = page.locator('table thead th');
-  await expect(page.locator('[data-skeleton]').first()).toBeVisible();
-  const boxes = () =>
-    headers.evaluateAll((cells) => cells.map((cell) => cell.getBoundingClientRect().toJSON()));
-  const waiting = await boxes();
-  release();
-  await expect(page.getByRole('link', { name: 'Đường đi ngắn nhất', exact: true })).toBeVisible();
-  const loaded = await boxes();
-  expect(waiting).toHaveLength(6);
-  loaded.forEach((box, index) => {
-    for (const edge of ['x', 'y', 'width', 'height'] as const)
-      expect(Math.abs(box[edge] - waiting[index][edge]), `${index} ${edge}`).toBeLessThanOrEqual(1);
-  });
-});

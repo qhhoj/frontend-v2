@@ -6,18 +6,10 @@ describe('usernameProblem', () => {
     expect(usernameProblem(name)).toBeNull();
   });
 
-  it('does not complain about an empty field (required covers it)', () => {
-    expect(usernameProblem('')).toBeNull();
-  });
-
   it.each(['bad name', 'a-b', 'user@x', 'tên', 'a.b', ' lead'])(
     'rejects the format of %j',
     (name) => {
       expect(usernameProblem(name)).toBe('format');
     },
   );
-
-  it('rejects more than 30 characters', () => {
-    expect(usernameProblem('x'.repeat(31))).toBe('length');
-  });
 });

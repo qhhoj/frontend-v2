@@ -38,14 +38,8 @@ describe('users list', () => {
         }),
       ),
     ).toBe(false);
-  });
-
-  it('refuses a never-activated account, which the backend cannot impersonate', () => {
     const inactive = userPage({ staff: { isSuperuser: false, isActive: false, banReason: null } });
     expect(canImpersonate(true, inactive)).toBe(false);
-  });
-
-  it('refuses when the target staff facts are unknown, so a superuser is never guessed', () => {
     expect(canImpersonate(true, userPage({ staff: null }))).toBe(false);
   });
 });
@@ -69,28 +63,20 @@ describe('users list view', () => {
     expect(usersViewFromQuery({ page: '900' }).page).toBe(STAFF_USERS_MAX_PAGE);
   });
 
-  it.each([
-    ['all', undefined],
-    ['active', false],
-    ['banned', true],
-  ] as const)('maps the %s tab to banned=%s and never sends a blank search', (tab, banned) => {
-    const query = staffUsersQueryOf({ tab, sort: 'default', search: '   ', page: 2 });
-    expect(query).toEqual(banned === undefined ? { page: 2 } : { page: 2, banned });
-    expect(staffUsersQueryOf({ tab, sort: 'default', search: 'tuan', page: 1 }).search).toBe(
-      'tuan',
-    );
-  });
-
-  it('reads the sort from the address, drops unknown values, and sends the server value', () => {
-    expect(usersViewFromQuery({ sort: '-lastAccess' }).sort).toBe('-lastAccess');
-    expect(usersViewFromQuery({ sort: 'username' }).sort).toBe('default');
-    const view = { tab: 'all', search: '', page: 1 } as const;
-    expect(staffUsersQueryOf({ ...view, sort: 'lastAccess' })).toEqual({
-      page: 1,
+  it('maps the tab to banned, the sort to the server value, and never sends a blank search', () => {
+    const view = { tab: 'all', sort: 'default', search: '   ', page: 2 } as const;
+    expect(staffUsersQueryOf(view)).toEqual({ page: 2 });
+    expect(staffUsersQueryOf({ ...view, tab: 'active' })).toEqual({ page: 2, banned: false });
+    expect(
+      staffUsersQueryOf({ ...view, tab: 'banned', search: 'tuan', sort: 'lastAccess' }),
+    ).toEqual({
+      page: 2,
+      banned: true,
+      search: 'tuan',
       sort: 'lastAccess',
     });
-    expect(staffUsersQueryOf({ ...view, sort: 'default' })).toEqual({ page: 1 });
-    expect(usersViewToQuery({ ...view, sort: '-lastAccess' }, {})).toEqual({ sort: '-lastAccess' });
+    expect(usersViewFromQuery({ sort: '-lastAccess' }).sort).toBe('-lastAccess');
+    expect(usersViewFromQuery({ sort: 'username' }).sort).toBe('default');
   });
 
   it('writes only what differs from the defaults, keeps the opened user, and starts a new filter on page 1', () => {

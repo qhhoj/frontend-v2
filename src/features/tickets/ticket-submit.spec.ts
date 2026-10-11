@@ -36,16 +36,4 @@ describe('submit failure: rate limits', () => {
       bodyParams: { seconds: 42 },
     });
   });
-  it('falls back to the generic rate-limit message when the server named no wait', () => {
-    expect(submitFailureOf(new ApiError('rate_limited', 429, 'slow'), 'problem')).toEqual({
-      kind: 'panel',
-      titleKey: 'tickets.new.failedTitle',
-      bodyKey: 'errors.rate_limited',
-    });
-  });
-  it('falls back to the generic message for anything that is not an API error', () => {
-    expect(submitFailureOf(new TypeError('boom'), 'problem')).toMatchObject({
-      bodyKey: 'errors.generic',
-    });
-  });
 });

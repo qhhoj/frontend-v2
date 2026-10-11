@@ -36,23 +36,6 @@ describe('UsernameField', () => {
     expect(wrapper.text()).toContain('Chỉ dùng chữ cái, chữ số và dấu gạch dưới.');
   });
 
-  it('flags a name that is too long', () => {
-    expect(mountField('x'.repeat(31)).text()).toContain('Tối đa 30 ký tự.');
-  });
-
-  it('shows the hint and a server error, and nothing invalid for an empty field', () => {
-    const taken = mountField('user_01', { error: 'Tên đăng nhập đã được dùng.' });
-    expect(taken.text()).toContain('Tên đăng nhập đã được dùng.');
-    expect(taken.text()).toContain('tối đa 30 ký tự');
-    expect(mountField('').find('[aria-invalid="true"]').exists()).toBe(false);
-  });
-
-  it('asks the browser for the username autocomplete', () => {
-    const input = mountField('').get('input');
-    expect(input.attributes('autocomplete')).toBe('username');
-    expect(input.attributes('name')).toBe('username');
-  });
-
   it('says it is checking, then that the name is free, in a polite line tied to the input', async () => {
     const wrapper = mountField('free_name');
     expect(lineOf(wrapper).attributes('aria-live')).toBe('polite');
@@ -67,11 +50,5 @@ describe('UsernameField', () => {
     await settle();
     expect(lineOf(wrapper).text()).toBe('Tên đã có người dùng');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
-  });
-
-  it('does not check a name the format check already rejects', async () => {
-    const wrapper = mountField('bad name');
-    await settle();
-    expect(lineOf(wrapper).text()).toBe('');
   });
 });

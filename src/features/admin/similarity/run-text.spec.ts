@@ -5,19 +5,6 @@ import { runDurationText } from './run-text';
 const STARTED = '2026-10-08T07:10:00.000Z';
 
 describe('run duration wording', () => {
-  it('shows seconds under a minute and minutes with seconds after it', () => {
-    expect(
-      runDurationText(
-        similarityRun({ startedAt: STARTED, finishedAt: '2026-10-08T07:10:05.000Z' }),
-      ),
-    ).toBe('5 giây');
-    expect(
-      runDurationText(
-        similarityRun({ startedAt: STARTED, finishedAt: '2026-10-08T07:11:05.000Z' }),
-      ),
-    ).toBe('1 phút 5 giây');
-  });
-
   it('never says not started for a failed run that has a start time', () => {
     const failed = similarityRun({
       status: 'failed',

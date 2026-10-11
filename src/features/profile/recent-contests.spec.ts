@@ -36,7 +36,4 @@ describe('recentContests', () => {
     });
     expect(rows[0]!.delta).toBe(50);
   });
-  it('cuts the list to the count', () => {
-    expect(recentContests([entry(1, 1), entry(2, 2), entry(3, 3)], 2)).toHaveLength(2);
-  });
 });

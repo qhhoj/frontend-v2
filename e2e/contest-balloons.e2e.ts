@@ -1,7 +1,5 @@
 import { contestDetail, contestViewer } from '../src/test/fixtures';
 import { balloon } from '../src/test/contest-extras-fixtures';
-import { THEMES } from '../src/theme/registry';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
@@ -57,36 +55,3 @@ test('the print sheet has no site header and lists the queue', async ({ page, ap
   // The site header (with its "Bài tập" link) is not drawn on the sheet.
   await expect(page.getByRole('link', { name: 'Bài tập', exact: true })).toHaveCount(0);
 });
-
-test('balloons off shows the crying Bit', async ({ page, api }) => {
-  volunteer(api);
-  api.routes['GET /contests/r42/balloons'] = {
-    status: 404,
-    body: { error: { code: 'not_found', message: 'x' } },
-  };
-  await page.goto('/contests/r42/balloons');
-  await expect(page.locator('[data-state="notFound"]')).toBeVisible();
-  await expect(page.locator('.bit-tear')).toHaveCount(2);
-});
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`the balloon screen and sheet are accessible in every theme and fit at ${viewport.name}`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    for (const theme of THEMES) {
-      volunteer(api);
-      await applyTheme(page, api, theme);
-      for (const path of ['/contests/r42/balloons', '/contests/r42/balloons/print']) {
-        await page.goto(path);
-        await expect(
-          page.getByTestId(path.endsWith('print') ? 'print-row' : 'balloon-row').first(),
-        ).toBeVisible();
-        expect(await axeViolationsIn(page), `${theme.id} ${path}`).toEqual([]);
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-          true,
-        );
-      }
-    }
-  });

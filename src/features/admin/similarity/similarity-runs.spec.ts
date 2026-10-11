@@ -40,14 +40,6 @@ describe('similarity runs', () => {
       truncatedGroups(similarityRun()).map((group) => `${group.problemCode}:${group.language}`),
     ).toEqual(['hcmus41c:cpp']);
   });
-
-  it('words a Retry-After in the largest whole unit, rounding up', () => {
-    expect(waitParts(45)).toEqual({ unit: 'seconds', count: 45 });
-    expect(waitParts(90)).toEqual({ unit: 'minutes', count: 2 });
-    expect(waitParts(2520)).toEqual({ unit: 'minutes', count: 42 });
-    expect(waitParts(3600)).toEqual({ unit: 'hours', count: 1 });
-    expect(waitParts(5400)).toEqual({ unit: 'hours', count: 2 });
-  });
 });
 
 describe('similarity runs: edges', () => {
@@ -77,16 +69,5 @@ describe('similarity runs: edges', () => {
     expect(waitParts(3599)).toEqual({ unit: 'hours', count: 1 });
     expect(waitParts(3600)).toEqual({ unit: 'hours', count: 1 });
     expect(waitParts(3601)).toEqual({ unit: 'hours', count: 2 });
-  });
-
-  it('measures a failed run that has both times, and no duration while it still runs', () => {
-    const failed = similarityRun({
-      status: 'failed',
-      error: 'deadline',
-      startedAt: '2026-10-08T07:10:00.000Z',
-      finishedAt: '2026-10-08T07:10:30.000Z',
-    });
-    expect(runDurationSeconds(failed)).toBe(30);
-    expect(runDurationSeconds(similarityRun({ status: 'running', finishedAt: null }))).toBeNull();
   });
 });

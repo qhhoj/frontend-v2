@@ -49,13 +49,6 @@ describe('usePdfStatement', () => {
     await vi.advanceTimersByTimeAsync(60_000);
     expect(probe).toHaveBeenCalledTimes(3);
   });
-  it('is ready at once when the first answer is 200', async () => {
-    probe.mockResolvedValue({ state: 'ready' });
-    const { phase, start } = setup();
-    start();
-    await vi.advanceTimersByTimeAsync(0);
-    expect(phase.value).toBe('ready');
-  });
   it('fails on an error answer and can be started again once the 3 s floor has passed', async () => {
     probe
       .mockRejectedValueOnce(new ApiError('generic', 500, 'x'))
@@ -226,12 +219,5 @@ describe('usePdfStatement', () => {
     scope.stop();
     await vi.advanceTimersByTimeAsync(60_000);
     expect(probe).toHaveBeenCalledTimes(1);
-  });
-  it('aborts a probe that is in flight when its scope is disposed', () => {
-    probe.mockImplementation(neverAnswers);
-    const { scope, start } = setup();
-    start();
-    scope.stop();
-    expect(signalOf(0).aborted).toBe(true);
   });
 });

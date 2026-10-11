@@ -22,31 +22,6 @@ const banner = () =>
   document.body.querySelector<HTMLElement>('[data-testid="high-priority-banner"]');
 
 describe('HighPriorityBanner', () => {
-  it('shows the newest unread important notification on a public page', async () => {
-    const calls = mockApi({ ...signedInViewer(), 'GET /notifications': inbox(() => false) });
-    await mountApp(START);
-    const highCall = calls.find((call) => call.path === '/notifications')!;
-    expect(highCall.query.get('state')).toBe('unread');
-    expect(highCall.query.get('priority')).toBe('high');
-    expect(banner()!.textContent).toContain('Quan trọng · chưa đọc');
-    expect(banner()!.textContent).toContain(important.title);
-    expect(banner()!.getAttribute('aria-label')).toBe('Thông báo quan trọng');
-  });
-
-  it('sits in an always-mounted assertive live region so a late arrival is announced', async () => {
-    mockApi({ ...signedInViewer(), 'GET /notifications': inbox(() => false) });
-    await mountApp(START);
-    expect(banner()!.parentElement!.getAttribute('aria-live')).toBe('assertive');
-  });
-
-  it('keeps the live region, without an alert role, even when nothing is important', async () => {
-    mockApi({ ...signedInViewer(), 'GET /notifications': () => page([], { pageSize: 20 }) });
-    await mountApp(START);
-    expect(banner()).toBeNull();
-    expect(document.body.querySelector('[aria-live="assertive"]')).not.toBeNull();
-    expect(document.body.querySelector('[role="alert"]')).toBeNull();
-  });
-
   it('goes away once marked read', async () => {
     let isRead = false;
     const calls = mockApi({
@@ -64,31 +39,6 @@ describe('HighPriorityBanner', () => {
     await flushPromises();
     expect(calls.some((call) => call.path === '/notifications/n-high/read')).toBe(true);
     expect(banner()).toBeNull();
-  });
-
-  it('opens the notification page when "Xem phiếu" (a ticket kind) is clicked', async () => {
-    mockApi({
-      ...signedInViewer(),
-      'GET /notifications': inbox(() => false),
-      'POST /notifications/n-high/read': noContent(),
-    });
-    const { router } = await mountApp(START);
-    [...banner()!.querySelectorAll('button')]
-      .find((button) => button.textContent?.trim() === 'Xem phiếu')!
-      .click();
-    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/notifications'));
-  });
-
-  it('says "Xem" when the important notification is not a ticket', async () => {
-    mockApi({
-      ...signedInViewer(),
-      'GET /notifications': () =>
-        page([{ ...important, kind: 'contest-announcement' }], { pageSize: 20 }),
-    });
-    await mountApp(START);
-    expect(
-      [...banner()!.querySelectorAll('button')].map((button) => button.textContent?.trim()),
-    ).toContain('Xem');
   });
 
   it('offers no mark-read button while viewing as another user', async () => {

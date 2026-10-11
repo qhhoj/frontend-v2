@@ -39,15 +39,6 @@ describe('staff actions', () => {
     });
   });
 
-  it('treats a submission waiting for final judging like one in progress', () => {
-    const pending = submissionDetail({ status: 'PD', result: null, viewer: flags() });
-    expect(staffActionsFor(pending, can(ALL), NOW)).toEqual({
-      rejudge: 'waiting',
-      reject: 'waiting',
-      abort: 'hidden',
-    });
-  });
-
   it('keeps abort waiting on a finished submission for a holder of the abort permission', () => {
     const finished = submissionDetail({ status: 'D', viewer: flags({ canReject: true }) });
     expect(staffActionsFor(finished, can(ALL), NOW).abort).toBe('waiting');

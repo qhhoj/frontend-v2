@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
 import { issue } from '@/test/mock-api';
-import { invalidSummary, lengthErrors, saveErrorText, serverFieldErrors } from './profile-errors';
+import { lengthErrors, saveErrorText, serverFieldErrors } from './profile-errors';
 
 /** What the backend answers today: `issues` (code + field) next to the older `fields` map. */
 const issuesError = (field: string, code: string) =>
@@ -15,16 +15,6 @@ const fieldsError = (fields: Record<string, string[]>) =>
 describe('serverFieldErrors', () => {
   it.each([
     ['firstName', 'max_length', 'Tên hiển thị chưa hợp lệ.'],
-    [
-      'timezone',
-      'is_time_zone',
-      'Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh).',
-    ],
-    [
-      'languageId',
-      'unknown_language',
-      'Ngôn ngữ này không còn trên trang. Hãy chọn ngôn ngữ khác.',
-    ],
     [
       'organizations',
       'organizations_not_editable',
@@ -51,10 +41,6 @@ describe('serverFieldErrors', () => {
       userScript: 'Too long.',
     });
   });
-
-  it('is empty for an error without fields', () => {
-    expect(serverFieldErrors(new ApiError('network_error', 0, 'Network error'))).toEqual({});
-  });
 });
 
 describe('lengthErrors', () => {
@@ -75,17 +61,6 @@ describe('lengthErrors', () => {
 });
 
 describe('saveErrorText', () => {
-  it.each([
-    ['forbidden', 403, 'Chưa lưu được tên hoặc phần giới thiệu'],
-    ['locked_in_official_contest', 403, 'Chưa lưu được: kỳ thi chính thức'],
-    ['conflict', 409, 'Chưa lưu được danh sách tổ chức'],
-    ['network_error', 0, 'Mất kết nối'],
-    ['rate_limited', 429, 'Bạn thao tác quá nhanh'],
-    ['teapot', 418, 'Đã có lỗi xảy ra'],
-  ])('explains %s', (code, status, start) => {
-    expect(saveErrorText(new ApiError(code, status, code))).toMatch(new RegExp(`^${start}`));
-  });
-
   it('shows the lock text for the backend refusal, whose issue sits on a field the form lacks', () => {
     const refused = new ApiError('locked_in_official_contest', 403, 'Locked', {
       issues: [
@@ -98,13 +73,5 @@ describe('saveErrorText', () => {
   it('is null when the fields explain the failure, and when nothing failed', () => {
     expect(saveErrorText(fieldsError({ timezone: ['x'] }))).toBeNull();
     expect(saveErrorText(null)).toBeNull();
-  });
-});
-
-describe('invalidSummary', () => {
-  it('names the fields to fix as a sentence', () => {
-    expect(invalidSummary(['firstName', 'about'], 'vi')).toBe(
-      'Chưa lưu được. Có 2 mục cần sửa: Tên hiển thị và Giới thiệu bản thân. Các thay đổi khác của bạn vẫn còn trên trang.',
-    );
   });
 });

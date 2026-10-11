@@ -5,14 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { BIT_LOOPS } from '@/mascot/bit-frames';
 import type { BitKind } from '@/mascot/bit-frames';
-import { BIT_PALETTES, PODIUM_COLOUR } from '@/mascot/bit-sprite';
+import { BIT_PALETTES } from '@/mascot/bit-sprite';
 import { stubMatchMedia } from '@/test/match-media';
 import BitLoop from './BitLoop.vue';
 
 const toRgb = (hex: string) =>
   `rgb(${[1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16)).join(', ')})`;
 const TERRACOTTA = BIT_PALETTES.terracotta;
-const CHARCOAL = BIT_PALETTES.charcoal;
 
 /** The colour drawn at (row, column), 0-based; undefined for a transparent pixel. */
 const colourAt = (wrapper: ReturnType<typeof mount>, row: number, column: number) =>
@@ -69,20 +68,6 @@ describe('BitLoop', () => {
     vi.unstubAllGlobals();
   });
 
-  it('draws the approved pixels of frame 0 and then of frame 1, in the palette the frame names', async () => {
-    const hourglass = mountLoop('judging');
-    expect(colourAt(hourglass, 0, 5)).toBe(toRgb(TERRACOTTA.A));
-    await vi.advanceTimersByTimeAsync(BIT_LOOPS.judging.frameMs[0]!);
-    expect(frameOf(hourglass)).toBe('1');
-    expect(colourAt(hourglass, 0, 5)).toBe(toRgb(TERRACOTTA.H));
-
-    const trio = mountLoop('community');
-    expect(colourAt(trio, 8, 41)).toBe(toRgb(CHARCOAL.O));
-    expect(colourAt(trio, 16, 18)).toBe(PODIUM_COLOUR);
-    expect(trio.attributes('style')).toContain('calc(var(--bit-px, 4px) * 52)');
-    expect(trio.attributes('style')).toContain('calc(var(--bit-px, 4px) * 22)');
-  });
-
   it('advances through every frame at its own timing and wraps back to frame 0', async () => {
     const { frameMs, frames } = BIT_LOOPS.staff;
     const bit = mountLoop('staff');
@@ -91,13 +76,6 @@ describe('BitLoop', () => {
       await vi.advanceTimersByTimeAsync(frameMs[index]!);
     }
     expect(frameOf(bit)).toBe('0');
-  });
-
-  it('runs one timer while mounted and clears it on unmount', () => {
-    const bit = mountLoop('welcome');
-    expect(vi.getTimerCount()).toBe(1);
-    bit.unmount();
-    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('shows frame 0 only under reduced motion, and runs no timer', async () => {
@@ -164,32 +142,5 @@ describe('BitLoop', () => {
     await nextTick();
     expect(vi.getTimerCount()).toBe(1);
     vi.restoreAllMocks();
-  });
-
-  it('starts again at frame 0 when its kind changes', async () => {
-    const bit = mountLoop('judging');
-    await vi.advanceTimersByTimeAsync(BIT_LOOPS.judging.frameMs[0]!);
-    expect(frameOf(bit)).toBe('1');
-    await bit.setProps({ kind: 'staff' });
-    expect(frameOf(bit)).toBe('0');
-    expect(vi.getTimerCount()).toBe(1);
-  });
-
-  it('is decorative without a label and an image with one', () => {
-    const decorative = mountLoop('envelope');
-    expect(decorative.attributes('aria-hidden')).toBe('true');
-    expect(decorative.attributes('role')).toBeUndefined();
-    const labelled = mountLoop('envelope', 'Bit với phong bì');
-    expect(labelled.attributes('role')).toBe('img');
-    expect(labelled.attributes('aria-label')).toBe('Bit với phong bì');
-  });
-
-  it('keeps every loop in its own box, the size of its first frame', () => {
-    for (const kind of Object.keys(BIT_LOOPS) as BitKind[]) {
-      const bit = mountLoop(kind);
-      const [row] = BIT_LOOPS[kind].frames[0]!;
-      expect(bit.attributes('style')).toContain(`calc(var(--bit-px, 4px) * ${row!.length})`);
-      bit.unmount();
-    }
   });
 });

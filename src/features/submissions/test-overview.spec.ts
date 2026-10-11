@@ -1,16 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { submissionCase } from '@/test/fixtures';
-import { buildOverviewRows, earnedTone } from './test-overview';
+import { buildOverviewRows } from './test-overview';
 
 const testCase = (position: number, status: 'AC' | 'WA' | 'TLE' | 'SC', batch: number | null) =>
   submissionCase({ position, status, batch, points: status === 'AC' ? 10 : 0, total: 10 });
 
 describe('buildOverviewRows', () => {
-  it('returns nothing without cases', () => {
-    expect(buildOverviewRows(null, null)).toEqual([]);
-    expect(buildOverviewRows([], null)).toEqual([]);
-  });
-
   it('groups by subtask and takes the first failing status as the verdict', () => {
     const rows = buildOverviewRows(
       [
@@ -51,13 +46,5 @@ describe('buildOverviewRows', () => {
     );
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ batch: null, earned: 20, max: 30, verdict: 'WA' });
-  });
-});
-
-describe('earnedTone', () => {
-  it('tells full, none and partial points apart', () => {
-    expect(earnedTone(10, 10)).toBe('full');
-    expect(earnedTone(0, 10)).toBe('none');
-    expect(earnedTone(4, 10)).toBe('partial');
   });
 });

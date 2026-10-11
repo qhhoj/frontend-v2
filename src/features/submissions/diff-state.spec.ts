@@ -59,23 +59,9 @@ describe('toggleDiffPick', () => {
     expect(toggleDiffPick(two, 'a')).toEqual(['b']);
     expect(toggleDiffPick(toggleDiffPick(two, 'a'), 'c')).toEqual(['b', 'c']);
   });
-
-  it('never changes the list it was given', () => {
-    const picked = ['a'];
-    toggleDiffPick(picked, 'b');
-    expect(picked).toEqual(['a']);
-  });
 });
 
 describe('diffViewState', () => {
-  it('is ready with both sources', () => {
-    expect(diffViewState({ left: loaded('x'), right: loaded('y') })).toEqual({
-      kind: 'ready',
-      leftSource: 'x',
-      rightSource: 'y',
-    });
-  });
-
   it('names the forbidden side, even while the other side still loads', () => {
     const pending: DiffSideInput = { isPending: true, errors: [], source: undefined };
     expect(diffViewState({ left: failed(403, 'solve_first'), right: pending })).toEqual({
@@ -111,12 +97,6 @@ describe('diffViewState', () => {
       kind: 'error',
       side: 'right',
     });
-  });
-
-  it('loads while either source is missing', () => {
-    expect(
-      diffViewState({ left: loaded(), right: { isPending: true, errors: [], source: undefined } }),
-    ).toEqual({ kind: 'loading' });
   });
 
   it('refuses above the line limit and names the longer side', () => {

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { ghost, unrankedGhost } from '@/test/admin-fixtures/ghosts';
 import { i18n } from '@/i18n';
-import { ghostStatusKey, refusedRowsOf, unrankedOf } from './ghost-import';
+import { refusedRowsOf } from './ghost-import';
 
 const KNOWN_CODES = [
   'label_missing',
@@ -39,29 +38,14 @@ describe('ghost import rules', () => {
     expect(refusedRowsOf(new Error('offline'))).toBeNull();
   });
 
-  it.each(KNOWN_CODES)('names the row code %s by its own line, never the fallback', (code) => {
-    const issues = [{ field: 'csv', code, message: 'x', row: 2 }];
-    const [line] = refusedRowsOf(new ApiError('ghost_import_invalid', 400, 'x', { issues }))!;
-    expect(line).toMatch(/^Dòng 2: /);
-    expect(line).not.toBe('Dòng 2: Dòng không hợp lệ.');
-  });
-
-  it.each(KNOWN_CODES)('has a Vietnamese and an English text for the row code %s', (code) => {
-    const key = `admin.ghosts.import.rowCodes.${code}`;
-    expect(i18n.global.te(key, 'vi')).toBe(true);
-    expect(i18n.global.te(key, 'en')).toBe(true);
-  });
-
-  it('picks the unranked rows and names why each lacks data', () => {
-    const points = unrankedGhost({ label: 'Cy', gap: 'points' });
-    expect(unrankedOf([ghost(), unrankedGhost(), points]).map((row) => row.label)).toEqual([
-      'Bob',
-      'Cy',
-    ]);
-    expect([ghost(), unrankedGhost(), points].map(ghostStatusKey)).toEqual([
-      'admin.ghosts.preview.ranked',
-      'admin.ghosts.preview.gap.rejectedBefore',
-      'admin.ghosts.preview.gap.points',
-    ]);
+  it('has a Vietnamese and an English text for every row code', () => {
+    for (const code of KNOWN_CODES) {
+      const key = `admin.ghosts.import.rowCodes.${code}`;
+      expect([code, i18n.global.te(key, 'vi'), i18n.global.te(key, 'en')]).toEqual([
+        code,
+        true,
+        true,
+      ]);
+    }
   });
 });

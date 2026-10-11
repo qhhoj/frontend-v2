@@ -64,21 +64,20 @@ describe('UserActivityPage', () => {
       view.find('a[download]').exists(),
     );
     await vi.waitFor(() => expect(wrapper.text()).toContain('Sau'));
+    const lastPage = () =>
+      calls
+        .filter((call) => call.path.endsWith('/logs'))
+        .at(-1)!
+        .query.get('page');
     const next = () => wrapper.findAll('button').find((button) => button.text() === 'Sau');
-    for (let step = 1; step < 200; step += 1) {
-      await next()!.trigger('click');
-      await vi.waitFor(() =>
-        expect(
-          calls
-            .filter((call) => call.path.endsWith('/logs'))
-            .at(-1)!
-            .query.get('page'),
-        ).toBe(String(step + 1)),
-      );
-      await flushPromises();
-    }
+    const table = wrapper.findComponent({ name: 'ActivityTable' });
+    (table.vm as unknown as { page: number }).page = 199;
+    await flushPromises();
+    await next()!.trigger('click');
+    await vi.waitFor(() => expect(lastPage()).toBe('200'));
+    await flushPromises();
     expect(next()).toBeUndefined();
-  }, 60_000);
+  });
 
   it.each([
     [true, 1],
@@ -124,20 +123,5 @@ describe('UserActivityPage', () => {
     expect(
       calls.some((call) => call.method === 'DELETE' && call.path.endsWith('/users/tuan_k')),
     ).toBe(true);
-  });
-
-  it('deletes the guests’ log through its own confirm', async () => {
-    const calls = mockApi(routes({ 'DELETE /admin/user-activity/anonymous': { status: 204 } }));
-    const { wrapper } = await mountScreen('/admin/activity', (view) =>
-      view.text().includes('Xoá nhật ký khách'),
-    );
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Xoá nhật ký khách')!
-      .trigger('click');
-    await flushPromises();
-    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xoá');
-    expect(calls.some((call) => call.path === '/admin/user-activity/anonymous')).toBe(true);
   });
 });

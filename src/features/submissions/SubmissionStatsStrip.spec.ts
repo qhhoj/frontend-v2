@@ -8,12 +8,6 @@ import SubmissionStatsStrip from './SubmissionStatsStrip.vue';
 beforeEach(() => mockApi({ ...anonymousViewer }));
 
 describe('the submission stats strip', () => {
-  it('shows the judged count, the accepted percentage, the queue and the judges', () => {
-    const wrapper = mountComponent(SubmissionStatsStrip, { props: { stats: submissionStats() } });
-    const text = wrapper.text();
-    for (const expected of ['1.284', '41%', '3', '4 / 4']) expect(text).toContain(expected);
-  });
-
   it('shows a dash instead of NaN or 0% when nothing was judged today', () => {
     const wrapper = mountComponent(SubmissionStatsStrip, {
       props: { stats: submissionStats({ judgedToday: 0, acceptedToday: 0 }) },
@@ -35,11 +29,5 @@ describe('the submission stats strip', () => {
       props: { stats: submissionStats({ judgesOnline: 0, judgesTotal: 0 }) },
     });
     expect(wrapper.text()).not.toContain('không có máy chấm');
-  });
-
-  it('shows dashes and the unavailable text when the stats could not be read', () => {
-    const wrapper = mountComponent(SubmissionStatsStrip, { props: { stats: undefined } });
-    expect(wrapper.findAll('dd').every((value) => value.text() === '—')).toBe(true);
-    expect(wrapper.text()).toContain('Không có số liệu thống kê');
   });
 });

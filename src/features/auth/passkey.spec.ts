@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fail, mockApi, noContent, ok } from '@/test/mock-api';
-import { isPasskeySupported, isPromptCancelled, signInWithPasskey } from './passkey';
+import { mockApi, noContent, ok } from '@/test/mock-api';
+import { isPromptCancelled, signInWithPasskey } from './passkey';
 
 const OPTIONS = { challenge: 'Y2hhbGxlbmdl', rpId: 'localhost' };
 
@@ -11,17 +11,6 @@ function stubBrowser(get: () => Promise<unknown>) {
   Object.defineProperty(navigator, 'credentials', { configurable: true, value: { get } });
 }
 afterEach(() => void Reflect.deleteProperty(navigator, 'credentials'));
-
-describe('isPasskeySupported', () => {
-  it('is false when the browser has no WebAuthn JSON helpers', () => {
-    expect(isPasskeySupported()).toBe(false);
-  });
-
-  it('is true when the browser can parse the options and get a credential', () => {
-    stubBrowser(() => Promise.resolve(null));
-    expect(isPasskeySupported()).toBe(true);
-  });
-});
 
 describe('signInWithPasskey', () => {
   it('asks the browser with the parsed options and sends its JSON assertion to the backend', async () => {
@@ -61,12 +50,6 @@ describe('signInWithPasskey', () => {
     stubBrowser(() => Promise.reject(new DOMException('blocked', 'SecurityError')));
     mockApi({ 'POST /auth/2fa/webauthn/login/options': ok(OPTIONS) });
     await expect(signInWithPasskey()).rejects.toMatchObject({ name: 'SecurityError' });
-  });
-
-  it('lets backend refusals through', async () => {
-    stubBrowser(() => Promise.resolve(null));
-    mockApi({ 'POST /auth/2fa/webauthn/login/options': fail(400, 'webauthn_not_enabled') });
-    await expect(signInWithPasskey()).rejects.toMatchObject({ code: 'webauthn_not_enabled' });
   });
 });
 

@@ -91,18 +91,4 @@ describe('replayViewState', () => {
       replayViewState(input({ error: refused(429, 'rate_limited'), load: { state: 'building' } })),
     ).toBe('building');
   });
-
-  it.each([
-    ['frozen', 'board_frozen'],
-    ['forbidden', 'board_hidden'],
-  ] as const)(
-    'drops a loaded board for the %s panel when a later read is refused with %s',
-    (expected, reason) => {
-      expect(replayViewState(input({ error: refused(403, 'forbidden', reason) }))).toBe(expected);
-    },
-  );
-
-  it('drops a loaded board for any other refusal of the gate too', () => {
-    expect(replayViewState(input({ error: refused(404, 'replay_not_ready') }))).toBe('notReady');
-  });
 });

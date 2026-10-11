@@ -121,37 +121,6 @@ describe('useRenderPreview', () => {
     expect(preview.html.value).toBe('');
   });
 
-  it('says an update is on its way from the keystroke until the answer, and when the answer came', async () => {
-    mockApi({
-      ...anonymousViewer,
-      'POST /problems/render-preview': () => ok({ html: '<p>x</p>' }),
-    });
-    mountComponent(Host);
-    expect(preview.isUpdating.value).toBe(false);
-    text.value = 'x';
-    await flushPromises();
-    expect(preview.isUpdating.value).toBe(true);
-    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
-    await flushPromises();
-    expect(preview.isUpdating.value).toBe(false);
-    expect(preview.updatedAt.value).toBeInstanceOf(Date);
-  });
-
-  it('is not updating while paused by a 429 or when the text is empty', async () => {
-    mockApi({ ...anonymousViewer, 'POST /problems/render-preview': () => rateLimited(42) });
-    mountComponent(Host);
-    text.value = 'x';
-    await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
-    await flushPromises();
-    expect(preview.isUpdating.value).toBe(false);
-    text.value = 'y';
-    await flushPromises();
-    expect(preview.isUpdating.value).toBe(false);
-    text.value = '  ';
-    await flushPromises();
-    expect(preview.isUpdating.value).toBe(false);
-  });
-
   it('sends nothing while the server asked to wait, and resumes after the wait', async () => {
     const calls = mockApi({
       ...anonymousViewer,

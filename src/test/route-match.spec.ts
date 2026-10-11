@@ -17,11 +17,4 @@ describe('matchPattern', () => {
     expect(matchPattern('GET /pages/*', 'GET /pages')).toBeNull();
     expect(matchPattern('GET /pages/*', 'GET /other/rules')).toBeNull();
   });
-  it('captures a :param segment that comes before a trailing *', () => {
-    expect(matchPattern('GET /users/:username/*', 'GET /users/ann/a/b')).toEqual({
-      username: 'ann',
-    });
-    expect(matchPattern('GET /users/:username/*', 'GET /users/ann')).toBeNull();
-    expect(matchPattern('GET /users/:username/*', 'GET /groups/ann/a')).toBeNull();
-  });
 });

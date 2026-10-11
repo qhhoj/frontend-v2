@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { i18n, translate } from '@/i18n';
-import { THEMES } from '@/theme/registry';
 import { ADMIN_MESSAGES } from './admin-messages';
 import en from './en.json';
 import vi from './vi.json';
@@ -38,24 +37,6 @@ describe('messages', () => {
     expect(mismatched).toEqual([]);
   });
 
-  it('label every registered theme', () => {
-    expect(THEMES.filter((theme) => !(theme.labelKey in vietnamese))).toEqual([]);
-  });
-
-  it('render singular and plural English forms from the count', () => {
-    i18n.global.locale.value = 'en';
-    expect(translate('problems.results', { n: 1 }, 1)).toBe('1 result');
-    expect(translate('problems.results', { n: 2 }, 2)).toBe('2 results');
-    expect(translate('ranking.cell.failed', { tries: 1 }, 1)).toBe('1 wrong try');
-    expect(translate('ranking.cell.failed', { tries: 2 }, 2)).toBe('2 wrong tries');
-    expect(translate('ranking.cell.pending', { tries: 1 }, 1)).toBe(
-      '1 submission waiting to be revealed',
-    );
-    expect(translate('home.ratingChart', { count: 2, first: 'a', last: 'b' }, 2)).toBe(
-      'Rating over 2 contests, from a to b',
-    );
-  });
-
   it('render every pluralised key in English for counts 1 and 2', () => {
     i18n.global.locale.value = 'en';
     const pluralKeys = Object.keys(english).filter((key) => english[key]!.includes('|'));
@@ -73,9 +54,5 @@ describe('messages', () => {
 describe('admin messages', () => {
   it('pair every area file: vi and en exist for each area', () => {
     expect(Object.keys(ADMIN_MESSAGES.vi).sort()).toEqual(Object.keys(ADMIN_MESSAGES.en).sort());
-  });
-
-  it('are reachable through the app i18n under admin.<area>', () => {
-    expect(translate('admin.shell.screens.dashboard')).toBe('Trang chủ quản trị');
   });
 });

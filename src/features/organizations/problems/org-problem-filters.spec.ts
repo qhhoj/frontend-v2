@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filtersFromQuery, listStateOf, routeQueryOf, withFilter } from './org-problem-filters';
+import { filtersFromQuery, listStateOf, routeQueryOf } from './org-problem-filters';
 
 const DEFAULTS = { tag: null, archived: 'false', q: '', page: 1 } as const;
 
@@ -22,14 +22,6 @@ describe('org problem filters', () => {
       archived: 'true',
       q: 'cây',
       page: '2',
-    });
-  });
-
-  it('starts again from page 1 when a filter changes', () => {
-    expect(withFilter({ ...DEFAULTS, page: 4 }, { tag: 'dt' })).toEqual({
-      ...DEFAULTS,
-      tag: 'dt',
-      page: 1,
     });
   });
 

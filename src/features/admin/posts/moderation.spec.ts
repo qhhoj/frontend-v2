@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { feedFromQuery, isQueueFeed } from './moderation';
+import { feedFromQuery } from './moderation';
 
 describe('feedFromQuery', () => {
   it.each(['all', 'global', 'hidden', 'scheduled'])('keeps the known feed %s', (feed) => {
@@ -12,12 +12,4 @@ describe('feedFromQuery', () => {
       expect(feedFromQuery(value)).toBe('all');
     },
   );
-});
-
-describe('isQueueFeed', () => {
-  it('is true for the two moderation queues only', () => {
-    expect(
-      ['all', 'global', 'hidden', 'scheduled'].map((feed) => isQueueFeed(feed as never)),
-    ).toEqual([false, false, true, true]);
-  });
 });

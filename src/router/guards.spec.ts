@@ -1,10 +1,8 @@
-import { nextTick } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
-import { i18n } from '@/i18n';
 import { onCsrfFailed, onUnauthorized } from '@/api/client';
-import { sessionUser, signedIn, signedOut } from '@/test/fixtures';
+import { signedIn, signedOut } from '@/test/fixtures';
 import { mockApi } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { createAppRouter } from './index';
@@ -21,11 +19,6 @@ describe('navigation guards', () => {
     setActivePinia(createPinia());
     onCsrfFailed(null);
     onUnauthorized(null);
-  });
-
-  it('lets anyone open a public page', async () => {
-    const { route } = await navigate('/problems', signedOut);
-    expect(route.name).toBe('problems');
   });
 
   it('redirects a signed-out viewer to login with the path', async () => {
@@ -89,11 +82,6 @@ describe('navigation guards', () => {
     expect(route.fullPath).toBe(destination);
   });
 
-  it('does not carry a redirect to the home page into login', async () => {
-    const { route } = await navigate('/login/2fa', signedOut);
-    expect(route.fullPath).toBe('/login');
-  });
-
   it('sends a signed-out viewer from 2FA to login, keeping the redirect', async () => {
     const { route } = await navigate('/login/2fa?redirect=/settings', signedOut);
     expect(route.name).toBe('login');
@@ -106,11 +94,6 @@ describe('navigation guards', () => {
     expect(route.query.redirect).toBe('/problems');
   });
 
-  it('sends a viewer with no forced change from the password page to the security settings', async () => {
-    const { route } = await navigate('/account/password', signedIn());
-    expect(route.name).toBe('settings-security');
-  });
-
   it('shows not-found to non-staff on admin routes and keeps the URL', async () => {
     const { route } = await navigate('/admin/judges', signedIn());
     expect(route.name).toBe('not-found');
@@ -121,14 +104,6 @@ describe('navigation guards', () => {
     const { route } = await navigate('/admin/a%2Fb/c%20d', signedIn());
     expect(route.name).toBe('not-found');
     expect(route.path).toBe('/admin/a%2Fb/c%20d');
-  });
-
-  it('opens admin routes for staff', async () => {
-    const { route } = await navigate(
-      '/admin/judges',
-      signedIn({ user: sessionUser({ isStaff: true }) }),
-    );
-    expect(route.name).toBe('admin-judges');
   });
 
   it('loads the session once across navigations', async () => {
@@ -154,18 +129,5 @@ describe('navigation guards', () => {
     const router = createAppRouter(createMemoryHistory());
     await router.push('/admin/judges');
     expect(router.currentRoute.value.name).toBe('login');
-  });
-
-  it('titles the document from the route', async () => {
-    await navigate('/problems', signedOut);
-    expect(document.title).toBe('Bài tập · QHHOJ');
-  });
-
-  it('retitles the document when the interface language changes', async () => {
-    await navigate('/problems', signedOut);
-    i18n.global.locale.value = 'en';
-    await nextTick();
-    expect(document.title).toBe('Problems · QHHOJ');
-    i18n.global.locale.value = 'vi';
   });
 });

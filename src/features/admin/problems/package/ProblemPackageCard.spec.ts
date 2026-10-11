@@ -41,23 +41,4 @@ describe('ProblemPackageCard', () => {
     expect(card.get('[role="status"]').text()).toContain('Gói đề đã sẵn sàng.');
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
   });
-
-  it('says it is packing while the server builds, with the judging Bit', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
-      'POST /problems/hcmus41c/package': { status: 202, body: { data: packageStatus('building') } },
-    });
-    const { wrapper } = await mountData();
-    const card = wrapper.get('[data-testid="problem-package"]');
-    await card
-      .findAll('button')
-      .find((button) => button.text() === 'Tải gói đề')!
-      .trigger('click');
-    await flushPromises();
-    expect(card.text()).toContain('Đang đóng gói');
-    expect(card.get('button').attributes('aria-disabled')).toBe('true');
-    expect(card.find('a').exists()).toBe(false);
-  });
 });

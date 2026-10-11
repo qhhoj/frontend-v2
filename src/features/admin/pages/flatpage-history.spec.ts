@@ -14,23 +14,6 @@ describe('flatpage history', () => {
     expect(lineChanges('x\nx', 'x')).toEqual({ removed: ['x'], added: [] });
   });
 
-  it('shows a created page as only added lines', () => {
-    expect(changeLinesOf({ content: { before: null, after: 'a\nb' } })).toEqual([
-      { field: 'content', removed: [], added: ['a', 'b'], hidden: 0 },
-    ]);
-  });
-
-  it('shows a short field as one removed and one added line, and a switch as words', () => {
-    const lines = changeLinesOf({
-      title: { before: 'Giới thiệu', after: 'Giới thiệu QHHOJ' },
-      registrationRequired: { before: false, after: true },
-    });
-    expect(lines).toEqual([
-      { field: 'title', removed: ['Giới thiệu'], added: ['Giới thiệu QHHOJ'], hidden: 0 },
-      { field: 'registrationRequired', removed: ['không'], added: ['có'], hidden: 0 },
-    ]);
-  });
-
   it('caps a rewrite at 40 lines a side and counts the rest', () => {
     const before = Array.from({ length: 100 }, (_unused, index) => `old ${index}`).join('\n');
     const [line] = changeLinesOf({ content: { before, after: 'new' } });

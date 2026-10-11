@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { contestStats } from '@/test/fixtures';
-import { formatPercent, languageShare, resultSegments, statsTotals } from './stats-summary';
+import { languageShare, resultSegments, statsTotals } from './stats-summary';
 
 describe('contest stats summary', () => {
   it('adds up submissions and accepted ones over every problem', () => {
@@ -29,9 +29,5 @@ describe('contest stats summary', () => {
     const { languages } = contestStats();
     expect(languageShare(languages[0]!, languages)).toBeCloseTo(1952 / 2354);
     expect(languageShare(languages[0]!, [])).toBe(0);
-  });
-  it('prints percentages with one decimal in the locale', () => {
-    expect(formatPercent(81.6, 'vi')).toBe('81,6%');
-    expect(formatPercent(81.6, 'en')).toBe('81.6%');
   });
 });

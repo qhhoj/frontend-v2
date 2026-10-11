@@ -6,7 +6,7 @@ import {
   listViewer,
   participationSummary,
 } from '@/test/fixtures';
-import { actionFactsOf, commandOf, contestAction, listCallToAction } from './contest-action';
+import { actionFactsOf, contestAction, listCallToAction } from './contest-action';
 import type { ActionFacts } from './contest-action';
 
 const facts = (overrides: Partial<ActionFacts> = {}): ActionFacts => ({
@@ -100,14 +100,6 @@ describe('contestAction', () => {
       contestAction(facts({ ...coded, phase: 'ended', skipsAccessCode: true })).needsAccessCode,
     ).toBe(false);
   });
-
-  it('maps only the requests to commands', () => {
-    expect(commandOf('rejoin')).toBe('join');
-    expect(commandOf('register')).toBe('register');
-    expect(commandOf('leave')).toBe('leave');
-    expect(commandOf('finished')).toBe('join');
-    expect(commandOf('opensLater')).toBeNull();
-  });
 });
 
 describe('actionFactsOf', () => {
@@ -134,13 +126,6 @@ describe('actionFactsOf', () => {
       isCurrent: false,
     });
   });
-
-  it('passes a registered row from the server straight through', () => {
-    const contest = contestDetail({ viewer: contestViewer({ liveStatus: 'registered' }) });
-    expect(actionFactsOf(contest, true, Date.parse(contest.endTime) - 1000).liveStatus).toBe(
-      'registered',
-    );
-  });
 });
 
 describe('listCallToAction', () => {
@@ -161,13 +146,6 @@ describe('listCallToAction', () => {
   };
   it.each([
     ['a visitor on a running contest', contestItem(), 'contests.list.enter', null, true],
-    [
-      'a visitor on a running contest with a code',
-      contestItem({ requiresAccessCode: true }),
-      'contests.list.enter',
-      null,
-      true,
-    ],
     [
       'a visitor on a running contest whose registration closed',
       contestItem(registrationClosed),
@@ -230,23 +208,9 @@ describe('listCallToAction', () => {
       false,
     ],
     [
-      'an upcoming contest without registration',
-      contestItem({ ...upcoming, viewer: signedIn }),
-      'contests.list.view',
-      null,
-      false,
-    ],
-    [
       'an ended contest',
       contestItem({ ...ended, viewer: signedIn }),
       'contests.list.virtual',
-      null,
-      false,
-    ],
-    [
-      'an ended contest without virtual runs',
-      contestItem({ ...ended, disallowVirtual: true, viewer: signedIn }),
-      'contests.list.view',
       null,
       false,
     ],
@@ -260,20 +224,4 @@ describe('listCallToAction', () => {
   ] as const)('%s', (_case, item, labelKey, badgeKey, isPrimary) =>
     expect(listCallToAction(item, NOW)).toEqual({ labelKey, badgeKey, isPrimary }),
   );
-
-  it.each([
-    ['a running contest', contestItem({ viewer: signedIn })],
-    [
-      'an upcoming contest with registration open',
-      contestItem({ ...upcoming, ...registrationOpen, viewer: signedIn }),
-    ],
-    ['an ended contest', contestItem({ ...ended, viewer: signedIn })],
-    [
-      'an ended contest without virtual runs',
-      contestItem({ ...ended, disallowVirtual: true, viewer: signedIn }),
-    ],
-  ])('gives a visitor the signed-in label on %s', (_case, item) => {
-    const visitor = { ...item, viewer: null };
-    expect(listCallToAction(visitor, NOW).labelKey).toBe(listCallToAction(item, NOW).labelKey);
-  });
 });

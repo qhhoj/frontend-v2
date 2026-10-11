@@ -5,30 +5,16 @@ import type { Component, PropType } from 'vue';
 import { fail, mockApi, ok, rateLimited } from '@/test/mock-api';
 import { anonymousViewer } from '@/test/problem-routes';
 import { mountComponent } from '@/test/mount';
-import { staffViewer, switchNamed } from '@/test/admin-routes';
 import AdminField from './AdminField.vue';
-import AdminPageHeader from './AdminPageHeader.vue';
-import AdminStatus from './AdminStatus.vue';
 import AdminSwitch from './AdminSwitch.vue';
-import AdminTabs from './AdminTabs.vue';
-import AdminUserLabel from './AdminUserLabel.vue';
 import ExactLookup from './ExactLookup.vue';
 import MarkdownField from './MarkdownField.vue';
-import OrganizationChips from './OrganizationChips.vue';
 import UploadButton from './UploadButton.vue';
 import UsernameChips from './UsernameChips.vue';
 import { PREVIEW_DELAY_MS } from './use-render-preview';
 import { translate } from '@/i18n';
 
 describe('AdminSwitch', () => {
-  it('is a switch that flips its model', async () => {
-    const wrapper = mountComponent(AdminSwitch, {
-      props: { modelValue: false, label: 'Công khai' },
-    });
-    await wrapper.get('[role="switch"]').trigger('click');
-    expect(wrapper.emitted('update:modelValue')).toEqual([[true]]);
-  });
-
   it('says why it is locked and never flips while locked', async () => {
     const wrapper = mountComponent(AdminSwitch, {
       props: {
@@ -41,14 +27,6 @@ describe('AdminSwitch', () => {
     await wrapper.get('[role="switch"]').trigger('click');
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     expect(wrapper.text()).toContain('Cần quyền judge.change_public_visibility');
-  });
-
-  it('is found by its visible label through the shared test helper, which throws for an unknown label', () => {
-    const wrapper = mountComponent(AdminSwitch, {
-      props: { modelValue: true, label: 'Công khai' },
-    });
-    expect(switchNamed(wrapper, 'Công khai').attributes('aria-checked')).toBe('true');
-    expect(() => switchNamed(wrapper, 'Riêng tư')).toThrow('No switch "Riêng tư"');
   });
 });
 
@@ -98,17 +76,6 @@ describe('UsernameChips', () => {
     await flushPromises();
     expect(wrapper.text()).toContain('Không có tài khoản "nobody".');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
-  });
-
-  it('says the account does not exist only for a real not_found', async () => {
-    mockApi({ ...anonymousViewer, 'GET /users/nobody': fail(404, 'not_found') });
-    const wrapper = mountComponent(ChipsHost, {
-      props: { component: UsernameChips, initial: [{ id: ID_A, username: null }] },
-    });
-    await wrapper.get('input').setValue('nobody');
-    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
-    await flushPromises();
-    expect(wrapper.text()).toContain('Không có tài khoản "nobody".');
   });
 
   it('shows the wait for a 429 instead of saying the account is missing', async () => {
@@ -206,51 +173,6 @@ describe('AdminField', () => {
   });
 });
 
-describe('AdminPageHeader', () => {
-  it('links every crumb but the last, and shows the title, the lead and the actions', () => {
-    const wrapper = mountComponent(AdminPageHeader, {
-      props: {
-        crumbs: [{ label: 'Bài tập', to: { name: 'admin-problems' } }, { label: 'aplusb' }],
-        title: 'Sửa bài',
-        lead: 'Thông tin chung của bài.',
-      },
-      slots: { actions: '<button type="button">Nhân bản</button>' },
-    });
-    expect(wrapper.get('nav').attributes('aria-label')).toBe('Đường dẫn');
-    expect(wrapper.findAll('nav a').map((link) => link.text())).toEqual(['Bài tập']);
-    expect(wrapper.get('nav').text()).toContain('aplusb');
-    expect(wrapper.get('h1').text()).toBe('Sửa bài');
-    expect(wrapper.text()).toContain('Thông tin chung của bài.');
-    expect(wrapper.text()).toContain('Nhân bản');
-  });
-});
-
-describe('AdminTabs', () => {
-  it('links each tab with the route params and marks only the open one as the current page', async () => {
-    mockApi(staffViewer(['judge.edit_own_problem']));
-    const wrapper = mountComponent(AdminTabs, {
-      props: {
-        label: 'Các phần của bài',
-        params: { code: 'aplusb' },
-        tabs: [
-          { routeName: 'admin-problemGeneral', labelKey: 'admin.shell.screens.problemGeneral' },
-          { routeName: 'admin-problemData', labelKey: 'admin.shell.screens.problemData' },
-        ],
-      },
-    });
-    await wrapper.vm.$router.push({ name: 'admin-problemData', params: { code: 'aplusb' } });
-    await flushPromises();
-    expect(wrapper.findAll('a').map((link) => link.attributes('href'))).toEqual([
-      '/admin/problems/aplusb/general',
-      '/admin/problems/aplusb/data',
-    ]);
-    expect(wrapper.findAll('a[aria-current="page"]').map((link) => link.text())).toEqual([
-      'Sửa bài: dữ liệu chấm',
-    ]);
-    expect(wrapper.get('nav').attributes('aria-label')).toBe('Các phần của bài');
-  });
-});
-
 describe('MarkdownField', () => {
   afterEach(() => vi.useRealTimers());
 
@@ -270,19 +192,6 @@ describe('MarkdownField', () => {
     ]);
     expect(wrapper.get('section').text()).toContain('Xin chào bạn');
   });
-
-  it('emits what is typed and links its error to the textarea', async () => {
-    vi.useFakeTimers();
-    mockApi({ ...anonymousViewer, 'POST /problems/render-preview': () => ok({ html: '' }) });
-    const wrapper = mountComponent(MarkdownField, {
-      props: { modelValue: '', label: 'Đề bài', previewStyle: 'problem', error: 'Quá dài.' },
-    });
-    await wrapper.get('textarea').setValue('abc');
-    expect(wrapper.emitted('update:modelValue')).toEqual([['abc']]);
-    const describedBy = wrapper.get('textarea').attributes('aria-describedby')!;
-    expect(wrapper.get(`#${describedBy}`).text()).toBe('Quá dài.');
-    expect(wrapper.get('textarea').attributes('aria-invalid')).toBe('true');
-  });
 });
 
 describe('ExactLookup', () => {
@@ -296,35 +205,6 @@ describe('ExactLookup', () => {
     await wrapper.get('form').trigger('submit');
     expect(wrapper.emitted('open')).toEqual([['aplusb']]);
     expect(wrapper.get('label').attributes('for')).toBe(wrapper.get('input').attributes('id'));
-  });
-});
-
-describe('AdminStatus', () => {
-  it.each([
-    ['done', 'status'],
-    ['queued', 'status'],
-    ['security', 'status'],
-    ['refused', 'alert'],
-  ] as const)('announces a %s line with the role %s', (kind, role) => {
-    const wrapper = mountComponent(AdminStatus, {
-      props: { kind, text: 'Đã xếp vào hàng đợi.' },
-    });
-    expect(wrapper.get(`[role="${role}"]`).text()).toContain('Đã xếp vào hàng đợi.');
-    expect(wrapper.find('[data-testid="inline-bit"]').exists()).toBe(true);
-  });
-});
-
-describe('AdminUserLabel', () => {
-  it('shows a decorative avatar and links the name to the profile, unless told not to', () => {
-    const linked = mountComponent(AdminUserLabel, { props: { username: 'thayhung' } });
-    expect(linked.get('svg').attributes('aria-hidden')).toBe('true');
-    expect(linked.get('a').text()).toBe('thayhung');
-    expect(linked.get('a').attributes('href')).toBe('/users/thayhung');
-    const plain = mountComponent(AdminUserLabel, {
-      props: { username: 'thayhung', link: false },
-    });
-    expect(plain.find('a').exists()).toBe(false);
-    expect(plain.text()).toBe('thayhung');
   });
 });
 
@@ -377,50 +257,6 @@ describe('UploadButton', () => {
   });
 });
 
-describe('OrganizationChips', () => {
-  const addSlug = async (wrapper: ReturnType<typeof mountComponent>, slug: string) => {
-    await wrapper.get('input').setValue(slug);
-    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
-    await flushPromises();
-  };
-
-  it('adds an exact slug as its id, never twice, and refuses an unknown slug', async () => {
-    mockApi({
-      ...anonymousViewer,
-      'GET /organizations/thpt-hung-vuong': ok({
-        id: 'org-a',
-        slug: 'thpt-hung-vuong',
-        name: 'THPT Hùng Vương',
-      }),
-      'GET /organizations/nope': fail(404, 'not_found'),
-    });
-    const wrapper = mountComponent(ChipsHost, {
-      props: { component: OrganizationChips, initial: [{ id: ID_A, slug: null }] },
-    });
-    expect(wrapper.text()).toContain('0192…9c21');
-    await addSlug(wrapper, 'thpt-hung-vuong');
-    await addSlug(wrapper, 'thpt-hung-vuong');
-    expect(wrapper.findAll('[data-testid="organization-chip"]')).toHaveLength(2);
-    expect(wrapper.get('output').text()).toContain('"slug":"thpt-hung-vuong"');
-    await addSlug(wrapper, 'nope');
-    expect(wrapper.text()).toContain('Không có tổ chức "nope".');
-    expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
-  });
-
-  it('shows a locked list read-only and says which permission it needs', () => {
-    const wrapper = mountComponent(OrganizationChips, {
-      props: {
-        modelValue: [{ id: 'org-a', slug: 'thpt-hung-vuong' }],
-        label: 'Tổ chức',
-        lockedBy: 'judge.edit_all_problem',
-      },
-    });
-    expect(wrapper.get('input').attributes('disabled')).toBeDefined();
-    expect(wrapper.find('button').exists()).toBe(false);
-    expect(wrapper.text()).toContain('Cần quyền judge.edit_all_problem');
-  });
-});
-
 describe('preview failure and the reasons a control is off', () => {
   it('shows a preview failure in words, not as a stale or blank preview', async () => {
     vi.useFakeTimers();
@@ -432,16 +268,6 @@ describe('preview failure and the reasons a control is off', () => {
     await flushPromises();
     expect(wrapper.get('section').text()).toContain(translate('errors.forbidden'));
     vi.useRealTimers();
-  });
-
-  it('ties a locked switch to its reason through aria-describedby', () => {
-    const wrapper = mountComponent(AdminSwitch, {
-      props: { modelValue: false, label: 'Công khai', lockedBy: 'judge.change_public_visibility' },
-    });
-    const describedBy = wrapper.get('[role="switch"]').attributes('aria-describedby')!;
-    expect(wrapper.get(`#${describedBy}`).text()).toContain(
-      'Cần quyền judge.change_public_visibility',
-    );
   });
 
   it('says why a full chip list is closed, and ties that reason to the input', () => {

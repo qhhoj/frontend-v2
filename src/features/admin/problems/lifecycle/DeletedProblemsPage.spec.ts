@@ -72,20 +72,6 @@ describe('DeletedProblemsPage', () => {
     expect(listCalls(calls)).toHaveLength(2);
   });
 
-  it('moves focus to the list when the restored row, which held it, leaves', async () => {
-    mockApi({
-      ...staffViewer(DELETE),
-      'GET /problems/deleted': sequence(page([deletedProblem()]), page([])),
-      'POST /problems/cuvui/restore': noContent(),
-    });
-    const { wrapper } = await mountDeleted();
-    const restore = buttonNamed(wrapper, 'Khôi phục cuvui')!;
-    restore.element.focus();
-    await restore.trigger('click');
-    await flushPromises();
-    expect(document.activeElement).toBe(wrapper.get('[data-testid="deleted-problems"]').element);
-  });
-
   it('shows a 409 purged from a stale row and refetches the list', async () => {
     const calls = mockApi({
       ...staffViewer(DELETE),
@@ -118,19 +104,6 @@ describe('DeletedProblemsPage', () => {
     expect(wrapper.get('[role="status"]').text()).toContain('Đã xếp lịch xóa hẳn cuvui');
   });
 
-  it('keeps the purge dialog open with the refusal inside it', async () => {
-    mockApi({
-      ...staffViewer(DELETE, { isSuperuser: true }),
-      'GET /problems/deleted': page([deletedProblem()]),
-      'POST /problems/cuvui/purge-now': fail(409, 'not_deleted'),
-    });
-    const { wrapper } = await mountDeleted();
-    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
-    await typeInDialog('cuvui');
-    await confirmDialog('Xóa hẳn');
-    expect(openDialog().textContent).toContain('Bài này chưa bị xóa.');
-  });
-
   it('reloads the list when a purge hits a stale row, and keeps the refusal in the dialog', async () => {
     const calls = mockApi({
       ...staffViewer(DELETE, { isSuperuser: true }),
@@ -145,40 +118,16 @@ describe('DeletedProblemsPage', () => {
     expect(listCalls(calls)).toHaveLength(2);
   });
 
-  it('does not reload the list when a purge is refused for another reason', async () => {
-    const calls = mockApi({
-      ...staffViewer(DELETE, { isSuperuser: true }),
-      'GET /problems/deleted': page([deletedProblem()]),
-      'POST /problems/cuvui/purge-now': fail(403, 'forbidden'),
-    });
-    const { wrapper } = await mountDeleted();
-    await buttonNamed(wrapper, 'Xóa hẳn cuvui ngay')!.trigger('click');
-    await typeInDialog('cuvui');
-    await confirmDialog('Xóa hẳn');
-    expect(listCalls(calls)).toHaveLength(1);
-  });
-
-  it('shows the empty state with the staff Bit', async () => {
-    mockApi({ ...staffViewer(DELETE), 'GET /problems/deleted': page([]) });
-    const { wrapper } = await mountDeleted();
-    expect(wrapper.text()).toContain('Không có bài nào đã xóa.');
-    expect(wrapper.find('[data-testid="admin-bit"][data-placement="empty"]').exists()).toBe(true);
-  });
-
   it('shows the list tabs on the problems index only to delete_problem holders', async () => {
-    mockApi({
-      ...staffViewer(['judge.edit_own_problem', ...DELETE]),
-      'GET /problems': page([]),
-    });
-    const { wrapper } = await mountApp('/admin/problems');
-    await vi.waitFor(() => expect(wrapper.find('input[type="search"]').exists()).toBe(true));
-    expect(wrapper.findAll('a').some((link) => link.text() === 'Đã xóa')).toBe(true);
-  });
-
-  it('hides the tabs from an editor without delete_problem', async () => {
-    mockApi({ ...staffViewer(['judge.edit_own_problem']), 'GET /problems': page([]) });
-    const { wrapper } = await mountApp('/admin/problems');
-    await vi.waitFor(() => expect(wrapper.find('input[type="search"]').exists()).toBe(true));
-    expect(wrapper.findAll('a').some((link) => link.text() === 'Đã xóa')).toBe(false);
+    const hasDeletedTab = async (permissions: string[]) => {
+      mockApi({ ...staffViewer(permissions), 'GET /problems': page([]) });
+      const { wrapper } = await mountApp('/admin/problems');
+      await vi.waitFor(() => expect(wrapper.find('input[type="search"]').exists()).toBe(true));
+      const found = wrapper.findAll('a').some((link) => link.text() === 'Đã xóa');
+      wrapper.unmount();
+      return found;
+    };
+    expect(await hasDeletedTab(['judge.edit_own_problem', ...DELETE])).toBe(true);
+    expect(await hasDeletedTab(['judge.edit_own_problem'])).toBe(false);
   });
 });

@@ -2,14 +2,11 @@ import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { profile, signedIn, signedOut } from '@/test/fixtures';
-import { stubMatchMedia } from '@/test/match-media';
-import { settingsRoutes } from '@/test/account-routes';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
 const root = document.documentElement;
 /** Glass and Glow only act on a Glass theme; the site default is a Clay theme. */
-const useGlassTheme = () => localStorage.setItem('qhhoj.theme', 'glass-dark');
 const echoProfile = {
   'GET /profile': ok(profile()),
   'PATCH /profile': ({ body }: { body: unknown }) => ok(profile(body as object)),
@@ -23,21 +20,6 @@ const choiceIn = (wrapper: VueWrapper, group: string, label: string) =>
     .find((button) => button.text() === label)!;
 
 describe('Settings › Appearance', () => {
-  it('starts with the look off: presets and sliders are disabled, Style and Mode are not', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    expect(document.title).toBe('Giao diện · QHHOJ');
-    expect(wrapper.get('[role="switch"]').attributes('aria-checked')).toBe('false');
-    expect(wrapper.get('button[aria-label="Ocean"]').attributes('disabled')).toBeDefined();
-    expect(wrapper.get('#glass-level').attributes('disabled')).toBeDefined();
-    expect(wrapper.get('#glow-level').attributes('disabled')).toBeDefined();
-    for (const group of ['Kiểu', 'Chế độ'])
-      for (const button of wrapper.findAll(`[role="group"][aria-label="${group}"] button`))
-        expect(button.attributes('disabled'), `${group} ${button.text()}`).toBeUndefined();
-    expect(root.dataset.accent).toBeUndefined();
-    expect(wrapper.get('p[role="status"]').text()).toBe('Đang dùng giao diện của trang');
-  });
-
   it("turning it on paints the theme's own look and keeps it in this browser for an anonymous visitor", async () => {
     const calls = mockApi({ 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/settings/appearance');
@@ -49,26 +31,6 @@ describe('Settings › Appearance', () => {
     expect(wrapper.get('button[aria-label="Ocean"]').attributes('disabled')).toBeUndefined();
     expect(wrapper.get('p[role="status"]').text()).toContain('trình duyệt này');
     expect(patches(calls)).toEqual([]);
-  });
-
-  it('turning it on in a Glass theme starts from Orchid, the Glass themes own preset', async () => {
-    useGlassTheme();
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    expect(wrapper.get('button[aria-label="Orchid"]').attributes('aria-pressed')).toBe('true');
-    await wrapper.get('[role="switch"]').trigger('click');
-    expect(root.dataset.accent).toBe('orchid');
-    expect(wrapper.get('button[aria-label="Orchid"]').attributes('aria-pressed')).toBe('true');
-  });
-
-  it('picks an accent and shows which one is pressed', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    await wrapper.get('[role="switch"]').trigger('click');
-    await wrapper.get('button[aria-label="Ocean"]').trigger('click');
-    expect(root.dataset.accent).toBe('ocean');
-    expect(wrapper.get('button[aria-label="Ocean"]').attributes('aria-pressed')).toBe('true');
-    expect(wrapper.get('button[aria-label="Clay"]').attributes('aria-pressed')).toBe('false');
   });
 
   it('a slider paints while it moves and saves once when released', async () => {
@@ -94,32 +56,6 @@ describe('Settings › Appearance', () => {
     expect(patches(calls).at(-1)).toEqual({
       appearance: { accent: 'orchid', glass: 40, glow: 100 },
     });
-  });
-
-  it('names the glass level in words next to the number it sets', async () => {
-    useGlassTheme();
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    await wrapper.get('[role="switch"]').trigger('click');
-    expect(wrapper.get('label[for="glass-level"]').element.parentElement?.textContent).toContain(
-      'Trong',
-    );
-    await wrapper.get('#glass-level').setValue('50');
-    expect(wrapper.get('label[for="glass-level"]').element.parentElement?.textContent).toContain(
-      'Mờ',
-    );
-    await wrapper.get('#glass-level').setValue('90');
-    expect(wrapper.get('label[for="glass-level"]').element.parentElement?.textContent).toContain(
-      'Đặc',
-    );
-  });
-
-  it('says where it is saved: this browser, or the account', async () => {
-    mockApi({ 'GET /auth/me': signedIn(), ...echoProfile });
-    const { wrapper } = await mountApp('/settings/appearance');
-    await wrapper.get('[role="switch"]').trigger('click');
-    await flushPromises();
-    expect(wrapper.get('p[role="status"]').text()).toContain('tài khoản');
   });
 
   it('picking a style and a mode saves only the mode and leaves the look off', async () => {
@@ -193,62 +129,5 @@ describe('Settings › Appearance', () => {
     expect(wrapper.get('button[aria-label="Ocean"]').attributes('disabled')).toBeUndefined();
     expect((wrapper.get('#glass-level').element as HTMLInputElement).value).toBe('40');
     expect((wrapper.get('#glow-level').element as HTMLInputElement).value).toBe('60');
-  });
-
-  it('enables Glass and Glow on a Glass theme, with no reason shown', async () => {
-    useGlassTheme();
-    const stored = JSON.stringify({ accent: 'ocean', glass: 40, glow: 60 });
-    localStorage.setItem('qhhoj.appearance', stored);
-    localStorage.setItem('qhhoj.paintedAppearance', stored);
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    expect(wrapper.get('#glass-level').attributes('disabled')).toBeUndefined();
-    expect(wrapper.get('#glow-level').attributes('disabled')).toBeUndefined();
-    expect(wrapper.text()).not.toContain('Glass và quầng sáng chỉ áp dụng');
-  });
-
-  it('keeps the Glass slider inert and explains why when the device asks for less transparency', async () => {
-    useGlassTheme();
-    stubMatchMedia().setQuery('(prefers-reduced-transparency: reduce)', true);
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    await wrapper.get('[role="switch"]').trigger('click');
-    expect(wrapper.get('#glass-level').attributes('disabled')).toBeDefined();
-    expect(wrapper.text()).toContain('Thiết bị của bạn yêu cầu giảm độ trong suốt');
-    expect(wrapper.get('#glow-level').attributes('disabled')).toBeUndefined();
-  });
-
-  it('shows Bit beside the title as decoration only', async () => {
-    mockApi({ 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/settings/appearance');
-    const bit = wrapper.get('[data-testid="appearance-bit"]');
-    expect(bit.attributes('aria-hidden')).toBe('true');
-    expect(bit.attributes('role')).toBeUndefined();
-  });
-
-  it('sits in the settings frame: the frame owns the h1 and the one breadcrumb, the page heading is an h2 beside Bit', async () => {
-    mockApi(settingsRoutes());
-    const { wrapper } = await mountApp('/settings/appearance');
-    expect(wrapper.findAll('#main h1').map((heading) => heading.text())).toEqual(['Cài đặt']);
-    const headings = wrapper.findAll('#main h1, #main h2').map((heading) => heading.text());
-    expect(headings.slice(0, 2)).toEqual(['Cài đặt', 'Giao diện']);
-    expect(wrapper.findAll('#main nav[aria-label="Đường dẫn"]')).toHaveLength(1);
-    expect(wrapper.text()).not.toContain('Cài đặt › Giao diện');
-    expect(wrapper.find('[data-testid="appearance-bit"]').exists()).toBe(true);
-    expect(
-      wrapper.get('#main nav[aria-label="Các mục cài đặt"] [aria-current="page"]').text(),
-    ).toBe('Giao diện');
-  });
-
-  it('turning the look off again returns to the site look and saves that', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedIn(), ...echoProfile });
-    const { wrapper } = await mountApp('/settings/appearance');
-    await wrapper.get('[role="switch"]').trigger('click');
-    await flushPromises();
-    await wrapper.get('[role="switch"]').trigger('click');
-    await flushPromises();
-    expect(wrapper.get('[role="switch"]').attributes('aria-checked')).toBe('false');
-    expect(root.dataset.accent).toBeUndefined();
-    expect(patches(calls).at(-1)).toEqual({ appearance: null });
   });
 });

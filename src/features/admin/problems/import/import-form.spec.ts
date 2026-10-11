@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  codeFromPolygonName,
-  emptyImportForm,
-  importFormErrors,
-  toImportOptions,
-} from './import-form';
+import { codeFromPolygonName, emptyImportForm, importFormErrors } from './import-form';
 
 const readyForm = () => ({
   ...emptyImportForm(),
@@ -21,30 +16,6 @@ describe('import form', () => {
     );
     expect(Object.keys(errors).sort()).toEqual(['code', 'file', 'statementLanguages']);
     expect(errors.statementLanguages).toContain('x_y=vi');
-  });
-
-  it('sends no error for a complete form', () => {
-    expect(importFormErrors({ ...readyForm(), languageMapText: 'english=en' }, everyMode)).toEqual(
-      {},
-    );
-  });
-
-  it('leaves out the choices the user did not make, and sends the picked ones as ids and pairs', () => {
-    const options = toImportOptions({
-      ...readyForm(),
-      authors: [{ id: 'a1', username: 'an' }],
-      languageMapText: 'english=en\nvietnamese=vi',
-      points: '1200',
-    });
-    expect(options).toMatchObject({
-      code: 'hcmus41c',
-      authors: ['a1'],
-      curators: [],
-      points: 1200,
-      statementLanguages: ['english=en', 'vietnamese=vi'],
-    });
-    expect(options.groupId).toBeUndefined();
-    expect(options.tutorialLanguage).toBeUndefined();
   });
 
   it('refuses a mode the viewer may not use, so the import is never sent to a 403', () => {

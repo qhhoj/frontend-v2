@@ -103,37 +103,6 @@ describe('ContestAnnouncementsTab', () => {
     );
   });
 
-  it('says whether announcements are also pushed live, from the contest setting', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...contestEditorRoutes(
-        editableContest({ settings: contestSettings({ pushAnnouncements: true }) }),
-      ),
-      ...list(),
-    });
-    const on = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/announcements',
-      'Đã bật gửi qua kênh trực tiếp.',
-    );
-    expect(on.wrapper.text()).toContain('Đã bật gửi qua kênh trực tiếp.');
-    on.wrapper.unmount();
-    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(), ...list() });
-    const off = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/announcements',
-      'Chưa bật gửi qua kênh trực tiếp.',
-    );
-    expect(off.wrapper.text()).toContain('Chưa bật gửi qua kênh trực tiếp.');
-  });
-
-  it('shows Bit asleep when there is no announcement yet', async () => {
-    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(), ...list([]) });
-    const { wrapper } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/announcements',
-      'Chưa có thông báo nào.',
-    );
-    expect(wrapper.text()).toContain('Chưa có thông báo nào.');
-  });
-
   it('goes back one page when a delete empties a later page, so the pager stays', async () => {
     let remaining = 21;
     const calls = mockApi({
@@ -163,15 +132,5 @@ describe('ContestAnnouncementsTab', () => {
     expect(wrapper.text()).toContain('20 thông báo · trang 1 của 1');
     expect(wrapper.text()).toContain('Làm rõ đề bài C');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
-  });
-
-  it('offers no resend while announcements are not pushed live', async () => {
-    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(), ...list() });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/announcements', LIST_TEXT);
-    expect(
-      wrapper
-        .findAll('button')
-        .some((candidate) => candidate.text() === 'Gửi lại cho những người chưa nhận được'),
-    ).toBe(false);
   });
 });

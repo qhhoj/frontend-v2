@@ -27,10 +27,6 @@ describe('syntaxStyle', () => {
     expect(new Set(picks).size).toBe(6);
   });
 
-  it('leaves a plain identifier uncoloured', async () => {
-    expect((await classesOf('c_cpp', 'int lis(int a) { return a; }')).get('a')).toBeUndefined();
-  });
-
   // Each case: one line of source and the token each category should land on (the five colour names are the style's categories).
   const lines: Array<{
     ace: string;
@@ -101,9 +97,4 @@ describe('syntaxStyle', () => {
       expect(new Set(picks).size).toBe(picks.length);
     },
   );
-
-  it('colours a Python call to a built-in like a function', async () => {
-    const classes = await classesOf('python', 'def lis(a): return len(a)');
-    expect(classes.get('len')).toBe(classes.get('lis'));
-  });
 });

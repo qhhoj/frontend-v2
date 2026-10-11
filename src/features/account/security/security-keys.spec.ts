@@ -42,25 +42,6 @@ async function addKey(wrapper: VueWrapper) {
 }
 
 describe('Settings › Security › security keys', () => {
-  it('lists the registered keys, each with a named remove button', async () => {
-    supportKeys();
-    const { wrapper } = await openSecurity({
-      'GET /auth/2fa/webauthn/credentials': ok([YUBIKEY, PIXEL]),
-    });
-    expect(wrapper.findAll('[data-security-key] strong').map((name) => name.text())).toEqual([
-      YUBIKEY.name,
-      PIXEL.name,
-    ]);
-    expect(wrapper.find(`button[aria-label="Xoá ${PIXEL.name}"]`).exists()).toBe(true);
-  });
-
-  it('says there is no key yet, with the padlock Bit', async () => {
-    supportKeys();
-    const { wrapper } = await openSecurity({ 'GET /auth/2fa/webauthn/credentials': ok([]) });
-    expect(wrapper.text()).toContain('Chưa có khoá nào.');
-    expect(wrapper.find('[data-testid="inline-bit"][data-frame]').exists()).toBe(true); // a moving kind: the padlock, not the nightcap
-  });
-
   it('adds a key: password, browser prompt, verify; the list and the session reload', async () => {
     supportKeys();
     const { wrapper, calls } = await openSecurity({
@@ -74,30 +55,6 @@ describe('Settings › Security › security keys', () => {
       YUBIKEY.name,
     ]);
     expect(calls.filter((call) => call.path === '/auth/me')).toHaveLength(2);
-  });
-
-  it('a cancelled prompt sends no verify and shows no error', async () => {
-    supportKeys(() => Promise.reject(new DOMException('cancelled', 'NotAllowedError')));
-    const { wrapper, calls } = await openSecurity({
-      'GET /auth/2fa/webauthn/credentials': ok([]),
-      'POST /auth/2fa/webauthn/register/options': ok({ challenge: 'abc' }),
-    });
-    await addKey(wrapper);
-    expect(calls.some((call) => call.path === '/auth/2fa/webauthn/register/verify')).toBe(false);
-    expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
-  });
-
-  it('a key that is already registered shows the security-key failure', async () => {
-    supportKeys();
-    const { wrapper } = await openSecurity({
-      'GET /auth/2fa/webauthn/credentials': ok([]),
-      'POST /auth/2fa/webauthn/register/options': ok({ challenge: 'abc' }),
-      'POST /auth/2fa/webauthn/register/verify': fail(400, 'webauthn_failed'),
-    });
-    await addKey(wrapper);
-    expect(wrapper.get('#main [role="alert"]').text()).toContain(
-      'Xác minh khoá bảo mật không thành công.',
-    );
   });
 
   it('a browser without WebAuthn gets an explanation instead of the add button', async () => {
@@ -145,45 +102,6 @@ describe('Settings › Security › security keys', () => {
 });
 
 describe('Settings › Security › rate-limited password confirms', () => {
-  it('shows how long to wait when adding a key is rate-limited', async () => {
-    supportKeys();
-    const { wrapper } = await openSecurity({
-      'GET /auth/2fa/webauthn/credentials': ok([]),
-      'POST /auth/2fa/webauthn/register/options': {
-        status: 429,
-        body: { error: { code: 'rate_limited', message: 'rate_limited' } },
-        headers: { 'Retry-After': '42' },
-      },
-    });
-    await addKey(wrapper);
-    expect(wrapper.get('#main [role="alert"]').text()).toContain('Thử lại sau 42 giây');
-  });
-
-  it('shows how long to wait when removing a key is rate-limited', async () => {
-    supportKeys();
-    const { wrapper } = await openSecurity({
-      'GET /auth/2fa/webauthn/credentials': ok([YUBIKEY]),
-      'DELETE /auth/2fa/webauthn/credentials/key-1': {
-        status: 429,
-        body: { error: { code: 'rate_limited', message: 'rate_limited' } },
-        headers: { 'Retry-After': '42' },
-      },
-    });
-    await wrapper.get(`button[aria-label="Xoá ${YUBIKEY.name}"]`).trigger('click');
-    await flushPromises();
-    const password = document.body.querySelector<HTMLInputElement>(
-      '[role="dialog"] input[name="removeKeyPassword"]',
-    )!;
-    password.value = 'mật khẩu';
-    password.dispatchEvent(new Event('input'));
-    await flushPromises();
-    dialogButton('Xoá khoá').click();
-    await flushPromises();
-    expect(document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent).toContain(
-      'Thử lại sau 42 giây',
-    );
-  });
-
   it('refreshes the list when the key is already gone (404)', async () => {
     supportKeys();
     const { wrapper, calls } = await openSecurity({

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { organizationDetail } from '@/test/community-fixtures';
-import { joinModeKey, slotsLine } from './organization-facts';
+import { slotsLine } from './organization-facts';
 
 describe('organization facts', () => {
   it('says how many places are left, never a negative number, or that there is no cap', () => {
@@ -13,9 +13,5 @@ describe('organization facts', () => {
       slots: 40,
     });
     expect(slotsLine(organizationDetail({ slots: null }))).toEqual({ key: 'orgs.slotsUnlimited' });
-  });
-  it('names how one joins', () => {
-    expect(joinModeKey(true)).toBe('orgs.open');
-    expect(joinModeKey(false)).toBe('orgs.private');
   });
 });

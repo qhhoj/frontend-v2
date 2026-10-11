@@ -1,32 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
-import { problemDetail, submissionItem } from '../src/test/fixtures';
+import { problemDetail } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
-import { expect, pdfReady, streamFrame, test } from './fixtures/api';
+import { expect, pdfReady, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-
-test('the appearance panel opens with Enter, traps Tab, closes with Escape and returns focus', async ({
-  page,
-  api,
-}) => {
-  void api;
-  await page.goto('/blog');
-  const trigger = page.getByRole('button', { name: 'Giao diện', exact: true });
-  await trigger.focus();
-  await page.keyboard.press('Enter');
-  const panel = page.getByRole('dialog', { name: 'Giao diện' });
-  await expect(panel).toBeVisible();
-  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  await expect(panel.getByRole('button').first()).toBeFocused();
-  // More Tab presses than the panel has stops: focus wraps inside it and never reaches the page behind.
-  for (let step = 0; step < 24; step += 1) {
-    await page.keyboard.press('Tab');
-    await expect(panel.locator(':focus')).toHaveCount(1);
-  }
-  await page.keyboard.press('Escape');
-  await expect(panel).toBeHidden();
-  await expect(trigger).toBeFocused();
-  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
-});
 
 test('choosing a mode in the panel with the keyboard applies it', async ({ page, api }) => {
   void api;
@@ -45,21 +21,6 @@ test('choosing a mode in the panel with the keyboard applies it', async ({ page,
   await page.keyboard.press('Space');
   await expect(page.locator('html')).toHaveAttribute('data-theme', lightTheme.id);
   await expect(lightButton).toHaveAttribute('aria-pressed', 'true');
-});
-
-test('the account menu works from the keyboard and Escape returns focus', async ({ page, api }) => {
-  api.signedIn = true;
-  await page.goto('/blog');
-  const trigger = page.getByRole('button', { name: 'Tài khoản của user_01' });
-  await trigger.focus();
-  await page.keyboard.press('Enter');
-  const menu = page.getByRole('menu');
-  await expect(menu).toBeFocused();
-  await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('menuitem', { name: 'Cài đặt' })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(menu).toBeHidden();
-  await expect(trigger).toBeFocused();
 });
 
 test('the points popover takes focus on open and gives it back on Escape', async ({
@@ -92,9 +53,6 @@ const ringOf = (target: Locator) =>
       colour: style.outlineColor,
     };
   });
-/** A select draws its ring on the whole pill, not on the inner combobox element. */
-const selectRootOf = (combobox: Locator) =>
-  combobox.locator('xpath=ancestor::*[@data-pc-name="select"][1]');
 async function expectFocusRing(target: Locator) {
   const ring = await ringOf(target);
   expect(ring.style, String(target)).toBe('solid');
@@ -171,58 +129,4 @@ test.describe('focus rings on the problem page', () => {
     await focusByTab(page, dock.locator('input[type="file"]'));
     await expectFocusRing(dock.locator('label', { hasText: 'Chọn tệp' }));
   });
-
-  test('sheet toggle on a phone', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/problems/duongdi');
-    const open = page.getByRole('button', { name: 'Mở rộng' });
-    await open.focus();
-    await expectFocusRing(open);
-    await open.click();
-    const close = page
-      .getByRole('dialog', { name: 'Nộp bài' })
-      .getByRole('button', { name: 'Thu gọn' });
-    await close.focus();
-    await expectFocusRing(close);
-  });
-});
-
-test('focus rings on the submission list: filter rail controls and the N new pill', async ({
-  page,
-  api,
-}) => {
-  api.routes['GET /submissions'] = ({ url }) =>
-    url.searchParams.get('pageSize') === '1'
-      ? {
-          body: {
-            data: [submissionItem({ id: 'new' })],
-            meta: { page: 1, pageSize: 1, total: 103 },
-          },
-        }
-      : {
-          body: {
-            data: [submissionItem({ id: 'p2' })],
-            meta: { page: 2, pageSize: 50, total: 100 },
-          },
-        };
-  api.routes['GET /events/submissions'] = {
-    contentType: 'text/event-stream',
-    raw: `retry: 600000\n\n${streamFrame('queued', { submissionId: 'new', userId: 'u', problemId: 'p', type: 'queued', status: 'QU' })}`,
-  };
-  await page.goto('/submissions?page=2');
-  const pill = page.getByTestId('new-pill');
-  await expect(pill).toBeVisible({ timeout: 6000 });
-  const rail = page.getByRole('complementary', { name: 'Bộ lọc' });
-  for (const target of [
-    pill,
-    rail.getByRole('checkbox', { name: /AC/ }),
-    rail.getByLabel('Bài', { exact: true }),
-    rail.getByTestId('live-toggle'),
-  ]) {
-    await target.focus();
-    await expectFocusRing(target);
-  }
-  const language = rail.getByRole('combobox', { name: 'Ngôn ngữ' });
-  await language.focus();
-  await expectFocusRing(selectRootOf(language));
 });

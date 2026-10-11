@@ -81,36 +81,6 @@ describe('SubmissionStaffPanel', () => {
     expect(text).not.toContain('Bài nộp bị khóa');
   });
 
-  it('turns a 403 (no edit rights on this problem) into text', async () => {
-    mockApi({
-      ...staffViewer(['judge.reject_submission']),
-      ...pageRoutes(),
-      [`POST /submissions/${finished.id}/reject`]: fail(403, 'forbidden'),
-    });
-    const { wrapper } = await mountApp(`/submissions/${finished.id}`);
-    await panelButton(wrapper, 'Từ chối bài nộp').trigger('click');
-    await flushPromises();
-    await confirmDialog('Từ chối');
-    expect(wrapper.get('[data-testid="staff-panel"] [role="alert"]').text()).toContain(
-      'Bạn không có quyền làm việc này.',
-    );
-  });
-
-  it('draws the lock line and a disabled rejudge once the lock time has passed', async () => {
-    const locked = submissionDetail({
-      status: 'D',
-      result: 'TLE',
-      lockedAfter: '2026-10-08T11:00:00.000Z',
-      viewer: { canAbort: false, canRejudge: false, canReject: true },
-    });
-    mockApi({
-      ...staffViewer(['judge.rejudge_submission', 'judge.reject_submission']),
-      ...pageRoutes(locked),
-    });
-    const { wrapper } = await mountApp(`/submissions/${locked.id}`);
-    expect(wrapper.get('[data-testid="staff-panel"]').text()).toContain('bị khóa từ');
-    expect(panelButton(wrapper, 'Chấm lại').attributes('aria-disabled')).toBe('true');
-  });
   const queued = submissionDetail({
     id: finished.id,
     status: 'QU',

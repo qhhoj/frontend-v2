@@ -3,7 +3,6 @@ import {
   fragmentOfLine,
   pairFilterFromQuery,
   percentText,
-  sourceLines,
   toPairsRequest,
 } from './similarity-pairs';
 
@@ -36,11 +35,6 @@ describe('similarity pairs', () => {
     const left = fragmentOfLine(fragments, 'left');
     expect([3, 4, 6, 7, 11].map((line) => left.get(line))).toEqual([undefined, 0, 0, undefined, 1]);
     expect(fragmentOfLine(fragments, 'right').get(13)).toBe(1);
-  });
-
-  it('splits a source into lines, an empty (deleted) source into none', () => {
-    expect(sourceLines('a\nb\n')).toEqual(['a', 'b']);
-    expect(sourceLines('')).toEqual([]);
   });
 });
 

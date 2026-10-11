@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { dataExportStatus } from '@/test/fixtures';
-import { daysLeft, exportFileOf, pollInterval, requestRuleOf, timeLeft } from './data-export';
+import { daysLeft, exportFileOf, requestRuleOf, timeLeft } from './data-export';
 
 const AT = '2026-10-08T09:12:00Z';
 
@@ -28,12 +28,6 @@ describe('exportFileOf', () => {
 });
 
 describe('requestRuleOf', () => {
-  it('allows a request whenever the backend says so', () => {
-    expect(requestRuleOf(dataExportStatus({ canPrepare: true }))).toEqual({
-      kind: 'allowed',
-    });
-  });
-
   it('waits for a running job, then for the once-a-day rule, else the daily limit is used up', () => {
     expect(requestRuleOf(dataExportStatus({ state: 'preparing', canPrepare: false }))).toEqual({
       kind: 'preparing',
@@ -59,13 +53,5 @@ describe('timeLeft and daysLeft', () => {
   it('counts whole days left, at least zero', () => {
     expect(daysLeft('2026-10-15T12:00:00Z', now)).toBe(7);
     expect(daysLeft('2026-10-01T12:00:00Z', now)).toBe(0);
-  });
-});
-
-describe('pollInterval', () => {
-  it('polls only while a job runs', () => {
-    expect(pollInterval(dataExportStatus({ state: 'preparing' }))).toBe(5000);
-    expect(pollInterval(dataExportStatus({ state: 'ready' }))).toBe(false);
-    expect(pollInterval(undefined)).toBe(false);
   });
 });

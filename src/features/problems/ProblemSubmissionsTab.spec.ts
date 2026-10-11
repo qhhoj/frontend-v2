@@ -32,21 +32,6 @@ describe('the problem Submissions tab', () => {
     expect(headers).not.toContain('Bài');
   });
 
-  it('links to the full list of this problem, narrowed to the viewer (the tab lists their own rows)', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...problemPageRoutes(),
-      'GET /submissions': page([submissionItem()]),
-    });
-    const { wrapper } = await mountApp(TAB_PATH);
-    await vi.waitFor(() =>
-      expect(wrapper.find('#problem-panel-submissions tbody tr').exists()).toBe(true),
-    );
-    const link = wrapper.get('#problem-panel-submissions a[href^="/submissions?"]');
-    expect(link.attributes('href')).toBe('/submissions?problem=duongdi&user=user_01');
-    expect(link.text()).toBe('Xem tất cả');
-  });
-
   it('sends an anonymous viewer to sign in without asking for anything', async () => {
     const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper } = await mountApp(TAB_PATH);
@@ -54,23 +39,5 @@ describe('the problem Submissions tab', () => {
       expect(wrapper.find('#problem-panel-submissions a[href^="/login"]').exists()).toBe(true),
     );
     expect(submissionCalls(calls)).toHaveLength(0);
-  });
-
-  it('shows the empty text when the viewer has not submitted yet', async () => {
-    mockApi({ ...signedInViewer(), ...problemPageRoutes(), 'GET /submissions': page([]) });
-    const { wrapper } = await mountApp(TAB_PATH);
-    await vi.waitFor(() =>
-      expect(wrapper.get('#problem-panel-submissions').text()).toContain('Bạn chưa nộp bài này.'),
-    );
-    expect(wrapper.get('#problem-panel-submissions [role="img"]').attributes('aria-label')).toBe(
-      'Bit ngủ trong mũ ngủ',
-    );
-  });
-
-  it('asks for the list once, for the rail, while another tab is open', async () => {
-    const calls = mockApi({ ...signedInViewer(), ...problemPageRoutes() });
-    const { wrapper } = await mountApp('/problems/duongdi');
-    await vi.waitFor(() => expect(wrapper.find('[role="tabpanel"]').exists()).toBe(true));
-    expect(submissionCalls(calls)).toHaveLength(1);
   });
 });

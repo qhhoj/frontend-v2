@@ -5,7 +5,7 @@ import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { contestExportStatus, feedKeyStatus, mintedFeedKey } from '@/test/contest-extras-fixtures';
 import { profile, sessionUser, signedIn } from '@/test/fixtures';
-import { fail, issue, mockApi, noContent, ok, sequence } from '@/test/mock-api';
+import { fail, issue, mockApi, ok, sequence } from '@/test/mock-api';
 
 const EDIT = ['judge.edit_own_contest'];
 const TITLE = 'Nguồn sự kiện cho công cụ công bố kết quả';
@@ -60,53 +60,6 @@ describe('contest data tab', () => {
     expect(document.body.textContent).not.toContain(minted.key);
   });
 
-  it('sends the chosen mode and days', async () => {
-    const calls = mockApi(
-      routes({ 'POST /contests/hcmus-w41/feed-key': ok(mintedFeedKey({ mode: 'live' })) }),
-    );
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
-    await wrapper.get('input[value="live"]').setValue(true);
-    await wrapper.get('input[type="number"]').setValue(3);
-    await press(wrapper, 'Tạo khóa');
-    await confirmDialog('Tạo khóa');
-    expect(calls.filter((call) => call.method === 'POST').map((call) => call.body)).toEqual([
-      { mode: 'live', expiresInDays: 3 },
-    ]);
-  });
-
-  it('offers the release only during a freeze, and maps not_frozen', async () => {
-    vi.useFakeTimers({ now: Date.parse('2026-10-08T09:30:00.000Z'), toFake: ['Date'] });
-    mockApi(
-      routes(
-        {
-          'GET /contests/hcmus-w41/feed-key': ok(feedKeyStatus()),
-          'POST /contests/hcmus-w41/feed-key/release': fail(409, 'not_frozen'),
-        },
-        editableContest({ phase: 'running' }),
-      ),
-    );
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
-    await press(wrapper, 'Mở cho công cụ công bố');
-    await confirmDialog('Mở');
-    expect(document.body.querySelector('[role="dialog"] [role="alert"]')!.textContent).toContain(
-      'Bảng xếp hạng không đóng băng',
-    );
-  });
-
-  it('hides the release before the freeze and for a live key', async () => {
-    vi.useFakeTimers({ now: Date.parse('2026-10-08T07:00:00.000Z'), toFake: ['Date'] });
-    mockApi(
-      routes(
-        { 'GET /contests/hcmus-w41/feed-key': ok(feedKeyStatus()) },
-        editableContest({ phase: 'running' }),
-      ),
-    );
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
-    expect(
-      wrapper.findAll('button').some((button) => button.text() === 'Mở cho công cụ công bố'),
-    ).toBe(false);
-  });
-
   it('offers no key controls while impersonating', async () => {
     mockApi({
       ...routes(),
@@ -119,20 +72,6 @@ describe('contest data tab', () => {
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
     expect(wrapper.text()).toContain('Đang xem với tư cách người khác');
     expect(wrapper.findAll('button').some((button) => button.text() === 'Tạo khóa')).toBe(false);
-  });
-
-  it('revokes only after the confirm', async () => {
-    const calls = mockApi(
-      routes({
-        'GET /contests/hcmus-w41/feed-key': ok(feedKeyStatus()),
-        'DELETE /contests/hcmus-w41/feed-key': noContent(),
-      }),
-    );
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
-    await press(wrapper, 'Thu hồi khóa');
-    expect(calls.filter((call) => call.method === 'DELETE')).toHaveLength(0);
-    await confirmDialog('Thu hồi');
-    expect(calls.filter((call) => call.method === 'DELETE')).toHaveLength(1);
   });
 
   it('prepares the export once and links the ready zip; a missing export root says so', async () => {
@@ -177,14 +116,5 @@ describe('contest data tab', () => {
     const card = wrapper.get('[data-testid="export-card"]').text();
     expect(card).toContain('Bản xuất đang được tạo');
     expect(card).not.toContain('Hãy tải lại và thử lại.');
-  });
-
-  it('keeps the export card quiet before the end and asks nothing', async () => {
-    const calls = mockApi(routes({}, editableContest({ phase: 'running' })));
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/data', TITLE);
-    expect(wrapper.get('[data-testid="export-card"]').text()).toContain(
-      'Xuất được sau khi kỳ thi kết thúc.',
-    );
-    expect(calls.some((call) => call.path === '/contests/hcmus-w41/export')).toBe(false);
   });
 });

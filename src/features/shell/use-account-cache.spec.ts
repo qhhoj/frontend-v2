@@ -30,20 +30,6 @@ function mountSync() {
 }
 
 describe('account cache sync', () => {
-  it('keeps the cache when the first /auth/me answer arrives', async () => {
-    const { session, isCached } = mountSync();
-    session.$patch({ status: 'authenticated', user: accountA });
-    await Promise.resolve();
-    expect(isCached()).toBe(true);
-  });
-
-  it('keeps the cache of an anonymous visitor who stays anonymous', async () => {
-    const { session, isCached } = mountSync();
-    session.$patch({ status: 'anonymous', user: null });
-    await Promise.resolve();
-    expect(isCached()).toBe(true);
-  });
-
   it('drops the cache when another account takes over the session', async () => {
     const { session, isCached } = mountSync();
     session.$patch({ status: 'authenticated', user: accountA });

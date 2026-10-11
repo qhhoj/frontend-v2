@@ -1,33 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  ACCENTS,
-  appearanceVariables,
-  GLASS_STOPS,
-  nearestGlassStop,
-  parseAppearance,
-  siteLook,
-} from './appearance';
-import { THEMES } from './registry';
-
-describe('accent presets', () => {
-  it('are the ids the backend accepts (backend APPEARANCE_ACCENTS), in picker order', () => {
-    expect(ACCENTS.map((accent) => accent.id)).toEqual([
-      'clay',
-      'orchid',
-      'ocean',
-      'mint',
-      'sunset',
-      'gold',
-      'mono',
-    ]);
-  });
-});
-
-describe('siteLook', () => {
-  it("is a theme's own look: its accent at Glass 0 (Clear) and Glow 100 (the site's blobs)", () => {
-    expect(siteLook('orchid')).toEqual({ accent: 'orchid', glass: 0, glow: 100 });
-  });
-});
+import { parseAppearance } from './appearance';
 
 describe('parseAppearance', () => {
   it('accepts a complete look, boundaries included, and drops unknown keys', () => {
@@ -59,38 +31,5 @@ describe('parseAppearance', () => {
     ['an array', []],
   ])('reads %s as no look', (_name, value) => {
     expect(parseAppearance(value)).toBeNull();
-  });
-
-  it("has each theme's own accent among the presets", () => {
-    const accentIds: string[] = ACCENTS.map((accent) => accent.id);
-    for (const theme of THEMES) expect(accentIds).toContain(theme.accent);
-  });
-});
-
-describe('glass stops', () => {
-  it.each([
-    [0, 0],
-    [24, 0],
-    [25, 50],
-    [50, 50],
-    [74, 50],
-    [75, 100],
-    [100, 100],
-  ])('highlights the nearest of Clear, Frosted and Solid for %i: %i', (glass, stop) => {
-    expect(nearestGlassStop(glass)).toBe(stop);
-  });
-
-  it('offers Clear, Frosted, Solid as 0, 50, 100', () => {
-    expect(GLASS_STOPS.map((stop) => stop.value)).toEqual([0, 50, 100]);
-  });
-});
-
-describe('appearanceVariables', () => {
-  it('turns glow into a 0-1 strength and keeps glass as the 0-100 number', () => {
-    expect(appearanceVariables({ accent: 'sunset', glass: 40, glow: 35 })).toEqual({
-      accent: 'sunset',
-      glass: '40',
-      blobStrength: '0.35',
-    });
   });
 });

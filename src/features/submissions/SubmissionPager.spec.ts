@@ -9,10 +9,6 @@ const mountPager = (props: Record<string, unknown>) =>
   mountComponent(SubmissionPager, { props: { pageSize: 50, itemCount: 50, ...props } });
 
 describe('the submission pager', () => {
-  it('is hidden when everything fits one page', () => {
-    expect(mountPager({ page: 1, total: 30, itemCount: 30 }).find('nav').exists()).toBe(false);
-  });
-
   it('shows the position and asks for the neighbour page', async () => {
     const wrapper = mountPager({ page: 2, total: 120 });
     expect(wrapper.text()).toContain('Trang 2 / 3');

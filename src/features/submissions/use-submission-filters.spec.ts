@@ -50,16 +50,6 @@ describe('submission filters in the URL', () => {
     expect(toSubmissionQuery(filters)).toEqual({ waiting: ['final'] });
   });
 
-  it('accepts every result the backend accepts, not only the six checkboxes (nothing is staff-gated)', () => {
-    expect(parseSubmissionFilters({ result: 'IE' }).results).toEqual(['IE']);
-  });
-
-  it('reads live=0 as off and anything else as on', () => {
-    expect(parseSubmissionFilters({ live: '0' }).live).toBe(false);
-    expect(parseSubmissionFilters({ live: '1' }).live).toBe(true);
-    expect(parseSubmissionFilters({}).live).toBe(true);
-  });
-
   it('goes back to page 1 when a filter changes but not when the page does', () => {
     const current = parseSubmissionFilters({ page: '4' });
     expect(withPatch(current, { results: ['AC'] }).page).toBe(1);

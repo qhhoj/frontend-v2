@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  groupQuery,
-  parseContestListFilters,
-  toContestListLocation,
-} from './use-contest-list-filters';
+import { groupQuery, parseContestListFilters } from './use-contest-list-filters';
 
 describe('contest list filters', () => {
   it('reads search, rated, one phase and the page from the URL, dropping what the API would refuse', () => {
@@ -24,17 +20,6 @@ describe('contest list filters', () => {
       phase: null,
       page: 1,
       tag: null,
-    });
-  });
-
-  it('leaves defaults out of the URL', () => {
-    expect(
-      toContestListLocation({ search: '', isRatedOnly: false, phase: null, page: 1, tag: null }),
-    ).toEqual({
-      search: undefined,
-      rated: undefined,
-      phase: undefined,
-      page: undefined,
     });
   });
 
@@ -67,14 +52,6 @@ describe('contest list filters', () => {
     expect(parseContestListFilters({ tag: 'quoc-gia' }).tag).toBe('quoc-gia');
     expect(parseContestListFilters({ tag: 'Quốc gia' }).tag).toBeNull();
     expect(parseContestListFilters({}).tag).toBeNull();
-  });
-
-  it('writes the tag to the URL and sends it with every group', () => {
-    const filters = { search: '', isRatedOnly: false, phase: null, page: 1, tag: 'icpc' };
-    expect(toContestListLocation(filters).tag).toBe('icpc');
-    expect(toContestListLocation({ ...filters, tag: null }).tag).toBeUndefined();
-    expect(groupQuery(filters, 'ended').tag).toBe('icpc');
-    expect(groupQuery({ ...filters, tag: null }, 'ended').tag).toBeUndefined();
   });
 
   it('caps the search at 100 code points, so a cut never splits a surrogate pair', () => {

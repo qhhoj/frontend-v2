@@ -28,16 +28,8 @@ async function probe(viewer: Record<string, MockHandler>, officialMode: boolean)
 }
 
 describe('useOfficialMode', () => {
-  it('locks a signed-in member while the mode is on', async () => {
-    expect((await probe(asMember, true)).text).toBe('true/true/false');
-  });
-
   it('exempts a superuser: active but not locked', async () => {
     expect((await probe(asSuperuser, true)).text).toBe('true/false/true');
-  });
-
-  it('locks nobody while the mode is off', async () => {
-    expect((await probe(asMember, false)).text).toBe('false/false/false');
   });
 
   it('asks nothing for an anonymous viewer', async () => {

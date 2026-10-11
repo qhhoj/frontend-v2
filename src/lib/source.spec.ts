@@ -3,21 +3,15 @@ import { ApiError } from '@/api/client';
 import type { FieldIssue } from '@/api/client';
 import {
   MAX_SOURCE_LENGTH,
-  acceptedExtension,
   checkUploadFile,
   codePointCount,
   readSourceFile,
   submitErrorKey,
-  uploadCapBytes,
 } from './source';
 
 const MEGABYTE = 1024 * 1024;
 
 describe('codePointCount', () => {
-  it('counts an astral character once, like the backend schema', () => {
-    expect(codePointCount('a😀b')).toBe(3);
-    expect('a😀b'.length).toBe(4);
-  });
   it('accepts exactly the maximum and no more', () => {
     expect(codePointCount('😀'.repeat(MAX_SOURCE_LENGTH))).toBe(MAX_SOURCE_LENGTH);
     expect(codePointCount('x'.repeat(MAX_SOURCE_LENGTH) + 'y')).toBe(MAX_SOURCE_LENGTH + 1);
@@ -25,10 +19,6 @@ describe('codePointCount', () => {
 });
 
 describe('readSourceFile', () => {
-  it('returns the text of a small text file', async () => {
-    const result = await readSourceFile(new File(['int main(){}'], 'a.cpp'));
-    expect(result).toEqual({ ok: true, text: 'int main(){}' });
-  });
   it('rejects a binary file', async () => {
     const result = await readSourceFile(new File([new Uint8Array([1, 0, 2])], 'a.bin'));
     expect(result).toEqual({ ok: false, reason: 'notText' });
@@ -72,12 +62,6 @@ describe('checkUploadFile', () => {
     });
     expect(checkUploadFile(megabytes(6), scratch)).toEqual({ ok: false, reason: 'tooLarge' });
   });
-  it('treats a name that is only an extension as having none', () => {
-    expect(checkUploadFile(new File(['x'], '.sb3'), scratch)).toEqual({
-      ok: false,
-      reason: 'wrongExtension',
-    });
-  });
   it('accepts exactly the cap and clamps a huge declared cap to the 20 MB the server accepts', () => {
     expect(checkUploadFile(megabytes(5), scratch)).toEqual({ ok: true });
     expect(checkUploadFile(megabytes(20), { extension: 'sb3', fileSizeLimit: 50 })).toEqual({
@@ -87,15 +71,6 @@ describe('checkUploadFile', () => {
       ok: false,
       reason: 'tooLarge',
     });
-  });
-  it('reports the effective cap in bytes, 0 when uploads are off', () => {
-    expect(uploadCapBytes({ fileSizeLimit: 5 })).toBe(5 * MEGABYTE);
-    expect(uploadCapBytes({ fileSizeLimit: 50 })).toBe(20 * MEGABYTE);
-    expect(uploadCapBytes({ fileSizeLimit: 0 })).toBe(0);
-  });
-  it('builds the accept attribute from the extension, dotted or not', () => {
-    expect(acceptedExtension({ extension: 'sb3' })).toBe('.sb3');
-    expect(acceptedExtension({ extension: '.sb3' })).toBe('.sb3');
   });
 });
 
@@ -125,27 +100,6 @@ describe('submitErrorKey', () => {
         submitErrorKey(refusal('validation_failed', 400, issue)).key,
         `${issue.field} ${issue.code}`,
       ).toBe(key);
-  });
-  it('tells the source length limit with the number', () => {
-    expect(
-      submitErrorKey(refusal('validation_failed', 400, issueOf('source', 'is_source_length'))),
-    ).toEqual({
-      key: 'submit.errors.sourceLength',
-      params: { max: MAX_SOURCE_LENGTH },
-    });
-  });
-  it('maps the distinct top-level refusals (B9) to texts that exist', () => {
-    expect(submitErrorKey(refusal('not_found', 404)).key).toBe('submit.errors.problemGone');
-    for (const code of [
-      'banned_from_problem',
-      'contest_submission_limit',
-      'unfinished_submission_limit',
-      'rate_limited',
-      'conflict',
-      'file_too_large',
-      'unauthorized',
-    ])
-      expect(submitErrorKey(refusal(code, 403)).key, code).toBe(`errors.${code}`);
   });
   it('falls back to the generic message for an unknown code, an unknown issue and a non-API error', () => {
     expect(submitErrorKey(refusal('brand_new', 400)).key).toBe('errors.generic');

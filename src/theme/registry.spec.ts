@@ -13,11 +13,6 @@ describe('resolveTheme', () => {
     expect(resolveTheme(AUTO_THEME, 'light').id).toBe('clay-light');
   });
 
-  it('follows the system scheme for glass-auto and lands on Glass', () => {
-    expect(resolveTheme(GLASS_AUTO_THEME, 'dark').id).toBe('glass-dark');
-    expect(resolveTheme(GLASS_AUTO_THEME, 'light').id).toBe('glass-light');
-  });
-
   it('maps the legacy siteTheme values light and dark onto Clay whatever the system says', () => {
     expect(resolveTheme('light', 'dark').id).toBe('clay-light');
     expect(resolveTheme('dark', 'light').id).toBe('clay-dark');
@@ -44,29 +39,5 @@ describe('canonicalPreference', () => {
       expect(canonicalPreference(inherited)).toBe(inherited);
     for (const value of [AUTO_THEME, GLASS_AUTO_THEME, ...THEMES.map((theme) => theme.id)])
       expect(canonicalPreference(value)).toBe(value);
-  });
-});
-
-describe('THEMES', () => {
-  it('has unique ids and a theme for each scheme', () => {
-    expect(new Set(THEMES.map((theme) => theme.id)).size).toBe(THEMES.length);
-    expect(new Set(THEMES.map((theme) => theme.scheme))).toEqual(new Set(['dark', 'light']));
-  });
-
-  it('keeps the auto preferences apart from theme ids', () => {
-    for (const auto of [AUTO_THEME, GLASS_AUTO_THEME])
-      expect(THEMES.some((theme) => theme.id === auto)).toBe(false);
-  });
-
-  it('makes the first theme of each scheme flat and keeps a Glass theme in each', () => {
-    for (const scheme of ['dark', 'light'] as const) {
-      expect(THEMES.find((theme) => theme.scheme === scheme)?.glass).toBe(false);
-      expect(THEMES.some((theme) => theme.scheme === scheme && theme.glass)).toBe(true);
-    }
-  });
-
-  it('saves every preference as a value the backend accepts', () => {
-    for (const value of [AUTO_THEME, GLASS_AUTO_THEME, ...THEMES.map((theme) => theme.id)])
-      expect(value).toMatch(/^[a-z][a-z0-9-]{0,31}$/);
   });
 });

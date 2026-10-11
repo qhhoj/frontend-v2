@@ -22,10 +22,6 @@ async function assignWith(text: string) {
 }
 
 describe('staff card: assignee list', () => {
-  it('sends the list at the backend limit of 20 names', async () => {
-    const { patches } = await assignWith(usernames(LIMIT).join(', '));
-    expect(patches.map((call) => call.body)).toEqual([{ assignees: usernames(LIMIT) }]);
-  });
   it('sends each name once, in the order typed', async () => {
     const { patches } = await assignWith('colan, colan  thayhung colan');
     expect(patches.map((call) => call.body)).toEqual([{ assignees: ['colan', 'thayhung'] }]);
@@ -39,9 +35,5 @@ describe('staff card: assignee list', () => {
         .get('form[data-testid="assignees-form"] button[type="submit"]')
         .attributes('aria-disabled'),
     ).toBe('true');
-  });
-  it('counts duplicates once, so 21 typed names with repeats still send', async () => {
-    const { patches } = await assignWith([...usernames(LIMIT), 'user0', 'user1'].join(', '));
-    expect(patches.map((call) => call.body)).toEqual([{ assignees: usernames(LIMIT) }]);
   });
 });

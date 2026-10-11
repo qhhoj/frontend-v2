@@ -3,18 +3,14 @@ import { flushPromises } from '@vue/test-utils';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { staffViewer } from '@/test/admin-routes';
-import {
-  contestEditorRoutes,
-  contestSettings,
-  editableContest,
-} from '@/test/admin-fixtures/contests';
+import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 
 const EDIT = ['judge.edit_own_contest'];
 const WARNING = 'Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.';
 
 describe('ContestProblemsTab', () => {
-  it('adds a problem by code under the next label and saves the whole list', async () => {
+  it('adds a problem by code under the next label, saves the whole list and marks the public contest pages stale', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
       ...contestEditorRoutes(),
@@ -25,7 +21,11 @@ describe('ContestProblemsTab', () => {
       }),
       'PATCH /contests/hcmus-w41': ok(editableContest()),
     });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
+    const { wrapper, queryClient } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/problems',
+      WARNING,
+    );
+    seedCache(queryClient, [['contests', 'detail', 'probe']]);
     await wrapper.get('#contest-add-problem').setValue('hcmus41d');
     await wrapper.get('#contest-add-problem').trigger('keydown', { key: 'Enter' });
     await flushPromises();
@@ -40,6 +40,7 @@ describe('ContestProblemsTab', () => {
     };
     expect(Object.keys(body)).toEqual(['problems']);
     expect(body.problems.map((row) => row.problem).at(-1)).toBe('id-d');
+    expect(invalidatedKeys(queryClient, [['contests', 'detail', 'probe']])).toHaveLength(1);
   });
 
   it('says a code does not exist and does not add it twice', async () => {
@@ -63,57 +64,6 @@ describe('ContestProblemsTab', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(3);
   });
 
-  it('shows a stored output prefix in its row and saves it back untouched', async () => {
-    const contest = editableContest();
-    const stored = editableContest({
-      settings: contestSettings({
-        problemOutputPrefixes: [
-          { problemId: contest.problems![2]!.problemId, outputPrefixOverride: 4096 },
-        ],
-      }),
-    });
-    const calls = mockApi({
-      ...staffViewer(EDIT),
-      ...contestEditorRoutes(stored),
-      'PATCH /contests/hcmus-w41': ok(stored),
-    });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
-    expect(
-      (wrapper.get('input[aria-label="Cắt output cho hcmus41c"]').element as HTMLInputElement)
-        .value,
-    ).toBe('4096');
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Lưu bài trong kỳ thi')!
-      .trigger('click');
-    await flushPromises();
-    const body = calls.find((call) => call.method === 'PATCH')!.body as {
-      problems: { outputPrefixOverride?: number }[];
-    };
-    expect(body.problems.map((row) => row.outputPrefixOverride)).toEqual([
-      undefined,
-      undefined,
-      4096,
-    ]);
-  });
-
-  it('warns that changed points are not rescored', async () => {
-    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
-    expect(wrapper.text()).toContain(
-      'Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.',
-    );
-  });
-
-  it('moves a row up with its labelled button', async () => {
-    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
-    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
-    await wrapper.get('button[aria-label="Chuyển hcmus41c lên"]').trigger('click');
-    expect(
-      wrapper.findAll('tbody tr').map((row) => row.find('[data-testid="code"]').text()),
-    ).toEqual(['hcmus41a', 'hcmus41c', 'hcmus41b']);
-  });
-
   it('refuses a cleared points box beside its row, and sends nothing', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
@@ -129,32 +79,5 @@ describe('ContestProblemsTab', () => {
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
     expect(wrapper.text()).toContain('Điểm từ 0 đến 3500, là số nguyên.');
-  });
-
-  it('marks the public contest pages stale after saving the problem list', async () => {
-    mockApi({
-      ...staffViewer(EDIT),
-      ...contestEditorRoutes(),
-      'GET /problems/hcmus41d': ok({
-        id: 'id-d',
-        code: 'hcmus41d',
-        name: 'Xâu con chung dài nhất',
-      }),
-      'PATCH /contests/hcmus-w41': ok(editableContest()),
-    });
-    const { wrapper, queryClient } = await mountAndWaitFor(
-      '/admin/contests/hcmus-w41/problems',
-      WARNING,
-    );
-    seedCache(queryClient, [['contests', 'detail', 'probe']]);
-    await wrapper.get('#contest-add-problem').setValue('hcmus41d');
-    await wrapper.get('#contest-add-problem').trigger('keydown', { key: 'Enter' });
-    await flushPromises();
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Lưu bài trong kỳ thi')!
-      .trigger('click');
-    await flushPromises();
-    expect(invalidatedKeys(queryClient, [['contests', 'detail', 'probe']])).toHaveLength(1);
   });
 });

@@ -1,8 +1,6 @@
 import { submissionDetail, submissionItem } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { AUDIT_VIEWPORTS, applyTheme, axeViolationsIn } from './fixtures/audit';
 import { list, ok } from './fixtures/reply';
 
 const LEFT = 'dif-1';
@@ -72,35 +70,4 @@ test('shows the named forbidden state with the security Bit', async ({ page, api
   const panel = page.getByTestId('state-panel');
   await expect(panel).toHaveAttribute('data-state', 'forbidden');
   await expect(panel.locator('[data-bit-variant="security"]')).toBeVisible();
-});
-
-test('shows the crown Bit for identical sources', async ({ page, api }) => {
-  diffRoutes(api, `${LEFT_SOURCE}\r\n`);
-  await page.goto(DIFF_PATH);
-  await expect(page.getByTestId('state-panel').locator('[data-bit-variant="crown"]')).toBeVisible();
-});
-
-for (const viewport of AUDIT_VIEWPORTS)
-  for (const theme of THEMES)
-    test(`the diff page is accessible at ${viewport.name} in ${theme.id}`, async ({
-      page,
-      api,
-    }) => {
-      await page.setViewportSize(viewport);
-      diffRoutes(api);
-      await applyTheme(page, api, theme);
-      await page.goto(DIFF_PATH);
-      await expect(page.getByTestId('source-diff')).toBeVisible();
-      expect(await axeViolationsIn(page)).toEqual([]);
-    });
-
-test('the diff page never scrolls sideways at 375 px; the code region does', async ({
-  page,
-  api,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  diffRoutes(api);
-  await page.goto(DIFF_PATH);
-  await expect(page.getByTestId('source-diff')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

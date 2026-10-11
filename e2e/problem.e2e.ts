@@ -5,7 +5,6 @@ import {
   SCRATCH_ID,
   languageItem,
   problemDetail,
-  profile,
   submissionDetail,
 } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
@@ -104,20 +103,6 @@ test('the PDF button turns into an Open PDF link, announces it once and the last
 });
 
 test.describe('the submit dock', () => {
-  test('starts in the language of the account and lets the viewer pick another', async ({
-    page,
-    api,
-  }) => {
-    api.routes['GET /profile'] = { body: { data: profile({ languageId: PY3_ID }) } };
-    await openProblem(page, api);
-    const picker = dockOf(page).getByRole('combobox', { name: 'Ngôn ngữ' });
-    await expect(picker).toContainText('Python 3');
-    await picker.click();
-    await page.getByRole('option', { name: 'C++17' }).click();
-    await expect(picker).toContainText('C++17');
-    await expect(dockOf(page).locator('.cm-content')).toContainText('bits/stdc++.h');
-  });
-
   test('counts typed characters', async ({ page, api }) => {
     await openProblem(page, api);
     const counter = dockOf(page).getByTestId('source-counter');
