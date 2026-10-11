@@ -238,6 +238,32 @@
       "participants": "Thí sinh",
       "virtual": "thêm {count} lượt thi ảo",
       "problems": "Bài"
+    },
+    "basic": {
+      "sections": {
+        "info": "Kỳ thi",
+        "time": "Thời gian",
+        "format": "Cách tính điểm",
+        "access": "Ai thấy"
+      },
+      "leads": {
+        "info": "Khóa dùng trong địa chỉ trang kỳ thi.",
+        "time": "Giờ Việt Nam (UTC+7).",
+        "access": "Ai thấy kỳ thi và bảng xếp hạng."
+      },
+      "quickLegend": "Kéo dài",
+      "quick": "+{n} phút",
+      "quickHint": "Đặt Kết thúc theo Bắt đầu.",
+      "formatLegend": "Thể thức",
+      "formats": {
+        "ioi": "Điểm từng phần theo test; lấy lần nộp cao nhất.",
+        "icpc": "Đúng/sai cả bài; xếp theo số bài và thời gian phạt.",
+        "default": "Cộng điểm cao nhất mỗi bài; hoà thì ai xong sớm hơn."
+      },
+      "otherFormat": "Kỳ thi đang dùng thể thức {format}. Đổi thể thức khác ở tab Nâng cao.",
+      "moreFormats": "VNOJ, IOI 2016, Ultimate, Lần nộp cuối và cấu hình thể thức ở tab Nâng cao.",
+      "problems": "Bài thi: {count} bài.",
+      "problemsLink": "Sửa ở tab Bài trong kỳ thi"
     }
   },
   "format": {

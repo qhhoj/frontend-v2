@@ -93,5 +93,16 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
     ...mutation.fieldErrors.value,
     ...localErrors.value,
   }));
-  return { form, dirtyCount, isDirty, savedAt, save, discard, errors, mutation, changeMessage };
+  return {
+    form,
+    seed,
+    dirtyCount,
+    isDirty,
+    savedAt,
+    save,
+    discard,
+    errors,
+    mutation,
+    changeMessage,
+  };
 }

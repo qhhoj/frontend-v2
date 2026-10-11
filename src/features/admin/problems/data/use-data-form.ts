@@ -80,6 +80,7 @@ export function useDataForm(code: () => string) {
   return {
     query,
     form,
+    saved,
     errors,
     dirtyCount,
     savedAt,

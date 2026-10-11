@@ -9,14 +9,15 @@ import { deletedListRoutes } from '@/test/f4-routes';
 
 const EDIT = ['judge.edit_own_problem'];
 const DELETE = [...EDIT, 'judge.delete_problem'];
-const PATH = '/admin/problems/hcmus41c/general';
+const PATH = '/admin/problems/hcmus41c/general?view=advanced';
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
 const mountGeneral = async () => {
   const mounted = await mountApp(PATH);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('#problem-code').exists()) throw new Error('form not yet');
+      if (!mounted.wrapper.find('#problem-code, [data-testid="editor-view-basic"]').exists())
+        throw new Error('form not yet');
     },
     { timeout: 5000 },
   );

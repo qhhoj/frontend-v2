@@ -13,7 +13,7 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('[data-testid="data-checker-family-stock"]').exists())
+      if (!mounted.wrapper.find('[data-testid="data-save-bar"]').exists())
         throw new Error('tab not yet');
     },
     { timeout: 5000 },
@@ -58,7 +58,7 @@ describe('test data uploads', () => {
       ...problemEditorRoutes(),
       'GET /problems/hcmus41c/data': ok(problemData()),
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
     await pick(
       wrapper.get('[data-testid="source-generator"] input[type="file"]'),
       new File([new Uint8Array(1024 * 1024 + 1)], 'gen.cpp'),

@@ -11,11 +11,13 @@ import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import { useEditorView } from '../../ui/form/use-editor-view';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import { canSetVisible, checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestGeneralForm from './ContestGeneralForm.vue';
+import { CONTEST_BASIC_FIELDS } from './contest-views';
 
 const router = useRouter();
 const { can } = usePermissions();
@@ -45,11 +47,21 @@ const shownErrors = computed(() => ({
   ...mutation.fieldErrors.value,
 }));
 
-/** Nothing is sent while a local check fails; the create body keeps out every group the account may not set. */
+const EMPTY_FORM = emptyContestForm();
+const { view, errorViews, revealErrors } = useEditorView(
+  () => shownErrors.value,
+  CONTEST_BASIC_FIELDS,
+);
+
+/**
+ * Nothing is sent while a local check fails; the create body keeps out every group the account may not set. A refusal in
+ * the view out of sight brings that view up.
+ */
 async function create() {
   hasTried.value = true;
-  if (Object.keys(localErrors.value).length > 0 || !isOwnerReady.value) return;
-  await mutation.run(toContestBody(form.value, can, Boolean(owner.value)));
+  if (Object.keys(localErrors.value).length === 0 && isOwnerReady.value)
+    await mutation.run(toContestBody(form.value, can, Boolean(owner.value)));
+  await revealErrors();
 }
 </script>
 
@@ -69,6 +81,9 @@ async function create() {
         :errors="shownErrors"
         :is-create="true"
         :has-codes="{ access: false, ranking: false }"
+        :view="view"
+        :error-views="errorViews"
+        :saved="EMPTY_FORM"
         :owner="owner"
       />
       <AdminStatus

@@ -13,7 +13,8 @@
     "quota": "Quota",
     "problem": "Problems",
     "polygon": "Polygon",
-    "externalJudge": "External judge"
+    "externalJudge": "External judge",
+    "organization": "Organizations"
   },
   "blocks": {
     "site": {
@@ -71,6 +72,10 @@
     "externalJudge": {
       "title": "External judge (PCD VJudge)",
       "help": "Problems linked to an external judge are submitted there and the verdict is copied back. Without a base URL and token it is not connected."
+    },
+    "organization": {
+      "title": "Organization admin role",
+      "help": "The role given to every organization admin on becoming one (never taken away). Empty uses the role named \"Org Admin\"."
     }
   },
   "fields": {
@@ -124,6 +129,9 @@
       "apiToken": "API token",
       "maxInFlight": "Runs in flight at once",
       "maxWaitMinutes": "Minutes to wait for a verdict"
+    },
+    "organization": {
+      "adminRoleId": "Role id"
     }
   },
   "hints": {
@@ -172,6 +180,9 @@
       "apiToken": "Sent as a bearer token. Encrypted when saved, never shown again.",
       "maxInFlight": "A whole number from 1 to 50.",
       "maxWaitMinutes": "A whole number from 1 to 240. A run still unanswered after this is marked as a judge error."
+    },
+    "organization": {
+      "adminRoleId": "A role UUID, or empty."
     }
   },
   "chip": {

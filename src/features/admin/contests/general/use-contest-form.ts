@@ -68,5 +68,16 @@ export function useContestForm(contest: () => EditableContest) {
 
   const errors = computed(() => ({ ...localErrors.value, ...mutation.fieldErrors.value }));
 
-  return { form, errors, dirtyCount, isDirty, savedAt, pendingPatch, save, discard, mutation };
+  return {
+    form,
+    seed,
+    errors,
+    dirtyCount,
+    isDirty,
+    savedAt,
+    pendingPatch,
+    save,
+    discard,
+    mutation,
+  };
 }

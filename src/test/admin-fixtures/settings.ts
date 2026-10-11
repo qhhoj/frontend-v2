@@ -34,6 +34,7 @@ export const ALL_SETTINGS: Setting[] = [
   setting('contest.officialModeEndsAt', ''),
   setting('contest.banAfterDisqualifications', 0),
   setting('problem.deleteGraceDays', 30),
+  setting('organization.adminRoleId', ''),
   setting('discord.webhooks', { set: true }, { default: { set: false } }),
   setting('mail.from', 'QHHOJ <no-reply@qhhoj.example>'),
   setting('mail.smtpUrl', { set: true }, { default: { set: false } }),

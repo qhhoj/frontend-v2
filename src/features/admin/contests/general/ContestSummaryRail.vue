@@ -8,7 +8,8 @@ import ContestPhaseChip from '../list/ContestPhaseChip.vue';
 import { CONTEST_SECTION_KEYS, contestSectionLabel, jumpToSection } from './contest-sections';
 
 /** The general tab's right rail from 1280 px: the contest at a glance, then the form's sections as jump links. */
-const props = defineProps<{ contest: EditableContest }>();
+/** `hasSections`: the Advanced view, whose sections the rail links to. */
+const props = defineProps<{ contest: EditableContest; hasSections: boolean }>();
 const locale = useLocaleStore();
 const stats = computed(() => [
   {
@@ -46,7 +47,11 @@ const LINK =
         </span>
       </div>
     </div>
-    <nav :class="[CARD, 'flex flex-col p-2']" :aria-label="$t('admin.form.section.jumpTo')">
+    <nav
+      v-if="hasSections"
+      :class="[CARD, 'flex flex-col p-2']"
+      :aria-label="$t('admin.form.section.jumpTo')"
+    >
       <p class="m-0 px-2 pt-1 pb-1.5 text-xs font-semibold tracking-wide text-muted uppercase">
         {{ $t('admin.form.section.jumpTo') }}
       </p>
