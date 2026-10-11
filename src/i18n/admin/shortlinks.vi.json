@@ -33,7 +33,8 @@
     "delete": "Xóa",
     "deleteLabel": "Xóa liên kết {code}",
     "empty": "Chưa có liên kết ngắn nào.",
-    "pager": "Trang liên kết ngắn"
+    "pager": "Trang liên kết ngắn",
+    "open": "Mở trang đích"
   },
   "confirm": {
     "title": "Xóa liên kết /s/{code}?",

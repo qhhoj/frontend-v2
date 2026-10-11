@@ -106,8 +106,13 @@ describe('ShortLinksPage', () => {
     const autoKey = ['shortLinks', 'auto', 'u1', '/contests/hsg26'];
     queryClient.setQueryData(autoKey, LINKS[1]);
     await rowOf(wrapper, 'hsg-2026')
-      .get('button[aria-label="Xóa liên kết hsg-2026"]')
+      .get('button[aria-label="Thao tác khác cho /s/hsg-2026"]')
       .trigger('click');
+    await flushPromises();
+    const deleteItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
+      item.textContent?.includes('Xóa'),
+    );
+    (deleteItem!.querySelector('a') as HTMLElement).click();
     await flushPromises();
     expect(queryClient.getQueryData(autoKey)).toEqual(LINKS[1]);
     await confirmDialog('Xóa liên kết');

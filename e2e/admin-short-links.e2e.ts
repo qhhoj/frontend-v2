@@ -15,7 +15,8 @@ test('creates a chosen-code link and deletes another after confirming', async ({
   await expect(page.getByTestId('short-link-created')).toBeVisible();
   const sent = api.requestsTo('POST /short-links')[0].postData!.toString();
   expect(JSON.parse(sent)).toMatchObject({ code: 'thi-thu' });
-  await page.getByRole('button', { name: 'Xóa liên kết hsg-2026' }).click();
+  await page.getByRole('button', { name: 'Thao tác khác cho /s/hsg-2026' }).click();
+  await page.getByRole('menuitem', { name: 'Xóa' }).click();
   await confirmInDialog(page, 'Xóa liên kết');
   await expect(page.getByText('Đã xóa /s/hsg-2026')).toBeVisible();
   await expect(page.locator('#short-links-table')).toBeFocused();

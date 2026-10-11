@@ -33,7 +33,8 @@
     "delete": "Delete",
     "deleteLabel": "Delete link {code}",
     "empty": "No short links yet.",
-    "pager": "Short-link pages"
+    "pager": "Short-link pages",
+    "open": "Open target"
   },
   "confirm": {
     "title": "Delete the link /s/{code}?",

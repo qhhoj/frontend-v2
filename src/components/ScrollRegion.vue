@@ -12,6 +12,8 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 defineProps<{
   label: string;
   hint?: string;
+  /** No text line: the edge shades alone say it scrolls (admin tables). */
+  noHint?: boolean;
   /** A loading skeleton's frame: same layout and cue room as the real one, but inert (no region role, no focus) and the hint a placeholder bar. */
   placeholder?: boolean;
 }>();
@@ -42,7 +44,7 @@ onBeforeUnmount(() => observer?.disconnect());
 <template>
   <div :aria-hidden="placeholder || undefined">
     <p
-      v-if="hasMoreRight"
+      v-if="hasMoreRight && !noHint"
       data-testid="scroll-hint"
       aria-hidden="true"
       class="px-5 pt-3 text-[13px] text-muted lg:hidden"
