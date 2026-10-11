@@ -230,6 +230,7 @@ export const submissionItem = (
 
 export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestListItem => ({
   key: 'r42',
+  organizations: [],
   name: 'QHH Round #42 (Div. 2)',
   summary: '',
   startTime: '2026-10-08T08:00:00Z',
@@ -636,6 +637,7 @@ export const submissionStats = (overrides: Partial<SubmissionStats> = {}): Submi
   queueLength: 3,
   judgesOnline: 4,
   judgesTotal: 4,
+  verdictsToday: [],
   ...overrides,
 });
 
