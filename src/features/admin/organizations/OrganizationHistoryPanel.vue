@@ -4,11 +4,13 @@ import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { formatDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminChip from '../ui/AdminChip.vue';
+import type { ChipTone } from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
+import { CARD } from '../ui/controls';
 import { changeLabelOf, changesOf } from './organization-history';
 import { useOrganizationHistoryQuery } from './organization-history.queries';
 
@@ -19,34 +21,39 @@ const locale = useLocaleStore();
 const page = computed(() => pageFromQuery(route.query.history));
 const history = useOrganizationHistoryQuery(() => props.slug, page);
 const rows = computed(() => history.data.value?.items ?? []);
-const ACTION_CLASS = {
-  create: 'bg-verdict-ac-bg text-verdict-ac',
-  edit: 'bg-accent-soft text-accent-soft-text',
-  kick: 'bg-verdict-wa-bg text-verdict-wa',
-  delete: 'bg-verdict-wa-bg text-verdict-wa',
-} as const;
+const ACTION_TONE: Record<string, ChipTone> = {
+  create: 'positive',
+  edit: 'accent',
+  kick: 'negative',
+  delete: 'negative',
+};
 </script>
 
 <template>
-  <section data-testid="org-history" :aria-label="$t('admin.organizations.history.title')">
-    <SettingsCard
-      :title="$t('admin.organizations.history.title')"
-      :lead="$t('admin.organizations.history.lead')"
-    >
+  <section
+    data-testid="org-history"
+    :aria-labelledby="`org-history-${slug}`"
+    class="flex min-w-0 flex-col gap-3"
+  >
+    <header>
+      <h3 :id="`org-history-${slug}`" class="font-display text-base font-semibold">
+        {{ $t('admin.organizations.history.title') }}
+      </h3>
+      <p class="m-0 text-sm text-muted">{{ $t('admin.organizations.history.lead') }}</p>
+    </header>
+    <div :class="[CARD, 'px-4']">
       <QueryState
         :loading="history.isPending.value"
         :error="history.error.value"
         @retry="history.refetch()"
       >
-        <template #skeleton><SkeletonBlock class="h-32 w-full rounded-row" /></template>
+        <template #skeleton><SkeletonBlock class="my-4 h-32 w-full rounded-row" /></template>
         <ol v-if="rows.length > 0" class="flex flex-col divide-y divide-line">
           <li v-for="revision in rows" :key="revision.id" class="flex flex-col gap-2 py-3">
             <div class="flex flex-wrap items-center gap-2 text-sm">
-              <span
-                class="rounded-pill px-2.5 py-0.5 text-xs font-semibold"
-                :class="ACTION_CLASS[revision.action]"
-                >{{ $t(`admin.organizations.history.actions.${revision.action}`) }}</span
-              >
+              <AdminChip :tone="ACTION_TONE[revision.action]">{{
+                $t(`admin.organizations.history.actions.${revision.action}`)
+              }}</AdminChip>
               <AdminUserLabel
                 v-if="revision.editor"
                 :username="revision.editor.username"
@@ -87,14 +94,18 @@ const ACTION_CLASS = {
             </dl>
           </li>
         </ol>
-        <p v-else class="text-sm text-muted">{{ $t('admin.organizations.history.empty') }}</p>
+        <p v-else class="py-4 text-sm text-muted">
+          {{ $t('admin.organizations.history.empty') }}
+        </p>
         <NumberedPager
           v-if="history.data.value"
+          class="border-t border-line py-2"
+          compact
           :meta="history.data.value.meta"
           :label="$t('admin.organizations.history.pager')"
           query-key="history"
         />
       </QueryState>
-    </SettingsCard>
+    </div>
   </section>
 </template>

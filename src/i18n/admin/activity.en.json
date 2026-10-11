@@ -1,20 +1,18 @@
 {
   "title": "User activity",
   "lead": "Request logs, people online now, and a summary per user.",
-  "note": "Deleting logs cannot be undone: “Delete logs of …” removes every row and session of this person; “Delete guest logs” removes every guest row. Logs are kept for at most 90 days; a CSV export holds at most 100,000 rows, newest first.",
+  "note": "“Delete logs of …” (in a person’s summary) removes every row and session of that person. “Delete guest logs” (in the More menu) removes every guest row. Logs are kept for at most 90 days; a CSV export holds at most 100,000 rows, newest first.",
   "anonymousDelete": "Delete guest logs",
   "filters": {
     "user": "User",
-    "userPlaceholder": "Part of a username",
     "ip": "IP (prefix)",
     "ipPlaceholder": "For example 27.69",
     "path": "Path contains",
     "pathPlaceholder": "For example /submissions",
     "days": "Time range",
-    "day7": "7 days",
-    "day30": "30 days",
-    "day90": "90 days (maximum)",
-    "export": "Export CSV"
+    "export": "Export CSV",
+    "userSearch": "Search users",
+    "dayCount": "{days} days"
   },
   "table": {
     "caption": "Request log",
@@ -25,9 +23,10 @@
     "status": "Code",
     "guest": "guest",
     "empty": "No rows match.",
-    "page": "Page {page} · 50 rows per page; total not known",
+    "page": "Page {page} · total unknown",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "openSummary": "Show the summary of {username}"
   },
   "live": {
     "heading": "Online now",
@@ -36,7 +35,8 @@
     "guests": "guests",
     "bots": "bots",
     "nextPage": "Next page",
-    "empty": "Nobody has visited in this window."
+    "empty": "Nobody has visited in this window.",
+    "previousPage": "Previous page"
   },
   "summary": {
     "heading": "{username} · summary for {days} days",
@@ -47,15 +47,13 @@
     "topIps": "Most used IPs",
     "topPaths": "Most requested paths",
     "sessions": "Recent sign-in sessions (50 latest)",
-    "sessionIp": "IP",
-    "sessionDevice": "Device",
-    "sessionBrowser": "Browser · OS",
-    "sessionCreated": "Created",
-    "sessionLast": "Last activity",
     "mobile": "Phone",
     "desktop": "Computer",
     "noSessions": "No sign-in sessions yet.",
-    "delete": "Delete logs of {username}"
+    "delete": "Delete logs of {username}",
+    "sessionSpan": "{created} → {last}",
+    "close": "Close the summary",
+    "dangerTitle": "Delete logs"
   },
   "confirm": {
     "userTitle": "Delete the logs of {username}?",
@@ -63,5 +61,13 @@
     "anonymousTitle": "Delete all guest logs?",
     "anonymousBody": "Every guest row is deleted for good; this cannot be undone.",
     "delete": "Delete"
+  },
+  "notice": {
+    "title": "Deleting logs cannot be undone",
+    "summary": "Logs are kept for at most 90 days; a CSV export holds at most 100,000 rows."
+  },
+  "toast": {
+    "userDeleted": "Deleted the logs of {username}",
+    "anonymousDeleted": "Deleted the guest logs"
   }
 }

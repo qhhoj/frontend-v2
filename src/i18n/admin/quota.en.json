@@ -2,10 +2,17 @@
   "lead": "This month's credits and the data storage of every organization. Leave a quota empty to use the site default.",
   "tableCaption": "Organization quotas",
   "sortLabel": "Sort",
-  "sortName": "Organization name",
-  "sortCredits": "Credits used",
-  "columns": { "organization": "Organization", "credits": "Monthly credits", "storage": "Storage" },
+  "sort": {
+    "name": "Name",
+    "credits": "Credits used"
+  },
+  "columns": {
+    "organization": "Organization",
+    "credits": "Monthly credits",
+    "storage": "Storage"
+  },
   "percent": "{percent}%",
+  "meterLabel": "{meter} of {name}",
   "edit": "Edit",
   "editLabel": "Edit the quota of {name}",
   "editTitle": "Quota of {name}",

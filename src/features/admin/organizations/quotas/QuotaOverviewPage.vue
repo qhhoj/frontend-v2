@@ -1,36 +1,37 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { UsageOverviewRow, UsageSort } from '@/api/types/organization-usage';
 import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
-import { formatMebibytes, meterPercent } from '@/lib/quota';
+import { formatMebibytes } from '@/lib/quota';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminBit from '../../shell/AdminBit.vue';
 import AdminFilterTabs from '../../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../../ui/AdminFilterTabs.vue';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
-import AdminStatus from '../../ui/AdminStatus.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_TOGGLE_CLASS } from '../../ui/classes';
+import AdminTabs from '../../ui/AdminTabs.vue';
+import { buttonClass } from '../../ui/controls';
+import AdminDataTable from '../../ui/table/AdminDataTable.vue';
+import { rangeOf } from '../../ui/table/table-columns';
+import type { AdminColumn } from '../../ui/table/table-columns';
 import { useOrganizationViewTabs } from '../use-organization-view-tabs';
 import QuotaEditDialog from './QuotaEditDialog.vue';
+import QuotaMeter from './QuotaMeter.vue';
 import { useUsageOverviewQuery } from './quota-overview.queries';
 
 /** Rows the skeleton draws (the e2e shift case answers three organizations). */
 const SKELETON_ROWS = 3;
-const SORTS: { id: UsageSort; labelKey: string }[] = [
-  { id: 'name', labelKey: 'admin.quota.sortName' },
-  { id: 'credits', labelKey: 'admin.quota.sortCredits' },
-];
+const SORTS: UsageSort[] = ['name', 'credits'];
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
+const { t } = useI18n();
 const sort = computed<UsageSort>(() => (route.query.sort === 'credits' ? 'credits' : 'name'));
 const page = computed(() => pageFromQuery(route.query.page));
 const { data, isPending, error, refetch } = useUsageOverviewQuery(sort, page);
+const rows = computed(() => data.value?.items ?? []);
 const editing = ref<UsageOverviewRow | null>(null);
 const isEditOpen = computed({
   get: () => editing.value !== null,
@@ -38,17 +39,22 @@ const isEditOpen = computed({
     if (!isOpen) editing.value = null;
   },
 });
-const savedText = ref('');
-const chooseSort = (id: UsageSort) =>
-  void router.replace({ query: id === 'name' ? {} : { sort: id } });
+const sortTabs = computed<AdminFilterTab[]>(() =>
+  SORTS.map((key) => ({ key, label: t(`admin.quota.sort.${key}`) })),
+);
+const chooseSort = (key: string) =>
+  void router.replace({ query: key === 'name' ? {} : { sort: key } });
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'organization', label: t('admin.quota.columns.organization'), priority: 'primary' },
+  { key: 'credits', label: t('admin.quota.columns.credits'), cellClass: 'w-1/4' },
+  { key: 'storage', label: t('admin.quota.columns.storage'), cellClass: 'w-1/4' },
+]);
+const credits = (value: number) => formatNumber(value, locale.locale);
 const mib = (bytes: number) => formatMebibytes(bytes, locale.locale);
-const percentOf = (used: number, limit: number) => meterPercent({ used, limit }).percent;
-function openEdit(row: UsageOverviewRow) {
-  savedText.value = '';
-  editing.value = row;
-}
-const onSaved = (name: string) => void (savedText.value = translate('admin.quota.saved', { name }));
-const CELL = 'py-2 pr-3 align-middle';
+const range = computed(() => {
+  const meta = data.value?.meta;
+  return meta ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total) : null;
+});
 const { tabs: viewTabs } = useOrganizationViewTabs();
 </script>
 
@@ -58,144 +64,86 @@ const { tabs: viewTabs } = useOrganizationViewTabs();
       :title="$t('admin.shell.screens.organizationQuotas')"
       :lead="$t('admin.quota.lead')"
     />
-    <AdminFilterTabs
-      :tabs="viewTabs"
-      current="quotas"
-      :label="$t('admin.organizations.views.label')"
-    />
-    <AdminStatus v-if="savedText" kind="done" :text="savedText" />
-    <section data-testid="quota-overview" class="glass flex flex-col gap-4 rounded-panel p-5">
-      <div
-        class="flex flex-wrap items-center gap-2"
-        role="group"
-        :aria-label="$t('admin.quota.sortLabel')"
-      >
-        <AdminBit placement="people" />
-        <button
-          v-for="option in SORTS"
-          :key="option.id"
-          type="button"
-          :class="ADMIN_TOGGLE_CLASS"
-          :aria-pressed="sort === option.id"
-          @click="chooseSort(option.id)"
+    <AdminTabs :tabs="viewTabs" current="quotas" :label="$t('admin.organizations.views.label')" />
+    <AdminDataTable
+      data-testid="quota-overview"
+      :columns="columns"
+      :rows="rows"
+      :row-key="(row: UsageOverviewRow) => row.slug"
+      :row-label="(row: UsageOverviewRow) => row.name"
+      :label="$t('admin.quota.tableCaption')"
+      :loading="isPending"
+      :error="error"
+      :skeleton-rows="SKELETON_ROWS"
+      :empty-text="$t('admin.quota.empty')"
+      @retry="refetch()"
+    >
+      <template #toolbar>
+        <AdminFilterTabs
+          :tabs="sortTabs"
+          :current="sort"
+          :label="$t('admin.quota.sortLabel')"
+          @update:current="chooseSort"
+        />
+      </template>
+      <template #cell-organization="{ row }">
+        <RouterLink
+          data-testid="quota-org-link"
+          :to="{ name: 'admin-organizations', query: { org: row.slug } }"
+          class="font-semibold text-accent-text hover:underline"
+          >{{ row.name }}</RouterLink
         >
-          {{ $t(option.labelKey) }}
+        <span class="block font-mono text-xs text-muted">{{ row.slug }}</span>
+      </template>
+      <template #cell-credits="{ row }">
+        <QuotaMeter
+          :used="row.creditsUsed"
+          :limit="row.creditsLimit"
+          :unlimited="row.unlimited"
+          :format="credits"
+          :label="
+            $t('admin.quota.meterLabel', {
+              meter: $t('admin.quota.columns.credits'),
+              name: row.name,
+            })
+          "
+        />
+      </template>
+      <template #cell-storage="{ row }">
+        <QuotaMeter
+          :used="row.storageUsed"
+          :limit="row.storageLimit"
+          :unlimited="row.unlimited"
+          :format="mib"
+          :label="
+            $t('admin.quota.meterLabel', {
+              meter: $t('admin.quota.columns.storage'),
+              name: row.name,
+            })
+          "
+        />
+      </template>
+      <template #actions="{ row }">
+        <button
+          type="button"
+          :class="buttonClass('secondary', 'sm')"
+          :aria-label="$t('admin.quota.editLabel', { name: row.name })"
+          @click="editing = row"
+        >
+          {{ $t('admin.quota.edit') }}
         </button>
-      </div>
-      <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton>
-          <table data-skeleton-region="quota-table" class="w-full text-left text-sm">
-            <thead class="text-muted">
-              <tr class="h-14 md:h-auto">
-                <th v-for="index in 3" :key="index" :class="CELL">
-                  <SkeletonBlock text class="w-16" />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="index in SKELETON_ROWS"
-                :key="index"
-                class="border-t border-line max-md:first:h-[73px]"
-              >
-                <td :class="CELL"><SkeletonBlock text class="w-32" /></td>
-                <td :class="CELL"><SkeletonBlock text class="w-24" /></td>
-                <td class="py-2"><SkeletonBlock pill class="ml-auto h-11 w-16" /></td>
-              </tr>
-            </tbody>
-          </table>
-        </template>
-        <p v-if="data && data.items.length === 0" class="flex items-center gap-3 text-muted">
-          <AdminBit placement="empty" />{{ $t('admin.quota.empty') }}
-        </p>
-        <div v-else-if="data" class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <caption class="sr-only">
-              {{
-                $t('admin.quota.tableCaption')
-              }}
-            </caption>
-            <thead class="text-muted">
-              <tr>
-                <th scope="col" :class="CELL">{{ $t('admin.quota.columns.organization') }}</th>
-                <th scope="col" :class="CELL">{{ $t('admin.quota.columns.credits') }}</th>
-                <th scope="col" class="hidden md:table-cell" :class="CELL">
-                  {{ $t('admin.quota.columns.storage') }}
-                </th>
-                <th scope="col" class="py-2">
-                  <span class="sr-only">{{ $t('admin.quota.edit') }}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in data.items" :key="row.slug" class="border-t border-line">
-                <td :class="CELL">
-                  <RouterLink
-                    data-testid="quota-org-link"
-                    :to="{ name: 'admin-organizations', query: { org: row.slug } }"
-                    class="font-semibold text-accent-text hover:underline"
-                    >{{ row.name }}</RouterLink
-                  >
-                  <span class="block font-mono text-xs text-muted">{{ row.slug }}</span>
-                </td>
-                <td :class="CELL" class="tabular-nums">
-                  <template v-if="row.unlimited">
-                    {{ formatNumber(row.creditsUsed, locale.locale) }} /
-                    <span data-testid="quota-unlimited-label">{{
-                      $t('admin.quota.unlimited')
-                    }}</span>
-                  </template>
-                  <template v-else>
-                    {{ formatNumber(row.creditsUsed, locale.locale) }} /
-                    {{ formatNumber(row.creditsLimit, locale.locale) }}
-                    <span class="text-muted"
-                      >·
-                      {{
-                        $t('admin.quota.percent', {
-                          percent: percentOf(row.creditsUsed, row.creditsLimit),
-                        })
-                      }}</span
-                    >
-                  </template>
-                </td>
-                <td class="hidden tabular-nums md:table-cell" :class="CELL">
-                  <template v-if="row.unlimited">
-                    {{ mib(row.storageUsed) }} / {{ $t('admin.quota.unlimited') }}
-                  </template>
-                  <template v-else>
-                    {{ mib(row.storageUsed) }} / {{ mib(row.storageLimit) }}
-                    <span class="text-muted"
-                      >·
-                      {{
-                        $t('admin.quota.percent', {
-                          percent: percentOf(row.storageUsed, row.storageLimit),
-                        })
-                      }}</span
-                    >
-                  </template>
-                </td>
-                <td class="py-2 text-right">
-                  <button
-                    type="button"
-                    :class="ADMIN_BUTTON_CLASS"
-                    :aria-label="$t('admin.quota.editLabel', { name: row.name })"
-                    @click="openEdit(row)"
-                  >
-                    {{ $t('admin.quota.edit') }}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.quota.pager')" />
-      </QueryState>
-    </section>
+      </template>
+      <template v-if="data" #footer>
+        <span v-if="range" class="font-mono tabular-nums">{{
+          $t('admin.table.range', range)
+        }}</span>
+        <NumberedPager class="ml-auto" compact :meta="data.meta" :label="$t('admin.quota.pager')" />
+      </template>
+    </AdminDataTable>
     <QuotaEditDialog
       v-model:visible="isEditOpen"
       :slug="editing?.slug ?? null"
       :name="editing?.name ?? ''"
-      @saved="onSaved(editing?.name ?? '')"
     />
   </div>
 </template>

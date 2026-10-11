@@ -1,51 +1,77 @@
 <script setup lang="ts">
-import { activityExportUrl } from '@/api/activity-admin.api';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import AdminField from '../ui/AdminField.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
-import { ACTIVITY_DAY_CHOICES, toActivityRequest } from './activity';
+import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
+import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
+import { INPUT } from '../ui/controls';
+import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
+import type { ActiveFilter } from '../ui/table/AdminFilterBar.vue';
+import { ACTIVITY_DAY_CHOICES } from './activity';
 import type { ActivityDays, ActivityFilter } from './activity';
 
+/** The log filter row: user search, the 7 / 30 / 90-day switch, and IP and path in the filter panel (shown as chips). */
 const props = defineProps<{ filter: ActivityFilter }>();
 const emit = defineEmits<{ change: [filter: ActivityFilter] }>();
+const { t } = useI18n();
 
-const DAY_LABEL_KEYS: Record<ActivityDays, string> = {
-  7: 'admin.activity.filters.day7',
-  30: 'admin.activity.filters.day30',
-  90: 'admin.activity.filters.day90',
-};
-
-/** Each text box reports 300 ms after the last key, so a fast typist sends one request. */
-const user = useDebouncedText(
-  () => props.filter.user,
-  (text) => emit('change', { ...props.filter, user: text }),
-);
+/** The backend's length cap on `user`. */
+const USER_SEARCH_MAX_LENGTH = 150;
+const change = (patch: Partial<ActivityFilter>) => emit('change', { ...props.filter, ...patch });
+const user = computed({
+  get: () => props.filter.user,
+  set: (text: string) => change({ user: text.trim().slice(0, USER_SEARCH_MAX_LENGTH) }),
+});
+/** The panel's boxes report 300 ms after the last key, so a fast typist sends one request. */
 const ip = useDebouncedText(
   () => props.filter.ip,
-  (text) => emit('change', { ...props.filter, ip: text }),
+  (text) => change({ ip: text }),
 );
 const path = useDebouncedText(
   () => props.filter.path,
-  (text) => emit('change', { ...props.filter, path: text }),
+  (text) => change({ path: text }),
 );
 
-const pickDays = (days: ActivityDays) => emit('change', { ...props.filter, days });
+const dayTabs = computed<AdminFilterTab[]>(() =>
+  ACTIVITY_DAY_CHOICES.map((days) => ({
+    key: String(days),
+    label: t('admin.activity.filters.dayCount', { days }),
+  })),
+);
+const pickDays = (key: string) => change({ days: Number(key) as ActivityDays });
+
+type PanelField = 'ip' | 'path';
+const chips = computed<ActiveFilter[]>(() =>
+  (['ip', 'path'] as const)
+    .filter((field) => props.filter[field] !== '')
+    .map((field) => ({
+      key: field,
+      label: `${t(`admin.activity.filters.${field}`)}: ${props.filter[field]}`,
+    })),
+);
+const removeChip = (key: string) => change({ [key as PanelField]: '' });
+const clearAll = () => change({ ip: '', path: '' });
 </script>
 
 <template>
-  <section class="flex flex-col gap-4" :aria-label="$t('admin.activity.title')">
-    <div class="grid gap-3 sm:grid-cols-3">
-      <AdminField v-slot="{ id, describedBy }" :label="$t('admin.activity.filters.user')">
-        <input
-          :id="id"
-          v-model="user"
-          type="text"
-          maxlength="150"
-          :aria-describedby="describedBy"
-          :placeholder="$t('admin.activity.filters.userPlaceholder')"
-          :class="ADMIN_INPUT_CLASS"
-        />
-      </AdminField>
+  <AdminFilterBar
+    v-model:search="user"
+    :search-label="$t('admin.activity.filters.userSearch')"
+    :chips="chips"
+    :filter-count="chips.length"
+    @remove="removeChip"
+    @clear-all="clearAll"
+  >
+    <template #view>
+      <AdminFilterTabs
+        :tabs="dayTabs"
+        :current="String(filter.days)"
+        :label="$t('admin.activity.filters.days')"
+        @update:current="pickDays"
+      />
+    </template>
+    <template #filters>
       <AdminField v-slot="{ id, describedBy }" :label="$t('admin.activity.filters.ip')">
         <input
           :id="id"
@@ -54,7 +80,7 @@ const pickDays = (days: ActivityDays) => emit('change', { ...props.filter, days 
           maxlength="45"
           :aria-describedby="describedBy"
           :placeholder="$t('admin.activity.filters.ipPlaceholder')"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'font-mono']"
         />
       </AdminField>
       <AdminField v-slot="{ id, describedBy }" :label="$t('admin.activity.filters.path')">
@@ -65,34 +91,9 @@ const pickDays = (days: ActivityDays) => emit('change', { ...props.filter, days 
           maxlength="200"
           :aria-describedby="describedBy"
           :placeholder="$t('admin.activity.filters.pathPlaceholder')"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'font-mono']"
         />
       </AdminField>
-    </div>
-    <div class="flex flex-wrap items-end justify-between gap-4">
-      <fieldset class="flex flex-col gap-1.5">
-        <legend class="text-sm font-semibold">{{ $t('admin.activity.filters.days') }}</legend>
-        <div class="flex flex-wrap gap-2">
-          <label
-            v-for="days in ACTIVITY_DAY_CHOICES"
-            :key="days"
-            class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-strong px-4 has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text"
-          >
-            <input
-              type="radio"
-              name="activity-days"
-              :value="days"
-              :checked="filter.days === days"
-              class="size-4"
-              @change="pickDays(days)"
-            />
-            {{ $t(DAY_LABEL_KEYS[days]) }}
-          </label>
-        </div>
-      </fieldset>
-      <a :href="activityExportUrl(toActivityRequest(filter))" download :class="ADMIN_BUTTON_CLASS">
-        {{ $t('admin.activity.filters.export') }}
-      </a>
-    </div>
-  </section>
+    </template>
+  </AdminFilterBar>
 </template>

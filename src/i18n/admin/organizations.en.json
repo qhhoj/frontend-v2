@@ -8,21 +8,18 @@
     "label": "Organization list",
     "name": "Organization",
     "state": "State",
-    "members": "Members",
     "points": "PP",
     "open": "Open",
     "closed": "Closed",
     "hidden": "Hidden",
-    "footer": "{shown} / {total} organizations",
     "pager": "Organization pages",
-    "countMatch": "{shown} / {total} organizations match “{search}”",
-    "emptySearch": "No organization matches “{search}”. Try a shorter term.",
     "empty": "No organizations yet.",
-    "seats": "Members / seats"
+    "seats": "Members / seats",
+    "count": "{total} organizations",
+    "countMatchShort": "{total} results"
   },
   "editor": {
     "createTitle": "Create organization",
-    "editTitle": "Edit organization",
     "name": "Name",
     "slug": "Address (slug)",
     "slugHint": "Starts with a letter; letters, digits, - and _.",
@@ -33,13 +30,11 @@
     "about": "About (Markdown)",
     "logo": "Avatar (URL or path)",
     "admins": "Administrators (up to {max})",
-    "open": "Open: anyone may join",
-    "unlisted": "Hidden from the list (staff)",
+    "open": "Open",
+    "unlisted": "Hidden from the list",
     "notYours": "You do not administer this organization, so you cannot edit it.",
-    "staffOnly": "Hidden and seats are for staff who may edit every organization.",
     "createSubmit": "Create organization",
     "save": "Save changes",
-    "reset": "Reset",
     "logoHint": "An http(s) URL or a site path; the preview is on the left.",
     "logoBroken": "This image does not load. Check the path before saving.",
     "logoPreview": "Avatar preview",
@@ -48,7 +43,15 @@
     "createNoteStaff": "New organizations default to closed and hidden; untick \"Hidden\" to list it now. You are the first administrator.",
     "aboutPreview": "Preview",
     "logoUpload": "Upload image",
-    "logoUploadHint": "An http(s) URL or a site path, or upload a JPG, PNG, GIF or SVG (up to 5 MB); save to keep it."
+    "logoUploadHint": "An http(s) URL or a site path, or upload a JPG, PNG, GIF or SVG (up to 5 MB); save to keep it.",
+    "logoUploading": "Uploading the image…",
+    "openHint": "Anyone can join at once, without a request.",
+    "saved": "Saved {name}",
+    "sections": {
+      "identity": "Profile",
+      "access": "Members and visibility"
+    },
+    "unlistedHint": "Only members, administrators and staff see it in the list."
   },
   "errors": {
     "name": "Name is 1 to 128 characters.",
@@ -60,46 +63,38 @@
   },
   "requests": {
     "title": "Join requests",
-    "note": "Listed per organization.",
-    "pending": "Pending",
-    "accepted": "Accepted",
-    "refused": "Refused",
-    "pendingCount": "{count} pending",
-    "refuse": "Refuse",
-    "accept": "Accept",
-    "decidedBy": "decided by {name}",
-    "empty": "No requests.",
     "pager": "Request pages",
     "seats": "{members} / {slots} seats · {left} left",
     "seatsOpen": "{members} members · no seat limit"
   },
   "members": {
     "title": "Members",
-    "count": "{count} people · sorted by performance points",
+    "count": "{count} members",
     "kick": "Remove",
     "kickTitle": "Remove {username} from {organization}?",
     "kickBody": "They leave the organization at once; they may ask to join again.",
     "pager": "Member pages",
-    "countMatch": "{count} people match “{search}”",
     "search": "Search members",
-    "searchPlaceholder": "Search by username…",
     "admin": "Admin",
     "openUser": "User admin",
-    "openUserNamed": "Open {username} on the users page",
     "empty": "No members yet.",
-    "emptySearch": "No member matches “{search}”."
+    "countMatchShort": "{count} results",
+    "kicked": "Removed {username}",
+    "promoted": "{username} is now an administrator",
+    "demoted": "{username} is no longer an administrator",
+    "points": "PP",
+    "rank": "#",
+    "role": "Role"
   },
   "views": {
     "label": "Sections",
     "organizations": "Organizations",
-    "requests": "Join requests · all organizations",
+    "requests": "Join requests",
     "pending": "{count} awaiting review",
     "quotas": "Quotas"
   },
   "search": {
-    "label": "Search organizations",
-    "placeholder": "Search organizations…",
-    "hint": "Matches part of the name, short name or address."
+    "label": "Search organizations"
   },
   "queue": {
     "title": "Join requests from every organization",
@@ -114,9 +109,8 @@
       "user": "Applicant",
       "reason": "Reason",
       "sentAt": "Sent at",
-      "actions": "Actions"
+      "decided": "Outcome"
     },
-    "region": "Join requests",
     "reject": "Refuse",
     "accept": "Accept",
     "decided": {
@@ -134,9 +128,11 @@
     "alreadyDecided": "Another staff member already decided this request.",
     "decidedBy": "by {name}",
     "search": {
-      "label": "Search requests",
-      "placeholder": "Username or organization…",
-      "hint": "Matches part of the applicant's username, or the organization's name, short name or address."
+      "label": "Search requests"
+    },
+    "toast": {
+      "A": "Accepted {name}",
+      "R": "Refused {name}"
     }
   },
   "filters": {
@@ -164,10 +160,6 @@
     "recalculateQueued": "Recalculation queued; the numbers update within minutes."
   },
   "bulk": {
-    "selectPage": "Select the page",
-    "selectColumn": "Select",
-    "selectNamed": "Select the request from {username}",
-    "selected": "{count} selected",
     "accept": "Accept selected",
     "reject": "Refuse selected",
     "done": "{count} requests decided.",
@@ -210,6 +202,18 @@
     "button": "Delete organization",
     "dialogTitle": "Delete {name}?",
     "typeSlug": "Type the address {slug} to confirm",
-    "confirm": "Delete"
+    "confirm": "Delete",
+    "done": "Deleted the organization {slug}"
+  },
+  "detail": {
+    "back": "All organizations",
+    "close": "Close the organization"
+  },
+  "panels": {
+    "label": "Organization sections",
+    "info": "Details",
+    "members": "Members",
+    "requests": "Requests",
+    "history": "History"
   }
 }

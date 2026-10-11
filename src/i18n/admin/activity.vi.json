@@ -1,20 +1,18 @@
 {
   "title": "Hoạt động người dùng",
   "lead": "Nhật ký yêu cầu, người đang truy cập và tóm tắt theo người dùng.",
-  "note": "Xoá nhật ký là thao tác không hoàn tác — “Xoá nhật ký của …” xoá mọi dòng và phiên của người này; “Xoá nhật ký khách” xoá toàn bộ dòng của khách. Nhật ký giữ tối đa 90 ngày; xuất CSV tối đa 100 000 dòng, mới nhất trước.",
+  "note": "“Xoá nhật ký của …” (trong bảng tóm tắt của một người) xoá mọi dòng và phiên đăng nhập của người đó. “Xoá nhật ký khách” (trong menu Thêm) xoá toàn bộ dòng của khách. Nhật ký giữ tối đa 90 ngày; tệp CSV có tối đa 100 000 dòng, mới nhất trước.",
   "anonymousDelete": "Xoá nhật ký khách",
   "filters": {
     "user": "Người dùng",
-    "userPlaceholder": "Một phần tên người dùng",
     "ip": "IP (tiền tố)",
     "ipPlaceholder": "Ví dụ 27.69",
     "path": "Đường dẫn chứa",
     "pathPlaceholder": "Ví dụ /submissions",
     "days": "Khoảng thời gian",
-    "day7": "7 ngày",
-    "day30": "30 ngày",
-    "day90": "90 ngày (tối đa)",
-    "export": "Xuất CSV"
+    "export": "Xuất CSV",
+    "userSearch": "Tìm người dùng",
+    "dayCount": "{days} ngày"
   },
   "table": {
     "caption": "Nhật ký yêu cầu",
@@ -25,9 +23,10 @@
     "status": "Mã",
     "guest": "khách",
     "empty": "Không có dòng nào khớp.",
-    "page": "Trang {page} · 50 dòng mỗi trang; chưa biết tổng số",
+    "page": "Trang {page} · chưa biết tổng số",
     "previous": "Trước",
-    "next": "Sau"
+    "next": "Sau",
+    "openSummary": "Xem tóm tắt của {username}"
   },
   "live": {
     "heading": "Đang truy cập",
@@ -36,7 +35,8 @@
     "guests": "khách",
     "bots": "bot",
     "nextPage": "Trang sau",
-    "empty": "Chưa ai truy cập trong khoảng thời gian này."
+    "empty": "Chưa ai truy cập trong khoảng thời gian này.",
+    "previousPage": "Trang trước"
   },
   "summary": {
     "heading": "{username} · tóm tắt {days} ngày",
@@ -47,15 +47,13 @@
     "topIps": "IP nhiều nhất",
     "topPaths": "Đường dẫn nhiều nhất",
     "sessions": "Phiên đăng nhập gần đây (50 mới nhất)",
-    "sessionIp": "IP",
-    "sessionDevice": "Thiết bị",
-    "sessionBrowser": "Trình duyệt · Hệ điều hành",
-    "sessionCreated": "Tạo lúc",
-    "sessionLast": "Hoạt động cuối",
     "mobile": "Điện thoại",
     "desktop": "Máy tính",
     "noSessions": "Chưa có phiên đăng nhập nào.",
-    "delete": "Xoá nhật ký của {username}"
+    "delete": "Xoá nhật ký của {username}",
+    "sessionSpan": "{created} → {last}",
+    "close": "Đóng tóm tắt",
+    "dangerTitle": "Xoá nhật ký"
   },
   "confirm": {
     "userTitle": "Xoá nhật ký của {username}?",
@@ -63,5 +61,13 @@
     "anonymousTitle": "Xoá toàn bộ nhật ký khách?",
     "anonymousBody": "Mọi dòng của khách bị xoá vĩnh viễn; thao tác không hoàn tác được.",
     "delete": "Xoá"
+  },
+  "notice": {
+    "title": "Xoá nhật ký không hoàn tác được",
+    "summary": "Nhật ký giữ tối đa 90 ngày; tệp CSV có tối đa 100 000 dòng."
+  },
+  "toast": {
+    "userDeleted": "Đã xoá nhật ký của {username}",
+    "anonymousDeleted": "Đã xoá nhật ký khách"
   }
 }

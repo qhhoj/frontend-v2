@@ -8,7 +8,7 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import UploadButton from '../ui/UploadButton.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /**
@@ -68,7 +68,7 @@ watch(logo, () => {
         <input
           :id="id"
           v-model="logo"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           class="min-w-0 flex-1 basis-48"
           maxlength="150"
           :aria-describedby="describedBy"

@@ -2,13 +2,14 @@
 import { computed, ref, toRef, watch } from 'vue';
 import { updateOrganizationQuota } from '@/api/organization-usage.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { formatMebibytes } from '@/lib/quota';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {
   USAGE_DETAIL_KEY,
@@ -21,7 +22,6 @@ import type { QuotaForm } from './quota-form';
 /** Edits one organization's overrides; reads its usage for the current values, sends only what changed. */
 const props = defineProps<{ slug: string | null; name: string }>();
 const visible = defineModel<boolean>('visible', { required: true });
-const emit = defineEmits<{ saved: [] }>();
 const locale = useLocaleStore();
 const detail = useUsageDetailQuery(toRef(props, 'slug'));
 const original = computed<QuotaForm>(() =>
@@ -44,9 +44,8 @@ watch([visible, () => props.slug, isLoaded], ([isOpen]) => {
 const save = useAdminMutation({
   mutate: (body: ReturnType<typeof quotaBodyOf>) => updateOrganizationQuota(props.slug ?? '', body),
   invalidates: () => [USAGE_OVERVIEW_KEY, USAGE_DETAIL_KEY],
+  successText: () => translate('admin.quota.saved', { name: props.name }),
   onDone: () => {
-    // `saved` first: the page still knows which organization was edited until the dialog closes.
-    emit('saved');
     visible.value = false;
   },
 });
@@ -91,7 +90,7 @@ function submit() {
         v-model="form.credits"
         :disabled="!isLoaded"
         inputmode="numeric"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
       />
     </AdminField>
@@ -107,7 +106,7 @@ function submit() {
         v-model="form.storageMib"
         :disabled="!isLoaded"
         inputmode="numeric"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
       />
     </AdminField>
