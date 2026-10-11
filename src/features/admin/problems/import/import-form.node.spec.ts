@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   canCreateFor,
   codeFromPolygonName,
+  importScopeOf,
+  missingForMode,
   emptyImportForm,
   importFormErrors,
   toImportOptions,
@@ -12,7 +14,7 @@ const readyForm = () => ({
   file: new File(['zip'], 'p.zip'),
   code: 'hcmus41c',
 });
-const everyMode = () => true;
+const everyMode = () => null;
 
 describe('import form', () => {
   it('refuses a missing file, a bad code and a language pair the backend would answer 400 for', () => {
@@ -25,9 +27,8 @@ describe('import form', () => {
   });
 
   it('refuses a mode the viewer may not use, so the import is never sent to a 403', () => {
-    const errors = importFormErrors(
-      { ...readyForm(), mode: 'update' },
-      (mode) => mode === 'create',
+    const errors = importFormErrors({ ...readyForm(), mode: 'update' }, (mode) =>
+      mode === 'update' ? 'judge.edit_own_problem' : null,
     );
     expect(Object.keys(errors)).toEqual(['mode']);
     expect(errors.mode).toContain('judge.edit_own_problem');
@@ -57,7 +58,7 @@ describe('import form', () => {
 
 describe('importFormErrors without a file', () => {
   it('does not ask for a file when the package comes from Polygon', () => {
-    const errors = importFormErrors({ ...emptyImportForm(), code: 'sum' }, () => true, {
+    const errors = importFormErrors({ ...emptyImportForm(), code: 'sum' }, everyMode, {
       needsFile: false,
     });
     expect(errors).toEqual({});
@@ -98,5 +99,30 @@ describe('import owner', () => {
     expect(toImportOptions(form).organization).toBe('thpt-a');
     expect(toImportOptions({ ...form, mode: 'update' }).organization).toBeUndefined();
     expect(toImportOptions({ ...form, owner: null }).organization).toBeUndefined();
+  });
+});
+
+describe('import rights', () => {
+  const rights = (canImport: boolean, site: boolean, organizations: boolean) => ({
+    canImport,
+    canEditOwn: true,
+    scope: { site, organizations },
+  });
+
+  it('lets an organization creator without the import permission create for organizations only, never update', () => {
+    const teacher = rights(false, true, true);
+    expect(importScopeOf(teacher)).toEqual({ site: false, organizations: true });
+    expect(missingForMode('create', teacher)).toBeNull();
+    expect(missingForMode('update', teacher)).toBe('judge.import_polygon_package');
+  });
+
+  it('needs a creation scope to create, and the import permission plus edit_own_problem to update', () => {
+    expect(missingForMode('create', rights(true, false, false))).toBe('judge.add_problem');
+    expect(missingForMode('create', rights(false, true, false))).toBe('judge.add_problem');
+    expect(missingForMode('create', rights(true, true, false))).toBeNull();
+    expect(missingForMode('update', { ...rights(true, true, false), canEditOwn: false })).toBe(
+      'judge.edit_own_problem',
+    );
+    expect(missingForMode('update', rights(true, false, false))).toBeNull();
   });
 });
