@@ -54,7 +54,7 @@ test('an accepted request leaves the queue and the list search marks its match',
   await page.getByRole('searchbox', { name: 'Tìm tổ chức' }).fill('cl');
   await expect(page.getByTestId('org-list').locator('mark').first()).toHaveText('CL');
   await page.getByTestId('view-requests').click();
-  await page.getByRole('button', { name: 'Chấp nhận' }).click();
+  await page.getByRole('button', { name: 'Chấp nhận', exact: true }).click();
   await expect(page.getByTestId('queue-row')).toHaveCount(0);
   await expect(page.getByTestId('pending-count')).toHaveCount(0);
 });

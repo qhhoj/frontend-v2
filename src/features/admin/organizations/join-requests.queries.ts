@@ -13,12 +13,19 @@ export const allJoinRequestsKey = ['admin', 'organization-requests'] as const;
 export const useAllJoinRequestsQuery = (
   state: MaybeRefOrGetter<JoinRequestState>,
   page: MaybeRefOrGetter<number>,
+  search: MaybeRefOrGetter<string> = '',
 ) => {
   const viewer = useViewerId();
   const { can } = usePermissions();
   return useQuery({
-    queryKey: computed(() => [...allJoinRequestsKey, toValue(state), toValue(page), viewer.value]),
-    queryFn: () => fetchAllJoinRequests(toValue(state), toValue(page)),
+    queryKey: computed(() => [
+      ...allJoinRequestsKey,
+      toValue(state),
+      toValue(page),
+      toValue(search),
+      viewer.value,
+    ]),
+    queryFn: () => fetchAllJoinRequests(toValue(state), toValue(page), toValue(search)),
     enabled: computed(() => can(ORGANIZATION_QUEUE_PERMISSION)),
     placeholderData: keepPreviousData,
   });

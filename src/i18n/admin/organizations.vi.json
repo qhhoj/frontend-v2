@@ -20,7 +20,8 @@
     "pager": "Trang tổ chức",
     "countMatch": "{shown} / {total} tổ chức khớp “{search}”",
     "emptySearch": "Không có tổ chức nào khớp “{search}”. Thử rút gọn từ khóa.",
-    "empty": "Chưa có tổ chức nào."
+    "empty": "Chưa có tổ chức nào.",
+    "seats": "Thành viên / suất"
   },
   "editor": {
     "createTitle": "Tạo tổ chức",
@@ -41,7 +42,14 @@
     "staffOnly": "Ẩn và số suất chỉ dành cho nhân viên có quyền sửa mọi tổ chức.",
     "createSubmit": "Tạo tổ chức mới",
     "save": "Lưu thay đổi",
-    "reset": "Huỷ"
+    "reset": "Huỷ",
+    "logoHint": "URL http(s) hoặc đường dẫn trên trang; ảnh xem trước nằm bên trái.",
+    "logoBroken": "Không tải được ảnh này. Kiểm tra lại đường dẫn trước khi lưu.",
+    "logoPreview": "Xem trước ảnh đại diện",
+    "adminsHint": "Quản trị viên mới tự thành thành viên và được thêm vào nhóm Org Admin. Mỗi người quản trị tối đa 3 tổ chức.",
+    "createNote": "Tổ chức mới được tạo ở trạng thái đóng và ẩn khỏi danh sách cho đến khi nhân viên hiển thị nó. Bạn là quản trị viên đầu tiên.",
+    "createNoteStaff": "Mặc định tổ chức mới đóng và ẩn khỏi danh sách; bỏ chọn \"Ẩn\" để hiển thị ngay. Bạn là quản trị viên đầu tiên.",
+    "aboutPreview": "Xem trước"
   },
   "errors": {
     "name": "Tên từ 1 đến 128 ký tự.",
@@ -60,9 +68,11 @@
     "pendingCount": "{count} chờ duyệt",
     "refuse": "Từ chối",
     "accept": "Chấp nhận",
-    "decidedBy": "duyệt bởi {id}",
+    "decidedBy": "duyệt bởi {name}",
     "empty": "Không có yêu cầu nào.",
-    "pager": "Trang yêu cầu"
+    "pager": "Trang yêu cầu",
+    "seats": "{members} / {slots} suất · còn {left}",
+    "seatsOpen": "{members} thành viên · không giới hạn suất"
   },
   "members": {
     "title": "Thành viên",
@@ -71,13 +81,23 @@
     "kickNamed": "Đuổi {username}",
     "kickTitle": "Đuổi {username} khỏi {organization}?",
     "kickBody": "Người này rời tổ chức ngay; có thể xin vào lại.",
-    "pager": "Trang thành viên"
+    "pager": "Trang thành viên",
+    "countMatch": "{count} người khớp “{search}”",
+    "search": "Tìm thành viên",
+    "searchPlaceholder": "Tìm theo tên đăng nhập…",
+    "admin": "Quản trị viên",
+    "adminHint": "Bỏ khỏi ô Quản trị viên trước khi đuổi.",
+    "openUser": "Hồ sơ quản trị",
+    "openUserNamed": "Mở {username} trong trang người dùng",
+    "empty": "Chưa có thành viên nào.",
+    "emptySearch": "Không có thành viên nào khớp “{search}”."
   },
   "views": {
     "label": "Mục",
     "organizations": "Tổ chức",
     "requests": "Yêu cầu tham gia · tất cả tổ chức",
-    "pending": "{count} đang chờ duyệt"
+    "pending": "{count} đang chờ duyệt",
+    "quotas": "Hạn mức"
   },
   "search": {
     "label": "Tìm tổ chức",
@@ -114,6 +134,73 @@
     "empty": "Không có yêu cầu nào.",
     "pager": "Trang yêu cầu",
     "full": "Tổ chức đã đủ chỗ.",
-    "alreadyDecided": "Yêu cầu này đã được người khác xử lý."
+    "alreadyDecided": "Yêu cầu này đã được người khác xử lý.",
+    "decidedBy": "bởi {name}",
+    "search": {
+      "label": "Tìm yêu cầu",
+      "placeholder": "Tên đăng nhập hoặc tổ chức…",
+      "hint": "Khớp một phần tên đăng nhập người xin, hoặc tên, tên ngắn, địa chỉ tổ chức."
+    }
+  },
+  "filters": {
+    "open": "Kiểu",
+    "unlisted": "Hiển thị",
+    "any": "Tất cả",
+    "listed": "Đang hiện"
+  },
+  "context": {
+    "label": "Tình trạng tổ chức",
+    "seats": "Thành viên / suất",
+    "admins": "Quản trị viên",
+    "points": "PP",
+    "created": "Ngày tạo",
+    "unlistedNote": "Tổ chức đang ẩn: chỉ thành viên, quản trị viên và nhân viên thấy nó trong danh sách.",
+    "linksLabel": "Đi tới tổ chức",
+    "viewOnSite": "Xem trên trang",
+    "members": "Thành viên",
+    "problems": "Bài tập",
+    "contests": "Kỳ thi",
+    "posts": "Bài viết",
+    "quota": "Hạn mức",
+    "recalculate": "Tính lại điểm",
+    "recalculateHint": "Tính lại PP và số thành viên khi số liệu bị lệch.",
+    "recalculateQueued": "Đã xếp hàng tính lại; số liệu cập nhật sau ít phút."
+  },
+  "bulk": {
+    "selectPage": "Chọn cả trang",
+    "selectColumn": "Chọn",
+    "selectNamed": "Chọn yêu cầu của {username}",
+    "selected": "Đã chọn {count}",
+    "accept": "Chấp nhận đã chọn",
+    "reject": "Từ chối đã chọn",
+    "done": "Đã xử lý {count} yêu cầu.",
+    "failed": "{count} yêu cầu không xử lý được:"
+  },
+  "history": {
+    "title": "Lịch sử thay đổi",
+    "lead": "Ai đã tạo, sửa tổ chức hoặc đuổi thành viên.",
+    "empty": "Chưa có thay đổi nào được ghi lại.",
+    "pager": "Trang lịch sử",
+    "goneEditor": "Tài khoản đã xoá",
+    "yes": "Có",
+    "no": "Không",
+    "actions": {
+      "create": "Tạo",
+      "edit": "Sửa",
+      "kick": "Đuổi"
+    },
+    "fields": {
+      "name": "Tên",
+      "slug": "Địa chỉ",
+      "shortName": "Tên ngắn",
+      "about": "Giới thiệu",
+      "isOpen": "Mở",
+      "isUnlisted": "Ẩn",
+      "slots": "Số suất",
+      "logoOverrideImage": "Ảnh đại diện",
+      "admins": "Quản trị viên",
+      "member": "Thành viên bị đuổi"
+    },
+    "moreLines": "… và {n} dòng nữa"
   }
 }

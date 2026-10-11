@@ -4,6 +4,7 @@ import UserContent from '@/components/UserContent.vue';
 import type { PreviewSource } from '@/api/types/admin-common';
 import { ADMIN_INPUT_CLASS } from './classes';
 import { failureTextOf } from './admin-errors';
+import { useI18n } from 'vue-i18n';
 import { useRenderPreview } from './use-render-preview';
 
 const text = defineModel<string>({ required: true });
@@ -13,11 +14,17 @@ const props = defineProps<{
   previewStyle: PreviewSource;
   hint?: string;
   error?: string;
+  /** Heading of the preview column; defaults to the style name. */
+  previewLabel?: string;
 }>();
 const id = useId();
 const preview = useRenderPreview(
   () => text.value,
   () => props.previewStyle,
+);
+const { t } = useI18n();
+const previewHeading = computed(
+  () => props.previewLabel ?? t('admin.ui.preview', { style: props.previewStyle }),
 );
 const describedBy = computed(() =>
   props.error ? `${id}-error` : props.hint ? `${id}-hint` : undefined,
@@ -40,11 +47,8 @@ const describedBy = computed(() =>
       <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
       <p v-if="hint" :id="`${id}-hint`" class="text-xs text-muted">{{ hint }}</p>
     </div>
-    <section
-      :aria-label="$t('admin.ui.preview', { style: previewStyle })"
-      class="flex flex-col gap-1.5"
-    >
-      <p class="text-sm font-semibold">{{ $t('admin.ui.preview', { style: previewStyle }) }}</p>
+    <section :aria-label="previewHeading" class="flex flex-col gap-1.5">
+      <p class="text-sm font-semibold">{{ previewHeading }}</p>
       <div class="min-h-40 rounded-tile border border-line bg-surface-strong p-4">
         <UserContent :html="preview.html.value" />
       </div>

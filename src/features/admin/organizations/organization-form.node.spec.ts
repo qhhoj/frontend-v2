@@ -4,6 +4,8 @@ import {
   changedOrganizationFields,
   checkOrganizationForm,
   emptyOrganizationForm,
+  ORGANIZATION_SLUG_PATTERN,
+  slugFromName,
   toOrganizationBody,
   toOrganizationForm,
 } from './organization-form';
@@ -88,5 +90,18 @@ describe('organization form', () => {
       'shortName',
       'slug',
     ]);
+  });
+});
+
+describe('slugFromName', () => {
+  it('turns a Vietnamese name into an address the backend accepts', () => {
+    expect(slugFromName('Trường THPT chuyên Đại học Sư phạm')).toBe(
+      'truong-thpt-chuyen-dai-hoc-su-pham',
+    );
+    expect(slugFromName('  10 Tin -- K25  ')).toBe('org-10-tin-k25');
+    expect(slugFromName('Usage')).toBe('usage-org');
+    expect(slugFromName('!!!')).toBe('');
+    for (const name of ['Trường THPT', '2024 khoá', 'x'.repeat(300)])
+      expect(slugFromName(name)).toMatch(ORGANIZATION_SLUG_PATTERN);
   });
 });

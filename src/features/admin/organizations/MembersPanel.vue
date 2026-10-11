@@ -1,27 +1,42 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import { kickMember } from '@/api/organizations-admin.api';
 import type { OrganizationMember } from '@/api/types/organizations';
-import { useMembersQuery } from '@/features/organizations/organizations.queries';
+import {
+  useMembersQuery,
+  useOrganizationQuery,
+} from '@/features/organizations/organizations.queries';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { pageFromQuery } from '@/lib/paging';
+import IndexSearchBox from '../search/IndexSearchBox.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_DANGER_CLASS } from '../ui/classes';
+import MemberAdminRow from './MemberAdminRow.vue';
+import { organizationHistoryKey } from './organization-history.queries';
+import { memberSearchOf } from './organization-search';
 import { useOrganizationWrite } from './organization-write';
 
 const MEMBERS_PAGE_SIZE = 50;
 const props = defineProps<{ slug: string }>();
 const route = useRoute();
+const router = useRouter();
 const page = computed(() => pageFromQuery(route.query.members));
+const search = computed(() => memberSearchOf(route.query));
 const members = useMembersQuery(
   () => props.slug,
-  () => ({ sort: 'performancePoints', page: page.value, pageSize: MEMBERS_PAGE_SIZE }),
+  () => ({
+    sort: 'performancePoints',
+    page: page.value,
+    pageSize: MEMBERS_PAGE_SIZE,
+    ...(search.value ? { search: search.value } : {}),
+  }),
 );
+const detail = useOrganizationQuery(() => props.slug);
+/** Admins cannot be removed (backend `admin_not_kickable`): their rows say so instead of offering the button. */
+const adminIds = computed(() => new Set(detail.data.value?.admins.map((admin) => admin.id) ?? []));
 
 const isDialogOpen = ref(false);
 const section = ref<HTMLElement | null>(null);
@@ -33,11 +48,25 @@ const kick = useOrganizationWrite<OrganizationMember, void>({
   invalidates: () => [
     ['organizations', 'members', props.slug],
     ['organizations', 'detail', props.slug],
+    organizationHistoryKey(props.slug),
   ],
 });
 
 const rows = computed(() => members.data.value?.items ?? []);
 const count = computed(() => members.data.value?.meta.total ?? rows.value.length);
+const lead = computed(() =>
+  search.value
+    ? {
+        key: 'admin.organizations.members.countMatch',
+        params: { count: count.value, search: search.value },
+      }
+    : { key: 'admin.organizations.members.count', params: { count: count.value } },
+);
+
+/** A new search starts again from the first page of members. */
+function searchFor(text: string) {
+  void router.replace({ query: { ...route.query, mq: text || undefined, members: undefined } });
+}
 
 function askKick(member: OrganizationMember) {
   kick.reset();
@@ -62,31 +91,31 @@ async function confirmKick() {
   >
     <SettingsCard
       :title="$t('admin.organizations.members.title')"
-      :lead="$t('admin.organizations.members.count', { count })"
+      :lead="$t(lead.key, lead.params)"
     >
-      <ul class="flex flex-col divide-y divide-line">
-        <li
+      <IndexSearchBox
+        :value="search"
+        :label="$t('admin.organizations.members.search')"
+        :placeholder="$t('admin.organizations.members.searchPlaceholder')"
+        :clear-label="$t('admin.search.clear')"
+        @commit="searchFor"
+      />
+      <ul v-if="rows.length > 0" class="flex flex-col divide-y divide-line">
+        <MemberAdminRow
           v-for="row in rows"
           :key="row.id"
-          class="flex flex-wrap items-center justify-between gap-3 py-2"
-        >
-          <span class="flex min-w-0 items-center gap-3">
-            <span class="w-8 text-sm text-muted">{{ row.rank }}</span>
-            <AdminUserLabel :username="row.username" :rating="row.rating" />
-          </span>
-          <span class="flex items-center gap-3">
-            <span class="text-sm text-muted">{{ row.performancePoints }}</span>
-            <button
-              type="button"
-              :class="ADMIN_DANGER_CLASS"
-              :aria-label="$t('admin.organizations.members.kickNamed', { username: row.username })"
-              @click="askKick(row)"
-            >
-              {{ $t('admin.organizations.members.kick') }}
-            </button>
-          </span>
-        </li>
+          :member="row"
+          :is-admin="adminIds.has(row.id)"
+          @kick="askKick(row)"
+        />
       </ul>
+      <p v-else class="text-sm text-muted">
+        {{
+          search
+            ? $t('admin.organizations.members.emptySearch', { search })
+            : $t('admin.organizations.members.empty')
+        }}
+      </p>
       <NumberedPager
         v-if="members.data.value"
         :meta="members.data.value.meta"

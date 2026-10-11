@@ -75,7 +75,10 @@
     "zip_points_outside": "The zip archive points outside itself.",
     "zip_entry_too_large": "A file in the package is too large.",
     "zip_entry_unreadable": "A file in the package cannot be read.",
-    "zip_entry_missing": "The package lacks a file it declares."
+    "zip_entry_missing": "The package lacks a file it declares.",
+    "admin_cap": "A person may administer at most 3 organizations.",
+    "admin_not_kickable": "Administrators cannot be removed; take them out of Administrators first.",
+    "not_member": "This person is no longer in the organization."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

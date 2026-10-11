@@ -1,4 +1,4 @@
-import { useRoute, useRouter } from 'vue-router';
+import { useQueryClient } from '@tanstack/vue-query';
 import { createOrganization, updateOrganization } from '@/api/organizations-admin.api';
 import type { OrganizationBody } from '@/api/organizations-admin.api';
 import type { OrganizationDetail } from '@/api/types/organizations';
@@ -17,20 +17,21 @@ const sendSave = (request: SaveRequest): Promise<OrganizationDetail> =>
     : updateOrganization(request.slug, request.patch);
 
 /**
- * The write of the editor. A saved organization becomes the new baseline, and a changed slug moves `?org=` to it. Writes
- * refresh every `['organizations', …]` query, the public list and detail included.
+ * The write of the editor. A saved organization becomes the new baseline and is handed to `onSaved` (the page moves to a
+ * new slug) BEFORE every `['organizations', …]` query is refreshed: refreshing first would refetch the old slug, whose 404
+ * replaces the page (and the editor) before it could move.
  */
-export function useOrganizationSave(seed: (next: OrganizationForm) => void) {
-  const router = useRouter();
-  const route = useRoute();
+export function useOrganizationSave(
+  seed: (next: OrganizationForm) => void,
+  onSaved: (saved: OrganizationDetail) => unknown,
+) {
+  const queryClient = useQueryClient();
   return useOrganizationWrite<SaveRequest, OrganizationDetail>({
     mutate: sendSave,
-    invalidates: () => [['organizations']],
-    onDone: (saved) => {
+    onDone: async (saved) => {
       seed(toOrganizationForm(saved));
-      if (saved.slug !== route.query.org) {
-        void router.push({ query: { ...route.query, org: saved.slug } });
-      }
+      await onSaved(saved);
+      await queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
   });
 }

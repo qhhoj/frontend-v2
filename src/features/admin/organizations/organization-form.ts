@@ -50,6 +50,28 @@ export const emptyOrganizationForm = (): OrganizationForm => ({
   isUnlisted: true,
 });
 
+const SLUG_MAX_LENGTH = 128;
+/** Backend `RESERVED_ORGANIZATION_SLUG_PATTERN`: `GET /organizations/usage` is a static route. */
+const RESERVED_SLUGS = ['usage'];
+
+/**
+ * Legacy `prepopulated_fields`: an address typed for the name. Vietnamese marks are dropped (đ becomes d), every other run
+ * of characters becomes one hyphen, and a name that does not start with a letter gets the `org-` prefix the pattern needs.
+ */
+export function slugFromName(name: string): string {
+  const plain = name
+    .normalize('NFD')
+    .replace(/\p{M}+/gu, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!plain) return '';
+  const slug = /^[a-z]/.test(plain) ? plain : `org-${plain}`;
+  const cut = slug.slice(0, SLUG_MAX_LENGTH).replace(/-+$/, '');
+  return RESERVED_SLUGS.includes(cut) ? `${cut}-org` : cut;
+}
+
 /** The wire name and value of one form field: `admins` goes as the list of ids. */
 const wireFieldOf = (key: keyof OrganizationForm, form: OrganizationForm): [string, unknown] =>
   key === 'admins' ? ['adminIds', form.admins.map((chip) => chip.id)] : [key, form[key]];

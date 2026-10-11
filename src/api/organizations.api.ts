@@ -7,7 +7,10 @@ const ORGANIZATION_PAGE_SIZE = 100;
 const isJoinable = (organization: OrganizationListItem) =>
   organization.isOpen && !organization.isUnlisted;
 
-export type MemberQuery = Required<QueryOf<'/organizations/{slug}/members'>>;
+type MemberQueryParams = QueryOf<'/organizations/{slug}/members'>;
+/** Sort and paging always sent; `search` (a username substring) only when filtering. */
+export type MemberQuery = Required<Omit<MemberQueryParams, 'search'>> &
+  Pick<MemberQueryParams, 'search'>;
 
 /** `search` is a literal, case-insensitive substring over name, short name and slug; blank (after trimming) sends nothing. */
 export const fetchOrganizations = (page: number, search?: string) =>

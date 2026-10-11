@@ -205,6 +205,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/features/organizations/quota/OrgQuotaPage.vue'),
         meta: { titleKey: 'pages.organization', requiresAuth: true },
       },
+      {
+        path: 'manage',
+        name: 'organization-manage',
+        component: () => import('@/features/organizations/OrganizationManagePage.vue'),
+        meta: { titleKey: 'pages.organization', requiresAuth: true },
+      },
     ],
   },
   {
