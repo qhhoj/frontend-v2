@@ -23,14 +23,25 @@ export interface RowMenuItem {
 const props = defineProps<{ items: RowMenuItem[]; label: string }>();
 const router = useRouter();
 const menu = ref<InstanceType<typeof Menu>>();
+const opener = ref<HTMLButtonElement>();
 const isOpen = ref(false);
+
+/**
+ * Focus goes back to the ⋯ button before the item runs. A mouse pick otherwise leaves focus on the closing menu list, so a
+ * confirm dialog the item opens would return focus to nothing (PrimeVue does this itself only for a keyboard pick).
+ */
+function runItem(item: RowMenuItem) {
+  opener.value?.focus();
+  if (item.to) void router.push(item.to);
+  else item.run?.();
+}
 
 const toMenuItem = (item: RowMenuItem): MenuItem => ({
   label: item.label,
   disabled: item.disabled,
   rowIcon: item.icon,
   danger: item.danger,
-  command: () => (item.to ? void router.push(item.to) : item.run?.()),
+  command: () => runItem(item),
 });
 const model = computed<MenuItem[]>(() => {
   const plain = props.items.filter((item) => !item.danger).map(toMenuItem);
@@ -43,6 +54,7 @@ const model = computed<MenuItem[]>(() => {
 
 <template>
   <button
+    ref="opener"
     type="button"
     :class="iconButtonClass('ghost', 'sm')"
     :aria-label="label"
