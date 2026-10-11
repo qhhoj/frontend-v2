@@ -239,6 +239,7 @@ export const contestItem = (overrides: Partial<ContestListItem> = {}): ContestLi
   formatName: 'icpc',
   isRated: true,
   tags: [],
+  organizations: [],
   userCount: 318,
   virtualCount: 0,
   organizations: [],
