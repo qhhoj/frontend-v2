@@ -121,6 +121,7 @@
         "label": "Problem",
         "name": "Name",
         "points": "Points",
+        "submissions": "Submissions",
         "maxSubmissions": "Max submissions",
         "own": "Yours",
         "open": "Open"
