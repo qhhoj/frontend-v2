@@ -30,10 +30,12 @@ const save = useAdminMutation({
         ? { ...changes.value, currentPassword: adminPassword.value }
         : changes.value,
     ),
-  invalidates: () => [['admin', 'users']],
-  onSuccess: () => {
+  // Re-seeded from the stored row: the backend normalises the e-mail, and `leaveCurrentContest` is a one-off action.
+  onSuccess: (saved) => {
+    form.value = userEditFormOf(saved);
     adminPassword.value = '';
   },
+  // Also invalidates ['admin','users'], which holds the edit query.
   onDone: () => {
     void invalidateUserModeration(queryClient, props.user.username);
   },

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useQueryClient } from '@tanstack/vue-query';
 import type { UserEdit } from '@/api/types/users-admin';
 import { renameUser, resetUserTwoFactor, updateUserByStaff } from '@/api/users-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -9,11 +10,15 @@ import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { invalidateUserModeration } from './users.queries';
 
 /** Account-level actions: activation and rename (`auth.change_user`), two-factor reset (`judge.ban_user`). */
 const props = defineProps<{ user: UserEdit }>();
 const emit = defineEmits<{ renamed: [username: string] }>();
 const { can } = usePermissions();
+const queryClient = useQueryClient();
+/** The edit query, the opened card and the public board all show these facts. */
+const refresh = () => void invalidateUserModeration(queryClient, props.user.username);
 const canAccount = computed(() => can('auth.change_user'));
 const canResetTwoFactor = computed(() => can('judge.ban_user') && props.user.hasTwoFactor);
 const isDeactivateOpen = ref(false);
@@ -22,21 +27,25 @@ const newName = ref(props.user.username);
 
 const activation = useAdminMutation({
   mutate: (isActive: boolean) => updateUserByStaff(props.user.username, { isActive }),
-  invalidates: () => [['admin', 'users']],
   onDone: () => {
     isDeactivateOpen.value = false;
+    refresh();
   },
 });
 const rename = useAdminMutation({
   mutate: (username: string) => renameUser(props.user.username, username),
-  invalidates: () => [['admin', 'users']],
-  onDone: (result) => emit('renamed', result.username),
+  // Marked stale without a refetch: the old name's edit query would 404 before the card switches to the new one.
+  onDone: (result) => {
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'users'], refetchType: 'none' });
+    void queryClient.invalidateQueries({ queryKey: ['users'], refetchType: 'none' });
+    emit('renamed', result.username);
+  },
 });
 const twoFactor = useAdminMutation({
   mutate: () => resetUserTwoFactor(props.user.username),
-  invalidates: () => [['admin', 'users']],
   onDone: () => {
     isTwoFactorOpen.value = false;
+    refresh();
   },
 });
 const lineOf = (failure: unknown, fieldCount: number) =>

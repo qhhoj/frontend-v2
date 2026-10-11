@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import UserAccountSection from './UserAccountSection.vue';
@@ -17,6 +17,18 @@ const { can } = usePermissions();
 const query = useUserEditQuery(() => props.username);
 const user = computed(() => query.data.value);
 const canCredentials = computed(() => can('auth.change_user'));
+/** Latched, so a 2FA reset's confirmation stays on screen after the refetch clears the flag. */
+const hadTwoFactor = ref(false);
+watch(
+  () => user.value?.hasTwoFactor,
+  (has) => {
+    if (has) hadTwoFactor.value = true;
+  },
+  { immediate: true },
+);
+const showsAccount = computed(
+  () => canCredentials.value || (can('judge.ban_user') && hadTwoFactor.value),
+);
 </script>
 
 <template>
@@ -39,7 +51,7 @@ const canCredentials = computed(() => can('auth.change_user'));
     >
       <div v-if="user" class="flex flex-col gap-6" data-testid="user-edit">
         <UserProfileForm :key="user.id" :user="user" :can-edit-email="canCredentials" />
-        <template v-if="canCredentials || (can('judge.ban_user') && user.hasTwoFactor)">
+        <template v-if="showsAccount">
           <hr class="border-line" />
           <UserAccountSection :user="user" @renamed="(name) => emit('renamed', name)" />
         </template>

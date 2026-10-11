@@ -27,24 +27,25 @@ const canSubmit = computed(
   () => rows.value.length > 0 && rows.value.every((row) => row.username.trim() !== ''),
 );
 
-/** Requests run one after another, so the results keep the file's order. */
-async function sendAll(all: NewUserRow[]): Promise<CreatedUser[]> {
+/** Requests run one after another, so the results keep the file's order; each batch shows as it lands, so a later failure never hides passwords already generated. */
+async function sendAll(all: NewUserRow[]): Promise<void> {
   const organizationId = organization.value[0]?.id;
-  const done: CreatedUser[] = [];
+  results.value = [];
   for (let start = 0; start < all.length; start += USER_CREATE_BATCH)
-    done.push(
+    results.value.push(
       ...(await createUsers({
         users: all.slice(start, start + USER_CREATE_BATCH),
         organizationId,
       })),
     );
-  return done;
 }
 const create = useAdminMutation({
   mutate: sendAll,
   invalidates: () => [['admin', 'users']],
-  onSuccess: (created) => {
-    results.value = created;
+  onSuccess: () => {
+    // A refused row stays in the form so its one wrong field can be fixed.
+    if (mode.value === 'single' && results.value[0]?.status === 'created')
+      single.value = { username: '' };
   },
 });
 const refusal = computed(() => (create.failure.value ? failureTextOf(create.failure.value) : null));
@@ -57,7 +58,8 @@ function download() {
   const url = URL.createObjectURL(new Blob([resultsCsv(results.value)], { type: 'text/csv' }));
   const link = Object.assign(document.createElement('a'), { href: url, download: 'accounts.csv' });
   link.click();
-  URL.revokeObjectURL(url);
+  // Revoked on the next tick: Safari aborts a download whose URL dies in the same tick.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 </script>
 

@@ -36,12 +36,12 @@ export interface ParsedUsers {
   problem: 'missingUsername' | null;
 }
 
-/** Rows from a CSV with a header line; blank lines are skipped, empty cells are absent fields. Pure. */
+/** Rows from a CSV with a header line; blank lines and lines of bare separators (Excel's trailing `,,,,`) are skipped, empty cells are absent fields. Pure. */
 export function parseUserCsv(text: string): ParsedUsers {
   const lines = text
     .replace(/^﻿/, '')
     .split(/\r?\n/)
-    .filter((line) => line.trim() !== '');
+    .filter((line) => splitRecord(line).some((cell) => cell.trim() !== ''));
   const header = splitRecord(lines[0] ?? '').map((name) => name.toLowerCase());
   const indexOf = (names: readonly string[]) => header.findIndex((name) => names.includes(name));
   const columns = Object.fromEntries(
