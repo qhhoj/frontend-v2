@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
@@ -87,6 +88,17 @@ const emptyText = computed(() =>
         </template>
       </SubmissionFilterRail>
       <div class="flex min-w-0 flex-1 flex-col gap-3" :aria-busy="isPlaceholderData">
+        <p v-if="live.paused.value" class="flex flex-wrap items-center gap-3 text-sm text-muted">
+          <InlineBit kind="sweat" />
+          {{ $t('submissions.livePaused') }}
+          <button
+            type="button"
+            class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
+            @click="live.reconnect()"
+          >
+            {{ $t('submissions.liveReload') }}
+          </button>
+        </p>
         <div
           v-if="live.newCount.value > 0"
           class="sticky top-20 z-10 w-fit rounded-pill bg-surface-solid"

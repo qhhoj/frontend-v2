@@ -30,7 +30,9 @@ const isSaved = ref(false);
 
 async function submit() {
   isSaved.value = false;
-  isSaved.value = await editor.save();
+  const isSent = await editor.save();
+  // An unchanged form sends nothing; it is as saved as it gets.
+  isSaved.value = isSent || (!mutation.failure.value && Object.keys(errors.value).length === 0);
 }
 function reset() {
   isSaved.value = false;

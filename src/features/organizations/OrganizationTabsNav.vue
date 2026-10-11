@@ -60,13 +60,15 @@ const tabs = computed<OrganizationTab[]>(() => {
       <span v-if="tab.count" class="ml-1.5 rounded-pill bg-surface-hover px-2 text-sm">{{
         tab.count
       }}</span>
-      <span
-        v-if="tab.alert"
-        data-testid="pending-badge"
-        class="ml-1.5 rounded-pill bg-accent px-2 text-sm text-on-accent"
-        :aria-label="$t(tab.alert.label, { count: tab.alert.count })"
-        >{{ tab.alert.count }}</span
-      >
+      <template v-if="tab.alert">
+        <span
+          data-testid="pending-badge"
+          aria-hidden="true"
+          class="ml-1.5 rounded-pill bg-accent px-2 text-sm text-on-accent"
+          >{{ tab.alert.count }}</span
+        >
+        <span class="sr-only">{{ $t(tab.alert.label, { count: tab.alert.count }) }}</span>
+      </template>
     </RouterLink>
   </nav>
 </template>

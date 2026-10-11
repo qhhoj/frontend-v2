@@ -68,6 +68,7 @@ const options = computed(() => {
       option-label="label"
       option-value="code"
       filter
+      show-clear
       :filter-placeholder="$t('orgAdmin.submissions.problemSearch')"
       :loading="problems.isFetching.value"
       :aria-labelledby="LABEL_ID"
