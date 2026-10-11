@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
-import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 
 type StatusKind = 'done' | 'refused' | 'queued' | 'security';
 /** One result line: `done` and `queued` are polite status, `refused` an alert, `security` standing info announced politely. */
@@ -14,7 +13,7 @@ defineProps<{ kind: StatusKind; text: string }>();
 </script>
 
 <template>
-  <SettingsNotice :tone="TONES[kind]" :bit="ADMIN_BIT_KINDS[kind]" :role="ROLES[kind]">
+  <SettingsNotice :tone="TONES[kind]" :role="ROLES[kind]">
     {{ text }}
     <template #action><slot /></template>
   </SettingsNotice>

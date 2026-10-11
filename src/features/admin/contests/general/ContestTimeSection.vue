@@ -5,10 +5,10 @@ import { spanMessage } from '@/lib/contest-time';
 import AdminField from '../../ui/AdminField.vue';
 import { INPUT } from '../../ui/controls';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
-import ContestCheck from './ContestCheck.vue';
 import ContestTimeline from './ContestTimeline.vue';
 import { nullableNumber, numberOrNaN, textOf } from './input-values';
 import { usePermissionLocks } from './permission-locks';
@@ -134,7 +134,7 @@ const isLockLocked = computed(() => Boolean(lockedBy('judge.lock_contest')));
         />
       </template>
     </AdminField>
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.disallowVirtual"
       class="self-end"
       input-id="contest-disallowVirtual"

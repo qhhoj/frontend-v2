@@ -76,13 +76,6 @@ const guard = useDrawerCloseGuard(
     isVisible.value = false;
   },
 );
-/**
- * PrimeVue's drawer and dialogs all listen for Escape on the document: an Escape meant for a confirm over the drawer must
- * close only that confirm. The drawer is the one dialog while nothing is on top of it.
- */
-function onVisible(open: boolean) {
-  if (!open && document.querySelectorAll('[role="dialog"]').length <= 1) guard.requestClose();
-}
 /** After the slide-out: the list's URL without the drawer keys. */
 function afterHide() {
   const query = Object.fromEntries(
@@ -106,7 +99,7 @@ const openRenamed = (username: string) =>
     :visible="isVisible"
     :title="username"
     :subtitle="subtitle"
-    @update:visible="onVisible"
+    @update:visible="(open) => !open && guard.requestClose()"
     @hide="afterHide"
   >
     <template v-if="page" #meta>

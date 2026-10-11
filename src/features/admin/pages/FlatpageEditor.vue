@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteLocationNormalized } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatDateTime } from '@/lib/format';
@@ -12,8 +13,10 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import { BUTTON, CARD, INPUT } from '../ui/controls';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import AdminFormSection from '../ui/form/AdminFormSection.vue';
+import AdminLeaveDialog from '../ui/form/AdminLeaveDialog.vue';
 import AdminLeaveGuard from '../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
+import { useQueryLeaveGuard } from '../ui/form/use-query-leave-guard';
 import { failureTextOf } from '../ui/admin-errors';
 import FlatpagePreview from './FlatpagePreview.vue';
 import { prefillOf } from './flatpage-history';
@@ -31,6 +34,14 @@ const editor = useFlatpageEditor({
 const localeStore = useLocaleStore();
 const { form, saved, writer, remover, fieldErrors, dirtyCount } = editor;
 const isConfirmOpen = ref(false);
+/**
+ * Picking another page (or a deleted one) from the list only changes the query; it replaces this form's content. The
+ * move from "new" to the page's own id right after its create is the save's own navigation, not a leave.
+ */
+const leavesPage = (to: RouteLocationNormalized, from: RouteLocationNormalized) =>
+  !(writer.isDone.value && from.query.page === 'new') &&
+  (to.query.page !== from.query.page || to.query.deleted !== from.query.deleted);
+const queryGuard = useQueryLeaveGuard(() => dirtyCount.value > 0, leavesPage);
 const titleInput = ref<HTMLInputElement | null>(null);
 /** The stored flag is optional; the switch needs a plain boolean. */
 const registrationRequired = computed({
@@ -179,6 +190,11 @@ defineExpose({ loadOldValues, focusTitle });
         @discard="editor.discard()"
       />
       <AdminLeaveGuard :dirty-count="dirtyCount" />
+      <AdminLeaveDialog
+        v-model:visible="queryGuard.isLeaveOpen.value"
+        :count="dirtyCount"
+        @leave="queryGuard.leaveAnyway"
+      />
     </form>
 
     <section

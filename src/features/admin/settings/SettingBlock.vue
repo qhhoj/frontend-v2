@@ -11,6 +11,7 @@ import { isSameValue } from '../ui/form/dirty-form';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { failureTextOf, fieldErrorsOf, hasIssueCode } from '../ui/admin-errors';
 import SettingField from './SettingField.vue';
+import { SETTING_KINDS } from './setting-blocks';
 import type { ShownBlock } from './setting-blocks';
 import { checkBlock, sendKeysInOrder } from './setting-save';
 import type { Drafts } from './setting-save';
@@ -52,6 +53,10 @@ const dirtyCount = computed(
     props.block.settings.filter(
       (setting) => drafts[setting.key] && !isSameValue(drafts[setting.key], draftOf(setting)),
     ).length,
+);
+/** The Discord block only lists webhook rows, each saved on its own: with nothing to draft the footer would sit disabled. */
+const hasDraftFields = computed(() =>
+  props.block.settings.some((setting) => SETTING_KINDS[setting.key].kind !== 'webhooks'),
 );
 watch(dirtyCount, (count) => emit('dirty', count), { immediate: true });
 watch(dirtyCount, (count) => {
@@ -178,6 +183,7 @@ const historySuffix = (key: SettingKey) => (props.block.keys.length > 1 ? ` · $
       <AdminNotice tone="danger" :title="notice.text" />
     </div>
     <footer
+      v-if="hasDraftFields"
       class="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line px-4 py-3 sm:px-5"
     >
       <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">

@@ -229,12 +229,6 @@ const resultRows = computed(() =>
         <ContestWindowText :start-time="row.startTime" :end-time="row.endTime" />
       </template>
       <template #cell-users="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
-      <template #cell-pending="{ row }">
-        <template v-if="row.editor?.pendingCount != null">
-          {{ formatNumber(row.editor.pendingCount, locale.locale) }}
-        </template>
-        <span v-else class="text-muted">—</span>
-      </template>
       <template #cell-flags="{ row }"><ContestFlagChips :contest="row" /></template>
       <template #actions="{ row }">
         <RouterLink

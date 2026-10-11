@@ -14,6 +14,7 @@ import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import AdminLeaveDialog from '../ui/form/AdminLeaveDialog.vue';
 import AdminLeaveGuard from '../ui/form/AdminLeaveGuard.vue';
+import { useQueryLeaveGuard } from '../ui/form/use-query-leave-guard';
 import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { needsPermissionText } from '../ui/permission-text';
 import OrganizationContext from './OrganizationContext.vue';
@@ -22,7 +23,6 @@ import OrganizationLogoField from './OrganizationLogoField.vue';
 import { MAX_ORGANIZATION_ADMINS } from './organization-form';
 import { organizationPanelOf } from './organization-search';
 import { useOrganizationEditor } from './use-organization-editor';
-import { useQueryLeaveGuard } from './use-query-leave-guard';
 import { useSlugFromName } from './use-slug-from-name';
 
 const props = defineProps<{ slug: string | null }>();

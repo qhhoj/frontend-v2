@@ -2,23 +2,13 @@
 import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import type { DrawerForm } from './drawer-form';
 
-/**
- * `AdminSaveBar` inside the drawer footer: the footer is already fixed, padded and ruled, so the bar's sticky page frame
- * is switched off.
- */
+/** `AdminSaveBar` in the drawer footer, which already pins, pads and rules the row. */
 defineProps<{ form: DrawerForm }>();
-const IN_FOOTER = {
-  position: 'static',
-  margin: '0',
-  padding: '0',
-  borderTopWidth: '0',
-  flex: '1 1 auto',
-};
 </script>
 
 <template>
   <AdminSaveBar
-    :style="IN_FOOTER"
+    variant="footer"
     :form="form.formId"
     :save-label="form.saveLabel"
     :dirty-count="form.dirtyCount"

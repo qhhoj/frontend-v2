@@ -2,11 +2,11 @@
 import AdminField from '../../ui/AdminField.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { INPUT } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { RULES_MAX_LENGTH } from '../contest-form';
 import type { ContestForm } from '../contest-form';
-import ContestCheck from './ContestCheck.vue';
 
 /** Contest rules and the balloon queue settings. */
 const form = defineModel<ContestForm>({ required: true });
@@ -38,7 +38,7 @@ defineProps<{ errors: FieldErrors }>();
         />
       </template>
     </AdminField>
-    <ContestCheck
+    <AdminCheckbox
       v-model="form.balloons"
       input-id="contest-balloons"
       :label="$t('admin.contestRules.fields.balloons')"
