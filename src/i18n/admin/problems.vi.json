@@ -283,7 +283,8 @@
         "strayEnd": "E không có S"
       },
       "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
-      "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm."
+      "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm.",
+      "autofill": "Tạo test từ gói zip"
     },
     "errors": {
       "fileName": "Tên tệp tối đa 100 ký tự và không chứa ký tự NUL.",
@@ -291,7 +292,26 @@
       "count": "Phải là số nguyên không âm.",
       "argsTotal": "Tổng tham số của các test quá 1 MiB; hãy rút ngắn."
     },
-    "savedToast": "Đã lưu cấu hình chấm của {code}."
+    "savedToast": "Đã lưu cấu hình chấm của {code}.",
+    "autofill": {
+      "title": "Tạo test từ gói zip",
+      "found": "Tìm thấy {count} cặp input/output",
+      "rules": "Đặt tên tệp theo một trong các dạng: 1.in + 1.out, test01/bai.inp + test01/bai.out, input1.txt + output1.txt. Input có đuôi .in, .inp hoặc bắt đầu bằng input; output có đuôi .out, .ans, .ok hoặc bắt đầu bằng output.",
+      "modeLegend": "Danh sách đang có test",
+      "modes": {
+        "append": "Thêm vào sau {count} test hiện có",
+        "replace": "Thay {count} test hiện có"
+      },
+      "skipped": "Bỏ qua {count} cặp đã có trong danh sách.",
+      "total": "Tổng điểm",
+      "totalHint": "Chia đều cho các test, phần dư cộng vào các test cuối. Sửa điểm từng test sau khi thêm.",
+      "previewLabel": "Các test sẽ tạo",
+      "unpaired": "{count} tệp chưa ghép được",
+      "unpairedHint": "Các tệp này sẽ không thành test. Kiểm tra tên: input và output của một test phải cùng thư mục và cùng tên gốc.",
+      "others": "{count} tệp khác (không phải input/output)",
+      "apply": "Thêm {count} test",
+      "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu."
+    }
   },
   "uploads": {
     "archive": {

@@ -109,6 +109,7 @@ const FORM_ID = 'problem-data-form';
             v-model="form.cases"
             :data="query.data.value"
             :errors="errors"
+            :problem-points="problem.points"
             @invalid="markInvalid"
           />
         </fieldset>

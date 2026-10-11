@@ -157,6 +157,19 @@ export function toDataBody(form: DataForm): { body: ProblemDataBody } | { errors
 }
 
 export const addCase = (cases: KeyedCase[]) => [...cases, keyed(blankCase('C'))];
+/** Single tests (`C`) for these file pairs, with these points, in order. */
+export const casesFromPairs = (
+  pairs: { input: string; output: string }[],
+  points: number[],
+): KeyedCase[] =>
+  pairs.map((pair, index) =>
+    keyed({
+      ...blankCase('C'),
+      input: pair.input,
+      output: pair.output,
+      points: points[index] ?? 0,
+    }),
+  );
 export const addBatch = (cases: KeyedCase[]) => [
   ...cases,
   keyed(blankCase('S')),
