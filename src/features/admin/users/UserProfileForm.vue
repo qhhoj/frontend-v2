@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import type { UserEdit } from '@/api/types/users-admin';
 import { updateUserByStaff } from '@/api/users-admin.api';
@@ -9,18 +10,26 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
 import OrganizationChips from '../ui/OrganizationChips.vue';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
+import { useDirtyForm } from '../ui/form/dirty-form';
+import { needsPermissionText } from '../ui/permission-text';
 import { changedUserFields, STAFF_DISPLAY_RANKS, userEditFormOf } from './user-edit';
 import { invalidateUserModeration } from './users.queries';
 
+/** The Hồ sơ tab. The drawer footer saves it (`form` id, exposed state); only changed fields are sent. */
 const props = defineProps<{ user: UserEdit; canEditEmail: boolean }>();
+const { t } = useI18n();
 const queryClient = useQueryClient();
-const form = ref(userEditFormOf(props.user));
+const FORM_ID = 'user-edit-profile';
+/** The stored row the draft is compared with: the loaded user, then each saved answer. */
+const basis = ref(props.user);
+const { draft: form, discard, commit } = useDirtyForm(userEditFormOf(props.user));
 const adminPassword = ref('');
-const changes = computed(() => changedUserFields(props.user, form.value));
+const savedAt = ref<Date | null>(null);
+const changes = computed(() => changedUserFields(basis.value, form.value));
 /** A new e-mail is a credential change: the backend wants the admin's own password with it. */
 const isEmailChanged = computed(() => changes.value.email !== undefined);
-const hasChanges = computed(() => Object.keys(changes.value).length > 0);
+const dirtyCount = computed(() => Object.keys(changes.value).length);
 
 const save = useAdminMutation({
   mutate: () =>
@@ -30,10 +39,13 @@ const save = useAdminMutation({
         ? { ...changes.value, currentPassword: adminPassword.value }
         : changes.value,
     ),
+  successText: () => t('admin.users.edit.profile.saved'),
   // Re-seeded from the stored row: the backend normalises the e-mail, and `leaveCurrentContest` is a one-off action.
   onSuccess: (saved) => {
-    form.value = userEditFormOf(saved);
+    basis.value = saved;
+    commit(userEditFormOf(saved));
     adminPassword.value = '';
+    savedAt.value = new Date();
   },
   // Also invalidates ['admin','users'], which holds the edit query.
   onDone: () => {
@@ -41,21 +53,37 @@ const save = useAdminMutation({
   },
 });
 const errors = save.fieldErrors;
-/** A refusal that names no field (a superuser target, a busy lock) is a line under the button. */
+/** A refusal that names no field (a superuser target, a busy lock) is a line above the footer. */
 const refusal = computed(() =>
   save.failure.value && Object.keys(errors.value).length === 0
     ? failureTextOf(save.failure.value)
     : null,
 );
+function submit() {
+  if (dirtyCount.value > 0) void save.run(undefined);
+}
+function discardAll() {
+  discard();
+  adminPassword.value = '';
+  save.reset();
+}
+defineExpose({
+  formId: FORM_ID,
+  saveLabel: t('admin.users.edit.profile.save'),
+  dirtyCount,
+  isPending: save.isPending,
+  savedAt,
+  discard: discardAll,
+});
 </script>
 
 <template>
   <form
+    :id="FORM_ID"
     class="flex flex-col gap-4"
     :aria-label="$t('admin.users.edit.profile.title')"
-    @submit.prevent="hasChanges && save.run(undefined)"
+    @submit.prevent="submit"
   >
-    <h3 class="font-display text-base font-semibold">{{ $t('admin.users.edit.profile.title') }}</h3>
     <div class="grid gap-4 md:grid-cols-2">
       <AdminField
         v-slot="{ id, describedBy, invalid }"
@@ -68,7 +96,7 @@ const refusal = computed(() =>
           :id="id"
           v-model="form.displayName"
           maxlength="100"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         />
@@ -83,7 +111,7 @@ const refusal = computed(() =>
           :id="id"
           v-model="form.fullName"
           maxlength="30"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         />
@@ -92,7 +120,7 @@ const refusal = computed(() =>
     <AdminField
       v-slot="{ id, describedBy, invalid }"
       :label="$t('admin.users.edit.profile.email')"
-      :hint="canEditEmail ? undefined : $t('admin.users.edit.profile.emailLocked')"
+      :hint="canEditEmail ? undefined : needsPermissionText('auth.change_user')"
       :error="errors.email"
       input-id="edit-email"
     >
@@ -102,7 +130,7 @@ const refusal = computed(() =>
         type="email"
         autocomplete="off"
         :readonly="!canEditEmail"
-        :class="[ADMIN_INPUT_CLASS, !canEditEmail && 'text-muted']"
+        :class="[INPUT, !canEditEmail && 'text-muted']"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
@@ -120,7 +148,7 @@ const refusal = computed(() =>
         v-model="adminPassword"
         type="password"
         autocomplete="current-password"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
@@ -135,7 +163,7 @@ const refusal = computed(() =>
         :id="id"
         v-model="form.about"
         rows="5"
-        :class="[ADMIN_INPUT_CLASS, 'py-2']"
+        :class="[INPUT, 'py-2']"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
@@ -152,7 +180,7 @@ const refusal = computed(() =>
           :id="id"
           v-model="form.displayRank"
           :disabled="user.displayRank === 'banned'"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         >
@@ -191,7 +219,7 @@ const refusal = computed(() =>
         v-model="form.notes"
         rows="3"
         maxlength="4096"
-        :class="[ADMIN_INPUT_CLASS, 'py-2']"
+        :class="[INPUT, 'py-2']"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
@@ -204,24 +232,6 @@ const refusal = computed(() =>
       v-model="form.organizations"
       :label="$t('admin.users.edit.profile.organizations')"
       :error="errors.organizations"
-    />
-    <div class="flex flex-wrap items-center gap-3">
-      <button
-        type="submit"
-        :class="ADMIN_PRIMARY_CLASS"
-        :aria-disabled="!hasChanges || save.isPending.value || undefined"
-        :aria-busy="save.isPending.value || undefined"
-      >
-        {{ $t('admin.users.edit.profile.save') }}
-      </button>
-      <span v-if="!hasChanges" class="text-sm text-muted">{{
-        $t('admin.users.edit.profile.noChanges')
-      }}</span>
-    </div>
-    <AdminStatus
-      v-if="save.isDone.value"
-      kind="done"
-      :text="$t('admin.users.edit.profile.saved')"
     />
     <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
   </form>

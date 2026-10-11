@@ -1,10 +1,5 @@
 {
-  "lead": "Tra cứu một tài khoản theo tên đăng nhập, hoặc xem danh sách người dùng của máy chủ.",
-  "lookup": {
-    "label": "Tên đăng nhập",
-    "submit": "Tra cứu",
-    "hint": "Nhập đúng tên đăng nhập của tài khoản."
-  },
+  "lead": "Tìm, mở và sửa tài khoản người dùng.",
   "list": {
     "region": "Danh sách người dùng",
     "empty": "Không có người dùng nào.",
@@ -13,28 +8,26 @@
       "label": "Trạng thái",
       "all": "Tất cả",
       "active": "Chưa cấm",
-      "banned": "Đã cấm"
+      "banned": "Bị cấm"
     },
     "search": {
-      "label": "Tìm người dùng",
-      "placeholder": "Tìm tên đăng nhập…",
-      "clear": "Xóa ô tìm",
-      "hint": "Khớp phần đầu tên đăng nhập, không phân biệt hoa thường."
+      "label": "Tìm người dùng"
     },
     "columns": {
       "user": "Người dùng",
-      "rank": "Hạng · trạng thái",
       "joined": "Tham gia",
       "banReason": "Lý do cấm",
       "lastAccess": "Truy cập gần nhất",
-      "open": "Mở"
+      "role": "Vai trò",
+      "status": "Trạng thái"
     },
     "openUser": "Mở {username}",
     "status": {
-      "banned": "Đã cấm",
+      "banned": "Bị cấm",
       "inactive": "Chưa kích hoạt",
       "superuser": "Siêu quản trị",
-      "staff": "Nhân viên"
+      "staff": "Nhân viên",
+      "active": "Hoạt động"
     },
     "reasonNone": "Không có lý do được ghi.",
     "neverAccessed": "Chưa từng truy cập",
@@ -44,22 +37,15 @@
       "banned": "{total} người bị cấm · {pageSize} người mỗi trang",
       "match": "{total} người khớp “{search}” · {pageSize} người mỗi trang"
     },
-    "order": "Khi có tìm kiếm, danh sách theo tên đăng nhập; nếu không, tài khoản mới nhất trước. Chưa sắp xếp được theo lần truy cập gần nhất.",
     "pager": "Trang danh sách người dùng",
-    "previous": "Trước",
-    "next": "Sau",
-    "pageOf": "Trang {page} / {last}",
-    "sort": {
-      "label": "Sắp xếp",
-      "default": "Thứ tự mặc định",
-      "lastAccess": "Truy cập gần nhất, cũ trước",
-      "-lastAccess": "Truy cập gần nhất, mới trước"
+    "openExact": "Mở tài khoản “{username}”",
+    "locked": {
+      "self": "Bạn",
+      "superuser": "Khoá"
     }
   },
   "card": {
-    "label": "Thông tin người dùng",
     "notFound": "Không có tài khoản \"{name}\".",
-    "joined": "{name} · tham gia {date}",
     "copyId": "Sao chép ID",
     "none": "Chưa có",
     "facts": {
@@ -116,19 +102,15 @@
   },
   "edit": {
     "open": "Sửa",
-    "title": "Sửa {username}",
-    "credentialsLocked": "Đổi email, đặt mật khẩu hoặc gửi liên kết đặt lại cần quyền auth.change_user.",
     "profile": {
       "title": "Hồ sơ",
       "displayName": "Tên hiển thị",
       "displayNameHint": "Hiện thay cho tên đăng nhập; để trống để hiện tên đăng nhập.",
       "fullName": "Họ và tên",
       "email": "Email",
-      "emailLocked": "Đổi email cần quyền auth.change_user.",
       "about": "Giới thiệu (Markdown)",
       "organizations": "Tổ chức",
       "save": "Lưu hồ sơ",
-      "noChanges": "Chưa có thay đổi.",
       "saved": "Đã lưu hồ sơ.",
       "displayRank": "Danh hiệu",
       "displayRankHint": "Danh hiệu cạnh tên; “banned” chỉ đặt khi cấm.",
@@ -171,7 +153,6 @@
       "teacher": "Giáo viên"
     },
     "account": {
-      "title": "Tài khoản",
       "active": "Tài khoản đang hoạt động.",
       "inactive": "Tài khoản đang bị vô hiệu hoá: người dùng không thể đăng nhập.",
       "banned": "Tài khoản đang bị cấm; bỏ cấm để kích hoạt lại.",
@@ -190,8 +171,27 @@
         "title": "Đặt lại xác thực hai bước cho {username}?",
         "body": "Gỡ ứng dụng xác thực và mọi khoá bảo mật, đồng thời đăng xuất người dùng khỏi mọi phiên."
       },
-      "twoFactorDone": "Đã đặt lại xác thực hai bước."
-    }
+      "twoFactorDone": "Đã đặt lại xác thực hai bước.",
+      "renamed": "Đã đổi tên thành {username}.",
+      "activated": "Đã kích hoạt {username}.",
+      "deactivated": "Đã vô hiệu hoá {username}."
+    },
+    "sections": {
+      "profile": "Hồ sơ",
+      "access": "Quyền",
+      "security": "Bảo mật",
+      "account": "Tài khoản"
+    },
+    "sectionsLabel": "Mục của tài khoản",
+    "locked": {
+      "self": "Đây là tài khoản của bạn: hãy sửa trong Cài đặt tài khoản.",
+      "superuser": "Chỉ siêu quản trị mới mở được tài khoản siêu quản trị."
+    },
+    "chips": {
+      "twoFactor": "2FA",
+      "inContest": "Đang thi"
+    },
+    "danger": "Vùng nguy hiểm"
   },
   "create": {
     "open": "Tạo tài khoản",

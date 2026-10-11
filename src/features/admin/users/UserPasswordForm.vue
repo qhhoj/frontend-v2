@@ -2,12 +2,12 @@
 import { computed, nextTick, ref, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { setUserPassword } from '@/api/users-admin.api';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { ADMIN_DANGER_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
+import { BUTTON, INPUT } from '../ui/controls';
 
 const props = defineProps<{ username: string }>();
 const { t } = useI18n();
@@ -76,7 +76,7 @@ async function submit() {
     <h3 class="font-display text-base font-semibold">
       {{ $t('admin.users.edit.password.title') }}
     </h3>
-    <SettingsNotice tone="warning">{{ $t('admin.users.edit.password.warning') }}</SettingsNotice>
+    <AdminNotice tone="caution" :title="$t('admin.users.edit.password.warning')" />
     <div class="grid gap-4 md:grid-cols-2">
       <AdminField
         v-slot="{ id, describedBy, invalid }"
@@ -91,7 +91,7 @@ async function submit() {
           v-model="newPassword"
           type="password"
           autocomplete="new-password"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         />
@@ -108,7 +108,7 @@ async function submit() {
           v-model="confirmation"
           type="password"
           autocomplete="new-password"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         />
@@ -127,14 +127,14 @@ async function submit() {
         v-model="currentPassword"
         type="password"
         autocomplete="current-password"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
         :aria-describedby="describedBy"
         :aria-invalid="invalid === 'true'"
       />
     </AdminField>
     <button
       type="submit"
-      :class="ADMIN_DANGER_CLASS"
+      :class="BUTTON.primary"
       class="self-start"
       :aria-disabled="!isFilled || set.isPending.value || undefined"
       :aria-busy="set.isPending.value || undefined"

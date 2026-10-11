@@ -6,6 +6,7 @@ import { confirmDialog, staffViewer, superuserViewer } from '@/test/admin-routes
 import { ratingHistory, sessionResponse, sessionUser, userPage } from '@/test/fixtures';
 import { homeRoutes } from '@/test/home-routes';
 import { staffUser } from '@/test/admin-fixtures/users';
+import { emptyAccessRoutes, userEdit } from '@/test/admin-fixtures/user-edit';
 import { TEXT_DEBOUNCE_MS } from '@/lib/use-debounced-text';
 import { useSessionStore } from '@/stores/session.store';
 
@@ -21,8 +22,14 @@ const mountUsers = async (path: string) => {
   await flushPromises();
   return mounted;
 };
+/** A superuser viewer edits too, so the drawer also loads the edit fields and the access. */
+const editRoutes = {
+  'GET /admin/users/tuan_k/profile': ok(userEdit()),
+  ...emptyAccessRoutes('tuan_k'),
+};
 const routes = (viewer = staffViewer(['judge.ban_user']), extra = {}) => ({
   ...viewer,
+  ...editRoutes,
   'GET /admin/users': page(
     [
       staffUser(),
@@ -33,13 +40,24 @@ const routes = (viewer = staffViewer(['judge.ban_user']), extra = {}) => ({
   'GET /users/tuan_k': ok(target),
   ...extra,
 });
-const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], text: string) => {
-  await wrapper
-    .findAll('button')
-    .find((button) => button.text() === text)!
-    .trigger('click');
+/** The drawer is teleported to `<body>`, out of the wrapper. */
+const inBody = (selector: string) => document.body.querySelector<HTMLElement>(selector);
+const click = async (text: string) => {
+  [...document.body.querySelectorAll<HTMLButtonElement>('button')]
+    .find((button) => button.textContent?.trim() === text)!
+    .click();
   await flushPromises();
 };
+const typeInto = async (selector: string, value: string) => {
+  const box = inBody(selector) as HTMLTextAreaElement;
+  box.value = value;
+  box.dispatchEvent(new Event('input'));
+  await flushPromises();
+};
+/** The drawer mounts after the user's page loads. */
+const waitForDrawer = () =>
+  vi.waitFor(() => expect(inBody('[data-testid="user-edit"]')).not.toBeNull());
+const dialogCount = () => document.body.querySelectorAll('[role="dialog"]').length;
 
 describe('UsersPage', () => {
   // The first mount loads the lazy admin shell chunk.
@@ -47,12 +65,13 @@ describe('UsersPage', () => {
 
   it('bans with a required reason after confirming, and refreshes the card and the staff list', async () => {
     const calls = mockApi(routes(undefined, { 'POST /users/tuan_k/ban': { status: 204 } }));
-    const { wrapper } = await mountUsers('/admin/users?user=tuan_k');
-    await click(wrapper, 'Cấm người dùng');
-    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
-    expect(wrapper.get('#ban-reason').attributes('aria-invalid')).toBe('true');
-    await wrapper.get('#ban-reason').setValue('Spam blog');
-    await click(wrapper, 'Cấm người dùng');
+    await mountUsers('/admin/users?user=tuan_k');
+    await waitForDrawer();
+    await click('Cấm người dùng');
+    expect(dialogCount()).toBe(1);
+    expect(inBody('#ban-reason')?.getAttribute('aria-invalid')).toBe('true');
+    await typeInto('#ban-reason', 'Spam blog');
+    await click('Cấm người dùng');
     expect(calls.some((call) => call.path.endsWith('/ban'))).toBe(false);
     await confirmDialog('Cấm');
     expect(calls.find((call) => call.path.endsWith('/ban'))?.body).toEqual({ reason: 'Spam blog' });
@@ -68,22 +87,24 @@ describe('UsersPage', () => {
         }),
       }),
     );
-    const { wrapper } = await mountUsers('/admin/users?user=tuan_k');
-    await wrapper.get('#ban-reason').setValue('Gian lận trong kỳ thi');
-    await click(wrapper, 'Cấm người dùng');
+    await mountUsers('/admin/users?user=tuan_k');
+    await waitForDrawer();
+    await typeInto('#ban-reason', 'Gian lận trong kỳ thi');
+    await click('Cấm người dùng');
     await confirmDialog('Cấm');
-    expect(wrapper.get('#ban-reason').attributes('aria-invalid')).toBe('true');
-    expect(wrapper.text()).toContain('Reserved for automatic contest-cheating bans.');
+    expect(inBody('#ban-reason')?.getAttribute('aria-invalid')).toBe('true');
+    expect(document.body.textContent).toContain('Reserved for automatic contest-cheating bans.');
   });
 
   it('offers impersonation to a superuser only, and not for another superuser or a banned account', async () => {
     mockApi(routes());
     const plain = await mountUsers('/admin/users?user=tuan_k');
-    expect(plain.wrapper.text()).not.toContain('Đóng vai tuan_k');
+    await waitForDrawer();
+    expect(document.body.textContent).not.toContain('Đóng vai tuan_k');
     plain.wrapper.unmount();
     mockApi(routes(superuserViewer()));
     const asSuperuser = await mountUsers('/admin/users?user=tuan_k');
-    expect(asSuperuser.wrapper.text()).toContain('Đóng vai tuan_k');
+    await vi.waitFor(() => expect(document.body.textContent).toContain('Đóng vai tuan_k'));
     asSuperuser.wrapper.unmount();
     mockApi(
       routes(superuserViewer(), {
@@ -95,8 +116,9 @@ describe('UsersPage', () => {
         ),
       }),
     );
-    const otherSuperuser = await mountUsers('/admin/users?user=tuan_k');
-    expect(otherSuperuser.wrapper.text()).not.toContain('Đóng vai tuan_k');
+    await mountUsers('/admin/users?user=tuan_k');
+    await waitForDrawer();
+    expect(document.body.textContent).not.toContain('Đóng vai tuan_k');
   });
 
   it('starts viewing as the user: the session switches, the previous account’s cache is dropped, and the page goes home', async () => {
@@ -112,11 +134,12 @@ describe('UsersPage', () => {
         [`POST /auth/impersonate/${target.id}`]: ok(asTarget),
       }),
     );
-    const { wrapper, queryClient } = await mountUsers('/admin/users?user=tuan_k');
+    const { queryClient } = await mountUsers('/admin/users?user=tuan_k');
+    await vi.waitFor(() => expect(document.body.textContent).toContain('Đóng vai tuan_k'));
     expect(
       queryClient.getQueryCache().findAll({ queryKey: ['admin', 'users'] }).length,
     ).toBeGreaterThan(0);
-    await click(wrapper, 'Đóng vai tuan_k');
+    await click('Đóng vai tuan_k');
     await confirmDialog('Bắt đầu đóng vai');
     expect(calls.some((call) => call.path === `/auth/impersonate/${target.id}`)).toBe(true);
     const session = useSessionStore();

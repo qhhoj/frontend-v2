@@ -1,117 +1,139 @@
 <script setup lang="ts">
-import ScrollRegion from '@/components/ScrollRegion.vue';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { Lock } from 'lucide-vue-next';
+import type { TotalPageMeta } from '@/api/client';
+import type { StaffUser } from '@/api/types/users-admin';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatAgo, formatDate, formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { buttonClass } from '../ui/controls';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import { rangeOf } from '../ui/table/table-columns';
+import type { AdminColumn } from '../ui/table/table-columns';
+import UserStatusChips from './UserStatusChips.vue';
 import { userStatusOf } from './users-list';
-import type { StaffUser } from '@/api/types/users-admin';
+import type { UserLock } from './users-list';
 
-defineProps<{ users: StaffUser[]; showReason: boolean; selected: string | null }>();
-const emit = defineEmits<{ open: [username: string] }>();
+/** The staff user list: one row (a card on a phone) per account, "Sửa" opens the drawer unless the row is locked. */
+const props = defineProps<{
+  users: StaffUser[];
+  meta?: TotalPageMeta;
+  showReason: boolean;
+  loading: boolean;
+  error: unknown;
+  /** Why a row cannot be opened, by user id (`userLockOf`); absent or null: it can. */
+  locks: Record<string, UserLock>;
+}>();
+const sort = defineModel<string | undefined>('sort');
+const emit = defineEmits<{ open: [username: string]; retry: [] }>();
+const i18n = useI18n();
+const { t } = i18n;
 const locale = useLocaleStore();
 const now = Date.now();
+
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'user', label: t('admin.users.list.columns.user'), priority: 'primary' },
+  { key: 'role', label: t('admin.users.list.columns.role') },
+  { key: 'status', label: t('admin.users.list.columns.status'), priority: 'badge' },
+  props.showReason
+    ? { key: 'banReason', label: t('admin.users.list.columns.banReason'), cellClass: 'max-w-80' }
+    : { key: 'joined', label: t('admin.users.list.columns.joined') },
+  {
+    key: 'lastAccess',
+    label: t('admin.users.list.columns.lastAccess'),
+    sort: { asc: 'lastAccess', desc: '-lastAccess', first: 'desc' },
+  },
+]);
+const rankText = (user: StaffUser) => {
+  const key = `admin.users.ranks.${user.displayRank}`;
+  return i18n.te(key) ? t(key) : user.displayRank;
+};
+const range = computed(() =>
+  props.meta
+    ? rangeOf(props.meta.page, props.meta.pageSize, props.users.length, props.meta.total)
+    : null,
+);
 </script>
 
 <template>
-  <ScrollRegion :label="$t('admin.users.list.region')">
-    <table class="w-full min-w-[40rem] text-left text-sm">
-      <thead>
-        <tr class="text-muted">
-          <th scope="col" class="px-2 py-2 font-semibold">
-            {{ $t('admin.users.list.columns.user') }}
-          </th>
-          <th scope="col" class="px-2 py-2 font-semibold">
-            {{ $t('admin.users.list.columns.rank') }}
-          </th>
-          <th scope="col" class="px-2 py-2 font-semibold">
-            {{
-              showReason
-                ? $t('admin.users.list.columns.banReason')
-                : $t('admin.users.list.columns.joined')
-            }}
-          </th>
-          <th scope="col" class="px-2 py-2 font-semibold">
-            {{ $t('admin.users.list.columns.lastAccess') }}
-          </th>
-          <th scope="col" class="sr-only">{{ $t('admin.users.list.columns.open') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="user in users"
-          :key="user.id"
-          data-testid="user-row"
-          class="border-t border-line align-top"
-        >
-          <td class="px-2 py-2">
-            <AdminUserLabel
-              :username="user.username"
-              :rating="user.rating"
-              :link="false"
-              :status="userStatusOf(user) === 'banned' ? 'banned' : 'active'"
-            />
-            <p v-if="user.displayName !== user.username" class="text-xs text-muted">
-              {{ user.displayName }}
-            </p>
-          </td>
-          <td class="px-2 py-2">
-            <p>
-              {{
-                $te(`admin.users.ranks.${user.displayRank}`)
-                  ? $t(`admin.users.ranks.${user.displayRank}`)
-                  : user.displayRank
-              }}
-            </p>
-            <p class="flex flex-wrap gap-1 text-xs">
-              <span v-if="user.isSuperuser" class="rounded-pill border border-line px-2">
-                {{ $t('admin.users.list.status.superuser') }}
-              </span>
-              <span v-else-if="user.isStaff" class="rounded-pill border border-line px-2">
-                {{ $t('admin.users.list.status.staff') }}
-              </span>
-              <span
-                v-if="userStatusOf(user) === 'banned'"
-                class="rounded-pill border border-negative px-2 text-negative"
-              >
-                {{ $t('admin.users.list.status.banned') }}
-              </span>
-              <span
-                v-else-if="userStatusOf(user) === 'inactive'"
-                class="rounded-pill border border-line px-2 text-muted"
-              >
-                {{ $t('admin.users.list.status.inactive') }}
-              </span>
-            </p>
-          </td>
-          <td class="px-2 py-2">
-            <template v-if="showReason">
-              {{ user.banReason ?? $t('admin.users.list.reasonNone') }}
-            </template>
-            <template v-else>{{ formatDate(user.dateJoined, locale.locale) }}</template>
-          </td>
-          <td class="px-2 py-2">
-            <template v-if="user.lastAccess">
-              <p>{{ formatAgo(user.lastAccess, now, locale.locale) }}</p>
-              <p class="font-mono text-xs text-muted">
-                {{ formatNumericDateTime(user.lastAccess, locale.locale) }}
-              </p>
-            </template>
-            <p v-else class="text-muted">{{ $t('admin.users.list.neverAccessed') }}</p>
-          </td>
-          <td class="px-2 py-2">
-            <button
-              type="button"
-              :class="[ADMIN_BUTTON_CLASS, 'min-h-11']"
-              :aria-pressed="user.username === selected"
-              :aria-label="$t('admin.users.list.openUser', { username: user.username })"
-              @click="emit('open', user.username)"
-            >
-              {{ $t('admin.users.list.columns.open') }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </ScrollRegion>
+  <AdminDataTable
+    v-model:sort="sort"
+    :columns="columns"
+    :rows="users"
+    :row-key="(user) => user.id"
+    :row-label="(user) => user.username"
+    :row-attrs="() => ({ 'data-testid': 'user-row' })"
+    :label="$t('admin.users.list.region')"
+    :loading="loading"
+    :error="error"
+    @retry="emit('retry')"
+  >
+    <template #cell-user="{ row }">
+      <div class="flex min-w-0 flex-col">
+        <AdminUserLabel
+          :username="row.username"
+          :rating="row.rating"
+          :link="false"
+          :status="userStatusOf(row) === 'banned' ? 'banned' : 'active'"
+        />
+        <span v-if="row.displayName !== row.username" class="truncate text-xs text-muted">
+          {{ row.displayName }}
+        </span>
+      </div>
+    </template>
+    <template #cell-role="{ row }">
+      <AdminChip v-if="row.isSuperuser" tone="accent">
+        {{ $t('admin.users.list.status.superuser') }}
+      </AdminChip>
+      <AdminChip v-else-if="row.isStaff" tone="info">
+        {{ $t('admin.users.list.status.staff') }}
+      </AdminChip>
+      <span v-else class="text-muted">{{ rankText(row) }}</span>
+    </template>
+    <template #cell-status="{ row }"><UserStatusChips :status="userStatusOf(row)" /></template>
+    <template #cell-banReason="{ row }">
+      <span class="line-clamp-2">{{ row.banReason ?? $t('admin.users.list.reasonNone') }}</span>
+    </template>
+    <template #cell-joined="{ row }">
+      <span class="whitespace-nowrap">{{ formatDate(row.dateJoined, locale.locale) }}</span>
+    </template>
+    <template #cell-lastAccess="{ row }">
+      <span
+        v-if="row.lastAccess"
+        class="whitespace-nowrap"
+        :title="formatNumericDateTime(row.lastAccess, locale.locale)"
+      >
+        {{ formatAgo(row.lastAccess, now, locale.locale) }}
+      </span>
+      <span v-else class="text-muted">{{ $t('admin.users.list.neverAccessed') }}</span>
+    </template>
+    <template #actions="{ row }">
+      <button
+        v-if="!locks[row.id]"
+        type="button"
+        data-testid="user-edit-open"
+        :class="buttonClass('secondary', 'sm')"
+        :aria-label="$t('admin.users.list.openUser', { username: row.username })"
+        @click="emit('open', row.username)"
+      >
+        {{ $t('admin.users.edit.open') }}
+      </button>
+      <span
+        v-else
+        class="inline-flex items-center gap-1 px-2 text-xs text-muted"
+        :title="$t(`admin.users.edit.locked.${locks[row.id]}`)"
+      >
+        <Lock aria-hidden="true" class="size-3.5" :stroke-width="1.75" />
+        {{ $t(`admin.users.list.locked.${locks[row.id]}`) }}
+      </span>
+    </template>
+    <template #empty><slot name="empty" /></template>
+    <template v-if="meta" #footer>
+      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
+      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.users.list.pager')" />
+    </template>
+  </AdminDataTable>
 </template>

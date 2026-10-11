@@ -1,10 +1,5 @@
 {
-  "lead": "Look up one account by username, or browse the server's users.",
-  "lookup": {
-    "label": "Username",
-    "submit": "Look up",
-    "hint": "Type the account's exact username."
-  },
+  "lead": "Find, open and edit user accounts.",
   "list": {
     "region": "User list",
     "empty": "No users.",
@@ -16,25 +11,23 @@
       "banned": "Banned"
     },
     "search": {
-      "label": "Search users",
-      "placeholder": "Search usernames…",
-      "clear": "Clear search",
-      "hint": "Matches the start of the username, case-insensitive."
+      "label": "Search users"
     },
     "columns": {
       "user": "User",
-      "rank": "Rank · status",
       "joined": "Joined",
       "banReason": "Ban reason",
       "lastAccess": "Last access",
-      "open": "Open"
+      "role": "Role",
+      "status": "Status"
     },
     "openUser": "Open {username}",
     "status": {
       "banned": "Banned",
       "inactive": "Not activated",
       "superuser": "Superuser",
-      "staff": "Staff"
+      "staff": "Staff",
+      "active": "Active"
     },
     "reasonNone": "No reason recorded.",
     "neverAccessed": "Never accessed",
@@ -44,22 +37,15 @@
       "banned": "{total} banned users · {pageSize} per page",
       "match": "{total} users match “{search}” · {pageSize} per page"
     },
-    "order": "With a search, the list is ordered by username; otherwise, newest accounts first. It cannot be sorted by last access yet.",
     "pager": "User list pages",
-    "previous": "Previous",
-    "next": "Next",
-    "pageOf": "Page {page} / {last}",
-    "sort": {
-      "label": "Sort by",
-      "default": "Default order",
-      "lastAccess": "Last access, oldest first",
-      "-lastAccess": "Last access, newest first"
+    "openExact": "Open account “{username}”",
+    "locked": {
+      "self": "You",
+      "superuser": "Locked"
     }
   },
   "card": {
-    "label": "User details",
     "notFound": "No account \"{name}\".",
-    "joined": "{name} · joined {date}",
     "copyId": "Copy ID",
     "none": "None yet",
     "facts": {
@@ -116,19 +102,15 @@
   },
   "edit": {
     "open": "Edit",
-    "title": "Edit {username}",
-    "credentialsLocked": "Changing the e-mail, the password or sending a reset link needs the auth.change_user permission.",
     "profile": {
       "title": "Profile",
       "displayName": "Display name",
       "displayNameHint": "Shown in place of the username; leave empty to show the username.",
       "fullName": "Full name",
       "email": "E-mail",
-      "emailLocked": "Changing the e-mail needs the auth.change_user permission.",
       "about": "About (Markdown)",
       "organizations": "Organizations",
       "save": "Save profile",
-      "noChanges": "No changes yet.",
       "saved": "Profile saved.",
       "displayRank": "Display rank",
       "displayRankHint": "The title beside the name; “banned” is set by banning.",
@@ -171,7 +153,6 @@
       "teacher": "Teacher"
     },
     "account": {
-      "title": "Account",
       "active": "The account is active.",
       "inactive": "The account is inactive: the user cannot sign in.",
       "banned": "The account is banned; unban it to reactivate it.",
@@ -190,8 +171,27 @@
         "title": "Reset two-factor sign-in for {username}?",
         "body": "Removes their authenticator app and every security key and signs them out everywhere."
       },
-      "twoFactorDone": "Two-factor sign-in reset."
-    }
+      "twoFactorDone": "Two-factor sign-in reset.",
+      "renamed": "Renamed to {username}.",
+      "activated": "Activated {username}.",
+      "deactivated": "Deactivated {username}."
+    },
+    "sections": {
+      "profile": "Profile",
+      "access": "Permissions",
+      "security": "Security",
+      "account": "Account"
+    },
+    "sectionsLabel": "Account sections",
+    "locked": {
+      "self": "This is your own account: edit it in your account settings.",
+      "superuser": "Only a superuser can open a superuser account."
+    },
+    "chips": {
+      "twoFactor": "2FA",
+      "inContest": "In a contest"
+    },
+    "danger": "Danger zone"
   },
   "create": {
     "open": "Create accounts",

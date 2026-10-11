@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import type { OrganizationChip } from '@/api/types/admin-common';
 import type { CreatedUser, NewUserRow } from '@/api/types/users-admin';
 import { createUsers, USER_CREATE_BATCH } from '@/api/users-admin.api';
@@ -9,7 +9,7 @@ import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminStatus from '../ui/AdminStatus.vue';
 import OrganizationChips from '../ui/OrganizationChips.vue';
 import UploadButton from '../ui/UploadButton.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import CreatedUsersTable from './CreatedUsersTable.vue';
 import NewUserFields from './NewUserFields.vue';
 import { parseUserCsv, resultsCsv } from './user-csv';
@@ -61,6 +61,8 @@ function download() {
   // Revoked on the next tick: Safari aborts a download whose URL dies in the same tick.
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
+/** The custom header slot loses PrimeVue's own label, so the dialog is named by its heading here. */
+const titleId = useId();
 </script>
 
 <template>
@@ -70,9 +72,12 @@ function download() {
     :draggable="false"
     :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
     :close-button-props="{ 'aria-label': $t('common.close') }"
+    :pt="{ root: { 'aria-labelledby': titleId } }"
   >
     <template #header>
-      <h2 class="font-display text-lg font-semibold">{{ $t('admin.users.create.title') }}</h2>
+      <h2 :id="titleId" class="font-display text-lg font-semibold">
+        {{ $t('admin.users.create.title') }}
+      </h2>
     </template>
     <form class="flex flex-col gap-5" @submit.prevent="canSubmit && create.run(rows)">
       <fieldset class="flex flex-wrap gap-2">
@@ -120,7 +125,7 @@ function download() {
       />
       <button
         type="submit"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="BUTTON.primary"
         class="self-start"
         :aria-disabled="!canSubmit || create.isPending.value || undefined"
         :aria-busy="create.isPending.value || undefined"
@@ -141,7 +146,7 @@ function download() {
         "
       />
       <CreatedUsersTable :results="results" />
-      <button type="button" :class="ADMIN_BUTTON_CLASS" class="self-start" @click="download">
+      <button type="button" :class="BUTTON.secondary" class="self-start" @click="download">
         {{ $t('admin.users.create.results.download') }}
       </button>
     </section>
