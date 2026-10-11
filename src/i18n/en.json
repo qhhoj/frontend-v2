@@ -2010,7 +2010,8 @@
   },
   "shortLink": {
     "notFoundHint": "You may not have permission to view this page.",
-    "copy": "Copy short link",
+    "copy": "Copy",
+    "copyAriaLabel": "Copy link",
     "creating": "Creating link…",
     "copied": "Copied",
     "copiedAnnounce": "Copied {url}",

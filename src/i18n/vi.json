@@ -2010,7 +2010,8 @@
   },
   "shortLink": {
     "notFoundHint": "Bạn có thể không có quyền xem trang này.",
-    "copy": "Sao chép liên kết ngắn",
+    "copy": "Sao chép",
+    "copyAriaLabel": "Sao chép liên kết",
     "creating": "Đang tạo liên kết…",
     "copied": "Đã sao chép",
     "copiedAnnounce": "Đã sao chép {url}",

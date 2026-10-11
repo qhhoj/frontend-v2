@@ -85,7 +85,8 @@ describe('ShortLinkButton', () => {
     await button(wrapper).trigger('click');
     await flushPromises();
     await vi.advanceTimersByTimeAsync(2000);
-    expect(button(wrapper).text()).toBe('Sao chép liên kết ngắn');
+    expect(button(wrapper).text()).toBe('Sao chép');
+    expect(button(wrapper).attributes('aria-label')).toBe('Sao chép liên kết');
   });
 
   it('locks with the daily-limit text on 429 and sends nothing more', async () => {
