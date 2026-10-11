@@ -29,10 +29,6 @@ export interface WebhooksDraft {
 }
 export type SettingDraft = ScalarDraft | SecretDraft | OAuthDraft | WebhooksDraft;
 
-/** The last four characters of a plain credential, the rest as dots: enough to tell two keys apart. */
-export const maskedPreview = (value: unknown) =>
-  typeof value === 'string' && value !== '' ? `••••••••${value.slice(-4)}` : '';
-
 const isSealedSet = (value: unknown) =>
   typeof value === 'object' && value !== null && (value as { set?: unknown }).set === true;
 
@@ -40,8 +36,6 @@ export function draftOf(setting: Setting): SettingDraft {
   const { kind } = SETTING_KINDS[setting.key];
   if (kind === 'secretText')
     return { isSet: isSealedSet(setting.value), isReplacing: false, replacement: '' };
-  if (kind === 'maskedText')
-    return { isSet: setting.value !== '', isReplacing: false, replacement: '' };
   if (kind === 'webhooks')
     return { isSet: isSealedSet(setting.value), isReplacing: false, rows: [] };
   if (kind === 'oauth') {
@@ -84,7 +78,7 @@ function webhooksValue(rows: WebhookRow[]): Record<string, string> {
 export function valueToSend(setting: Setting, draft: SettingDraft): { value: unknown } | null {
   const { kind } = SETTING_KINDS[setting.key];
   if (kind === 'oauth') return oauthToSend(setting, draft as OAuthDraft);
-  if (kind === 'secretText' || kind === 'maskedText') {
+  if (kind === 'secretText') {
     const secret = draft as SecretDraft;
     const typed = secret.replacement.trim();
     return secret.isReplacing && typed !== '' ? { value: typed } : null;

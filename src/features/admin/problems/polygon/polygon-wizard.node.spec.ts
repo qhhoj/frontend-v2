@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { PolygonImportBody } from '@/api/types/polygon';
-import { polygonProblem } from '@/test/admin-fixtures/polygon';
+import { polygonPackage, polygonProblem } from '@/test/admin-fixtures/polygon';
 import { initialWizardState, stepStatusOf, wizardReducer } from './polygon-wizard';
 import type { WizardState } from './polygon-wizard';
 
 const ready = polygonProblem();
-const running = polygonProblem({ id: 2, latestPackage: { id: 3, revision: 4, state: 'RUNNING' } });
+const running = polygonProblem({
+  id: 2,
+  latestPackage: polygonPackage({ id: 3, revision: 4, state: 'RUNNING' }),
+});
 const body = { code: 'xau_doi_xung' } as PolygonImportBody;
 const pick: WizardState = { step: 'pick', selected: null };
 

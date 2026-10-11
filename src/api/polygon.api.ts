@@ -1,4 +1,4 @@
-import { apiGet, apiSend } from './typed';
+import { apiGet, apiGetPage, apiSend } from './typed';
 import type { PolygonImportBody, PolygonProblemsQuery } from './types/polygon';
 
 /** Whether the key and secret are set, and the account name setters share with; no call to Polygon. */
@@ -25,3 +25,17 @@ export const updatePolygonLink = (code: string, autoSync: boolean) =>
 
 export const unlinkPolygon = (code: string) =>
   apiSend('delete', '/problems/{code}/polygon', { path: { code } });
+
+/** Rows per page of the sync history. */
+export const POLYGON_SYNCS_PAGE_SIZE = 10;
+
+/** Every finished Polygon import and sync, newest first; needs `judge.edit_all_problem`. */
+export const fetchPolygonSyncs = (page: number) =>
+  apiGetPage('/polygon/syncs', { query: { page, pageSize: POLYGON_SYNCS_PAGE_SIZE } });
+
+/** One problem's finished imports and syncs, newest first (kept after an unlink). */
+export const fetchProblemPolygonSyncs = (code: string, page: number) =>
+  apiGetPage('/problems/{code}/polygon/syncs', {
+    path: { code },
+    query: { page, pageSize: POLYGON_SYNCS_PAGE_SIZE },
+  });

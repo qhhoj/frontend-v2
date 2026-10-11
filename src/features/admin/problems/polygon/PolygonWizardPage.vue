@@ -3,12 +3,14 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { usePermissions } from '@/stores/use-permissions';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
 import PolygonConfigureStep from './PolygonConfigureStep.vue';
 import PolygonNotConnected from './PolygonNotConnected.vue';
 import PolygonPickStep from './PolygonPickStep.vue';
 import PolygonProgressStep from './PolygonProgressStep.vue';
+import PolygonSyncHistory from './PolygonSyncHistory.vue';
 import WizardStepper from './WizardStepper.vue';
 import { initialWizardState, wizardReducer } from './polygon-wizard';
 import type { WizardEvent } from './polygon-wizard';
@@ -24,6 +26,11 @@ const status = usePolygonStatusQuery();
 const queryJob = typeof route.query.job === 'string' ? route.query.job : null;
 const state = ref(initialWizardState(queryJob));
 const accountName = computed(() => status.data.value?.accountName ?? '');
+/** Every problem's history names every problem, so the server asks for `judge.edit_all_problem`; asked for once opened. */
+const { can } = usePermissions();
+const isHistoryOpen = ref(false);
+const onHistoryToggle = (event: Event) =>
+  (isHistoryOpen.value = (event.target as HTMLDetailsElement).open);
 
 /** The sidebar link (no `?job=`) or a pasted job link reuses this page: the URL decides the step then. */
 watch(
@@ -107,5 +114,16 @@ const LEAD_KEYS = {
         @started="(jobId, body) => send({ type: 'started', jobId, body })"
       />
     </QueryState>
+    <details
+      v-if="state.step === 'pick' && can('judge.edit_all_problem')"
+      class="glass rounded-panel p-5"
+      data-testid="polygon-all-syncs"
+      @toggle="onHistoryToggle"
+    >
+      <summary class="min-h-11 cursor-pointer font-semibold">
+        {{ $t('admin.polygonLink.history.showAll') }}
+      </summary>
+      <PolygonSyncHistory v-if="isHistoryOpen" :code="null" class="mt-3" />
+    </details>
   </div>
 </template>

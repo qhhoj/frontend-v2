@@ -83,6 +83,7 @@
     "owner": "Chủ sở hữu",
     "package": "Bản",
     "packageValue": "r{revision}, gói #{id}",
+    "built": "Dựng lúc",
     "fromPolygon": "Lấy từ gói Polygon",
     "taken": {
       "statements": "Đề bài, bản dịch và lời giải",
@@ -152,6 +153,28 @@
       "title": "Huỷ liên kết {code} với Polygon?",
       "body": "Nội dung bài giữ nguyên; chỉ ngừng đồng bộ (cả tự đồng bộ). Muốn liên kết lại thì nhập lại bài ở chế độ cập nhật.",
       "confirm": "Huỷ liên kết"
+    }
+  },
+  "history": {
+    "show": "Lịch sử đồng bộ",
+    "showAll": "Lịch sử đồng bộ của mọi bài",
+    "title": "Các lượt nhập và đồng bộ, mới nhất trước",
+    "empty": "Chưa có lượt nhập hay đồng bộ nào được ghi lại.",
+    "total": "{total} lượt",
+    "previous": "Trang trước",
+    "next": "Trang sau",
+    "builtAt": "dựng lúc {date}",
+    "results": {
+      "ok": "Thành công",
+      "failed": "Lỗi"
+    },
+    "purposes": {
+      "link": "Nhập lần đầu",
+      "sync": "Đồng bộ"
+    },
+    "triggers": {
+      "manual": "Thủ công",
+      "auto": "Tự động"
     }
   }
 }

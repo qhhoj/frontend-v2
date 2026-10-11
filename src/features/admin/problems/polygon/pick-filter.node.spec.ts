@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { polygonProblem } from '@/test/admin-fixtures/polygon';
+import { polygonPackage, polygonProblem } from '@/test/admin-fixtures/polygon';
 import { cardBlockOf, filterCounts, filterProblems } from './pick-filter';
 
 const withState = (state: 'READY' | 'RUNNING' | 'FAILED' | 'NONE', id = 1) =>
@@ -8,7 +8,7 @@ const withState = (state: 'READY' | 'RUNNING' | 'FAILED' | 'NONE', id = 1) =>
     name: `bai-${id}`,
     title: null,
     owner: 'thu.tran',
-    latestPackage: { id: null, revision: null, state },
+    latestPackage: polygonPackage({ id: null, revision: null, state }),
   });
 
 describe('cardBlockOf', () => {

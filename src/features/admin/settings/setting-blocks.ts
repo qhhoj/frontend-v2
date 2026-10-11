@@ -8,8 +8,6 @@ export type SettingKind =
   | { kind: 'choice'; options: readonly string[] }
   | { kind: 'url' }
   | { kind: 'secretText' }
-  /** A credential the API returns in plain text: shown masked to its last characters, typed only to replace it. */
-  | { kind: 'maskedText' }
   | { kind: 'oauth' }
   | { kind: 'webhooks' };
 
@@ -39,7 +37,7 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'quota.cost.contest': { kind: 'integer', min: 0, max: 1000 },
   'quota.cost.dataPer10MiB': { kind: 'integer', min: 0, max: 1000 },
   'polygon.accountName': { kind: 'text' },
-  'polygon.apiKey': { kind: 'maskedText' },
+  'polygon.apiKey': { kind: 'secretText' },
   'polygon.apiSecret': { kind: 'secretText' },
 };
 

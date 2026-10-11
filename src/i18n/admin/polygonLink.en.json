@@ -83,6 +83,7 @@
     "owner": "Owner",
     "package": "Version",
     "packageValue": "r{revision}, package #{id}",
+    "built": "Built",
     "fromPolygon": "Taken from the Polygon package",
     "taken": {
       "statements": "Statements, translations and the tutorial",
@@ -152,6 +153,28 @@
       "title": "Unlink {code} from Polygon?",
       "body": "The problem's content stays; only syncing stops (auto-sync too). To link again, import the problem in update mode.",
       "confirm": "Unlink"
+    }
+  },
+  "history": {
+    "show": "Sync history",
+    "showAll": "Sync history of every problem",
+    "title": "Imports and syncs, newest first",
+    "empty": "No import or sync has been recorded yet.",
+    "total": "{total} runs",
+    "previous": "Previous",
+    "next": "Next",
+    "builtAt": "built {date}",
+    "results": {
+      "ok": "Succeeded",
+      "failed": "Failed"
+    },
+    "purposes": {
+      "link": "First import",
+      "sync": "Sync"
+    },
+    "triggers": {
+      "manual": "Manual",
+      "auto": "Automatic"
     }
   }
 }

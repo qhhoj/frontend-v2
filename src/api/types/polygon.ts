@@ -9,3 +9,5 @@ export type PolygonImportBody = JsonBodyOf<'/polygon/problems/{polygonId}/import
 export type PolygonTestResult = Schemas['PolygonTestResponse'];
 export type PolygonLink = Schemas['PolygonLinkResponse'];
 export type PolygonLinkState = Schemas['PolygonLinkStateResponse'];
+export type PolygonSyncRun = Schemas['PolygonSyncRunResponse'];
+export type PolygonSyncStep = Schemas['PolygonSyncStep'];
