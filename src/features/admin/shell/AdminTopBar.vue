@@ -7,7 +7,7 @@ defineEmits<{ search: [] }>();
 </script>
 
 <template>
-  <!-- One line at every width: below `sm` the badge, the search label and the back link's text give way to icons. -->
+  <!-- One line at every width: below `sm` the badge, the "Quản trị" label, the search label and the back link's text give way to icons. -->
   <header
     data-testid="admin-topbar"
     class="flex items-center gap-2 border-b border-line bg-surface-strong px-4 py-2 sm:gap-4 sm:px-6 sm:py-3"
@@ -17,7 +17,9 @@ defineEmits<{ search: [] }>();
       class="flex min-h-11 shrink-0 items-center gap-2 font-display text-lg font-bold"
     >
       {{ $t('app.name') }}
-      <span class="font-body text-sm font-semibold text-muted">{{ $t('admin.shell.title') }}</span>
+      <span class="hidden font-body text-sm font-semibold text-muted sm:inline">{{
+        $t('admin.shell.title')
+      }}</span>
     </RouterLink>
     <span
       class="hidden items-center gap-1.5 rounded-pill bg-content px-3 py-1 text-xs font-semibold text-ground md:inline-flex"

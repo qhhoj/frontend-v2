@@ -124,7 +124,13 @@ const status = computed(() => {
         />
       </div>
       <p role="status" class="text-xs text-muted">{{ status }}</p>
-      <div class="max-h-[min(60vh,28rem)] overflow-y-auto">
+      <!-- Focusable so a keyboard user can scroll it; the combobox keeps the selection. -->
+      <div
+        role="region"
+        tabindex="0"
+        :aria-label="$t('admin.shell.search.results')"
+        class="max-h-[min(60vh,28rem)] overflow-y-auto"
+      >
         <PaletteResults
           v-if="entries.length > 0"
           :listbox-id="listboxId"

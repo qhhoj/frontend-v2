@@ -55,6 +55,7 @@ test('a record hit links to its editor', async ({ page, api }) => {
   signInAsStaff(api, ['judge.edit_own_problem']);
   api.routes['GET /problems'] = adminList([problemItem({ code: 'aplusb', name: 'A cộng B' })]);
   await page.goto('/admin');
+  await expect(page.getByTestId('admin-topbar')).toBeVisible();
   await page.keyboard.press('Control+k');
   await page.getByRole('combobox').fill('aplus');
   await expect(page.getByRole('option', { name: /A cộng B/ })).toBeVisible();
