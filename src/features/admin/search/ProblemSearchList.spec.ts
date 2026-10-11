@@ -6,11 +6,13 @@ import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { adminProblemItem } from '@/test/admin-fixtures/index-search';
+import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 
 const PERMS = ['judge.edit_own_problem'];
 const page = (items: unknown[], total = items.length, current = 1) => ({
   body: { data: items, meta: { page: current, pageSize: 20, total } },
 });
+const META = { 'GET /problems/meta': { body: { data: problemEditingMeta() } } };
 const problemCalls = (calls: ApiCall[]) => calls.filter((call) => call.path === '/problems');
 const mountIndex = async (path = '/admin/problems') => {
   const mounted = await mountApp(path);
@@ -25,6 +27,7 @@ describe('ProblemSearchList', () => {
   it('lists problems the account may see (visibility=all), marks the typed text and links to the editor', async () => {
     const calls = mockApi({
       ...staffViewer(PERMS),
+      ...META,
       'GET /problems': page([adminProblemItem()], 86),
     });
     const { wrapper } = await mountIndex('/admin/problems?q=hcmus');
@@ -36,7 +39,11 @@ describe('ProblemSearchList', () => {
   });
 
   it('puts what was typed in the address after the pause and asks again with it', async () => {
-    const calls = mockApi({ ...staffViewer(PERMS), 'GET /problems': page([adminProblemItem()]) });
+    const calls = mockApi({
+      ...staffViewer(PERMS),
+      ...META,
+      'GET /problems': page([adminProblemItem()]),
+    });
     const { wrapper, router } = await mountIndex();
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await wrapper.get('input[type="search"]').setValue('cây');

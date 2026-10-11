@@ -34,3 +34,5 @@ export const isProblemSort = (value: unknown): value is ProblemSort =>
 export type ProblemListQuery = QueryOf<'/problems'>;
 export type RandomProblemQuery = QueryOf<'/problems/random'>;
 export type RandomProblem = Schemas['RandomProblemResponse'];
+/** `POST /problems/bulk/visibility`: one result per requested code. */
+export type BulkVisibilityResult = Schemas['BulkVisibilityResponse'];

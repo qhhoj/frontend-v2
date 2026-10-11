@@ -8,9 +8,16 @@ import OrganizationChips from '../../ui/OrganizationChips.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { EDIT_ALL_PROBLEM, permissionLock } from './field-lock';
 import type { ProblemForm } from './problem-form';
+import type { UserSummaryView } from '@/api/types/problem-editing';
+import AdminUserLabel from '../../ui/AdminUserLabel.vue';
 
 const form = defineModel<ProblemForm>({ required: true });
-defineProps<{ errors: FieldErrors }>();
+/** `isSuggestionPending`: the saved problem is still private, so the suggestion awaits review. */
+defineProps<{
+  errors: FieldErrors;
+  suggester: UserSummaryView | null;
+  isSuggestionPending: boolean;
+}>();
 const { can } = usePermissions();
 /** Staff-only people and organizations: a viewer without `judge.edit_all_problem` sees them locked. */
 const staffLock = computed(() => permissionLock(can, EDIT_ALL_PROBLEM));
@@ -18,6 +25,17 @@ const staffLock = computed(() => permissionLock(can, EDIT_ALL_PROBLEM));
 
 <template>
   <SettingsCard :title="$t('admin.problems.people.title')">
+    <p
+      v-if="suggester"
+      data-testid="people-suggester"
+      class="flex flex-wrap items-center gap-2 text-sm"
+    >
+      {{ $t('admin.problems.people.suggester') }}
+      <AdminUserLabel :username="suggester.username" :rating="suggester.rating" />
+      <span v-if="isSuggestionPending" class="text-muted">{{
+        $t('admin.problems.people.suggesterPending')
+      }}</span>
+    </p>
     <div class="grid gap-5 sm:grid-cols-2">
       <UsernameChips
         v-model="form.authors"

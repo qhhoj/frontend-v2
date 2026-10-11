@@ -3,7 +3,6 @@ import { ADMIN_SCREENS, adminRouteName } from './admin-screens';
 import type { AdminScreenId } from './admin-screens';
 
 type Loader = () => Promise<RouteComponent | { default: RouteComponent }>;
-const placeholder: Loader = () => import('./shell/AdminPlaceholder.vue');
 
 /** One line per screen: each screen task swaps only its own line (records are separated, so merges stay clean). */
 const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
@@ -17,7 +16,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   problemEditorial: () => import('./problems/ProblemEditorPage.vue'),
   problemData: () => import('./problems/ProblemEditorPage.vue'),
   problemFiles: () => import('./problems/ProblemEditorPage.vue'),
-  types: placeholder,
+  types: () => import('./catalogs/ProblemCatalogsPage.vue'),
   contests: () => import('./contests/ContestsIndexPage.vue'),
   contestNew: () => import('./contests/general/ContestCreatePage.vue'),
   contestTags: () => import('./contest-tags/ContestTagsPage.vue'),

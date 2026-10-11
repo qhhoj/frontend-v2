@@ -1,41 +1,81 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import type { BulkVisibilityResult } from '@/api/types/problems';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { valuesOf } from '@/features/problems/use-problem-filters';
 import { formatNumber } from '@/lib/format';
-import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
+import { usePermissions } from '@/stores/use-permissions';
+import { useProblemEditingMetaQuery } from '../problems/problem-editing.queries';
+import { isNotFound } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
-import HighlightedText from './HighlightedText.vue';
 import IndexSearchBox from './IndexSearchBox.vue';
-import { SEARCH_MAX_LENGTH, searchQueryOf } from './index-search';
-import { useAdminProblemSearchQuery } from './index-search.queries';
+import ProblemBulkResult from './ProblemBulkResult.vue';
+import ProblemBulkVisibilityDialog from './ProblemBulkVisibilityDialog.vue';
+import ProblemListFilters from './ProblemListFilters.vue';
+import ProblemListTable from './ProblemListTable.vue';
+import { useAdminProblemSearchQuery, useAuthorIdQuery } from './index-search.queries';
+import { filterQueryOf, filtersFromQuery, listQueryOf } from './problem-list-filters';
+import type { FilterPatch } from './problem-list-filters';
+import { useProblemSelection } from './use-problem-selection';
 
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
-const search = computed(() => (valuesOf(route.query.q)[0] ?? '').slice(0, SEARCH_MAX_LENGTH));
-const page = computed(() => pageFromQuery(route.query.page));
-const { data, isPending, error, refetch } = useAdminProblemSearchQuery(search, page);
-const commit = (text: string) =>
-  void router.replace({ query: searchQueryOf(route.query, { q: text }) });
-
-const shownText = computed(() => formatNumber(data.value?.items.length ?? 0, locale.locale));
-const totalText = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
 const { t } = useI18n();
+const { can } = usePermissions();
+const filters = computed(() => filtersFromQuery(route.query));
+const author = computed(() => filters.value.author);
+const { data: meta } = useProblemEditingMetaQuery();
+const authorLookup = useAuthorIdQuery(author);
+const isAuthorUnknown = computed(() => author.value !== '' && isNotFound(authorLookup.error.value));
+/** A lookup that failed for another reason (network, 5xx) shows as the list's error, with a retry. */
+const lookupError = computed(() => (isAuthorUnknown.value ? null : authorLookup.error.value));
+const listQuery = computed(() => listQueryOf(filters.value, authorLookup.data.value));
+const isReady = computed(() => author.value === '' || authorLookup.isSuccess.value);
+const { data, isPending, error, refetch } = useAdminProblemSearchQuery(listQuery, isReady);
+const retry = () => void (lookupError.value ? authorLookup.refetch() : refetch());
+const change = (patch: FilterPatch) =>
+  void router.replace({ query: filterQueryOf(route.query, patch) });
+
+const canBulk = computed(() => can('judge.change_public_visibility'));
+const pageCodes = computed(() => (data.value?.items ?? []).map((item) => item.code));
+const selection = useProblemSelection(pageCodes);
+const lastResult = ref<BulkVisibilityResult | null>(null);
+watch(
+  listQuery,
+  () => {
+    selection.clear();
+    lastResult.value = null;
+  },
+  { deep: true },
+);
+const isBulkOpen = ref(false);
+/** Kept after the dialog closes, so its wording does not flip while it fades out. */
+const isBulkPublic = ref(true);
+function openBulk(isPublic: boolean) {
+  isBulkPublic.value = isPublic;
+  isBulkOpen.value = true;
+}
+function onBulkDone(result: BulkVisibilityResult) {
+  lastResult.value = result;
+  selection.clear();
+}
+
 const countText = computed(() => {
   const values = {
-    shown: shownText.value,
-    total: totalText.value,
-    q: search.value,
+    shown: formatNumber(data.value?.items.length ?? 0, locale.locale),
+    total: formatNumber(data.value?.meta.total ?? 0, locale.locale),
+    q: filters.value.q,
   };
-  if (!search.value) return t('admin.search.problems.count', values);
-  return t('admin.search.problems.countFor', values);
+  return t(
+    filters.value.q ? 'admin.search.problems.countFor' : 'admin.search.problems.count',
+    values,
+  );
 });
 </script>
 
@@ -48,15 +88,47 @@ const countText = computed(() => {
       {{ $t('admin.search.problems.title') }}
     </h2>
     <IndexSearchBox
-      :value="search"
+      :value="filters.q"
       :label="$t('admin.search.problems.label')"
       :placeholder="$t('admin.search.problems.placeholder')"
       :clear-label="$t('admin.search.clear')"
       :hint="$t('admin.search.problems.hint')"
       :status="data ? countText : ''"
-      @commit="commit"
+      @commit="(q: string) => change({ q })"
     />
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+    <ProblemListFilters
+      :filters="filters"
+      :meta="meta"
+      :author-error="isAuthorUnknown ? $t('admin.ui.noSuchUser', { name: author }) : ''"
+      @change="change"
+    />
+    <div
+      v-if="canBulk && selection.selected.value.length > 0"
+      class="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-row border border-line-strong bg-surface-solid p-3"
+    >
+      <p class="text-sm font-semibold" role="status">
+        {{ $t('admin.problemList.selected', { count: selection.selected.value.length }) }}
+      </p>
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openBulk(true)">
+        {{ $t('admin.problemList.bulk.publish') }}
+      </button>
+      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="openBulk(false)">
+        {{ $t('admin.problemList.bulk.unpublish') }}
+      </button>
+      <button type="button" class="text-sm text-muted underline" @click="selection.clear">
+        {{ $t('admin.problemList.clearSelection') }}
+      </button>
+    </div>
+    <ProblemBulkResult v-if="lastResult" :result="lastResult" />
+    <EmptyState v-if="isAuthorUnknown" compact>
+      <strong>{{ $t('admin.ui.noSuchUser', { name: author }) }}</strong>
+    </EmptyState>
+    <QueryState
+      v-else
+      :loading="isPending && !lookupError"
+      :error="error ?? lookupError"
+      @retry="retry"
+    >
       <template #skeleton>
         <SkeletonBlock
           data-skeleton-region="problem-search-table"
@@ -66,67 +138,35 @@ const countText = computed(() => {
       <EmptyState v-if="data && data.items.length === 0" compact>
         <strong>
           {{
-            search
-              ? $t('admin.search.problems.emptyFor', { q: search })
+            filters.q
+              ? $t('admin.search.problems.emptyFor', { q: filters.q })
               : $t('admin.search.problems.empty')
           }}
         </strong>
         <span>{{ $t('admin.search.problems.emptyAdvice') }}</span>
       </EmptyState>
       <div v-else-if="data" class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <caption class="sr-only">
-            {{
-              $t('admin.search.problems.title')
-            }}
-          </caption>
-          <thead class="text-xs text-muted uppercase">
-            <tr>
-              <th scope="col" class="px-3 py-2">
-                {{ $t('admin.search.problems.columns.problem') }}
-              </th>
-              <th scope="col" class="px-3 py-2">
-                {{ $t('admin.search.problems.columns.points') }}
-              </th>
-              <th scope="col" class="px-3 py-2">
-                <span class="sr-only">{{ $t('admin.search.edit') }}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="problem in data.items" :key="problem.id" class="border-t border-line">
-              <td class="px-3 py-3">
-                <RouterLink
-                  :to="{ name: 'admin-problemGeneral', params: { code: problem.code } }"
-                  class="font-semibold text-accent hover:underline"
-                >
-                  <HighlightedText :text="problem.name" :query="search" />
-                </RouterLink>
-                <div class="flex flex-wrap items-center gap-2 font-mono text-xs text-muted">
-                  <HighlightedText :text="problem.code" :query="search" />
-                  <span
-                    v-if="!problem.isPublic"
-                    class="rounded-pill border border-line px-2 py-0.5 font-sans"
-                    >{{ $t('admin.search.problems.private') }}</span
-                  >
-                </div>
-              </td>
-              <td class="px-3 py-3 font-mono">{{ formatNumber(problem.points, locale.locale) }}</td>
-              <td class="px-3 py-3 text-right">
-                <RouterLink
-                  :to="{ name: 'admin-problemGeneral', params: { code: problem.code } }"
-                  :class="ADMIN_BUTTON_CLASS"
-                  >{{ $t('admin.search.edit') }}</RouterLink
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <ProblemListTable
+          :items="data.items"
+          :search="filters.q"
+          :selectable="canBulk"
+          :is-selected="selection.isSelected"
+          :is-all-selected="selection.isAllSelected.value"
+          :is-some-selected="selection.isSomeSelected.value"
+          @toggle="selection.toggle"
+          @toggle-all="selection.toggleAll"
+        />
         <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
           <p class="text-sm text-muted">{{ countText }}</p>
           <NumberedPager :meta="data.meta" :label="$t('admin.search.pager')" />
         </div>
       </div>
     </QueryState>
+    <ProblemBulkVisibilityDialog
+      v-model:visible="isBulkOpen"
+      :codes="selection.selected.value"
+      :is-public="isBulkPublic"
+      @done="onBulkDone"
+    />
   </section>
 </template>

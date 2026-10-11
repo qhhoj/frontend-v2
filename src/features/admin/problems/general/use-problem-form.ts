@@ -40,14 +40,21 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   const { can } = usePermissions();
   const { seed, form, isDirty } = useFormSeed(problem, meta);
   const localErrors = ref<FieldErrors>({});
+  /** Why this save is made: the revision comment, never stored on the problem; cleared after each save. */
+  const changeMessage = ref('');
 
   const mutation = useAdminMutation({
-    mutate: (code: string) => updateProblem(code, changedProblemFields(seed.value, form.value)),
+    mutate: (code: string) =>
+      updateProblem(code, {
+        ...changedProblemFields(seed.value, form.value),
+        changeMessage: changeMessage.value.trim() || undefined,
+      }),
     invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
     onDone: (saved: EditableProblem, code: string) => {
       queryClient.setQueryData(editableProblemKey(saved.code, viewer.value), saved);
       seed.value = toProblemForm(saved, meta());
       form.value = cloneForm(seed.value);
+      changeMessage.value = '';
       if (saved.code !== code)
         void router.replace({ name: route.name!, params: { code: saved.code } });
     },
@@ -74,5 +81,5 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
     ...mutation.fieldErrors.value,
     ...localErrors.value,
   }));
-  return { form, isDirty, save, errors, mutation };
+  return { form, isDirty, save, errors, mutation, changeMessage };
 }

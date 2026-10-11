@@ -33,7 +33,10 @@ export const ADMIN_SCREENS = {
   problemEditorial: problemTab('editorial'),
   problemData: problemTab('data'),
   problemFiles: problemTab('files'),
-  types: { path: '/admin/types', permission: 'judge.add_tagproblem' },
+  types: {
+    path: '/admin/types',
+    permission: ['judge.change_problemtype', 'judge.change_problemgroup', 'judge.change_license'],
+  },
   contests: { path: '/admin/contests', permission: ['judge.add_contest', ...CONTEST_EDIT] },
   contestNew: { path: '/admin/contests/new', permission: 'judge.add_contest' },
   contestTags: { path: '/admin/contest-tags', permission: 'judge.change_contest_tag' },

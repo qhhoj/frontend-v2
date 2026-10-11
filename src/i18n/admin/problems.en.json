@@ -47,7 +47,7 @@
       "summary": "Summary",
       "summaryHint": "Shown in the problem list, up to 1000 characters.",
       "ogImage": "Preview image",
-      "ogImageHint": "Leave empty to keep the current image."
+      "ogImageHint": "Image address used when the problem link is shared; empty for none."
     },
     "limits": {
       "timeLimit": "Time limit (seconds)",
@@ -76,7 +76,13 @@
       "types": "Problem types (at least 1)",
       "pickType": "Pick a type",
       "addType": "Add type",
-      "allowedLanguages": "Allowed languages"
+      "allowedLanguages": "Allowed languages",
+      "allowedCount": "({count} of {total})",
+      "pick": {
+        "all": "All",
+        "none": "None",
+        "defaults": "Site defaults"
+      }
     },
     "visibility": {
       "source": "Show submission source",
@@ -103,7 +109,9 @@
       "memory": "From 0 to 1048576 KiB.",
       "points": "From 800 to 3500.",
       "types": "At least one problem type is needed."
-    }
+    },
+    "changeMessage": "Reason",
+    "changeMessagePlaceholder": "Optional, kept in the history"
   },
   "people": {
     "title": "People in charge",
@@ -113,14 +121,18 @@
     "banned": "Banned from submitting",
     "organizations": "Organizations",
     "orgPrivate": "Private to organizations",
-    "orgPrivateHint": "Only members of the listed organizations see the problem."
+    "orgPrivateHint": "Only members of the listed organizations see the problem.",
+    "suggester": "Suggested by",
+    "suggesterPending": "awaiting review"
   },
   "status": {
     "title": "Status",
     "public": "Public",
     "manual": "Managed manually",
     "fullMarkup": "Allow full markup",
-    "fullMarkupHint": "HTML is not filtered."
+    "fullMarkupHint": "HTML is not filtered.",
+    "dateOffer": "Set the publication date to now, so the problem lists as new?",
+    "dateNow": "Use today’s date"
   },
   "clone": {
     "title": "Clone problem",
