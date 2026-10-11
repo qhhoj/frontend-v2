@@ -36,6 +36,23 @@ function runItem(item: RowMenuItem) {
   else item.run?.();
 }
 
+/** PrimeVue aligns the popup to the ⋯ button but never clamps it, so a button near or beyond the right edge (a table that scrolls sideways) pushed the menu off-screen. */
+const EDGE_PX = 8;
+function keepOnScreen() {
+  const popup = (menu.value as unknown as { container?: HTMLElement } | undefined)?.container;
+  if (!popup) return;
+  const { left, right } = popup.getBoundingClientRect();
+  const maxRight = document.documentElement.clientWidth - EDGE_PX;
+  const shifted = Math.min(left, left - (right - maxRight));
+  const clamped = Math.max(EDGE_PX, shifted);
+  if (clamped !== left) popup.style.insetInlineStart = `${clamped + window.scrollX}px`;
+}
+
+function onShow() {
+  keepOnScreen();
+  isOpen.value = true;
+}
+
 const toMenuItem = (item: RowMenuItem): MenuItem => ({
   label: item.label,
   disabled: item.disabled,
@@ -70,7 +87,7 @@ const model = computed<MenuItem[]>(() => {
     :model="model"
     popup
     :pt="{ root: { 'aria-label': label } }"
-    @show="isOpen = true"
+    @show="onShow"
     @hide="isOpen = false"
   >
     <template #item="{ item, props: itemProps }">
