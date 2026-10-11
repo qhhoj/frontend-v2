@@ -961,6 +961,11 @@
       "points": "Points",
       "acRate": "AC rate"
     },
+    "noStatement": {
+      "title": "No statement yet",
+      "body": "This problem has no statement yet. If you are the author, upload a PDF or write one in the admin area.",
+      "edit": "Write the statement"
+    },
     "untranslated": "This statement has no translation in this language yet; showing the original.",
     "authors": "Authors:",
     "pdfPreparing": "Preparing PDF…",
