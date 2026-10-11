@@ -317,6 +317,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 - **Activity**: `hasMore` pager (no total), filter in the URL, CSV export as a plain link with the same filter, live visitors refetch every 30 s (next page by `hasMore`), summary bars in SVG with a text table; deletes sit behind confirms.
 - **Admin site loading parity**: judges (stats and rows), the first settings block and the activity table; skeleton heights are per breakpoint (`sm`) and fit a typical load (5 judges, 3 log rows), so other counts still move what follows.
 - **Admin writes and reads**: shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages use 8e's API files — one query per data, no copy.
+- **Admin redesign** (`design-system/qhhoj/pages/admin.md`): admin redesign picks by orchestrator pending user review (density 40/36 px fine, 44 px coarse; radius 16/12; user editor drawer; no codenames in UI; token font stacks).
 
 ## Settings (8h)
 

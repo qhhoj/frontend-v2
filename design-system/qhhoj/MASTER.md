@@ -53,7 +53,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 ## Typography
 
-- Display/headings: **Space Grotesk** 500-700. Body/UI: **Inter** 400-700. Numbers and code: **JetBrains Mono** (400, 600) with `tabular-nums`.
+- Display/headings: **Space Grotesk** 500-700. Body/UI: `--qh-font-body` (Verdana, then DejaVu Sans and the system sans). Numbers and code: **JetBrains Mono** (400, 600) with `tabular-nums`.
 - Base 16 px (browser default). Hero rating number 60 px (`text-6xl`), card numbers 26 px.
 - Self-hosted via `@fontsource` (no Google Fonts request).
 
