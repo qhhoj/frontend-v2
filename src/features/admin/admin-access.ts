@@ -1,3 +1,4 @@
+import type { Schemas } from '@/api/schemas';
 import { allowsAny } from '@/lib/permissions';
 import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS } from './admin-screens';
@@ -9,8 +10,12 @@ export type { AdminCapability };
 export interface AdminViewer extends PermissionHolder {
   isStaff?: boolean;
   /** Absent while the backend predates the field: no object rights. */
-  adminCapabilities?: Partial<Record<AdminCapability, boolean>>;
+  adminCapabilities?: Partial<Schemas['AdminCapabilitiesResponse']>;
 }
+
+/** A yes/no right, or a creation scope that opens the screen when it reaches anywhere (site-wide or an organization). */
+const isGranted = (value: boolean | Schemas['CreationScopeResponse'] | undefined): boolean =>
+  typeof value === 'object' ? value.site || value.organizations : value === true;
 
 /** What opens an admin screen: any permission of the rule, or the object right (the server still checks each object). */
 export interface AdminAccess {
@@ -20,7 +25,7 @@ export interface AdminAccess {
 }
 
 const holds = (user: AdminViewer | null, capability: AdminCapability | undefined) =>
-  capability !== undefined && Boolean(user?.adminCapabilities?.[capability]);
+  capability !== undefined && isGranted(user?.adminCapabilities?.[capability]);
 
 export const canUseAdmin = (user: AdminViewer | null, access: AdminAccess): boolean =>
   allowsAny(user, access.permission) || holds(user, access.capability);

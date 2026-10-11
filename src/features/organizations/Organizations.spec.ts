@@ -56,7 +56,13 @@ describe('organization access and states', () => {
       ...signedInViewer(),
       ...organizationRoutes(
         organizationDetail({
-          viewer: { isMember: true, canAdminister: false, pendingRequestId: null },
+          viewer: {
+            isMember: true,
+            canAdminister: false,
+            canCreateProblem: false,
+            canCreateContest: false,
+            pendingRequestId: null,
+          },
         }),
       ),
     });

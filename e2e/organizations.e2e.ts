@@ -33,8 +33,20 @@ const HCMUS = {
   slots: 60,
   memberCount: 48,
 };
-const NOT_A_MEMBER = { isMember: false, canAdminister: false, pendingRequestId: null };
-const ADMINISTRATOR = { isMember: true, canAdminister: true, pendingRequestId: null };
+const NOT_A_MEMBER = {
+  isMember: false,
+  canAdminister: false,
+  canCreateProblem: false,
+  canCreateContest: false,
+  pendingRequestId: null,
+};
+const ADMINISTRATOR = {
+  isMember: true,
+  canAdminister: true,
+  canCreateProblem: false,
+  canCreateContest: false,
+  pendingRequestId: null,
+};
 
 test('a signed-in visitor joins an open organization and the panel turns to member', async ({
   page,
@@ -45,7 +57,13 @@ test('a signed-in visitor joins an open organization and the panel turns to memb
   api.routes['GET /organizations/lhp'] = () =>
     ok(
       organizationDetail({
-        viewer: { isMember: joined, canAdminister: false, pendingRequestId: null },
+        viewer: {
+          isMember: joined,
+          canAdminister: false,
+          canCreateProblem: false,
+          canCreateContest: false,
+          pendingRequestId: null,
+        },
       }),
     );
   api.routes['POST /organizations/lhp/join'] = () => {

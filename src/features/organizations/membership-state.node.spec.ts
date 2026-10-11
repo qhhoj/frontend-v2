@@ -8,7 +8,13 @@ const viewer = (
   isMember: boolean,
   canAdminister: boolean,
   pendingRequestId: string | null = null,
-) => ({ isMember, canAdminister, pendingRequestId });
+) => ({
+  isMember,
+  canAdminister,
+  canCreateProblem: false,
+  canCreateContest: false,
+  pendingRequestId,
+});
 
 describe('membershipState', () => {
   it('picks the one panel the board draws for each viewer', () => {

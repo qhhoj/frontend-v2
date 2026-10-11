@@ -53,6 +53,48 @@ describe('ProblemDataTab', () => {
     expect(wrapper.get('[data-testid="data-save-bar"]').text()).toContain('Đã lưu lúc');
   });
 
+  it('sends a migrated configuration back unchanged apart from the edit', async () => {
+    // As the migration stored it: grader args `{}`, a custom checker with its legacy args.
+    const migrated = problemData({
+      customChecker: 'chk.cpp',
+      checker: 'bridged',
+      checkerArgs: { files: 'chk.cpp', lang: 'CPP17', type: 'testlib' },
+      graderArgs: {},
+    });
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(migrated),
+      'PUT /problems/hcmus41c/data': ok(migrated),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await wrapper.get('#data-unicode').setValue(true);
+    await saveConfig(wrapper);
+    const body = calls.find((call) => call.method === 'PUT')!.body;
+    expect(body).toEqual({
+      checker: 'bridged',
+      checkerArgs: migrated.checkerArgs,
+      grader: 'standard',
+      graderArgs: {},
+      outputPrefix: null,
+      outputLimit: null,
+      unicode: true,
+      nobigmath: false,
+      cases: migrated.cases,
+    });
+  });
+
+  it('sends nothing while the configuration is unchanged', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await saveConfig(wrapper);
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+  });
+
   it('asks before a route leave with unsaved configuration, and Stay keeps it', async () => {
     mockApi({
       'GET /problems': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },

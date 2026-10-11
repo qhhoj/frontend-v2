@@ -31,7 +31,13 @@ test('a member who is not an admin sees the forbidden state', async ({ page, api
   api.routes['GET /organizations/lhp'] = {
     body: {
       data: organizationDetail({
-        viewer: { isMember: true, canAdminister: false, pendingRequestId: null },
+        viewer: {
+          isMember: true,
+          canAdminister: false,
+          canCreateProblem: false,
+          canCreateContest: false,
+          pendingRequestId: null,
+        },
       }),
     },
   };
