@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Lock } from 'lucide-vue-next';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
+import AdminFormSection from '../ui/form/AdminFormSection.vue';
 import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
 import { ADMIN_INPUT_CLASS } from '../ui/classes';
@@ -11,7 +11,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.languages.form.groups.identity')">
+  <AdminFormSection :title="$t('admin.languages.form.groups.identity')" :columns="1">
     <div class="grid gap-5 md:grid-cols-2">
       <AdminField
         v-if="mode === 'create'"
@@ -95,5 +95,5 @@ const form = defineModel<LanguageForm>('form', { required: true });
         />
       </AdminField>
     </div>
-  </SettingsCard>
+  </AdminFormSection>
 </template>

@@ -1,0 +1,29 @@
+{
+  "required": "required",
+  "needsPermission": "Needs the “{permission}” permission",
+  "saveBar": {
+    "unsaved": "{count} unsaved change | {count} unsaved changes",
+    "savedAt": "Saved at {time}",
+    "clean": "No changes to save.",
+    "discard": "Discard changes",
+    "save": "Save changes",
+    "saving": "Saving…"
+  },
+  "leave": {
+    "title": "Leave this page?",
+    "body": "{count} unsaved change will be lost. | {count} unsaved changes will be lost.",
+    "bodyUncounted": "Unsaved changes will be lost.",
+    "leave": "Leave",
+    "stay": "Stay"
+  },
+  "dateTime": {
+    "placeholder": "dd/mm/yyyy hh:mm",
+    "now": "Now",
+    "nowLabel": "Set {label} to now",
+    "invalid": "Use dd/mm/yyyy hh:mm, for example 08/10/2026 13:00.",
+    "zoneHint": "{zone} time"
+  },
+  "section": {
+    "jumpTo": "Jump to section"
+  }
+}

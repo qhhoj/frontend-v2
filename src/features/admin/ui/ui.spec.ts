@@ -28,7 +28,8 @@ describe('AdminSwitch', () => {
     expect(wrapper.get('[role="switch"]').attributes('aria-disabled')).toBe('true');
     await wrapper.get('[role="switch"]').trigger('click');
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
-    expect(wrapper.text()).toContain('Cần quyền judge.change_public_visibility');
+    expect(wrapper.text()).toContain('Cần quyền “Công khai hoặc ẩn bài”');
+    expect(wrapper.text()).not.toContain('judge.change_public_visibility');
   });
 });
 
@@ -247,7 +248,7 @@ describe('AdminField', () => {
       '<template #default="slotProps"><input :id="slotProps.id" :aria-describedby="slotProps.describedBy" :aria-invalid="slotProps.invalid" /></template>',
   };
 
-  it('ties the label, the input, the error and the hint together', () => {
+  it('ties the label and the input to the error, which replaces the hint', () => {
     const wrapper = mountComponent(AdminField, {
       props: {
         label: 'Tên bài',
@@ -262,10 +263,18 @@ describe('AdminField', () => {
     expect(input.attributes('id')).toBe('problem-name');
     expect(input.attributes('aria-invalid')).toBe('true');
     const describedBy = input.attributes('aria-describedby')!.split(' ');
-    expect(describedBy.map((id) => wrapper.get(`#${id}`).text())).toEqual([
-      'Không được để trống.',
-      'Tối đa 100 ký tự',
-    ]);
+    expect(describedBy.map((id) => wrapper.get(`#${id}`).text())).toEqual(['Không được để trống.']);
+    expect(wrapper.text()).not.toContain('Tối đa 100 ký tự');
+  });
+
+  it('describes the input with the hint while there is no error', () => {
+    const wrapper = mountComponent(AdminField, {
+      props: { label: 'Tên bài', hint: 'Tối đa 100 ký tự', required: true },
+      slots: withInput,
+    });
+    const input = wrapper.get('input');
+    expect(wrapper.get(`#${input.attributes('aria-describedby')}`).text()).toBe('Tối đa 100 ký tự');
+    expect(wrapper.get('label').text()).toContain('bắt buộc');
   });
 
   it('marks nothing invalid and describes nothing when there is no error and no hint', () => {

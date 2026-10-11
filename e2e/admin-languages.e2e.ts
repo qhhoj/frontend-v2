@@ -68,7 +68,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     expect(await axeViolationsIn(page)).toEqual([]);
     await page.getByLabel('Tên *', { exact: true }).fill('Ruby 3');
     await page.getByRole('button', { name: 'Lưu thay đổi' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Đã lưu.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Đã lưu lúc' })).toBeVisible();
     expect(api.requestsTo(`PATCH /admin/languages/${ruby.id}`)).toHaveLength(1);
   });
 

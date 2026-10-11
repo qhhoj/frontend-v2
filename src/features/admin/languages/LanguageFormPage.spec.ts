@@ -105,7 +105,7 @@ describe('LanguageFormPage, edit', () => {
     expect(writes(calls).map((call) => [call.method, call.path, call.body])).toEqual([
       ['PATCH', `/admin/languages/${ruby().id}`, { name: 'Ruby 3' }],
     ]);
-    expect(wrapper.text()).toContain('Đã lưu.');
+    expect(wrapper.text()).toContain('Đã lưu lúc');
   });
 
   it('says there is no such language for an unknown key, and for a key with # in it opens the right one', async () => {
