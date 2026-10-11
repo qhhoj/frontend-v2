@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed, ref, useId } from 'vue';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import {
@@ -158,8 +159,8 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
             <table data-testid="official-table" class="w-full min-w-[480px] text-sm">
               <thead class="text-left text-muted">
                 <tr>
-                  <th scope="col" class="px-2 py-2">
-                    {{ $t('admin.contests.ranking.official.columns.rank') }}
+                  <th scope="col" class="w-14 px-2 py-2 text-right">
+                    <RankColumnHeader :label="$t('admin.contests.ranking.official.columns.rank')" />
                   </th>
                   <th scope="col" class="px-2 py-2">
                     {{ $t('admin.contests.ranking.official.columns.username') }}
@@ -182,7 +183,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
               </thead>
               <tbody>
                 <tr v-for="row in topRows" :key="row.username" class="border-t border-line">
-                  <td class="px-2 py-2">{{ row.rank }}</td>
+                  <td class="px-2 py-2 text-right">{{ row.rank }}</td>
                   <td class="px-2 py-2 font-mono">{{ row.username }}</td>
                   <td class="px-2 py-2">{{ row.fullName }}</td>
                   <td v-for="(score, index) in row.scores" :key="index" class="px-2 py-2">

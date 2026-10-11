@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SubmissionResult } from '@/api/types/submissions';
@@ -71,7 +72,9 @@ const verdictFor = (result: string | null): Verdict =>
             <table class="w-full border-collapse text-[15px]">
               <thead>
                 <tr class="text-[13px] text-muted">
-                  <th scope="col" :class="HEADER_RIGHT">{{ $t('profileTabs.columns.rank') }}</th>
+                  <th scope="col" :class="HEADER_RIGHT">
+                    <RankColumnHeader :label="$t('profileTabs.columns.rank')" />
+                  </th>
                   <th scope="col" :class="HEADER_LEFT">{{ $t('profileTabs.columns.problem') }}</th>
                   <th scope="col" :class="[HEADER_RIGHT, HIDDEN_ON_PHONE]">
                     {{ $t('profileTabs.columns.weight') }}

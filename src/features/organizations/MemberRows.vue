@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import type { OrganizationMember } from '@/api/types/organizations';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -30,7 +31,9 @@ const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
     </colgroup>
     <thead>
       <tr class="text-left text-muted">
-        <th scope="col" class="py-2 pr-3 font-semibold">{{ $t('orgs.columns.rank') }}</th>
+        <th scope="col" class="py-2 pr-3 text-right font-semibold">
+          <RankColumnHeader :label="$t('orgs.columns.rank')" />
+        </th>
         <th scope="col" class="py-2 font-semibold">{{ $t('orgs.columns.user') }}</th>
         <th
           v-for="(column, index) in columns"
@@ -45,7 +48,7 @@ const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
     </thead>
     <tbody>
       <tr v-for="member in members" :key="member.id" class="border-t border-line">
-        <td class="py-2 pr-3 font-mono">{{ member.rank }}</td>
+        <td class="py-2 pr-3 text-right font-mono">{{ member.rank }}</td>
         <td class="py-2">
           <div class="flex min-w-0 items-center gap-2">
             <UserAvatar :username="member.username" :size="24" class="shrink-0" />
