@@ -3,7 +3,7 @@
   "saved": "Đã lưu.",
   "needsPermission": "Cần quyền {permission}",
   "nobody": "Không có ai.",
-  "addByUsername": "Thêm theo tên đăng nhập chính xác, nhấn Enter",
+  "addByUsername": "Gõ để tìm, Enter để thêm",
   "noSuchUser": "Không có tài khoản \"{name}\".",
   "addBySlug": "Thêm theo mã tổ chức (slug) chính xác, nhấn Enter",
   "noSuchOrganization": "Không có tổ chức \"{name}\".",

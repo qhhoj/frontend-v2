@@ -7,11 +7,13 @@ import { anonymousViewer } from '@/test/problem-routes';
 import { mountComponent } from '@/test/mount';
 import AdminField from './AdminField.vue';
 import AdminSwitch from './AdminSwitch.vue';
+import ExactChips from './ExactChips.vue';
 import ExactLookup from './ExactLookup.vue';
 import MarkdownField from './MarkdownField.vue';
 import UploadButton from './UploadButton.vue';
 import UsernameChips from './UsernameChips.vue';
 import { PREVIEW_DELAY_MS } from './use-render-preview';
+import { SUGGEST_DELAY_MS } from './use-chip-suggestions';
 import { translate } from '@/i18n';
 
 describe('AdminSwitch', () => {
@@ -133,6 +135,109 @@ describe('UsernameChips', () => {
     expect(wrapper.get('input').attributes('disabled')).toBeDefined();
     expect(wrapper.find('button').exists()).toBe(false);
     expect(wrapper.text()).toContain('Cần quyền judge.edit_all_problem');
+  });
+});
+
+describe('UsernameChips suggestions', () => {
+  afterEach(() => vi.useRealTimers());
+  const typeAndWait = async (wrapper: ReturnType<typeof mountComponent>, text: string) => {
+    await wrapper.get('input').setValue(text);
+    await vi.advanceTimersByTimeAsync(SUGGEST_DELAY_MS);
+    await flushPromises();
+  };
+  const optionNames = (wrapper: ReturnType<typeof mountComponent>) =>
+    wrapper.findAll('[role="option"]').map((option) => option.text());
+
+  it('offers users by prefix after a pause, leaves out picked ones, and picks with the keyboard', async () => {
+    vi.useFakeTimers();
+    const calls = mockApi({
+      ...anonymousViewer,
+      'GET /user-suggestions': ok([
+        { id: ID_A, username: 'thayhung' },
+        { id: 'id-b', username: 'thaylam' },
+        { id: 'id-c', username: 'thaytu' },
+      ]),
+    });
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [{ id: ID_A, username: null }] },
+    });
+    await wrapper.get('input').setValue('th');
+    await wrapper.get('input').setValue('thay');
+    expect(calls.filter((call) => call.path.endsWith('/user-suggestions'))).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(SUGGEST_DELAY_MS);
+    await flushPromises();
+    const asked = calls.filter((call) => call.path.endsWith('/user-suggestions'));
+    expect(asked.map((call) => call.query.get('prefix'))).toEqual(['thay']);
+    expect(optionNames(wrapper)).toEqual(['thaylam', 'thaytu']);
+    expect(wrapper.get('input').attributes('aria-expanded')).toBe('true');
+
+    await wrapper.get('input').trigger('keydown', { key: 'ArrowUp' });
+    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+    expect(wrapper.get('output').text()).toContain('"username":"thaytu"');
+    expect(wrapper.find('[role="option"]').exists()).toBe(false);
+    expect((wrapper.get('input').element as HTMLInputElement).value).toBe('');
+  });
+
+  it('sends nothing for text that cannot start a username', async () => {
+    vi.useFakeTimers();
+    const calls = mockApi({ ...anonymousViewer });
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [] },
+    });
+    await typeAndWait(wrapper, 'a.b');
+    expect(calls.filter((call) => call.path.endsWith('/user-suggestions'))).toHaveLength(0);
+  });
+
+  it('shows nothing when suggestions fail, and Enter still adds the exact username', async () => {
+    vi.useFakeTimers();
+    mockApi({
+      ...anonymousViewer,
+      'GET /user-suggestions': rateLimited(30),
+      'GET /users/thayhung': ok({ id: 'id-h', username: 'thayhung' }),
+    });
+    const wrapper = mountComponent(ChipsHost, {
+      props: { component: UsernameChips, initial: [] },
+    });
+    await typeAndWait(wrapper, 'thayhung');
+    expect(wrapper.find('[role="option"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('30');
+    await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+    await flushPromises();
+    expect(wrapper.get('output').text()).toContain('"username":"thayhung"');
+  });
+});
+
+describe('ExactChips suggestions', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('shows only the answer for the newest text when answers arrive out of order', async () => {
+    vi.useFakeTimers();
+    mockApi({ ...anonymousViewer });
+    const pending = new Map<string, (chips: { id: string }[]) => void>();
+    const suggest = (typed: string) =>
+      new Promise<{ id: string }[]>((resolve) => pending.set(typed, resolve));
+    const wrapper = mountComponent(ExactChips, {
+      props: {
+        modelValue: [],
+        label: 'Danh sách',
+        lookup: () => Promise.reject(new Error('unused')),
+        suggest,
+        nameOf: (chip: { id: string }) => chip.id,
+        isNamed: () => true,
+        placeholder: '',
+        noSuchText: () => '',
+        chipTestId: 'chip',
+      },
+    });
+    await wrapper.get('input').setValue('a');
+    await vi.advanceTimersByTimeAsync(SUGGEST_DELAY_MS);
+    await wrapper.get('input').setValue('ab');
+    await vi.advanceTimersByTimeAsync(SUGGEST_DELAY_MS);
+    pending.get('ab')!([{ id: 'newest' }]);
+    await flushPromises();
+    pending.get('a')!([{ id: 'stale' }]);
+    await flushPromises();
+    expect(wrapper.findAll('[role="option"]').map((option) => option.text())).toEqual(['newest']);
   });
 });
 

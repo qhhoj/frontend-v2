@@ -3,11 +3,15 @@ import { computed, ref, useId } from 'vue';
 import { failureTextOf, isNotFound } from './admin-errors';
 import { X } from 'lucide-vue-next';
 import { ADMIN_INPUT_CLASS } from './classes';
+import { useChipSuggestions } from './use-chip-suggestions';
+import type { Suggest } from './use-chip-suggestions';
 
 const chips = defineModel<Chip[]>({ required: true });
 const props = defineProps<{
   label: string;
   lookup: (typed: string) => Promise<Chip>;
+  /** Offers chips while typing; Enter with none highlighted still runs the exact `lookup`. */
+  suggest?: Suggest<Chip>;
   /** The chip's shown name: the looked-up name, or a short id while this session has not seen the name. */
   nameOf: (chip: Chip) => string;
   isNamed: (chip: Chip) => boolean;
@@ -36,7 +40,29 @@ const describedBy = computed(() => {
   ];
   return ids.filter(Boolean).join(' ') || undefined;
 });
+const suggestions = useChipSuggestions(
+  typed,
+  () => props.suggest,
+  () => chips.value,
+);
+const listboxId = `${id}-suggestions`;
+const optionId = (index: number) => `${listboxId}-${index}`;
+const activeOptionId = computed(() =>
+  suggestions.activeIndex.value < 0 ? undefined : optionId(suggestions.activeIndex.value),
+);
 const isChipsFull = computed(() => props.max !== undefined && chips.value.length >= props.max);
+
+function pick(chip: Chip) {
+  if (!chips.value.some((picked) => picked.id === chip.id)) chips.value = [...chips.value, chip];
+  typed.value = '';
+  lookupError.value = '';
+}
+
+function onEnter() {
+  const chip = suggestions.active();
+  if (chip) pick(chip);
+  else void add();
+}
 
 async function add() {
   const text = typed.value.trim();
@@ -80,17 +106,49 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
       </li>
       <li v-if="chips.length === 0" class="text-sm text-muted">{{ $t('admin.ui.nobody') }}</li>
     </ul>
-    <input
-      :id="id"
-      v-model="typed"
-      :class="ADMIN_INPUT_CLASS"
-      :placeholder="placeholder"
-      :disabled="isChipsFull || Boolean(lockedBy)"
-      :aria-invalid="lookupError || error ? 'true' : undefined"
-      :aria-describedby="describedBy"
-      autocomplete="off"
-      @keydown.enter.prevent="add"
-    />
+    <div class="relative">
+      <input
+        :id="id"
+        v-model="typed"
+        :class="ADMIN_INPUT_CLASS"
+        :placeholder="placeholder"
+        :disabled="isChipsFull || Boolean(lockedBy)"
+        :aria-invalid="lookupError || error ? 'true' : undefined"
+        :aria-describedby="describedBy"
+        :role="suggest ? 'combobox' : undefined"
+        :aria-expanded="suggest ? suggestions.options.value.length > 0 : undefined"
+        :aria-controls="suggest ? listboxId : undefined"
+        :aria-activedescendant="activeOptionId"
+        aria-autocomplete="list"
+        autocomplete="off"
+        @keydown.enter.prevent="onEnter"
+        @keydown.down.prevent="suggestions.move(1)"
+        @keydown.up.prevent="suggestions.move(-1)"
+        @keydown.esc="suggestions.close"
+        @blur="suggestions.close"
+      />
+      <ul
+        v-if="suggest"
+        v-show="suggestions.options.value.length > 0"
+        :id="listboxId"
+        role="listbox"
+        :aria-label="label"
+        class="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-row border border-line bg-surface-solid p-1 shadow-lg"
+      >
+        <li
+          v-for="(chip, index) in suggestions.options.value"
+          :id="optionId(index)"
+          :key="chip.id"
+          role="option"
+          :aria-selected="index === suggestions.activeIndex.value"
+          class="flex min-h-11 cursor-pointer items-center rounded-row px-3 text-sm aria-selected:bg-accent-soft aria-selected:text-accent-soft-text hover:bg-surface-hover"
+          @mousedown.prevent
+          @click="pick(chip)"
+        >
+          {{ nameOf(chip) }}
+        </li>
+      </ul>
+    </div>
     <p v-if="lookupError || error" :id="`${id}-error`" class="text-sm text-negative">
       {{ lookupError || error }}
     </p>
