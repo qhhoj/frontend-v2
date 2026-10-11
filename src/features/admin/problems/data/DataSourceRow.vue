@@ -6,7 +6,8 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureReasonOf } from '../failure-reason';
 import { SOURCE_MAX_BYTES } from '../limits';
-import { ADMIN_DANGER_CLASS } from '../../ui/classes';
+import { Trash2 } from 'lucide-vue-next';
+import { iconButtonClass } from '../../ui/controls';
 import UploadButton from '../../ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { useKeepDataAnswer } from './problem-data.queries';
@@ -34,23 +35,23 @@ const remove = useAdminMutation({
 </script>
 
 <template>
-  <div
+  <li
     :data-testid="`source-${kind}`"
-    class="flex flex-col gap-2 border-b border-line py-3 sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-5"
   >
-    <div class="flex flex-col">
-      <p class="font-semibold">{{ label }}</p>
-      <p class="text-sm">
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-semibold">{{ label }}</p>
+      <p class="truncate text-sm">
         <a
           v-if="storedName"
           :href="problemDataFileUrl(code, storedName)"
-          class="font-mono text-accent-text underline"
+          class="font-mono text-accent-text hover:underline"
           >{{ storedName }}</a
         >
         <span v-else class="text-muted">{{ $t('admin.problems.uploads.sources.none') }}</span>
       </p>
     </div>
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex items-center gap-1">
       <UploadButton
         :label="
           storedName
@@ -64,11 +65,12 @@ const remove = useAdminMutation({
       <button
         v-if="storedName"
         type="button"
-        :class="ADMIN_DANGER_CLASS"
+        :class="[iconButtonClass('ghost'), 'text-negative']"
         :aria-label="$t('admin.problems.uploads.sources.remove', { name: storedName })"
+        :title="$t('admin.problems.uploads.sources.remove', { name: storedName })"
         @click="isConfirmShown = true"
       >
-        {{ $t('admin.problems.uploads.sources.removeConfirm') }}
+        <Trash2 aria-hidden="true" class="size-4" :stroke-width="1.75" />
       </button>
     </div>
     <AdminStatus
@@ -93,5 +95,5 @@ const remove = useAdminMutation({
         />
       </template>
     </ConfirmDialog>
-  </div>
+  </li>
 </template>

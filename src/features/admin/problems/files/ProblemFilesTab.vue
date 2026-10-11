@@ -7,6 +7,7 @@ import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
 import ProblemUploadCard from './ProblemUploadCard.vue';
 
+/** Three tiles: images for the statement (address only), the PDF statement, the material for contestants. */
 defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const { can } = usePermissions();
 const pdfLock = computed(() => permissionLock(can, 'judge.upload_file_statement'));
@@ -14,17 +15,15 @@ const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_ma
 </script>
 
 <template>
-  <div class="grid gap-5 lg:grid-cols-3">
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
     <ProblemUploadCard
       kind="image"
       test-id="upload-image"
       :code="problem.code"
       :title="$t('admin.problems.files.image.title')"
       :lead="$t('admin.problems.files.image.lead')"
-      :button-label="$t('admin.problems.files.image.button')"
       :accept="IMAGE_ACCEPT"
       :max-bytes="IMAGE_MAX_BYTES"
-      endpoint="/problems/uploads/image"
     />
     <ProblemUploadCard
       kind="pdf"
@@ -32,11 +31,10 @@ const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_ma
       :code="problem.code"
       :title="$t('admin.problems.files.pdf.title')"
       :lead="$t('admin.problems.files.pdf.lead')"
-      :button-label="$t('admin.problems.files.pdf.button')"
       accept="application/pdf"
-      :endpoint="`/problems/${problem.code}/statement`"
       :max-bytes="UPLOAD_LIMITS.statementPdf"
       :locked-by="pdfLock"
+      :current-url="problem.pdfStatementUrl"
     />
     <ProblemUploadCard
       kind="material"
@@ -44,12 +42,10 @@ const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_ma
       :code="problem.code"
       :title="$t('admin.problems.files.material.title')"
       :lead="$t('admin.problems.files.material.lead')"
-      :button-label="$t('admin.problems.files.material.button')"
       accept=".zip,.pdf,.txt,.md"
-      :endpoint="`/problems/${problem.code}/material`"
       :max-bytes="UPLOAD_LIMITS.material"
       :locked-by="materialLock"
+      :current-url="problem.materialUrl"
     />
-    <p class="text-xs text-muted lg:col-span-3">{{ $t('admin.problems.files.footer') }}</p>
   </div>
 </template>

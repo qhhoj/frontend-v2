@@ -1,68 +1,89 @@
 import { computed, ref, watch } from 'vue';
-import type { Ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { putProblemData } from '@/api/problem-data.api';
 import type { ProblemData, ProblemDataBody } from '@/api/types/problem-data';
+import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { countChanges } from '../../ui/form/dirty-form';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { problemDataKey, useProblemDataQuery } from './problem-data.queries';
 import { checkDataForm, dataSnapshot, toDataBody, toDataForm } from './test-cases';
 import type { DataForm } from './test-cases';
 import { useInvalidArgs } from './use-invalid-args';
 
-/** Seeds the form from the stored configuration, once: a form the viewer has touched is never overwritten by a refetch. */
-function seedOnce(
-  form: Ref<DataForm | null>,
-  savedSnapshot: Ref<string>,
-  data: ProblemData | undefined,
-) {
-  if (!data || form.value !== null) return;
-  form.value = toDataForm(data);
-  savedSnapshot.value = dataSnapshot(form.value);
-}
+/** What a save would send, as a plain object: row keys left out, so two forms compare by their values. */
+const sentShape = (form: DataForm) => JSON.parse(dataSnapshot(form)) as object;
 
-/** The data tab's form: seeded once from the query (a background refetch never overwrites an edit), saved as a whole. */
+/**
+ * The data tab's form: seeded once from the query (a background refetch never overwrites an edit), saved as a whole.
+ * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it, discard goes back to it.
+ */
 export function useDataForm(code: () => string) {
   const queryClient = useQueryClient();
   const viewer = useViewerId();
   const query = useProblemDataQuery(code);
   const form = ref<DataForm | null>(null);
-  /** The snapshot of the last saved (or seeded) form: the unsaved-change guard compares against it. */
-  const savedSnapshot = ref('');
-  const isDirty = computed(
-    () => form.value !== null && dataSnapshot(form.value) !== savedSnapshot.value,
+  const saved = ref<ProblemData | null>(null);
+  const savedAt = ref<Date | null>(null);
+  const dirtyCount = computed(() =>
+    form.value && saved.value
+      ? countChanges(sentShape(form.value), sentShape(toDataForm(saved.value)))
+      : 0,
   );
   const errors = computed<FieldErrors>(() => (form.value ? checkDataForm(form.value) : {}));
   const { badRowNumbers, markInvalid } = useInvalidArgs(form);
-  let sentSnapshot = '';
 
   const mutation = useAdminMutation({
     mutate: (body: ProblemDataBody) => putProblemData(code(), body),
-    onDone: (saved: ProblemData) => {
-      queryClient.setQueryData(problemDataKey(code(), viewer.value), saved);
-      form.value = toDataForm(saved);
-      savedSnapshot.value = sentSnapshot;
+    successText: () => translate('admin.problems.data.savedToast', { code: code() }),
+    onSuccess: () => (savedAt.value = new Date()),
+    onDone: (answer: ProblemData) => {
+      queryClient.setQueryData(problemDataKey(code(), viewer.value), answer);
+      saved.value = answer;
+      form.value = toDataForm(answer);
     },
   });
 
+  function seed(data: ProblemData) {
+    saved.value = data;
+    form.value = toDataForm(data);
+  }
   watch(code, () => {
     form.value = null;
+    saved.value = null;
   });
   watch(
     () => query.data.value,
-    (data) => seedOnce(form, savedSnapshot, data),
+    (data) => {
+      if (data && form.value === null) seed(data);
+    },
     { immediate: true },
   );
+
+  function discard() {
+    if (saved.value) seed(saved.value);
+  }
 
   function save() {
     if (!form.value || badRowNumbers.value.length > 0 || Object.keys(errors.value).length > 0)
       return;
+    if (dirtyCount.value === 0) return;
     const result = toDataBody(form.value);
     if ('errors' in result) return;
-    sentSnapshot = dataSnapshot(form.value);
     void mutation.run(result.body);
   }
 
-  return { query, form, errors, isDirty, badRowNumbers, markInvalid, save, mutation };
+  return {
+    query,
+    form,
+    errors,
+    dirtyCount,
+    savedAt,
+    badRowNumbers,
+    markInvalid,
+    save,
+    discard,
+    mutation,
+  };
 }

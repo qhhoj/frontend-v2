@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import AdminBit from '../../shell/AdminBit.vue';
+import AdminNotice from '../../ui/feedback/AdminNotice.vue';
 
 const props = defineProps<{ feedback: string }>();
 const lines = computed(() =>
@@ -12,17 +12,13 @@ const lines = computed(() =>
 </script>
 
 <template>
-  <section
-    v-if="lines.length > 0"
-    role="alert"
-    data-testid="data-feedback"
-    class="flex flex-col gap-2 rounded-panel border border-negative p-4"
-  >
-    <h2 class="flex items-center gap-2 font-semibold">
-      <AdminBit placement="refused" />{{ $t('admin.problems.data.feedback.title') }}
-    </h2>
-    <ul class="list-disc pl-5 text-sm">
-      <li v-for="(line, index) in lines" :key="index">{{ line }}</li>
-    </ul>
-  </section>
+  <div v-if="lines.length > 0" role="alert" data-testid="data-feedback">
+    <AdminNotice tone="danger" :title="$t('admin.problems.data.feedback.title')">
+      <template #action>
+        <ul class="mt-1 list-disc pl-5">
+          <li v-for="(line, index) in lines" :key="index">{{ line }}</li>
+        </ul>
+      </template>
+    </AdminNotice>
+  </div>
 </template>

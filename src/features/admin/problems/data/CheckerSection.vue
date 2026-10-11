@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Checker, Grader } from '@/api/types/problem-data';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../../ui/AdminField.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { INPUT } from '../../ui/controls';
 import { optionalNumber } from './test-cases';
 import type { DataForm } from './test-cases';
 
@@ -32,19 +32,14 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.problems.data.checker.title')">
-    <div class="grid gap-5 sm:grid-cols-2">
+  <AdminFormSection :title="$t('admin.problems.data.checker.title')" :columns="1">
+    <div class="grid gap-4 md:grid-cols-2">
       <AdminField
         v-slot="{ id, describedBy }"
         input-id="data-checker"
         :label="$t('admin.problems.data.checker.checkerLabel')"
       >
-        <select
-          :id="id"
-          v-model="form.checker"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-        >
+        <select :id="id" v-model="form.checker" :class="INPUT" :aria-describedby="describedBy">
           <option v-for="option in checkerOptions" :key="option" :value="option">
             {{ $t(`admin.problems.data.checkers.${option}`) }}
           </option>
@@ -55,12 +50,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
         input-id="data-grader"
         :label="$t('admin.problems.data.checker.graderLabel')"
       >
-        <select
-          :id="id"
-          v-model="form.grader"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-        >
+        <select :id="id" v-model="form.grader" :class="INPUT" :aria-describedby="describedBy">
           <option v-for="option in GRADERS" :key="option" :value="option">
             {{ $t(`admin.problems.data.graders.${option}`) }}
           </option>
@@ -76,8 +66,10 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
         <input
           :id="id"
           v-model="form.checkerArgsText"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           autocomplete="off"
+          spellcheck="false"
+          class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="errors.checkerArgs ? 'true' : undefined"
         />
@@ -92,8 +84,10 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
         <input
           :id="id"
           v-model="form.graderArgsText"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           autocomplete="off"
+          spellcheck="false"
+          class="font-mono"
           :aria-describedby="describedBy"
           :aria-invalid="errors.graderArgs ? 'true' : undefined"
         />
@@ -108,7 +102,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
           :value="form.outputLimit ?? ''"
           type="number"
           min="0"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           @input="setOutputNumber('outputLimit', ($event.target as HTMLInputElement).value)"
         />
@@ -123,13 +117,23 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
           :value="form.outputPrefix ?? ''"
           type="number"
           min="0"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           @input="setOutputNumber('outputPrefix', ($event.target as HTMLInputElement).value)"
         />
       </AdminField>
     </div>
-    <AdminSwitch v-model="form.unicode" :label="$t('admin.problems.data.checker.unicode')" />
-    <AdminSwitch v-model="form.nobigmath" :label="$t('admin.problems.data.checker.nobigmath')" />
-  </SettingsCard>
+    <div class="flex flex-wrap gap-x-8 gap-y-3">
+      <AdminCheckbox
+        v-model="form.unicode"
+        input-id="data-unicode"
+        :label="$t('admin.problems.data.checker.unicode')"
+      />
+      <AdminCheckbox
+        v-model="form.nobigmath"
+        input-id="data-nobigmath"
+        :label="$t('admin.problems.data.checker.nobigmath')"
+      />
+    </div>
+  </AdminFormSection>
 </template>

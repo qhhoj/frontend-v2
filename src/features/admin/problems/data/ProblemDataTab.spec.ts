@@ -2,13 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import {
-  cancelDialog,
-  confirmDialog,
-  openDialog,
-  staffViewer,
-  switchNamed,
-} from '@/test/admin-routes';
+import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
@@ -48,7 +42,7 @@ describe('ProblemDataTab', () => {
       'PUT /problems/hcmus41c/data': ok(problemData({ unicode: true })),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await switchNamed(wrapper, 'Chấp nhận Unicode').trigger('click');
+    await wrapper.get('#data-unicode').setValue(true);
     await saveConfig(wrapper);
     const body = calls.find((call) => call.method === 'PUT')!.body as {
       unicode: boolean;
@@ -56,7 +50,7 @@ describe('ProblemDataTab', () => {
     };
     expect(body.unicode).toBe(true);
     expect(body.cases).toHaveLength(5);
-    expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu.');
+    expect(wrapper.get('[data-testid="data-save-bar"]').text()).toContain('Đã lưu lúc');
   });
 
   it('asks before a route leave with unsaved configuration, and Stay keeps it', async () => {
@@ -67,7 +61,7 @@ describe('ProblemDataTab', () => {
       'GET /problems/hcmus41c/data': ok(problemData()),
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await switchNamed(wrapper, 'Chấp nhận Unicode').trigger('click');
+    await wrapper.get('#data-unicode').setValue(true);
     await router.push('/admin/problems');
     await flushPromises();
     expect(openDialog().textContent).toContain('Rời trang?');

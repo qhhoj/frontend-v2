@@ -48,7 +48,7 @@ describe('ProblemStatementsTab', () => {
       name: 'Constrained shortest path',
       description: 'Given a graph.',
     });
-    expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu.');
+    expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu lúc');
     expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 
@@ -80,7 +80,7 @@ describe('ProblemStatementsTab', () => {
     await wrapper.get('textarea').setValue('Mới');
     const saveOriginal = buttonLabelled(wrapper, 'Lưu mô tả gốc');
     expect(saveOriginal.attributes('aria-disabled')).toBe('true');
-    expect(wrapper.text()).toContain('Cần quyền judge.problem_full_markup');
+    expect(wrapper.text()).toContain('Cần quyền “Dùng markup không lọc trong đề bài”');
     await saveOriginal.trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
@@ -97,11 +97,11 @@ describe('ProblemStatementsTab', () => {
     await wrapper.get('textarea').setValue('Mô tả mới');
     const save = buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt');
     expect(save.attributes('aria-disabled')).toBe('true');
-    expect(wrapper.text()).toContain('Cần quyền judge.problem_full_markup');
+    expect(wrapper.text()).toContain('Cần quyền “Dùng markup không lọc trong đề bài”');
     await save.trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PUT')).toBe(false);
-    await buttonLabelled(wrapper, 'Hủy thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Huỷ thay đổi').trigger('click');
     await wrapper.get('#statement-name').setValue('Tên mới');
     await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').trigger('click');
     await flushPromises();
