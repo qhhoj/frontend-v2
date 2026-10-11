@@ -38,19 +38,28 @@ const history = (): RatingHistoryEntry[] => [
 describe('profile charts', () => {
   it('names the rating chart with the exact contest count, best and current rating', () => {
     const chart = mountComponent(RatingChart, { props: { history: history() } }).get(
-      'svg[role="img"]',
+      'svg[role="group"]',
     );
     expect(chart.attributes('aria-label')).toBe(
       'Biểu đồ rating qua 3 kỳ thi, cao nhất 1650, hiện tại 1600',
     );
   });
-  it('draws the best contest larger and labels every second contest along the bottom', () => {
+  it('shows the four figures, the change since the previous contest and tier names at the edge', () => {
     const wrapper = mountComponent(RatingChart, { props: { history: history() } });
-    expect(wrapper.findAll('circle').map((dot) => dot.attributes('r'))).toEqual(['4', '6', '4']);
-    const labels = wrapper.findAll('text').map((text) => text.text());
-    expect(labels).toContain('#1');
-    expect(labels).toContain('#3');
-    expect(labels).not.toContain('#2');
+    const stats = wrapper.get('[data-testid="rating-stats"]').text();
+    expect(stats).toContain('1600');
+    expect(stats).toContain('1650');
+    expect(stats).toContain('-50');
+    expect(wrapper.text()).toContain('Specialist');
+    expect(wrapper.text()).not.toContain('Cao nhất 1650');
+  });
+  it('names each contest on the axis when there are few, and gives every contest a focusable tooltip target', () => {
+    const wrapper = mountComponent(RatingChart, { props: { history: history() } });
+    expect(wrapper.text()).toContain('Round B');
+    const targets = wrapper.findAll('rect[tabindex="0"]');
+    expect(targets).toHaveLength(3);
+    expect(targets[1]!.attributes('aria-label')).toContain('Round B');
+    expect(targets[1]!.attributes('aria-label')).toContain('(+150)');
   });
   it('draws nothing when no contest has a rating', () => {
     const unrated = [contest('2026-09-15T10:00:00Z', null, null)];

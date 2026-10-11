@@ -49,9 +49,7 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
             <p class="mt-1 text-sm text-muted">
               {{ $t('profile.chartLead', { count: ratedCount }) }}
             </p>
-            <div class="mt-3 overflow-x-auto">
-              <RatingChart :history="history" class="w-full" />
-            </div>
+            <RatingChart :history="history" class="mt-3 w-full" />
           </template>
           <StatePanel
             v-else

@@ -1324,7 +1324,6 @@
   },
   "ratingChart": {
     "label": "Rating over {count} contests, highest {max}, now {current}",
-    "best": "Highest {max}",
     "pointTitle": "{contest}: {rating}",
     "hiddenContest": "A contest you cannot see",
     "heatmapLabel": "Submission activity over 53 weeks",
@@ -1346,7 +1345,25 @@
       "11": "Nov",
       "12": "Dec"
     },
-    "title": "Rating chart"
+    "title": "Rating chart",
+    "place": "rank {rank}",
+    "delta": "Δ latest",
+    "current": "Current",
+    "max": "Highest",
+    "contests": "Contests",
+    "noDelta": "—",
+    "tierShort": {
+      "newbie": "N",
+      "pupil": "P",
+      "specialist": "S",
+      "expert": "E",
+      "candidate-master": "CM",
+      "master": "M",
+      "international-master": "IM",
+      "grandmaster": "GM",
+      "international-grandmaster": "IGM",
+      "legendary-grandmaster": "LGM"
+    }
   },
   "profile": {
     "own": "Your profile",

@@ -31,13 +31,13 @@ describe('rating chart model', () => {
     ]);
   });
   it('places the highest rating highest and spreads contests evenly, one contest in the middle', () => {
-    const box = { width: 600, height: 200, padding: 20 };
+    const box = { width: 600, height: 200, left: 20, right: 20, top: 20, bottom: 20 };
     const points = chartPoints(
       [entry('2026-08-01T00:00:00Z', 1400), entry('2026-09-01T00:00:00Z', 1600)],
       box,
     );
     expect(points[1]!.y).toBeLessThan(points[0]!.y);
-    expect([points[0]!.x, points[1]!.x]).toEqual([20, 580]);
+    expect([points[0]!.x, points[1]!.x]).toEqual([225, 375]);
     expect(chartPoints([entry('2026-08-01T00:00:00Z', 1400)], box)[0]!.x).toBe(300);
   });
   it('cuts the tier bands to the range, each band coloured by its tier', () => {

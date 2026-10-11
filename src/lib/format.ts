@@ -99,6 +99,24 @@ export const formatDate = (date: string, locale: Locale) =>
     new Date(date),
   );
 
+/** An instant as a numeric date with a two-digit year, e.g. `20/09/25`, for axis labels (viewer's zone like `formatNumericDate`). */
+export const formatShortNumericDate = (date: string, locale: Locale) =>
+  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  }).format(new Date(date));
+
+/** The month and two-digit year as `09/25` in both locales (vi spells a bare month out as "tháng 09, 25"), for axis labels. */
+export const formatMonthYear = (date: string, locale: Locale) => {
+  const parts = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    month: '2-digit',
+    year: '2-digit',
+  }).formatToParts(new Date(date));
+  const part = (type: string) => parts.find((item) => item.type === type)!.value;
+  return `${part('month')}/${part('year')}`;
+};
+
 /** Contest start and end are instants: they show in the viewer's own zone (decisions.md, "Dates from the API"). */
 export const formatClock = (date: string, locale: Locale) =>
   new Intl.DateTimeFormat(INTL_LOCALES[locale], {

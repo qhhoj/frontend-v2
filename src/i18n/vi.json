@@ -1324,7 +1324,6 @@
   },
   "ratingChart": {
     "label": "Biểu đồ rating qua {count} kỳ thi, cao nhất {max}, hiện tại {current}",
-    "best": "Cao nhất {max}",
     "pointTitle": "{contest}: {rating}",
     "hiddenContest": "Kỳ thi bạn không được xem",
     "heatmapLabel": "Biểu đồ hoạt động nộp bài 53 tuần",
@@ -1346,7 +1345,25 @@
       "11": "Th11",
       "12": "Th12"
     },
-    "title": "Biểu đồ rating"
+    "title": "Biểu đồ rating",
+    "place": "hạng {rank}",
+    "delta": "Δ gần nhất",
+    "current": "Hiện tại",
+    "max": "Cao nhất",
+    "contests": "Số kỳ thi",
+    "noDelta": "—",
+    "tierShort": {
+      "newbie": "N",
+      "pupil": "P",
+      "specialist": "S",
+      "expert": "E",
+      "candidate-master": "CM",
+      "master": "M",
+      "international-master": "IM",
+      "grandmaster": "GM",
+      "international-grandmaster": "IGM",
+      "legendary-grandmaster": "LGM"
+    }
   },
   "profile": {
     "own": "Hồ sơ của bạn",

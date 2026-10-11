@@ -2,16 +2,24 @@ import type { RatingHistoryEntry } from '@/api/types/users';
 import { RATING_TIERS, TIER_LOWER_BOUNDS, tierColor } from './rating-tiers';
 import type { TierColor } from './rating-tiers';
 
+/** The drawing area: the plot is the rectangle left of `width - right`, between `top` and `height - bottom`; the margins hold the axis labels. */
 export interface ChartBox {
   width: number;
   height: number;
-  padding: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
 }
 export interface ChartPoint {
   x: number;
   y: number;
   rating: number;
+  /** Rating change against the contest before; null for the first rated contest. */
+  delta: number | null;
   contestName: string | null;
+  endTime: string;
+  rank: number | null;
 }
 export interface RatingRange {
   low: number;
@@ -52,27 +60,52 @@ export function ratingLabelTicks({ low, high }: RatingRange, plotHeight: number,
   );
 }
 
-/** Every how many contests a `#n` label is drawn so that neighbours stay `minGap` units apart. */
-export const labelEvery = (count: number, plotWidth: number, minGap = 40) =>
-  count < 2 ? 1 : Math.max(1, Math.ceil(minGap / (plotWidth / (count - 1))));
+/** Indices of the contests that get an x label: the last one and every `ceil(minGap / spacing)`-th before it, so neighbouring labels stay `minGap` apart and the current contest is always named. */
+export function labelledIndices(count: number, spacing: number, minGap: number): number[] {
+  const every = spacing > 0 ? Math.max(1, Math.ceil(minGap / spacing)) : 1;
+  const indices: number[] = [];
+  for (let index = count - 1; index >= 0; index -= every) indices.unshift(index);
+  return indices;
+}
+
+/** `text` cut with an ellipsis so that it fits `maxWidth` at `charWidth` per character. */
+export function truncateLabel(text: string, maxWidth: number, charWidth = 6.4) {
+  const fit = Math.max(1, Math.floor(maxWidth / charWidth));
+  return text.length <= fit ? text : `${text.slice(0, Math.max(1, fit - 1)).trimEnd()}…`;
+}
 
 /** y of a rating in the box: a higher rating sits higher, so a smaller y. */
 export const ratingY = (rating: number, range: RatingRange, box: ChartBox) =>
   box.height -
-  box.padding -
-  ((rating - range.low) / (range.high - range.low)) * (box.height - 2 * box.padding);
+  box.bottom -
+  ((rating - range.low) / (range.high - range.low)) * (box.height - box.top - box.bottom);
 
-/** Points for the rated entries, one per contest, spread evenly across the width (one contest sits in the middle). */
+const POINT_INSET = 14;
+const MAX_POINT_SPACING = 150;
+
+/** Distance between neighbouring contests: even across the plot, at most `MAX_POINT_SPACING` so a few contests huddle in the middle instead of spreading thin. */
+export const pointSpacing = (count: number, box: ChartBox) =>
+  count < 2
+    ? 0
+    : Math.min(
+        MAX_POINT_SPACING,
+        (box.width - box.left - box.right - 2 * POINT_INSET) / (count - 1),
+      );
+
+/** Points for the rated entries, one per contest, evenly spaced and centred in the plot (one contest sits in the middle). */
 export function chartPoints(entries: RatingHistoryEntry[], box: ChartBox): ChartPoint[] {
   const rated = ratedHistory(entries);
-  const ratings = rated.map((entry) => entry.rating ?? 0);
-  const range = ratingRange(ratings);
-  const step = rated.length > 1 ? (box.width - 2 * box.padding) / (rated.length - 1) : 0;
+  const range = ratingRange(rated.map((entry) => entry.rating ?? 0));
+  const step = pointSpacing(rated.length, box);
+  const first = box.left + (box.width - box.left - box.right - step * (rated.length - 1)) / 2;
   return rated.map((entry, index) => ({
-    x: rated.length > 1 ? box.padding + index * step : box.width / 2,
+    x: first + index * step,
     y: ratingY(entry.rating ?? 0, range, box),
     rating: entry.rating ?? 0,
+    delta: index === 0 ? null : (entry.rating ?? 0) - (rated[index - 1]!.rating ?? 0),
     contestName: entry.contestName,
+    endTime: entry.endTime,
+    rank: entry.rank,
   }));
 }
 
@@ -91,3 +124,23 @@ export const bandGeometry = (band: TierBand, range: RatingRange, box: ChartBox) 
   const top = ratingY(band.high, range, box);
   return { y: top, height: ratingY(band.low, range, box) - top };
 };
+
+/** Tier bands tall enough (in px) to hold their name at the right edge. */
+export const labelledBands = <Band extends { height: number }>(bands: Band[], minHeight = 14) =>
+  bands.filter((band) => band.height >= minHeight);
+
+/** Where a tooltip of `size` goes: right of the point, flipped left when it would pass the plot's right edge, and kept inside the box vertically. */
+export function tooltipPosition(
+  point: { x: number; y: number },
+  size: { width: number; height: number },
+  box: ChartBox,
+  gap = 12,
+) {
+  const fitsRight = point.x + gap + size.width <= box.width - box.right;
+  const left = fitsRight ? point.x + gap : Math.max(2, point.x - gap - size.width);
+  const top = Math.min(
+    Math.max(point.y - size.height / 2, 2),
+    box.height - box.bottom - size.height,
+  );
+  return { x: left, y: top };
+}

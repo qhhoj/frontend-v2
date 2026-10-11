@@ -1,65 +1,134 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
 import { translate } from '@/i18n';
+import { formatMonthYear, formatNumericDate, formatShortNumericDate } from '@/lib/format';
 import {
   bandGeometry,
   chartPoints,
+  labelledBands,
+  labelledIndices,
+  pointSpacing,
   ratedHistory,
-  ratingRange,
-  labelEvery,
   ratingLabelTicks,
+  ratingRange,
   ratingY,
   tierBands,
+  tooltipPosition,
+  truncateLabel,
 } from '@/lib/rating-chart';
-import { TIER_FILL_CLASSES } from '@/lib/tier-classes';
-import type { ChartBox } from '@/lib/rating-chart';
+import type { ChartBox, ChartPoint } from '@/lib/rating-chart';
+import { ratingTier, tierColor } from '@/lib/rating-tiers';
+import { TIER_FILL_CLASSES, TIER_STROKE_CLASSES } from '@/lib/tier-classes';
+import { useLocaleStore } from '@/stores/locale.store';
+import RatingStats from './RatingStats.vue';
+import { useElementWidth } from './use-element-width';
 
-/** Rating over the contests a viewer may see: tier bands behind a polyline, one dot per contest. Draws nothing without a rated contest. */
+/**
+ * Rating over the contests a viewer may see: a row of four figures, then faint tier bands behind a line with a hollow dot per contest.
+ * Hovering or focusing a contest shows its name, date, place, rating change and tier. Draws nothing without a rated contest.
+ */
 const props = defineProps<{ history: RatingHistoryEntry[] }>();
-const BOX: ChartBox = { width: 640, height: 220, padding: 32 };
-/** The plot runs between the padding on both sides; the best contest's dot is drawn larger than the others. */
-const PLOT_LEFT = BOX.padding;
-const PLOT_WIDTH = BOX.width - 2 * BOX.padding;
-const PLOT_RIGHT = BOX.width - BOX.padding;
-const MAX_POINT_RADIUS = 4;
+const locale = useLocaleStore();
+const root = ref<HTMLElement | null>(null);
+const width = useElementWidth(() => root.value, 640);
+
+const PHONE_WIDTH = 480;
+const NAME_SLOT = 80; // px per contest needed to print the contest name (cut to fit) under its dot
+const AXIS_LEFT = 44;
+const TOP = 18;
+const LABEL_CHAR = 6.4;
+const TOOLTIP_HEIGHT = 70;
+const isPhone = computed(() => width.value < PHONE_WIDTH);
+const height = computed(() => (isPhone.value ? 280 : 300));
+
 const rated = computed(() => ratedHistory(props.history));
-const points = computed(() => chartPoints(props.history, BOX));
 const range = computed(() => ratingRange(rated.value.map((entry) => entry.rating ?? 0)));
-const bands = computed(() =>
-  tierBands(range.value).map((band) => ({ ...band, ...bandGeometry(band, range.value, BOX) })),
+const tierName = (rating: number) => translate(`tiers.${ratingTier(rating)}`);
+const bandName = (low: number) => {
+  const key = ratingTier(low);
+  return translate(isPhone.value ? `ratingChart.tierShort.${key}` : `tiers.${key}`);
+};
+/** The right margin holds the widest tier name. */
+const rightMargin = computed(
+  () =>
+    Math.max(...tierBands(range.value).map((band) => bandName(band.low).length)) * LABEL_CHAR + 8,
 );
-const ticks = computed(() =>
-  ratingLabelTicks(range.value, BOX.height - 2 * BOX.padding).map((rating) => ({
-    rating,
-    y: ratingY(rating, range.value, BOX),
+const baseBox = computed<ChartBox>(() => ({
+  width: width.value,
+  height: height.value,
+  left: AXIS_LEFT,
+  right: rightMargin.value,
+  top: TOP,
+  bottom: 0,
+}));
+const spacing = computed(() => pointSpacing(rated.value.length, baseBox.value));
+/** Few contests: each dot is named (name and date, two rows); many: dates only (one row). */
+const showNames = computed(() => rated.value.length < 2 || spacing.value >= NAME_SLOT);
+const box = computed<ChartBox>(() => ({ ...baseBox.value, bottom: showNames.value ? 44 : 30 }));
+const plotRight = computed(() => box.value.width - box.value.right);
+
+const points = computed(() => chartPoints(props.history, box.value));
+const bands = computed(() =>
+  tierBands(range.value).map((band) => ({
+    ...band,
+    ...bandGeometry(band, range.value, box.value),
   })),
 );
-/** Dots shrink on a long history so neighbours never overlap. */
-const pointRadius = computed(() =>
-  points.value.length < 2
-    ? MAX_POINT_RADIUS
-    : Math.min(MAX_POINT_RADIUS, Math.max(1.5, (PLOT_WIDTH / (points.value.length - 1)) * 0.4)),
+const bandLabels = computed(() =>
+  labelledBands(bands.value).map((band) => ({
+    key: band.low,
+    y: band.y + band.height / 2 + 4,
+    text: bandName(band.low),
+    colorClass: TIER_FILL_CLASSES[band.color],
+  })),
 );
-const polyline = computed(() => points.value.map((point) => `${point.x},${point.y}`).join(' '));
+/** A dotted line at the lower edge of each band but the lowest. */
+const boundaries = computed(() =>
+  bands.value.slice(1).map((band) => ({
+    key: band.low,
+    y: band.y + band.height,
+    colorClass: TIER_STROKE_CLASSES[band.color],
+  })),
+);
+const ticks = computed(() =>
+  ratingLabelTicks(range.value, box.value.height - box.value.top - box.value.bottom, 32).map(
+    (rating) => ({ rating, y: ratingY(rating, range.value, box.value) }),
+  ),
+);
 const best = computed(() =>
   points.value.reduce((top, point) => (point.rating > top.rating ? point : top)),
 );
-/** The best-point label is centred on the point; near an edge it starts or ends at the point instead (clear of the rating labels), so it is never cut. */
-const bestLabel = computed(() => {
-  const { x } = best.value;
-  if (x > BOX.width - 70) return { x: x + pointRadius.value, anchor: 'end' };
-  if (x < 70) return { x: Math.max(x, 40), anchor: 'start' };
-  return { x, anchor: 'middle' };
-});
 const current = computed(() => points.value.at(-1)!);
-/** Every n-th contest is labelled `#1, #3, …` along the bottom edge (n grows with the history), so the axis reads in contest order and the labels never touch. */
+
+const dateOf = (point: ChartPoint, short: boolean) =>
+  short
+    ? formatShortNumericDate(point.endTime, locale.locale)
+    : formatNumericDate(point.endTime, locale.locale);
 const xLabels = computed(() => {
-  const every = Math.max(2, labelEvery(points.value.length, PLOT_WIDTH));
-  return points.value.flatMap((point, index) =>
-    index % every === 0 ? [{ x: point.x, text: `#${index + 1}` }] : [],
+  const labelled = labelledIndices(
+    points.value.length,
+    spacing.value,
+    showNames.value ? NAME_SLOT : 44,
   );
+  const marks = labelled.map((index) => {
+    const point = points.value[index]!;
+    return {
+      key: index,
+      x: point.x,
+      name: showNames.value
+        ? truncateLabel(
+            point.contestName ?? translate('ratingChart.hiddenContest'),
+            spacing.value - 16,
+          )
+        : null,
+      date: showNames.value ? dateOf(point, true) : formatMonthYear(point.endTime, locale.locale),
+    };
+  });
+  // Two labelled contests in one month would print the same text twice: keep the first.
+  return marks.filter((mark, index) => showNames.value || mark.date !== marks[index - 1]?.date);
 });
+
 const label = computed(() =>
   translate('ratingChart.label', {
     count: points.value.length,
@@ -67,70 +136,205 @@ const label = computed(() =>
     current: current.value.rating,
   }),
 );
-const pointTitle = (point: { contestName: string | null; rating: number }) =>
-  translate('ratingChart.pointTitle', {
-    contest: point.contestName ?? translate('ratingChart.hiddenContest'),
-    rating: point.rating,
-  });
+const signed = (delta: number) => (delta > 0 ? `+${delta}` : String(delta));
+const contestTitle = (point: ChartPoint) =>
+  point.contestName ?? translate('ratingChart.hiddenContest');
+/** The tooltip's three rows, as text for screen readers and as the drawn rows. */
+const rows = (point: ChartPoint) => ({
+  name: contestTitle(point),
+  place: [
+    dateOf(point, false),
+    ...(point.rank === null ? [] : [translate('ratingChart.place', { rank: point.rank })]),
+  ].join(' · '),
+  rating: String(point.rating),
+  delta: point.delta === null ? '' : `(${signed(point.delta)})`,
+  tier: tierName(point.rating),
+});
+const spoken = (point: ChartPoint) => {
+  const row = rows(point);
+  return `${row.name}, ${row.place}, ${row.rating} ${row.delta} ${row.tier}`.replace(/ {2}/g, ' ');
+};
+
+const active = ref<number | null>(null);
+const activePoint = computed(() => (active.value === null ? null : points.value[active.value]!));
+const tooltip = computed(() => {
+  const point = activePoint.value;
+  if (!point) return null;
+  const row = rows(point);
+  const name = truncateLabel(row.name, 220);
+  const ratingRow = (row.rating.length + row.delta.length) * 7.5 + row.tier.length * 6.4 + 6;
+  const widest = Math.max(name.length * 6.4, row.place.length * 6.2, ratingRow, 150);
+  const size = { width: widest + 20, height: TOOLTIP_HEIGHT };
+  return {
+    ...tooltipPosition(point, size, box.value),
+    ...size,
+    name,
+    place: row.place,
+    rating: row.rating,
+    delta: row.delta,
+    deltaClass: !point.delta ? 'fill-muted' : point.delta > 0 ? 'fill-positive' : 'fill-negative',
+    tier: row.tier,
+    tierClass: TIER_FILL_CLASSES[tierColor(ratingTier(point.rating))],
+  };
+});
+const hitWidth = computed(() => Math.max(spacing.value, 24));
 </script>
 
 <template>
-  <svg
-    v-if="points.length"
-    role="img"
-    :aria-label="label"
-    :viewBox="`0 0 ${BOX.width} ${BOX.height}`"
-    class="h-auto w-full min-w-[32rem]"
-  >
-    <rect
-      v-for="band in bands"
-      :key="`${band.color}-${band.low}`"
-      :x="PLOT_LEFT"
-      :y="band.y"
-      :width="PLOT_WIDTH"
-      :height="band.height"
-      :class="TIER_FILL_CLASSES[band.color]"
-      fill-opacity="0.12"
+  <div v-if="points.length" ref="root" class="flex flex-col gap-3">
+    <RatingStats
+      :current="current.rating"
+      :max="best.rating"
+      :count="points.length"
+      :delta="current.delta"
     />
-    <g v-for="tick in ticks" :key="tick.rating">
-      <line
-        :x1="PLOT_LEFT"
-        :x2="PLOT_RIGHT"
-        :y1="tick.y"
-        :y2="tick.y"
-        class="stroke-line"
-        stroke-width="1"
+    <svg
+      role="group"
+      :aria-label="label"
+      :viewBox="`0 0 ${box.width} ${box.height}`"
+      :width="box.width"
+      :height="box.height"
+      class="block h-auto w-full overflow-visible"
+      @pointerleave="active = null"
+      @keydown.esc="active = null"
+    >
+      <rect
+        v-for="band in bands"
+        :key="band.low"
+        :x="box.left"
+        :y="band.y"
+        :width="plotRight - box.left"
+        :height="band.height"
+        :class="TIER_FILL_CLASSES[band.color]"
+        fill-opacity="0.09"
       />
-      <text x="2" :y="tick.y + 4" class="fill-muted text-[12px]">{{ tick.rating }}</text>
-    </g>
-    <polyline :points="polyline" class="fill-none stroke-accent" stroke-width="2" />
-    <circle
-      v-for="(point, index) in points"
-      :key="index"
-      :cx="point.x"
-      :cy="point.y"
-      :r="point === best ? pointRadius + 2 : pointRadius"
-      class="fill-accent"
-    >
-      <title>{{ pointTitle(point) }}</title>
-    </circle>
-    <text
-      v-for="mark in xLabels"
-      :key="mark.text"
-      :x="mark.x"
-      :y="BOX.height - 6"
-      text-anchor="middle"
-      class="fill-muted text-[12px]"
-    >
-      {{ mark.text }}
-    </text>
-    <text
-      :x="bestLabel.x"
-      :y="best.y - 10"
-      :text-anchor="bestLabel.anchor"
-      class="fill-content text-[13px] font-semibold"
-    >
-      {{ $t('ratingChart.best', { max: best.rating }) }}
-    </text>
-  </svg>
+      <line
+        v-for="line in boundaries"
+        :key="line.key"
+        :x1="box.left"
+        :x2="plotRight"
+        :y1="line.y"
+        :y2="line.y"
+        :class="line.colorClass"
+        stroke-opacity="0.35"
+        stroke-dasharray="1 4"
+        stroke-linecap="round"
+      />
+      <text
+        v-for="item in bandLabels"
+        :key="item.key"
+        :x="plotRight + 8"
+        :y="item.y"
+        :class="item.colorClass"
+        class="text-[12px] font-semibold"
+      >
+        {{ item.text }}
+      </text>
+      <text
+        v-for="tick in ticks"
+        :key="tick.rating"
+        :x="box.left - 8"
+        :y="tick.y + 4"
+        text-anchor="end"
+        class="fill-muted text-[12px] tabular-nums"
+      >
+        {{ tick.rating }}
+      </text>
+      <polyline
+        :points="points.map((point) => `${point.x},${point.y}`).join(' ')"
+        class="fill-none stroke-accent"
+        stroke-width="2"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      />
+      <circle
+        v-for="(point, index) in points"
+        :key="index"
+        :cx="point.x"
+        :cy="point.y"
+        :r="index === active ? 6 : points.length > 12 ? 3 : 4.5"
+        stroke-width="2"
+        class="stroke-accent"
+        :class="index === active ? 'fill-accent' : 'fill-surface-solid'"
+      />
+      <circle
+        :cx="best.x"
+        :cy="best.y"
+        r="7.5"
+        fill="none"
+        class="stroke-content"
+        stroke-opacity="0.35"
+        stroke-dasharray="2 2"
+      />
+      <g v-for="mark in xLabels" :key="mark.key" class="fill-muted text-[12px]">
+        <text v-if="mark.name" :x="mark.x" :y="box.height - 28" text-anchor="middle">
+          {{ mark.name }}
+        </text>
+        <text
+          :x="mark.x"
+          :y="box.height - (mark.name ? 13 : 12)"
+          text-anchor="middle"
+          class="tabular-nums"
+        >
+          {{ mark.date }}
+        </text>
+      </g>
+      <line
+        v-if="activePoint"
+        :x1="activePoint.x"
+        :x2="activePoint.x"
+        :y1="box.top"
+        :y2="box.height - box.bottom"
+        class="stroke-content"
+        stroke-opacity="0.25"
+      />
+      <rect
+        v-for="(point, index) in points"
+        :key="`hit-${index}`"
+        :x="point.x - hitWidth / 2"
+        :y="box.top"
+        :width="hitWidth"
+        :height="box.height - box.top - box.bottom"
+        fill="transparent"
+        role="img"
+        tabindex="0"
+        class="outline-none"
+        :aria-label="spoken(point)"
+        @pointerenter="active = index"
+        @focus="active = index"
+        @blur="active = null"
+      />
+      <g v-if="tooltip" class="pointer-events-none">
+        <rect
+          :x="tooltip.x"
+          :y="tooltip.y"
+          :width="tooltip.width"
+          :height="tooltip.height"
+          rx="8"
+          class="fill-surface-solid stroke-line-strong"
+        />
+        <text
+          :x="tooltip.x + 10"
+          :y="tooltip.y + 19"
+          class="fill-content text-[12px] font-semibold"
+        >
+          {{ tooltip.name }}
+        </text>
+        <text :x="tooltip.x + 10" :y="tooltip.y + 37" class="fill-muted text-[12px] tabular-nums">
+          {{ tooltip.place }}
+        </text>
+        <text
+          :x="tooltip.x + 10"
+          :y="tooltip.y + 57"
+          class="fill-content text-[13px] font-semibold tabular-nums"
+        >
+          {{ tooltip.rating }}
+          <tspan :class="tooltip.deltaClass">{{ tooltip.delta }}</tspan>
+          <tspan :class="tooltip.tierClass" class="text-[12px] font-normal" dx="6">
+            {{ tooltip.tier }}
+          </tspan>
+        </text>
+      </g>
+    </svg>
+  </div>
 </template>
