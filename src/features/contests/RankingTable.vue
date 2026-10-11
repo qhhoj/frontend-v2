@@ -16,6 +16,7 @@ import {
 } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
+import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
   PROBLEM_COLUMN_REM,
   RANK_COLUMN_REM,
@@ -100,7 +101,7 @@ const scoreHeaderKey = computed(() => {
             scope="col"
             class="px-1.5 py-4 font-bold text-content"
           >
-            <abbr :title="problem.code" class="no-underline">{{ problem.label }}</abbr>
+            <RankingProblemHeader :problem="problem" />
           </th>
         </tr>
       </thead>
