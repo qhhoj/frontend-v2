@@ -13,7 +13,8 @@
     "quota": "Hạn mức",
     "problem": "Bài tập",
     "polygon": "Polygon",
-    "externalJudge": "Máy chấm ngoài"
+    "externalJudge": "Máy chấm ngoài",
+    "organization": "Tổ chức"
   },
   "blocks": {
     "site": {
@@ -71,6 +72,10 @@
     "externalJudge": {
       "title": "Máy chấm ngoài (PCD VJudge)",
       "help": "Bài gắn với máy chấm ngoài được nộp sang đó và kết quả được chép về. Thiếu URL gốc và token thì chưa kết nối."
+    },
+    "organization": {
+      "title": "Vai trò quản trị tổ chức",
+      "help": "Vai trò được gán cho mỗi quản trị viên tổ chức khi trở thành quản trị viên (không bao giờ bị thu hồi). Để trống thì dùng vai trò tên “Org Admin”."
     }
   },
   "fields": {
@@ -124,6 +129,9 @@
       "apiToken": "API token",
       "maxInFlight": "Số lượt chấm đồng thời",
       "maxWaitMinutes": "Số phút chờ kết quả"
+    },
+    "organization": {
+      "adminRoleId": "Id vai trò"
     }
   },
   "hints": {
@@ -172,6 +180,9 @@
       "apiToken": "Gửi dưới dạng bearer token. Được mã hóa khi lưu, không hiện lại.",
       "maxInFlight": "Số nguyên từ 1 đến 50.",
       "maxWaitMinutes": "Số nguyên từ 1 đến 240. Lượt chấm quá thời gian này mà chưa có kết quả bị đánh dấu lỗi máy chấm."
+    },
+    "organization": {
+      "adminRoleId": "UUID của vai trò, hoặc để trống."
     }
   },
   "chip": {
