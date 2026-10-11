@@ -63,8 +63,10 @@ describe('Polygon link step', () => {
     );
   });
 
-  it('asks for a full package when the newest package is not one', async () => {
-    expect(await refusalText(fail(409, 'polygon_package_not_ready'))).toContain('full package');
+  it('asks for a READY package when the newest package is not READY', async () => {
+    expect(await refusalText(fail(409, 'polygon_package_not_ready'))).toContain(
+      'Chưa có gói READY để nhập',
+    );
   });
 
   it('links the already linked problem only when the server names it', async () => {

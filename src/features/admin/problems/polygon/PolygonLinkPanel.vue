@@ -20,6 +20,7 @@ import { isFinal } from '../import/import-job';
 import { importRefusalText } from '../import/import-refusal';
 import { useImportJob } from '../import/use-import-job';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
+import PackageTypePill from './PackageTypePill.vue';
 import PolygonSyncHistory from './PolygonSyncHistory.vue';
 import { canSyncNow, linkStatusOf } from './polygon-link';
 import type { LinkStatus } from './polygon-link';
@@ -184,6 +185,7 @@ const onHistoryToggle = (event: Event) =>
               $t('admin.polygonLink.panel.latest')
             }}</span>
             <span class="text-xl font-bold">r{{ state.latestPackage.revision }}</span>
+            <PackageTypePill class="font-sans" :type="state.latestPackage.type" />
             <span v-if="state.latestPackage.createdAt" class="font-sans text-xs text-muted">{{
               $t('admin.polygonLink.history.builtAt', {
                 date: dateText(state.latestPackage.createdAt),

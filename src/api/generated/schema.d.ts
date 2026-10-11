@@ -4316,13 +4316,13 @@ export interface paths {
          *     the permission: the server finds `owner/name` among the problems shared
          *     with the QHHOJ account and compares the token with the `<problem url>` of
          *     the newest READY package's problem.xml (read once per problem, then
-         *     cached). Answers the problem, its statement title and the newest full
-         *     package. Each check, here or on import, counts towards 20 per 10 minutes
-         *     per user. Errors: 400 `polygon_link_invalid` (not a problem link), 404
-         *     `polygon_link_refused` (not shared with the account, or the token does not
+         *     cached). Answers the problem, its statement title and the newest READY
+         *     package (`type` full or standard). Each check, here or on import, counts
+         *     towards 20 per 10 minutes per user. Errors: 400 `polygon_link_invalid`
+         *     (not a problem link), 404 `polygon_link_refused` (not shared with the account, or the token does not
          *     match: one answer for both), 409 `polygon_no_package` (no READY package to
-         *     check against), `polygon_package_not_ready` (newest package not a READY
-         *     full package), `polygon_already_linked` (names the QHHOJ problem, also as
+         *     check against), `polygon_package_not_ready` (newest package not READY),
+         *     `polygon_already_linked` (names the QHHOJ problem, also as
          *     `linkedProblemCode`, only to a user who may edit it) or
          *     `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
          */
@@ -8967,10 +8967,10 @@ export interface components {
             /** @description BullMQ state: waiting | active | completed | failed | delayed | prioritized. */
             state: string;
             /**
-             * @description Step for a progress display: queued, then downloading (Polygon imports only), statements, tests, and done or failed.
+             * @description Step for a progress display: queued, then downloading (Polygon imports only), statements, generating (the tests of a Polygon standard package, on a judge), tests, and done or failed.
              * @enum {string}
              */
-            step: "done" | "downloading" | "failed" | "queued" | "statements" | "tests";
+            step: "done" | "downloading" | "failed" | "generating" | "queued" | "statements" | "tests";
         };
         ImportJobStartedResponse: {
             /** @description Job id to poll at `GET /problems/imports/{jobId}`. */
@@ -8979,7 +8979,7 @@ export interface components {
         ImportProgressResponse: {
             done: number | null;
             /** @enum {string} */
-            step: "downloading" | "statements" | "tests";
+            step: "downloading" | "generating" | "statements" | "tests";
             total: number | null;
         };
         ImportResultResponse: {
@@ -9712,6 +9712,8 @@ export interface components {
             id: number | null;
             revision: number | null;
             state: components["schemas"]["PolygonPackageState"];
+            /** @description `full`: every test with its answer is in the package; `standard`: the tests are generated on a judge during the import. Null unless READY. */
+            type: components["schemas"]["PolygonPackageType"] | null;
         };
         PolygonLinkImportDto: {
             /**
@@ -9792,6 +9794,11 @@ export interface components {
         };
         /** @enum {string} */
         PolygonPackageState: "FAILED" | "NONE" | "READY" | "RUNNING";
+        /**
+         * @description `full`: every test with its answer is in the package; `standard`: the tests are generated on a judge during the import. Null unless READY.
+         * @enum {string}
+         */
+        PolygonPackageType: "full" | "standard";
         PolygonProblemLinkDto: {
             /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
             link: string;
@@ -9799,7 +9806,7 @@ export interface components {
         PolygonProblemResponse: {
             /** @description Polygon problem id. */
             id: number;
-            /** @description The newest full package, READY: the one an import takes. */
+            /** @description The newest package, READY (full, or standard with generated tests): the one an import takes. */
             latestPackage: components["schemas"]["PolygonLatestPackageResponse"];
             /** @description The working copy has uncommitted changes. */
             modified: boolean;
@@ -9840,6 +9847,8 @@ export interface components {
              */
             packageCreatedAt: string | null;
             packageId: number;
+            /** @description The package variant taken: `full`, or `standard` (tests generated on a judge). */
+            packageType: components["schemas"]["PolygonPackageType"];
             /** @description Polygon short name. */
             polygonName: string;
             /** @description Polygon problem id. */
@@ -9857,7 +9866,7 @@ export interface components {
          * @description Where a failed job stopped: `checking` (before any work), a progress step, `saving` (the database write) or `finishing` (data files after the write); null unless failed, and for jobs that failed before it was recorded.
          * @enum {string}
          */
-        PolygonSyncStep: "checking" | "downloading" | "finishing" | "saving" | "statements" | "tests";
+        PolygonSyncStep: "checking" | "downloading" | "finishing" | "generating" | "saving" | "statements" | "tests";
         /** @enum {string} */
         PolygonSyncTrigger: "auto" | "manual";
         PolygonTestResponse: {

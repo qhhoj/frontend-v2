@@ -15,6 +15,7 @@ const run = (overrides: Partial<PolygonSyncRun> = {}): PolygonSyncRun => ({
   polygonName: 'xau-doi-xung',
   revision: 11,
   packageId: 7,
+  packageType: 'full',
   packageCreatedAt: '2026-10-02T03:00:00Z',
   purpose: 'sync',
   trigger: 'manual',

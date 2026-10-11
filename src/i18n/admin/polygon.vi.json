@@ -48,6 +48,7 @@
       "checking": "kiểm tra trước khi nhập",
       "downloading": "tải gói từ Polygon",
       "statements": "chuyển đề bài",
+      "generating": "sinh test trên judge",
       "tests": "tải test lên",
       "saving": "lưu vào cơ sở dữ liệu",
       "finishing": "đặt tệp dữ liệu sau khi lưu"
@@ -63,6 +64,7 @@
       "queued": "Đã xếp hàng",
       "downloading": "Tải gói từ Polygon",
       "statements": "Chuyển đề bài",
+      "generating": "Đang sinh test",
       "tests": "Tải test lên",
       "end": "Hoàn tất",
       "failed": "Không nhập được"

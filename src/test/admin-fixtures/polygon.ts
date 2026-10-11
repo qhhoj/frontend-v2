@@ -5,6 +5,7 @@ export const polygonPackage = (overrides: Partial<PolygonPackage> = {}): Polygon
   id: 7,
   revision: 11,
   state: 'READY',
+  type: 'full',
   createdAt: '2026-10-02T03:00:00Z',
   ...overrides,
 });

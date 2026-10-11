@@ -5,6 +5,14 @@
     "FAILED": "FAILED",
     "NONE": "No package"
   },
+  "packageType": {
+    "full": "Full package",
+    "standard": "Standard package · tests are generated on a judge",
+    "short": {
+      "full": "full",
+      "standard": "standard"
+    }
+  },
   "howTo": {
     "title": "How-to for problem setters",
     "steps": {
@@ -44,7 +52,6 @@
     "problem": "problem",
     "checking": "Checking the link…",
     "verified": "Link verified",
-    "fullReady": "Full package READY",
     "packageValue": "r{revision}, package #{id}, built {time}",
     "notLinked": "Not linked to any QHHOJ problem yet.",
     "checkAgain": "Check again",
@@ -63,9 +70,9 @@
       "title": "Build a package first",
       "body": "QHHOJ checks the link against the newest package, so the problem needs at least one READY package. Build a full package on Polygon, then check again."
     },
-    "notFull": {
-      "title": "No full package to import",
-      "body": "The newest package is not a READY full package: a standard package lacks the generated tests, or the package is still building or failed. On Polygon, open Packages and build a full package; if one is RUNNING, wait until it finishes."
+    "notReady": {
+      "title": "No READY package to import",
+      "body": "The newest package is not READY: it is still building or it failed. On Polygon, open Packages and build a full or standard package; if one is RUNNING, wait until it finishes."
     },
     "linked": {
       "title": "Already on QHHOJ",

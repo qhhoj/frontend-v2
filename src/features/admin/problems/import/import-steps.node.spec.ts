@@ -11,6 +11,7 @@ describe('importStepsOf', () => {
       'queued',
       'downloading',
       'statements',
+      'generating',
       'tests',
       'end',
     ]);
@@ -27,6 +28,7 @@ describe('importStepsOf', () => {
       'queued:done',
       'downloading:done',
       'statements:current',
+      'generating:pending',
       'tests:pending',
       'end:pending',
     ]);
@@ -41,6 +43,7 @@ describe('importStepsOf', () => {
       'queued:done',
       'downloading:done',
       'statements:done',
+      'generating:done',
       'tests:failed',
       'end:failed',
     ]);
@@ -51,6 +54,7 @@ describe('importStepsOf', () => {
       'queued:failed',
       'downloading:pending',
       'statements:pending',
+      'generating:pending',
       'tests:pending',
       'end:failed',
     ]);

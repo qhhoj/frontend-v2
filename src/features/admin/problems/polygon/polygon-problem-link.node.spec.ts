@@ -32,7 +32,7 @@ describe('linkRefusalOf', () => {
     expect(refusal('polygon_link_invalid')).toEqual({ kind: 'invalid' });
     expect(refusal('polygon_link_refused')).toEqual({ kind: 'refused' });
     expect(refusal('polygon_no_package')).toEqual({ kind: 'noPackage' });
-    expect(refusal('polygon_package_not_ready')).toEqual({ kind: 'notFull' });
+    expect(refusal('polygon_package_not_ready')).toEqual({ kind: 'notReady' });
   });
 
   it('names the linked problem only when the server sent its code', () => {
