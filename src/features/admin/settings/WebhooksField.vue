@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AdminBit from '../shell/AdminBit.vue';
+import { Lock } from 'lucide-vue-next';
 import DiscordWebhooksTable from './DiscordWebhooksTable.vue';
 
 /** The webhook URLs are secrets: each event shows only a masked target and is set, removed or tested on its own row. */
@@ -7,10 +7,10 @@ import DiscordWebhooksTable from './DiscordWebhooksTable.vue';
 
 <template>
   <div class="flex flex-col gap-3">
-    <div class="flex items-start gap-2">
-      <p class="flex-1 text-xs text-muted">{{ $t('admin.settings.webhooks.note') }}</p>
-      <AdminBit placement="security" />
-    </div>
+    <p class="flex items-start gap-2 text-sm text-muted">
+      <Lock aria-hidden="true" class="mt-0.5 size-4 shrink-0" :stroke-width="1.75" />
+      {{ $t('admin.settings.webhooks.note') }}
+    </p>
     <DiscordWebhooksTable />
   </div>
 </template>

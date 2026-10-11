@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { translate } from '@/i18n';
-import { openDialog, STAFF_ID, staffViewer } from '@/test/admin-routes';
+import { STAFF_ID, staffViewer } from '@/test/admin-routes';
 import { createdIntegrationClient, INTEGRATION_KEY, integrationClient } from '@/test/f5-fixtures';
 import { profile, sessionUser, signedIn } from '@/test/fixtures';
 import { invalid, issue, mockApi, ok, page } from '@/test/mock-api';
@@ -21,23 +21,44 @@ const routes = (extra: Record<string, MockHandler> = {}) => ({
 });
 const openPage = async () => {
   const mounted = await mountApp('/admin/integrations');
-  await vi.waitFor(() =>
-    expect(mounted.wrapper.find('[data-testid="integration-form"]').exists()).toBe(true),
-  );
+  await vi.waitFor(() => expect(mounted.wrapper.find('tr[data-client]').exists()).toBe(true));
   await flushPromises();
   return mounted;
 };
 type Wrapper = Awaited<ReturnType<typeof openPage>>['wrapper'];
 const rowOf = (wrapper: Wrapper, name: string) =>
   wrapper.findAll('tr[data-client]').find((row) => row.text().includes(name))!;
+/** The create form is in a drawer, rendered into `document.body`. */
+const formOf = () => document.querySelector<HTMLFormElement>('[data-testid="integration-form"]');
+const fill = (selector: string, value: string) => {
+  const field = formOf()!.querySelector<HTMLInputElement>(selector)!;
+  field.value = value;
+  field.dispatchEvent(new Event('input'));
+};
+const openForm = async (wrapper: Wrapper) => {
+  await wrapper.get('[data-testid="integration-create"]').trigger('click');
+  await vi.waitFor(() => expect(formOf()).not.toBeNull());
+};
 const fillForm = async (wrapper: Wrapper) => {
-  const form = wrapper.get('[data-testid="integration-form"]');
-  await form.get('#integration-name').setValue('Hệ thống thi tỉnh');
-  await form.get('input[value="contests:write"]').setValue(true);
-  await form.get('input[value="contests:read"]').setValue(true);
-  await form.get('#integration-cidrs').setValue('10.0.0.0/8\n192.168.1.0/24');
-  await form.get('#integration-acts-as').setValue('syncauthor');
-  return form;
+  await openForm(wrapper);
+  fill('#integration-name', 'Hệ thống thi tỉnh');
+  for (const scope of ['contests:write', 'contests:read']) {
+    formOf()!.querySelector<HTMLInputElement>(`input[value="${scope}"]`)!.click();
+    await flushPromises();
+  }
+  fill('#integration-cidrs', '10.0.0.0/8\n192.168.1.0/24');
+  fill('#integration-acts-as', 'syncauthor');
+  await flushPromises();
+  return formOf()!;
+};
+/** The reveal-once dialog (the drawer may still be leaving). */
+const keyDialog = () =>
+  [...document.querySelectorAll<HTMLElement>('[role="dialog"]')].find((dialog) =>
+    dialog.querySelector('[data-testid="key-close"]'),
+  )!;
+const submit = async (form: HTMLFormElement) => {
+  form.dispatchEvent(new Event('submit', { cancelable: true }));
+  await flushPromises();
 };
 
 describe('IntegrationClientsPage', () => {
@@ -48,23 +69,22 @@ describe('IntegrationClientsPage', () => {
       }),
     );
     const { wrapper } = await openPage();
-    const form = await fillForm(wrapper);
-    await form.trigger('submit');
-    await flushPromises();
+    await submit(await fillForm(wrapper));
+    await vi.waitFor(() => expect(keyDialog()).toBeDefined());
     expect(calls.find((call) => call.method === 'POST')!.body).toEqual({
       name: 'Hệ thống thi tỉnh',
       scopes: ['contests:write', 'contests:read'],
       allowedCidrs: ['10.0.0.0/8', '192.168.1.0/24'],
       actsAs: 'syncauthor',
     });
-    expect(openDialog().textContent).toContain(INTEGRATION_KEY);
-    const close = openDialog().querySelector<HTMLButtonElement>('[data-testid="key-close"]')!;
+    expect(keyDialog().textContent).toContain(INTEGRATION_KEY);
+    const close = keyDialog().querySelector<HTMLButtonElement>('[data-testid="key-close"]')!;
     expect(close.getAttribute('aria-disabled')).toBe('true');
     close.click();
     await flushPromises();
     expect(document.body.textContent).toContain(INTEGRATION_KEY);
     expect(wrapper.get('[data-testid="integration-table"]').text()).not.toContain(INTEGRATION_KEY);
-    openDialog().querySelector<HTMLInputElement>('#key-saved')!.click();
+    keyDialog().querySelector<HTMLInputElement>('#key-saved')!.click();
     await flushPromises();
     close.click();
     await vi.waitFor(() => expect(document.body.textContent).not.toContain(INTEGRATION_KEY));
@@ -84,13 +104,12 @@ describe('IntegrationClientsPage', () => {
     );
     const { wrapper } = await openPage();
     const form = await fillForm(wrapper);
-    await form.trigger('submit');
-    await flushPromises();
-    expect(form.get('#integration-acts-as').attributes('aria-invalid')).toBe('true');
-    expect(form.get('#integration-cidrs').attributes('aria-invalid')).toBe('true');
-    expect(form.text()).toContain(translate('admin.integrations.form.actsAsRefused'));
-    expect(form.text()).toContain(translate('admin.integrations.form.cidrRefused'));
-    expect(form.text()).not.toContain('This user needs judge.create_private_contest.');
+    await submit(form);
+    expect(form.querySelector('#integration-acts-as')!.getAttribute('aria-invalid')).toBe('true');
+    expect(form.querySelector('#integration-cidrs')!.getAttribute('aria-invalid')).toBe('true');
+    expect(form.textContent).toContain(translate('admin.integrations.form.actsAsRefused'));
+    expect(form.textContent).toContain(translate('admin.integrations.form.cidrRefused'));
+    expect(form.textContent).not.toContain('This user needs judge.create_private_contest.');
   });
 
   it('marks a key past its expiry as expired, not active, while a future one stays active', async () => {
@@ -127,10 +146,11 @@ describe('IntegrationClientsPage', () => {
     });
     const { wrapper } = await openPage();
     expect(wrapper.text()).toContain('Bạn đang xem dưới tên người khác');
-    const form = wrapper.get('[data-testid="integration-form"]');
-    expect(form.get('button[type="submit"]').attributes('aria-disabled')).toBe('true');
-    await form.trigger('submit');
+    const create = wrapper.get('[data-testid="integration-create"]');
+    expect(create.attributes('aria-disabled')).toBe('true');
+    await create.trigger('click');
     await flushPromises();
+    expect(formOf()).toBeNull();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     const revoke = rowOf(wrapper, 'Hệ thống thi tỉnh').get('button');
     expect(revoke.attributes('aria-disabled')).toBe('true');

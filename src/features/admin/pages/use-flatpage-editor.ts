@@ -3,6 +3,7 @@ import type { Ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { createFlatpage, deleteFlatpage, updateFlatpage } from '@/api/flatpages-admin.api';
 import type { FlatpageAdmin, FlatpageBody } from '@/api/types/flatpages-admin';
+import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import type { AdminQueryKey } from '../ui/use-admin-mutation';
@@ -15,7 +16,12 @@ import {
 } from './flatpage-form';
 import { flatpageKey, PUBLIC_FLATPAGES_KEY, useFlatpageQuery } from './flatpages.queries';
 
-const BLANK_FORM: FlatpageBody = { url: '', title: '', content: '', registrationRequired: false };
+export const BLANK_FORM: FlatpageBody = {
+  url: '',
+  title: '',
+  content: '',
+  registrationRequired: false,
+};
 export const bodyOf = (page: FlatpageAdmin): FlatpageBody => ({
   url: page.url,
   title: page.title,
@@ -83,6 +89,7 @@ function useFlatpageSave({ pageId, saved, createdPage, form, onCreated }: WriteO
     mutate: ({ id, body, patch }) =>
       id === null ? createFlatpage(body) : updateFlatpage(id, patch),
     invalidates: ({ id }) => keysToRefreshAfterSave(id),
+    successText: () => translate('admin.pages.saved'),
     onDone: (page, { id }) => {
       queryClient.setQueryData(flatpageKey(page.id, viewer.value), page);
       isNothingToSave.value = false;
@@ -137,6 +144,7 @@ export function useFlatpageEditor({ pageId, onCreated, onDeleted }: EditorOption
   const remover = useAdminMutation<string, void>({
     mutate: (id) => deleteFlatpage(id),
     invalidates: () => [['admin', 'flatpages'], PUBLIC_FLATPAGES_KEY],
+    successText: () => translate('admin.pages.deletedToast'),
     onDone: (_result, id) => {
       queryClient.removeQueries({ queryKey: flatpageKey(id, viewer.value) });
       queryClient.removeQueries({ queryKey: ['admin', 'flatpage-revisions', id] });
@@ -162,5 +170,12 @@ export function useFlatpageEditor({ pageId, onCreated, onDeleted }: EditorOption
     };
   });
 
-  return { form, saved, pageQuery, ...save, remover, fieldErrors, discard };
+  /** Fields that differ from the saved page (or from a blank form for a new one): the save bar's count. */
+  const dirtyCount = computed(() => {
+    const baseline = saved.value ?? createdPage.value;
+    return Object.keys(changedFlatpageFields(baseline ? bodyOf(baseline) : BLANK_FORM, form))
+      .length;
+  });
+
+  return { form, saved, pageQuery, ...save, remover, fieldErrors, discard, dirtyCount };
 }

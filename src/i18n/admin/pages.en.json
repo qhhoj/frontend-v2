@@ -5,9 +5,7 @@
     "total": "{total} pages",
     "loginChip": "Login required",
     "pager": "Static pages pager",
-    "search": "Search pages",
-    "searchPlaceholder": "URL or title",
-    "searchSubmit": "Search"
+    "search": "Search pages"
   },
   "pick": "Pick a page or create a new one.",
   "field": {
@@ -18,7 +16,7 @@
     "content": "Content (Markdown)",
     "contentCount": "{length} / 100,000",
     "contentHint": "At most 100,000 characters.",
-    "registrationRequired": "Only signed-in members can read it (guests get 401 and a sign-in prompt)"
+    "registrationRequired": "Only signed-in members can read it"
   },
   "errors": {
     "url": "Use only letters, digits, “-”, “_”, “.”, “~” and “/”, and not an empty path.",
@@ -28,13 +26,13 @@
   },
   "save": "Save page",
   "saved": "Page saved.",
-  "unchanged": "Nothing to save.",
-  "discard": "Discard",
+  "deletedToast": "Page deleted.",
   "delete": {
     "open": "Delete page",
     "title": "Delete page {url}?",
     "body": "The URL will return a missing-page answer.",
-    "confirm": "Delete page"
+    "confirm": "Delete page",
+    "zone": "Danger zone"
   },
   "tabs": {
     "label": "Page sections",
@@ -69,7 +67,7 @@
     "load": "Load old values",
     "showChanges": "Show changes",
     "loaded": "Loaded the old values of revision {time}; not saved yet.",
-    "note": "There is no separate restore API: “Load old values” only fills the form; press “Save page” to apply.",
+    "note": "“Load old values” only fills the form; press “Save page” to apply.",
     "empty": "This page has no edits yet.",
     "previous": "Previous",
     "next": "Next"
@@ -83,8 +81,8 @@
       "empty": "No content yet",
       "paused": "Paused"
     },
-    "pausedWait": "More than 60 previews a minute, so the server refused (429). The last preview stays; type again after {seconds} seconds to update it. Saving the page still works.",
-    "paused": "More than 60 previews a minute, so the server refused (429). The last preview stays; type again to update it. Saving the page still works.",
+    "pausedWait": "More than 60 previews a minute, so previews are paused. The last preview stays; type again after {seconds} seconds to update it. Saving the page still works.",
+    "paused": "More than 60 previews a minute, so previews are paused. The last preview stays; type again to update it. Saving the page still works.",
     "hint": "Updates 0.5 seconds after the last key, with the same sanitiser as saving."
   },
   "deleted": {

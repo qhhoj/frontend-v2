@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useRoute } from 'vue-router';
 import { deleteShortLink } from '@/api/short-links.api';
+import { translate } from '@/i18n';
 import type { ShortLink } from '@/api/types/short-links';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminBit from '../shell/AdminBit.vue';
@@ -20,16 +21,15 @@ const { data, isPending, error, refetch } = useAdminShortLinksQuery(page);
 const links = computed(() => data.value?.items ?? []);
 /** The link waiting for "Xóa liên kết"; null closes the dialog. */
 const pending = ref<ShortLink | null>(null);
-const deletedCode = ref<string | null>(null);
 const queryClient = useQueryClient();
 const remove = useAdminMutation<string, void>({
   mutate: deleteShortLink,
   invalidates: () => [shortLinksKey],
-  onDone: (_result, code) => {
+  successText: (_result, code) => translate('admin.shortlinks.deleted', { code }),
+  onDone: () => {
     // The copy button caches the automatic code of a page: a deleted one must not be offered again.
     queryClient.removeQueries({ queryKey: ['shortLinks'] });
     pending.value = null;
-    deletedCode.value = code;
   },
 });
 const isConfirmOpen = computed({
@@ -40,7 +40,6 @@ const isConfirmOpen = computed({
 });
 function askToRemove(link: ShortLink) {
   remove.reset();
-  deletedCode.value = null;
   pending.value = link;
 }
 const confirmRemove = () => pending.value && void remove.run(pending.value.code);
@@ -53,15 +52,8 @@ const tableRegion = () => document.getElementById('short-links-table');
     <AdminPageHeader
       :title="$t('admin.shell.screens.shortLinks')"
       :lead="$t('admin.shortlinks.lead')"
-    >
-      <template #actions><AdminBit placement="header" /></template>
-    </AdminPageHeader>
-    <ShortLinkCreateForm />
-    <AdminStatus
-      v-if="deletedCode"
-      kind="done"
-      :text="$t('admin.shortlinks.deleted', { code: deletedCode })"
     />
+    <ShortLinkCreateForm />
     <ShortLinksTable
       :links="links"
       :meta="data?.meta"

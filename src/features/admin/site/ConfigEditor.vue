@@ -6,12 +6,8 @@ import { deleteConfig, putConfig } from '@/api/site-admin.api';
 import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import {
-  ADMIN_BUTTON_CLASS,
-  ADMIN_DANGER_CLASS,
-  ADMIN_INPUT_CLASS,
-  ADMIN_PRIMARY_CLASS,
-} from '../ui/classes';
+import AdminChip from '../ui/AdminChip.vue';
+import { BUTTON, INPUT } from '../ui/controls';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import HtmlPreview from './HtmlPreview.vue';
@@ -53,6 +49,7 @@ function checkForm(): Record<string, string> {
 
 const save = useAdminMutation({
   mutate: ({ key, text }: { key: string; text: string }) => putConfig(key, text),
+  successText: (result) => translate('admin.site.config.saved', { key: result.key }),
   onDone: (result) => {
     writeConfig(queryClient, result.key, result.value);
     refreshAfterConfigWrite(queryClient);
@@ -68,6 +65,7 @@ function submit() {
 
 const remove = useAdminMutation({
   mutate: (key: string) => deleteConfig(key),
+  successText: (_result, key) => translate('admin.site.config.deleted', { key }),
   onDone: (_result, key) => {
     writeConfig(queryClient, key, null);
     refreshAfterConfigWrite(queryClient);
@@ -99,21 +97,20 @@ const errorOf = (field: string): string | undefined =>
         <input
           :id="id"
           v-model="keyName"
-          :class="[ADMIN_INPUT_CLASS, 'font-mono']"
+          :class="[INPUT, 'font-mono']"
           :aria-describedby="describedBy"
           :aria-invalid="errorOf('key') ? 'true' : undefined"
           autocomplete="off"
         />
       </AdminField>
-      <p v-else class="font-mono text-sm font-semibold">{{ keyName }}</p>
       <p v-if="knownConfigKey(keyName)" class="text-sm text-muted">
         {{ $t(`admin.site.config.known.${keyName}`) }}
       </p>
 
       <div class="flex flex-wrap items-center gap-2">
-        <span class="rounded-pill bg-surface-hover px-3 py-1 text-xs font-semibold">
+        <AdminChip :tone="kind === 'text' ? 'neutral' : 'info'">
           {{ $t(`admin.site.config.kinds.${kind}`) }}
-        </span>
+        </AdminChip>
       </div>
 
       <AdminField
@@ -127,7 +124,7 @@ const errorOf = (field: string): string | undefined =>
           :id="id"
           v-model="value"
           rows="8"
-          :class="[ADMIN_INPUT_CLASS, 'min-h-[8rem] py-2 font-mono text-sm']"
+          :class="[INPUT, 'min-h-[8rem] py-2 font-mono text-sm']"
           :aria-describedby="describedBy"
           :aria-invalid="errorOf('value') ? 'true' : undefined"
         />
@@ -145,11 +142,6 @@ const errorOf = (field: string): string | undefined =>
       </p>
 
       <AdminStatus
-        v-if="save.isDone.value"
-        kind="done"
-        :text="$t('admin.site.config.saved', { key: keyName })"
-      />
-      <AdminStatus
         v-if="save.failure.value"
         kind="refused"
         :text="failureTextOf(save.failure.value)"
@@ -158,18 +150,19 @@ const errorOf = (field: string): string | undefined =>
       <div class="flex flex-wrap gap-2">
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="BUTTON.primary"
           :aria-busy="save.isPending.value || undefined"
         >
           {{ $t('admin.site.config.save') }}
         </button>
-        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('close')">
+        <button type="button" :class="BUTTON.ghost" @click="emit('close')">
           {{ $t('admin.site.config.close') }}
         </button>
         <button
           v-if="!isCreating"
           type="button"
-          :class="ADMIN_DANGER_CLASS"
+          class="ml-auto"
+          :class="BUTTON.danger"
           @click="isDeleteOpen = true"
         >
           {{ $t('admin.site.config.delete') }}

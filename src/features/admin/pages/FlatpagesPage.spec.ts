@@ -62,7 +62,7 @@ describe('FlatpagesPage', () => {
     expect(wrapper.text()).toContain('“/faq” đã có trang khác dùng.');
     isTaken = false;
     await click(wrapper, 'Lưu trang');
-    expect(wrapper.text()).toContain('Đã lưu trang.');
+    expect(wrapper.text()).toContain('Đã lưu lúc');
   });
 
   it('after a create, the page is opened at its id and the next save is an update, never a second create', async () => {

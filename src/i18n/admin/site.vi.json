@@ -1,8 +1,14 @@
 {
   "config": {
     "title": "Cấu hình thô",
-    "warning": "Cấu hình thô: HTML của nhân viên, quyền ở mức vận hành — Mọi giá trị đều công khai (trả về cho mọi người ở GET /site) nên tuyệt đối không đặt bí mật ở đây; bí mật dùng trang Cài đặt. Thông báo và chân trang là HTML do nhân viên viết và được làm sạch trước khi hiện; mã theo dõi chỉ chấp nhận đúng đoạn mẫu của nhà vận hành. Chỉ người có quyền “Sửa cấu hình thô”.",
-    "listNote": "Danh sách lấy từ GET /site; trang quản trị đọc với cache: no-cache.",
+    "lead": "Các khoá văn bản tự do mà trang web đọc: thông báo, chân trang, liên kết.",
+    "caption": "Các khoá cấu hình",
+    "warning": {
+      "title": "Mọi giá trị ở đây đều công khai",
+      "summary": "Ai cũng đọc được các giá trị này, nên đừng đặt bí mật ở đây; bí mật thuộc trang Cài đặt.",
+      "html": "Giá trị HTML (thông báo, chân trang) được làm sạch trước khi hiện trên trang.",
+      "tracking": "Mã theo dõi chỉ được dùng đúng đoạn mẫu của người vận hành trang."
+    },
     "columns": {
       "key": "Khoá",
       "value": "Giá trị",
@@ -27,7 +33,7 @@
     "previewLabel": "Xem trước trong khung cách ly (không chạy mã)",
     "previewNote": "Thẻ script, sự kiện on…, iframe và liên kết javascript: không chạy trong khung xem trước; trang thật làm sạch khi hiện.",
     "urlNote": "Khoá liên kết chỉ nhận http hoặc https.",
-    "trackingNote": "Chỉ đoạn mẫu theo dõi do nhà vận hành quy định được dùng; máy chủ hiện chưa kiểm tra đoạn này.",
+    "trackingNote": "Chỉ dùng đúng đoạn mẫu theo dõi của người vận hành trang.",
     "save": "Lưu",
     "close": "Huỷ",
     "delete": "Xoá khoá",
@@ -45,6 +51,7 @@
     "unusedChip": "Chỉ trang cũ dùng: ở đây không đọc",
     "knownHeading": "Khoá đã biết chưa đặt",
     "setKnown": "Đặt",
+    "setKnownLabel": "Đặt {key}",
     "known": {
       "top_notification": "Thông báo trang: văn bản thuần hiện trên mọi trang cho mọi người xem, đến khi họ đóng.",
       "announcement": "Trang cũ: khung thông báo HTML cuối mọi trang.",

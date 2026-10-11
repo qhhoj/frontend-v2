@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
-import QueryState from '@/components/QueryState.vue';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import { useI18n } from 'vue-i18n';
 import { translate } from '@/i18n';
-import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
-import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import { SITE_NOTICE_KEY } from '@/features/site-notice/site-notice';
+import AdminChip from '../ui/AdminChip.vue';
+import AdminDrawer from '../ui/AdminDrawer.vue';
+import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import { BUTTON, CARD, buttonClass } from '../ui/controls';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../ui/table/table-columns';
 import ConfigEditor from './ConfigEditor.vue';
 import SiteNoticeCard from './SiteNoticeCard.vue';
 import { configKindOf } from './config-kinds';
@@ -27,6 +29,7 @@ interface EditTarget {
   isNew: boolean;
 }
 
+const { t } = useI18n();
 const query = useSiteAdminQuery();
 const editing = ref<EditTarget | null>(null);
 const config = computed(() => query.data.value?.config ?? {});
@@ -37,6 +40,17 @@ const rows = computed<ConfigRow[]>(() =>
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([key, value]) => ({ key, value, kind: configKindOf(key, value), length: value.length })),
 );
+const columns = computed<AdminColumn[]>(() => [
+  {
+    key: 'key',
+    label: t('admin.site.config.columns.key'),
+    priority: 'primary',
+    cellClass: 'min-w-56',
+  },
+  { key: 'kind', label: t('admin.site.config.columns.kind'), priority: 'badge' },
+  { key: 'value', label: t('admin.site.config.columns.value'), cellClass: 'w-full' },
+  { key: 'length', label: t('admin.site.config.columns.length'), align: 'end' },
+]);
 
 const editorTitle = computed(() =>
   editing.value?.isNew
@@ -46,6 +60,12 @@ const editorTitle = computed(() =>
 const editorValue = computed(() =>
   editing.value && !editing.value.isNew ? (config.value[editing.value.key] ?? '') : '',
 );
+const isEditorOpen = computed({
+  get: () => editing.value !== null,
+  set: (isOpen: boolean) => {
+    if (!isOpen) editing.value = null;
+  },
+});
 
 const deletedText = ref('');
 const editRow = (key: string) => {
@@ -75,112 +95,115 @@ function onDeleted(key: string) {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
-    <AdminPageHeader :title="$t('admin.site.config.title')">
+  <div class="flex w-full flex-col gap-6">
+    <AdminPageHeader :title="$t('admin.site.config.title')" :lead="$t('admin.site.config.lead')">
       <template #actions>
-        <button ref="addButton" type="button" :class="ADMIN_PRIMARY_CLASS" @click="addKey()">
+        <button ref="addButton" type="button" :class="BUTTON.primary" @click="addKey()">
           {{ $t('admin.site.config.add') }}
         </button>
       </template>
     </AdminPageHeader>
 
     <p role="status" class="sr-only">{{ deletedText }}</p>
-    <p v-if="deletedText" aria-hidden="true" class="text-sm font-semibold text-positive">
-      {{ deletedText }}
-    </p>
 
-    <SettingsNotice tone="warning" :bit="ADMIN_BIT_KINDS.security">
-      {{ $t('admin.site.config.warning') }}
-    </SettingsNotice>
-
-    <QueryState
-      :loading="query.isPending.value"
-      :error="query.error.value"
-      @retry="query.refetch()"
+    <AdminNotice
+      tone="caution"
+      :title="$t('admin.site.config.warning.title')"
+      :summary="$t('admin.site.config.warning.summary')"
     >
-      <SiteNoticeCard :current="notice" />
-      <div class="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2 lg:items-start">
-        <SettingsCard :title="$t('admin.site.config.title')">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="text-muted">
-                <tr>
-                  <th scope="col" class="px-2 py-2 font-semibold">
-                    {{ $t('admin.site.config.columns.key') }}
-                  </th>
-                  <th scope="col" class="px-2 py-2 font-semibold">
-                    {{ $t('admin.site.config.columns.value') }}
-                  </th>
-                  <th scope="col" class="px-2 py-2 font-semibold">
-                    {{ $t('admin.site.config.columns.kind') }}
-                  </th>
-                  <th scope="col" class="px-2 py-2 font-semibold">
-                    {{ $t('admin.site.config.columns.length') }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="row in rows" :key="row.key" class="border-t border-line">
-                  <td class="px-2 py-2">
-                    <button
-                      type="button"
-                      class="font-mono font-semibold hover:underline"
-                      @click="editRow(row.key)"
-                    >
-                      {{ row.key }}
-                    </button>
-                    <span
-                      v-if="knownConfigKey(row.key)"
-                      class="block text-xs"
-                      :class="knownConfigKey(row.key)!.isUsed ? 'text-positive' : 'text-muted'"
-                    >
-                      {{
-                        knownConfigKey(row.key)!.isUsed
-                          ? $t('admin.site.config.usedChip')
-                          : $t('admin.site.config.unusedChip')
-                      }}
-                    </span>
-                  </td>
-                  <td class="max-w-[260px] truncate px-2 py-2 font-mono text-xs">
-                    {{ row.value }}
-                  </td>
-                  <td class="px-2 py-2">{{ $t(`admin.site.config.kinds.${row.kind}`) }}</td>
-                  <td class="px-2 py-2 tabular-nums">{{ row.length }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="text-xs text-muted">{{ $t('admin.site.config.listNote') }}</p>
-          <div v-if="unsetKnown.length" class="flex flex-col gap-2 border-t border-line pt-3">
-            <h3 class="text-sm font-semibold">{{ $t('admin.site.config.knownHeading') }}</h3>
-            <ul class="flex flex-col gap-2">
-              <li v-for="entry in unsetKnown" :key="entry.key" class="flex items-start gap-3">
-                <div class="min-w-0 flex-1">
-                  <span class="font-mono text-sm font-semibold">{{ entry.key }}</span>
-                  <span class="block text-xs text-muted">{{
-                    $t(`admin.site.config.known.${entry.key}`)
-                  }}</span>
-                </div>
-                <button type="button" :class="ADMIN_BUTTON_CLASS" @click="addKey(entry.key)">
-                  {{ $t('admin.site.config.setKnown') }}
-                </button>
-              </li>
-            </ul>
-          </div>
-        </SettingsCard>
+      <p class="m-0">{{ $t('admin.site.config.warning.html') }}</p>
+      <p class="m-0">{{ $t('admin.site.config.warning.tracking') }}</p>
+    </AdminNotice>
 
-        <SettingsCard v-if="editing" :title="editorTitle">
-          <ConfigEditor
-            :key="`${editing.key}:${editing.isNew}`"
-            :config-key="editing.key"
-            :is-new="editing.isNew"
-            :initial-value="editorValue"
-            :taken-keys="takenKeys"
-            @close="closeEditor"
-            @deleted="onDeleted"
-          />
-        </SettingsCard>
-      </div>
-    </QueryState>
+    <SiteNoticeCard v-if="query.data.value" :current="notice" />
+
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <AdminDataTable
+        :columns="columns"
+        :rows="rows"
+        :row-key="(row) => row.key"
+        :row-attrs="(row) => ({ 'data-key': row.key })"
+        :label="$t('admin.site.config.caption')"
+        :loading="query.isPending.value"
+        :error="query.error.value"
+        :skeleton-rows="6"
+        @retry="query.refetch()"
+      >
+        <template #cell-key="{ row }">
+          <button
+            type="button"
+            class="rounded-cell text-left font-mono font-semibold text-accent-text hover:underline"
+            @click="editRow(row.key)"
+          >
+            {{ row.key }}
+          </button>
+          <span
+            v-if="knownConfigKey(row.key)"
+            class="block text-xs"
+            :class="knownConfigKey(row.key)!.isUsed ? 'text-positive' : 'text-muted'"
+          >
+            {{
+              knownConfigKey(row.key)!.isUsed
+                ? $t('admin.site.config.usedChip')
+                : $t('admin.site.config.unusedChip')
+            }}
+          </span>
+        </template>
+        <template #cell-kind="{ row }">
+          <AdminChip :tone="row.kind === 'text' ? 'neutral' : 'info'">
+            {{ $t(`admin.site.config.kinds.${row.kind}`) }}
+          </AdminChip>
+        </template>
+        <template #cell-value="{ row }">
+          <span
+            class="block max-w-[14rem] truncate font-mono text-xs sm:max-w-md lg:max-w-xl"
+            :title="row.value"
+          >
+            {{ row.value || $t('admin.site.config.history.emptyValue') }}
+          </span>
+        </template>
+      </AdminDataTable>
+
+      <section
+        v-if="unsetKnown.length"
+        :class="[CARD, 'flex flex-col gap-3 p-4']"
+        aria-labelledby="config-known-title"
+      >
+        <h2 id="config-known-title" class="font-display text-base font-semibold">
+          {{ $t('admin.site.config.knownHeading') }}
+        </h2>
+        <ul class="m-0 flex list-none flex-col gap-3 p-0">
+          <li v-for="entry in unsetKnown" :key="entry.key" class="flex items-start gap-3">
+            <div class="min-w-0 flex-1">
+              <span class="font-mono text-sm font-semibold break-all">{{ entry.key }}</span>
+              <span class="block text-xs text-muted">{{
+                $t(`admin.site.config.known.${entry.key}`)
+              }}</span>
+            </div>
+            <button
+              type="button"
+              :class="buttonClass('secondary', 'sm')"
+              :aria-label="$t('admin.site.config.setKnownLabel', { key: entry.key })"
+              @click="addKey(entry.key)"
+            >
+              {{ $t('admin.site.config.setKnown') }}
+            </button>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <AdminDrawer v-model:visible="isEditorOpen" :title="editorTitle">
+      <ConfigEditor
+        v-if="editing"
+        :key="`${editing.key}:${editing.isNew}`"
+        :config-key="editing.key"
+        :is-new="editing.isNew"
+        :initial-value="editorValue"
+        :taken-keys="takenKeys"
+        @close="closeEditor"
+        @deleted="onDeleted"
+      />
+    </AdminDrawer>
   </div>
 </template>

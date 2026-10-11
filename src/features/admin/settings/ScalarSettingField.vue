@@ -6,7 +6,7 @@ import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import DefaultResetButton from './DefaultResetButton.vue';
 import { SETTING_KINDS } from './setting-blocks';
 import {
@@ -62,14 +62,14 @@ const timeZones = computed(() =>
           :min="kind.min"
           :max="kind.max"
           :aria-describedby="describedBy"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
         <select
           v-else-if="kind.kind === 'choice'"
           :id="id"
           v-model="value"
           :aria-describedby="describedBy"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         >
           <option v-for="option in kind.options" :key="option" :value="option">
             {{ $t(`admin.settings.options.${setting.key}.${option}`) }}
@@ -82,7 +82,7 @@ const timeZones = computed(() =>
             type="text"
             list="settings-time-zones"
             :aria-describedby="describedBy"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
           />
           <datalist id="settings-time-zones">
             <option v-for="zone in timeZones" :key="zone" :value="zone" />
@@ -94,7 +94,7 @@ const timeZones = computed(() =>
           v-model="value"
           :type="kind.kind === 'url' ? 'url' : 'text'"
           :aria-describedby="describedBy"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
         />
       </AdminField>
       <DefaultResetButton

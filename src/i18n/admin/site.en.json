@@ -1,8 +1,14 @@
 {
   "config": {
     "title": "Raw config",
-    "warning": "Raw config: staff-written HTML, operator-level permission — Every value is public (GET /site returns it to everyone), so never put a secret here; secrets go on the Settings page. The announcement and footer are staff-written HTML, cleaned before they show; tracking code accepts only the operator's own pattern. Only those with \"Edit raw config\" permission.",
-    "listNote": "The list comes from GET /site; the admin page reads it with cache: no-cache.",
+    "lead": "Free-text keys the site reads: the notice, footer and links.",
+    "caption": "Config keys",
+    "warning": {
+      "title": "Every value here is public",
+      "summary": "Anyone can read these values, so never put a secret here; secrets belong on the Settings page.",
+      "html": "HTML values (announcement, footer) are cleaned before they show on the site.",
+      "tracking": "Tracking code must be the site operator's own snippet, as given."
+    },
     "columns": {
       "key": "Key",
       "value": "Value",
@@ -27,7 +33,7 @@
     "previewLabel": "Preview in an isolated frame (runs no code)",
     "previewNote": "Script tags, on… event attributes, iframes and javascript: links do not run in the preview; the live page cleans the value when it shows.",
     "urlNote": "A link key accepts only http or https.",
-    "trackingNote": "Only the operator's own tracking snippet may be used; the server does not check this text yet.",
+    "trackingNote": "Use only the site operator's own tracking snippet, as given.",
     "save": "Save",
     "close": "Cancel",
     "delete": "Delete key",
@@ -45,6 +51,7 @@
     "unusedChip": "Old site only: not read here",
     "knownHeading": "Known keys not set",
     "setKnown": "Set",
+    "setKnownLabel": "Set {key}",
     "known": {
       "top_notification": "Site notice: plain text shown above every page to every visitor until they close it.",
       "announcement": "Old site: HTML announcement box at the bottom of every page.",

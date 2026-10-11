@@ -8,7 +8,7 @@ import { formatClock } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /** Under the External judge block: lists the OJs the saved connection serves, and warns about a plain-http address. */
@@ -45,7 +45,7 @@ function run() {
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="BUTTON.secondary"
         :aria-busy="check.isPending.value || undefined"
         @click="run"
       >

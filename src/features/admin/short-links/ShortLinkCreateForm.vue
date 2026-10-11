@@ -3,14 +3,14 @@ import { computed, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { createShortLink } from '@/api/short-links.api';
 import type { ShortLink } from '@/api/types/short-links';
+import { CircleCheck } from 'lucide-vue-next';
 import CopyButton from '@/components/CopyButton.vue';
-import GlassCard from '@/components/GlassCard.vue';
 import { shortLinkUrl } from '@/features/short-links/short-link-path';
 import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf, isConflict } from '../ui/admin-errors';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { BUTTON, CARD, INPUT } from '../ui/controls';
 import { fromLocalInput } from '../ui/datetime';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { shortLinksKey } from './short-links.queries';
@@ -72,14 +72,14 @@ const expiresError = computed(() =>
 </script>
 
 <template>
-  <GlassCard as="div" class="rounded-panel p-5 sm:p-6">
+  <div :class="[CARD, 'p-4 sm:p-5']">
     <form
       data-testid="short-link-form"
       class="flex flex-col gap-4"
       novalidate
       @submit.prevent="submit"
     >
-      <h2 class="font-display text-base font-bold">{{ $t('admin.shortlinks.form.title') }}</h2>
+      <h2 class="font-display text-base font-semibold">{{ $t('admin.shortlinks.form.title') }}</h2>
       <div class="grid gap-4 md:grid-cols-3">
         <AdminField
           v-slot="{ id, describedBy, invalid }"
@@ -95,7 +95,7 @@ const expiresError = computed(() =>
             spellcheck="false"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
-            :class="`${ADMIN_INPUT_CLASS} font-mono`"
+            :class="`${INPUT} font-mono`"
           />
         </AdminField>
         <AdminField
@@ -113,7 +113,7 @@ const expiresError = computed(() =>
             autocapitalize="off"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
-            :class="`${ADMIN_INPUT_CLASS} font-mono`"
+            :class="`${INPUT} font-mono`"
           />
         </AdminField>
         <AdminField
@@ -129,28 +129,34 @@ const expiresError = computed(() =>
             type="datetime-local"
             :aria-describedby="describedBy"
             :aria-invalid="invalid ? 'true' : undefined"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
           />
         </AdminField>
       </div>
       <div>
         <button
           type="submit"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="BUTTON.primary"
           :aria-disabled="create.isPending.value || undefined"
         >
           {{ $t('admin.shortlinks.form.submit') }}
         </button>
       </div>
-      <AdminStatus
+      <div
         v-if="created"
+        role="status"
         data-testid="short-link-created"
-        kind="done"
-        :text="$t('admin.shortlinks.form.created', { code: created.code })"
+        class="flex flex-wrap items-center gap-2 text-sm"
       >
+        <CircleCheck
+          aria-hidden="true"
+          class="size-4 shrink-0 text-positive"
+          :stroke-width="1.75"
+        />
+        <span>{{ $t('admin.shortlinks.form.created', { code: created.code }) }}</span>
         <CopyButton :text="shortLinkUrl(created.code)" :label="$t('admin.shortlinks.form.copy')" />
-      </AdminStatus>
+      </div>
       <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
     </form>
-  </GlassCard>
+  </div>
 </template>

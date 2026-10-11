@@ -1,7 +1,7 @@
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
-import { adminList, adminOk, confirmInDialog, dialogOf, signInAsStaff } from './fixtures/admin';
+import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
 import { siteData } from '../src/test/admin-fixtures/site';
 
 const CONFIG_PERMS = ['judge.change_miscconfig'];
@@ -75,11 +75,13 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.goto('/admin/config');
     await page.getByRole('button', { name: 'contact_email' }).click();
     await page.getByRole('button', { name: 'Xoá khoá', exact: true }).click();
-    await expect(dialogOf(page)).toContainText('Mọi trang ngừng dùng giá trị này ngay.');
+    // The confirm opens over the editor drawer, which is a dialog too.
+    const confirm = page.getByRole('dialog', { name: 'Xoá khoá contact_email?' });
+    await expect(confirm).toContainText('Mọi trang ngừng dùng giá trị này ngay.');
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(api.requestsTo('DELETE /admin/site/config/contact_email')).toHaveLength(0);
 
-    await confirmInDialog(page, 'Xoá khoá');
+    await confirm.getByRole('button', { name: 'Xoá khoá', exact: true }).click();
     await expect(page.getByRole('button', { name: 'contact_email' })).toHaveCount(0);
     expect(api.requestsTo('DELETE /admin/site/config/contact_email')).toHaveLength(1);
   });

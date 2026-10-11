@@ -22,12 +22,12 @@ test('creates a chosen-code link and deletes another after confirming', async ({
   await expect(page.locator('#short-links-table')).toBeFocused();
 });
 
-test('shows the staff Bit in the header and on the empty list', async ({ page, api }) => {
+test('shows the one staff Bit on the empty list only', async ({ page, api }) => {
   staff(api);
   api.routes['GET /short-links'] = adminList([]);
   await page.goto('/admin/short-links');
-  await expect(page.locator('[data-testid="admin-bit"][data-placement="header"]')).toBeVisible();
   await expect(page.locator('[data-testid="admin-bit"][data-placement="empty"]')).toBeVisible();
+  await expect(page.getByTestId('admin-bit')).toHaveCount(1);
 });
 
 for (const viewport of AUDIT_VIEWPORTS)

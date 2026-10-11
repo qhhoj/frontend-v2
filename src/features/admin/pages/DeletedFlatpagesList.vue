@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import { positivePageOf } from './flatpage-route';
 import { useDeletedFlatpagesQuery } from './flatpages.queries';
 
@@ -39,15 +37,15 @@ const items = computed(() => query.data.value?.items ?? []);
       :error="query.error.value"
       @retry="query.refetch()"
     >
-      <EmptyState v-if="items.length === 0" compact :kind="ADMIN_BIT_KINDS.empty">
+      <p v-if="items.length === 0" class="text-sm text-muted">
         {{ $t('admin.pages.deleted.empty') }}
-      </EmptyState>
+      </p>
       <ul v-else class="flex flex-col gap-2">
         <li v-for="item in items" :key="item.id">
           <button
             type="button"
             :aria-pressed="item.id === openedId"
-            class="flex w-full min-w-0 flex-col gap-1 rounded-row border border-line bg-surface-solid p-3 text-left hover:bg-surface-hover aria-pressed:border-accent"
+            class="flex w-full min-w-0 flex-col gap-1 rounded-row border border-line bg-surface-solid px-4 py-2.5 text-left hover:bg-surface-hover aria-pressed:border-accent aria-pressed:bg-accent-soft"
             @click="emit('open', item.id)"
           >
             <span class="truncate font-mono text-sm">{{ item.url }}</span>
@@ -63,6 +61,7 @@ const items = computed(() => query.data.value?.items ?? []);
       </ul>
       <NumberedPager
         v-if="query.data.value && query.data.value.meta.total"
+        compact
         :meta="query.data.value.meta"
         :label="$t('admin.pages.deleted.pager')"
         query-key="dp"

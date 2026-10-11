@@ -7,7 +7,7 @@ import { restoreSettingRevision, SETTING_REVISIONS_PAGE_SIZE } from '@/api/setti
 import type { Setting, SettingKey, SettingRevision } from '@/api/types/settings-admin';
 import type { ApiError } from '@/api/client';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON, CARD } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { SETTING_KINDS } from './setting-blocks';
 import { isRestorable } from './revisions';
@@ -64,6 +64,7 @@ const isConfirmOpen = computed({
 const restore = useAdminMutation<SettingRevision, Setting>({
   mutate: (revision) => restoreSettingRevision(props.settingKey, revision.id),
   invalidates: () => [settingRevisionsPrefix(props.settingKey)],
+  successText: () => t('admin.settings.revisions.restored', { key: props.settingKey }),
   onDone: (answer) => {
     restoreTarget.value = null;
     storeAnswer(answer);
@@ -84,23 +85,19 @@ function restoreFailureText(failure: ApiError): string {
 </script>
 
 <template>
-  <section
-    ref="root"
-    data-testid="revisions"
-    class="flex flex-col gap-4 rounded-row border border-line-strong bg-surface-solid p-4"
-  >
+  <section ref="root" data-testid="revisions" :class="[CARD, 'flex flex-col gap-4 p-4']">
     <header class="flex flex-wrap items-start justify-between gap-2">
       <div class="flex flex-col gap-1">
         <h2
           ref="heading"
           tabindex="-1"
-          class="font-display text-base font-bold focus-visible:outline-none"
+          class="font-display text-base font-semibold focus-visible:outline-none"
         >
           {{ t('admin.settings.revisions.title', { key: settingKey }) }}
         </h2>
         <p class="text-sm text-muted">{{ t('admin.settings.revisions.subtitle') }}</p>
       </div>
-      <button v-if="closable" type="button" :class="ADMIN_BUTTON_CLASS" @click="emit('close')">
+      <button v-if="closable" type="button" :class="BUTTON.ghost" @click="emit('close')">
         {{ t('admin.settings.revisions.close') }}
       </button>
     </header>
@@ -124,12 +121,15 @@ function restoreFailureText(failure: ApiError): string {
         </li>
       </ol>
     </QueryState>
-    <nav class="flex flex-wrap items-center justify-between gap-2 text-sm text-muted">
+    <nav
+      v-if="page > 1 || !isLastPage"
+      class="flex flex-wrap items-center justify-between gap-2 text-sm text-muted"
+    >
       <span>{{ t('admin.settings.revisions.total', { total }) }}</span>
       <span class="flex gap-2">
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="BUTTON.secondary"
           :aria-disabled="page <= 1 || undefined"
           @click="page > 1 && (page -= 1)"
         >
@@ -137,7 +137,7 @@ function restoreFailureText(failure: ApiError): string {
         </button>
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="BUTTON.secondary"
           :aria-disabled="isLastPage || undefined"
           @click="!isLastPage && (page += 1)"
         >

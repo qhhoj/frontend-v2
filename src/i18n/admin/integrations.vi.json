@@ -1,5 +1,6 @@
 {
-  "lead": "Khoá cho hệ thống bên ngoài tạo kỳ thi riêng tư, đặt thí sinh và đọc bảng điểm. Khoá chỉ tạo được từ phiên đăng nhập trên trình duyệt, không qua mã API hay khi đang đóng vai.",
+  "lead": "Khoá cho hệ thống bên ngoài tạo kỳ thi riêng tư, đặt thí sinh và đọc bảng điểm.",
+  "add": "Thêm hệ thống",
   "impersonating": "Bạn đang xem dưới tên người khác: không tạo hay thu hồi khoá được.",
   "form": {
     "title": "Tạo khoá mới",
@@ -18,7 +19,8 @@
     "actsAsHint": "Tên người dùng có quyền tạo kỳ thi riêng tư; kỳ thi tạo ra mang tên người này.",
     "expires": "Hết hạn",
     "expiresHint": "Phải sau thời điểm hiện tại. Để trống nếu khoá dùng đến khi bị thu hồi.",
-    "submit": "Tạo khoá"
+    "submit": "Tạo khoá",
+    "cancel": "Huỷ"
   },
   "key": {
     "title": "Khoá của {name}",

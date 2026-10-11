@@ -1,6 +1,6 @@
 {
   "title": "Site settings",
-  "lead": "Typed settings: each key has a default, a kind and a description. Secrets are sealed and never shown again.",
+  "lead": "The site's typed settings; each block is checked and saved on its own, and secrets are never shown again.",
   "groupsLabel": "Setting groups",
   "groups": {
     "site": "Site",
@@ -15,7 +15,6 @@
     "polygon": "Polygon",
     "externalJudge": "External judge"
   },
-  "infoCard": "Values are checked when saved. An error shows right under the wrong block; nothing is saved part-way through a key. Only people with the “Change settings” permission see this page.",
   "blocks": {
     "site": {
       "title": "Time zone",
@@ -231,14 +230,14 @@
     "httpOrHttpsOrEmpty": "Leave empty or use http:// or https://."
   },
   "save": "Save",
-  "discard": "Discard edits",
+  "discard": "Discard changes",
   "saved": "Saved.",
+  "savedBlock": "Saved {name}.",
   "badValue": {
     "officialModeEndsAt": "Not a valid instant. Use ISO 8601 with an offset, for example 2026-10-10T17:00:00+07:00."
   },
   "saveFailed": "Could not save {key}: {message}",
   "history": "History",
-  "historyWithKey": "History · {key}",
   "revisions": {
     "title": "History · {key}",
     "subtitle": "Newest first · 20 per page",
@@ -253,7 +252,8 @@
     "restoreField": "Restore non-secret fields",
     "confirmTitle": "Restore the previous value?",
     "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept.",
-    "close": "Close"
+    "close": "Close",
+    "restored": "Restored {key}."
   },
   "reset": {
     "label": "Reset to default {value}",
