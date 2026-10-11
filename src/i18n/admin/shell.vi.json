@@ -105,7 +105,8 @@
     "problemsDeleted": "Bài đã xóa",
     "organizationQuotas": "Hạn mức tổ chức",
     "cannedReplies": "Mẫu trả lời phiếu",
-    "polygonImport": "Nhập từ Polygon"
+    "polygonImport": "Nhập từ Polygon",
+    "problemExternal": "Sửa bài: máy chấm ngoài"
   },
   "waiting": "đang chờ xử lý",
   "search": {

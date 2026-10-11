@@ -561,6 +561,7 @@ export const problemDetail = (overrides: Partial<ProblemDetail> = {}): ProblemDe
   acRate: 38.4,
   canEdit: false,
   viewerStatus: null,
+  externalJudge: null,
   contest: null,
   isPublic: true,
   isManuallyManaged: false,
@@ -623,6 +624,7 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
   batches: null,
   totalCases: 20,
   viewer: { canAbort: false, canRejudge: false, canReject: false, canLock: false },
+  externalRun: null,
   lockedAfter: null,
   ...overrides,
 });

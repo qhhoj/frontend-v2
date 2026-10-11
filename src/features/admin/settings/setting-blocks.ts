@@ -6,7 +6,8 @@ export type SettingKind =
   | { kind: 'integer'; min: number; max: number }
   | { kind: 'text' }
   | { kind: 'choice'; options: readonly string[] }
-  | { kind: 'url' }
+  /** `allowHttp`: a plain `http://` address is accepted (the form warns about it). */
+  | { kind: 'url'; allowHttp?: boolean }
   | { kind: 'secretText' }
   | { kind: 'oauth' }
   | { kind: 'webhooks' };
@@ -39,6 +40,10 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'polygon.accountName': { kind: 'text' },
   'polygon.apiKey': { kind: 'secretText' },
   'polygon.apiSecret': { kind: 'secretText' },
+  'externalJudge.baseUrl': { kind: 'url', allowHttp: true },
+  'externalJudge.apiToken': { kind: 'secretText' },
+  'externalJudge.maxInFlight': { kind: 'integer', min: 1, max: 50 },
+  'externalJudge.maxWaitMinutes': { kind: 'integer', min: 1, max: 240 },
 };
 
 export type SettingGroup =
@@ -46,6 +51,7 @@ export type SettingGroup =
   | 'contest'
   | 'problem'
   | 'polygon'
+  | 'externalJudge'
   | 'mail'
   | 'auth'
   | 'notify'
@@ -58,6 +64,7 @@ export const SETTING_GROUPS: SettingGroup[] = [
   'contest',
   'problem',
   'polygon',
+  'externalJudge',
   'mail',
   'auth',
   'notify',
@@ -87,6 +94,16 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
     id: 'polygon',
     group: 'polygon',
     keys: ['polygon.accountName', 'polygon.apiKey', 'polygon.apiSecret'],
+  },
+  {
+    id: 'externalJudge',
+    group: 'externalJudge',
+    keys: [
+      'externalJudge.baseUrl',
+      'externalJudge.apiToken',
+      'externalJudge.maxInFlight',
+      'externalJudge.maxWaitMinutes',
+    ],
   },
   { id: 'mail', group: 'mail', keys: ['mail.from', 'mail.smtpUrl'] },
   { id: 'google', group: 'auth', keys: ['auth.google'] },

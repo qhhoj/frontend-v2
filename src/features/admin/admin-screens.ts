@@ -39,6 +39,7 @@ export const ADMIN_SCREENS = {
   problemEditorial: problemTab('editorial'),
   problemData: problemTab('data'),
   problemFiles: problemTab('files'),
+  problemExternal: problemTab('external'),
   types: {
     path: '/admin/types',
     permission: ['judge.change_problemtype', 'judge.change_problemgroup', 'judge.change_license'],

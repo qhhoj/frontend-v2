@@ -93,9 +93,14 @@ export function checkDraft(setting: Setting, draft: SettingDraft): string | null
   if (kind.kind === 'url') {
     const raw = (draft as ScalarDraft).value;
     const value = typeof raw === 'string' ? raw : '';
-    return value === '' || value.startsWith('https://')
-      ? null
-      : translate('admin.settings.errors.httpsOrEmpty');
+    const isAllowed =
+      value.startsWith('https://') || (kind.allowHttp && value.startsWith('http://'));
+    if (value === '' || isAllowed) return null;
+    return translate(
+      kind.allowHttp
+        ? 'admin.settings.errors.httpOrHttpsOrEmpty'
+        : 'admin.settings.errors.httpsOrEmpty',
+    );
   }
   return null;
 }

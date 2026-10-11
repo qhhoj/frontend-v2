@@ -1,0 +1,47 @@
+{
+  "dataNote": "This problem is judged on {oj}. The test data below is not used for judging.",
+  "notConnected": {
+    "title": "The external judge is not connected",
+    "bodyAdmin": "Save its base URL and token in the settings first.",
+    "bodyAsk": "Ask an administrator to connect it.",
+    "openSettings": "Open settings"
+  },
+  "active": {
+    "label": "Judge on the external judge",
+    "description": "Off: submissions are judged here as usual."
+  },
+  "oj": "Remote OJ",
+  "problemId": "Problem id on that OJ",
+  "search": {
+    "button": "Search",
+    "empty": "Nothing found.",
+    "total": "{shown} of {total} results"
+  },
+  "verify": {
+    "button": "Verify",
+    "title": "Remote title: {title}"
+  },
+  "languages": {
+    "caption": "Remote languages and the site languages they are sent as",
+    "remote": "Remote language",
+    "site": "Site language",
+    "pick": "Site language for {name}",
+    "unused": "Not used",
+    "duplicate": "A site language can be used for one remote language only."
+  },
+  "save": "Save",
+  "saved": "Saved. The allowed languages of this problem are now exactly the mapped ones.",
+  "remove": {
+    "button": "Remove link",
+    "title": "Remove the external judge link?",
+    "body": "Submissions are judged here again. The allowed languages stay as they are.",
+    "confirm": "Remove"
+  },
+  "check": {
+    "button": "Test connection",
+    "hint": "Asks the saved connection for its OJ list.",
+    "ok": "{time} · Connected. {count} OJs: {ojs}",
+    "failed": "{time} · Failed: {reason}",
+    "httpWarning": "The base URL starts with http://: the token travels unencrypted. Use https:// if the judge offers it."
+  }
+}

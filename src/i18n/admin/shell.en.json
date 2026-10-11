@@ -105,7 +105,8 @@
     "problemsDeleted": "Deleted problems",
     "organizationQuotas": "Organization quotas",
     "cannedReplies": "Ticket reply templates",
-    "polygonImport": "Import from Polygon"
+    "polygonImport": "Import from Polygon",
+    "problemExternal": "Edit problem: external judge"
   },
   "waiting": "waiting",
   "search": {

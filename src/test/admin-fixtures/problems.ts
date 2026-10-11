@@ -92,6 +92,7 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
   userCount: 0,
   hasEditorial: false,
   viewerStatus: null,
+  externalJudge: null,
   contest: null,
   language: 'vi',
   translated: true,

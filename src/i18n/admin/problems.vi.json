@@ -6,14 +6,16 @@
     "statements": "Đề bài và bản dịch",
     "editorial": "Lời giải",
     "data": "Dữ liệu chấm",
-    "files": "Tệp và tải lên"
+    "files": "Tệp và tải lên",
+    "external": "Chấm ngoài"
   },
   "leads": {
     "general": "Sửa thông tin chung. Mỗi tab lưu riêng.",
     "statements": "Đề bài theo ngôn ngữ, xem trước trực tiếp.",
     "editorial": "Lời giải, công khai và tác giả.",
     "data": "Gói dữ liệu, cấu hình checker và danh sách test.",
-    "files": "Ảnh trong đề, đề PDF và tài liệu kèm."
+    "files": "Ảnh trong đề, đề PDF và tài liệu kèm.",
+    "external": "Chấm bài này trên một online judge khác thay vì chấm tại đây."
   },
   "notFound": "Không tìm thấy bài {code}.",
   "cannotEdit": "Tài khoản này không sửa được bài {code}.",

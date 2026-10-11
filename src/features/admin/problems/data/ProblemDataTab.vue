@@ -52,6 +52,12 @@ const archive = useAdminMutation({
         :disabled="mutation.isPending.value"
         class="m-0 flex min-w-0 flex-col gap-5 border-0 p-0"
       >
+        <AdminStatus
+          v-if="problem.externalJudge"
+          kind="queued"
+          data-testid="external-judge-note"
+          :text="$t('admin.externalJudge.dataNote', { oj: problem.externalJudge.oj })"
+        />
         <DataArchiveCard :code="problem.code" :data="query.data.value">
           <template #upload>
             <UploadButton

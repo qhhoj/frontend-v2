@@ -6,14 +6,16 @@
     "statements": "Statements and translations",
     "editorial": "Editorial",
     "data": "Test data",
-    "files": "Files and uploads"
+    "files": "Files and uploads",
+    "external": "External judge"
   },
   "leads": {
     "general": "Edit the general details. Each tab saves on its own.",
     "statements": "Statements per language, with a live preview.",
     "editorial": "The editorial, its visibility and its authors.",
     "data": "The data package, checker settings and the test list.",
-    "files": "Images in the statement, the PDF statement and attached material."
+    "files": "Images in the statement, the PDF statement and attached material.",
+    "external": "Judge this problem on a remote online judge instead of here."
   },
   "notFound": "Problem {code} not found.",
   "cannotEdit": "This account cannot edit problem {code}.",

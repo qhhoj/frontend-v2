@@ -1,0 +1,47 @@
+{
+  "dataNote": "Bài này được chấm trên {oj}. Dữ liệu test bên dưới không dùng để chấm.",
+  "notConnected": {
+    "title": "Chưa kết nối máy chấm ngoài",
+    "bodyAdmin": "Hãy lưu URL gốc và token trong phần cài đặt trước.",
+    "bodyAsk": "Nhờ quản trị viên kết nối.",
+    "openSettings": "Mở cài đặt"
+  },
+  "active": {
+    "label": "Chấm trên máy chấm ngoài",
+    "description": "Tắt: bài nộp được chấm tại đây như bình thường."
+  },
+  "oj": "OJ bên ngoài",
+  "problemId": "Mã bài trên OJ đó",
+  "search": {
+    "button": "Tìm",
+    "empty": "Không tìm thấy.",
+    "total": "{shown} / {total} kết quả"
+  },
+  "verify": {
+    "button": "Xác minh",
+    "title": "Tên bài bên ngoài: {title}"
+  },
+  "languages": {
+    "caption": "Ngôn ngữ bên ngoài và ngôn ngữ của trang được gửi sang",
+    "remote": "Ngôn ngữ bên ngoài",
+    "site": "Ngôn ngữ của trang",
+    "pick": "Ngôn ngữ của trang cho {name}",
+    "unused": "Không dùng",
+    "duplicate": "Mỗi ngôn ngữ của trang chỉ dùng cho một ngôn ngữ bên ngoài."
+  },
+  "save": "Lưu",
+  "saved": "Đã lưu. Ngôn ngữ được phép của bài này giờ đúng bằng các ngôn ngữ đã ghép.",
+  "remove": {
+    "button": "Gỡ liên kết",
+    "title": "Gỡ liên kết máy chấm ngoài?",
+    "body": "Bài nộp lại được chấm tại đây. Ngôn ngữ được phép giữ nguyên.",
+    "confirm": "Gỡ"
+  },
+  "check": {
+    "button": "Kiểm tra kết nối",
+    "hint": "Hỏi máy chấm ngoài danh sách OJ bằng kết nối đã lưu.",
+    "ok": "{time} · Kết nối được. {count} OJ: {ojs}",
+    "failed": "{time} · Lỗi: {reason}",
+    "httpWarning": "URL gốc bắt đầu bằng http://: token đi qua mạng không mã hóa. Dùng https:// nếu máy chấm hỗ trợ."
+  }
+}
