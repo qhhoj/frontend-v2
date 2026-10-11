@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
-import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
-import { contestEditorRoutes, editableContest } from '@/test/admin-fixtures/contests';
+import { organizationItem, profile, sessionUser, signedIn } from '@/test/fixtures';
+import {
+  contestEditorRoutes,
+  contestSettings,
+  editableContest,
+} from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { needsPermissionText } from '../../ui/permission-text';
 
@@ -106,5 +111,76 @@ describe('ContestGeneralTab', () => {
     expect(wrapper.text()).toContain('Có thẻ chưa có trong danh mục thẻ kỳ thi.');
     expect(wrapper.text()).toContain('Thẻ này chưa có trong danh mục thẻ kỳ thi.');
     expect(wrapper.text()).not.toContain('Unknown tag moi.');
+  });
+
+  describe('visibility for an organization admin holding only create_private_contest', () => {
+    const orgAdmin = () => ({
+      'GET /auth/me': signedIn({
+        user: sessionUser({
+          isStaff: false,
+          permissions: [...EDIT, 'judge.create_private_contest'],
+        }),
+      }),
+      'GET /profile': ok(profile()),
+    });
+    const openVisibility = async (contest: ReturnType<typeof editableContest>) => {
+      mockApi({ ...orgAdmin(), ...contestEditorRoutes(contest) });
+      const { wrapper } = await mountAndWaitFor(
+        '/admin/contests/hcmus-w41/general',
+        'Thông tin kỳ thi',
+      );
+      return wrapper.get('#contest-isVisible');
+    };
+
+    it('can toggle it on an organization-private contest', async () => {
+      const checkbox = await openVisibility(
+        editableContest({
+          isOrganizationPrivate: true,
+          settings: contestSettings({ isVisible: false, isOrganizationPrivate: true }),
+        }),
+      );
+      expect(checkbox.attributes('disabled')).toBeUndefined();
+    });
+
+    it('cannot toggle it on a public contest', async () => {
+      const checkbox = await openVisibility(
+        editableContest({ settings: contestSettings({ isVisible: false }) }),
+      );
+      expect(checkbox.attributes('disabled')).toBeDefined();
+    });
+  });
+
+  it('keeps visibility open for staff with change_contest_visibility on a public contest', async () => {
+    mockApi({
+      ...staffViewer([...EDIT, 'judge.change_contest_visibility']),
+      ...contestEditorRoutes(editableContest({ settings: contestSettings({ isVisible: false }) })),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      'Thông tin kỳ thi',
+    );
+    expect(wrapper.get('#contest-isVisible').attributes('disabled')).toBeUndefined();
+  });
+
+  it('names an organization chip instead of showing its id', async () => {
+    const orgId = '01a1a1a1-0000-7000-8000-000000007285';
+    mockApi({
+      ...staffViewer([...EDIT, 'judge.create_private_contest']),
+      ...contestEditorRoutes(
+        editableContest({
+          isOrganizationPrivate: true,
+          settings: contestSettings({ isOrganizationPrivate: true, organizations: [orgId] }),
+        }),
+      ),
+      'GET /organizations': page([organizationItem({ id: orgId, name: 'THPT Hùng Vương' })]),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/general',
+      'Thông tin kỳ thi',
+    );
+    await flushPromises();
+    const chip = wrapper.get('[data-testid="organization-chip"]');
+    expect(chip.text()).toContain('THPT Hùng Vương');
+    expect(chip.text()).not.toContain('01a1');
   });
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { translate } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { createContest, createOrganizationContest } from '@/api/contest-editing.api';
@@ -13,7 +13,7 @@ import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
-import { checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
+import { canSetVisible, checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestGeneralForm from './ContestGeneralForm.vue';
 
@@ -22,6 +22,10 @@ const { can } = usePermissions();
 const form = ref(emptyContestForm());
 /** Mock-up 2C: an owning organization makes the contest its members-only one; the server sets those fields. */
 const owner = ref<CreationOwner | null>(null);
+/** Members of the owning organization should see the contest: it starts visible when the account may set that. */
+watch(owner, (picked) => {
+  form.value.isVisible = Boolean(picked) && canSetVisible(form.value, can, true);
+});
 const isOwnerReady = ref(false);
 const localErrors = computed(() => checkContestForm(form.value));
 /** Errors show once a save was tried, not while the first field is still being typed. */
@@ -45,7 +49,7 @@ const shownErrors = computed(() => ({
 async function create() {
   hasTried.value = true;
   if (Object.keys(localErrors.value).length > 0 || !isOwnerReady.value) return;
-  await mutation.run(toContestBody(form.value, can));
+  await mutation.run(toContestBody(form.value, can, Boolean(owner.value)));
 }
 </script>
 

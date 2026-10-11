@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Lock } from 'lucide-vue-next';
 import type { CreationOwner } from '../../creation/creation-owners';
 import AdminField from '../../ui/AdminField.vue';
@@ -8,20 +9,29 @@ import { INPUT } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { canSetVisible } from '../contest-form';
 import type { ContestForm } from '../contest-form';
+import { usePermissions } from '@/stores/use-permissions';
 import TagChips from './TagChips.vue';
 import { numberOrNaN, textOf } from './input-values';
 import { usePermissionLocks } from './permission-locks';
 
 /** Who sees the contest and its scoreboard: visibility, privacy, entry codes and bans. */
 const form = defineModel<ContestForm>({ required: true });
-defineProps<{
+const props = defineProps<{
   errors: FieldErrors;
   hasCodes: { access: boolean; ranking: boolean };
   /** Set on create in an organization: members-only access is fixed, so its controls give way to one line. */
   owner?: CreationOwner | null;
 }>();
+const { can } = usePermissions();
 const { lockedBy, hintOf } = usePermissionLocks();
+/** Visibility unlocks for `judge.change_contest_visibility`, or `judge.create_private_contest` on a private contest. */
+const visibleLock = computed(() =>
+  canSetVisible(form.value, can, Boolean(props.owner))
+    ? undefined
+    : 'judge.change_contest_visibility',
+);
 const SCOREBOARD_OPTIONS = ['V', 'H', 'C', 'P'] as const;
 const PRIVATE = 'judge.create_private_contest';
 const ACCESS_CODE = 'judge.contest_access_code';
@@ -38,7 +48,7 @@ const ACCESS_CODE = 'judge.contest_access_code';
       input-id="contest-isVisible"
       :label="$t('admin.contests.general.fields.isVisible')"
       :description="$t('admin.contests.general.fields.isVisibleHint')"
-      :locked-by="lockedBy('judge.change_contest_visibility')"
+      :locked-by="visibleLock"
     />
     <AdminCheckbox
       v-model="form.isPrivate"
