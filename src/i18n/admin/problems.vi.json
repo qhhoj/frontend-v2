@@ -3,14 +3,14 @@
   "tabsLabel": "Các phần của bài",
   "tabs": {
     "general": "Thông tin chung",
-    "statements": "Đề bài và bản dịch",
+    "statements": "Đề bài",
     "editorial": "Lời giải",
     "data": "Dữ liệu chấm",
-    "files": "Tệp và tải lên",
+    "files": "Tệp",
     "external": "Chấm ngoài"
   },
   "leads": {
-    "general": "Sửa thông tin chung. Mỗi tab lưu riêng.",
+    "general": "Mã, giới hạn, phân loại, người phụ trách và trạng thái.",
     "statements": "Đề bài theo ngôn ngữ, xem trước trực tiếp.",
     "editorial": "Lời giải, công khai và tác giả.",
     "data": "Gói dữ liệu, cấu hình checker và danh sách test.",
@@ -26,17 +26,22 @@
   "general": {
     "create": {
       "title": "Tạo bài tập",
-      "lead": "Người không có quyền thêm bài gửi dưới dạng đề xuất; nhân viên duyệt sau.",
-      "block": "Tạo bài mới",
+      "lead": "Không có quyền tạo bài thì bài được gửi dưới dạng đề xuất để nhân viên duyệt.",
       "createButton": "Tạo bài",
       "suggestButton": "Gửi đề xuất bài",
-      "suggested": "Đã gửi đề xuất {code}."
+      "suggested": "Đã gửi đề xuất {code}.",
+      "required": "Các mục có * là bắt buộc.",
+      "createdToast": "Đã tạo bài {code}.",
+      "cancel": "Huỷ"
     },
     "sections": {
       "basics": "Thông tin cơ bản",
       "limits": "Giới hạn và điểm",
-      "classes": "Phân loại và ngôn ngữ",
-      "visibility": "Hiển thị với thí sinh"
+      "classes": "Phân loại",
+      "visibility": "Hiển thị với thí sinh",
+      "people": "Người phụ trách",
+      "status": "Trạng thái",
+      "danger": "Vùng nguy hiểm"
     },
     "basics": {
       "code": "Mã bài",
@@ -68,7 +73,8 @@
       "removeLimit": "Bỏ giới hạn {language}",
       "timeFor": "Thời gian cho {language}",
       "memoryFor": "Bộ nhớ cho {language}",
-      "removeColumn": "Bỏ"
+      "removeColumn": "Bỏ",
+      "noLimits": "Chưa có giới hạn riêng nào."
     },
     "classes": {
       "group": "Nhóm bài",
@@ -87,7 +93,6 @@
     },
     "visibility": {
       "source": "Hiển thị mã nguồn bài nộp",
-      "sourceHint": "F, A, S, O: theo cấu hình chung, luôn, sau khi giải, chỉ chủ.",
       "sourceF": "Theo cấu hình chung",
       "sourceA": "Luôn",
       "sourceS": "Sau khi giải",
@@ -106,13 +111,22 @@
     "errors": {
       "code": "Chữ thường, số, gạch dưới, 1 đến 32 ký tự.",
       "timeLimit": "Từ 0,01 đến 60 giây.",
-      "highTime": "Trên 5 giây cần quyền judge.high_problem_timelimit.",
+      "highTime": "Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.",
       "memory": "Từ 0 đến 1048576 KiB.",
       "points": "Từ 800 đến 3500.",
       "types": "Cần ít nhất một loại bài."
     },
     "changeMessage": "Lý do",
-    "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử"
+    "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử",
+    "descriptions": {
+      "basics": "Mã và tên hiện ở danh sách bài.",
+      "limits": "Áp dụng cho mọi ngôn ngữ, trừ khi có giới hạn riêng bên dưới.",
+      "classes": "Dùng cho bộ lọc công khai và ngôn ngữ được nộp.",
+      "visibility": "Thí sinh thấy gì sau khi nộp.",
+      "people": "Ai sửa, thử và được thấy bài.",
+      "status": "Lưu cùng các mục trên."
+    },
+    "savedToast": "Đã lưu bài {code}."
   },
   "people": {
     "title": "Người phụ trách",
@@ -143,16 +157,14 @@
     }
   },
   "clone": {
-    "title": "Nhân bản bài",
+    "title": "Nhân bản bài {code}",
     "code": "Mã bài mới",
     "hint": "Sao chép đề, bản dịch, dữ liệu chấm.",
     "submit": "Nhân bản",
-    "done": "Đã nhân bản.",
-    "open": "Mở {code}"
+    "open": "Nhân bản bài…",
+    "doneToast": "Đã nhân bản thành {code}."
   },
   "statements": {
-    "title": "Đề bài theo ngôn ngữ",
-    "lead": "Mỗi ngôn ngữ lưu riêng bằng PUT /translations/:lang.",
     "slotsLabel": "Ngôn ngữ đề",
     "slots": {
       "vi": "Tiếng Việt",
@@ -164,9 +176,8 @@
     "nameHint": "Tối đa 100 ký tự.",
     "contentLabel": "Nội dung (Markdown)",
     "imageButton": "Chèn ảnh",
-    "imageHint": "Ảnh tải lên qua /problems/uploads/image, URL được chèn vào văn bản.",
-    "fullMarkupNote": "Bài này dùng markup đầy đủ: xem trước theo kiểu thường vì bạn không có quyền judge.problem_full_markup.",
-    "discard": "Hủy thay đổi",
+    "imageHint": "Ảnh tải lên được chèn vào nội dung tại vị trí con trỏ.",
+    "fullMarkupNote": "Bài này dùng markup đầy đủ: bản xem trước dùng kiểu thường vì bạn không có quyền “Dùng markup không lọc trong đề bài”.",
     "save": {
       "vi": "Lưu bản dịch tiếng Việt",
       "en": "Lưu bản dịch tiếng Anh",
@@ -176,18 +187,18 @@
       "nameLength": "Tên từ 1 đến {max} ký tự.",
       "descriptionLength": "Nội dung tối đa {max} ký tự.",
       "character": "Không dùng ký tự {character}; hãy thay bằng ký tự thường."
-    }
+    },
+    "savedToast": "Đã lưu {slot}."
   },
   "editorial": {
-    "title": "Lời giải",
-    "lead": "Lời giải, công khai và tác giả.",
     "public": "Công khai lời giải",
     "publicHint": "Khi tắt, chỉ nhân viên và tác giả thấy.",
     "publishOn": "Công khai từ",
     "publishOnHint": "Lời giải mở cho mọi người khi đến giờ này (nếu đã bật công khai).",
     "authors": "Tác giả lời giải",
     "content": "Nội dung (Markdown)",
-    "save": "Lưu lời giải"
+    "save": "Lưu lời giải",
+    "savedToast": "Đã lưu lời giải."
   },
   "data": {
     "save": "Lưu cấu hình",
@@ -239,7 +250,7 @@
       "title": "Danh sách test",
       "count": "{count} test",
       "countOver": "{count} test, vượt ngưỡng khuyến nghị {soft}.",
-      "hardLimit": "Giới hạn cứng {max} test cần quyền judge.create_mass_testcases; tài khoản này theo giới hạn thường.",
+      "hardLimit": "Cần quyền “{permission}” để có tới {max} test; tài khoản này theo giới hạn thường.",
       "legend": "C: test lẻ · S: mở nhóm có điểm · E: đóng nhóm. Điểm của nhóm là điểm cả nhóm.",
       "addCase": "Thêm test",
       "addBatch": "Thêm nhóm",
@@ -279,7 +290,8 @@
       "generatorArgs": "Tham số generator tối đa 1000 ký tự.",
       "count": "Phải là số nguyên không âm.",
       "argsTotal": "Tổng tham số của các test quá 1 MiB; hãy rút ngắn."
-    }
+    },
+    "savedToast": "Đã lưu cấu hình chấm của {code}."
   },
   "uploads": {
     "archive": {
@@ -303,36 +315,25 @@
   "files": {
     "image": {
       "title": "Ảnh trong đề",
-      "lead": "Ảnh dán vào khung viết đề; trả về URL để chèn.",
-      "button": "Chọn ảnh"
+      "lead": "Mỗi ảnh tải lên trả về một địa chỉ để dán vào đề."
     },
     "pdf": {
       "title": "Đề PDF",
-      "lead": "Một tệp PDF cho cả bài, thay tệp cũ.",
-      "button": "Chọn PDF"
+      "lead": "Một tệp PDF cho cả bài; tải tệp mới sẽ thay tệp cũ."
     },
     "material": {
       "title": "Tài liệu kèm",
-      "lead": "Gói tài liệu cho thí sinh tải về.",
-      "button": "Chọn tài liệu"
+      "lead": "Gói tài liệu cho thí sinh tải về."
     },
-    "attachments": {
-      "title": "Tệp đi kèm",
-      "lead": "Chấp nhận một tệp mỗi lần, thay tệp cũ. Chỉ nhận ảnh trong khung viết đề.",
-      "pdfButton": "Tải đề PDF lên",
-      "materialButton": "Tải tài liệu lên"
-    },
-    "uploaded": "Đã tải lên: {url}",
-    "current": "Hiện tại:",
     "none": "Chưa có tệp",
     "open": "Mở",
     "copy": "Sao chép địa chỉ",
-    "footer": "Mỗi lần tải lên trả về một URL; hệ thống không có danh sách tệp đã tải, nên URL cần được lưu vào đề hoặc vào hai trường PDF và tài liệu của bài."
+    "upload": "Tải lên",
+    "replace": "Thay tệp"
   },
-  "drafts": {
-    "leaveTitle": "Rời khỏi bản nháp chưa lưu?",
-    "leaveBody": "Thay đổi chưa lưu trong phần này sẽ mất.",
-    "leave": "Rời trang",
-    "stay": "Ở lại"
+  "header": {
+    "public": "Công khai",
+    "private": "Riêng tư",
+    "suggested": "Đề xuất"
   }
 }

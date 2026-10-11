@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { CaseChecker } from '@/api/types/problem-data';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../../ui/classes';
+import { ArrowDown, ArrowUp, X } from 'lucide-vue-next';
+import { INPUT, iconButtonClass } from '../../ui/controls';
 import { argsText, optionalNumber, parseArgs } from './test-cases';
 import type { KeyedCase } from './test-cases';
 
@@ -19,6 +20,8 @@ const emit = defineEmits<{
 }>();
 
 const rowNumber = computed(() => props.index + 1);
+const CELL = 'border-b border-line px-2 py-2 align-top';
+const ICON = iconButtonClass('ghost', 'sm');
 const argsDraft = ref(argsText(row.value.checkerArgs));
 const CASE_CHECKERS: CaseChecker[] = [
   '',
@@ -43,69 +46,72 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
 </script>
 
 <template>
-  <tr class="block border-b border-line py-3 sm:table-row">
-    <td class="block p-2 sm:table-cell">
-      <p class="mb-2 font-semibold">
+  <tr>
+    <th scope="row" :class="[CELL, 'sticky left-0 z-10 bg-surface text-left']">
+      <p class="mb-1 font-mono text-xs font-semibold tabular-nums">
         {{ $t('admin.problems.data.cases.rowLabel', { row: rowNumber }) }}
       </p>
-      <div class="flex flex-wrap gap-1">
+      <div class="flex gap-0.5">
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="ICON"
           :disabled="isFirst"
           :aria-label="$t('admin.problems.data.cases.moveUp', { row: rowNumber })"
+          :title="$t('admin.problems.data.cases.moveUp', { row: rowNumber })"
           @click="emit('move', -1)"
         >
-          ↑
+          <ArrowUp aria-hidden="true" class="size-4" :stroke-width="1.75" />
         </button>
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="ICON"
           :disabled="isLast"
           :aria-label="$t('admin.problems.data.cases.moveDown', { row: rowNumber })"
+          :title="$t('admin.problems.data.cases.moveDown', { row: rowNumber })"
           @click="emit('move', 1)"
         >
-          ↓
+          <ArrowDown aria-hidden="true" class="size-4" :stroke-width="1.75" />
         </button>
         <button
           type="button"
-          :class="ADMIN_BUTTON_CLASS"
+          :class="[ICON, 'text-negative']"
           :aria-label="$t('admin.problems.data.cases.remove', { row: rowNumber })"
+          :title="$t('admin.problems.data.cases.remove', { row: rowNumber })"
           @click="emit('remove')"
         >
-          ×
+          <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
         </button>
       </div>
-    </td>
-    <td class="block p-2 sm:table-cell">
-      <label :for="`case-${index}-type`" class="text-xs text-muted sm:sr-only">{{
+    </th>
+    <td :class="CELL">
+      <label :for="`case-${index}-type`" class="sr-only">{{
         $t('admin.problems.data.cases.columns.type')
       }}</label>
-      <select :id="`case-${index}-type`" v-model="row.type" :class="ADMIN_INPUT_CLASS">
+      <select :id="`case-${index}-type`" v-model="row.type" :class="[INPUT, 'min-w-32']">
         <option value="C">{{ $t('admin.problems.data.cases.types.C') }}</option>
         <option value="S">{{ $t('admin.problems.data.cases.types.S') }}</option>
         <option value="E">{{ $t('admin.problems.data.cases.types.E') }}</option>
       </select>
     </td>
-    <td class="block p-2 sm:table-cell">
+    <td :class="CELL">
       <template v-if="row.type === 'C'">
-        <label :for="`case-${index}-input`" class="text-xs text-muted sm:sr-only">{{
+        <label :for="`case-${index}-input`" class="sr-only">{{
           $t('admin.problems.data.cases.columns.input')
         }}</label>
         <input
           :id="`case-${index}-input`"
           v-model="row.input"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'min-w-40 font-mono']"
           list="archive-files"
           autocomplete="off"
         />
-        <label :for="`case-${index}-output`" class="mt-2 block text-xs text-muted sm:sr-only">{{
+        <label :for="`case-${index}-output`" class="sr-only">{{
           $t('admin.problems.data.cases.columns.output')
         }}</label>
         <input
           :id="`case-${index}-output`"
           v-model="row.output"
-          :class="ADMIN_INPUT_CLASS"
+          :class="[INPUT, 'min-w-40 font-mono']"
           list="archive-files"
           autocomplete="off"
         />
@@ -114,8 +120,8 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
         {{ $t('admin.problems.data.cases.batchLabel', { n: rowNumber }) }}
       </p>
     </td>
-    <td class="block p-2 sm:table-cell">
-      <label :for="`case-${index}-points`" class="text-xs text-muted sm:sr-only">{{
+    <td :class="CELL">
+      <label :for="`case-${index}-points`" class="sr-only">{{
         $t('admin.problems.data.cases.columns.points')
       }}</label>
       <input
@@ -124,33 +130,33 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
         :value="row.points ?? ''"
         type="number"
         min="0"
-        :class="ADMIN_INPUT_CLASS"
+        :class="[INPUT, 'w-24 font-mono tabular-nums']"
         @input="setOptionalNumber('points', ($event.target as HTMLInputElement).value)"
       />
-      <label v-if="row.type === 'C'" class="mt-2 flex min-h-11 items-center gap-2 text-sm">
-        <input v-model="row.isPretest" type="checkbox" class="size-5" />
+      <label v-if="row.type === 'C'" class="mt-1 flex min-h-8 items-center gap-2 text-sm">
+        <input v-model="row.isPretest" type="checkbox" class="size-4 accent-accent" />
         {{ $t('admin.problems.data.cases.pretest') }}
       </label>
     </td>
-    <td class="block p-2 sm:table-cell">
+    <td :class="CELL">
       <details>
-        <summary class="min-h-11 content-center font-semibold">
+        <summary class="min-h-8 cursor-pointer content-center font-semibold whitespace-nowrap">
           {{ $t('admin.problems.data.cases.columns.options') }}
         </summary>
-        <div class="mt-2 flex flex-col gap-2">
+        <div class="mt-2 flex w-64 flex-col gap-2">
           <label :for="`case-${index}-generatorArgs`" class="text-sm">{{
             $t('admin.problems.data.cases.generatorArgs')
           }}</label>
           <input
             :id="`case-${index}-generatorArgs`"
             v-model="row.generatorArgs"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             autocomplete="off"
           />
           <label :for="`case-${index}-checker`" class="text-sm">{{
             $t('admin.problems.data.cases.caseChecker')
           }}</label>
-          <select :id="`case-${index}-checker`" v-model="row.checker" :class="ADMIN_INPUT_CLASS">
+          <select :id="`case-${index}-checker`" v-model="row.checker" :class="INPUT">
             <option v-for="option in CASE_CHECKERS" :key="option || 'inherit'" :value="option">
               {{
                 option
@@ -165,7 +171,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
           <input
             :id="`case-${index}-checkerArgs`"
             :value="argsDraft"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             autocomplete="off"
             :aria-invalid="parseArgs(argsDraft) === undefined ? 'true' : undefined"
             @input="onArgsInput(($event.target as HTMLInputElement).value)"
@@ -178,7 +184,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
             :value="row.outputPrefix ?? ''"
             type="number"
             min="0"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             @input="setOptionalNumber('outputPrefix', ($event.target as HTMLInputElement).value)"
           />
           <label :for="`case-${index}-outputLimit`" class="text-sm">{{
@@ -189,14 +195,14 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
             :value="row.outputLimit ?? ''"
             type="number"
             min="0"
-            :class="ADMIN_INPUT_CLASS"
+            :class="INPUT"
             @input="setOptionalNumber('outputLimit', ($event.target as HTMLInputElement).value)"
           />
         </div>
       </details>
     </td>
-    <td class="block p-2 sm:table-cell">
-      <ul class="flex flex-col gap-1 text-xs text-negative">
+    <td :class="CELL">
+      <ul class="flex max-w-56 flex-col gap-1 text-xs text-negative">
         <li v-for="message in messages" :key="message">{{ message }}</li>
       </ul>
     </td>

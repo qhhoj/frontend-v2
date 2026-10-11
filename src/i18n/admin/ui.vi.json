@@ -110,5 +110,10 @@
   "maxReached": "Đã đủ {max} mục.",
   "bulk": {
     "selectPage": "Chọn cả trang"
-  }
+  },
+  "markdownPane": {
+    "write": "Soạn",
+    "preview": "Xem trước"
+  },
+  "markdownPanes": "Soạn hoặc xem trước"
 }

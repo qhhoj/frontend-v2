@@ -2,6 +2,7 @@ import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { putTranslation, updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
+import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
@@ -29,12 +30,9 @@ function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): P
   return putTranslation(code, target, { name: draft.name, description: draft.description });
 }
 
-const sameText = (left: StatementDraft, right: StatementDraft) =>
-  left.name === right.name && left.description === right.description;
-
-/** Whether any slot's text differs from what was last saved (the exists flag does not count). */
-const hasUnsaved = (drafts: Drafts, saved: Drafts) =>
-  STATEMENT_SLOTS.some((item) => !sameText(drafts[item], saved[item]));
+/** How many of a slot's two texts (name, description) differ from what was last saved. */
+const changedFields = (draft: StatementDraft, saved: StatementDraft) =>
+  Number(draft.name !== saved.name) + Number(draft.description !== saved.description);
 
 /**
  * Whether saving the slot would write its description: the original always does (it is the description), a translation does
@@ -66,21 +64,36 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   );
   const previewStyle = computed(() => previewStyleFor(problem(), canFullMarkup.value));
   const errors = computed(() => checkStatementDraft(current.value, slot.value));
-  const isDirty = computed(() => hasUnsaved(drafts.value, saved.value));
+  /** The save bar counts the slot on screen (one slot saves at a time); the leave guard counts every slot. */
+  const dirtyCount = computed(() => changedFields(current.value, saved.value[slot.value]));
+  const totalDirtyCount = computed(() =>
+    STATEMENT_SLOTS.reduce(
+      (total, item) => total + changedFields(drafts.value[item], saved.value[item]),
+      0,
+    ),
+  );
+  const savedAt = ref<Date | null>(null);
 
   const saveMutation = useAdminMutation({
     mutate: (target: StatementSlot) => saveSlot(problem().code, target, drafts.value[target]),
     invalidates: () => [['admin', 'problem', problem().code], PUBLIC_PROBLEMS_KEY],
+    successText: (_saved: unknown, target: StatementSlot) =>
+      translate('admin.problems.statements.savedToast', {
+        slot: translate(`admin.problems.statements.slots.${target}`),
+      }),
+    onSuccess: () => (savedAt.value = new Date()),
     onDone: (_saved: unknown, target: StatementSlot) => recordSaved(drafts, saved, target),
   });
 
   async function save() {
     if (isLocked.value || Object.keys(errors.value).length > 0) return;
+    if (dirtyCount.value === 0) return;
     await saveMutation.run(slot.value);
   }
 
+  /** Puts the slot on screen back to its last saved text. */
   function discard() {
-    drafts.value[slot.value] = statementDraftOf(problem(), slot.value);
+    drafts.value[slot.value] = { ...saved.value[slot.value] };
   }
 
   return {
@@ -88,7 +101,9 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     drafts,
     current,
     isLocked,
-    isDirty,
+    dirtyCount,
+    totalDirtyCount,
+    savedAt,
     previewStyle,
     canFullMarkup,
     errors,

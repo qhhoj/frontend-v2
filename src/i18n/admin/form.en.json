@@ -24,6 +24,8 @@
     "zoneHint": "{zone} time"
   },
   "section": {
-    "jumpTo": "Jump to section"
+    "jumpTo": "Jump to section",
+    "onThisPage": "On this page",
+    "pick": "Choose a section"
   }
 }

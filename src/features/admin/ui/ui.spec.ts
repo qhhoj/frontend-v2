@@ -135,7 +135,7 @@ describe('UsernameChips', () => {
     });
     expect(wrapper.get('input').attributes('disabled')).toBeDefined();
     expect(wrapper.find('button').exists()).toBe(false);
-    expect(wrapper.text()).toContain('Cần quyền judge.edit_all_problem');
+    expect(wrapper.text()).toContain('Cần quyền “Sửa mọi bài”');
   });
 });
 

@@ -3,14 +3,14 @@
   "tabsLabel": "Problem sections",
   "tabs": {
     "general": "General",
-    "statements": "Statements and translations",
+    "statements": "Statements",
     "editorial": "Editorial",
     "data": "Test data",
-    "files": "Files and uploads",
+    "files": "Files",
     "external": "External judge"
   },
   "leads": {
-    "general": "Edit the general details. Each tab saves on its own.",
+    "general": "Code, limits, classification, people and status.",
     "statements": "Statements per language, with a live preview.",
     "editorial": "The editorial, its visibility and its authors.",
     "data": "The data package, checker settings and the test list.",
@@ -26,17 +26,22 @@
   "general": {
     "create": {
       "title": "Create problem",
-      "lead": "A viewer without the right to add problems sends a suggestion; staff review it later.",
-      "block": "New problem",
+      "lead": "Without the right to add problems, the problem is sent as a suggestion for staff to review.",
       "createButton": "Create problem",
       "suggestButton": "Send suggestion",
-      "suggested": "Suggestion for {code} sent."
+      "suggested": "Suggestion for {code} sent.",
+      "required": "Fields marked * are required.",
+      "createdToast": "Created {code}.",
+      "cancel": "Cancel"
     },
     "sections": {
       "basics": "Basics",
       "limits": "Limits and points",
-      "classes": "Classification and languages",
-      "visibility": "Visible to contestants"
+      "classes": "Classification",
+      "visibility": "Visible to contestants",
+      "people": "People",
+      "status": "Status",
+      "danger": "Danger zone"
     },
     "basics": {
       "code": "Problem code",
@@ -68,7 +73,8 @@
       "removeLimit": "Remove the limit for {language}",
       "timeFor": "Time for {language}",
       "memoryFor": "Memory for {language}",
-      "removeColumn": "Remove"
+      "removeColumn": "Remove",
+      "noLimits": "No per-language limits yet."
     },
     "classes": {
       "group": "Group",
@@ -87,7 +93,6 @@
     },
     "visibility": {
       "source": "Show submission source",
-      "sourceHint": "F, A, S, O: site setting, always, after solving, owners only.",
       "sourceF": "Site setting",
       "sourceA": "Always",
       "sourceS": "After solving",
@@ -106,13 +111,22 @@
     "errors": {
       "code": "Lowercase letters, digits, underscore, 1 to 32 characters.",
       "timeLimit": "From 0.01 to 60 seconds.",
-      "highTime": "Over 5 seconds needs judge.high_problem_timelimit.",
+      "highTime": "Over 5 seconds needs the “Set a high time limit” permission.",
       "memory": "From 0 to 1048576 KiB.",
       "points": "From 800 to 3500.",
       "types": "At least one problem type is needed."
     },
     "changeMessage": "Reason",
-    "changeMessagePlaceholder": "Optional, kept in the history"
+    "changeMessagePlaceholder": "Optional, kept in the history",
+    "descriptions": {
+      "basics": "Code and name show in the problem list.",
+      "limits": "Apply to every language unless a language has its own limit below.",
+      "classes": "Used by the public filters and for which languages can submit.",
+      "visibility": "What contestants see after they submit.",
+      "people": "Who edits, tests and sees the problem.",
+      "status": "Saved with the sections above."
+    },
+    "savedToast": "Saved {code}."
   },
   "people": {
     "title": "People in charge",
@@ -143,16 +157,14 @@
     }
   },
   "clone": {
-    "title": "Clone problem",
+    "title": "Clone {code}",
     "code": "New problem code",
     "hint": "Copies the statements, translations and test data.",
     "submit": "Clone",
-    "done": "Cloned.",
-    "open": "Open {code}"
+    "open": "Clone problem…",
+    "doneToast": "Cloned as {code}."
   },
   "statements": {
-    "title": "Statements by language",
-    "lead": "Each language is saved on its own with PUT /translations/:lang.",
     "slotsLabel": "Statement language",
     "slots": {
       "vi": "Tiếng Việt",
@@ -164,9 +176,8 @@
     "nameHint": "Up to 100 characters.",
     "contentLabel": "Content (Markdown)",
     "imageButton": "Insert image",
-    "imageHint": "Images upload through /problems/uploads/image; the URL goes into the text.",
-    "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack judge.problem_full_markup.",
-    "discard": "Discard changes",
+    "imageHint": "An uploaded image is inserted at the cursor.",
+    "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack the “Use unsanitised problem markup” permission.",
     "save": {
       "vi": "Save Vietnamese translation",
       "en": "Save English translation",
@@ -176,18 +187,18 @@
       "nameLength": "Name is 1 to {max} characters.",
       "descriptionLength": "Content is at most {max} characters.",
       "character": "Do not use the character {character}; use a plain one instead."
-    }
+    },
+    "savedToast": "Saved {slot}."
   },
   "editorial": {
-    "title": "Editorial",
-    "lead": "The editorial, its publication and authors.",
     "public": "Publish the editorial",
     "publicHint": "When off, only staff and the authors see it.",
     "publishOn": "Publish from",
     "publishOnHint": "The editorial opens to everyone at this time (when publishing is on).",
     "authors": "Editorial authors",
     "content": "Content (Markdown)",
-    "save": "Save editorial"
+    "save": "Save editorial",
+    "savedToast": "Editorial saved."
   },
   "data": {
     "save": "Save configuration",
@@ -239,7 +250,7 @@
       "title": "Test list",
       "count": "{count} tests",
       "countOver": "{count} tests, over the advised {soft}.",
-      "hardLimit": "Hard limit {max} tests needs judge.create_mass_testcases; this account has the normal limit.",
+      "hardLimit": "The “{permission}” permission allows up to {max} tests; this account has the usual limit.",
       "legend": "C: single test · S: open a scored group · E: close the group. A group's points are the whole group's.",
       "addCase": "Add test",
       "addBatch": "Add group",
@@ -279,7 +290,8 @@
       "generatorArgs": "Generator arguments are at most 1000 characters.",
       "count": "Must be a whole number, zero or more.",
       "argsTotal": "All test arguments together are over 1 MiB; shorten them."
-    }
+    },
+    "savedToast": "Saved the judging setup of {code}."
   },
   "uploads": {
     "archive": {
@@ -303,36 +315,25 @@
   "files": {
     "image": {
       "title": "Images in the statement",
-      "lead": "Images pasted into the statement box; the address is returned to insert.",
-      "button": "Choose image"
+      "lead": "Each upload returns an address to paste into the statement."
     },
     "pdf": {
       "title": "Statement PDF",
-      "lead": "One PDF for the whole problem; replaces the old one.",
-      "button": "Choose PDF"
+      "lead": "One PDF for the whole problem; a new upload replaces it."
     },
     "material": {
       "title": "Attached material",
-      "lead": "A material pack contestants download.",
-      "button": "Choose material"
+      "lead": "A material pack contestants download."
     },
-    "attachments": {
-      "title": "Attachments",
-      "lead": "One file at a time; replaces the old one. Only images for the statement box are accepted there.",
-      "pdfButton": "Upload statement PDF",
-      "materialButton": "Upload material"
-    },
-    "uploaded": "Uploaded: {url}",
-    "current": "Current:",
     "none": "No file yet",
     "open": "Open",
     "copy": "Copy address",
-    "footer": "Each upload returns one address; the system keeps no list of uploads, so save the address in the statement or in the problem's PDF and material fields."
+    "upload": "Upload",
+    "replace": "Replace"
   },
-  "drafts": {
-    "leaveTitle": "Leave with unsaved changes?",
-    "leaveBody": "Unsaved changes in this part will be lost.",
-    "leave": "Leave page",
-    "stay": "Stay"
+  "header": {
+    "public": "Public",
+    "private": "Private",
+    "suggested": "Suggested"
   }
 }

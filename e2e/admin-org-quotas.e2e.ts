@@ -76,6 +76,8 @@ test('a clone refused by the quota names the credits with the sweating Bit', asy
     },
   };
   await page.goto('/admin/problems/hcmus41c/general');
+  await page.getByRole('button', { name: 'Thêm', exact: true }).click();
+  await page.getByRole('button', { name: 'Nhân bản bài…' }).click();
   await page.locator('#problem-clone-code').fill('hcmus41c_ban_sao');
   await page.locator('#problem-clone-code').press('Enter');
   const alert = page.getByRole('alert').filter({ hasText: 'cần 10, còn lại 6' });

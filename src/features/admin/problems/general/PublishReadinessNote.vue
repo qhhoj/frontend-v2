@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TriangleAlert } from 'lucide-vue-next';
+import AdminNotice from '../../ui/feedback/AdminNotice.vue';
 import { useProblemDataQuery } from '../data/problem-data.queries';
 import { publishIssues } from './publish-readiness';
 
-/** Shown while a saved private problem is switched to public: advice only, the save is never blocked. */
+/** Shown while a saved private problem is ticked public: a checklist of what is missing, never blocking the save. */
 const props = defineProps<{ code: string; points: number }>();
 const data = useProblemDataQuery(() => props.code);
 /** A failed data read (no rights, network) says nothing rather than guessing. */
@@ -14,26 +14,21 @@ const issues = computed(() =>
 </script>
 
 <template>
-  <div
-    v-if="issues.length > 0"
-    role="status"
-    data-testid="publish-readiness"
-    class="flex flex-col gap-2 rounded-row border border-line-strong p-3 text-sm"
-  >
-    <p class="flex items-center gap-2 font-semibold">
-      <TriangleAlert aria-hidden="true" class="size-4 shrink-0 text-negative" />
-      {{ $t('admin.problems.status.readiness.title') }}
-    </p>
-    <ul class="list-disc pl-6">
-      <li v-for="issue in issues" :key="issue">
-        {{ $t(`admin.problems.status.readiness.${issue}`) }}
-      </li>
-    </ul>
-    <RouterLink
-      :to="{ name: 'admin-problemData', params: { code } }"
-      class="self-start font-semibold text-accent-text hover:underline"
-    >
-      {{ $t('admin.problems.status.readiness.openData') }}
-    </RouterLink>
+  <div v-if="issues.length > 0" role="status" data-testid="publish-readiness">
+    <AdminNotice tone="caution" :title="$t('admin.problems.status.readiness.title')">
+      <template #action>
+        <ul class="mt-1 list-disc pl-5">
+          <li v-for="issue in issues" :key="issue">
+            {{ $t(`admin.problems.status.readiness.${issue}`) }}
+          </li>
+        </ul>
+        <RouterLink
+          :to="{ name: 'admin-problemData', params: { code } }"
+          class="mt-1 inline-flex min-h-6 font-semibold text-accent-text underline underline-offset-2"
+        >
+          {{ $t('admin.problems.status.readiness.openData') }}
+        </RouterLink>
+      </template>
+    </AdminNotice>
   </div>
 </template>

@@ -7,117 +7,107 @@ import type {
   EditorialDraftBody,
   ProblemEditingMeta,
 } from '@/api/types/problem-editing';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import AdminBit from '../../shell/AdminBit.vue';
-import AdminField from '../../ui/AdminField.vue';
+import { translate } from '@/i18n';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import AdminSwitch from '../../ui/AdminSwitch.vue';
-import { failureReasonOf } from '../failure-reason';
-import { ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../../ui/classes';
-import { toLocalInput } from '../../ui/datetime';
+import { CARD } from '../../ui/controls';
+import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
+import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
+import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import { useDirtyForm } from '../../ui/form/dirty-form';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import UsernameChips from '../../ui/UsernameChips.vue';
-import { publishOnToSend } from './editorial-draft';
+import { failureReasonOf } from '../failure-reason';
+import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { markdownError } from '../statements/statement-drafts';
-import { useDraftLeaveGuard } from '../drafts/use-draft-leave-guard';
-import DraftLeaveDialog from '../drafts/DraftLeaveDialog.vue';
 
+interface EditorialForm {
+  isPublic: boolean;
+  /** ISO instant; null = publish from the moment it is saved. */
+  publishOn: string | null;
+  authors: UserChip[];
+  content: string;
+}
+
+/** Public flag and release time on one row, authors, then the Markdown with its preview; one save bar. */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const stored = props.problem.editor!.solution;
-const isPublic = ref(stored?.isPublic ?? false);
-const publishOnBox = ref(toLocalInput(stored?.publishOn ?? null));
-const authors = ref<UserChip[]>(
-  (stored?.authors ?? []).map(({ id, username }) => ({ id, username })),
-);
-const content = ref(stored?.content ?? '');
-
-/** What the viewer sees now, as text: compared with the last saved answer for the unsaved-change guard. */
-const snapshot = () =>
-  JSON.stringify({
-    isPublic: isPublic.value,
-    publishOn: publishOnBox.value,
-    authors: authors.value.map((chip) => chip.id),
-    content: content.value,
-  });
-const savedSnapshot = ref(snapshot());
-const isDirty = computed(() => snapshot() !== savedSnapshot.value);
-const contentError = computed(() => markdownError(content.value));
-let sentSnapshot = '';
-const { isLeaveOpen, leaveAnyway } = useDraftLeaveGuard(() => isDirty.value);
+const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>({
+  isPublic: stored?.isPublic ?? false,
+  publishOn: stored?.publishOn ?? null,
+  authors: (stored?.authors ?? []).map(({ id, username }) => ({ id, username })),
+  content: stored?.content ?? '',
+});
+const contentError = computed(() => markdownError(draft.value.content));
+const savedAt = ref<Date | null>(null);
 
 const mutation = useAdminMutation({
-  mutate: (draft: EditorialDraftBody) => putEditorial(props.problem.code, draft),
+  mutate: (body: EditorialDraftBody) => putEditorial(props.problem.code, body),
   invalidates: () => [['admin', 'problem', props.problem.code], PUBLIC_PROBLEMS_KEY],
-  onDone: () => {
-    savedSnapshot.value = sentSnapshot;
-  },
+  successText: () => translate('admin.problems.editorial.savedToast'),
+  onSuccess: () => (savedAt.value = new Date()),
 });
 
-function save() {
-  if (contentError.value) return;
-  sentSnapshot = snapshot();
-  void mutation.run({
-    isPublic: isPublic.value,
-    publishOn: publishOnToSend(publishOnBox.value, stored?.publishOn ?? null, new Date()),
-    authors: authors.value.map((chip) => chip.id),
-    content: content.value,
+async function save() {
+  if (contentError.value || dirtyCount.value === 0) return;
+  const sent = { ...draft.value, authors: [...draft.value.authors] };
+  await mutation.run({
+    isPublic: sent.isPublic,
+    publishOn: sent.publishOn ?? new Date().toISOString(),
+    authors: sent.authors.map((chip) => chip.id),
+    content: sent.content,
   });
+  if (mutation.isDone.value) commit(sent);
 }
 </script>
 
 <template>
-  <SettingsCard
-    :title="$t('admin.problems.editorial.title')"
-    :lead="$t('admin.problems.editorial.lead')"
-  >
-    <template #header-end>
-      <AdminBit placement="composing" />
-    </template>
-    <AdminSwitch
-      v-model="isPublic"
-      :label="$t('admin.problems.editorial.public')"
-      :description="$t('admin.problems.editorial.publicHint')"
-    />
-    <AdminField
-      v-slot="{ id, describedBy }"
-      input-id="editorial-publishOn"
-      :label="$t('admin.problems.editorial.publishOn')"
-      :hint="$t('admin.problems.editorial.publishOnHint')"
+  <form class="flex flex-col gap-4" novalidate @submit.prevent="save">
+    <fieldset
+      :disabled="mutation.isPending.value"
+      :class="[CARD, 'm-0 flex min-w-0 flex-col gap-5 p-4 sm:p-5']"
     >
-      <input
-        :id="id"
-        v-model="publishOnBox"
-        type="datetime-local"
-        :class="ADMIN_INPUT_CLASS"
-        :aria-describedby="describedBy"
+      <div class="grid gap-4 md:grid-cols-2 md:items-start">
+        <AdminCheckbox
+          v-model="draft.isPublic"
+          class="md:mt-7"
+          input-id="editorial-isPublic"
+          :label="$t('admin.problems.editorial.public')"
+          :description="$t('admin.problems.editorial.publicHint')"
+        />
+        <AdminDateTimeField
+          v-model="draft.publishOn"
+          input-id="editorial-publishOn"
+          :label="$t('admin.problems.editorial.publishOn')"
+          :hint="$t('admin.problems.editorial.publishOnHint')"
+        />
+      </div>
+      <UsernameChips
+        v-model="draft.authors"
+        class="max-w-xl"
+        :label="$t('admin.problems.editorial.authors')"
       />
-    </AdminField>
-    <UsernameChips v-model="authors" :label="$t('admin.problems.editorial.authors')" />
-    <MarkdownField
-      v-model="content"
-      :label="$t('admin.problems.editorial.content')"
-      preview-style="solution"
-      :error="contentError"
+      <MarkdownField
+        v-model="draft.content"
+        :label="$t('admin.problems.editorial.content')"
+        preview-style="solution"
+        :error="contentError"
+      />
+    </fieldset>
+    <AdminStatus
+      v-if="mutation.failure.value"
+      kind="refused"
+      :text="failureReasonOf(mutation.failure.value)"
     />
-    <div class="flex flex-wrap items-center gap-3">
-      <AdminStatus
-        v-if="mutation.failure.value"
-        kind="refused"
-        :text="failureReasonOf(mutation.failure.value)"
-      />
-      <AdminStatus v-else-if="mutation.isDone.value" kind="done" :text="$t('admin.ui.saved')" />
-      <button
-        type="button"
-        class="ml-auto"
-        :class="ADMIN_PRIMARY_CLASS"
-        :aria-disabled="mutation.isPending.value ? 'true' : undefined"
-        @click="save"
-      >
-        {{ $t('admin.problems.editorial.save') }}
-      </button>
-    </div>
-    <DraftLeaveDialog v-model:visible="isLeaveOpen" @leave="leaveAnyway" />
-  </SettingsCard>
+    <AdminSaveBar
+      data-testid="editorial-save-bar"
+      :dirty-count="dirtyCount"
+      :pending="mutation.isPending.value"
+      :saved-at="savedAt"
+      :save-label="$t('admin.problems.editorial.save')"
+      @discard="discard"
+    />
+    <AdminLeaveGuard :dirty-count="dirtyCount" />
+  </form>
 </template>

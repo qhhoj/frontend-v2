@@ -24,6 +24,8 @@
     "zoneHint": "Giờ {zone}"
   },
   "section": {
-    "jumpTo": "Đi tới mục"
+    "jumpTo": "Đi tới mục",
+    "onThisPage": "Trên trang này",
+    "pick": "Chọn một mục"
   }
 }

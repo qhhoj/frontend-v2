@@ -20,6 +20,7 @@ const props = withDefaults(
     required?: boolean;
     timeZone?: string;
     showNow?: boolean;
+    disabled?: boolean;
   }>(),
   {
     hint: undefined,
@@ -28,6 +29,7 @@ const props = withDefaults(
     required: false,
     timeZone: SITE_TIME_ZONE,
     showNow: true,
+    disabled: false,
   },
 );
 const { t } = useI18n();
@@ -70,7 +72,7 @@ function setNow() {
   <AdminField
     v-slot="{ id, describedBy, invalid }"
     :label="label"
-    :hint="hint ?? $t('admin.form.dateTime.zoneHint', { zone: timeZone })"
+    :hint="hint ?? $t('admin.form.dateTime.zoneHint', { zone })"
     :error="shownError"
     :input-id="inputId"
     :required="required"
@@ -87,6 +89,7 @@ function setNow() {
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
           :aria-required="required || undefined"
+          :disabled="disabled"
           :class="[INPUT, 'pr-16 font-mono tabular-nums']"
           @input="onInput"
           @blur="onBlur"
@@ -103,6 +106,7 @@ function setNow() {
         type="button"
         :class="buttonClass('secondary', 'sm')"
         :aria-label="$t('admin.form.dateTime.nowLabel', { label })"
+        :disabled="disabled"
         @click="setNow"
       >
         {{ $t('admin.form.dateTime.now') }}

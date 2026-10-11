@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
-import { staffViewer, switchNamed } from '@/test/admin-routes';
+import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
@@ -24,8 +24,30 @@ const mountAdmin = async (path: string) => {
   return mounted;
 };
 
-const buttonLabelled = (wrapper: Mounted['wrapper'], label: string) =>
-  wrapper.findAll('button').find((button) => button.text() === label)!;
+/** "Thêm" in the editor header, then "Nhân bản bài…" in its menu (both menus render into `document.body`). */
+async function openClone(wrapper: Mounted['wrapper']) {
+  await wrapper
+    .findAll('button')
+    .find((button) => button.text() === 'Thêm')!
+    .trigger('click');
+  await flushPromises();
+  [...document.body.querySelectorAll('button')]
+    .find((button) => button.textContent?.trim() === 'Nhân bản bài…')!
+    .click();
+  // The menu is a popover (also `role="dialog"`): wait until only the clone dialog is left.
+  await vi.waitFor(() => {
+    const dialogs = document.body.querySelectorAll('[role="dialog"]');
+    if (dialogs.length !== 1 || !dialogs[0]!.querySelector('#problem-clone-code'))
+      throw new Error('clone dialog not alone yet');
+  });
+}
+
+async function typeCloneCode(code: string) {
+  const box = document.body.querySelector<HTMLInputElement>('#problem-clone-code')!;
+  box.value = code;
+  box.dispatchEvent(new Event('input'));
+  await flushPromises();
+}
 
 describe('problem people, status and clone', () => {
   it('locks authors, curators, banned users and organizations without judge.edit_all_problem', async () => {
@@ -41,19 +63,19 @@ describe('problem people, status and clone', () => {
     ).toBeUndefined();
   });
 
-  it('locks each status switch behind its own permission', async () => {
+  it('locks each status checkbox behind its own permission', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.change_public_visibility']),
       ...problemEditorRoutes(),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-    expect(switchNamed(wrapper, 'Công khai').attributes('aria-disabled')).toBeUndefined();
-    expect(switchNamed(wrapper, 'Quản lý thủ công').attributes('aria-disabled')).toBe('true');
-    expect(switchNamed(wrapper, 'Cho phép markup đầy đủ').attributes('aria-disabled')).toBe('true');
+    expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
+    expect(wrapper.get('#problem-isManuallyManaged').attributes('disabled')).toBeDefined();
+    expect(wrapper.get('#problem-isFullMarkup').attributes('disabled')).toBeDefined();
   });
 
-  it('clones under a new code, links to the copy, marks lists stale; a taken code shows under the box', async () => {
-    let isTaken = false;
+  it('clones under a new code from the header menu and opens the copy; a taken code shows under the box', async () => {
+    let isTaken = true;
     mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.clone_problem']),
       ...problemEditorRoutes(),
@@ -62,40 +84,45 @@ describe('problem people, status and clone', () => {
         isTaken
           ? fail(400, 'validation_failed', { code: ['That code is taken.'] })
           : ok(editableProblem({ code: 'hcmus41c_copy' })),
+      'GET /problems/hcmus41c_copy': ok(editableProblem({ code: 'hcmus41c_copy' })),
     });
-    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/general');
+    const { wrapper, queryClient, router } = await mountAdmin('/admin/problems/hcmus41c/general');
     const keys = [
       ['problems', 'list', 'probe'],
       ['admin', 'index', 'problems', 'probe'],
     ];
     seedCache(queryClient, keys);
-    await wrapper.get('#problem-clone-code').setValue('hcmus41c_copy');
-    await buttonLabelled(wrapper, 'Nhân bản').trigger('click');
-    await flushPromises();
+    await openClone(wrapper);
+    await typeCloneCode('hcmus41c_copy');
+    await confirmDialog('Nhân bản');
+    expect(openDialog().textContent).toContain('That code is taken.');
+    isTaken = false;
+    await confirmDialog('Nhân bản');
     expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
-    expect(wrapper.get('a[href="/admin/problems/hcmus41c_copy/general"]').text()).toBe(
-      'Mở hcmus41c_copy',
-    );
-    isTaken = true;
-    await buttonLabelled(wrapper, 'Nhân bản').trigger('click');
-    await flushPromises();
-    expect(wrapper.text()).toContain('That code is taken.');
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c_copy/general');
   });
 
   it('hides clone without judge.clone_problem', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_problem']), ...problemEditorRoutes() });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-    expect(wrapper.find('#problem-clone-code').exists()).toBe(false);
+    expect(wrapper.findAll('button').some((button) => button.text() === 'Thêm')).toBe(false);
   });
 
-  it('keeps the clone box outside the save form, so Enter there can never save the problem', async () => {
+  it('keeps the clone box out of the save form, so Enter there can never save the problem', async () => {
     const calls = mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.clone_problem']),
       ...problemEditorRoutes(),
+      'POST /problems/hcmus41c/clone': ok(editableProblem({ code: 'hcmus41c_copy' })),
+      'GET /problems/hcmus41c_copy': ok(editableProblem({ code: 'hcmus41c_copy' })),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-    expect(wrapper.get('#problem-clone-code').element.closest('form')).toBeNull();
-    await wrapper.get('#problem-clone-code').trigger('keydown', { key: 'Enter' });
+    await openClone(wrapper);
+    const box = document.body.querySelector<HTMLInputElement>('#problem-clone-code')!;
+    expect(box.closest('#problem-general-form')).toBeNull();
+    await typeCloneCode('hcmus41c_copy');
+    box.form!.requestSubmit();
+    await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+    expect(calls.some((call) => call.path === '/problems/hcmus41c/clone')).toBe(true);
   });
 });

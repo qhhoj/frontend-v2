@@ -48,7 +48,7 @@ describe('ProblemGeneralTab', () => {
     expect(wrapper.get('fieldset').attributes('disabled')).toBeDefined();
     await flushPromises();
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ points: 1500 });
-    expect(wrapper.get('[role="status"]').text()).toContain('Đã lưu.');
+    expect(wrapper.get('[data-testid="problem-save-bar"]').text()).toContain('Đã lưu lúc');
   });
 
   it('locks the staff-only basics (summary, og image, date, license) without judge.edit_all_problem, and unlocks them with it', async () => {
@@ -164,10 +164,8 @@ describe('ProblemGeneralTab', () => {
 
   describe('publishing a private problem', () => {
     const PUBLISH = [...EDIT, 'judge.change_public_visibility'];
-    const publicSwitch = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
-      wrapper
-        .findAll('[role="switch"]')
-        .find((item) => item.element.parentElement?.textContent?.trim().startsWith('Công khai'))!;
+    const tickPublic = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+      wrapper.get('#problem-isPublic').setValue(true);
 
     it('warns when the problem has no test cases, without blocking the save', async () => {
       const calls = mockApi({
@@ -177,11 +175,11 @@ describe('ProblemGeneralTab', () => {
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
       expect(calls.some((call) => call.path.endsWith('/data'))).toBe(false);
-      await publicSwitch(wrapper).trigger('click');
+      await tickPublic(wrapper);
       await flushPromises();
       const note = wrapper.get('[data-testid="publish-readiness"]');
       expect(note.text()).toContain('chưa có test nào');
-      expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('disabled')).toBeUndefined();
+      expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('aria-disabled')).toBeUndefined();
     });
 
     it('says nothing when the cases carry points', async () => {
@@ -191,7 +189,7 @@ describe('ProblemGeneralTab', () => {
         'GET /problems/hcmus41c/data': ok(problemData()),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      await publicSwitch(wrapper).trigger('click');
+      await tickPublic(wrapper);
       await flushPromises();
       expect(wrapper.find('[data-testid="publish-readiness"]').exists()).toBe(false);
     });

@@ -2,8 +2,10 @@
 import { computed } from 'vue';
 import { translate } from '@/i18n';
 import type { ProblemData } from '@/api/types/problem-data';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { Plus } from 'lucide-vue-next';
+import ScrollRegion from '@/components/ScrollRegion.vue';
+import { buttonClass } from '../../ui/controls';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import CaseRow from './CaseRow.vue';
 import {
   addBatch,
@@ -52,6 +54,8 @@ const messagesAt = (index: number) => {
   ];
 };
 
+const HEAD = 'border-b border-line px-2 py-2 whitespace-nowrap';
+
 function move(index: number, offset: -1 | 1) {
   cases.value = moveCase(cases.value, index, offset);
 }
@@ -64,59 +68,74 @@ function remove(index: number) {
 </script>
 
 <template>
-  <SettingsCard :title="$t('admin.problems.data.cases.title')">
-    <div class="flex flex-col gap-1 text-sm">
-      <p class="font-semibold">{{ countLine }}</p>
-      <p v-if="isOverMax" role="alert" class="text-negative">
-        {{ $t('admin.problems.data.cases.overMax', { max: data.limits.maxCases }) }}
-      </p>
-      <p v-if="errors.cases" role="alert" class="text-negative">{{ errors.cases }}</p>
-      <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-xs text-muted">
-        {{ $t('admin.problems.data.cases.hardLimit', { max: MASS_TESTCASE_LIMIT }) }}
-      </p>
-    </div>
+  <AdminFormSection
+    :title="$t('admin.problems.data.cases.title')"
+    :description="countLine"
+    :columns="1"
+  >
+    <p v-if="isOverMax" role="alert" class="text-sm text-negative">
+      {{ $t('admin.problems.data.cases.overMax', { max: data.limits.maxCases }) }}
+    </p>
+    <p v-if="errors.cases" role="alert" class="text-sm text-negative">{{ errors.cases }}</p>
+    <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-xs text-muted">
+      {{
+        $t('admin.problems.data.cases.hardLimit', {
+          max: MASS_TESTCASE_LIMIT,
+          permission: $t('admin.permissions.judge.create_mass_testcases'),
+        })
+      }}
+    </p>
     <datalist id="archive-files">
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
-    <table class="block w-full sm:table">
-      <caption class="sr-only">
-        {{
-          $t('admin.problems.data.cases.title')
-        }}
-      </caption>
-      <thead class="hidden sm:table-header-group">
-        <tr class="text-left text-sm text-muted">
-          <th scope="col" class="p-2">{{ $t('admin.problems.data.cases.columns.order') }}</th>
-          <th scope="col" class="p-2">{{ $t('admin.problems.data.cases.columns.type') }}</th>
-          <th scope="col" class="p-2">{{ $t('admin.problems.data.cases.columns.input') }}</th>
-          <th scope="col" class="p-2">{{ $t('admin.problems.data.cases.columns.points') }}</th>
-          <th scope="col" class="p-2">{{ $t('admin.problems.data.cases.columns.options') }}</th>
-          <th scope="col" class="p-2"></th>
-        </tr>
-      </thead>
-      <tbody class="block sm:table-row-group">
-        <CaseRow
-          v-for="(row, index) in cases"
-          :key="row.key"
-          :model-value="row"
-          :index="index"
-          :is-first="index === 0"
-          :is-last="index === cases.length - 1"
-          :messages="messagesAt(index)"
-          @move="move(index, $event)"
-          @remove="remove(index)"
-          @invalid="emit('invalid', row.key, $event)"
-        />
-      </tbody>
-    </table>
+    <ScrollRegion class="min-w-0" :label="$t('admin.problems.data.cases.title')" no-hint>
+      <table class="w-full min-w-[52rem] border-separate border-spacing-0 text-sm">
+        <caption class="sr-only">
+          {{
+            $t('admin.problems.data.cases.title')
+          }}
+        </caption>
+        <thead>
+          <tr class="text-left text-xs font-semibold text-muted">
+            <th scope="col" :class="[HEAD, 'sticky left-0 z-10 bg-surface']">
+              {{ $t('admin.problems.data.cases.columns.order') }}
+            </th>
+            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.type') }}</th>
+            <th scope="col" :class="HEAD">
+              {{ $t('admin.problems.data.cases.columns.input') }} /
+              {{ $t('admin.problems.data.cases.columns.output') }}
+            </th>
+            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.points') }}</th>
+            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.options') }}</th>
+            <th scope="col" :class="HEAD"><span class="sr-only">!</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <CaseRow
+            v-for="(row, index) in cases"
+            :key="row.key"
+            :model-value="row"
+            :index="index"
+            :is-first="index === 0"
+            :is-last="index === cases.length - 1"
+            :messages="messagesAt(index)"
+            @move="move(index, $event)"
+            @remove="remove(index)"
+            @invalid="emit('invalid', row.key, $event)"
+          />
+        </tbody>
+      </table>
+    </ScrollRegion>
     <div class="flex flex-wrap gap-2">
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="cases = addCase(cases)">
+      <button type="button" :class="buttonClass('secondary')" @click="cases = addCase(cases)">
+        <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.problems.data.cases.addCase') }}
       </button>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="cases = addBatch(cases)">
+      <button type="button" :class="buttonClass('secondary')" @click="cases = addBatch(cases)">
+        <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.problems.data.cases.addBatch') }}
       </button>
     </div>
     <p class="text-xs text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
-  </SettingsCard>
+  </AdminFormSection>
 </template>

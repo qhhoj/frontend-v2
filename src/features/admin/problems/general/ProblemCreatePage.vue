@@ -10,11 +10,14 @@ const retry = () => void meta.refetch();
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <AdminPageHeader :title="$t('admin.problems.general.create.title')" />
+  <div class="flex flex-col gap-4">
+    <AdminPageHeader
+      :title="$t('admin.problems.general.create.title')"
+      :lead="$t('admin.problems.general.create.lead')"
+    />
     <QueryState :loading="meta.isPending.value" :error="meta.error.value" @retry="retry">
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="problem-create" class="h-96 w-full rounded-panel" />
+        <SkeletonBlock data-skeleton-region="problem-create" class="h-96 w-full rounded-row" />
       </template>
       <ProblemCreateForm v-if="meta.data.value" :meta="meta.data.value" />
     </QueryState>

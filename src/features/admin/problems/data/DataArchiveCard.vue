@@ -2,11 +2,14 @@
 import { computed, ref } from 'vue';
 import { problemDataFileUrl } from '@/api/problem-data.api';
 import type { ProblemData } from '@/api/types/problem-data';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import { ADMIN_BUTTON_CLASS } from '../../ui/classes';
+import { Eye } from 'lucide-vue-next';
+import { buttonClass } from '../../ui/controls';
+import AdminChip from '../../ui/AdminChip.vue';
+import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import InitYamlDialog from './InitYamlDialog.vue';
 import { ARCHIVE_PREVIEW_COUNT } from './test-cases';
 
+/** The data card's first section: the archive, its init.yml and file names, and the upload; sections after it come in the slot. */
 const props = defineProps<{ code: string; data: ProblemData }>();
 const isInitShown = ref(false);
 const previewFiles = computed(() => props.data.archiveFiles.slice(0, ARCHIVE_PREVIEW_COUNT));
@@ -14,46 +17,50 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
 </script>
 
 <template>
-  <SettingsCard
+  <AdminFormSection
     :title="$t('admin.problems.data.archive.title')"
-    :lead="$t('admin.problems.data.archive.lead')"
+    :description="$t('admin.problems.data.archive.lead')"
+    :columns="1"
   >
-    <div class="flex flex-col gap-1 text-sm">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
       <a
         v-if="data.archive"
         :href="problemDataFileUrl(code, data.archive)"
-        class="inline-flex min-h-11 items-center font-mono font-semibold text-accent-text underline"
+        class="inline-flex min-h-8 items-center font-mono font-semibold text-accent-text hover:underline"
         >{{ data.archive }}</a
       >
-      <p v-else class="font-mono font-semibold">{{ $t('admin.problems.data.archive.none') }}</p>
-      <p class="text-muted">
+      <span v-else class="font-semibold">{{ $t('admin.problems.data.archive.none') }}</span>
+      <AdminChip :tone="data.hasInit ? 'positive' : 'caution'">
         {{
           data.hasInit
             ? $t('admin.problems.data.archive.initMade')
             : $t('admin.problems.data.archive.initMissing')
         }}
-      </p>
+      </AdminChip>
     </div>
-    <ul class="flex flex-wrap gap-x-4 gap-y-1">
+    <ul v-if="previewFiles.length > 0" class="flex flex-wrap gap-1.5">
       <li v-for="file in previewFiles" :key="file">
-        <span class="font-mono text-sm">{{ file }}</span>
+        <AdminChip
+          ><span class="font-mono">{{ file }}</span></AdminChip
+        >
+      </li>
+      <li v-if="hiddenCount > 0" class="self-center text-xs text-muted">
+        {{ $t('admin.problems.data.archive.more', { count: hiddenCount }) }}
       </li>
     </ul>
-    <p v-if="hiddenCount > 0" class="text-sm text-muted">
-      {{ $t('admin.problems.data.archive.more', { count: hiddenCount }) }}
-    </p>
     <div class="flex flex-wrap gap-2">
+      <slot name="upload" />
       <button
         v-if="data.hasInit"
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="buttonClass('secondary')"
         @click="isInitShown = true"
       >
+        <Eye aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.problems.data.archive.viewInit') }}
       </button>
-      <slot name="upload" />
     </div>
     <p class="text-xs text-muted">{{ $t('admin.problems.data.archive.note') }}</p>
     <InitYamlDialog v-model:visible="isInitShown" :code="code" />
-  </SettingsCard>
+  </AdminFormSection>
 </template>

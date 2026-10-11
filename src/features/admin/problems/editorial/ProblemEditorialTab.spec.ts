@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
-import { staffViewer, switchNamed } from '@/test/admin-routes';
+import { staffViewer } from '@/test/admin-routes';
 import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
 /** The shell and the editorial tab load lazily: wait until the publish box is on the page. */
@@ -35,7 +35,7 @@ describe('ProblemEditorialTab', () => {
       'PUT /problems/hcmus41c/editorial': { status: 204 },
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/editorial');
-    await switchNamed(wrapper, 'Công khai lời giải').trigger('click');
+    await wrapper.get('#editorial-isPublic').setValue(true);
     await wrapper
       .findAll('button')
       .find((button) => button.text() === 'Lưu lời giải')!
