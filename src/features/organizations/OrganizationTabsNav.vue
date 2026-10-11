@@ -25,8 +25,10 @@ const tabs = computed<OrganizationTab[]>(() => {
   const problems = { routeName: 'organization-problems', labelKey: 'orgs.tabs.problems' };
   const contests = { routeName: 'organization-contests', labelKey: 'orgs.tabs.contests' };
   const quota = { routeName: 'organization-quota', labelKey: 'orgs.tabs.quota' };
+  const manage = { routeName: 'organization-manage', labelKey: 'orgs.tabs.manage' };
   const viewer = props.organization.viewer;
-  if (viewer?.canAdminister) return [about, members, problems, contests, posts, requests, quota];
+  if (viewer?.canAdminister)
+    return [about, members, problems, contests, posts, requests, quota, manage];
   if (viewer?.isMember) return [about, members, problems, contests, posts];
   return [about, members, contests, posts];
 });

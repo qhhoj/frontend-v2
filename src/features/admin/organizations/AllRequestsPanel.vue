@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -13,6 +13,8 @@ import { formatNumericDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
+import { searchQueryOf } from '../search/index-search';
+import IndexSearchBox from '../search/IndexSearchBox.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
@@ -21,19 +23,28 @@ import {
   invalidateAfterDecision,
   isAlreadyDecided,
 } from './join-request-decision';
+import BulkDecisionBar from './BulkDecisionBar.vue';
+import { useBulkDecisions } from './join-request-bulk';
 import { useAllJoinRequestsQuery } from './join-requests.queries';
-import { requestStateOf } from './organization-search';
+import { requestSearchOf, requestStateOf } from './organization-search';
 import { useOrganizationWrite } from './organization-write';
 
 const STATE_TABS: JoinRequestState[] = ['P', 'A', 'R'];
 const route = useRoute();
+const router = useRouter();
 const queryClient = useQueryClient();
 const locale = useLocaleStore();
 const { t } = useI18n();
 const state = computed(() => requestStateOf(route.query));
 const page = computed(() => pageFromQuery(route.query.page));
-const list = useAllJoinRequestsQuery(state, page);
+const search = computed(() => requestSearchOf(route.query));
+const list = useAllJoinRequestsQuery(state, page, search);
 const rows = computed(() => list.data.value?.items ?? []);
+const bulk = useBulkDecisions(() => rows.value);
+
+function searchFor(text: string) {
+  void router.replace({ query: searchQueryOf(route.query, { q: text }) });
+}
 const decidingId = ref<string | null>(null);
 
 const decision = useOrganizationWrite<{ request: JoinRequest; next: 'A' | 'R' }, JoinRequest>({
@@ -42,7 +53,7 @@ const decision = useOrganizationWrite<{ request: JoinRequest; next: 'A' | 'R' },
 });
 
 async function decide(request: JoinRequest, next: 'A' | 'R') {
-  if (decision.isPending.value) return;
+  if (decision.isPending.value || bulk.isBusy.value) return;
   decidingId.value = request.id;
   const done = await decision.run({ request, next });
   if (!done && isAlreadyDecided(decision.failure.value))
@@ -51,11 +62,19 @@ async function decide(request: JoinRequest, next: 'A' | 'R') {
 
 function decidedText(request: JoinRequest): string {
   const time = request.decidedAt ? formatNumericDateTime(request.decidedAt, locale.locale) : '';
-  return t(`admin.organizations.queue.decided.${request.state}`, { time });
+  const decided = t(`admin.organizations.queue.decided.${request.state}`, { time });
+  return request.decidedByUsername
+    ? `${decided} · ${t('admin.organizations.queue.decidedBy', { name: request.decidedByUsername })}`
+    : decided;
 }
 
+/** A state tab keeps the search and returns to page 1. */
 const stateLink = (next: JoinRequestState) => ({
-  query: { view: 'requests', ...(next === 'P' ? {} : { state: next }) },
+  query: {
+    view: 'requests',
+    ...(next === 'P' ? {} : { state: next }),
+    ...(search.value ? { q: search.value } : {}),
+  },
 });
 </script>
 
@@ -80,6 +99,23 @@ const stateLink = (next: JoinRequestState) => ({
         {{ $t(`admin.organizations.queue.states.${tab}`) }}
       </RouterLink>
     </nav>
+    <IndexSearchBox
+      :value="search"
+      :label="$t('admin.organizations.queue.search.label')"
+      :placeholder="$t('admin.organizations.queue.search.placeholder')"
+      :clear-label="$t('admin.search.clear')"
+      :hint="$t('admin.organizations.queue.search.hint')"
+      @commit="searchFor"
+    />
+    <BulkDecisionBar
+      v-if="state === 'P' && bulk.hasPending.value"
+      :selected-count="bulk.selected.value.length"
+      :is-all-ticked="bulk.isAllTicked.value"
+      :busy="bulk.isBusy.value"
+      :outcome="bulk.outcome.value"
+      @toggle-all="bulk.toggleAll()"
+      @decide="bulk.decide"
+    />
     <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
       <template #skeleton>
         <SkeletonBlock class="h-56 w-full rounded-row" />
@@ -94,6 +130,9 @@ const stateLink = (next: JoinRequestState) => ({
         <table class="w-full text-left text-sm">
           <thead class="text-muted">
             <tr>
+              <th v-if="state === 'P'" scope="col" class="w-10 px-3 py-2">
+                <span class="sr-only">{{ $t('admin.organizations.bulk.selectColumn') }}</span>
+              </th>
               <th scope="col" class="px-3 py-2 font-semibold">
                 {{ $t('admin.organizations.queue.columns.organization') }}
               </th>
@@ -118,6 +157,17 @@ const stateLink = (next: JoinRequestState) => ({
               data-testid="queue-row"
               class="border-t border-line align-top"
             >
+              <td v-if="state === 'P'" class="px-3 py-3">
+                <input
+                  type="checkbox"
+                  class="size-4 accent-accent"
+                  :checked="bulk.ticked.value.has(request.id)"
+                  :aria-label="
+                    $t('admin.organizations.bulk.selectNamed', { username: request.username })
+                  "
+                  @change="bulk.toggle(request.id)"
+                />
+              </td>
               <td class="px-3 py-3">
                 <RouterLink
                   data-testid="queue-org"

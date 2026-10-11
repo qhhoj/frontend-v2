@@ -75,7 +75,10 @@
     "zip_points_outside": "Tệp zip tham chiếu ra ngoài chính nó.",
     "zip_entry_too_large": "Một tệp trong gói quá lớn.",
     "zip_entry_unreadable": "Không đọc được một tệp trong gói.",
-    "zip_entry_missing": "Gói thiếu một tệp được khai báo."
+    "zip_entry_missing": "Gói thiếu một tệp được khai báo.",
+    "admin_cap": "Mỗi người quản trị tối đa 3 tổ chức.",
+    "admin_not_kickable": "Không thể đuổi quản trị viên; bỏ họ khỏi ô Quản trị viên trước.",
+    "not_member": "Người này không còn trong tổ chức."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

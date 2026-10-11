@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { useOrganizationsQuery } from '@/features/organizations/organizations.queries';
+import type { OrganizationDetail } from '@/api/types/organizations';
 import { pageFromQuery } from '@/lib/paging';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
@@ -14,7 +14,12 @@ import AllRequestsPanel from './AllRequestsPanel.vue';
 import OrganizationAdminPanels from './OrganizationAdminPanels.vue';
 import OrganizationEditor from './OrganizationEditor.vue';
 import OrganizationList from './OrganizationList.vue';
-import { organizationSearchOf, organizationsViewOf } from './organization-search';
+import { useAdminOrganizationsQuery } from './organization-list.queries';
+import {
+  organizationFiltersOf,
+  organizationSearchOf,
+  organizationsViewOf,
+} from './organization-search';
 import { ORGANIZATION_QUEUE_PERMISSION, useAllJoinRequestsQuery } from './join-requests.queries';
 
 /** `?org=<slug>` edits an organization, `?org=new` creates one; neither names one. */
@@ -31,13 +36,26 @@ const editedSlug = computed(() =>
 );
 const page = computed(() => pageFromQuery(route.query.page));
 const search = computed(() => organizationSearchOf(route.query));
-const organizations = useOrganizationsQuery(page, search, () => view.value === 'organizations');
+const filters = computed(() => organizationFiltersOf(route.query));
+const organizations = useAdminOrganizationsQuery(
+  page,
+  search,
+  filters,
+  () => view.value === 'organizations',
+);
 const pending = useAllJoinRequestsQuery('P', 1);
 const pendingTotal = computed(() => pending.data.value?.meta.total ?? 0);
 const canAdd = computed(() => can('judge.add_organization'));
+const canSeeQuotas = computed(() => can('judge.edit_all_organization'));
 
 function startCreate() {
   void router.push({ query: { ...route.query, org: NEW_ORGANIZATION } });
+}
+
+/** A create or a renamed slug moves `?org=` to the saved organization. */
+async function onSaved(saved: OrganizationDetail) {
+  if (saved.slug !== route.query.org)
+    await router.push({ query: { ...route.query, org: saved.slug } });
 }
 
 function searchFor(text: string) {
@@ -96,6 +114,14 @@ const tabClass = (selected: boolean) => [
         >{{ pendingTotal }}</span
       >
     </RouterLink>
+    <RouterLink
+      v-if="canSeeQuotas"
+      data-testid="view-quotas"
+      :to="{ name: 'admin-organizationQuotas' }"
+      :class="tabClass(false)"
+    >
+      {{ $t('admin.organizations.views.quotas') }}
+    </RouterLink>
   </nav>
   <AllRequestsPanel v-if="view === 'requests'" />
   <QueryState
@@ -112,10 +138,11 @@ const tabClass = (selected: boolean) => [
         :meta="organizations.data.value.meta"
         :selected="orgParam"
         :search="search"
+        :filters="filters"
         @search="searchFor"
       />
       <section v-if="orgParam !== null" class="flex min-w-0 flex-col gap-6">
-        <OrganizationEditor :key="orgParam" :slug="editedSlug" />
+        <OrganizationEditor :key="orgParam" :slug="editedSlug" @saved="onSaved" />
         <OrganizationAdminPanels v-if="editedSlug !== null" :key="editedSlug" :slug="editedSlug" />
       </section>
     </div>

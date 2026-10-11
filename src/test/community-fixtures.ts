@@ -50,6 +50,7 @@ export const organizationItem = (
   isUnlisted: false,
   memberCount: 842,
   performancePoints: 481230,
+  slots: null,
   ...overrides,
 });
 export const organizationDetail = (
@@ -90,6 +91,7 @@ export const joinRequest = (overrides: Partial<JoinRequest> = {}): JoinRequest =
   reason: 'Em muốn tham gia đội tuyển.',
   createdAt: '2026-10-08T10:00:00Z',
   decidedBy: null,
+  decidedByUsername: null,
   decidedAt: null,
   ...overrides,
 });

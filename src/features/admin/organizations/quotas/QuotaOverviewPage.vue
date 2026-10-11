@@ -126,7 +126,12 @@ const CELL = 'py-2 pr-3 align-middle';
             <tbody>
               <tr v-for="row in data.items" :key="row.slug" class="border-t border-line">
                 <td :class="CELL">
-                  <span class="font-semibold">{{ row.name }}</span>
+                  <RouterLink
+                    data-testid="quota-org-link"
+                    :to="{ name: 'admin-organizations', query: { org: row.slug } }"
+                    class="font-semibold text-accent-text hover:underline"
+                    >{{ row.name }}</RouterLink
+                  >
                   <span class="block font-mono text-xs text-muted">{{ row.slug }}</span>
                 </td>
                 <td :class="CELL" class="tabular-nums">

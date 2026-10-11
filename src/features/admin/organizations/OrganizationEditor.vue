@@ -1,18 +1,41 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import type { OrganizationDetail } from '@/api/types/organizations';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../ui/AdminField.vue';
+import MarkdownField from '../ui/MarkdownField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
 import UsernameChips from '../ui/UsernameChips.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
-import { MAX_ORGANIZATION_ADMINS } from './organization-form';
+import OrganizationContext from './OrganizationContext.vue';
+import OrganizationLogoField from './OrganizationLogoField.vue';
+import { MAX_ORGANIZATION_ADMINS, slugFromName } from './organization-form';
 import { useOrganizationEditor } from './use-organization-editor';
 
 const props = defineProps<{ slug: string | null }>();
-const editor = useOrganizationEditor(() => props.slug);
-const { form, errors, isCreate, canEditAll, isReadOnly, mutation } = editor;
+/** The page decides where a saved organization lives (a new slug moves the URL). */
+const emit = defineEmits<{ saved: [organization: OrganizationDetail] }>();
+const editor = useOrganizationEditor(
+  () => props.slug,
+  (saved) => emit('saved', saved),
+);
+const { form, detail, errors, isCreate, canEditAll, isReadOnly, mutation } = editor;
+/** A create fills the address from the name until the address is typed by hand (clearing it hands it back). */
+const isSlugTyped = ref(false);
+if (isCreate)
+  watch(
+    () => form.name,
+    (name) => {
+      if (!isSlugTyped.value) form.slug = slugFromName(name);
+    },
+  );
+const onSlugInput = () => (isSlugTyped.value = form.slug !== '');
+function reset() {
+  isSlugTyped.value = false;
+  editor.reset();
+}
 const isSaved = ref(false);
 const staffLock = computed(() => (canEditAll.value ? undefined : 'judge.edit_all_organization'));
 const titleKey = isCreate
@@ -38,6 +61,14 @@ async function submit() {
     <p>{{ $t('admin.organizations.editor.notYours') }}</p>
   </SettingsCard>
   <SettingsCard v-else :title="$t(titleKey)">
+    <OrganizationContext v-if="detail" :organization="detail" />
+    <p v-if="isCreate" data-testid="create-note" class="text-sm text-muted">
+      {{
+        canEditAll
+          ? $t('admin.organizations.editor.createNoteStaff')
+          : $t('admin.organizations.editor.createNote')
+      }}
+    </p>
     <form class="flex flex-col gap-5" novalidate @submit.prevent="submit">
       <div class="grid gap-4 md:grid-cols-2">
         <AdminField
@@ -70,6 +101,7 @@ async function submit() {
               maxlength="128"
               :aria-describedby="describedBy"
               :aria-invalid="invalid ? 'true' : undefined"
+              @input="onSlugInput"
             />
           </template>
         </AdminField>
@@ -112,37 +144,20 @@ async function submit() {
           </template>
         </AdminField>
       </div>
-      <AdminField input-id="org-about" :label="$t('admin.organizations.editor.about')">
-        <template #default="{ id }">
-          <textarea
-            :id="id"
-            v-model="form.about"
-            rows="6"
-            class="w-full rounded-row border border-line-strong bg-surface-solid p-3 text-content"
-          ></textarea>
-        </template>
-      </AdminField>
-      <AdminField
-        input-id="org-logo"
-        :label="$t('admin.organizations.editor.logo')"
-        :error="errors.logoOverrideImage"
-      >
-        <template #default="{ id, describedBy, invalid }">
-          <input
-            :id="id"
-            v-model="form.logoOverrideImage"
-            :class="ADMIN_INPUT_CLASS"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-          />
-        </template>
-      </AdminField>
+      <MarkdownField
+        v-model="form.about"
+        :label="$t('admin.organizations.editor.about')"
+        preview-style="organization"
+        :preview-label="$t('admin.organizations.editor.aboutPreview')"
+      />
+      <OrganizationLogoField v-model="form.logoOverrideImage" :error="errors.logoOverrideImage" />
       <UsernameChips
         v-model="form.admins"
         :label="$t('admin.organizations.editor.admins', { max: MAX_ORGANIZATION_ADMINS })"
         :max="MAX_ORGANIZATION_ADMINS"
         :error="errors.adminIds"
       />
+      <p class="-mt-3 text-xs text-muted">{{ $t('admin.organizations.editor.adminsHint') }}</p>
       <AdminSwitch v-model="form.isOpen" :label="$t('admin.organizations.editor.open')" />
       <AdminSwitch
         v-model="form.isUnlisted"
@@ -164,7 +179,7 @@ async function submit() {
               : $t('admin.organizations.editor.save')
           }}
         </button>
-        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="editor.reset()">
+        <button type="button" :class="ADMIN_BUTTON_CLASS" @click="reset">
           {{ $t('admin.organizations.editor.reset') }}
         </button>
       </div>

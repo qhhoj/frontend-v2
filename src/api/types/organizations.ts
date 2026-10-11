@@ -27,3 +27,5 @@ export type JoinRequest = Schemas['OrganizationRequestResponse'];
 export const JOIN_REASON_MAX_LENGTH = 4096;
 /** backend: libs/community MAX_OPEN_ORGANIZATIONS */
 export const MAX_OPEN_ORGANIZATIONS = 3;
+/** backend: organizations/editing/dto/organization-revision.response.ts (OrganizationRevisionResponse) */
+export type OrganizationRevision = Schemas['OrganizationRevisionResponse'];

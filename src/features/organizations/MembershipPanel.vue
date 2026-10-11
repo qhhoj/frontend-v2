@@ -147,7 +147,7 @@ const retry = () => {
       </span>
       <p class="text-sm text-muted">{{ $t('orgMembership.adminLine') }}</p>
       <RouterLink
-        :to="`/admin/organizations/${organization.slug}`"
+        :to="{ name: 'organization-manage', params: { slug: organization.slug } }"
         class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
       >
         {{ $t('orgMembership.edit') }}

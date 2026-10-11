@@ -17,15 +17,20 @@ export async function lookupOrganization(slug: string): Promise<OrganizationChip
 }
 
 /**
- * backend P3: `POST /problems/render-preview` `{ style, markdown }` (`judge.edit_own_problem`), or for `'flatpage'`
- * `POST /admin/site/pages/render-preview` `{ content }` (`flatpages.change_flatpage`). Both answer the sanitised `{ html }`.
+ * backend P3: `POST /problems/render-preview` `{ style, markdown }` (`judge.edit_own_problem`); for `'flatpage'`
+ * `POST /admin/site/pages/render-preview` `{ content }` (`flatpages.change_flatpage`); for `'organization'`
+ * `POST /organizations/render-preview` `{ markdown }` (organization creators, staff and any organization admin). All answer
+ * the sanitised `{ html }`.
  */
 export async function renderPreview(source: PreviewSource, markdown: string): Promise<string> {
-  const { html } =
-    source === 'flatpage'
-      ? await apiSend('post', '/admin/site/pages/render-preview', { body: { content: markdown } })
-      : await apiSend('post', '/problems/render-preview', { body: { style: source, markdown } });
-  return html;
+  if (source === 'flatpage')
+    return (
+      await apiSend('post', '/admin/site/pages/render-preview', { body: { content: markdown } })
+    ).html;
+  if (source === 'organization')
+    return (await apiSend('post', '/organizations/render-preview', { body: { markdown } })).html;
+  return (await apiSend('post', '/problems/render-preview', { body: { style: source, markdown } }))
+    .html;
 }
 
 /** Raw text endpoints (`init.yml`): not a `{ data }` envelope, same session handling. */

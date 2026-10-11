@@ -1495,7 +1495,8 @@
       "requests": "Join requests",
       "problems": "Problems",
       "contests": "Contests",
-      "quota": "Quota"
+      "quota": "Quota",
+      "manage": "Manage"
     },
     "noContests": "This organization has no contests yet",
     "noAbout": "No description yet.",
@@ -1559,7 +1560,7 @@
     "leave": "Leave",
     "privateLeave": "Private organization: to come back after leaving you need a new request.",
     "administrator": "Administrator",
-    "adminLine": "Administrators cannot leave or be removed. Editing is in the admin area.",
+    "adminLine": "Administrators cannot leave or be removed. Edit the organization and its members on the Manage tab.",
     "edit": "Edit organization",
     "joined": "You joined {name}",
     "joinFailedTitle": "Could not join",

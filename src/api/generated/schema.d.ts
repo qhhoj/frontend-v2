@@ -63,7 +63,9 @@ export interface paths {
          * List join requests across organizations
          * @description Requires `judge.edit_all_organization`. Returns the staff queue of join
          *     requests over all organizations, one `state` at a time (`P` by default),
-         *     newest first, 50 per page.
+         *     newest first, 50 per page. `search` keeps requests whose requester
+         *     username, or whose organization name, short name or slug, contains the
+         *     text (any case).
          */
         get: operations["OrganizationRequestQueueController_list"];
         put?: never;
@@ -3010,8 +3012,9 @@ export interface paths {
          * @description Returns one page of organizations the viewer may list. Unlisted
          *     organizations appear only to their members, their admins and holders of
          *     `judge.edit_all_organization`. `search` narrows by a case-insensitive
-         *     substring of name, short name or slug. Paged with `page` and `pageSize`
-         *     (default 100, at most 100). Anonymous callers may use it.
+         *     substring of name, short name or slug; `open` and `unlisted` (true or
+         *     false) keep only organizations in that state. Paged with `page` and
+         *     `pageSize` (default 100, at most 100). Anonymous callers may use it.
          */
         get: operations["OrganizationsController_list"];
         put?: never;
@@ -3023,7 +3026,8 @@ export interface paths {
          *     `isUnlisted`, `slots` and `shortName` need `judge.edit_all_organization`
          *     (403 `forbidden`). A taken slug is 400 `validation_failed`. A user may
          *     administer at most three organizations unless the actor holds
-         *     `judge.spam_organization`.
+         *     `judge.spam_organization`: issue code `admin_cap` on `adminIds`, a 403
+         *     for the creator and a 400 for another admin. Recorded in the history.
          */
         post: operations["OrganizationEditingController_create"];
         delete?: never;
@@ -3060,7 +3064,8 @@ export interface paths {
          *     list and must not be empty, and new admins are subject to the three-
          *     organization cap. Staff fields `isUnlisted`, `slots` and `shortName` need
          *     `judge.edit_all_organization`. A slug that is taken is 400
-         *     `validation_failed`.
+         *     `validation_failed`; the admin cap is issue code `admin_cap`. Changed
+         *     fields are recorded in the history.
          */
         patch: operations["OrganizationEditingController_update"];
         trace?: never;
@@ -3102,9 +3107,10 @@ export interface paths {
         /**
          * Remove a member from an organization
          * @description Organization administrators (and holders of `judge.edit_all_organization`)
-         *     remove the member given by `userId`. Admins cannot be removed, and the
-         *     user must be a member (409 `conflict`). Returns 204; 403 `forbidden` for
-         *     non-administrators.
+         *     remove the member given by `userId`. Admins cannot be removed (409
+         *     `conflict`, issue code `admin_not_kickable`) and the user must be a member
+         *     (`not_member`). Returns 204; 403 `forbidden` for non-administrators. The
+         *     removal is recorded in the organization's history.
          */
         post: operations["MembershipController_kick"];
         delete?: never;
@@ -3146,9 +3152,10 @@ export interface paths {
          * List the members of an organization
          * @description Returns the organization's members with their points, problem count and
          *     rating, ranked by the chosen `sort` (`performancePoints` by default,
-         *     `points`, `problemCount` or `rating`; ties share a rank). Paged with
-         *     `page` and `pageSize` (default 100). Fails with 404 `not_found` for an
-         *     unknown slug.
+         *     `points`, `problemCount` or `rating`; ties share a rank). `search` keeps
+         *     members whose username contains the text, ranked among the matches only.
+         *     Paged with `page` and `pageSize` (default 100). Fails with 404
+         *     `not_found` for an unknown slug.
          */
         get: operations["OrganizationsController_members"];
         put?: never;
@@ -3361,6 +3368,29 @@ export interface paths {
         patch: operations["OrganizationUsageController_updateQuota"];
         trace?: never;
     };
+    "/api/internal/organizations/{slug}/recalculate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Recalculate an organization's points and member count
+         * @description Requires `judge.edit_all_organization`. Queues the worker's recompute of
+         *     the organization's performance points and member count (they are
+         *     otherwise refreshed only after membership or points changes) and returns
+         *     204. 404 `not_found` for an unknown slug.
+         */
+        post: operations["OrganizationEditingController_recalculate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/organizations/{slug}/requests": {
         parameters: {
             query?: never;
@@ -3437,6 +3467,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/organizations/{slug}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List an organization's change history
+         * @description Organization administrators only (403 `forbidden`). Returns the
+         *     recorded creates, edits and member removals, newest first, 20 per page,
+         *     each with its editor and the fields before and after.
+         */
+        get: operations["OrganizationEditingController_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/organizations/{slug}/usage": {
         parameters: {
             query?: never;
@@ -3453,6 +3505,29 @@ export interface paths {
         get: operations["OrganizationUsageController_one"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/organizations/render-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview an organization's about text
+         * @description Renders and sanitises the Markdown exactly as saving `about` would. For
+         *     holders of `judge.add_organization` or `judge.edit_all_organization` and
+         *     administrators of any organization (403 `forbidden` otherwise). Limited
+         *     to 60 previews per user per minute (429 `rate_limited`).
+         */
+        post: operations["OrganizationEditingController_preview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7894,6 +7969,10 @@ export interface components {
             /** @description Account name of the contestant. */
             username: string;
         };
+        OrganizationAboutPreviewDto: {
+            /** @description Markdown about text to render. */
+            markdown: string;
+        };
         OrganizationDetailResponse: {
             /** @description Markdown source, for the edit form: administrators only. */
             about: string | null;
@@ -7940,6 +8019,8 @@ export interface components {
             performancePoints: number;
             /** @description Short name shown beside members, at most 20 characters. */
             shortName: string;
+            /** @description Most members the organization may have; null for no limit. */
+            slots: number | null;
             /** @description Unique identifier used in URLs. */
             slug: string;
         };
@@ -7982,6 +8063,8 @@ export interface components {
             decidedAt: string | null;
             /** @description Id of the admin who decided; null while pending. */
             decidedBy: string | null;
+            /** @description Username of the admin who decided; null while pending or when that account is gone. */
+            decidedByUsername: string | null;
             id: string;
             /** @description Slug of the organization asked to join. */
             organizationSlug: string;
@@ -7999,6 +8082,28 @@ export interface components {
          * @enum {string}
          */
         OrganizationRequestState: "A" | "P" | "R";
+        /**
+         * @description `create`, `edit`, or `kick` (a member removed; `changes.member.before` is their username).
+         * @enum {string}
+         */
+        OrganizationRevisionAction: "create" | "edit" | "kick";
+        OrganizationRevisionResponse: {
+            /** @description `create`, `edit`, or `kick` (a member removed; `changes.member.before` is their username). */
+            action: components["schemas"]["OrganizationRevisionAction"];
+            /**
+             * Format: date-time
+             * @description When the change was made.
+             */
+            at: string;
+            /** @description Per changed field, its value before and after; admins appear as `admins`, a sorted list of usernames. */
+            changes: {
+                [key: string]: components["schemas"]["FieldChangeResponse"];
+            };
+            /** @description Who made the change; null when that account is gone. */
+            editor: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description Revision id. */
+            id: string;
+        };
         OrganizationSummaryResponse: {
             id: string;
             isOpen: boolean;
@@ -10869,6 +10974,8 @@ export interface operations {
             query?: {
                 /** @description 1-based page number; 50 requests per page. */
                 page?: number;
+                /** @description Keeps requests whose requester username, or whose organization name, short name or slug, contains this text (any case). */
+                search?: string;
                 /** @description P pending, A approved or R rejected. */
                 state?: components["schemas"]["OrganizationRequestState"];
             };
@@ -16420,12 +16527,16 @@ export interface operations {
     OrganizationsController_list: {
         parameters: {
             query?: {
+                /** @description true: only open organizations; false: only private ones. */
+                open?: boolean;
                 /** @description 1-based page number. */
                 page?: number;
                 /** @description Organizations per page, 1 to 100. */
                 pageSize?: number;
                 /** @description Substring over name, shortName and slug; surrounding spaces are dropped. 50 bounds a name; the user search allows 64. */
                 search?: string;
+                /** @description true: only unlisted organizations; false: only listed ones. Narrows what the viewer may already list. */
+                unlisted?: boolean;
             };
             header?: never;
             path?: never;
@@ -16671,6 +16782,8 @@ export interface operations {
                 page?: number;
                 /** @description Members per page, 1 to 100. */
                 pageSize?: number;
+                /** @description Keeps members whose username contains this text (any case); ranks then count matching members only. */
+                search?: string;
                 /** @description Ranking column, best first. */
                 sort?: "performancePoints" | "points" | "problemCount" | "rating";
             };
@@ -17132,6 +17245,37 @@ export interface operations {
             };
         };
     };
+    OrganizationEditingController_recalculate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     OrganizationRequestsController_list: {
         parameters: {
             query?: {
@@ -17290,6 +17434,45 @@ export interface operations {
             };
         };
     };
+    OrganizationEditingController_history: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number; 20 revisions per page. */
+                page?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Slug of the organization. */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationRevisionResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     OrganizationUsageController_one: {
         parameters: {
             query?: never;
@@ -17309,6 +17492,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationUsageResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganizationEditingController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationAboutPreviewDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RenderPreviewResponse"];
                     };
                 };
             };

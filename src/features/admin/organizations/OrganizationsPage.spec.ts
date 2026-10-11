@@ -31,6 +31,8 @@ const routes = (extra = {}, viewer = staffViewer(ALL)) => ({
   'GET /organizations/lhp': ok(detail),
   'GET /organizations/lhp/requests': page([request]),
   'GET /organizations/lhp/members': page([ngocanh]),
+  'GET /organizations/lhp/revisions': page([]),
+  'POST /organizations/render-preview': ok({ html: '<p>Trường THPT chuyên…</p>' }),
   [`GET ${QUEUE}`]: page([]),
   ...extra,
 });

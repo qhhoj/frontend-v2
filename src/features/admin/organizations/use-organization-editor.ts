@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import type { OrganizationDetail } from '@/api/types/organizations';
 import { useOrganizationQuery } from '@/features/organizations/organizations.queries';
 import { usePermissions } from '@/stores/use-permissions';
 import type { FieldErrors } from '../ui/admin-errors';
@@ -15,7 +16,10 @@ import { useOrganizationSave } from './organization-save';
  * The editor of one organization, or of a new one when `slug()` is null. `slug()` is read once: the page keys the editor by
  * organization, so a create and an edit never share an instance.
  */
-export function useOrganizationEditor(slug: () => string | null) {
+export function useOrganizationEditor(
+  slug: () => string | null,
+  onSaved: (saved: OrganizationDetail) => unknown,
+) {
   const { can } = usePermissions();
   const canEditAll = computed(() => can('judge.edit_all_organization'));
   const isCreate = slug() === null;
@@ -26,7 +30,7 @@ export function useOrganizationEditor(slug: () => string | null) {
     return loaded !== undefined && loaded.viewer?.canAdminister !== true;
   });
   const { baseline, form, seed } = useOrganizationFormState(() => detail?.data.value);
-  const write = useOrganizationSave(seed);
+  const write = useOrganizationSave(seed, onSaved);
   const clientErrors = ref<FieldErrors>({});
 
   /** What a save would send, or null when an edit changed nothing. */
@@ -52,6 +56,7 @@ export function useOrganizationEditor(slug: () => string | null) {
 
   return {
     form,
+    detail: computed(() => detail?.data.value),
     isCreate,
     canEditAll,
     isReadOnly,

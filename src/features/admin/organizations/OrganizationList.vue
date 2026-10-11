@@ -3,24 +3,32 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
+import type { OrganizationListFilters } from '@/api/organizations-admin.api';
 import type { OrganizationListItem } from '@/api/types/organizations';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
+import { formatNumber } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import { ADMIN_BIT_KINDS } from '../shell/admin-bit';
 import HighlightedText from '../search/HighlightedText.vue';
 import IndexSearchBox from '../search/IndexSearchBox.vue';
+import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { PER_ORGANIZATION_RESET } from './organization-search';
+import { seatsText } from './org-seats';
 
 const props = defineProps<{
   items: OrganizationListItem[];
   meta: NumberedPageMeta;
   selected: string | null;
   search: string;
+  filters: OrganizationListFilters;
 }>();
 const emit = defineEmits<{ search: [text: string] }>();
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const locale = useLocaleStore();
 
 const total = computed(() => ('total' in props.meta ? props.meta.total : props.items.length));
 const footer = computed(() =>
@@ -33,9 +41,38 @@ const footer = computed(() =>
     : t('admin.organizations.list.footer', { shown: props.items.length, total: total.value }),
 );
 
+/** The member search and the members, requests and history pages belong to the organization being left. */
 function select(slug: string) {
-  void router.push({ query: { ...route.query, org: slug } });
+  void router.push({
+    query: { ...route.query, org: slug, ...PER_ORGANIZATION_RESET },
+  });
 }
+
+type FilterKey = keyof OrganizationListFilters;
+const FILTERS: { key: FilterKey; labelKey: string; yesKey: string; noKey: string }[] = [
+  {
+    key: 'open',
+    labelKey: 'admin.organizations.filters.open',
+    yesKey: 'admin.organizations.list.open',
+    noKey: 'admin.organizations.list.closed',
+  },
+  {
+    key: 'unlisted',
+    labelKey: 'admin.organizations.filters.unlisted',
+    yesKey: 'admin.organizations.list.hidden',
+    noKey: 'admin.organizations.filters.listed',
+  },
+];
+const flagText = (value: boolean | undefined) => (value === undefined ? '' : value ? '1' : '0');
+
+/** A filter change starts again from page 1. */
+function setFilter(key: FilterKey, text: string) {
+  void router.replace({ query: { ...route.query, [key]: text || undefined, page: undefined } });
+}
+
+/** Members against seats, so a lowered limit is visible before a save is refused. */
+const seatsOf = (item: OrganizationListItem) =>
+  seatsText(item, (value) => formatNumber(value, locale.locale));
 </script>
 
 <template>
@@ -53,6 +90,21 @@ function select(slug: string) {
       :status="search ? footer : ''"
       @commit="emit('search', $event)"
     />
+    <div class="flex flex-wrap gap-3">
+      <label v-for="filter in FILTERS" :key="filter.key" class="flex items-center gap-2 text-sm">
+        <span class="font-semibold whitespace-nowrap">{{ $t(filter.labelKey) }}</span>
+        <select
+          :data-testid="`filter-${filter.key}`"
+          :class="[ADMIN_INPUT_CLASS, 'w-auto']"
+          :value="flagText(filters[filter.key])"
+          @change="setFilter(filter.key, ($event.target as HTMLSelectElement).value)"
+        >
+          <option value="">{{ $t('admin.organizations.filters.any') }}</option>
+          <option value="1">{{ $t(filter.yesKey) }}</option>
+          <option value="0">{{ $t(filter.noKey) }}</option>
+        </select>
+      </label>
+    </div>
     <EmptyState v-if="items.length === 0" compact :kind="ADMIN_BIT_KINDS.empty">
       {{
         search
@@ -71,7 +123,7 @@ function select(slug: string) {
               {{ $t('admin.organizations.list.state') }}
             </th>
             <th scope="col" class="hidden px-3 py-2 font-semibold md:table-cell">
-              {{ $t('admin.organizations.list.members') }}
+              {{ $t('admin.organizations.list.seats') }}
             </th>
             <th scope="col" class="px-3 py-2 text-right font-semibold">
               {{ $t('admin.organizations.list.points') }}
@@ -108,7 +160,7 @@ function select(slug: string) {
                 {{ t('admin.organizations.list.hidden') }}
               </span>
             </td>
-            <td class="hidden px-3 py-2 md:table-cell">{{ item.memberCount }}</td>
+            <td class="hidden px-3 py-2 tabular-nums md:table-cell">{{ seatsOf(item) }}</td>
             <td class="px-3 py-2 text-right">{{ item.performancePoints }}</td>
           </tr>
         </tbody>

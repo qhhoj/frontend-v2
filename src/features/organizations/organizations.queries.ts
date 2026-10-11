@@ -46,6 +46,8 @@ export interface MemberListOptions {
   sort: MemberSort;
   page: number;
   pageSize: number;
+  /** Username substring; ranks then count the matches only. */
+  search?: string;
 }
 export const useMembersQuery = (
   slug: MaybeRefOrGetter<string>,

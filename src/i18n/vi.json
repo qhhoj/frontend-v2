@@ -1495,7 +1495,8 @@
       "requests": "Yêu cầu tham gia",
       "problems": "Bài tập",
       "contests": "Kỳ thi",
-      "quota": "Hạn mức"
+      "quota": "Hạn mức",
+      "manage": "Quản lý"
     },
     "noContests": "Tổ chức chưa có kỳ thi nào",
     "noAbout": "Tổ chức chưa có giới thiệu.",
@@ -1559,7 +1560,7 @@
     "leave": "Rời tổ chức",
     "privateLeave": "Tổ chức riêng tư: nếu rời, muốn vào lại phải gửi yêu cầu mới.",
     "administrator": "Quản trị viên",
-    "adminLine": "Quản trị viên không thể rời tổ chức hoặc bị loại. Chỉnh sửa tổ chức nằm ở mục quản trị.",
+    "adminLine": "Quản trị viên không thể rời tổ chức hoặc bị loại. Sửa thông tin và thành viên ở thẻ Quản lý.",
     "edit": "Sửa tổ chức",
     "joined": "Đã tham gia {name}",
     "joinFailedTitle": "Không tham gia được",

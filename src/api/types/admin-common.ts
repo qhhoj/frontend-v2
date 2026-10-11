@@ -14,5 +14,5 @@ export interface OrganizationChip {
 
 export type PreviewStyle = JsonBodyOf<'/problems/render-preview', 'post'>['style'];
 
-/** @uiOnly what a preview is rendered for: a problem style, or a static page (its own endpoint and permission). */
-export type PreviewSource = PreviewStyle | 'flatpage';
+/** @uiOnly what a preview is rendered for: a problem style, a static page or an organization's about (each its own endpoint and permission). */
+export type PreviewSource = PreviewStyle | 'flatpage' | 'organization';

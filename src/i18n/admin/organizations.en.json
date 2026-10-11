@@ -20,7 +20,8 @@
     "pager": "Organization pages",
     "countMatch": "{shown} / {total} organizations match “{search}”",
     "emptySearch": "No organization matches “{search}”. Try a shorter term.",
-    "empty": "No organizations yet."
+    "empty": "No organizations yet.",
+    "seats": "Members / seats"
   },
   "editor": {
     "createTitle": "Create organization",
@@ -41,7 +42,14 @@
     "staffOnly": "Hidden and seats are for staff who may edit every organization.",
     "createSubmit": "Create organization",
     "save": "Save changes",
-    "reset": "Reset"
+    "reset": "Reset",
+    "logoHint": "An http(s) URL or a site path; the preview is on the left.",
+    "logoBroken": "This image does not load. Check the path before saving.",
+    "logoPreview": "Avatar preview",
+    "adminsHint": "New admins become members and join the Org Admin group. A person may administer at most 3 organizations.",
+    "createNote": "New organizations start closed and hidden from the list until staff list them. You are the first administrator.",
+    "createNoteStaff": "New organizations default to closed and hidden; untick \"Hidden\" to list it now. You are the first administrator.",
+    "aboutPreview": "Preview"
   },
   "errors": {
     "name": "Name is 1 to 128 characters.",
@@ -60,9 +68,11 @@
     "pendingCount": "{count} pending",
     "refuse": "Refuse",
     "accept": "Accept",
-    "decidedBy": "decided by {id}",
+    "decidedBy": "decided by {name}",
     "empty": "No requests.",
-    "pager": "Request pages"
+    "pager": "Request pages",
+    "seats": "{members} / {slots} seats · {left} left",
+    "seatsOpen": "{members} members · no seat limit"
   },
   "members": {
     "title": "Members",
@@ -71,13 +81,23 @@
     "kickNamed": "Remove {username}",
     "kickTitle": "Remove {username} from {organization}?",
     "kickBody": "They leave the organization at once; they may ask to join again.",
-    "pager": "Member pages"
+    "pager": "Member pages",
+    "countMatch": "{count} people match “{search}”",
+    "search": "Search members",
+    "searchPlaceholder": "Search by username…",
+    "admin": "Admin",
+    "adminHint": "Remove them from Administrators before removing them here.",
+    "openUser": "User admin",
+    "openUserNamed": "Open {username} on the users page",
+    "empty": "No members yet.",
+    "emptySearch": "No member matches “{search}”."
   },
   "views": {
     "label": "Sections",
     "organizations": "Organizations",
     "requests": "Join requests · all organizations",
-    "pending": "{count} awaiting review"
+    "pending": "{count} awaiting review",
+    "quotas": "Quotas"
   },
   "search": {
     "label": "Search organizations",
@@ -114,6 +134,73 @@
     "empty": "No requests.",
     "pager": "Request pages",
     "full": "The organization is full.",
-    "alreadyDecided": "Another staff member already decided this request."
+    "alreadyDecided": "Another staff member already decided this request.",
+    "decidedBy": "by {name}",
+    "search": {
+      "label": "Search requests",
+      "placeholder": "Username or organization…",
+      "hint": "Matches part of the applicant's username, or the organization's name, short name or address."
+    }
+  },
+  "filters": {
+    "open": "Kind",
+    "unlisted": "Visibility",
+    "any": "All",
+    "listed": "Listed"
+  },
+  "context": {
+    "label": "Organization status",
+    "seats": "Members / seats",
+    "admins": "Administrators",
+    "points": "PP",
+    "created": "Created",
+    "unlistedNote": "Hidden: only members, administrators and staff see it in lists.",
+    "linksLabel": "Go to the organization",
+    "viewOnSite": "View on site",
+    "members": "Members",
+    "problems": "Problems",
+    "contests": "Contests",
+    "posts": "Posts",
+    "quota": "Quota",
+    "recalculate": "Recalculate points",
+    "recalculateHint": "Recomputes PP and the member count when they drift.",
+    "recalculateQueued": "Recalculation queued; the numbers update within minutes."
+  },
+  "bulk": {
+    "selectPage": "Select the page",
+    "selectColumn": "Select",
+    "selectNamed": "Select the request from {username}",
+    "selected": "{count} selected",
+    "accept": "Accept selected",
+    "reject": "Refuse selected",
+    "done": "{count} requests decided.",
+    "failed": "{count} could not be decided:"
+  },
+  "history": {
+    "title": "Change history",
+    "lead": "Who created or edited the organization, or removed a member.",
+    "empty": "No changes recorded yet.",
+    "pager": "History pages",
+    "goneEditor": "Deleted account",
+    "yes": "Yes",
+    "no": "No",
+    "actions": {
+      "create": "Created",
+      "edit": "Edited",
+      "kick": "Removed"
+    },
+    "fields": {
+      "name": "Name",
+      "slug": "Address",
+      "shortName": "Short name",
+      "about": "About",
+      "isOpen": "Open",
+      "isUnlisted": "Hidden",
+      "slots": "Seats",
+      "logoOverrideImage": "Avatar",
+      "admins": "Administrators",
+      "member": "Removed member"
+    },
+    "moreLines": "… and {n} more lines"
   }
 }

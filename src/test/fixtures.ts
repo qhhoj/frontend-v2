@@ -650,6 +650,7 @@ export const organizationItem = (
   isUnlisted: false,
   memberCount: 120,
   performancePoints: 4200,
+  slots: null,
   ...overrides,
 });
 
