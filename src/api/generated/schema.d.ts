@@ -3438,6 +3438,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/polygon/syncs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the Polygon sync history of every problem
+         * @description Needs `judge.import_polygon_package` and `judge.edit_all_problem` (the
+         *     runs name every problem). Every finished Polygon import and sync job, newest
+         *     first: problem code, Polygon problem, revision, package and its build time,
+         *     first import or sync, manual or automatic, who started it, the result and,
+         *     for a failure, the step it stopped at and the error shown to the requester.
+         *     Paged, default 20 per page (max 100). Errors: 403 `forbidden`.
+         */
+        get: operations["PolygonController_syncs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/polygon/test": {
         parameters: {
             query?: never;
@@ -4035,6 +4060,31 @@ export interface paths {
          *     409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
          */
         post: operations["ProblemPolygonLinkController_sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/polygon/syncs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a problem's Polygon sync history
+         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         *     data. Every finished Polygon import and sync job of the problem, newest
+         *     first, also after an unlink: revision, package and its build time, first
+         *     import or sync, manual or automatic, who started it, the result and, for a
+         *     failure, the step it stopped at and the error shown to the requester. Paged,
+         *     default 20 per page (max 100). Errors: 404 `not_found`, 403 `forbidden`.
+         */
+        get: operations["ProblemPolygonLinkController_syncs"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7172,6 +7222,8 @@ export interface components {
         ImportJobResponse: {
             /** @description Only an import error written for the requester; any other failure is "Import failed". */
             error: string | null;
+            /** @description Where a failed job stopped: `checking` (before any work), a progress step, `saving` (the database write) or `finishing` (data files after the write); null unless failed, and for jobs that failed before it was recorded. */
+            failedStep: components["schemas"]["PolygonSyncStep"] | null;
             /** @description Job id. */
             id: string;
             /** @description Progress of the running step; null while queued and once finished. */
@@ -7832,6 +7884,11 @@ export interface components {
             status: string;
         };
         PolygonLatestPackageResponse: {
+            /**
+             * Format: date-time
+             * @description When Polygon started building it; null without a package.
+             */
+            createdAt: string | null;
             id: number | null;
             revision: number | null;
             state: components["schemas"]["PolygonPackageState"];
@@ -7893,11 +7950,18 @@ export interface components {
             linkedAt: string;
             name: string;
             owner: string;
+            /**
+             * Format: date-time
+             * @description Polygon's build time of that package; null for links made before it was recorded.
+             */
+            packageCreatedAt: string | null;
             packageId: number;
             /** @description Polygon problem id. */
             problemId: number;
             /** @description Revision and package the problem's content was last taken from. */
             revision: number;
+            /** @description Statement title taken from that package; null for links made before it was recorded. */
+            title: string | null;
         };
         PolygonLinkStateResponse: {
             /** @description The newest package on Polygon now; null when Polygon could not be asked (not connected, unreachable, access revoked). */
@@ -7929,7 +7993,48 @@ export interface components {
             connected: boolean;
         };
         /** @enum {string} */
+        PolygonSyncPurpose: "link" | "sync";
+        /** @enum {string} */
         PolygonSyncResult: "failed" | "ok";
+        PolygonSyncRunResponse: {
+            /** @description Code the job imported into. */
+            code: string;
+            /** @description Why it failed, as shown to the requester; null when it succeeded. */
+            error: string | null;
+            failedStep: components["schemas"]["PolygonSyncStep"] | null;
+            /**
+             * Format: date-time
+             * @description When the job ended.
+             */
+            finishedAt: string;
+            /** @description Run id. */
+            id: string;
+            /**
+             * Format: date-time
+             * @description Polygon's build time of the package; null for jobs queued before it was recorded.
+             */
+            packageCreatedAt: string | null;
+            packageId: number;
+            /** @description Polygon short name. */
+            polygonName: string;
+            /** @description Polygon problem id. */
+            polygonProblemId: number;
+            /** @description Id of the QHHOJ problem; null when a first import failed before creating it. */
+            problemId: string | null;
+            purpose: components["schemas"]["PolygonSyncPurpose"];
+            /** @description Who started it (the linking user for an automatic sync); null when the account is gone. */
+            requestedBy: components["schemas"]["UserSummaryResponse"] | null;
+            result: components["schemas"]["PolygonSyncResult"];
+            revision: number;
+            trigger: components["schemas"]["PolygonSyncTrigger"];
+        };
+        /**
+         * @description Where a failed job stopped: `checking` (before any work), a progress step, `saving` (the database write) or `finishing` (data files after the write); null unless failed, and for jobs that failed before it was recorded.
+         * @enum {string}
+         */
+        PolygonSyncStep: "checking" | "downloading" | "finishing" | "saving" | "statements" | "tests";
+        /** @enum {string} */
+        PolygonSyncTrigger: "auto" | "manual";
         PolygonTestResponse: {
             ok: boolean;
             /** @description Problems the account can read. */
@@ -16785,6 +16890,44 @@ export interface operations {
             };
         };
     };
+    PolygonController_syncs: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+                /** @description Runs per page, 1-100. */
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonSyncRunResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     PolygonConnectionController_test: {
         parameters: {
             query?: never;
@@ -18012,6 +18155,47 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ImportJobStartedResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemPolygonLinkController_syncs: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+                /** @description Runs per page, 1-100. */
+                pageSize?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PolygonSyncRunResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
                     };
                 };
             };

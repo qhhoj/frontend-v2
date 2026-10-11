@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PolygonProblem } from '@/api/types/polygon';
+import { formatNumericDateTime } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import PackageStatePill from './PackageStatePill.vue';
 import { cardBlockOf } from './pick-filter';
 
@@ -8,6 +10,7 @@ import { cardBlockOf } from './pick-filter';
 const props = defineProps<{ problem: PolygonProblem; isSelected: boolean }>();
 const emit = defineEmits<{ select: [problem: PolygonProblem] }>();
 const block = computed(() => cardBlockOf(props.problem));
+const locale = useLocaleStore();
 const packageText = computed(() => {
   const { latestPackage } = props.problem;
   return latestPackage.id === null ? '' : `· #${latestPackage.id}`;
@@ -44,6 +47,11 @@ const packageText = computed(() => {
     <span class="flex flex-wrap items-center gap-2 text-xs text-muted">
       <PackageStatePill :state="problem.latestPackage.state" />
       <span class="font-mono">r{{ problem.revision }} {{ packageText }}</span>
+      <time v-if="problem.latestPackage.createdAt" :datetime="problem.latestPackage.createdAt">{{
+        $t('admin.polygonLink.history.builtAt', {
+          date: formatNumericDateTime(problem.latestPackage.createdAt, locale.locale),
+        })
+      }}</time>
     </span>
     <span v-if="block" class="text-sm text-muted">
       {{ $t(`admin.polygonLink.pick.blocked.${block}`, { code: problem.linkedProblemCode }) }}

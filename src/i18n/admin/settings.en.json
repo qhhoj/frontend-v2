@@ -158,12 +158,12 @@
     },
     "polygon": {
       "accountName": "The Polygon account that owns the API key; shown in the how-to for setters.",
-      "apiKey": "From Polygon: Settings, API keys. Only the last four characters show.",
+      "apiKey": "From Polygon: Settings, API keys. Encrypted when saved, never shown again.",
       "apiSecret": "Encrypted when saved, never shown again. After replacing it, test the connection again."
     }
   },
   "chip": {
-    "set": "Set",
+    "set": "Saved",
     "unset": "Not set"
   },
   "secret": {

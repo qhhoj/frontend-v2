@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ImportJob } from '@/api/types/problem-imports';
-import { downloadProgressOf, importStepsOf } from './import-steps';
+import { downloadProgressOf, failedRowOf, importStepsOf } from './import-steps';
 
 const statuses = (steps: ReturnType<typeof importStepsOf>) =>
   steps.map((step) => `${step.key}:${step.status}`);
@@ -46,6 +46,24 @@ describe('importStepsOf', () => {
     ]);
   });
 
+  it('places the server failure step: checks fail the queued row, the write and the file moves fail the end', () => {
+    expect(statuses(importStepsOf('polygon', 'failed', failedRowOf('checking')))).toEqual([
+      'queued:failed',
+      'downloading:pending',
+      'statements:pending',
+      'tests:pending',
+      'end:failed',
+    ]);
+    expect(statuses(importStepsOf('zip', 'failed', failedRowOf('saving')))).toEqual([
+      'queued:done',
+      'statements:done',
+      'tests:done',
+      'end:failed',
+    ]);
+    expect(failedRowOf('finishing')).toBe('end');
+    expect(failedRowOf('downloading')).toBe('downloading');
+  });
+
   it('fails only the end when the page never saw the job run', () => {
     expect(statuses(importStepsOf('zip', 'failed'))).toEqual([
       'queued:pending',
@@ -63,6 +81,7 @@ const job = (progress: ImportJob['progress']): ImportJob => ({
   progress,
   result: null,
   error: null,
+  failedStep: null,
 });
 
 describe('downloadProgressOf', () => {

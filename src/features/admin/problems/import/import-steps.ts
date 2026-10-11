@@ -1,4 +1,5 @@
 import type { ImportJob } from '@/api/types/problem-imports';
+import type { PolygonSyncStep } from '@/api/types/polygon';
 
 export type ImportStepKey = ImportJob['step'];
 /** The steps a job passes through while it runs (`queued` included); `done` and `failed` end it. */
@@ -19,8 +20,20 @@ const RUNNING_STEPS: Record<ImportSource, RunningStep[]> = {
 export const isRunningStep = (step: ImportStepKey): step is RunningStep =>
   step !== 'done' && step !== 'failed';
 
-function failedSteps(running: RunningStep[], failedAt: RunningStep | null): ShownStep[] {
-  const failedIndex = failedAt ? running.indexOf(failedAt) : -1;
+/** The row a failed job's `failedStep` belongs to: the checks before any work fail the queued row; the database write and the file moves after it fail the end, every running row having passed. */
+const FAILED_ROW: Record<PolygonSyncStep, RunningStep | 'end'> = {
+  checking: 'queued',
+  downloading: 'downloading',
+  statements: 'statements',
+  tests: 'tests',
+  saving: 'end',
+  finishing: 'end',
+};
+export const failedRowOf = (step: PolygonSyncStep) => FAILED_ROW[step];
+
+function failedSteps(running: RunningStep[], failedAt: RunningStep | 'end' | null): ShownStep[] {
+  const failedIndex =
+    failedAt === 'end' ? running.length : failedAt ? running.indexOf(failedAt) : -1;
   return [
     ...running.map((key, index): ShownStep => {
       if (index < failedIndex) return { key, status: 'done' };
@@ -31,13 +44,14 @@ function failedSteps(running: RunningStep[], failedAt: RunningStep | null): Show
 }
 
 /**
- * The rows of the progress list for a job's `step`. A failed job does not say where it stopped, so `failedAt` is the
- * last running step this page saw: that row fails and the rows before it are done; unseen (a reload), only the end fails.
+ * The rows of the progress list for a job's `step`. For a failed job `failedAt` is the row it stopped at (from its
+ * `failedStep`, else the last running step this page saw): that row fails and the rows before it are done; unknown, only
+ * the end fails.
  */
 export function importStepsOf(
   source: ImportSource,
   step: ImportStepKey,
-  failedAt: RunningStep | null = null,
+  failedAt: RunningStep | 'end' | null = null,
 ): ShownStep[] {
   const running = RUNNING_STEPS[source];
   if (step === 'failed') return failedSteps(running, failedAt);

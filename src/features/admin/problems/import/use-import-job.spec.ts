@@ -16,6 +16,7 @@ const job = (state: string, id = 'job-1'): ImportJob => ({
   progress: null,
   result: null,
   error: null,
+  failedStep: null,
 });
 const apiError = (status: number) => new ApiError('error', status, 'error');
 const callsFor = (id: string) => fetchMock.mock.calls.filter(([called]) => called === id).length;

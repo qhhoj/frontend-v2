@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { PolygonProblem } from '@/api/types/polygon';
+import { formatNumericDateTime } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import PackageStatePill from './PackageStatePill.vue';
 
 /** Step 2's side card: the picked Polygon problem, what each sync takes from the package and what QHHOJ keeps. */
 defineProps<{ problem: PolygonProblem }>();
 const FROM_PACKAGE = ['statements', 'tests', 'checker', 'limits'] as const;
+const locale = useLocaleStore();
 </script>
 
 <template>
@@ -34,6 +37,14 @@ const FROM_PACKAGE = ['statements', 'tests', 'checker', 'limits'] as const;
         }}</span>
         <PackageStatePill :state="problem.latestPackage.state" />
       </dd>
+      <template v-if="problem.latestPackage.createdAt">
+        <dt class="text-muted">{{ $t('admin.polygonLink.source.built') }}</dt>
+        <dd>
+          <time :datetime="problem.latestPackage.createdAt">{{
+            formatNumericDateTime(problem.latestPackage.createdAt, locale.locale)
+          }}</time>
+        </dd>
+      </template>
     </dl>
     <div class="flex flex-col gap-2 border-t border-line pt-4">
       <h3 class="text-xs font-bold tracking-wide text-muted uppercase">

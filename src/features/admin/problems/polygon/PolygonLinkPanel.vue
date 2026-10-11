@@ -20,6 +20,7 @@ import { isFinal } from '../import/import-job';
 import { importRefusalText } from '../import/import-refusal';
 import { useImportJob } from '../import/use-import-job';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
+import PolygonSyncHistory from './PolygonSyncHistory.vue';
 import { canSyncNow, linkStatusOf } from './polygon-link';
 import type { LinkStatus } from './polygon-link';
 import { polygonLinkKey, usePolygonLinkQuery } from './polygon.queries';
@@ -94,6 +95,11 @@ function openUnlink() {
   unlink.reset();
   isUnlinkOpen.value = true;
 }
+
+/** The history is asked for only once opened. */
+const isHistoryOpen = ref(false);
+const onHistoryToggle = (event: Event) =>
+  (isHistoryOpen.value = (event.target as HTMLDetailsElement).open);
 </script>
 
 <template>
@@ -113,7 +119,11 @@ function openUnlink() {
     <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <dt class="text-muted">{{ $t('admin.polygonLink.panel.problem') }}</dt>
-        <dd class="font-mono font-semibold break-all">
+        <dd v-if="state.link.title" class="font-semibold break-words">{{ state.link.title }}</dd>
+        <dd
+          class="font-mono break-all"
+          :class="state.link.title ? 'text-xs text-muted' : 'font-semibold'"
+        >
           {{ state.link.name }} · {{ state.link.problemId }}
         </dd>
       </div>
@@ -161,6 +171,11 @@ function openUnlink() {
             $t('admin.polygonLink.panel.inUse')
           }}</span>
           <span class="text-xl font-bold">r{{ state.link.revision }}</span>
+          <span v-if="state.link.packageCreatedAt" class="font-sans text-xs text-muted">{{
+            $t('admin.polygonLink.history.builtAt', {
+              date: dateText(state.link.packageCreatedAt),
+            })
+          }}</span>
         </span>
         <template v-if="state.latestPackage?.revision">
           <ArrowRight aria-hidden="true" class="size-5 text-muted" />
@@ -169,6 +184,11 @@ function openUnlink() {
               $t('admin.polygonLink.panel.latest')
             }}</span>
             <span class="text-xl font-bold">r{{ state.latestPackage.revision }}</span>
+            <span v-if="state.latestPackage.createdAt" class="font-sans text-xs text-muted">{{
+              $t('admin.polygonLink.history.builtAt', {
+                date: dateText(state.latestPackage.createdAt),
+              })
+            }}</span>
           </span>
         </template>
       </div>
@@ -235,6 +255,13 @@ function openUnlink() {
       kind="refused"
       :text="failureTextOf(autoSync.failure.value)"
     />
+
+    <details class="border-t border-line pt-4" @toggle="onHistoryToggle">
+      <summary class="min-h-11 cursor-pointer text-sm font-semibold">
+        {{ $t('admin.polygonLink.history.show') }}
+      </summary>
+      <PolygonSyncHistory v-if="isHistoryOpen" :code="code" class="mt-3" />
+    </details>
 
     <ImportProgress
       v-if="syncJobId"

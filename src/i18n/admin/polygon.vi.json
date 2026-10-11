@@ -43,6 +43,15 @@
     "doneText": "Nhập xong. Mở bài để xem và chỉnh tiếp.",
     "open": "Mở {code}",
     "failed": "Không nhập được. Hệ thống không cho biết thêm lý do.",
+    "stoppedAt": "Dừng ở bước: {step}.",
+    "failedSteps": {
+      "checking": "kiểm tra trước khi nhập",
+      "downloading": "tải gói từ Polygon",
+      "statements": "chuyển đề bài",
+      "tests": "tải test lên",
+      "saving": "lưu vào cơ sở dữ liệu",
+      "finishing": "đặt tệp dữ liệu sau khi lưu"
+    },
     "pollFailed": "Chưa lấy được trạng thái. Trang sẽ thử lại.",
     "stopped": {
       "notFound": "Không tìm thấy lượt nhập này. Lượt nhập hết hạn sau 24 giờ.",

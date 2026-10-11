@@ -158,12 +158,12 @@
     },
     "polygon": {
       "accountName": "Tài khoản Polygon sở hữu khoá API; hiện trong hướng dẫn cho người ra đề.",
-      "apiKey": "Lấy ở Polygon: Settings, API keys. Chỉ hiện bốn ký tự cuối.",
+      "apiKey": "Lấy ở Polygon: Settings, API keys. Mã hoá khi lưu, không hiện lại.",
       "apiSecret": "Mã hoá khi lưu, không hiện lại. Thay bí mật thì kiểm tra kết nối lại."
     }
   },
   "chip": {
-    "set": "Đã đặt",
+    "set": "Đã lưu",
     "unset": "Chưa đặt"
   },
   "secret": {

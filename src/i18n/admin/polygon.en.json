@@ -43,6 +43,15 @@
     "doneText": "Import finished. Open the problem to check it and keep editing.",
     "open": "Open {code}",
     "failed": "The import failed. The system gives no further reason.",
+    "stoppedAt": "Stopped at: {step}.",
+    "failedSteps": {
+      "checking": "checks before the import",
+      "downloading": "downloading the package from Polygon",
+      "statements": "converting the statements",
+      "tests": "uploading the tests",
+      "saving": "saving to the database",
+      "finishing": "placing the data files after saving"
+    },
     "pollFailed": "Could not fetch the status yet. The page will try again.",
     "stopped": {
       "notFound": "This import was not found. Imports expire after 24 hours.",

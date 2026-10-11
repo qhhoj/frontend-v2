@@ -8,7 +8,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { ADMIN_PRIMARY_CLASS } from '../../ui/classes';
 import type { ImportPhase, PollStop } from './import-job';
-import { downloadProgressOf, importStepsOf, isRunningStep } from './import-steps';
+import { downloadProgressOf, failedRowOf, importStepsOf, isRunningStep } from './import-steps';
 import type { ImportSource, RunningStep, StepStatus } from './import-steps';
 
 /** The job's steps from its `step` (a zip import has no download), the download bytes, and the end: link or reason. */
@@ -24,7 +24,7 @@ const props = withDefaults(
   { source: 'zip' },
 );
 
-/** A failed job does not say where it stopped: the last running step seen here is where it failed. */
+/** A job that failed before the server recorded `failedStep`: the last running step seen here is where it failed. */
 const lastRunningStep = ref<RunningStep | null>(null);
 watch(
   () => props.job?.step,
@@ -33,8 +33,13 @@ watch(
   },
   { immediate: true },
 );
+const failedStep = computed(() => props.job?.failedStep ?? null);
 const steps = computed(() =>
-  importStepsOf(props.source, props.job?.step ?? 'queued', lastRunningStep.value),
+  importStepsOf(
+    props.source,
+    props.job?.step ?? 'queued',
+    failedStep.value ? failedRowOf(failedStep.value) : lastRunningStep.value,
+  ),
 );
 const isFinished = computed(() => props.phase === 'done' || props.phase === 'failed');
 const download = computed(() => downloadProgressOf(props.job));
@@ -130,6 +135,13 @@ const labelKey = (key: string, status: StepStatus) =>
       kind="refused"
       :text="failedText || $t('admin.polygon.progress.failed')"
     />
+    <p v-if="phase === 'failed' && failedStep" class="text-sm text-muted" data-testid="failed-step">
+      {{
+        $t('admin.polygon.progress.stoppedAt', {
+          step: $t(`admin.polygon.progress.failedSteps.${failedStep}`),
+        })
+      }}
+    </p>
     <AdminStatus v-if="stop" kind="refused" :text="$t(`admin.polygon.progress.stopped.${stop}`)" />
     <p v-else-if="pollFailure" class="text-sm text-negative">
       {{ $t('admin.polygon.progress.pollFailed') }} {{ failureTextOf(pollFailure) }}
