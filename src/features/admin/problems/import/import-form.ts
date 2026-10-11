@@ -2,6 +2,8 @@ import { PROBLEM_CODE_PATTERN, PROBLEM_CODE_MAX } from '../problem-code';
 import type { UserChip } from '@/api/types/admin-common';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { translate } from '@/i18n';
+import type { CreationOwner } from '../../creation/creation-owners';
+import type { CreationScope } from '../../creation/creation-scope';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { parseLanguageMap } from './import-job';
 
@@ -12,7 +14,7 @@ export const LANGUAGE_NAME_MAX = 30;
 
 export const IMPORT_MODES = ['create', 'update'] as const;
 export type ImportMode = (typeof IMPORT_MODES)[number];
-/** Backend `ProblemImportsService.resolveJob`: create needs `judge.add_problem`; update needs the edit rule (`canEdit`, `edit_own_problem`). */
+/** Backend `ProblemImportsService.resolveJob`: a site create needs `judge.add_problem` (an organization create its creation rights, see `canCreateFor`); update needs the edit rule (`canEdit`, `edit_own_problem`). */
 export const IMPORT_MODE_PERMISSION: Record<ImportMode, string> = {
   create: 'judge.add_problem',
   update: 'judge.edit_own_problem',
@@ -22,6 +24,8 @@ export interface ImportForm {
   file: File | null;
   code: string;
   mode: ImportMode;
+  /** Who owns a created problem: an administered organization, or null for the site. Not sent on update. */
+  owner: CreationOwner | null;
   groupId: string;
   typeIds: string[];
   points: string;
@@ -54,6 +58,7 @@ export const emptyImportForm = (): ImportForm => ({
   file: null,
   code: '',
   mode: 'create',
+  owner: null,
   groupId: '',
   typeIds: [],
   points: '',
@@ -130,6 +135,10 @@ export function importFormErrors(
   };
 }
 
+/** Whether the viewer may create for this owner: an organization needs the organization scope, the site `judge.add_problem` (the session's `problemCreation`). */
+export const canCreateFor = (owner: CreationOwner | null, scope: CreationScope): boolean =>
+  owner ? scope.organizations : scope.site;
+
 const optionalText = (text: string) => text.trim() || undefined;
 
 /** Options as the query string takes them: an empty choice is left out, not sent as an empty value. */
@@ -137,6 +146,7 @@ export function toImportOptions(form: ImportForm): ImportOptions {
   return {
     code: form.code,
     mode: form.mode,
+    organization: form.mode === 'create' ? form.owner?.slug : undefined,
     authors: form.authors.map((chip) => chip.id),
     curators: form.curators.map((chip) => chip.id),
     groupId: form.groupId || undefined,

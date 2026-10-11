@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok, sequence } from '@/test/mock-api';
+import { mockApi, ok, page, sequence } from '@/test/mock-api';
+import { organizationItem, sessionUser, signedIn } from '@/test/fixtures';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditingMeta } from '@/test/admin-fixtures/problems';
@@ -115,6 +116,50 @@ describe('ZipImportPage', () => {
     expect(wrapper.text()).toContain('Cần quyền “Sửa bài của mình”');
     await start(wrapper);
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
+  });
+
+  it('imports into the only administered organization for a teacher without judge.add_problem', async () => {
+    const teacher = sessionUser({
+      isStaff: true,
+      permissions: ['judge.import_polygon_package', 'judge.create_organization_problem'],
+      adminCapabilities: {
+        organizations: true,
+        problemCreation: { site: false, organizations: true },
+        contestCreation: { site: false, organizations: false },
+      },
+    });
+    const calls = mockApi({
+      ...staffViewer(),
+      'GET /auth/me': signedIn({ user: teacher }),
+      'GET /organizations': page([organizationItem()]),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
+      'GET /problems/imports/job-1': job('active'),
+    });
+    const { wrapper } = await mountApp('/admin/problems/import');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="problem-code-prefix"]').exists()).toBe(true),
+    );
+    expect(wrapper.get('[data-testid="creation-owner"]').text()).toContain('THPT A');
+    expect(wrapper.text()).not.toContain('Không thuộc tổ chức');
+    await start(wrapper);
+    const post = calls.find((call) => call.method === 'POST');
+    expect(post?.query.get('organization')).toBe('thpt-a');
+    expect(post?.query.get('code')).toBe('thpta_hcmus41c');
+  });
+
+  it('imports a site problem without an organization for a site creator', async () => {
+    const calls = mockApi({
+      ...staffViewer(PERMS),
+      'GET /problems/meta': ok(problemEditingMeta()),
+      'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
+      'GET /problems/imports/job-1': job('active'),
+    });
+    const { wrapper } = await mountApp('/admin/problems/import');
+    await start(wrapper);
+    const post = calls.find((call) => call.method === 'POST');
+    expect(post?.query.has('organization')).toBe(false);
+    expect(post?.query.get('code')).toBe('hcmus41c');
   });
 
   it('stops polling on a 404 and says the import was not found', async () => {

@@ -6,6 +6,9 @@ import { formatFileSize } from '@/lib/format';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useProblemEditingMetaQuery } from '../problem-editing.queries';
+import ProblemCodeField from '../general/ProblemCodeField.vue';
+import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
+import { useCreationScope } from '../../creation/creation-scope';
 import AdminField from '../../ui/AdminField.vue';
 import AdminCheckChips from '../../ui/AdminCheckChips.vue';
 import UploadButton from '../../ui/UploadButton.vue';
@@ -18,6 +21,7 @@ import ImportCheckbox from './ImportCheckbox.vue';
 import {
   IMPORT_MODES,
   IMPORT_MODE_PERMISSION,
+  canCreateFor,
   emptyImportForm,
   importFormErrors,
   toImportOptions,
@@ -49,9 +53,23 @@ const typeOptions = computed(() =>
   (meta.value?.types ?? []).map((type) => ({ value: type.id, label: type.fullName })),
 );
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
-const isSubmitBlocked = computed(() => props.isPending || (props.withFile && !form.value.file));
+const isOwnerReady = ref(false);
+const isCreate = computed(() => form.value.mode === 'create');
+const { scope, canCreate } = useCreationScope('problem');
+/** A create waits for the owner picker; without any create right the mode check refuses instead. */
+const isWaitingForOwner = computed(() => isCreate.value && canCreate.value && !isOwnerReady.value);
+const isSubmitBlocked = computed(
+  () => props.isPending || (props.withFile && !form.value.file) || isWaitingForOwner.value,
+);
 const { canAny } = usePermissions();
-const canUseMode = (mode: ImportMode) => canAny(IMPORT_MODE_PERMISSION[mode]);
+/** Create is offered to site and organization creators alike; the owner picked decides which rule the submit checks. */
+const canUseMode = (mode: ImportMode) =>
+  mode === 'create' ? canCreate.value : canAny(IMPORT_MODE_PERMISSION.update);
+const canSubmitMode = (mode: ImportMode) =>
+  mode === 'create' ? canCreateFor(form.value.owner, scope.value) : canUseMode(mode);
+const codePrefix = computed(() =>
+  isCreate.value ? (form.value.owner?.problemCodePrefix ?? '') : '',
+);
 /** A viewer who may only update starts on update, so the default never refuses itself. */
 if (!canUseMode('create') && canUseMode('update')) form.value.mode = 'update';
 
@@ -72,8 +90,8 @@ function onDrop(event: DragEvent) {
 }
 
 function submit() {
-  if (props.isPending) return;
-  localErrors.value = importFormErrors(form.value, canUseMode, { needsFile: props.withFile });
+  if (props.isPending || isWaitingForOwner.value) return;
+  localErrors.value = importFormErrors(form.value, canSubmitMode, { needsFile: props.withFile });
   if (Object.keys(localErrors.value).length > 0) return;
   emit('start', { options: toImportOptions(form.value), file: form.value.file });
 }
@@ -116,22 +134,21 @@ function submit() {
         </p>
       </div>
 
+      <CreationOwnerPicker
+        v-if="isCreate && canCreate"
+        v-model="form.owner"
+        v-model:ready="isOwnerReady"
+        kind="problem"
+      />
+
       <div class="grid gap-5 @lg:grid-cols-2">
-        <AdminField
-          v-slot="{ id, describedBy, invalid }"
-          :label="$t('admin.polygon.form.code')"
-          :error="errorOf('code')"
+        <ProblemCodeField
+          v-model="form.code"
           input-id="import-code"
-        >
-          <input
-            :id="id"
-            v-model="form.code"
-            :class="INPUT"
-            autocomplete="off"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-          />
-        </AdminField>
+          :hint="$t('admin.polygon.form.codeInvalid')"
+          :prefix="codePrefix"
+          :error="errorOf('code')"
+        />
 
         <fieldset class="flex flex-col gap-2">
           <legend class="mb-1.5 text-sm font-semibold">
