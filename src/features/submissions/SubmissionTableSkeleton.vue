@@ -64,16 +64,19 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
         data-skeleton-region="row"
         class="flex items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0"
       >
-        <SkeletonBlock class="h-12 w-24 shrink-0" />
+        <SkeletonBlock class="h-12 w-24 shrink-0 self-start" />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <div v-if="isShown('problem')"><SkeletonBlock text class="w-32" /></div>
           <div class="text-[13px]"><SkeletonBlock text class="w-28" /></div>
-          <div v-if="isShown('language') || isShown('cost')" class="text-xs">
-            <SkeletonBlock text class="w-36" />
+          <div v-if="isShown('when') || isShown('language')" class="text-xs">
+            <SkeletonBlock text class="w-24" />
           </div>
+          <div v-if="isShown('cost')" class="text-xs"><SkeletonBlock text class="w-28" /></div>
         </div>
-        <SkeletonBlock v-if="hasPickColumn" round class="size-11 shrink-0" />
-        <SkeletonBlock class="size-7 shrink-0" />
+        <div class="flex shrink-0 flex-col items-center">
+          <SkeletonBlock v-if="hasPickColumn" round class="size-11" />
+          <SkeletonBlock class="size-7" />
+        </div>
       </li>
     </ul>
     <ScrollRegion v-else placeholder label="">
