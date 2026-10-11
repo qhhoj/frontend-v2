@@ -13,12 +13,19 @@ import type { CreationKind } from './creation-scope';
  * The owner strip of a create form: one wrapping row, who owns the new problem or contest. Radio chips for a few
  * organizations, a select for many, a fixed line when there is one choice. "Không thuộc tổ chức" only for site-wide creators.
  */
-const props = defineProps<{ kind: CreationKind }>();
+/** `allowSite: false` hides "Không thuộc tổ chức" even for a site-wide creator (an import without `judge.import_polygon_package`). */
+const props = withDefaults(defineProps<{ kind: CreationKind; allowSite?: boolean }>(), {
+  allowSite: true,
+});
 const owner = defineModel<CreationOwner | null>({ required: true });
 /** False until the owners are known, so the form waits instead of posting to the wrong place. */
 const isReady = defineModel<boolean>('ready', { default: false });
 const route = useRoute();
-const { scope } = useCreationScope(props.kind);
+const { scope: sessionScope } = useCreationScope(props.kind);
+const scope = computed(() => ({
+  site: sessionScope.value.site && props.allowSite,
+  organizations: sessionScope.value.organizations,
+}));
 const owners = useCreationOwnersQuery(() => scope.value.organizations);
 const options = computed(() => (scope.value.organizations ? (owners.data.value ?? []) : []));
 const choiceCount = computed(() => options.value.length + (scope.value.site ? 1 : 0));

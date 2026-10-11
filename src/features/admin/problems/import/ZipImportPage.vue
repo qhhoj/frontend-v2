@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue';
 import { startZipImport } from '@/api/problem-imports.api';
 import type { ImportOptions } from '@/api/types/problem-imports';
-import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../../admin-access';
 import { ADMIN_SCREENS } from '../../admin-screens';
 import { buttonClass } from '../../ui/controls';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
@@ -19,7 +20,7 @@ interface ImportSubmission {
   file: File | null;
 }
 
-const { canAny } = usePermissions();
+const session = useSessionStore();
 const jobId = ref<string | null>(null);
 const submittedCode = ref('');
 const { job, phase, failure: pollFailure, stop } = useImportJob(jobId);
@@ -47,7 +48,7 @@ const refusal = computed(() =>
     <AdminPageHeader :title="$t('admin.polygon.title')" :lead="$t('admin.polygon.lead')">
       <template #actions>
         <RouterLink
-          v-if="canAny(ADMIN_SCREENS.polygonImport.permission)"
+          v-if="canUseAdmin(session.user, ADMIN_SCREENS.polygonImport)"
           :to="{ name: 'admin-polygonImport' }"
           :class="buttonClass('secondary')"
           >{{ $t('admin.polygonLink.wizard.fromPolygon') }}</RouterLink

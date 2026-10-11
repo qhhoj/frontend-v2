@@ -4451,8 +4451,10 @@ export interface paths {
         put?: never;
         /**
          * Import a Polygon problem and link it
-         * @description Needs `judge.import_polygon_package`, plus `judge.add_problem` to create a
-         *     problem or write access to the problem to update it. The body takes the
+         * @description The rights of the zip import (`POST /problems/imports`): an organization
+         *     problem creator without `judge.import_polygon_package` may only create
+         *     for an organization, and may not turn on `autoSync` (403 `forbidden`; a
+         *     sync needs that permission). The body takes the
          *     problem `link` (checked again as on `POST /polygon/resolve`, with the same
          *     errors), the zip import's options (`code`, `mode`, `organization`,
          *     authors, curators, group, types, points, statement languages, zero-point
@@ -4485,7 +4487,7 @@ export interface paths {
         put?: never;
         /**
          * Check a Polygon problem link and preview the problem
-         * @description Needs `judge.import_polygon_package`. The body takes the problem page
+         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). The body takes the problem page
          *     address, `https://polygon.codeforces.com/p…/owner/name`; its `p…` part is
          *     the permission: the server finds `owner/name` among the problems shared
          *     with the QHHOJ account and compares the token with the `<problem url>` of
@@ -4516,7 +4518,7 @@ export interface paths {
         };
         /**
          * Get whether the Polygon account is connected
-         * @description Needs `judge.import_polygon_package`. `connected` is true when both the API
+         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). `connected` is true when both the API
          *     key and secret are set in the admin settings; `accountName` is the Polygon
          *     login setters add as a READ co-author (empty when unset). No call to Polygon
          *     is made. The secret is never returned.
@@ -5559,6 +5561,9 @@ export interface paths {
          * Import a Polygon package as a new or existing problem
          * @description Needs `judge.import_polygon_package`; creating a problem also needs
          *     `judge.add_problem`, updating needs write access to the problem's test data.
+         *     Without `judge.import_polygon_package`, an organization problem creator
+         *     may only create for an organization (`organization` required, no
+         *     `update`; else 403 `forbidden`).
          *     Send the Polygon package as a multipart `file` (a zip with `problem.xml` at
          *     its root, up to 512 MiB) and the options in the query string: `code`, `mode`
          *     (`create` or `update`), `organization`, authors, curators, group, types,
@@ -5591,7 +5596,7 @@ export interface paths {
         };
         /**
          * Get the state of a Polygon import job
-         * @description Needs `judge.import_polygon_package`. Returns the job state (`waiting`,
+         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). Returns the job state (`waiting`,
          *     `active`, `completed`, `failed`, ...), the imported problem when completed,
          *     and the error written for the requester when it failed. Only the user who
          *     started the job, or a superuser, can read it; anyone else gets the same 404

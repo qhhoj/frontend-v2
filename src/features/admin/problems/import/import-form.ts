@@ -4,6 +4,7 @@ import type { ImportOptions } from '@/api/types/problem-imports';
 import { translate } from '@/i18n';
 import type { CreationOwner } from '../../creation/creation-owners';
 import type { CreationScope } from '../../creation/creation-scope';
+import { IMPORT_POLYGON } from '../../admin-screens';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { parseLanguageMap } from './import-job';
 
@@ -14,7 +15,7 @@ export const LANGUAGE_NAME_MAX = 30;
 
 export const IMPORT_MODES = ['create', 'update'] as const;
 export type ImportMode = (typeof IMPORT_MODES)[number];
-/** Backend `ProblemImportsService.resolveJob`: a site create needs `judge.add_problem` (an organization create its creation rights, see `canCreateFor`); update needs the edit rule (`canEdit`, `edit_own_problem`). */
+/** Backend `ProblemImportsService.resolveJob`: a site create needs `judge.add_problem` (an organization create its creation rights, see `canCreateFor`); update needs the edit rule (`canEdit`, `edit_own_problem`). Both need `judge.import_polygon_package` too, except a create for an organization (`importRightsOf`). */
 export const IMPORT_MODE_PERMISSION: Record<ImportMode, string> = {
   create: 'judge.add_problem',
   update: 'judge.edit_own_problem',
@@ -86,15 +87,13 @@ function fileAndCodeErrors(form: ImportForm, needsFile: boolean): FieldErrors {
   return errors;
 }
 
-function modeAndPointsErrors(
-  form: ImportForm,
-  canUseMode: (mode: ImportMode) => boolean,
-): FieldErrors {
+/** The permission a mode still needs, or null when the viewer may use it (see `missingForMode`). */
+export type MissingForMode = (mode: ImportMode) => string | null;
+
+function modeAndPointsErrors(form: ImportForm, missingFor: MissingForMode): FieldErrors {
   const errors: FieldErrors = {};
-  if (!canUseMode(form.mode))
-    errors.mode = translate('admin.ui.needsPermission', {
-      permission: IMPORT_MODE_PERMISSION[form.mode],
-    });
+  const missing = missingFor(form.mode);
+  if (missing) errors.mode = translate('admin.ui.needsPermission', { permission: missing });
   const points = form.points.trim();
   if (points && !isPointsInRange(points))
     errors.points = translate('admin.polygon.form.pointsRange', {
@@ -125,12 +124,12 @@ function languageErrors(form: ImportForm): FieldErrors {
  */
 export function importFormErrors(
   form: ImportForm,
-  canUseMode: (mode: ImportMode) => boolean,
+  missingFor: MissingForMode,
   { needsFile = true }: { needsFile?: boolean } = {},
 ): FieldErrors {
   return {
     ...fileAndCodeErrors(form, needsFile),
-    ...modeAndPointsErrors(form, canUseMode),
+    ...modeAndPointsErrors(form, missingFor),
     ...languageErrors(form),
   };
 }
@@ -138,6 +137,29 @@ export function importFormErrors(
 /** Whether the viewer may create for this owner: an organization needs the organization scope, the site `judge.add_problem` (the session's `problemCreation`). */
 export const canCreateFor = (owner: CreationOwner | null, scope: CreationScope): boolean =>
   owner ? scope.organizations : scope.site;
+
+/** What an import viewer holds: the import permission, `edit_own_problem`, and the session's problem creation scope. */
+export interface ImportRights {
+  canImport: boolean;
+  canEditOwn: boolean;
+  scope: CreationScope;
+}
+
+/** The creation scope of an import: site-wide also needs `judge.import_polygon_package` (an organization creator without it may only create for an organization). */
+export const importScopeOf = (rights: ImportRights): CreationScope => ({
+  site: rights.scope.site && rights.canImport,
+  organizations: rights.scope.organizations,
+});
+
+/** The permission a mode lacks for this viewer, or null: create needs a creation scope (site or organization), update the import permission and `edit_own_problem`. */
+export function missingForMode(mode: ImportMode, rights: ImportRights): string | null {
+  if (mode === 'create') {
+    const scope = importScopeOf(rights);
+    return scope.site || scope.organizations ? null : IMPORT_MODE_PERMISSION.create;
+  }
+  if (!rights.canImport) return IMPORT_POLYGON;
+  return rights.canEditOwn ? null : IMPORT_MODE_PERMISSION.update;
+}
 
 const optionalText = (text: string) => text.trim() || undefined;
 

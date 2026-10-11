@@ -9,6 +9,7 @@ import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import ProblemCodeField from '../general/ProblemCodeField.vue';
 import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
 import { useCreationScope } from '../../creation/creation-scope';
+import { IMPORT_POLYGON } from '../../admin-screens';
 import AdminField from '../../ui/AdminField.vue';
 import AdminCheckChips from '../../ui/AdminCheckChips.vue';
 import UploadButton from '../../ui/UploadButton.vue';
@@ -22,6 +23,8 @@ import {
   IMPORT_MODES,
   IMPORT_MODE_PERMISSION,
   canCreateFor,
+  importScopeOf,
+  missingForMode,
   emptyImportForm,
   importFormErrors,
   toImportOptions,
@@ -55,18 +58,29 @@ const typeOptions = computed(() =>
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isOwnerReady = ref(false);
 const isCreate = computed(() => form.value.mode === 'create');
-const { scope, canCreate } = useCreationScope('problem');
+const { scope } = useCreationScope('problem');
+const { canAny } = usePermissions();
+const rights = computed(() => ({
+  canImport: canAny(IMPORT_POLYGON),
+  canEditOwn: canAny(IMPORT_MODE_PERMISSION.update),
+  scope: scope.value,
+}));
+/** Site-wide only with the import permission; an organization creator may create for their organizations. */
+const importScope = computed(() => importScopeOf(rights.value));
+const missingFor = (mode: ImportMode) => missingForMode(mode, rights.value);
+const canUseMode = (mode: ImportMode) => missingFor(mode) === null;
+/** The submit also checks the owner picked. */
+const missingOnSubmit = (mode: ImportMode) =>
+  mode === 'create' && !canCreateFor(form.value.owner, importScope.value)
+    ? IMPORT_MODE_PERMISSION.create
+    : missingFor(mode);
 /** A create waits for the owner picker; without any create right the mode check refuses instead. */
-const isWaitingForOwner = computed(() => isCreate.value && canCreate.value && !isOwnerReady.value);
+const isWaitingForOwner = computed(
+  () => isCreate.value && canUseMode('create') && !isOwnerReady.value,
+);
 const isSubmitBlocked = computed(
   () => props.isPending || (props.withFile && !form.value.file) || isWaitingForOwner.value,
 );
-const { canAny } = usePermissions();
-/** Create is offered to site and organization creators alike; the owner picked decides which rule the submit checks. */
-const canUseMode = (mode: ImportMode) =>
-  mode === 'create' ? canCreate.value : canAny(IMPORT_MODE_PERMISSION.update);
-const canSubmitMode = (mode: ImportMode) =>
-  mode === 'create' ? canCreateFor(form.value.owner, scope.value) : canUseMode(mode);
 const codePrefix = computed(() =>
   isCreate.value ? (form.value.owner?.problemCodePrefix ?? '') : '',
 );
@@ -91,7 +105,7 @@ function onDrop(event: DragEvent) {
 
 function submit() {
   if (props.isPending || isWaitingForOwner.value) return;
-  localErrors.value = importFormErrors(form.value, canSubmitMode, { needsFile: props.withFile });
+  localErrors.value = importFormErrors(form.value, missingOnSubmit, { needsFile: props.withFile });
   if (Object.keys(localErrors.value).length > 0) return;
   emit('start', { options: toImportOptions(form.value), file: form.value.file });
 }
@@ -135,9 +149,10 @@ function submit() {
       </div>
 
       <CreationOwnerPicker
-        v-if="isCreate && canCreate"
+        v-if="isCreate && canUseMode('create')"
         v-model="form.owner"
         v-model:ready="isOwnerReady"
+        :allow-site="rights.canImport"
         kind="problem"
       />
 
@@ -169,7 +184,7 @@ function submit() {
             />
             {{ $t(`admin.polygon.form.mode.${mode}`) }}
             <span v-if="!canUseMode(mode)" class="basis-full pl-6 text-sm text-muted">
-              {{ needsPermissionText(IMPORT_MODE_PERMISSION[mode]) }}
+              {{ needsPermissionText(missingFor(mode) ?? '') }}
             </span>
           </label>
           <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>

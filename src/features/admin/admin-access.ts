@@ -2,9 +2,9 @@ import type { Schemas } from '@/api/schemas';
 import { allowsAny } from '@/lib/permissions';
 import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { ADMIN_SCREENS } from './admin-screens';
-import type { AdminCapability } from './admin-screens';
+import type { AdminCapability, AdminCapabilityRule } from './admin-screens';
 
-export type { AdminCapability };
+export type { AdminCapability, AdminCapabilityRule };
 
 /** What the admin checks read; a `SessionUser` is one. */
 export interface AdminViewer extends PermissionHolder {
@@ -21,11 +21,15 @@ const isGranted = (value: boolean | Schemas['CreationScopeResponse'] | undefined
 export interface AdminAccess {
   /** `null`: anyone who may enter `/admin`. */
   permission: PermissionRule | null;
-  capability?: AdminCapability;
+  capability?: AdminCapabilityRule;
 }
 
-const holds = (user: AdminViewer | null, capability: AdminCapability | undefined) =>
-  capability !== undefined && isGranted(user?.adminCapabilities?.[capability]);
+const holds = (user: AdminViewer | null, capability: AdminCapabilityRule | undefined) => {
+  const capabilities = user?.adminCapabilities;
+  if (capability === 'organizationProblemCreation')
+    return capabilities?.problemCreation?.organizations === true;
+  return capability !== undefined && isGranted(capabilities?.[capability]);
+};
 
 export const canUseAdmin = (user: AdminViewer | null, access: AdminAccess): boolean =>
   allowsAny(user, access.permission) || holds(user, access.capability);
