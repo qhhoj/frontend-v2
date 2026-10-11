@@ -13,7 +13,8 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('#data-checkerArgs').exists()) throw new Error('tab not yet');
+      if (!mounted.wrapper.find('[data-testid="data-checker-family-stock"]').exists())
+        throw new Error('tab not yet');
     },
     { timeout: 5000 },
   );
@@ -81,6 +82,29 @@ describe('ProblemDataTab', () => {
       unicode: true,
       nobigmath: false,
       cases: migrated.cases,
+    });
+  });
+
+  it('sets file I/O from the controls and refuses to save a name the judge would reject', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData()),
+      'PUT /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
+    await wrapper.get('[data-testid="data-io-method-file"] input').setValue(true);
+    await wrapper.get('#data-io_input_file').setValue('../SUM.INP');
+    await wrapper.get('#data-io_output_file').setValue('SUM.OUT');
+    await saveConfig(wrapper);
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+    await wrapper.get('#data-io_input_file').setValue('SUM.INP');
+    await saveConfig(wrapper);
+    const body = calls.find((call) => call.method === 'PUT')!.body as { graderArgs: unknown };
+    expect(body.graderArgs).toEqual({
+      io_method: 'file',
+      io_input_file: 'SUM.INP',
+      io_output_file: 'SUM.OUT',
     });
   });
 

@@ -311,6 +311,147 @@
       "others": "{count} other files (not input/output)",
       "apply": "Add {count} tests",
       "applied": "Added {count} tests. Press “Save configuration” to save."
+    },
+    "config": {
+      "checkerTitle": "Checker",
+      "checkerDescription": "How a submission's output is compared with each test's answer.",
+      "familyLegend": "Checker type",
+      "family": {
+        "stock": {
+          "label": "Built-in",
+          "description": "A built-in comparison rule, no file needed."
+        },
+        "testlib": {
+          "label": "Testlib",
+          "description": "A C++ checker written with testlib.h (registerTestlibCmd)."
+        },
+        "themis": {
+          "label": "Themis",
+          "description": "Reads the test and work directories from stdin, prints a 0–1 score last."
+        },
+        "default": {
+          "label": "Exit code",
+          "description": "Gets input, output and answer; exit 0 is correct, 1 is wrong."
+        }
+      },
+      "stockLabel": "Comparison rule",
+      "stock": {
+        "standard": {
+          "label": "Standard",
+          "hint": "Compares word by word, ignoring extra whitespace and blank lines."
+        },
+        "floats": {
+          "label": "Floats",
+          "hint": "Numbers match within an absolute or relative error."
+        },
+        "floatsabs": {
+          "label": "Floats, absolute error",
+          "hint": "Numbers match when output minus answer is small enough."
+        },
+        "floatsrel": {
+          "label": "Floats, relative error",
+          "hint": "Numbers match when the relative error is small enough."
+        },
+        "identical": {
+          "label": "Identical",
+          "hint": "The output must equal the answer byte for byte."
+        },
+        "linecount": {
+          "label": "Line by line",
+          "hint": "Compares line by line, each line word by word."
+        },
+        "rstripped": {
+          "label": "Line by line, trailing spaces ignored",
+          "hint": "Lines must match after trailing whitespace is removed."
+        },
+        "sorted": {
+          "label": "Any order",
+          "hint": "Compares after sorting the lines (or the words)."
+        },
+        "unordered": {
+          "label": "Set of words",
+          "hint": "Correct when the output has the answer's words in any order."
+        },
+        "easy": {
+          "label": "Easy",
+          "hint": "Ignores all whitespace, letter case and character order."
+        },
+        "linematches": {
+          "label": "Points per line",
+          "hint": "Each line that matches the answer earns its share."
+        }
+      },
+      "precision": "Digits after the decimal point",
+      "precisionHint": "The allowed error is 10^-{n}. Empty: 6.",
+      "splitOn": "Sort by",
+      "splitLines": "Lines",
+      "splitWhitespace": "Words",
+      "weights": "Points of each line",
+      "weightsHint": "Whole numbers separated by spaces, e.g. 1 1 2; one per answer line.",
+      "peAllowed": "Report a presentation error when only whitespace differs",
+      "peAllowedHint": "Off: wrong answer only.",
+      "filterNewLine": "Ignore blank lines",
+      "fillerLines": "Require every line",
+      "fillerLinesHint": "On: missing or extra lines are wrong.",
+      "checkerFile": "Checker file (.cpp, .pas, .java)",
+      "checkerFileMissing": "No checker file yet. The problem cannot be judged until one is uploaded.",
+      "percentage": "Checker points are a percentage",
+      "percentageHint": "On: \"points 50\" is 50% of the test. Off: \"points N\" is N points of the test.",
+      "themisHint": "The checker finds files by the names in its source and by the file I/O names below. If it uses the problem's file names, choose \"Files\".",
+      "graderTitle": "How the program runs",
+      "graderDescription": "How a submission reads input and returns its result.",
+      "graderLegend": "Problem type",
+      "grader": {
+        "standard": {
+          "label": "Standard",
+          "description": "The program reads input and prints output."
+        },
+        "interactive": {
+          "label": "Interactive",
+          "description": "The program talks to the problem's (testlib) interactor."
+        },
+        "signature": {
+          "label": "Functions only",
+          "description": "Contestants write functions, linked with the problem's grader and header."
+        },
+        "output_only": {
+          "label": "Output only",
+          "description": "Contestants submit output files, not source code."
+        }
+      },
+      "ioLegend": "Input/output",
+      "io": {
+        "standard": {
+          "label": "stdin / stdout",
+          "description": "Read from standard input, print to standard output."
+        },
+        "file": {
+          "label": "Files",
+          "description": "Read and write files with fixed names."
+        }
+      },
+      "io_input_file": "Input file name",
+      "io_input_fileHint": "e.g. SUM.INP",
+      "io_output_file": "Output file name",
+      "io_output_fileHint": "e.g. SUM.OUT",
+      "interactorFile": "Interactor (.cpp, testlib)",
+      "interactorMissing": "No interactor yet. The problem cannot be judged until one is uploaded.",
+      "graderFile": "Grader (.cpp, with main)",
+      "headerFile": "Header (.h)",
+      "allowMain": "Allow contestants to write main",
+      "allowMainHint": "Off: a submission with main is refused.",
+      "advancedTitle": "Advanced options",
+      "advancedDescription": "Rarely changed.",
+      "outputLimitHint": "Largest output in bytes. Empty: the judge default.",
+      "outputPrefixHint": "Leading output bytes kept for review.",
+      "unicodeHint": "Treat Unicode whitespace as whitespace when comparing.",
+      "nobigmathHint": "Not supported by the current judge; a problem with it on cannot be judged.",
+      "errors": {
+        "precision": "Enter a whole number from 0 to {max}.",
+        "weights": "At least one line needs points above 0.",
+        "weightsFormat": "Only whole numbers of 0 or more, separated by spaces.",
+        "fileName": "Enter a file name without / or \\, not starting with a dot, other than input, output, main."
+      }
     }
   },
   "uploads": {

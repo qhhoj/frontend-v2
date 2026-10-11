@@ -5,11 +5,9 @@ import DataSourceRow from './DataSourceRow.vue';
 
 defineProps<{ code: string; data: ProblemData }>();
 
+/** The checker, interactor, grader and header are uploaded beside the setting that uses them (CheckerSection). */
 const SOURCES: { kind: SourceFileKind; labelKey: string }[] = [
   { kind: 'generator', labelKey: 'admin.problems.uploads.sources.generator' },
-  { kind: 'customChecker', labelKey: 'admin.problems.uploads.sources.customChecker' },
-  { kind: 'customGrader', labelKey: 'admin.problems.uploads.sources.customGrader' },
-  { kind: 'customHeader', labelKey: 'admin.problems.uploads.sources.customHeader' },
 ];
 </script>
 
