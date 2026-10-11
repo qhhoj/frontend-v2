@@ -43,6 +43,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   organizations: () => import('./organizations/OrganizationsPage.vue'),
   posts: () => import('./posts/BlogModerationPage.vue'),
   commentReports: () => import('./comments/CommentReportsPage.vue'),
+  comments: () => import('./comments/CommentsAdminPage.vue'),
   tickets: () => import('./tickets/TicketQueuePage.vue'),
   cannedReplies: () => import('./canned-replies/CannedRepliesPage.vue'),
   activity: () => import('./activity/UserActivityPage.vue'),

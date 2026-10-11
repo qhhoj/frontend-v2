@@ -1,4 +1,5 @@
 import { apiText } from './client';
+import { previewComment } from './comments.api';
 import { fetchOrganization } from './organizations.api';
 import type { OrganizationChip, PreviewSource, UserChip } from './types/admin-common';
 import { apiSend } from './typed';
@@ -19,10 +20,11 @@ export async function lookupOrganization(slug: string): Promise<OrganizationChip
 /**
  * backend P3: `POST /problems/render-preview` `{ style, markdown }` (`judge.edit_own_problem`); for `'flatpage'`
  * `POST /admin/site/pages/render-preview` `{ content }` (`flatpages.change_flatpage`); for `'organization'`
- * `POST /organizations/render-preview` `{ markdown }` (organization creators, staff and any organization admin). All answer
- * the sanitised `{ html }`.
+ * `POST /organizations/render-preview` `{ markdown }` (organization creators, staff and any organization admin); for
+ * `'comment'` `POST /comments/preview` (any user who may comment). All answer the sanitised HTML.
  */
 export async function renderPreview(source: PreviewSource, markdown: string): Promise<string> {
+  if (source === 'comment') return previewComment(markdown);
   if (source === 'flatpage')
     return (
       await apiSend('post', '/admin/site/pages/render-preview', { body: { content: markdown } })

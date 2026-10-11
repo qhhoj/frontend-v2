@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   Link,
   ListChecks,
+  MessagesSquare,
   Newspaper,
   Plug,
   RotateCcw,
@@ -67,6 +68,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('types', Tags),
     screenItem('posts', Newspaper),
     screenItem('commentReports', Flag),
+    screenItem('comments', MessagesSquare),
   ]),
   group('contests', [
     screenItem('contests', Trophy),

@@ -19,6 +19,7 @@ const PERMS = ['judge.change_settings'];
 const routes = (extra = {}) => ({
   ...staffViewer(PERMS),
   'GET /admin/settings': ok(ALL_SETTINGS),
+  'GET /admin/discord-webhooks': ok([]),
   ...extra,
 });
 /** AdminShell and the screens load lazily: wait until the first settings block is in the DOM. */

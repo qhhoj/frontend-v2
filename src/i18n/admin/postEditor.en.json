@@ -1,0 +1,56 @@
+{
+  "newTitle": "Write a post",
+  "editTitle": "Edit post",
+  "forOrganization": "For the organization {slug}",
+  "view": "View post",
+  "content": "Post content",
+  "publishing": "Publishing",
+  "staff": "Staff options",
+  "fields": {
+    "title": "Title",
+    "content": "Content (Markdown)",
+    "visible": "Shown",
+    "publishOn": "Publish time",
+    "sticky": "Pinned",
+    "globalPost": "On the home newsfeed",
+    "summary": "Summary (Markdown)",
+    "ogImage": "Link preview image",
+    "authors": "Authors"
+  },
+  "hints": {
+    "visible": "Off keeps the post as a draft only its authors and staff can open.",
+    "publishOn": "Empty means now. A shown post with a later time stays hidden until then.",
+    "sticky": "Kept at the top of the lists.",
+    "globalPost": "Listed on the home page and the global newsfeed.",
+    "summary": "Shown in lists instead of the start of the post. Empty uses the content.",
+    "ogImage": "An https URL or a site path such as /static/banner.png. Empty for none."
+  },
+  "state": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "public": "Public"
+  },
+  "stateHint": {
+    "draft": "Only authors and staff can open it.",
+    "scheduled": "Goes public by itself at the publish time.",
+    "public": "Everyone can read it."
+  },
+  "create": "Create post",
+  "save": "Save changes",
+  "saving": "Saving…",
+  "saved": "Saved.",
+  "nothingToSave": "Nothing changed.",
+  "cannotEdit": "You cannot edit this post.",
+  "errors": {
+    "title": "Enter a title of at most {max} characters.",
+    "content": "Write the post content.",
+    "ogImage": "Use an http(s) URL or a path starting with /, at most 150 characters.",
+    "publishOn": "Pick a valid date and time."
+  },
+  "delete": {
+    "action": "Delete",
+    "title": "Delete “{title}”?",
+    "body": "The post and its whole discussion are deleted for good. Contribution points are recomputed.",
+    "confirm": "Delete post"
+  }
+}

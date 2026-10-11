@@ -7,7 +7,7 @@ import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import PostsTable from './PostsTable.vue';
-import type { ModerationFeed, RowFailure } from './moderation';
+import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
 
 /** The list of one tab: the loading, error and empty states, the table, and the pager. */
 withDefaults(
@@ -22,7 +22,12 @@ withDefaults(
   }>(),
   { pendingPostId: null },
 );
-defineEmits<{ retry: []; hide: [post: PostListItem]; show: [post: PostListItem] }>();
+defineEmits<{
+  retry: [];
+  hide: [post: PostListItem];
+  show: [post: PostListItem];
+  flag: [post: PostListItem, patch: PostFlags];
+}>();
 </script>
 
 <template>
@@ -38,6 +43,7 @@ defineEmits<{ retry: []; hide: [post: PostListItem]; show: [post: PostListItem] 
         :pending-post-id="pendingPostId"
         @hide="$emit('hide', $event)"
         @show="$emit('show', $event)"
+        @flag="(post, patch) => $emit('flag', post, patch)"
       />
       <div v-if="meta" class="flex flex-wrap items-center justify-between gap-3 p-4">
         <p class="text-sm text-muted">

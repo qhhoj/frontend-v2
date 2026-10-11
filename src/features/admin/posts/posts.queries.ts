@@ -8,11 +8,19 @@ import { useViewerId } from '@/stores/use-viewer-id';
 export const useModerationPostsQuery = (
   state: MaybeRefOrGetter<ModerationState>,
   page: MaybeRefOrGetter<number>,
+  search: MaybeRefOrGetter<string> = '',
 ) => {
   const viewer = useViewerId();
   return useQuery({
-    queryKey: computed(() => ['admin', 'posts', toValue(state), toValue(page), viewer.value]),
-    queryFn: () => fetchModerationPosts(toValue(state), toValue(page)),
+    queryKey: computed(() => [
+      'admin',
+      'posts',
+      toValue(state),
+      toValue(page),
+      toValue(search),
+      viewer.value,
+    ]),
+    queryFn: () => fetchModerationPosts(toValue(state), toValue(page), toValue(search)),
     placeholderData: keepPreviousData,
   });
 };

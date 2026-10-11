@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PostListItem } from '@/api/types/blog';
-import type { QueueFeed, RowFailure } from './moderation';
+import type { PostFlags, QueueFeed, RowFailure } from './moderation';
 import PostsQueueView from './PostsQueueView.vue';
 import { useModerationPostsQuery } from './posts.queries';
 
@@ -8,15 +8,21 @@ const props = withDefaults(
   defineProps<{
     feed: QueueFeed;
     page: number;
+    search: string;
     rowFailure: RowFailure | null;
     pendingPostId?: string | null;
   }>(),
   { pendingPostId: null },
 );
-defineEmits<{ hide: [post: PostListItem]; show: [post: PostListItem] }>();
+defineEmits<{
+  hide: [post: PostListItem];
+  show: [post: PostListItem];
+  flag: [post: PostListItem, patch: PostFlags];
+}>();
 const { data, isPending, error, refetch } = useModerationPostsQuery(
   () => props.feed,
   () => props.page,
+  () => props.search,
 );
 </script>
 
@@ -32,5 +38,6 @@ const { data, isPending, error, refetch } = useModerationPostsQuery(
     @retry="refetch()"
     @hide="$emit('hide', $event)"
     @show="$emit('show', $event)"
+    @flag="(post, patch) => $emit('flag', post, patch)"
   />
 </template>

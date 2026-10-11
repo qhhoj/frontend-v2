@@ -4,7 +4,7 @@
     "reports": "Bình luận bị báo cáo"
   },
   "title": "Bình luận bị báo cáo",
-  "lead": "Mỗi dòng là một bình luận còn báo cáo chưa xử lý, mới nhất trước. Mở bình luận để ẩn hoặc xoá, rồi đánh dấu đã xử lý hay bỏ qua.",
+  "lead": "Mỗi thẻ là một bình luận có báo cáo đang mở, mới nhất trước. Ẩn ngay tại đây, hoặc ẩn và xử lý trong một bước; bỏ qua báo cáo không cần xử lý.",
   "empty": "Không còn báo cáo nào cần xử lý.",
   "reporters": "{count} người báo cáo",
   "chips": {
@@ -18,5 +18,60 @@
     "dismissed": "Đã bỏ qua các báo cáo."
   },
   "settleFailed": "Không cập nhật được báo cáo. Có thể chúng đã được xử lý; hãy tải lại.",
-  "pager": "Trang báo cáo"
+  "pager": "Trang báo cáo",
+  "hide": "Ẩn bình luận",
+  "show": "Hiện bình luận",
+  "hideAndResolve": "Ẩn và xử lý",
+  "hidden": "Đã ẩn bình luận.",
+  "shown": "Đã hiện lại bình luận.",
+  "hiddenResolved": "Đã ẩn bình luận và xử lý các báo cáo.",
+  "all": {
+    "crumb": "Mọi bình luận",
+    "title": "Mọi bình luận",
+    "lead": "Mọi bình luận trên trang, mới nhất trước. Tìm theo nội dung hoặc tác giả, rồi ẩn hoặc hiện một hay nhiều bình luận.",
+    "reportsLink": "Bình luận bị báo cáo",
+    "filters": {
+      "search": "Nội dung",
+      "searchPlaceholder": "Từ trong bình luận",
+      "author": "Tác giả",
+      "authorPlaceholder": "Đúng tên đăng nhập",
+      "state": "Trạng thái",
+      "pageType": "Trang",
+      "submit": "Tìm"
+    },
+    "states": {
+      "all": "Tất cả",
+      "visible": "Đang hiện",
+      "hidden": "Đã ẩn"
+    },
+    "pageTypes": {
+      "any": "Mọi trang",
+      "problem": "Bài tập",
+      "editorial": "Lời giải",
+      "contest": "Kỳ thi",
+      "blog": "Bài viết",
+      "tagProblem": "Bài gắn thẻ"
+    },
+    "select": "Chọn bình luận ở {page}",
+    "hiddenBy": "Ẩn bởi {name}",
+    "hide": "Ẩn",
+    "show": "Hiện",
+    "bulk": {
+      "label": "Bình luận đã chọn",
+      "selectPage": "Chọn cả trang",
+      "count": "Đã chọn {count} bình luận",
+      "hide": "Ẩn mục đã chọn",
+      "show": "Hiện mục đã chọn"
+    },
+    "result": {
+      "hidden": "Đã ẩn {done}, bị từ chối {refused}.",
+      "shown": "Đã hiện {done}, bị từ chối {refused}."
+    },
+    "refused": {
+      "parentHidden": "Bình luận cha đang ẩn: hãy hiện bình luận cha trước.",
+      "gone": "Không còn hoặc ngoài quyền của bạn."
+    },
+    "empty": "Không có bình luận nào khớp.",
+    "pager": "Trang bình luận"
+  }
 }

@@ -1,0 +1,56 @@
+{
+  "newTitle": "Viết bài",
+  "editTitle": "Sửa bài viết",
+  "forOrganization": "Cho tổ chức {slug}",
+  "view": "Xem bài",
+  "content": "Nội dung bài viết",
+  "publishing": "Đăng bài",
+  "staff": "Tuỳ chọn của ban quản trị",
+  "fields": {
+    "title": "Tiêu đề",
+    "content": "Nội dung (Markdown)",
+    "visible": "Hiện bài",
+    "publishOn": "Thời điểm đăng",
+    "sticky": "Ghim",
+    "globalPost": "Lên bảng tin trang chủ",
+    "summary": "Tóm tắt (Markdown)",
+    "ogImage": "Ảnh xem trước liên kết",
+    "authors": "Tác giả"
+  },
+  "hints": {
+    "visible": "Tắt thì bài là bản nháp, chỉ tác giả và ban quản trị mở được.",
+    "publishOn": "Để trống là ngay bây giờ. Bài đang hiện với thời điểm sau này sẽ ẩn đến lúc đó.",
+    "sticky": "Luôn nằm đầu danh sách.",
+    "globalPost": "Hiện ở trang chủ và bảng tin chung.",
+    "summary": "Hiện trong danh sách thay cho phần đầu bài. Để trống thì dùng nội dung.",
+    "ogImage": "Một URL https hoặc đường dẫn trong trang như /static/banner.png. Để trống nếu không có."
+  },
+  "state": {
+    "draft": "Bản nháp",
+    "scheduled": "Đã hẹn giờ",
+    "public": "Công khai"
+  },
+  "stateHint": {
+    "draft": "Chỉ tác giả và ban quản trị mở được.",
+    "scheduled": "Tự công khai vào thời điểm đăng.",
+    "public": "Mọi người đều đọc được."
+  },
+  "create": "Tạo bài",
+  "save": "Lưu thay đổi",
+  "saving": "Đang lưu…",
+  "saved": "Đã lưu.",
+  "nothingToSave": "Không có gì thay đổi.",
+  "cannotEdit": "Bạn không thể sửa bài này.",
+  "errors": {
+    "title": "Nhập tiêu đề tối đa {max} ký tự.",
+    "content": "Hãy viết nội dung bài.",
+    "ogImage": "Dùng URL http(s) hoặc đường dẫn bắt đầu bằng /, tối đa 150 ký tự.",
+    "publishOn": "Chọn ngày giờ hợp lệ."
+  },
+  "delete": {
+    "action": "Xoá",
+    "title": "Xoá “{title}”?",
+    "body": "Bài viết và toàn bộ thảo luận bị xoá vĩnh viễn. Điểm đóng góp được tính lại.",
+    "confirm": "Xoá bài"
+  }
+}

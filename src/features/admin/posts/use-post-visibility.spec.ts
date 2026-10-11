@@ -4,7 +4,7 @@ import { postItem } from '@/test/community-fixtures';
 import { mountComponent } from '@/test/mount';
 import { usePostVisibility } from './use-post-visibility';
 
-const api = vi.hoisted(() => ({ hidePost: vi.fn(), showPost: vi.fn() }));
+const api = vi.hoisted(() => ({ patchPostFlag: vi.fn() }));
 vi.mock('@/api/blog-admin.api', () => api);
 
 function mountHook() {
@@ -23,14 +23,14 @@ function mountHook() {
 describe('usePostVisibility', () => {
   it('holds the post id while the write runs, ignores a second call, and lets go afterwards', async () => {
     let release!: () => void;
-    api.showPost.mockReturnValue(new Promise<void>((resolve) => (release = resolve)));
+    api.patchPostFlag.mockReturnValue(new Promise<void>((resolve) => (release = resolve)));
     const visibility = mountHook();
     const post = postItem({ id: 'h-1', visible: false });
     const first = visibility.show(post);
     expect(visibility.pendingId.value).toBe('h-1');
     expect(await visibility.show(post)).toBeUndefined();
     expect(visibility.pendingId.value).toBe('h-1');
-    expect(api.showPost).toHaveBeenCalledTimes(1);
+    expect(api.patchPostFlag).toHaveBeenCalledTimes(1);
     release();
     await first;
     expect(visibility.pendingId.value).toBeNull();

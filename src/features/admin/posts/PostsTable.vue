@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { PostListItem } from '@/api/types/blog';
+import { hasPermission } from '@/lib/permissions';
+import { useSessionStore } from '@/stores/session.store';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { ADMIN_BUTTON_CLASS } from '../ui/classes';
 import { unhidePlanOf } from './post-visibility';
-import type { ModerationFeed, RowFailure } from './moderation';
+import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
 
 const props = withDefaults(
   defineProps<{
@@ -18,18 +21,27 @@ const props = withDefaults(
   }>(),
   { pendingPostId: null },
 );
-defineEmits<{ hide: [post: PostListItem]; show: [post: PostListItem] }>();
+defineEmits<{
+  hide: [post: PostListItem];
+  show: [post: PostListItem];
+  flag: [post: PostListItem, patch: PostFlags];
+}>();
 const locale = useLocaleStore();
+const session = useSessionStore();
+const canPin = computed(() => hasPermission(session.user, 'judge.pin_post'));
+const canMarkGlobal = computed(() => hasPermission(session.user, 'judge.mark_global_post'));
 const CELL = 'px-3 py-3 align-top';
 const CHIP = 'rounded-pill bg-surface-hover px-2.5 py-0.5 text-xs font-semibold';
 
 const isAheadOfTime = (post: PostListItem) => unhidePlanOf(post, Date.now()).scheduled;
 const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
+/** One post write at a time: while one runs, every row's actions wait. */
+const isBusy = computed(() => props.pendingPostId !== null);
 </script>
 
 <template>
   <div class="overflow-x-auto">
-    <table class="w-full min-w-[46rem] text-sm">
+    <table class="w-full min-w-[56rem] text-sm">
       <caption class="sr-only">
         {{
           $t('admin.posts.table.caption')
@@ -74,10 +86,8 @@ const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
               <span v-if="post.score < 0" :class="CHIP">{{
                 $t('admin.posts.chips.negativeScore')
               }}</span>
-              <span v-if="feed === 'hidden'" :class="CHIP">{{
-                $t('admin.posts.chips.hidden')
-              }}</span>
-              <span v-if="feed === 'hidden' && isAheadOfTime(post)" :class="CHIP">
+              <span v-if="!post.visible" :class="CHIP">{{ $t('admin.posts.chips.hidden') }}</span>
+              <span v-if="!post.visible && isAheadOfTime(post)" :class="CHIP">
                 {{ $t('admin.posts.chips.aheadOfTime') }}
               </span>
             </div>
@@ -98,26 +108,57 @@ const isRowPending = (post: PostListItem) => props.pendingPostId === post.id;
           <td :class="`${CELL} tabular-nums`">{{ post.score }}</td>
           <td :class="`${CELL} tabular-nums`">{{ post.commentCount }}</td>
           <td :class="CELL">
-            <button
-              v-if="feed !== 'hidden'"
-              type="button"
-              :class="ADMIN_BUTTON_CLASS"
-              @click="$emit('hide', post)"
-            >
-              {{ $t('admin.posts.hide.action') }}
-            </button>
-            <button
-              v-else
-              type="button"
-              :class="ADMIN_BUTTON_CLASS"
-              :disabled="isRowPending(post)"
-              :aria-busy="isRowPending(post) || undefined"
-              @click="$emit('show', post)"
-            >
-              {{
-                isRowPending(post) ? $t('admin.posts.row.unhiding') : $t('admin.posts.row.unhide')
-              }}
-            </button>
+            <div class="flex flex-wrap gap-1.5">
+              <RouterLink
+                :to="{ name: 'post-edit', params: { id: post.id } }"
+                :class="ADMIN_BUTTON_CLASS"
+              >
+                {{ $t('admin.posts.row.edit') }}
+              </RouterLink>
+              <button
+                v-if="canPin"
+                type="button"
+                :class="ADMIN_BUTTON_CLASS"
+                :aria-disabled="isBusy || undefined"
+                @click="isBusy || $emit('flag', post, { sticky: !post.sticky })"
+              >
+                {{ post.sticky ? $t('admin.posts.row.unpin') : $t('admin.posts.row.pin') }}
+              </button>
+              <button
+                v-if="canMarkGlobal"
+                type="button"
+                :class="ADMIN_BUTTON_CLASS"
+                :aria-disabled="isBusy || undefined"
+                @click="isBusy || $emit('flag', post, { globalPost: !post.globalPost })"
+              >
+                {{
+                  post.globalPost
+                    ? $t('admin.posts.row.unmarkGlobal')
+                    : $t('admin.posts.row.markGlobal')
+                }}
+              </button>
+              <button
+                v-if="post.visible"
+                type="button"
+                :class="ADMIN_BUTTON_CLASS"
+                :aria-disabled="isBusy || undefined"
+                @click="isBusy || $emit('hide', post)"
+              >
+                {{ $t('admin.posts.hide.action') }}
+              </button>
+              <button
+                v-else
+                type="button"
+                :class="ADMIN_BUTTON_CLASS"
+                :disabled="isRowPending(post)"
+                :aria-busy="isRowPending(post) || undefined"
+                @click="$emit('show', post)"
+              >
+                {{
+                  isRowPending(post) ? $t('admin.posts.row.unhiding') : $t('admin.posts.row.unhide')
+                }}
+              </button>
+            </div>
             <AdminStatus
               v-if="rowFailure?.postId === post.id"
               kind="refused"

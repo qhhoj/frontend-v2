@@ -41,17 +41,6 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'polygon.apiSecret': { kind: 'secretText' },
 };
 
-export const WEBHOOK_EVENTS = [
-  'default',
-  'on_new_comment',
-  'on_new_blogpost',
-  'on_new_problem',
-  'on_new_suggested_problem',
-  'on_new_ticket',
-  'on_new_ticket_message',
-] as const;
-export const MAX_WEBHOOKS = 20;
-
 export type SettingGroup =
   | 'site'
   | 'contest'

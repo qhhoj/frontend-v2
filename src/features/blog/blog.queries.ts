@@ -14,10 +14,12 @@ export const usePostsQuery = (feed: MaybeRefOrGetter<PostFeed>, page: MaybeRefOr
   });
 };
 
+/** An empty id (the editor's new post) fetches nothing. */
 export const usePostQuery = (id: MaybeRefOrGetter<string>) => {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => ['posts', 'detail', toValue(id), viewer.value]),
     queryFn: () => fetchPost(toValue(id)),
+    enabled: computed(() => toValue(id) !== ''),
   });
 };

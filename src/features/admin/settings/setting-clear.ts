@@ -1,7 +1,7 @@
 import type { Setting, SettingKey } from '@/api/types/settings-admin';
 import { SETTING_KINDS } from './setting-blocks';
 import { draftOf } from './setting-values';
-import type { OAuthDraft, SecretDraft, WebhooksDraft } from './setting-values';
+import type { OAuthDraft, SecretDraft } from './setting-values';
 
 /**
  * The value that empties each sealed kind through the normal PATCH. A social login is switched off in the same write: the
@@ -10,22 +10,20 @@ import type { OAuthDraft, SecretDraft, WebhooksDraft } from './setting-values';
 export function clearValueOf(setting: Setting): unknown {
   const { kind } = SETTING_KINDS[setting.key];
   if (kind === 'secretText') return '';
-  if (kind === 'webhooks') return {};
   if (kind === 'oauth') return { enabled: false, clientSecret: '' };
   throw new Error(`${setting.key} has no secret to clear`);
 }
 
+/** The Discord webhooks are removed one event at a time in their own table, so they have no clear-all. */
 export function isClearable(setting: Setting): boolean {
   const { kind } = SETTING_KINDS[setting.key];
   const draft = draftOf(setting);
-  if (kind === 'secretText' || kind === 'webhooks')
-    return (draft as SecretDraft | WebhooksDraft).isSet;
+  if (kind === 'secretText') return (draft as SecretDraft).isSet;
   return kind === 'oauth' && (draft as OAuthDraft).secretSet;
 }
 
 const PLAIN_CONSEQUENCES: Partial<Record<SettingKey, string[]>> = {
   'mail.smtpUrl': ['mailOff', 'notRestorable', 'senderKept'],
-  'discord.webhooks': ['notificationsOff', 'notRestorable'],
   'polygon.apiKey': ['polygonOff', 'notRestorable'],
   'polygon.apiSecret': ['polygonOff', 'notRestorable'],
 };
