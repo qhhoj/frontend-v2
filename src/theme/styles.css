@@ -477,13 +477,21 @@
     color: var(--qh-accent-text);
     margin-block: 1.25em 0.4em;
   }
+  /* Legacy statements use h2-h4 inconsistently for the same sections, so all of them look alike. */
   & h1,
-  & h2 {
-    font-size: 17px;
-  }
+  & h2,
   & h3,
   & h4 {
-    font-size: 16px;
+    padding-bottom: 0.25em;
+    font-size: 17px;
+    border-bottom: 1px solid var(--qh-line);
+  }
+  & h5,
+  & h6 {
+    margin-block: 1em 0.4em;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--qh-text);
   }
   & > :first-child {
     margin-top: 0;
@@ -500,10 +508,29 @@
 /* Sample blocks in a statement are one rounded box: the copy bar is its top edge, the pre its body. The bar's padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */
 .user-content.statement pre {
   padding: 0.75rem 1rem;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  tab-size: 4;
+  font-variant-ligatures: none;
   background-color: var(--qh-surface-strong);
   border: 1px solid var(--qh-line);
   border-radius: var(--qh-radius-cell);
 }
+/* Input and output samples are paired: side by side where each half has room for 18rem, stacked below that. */
+.user-content.statement .sample-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 0 1rem;
+  margin-block: 0.75em;
+  & > .sample {
+    min-width: 0;
+  }
+}
+.user-content.statement .sample > pre {
+  margin-block: 0;
+}
+
 @utility copy-bar {
   display: flex;
   justify-content: flex-end;
@@ -519,17 +546,23 @@
   border-radius: 0 0 var(--qh-radius-cell) var(--qh-radius-cell);
 }
 
-/* A sample's title row ("Ví dụ vào") holds its copy button: one line, no bar above the box. */
+/* A sample's title row ("Ví dụ vào") is a small muted label with its copy button: one line, no bar above the box. Wins over the section heading rules by specificity. */
 .user-content.statement .sample-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.4em;
+  margin-block: 1em 0.4em;
+  padding-bottom: 0;
+  font-family: var(--qh-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--qh-text-muted);
+  border-bottom: 0;
 }
 @utility copy-bar-inline {
   display: flex;
-  margin-block: -0.25rem;
+  margin-block: -0.5rem;
 }
 
 /* The copy button itself. */
@@ -539,6 +572,7 @@
   padding-inline: 0.75rem;
   font: inherit;
   font-size: 13px;
+  font-weight: 400;
   color: var(--qh-text);
   background-color: var(--qh-surface-solid);
   border: 1px solid var(--qh-line-strong);

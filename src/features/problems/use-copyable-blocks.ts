@@ -28,6 +28,30 @@ function titleRowOf(block: HTMLElement): HTMLElement | null {
   return isBoldLine ? previous : null;
 }
 
+/** Wraps every titled `pre` (title row + block) in `.sample`, and each two neighbouring samples (input, output) in `.sample-pair`, so CSS can lay them side by side. */
+function pairSamples(root: HTMLElement) {
+  const samples: HTMLElement[] = [];
+  for (const block of root.querySelectorAll<HTMLElement>('pre')) {
+    if (block.parentElement?.matches('.sample')) continue;
+    const title = titleRowOf(block);
+    if (!title) continue;
+    const sample = document.createElement('div');
+    sample.className = 'sample';
+    title.before(sample);
+    sample.append(title, block);
+    samples.push(sample);
+  }
+  for (let index = 0; index + 1 < samples.length; index++) {
+    const [first, second] = [samples[index], samples[index + 1]];
+    if (!first || !second || first.nextElementSibling !== second) continue;
+    const pair = document.createElement('div');
+    pair.className = 'sample-pair';
+    first.before(pair);
+    pair.append(first, second);
+    index++;
+  }
+}
+
 /**
  * Adds a copy button to every `pre` in backend-sanitized HTML (samples have no structured form yet, backend ask B22).
  * Right after a title row the button joins that row (right-aligned, no extra line above the box); otherwise a bar
@@ -76,18 +100,26 @@ export function useCopyableBlocks(root: Ref<HTMLElement | null>, html: Ref<strin
     element.append(bar.button, bar.status);
     if (titleRow) {
       titleRow.classList.add('sample-title');
+      const titleText = document.createElement('span');
+      titleText.append(...titleRow.childNodes);
+      titleRow.append(titleText);
       titleRow.append(element);
     } else block.before(element);
     bars.add(bar);
   }
 
-  const decorate = () => {
-    if (!clipboardAvailable()) return;
-    for (const block of root.value?.querySelectorAll<HTMLElement>('pre') ?? []) {
+  const addMissingBars = (container: HTMLElement) => {
+    for (const block of container.querySelectorAll<HTMLElement>('pre')) {
       const previous = block.previousElementSibling;
       if (!previous?.matches('.copy-bar') && !previous?.querySelector('.copy-bar-inline'))
         addBar(block);
     }
+  };
+  const decorate = () => {
+    const container = root.value;
+    if (!container) return;
+    if (clipboardAvailable()) addMissingBars(container);
+    pairSamples(container);
   };
   onMounted(decorate);
   watch(html, decorate, { flush: 'post' });
