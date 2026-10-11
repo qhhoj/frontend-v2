@@ -31,9 +31,7 @@ test('builds the package, polls, and offers the zip link', async ({ page, api })
   await page.goto('/admin/problems/hcmus41c/data');
   await page.getByRole('button', { name: 'Tải gói đề' }).click();
   await expect(page.getByText('Đang đóng gói', { exact: false })).toBeVisible();
-  await expect(
-    page.getByTestId('problem-package').getByRole('status').getByTestId('inline-bit'),
-  ).toBeVisible();
+  await expect(page.getByTestId('problem-package').getByRole('status')).toBeVisible();
   const link = page.getByRole('link', { name: 'Tải hcmus41c.zip' });
   await expect(link).toBeVisible({ timeout: 15_000 });
   await expect(link).toHaveAttribute('href', '/api/internal/problems/hcmus41c/package');
@@ -42,7 +40,7 @@ test('builds the package, polls, and offers the zip link', async ({ page, api })
   ).toHaveLength(1);
 });
 
-test('a package over the cap says so with the sweating Bit', async ({ page, api }) => {
+test('a package over the cap says so', async ({ page, api }) => {
   editorRoutes(api);
   api.routes['POST /problems/hcmus41c/package'] = {
     status: 202,
@@ -57,7 +55,4 @@ test('a package over the cap says so with the sweating Bit', async ({ page, api 
   await expect(page.getByRole('alert').filter({ hasText: '512 MiB' })).toBeVisible({
     timeout: 10_000,
   });
-  await expect(
-    page.getByTestId('problem-package').getByRole('alert').getByTestId('inline-bit'),
-  ).toBeVisible();
 });
