@@ -1,103 +1,116 @@
 <script setup lang="ts">
-import ScrollRegion from '@/components/ScrollRegion.vue';
-import { Trash2 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { ExternalLink, Trash2 } from 'lucide-vue-next';
+import type { NumberedPageMeta } from '@/api/client';
 import type { ShortLink } from '@/api/types/short-links';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminChip from '../ui/AdminChip.vue';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
+import { rangeOf } from '../ui/table/table-columns';
+import type { AdminColumn } from '../ui/table/table-columns';
 
-/** The card takes focus after a delete (`tabindex=-1`); the scroller inside is the tab stop. Keep `ShortLinksTableSkeleton.vue` in step (same card, row height). Below md only code, target, visits and the action show. */
-defineProps<{ links: ShortLink[] }>();
-defineEmits<{ remove: [link: ShortLink] }>();
+/** The card takes focus after a delete (`tabindex=-1`, id `short-links-table`). On a phone each link is a card. */
+const props = defineProps<{
+  links: ShortLink[];
+  meta?: NumberedPageMeta;
+  loading: boolean;
+  error: unknown;
+}>();
+const emit = defineEmits<{ remove: [link: ShortLink]; retry: [] }>();
 const locale = useLocaleStore();
-const CELL = 'px-3 py-2 align-middle';
-const WIDE = 'hidden md:table-cell';
+const { t } = useI18n();
+
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'code', label: t('admin.shortlinks.table.code'), priority: 'primary' },
+  { key: 'path', label: t('admin.shortlinks.table.path'), cellClass: 'max-w-64 truncate' },
+  { key: 'expires', label: t('admin.shortlinks.table.expires') },
+  { key: 'hits', label: t('admin.shortlinks.table.hits'), align: 'end' },
+  { key: 'kind', label: t('admin.shortlinks.table.kind'), priority: 'meta' },
+  { key: 'lastHit', label: t('admin.shortlinks.table.lastHit'), priority: 'meta' },
+]);
 const isExpired = (link: ShortLink) =>
   link.expiresAt !== null && new Date(link.expiresAt).getTime() < Date.now();
 const dateOrDash = (value: string | null) => (value ? formatDateTime(value, locale.locale) : '—');
+/** "1–50 / 312" when the list says its total. */
+const range = computed(() => {
+  const meta = props.meta;
+  return meta && 'total' in meta
+    ? rangeOf(meta.page, meta.pageSize, props.links.length, meta.total)
+    : null;
+});
+const menuItems = (link: ShortLink) => [
+  { label: t('admin.shortlinks.table.open'), icon: ExternalLink, to: link.path },
+  {
+    label: t('admin.shortlinks.table.delete'),
+    icon: Trash2,
+    danger: true,
+    run: () => emit('remove', link),
+  },
+];
 </script>
 
 <template>
-  <div
+  <AdminDataTable
     id="short-links-table"
     data-testid="short-links-table"
     tabindex="-1"
-    class="glass overflow-hidden rounded-card focus-visible:-outline-offset-2"
+    class="focus-visible:-outline-offset-2"
+    :columns="columns"
+    :rows="links"
+    :row-key="(link) => link.code"
+    :row-label="(link) => `/s/${link.code}`"
+    :row-attrs="(link) => ({ 'data-code': link.code })"
+    :label="$t('admin.shortlinks.table.caption')"
+    :loading="loading"
+    :error="error"
+    :skeleton-rows="6"
+    @retry="$emit('retry')"
   >
-    <ScrollRegion :label="$t('admin.shortlinks.table.region')">
-      <table class="w-full border-collapse text-sm">
-        <caption class="sr-only">
-          {{
-            $t('admin.shortlinks.table.caption')
-          }}
-        </caption>
-        <thead>
-          <tr class="text-left text-[13px] text-muted">
-            <th scope="col" :class="CELL">{{ $t('admin.shortlinks.table.code') }}</th>
-            <th scope="col" :class="CELL">{{ $t('admin.shortlinks.table.path') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.shortlinks.table.kind') }}</th>
-            <th scope="col" :class="[CELL, 'text-right']">
-              {{ $t('admin.shortlinks.table.hits') }}
-            </th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.shortlinks.table.lastHit') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.shortlinks.table.expires') }}</th>
-            <th scope="col" :class="CELL">
-              <span class="sr-only">{{ $t('admin.shortlinks.table.actions') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="link in links"
-            :key="link.code"
-            :data-code="link.code"
-            class="border-t border-line"
-          >
-            <td :class="[CELL, 'font-mono font-semibold']">
-              /s/{{ link.code }}
-              <span
-                v-if="isExpired(link)"
-                data-testid="expired-chip"
-                class="ml-2 rounded-pill border border-line px-2 font-body text-xs font-semibold text-negative md:hidden"
-                >{{ $t('admin.shortlinks.table.expired') }}</span
-              >
-            </td>
-            <td :class="[CELL, 'max-w-48 truncate font-mono']">
-              <RouterLink :to="link.path" class="text-accent-text hover:underline">{{
-                link.path
-              }}</RouterLink>
-            </td>
-            <td :class="[CELL, WIDE]">
-              {{
-                $t(link.isAuto ? 'admin.shortlinks.table.auto' : 'admin.shortlinks.table.chosen')
-              }}
-            </td>
-            <td :class="[CELL, 'text-right font-mono tabular-nums']">
-              {{ formatNumber(link.hits, locale.locale) }}
-            </td>
-            <td :class="[CELL, WIDE, 'whitespace-nowrap text-muted']">
-              {{ dateOrDash(link.lastHitAt) }}
-            </td>
-            <td :class="[CELL, WIDE, 'whitespace-nowrap']">
-              <span v-if="isExpired(link)" class="font-semibold text-negative">{{
-                $t('admin.shortlinks.table.expired')
-              }}</span>
-              <template v-else>{{
-                link.expiresAt ? dateOrDash(link.expiresAt) : $t('admin.shortlinks.table.never')
-              }}</template>
-            </td>
-            <td :class="CELL">
-              <button
-                type="button"
-                class="inline-flex size-11 items-center justify-center rounded-pill border border-line text-negative hover:bg-surface-hover"
-                :aria-label="$t('admin.shortlinks.table.deleteLabel', { code: link.code })"
-                @click="$emit('remove', link)"
-              >
-                <Trash2 aria-hidden="true" class="size-4" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </ScrollRegion>
-  </div>
+    <template #cell-code="{ row }">
+      <span class="font-mono font-semibold">/s/{{ row.code }}</span>
+    </template>
+    <template #cell-path="{ row }">
+      <RouterLink :to="row.path" class="font-mono text-accent-text hover:underline">{{
+        row.path
+      }}</RouterLink>
+    </template>
+    <template #cell-expires="{ row }">
+      <AdminChip v-if="isExpired(row)" tone="negative" data-testid="expired-chip">
+        {{ $t('admin.shortlinks.table.expired') }}
+      </AdminChip>
+      <span v-else-if="row.expiresAt" class="whitespace-nowrap">{{
+        dateOrDash(row.expiresAt)
+      }}</span>
+      <span v-else class="text-muted">{{ $t('admin.shortlinks.table.never') }}</span>
+    </template>
+    <template #cell-hits="{ row }">{{ formatNumber(row.hits, locale.locale) }}</template>
+    <template #cell-kind="{ row }">
+      {{ $t(row.isAuto ? 'admin.shortlinks.table.auto' : 'admin.shortlinks.table.chosen') }}
+    </template>
+    <template #cell-lastHit="{ row }">
+      <span class="whitespace-nowrap text-muted">{{ dateOrDash(row.lastHitAt) }}</span>
+    </template>
+    <template #actions="{ row }">
+      <AdminRowMenu
+        :label="$t('admin.table.rowMenu', { name: `/s/${row.code}` })"
+        :items="menuItems(row)"
+      />
+    </template>
+    <template #empty><slot name="empty" /></template>
+    <template v-if="meta" #footer>
+      <span v-if="range" class="font-mono tabular-nums">
+        {{ $t('admin.table.range', range) }}
+      </span>
+      <NumberedPager
+        class="ml-auto"
+        compact
+        :meta="meta"
+        :label="$t('admin.shortlinks.table.pager')"
+      />
+    </template>
+  </AdminDataTable>
 </template>

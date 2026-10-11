@@ -1,0 +1,139 @@
+<script setup lang="ts">
+import { CornerDownLeft, Search, SlidersHorizontal, X } from 'lucide-vue-next';
+import { onBeforeUnmount, ref, useId, watch } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+import { useRouter } from 'vue-router';
+import { INPUT, buttonClass } from '../controls';
+
+export interface ActiveFilter {
+  key: string;
+  label: string;
+}
+
+/**
+ * One filter row above a list (pages/admin.md, "Filter bar"): a search box applied 250 ms after typing stops, the view switch
+ * (`view` slot, an `AdminFilterTabs`), a "Bộ lọc (2)" button that opens the `filters` panel, and the result count at the right.
+ * Active filters show as removable chips under the row. `exact` is an exact code or username match: a "Mở hcmus41c ↵" row
+ * appears under the box and Enter opens it. No apply buttons: the consumer writes every change to the query string.
+ */
+const props = withDefaults(
+  defineProps<{
+    searchLabel: string;
+    resultText?: string;
+    exact?: { label: string; to: RouteLocationRaw } | null;
+    chips?: ActiveFilter[];
+    filterCount?: number;
+  }>(),
+  { resultText: undefined, exact: null, chips: () => [], filterCount: 0 },
+);
+const search = defineModel<string>('search', { default: '' });
+const emit = defineEmits<{ remove: [key: string]; 'clear-all': [] }>();
+const router = useRouter();
+const panelId = useId();
+const isPanelOpen = ref(false);
+
+const SEARCH_DELAY_MS = 250;
+const typed = ref(search.value);
+let timer: ReturnType<typeof setTimeout> | undefined;
+watch(typed, (text) => {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    timer = undefined;
+    if (text !== search.value) search.value = text;
+  }, SEARCH_DELAY_MS);
+});
+watch(search, (text) => {
+  if (timer === undefined && text !== typed.value) typed.value = text;
+});
+onBeforeUnmount(() => clearTimeout(timer));
+
+function openExact(event: KeyboardEvent) {
+  if (!props.exact) return;
+  event.preventDefault();
+  void router.push(props.exact.to);
+}
+const removeChip = (key: string) => emit('remove', key);
+</script>
+
+<template>
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative min-w-0 flex-1 basis-56">
+        <Search
+          aria-hidden="true"
+          class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
+          :stroke-width="1.75"
+        />
+        <input
+          v-model="typed"
+          type="search"
+          :aria-label="searchLabel"
+          :placeholder="searchLabel"
+          :class="[INPUT, 'pl-9']"
+          @keydown.enter="openExact"
+        />
+        <RouterLink
+          v-if="exact"
+          :to="exact.to"
+          class="absolute inset-x-0 top-full z-20 mt-1 flex min-h-[var(--qa-control,2.25rem)] items-center gap-2 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm font-semibold text-accent-text hover:bg-surface-hover"
+        >
+          {{ exact.label }}
+          <CornerDownLeft
+            aria-hidden="true"
+            class="ml-auto size-4 text-muted"
+            :stroke-width="1.75"
+          />
+        </RouterLink>
+      </div>
+      <slot name="view" />
+      <button
+        v-if="$slots.filters"
+        type="button"
+        :class="buttonClass('secondary')"
+        :aria-expanded="isPanelOpen"
+        :aria-controls="panelId"
+        @click="isPanelOpen = !isPanelOpen"
+      >
+        <SlidersHorizontal aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        {{
+          filterCount
+            ? $t('admin.table.filtersCount', { count: filterCount })
+            : $t('admin.table.filters')
+        }}
+      </button>
+      <span
+        v-if="resultText"
+        class="ml-auto text-sm whitespace-nowrap text-muted"
+        aria-live="polite"
+      >
+        {{ resultText }}
+      </span>
+    </div>
+    <div
+      v-if="$slots.filters"
+      v-show="isPanelOpen"
+      :id="panelId"
+      class="grid gap-3 rounded-row border border-line bg-surface-solid p-3 sm:grid-cols-2 lg:grid-cols-4"
+    >
+      <slot name="filters" />
+    </div>
+    <ul v-if="chips.length" class="m-0 flex list-none flex-wrap items-center gap-2 p-0">
+      <li v-for="chip in chips" :key="chip.key">
+        <button
+          type="button"
+          class="inline-flex h-[var(--qa-chip,1.5rem)] items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-xs font-semibold hover:bg-surface-hover"
+          :aria-label="$t('admin.table.removeFilter', { label: chip.label })"
+          @click="removeChip(chip.key)"
+        >
+          {{ chip.label }}
+          <X aria-hidden="true" class="size-3.5 text-muted" :stroke-width="1.75" />
+        </button>
+      </li>
+      <li>
+        <button type="button" :class="buttonClass('ghost', 'sm')" @click="$emit('clear-all')">
+          {{ $t('admin.table.clearAll') }}
+        </button>
+      </li>
+    </ul>
+  </div>
+</template>

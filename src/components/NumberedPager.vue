@@ -12,10 +12,13 @@ const props = withDefaults(
     label: string;
     queryKey?: string;
     align?: 'center' | 'end';
+    /** Admin density: 32 px cells on a fine pointer (44 px on a coarse one), 12 px radius. */
+    compact?: boolean;
   }>(),
   {
     queryKey: 'page',
     align: 'center',
+    compact: false,
   },
 );
 const route = useRoute();
@@ -29,10 +32,16 @@ const linkTo = (page: number) => {
   );
   return { query: page === 1 ? kept : { ...kept, [props.queryKey]: String(page) } };
 };
-const CELL =
-  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill px-3 font-semibold';
+const CELL = computed(() =>
+  props.compact
+    ? 'inline-flex min-h-8 min-w-8 items-center justify-center rounded-cell px-2 font-mono text-sm font-semibold tabular-nums pointer-coarse:min-h-11 pointer-coarse:min-w-11'
+    : 'inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill px-3 font-semibold',
+);
 // A disabled arrow keeps its shape but reads as muted text with no hover fill (token colours only, no opacity).
-const ARROW = `${CELL} border border-line text-content hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:bg-transparent aria-disabled:text-muted aria-disabled:hover:bg-transparent`;
+const ARROW = computed(
+  () =>
+    `${CELL.value} border border-line text-content hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:bg-transparent aria-disabled:text-muted aria-disabled:hover:bg-transparent`,
+);
 </script>
 
 <template>

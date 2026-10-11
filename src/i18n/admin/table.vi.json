@@ -1,0 +1,19 @@
+{
+  "actions": "Thao tác",
+  "bulkLabel": "Thao tác hàng loạt",
+  "selected": "{count} đã chọn | {count} đã chọn",
+  "clearSelection": "Bỏ chọn",
+  "selectPage": "Chọn mọi dòng trên trang",
+  "selectRow": "Chọn {name}",
+  "rowMenu": "Thao tác khác cho {name}",
+  "details": "Chi tiết",
+  "empty": "Chưa có gì ở đây.",
+  "emptyFiltered": "Không có kết quả cho bộ lọc này.",
+  "clearFilters": "Xoá bộ lọc",
+  "filters": "Bộ lọc",
+  "filtersCount": "Bộ lọc ({count})",
+  "removeFilter": "Bỏ lọc {label}",
+  "clearAll": "Xoá tất cả",
+  "openExact": "Mở {code}",
+  "range": "{from}–{to} / {total}"
+}
