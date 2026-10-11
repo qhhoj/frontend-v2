@@ -103,11 +103,12 @@ test.describe('focus rings on the problem page', () => {
       await target.focus();
       await expectFocusRing(target);
     }
-    // Header actions in DOM order: the short-link button comes right before the PDF button.
-    await shortLinkButton.focus();
+    // Links-card header actions in DOM order: the PDF button comes right before the short-link button.
+    await pdfButton.focus();
     await page.keyboard.press('Tab');
-    await expect(pdfButton).toBeFocused();
-    await pdfButton.click();
+    await expect(shortLinkButton).toBeFocused();
+    await pdfButton.focus();
+    await page.keyboard.press('Enter');
     const link = page.getByRole('link', { name: 'Mở PDF' });
     await expect(link).toBeFocused();
     await expectFocusRing(link);
