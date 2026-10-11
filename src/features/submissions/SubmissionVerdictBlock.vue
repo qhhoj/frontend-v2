@@ -10,9 +10,10 @@ import { NO_VALUE, gradingPercent, isFinished, scoreText } from './submission-ro
 /**
  * The left block of a submission row: the verdict code on a solid fill over the score ("738.46 / 1000"). A row still being
  * judged shows its status and, while grading, the share judged so far, with the judging Bit (decorative, still under reduced
- * motion and low power) in the block's free corner; the block's size never depends on it. `compact` is the phone's narrower block.
+ * motion and low power) in the block's free corner; the block's size never depends on it. `compact` is the phone's narrower block;
+ * `dense` the shorter block of the list's one-line 42px rows.
  */
-const props = defineProps<{ row: SubmissionListItem; compact?: boolean }>();
+const props = defineProps<{ row: SubmissionListItem; compact?: boolean; dense?: boolean }>();
 const locale = useLocaleStore();
 const verdict = computed(() => verdictOf(props.row));
 const label = computed(() =>
@@ -43,16 +44,22 @@ const rowLabel = computed(() =>
     :to="{ name: 'submission', params: { id: row.id } }"
     :aria-label="rowLabel"
     :title="$t(verdict.labelKey)"
-    class="relative flex min-h-12 flex-col justify-center gap-0.5 overflow-hidden rounded-cell px-2.5 py-1.5 hover:brightness-110"
-    :class="[BLOCK_TONE_CLASSES[blockToneOf(verdict)], compact ? 'w-24' : 'w-[7.875rem]']"
+    class="relative flex flex-col justify-center overflow-hidden rounded-cell px-2.5 hover:brightness-110"
+    :class="[
+      BLOCK_TONE_CLASSES[blockToneOf(verdict)],
+      compact ? 'w-24' : 'w-[7.875rem]',
+      dense ? 'min-h-9 py-0.5' : 'min-h-12 gap-0.5 py-1.5',
+    ]"
   >
-    <span class="font-display text-[15px] leading-[1.1] font-bold whitespace-nowrap">{{
-      label
-    }}</span>
+    <span
+      class="font-display leading-[1.1] font-bold whitespace-nowrap"
+      :class="dense ? 'text-[13px]' : 'text-[15px]'"
+      >{{ label }}</span
+    >
     <span
       v-if="detail"
       class="truncate font-mono leading-tight"
-      :class="compact ? 'text-[11px]' : 'text-xs'"
+      :class="compact || dense ? 'text-[11px]' : 'text-xs'"
       >{{ detail }}</span
     >
     <BitLoop

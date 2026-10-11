@@ -136,7 +136,7 @@ describe('live updates on the submission list', () => {
     });
     feed().emit('queued', frame('queued', 'x'));
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS);
-    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
+    await wrapper.get('button[data-quick-filter="accepted"]').trigger('click');
     await flushPromises();
     releaseProbe();
     await flushPromises();
@@ -147,7 +147,7 @@ describe('live updates on the submission list', () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const { wrapper } = await openList();
     feed().emit('queued', frame('queued', 'x'));
-    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
+    await wrapper.get('button[data-quick-filter="accepted"]').trigger('click');
     await flushPromises();
     const callsAfterFilter = listCalls(calls).length;
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
@@ -157,10 +157,10 @@ describe('live updates on the submission list', () => {
     const calls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const { wrapper } = await openList();
     feed().emit('queued', frame('queued', 'x'));
-    const toggle = wrapper.get('input[data-testid="live-toggle"]');
-    await toggle.setValue(false);
+    const toggle = wrapper.get('button[data-testid="live-toggle"]');
+    await toggle.trigger('click');
     await vi.waitFor(() => expect(feed().closed).toBe(true));
-    await toggle.setValue(true);
+    await toggle.trigger('click');
     await vi.advanceTimersByTimeAsync(LIVE_SETTLE_MS * 2);
     expect(listCalls(calls)).toHaveLength(1);
   });

@@ -74,14 +74,37 @@ describe('the submission list page', () => {
       'GET /submissions': page([submissionItem()], { total: 120 }),
     });
     const { wrapper } = await openList();
-    await wrapper.get('input[type="checkbox"][value="AC"]').setValue(true);
+    await wrapper.get('button[data-quick-filter="accepted"]').trigger('click');
     await flushPromises();
     expect(scrollIntoView).not.toHaveBeenCalled();
-    await wrapper.get('nav[aria-label="Trang"] button[data-direction="next"]').trigger('click');
-    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    await wrapper.get('nav[aria-label="Trang"] a[href$="page=2"]').trigger('click');
+    await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
     const scrolled = scrollIntoView.mock.contexts[0] as HTMLElement;
     expect(scrolled.contains(wrapper.get('tbody').element)).toBe(true);
-    expect(scrolled.contains(wrapper.get('aside').element)).toBe(false);
+    expect(scrolled.contains(wrapper.get('[role="search"]').element)).toBe(false);
+  });
+
+  it('opens the advanced panel by itself for a link that sets a filter only it shows', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const plain = await openList();
+    expect(plain.wrapper.find('input[name="problem"]').exists()).toBe(false);
+    const linked = await openList('/submissions?problem=aplusb');
+    expect(linked.wrapper.get('input[name="problem"]').element).toHaveProperty('value', 'aplusb');
+    expect(linked.wrapper.get('button[data-testid="advanced-filters"]').text()).toContain('1');
+  });
+
+  it('shows "Của tôi" only to a signed-in viewer and filters by their username', async () => {
+    mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    const anonymous = await openList();
+    expect(anonymous.wrapper.find('button[data-quick-filter="mine"]').exists()).toBe(false);
+
+    const calls = mockApi({ ...signedInViewer(), ...submissionListRoutes });
+    const { wrapper } = await openList();
+    const mine = wrapper.get('button[data-quick-filter="mine"]');
+    await mine.trigger('click');
+    const username = useSessionStore().user!.username;
+    await vi.waitFor(() => expect(calls.at(-1)!.query.get('user')).toBe(username));
+    expect(mine.attributes('aria-pressed')).toBe('true');
   });
 });
 

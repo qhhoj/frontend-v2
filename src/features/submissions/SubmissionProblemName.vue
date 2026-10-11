@@ -3,8 +3,8 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import DeletedProblemChip from './DeletedProblemChip.vue';
 import { NO_VALUE } from './submission-row';
 
-/** The problem of a row as one truncating line: contest letter, name (a link unless deleted); the code shows on hover only. */
-defineProps<{ problem: SubmissionListItem['problem']; label?: string }>();
+/** The problem of a row as one truncating line: contest letter, name (a link unless deleted), and with `showCode` the code after it in muted mono (otherwise on hover only). */
+defineProps<{ problem: SubmissionListItem['problem']; label?: string; showCode?: boolean }>();
 </script>
 
 <template>
@@ -19,6 +19,10 @@ defineProps<{ problem: SubmissionListItem['problem']; label?: string }>();
       class="font-semibold text-content hover:underline"
       >{{ problem.name }}</RouterLink
     >
+    <!-- Only a wide card has room for the code; a narrower one keeps it for the name. -->
+    <span v-if="showCode" class="ml-2 hidden font-mono text-xs text-muted @5xl:inline">{{
+      problem.code
+    }}</span>
   </div>
   <template v-else>{{ NO_VALUE }}</template>
 </template>
