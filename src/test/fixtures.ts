@@ -360,6 +360,8 @@ export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestVi
   isTester: false,
   inContest: false,
   canViewBalloons: false,
+  canSeeFullScoreboard: true,
+  boardFrozenAt: null,
   liveParticipation: null,
   ...overrides,
 });

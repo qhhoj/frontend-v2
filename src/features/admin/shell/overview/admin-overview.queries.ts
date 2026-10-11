@@ -1,5 +1,5 @@
-import { computed } from 'vue';
-import { useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
+import { computed, onScopeDispose } from 'vue';
+import { TICKET_SUMMARY_POLL_MS, useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS } from '../../admin-screens';
 import { useCommentReportsQuery } from '../../comments/comment-reports.queries';
@@ -8,6 +8,17 @@ import {
   useAllJoinRequestsQuery,
 } from '../../organizations/join-requests.queries';
 import type { AdminNavId } from '../admin-nav';
+
+/**
+ * The report and join-request badges share their screens' first-page queries, which do not poll themselves; refresh them
+ * on the ticket count's interval while the tab is visible (a hidden tab waits, as `refetchInterval` does).
+ */
+function pollWhileVisible(refresh: () => void) {
+  const timer = setInterval(() => {
+    if (document.visibilityState === 'visible') refresh();
+  }, TICKET_SUMMARY_POLL_MS);
+  onScopeDispose(() => clearInterval(timer));
+}
 
 /**
  * What waits for staff: `null` where the viewer cannot act on it (or the count has not arrived), never a 0 they cannot use.
@@ -21,6 +32,10 @@ export function useAdminCounts() {
   const tickets = useTicketSummaryQuery();
   const reports = useCommentReportsQuery(1, canReports);
   const requests = useAllJoinRequestsQuery('P', 1);
+  pollWhileVisible(() => {
+    if (canReports.value) void reports.refetch();
+    if (canRequests.value) void requests.refetch();
+  });
   return {
     awaitingTickets: computed(() =>
       canTickets.value ? (tickets.data.value?.awaitingStaff ?? null) : null,

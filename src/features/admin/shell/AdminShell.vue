@@ -77,7 +77,8 @@ watch(
       />
     </details>
     <main id="main" tabindex="-1" class="relative min-w-0 focus-visible:outline-none">
-      <div class="flex flex-col gap-5 px-4 py-6 sm:px-8">
+      <!-- One width cap for every screen; it only shows on screens wider than about 1530px. -->
+      <div class="mx-auto flex w-full max-w-[1344px] flex-col gap-5 px-4 py-6 sm:px-8">
         <slot v-if="isAllowed" />
         <AdminForbidden v-else />
       </div>

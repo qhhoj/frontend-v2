@@ -84,7 +84,8 @@ describe('admin nav current section and dashboard', () => {
   it('builds the dashboard from the same rules and names only a permission the viewer holds', () => {
     const sections = visibleDashboard(staff(['judge.add_contest', 'judge.change_judge']));
     expect(sections.map((section) => section.items.map((item) => item.id))).toEqual([
-      ['contests', 'judges'],
+      ['contests'],
+      ['judges'],
     ]);
     expect(
       heldPermission(

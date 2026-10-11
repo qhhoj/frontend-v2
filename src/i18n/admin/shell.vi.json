@@ -29,11 +29,6 @@
       "contestNew": "Tạo kỳ thi",
       "polygonImport": "Nhập từ Polygon"
     },
-    "sections": {
-      "content": "Nội dung",
-      "contests": "Kỳ thi và chấm bài",
-      "people": "Người dùng và trang web"
-    },
     "descriptions": {
       "problems": "Sửa đề, bản dịch, lời giải, dữ liệu chấm; nhân bản bài.",
       "problemImport": "Tải gói Polygon dạng .zip lên, theo dõi tiến trình nhập.",
@@ -51,7 +46,15 @@
       "organizations": "Sửa tổ chức mình quản trị, thành viên và yêu cầu tham gia.",
       "tickets": "Phiếu do người dùng gửi.",
       "polygonImport": "Chọn bài được chia sẻ trên Polygon, thiết lập rồi theo dõi nhập.",
-      "submissions": "Lọc bài nộp, chọn nhiều bài để chấm lại hoặc tính lại điểm."
+      "submissions": "Lọc bài nộp, chọn nhiều bài để chấm lại hoặc tính lại điểm.",
+      "types": "Dạng bài, nhóm bài và giấy phép.",
+      "contestTags": "Danh mục nhãn hiện ở danh sách kỳ thi.",
+      "languages": "Ngôn ngữ dùng để nộp bài và máy chấm chạy chúng.",
+      "organizationQuotas": "Hạn mức và mức dùng của từng tổ chức.",
+      "config": "Cấu hình khác dạng khoá – giá trị.",
+      "shortLinks": "Đặt mã, hạn dùng và xoá liên kết rút gọn.",
+      "integrations": "Khoá cho hệ thống ngoài tạo kỳ thi riêng và đọc bảng xếp hạng.",
+      "log": "Mọi thay đổi đã ghi: ai sửa, sửa gì, lúc nào."
     }
   },
   "screens": {
