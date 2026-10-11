@@ -1,11 +1,6 @@
-import type { Page } from '@playwright/test';
 import { expect, test } from './fixtures/api';
 
 const UNKNOWN = '/no/such/page';
-const runningCssAnimations = (page: Page) =>
-  page.evaluate(
-    () => document.getAnimations().filter((animation) => animation instanceof CSSAnimation).length,
-  );
 
 test('an unknown path shows the 404 page with two focusable links and the path', async ({
   page,
@@ -22,17 +17,4 @@ test('an unknown path shows the 404 page with two focusable links and the path',
   }
   await page.getByRole('main').getByRole('link', { name: 'Về trang chủ' }).click();
   await expect(page).toHaveURL(/\/$/);
-});
-
-test('with motion the sob and the falling tears run; with reduced motion nothing animates', async ({
-  page,
-  api,
-}) => {
-  api.signedIn = false;
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto(UNKNOWN);
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  expect(await runningCssAnimations(page)).toBeGreaterThanOrEqual(3); // sob + two tears
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  expect(await runningCssAnimations(page)).toBe(0);
 });

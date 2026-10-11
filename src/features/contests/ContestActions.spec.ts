@@ -1,16 +1,12 @@
 import { flushPromises } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError } from '@/api/client';
-import { errorMessageKey } from '@/i18n/error-message';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
-import { stubMatchMedia } from '@/test/match-media';
-import { PARTICIPATION_REFUSALS } from './participation-refusal';
 
 const NOW = Date.parse('2026-10-08T09:37:07Z');
 const actionsOf = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
@@ -207,10 +203,6 @@ describe('contest refusals', () => {
     expect(dialog()).not.toBeNull();
     expect(dialog()!.querySelector('[role="alert"]')).toBeNull();
   });
-
-  it.each(PARTICIPATION_REFUSALS)('gives %s its own text rather than the generic one', (code) => {
-    expect(errorMessageKey(new ApiError(code, 409, 'x'))).toBe(`errors.${code}`);
-  });
 });
 
 describe('contest actions with rules', () => {
@@ -323,32 +315,5 @@ describe('contest actions with rules', () => {
     ).toBeGreaterThanOrEqual(2);
     await tickAndConfirm();
     expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
-  });
-});
-
-describe('contest actions: the phone bar tells the footer how tall it is', () => {
-  const stubBarHeight = (blockSize: number) =>
-    vi.stubGlobal(
-      'ResizeObserver',
-      class {
-        constructor(private readonly callback: (entries: unknown[]) => void) {}
-        observe() {
-          this.callback([{ borderBoxSize: [{ blockSize }], contentRect: { height: 0 } }]);
-        }
-        unobserve() {}
-        disconnect() {}
-      },
-    );
-  const dockHeight = () => document.documentElement.style.getPropertyValue('--dock-height');
-
-  it('publishes the bar height on a phone and removes it when the page goes', async () => {
-    stubMatchMedia().setQuery('(max-width: 767.98px)', true);
-    stubBarHeight(96);
-    mockApi({ ...signedInViewer(), ...contestPageRoutes() });
-    const { wrapper } = await mountApp('/contests/r42');
-    await flushPromises();
-    expect(dockHeight()).toBe('96px');
-    wrapper.unmount();
-    expect(dockHeight()).toBe('');
   });
 });

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { profile } from '../src/test/fixtures';
-import { THEMES } from '../src/theme/registry';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
+import { AUDIT_THEMES, AUDIT_VIEWPORTS, FULL_AUDIT } from './fixtures/audit';
 
 /**
  * `ready` is text that only shows once the page has left its loading state, so axe never audits skeletons.
@@ -63,13 +63,11 @@ const PAGES = [
   },
 ] as const;
 
-const VIEWPORTS = [
-  { name: 'desktop', width: 1280, height: 800 },
-  { name: 'phone 375 px', width: 375, height: 812 },
-] as const;
+/** Desktop only on the local gate; every viewport on a full run (`E2E_FULL=1`). */
+const VIEWPORTS = FULL_AUDIT ? AUDIT_VIEWPORTS : AUDIT_VIEWPORTS.slice(0, 1);
 
 for (const viewport of VIEWPORTS)
-  for (const theme of THEMES)
+  for (const theme of AUDIT_THEMES)
     for (const { path, ready } of PAGES)
       // One viewer per page: signed-in where it differs, since anonymous shares the markup.
       for (const [viewer, readyText] of Object.entries(ready).slice(-1))

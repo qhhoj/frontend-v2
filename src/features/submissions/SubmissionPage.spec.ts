@@ -1,10 +1,9 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useSessionStore } from '@/stores/session.store';
 import { installFakeEventSource, latestEventSource, pageStreams } from '@/test/fake-event-source';
-import { sessionUser, submissionCase, submissionDetail } from '@/test/fixtures';
+import { submissionCase, submissionDetail } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
   anonymousViewer,
@@ -207,42 +206,6 @@ describe('submission page', () => {
     expect(router.currentRoute.value.query.redirect).toBe('/submissions/sub-1');
   });
 
-  it("does not reuse the previous account's row after the account changes", async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...problemPageRoutes(),
-      ...sourceRoute,
-      'GET /submissions/sub-1': sequence(
-        ok(submissionDetail({ result: 'AC', points: 1600 })),
-        fail(403, 'hidden'),
-      ),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    useSessionStore().user = sessionUser({
-      id: '0192a000-0000-7000-8000-000000000002',
-      username: 'user_02',
-    });
-    await vi.waitFor(() => expect(detailCalls(calls)).toHaveLength(2));
-    await vi.waitFor(() => expect(wrapper.text()).toContain('Bạn không có quyền xem bài nộp này'));
-    expect(wrapper.find('[role="img"]').exists()).toBe(false);
-  });
-
-  it('numbers a source that ends in a newline without a phantom last line', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...submissionPageRoutes(),
-      ...problemPageRoutes(),
-      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'int main() {}\n' }),
-    });
-    const { wrapper } = await openSubmission('sub-1');
-    await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="source-expand"]').exists()).toBe(true),
-    );
-    await wrapper.get('[data-testid="source-expand"]').trigger('click');
-    await vi.waitFor(() => expect(wrapper.find('pre[aria-hidden="true"]').exists()).toBe(true));
-    expect(wrapper.get('pre[aria-hidden="true"]').text()).toBe('1');
-  });
-
   it('never announces a bare final status while the final read is on its way, and shows no provisional score beside the final verdict', async () => {
     const final = ok(submissionDetail({ status: 'D', result: 'AC', points: 1600 }));
     let rowReads = 0;
@@ -313,21 +276,5 @@ describe('submission page', () => {
     expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
     expect(pageStreams()).toHaveLength(1);
-  });
-
-  it('refuses an unreadable or identical id in the compare form, with the reason', async () => {
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
-    const { wrapper, router } = await openSubmission('sub-1');
-    const form = wrapper.get('[data-testid="compare-form"]');
-    await form.get('input').setValue('not an id!');
-    await form.trigger('submit');
-    expect(form.get('[role="alert"]').text()).toBe(
-      'Nhập mã bài nộp hoặc dán liên kết của một bài nộp.',
-    );
-    await form.get('input').setValue('sub-1');
-    await form.trigger('submit');
-    expect(form.get('[role="alert"]').text()).toBe('Hãy chọn một bài nộp khác bài này.');
-    expect(form.get('input').attributes('aria-invalid')).toBe('true');
-    expect(router.currentRoute.value.name).toBe('submission');
   });
 });

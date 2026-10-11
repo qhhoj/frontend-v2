@@ -20,7 +20,7 @@ const MEDALS: Record<number, string> = {
   2: 'coin-6 size-13 text-lg',
   3: 'coin-5 size-13 text-lg',
 };
-/** Coin tokens are contrast-checked against on-coin in themes.spec. */
+/** Coin tokens are contrast-checked against on-coin in themes.node.spec. */
 const medalOf = (row: RankingRow) => MEDALS[row.rank ?? 3];
 /**
  * DOM order is rank order (screen readers). Only the plain 1-2-3 podium is rearranged on wide screens

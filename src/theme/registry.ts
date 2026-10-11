@@ -9,7 +9,7 @@ export interface ThemeDefinition {
   scheme: ColorScheme;
   /** Frosted surfaces over background blobs (Glass); flat themes (Clay) are opaque with no blobs. */
   glass: boolean;
-  /** The theme's own accent preset: its base values equal that preset's rule (themes.spec.ts), and a look turned on starts from it. */
+  /** The theme's own accent preset: its base values equal that preset's rule (themes.node.spec.ts), and a look turned on starts from it. */
   accent: AccentId;
 }
 

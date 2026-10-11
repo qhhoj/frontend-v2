@@ -5,7 +5,7 @@ const ASK_CALL = /trustedUntilBackendFixed(?:<[^()]*>)?\(\s*'(M\d-\d{2})'/g;
 
 /**
  * The one place a value is trusted past the generated types: the backend's document is wrong or silent about it.
- * Each use names its ask; `backend-ask.spec.ts` fails when the ask has no section in `docs/api-mismatches/`.
+ * Each use names its ask; `backend-ask.node.spec.ts` fails when the ask has no section in `docs/api-mismatches/`.
  * Delete the call when the ask lands.
  */
 export function trustedUntilBackendFixed<Wanted>(askId: AskId, value: unknown): Wanted {

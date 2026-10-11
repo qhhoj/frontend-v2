@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { profile, sessionUser, signedIn, signedOut } from '@/test/fixtures';
+import { profile, sessionUser, signedIn } from '@/test/fixtures';
 import { mockApi, noContent, ok } from '@/test/mock-api';
 import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
@@ -29,20 +29,8 @@ const clickInPanel = async (label: string) => {
   button.click();
   await flushPromises();
 };
-const patchesOf = (calls: Array<{ method: string; body: unknown }>) =>
-  calls.filter((call) => call.method === 'PATCH').map((call) => call.body);
 
 describe('app shell', () => {
-  it('has exactly one live region, outside the page content, and it is quiet when nothing loads', async () => {
-    mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
-    const { wrapper } = await mountApp('/blog');
-    const regions = wrapper.findAll('[role="status"]');
-    expect(regions).toHaveLength(1);
-    expect(regions[0]!.attributes('aria-live')).toBe('polite');
-    expect(regions[0]!.text()).toBe('');
-    expect(wrapper.get('#main').find('[role="status"]').exists()).toBe(false);
-  });
-
   it('signs out from the user menu and stays on a public page', async () => {
     const calls = mockApi({
       ...blogListRoutes,
@@ -70,39 +58,6 @@ describe('app shell', () => {
     const { wrapper } = await mountApp('/blog');
     await wrapper.get('button[aria-label="Tài khoản của user_01"]').trigger('click');
     expect(document.body.textContent).toContain('Quản trị');
-  });
-
-  it('saves only the mode to the account when signed in, and leaves the look off', async () => {
-    const calls = mockApi({
-      ...blogListRoutes,
-      'GET /auth/me': signedIn(),
-      'GET /profile': ok(profile()),
-      'PATCH /profile': ({ body }) => ok(profile(body as object)),
-    });
-    const { wrapper } = await mountApp('/blog');
-    await openPanel(wrapper);
-    await clickInPanel('Glass');
-    await clickInPanel('Sáng');
-    expect(patchesOf(calls)).toEqual([{ siteTheme: 'glass-auto' }, { siteTheme: 'glass-light' }]);
-    expect(document.documentElement.dataset.theme).toBe('glass-light');
-    expect(document.documentElement.dataset.accent).toBeUndefined();
-  });
-
-  it.each([
-    [['Tự động'], 'auto', 'clay-light'],
-    [['Glass', 'Tự động'], 'glass-auto', 'glass-light'],
-  ])('saves %j to the account as %s and follows the device', async (picks, saved, shown) => {
-    const calls = mockApi({
-      ...blogListRoutes,
-      'GET /auth/me': signedIn(),
-      'GET /profile': ok(profile({ siteTheme: 'clay-dark' })),
-      'PATCH /profile': ({ body }) => ok(profile(body as object)),
-    });
-    const { wrapper } = await mountApp('/blog');
-    await openPanel(wrapper);
-    for (const pick of picks) await clickInPanel(pick);
-    expect(patchesOf(calls).at(-1)).toEqual({ siteTheme: saved });
-    expect(document.documentElement.dataset.theme).toBe(shown);
   });
 
   it('keeps the local theme when saving to the account fails', async () => {

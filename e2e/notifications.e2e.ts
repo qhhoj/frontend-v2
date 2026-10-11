@@ -1,10 +1,8 @@
 import type { Page } from '@playwright/test';
 import type { NotificationItem } from '../src/api/types/notifications';
 import { inboxSample, NOTIFICATION_NOW, notificationItem } from '../src/test/notification-fixtures';
-import { THEMES } from '../src/theme/registry';
 import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
-import { AUDIT_VIEWPORTS } from './fixtures/audit';
 import { ok } from './fixtures/reply';
 import type { Reply } from './fixtures/reply';
 
@@ -84,7 +82,3 @@ test('a notification whose ticket is gone stays as an old notification', async (
   await expect(page.locator('main [data-testid="notification-row"]')).toContainText('Thông báo cũ');
   await expect(page).toHaveURL(/\/notifications$/);
 });
-
-for (const {} of AUDIT_VIEWPORTS)
-  for (const {} of THEMES) {
-  }

@@ -5,7 +5,7 @@ import SummaryPill from '@/components/SourceDiffSummaryPill.vue';
 import { diffSummary, foldSameRuns, wordSegments } from '@/lib/line-diff';
 import type { DiffRow, Segment } from '@/lib/line-diff';
 
-/** Keep `SourceDiffSkeleton.vue` in step: same card, summary row and line font. Colours: only the verdict pairs themes.spec.ts checks. */
+/** Keep `SourceDiffSkeleton.vue` in step: same card, summary row and line font. Colours: only the verdict pairs themes.node.spec.ts checks. */
 const props = defineProps<{ rows: DiffRow[] }>();
 type Side = 'left' | 'right';
 

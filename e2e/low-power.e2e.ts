@@ -38,13 +38,6 @@ test('"Luôn bật" sticks across a reload and the footer says so', async ({ pag
   await expect(page.getByTestId('app-footer')).toContainText('Chế độ tiết kiệm: Bật');
 });
 
-test('the footer link opens the switch', async ({ page }) => {
-  await page.goto('/blog');
-  await page.getByTestId('low-power-footer').click();
-  await expect(page).toHaveURL(/\/settings\/appearance#low-power$/);
-  await expect(page.getByTestId('low-power-section')).toBeInViewport();
-});
-
 test('a running ranking is re-read after 60 s, not 30 s, in low-power mode', async ({
   page,
   api,

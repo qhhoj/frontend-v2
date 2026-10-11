@@ -1,4 +1,4 @@
-/* Clay dark: warm charcoal ground, opaque surfaces, a lighter clay accent. No blur, no blobs. Every text pair is checked by themes.spec.ts. */
+/* Clay dark: warm charcoal ground, opaque surfaces, a lighter clay accent. No blur, no blobs. Every text pair is checked by themes.node.spec.ts. */
 :root[data-theme='clay-dark'] {
   color-scheme: dark;
   --qh-blur: 0px;
@@ -105,7 +105,7 @@
   --qh-on-coin: #1a1816;
 }
 
-/* Accent presets, one rule per id in src/theme/appearance.ts; the clay rule repeats the base above. Every rule keeps the theme flat (opaque hover, transparent blobs, one-colour gradient, invisible glow). Checked by themes.spec.ts. */
+/* Accent presets, one rule per id in src/theme/appearance.ts; the clay rule repeats the base above. Every rule keeps the theme flat (opaque hover, transparent blobs, one-colour gradient, invisible glow). Checked by themes.node.spec.ts. */
 :root[data-theme='clay-dark'][data-accent='clay'],
 :root[data-theme='clay-dark'] [data-accent='clay'] {
   --qh-surface-hover: #352f2b;

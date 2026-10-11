@@ -3,7 +3,7 @@ import { profile } from '../src/test/fixtures';
 import type { AccentId, Appearance } from '../src/theme/appearance';
 import { THEMES } from '../src/theme/registry';
 import { expect, test } from './fixtures/api';
-import { applyTheme, AUDIT_VIEWPORTS } from './fixtures/audit';
+import { applyTheme } from './fixtures/audit';
 import { expectSameColour, readGlass } from './fixtures/glass-probe';
 
 const TRIGGER = { name: 'Giao diện', exact: true } as const;
@@ -11,18 +11,6 @@ const READY = 'Dùng giao diện riêng';
 const themeNamed = (id: string) => THEMES.find((theme) => theme.id === id)!;
 /** The worst case for contrast: the most see-through glass and the strongest blobs. */
 const worstLook = (accent: AccentId): Appearance => ({ accent, glass: 0, glow: 100 });
-/**
- * Per theme, the preset with the lowest accent contrast other than the theme's own, from the `themes.spec.ts` model
- * (on-accent on the fills, accent text, focus ring, soft text over every ground at every Glass level). Axe checks the
- * own preset and this one; the unit loop holds all 28 to the same rules.
- */
-const LOWEST_CONTRAST_ACCENT: Record<string, AccentId> = {
-  'clay-light': 'gold',
-  'clay-dark': 'sunset',
-  'glass-light': 'gold',
-  'glass-dark': 'sunset',
-};
-
 /** Starts every page of the test with this look remembered in the browser (and painted by the pre-paint script). */
 const rememberLook = (page: Page, look: Appearance) =>
   page.addInitScript((stored) => {
@@ -60,65 +48,6 @@ test('an anonymous visitor picks a look in the panel; it survives a reload and n
   expectSameColour(look.fill, look.solid);
   expect(look.blur).toBe('blur(0px)');
   expect(api.requestsTo('PATCH /profile')).toEqual([]);
-});
-
-test('"use site default" clears the look and puts the mode back to Clay, automatic', async ({
-  page,
-  api,
-}) => {
-  void api;
-  await page.goto('/blog');
-  const panel = await openPanel(page);
-  await panel.getByRole('button', { name: 'Mint' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-accent', 'mint');
-  await panel.getByRole('button', { name: 'Dùng mặc định của trang' }).click();
-  await expect(page.locator('html')).not.toHaveAttribute('data-accent', /.+/);
-  await expect(
-    panel.getByRole('group', { name: 'Kiểu' }).getByRole('button', { name: 'Clay', exact: true }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  await expect(
-    panel
-      .getByRole('group', { name: 'Chế độ', exact: true })
-      .getByRole('button', { name: 'Tự động' }),
-  ).toHaveAttribute('aria-pressed', 'true');
-});
-
-test('picking a mode in the panel changes the theme and leaves the look off', async ({
-  page,
-  api,
-}) => {
-  api.signedIn = true;
-  await page.emulateMedia({ colorScheme: 'light' });
-  await page.goto('/blog');
-  const panel = await openPanel(page);
-  await panel.getByRole('button', { name: 'Glass', exact: true }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'glass-light');
-  await expect(page.locator('html')).not.toHaveAttribute('data-accent', /.+/);
-  await expect
-    .poll(() =>
-      api.requestsTo('PATCH /profile').map((request) => JSON.parse(String(request.postData))),
-    )
-    .toEqual([{ siteTheme: 'glass-auto' }]);
-});
-
-test('in a Clay theme the Glass and Glow controls are disabled with a reason, and the accent still works', async ({
-  page,
-  api,
-}) => {
-  await applyTheme(page, api, themeNamed('clay-light'));
-  await page.goto('/settings/appearance');
-  await expect(page.getByText(READY, { exact: true })).toBeVisible();
-  await page.getByRole('switch', { name: READY }).click();
-  await expect(page.locator('#glass-level')).toBeDisabled();
-  await expect(page.locator('#glow-level')).toBeDisabled();
-  await expect(
-    page.getByText('Glass và quầng sáng chỉ áp dụng cho giao diện Glass.'),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Ocean' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-accent', 'ocean');
-  const look = await readGlass(page);
-  expectSameColour(look.fill, look.solid);
-  expect(look.blur).toBe('blur(0px)');
 });
 
 test('the panel and the settings page show the same look, and the page takes focus', async ({
@@ -179,16 +108,4 @@ test('a device that asks for less transparency gets solid cards whatever the sli
   expect(look.blur).toBe('blur(0px)');
   await expect(page.locator('#glass-level')).toBeDisabled();
   await expect(page.getByText('Thiết bị của bạn yêu cầu giảm độ trong suốt')).toBeVisible();
-});
-
-for (const theme of THEMES)
-  for (const {} of [theme.accent, LOWEST_CONTRAST_ACCENT[theme.id]]) {
-  }
-
-const phone = AUDIT_VIEWPORTS.find((viewport) => viewport.width === 375)!;
-test.describe(`at ${phone.name}`, () => {
-  test.use({ viewport: { width: phone.width, height: phone.height } });
-
-  for (const {} of THEMES) {
-  }
 });

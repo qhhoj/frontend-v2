@@ -1,7 +1,7 @@
 /**
  * A visitor's own look: an accent preset plus two levels. Style and mode (Clay or Glass; light, dark or auto) are not
  * part of it: they stay the theme preference (`siteTheme` on the account). The backend stores the same shape
- * (`appearance`, backend Task 20). Add a preset: its id here, a block in every theme file (`themes.spec.ts` enforces
+ * (`appearance`, backend Task 20). Add a preset: its id here, a block in every theme file (`themes.node.spec.ts` enforces
  * it), the label in both locales, the id in the pre-paint script's `accents`, and in the backend's `APPEARANCE_ACCENTS`.
  */
 export const ACCENTS = [

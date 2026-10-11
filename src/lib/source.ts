@@ -12,6 +12,9 @@ const SURROGATE_PAIR = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 export const codePointCount = (text: string) =>
   text.length - (text.match(SURROGATE_PAIR)?.length ?? 0);
 
+/** Lines to number in a source view: a source ending in a newline has no empty last line. */
+export const sourceLineCount = (text: string) => text.replace(/\n$/, '').split('\n').length;
+
 export type SourceFileResult =
   { ok: true; text: string } | { ok: false; reason: 'tooLarge' | 'notText' | 'tooLong' };
 

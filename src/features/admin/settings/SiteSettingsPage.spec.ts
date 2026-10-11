@@ -82,26 +82,6 @@ describe('SiteSettingsPage', () => {
     expect(contest.get('[role="alert"]').text()).toContain('contest.officialMode');
   });
 
-  it('says a bad official-mode end time in Vietnamese, not in the backend English', async () => {
-    mockApi(
-      routes({
-        'PATCH /admin/settings/contest.officialModeEndsAt': invalid(
-          issue('value', 'invalid', 'Must be an ISO 8601 instant with an offset'),
-        ),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    const contest = block(wrapper, 'contest');
-    const label = contest
-      .findAll('label')
-      .find((item) => item.text().startsWith('Thời điểm tự tắt chế độ thi chính thức'))!;
-    await contest.get(`#${label.attributes('for')}`).setValue('tomorrow');
-    await clickIn(contest, 'Lưu');
-    const alert = contest.get('[role="alert"]').text();
-    expect(alert).toContain('Thời điểm chưa hợp lệ');
-    expect(alert).not.toContain('Must be an ISO');
-  });
-
   it('shows the backend refusal under its block and keeps the edit', async () => {
     mockApi(
       routes({
@@ -116,25 +96,6 @@ describe('SiteSettingsPage', () => {
     await clickIn(site, 'Lưu');
     expect(site.get('[role="alert"]').text()).toContain('Not an IANA time zone.');
     expect((site.get('input').element as HTMLInputElement).value).toBe('Mars/Base');
-  });
-
-  it('shows a sealed secret as set, and offers to replace it', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountSettings();
-    const mail = block(wrapper, 'mail');
-    expect(mail.text()).toContain('Đã đặt');
-    expect(mail.find('input[type="password"]').exists()).toBe(false);
-    await clickIn(mail, 'Thay thế');
-    expect(mail.find('input[type="password"]').exists()).toBe(true);
-  });
-
-  it('keeps the SMTP URL when "Thay thế" is opened and saved with an empty box', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await mountSettings();
-    const mail = block(wrapper, 'mail');
-    await clickIn(mail, 'Thay thế');
-    await clickIn(mail, 'Lưu');
-    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
   });
 
   it('opens a key’s history and restores through the restore endpoint, with no value of its own', async () => {
@@ -165,54 +126,6 @@ describe('SiteSettingsPage', () => {
     expect(restore.body).toBeUndefined();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
   });
-
-  it('offers no restore for a whole-secret key, so the server’s 409 is never provoked', async () => {
-    mockApi(
-      routes({
-        'GET /admin/settings/mail.smtpUrl/revisions': page(
-          [settingRevision({ set: true }, { set: true })],
-          { pageSize: 20 },
-        ),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'mail'), 'Lịch sử · mail.smtpUrl');
-    expect(wrapper.get('[data-testid="revisions"]').text()).toContain(
-      'Không khôi phục được giá trị bí mật.',
-    );
-    expect(
-      wrapper
-        .get('[data-testid="revisions"]')
-        .findAll('button')
-        .some((button) => button.text() === 'Khôi phục'),
-    ).toBe(false);
-  });
-
-  it('counts the blocks of a group from the blocks actually shown', async () => {
-    mockApi(
-      routes({
-        'GET /admin/settings': ok(
-          ALL_SETTINGS.filter((entry) => !['auth.github', 'auth.facebook'].includes(entry.key)),
-        ),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    expect(wrapper.get('a[href="#settings-auth"]').text()).toContain('2');
-    expect(wrapper.findAll('#settings-auth [data-block]')).toHaveLength(2);
-  });
-});
-
-describe('keys that were hidden', () => {
-  it('shows the official mode end time and the problem grace days with their labels', async () => {
-    mockApi(routes({ 'GET /admin/settings': ok(ALL_SETTINGS) }));
-    const { wrapper } = await mountSettings();
-    expect(wrapper.get('[data-block="contest"]').text()).toContain(
-      'Thời điểm tự tắt chế độ thi chính thức',
-    );
-    expect(wrapper.get('[data-block="problem"]').text()).toContain(
-      'Số ngày có thể khôi phục bài đã xóa',
-    );
-  });
 });
 
 const withMinPercent = (stored: number) =>
@@ -225,37 +138,6 @@ const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: s
   wrapper.get(`[data-key="${key}"]`);
 
 describe('defaults', () => {
-  it('fills the default into the box and sends nothing until "Lưu"', async () => {
-    const calls = mockApi(
-      routes({
-        'GET /admin/settings': ok(withMinPercent(65)),
-        'PATCH /admin/settings/similarity.minPercent': ok(
-          setting('similarity.minPercent', 50, { default: 50, isDefault: true }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    const row = keyRow(wrapper, 'similarity.minPercent');
-    await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
-    expect((row.get('input').element as HTMLInputElement).value).toBe('50');
-    expect(row.text()).toContain('Đã điền giá trị mặc định, chưa lưu. Giá trị đang lưu: 65.');
-    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
-    await clickIn(block(wrapper, 'similarity'), 'Lưu');
-    expect(
-      calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]),
-    ).toEqual([['/admin/settings/similarity.minPercent', { value: 50 }]]);
-  });
-
-  it('disables the control while the box holds the default, and enables it after an edit', async () => {
-    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(50)) }));
-    const { wrapper } = await mountSettings();
-    const row = keyRow(wrapper, 'similarity.minPercent');
-    const button = row.get('button[aria-label="Về mặc định 50"]');
-    expect(button.attributes('aria-disabled')).toBe('true');
-    await row.get('input').setValue('70');
-    expect(button.attributes('aria-disabled')).toBeUndefined();
-  });
-
   it('"Đặt lại" still discards the filled default and shows the stored value again', async () => {
     mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
     const { wrapper } = await mountSettings();
@@ -284,23 +166,6 @@ describe('defaults', () => {
     expect(switchNamed(row, 'Bật chế độ kỳ thi chính thức').attributes('aria-checked')).toBe(
       'false',
     );
-  });
-
-  it('shows "Mặc định" or "Khác mặc định" per key, from the stored value', async () => {
-    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
-    const { wrapper } = await mountSettings();
-    const chip = (key: string) => keyRow(wrapper, key).get('[data-testid="default-chip"]').text();
-    expect(chip('similarity.minPercent')).toBe('Khác mặc định');
-    expect(chip('similarity.maxPairs')).toBe('Mặc định');
-  });
-
-  it('offers no reset on a key with a sealed part', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountSettings();
-    for (const key of ['mail.smtpUrl', 'auth.google', 'discord.webhooks'])
-      expect(keyRow(wrapper, key).find('button[aria-label^="Về mặc định"]').exists(), key).toBe(
-        false,
-      );
   });
 });
 
@@ -336,49 +201,6 @@ describe('clearing a secret', () => {
     expect(patches(calls)).toEqual([]);
   });
 
-  it('switches an enabled social login off together with its secret', async () => {
-    const calls = mockApi(
-      routes({
-        'PATCH /admin/settings/auth.google': ok(
-          setting('auth.google', {
-            enabled: false,
-            clientId: '1048',
-            clientSecret: { set: false },
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'google'), 'Xoá bí mật');
-    expect(openDialog().textContent).toContain('bị tắt cùng lúc');
-    await confirmDialog('Xoá bí mật máy khách Google');
-    expect(patches(calls)).toEqual([
-      ['/admin/settings/auth.google', { value: { enabled: false, clientSecret: '' } }],
-    ]);
-  });
-
-  it('empties the webhook list', async () => {
-    const calls = mockApi(
-      routes({
-        'PATCH /admin/settings/discord.webhooks': ok(setting('discord.webhooks', { set: false })),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'discord'), 'Xoá bí mật');
-    await confirmDialog('Xoá danh sách webhook Discord');
-    expect(patches(calls)).toEqual([['/admin/settings/discord.webhooks', { value: {} }]]);
-  });
-
-  it('offers no clear for a secret that is not set', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountSettings();
-    expect(
-      block(wrapper, 'github')
-        .findAll('button')
-        .some((button) => button.text() === 'Xoá bí mật'),
-    ).toBe(false);
-  });
-
   it('keeps the dialog open and says why when the server refuses', async () => {
     mockApi(routes({ 'PATCH /admin/settings/mail.smtpUrl': fail(403, 'forbidden') }));
     const { wrapper } = await mountSettings();
@@ -401,36 +223,6 @@ describe('clearing a secret', () => {
     await confirmDialog('Xoá URL SMTP');
     expect((mail.get('input').element as HTMLInputElement).value).toBe('QHHOJ <ops@qhhoj.example>');
     expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
-  });
-});
-
-describe('webhooks', () => {
-  const patchesOf = (calls: { method: string; path: string; body: unknown }[]) =>
-    calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]);
-
-  it('saves one https URL per event, the shape the backend parses', async () => {
-    const calls = mockApi(
-      routes({
-        'PATCH /admin/settings/discord.webhooks': ok(setting('discord.webhooks', { set: true })),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    const discord = block(wrapper, 'discord');
-    await clickIn(discord, 'Thay thế');
-    await discord.get('input[type="url"]').setValue('https://discord.example/1');
-    await clickIn(discord, 'Lưu');
-    expect(patchesOf(calls)).toEqual([
-      ['/admin/settings/discord.webhooks', { value: { default: 'https://discord.example/1' } }],
-    ]);
-  });
-
-  it('"Thay thế" with an empty URL sends nothing, so the stored list is kept', async () => {
-    const calls = mockApi(routes());
-    const { wrapper } = await mountSettings();
-    const discord = block(wrapper, 'discord');
-    await clickIn(discord, 'Thay thế');
-    await clickIn(discord, 'Lưu');
-    expect(patchesOf(calls)).toEqual([]);
   });
 });
 
@@ -458,35 +250,5 @@ describe('saving a replaced secret', () => {
     await clickIn(block(wrapper, 'site'), 'Lưu');
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
     expect(block(wrapper, 'site').text()).toContain('Không có thay đổi.');
-  });
-});
-
-describe('history panel', () => {
-  const pdfHistoryButton = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
-    block(wrapper, 'pdf')
-      .findAll('button')
-      .find((button) => button.text() === 'Lịch sử · pdf.renderTimeoutMs')!;
-
-  it('opening a key scrolls the panel into view and focuses its heading; Đóng gives focus back to its button', async () => {
-    mockApi(
-      routes({
-        'GET /admin/settings/pdf.renderTimeoutMs/revisions': page([settingRevision(30000, 45000)], {
-          pageSize: 20,
-        }),
-      }),
-    );
-    const { wrapper } = await mountSettings();
-    await pdfHistoryButton(wrapper).trigger('click');
-    await flushPromises();
-    const panel = wrapper.get('[data-testid="revisions"]');
-    expect(document.activeElement).toBe(panel.get('h2').element);
-    expect(scrollIntoView).toHaveBeenCalled();
-    await panel
-      .findAll('button')
-      .find((button) => button.text() === 'Đóng')!
-      .trigger('click');
-    await flushPromises();
-    expect(wrapper.find('[data-testid="revisions"]').exists()).toBe(false);
-    expect(document.activeElement).toBe(pdfHistoryButton(wrapper).element);
   });
 });

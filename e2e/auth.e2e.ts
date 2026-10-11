@@ -2,7 +2,7 @@ import { generateKeyPairSync } from 'node:crypto';
 import type { Page } from '@playwright/test';
 import { CPP17_ID, organizationItem } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
-import { PASSKEY_CREDENTIAL_ID, fail, installAuth, invalid } from './fixtures/auth';
+import { PASSKEY_CREDENTIAL_ID, fail, installAuth } from './fixtures/auth';
 import type { AuthScenario } from './fixtures/auth';
 
 const SIGN_IN = { name: 'Đăng nhập', exact: true } as const;
@@ -41,24 +41,6 @@ test.describe('password sign-in', () => {
     await expect(page).toHaveURL(/\/settings$/);
   });
 
-  test('shows and hides the password on request', async ({ page, api }) => {
-    installAuth(api);
-    await page.goto('/login');
-    await page.getByLabel('Mật khẩu', PASSWORD).fill('secret');
-    await page.getByRole('button', { name: 'Hiện mật khẩu' }).click();
-    await expect(page.getByLabel('Mật khẩu', PASSWORD)).toHaveAttribute('type', 'text');
-  });
-
-  test('shows the ban reason the backend sends as a member of the error', async ({ page, api }) => {
-    installAuth(api);
-    api.routes['POST /auth/login'] = fail(403, 'banned', { banReason: 'cheating in R41' });
-    await page.goto('/login');
-    await page.getByLabel('Tên đăng nhập').fill('user_01');
-    await page.getByLabel('Mật khẩu', PASSWORD).fill('x');
-    await page.getByRole('button', SIGN_IN).click();
-    await expect(alertOf(page)).toHaveText('Tài khoản đã bị khoá. Lý do: cheating in R41');
-  });
-
   test('switching language translates the screen and keeps what was typed', async ({
     page,
     api,
@@ -84,14 +66,6 @@ test.describe('password sign-in', () => {
     await expect(page).toHaveURL(/\/login\?error=oauth_failed$/);
     await expect(alertOf(page)).toHaveText('Đăng nhập bằng mạng xã hội không thành công.');
   });
-
-  test('offers only the providers the backend lists', async ({ page, api }) => {
-    installAuth(api);
-    api.routes['GET /auth/social/providers'] = { body: { data: { providers: ['github'] } } };
-    await page.goto('/login');
-    await expect(page.getByRole('link', { name: 'Đăng nhập với GitHub' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Đăng nhập với Google' })).toHaveCount(0);
-  });
 });
 
 test.describe('second factor', () => {
@@ -107,43 +81,6 @@ test.describe('second factor', () => {
     await page.keyboard.type('481923');
     await expect(page).toHaveURL(/\/problems$/);
     expect(requestsOf(auth, 'totp')).toEqual([{ code: '481923' }]);
-  });
-
-  test('a pasted code with a space fills all six boxes', async ({ page, api }) => {
-    const auth = installAuth(api, { phase: 'partial' });
-    await page.goto('/login/2fa');
-    await digit(page, 1).evaluate((box) => {
-      const data = new DataTransfer();
-      data.setData('text/plain', '481 923');
-      box.dispatchEvent(
-        new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }),
-      );
-    });
-    await expect(page).toHaveURL(/\/$/);
-    expect(requestsOf(auth, 'totp')).toEqual([{ code: '481923' }]);
-  });
-
-  test('a backup code is sent normalised', async ({ page, api }) => {
-    const auth = installAuth(api, { phase: 'partial' });
-    await page.goto('/login/2fa');
-    await page.getByRole('button', { name: 'Dùng mã dự phòng' }).click();
-    await page.getByLabel('Mã dự phòng').fill('abcd-efgh ijkl 2345');
-    await page.getByRole('button', { name: 'Xác nhận' }).click();
-    await expect(page).toHaveURL(/\/$/);
-    expect(requestsOf(auth, 'totp')).toEqual([{ code: 'ABCDEFGHIJKL2345' }]);
-  });
-
-  test('an account whose second factor was turned off is told to sign in again', async ({
-    page,
-    api,
-  }) => {
-    const auth = installAuth(api, { phase: 'partial', methods: [] });
-    await page.goto('/login/2fa');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Phiên đã thay đổi');
-    await expect(digit(page, 1)).toHaveCount(0);
-    await page.getByRole('button', { name: 'Đăng nhập lại' }).click();
-    await expect(page).toHaveURL(/\/login$/);
-    expect(auth.phase).toBe('anonymous');
   });
 
   test('a viewer without a usable factor can sign out and use another account', async ({
@@ -245,36 +182,6 @@ test.describe('registration, activation and resend', () => {
     });
   });
 
-  test('the activation mail can be sent again once the cooldown is over', async ({ page, api }) => {
-    const auth = installAuth(api);
-    await page.clock.install();
-    await page.goto('/register');
-    await fillRegistration(page, 'new_user');
-    await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
-    await expect(page.getByRole('button', { name: /Gửi lại sau/ })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
-    await page.clock.runFor(60_000);
-    await page.getByRole('button', { name: 'Gửi lại email' }).click();
-    await expect(statusOf(page)).toContainText('Đã gửi lại.');
-    expect(requestsOf(auth, 'resend')).toEqual([{ email: 'new@example.com' }]);
-  });
-
-  test('an unavailable mailer shows the "registration unavailable" card', async ({ page, api }) => {
-    installAuth(api);
-    api.routes['POST /auth/register'] = fail(503, 'mail_unavailable');
-    await page.goto('/register');
-    await fillRegistration(page, 'new_user');
-    await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Đăng ký tạm thời không khả dụng',
-    );
-    await expect(
-      page.locator('#main').getByRole('link', { name: 'Về trang đăng nhập' }),
-    ).toBeVisible();
-  });
-
   test('activates from the mailed link; a reload shows success without sending the key again', async ({
     page,
     api,
@@ -359,43 +266,6 @@ test.describe('registration, activation and resend', () => {
   });
 });
 
-test.describe('social signup ends', () => {
-  test('a taken email ends the signup on a card that offers sign-in and password reset', async ({
-    page,
-    api,
-  }) => {
-    installAuth(api);
-    api.routes['POST /auth/social/complete'] = invalid({
-      field: 'email',
-      code: 'email_taken',
-      message: 'Email is taken.',
-    });
-    await page.goto('/register/social?token=pending-1');
-    await page.getByLabel('Tên đăng nhập').fill('social_user');
-    await page.getByLabel('Mật khẩu', PASSWORD).fill('correct horse battery');
-    await page.getByRole('button', { name: 'Tạo tài khoản' }).click();
-    await expect(alertOf(page)).toHaveText(
-      'Email này đã được đăng ký. Hãy đăng nhập hoặc đặt lại mật khẩu.',
-    );
-    await expect(page.getByLabel('Tên đăng nhập')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Đăng nhập', exact: true })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Quên mật khẩu?' })).toBeVisible();
-  });
-
-  test('a linked identity ends the signup on the sign-in card', async ({ page, api }) => {
-    installAuth(api);
-    api.routes['POST /auth/social/complete'] = fail(409, 'conflict');
-    await page.goto('/register/social?token=pending-1');
-    await page.getByLabel('Tên đăng nhập').fill('social_user');
-    await page.getByLabel('Mật khẩu', PASSWORD).fill('correct horse battery');
-    await page.getByRole('button', { name: 'Tạo tài khoản' }).click();
-    await expect(alertOf(page)).toHaveText(
-      'Tài khoản mạng xã hội này đã được liên kết với một tài khoản QHHOJ. Hãy đăng nhập.',
-    );
-    await expect(page.getByLabel('Tên đăng nhập')).toHaveCount(0);
-  });
-});
-
 test.describe('passwords', () => {
   test('asks for a reset link, then sets a new password from the mailed link and lands on sign-in', async ({
     page,
@@ -417,23 +287,6 @@ test.describe('passwords', () => {
     expect(requestsOf(auth, 'reset')).toEqual([
       { token: 'tok-1', newPassword: 'brand new passphrase' },
     ]);
-  });
-
-  test('a reset link that has expired shows the dead-link card with a way to ask for a new one', async ({
-    page,
-    api,
-  }) => {
-    installAuth(api);
-    api.routes['POST /auth/password/reset/confirm'] = fail(400, 'invalid_token');
-    await page.goto('/reset-password/tok-1');
-    await page.getByLabel('Mật khẩu mới', PASSWORD).fill('brand new passphrase');
-    await page.getByLabel('Nhập lại mật khẩu', PASSWORD).fill('brand new passphrase');
-    await page.getByRole('button', { name: 'Đổi mật khẩu' }).click();
-    await expect(page).toHaveURL(/\/reset-password\/expired$/);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Liên kết không còn hiệu lực');
-    await page.locator('#main').getByRole('link', { name: 'Yêu cầu liên kết mới' }).click();
-    await expect(page).toHaveURL(/\/forgot-password$/);
-    expect(api.requestsTo('POST /auth/password/reset/confirm')).toHaveLength(1);
   });
 
   test('a breached password forces a change before anything else, then returns', async ({

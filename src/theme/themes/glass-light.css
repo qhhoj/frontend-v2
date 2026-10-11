@@ -1,4 +1,4 @@
-/* Glass light: lavender ground, softer blobs, white frosted glass. Every text pair is checked by themes.spec.ts. */
+/* Glass light: lavender ground, softer blobs, white frosted glass. Every text pair is checked by themes.node.spec.ts. */
 :root[data-theme='glass-light'] {
   color-scheme: light;
   --qh-blur: 24px;
@@ -105,7 +105,7 @@
   --qh-on-coin: #1b1230;
 }
 
-/* Accent presets, one rule per id in src/theme/appearance.ts; the first repeats the base above. Light presets use dark steps of the hue for link text, focus ring and soft-tint text. Every preset is checked by themes.spec.ts. */
+/* Accent presets, one rule per id in src/theme/appearance.ts; the first repeats the base above. Light presets use dark steps of the hue for link text, focus ring and soft-tint text. Every preset is checked by themes.node.spec.ts. */
 :root[data-theme='glass-light'][data-accent='orchid'],
 :root[data-theme='glass-light'] [data-accent='orchid'] {
   --qh-surface-hover: rgba(91, 63, 214, 0.1);

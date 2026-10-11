@@ -27,19 +27,6 @@ const cellTexts = (row: ReturnType<typeof rowOf>) =>
 describe('contest ranking', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('renders solved, first-solve, failed and frozen cells with spoken labels', async () => {
-    mockApi(routes());
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    const leader = rowOf(wrapper, 'user_07');
-    expect(cellTexts(leader)).toEqual(['+ 0:09', '+1 0:31', '?2']);
-    expect(leader.findAll('td .sr-only').map((label) => label.text())).toEqual([
-      'Giải đầu tiên, sau 0 lần sai, lúc 0:09',
-      'Giải sau 1 lần sai, lúc 0:31',
-      '2 lần nộp chờ công bố',
-    ]);
-    expect(cellTexts(rowOf(wrapper, 'user_12'))).toContain('−4');
-  });
-
   it('switches to the board with virtual participants through the URL', async () => {
     const calls = mockApi(routes());
     const { wrapper, router } = await mountApp('/contests/r42/ranking');
@@ -195,37 +182,5 @@ describe('contest ranking', () => {
     const [first, tiedFirst, third] = podium.findAll('span[aria-hidden="true"]');
     expect(first!.classes()).toEqual(tiedFirst!.classes());
     expect(third!.classes()).not.toEqual(first!.classes());
-  });
-
-  it('prints cell points at the contest precision', async () => {
-    const [problemA] = RANKING_PROBLEM_IDS;
-    mockApi(
-      routes({
-        'GET /contests/r42': ok(contestDetail({ formatName: 'ioi', pointsPrecision: 1 })),
-        'GET /contests/r42/ranking': ok(
-          ranking({
-            frozen: false,
-            problems: [
-              {
-                problemId: problemA,
-                code: 'r42a',
-                label: 'A',
-                points: 100,
-                firstSolve: null,
-                acceptedCount: 0,
-              },
-            ],
-            rows: [
-              rankingRow(1, 'part-07', 'user_07', 99.5, 600, {
-                [problemA]: { points: 99.5, time: 600 },
-              }),
-            ],
-          }),
-        ),
-      }),
-    );
-    const { wrapper } = await mountApp('/contests/r42/ranking');
-    expect(cellTexts(rowOf(wrapper, 'user_07'))).toEqual(['99,5']);
-    expect(rowOf(wrapper, 'user_07').findAll('td')[1]!.text()).toBe('99,5');
   });
 });

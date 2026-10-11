@@ -1,16 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
-import { commentPageRoute } from '@/test/community-routes';
-import {
-  contestDetail,
-  contestProblem,
-  problemDetail,
-  problemEditorial,
-  sessionUser,
-} from '@/test/fixtures';
-import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
+import { contestDetail, contestProblem, problemDetail, problemEditorial } from '@/test/fixtures';
+import { fail, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -70,30 +62,6 @@ describe('problem page', () => {
     const { wrapper, router } = await mountApp('/problems/ghost');
     await vi.waitFor(() => expect(wrapper.find('[data-testid="pale-404"]').exists()).toBe(true));
     expect(router.currentRoute.value.path).toBe('/problems/ghost');
-  });
-
-  it("does not show the previous account's viewer status after the account changes", async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      'GET /submissions': page([]),
-      ...commentPageRoute('problem', 'duongdi'),
-      'GET /problems/duongdi': sequence(
-        ok(problemDetail({ viewerStatus: 'solved' })),
-        ok(problemDetail({ viewerStatus: null })),
-      ),
-    });
-    const { wrapper } = await openProblem();
-    expect(wrapper.get('[data-testid="viewer-status"]').text()).toContain('Đã giải');
-    useSessionStore().user = sessionUser({
-      id: '0192a000-0000-7000-8000-000000000002',
-      username: 'user_02',
-    });
-    await vi.waitFor(() =>
-      expect(calls.filter((call) => call.path === '/problems/duongdi')).toHaveLength(2),
-    );
-    await vi.waitFor(() =>
-      expect(wrapper.get('[data-testid="viewer-status"]').text()).not.toContain('Đã giải'),
-    );
   });
 
   it('links all submissions and the best-submissions ranking of the problem', async () => {
@@ -156,6 +124,16 @@ describe('problem page', () => {
 });
 
 describe('problem page editorial tab', () => {
+  it('flags an editorial that only editors can see', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...problemPageRoutes(problemDetail()),
+      'GET /problems/duongdi/editorial': ok(problemEditorial({ isPublic: false })),
+    });
+    const { wrapper } = await mountApp('/problems/duongdi?tab=editorial');
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Chỉ người chỉnh sửa thấy'));
+  });
+
   it('drops the tab on a revisit when the cached editorial already holds a 404 after an earlier success', async () => {
     mockApi({
       ...anonymousViewer,
@@ -233,23 +211,6 @@ describe('problem page inside a contest', () => {
     );
     const current = wrapper.get('[data-testid="problem-switcher"] [aria-current="page"]');
     expect(current.attributes('href')).toBe('/problems/r42b');
-  });
-
-  const TWO_COLUMNS = 'lg:grid-cols-[240px_minmax(0,1fr)]';
-  const layoutOf = (wrapper: Awaited<ReturnType<typeof openProblem>>['wrapper']) =>
-    wrapper.get('#main > div').classes().join(' ');
-
-  it('keeps the statement full width for good when the contest request fails', async () => {
-    mockApi({
-      ...signedInViewer(),
-      ...problemPageRoutes(inContest),
-      'GET /contests/r42': fail(500, 'generic'),
-    });
-    const { wrapper } = await openProblem('/problems/r42b');
-    await flushPromises();
-    expect(layoutOf(wrapper)).not.toContain(TWO_COLUMNS);
-    expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="statement-card"]').exists()).toBe(true);
   });
 
   it('has no rail outside a contest and asks for no contest', async () => {

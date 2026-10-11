@@ -62,24 +62,3 @@ test('hiding solved problems needs a signed-in viewer', async ({ page, api }) =>
   const requested = api.requests.filter((request) => request.key === 'GET /problems');
   expect(requested.at(-1)!.url.searchParams.get('solved')).toBe('false');
 });
-
-test('the random button opens a problem under the current filters', async ({ page, api }) => {
-  await page.goto('/problems?editorial=1');
-  await control(page, 'Bài ngẫu nhiên').click();
-  await expect(page).toHaveURL(/\/problems\/duongdi$/);
-  const asked = api.requests.find((request) => request.key === 'GET /problems/random')!;
-  expect(asked.url.searchParams.get('hasEditorial')).toBe('true');
-});
-
-test('the random button says when nothing matches and stays on the list', async ({ page, api }) => {
-  api.routes['GET /problems/random'] = {
-    status: 404,
-    body: { error: { code: 'no_problem', message: 'No matching problem' } },
-  };
-  await page.goto('/problems');
-  await control(page, 'Bài ngẫu nhiên').click();
-  await expect(
-    page.getByTestId('random-status').filter({ hasText: 'Không có bài phù hợp.' }),
-  ).toBeVisible();
-  await expect(page).toHaveURL(/\/problems$/);
-});

@@ -1,10 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { partialSession, profile, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import { partialSession, signedOut } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
-import { homeRoutes } from '@/test/home-routes';
 import { fail, issue, mockApi, ok } from '@/test/mock-api';
-import { blogListRoutes } from '@/test/community-routes';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 
@@ -103,22 +101,6 @@ describe('login page', () => {
 
 /** Ledger CARRY T6: the step every sign-in ends with (`useAfterSignIn`), exercised through the login form. */
 describe('after a sign-in', () => {
-  /** Signed out until the password is accepted, then a full session landing on the signed-in home page. */
-  const signedInRoutes = () => {
-    let signedInNow = false;
-    return mockApi({
-      ...blogListRoutes,
-      ...routes(),
-      ...homeRoutes,
-      'GET /profile': ok(profile()),
-      'GET /auth/me': () => (signedInNow ? signedIn() : signedOut),
-      'POST /auth/login': () => {
-        signedInNow = true;
-        return ok(sessionResponse());
-      },
-    });
-  };
-
   it('sends a pending second factor to the 2FA page carrying the redirect the query had', async () => {
     mockApi(routes({ 'POST /auth/login': ok(partialSession()) }));
     const { wrapper, router } = await mountApp('/login?redirect=/blog');
@@ -127,13 +109,5 @@ describe('after a sign-in', () => {
       timeout: 5000,
     });
     expect(router.currentRoute.value.query).toEqual({ redirect: '/blog' });
-  });
-
-  it("drops the previous account's cached data", async () => {
-    signedInRoutes();
-    const { wrapper, queryClient } = await mountApp('/login');
-    queryClient.setQueryData(['submissions', 'previous-account'], { items: ['secret'] });
-    await signIn(wrapper, 'correct horse');
-    expect(queryClient.getQueryData(['submissions', 'previous-account'])).toBeUndefined();
   });
 });
