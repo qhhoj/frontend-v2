@@ -4,14 +4,13 @@ import {
   contestDetail,
   contestProblem,
   contestViewer,
-  problemMeta,
   sessionUser,
   submissionItem,
 } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
+import { anonymousViewer, signedInViewer, submissionListRoutes } from '@/test/problem-routes';
 
 const RUNNING = Date.parse('2026-10-08T09:00:00Z');
 const open = contestDetail({ phase: 'ended', frozenLastMinutes: 0, problems: [contestProblem(0)] });
@@ -26,7 +25,7 @@ describe('contest submissions tab', () => {
       ...anonymousViewer,
       ...contestPageRoutes(open),
       'GET /contests/r42/submissions': page([submissionItem()]),
-      'GET /problems/meta': ok(problemMeta()),
+      ...submissionListRoutes,
     });
     await mountApp('/contests/r42/submissions?result=WA&waiting=grading&waiting=final');
     const query = listCalls(calls)[0]!.query;
@@ -41,7 +40,7 @@ describe('contest submissions tab', () => {
       ...signedInViewer(),
       ...contestPageRoutes(contestDetail()),
       'GET /contests/r42/submissions': page([]),
-      'GET /problems/meta': ok(problemMeta()),
+      ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions?user=other');
     expect(wrapper.get('[data-testid="own-only"]').text()).toContain('Chỉ hiện bài nộp của bạn');
@@ -54,7 +53,7 @@ describe('contest submissions tab', () => {
     const calls = mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(contestDetail()),
-      'GET /problems/meta': ok(problemMeta()),
+      ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
     expect(listCalls(calls)).toHaveLength(0);
@@ -76,14 +75,14 @@ describe('contest submissions tab', () => {
       ...signedInViewer(),
       ...contestPageRoutes(contestDetail({ showSubmissionList: true })),
       'GET /contests/r42/submissions': (call) => page(call.query.get('user') ? [mine] : [everyone]),
-      'GET /problems/meta': ok(problemMeta()),
+      ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(wrapper.find('tr[data-id="sub-everyone"]').exists()).toBe(true);
+    expect(wrapper.find('[data-id="sub-everyone"]').exists()).toBe(true);
     vi.setSystemTime(Date.parse('2026-10-08T10:30:00Z'));
     vi.advanceTimersByTime(30_000);
     await nextTick();
-    expect(wrapper.find('tr[data-id="sub-everyone"]').exists()).toBe(false);
+    expect(wrapper.find('[data-id="sub-everyone"]').exists()).toBe(false);
   });
 
   it('shows the full list to an editor without the banner', async () => {
@@ -92,7 +91,7 @@ describe('contest submissions tab', () => {
       ...signedInViewer(),
       ...contestPageRoutes(contestDetail({ viewer: contestViewer({ canEdit: true }) })),
       'GET /contests/r42/submissions': page([submissionItem()]),
-      'GET /problems/meta': ok(problemMeta()),
+      ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
     expect(wrapper.find('[data-testid="own-only"]').exists()).toBe(false);

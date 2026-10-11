@@ -39,6 +39,15 @@ export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ce: 'bg-verdict-ce-bg text-verdict-ce',
   pending: 'bg-verdict-pending-bg text-verdict-pending',
 };
+/** Custom properties of the verdict tones (tokens), for drawings that need a colour value (rings, strips). */
+export const VERDICT_TONE_VARS: Record<VerdictTone, string> = {
+  ac: '--qh-verdict-ac',
+  wa: '--qh-verdict-wa',
+  tle: '--qh-verdict-tle',
+  rte: '--qh-verdict-rte',
+  ce: '--qh-verdict-ce',
+  pending: '--qh-verdict-pending',
+};
 /** The solid verdict block of a submission row (white text on a saturated fill); pending keeps the soft tint. System outcomes (IE, AB) are the dark `sys` block. */
 export type BlockTone = VerdictTone | 'sys';
 const SYSTEM_CODES: readonly VerdictCode[] = ['IE', 'AB'];

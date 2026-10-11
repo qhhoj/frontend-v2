@@ -59,7 +59,7 @@ export function quickFilterPatch(
   }
 }
 
-/** How many filters only the advanced panel shows: the problem, another user, or results no chip stands for. */
+/** How many filters only the advanced panel shows: the problem, another user, results no chip stands for, or the final-judging box. */
 export function advancedFilterCount(filters: SubmissionFilters, username: string | null): number {
   const resultsByChip =
     filters.results.length === 0 ||
@@ -69,5 +69,6 @@ export function advancedFilterCount(filters: SubmissionFilters, username: string
     filters.problem !== '',
     filters.user !== '' && filters.user !== username,
     !resultsByChip,
+    filters.statusGroups.includes('final'),
   ].filter(Boolean).length;
 }

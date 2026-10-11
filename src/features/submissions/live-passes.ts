@@ -1,15 +1,17 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import type { Ref } from 'vue';
-import { fetchSubmissions } from '@/api/submissions.api';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import type { FrameSummary } from './live-feed';
-import { submissionListApiQuery } from './submissions.queries';
+import { fetchScopePage, scopeApiQuery } from './list/submission-scope';
+import type { SubmissionScope } from './list/submission-scope';
 import type { SubmissionFilters } from './use-submission-filters';
 
 export const FIRST_PAGE = 1;
 
 export interface PassContext {
+  /** Whose list it is: the probe for rows above a later page asks the same endpoint. */
+  scope: Ref<SubmissionScope>;
   filters: Ref<SubmissionFilters>;
   /** Reads the shown page again and resolves to its rows. */
   refetchRows: () => Promise<SubmissionListItem[] | undefined>;
@@ -43,8 +45,8 @@ export function createListPasses(context: PassContext) {
     const startedIn = currentGeneration();
     if (touchedShownRow) await context.refetchRows();
     if (!queuedFrames) return;
-    const probe = await fetchSubmissions({
-      ...submissionListApiQuery(filters.value),
+    const probe = await fetchScopePage(context.scope.value, {
+      ...scopeApiQuery(context.scope.value, filters.value),
       page: FIRST_PAGE,
       pageSize: 1,
     });

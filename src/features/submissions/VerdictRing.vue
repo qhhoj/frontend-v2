@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import type { RingProgress } from '@/lib/grading';
 import { translate } from '@/i18n';
-import type { Verdict, VerdictTone } from '@/lib/verdicts';
+import { VERDICT_TONE_VARS } from '@/lib/verdicts';
+import type { Verdict } from '@/lib/verdicts';
 
 /** While grading `progress` fills the ring in the positive colour; a final `verdict` fills it all in its own colour. */
 const props = defineProps<{
@@ -13,20 +14,11 @@ const props = defineProps<{
 }>();
 const FULL_TURN_DEGREES = 360;
 const PERCENT = 100;
-/** Custom properties of the verdict tones (tokens), the same ones the verdict badges use. */
-const TONE_COLOURS: Record<VerdictTone, string> = {
-  ac: '--qh-verdict-ac',
-  wa: '--qh-verdict-wa',
-  tle: '--qh-verdict-tle',
-  rte: '--qh-verdict-rte',
-  ce: '--qh-verdict-ce',
-  pending: '--qh-verdict-pending',
-};
 
 const fraction = computed(() => (props.isEmpty ? 0 : (props.progress?.fraction ?? 1)));
 const filledColour = computed(() => {
   if (props.isEmpty) return '--qh-text-muted';
-  return props.progress ? '--qh-positive' : TONE_COLOURS[props.verdict.tone];
+  return props.progress ? '--qh-positive' : VERDICT_TONE_VARS[props.verdict.tone];
 });
 const ringStyle = computed(() => ({
   background: `conic-gradient(var(${filledColour.value}) ${fraction.value * FULL_TURN_DEGREES}deg, var(--qh-line-strong) 0)`,

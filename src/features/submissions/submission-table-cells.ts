@@ -1,5 +1,14 @@
 /** Columns a submission table can show, in table order. The verdict column holds the score; `cost` is "time · memory". */
 export type ColumnKey = 'verdict' | 'problem' | 'user' | 'cost' | 'language' | 'when';
+/** Every column, in table order. */
+export const ALL_COLUMN_KEYS: readonly ColumnKey[] = [
+  'verdict',
+  'problem',
+  'user',
+  'cost',
+  'language',
+  'when',
+];
 
 /** A column plus the two that have no heading text: the pick box and the source link. */
 export type ColumnSlot = ColumnKey | 'pick' | 'source';

@@ -4,12 +4,14 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import { createFrameSummary, createSettler, useFeedStream } from './live-feed';
 import { useAnnouncer, useListFilterKey, useNewRowBaseline } from './live-list-state';
 import { createListPasses } from './live-passes';
+import type { SubmissionScope } from './list/submission-scope';
 import type { SubmissionFilters } from './use-submission-filters';
 
 /** Frames of a burst are read together: the first one starts the window, the pass runs when it ends. */
 export const LIVE_SETTLE_MS = 3000;
 
 interface LiveSubmissionListOptions {
+  scope: Ref<SubmissionScope>;
   filters: Ref<SubmissionFilters>;
   /** The rows shown now. */
   rows: Ref<SubmissionListItem[]>;

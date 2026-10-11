@@ -1150,7 +1150,11 @@
       "user": "username",
       "live": "Live updates",
       "problemLabel": "Problem",
-      "userLabel": "User"
+      "userLabel": "User",
+      "orgProblemLabel": "Organization problem",
+      "anyProblem": "Any problem",
+      "anyProblemCount": "Any problem ({count})",
+      "problemSearch": "Search code or name"
     },
     "pager": {
       "label": "Pages",
@@ -1196,6 +1200,21 @@
       "label": "Row density",
       "compact": "Compact",
       "comfortable": "Roomy"
+    },
+    "strip": {
+      "passed": "{passed}/{outOf} tests passed",
+      "passedBatch": "{passed}/{outOf} subtasks passed",
+      "more": "{count} more tests",
+      "grading": "judging",
+      "failure": "{count} {code}",
+      "cell": "Test {number}: {verdict}",
+      "cellBatch": "Subtask {number}: {verdict}",
+      "pending": "not judged yet",
+      "hint": "Use the arrow keys to read each test"
+    },
+    "ring": {
+      "label": "Score {percent}%",
+      "grading": "{percent}% of the points judged"
     }
   },
   "ranking": {
@@ -2678,12 +2697,7 @@
       "unlistedNote": "A new organization stays out of the public list until staff list it."
     },
     "submissions": {
-      "problemLabel": "Organization problem",
-      "anyProblem": "Any problem",
-      "anyProblemCount": "Any problem ({count})",
-      "problemSearch": "Search code or name",
       "empty": "The organization's members have no submissions yet.",
-      "emptyFiltered": "No member submissions match these filters.",
       "forbiddenTitle": "Only members can see the organization's submissions"
     }
   }

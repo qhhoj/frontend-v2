@@ -1150,7 +1150,11 @@
       "user": "tên đăng nhập",
       "live": "Cập nhật trực tiếp",
       "problemLabel": "Bài",
-      "userLabel": "Người nộp"
+      "userLabel": "Người nộp",
+      "orgProblemLabel": "Bài của tổ chức",
+      "anyProblem": "Mọi bài",
+      "anyProblemCount": "Mọi bài ({count})",
+      "problemSearch": "Tìm mã hoặc tên bài"
     },
     "pager": {
       "label": "Trang",
@@ -1196,6 +1200,21 @@
       "label": "Mật độ hàng",
       "compact": "Gọn",
       "comfortable": "Rộng"
+    },
+    "strip": {
+      "passed": "{passed}/{outOf} test đúng",
+      "passedBatch": "{passed}/{outOf} subtask đúng",
+      "more": "còn {count} test",
+      "grading": "đang chấm",
+      "failure": "{count} {code}",
+      "cell": "Test {number}: {verdict}",
+      "cellBatch": "Subtask {number}: {verdict}",
+      "pending": "chưa chấm",
+      "hint": "Dùng phím mũi tên để xem từng test"
+    },
+    "ring": {
+      "label": "Điểm {percent}%",
+      "grading": "Đã chấm {percent}% số điểm"
     }
   },
   "ranking": {
@@ -2678,12 +2697,7 @@
       "unlistedNote": "Tổ chức mới chưa hiện trong danh sách công khai cho đến khi ban quản trị duyệt."
     },
     "submissions": {
-      "problemLabel": "Bài của tổ chức",
-      "anyProblem": "Mọi bài",
-      "anyProblemCount": "Mọi bài ({count})",
-      "problemSearch": "Tìm mã hoặc tên bài",
       "empty": "Thành viên tổ chức chưa nộp bài nào.",
-      "emptyFiltered": "Thành viên tổ chức chưa nộp bài với bộ lọc này.",
       "forbiddenTitle": "Chỉ thành viên xem được bài nộp của tổ chức"
     }
   }

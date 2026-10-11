@@ -1,2 +1,3 @@
-/** A row of the submission list, whether the card shows the table (a `tr`) or the stacked rows of a narrow card (an `li`). */
-export const ROW = '[data-testid="submission-table-card"] [data-id]';
+/** A row of the submission list: a card ("Rộng"), a table row ("Gọn"), or a stacked row of a narrow table card. */
+export const ROW =
+  ':is([data-testid="submission-card-list"], [data-testid="submission-table-card"]) [data-id]';

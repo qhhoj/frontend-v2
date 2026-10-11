@@ -1,12 +1,12 @@
 import { ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
 
-/** "Gọn": one-line 42px rows; "Rộng": the roomier rows of the other submission tables. */
+/** "Gọn": the one-line 42px table rows, for scanning many rows; "Rộng": the cards with score ring and per-test strip. */
 export type ListDensity = 'compact' | 'comfortable';
 
 export const DENSITY_STORAGE_KEY = 'qhhoj.submissions.density';
 const DENSITIES: readonly ListDensity[] = ['compact', 'comfortable'];
-const DEFAULT_DENSITY: ListDensity = 'compact';
+const DEFAULT_DENSITY: ListDensity = 'comfortable';
 
 const isDensity = (value: string | null): value is ListDensity =>
   DENSITIES.includes(value as ListDensity);

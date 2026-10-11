@@ -164,18 +164,48 @@ test.describe('submission list', () => {
     await expect(page.getByRole('status').filter({ hasText: 'Có 1 bài nộp mới' })).toHaveCount(1);
   });
 
+  test('re-reads the page while a row with a test strip is judged, and stops once it is done', async ({
+    page,
+    api,
+  }) => {
+    api.signedIn = true;
+    const strip = (statuses: ('AC' | 'WA')[]) => ({
+      unit: 'case' as const,
+      statuses,
+      batches: statuses.map(() => null),
+      more: 0,
+      total: 3,
+    });
+    const states = [
+      submissionItem({ status: 'G', result: null, points: null, testSummary: strip(['AC']) }),
+      submissionItem({ status: 'G', result: null, points: null, testSummary: strip(['AC', 'AC']) }),
+      submissionItem({ testSummary: strip(['AC', 'AC', 'WA']), result: 'WA', points: 0 }),
+    ];
+    let reads = 0;
+    api.routes['GET /submissions'] = () => list([states[Math.min(reads++, states.length - 1)]]);
+    await page.goto('/submissions');
+    await expect(page.getByTestId('test-strip')).toContainText('1/3 test đúng');
+    await expect(page.getByTestId('test-strip')).toContainText('2/3 test đúng', { timeout: 5_000 });
+    await expect(page.getByTestId('test-strip')).toContainText('2/3 test đúng · 1 WA', {
+      timeout: 5_000,
+    });
+    const settled = reads;
+    await page.waitForTimeout(4_000);
+    expect(reads).toBe(settled);
+  });
+
   test.describe('at 375 px', () => {
     test.use({ viewport: { width: PHONE_WIDTH, height: 812 } });
 
-    test('puts the filters above the list, whose rows stack inside the card without scrolling the page', async ({
+    test('puts the filters above the cards, which fit the width without scrolling the page', async ({
       page,
       api,
     }) => {
       await openList(page, api);
       const rail = (await page.getByRole('search').boundingBox())!;
-      const card = (await page.getByTestId('submission-table-card').boundingBox())!;
-      expect(rail.y + rail.height).toBeLessThanOrEqual(card.y);
-      await expect(page.getByTestId('submission-table-card').locator('table')).toHaveCount(0);
+      const cards = (await page.getByTestId('submission-card-list').boundingBox())!;
+      expect(rail.y + rail.height).toBeLessThanOrEqual(cards.y);
+      await expect(page.locator('table')).toHaveCount(0);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
       ).toBeLessThanOrEqual(0);

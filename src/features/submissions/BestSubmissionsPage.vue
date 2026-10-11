@@ -13,7 +13,8 @@ import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionTable from './SubmissionTable.vue';
 import SubmissionTableSkeleton from './SubmissionTableSkeleton.vue';
-import { SUBMISSION_PAGE_SIZE, useBestSubmissionsQuery } from './submissions.queries';
+import { SUBMISSION_PAGE_SIZE } from './list/submission-scope';
+import { useBestSubmissionsQuery } from './submissions.queries';
 
 /** A problem's best submissions: each user's best one, ranked (points, time, memory, earliest), `?page=` paged. */
 const route = useRoute();
