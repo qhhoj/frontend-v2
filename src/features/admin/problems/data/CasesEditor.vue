@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef, toRaw } from 'vue';
 import { translate } from '@/i18n';
 import type { ProblemData } from '@/api/types/problem-data';
 import { FileArchive, Plus } from 'lucide-vue-next';
@@ -9,7 +9,7 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import CaseRow from './CaseRow.vue';
 import ZipAutofillDialog from './ZipAutofillDialog.vue';
 import type { AutofillMode } from './ZipAutofillDialog.vue';
-import { useAdminToast } from '../../ui/feedback/use-admin-toast';
+import AdminStatus from '../../ui/AdminStatus.vue';
 import {
   addBatch,
   addCase,
@@ -65,14 +65,22 @@ const messagesAt = (index: number) => {
 const HEAD = 'border-b border-line px-2 py-2 whitespace-nowrap';
 
 const isAutofillShown = ref(false);
-const toast = useAdminToast();
+/**
+ * The "added N tests, now save" line: shown inline (a toast would sit over the save bar it points to) while the list is still the
+ * one the autofill made; any later change, a save or a discard replaces the list and hides it.
+ */
+const applied = shallowRef<{ list: KeyedCase[]; count: number } | null>(null);
+const appliedText = computed(() =>
+  applied.value && applied.value.list === toRaw(cases.value)
+    ? translate('admin.problems.data.autofill.applied', { count: applied.value.count })
+    : '',
+);
 /** Replaced rows take their args-box flags with them, as a removed row does. */
 function applyAutofill(rows: KeyedCase[], mode: AutofillMode) {
   if (mode === 'replace') cases.value.forEach((row) => emit('invalid', row.key, false));
-  cases.value = mode === 'replace' ? rows : [...cases.value, ...rows];
-  toast.show({
-    text: translate('admin.problems.data.autofill.appliedToast', { count: rows.length }),
-  });
+  const list = mode === 'replace' ? rows : [...cases.value, ...rows];
+  cases.value = list;
+  applied.value = { list: toRaw(list), count: rows.length };
 }
 
 function move(index: number, offset: -1 | 1) {
@@ -104,6 +112,12 @@ function remove(index: number) {
         })
       }}
     </p>
+    <AdminStatus
+      v-if="appliedText"
+      kind="done"
+      data-testid="autofill-applied"
+      :text="appliedText"
+    />
     <datalist id="archive-files">
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>

@@ -310,7 +310,7 @@
       "unpairedHint": "Các tệp này sẽ không thành test. Kiểm tra tên: input và output của một test phải cùng thư mục và cùng tên gốc.",
       "others": "{count} tệp khác (không phải input/output)",
       "apply": "Thêm {count} test",
-      "appliedToast": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu."
+      "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu."
     }
   },
   "uploads": {

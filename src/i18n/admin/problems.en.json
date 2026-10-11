@@ -310,7 +310,7 @@
       "unpairedHint": "These files will not become tests. Check their names: a test's input and output must share a folder and a base name.",
       "others": "{count} other files (not input/output)",
       "apply": "Add {count} tests",
-      "appliedToast": "Added {count} tests. Press “Save configuration” to save."
+      "applied": "Added {count} tests. Press “Save configuration” to save."
     }
   },
   "uploads": {

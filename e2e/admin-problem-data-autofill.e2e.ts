@@ -53,6 +53,7 @@ test('fills the test list from an uploaded zip and saves it through the save bar
   await expect(dialog).toBeHidden();
 
   await expect(page.getByText('3 test', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('autofill-applied')).toContainText('Đã thêm 3 test');
   expect(api.requestsTo('PUT /problems/hcmus41c/data')).toHaveLength(0);
   await page.getByTestId('data-save-bar').getByRole('button', { name: 'Lưu cấu hình' }).click();
   await expect.poll(() => api.requestsTo('PUT /problems/hcmus41c/data').length).toBe(1);
@@ -66,4 +67,5 @@ test('fills the test list from an uploaded zip and saves it through the save bar
     ['C', 'Test02/BAI.INP', 'Test02/BAI.OUT', 33],
     ['C', 'Test10/BAI.INP', 'Test10/BAI.OUT', 34],
   ]);
+  await expect(page.getByTestId('autofill-applied')).toHaveCount(0);
 });

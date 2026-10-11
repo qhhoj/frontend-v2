@@ -2,7 +2,6 @@
 import Dialog from 'primevue/dialog';
 import { TriangleAlert } from 'lucide-vue-next';
 import { computed, ref, useId, watch } from 'vue';
-import ScrollRegion from '@/components/ScrollRegion.vue';
 import AdminChip from '../../ui/AdminChip.vue';
 import AdminField from '../../ui/AdminField.vue';
 import { BUTTON, INPUT } from '../../ui/controls';
@@ -112,11 +111,12 @@ const CELL = 'border-b border-line px-2 py-1.5';
           :aria-invalid="invalid === 'true'"
         />
       </AdminField>
-      <ScrollRegion
+      <div
         v-if="pairs.length > 0"
-        class="max-h-72 min-w-0 rounded-cell border border-line"
-        :label="$t('admin.problems.data.autofill.previewLabel')"
-        no-hint
+        role="region"
+        tabindex="0"
+        class="max-h-72 min-w-0 overflow-auto rounded-cell border border-line focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+        :aria-label="$t('admin.problems.data.autofill.previewLabel')"
       >
         <table class="w-full border-separate border-spacing-0 text-sm">
           <caption class="sr-only">
@@ -145,7 +145,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
             </tr>
           </tbody>
         </table>
-      </ScrollRegion>
+      </div>
       <section
         v-if="pairing.unpaired.length > 0"
         data-testid="autofill-unpaired"
