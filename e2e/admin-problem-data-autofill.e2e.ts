@@ -56,7 +56,7 @@ test('fills the test list from an uploaded zip and saves it through the save bar
   expect(api.requestsTo('PUT /problems/hcmus41c/data')).toHaveLength(0);
   await page.getByTestId('data-save-bar').getByRole('button', { name: 'Lưu cấu hình' }).click();
   await expect.poll(() => api.requestsTo('PUT /problems/hcmus41c/data').length).toBe(1);
-  const sent = api.requestsTo('PUT /problems/hcmus41c/data')[0]!.body as {
+  const sent = JSON.parse(String(api.requestsTo('PUT /problems/hcmus41c/data')[0]!.postData)) as {
     cases: { type: string; input: string; output: string; points: number }[];
   };
   expect(

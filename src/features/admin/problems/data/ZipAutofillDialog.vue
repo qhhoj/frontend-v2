@@ -109,7 +109,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
           inputmode="numeric"
           :class="[INPUT, 'max-w-40']"
           :aria-describedby="describedBy"
-          :aria-invalid="invalid"
+          :aria-invalid="invalid === 'true'"
         />
       </AdminField>
       <ScrollRegion
