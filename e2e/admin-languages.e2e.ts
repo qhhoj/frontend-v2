@@ -20,8 +20,8 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['GET /admin/languages'] = adminOk(LANGUAGES);
     api.routes['GET /judges'] = adminOk(JUDGE_FLEET);
     await page.goto('/admin/languages');
-    await expect(page.getByRole('table')).toBeVisible();
-    await expect(page.getByRole('cell', { name: '5 / 5' }).first()).toBeVisible();
+    // A table from 768 px, one card per language below.
+    await expect(page.getByText('5 / 5', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('PAS chỉ chạy trên một máy')).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(await fitsWidth(page)).toBe(true);
@@ -41,13 +41,13 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.goto('/admin/languages/new');
     await expect(page.getByTestId('language-save-bar')).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
-    await page.getByLabel('Mã ngôn ngữ *', { exact: true }).fill('KOTLIN');
-    await page.getByLabel('Tên *', { exact: true }).fill('Kotlin');
-    await page.getByLabel('Tên chung *', { exact: true }).fill('Kotlin');
-    await page.getByLabel('Chế độ Ace *', { exact: true }).fill('kotlin');
-    await page.getByLabel('Pygments *', { exact: true }).fill('kotlin');
-    await page.getByLabel('Đuôi tệp *', { exact: true }).fill('kt');
-    await page.getByLabel('Đuôi tệp *', { exact: true }).press('Enter');
+    await page.getByRole('textbox', { name: 'Mã ngôn ngữ bắt buộc', exact: true }).fill('KOTLIN');
+    await page.getByRole('textbox', { name: 'Tên bắt buộc', exact: true }).fill('Kotlin');
+    await page.getByRole('textbox', { name: 'Tên chung bắt buộc', exact: true }).fill('Kotlin');
+    await page.getByRole('textbox', { name: 'Chế độ Ace bắt buộc', exact: true }).fill('kotlin');
+    await page.getByRole('textbox', { name: 'Pygments bắt buộc', exact: true }).fill('kotlin');
+    await page.getByRole('textbox', { name: 'Đuôi tệp bắt buộc', exact: true }).fill('kt');
+    await page.getByRole('textbox', { name: 'Đuôi tệp bắt buộc', exact: true }).press('Enter');
     await expect(page).toHaveURL(/\/admin\/languages$/);
     expect(api.requestsTo('POST /admin/languages')).toHaveLength(1);
     expect(await fitsWidth(page)).toBe(true);
@@ -66,7 +66,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.goto('/admin/languages/RUBY');
     await expect(page.getByTestId('language-key-sealed')).toContainText('Cố định');
     expect(await axeViolationsIn(page)).toEqual([]);
-    await page.getByLabel('Tên *', { exact: true }).fill('Ruby 3');
+    await page.getByRole('textbox', { name: 'Tên bắt buộc', exact: true }).fill('Ruby 3');
     await page.getByRole('button', { name: 'Lưu thay đổi' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Đã lưu lúc' })).toBeVisible();
     expect(api.requestsTo(`PATCH /admin/languages/${ruby.id}`)).toHaveLength(1);

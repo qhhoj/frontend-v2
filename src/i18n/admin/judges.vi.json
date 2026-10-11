@@ -5,8 +5,7 @@
     "empty": "Chưa có máy chấm nào.",
     "emptyAdd": "Thêm máy chấm",
     "search": "Tìm máy chấm",
-    "searchPlaceholder": "Tên hoặc IP",
-    "noMatch": "Không có máy chấm nào khớp."
+    "searchPlaceholder": "Tên hoặc IP"
   },
   "stats": {
     "online": "đang trực tuyến",
@@ -27,20 +26,16 @@
   },
   "row": {
     "ping": "{ms} ms",
-    "languages": "{count} ngôn ngữ",
-    "slots": "{busy}/{slots} ô đang chấm",
-    "build": "bản dựng {build}",
     "disable": "Tắt",
     "enable": "Bật lại",
     "block": "Chặn",
     "unblock": "Bỏ chặn",
-    "rotate": "Khoá",
-    "disconnect": "Ngắt",
-    "details": "Chi tiết",
+    "rotate": "Cấp khoá mới",
+    "disconnect": "Ngắt kết nối",
+    "details": "Thông tin máy",
     "started": "Khởi động lúc {time} · ping là trung bình 6 lần gần nhất.",
     "descriptionLabel": "Mô tả (hiện cho nhân viên)",
     "saveDescription": "Lưu mô tả",
-    "loadLabel": "Tải",
     "delete": "Xóa",
     "protocol": "Giao thức",
     "features": "Tính năng",
@@ -117,5 +112,25 @@
       "pinnedOffline": "{count} bài nộp đang chờ riêng máy chấm {subject}, mà máy này không hoạt động.",
       "stale": "Bài nộp chờ lâu nhất đã quá 5 phút: hàng đợi có thể đang tắc."
     }
+  },
+  "table": {
+    "caption": "Máy chấm",
+    "name": "Máy chấm",
+    "status": "Trạng thái",
+    "load": "Tải",
+    "ping": "Ping",
+    "busy": "Đang chấm",
+    "build": "Bản dựng",
+    "languages": "Ngôn ngữ",
+    "ip": "IP"
+  },
+  "toast": {
+    "disabled": "Đã tắt {name}",
+    "enabled": "Đã bật lại {name}",
+    "blocked": "Đã chặn {name}",
+    "unblocked": "Đã bỏ chặn {name}",
+    "description": "Đã lưu mô tả của {name}",
+    "disconnected": "Đã ngắt kết nối {name}",
+    "deleted": "Đã xoá {name}"
   }
 }

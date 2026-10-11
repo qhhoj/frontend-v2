@@ -1,28 +1,27 @@
 {
   "title": "Ngôn ngữ lập trình",
   "lead": "Danh sách ngôn ngữ nộp bài và những máy chấm đang chạy chúng.",
-  "stats": {
-    "count": "{count} ngôn ngữ",
-    "online": "{online} máy chấm trực tuyến",
-    "single": "{single} chỉ có trên một máy"
-  },
   "single": {
     "title": "{key} chỉ chạy trên một máy",
-    "body": "Bài nộp {key} sẽ chờ nếu máy {judge} tắt hoặc bị chặn."
+    "body": "Bài nộp {key} sẽ chờ nếu máy {judge} tắt hoặc bị chặn.",
+    "many": "{count} ngôn ngữ chỉ chạy trên một máy"
   },
   "table": {
     "key": "Mã",
     "name": "Tên",
     "extension": "Đuôi tệp",
-    "inProblem": "Có trong bài mới",
-    "coverage": "Máy chấm hỗ trợ",
+    "inProblem": "Bài mới",
+    "coverage": "Máy chấm",
     "judgesCount": "{count} / {total}",
     "showJudges": "Xem máy",
     "fileOnly": "chỉ nhận tệp",
-    "yes": "Có",
-    "no": "Không",
     "onlineCount": "{count} trực tuyến",
-    "versionDrift": "Phiên bản khác nhau"
+    "versionDrift": "Phiên bản khác nhau",
+    "caption": "Ngôn ngữ",
+    "summary": "{count} ngôn ngữ · {online} máy chấm trực tuyến",
+    "summaryNoJudges": "{count} ngôn ngữ",
+    "inProblemChip": "Có trong bài mới",
+    "versions": "Máy chạy"
   },
   "empty": "Chưa có ngôn ngữ nào.",
   "form": {
@@ -36,13 +35,13 @@
       "content": "Nội dung hiển thị"
     },
     "labels": {
-      "key": "Mã ngôn ngữ *",
-      "name": "Tên *",
+      "key": "Mã ngôn ngữ",
+      "name": "Tên",
       "shortName": "Tên ngắn",
-      "commonName": "Tên chung *",
-      "ace": "Chế độ Ace *",
-      "pygments": "Pygments *",
-      "extension": "Đuôi tệp *",
+      "commonName": "Tên chung",
+      "ace": "Chế độ Ace",
+      "pygments": "Pygments",
+      "extension": "Đuôi tệp",
       "fileSize": "Giới hạn dung lượng tệp (byte)",
       "fileOnly": "Chỉ nhận tệp tải lên",
       "includeInProblem": "Có trong bài tập mới",

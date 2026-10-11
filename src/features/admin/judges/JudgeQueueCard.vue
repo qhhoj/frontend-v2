@@ -7,6 +7,7 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
+import { CARD } from '../ui/controls';
 import { priorityKey, queueAlerts } from './queue-health';
 import { JUDGE_POLL_MS, useJudgeQueueQuery } from './queue.queries';
 
@@ -41,7 +42,7 @@ const largest = computed(() =>
 <template>
   <section
     data-testid="judge-queue"
-    class="glass flex flex-col gap-4 rounded-panel p-5"
+    :class="[CARD, 'flex flex-col gap-4 p-5']"
     aria-labelledby="judge-queue-title"
   >
     <header class="flex flex-wrap items-center gap-3">
