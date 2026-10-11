@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { RecentComment } from '@/api/types/comments';
-import UserContent from '@/components/UserContent.vue';
 import UserLink from '@/components/UserLink.vue';
 import { commentRoute } from '@/lib/comment-links';
+import { htmlPlainText } from '@/lib/html-excerpt';
 import { formatAgo, signedScore } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -11,6 +11,9 @@ import { useLocaleStore } from '@/stores/locale.store';
 const props = defineProps<{ comment: RecentComment; now: number }>();
 const locale = useLocaleStore();
 /** The page's screen with the comment's anchor; null for a tag problem, which has no screen. */
+/** A comment's preview is one plain line of words, so a `#include` or a code block never renders as a heading or in a big type. */
+const EXCERPT_LENGTH = 200;
+const excerpt = computed(() => htmlPlainText(props.comment.bodyHtml, EXCERPT_LENGTH));
 const target = computed(() => commentRoute(props.comment.page, props.comment.id));
 </script>
 
@@ -29,7 +32,7 @@ const target = computed(() => commentRoute(props.comment.page, props.comment.id)
       </RouterLink>
       <span v-else class="font-semibold">{{ comment.page.title }}</span>
     </p>
-    <UserContent :html="comment.bodyHtml" class="line-clamp-2 text-sm text-muted" />
+    <p class="line-clamp-2 text-sm text-muted [overflow-wrap:anywhere]">{{ excerpt }}</p>
     <p class="text-xs text-muted">
       {{ formatAgo(comment.createdAt, now, locale.locale) }} · {{ signedScore(comment.score) }}
     </p>

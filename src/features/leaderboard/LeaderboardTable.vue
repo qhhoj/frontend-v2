@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { nextTick, watch } from 'vue';
+import { computed, nextTick, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { ArrowDown } from 'lucide-vue-next';
 import { useRoute, useRouter } from 'vue-router';
 import type { LeaderboardEntry, LeaderboardSort, RankField } from '@/api/types/users';
+import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import StateBit from '@/components/StateBit.vue';
 import UserName from '@/components/UserName.vue';
@@ -14,7 +16,6 @@ import {
   BOARD_HEAD_CLASS,
   BOARD_TABLE_CLASS,
   BOARD_ROW_CLASS,
-  NO_FULL_NAME,
   ORGANIZATION_CELL_CLASS,
   ORGANIZATION_HEAD_CLASS,
   RANK_CELL_CLASS,
@@ -34,11 +35,16 @@ const props = defineProps<{
   sort: LeaderboardSort;
   viewerName: string | null;
 }>();
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
 const valueOf = (entry: LeaderboardEntry, key: RankField) =>
   entry[key] === null ? '—' : formatNumber(entry[key], locale.locale);
+const sortOptions = computed(() =>
+  boardColumns(props.sort).map((column) => ({ value: column.key, label: t(column.labelKey) })),
+);
+const changeSort = (key: string) => router.push(sortLocation(key as LeaderboardSort));
 const scrollToTarget = async () => {
   await nextTick();
   if (route.hash) revealRow(route.hash.slice(1));
@@ -47,6 +53,14 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
 </script>
 
 <template>
+  <ToolbarSelect
+    class="lg:hidden"
+    :label="$t('leaderboard.sortBy')"
+    :model-value="sort"
+    :options="sortOptions"
+    :active="false"
+    @update:model-value="changeSort"
+  />
   <ScrollRegion :label="$t('leaderboard.scrollRegion')">
     <table :class="BOARD_TABLE_CLASS">
       <thead :class="BOARD_HEAD_CLASS">
@@ -97,9 +111,9 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
             </span>
           </td>
           <td :class="USER_CELL_CLASS">
-            <span class="flex items-center gap-2.5">
+            <span class="flex min-h-10 items-center gap-2.5">
               <UserAvatar :username="entry.username" :size="AVATAR_PX" class="shrink-0" />
-              <span class="flex min-w-0 flex-col">
+              <span class="flex min-w-0 flex-col justify-center">
                 <span class="flex items-center gap-2">
                   <UserName
                     :username="entry.username"
@@ -114,8 +128,11 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
                     {{ $t('common.you') }}
                   </span>
                 </span>
-                <span class="truncate text-xs text-muted">
-                  {{ entry.displayName !== entry.username ? entry.displayName : NO_FULL_NAME }}
+                <span
+                  v-if="entry.displayName !== entry.username"
+                  class="truncate text-xs text-muted"
+                >
+                  {{ entry.displayName }}
                 </span>
               </span>
             </span>

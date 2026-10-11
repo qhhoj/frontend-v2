@@ -9,8 +9,9 @@ import { votePost } from '@/api/blog.api';
 import { formatNumericDate } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import { summaryExcerpt } from './post-summary';
 
-/** One post as a compact row, no excerpt: a one-line title, then author, date and comments, with the vote on the right. */
+/** One post as a row: a two-line title, a muted two-line excerpt, then author, date and comments, with the vote centred on the right. */
 const props = defineProps<{ post: PostListItem }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
@@ -19,6 +20,7 @@ const isAuthor = computed(() =>
   props.post.authors.some((author) => author.id === session.user?.id),
 );
 const canVote = computed(() => session.user !== null && !isAuthor.value);
+const excerpt = computed(() => summaryExcerpt(props.post.summaryHtml));
 const send = (score: VoteScore) => votePost(props.post.id, score);
 const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] });
 </script>
@@ -26,10 +28,10 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 <template>
   <article
     data-testid="post-row"
-    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-3.5 sm:px-5 sm:py-4"
+    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-4 sm:px-5 sm:py-5"
   >
-    <div class="flex min-w-0 flex-col gap-1">
-      <h2 class="truncate text-base font-semibold">
+    <div class="flex min-w-0 flex-col gap-2">
+      <h2 class="line-clamp-2 text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
         <span
           v-if="post.sticky"
           class="mr-2 inline-flex rounded-pill bg-accent-soft px-2.5 py-0.5 align-middle text-xs font-semibold text-accent-soft-text"
@@ -40,6 +42,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           {{ post.title }}
         </RouterLink>
       </h2>
+      <p v-if="excerpt" class="line-clamp-2 leading-6 text-muted [overflow-wrap:anywhere]">
+        {{ excerpt }}
+      </p>
       <footer class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted">
         <UserLink
           v-for="author in post.authors"

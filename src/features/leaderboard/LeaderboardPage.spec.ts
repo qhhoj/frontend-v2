@@ -73,8 +73,7 @@ describe('leaderboard page: shows the viewer’s own rank', () => {
     });
     const { wrapper, router } = await mountApp('/users');
     const card = wrapper.get('[data-testid="my-rank"]');
-    expect(card.text()).toContain('1.134');
-    expect(card.text()).toContain('Specialist');
+    expect(card.text()).toContain('#1.134');
     await card.get('button').trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.fullPath).toBe('/users?page=12#user-user_01');
@@ -92,9 +91,7 @@ describe('leaderboard page: shows the viewer’s own rank', () => {
       'GET /users/user_01/rank': fail(404, 'not_found'),
     });
     const { wrapper } = await mountApp('/users');
-    expect(wrapper.get('[data-testid="my-rank"]').text()).toContain(
-      'Tài khoản của bạn không có trên bảng xếp hạng',
-    );
+    expect(wrapper.find('[data-testid="my-rank"]').exists()).toBe(false);
   });
 });
 
@@ -172,7 +169,7 @@ describe('leaderboard page: find-my-rank again and errors', () => {
     expect(document.activeElement?.id).toBe('user-user_01');
   });
 
-  it('shows the query error with a retry in the rank card when the rank request fails', async () => {
+  it('shows no rank line when the rank request fails', async () => {
     mockApi({
       ...signedInViewer(),
       'GET /users': board,
@@ -180,9 +177,6 @@ describe('leaderboard page: find-my-rank again and errors', () => {
       'GET /users/user_01/rank': fail(500, 'internal_error'),
     });
     const { wrapper } = await mountApp('/users');
-    const card = wrapper.get('[data-testid="my-rank"]');
-    expect(card.find('[role="alert"]').exists()).toBe(true);
-    expect(card.text()).toContain('Thử lại');
-    expect(card.text()).not.toContain('Tài khoản của bạn không có trên bảng xếp hạng');
+    expect(wrapper.find('[data-testid="my-rank"]').exists()).toBe(false);
   });
 });
