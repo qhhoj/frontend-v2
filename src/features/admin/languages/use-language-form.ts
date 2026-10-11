@@ -29,6 +29,13 @@ function useLanguageSave(
         ? updateLanguage(stored.value.id, patchOf(stored.value, form))
         : createLanguage(createBodyOf(form)),
     invalidates: () => [languagesAdminKey],
+    successText: (answer) =>
+      translate(
+        stored.value ? 'admin.languages.form.savedToast' : 'admin.languages.form.createdToast',
+        {
+          key: answer.key,
+        },
+      ),
     onDone: (answer) => {
       if (!stored.value) return onCreated();
       stored.value = answer;

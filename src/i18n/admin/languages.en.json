@@ -68,6 +68,8 @@
     "save": "Save changes",
     "cancel": "Cancel",
     "saved": "Saved.",
+    "savedToast": "Saved language {key}.",
+    "createdToast": "Created language {key}.",
     "errors": {
       "key": "1–10 characters: letters, digits and _ + # . -",
       "keyTaken": "Another language already uses this key.",

@@ -68,6 +68,8 @@
     "save": "Lưu thay đổi",
     "cancel": "Huỷ",
     "saved": "Đã lưu.",
+    "savedToast": "Đã lưu ngôn ngữ {key}.",
+    "createdToast": "Đã tạo ngôn ngữ {key}.",
     "errors": {
       "key": "Mã gồm 1–10 ký tự: chữ, số và _ + # . -",
       "keyTaken": "Mã này đã có ngôn ngữ khác dùng.",
