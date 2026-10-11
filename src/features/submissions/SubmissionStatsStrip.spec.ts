@@ -46,7 +46,7 @@ describe('the submission stats strip', () => {
     const older: Partial<SubmissionStats> = submissionStats();
     delete older.verdictsToday;
     const wrapper = mountComponent(SubmissionStatsStrip, {
-      props: { stats: older as SubmissionStats, live: true },
+      props: { stats: older, live: true },
     });
     expect(wrapper.find('[data-testid="verdict-distribution"]').exists()).toBe(false);
     expect(wrapper.text()).toContain('1.284');
