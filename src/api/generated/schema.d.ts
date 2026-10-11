@@ -1869,8 +1869,7 @@ export interface paths {
         };
         /**
          * List contest tags
-         * @description Returns the contest tag catalogue, public, each tag with the number of
-         *     contests the viewer may see that carry it. Paged with `page` and
+         * @description Returns the contest tag catalogue, public. Paged with `page` and
          *     `pageSize`.
          */
         get: operations["ContestTagsController_list"];
@@ -2494,10 +2493,8 @@ export interface paths {
         /**
          * Judge the final submissions of a contest
          * @description Contest editors only. Queues judging of the pending final submissions of
-         *     a final-submission contest that has started; returns 202. A running
-         *     contest is judged early (results become visible) and what is submitted
-         *     afterwards waits for the end. Fails with 409 `conflict` for any other
-         *     format or before the start.
+         *     an ended final-submission contest; returns 202. Fails with 409 `conflict`
+         *     for any other format or while the contest is still running.
          */
         post: operations["ContestEditingController_judgeFinal"];
         delete?: never;
@@ -2572,8 +2569,7 @@ export interface paths {
         /**
          * List participations in a contest
          * @description Returns the viewer's own participations in the contest, or anyone's for
-         *     contest editors (filter by the exact `user`, or by `search` for usernames
-         *     containing the text; other users and `search` are refused with 403 for
+         *     contest editors (filter by `user`; other users are refused with 403 for
          *     non-editors). Live and virtual participations are included (not spectator
          *     rows). Results are frozen for non-editors while the ranking is frozen.
          *     Paged with `page` and `pageSize`.
@@ -2667,32 +2663,6 @@ export interface paths {
          *     and results, for one stale score; returns 202 with `queued` true.
          */
         post: operations["ParticipationAdminController_recompute"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/contests/{key}/participations/disqualify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Disqualify or reinstate many participants
-         * @description Contest editors only. Applies `disqualified` to each listed participation
-         *     of the contest as the single route does (contest ban, current contest,
-         *     cheating ban), then purges the ranking cache and queues one rescore. An
-         *     id that is not a participation of this contest is reported as `failed`
-         *     (`not_found`) and does not stop the others; a row that already had the
-         *     value is `unchanged`. Limited to 20 runs per hour per user (429
-         *     `rate_limited`).
-         */
-        post: operations["ContestParticipationController_disqualifyMany"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3048,58 +3018,6 @@ export interface paths {
         get: operations["ContestSubmissionsController_list"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/contests/bulk/tag": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add or remove a tag on contests in bulk
-         * @description Requires `judge.change_contest_tag`. Adds (`assigned` true) or removes
-         *     the tag on each listed contest as `PATCH /contests/{key}` would, so the
-         *     caller needs edit rights on each and an added tag must exist. A contest
-         *     whose tags changed meanwhile fails with `conflict`, one already holding 20
-         *     tags with `too_many_tags`; failures do not stop the others. Limited to 20
-         *     runs per hour per user, shared with the bulk visibility route (429
-         *     `rate_limited`).
-         */
-        post: operations["ContestBulkController_tag"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/internal/contests/bulk/visibility": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Show or hide contests in bulk
-         * @description Applies `isVisible` to each listed contest exactly as `PATCH
-         *     /contests/{key}` would: the caller needs edit rights on each, and showing
-         *     one needs `judge.change_contest_visibility` (or
-         *     `judge.create_private_contest` for a private contest). A refused contest
-         *     is reported as `failed` with the PATCH's error code and does not stop the
-         *     others. Limited to 20 runs per hour per user, shared with the bulk tag
-         *     route (429 `rate_limited`).
-         */
-        post: operations["ContestBulkController_visibility"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6075,37 +5993,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/internal/submissions/{id}/score": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Override a submission's verdict and score
-         * @description Needs `judge.change_submission` and edit rights on the problem (403
-         *     `forbidden`). Sets `result` (a graded verdict) and `points` on the
-         *     problem's scale; the case results stay as judged. User points, problem
-         *     statistics and contest results are recomputed as after a judging (an
-         *     `ioi16` contest still scores batches from the judged cases). Sending the
-         *     stored score again changes nothing. 400
-         *     `points_above_problem`, `points_not_partial` (a problem without partial
-         *     points takes 0 or full) or `accepted_needs_full_points`. 409 `conflict`
-         *     while the submission is queued or judged, or is a pending final
-         *     submission; 409 `problem_deleted` when the problem is deleted. A rejudge
-         *     discards the override unless `lock` locks the submission too. Logged as a
-         *     submission revision with `comment`. Answers 204.
-         */
-        put: operations["SubmissionActionsController_overrideScore"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/internal/submissions/{id}/source": {
         parameters: {
             query?: never;
@@ -7163,58 +7050,6 @@ export interface components {
             /** @description Why the user is banned; shown to the user at sign-in and to staff. Must not be blank. */
             reason: string;
         };
-        BulkContestResponse: {
-            /** @description Number of contests changed. */
-            done: number;
-            /** @description Number of contests refused. */
-            failed: number;
-            /** @description One entry per requested key, in request order. */
-            results: components["schemas"]["BulkContestResultResponse"][];
-        };
-        BulkContestResultResponse: {
-            /** @description The contest key from the request. */
-            key: string;
-            /** @description `done` when the contest changed, `unchanged` when it already was so, `failed` when the edit was refused. */
-            outcome: components["schemas"]["BulkVisibilityOutcome"];
-            /** @description Set when failed: the error code the single-contest PATCH would answer (`not_found`, `forbidden`, `conflict`, ...), or `too_many_tags`. */
-            reason?: string;
-        };
-        BulkContestTagDto: {
-            /** @description true adds the tag to every listed contest, false removes it. */
-            assigned: boolean;
-            /** @description Contest keys to change, 1 to 100, no repeats. */
-            keys: string[];
-            /** @description The tag slug to add or remove. */
-            tag: string;
-        };
-        BulkContestVisibilityDto: {
-            /** @description true shows every listed contest, false hides it. */
-            isVisible: boolean;
-            /** @description Contest keys to change, 1 to 100, no repeats. */
-            keys: string[];
-        };
-        BulkDisqualifyDto: {
-            /** @description True to disqualify the participation, false to reinstate it. */
-            disqualified: boolean;
-            /** @description Participation ids, 1 to 100, no repeats. */
-            ids: string[];
-        };
-        BulkDisqualifyResponse: {
-            /** @description Number of participations changed. */
-            done: number;
-            /** @description Number of ids refused. */
-            failed: number;
-            /** @description One entry per requested id, in request order. */
-            results: components["schemas"]["BulkDisqualifyResultResponse"][];
-        };
-        BulkDisqualifyResultResponse: {
-            /** @description The participation id from the request. */
-            id: string;
-            /** @description `done` when the flag changed, `unchanged` when it already had that value, `failed` when the participation is not in the contest. */
-            outcome: components["schemas"]["BulkVisibilityOutcome"];
-            /** @description Set when failed: the error code (`not_found`). */
-            reason?: string;
-        };
         BulkHideCommentsDto: {
             /** @description True to hide each comment with its replies, false to restore them. */
             hidden: boolean;
@@ -7746,8 +7581,6 @@ export interface components {
             /** @description Unique short identifier used in URLs. */
             key: string;
             labelStyle: components["schemas"]["ContestLabelStyle"];
-            /** @description Shown instead of the site logo inside the contest; empty for none. */
-            logoOverrideImage: string;
             name: string;
             /** @description The organizations the contest is restricted to, empty unless it is organization-private; unlisted ones show only to viewers who may list them. */
             organizations: components["schemas"]["ContestOrganizationResponse"][];
@@ -7835,22 +7668,9 @@ export interface components {
             /** @description Language name. */
             name: string;
         };
-        ContestListEditorResponse: {
-            /** @description Whether the contest is shown to users who may see it. */
-            isVisible: boolean;
-            /**
-             * Format: date-time
-             * @description Live submissions are not rejudged after this time; null for no lock.
-             */
-            lockedAfter: string | null;
-            /** @description Submissions still waiting for the final judge; null unless the format is `final_submission`. */
-            pendingCount: number | null;
-        };
         ContestListItemResponse: {
             /** @description Virtual participation after the end is not allowed. */
             disallowVirtual: boolean;
-            /** @description Null unless the viewer may edit the contest. */
-            editor: components["schemas"]["ContestListEditorResponse"] | null;
             /**
              * Format: date-time
              * @description When the contest ends, ISO 8601.
@@ -7900,8 +7720,6 @@ export interface components {
             /** @description Virtual participations. */
             virtualCount: number;
         };
-        /** @enum {string} */
-        ContestListSort: "name" | "newest" | "oldest" | "users";
         ContestListViewerResponse: {
             /** @description Their current contest (`GET /contests/current`) is this one, and that participation has not ended. */
             isCurrent: boolean;
@@ -8042,8 +7860,6 @@ export interface components {
              * @description Live submissions are not rejudged after this time; null for no lock.
              */
             lockedAfter: string | null;
-            /** @description Image for link previews; empty for the site image. */
-            ogImage: string;
             /** @description Organization ids tied to the contest. */
             organizations: string[];
             /** @description User ids allowed in a private contest. */
@@ -8081,8 +7897,6 @@ export interface components {
         ContestTagResponse: {
             /** @description A theme token key (`tag-1`..`tag-8`), never a hex. */
             color: components["schemas"]["TagColor"];
-            /** @description Contests carrying the tag, among those the viewer may see. */
-            contestCount: number;
             /** @description Short description. */
             description: string;
             /** @description Display name. */
@@ -8193,12 +8007,8 @@ export interface components {
              *     none.
              */
             lockedAfter?: string | null;
-            /** @description Replaces the site logo inside the contest: an http(s) URL or a site path, up to 150 characters; empty for none. */
-            logoOverrideImage?: string;
             /** @description Contest name, 1 to 100 characters. */
             name: string;
-            /** @description Image for link previews: an http(s) URL or a site path, up to 150 characters; empty for the site image. */
-            ogImage?: string;
             /** @description Organization ids tied to the contest. */
             organizations?: string[];
             /** @description Decimal places shown in scores. */
@@ -9673,11 +9483,6 @@ export interface components {
             /** @description The viewer's pending join request (Task 6), else null. */
             pendingRequestId: string | null;
         };
-        /**
-         * @description The verdict to show. `AC` needs full points.
-         * @enum {string}
-         */
-        OverrideResult: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "TLE" | "WA";
         PackageBuildingResponse: {
             /**
              * @description Always `building`.
@@ -10900,16 +10705,6 @@ export interface components {
          * @enum {string}
          */
         ScoreboardVisibility: "C" | "H" | "P" | "V";
-        ScoreOverrideDto: {
-            /** @description Why, kept in the submission's revision log; 1 to 500 characters. */
-            comment: string;
-            /** @description true also locks it, so a later rejudge cannot discard the override. Default false. */
-            lock?: boolean;
-            /** @description Points on the problem's scale, 0 to the problem's points (3 decimals); a problem without partial points takes only 0 or full. */
-            points: number;
-            /** @description The verdict to show. `AC` needs full points. */
-            result: components["schemas"]["OverrideResult"];
-        };
         ScratchCodesRemainingResponse: {
             /** @description Number of unused scratch codes. */
             remaining: number;
@@ -11650,8 +11445,6 @@ export interface components {
             canAbort: boolean;
             /** @description Whether `POST` and `DELETE /submissions/{id}/lock` are allowed. */
             canLock: boolean;
-            /** @description Whether `PUT /submissions/{id}/score` is allowed. */
-            canOverrideScore: boolean;
             /** @description Whether `POST /submissions/{id}/reject` is allowed. */
             canReject: boolean;
             /** @description Whether `POST /submissions/{id}/rejudge` is allowed. */
@@ -12153,12 +11946,8 @@ export interface components {
              *     none.
              */
             lockedAfter?: string | null;
-            /** @description Replaces the site logo inside the contest: an http(s) URL or a site path, up to 150 characters; empty for none. */
-            logoOverrideImage?: string;
             /** @description Contest name, 1 to 100 characters. */
             name?: string;
-            /** @description Image for link previews: an http(s) URL or a site path, up to 150 characters; empty for the site image. */
-            ogImage?: string;
             /** @description Organization ids tied to the contest. */
             organizations?: string[];
             /** @description Decimal places shown in scores. */
@@ -16517,8 +16306,6 @@ export interface operations {
             query?: {
                 /** @description true: only contests the viewer may edit (the admin screen's index); false: only the others. */
                 editable?: boolean;
-                /** @description true: only contests the viewer authors, curates or tests; a signed-out visitor gets none. */
-                mine?: boolean;
                 /** @description Only contests of this organization id. */
                 organization?: string;
                 /** @description 1-based page number. */
@@ -16533,16 +16320,8 @@ export interface operations {
                 rated?: boolean;
                 /** @description Key or name, case-insensitive. */
                 search?: string;
-                /** @description Row order; without it upcoming contests come soonest first and the rest newest first. */
-                sort?: components["schemas"]["ContestListSort"];
-                /** @description Only contests starting before this time, ISO 8601. */
-                startBefore?: string;
-                /** @description Only contests starting at or after this time, ISO 8601. */
-                startFrom?: string;
                 /** @description Only contests carrying this tag slug. */
                 tag?: string;
-                /** @description true: only visible contests; false: only hidden ones (which only their editors, testers and staff see). */
-                visible?: boolean;
             };
             header?: never;
             path?: never;
@@ -17873,8 +17652,6 @@ export interface operations {
                 page?: number;
                 /** @description Participations per page, 1 to 100. */
                 pageSize?: number;
-                /** @description Usernames containing this text, case-insensitive; contest editors only. */
-                search?: string;
                 /** @description `score`: best first (score, then time, then tiebreaker); default: live before virtual, oldest first. */
                 sort?: "score";
                 /** @description Username; others than the viewer need edit rights. */
@@ -18088,45 +17865,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["QueuedResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ContestParticipationController_disqualifyMany: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Key of the contest. */
-                key: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDisqualifyDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["BulkDisqualifyResponse"];
                     };
                 };
             };
@@ -18741,78 +18479,6 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["SubmissionListItemResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ContestBulkController_tag: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkContestTagDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["BulkContestResponse"];
-                    };
-                };
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ContestBulkController_visibility: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkContestVisibilityDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["BulkContestResponse"];
                     };
                 };
             };
@@ -24202,41 +23868,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
-            default: {
-                headers: {
-                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
-                    "Retry-After"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    SubmissionActionsController_overrideScore: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Submission id. */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScoreOverrideDto"];
-            };
-        };
         responses: {
             204: {
                 headers: {
