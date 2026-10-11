@@ -85,7 +85,6 @@ const contestBasics = (): Omit<EditableContest, 'problems' | 'viewer' | 'setting
   userCount: 214,
   isPrivate: false,
   isOrganizationPrivate: false,
-  organizations: [],
   authors: [{ id: 'id-thayhung', username: 'thayhung', rating: null }],
   registrationStart: null,
   registrationEnd: null,
