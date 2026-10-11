@@ -35,6 +35,12 @@ const stateKey = computed(() => {
       rel="noopener"
       >{{ $t('footer.source') }}</a
     >
+    <RouterLink
+      :to="{ name: 'runtimes' }"
+      data-testid="runtimes-footer"
+      class="inline-flex min-h-11 items-center text-accent-text underline"
+      >{{ $t('footer.runtimes') }}</RouterLink
+    >
     <span>
       {{ $t('lowPower.footer', { state: $t(stateKey) }) }} ·
       <RouterLink

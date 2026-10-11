@@ -56,7 +56,8 @@
     "contestReplay": "Phát lại",
     "contestBalloons": "Bóng bay",
     "contestBalloonsPrint": "Phiếu bóng bay",
-    "problemBest": "Bài nộp tốt nhất"
+    "problemBest": "Bài nộp tốt nhất",
+    "runtimes": "Máy chấm và ngôn ngữ"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -1255,7 +1256,8 @@
       "fileUploadDisabled": "Ngôn ngữ này không cho tải tệp lên.",
       "fileRejected": "Tệp bị từ chối.",
       "sourceLength": "Mã nguồn vượt quá {max} ký tự."
-    }
+    },
+    "versions": "Xem phiên bản"
   },
   "submission": {
     "ringLabel": "Đã chấm {graded} trên {total} test",
@@ -1310,7 +1312,12 @@
       "copy": "Sao chép mã nguồn",
       "resubmit": "Nộp lại",
       "collapse": "Thu gọn",
-      "expand": "Xem mã nguồn ({count} dòng)"
+      "expand": "Xem mã nguồn ({count} dòng)",
+      "lines": "{count} dòng",
+      "raw": "Xem mã nguồn thô",
+      "rawShort": "Mã thô",
+      "download": "Tải mã nguồn xuống",
+      "downloadShort": "Tải xuống"
     },
     "forbidden": {
       "solve_first": "Giải bài này trước để xem bài nộp",
@@ -2461,6 +2468,37 @@
   },
   "footer": {
     "versionTitle": "Bản dựng giao diện đang chạy (commit và ngày)",
-    "source": "Mã nguồn (AGPL)"
+    "source": "Mã nguồn (AGPL)",
+    "runtimes": "Máy chấm"
+  },
+  "runtimes": {
+    "title": "Máy chấm và ngôn ngữ",
+    "lead": "Tự động làm mới mỗi 5 giây.",
+    "tiles": {
+      "online": "Máy chấm trực tuyến",
+      "busy": "Khe chấm đang bận",
+      "queue": "Bài nộp đang chờ",
+      "ping": "Ping trung bình"
+    },
+    "online": "Trực tuyến",
+    "offline": "Ngoại tuyến",
+    "load": "Tải: {busy}/{slots} khe",
+    "loadLabel": "Mức sử dụng khe chấm",
+    "ping": "Ping",
+    "uptime": "Hoạt động",
+    "uptimeUnit": {
+      "day": "{n} ngày",
+      "hour": "{n} giờ",
+      "minute": "{n} phút"
+    },
+    "asleep": "Đang ngủ. Bài nộp được chuyển sang máy khác.",
+    "languages": "Ngôn ngữ lập trình",
+    "search": "Tìm ngôn ngữ",
+    "noMatch": "Không có ngôn ngữ nào khớp.",
+    "noJudge": "Chưa có máy chấm",
+    "mismatch": "{count} máy khác phiên bản",
+    "extension": "Đuôi file",
+    "perJudge": "Phiên bản trên từng máy chấm",
+    "notInstalled": "chưa cài"
   }
 }

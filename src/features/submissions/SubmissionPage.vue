@@ -131,6 +131,7 @@ const verdict = computed(() => {
           :problem-code="isDeletedProblem ? null : problemCode"
           :is-own="isOwn"
           :language-key="row.language?.key ?? null"
+          :language-name="row.language?.name ?? null"
         />
         <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
         <CasesTable

@@ -5308,6 +5308,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/runtimes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the judges and the languages they run
+         * @description Public. Returns the judges that may connect (blocked and disabled ones are
+         *     left out) with online state, slots, slots in use, mean ping in milliseconds
+         *     and when they started, and every programming language with the compiler
+         *     version each judge has for it. Keys, addresses, builds and notes are never
+         *     returned.
+         */
+        get: operations["RuntimesController_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/seo/preview": {
         parameters: {
             query?: never;
@@ -5725,6 +5749,52 @@ export interface paths {
          *     language it is the URL of the uploaded file.
          */
         get: operations["SubmissionsController_source"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/submissions/{id}/source/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the source code as a file
+         * @description Same access rules, errors and body as the raw endpoint, but answers
+         *     `Content-Disposition: attachment` with the filename `<submission id>.<language
+         *     extension>` (`Main.java` for Java).
+         */
+        get: operations["SubmissionSourceFileController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/submissions/{id}/source/raw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show the source code as plain text
+         * @description Needs a signed-in user and follows the same access rules and errors as the
+         *     source endpoint. Answers `text/plain; charset=utf-8` with
+         *     `Content-Disposition: inline`, `X-Content-Type-Options: nosniff` and
+         *     `Cache-Control: private, no-store`. 404
+         *     `not_found` for a file-only language, which has no source text.
+         */
+        get: operations["SubmissionSourceFileController_raw"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10137,6 +10207,51 @@ export interface components {
              */
             event: "resync";
         };
+        RuntimeJudgeResponse: {
+            /** @description Slots in use at its last pong; 0 while offline. */
+            busy: number;
+            /** @description Judge name. */
+            name: string;
+            /** @description Whether the judge is connected now. */
+            online: boolean;
+            /** @description Milliseconds, mean of the last 6 pings; null while offline or unmeasured. */
+            pingMs: number | null;
+            /** @description Assignments it runs at once. */
+            slots: number;
+            /**
+             * Format: date-time
+             * @description When the judge process last started; null if it never connected. Meaningful while online.
+             */
+            startedAt: string | null;
+        };
+        RuntimeLanguageResponse: {
+            /** @description Generic family name, shared by versions. */
+            commonName: string;
+            /** @description File extension without the dot. */
+            extension: string;
+            /** @description Whether solutions are uploaded as a file instead of typed. */
+            fileOnly: boolean;
+            /** @description Language key judges report. */
+            key: string;
+            /** @description Display name. */
+            name: string;
+            /** @description One entry per listed judge, online or not, that has the language. */
+            versions: components["schemas"]["RuntimeVersionResponse"][];
+        };
+        RuntimesResponse: {
+            /** @description Judges that may connect, by name. */
+            judges: components["schemas"]["RuntimeJudgeResponse"][];
+            /** @description Every programming language, by name. */
+            languages: components["schemas"]["RuntimeLanguageResponse"][];
+        };
+        RuntimeVersionResponse: {
+            /** @description Compiler or interpreter name. */
+            compiler: string;
+            /** @description Name of the judge that has this runtime. */
+            judge: string;
+            /** @description Runtime version. */
+            version: string;
+        };
         ScopeQueryDto: {
             /** @description Contest key. */
             contest?: string;
@@ -10804,6 +10919,8 @@ export interface components {
          */
         SubmissionResult: "AB" | "AC" | "CE" | "IE" | "IR" | "MLE" | "OLE" | "RJ" | "RTE" | "SC" | "TLE" | "WA";
         SubmissionSourceResponse: {
+            /** @description Name the raw and download links give the file (`<id>.<extension>`, `Main.java` for Java); null for a file-only language. */
+            filename: string | null;
             /** @description Submission id. */
             id: string;
             /** @description Submitted source text; for a file-only language, the URL of the uploaded file. */
@@ -22084,6 +22201,38 @@ export interface operations {
             };
         };
     };
+    RuntimesController_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RuntimesResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     SeoController_preview: {
         parameters: {
             query: {
@@ -22799,6 +22948,74 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["SubmissionSourceResponse"];
                     };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SubmissionSourceFileController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Submission id. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The source text, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SubmissionSourceFileController_raw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Submission id. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The source text, shown inline. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
