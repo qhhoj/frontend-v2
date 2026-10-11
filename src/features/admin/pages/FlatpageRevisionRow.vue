@@ -6,7 +6,7 @@ import { formatDateTime } from '@/lib/format';
 import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import ChangeLines from './ChangeLines.vue';
 import { canLoadOldValues, changeLinesOf, fieldLabelKey } from './flatpage-history';
 
@@ -73,7 +73,7 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
           <button
             v-if="!readonly && canLoadOldValues(revision)"
             type="button"
-            :class="ADMIN_BUTTON_CLASS"
+            :class="BUTTON.secondary"
             @click="emit('load')"
           >
             {{ t('admin.pages.history.load') }}

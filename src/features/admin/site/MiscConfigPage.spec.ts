@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import { staffViewer } from '@/test/admin-routes';
 import { siteData } from '@/test/admin-fixtures/site';
 
 const PERMS = ['judge.change_miscconfig'];
@@ -14,8 +14,23 @@ const mountConfig = async () => {
   await vi.waitFor(() => expect(mounted.wrapper.findAll('tbody tr').length).toBeGreaterThan(0));
   return mounted.wrapper;
 };
-const buttonNamed = (wrapper: Mounted, label: string) =>
-  wrapper.findAll('button').find((button) => button.text() === label)!;
+/** The editor is a drawer and the delete confirm a dialog on top of it: both render into `document.body`. */
+const buttonNamed = (label: string, root: ParentNode = document.body) =>
+  [...root.querySelectorAll<HTMLButtonElement>('button')].find(
+    (button) => button.textContent?.trim() === label,
+  )!;
+const field = (id: string) => document.getElementById(id) as HTMLInputElement;
+const typeInto = async (id: string, value: string) => {
+  field(id).value = value;
+  field(id).dispatchEvent(new Event('input'));
+  await flushPromises();
+};
+/** The topmost dialog: the confirm opened over the editor drawer. */
+const topDialog = () => [...document.querySelectorAll<HTMLElement>('[role="dialog"]')].at(-1)!;
+const openEditor = async (wrapper: Mounted, key: string) => {
+  await rowWith(wrapper, key).get('button').trigger('click');
+  await vi.waitFor(() => expect(field('config-value')).not.toBeNull());
+};
 const rowWith = (wrapper: Mounted, key: string) =>
   wrapper.findAll('tbody tr').find((row) => row.text().includes(key))!;
 
@@ -29,11 +44,10 @@ describe('MiscConfigPage', () => {
     });
     const wrapper = await mountConfig();
     expect(rowWith(wrapper, 'announcement').text()).toContain('HTML');
-    await rowWith(wrapper, 'announcement').get('button').trigger('click');
-    const frame = wrapper.get('iframe');
-    expect(frame.attributes('sandbox')).toBe('');
-    await wrapper.get('#config-value').setValue('<p>Mới</p>');
-    await buttonNamed(wrapper, 'Lưu').trigger('click');
+    await openEditor(wrapper, 'announcement');
+    expect(document.querySelector('iframe')!.getAttribute('sandbox')).toBe('');
+    await typeInto('config-value', '<p>Mới</p>');
+    buttonNamed('Lưu').click();
     await flushPromises();
     expect(calls.find((call) => call.method === 'PUT')?.body).toEqual({ value: '<p>Mới</p>' });
     expect(calls.filter((call) => call.path === '/site')).toHaveLength(1);
@@ -50,24 +64,25 @@ describe('MiscConfigPage', () => {
       'GET /admin/site/config/new_key/revisions': page([]),
     });
     const wrapper = await mountConfig();
-    await buttonNamed(wrapper, 'Thêm khoá').trigger('click');
-    await wrapper.get('#config-key').setValue('new_key');
-    await wrapper.get('#config-value').setValue('x');
-    await buttonNamed(wrapper, 'Lưu').trigger('click');
+    buttonNamed('Thêm khoá').click();
+    await vi.waitFor(() => expect(field('config-key')).not.toBeNull());
+    await typeInto('config-key', 'new_key');
+    await typeInto('config-value', 'x');
+    buttonNamed('Lưu').click();
     await flushPromises();
-    expect(wrapper.text()).toContain('new_key');
-    await rowWith(wrapper, 'contact_email').get('button').trigger('click');
-    await buttonNamed(wrapper, 'Xoá khoá').trigger('click');
+    expect(wrapper.findAll('tbody tr').some((row) => row.text().includes('new_key'))).toBe(true);
+    await openEditor(wrapper, 'contact_email');
+    buttonNamed('Xoá khoá').click();
     await flushPromises();
     expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xoá khoá');
+    await vi.waitFor(() => expect(topDialog().textContent).toContain('Mọi trang ngừng dùng'));
+    buttonNamed('Xoá khoá', topDialog()).click();
+    await flushPromises();
     expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
     expect(wrapper.findAll('tbody tr').some((row) => row.text().includes('contact_email'))).toBe(
       false,
     );
     expect(wrapper.get('[role="status"]').text()).toContain('contact_email');
-    await vi.waitFor(() =>
-      expect(document.activeElement).toBe(buttonNamed(wrapper, 'Thêm khoá').element),
-    );
+    await vi.waitFor(() => expect(document.activeElement).toBe(buttonNamed('Thêm khoá')));
   });
 });

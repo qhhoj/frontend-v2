@@ -1,108 +1,147 @@
 <script setup lang="ts">
-import ScrollRegion from '@/components/ScrollRegion.vue';
-import type { IntegrationClient } from '@/api/types/integration-clients';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { NumberedPageMeta } from '@/api/client';
+import type { IntegrationClient, IntegrationScope } from '@/api/types/integration-clients';
+import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminChip from '../ui/AdminChip.vue';
+import type { ChipTone } from '../ui/AdminChip.vue';
+import { buttonClass } from '../ui/controls';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import { rangeOf } from '../ui/table/table-columns';
+import type { AdminColumn } from '../ui/table/table-columns';
+import { SCOPE_KEYS } from './integration-form';
 
-/** Keep `IntegrationClientsTableSkeleton.vue` in step. Below md only name, key, state and the action show. */
-defineProps<{ clients: IntegrationClient[]; isLocked: boolean }>();
-defineEmits<{ revoke: [client: IntegrationClient] }>();
+/** The card takes focus after a revoke (`tabindex=-1`, id `integration-table`). On a phone each client is a card. */
+const props = defineProps<{
+  clients: IntegrationClient[];
+  meta?: NumberedPageMeta;
+  isLocked: boolean;
+  loading: boolean;
+  error: unknown;
+}>();
+defineEmits<{ revoke: [client: IntegrationClient]; retry: [] }>();
+defineSlots<{ empty?: () => unknown }>();
 const locale = useLocaleStore();
-const CELL = 'px-3 py-2 align-middle';
-const WIDE = 'hidden md:table-cell';
+const { t } = useI18n();
+
+const columns = computed<AdminColumn[]>(() => [
+  {
+    key: 'name',
+    label: t('admin.integrations.table.name'),
+    priority: 'primary',
+    cellClass: 'min-w-48',
+  },
+  { key: 'state', label: t('admin.integrations.table.state'), priority: 'badge' },
+  { key: 'scopes', label: t('admin.integrations.table.scopes'), priority: 'meta' },
+  { key: 'actsAs', label: t('admin.integrations.table.actsAs') },
+  { key: 'lastUsed', label: t('admin.integrations.table.lastUsed'), priority: 'meta' },
+  { key: 'expires', label: t('admin.integrations.table.expires'), priority: 'meta' },
+  { key: 'cidrs', label: t('admin.integrations.table.cidrs'), priority: 'meta' },
+]);
 const dateOf = (value: string) => formatDateTime(value, locale.locale);
+type ClientState = 'revoked' | 'expired' | 'active';
 /** Revoked wins over expired: both end the key, but revoking is the staff's act. */
-const stateOf = (client: IntegrationClient): 'revoked' | 'expired' | 'active' => {
+const stateOf = (client: IntegrationClient): ClientState => {
   if (client.revokedAt) return 'revoked';
   return client.expiresAt && new Date(client.expiresAt).getTime() <= Date.now()
     ? 'expired'
     : 'active';
 };
+const STATE_TONES: Record<ClientState, ChipTone> = {
+  active: 'positive',
+  expired: 'caution',
+  revoked: 'neutral',
+};
+const stateText = (client: IntegrationClient) => {
+  const state = stateOf(client);
+  if (state === 'revoked')
+    return t('admin.integrations.table.revokedAt', { date: dateOf(client.revokedAt!) });
+  if (state === 'expired')
+    return t('admin.integrations.table.expiredAt', { date: dateOf(client.expiresAt!) });
+  return t('admin.integrations.table.active');
+};
+const scopeText = (scope: IntegrationScope) =>
+  t(`admin.integrations.form.scope.${SCOPE_KEYS[scope]}`);
+/** "1–50 / 312" when the list says its total. */
+const range = computed(() => {
+  const meta = props.meta;
+  return meta && 'total' in meta
+    ? rangeOf(meta.page, meta.pageSize, props.clients.length, meta.total)
+    : null;
+});
 </script>
 
 <template>
-  <div
+  <AdminDataTable
     id="integration-table"
     data-testid="integration-table"
     tabindex="-1"
-    class="glass overflow-hidden rounded-card focus-visible:-outline-offset-2"
+    class="focus-visible:-outline-offset-2"
+    :columns="columns"
+    :rows="clients"
+    :row-key="(client) => client.id"
+    :row-label="(client) => client.name"
+    :row-attrs="(client) => ({ 'data-client': client.id })"
+    :label="$t('admin.integrations.table.caption')"
+    :loading="loading"
+    :error="error"
+    :skeleton-rows="3"
+    @retry="$emit('retry')"
   >
-    <ScrollRegion :label="$t('admin.integrations.table.region')">
-      <table class="w-full border-collapse text-sm">
-        <caption class="sr-only">
-          {{
-            $t('admin.integrations.table.caption')
-          }}
-        </caption>
-        <thead>
-          <tr class="text-left text-[13px] text-muted">
-            <th scope="col" :class="CELL">{{ $t('admin.integrations.table.name') }}</th>
-            <th scope="col" :class="CELL">{{ $t('admin.integrations.table.key') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.integrations.table.scopes') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.integrations.table.cidrs') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.integrations.table.actsAs') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.integrations.table.lastUsed') }}</th>
-            <th scope="col" :class="[CELL, WIDE]">{{ $t('admin.integrations.table.expires') }}</th>
-            <th scope="col" :class="CELL">{{ $t('admin.integrations.table.state') }}</th>
-            <th scope="col" :class="CELL">
-              <span class="sr-only">{{ $t('admin.integrations.table.revoke') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="client in clients"
-            :key="client.id"
-            :data-client="client.id"
-            class="border-t border-line"
-          >
-            <td :class="[CELL, 'font-semibold']">{{ client.name }}</td>
-            <td :class="[CELL, 'font-mono']">{{ client.keyPrefix }}…</td>
-            <td :class="[CELL, WIDE]">
-              <code v-for="scope in client.scopes" :key="scope" class="block font-mono text-xs">{{
-                scope
-              }}</code>
-            </td>
-            <td :class="[CELL, WIDE, 'font-mono text-xs']">{{ client.allowedCidrs.join(', ') }}</td>
-            <td :class="[CELL, WIDE]">{{ client.actsAs.username }}</td>
-            <td :class="[CELL, WIDE, 'whitespace-nowrap text-muted']">
-              {{
-                client.lastUsedAt ? dateOf(client.lastUsedAt) : $t('admin.integrations.table.never')
-              }}
-            </td>
-            <td :class="[CELL, WIDE, 'whitespace-nowrap']">
-              {{
-                client.expiresAt
-                  ? dateOf(client.expiresAt)
-                  : $t('admin.integrations.table.noExpiry')
-              }}
-            </td>
-            <td :class="[CELL, 'whitespace-nowrap']">
-              <span v-if="stateOf(client) === 'revoked'" class="font-semibold text-negative">{{
-                $t('admin.integrations.table.revokedAt', { date: dateOf(client.revokedAt!) })
-              }}</span>
-              <span v-else-if="stateOf(client) === 'expired'" class="font-semibold text-negative">{{
-                $t('admin.integrations.table.expiredAt', { date: dateOf(client.expiresAt!) })
-              }}</span>
-              <span v-else class="font-semibold text-positive">{{
-                $t('admin.integrations.table.active')
-              }}</span>
-            </td>
-            <td :class="CELL">
-              <button
-                v-if="!client.revokedAt"
-                type="button"
-                class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold text-negative hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:text-muted"
-                :aria-label="$t('admin.integrations.table.revokeLabel', { name: client.name })"
-                :aria-disabled="isLocked || undefined"
-                @click="isLocked || $emit('revoke', client)"
-              >
-                {{ $t('admin.integrations.table.revoke') }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </ScrollRegion>
-  </div>
+    <template #cell-name="{ row }">
+      <span class="block font-semibold">{{ row.name }}</span>
+      <span class="block font-mono text-xs text-muted">{{ row.keyPrefix }}…</span>
+    </template>
+    <template #cell-state="{ row }">
+      <AdminChip :tone="STATE_TONES[stateOf(row)]">{{ stateText(row) }}</AdminChip>
+    </template>
+    <template #cell-scopes="{ row }">
+      <span class="inline-flex flex-wrap gap-1">
+        <AdminChip v-for="scope in row.scopes" :key="scope" :title="scope">
+          {{ scopeText(scope) }}
+        </AdminChip>
+      </span>
+    </template>
+    <template #cell-actsAs="{ row }">{{ row.actsAs.username }}</template>
+    <template #cell-lastUsed="{ row }">
+      <span class="whitespace-nowrap text-muted">{{
+        row.lastUsedAt ? dateOf(row.lastUsedAt) : $t('admin.integrations.table.never')
+      }}</span>
+    </template>
+    <template #cell-expires="{ row }">
+      <span class="whitespace-nowrap">{{
+        row.expiresAt ? dateOf(row.expiresAt) : $t('admin.integrations.table.noExpiry')
+      }}</span>
+    </template>
+    <template #cell-cidrs="{ row }">
+      <span class="font-mono text-xs break-all">{{ row.allowedCidrs.join(', ') }}</span>
+    </template>
+    <template #actions="{ row }">
+      <button
+        v-if="!row.revokedAt"
+        type="button"
+        :class="buttonClass('danger', 'sm')"
+        :aria-label="$t('admin.integrations.table.revokeLabel', { name: row.name })"
+        :aria-disabled="isLocked || undefined"
+        @click="isLocked || $emit('revoke', row)"
+      >
+        {{ $t('admin.integrations.table.revoke') }}
+      </button>
+    </template>
+    <template #empty><slot name="empty" /></template>
+    <template v-if="meta" #footer>
+      <span v-if="range" class="font-mono tabular-nums">
+        {{ $t('admin.table.range', range) }}
+      </span>
+      <NumberedPager
+        class="ml-auto"
+        compact
+        :meta="meta"
+        :label="$t('admin.integrations.table.pager')"
+      />
+    </template>
+  </AdminDataTable>
 </template>

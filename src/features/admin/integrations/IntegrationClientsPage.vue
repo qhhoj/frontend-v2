@@ -4,19 +4,19 @@ import { onBeforeRouteLeave, useRoute } from 'vue-router';
 import { revokeIntegrationClient } from '@/api/integration-clients.api';
 import type { CreatedIntegrationClient, IntegrationClient } from '@/api/types/integration-clients';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import AdminDrawer from '../ui/AdminDrawer.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
+import { BUTTON } from '../ui/controls';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import RevealKeyDialog from '../ui/RevealKeyDialog.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import IntegrationClientForm from './IntegrationClientForm.vue';
 import IntegrationClientsTable from './IntegrationClientsTable.vue';
-import IntegrationClientsTableSkeleton from './IntegrationClientsTableSkeleton.vue';
 import { integrationClientsKey, useIntegrationClientsQuery } from './integration-clients.queries';
 
 const route = useRoute();
@@ -39,13 +39,12 @@ const keyTexts = computed(() => ({
   copy: translate('admin.integrations.key.copy'),
 }));
 const pending = ref<IntegrationClient | null>(null);
-const revokedName = ref<string | null>(null);
 const revoke = useAdminMutation<IntegrationClient, void>({
   mutate: (client) => revokeIntegrationClient(client.id),
   invalidates: () => [integrationClientsKey],
-  onDone: (_result, client) => {
+  successText: (_result, client) => translate('admin.integrations.revoked', { name: client.name }),
+  onDone: () => {
     pending.value = null;
-    revokedName.value = client.name;
   },
 });
 const isConfirmOpen = computed({
@@ -56,11 +55,24 @@ const isConfirmOpen = computed({
 });
 function askToRevoke(client: IntegrationClient) {
   revoke.reset();
-  revokedName.value = null;
   pending.value = client;
 }
 const confirmRevoke = () => pending.value && void revoke.run(pending.value);
 const tableRegion = () => document.getElementById('integration-table');
+/**
+ * The create form lives in a drawer. A minted key closes it; the reveal-once dialog opens once the drawer has gone, so the
+ * drawer's focus return does not pull focus out of the dialog.
+ */
+const isCreateOpen = ref(false);
+let minted: CreatedIntegrationClient | null = null;
+function onCreated(client: CreatedIntegrationClient) {
+  minted = client;
+  isCreateOpen.value = false;
+}
+function onDrawerHidden() {
+  revealed.value = minted;
+  minted = null;
+}
 </script>
 
 <template>
@@ -69,29 +81,48 @@ const tableRegion = () => document.getElementById('integration-table');
       :title="$t('admin.shell.screens.integrations')"
       :lead="$t('admin.integrations.lead')"
     >
-      <template #actions><AdminBit placement="header" /></template>
+      <template #actions>
+        <button
+          type="button"
+          data-testid="integration-create"
+          :class="BUTTON.primary"
+          :aria-disabled="isLocked || undefined"
+          @click="isLocked || (isCreateOpen = true)"
+        >
+          {{ $t('admin.integrations.add') }}
+        </button>
+      </template>
     </AdminPageHeader>
-    <AdminStatus v-if="isLocked" kind="security" :text="$t('admin.integrations.impersonating')" />
-    <IntegrationClientForm :is-locked="isLocked" @created="(client) => (revealed = client)" />
-    <AdminStatus
-      v-if="revokedName"
-      kind="done"
-      :text="$t('admin.integrations.revoked', { name: revokedName })"
-    />
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton><IntegrationClientsTableSkeleton /></template>
-      <IntegrationClientsTable
-        v-if="clients.length > 0"
-        :clients="clients"
+    <div v-if="isLocked" role="status">
+      <AdminNotice tone="caution" :title="$t('admin.integrations.impersonating')" />
+    </div>
+    <IntegrationClientsTable
+      :clients="clients"
+      :meta="data?.meta"
+      :is-locked="isLocked"
+      :loading="isPending"
+      :error="error"
+      @revoke="askToRevoke"
+      @retry="refetch()"
+    >
+      <template #empty>
+        <div class="flex flex-col items-center gap-3 p-6 text-center">
+          <AdminBit placement="empty" />
+          <p>{{ $t('admin.integrations.table.empty') }}</p>
+        </div>
+      </template>
+    </IntegrationClientsTable>
+    <AdminDrawer
+      v-model:visible="isCreateOpen"
+      :title="$t('admin.integrations.form.title')"
+      @hide="onDrawerHidden"
+    >
+      <IntegrationClientForm
         :is-locked="isLocked"
-        @revoke="askToRevoke"
+        @created="onCreated"
+        @cancel="isCreateOpen = false"
       />
-      <section v-else class="glass flex flex-col items-center gap-3 rounded-panel p-6 text-center">
-        <AdminBit placement="empty" />
-        <p>{{ $t('admin.integrations.table.empty') }}</p>
-      </section>
-      <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.integrations.table.pager')" />
-    </QueryState>
+    </AdminDrawer>
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
       tone="danger"

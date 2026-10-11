@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import AdminBit from '../shell/AdminBit.vue';
+import { Lock } from 'lucide-vue-next';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminField from '../ui/AdminField.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS } from '../ui/classes';
+import { BUTTON, INPUT } from '../ui/controls';
 import type { SecretDraft } from './setting-values';
 
 /** A sealed value: only "set" or "not set" is ever shown. Typing is a replacement, and an empty box keeps the stored value. */
@@ -29,24 +30,18 @@ const cancelReplacing = () => (part.value = { ...part.value, isReplacing: false,
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap items-center gap-2">
       <span class="text-sm font-semibold">{{ label }}</span>
-      <span
-        class="rounded-pill px-2 text-xs"
-        :class="
-          part.isSet ? 'bg-accent-soft text-accent-soft-text' : 'border border-line text-muted'
-        "
-      >
+      <AdminChip :tone="part.isSet ? 'accent' : 'neutral'" :icon="Lock">
         {{ part.isSet ? t('admin.settings.chip.set') : t('admin.settings.chip.unset') }}
-      </span>
-      <AdminBit placement="security" />
+      </AdminChip>
       <button
         v-if="!part.isReplacing"
         type="button"
-        :class="ADMIN_BUTTON_CLASS"
+        :class="BUTTON.secondary"
         @click="startReplacing"
       >
         {{ part.isSet ? t('admin.settings.secret.replace') : t('admin.settings.secret.set') }}
       </button>
-      <button v-else type="button" :class="ADMIN_BUTTON_CLASS" @click="cancelReplacing">
+      <button v-else type="button" :class="BUTTON.secondary" @click="cancelReplacing">
         {{ t('admin.settings.secret.cancelReplace') }}
       </button>
       <slot name="actions" />
@@ -67,7 +62,7 @@ const cancelReplacing = () => (part.value = { ...part.value, isReplacing: false,
         type="password"
         autocomplete="new-password"
         :aria-describedby="describedBy"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
       />
     </AdminField>
     <p v-else class="text-xs text-muted">{{ hint }}</p>

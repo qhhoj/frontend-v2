@@ -5,9 +5,7 @@
     "total": "{total} trang",
     "loginChip": "Cần đăng nhập",
     "pager": "Phân trang trang tĩnh",
-    "search": "Tìm trang",
-    "searchPlaceholder": "Đường dẫn hoặc tiêu đề",
-    "searchSubmit": "Tìm"
+    "search": "Tìm trang"
   },
   "pick": "Chọn một trang hoặc tạo trang mới.",
   "field": {
@@ -18,7 +16,7 @@
     "content": "Nội dung (Markdown)",
     "contentCount": "{length} / 100 000",
     "contentHint": "Tối đa 100 000 ký tự.",
-    "registrationRequired": "Chỉ thành viên đã đăng nhập xem được (khách nhận 401 và lời mời đăng nhập)"
+    "registrationRequired": "Chỉ thành viên đã đăng nhập xem được"
   },
   "errors": {
     "url": "Ký tự ngoài chữ, số, “-”, “_”, “.”, “~” và “/”, hoặc đường dẫn rỗng.",
@@ -28,13 +26,13 @@
   },
   "save": "Lưu trang",
   "saved": "Đã lưu trang.",
-  "unchanged": "Không có thay đổi để lưu.",
-  "discard": "Huỷ",
+  "deletedToast": "Đã xoá trang.",
   "delete": {
     "open": "Xoá trang",
     "title": "Xoá trang {url}?",
     "body": "Đường dẫn sẽ trả về trang không tồn tại.",
-    "confirm": "Xoá trang"
+    "confirm": "Xoá trang",
+    "zone": "Vùng nguy hiểm"
   },
   "tabs": {
     "label": "Mục của trang",
@@ -69,7 +67,7 @@
     "load": "Nạp giá trị cũ",
     "showChanges": "Xem thay đổi",
     "loaded": "Đã nạp giá trị cũ của bản {time}; chưa lưu.",
-    "note": "Chưa có API khôi phục riêng: “Nạp giá trị cũ” chỉ điền giá trị cũ vào form; bấm “Lưu trang” để áp dụng.",
+    "note": "“Nạp giá trị cũ” chỉ điền giá trị cũ vào form; bấm “Lưu trang” để áp dụng.",
     "empty": "Trang này chưa có bản sửa nào.",
     "previous": "Trước",
     "next": "Sau"
@@ -83,8 +81,8 @@
       "empty": "Chưa có nội dung",
       "paused": "Tạm dừng"
     },
-    "pausedWait": "Xem trước quá 60 lần mỗi phút nên máy chủ từ chối (429). Giữ nguyên bản cũ; gõ tiếp sau {seconds} giây để cập nhật. Lưu trang vẫn bình thường.",
-    "paused": "Xem trước quá 60 lần mỗi phút nên máy chủ từ chối (429). Giữ nguyên bản cũ; gõ tiếp để cập nhật. Lưu trang vẫn bình thường.",
+    "pausedWait": "Xem trước quá 60 lần mỗi phút nên tạm dừng. Giữ nguyên bản cũ; gõ tiếp sau {seconds} giây để cập nhật. Lưu trang vẫn bình thường.",
+    "paused": "Xem trước quá 60 lần mỗi phút nên tạm dừng. Giữ nguyên bản cũ; gõ tiếp để cập nhật. Lưu trang vẫn bình thường.",
     "hint": "Cập nhật 0,5 giây sau phím cuối, cùng bộ làm sạch với khi lưu."
   },
   "deleted": {

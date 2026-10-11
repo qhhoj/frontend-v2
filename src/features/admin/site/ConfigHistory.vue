@@ -5,7 +5,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import { useConfigHistoryQuery } from './config-history.queries';
 
 /** One key's changes, newest first: who, when, and the value before and after (also for a deleted key). */
@@ -62,10 +62,10 @@ const hasMore = () =>
         </li>
       </ol>
       <div v-if="page > 1 || hasMore()" class="flex gap-2">
-        <button v-if="page > 1" type="button" :class="ADMIN_BUTTON_CLASS" @click="page -= 1">
+        <button v-if="page > 1" type="button" :class="BUTTON.secondary" @click="page -= 1">
           {{ $t('admin.site.config.history.newer') }}
         </button>
-        <button v-if="hasMore()" type="button" :class="ADMIN_BUTTON_CLASS" @click="page += 1">
+        <button v-if="hasMore()" type="button" :class="BUTTON.secondary" @click="page += 1">
           {{ $t('admin.site.config.history.older') }}
         </button>
       </div>

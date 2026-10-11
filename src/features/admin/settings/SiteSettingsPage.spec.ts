@@ -139,12 +139,12 @@ const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: s
   wrapper.get(`[data-key="${key}"]`);
 
 describe('defaults', () => {
-  it('"Đặt lại" still discards the filled default and shows the stored value again', async () => {
+  it('"Huỷ thay đổi" still discards the filled default and shows the stored value again', async () => {
     mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'similarity.minPercent');
     await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
-    await clickIn(block(wrapper, 'similarity'), 'Đặt lại');
+    await clickIn(block(wrapper, 'similarity'), 'Huỷ thay đổi');
     expect((row.get('input').element as HTMLInputElement).value).toBe('65');
     expect(row.text()).not.toContain('Đã điền giá trị mặc định');
   });

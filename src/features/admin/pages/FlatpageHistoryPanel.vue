@@ -6,7 +6,7 @@ import QueryState from '@/components/QueryState.vue';
 import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { FLATPAGE_REVISIONS_PAGE_SIZE } from '@/api/flatpages-admin.api';
 import AdminBit from '../shell/AdminBit.vue';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import { positivePageOf } from './flatpage-route';
 import { useFlatpageRevisionsQuery } from './flatpage-revisions.queries';
 import FlatpageRevisionRow from './FlatpageRevisionRow.vue';
@@ -81,7 +81,7 @@ function goToPage(target: number) {
         <div class="flex gap-2">
           <button
             type="button"
-            :class="ADMIN_BUTTON_CLASS"
+            :class="BUTTON.secondary"
             :aria-disabled="page <= 1 || undefined"
             @click="page > 1 && goToPage(page - 1)"
           >
@@ -89,7 +89,7 @@ function goToPage(target: number) {
           </button>
           <button
             type="button"
-            :class="ADMIN_BUTTON_CLASS"
+            :class="BUTTON.secondary"
             :aria-disabled="!hasNext || undefined"
             @click="hasNext && goToPage(page + 1)"
           >

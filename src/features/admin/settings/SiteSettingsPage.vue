@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import type { SettingKey } from '@/api/types/settings-admin';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import AdminLeaveGuard from '../ui/form/AdminLeaveGuard.vue';
 import RevisionsPanel from './RevisionsPanel.vue';
 import SettingBlock from './SettingBlock.vue';
 import { SETTING_BLOCK_EXTRAS } from './setting-block-extras';
@@ -20,6 +20,11 @@ const groups = computed(() =>
     group,
     blocks: shown.value.filter((block) => block.group === group),
   })).filter((entry) => entry.blocks.length > 0),
+);
+/** Unsaved keys per block: leaving the page with any asks first. */
+const dirtyByBlock = reactive<Record<string, number>>({});
+const dirtyCount = computed(() =>
+  Object.values(dirtyByBlock).reduce((total, count) => total + count, 0),
 );
 const historyKey = ref<SettingKey | null>(null);
 const panel = ref<{ revealPanel: () => void } | null>(null);
@@ -46,12 +51,13 @@ function closeHistory() {
       v-for="entry in groups"
       :key="entry.group"
       :href="`#settings-${entry.group}`"
-      class="rounded-pill border border-line px-3 py-1 hover:bg-surface-hover"
+      class="inline-flex min-h-[var(--qa-chip,1.5rem)] items-center gap-1.5 rounded-pill border border-line bg-surface-solid px-3 py-1 hover:bg-surface-hover"
     >
-      {{ t(`admin.settings.groups.${entry.group}`) }} {{ entry.blocks.length }}
+      {{ t(`admin.settings.groups.${entry.group}`) }}
+      <span class="font-mono text-xs text-muted tabular-nums">{{ entry.blocks.length }}</span>
     </a>
   </nav>
-  <SettingsNotice tone="info">{{ t('admin.settings.infoCard') }}</SettingsNotice>
+  <AdminLeaveGuard :dirty-count="dirtyCount" />
   <QueryState
     :loading="settings.isPending.value"
     :error="settings.error.value"
@@ -62,19 +68,24 @@ function closeHistory() {
         data-skeleton-region="settings-block"
         class="h-[24.4rem] w-full sm:h-[23.9rem]"
     /></template>
-    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
-      <div class="flex flex-col gap-8">
+    <div
+      class="grid items-start gap-6"
+      :class="historyKey && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]'"
+    >
+      <div class="flex min-w-0 flex-col gap-6">
         <section
           v-for="entry in groups"
           :id="`settings-${entry.group}`"
           :key="entry.group"
-          class="flex flex-col gap-4"
+          class="grid scroll-mt-4 items-start gap-4"
+          :class="!historyKey && entry.blocks.length > 1 && 'xl:grid-cols-2'"
         >
           <SettingBlock
             v-for="block in entry.blocks"
             :key="block.id"
             :block="block"
             @history="openHistory"
+            @dirty="(count) => (dirtyByBlock[block.id] = count)"
           >
             <component
               :is="SETTING_BLOCK_EXTRAS[block.id]"
@@ -84,7 +95,7 @@ function closeHistory() {
           </SettingBlock>
         </section>
       </div>
-      <aside v-if="historyKey" class="lg:sticky lg:top-4">
+      <aside v-if="historyKey" class="xl:sticky xl:top-4">
         <RevisionsPanel
           ref="panel"
           :setting-key="historyKey"

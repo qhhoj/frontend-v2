@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
-import { ADMIN_INPUT_CLASS } from '../ui/classes';
+import { INPUT } from '../ui/controls';
 import SecretField from './SecretField.vue';
 import type { OAuthDraft, SecretDraft } from './setting-values';
 
@@ -45,7 +45,7 @@ const secret = computed<SecretDraft>({
         v-model="clientId"
         type="text"
         :aria-describedby="describedBy"
-        :class="ADMIN_INPUT_CLASS"
+        :class="INPUT"
       />
     </AdminField>
     <p v-if="enabled && clientId.trim() === ''" class="text-sm text-negative">

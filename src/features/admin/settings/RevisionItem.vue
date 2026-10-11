@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import type { SettingRevision } from '@/api/types/settings-admin';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import { ADMIN_BUTTON_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import { shortId } from '../ui/short-id';
 import { diffLines, hasSealedPart } from './revisions';
 
@@ -58,7 +58,7 @@ const lineText = (field: string, text: string) => (field === 'value' ? text : `$
       v-if="canRestore"
       type="button"
       class="self-start"
-      :class="ADMIN_BUTTON_CLASS"
+      :class="BUTTON.secondary"
       @click="emit('restore', revision)"
     >
       {{ restoreLabel }}

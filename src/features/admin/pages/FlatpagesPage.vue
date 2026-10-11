@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { usePermissions } from '@/stores/use-permissions';
-import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import AdminChip from '../ui/AdminChip.vue';
+import { BUTTON, CARD } from '../ui/controls';
+import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import DeletedFlatpagesList from './DeletedFlatpagesList.vue';
 import FlatpageEditor from './FlatpageEditor.vue';
 import FlatpageEditorTabs from './FlatpageEditorTabs.vue';
@@ -30,13 +31,15 @@ const editor = ref<FlatpageEditorHandle | null>(null);
 const listPage = computed(() => positivePageOf(route.query.lp));
 /** `?ps=`: the list's search, kept beside the open page so a pick does not clear it. */
 const listSearch = computed(() => (typeof route.query.ps === 'string' ? route.query.ps : ''));
-const searchText = ref(listSearch.value);
-watch(listSearch, (value) => (searchText.value = value));
 const list = useFlatpagesQuery(listPage, listSearch);
-function searchList() {
-  const text = searchText.value.trim();
-  void router.replace({ query: { ...route.query, ps: text || undefined, lp: undefined } });
-}
+/** The filter bar's search, applied as it is typed: a new search starts the list on its first page. */
+const searchText = computed({
+  get: () => listSearch.value,
+  set: (text: string) =>
+    void router.replace({
+      query: { ...route.query, ps: text.trim() || undefined, lp: undefined },
+    }),
+});
 const pageParam = computed(() => (typeof route.query.page === 'string' ? route.query.page : null));
 /** A deleted page has no editor: `?deleted=<id>` opens only its history, read-only. */
 const deletedId = computed(() =>
@@ -78,14 +81,13 @@ async function loadRevision(revision: FlatpageRevision) {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[1280px] flex-col gap-6">
+  <div class="flex w-full flex-col gap-6">
     <AdminPageHeader :title="$t('admin.shell.screens.pages')" :lead="$t('admin.pages.lead')">
       <template #actions>
-        <AdminBit placement="composing" />
         <button
           v-if="can('flatpages.add_flatpage')"
           type="button"
-          :class="ADMIN_PRIMARY_CLASS"
+          :class="BUTTON.primary"
           @click="goTo('new')"
         >
           {{ t('admin.pages.newPage') }}
@@ -95,45 +97,39 @@ async function loadRevision(revision: FlatpageRevision) {
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start">
       <section class="flex min-w-0 flex-col gap-3" :aria-label="$t('admin.shell.screens.pages')">
-        <form role="search" class="flex gap-2" @submit.prevent="searchList">
-          <input
-            v-model="searchText"
-            type="search"
-            autocomplete="off"
-            :aria-label="t('admin.pages.list.search')"
-            :placeholder="t('admin.pages.list.searchPlaceholder')"
-            :class="ADMIN_INPUT_CLASS"
-          />
-          <button type="submit" :class="ADMIN_BUTTON_CLASS">
-            {{ t('admin.pages.list.searchSubmit') }}
-          </button>
-        </form>
+        <AdminFilterBar
+          v-model:search="searchText"
+          :search-label="t('admin.pages.list.search')"
+          :result-text="list.data.value ? t('admin.pages.list.total', { total }) : undefined"
+        />
         <QueryState
           :loading="list.isPending.value"
           :error="list.error.value"
           @retry="list.refetch()"
         >
-          <p class="text-sm text-muted">{{ t('admin.pages.list.total', { total }) }}</p>
-          <ul class="flex flex-col gap-2">
+          <ul
+            :class="[CARD, 'm-0 flex list-none flex-col divide-y divide-line overflow-hidden p-0']"
+          >
             <li v-for="item in list.data.value?.items ?? []" :key="item.id">
               <button
                 type="button"
                 :aria-pressed="item.id === pageId"
-                class="flex w-full min-w-0 flex-col gap-1 rounded-row border border-line bg-surface-solid p-3 text-left hover:bg-surface-hover aria-pressed:border-accent"
+                class="flex w-full min-w-0 flex-col gap-1 px-4 py-2.5 text-left hover:bg-surface-hover aria-pressed:bg-accent-soft"
                 @click="goTo(item.id)"
               >
-                <span class="truncate font-semibold">{{ item.title }}</span>
+                <span class="flex min-w-0 items-center gap-2">
+                  <span class="min-w-0 flex-1 truncate font-semibold">{{ item.title }}</span>
+                  <AdminChip v-if="item.registrationRequired" tone="accent">
+                    {{ t('admin.pages.list.loginChip') }}
+                  </AdminChip>
+                </span>
                 <span class="truncate font-mono text-xs text-muted">{{ item.url }}</span>
-                <span
-                  v-if="item.registrationRequired"
-                  class="w-fit rounded-pill bg-accent-soft px-2 text-xs text-accent-soft-text"
-                  >{{ t('admin.pages.list.loginChip') }}</span
-                >
               </button>
             </li>
           </ul>
           <NumberedPager
             v-if="list.data.value"
+            compact
             :meta="list.data.value.meta"
             :label="t('admin.pages.list.pager')"
             query-key="lp"
@@ -165,7 +161,10 @@ async function loadRevision(revision: FlatpageRevision) {
             @load="loadRevision"
           />
         </template>
-        <p v-else class="rounded-panel border border-dashed border-line p-6 text-center text-muted">
+        <p
+          v-else
+          class="rounded-row border border-dashed border-line-strong p-6 text-center text-muted"
+        >
           {{ t('admin.pages.pick') }}
         </p>
       </section>

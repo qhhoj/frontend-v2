@@ -1,6 +1,6 @@
 {
   "title": "Cài đặt trang",
-  "lead": "Các cài đặt có kiểu cố định: mỗi khoá có giá trị mặc định, kiểu và mô tả. Bí mật được niêm phong, không hiện lại.",
+  "lead": "Cài đặt có kiểu của trang; mỗi khối được kiểm tra và lưu riêng, bí mật không bao giờ hiện lại.",
   "groupsLabel": "Nhóm cài đặt",
   "groups": {
     "site": "Trang web",
@@ -15,7 +15,6 @@
     "polygon": "Polygon",
     "externalJudge": "Máy chấm ngoài"
   },
-  "infoCard": "Giá trị được kiểm tra khi lưu. Lỗi hiện ngay dưới khối sai; không có gì bị lưu một phần trong một khoá. Chỉ người có quyền “Sửa cài đặt” mới thấy trang này.",
   "blocks": {
     "site": {
       "title": "Múi giờ",
@@ -231,14 +230,14 @@
     "httpOrHttpsOrEmpty": "Để trống hoặc dùng http:// hoặc https://."
   },
   "save": "Lưu",
-  "discard": "Đặt lại",
+  "discard": "Huỷ thay đổi",
   "saved": "Đã lưu.",
+  "savedBlock": "Đã lưu {name}.",
   "badValue": {
     "officialModeEndsAt": "Thời điểm chưa hợp lệ. Dùng dạng ISO 8601 có múi giờ, ví dụ 2026-10-10T17:00:00+07:00."
   },
   "saveFailed": "Không lưu được {key}: {message}",
   "history": "Lịch sử",
-  "historyWithKey": "Lịch sử · {key}",
   "revisions": {
     "title": "Lịch sử · {key}",
     "subtitle": "Mới nhất trước · 20 bản mỗi trang",
@@ -253,7 +252,8 @@
     "restoreField": "Khôi phục trường không bí mật",
     "confirmTitle": "Khôi phục giá trị trước?",
     "confirmBody": "Máy chủ đặt lại giá trị cũ và ghi thành một bản mới; bí mật đang lưu được giữ nguyên.",
-    "close": "Đóng"
+    "close": "Đóng",
+    "restored": "Đã khôi phục {key}."
   },
   "reset": {
     "label": "Về mặc định {value}",

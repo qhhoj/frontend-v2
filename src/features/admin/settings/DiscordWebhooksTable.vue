@@ -15,7 +15,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import { BUTTON, INPUT } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { settingRevisionsPrefix, settingsKey } from './settings.queries';
 
@@ -117,7 +117,7 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
               </p>
             </div>
             <div class="flex flex-wrap gap-2 sm:justify-end">
-              <button type="button" :class="ADMIN_BUTTON_CLASS" @click="startEdit(row.event)">
+              <button type="button" :class="BUTTON.secondary" @click="startEdit(row.event)">
                 {{
                   row.target
                     ? $t('admin.settings.webhooks.replace')
@@ -127,7 +127,7 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
               <button
                 v-if="row.target"
                 type="button"
-                :class="ADMIN_BUTTON_CLASS"
+                :class="BUTTON.secondary"
                 @click="askRemove(row.event)"
               >
                 {{ $t('admin.settings.webhooks.remove') }}
@@ -135,7 +135,7 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
               <button
                 v-if="canTest(row)"
                 type="button"
-                :class="ADMIN_BUTTON_CLASS"
+                :class="BUTTON.secondary"
                 :aria-disabled="tester.isPending.value || undefined"
                 @click="tester.isPending.value || sendTest(row.event)"
               >
@@ -158,18 +158,18 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
                 required
                 autocomplete="off"
                 placeholder="https://discord.com/api/webhooks/…"
-                :class="[ADMIN_INPUT_CLASS, 'font-normal']"
+                :class="[INPUT, 'font-normal']"
                 :aria-invalid="urlError || writer.fieldErrors.value.url ? 'true' : undefined"
               />
             </label>
             <button
               type="submit"
-              :class="ADMIN_PRIMARY_CLASS"
+              :class="BUTTON.primary"
               :aria-disabled="writer.isPending.value || undefined"
             >
               {{ $t('admin.settings.webhooks.save') }}
             </button>
-            <button type="button" :class="ADMIN_BUTTON_CLASS" @click="editing = null">
+            <button type="button" :class="BUTTON.secondary" @click="editing = null">
               {{ $t('admin.settings.secret.cancelReplace') }}
             </button>
             <p

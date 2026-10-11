@@ -6,7 +6,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { updateSetting } from '@/api/settings-admin.api';
 import type { Setting } from '@/api/types/settings-admin';
 import { failureTextOf } from '../ui/admin-errors';
-import { ADMIN_DANGER_CLASS } from '../ui/classes';
+import { BUTTON } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { clearConsequences, clearValueOf } from './setting-clear';
 
@@ -32,7 +32,7 @@ function open() {
 </script>
 
 <template>
-  <button type="button" :class="ADMIN_DANGER_CLASS" @click="open">
+  <button type="button" :class="BUTTON.danger" @click="open">
     <Trash2 aria-hidden="true" class="size-4" />{{ t('admin.settings.clear.button') }}
   </button>
   <ConfirmDialog
