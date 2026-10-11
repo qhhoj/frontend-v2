@@ -73,14 +73,28 @@ export function quotaRefusalText(error: unknown): string | null {
   });
 }
 
+/** The wait in words: seconds under a minute, whole minutes (rounded up) under an hour, else hours and minutes. */
+export function formatWait(seconds: number): string {
+  if (seconds < 60) return i18n.global.t('admin.ui.duration.seconds', { count: seconds });
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 60) return i18n.global.t('admin.ui.duration.minutes', { count: minutes });
+  const hours = Math.floor(minutes / 60);
+  const restMinutes = minutes % 60;
+  return restMinutes === 0
+    ? i18n.global.t('admin.ui.duration.hours', { count: hours })
+    : i18n.global.t('admin.ui.duration.hoursMinutes', { hours, minutes: restMinutes });
+}
+
 /** The page-line text of a failed write: the SPA text of its code, then the wait when the server said how long (`Retry-After`). */
 export function failureTextOf(error: unknown): string {
+  const seconds = error instanceof ApiError ? error.retryAfterSeconds : null;
+  if (seconds !== null && error instanceof ApiError && error.code === 'rate_limited')
+    return i18n.global.t('admin.ui.rateLimitedWait', { wait: formatWait(seconds) });
   const text = hasIssueCode(error, 'busy')
     ? i18n.global.t('admin.ui.issues.busy')
     : (quotaRefusalText(error) ?? i18n.global.t(errorMessageKey(error)));
-  const seconds = error instanceof ApiError ? error.retryAfterSeconds : null;
   if (seconds === null) return text;
-  return `${text} ${i18n.global.t('admin.ui.retryIn', { seconds })}`;
+  return `${text} ${i18n.global.t('admin.ui.retryIn', { wait: formatWait(seconds) })}`;
 }
 
 /**

@@ -22,6 +22,6 @@ describe('orgFailureText', () => {
   });
 
   it('falls back to the generic text and appends the wait of a rate limit', () => {
-    expect(orgFailureText(refusal(429, 'rate_limited', undefined, 600))).toContain('600');
+    expect(orgFailureText(refusal(429, 'rate_limited', undefined, 600))).toContain('10 phút');
   });
 });

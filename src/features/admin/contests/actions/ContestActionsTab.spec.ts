@@ -276,6 +276,6 @@ describe('replay rebuild card', () => {
     const { wrapper } = await mounted;
     await click(wrapper, 'Dựng lại bản phát lại');
     await confirmDialog('Dựng lại');
-    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain('1200');
+    expect(openDialog().querySelector('[role="alert"]')?.textContent).toContain('20 phút');
   });
 });
