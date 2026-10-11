@@ -961,6 +961,11 @@
       "points": "Điểm",
       "acRate": "Tỉ lệ AC"
     },
+    "noStatement": {
+      "title": "Chưa có đề bài",
+      "body": "Bài này chưa có đề. Nếu bạn là người ra đề, hãy tải PDF hoặc viết đề trong trang quản trị.",
+      "edit": "Viết đề bài"
+    },
     "untranslated": "Chưa có bản dịch cho ngôn ngữ này; đang hiện bản gốc.",
     "authors": "Tác giả:",
     "pdfPreparing": "Đang chuẩn bị PDF…",

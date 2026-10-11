@@ -9,6 +9,7 @@ import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArch
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
+import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemFactsCard from './ProblemFactsCard.vue';
 import ProblemHeader from './ProblemHeader.vue';
@@ -19,6 +20,7 @@ import ProblemSubmitCard from './ProblemSubmitCard.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
 import SubmitDock from './SubmitDock.vue';
+import { hasNoStatement } from './statement-presence';
 import type { PROBLEM_LAYOUT } from './problem-layout';
 import { useSubmitForm } from './use-submit-form';
 
@@ -96,7 +98,12 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
             :url="problem.pdfStatementUrl"
             class="mb-6 last:mb-0"
           />
-          <StatementBody :html="problem.descriptionHtml" />
+          <NoStatement
+            v-if="hasNoStatement(problem)"
+            :code="problem.code"
+            :can-edit="problem.canEdit"
+          />
+          <StatementBody v-else :html="problem.descriptionHtml" />
           <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
             {{ $t('problem.authors') }}
             <template v-for="(author, index) in problem.authors" :key="author.id"

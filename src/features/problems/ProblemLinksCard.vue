@@ -13,6 +13,7 @@ import type { BitLook } from '@/mascot/bit-sprite';
 import { useLocaleStore } from '@/stores/locale.store';
 import { HEADER_BUTTON_IDLE_CLASS, PDF_PILL_CLASS } from './links-card-classes';
 import PdfButton from './PdfButton.vue';
+import { hasTextStatement } from './statement-presence';
 
 /**
  * Where else this problem leads (board C): a titled card whose header holds the actions (the PDF pill, the copy-link icon)
@@ -22,8 +23,6 @@ import PdfButton from './PdfButton.vue';
 const props = defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
 const route = useRoute();
 const locale = useLocaleStore();
-/** The rendered PDF prints the text statement; a statement that is only an uploaded PDF has none. */
-const hasTextStatement = computed(() => props.problem.descriptionHtml.trim() !== '');
 
 interface LinkRow {
   key: string;
@@ -85,7 +84,7 @@ const ROW =
       >
         <FileText aria-hidden="true" class="size-4" />PDF
       </a>
-      <PdfButton v-else-if="hasTextStatement" :code="problem.code" :lang="locale.locale" />
+      <PdfButton v-else-if="hasTextStatement(problem)" :code="problem.code" :lang="locale.locale" />
       <ShortLinkButton compact :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
     </div>
     <ul class="m-0 list-none border-t border-line p-0 pt-1">
