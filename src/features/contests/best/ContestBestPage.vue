@@ -116,7 +116,7 @@ const CHIP =
               $t('contests.best.frozen', { time: formatDateTime(frozenAt, locale.locale) })
             }}
           </p>
-          <EmptyState v-if="!rows.length">{{ $t('submissions.best.empty') }}</EmptyState>
+          <EmptyState v-if="!list?.items.length">{{ $t('submissions.best.empty') }}</EmptyState>
           <template v-else>
             <SubmissionTable
               :submissions="rows"
