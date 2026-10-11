@@ -8,7 +8,7 @@ const target = () => commentRoute(props.item.page, props.item.comment.id);
 </script>
 
 <template>
-  <span class="flex max-w-64 min-w-0 flex-col">
+  <span class="flex max-w-48 min-w-0 flex-col">
     <RouterLink
       v-if="target()"
       :to="target()!"

@@ -99,7 +99,19 @@ const cellText = (row: Row, key: string) => {
 };
 const alignClass = (column: AdminColumn) =>
   column.align === 'end' ? 'text-right font-mono tabular-nums' : 'text-left';
-const CELL = 'h-[var(--qa-row,2.5rem)] border-b border-line px-3 align-middle';
+/**
+ * `max-w-0` + `w-full` is the auto-layout idiom for "all the leftover width, never more": the content wraps or truncates
+ * inside it. The column marked `grow` gets it, else the primary one: the name is what yields when the others need room.
+ */
+const growsOf = (column: AdminColumn) =>
+  column.grow ?? (!props.columns.some((other) => other.grow) && column === primary.value);
+const growClass = (column: AdminColumn) => growsOf(column) && 'w-full max-w-0';
+/**
+ * A table cell never asks for more than 16rem and lets an unbroken value (a long username, an IPv6 address) wrap, so one
+ * long value cannot widen the table past its card; `:where()` keeps the cap at zero specificity for a column's own `cellClass`.
+ */
+const CELL =
+  'h-[var(--qa-row,2.5rem)] border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
 const CHECKBOX = 'size-4 accent-[var(--qh-accent)] align-middle';
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 </script>
@@ -182,10 +194,10 @@ const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeigh
           <p v-if="secondary.length" class="m-0 flex flex-wrap gap-x-2 text-sm text-muted">
             <template v-for="(column, index) in secondary" :key="column.key">
               <span v-if="index > 0" aria-hidden="true">·</span>
-              <span class="inline-flex items-baseline gap-1">
+              <span class="inline-flex max-w-full min-w-0 items-baseline gap-1">
                 <span>{{ column.label }}</span>
                 <span
-                  class="text-content"
+                  class="min-w-0 text-content [overflow-wrap:anywhere]"
                   :class="column.align === 'end' && 'font-mono tabular-nums'"
                 >
                   <slot :name="`cell-${column.key}`" :row="row">{{
@@ -306,7 +318,7 @@ const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeigh
                 <td
                   v-for="column in columns"
                   :key="column.key"
-                  :class="[CELL, alignClass(column), column.cellClass]"
+                  :class="[CELL, alignClass(column), growClass(column), column.cellClass]"
                 >
                   <slot :name="`cell-${column.key}`" :row="row">{{
                     cellText(row, column.key)

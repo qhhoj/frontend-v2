@@ -3,7 +3,7 @@ import { useId } from 'vue';
 
 /**
  * One section of an admin form card: a 16/600 title, an optional one-line description, then the fields in a grid
- * (two columns from 1024 px, one below; give a full-width child `lg:col-span-2`). Sections sit inside one card
+ * (two columns from 1024 px, one below, both able to shrink below their content; give a full-width child `lg:col-span-2`). Sections sit inside one card
  * (`CARD` from `../controls`) and are split by hairlines. `danger` is the last section, with a red hairline.
  * `id` is the anchor for a section rail or "Đi tới mục".
  */
@@ -35,7 +35,10 @@ const headingId = useId();
       {{ title }}
     </h2>
     <p v-if="description" class="mt-0.5 text-sm text-muted">{{ description }}</p>
-    <div class="mt-4 grid gap-4" :class="columns === 2 && 'lg:grid-cols-2'">
+    <div
+      class="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4"
+      :class="columns === 2 && 'lg:grid-cols-[repeat(2,minmax(0,1fr))]'"
+    >
       <slot />
     </div>
   </section>

@@ -119,8 +119,7 @@
     "state": "Trạng thái",
     "page": "Ở trang",
     "createdAt": "Viết lúc",
-    "reports": "Báo cáo",
-    "when": "Gần nhất"
+    "reports": "Báo cáo"
   },
   "rowName": "bình luận ở {page}"
 }

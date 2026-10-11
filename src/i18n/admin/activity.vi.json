@@ -16,9 +16,7 @@
   },
   "table": {
     "caption": "Nhật ký yêu cầu",
-    "at": "Lúc",
     "user": "Người dùng",
-    "ip": "IP",
     "request": "Yêu cầu",
     "status": "Mã",
     "guest": "khách",
@@ -26,6 +24,7 @@
     "page": "Trang {page} · chưa biết tổng số",
     "previous": "Trước",
     "next": "Sau",
+    "copyIp": "Sao chép địa chỉ IP {ip}",
     "openSummary": "Xem tóm tắt của {username}"
   },
   "live": {

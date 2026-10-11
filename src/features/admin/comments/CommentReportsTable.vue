@@ -40,11 +40,15 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const locale = useLocaleStore();
 const columns = computed<AdminColumn[]>(() => [
-  { key: 'comment', label: t('admin.comments.columns.comment'), priority: 'primary' },
+  {
+    key: 'comment',
+    label: t('admin.comments.columns.comment'),
+    priority: 'primary',
+    cellClass: 'min-w-40',
+  },
   { key: 'state', label: t('admin.comments.columns.state'), priority: 'badge' },
   { key: 'reports', label: t('admin.comments.columns.reports') },
   { key: 'page', label: t('admin.comments.columns.page') },
-  { key: 'when', label: t('admin.comments.columns.when'), priority: 'meta' },
 ]);
 const range = computed(() =>
   props.meta
@@ -115,7 +119,7 @@ const rowName = (item: CommentReportQueueItem) =>
       </AdminChip>
     </template>
     <template #cell-reports="{ row }">
-      <ul class="m-0 flex max-w-md list-none flex-col gap-1 p-0 py-2">
+      <ul class="m-0 flex max-w-48 min-w-0 list-none flex-col gap-1 p-0 py-2">
         <li
           v-for="(report, index) in row.reports"
           :key="index"
@@ -128,6 +132,7 @@ const rowName = (item: CommentReportQueueItem) =>
             v-if="report.reporter"
             :username="report.reporter.username"
             :rating="report.reporter.rating"
+            class="max-w-full truncate"
           />
           <span v-if="report.note" class="text-muted">“{{ report.note }}”</span>
           <span v-if="report.status !== 'open'" class="text-xs text-muted">
@@ -139,13 +144,11 @@ const rowName = (item: CommentReportQueueItem) =>
         </li>
       </ul>
     </template>
-    <template #cell-page="{ row }"><CommentPlace :item="row" /></template>
-    <template #cell-when="{ row }">
-      <span class="flex flex-col whitespace-nowrap">
-        <span>{{ when(row) }}</span>
-        <span class="text-xs text-muted">
-          {{ $t('admin.comments.reporters', { count: row.reporterCount }, row.reporterCount) }}
-        </span>
+    <template #cell-page="{ row }">
+      <CommentPlace :item="row" />
+      <span class="block text-xs text-muted">
+        {{ when(row) }} ·
+        {{ $t('admin.comments.reporters', { count: row.reporterCount }, row.reporterCount) }}
       </span>
     </template>
     <template v-if="isOpenTab" #actions="{ row }">

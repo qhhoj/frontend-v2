@@ -36,9 +36,7 @@ const columns = computed<AdminColumn[]>(() => [
   },
   { key: 'state', label: t('admin.integrations.table.state'), priority: 'badge' },
   { key: 'scopes', label: t('admin.integrations.table.scopes'), priority: 'meta' },
-  { key: 'actsAs', label: t('admin.integrations.table.actsAs') },
   { key: 'lastUsed', label: t('admin.integrations.table.lastUsed'), priority: 'meta' },
-  { key: 'expires', label: t('admin.integrations.table.expires'), priority: 'meta' },
   { key: 'cidrs', label: t('admin.integrations.table.cidrs'), priority: 'meta' },
 ]);
 const dateOf = (value: string) => formatDateTime(value, locale.locale);
@@ -94,6 +92,9 @@ const range = computed(() => {
     <template #cell-name="{ row }">
       <span class="block font-semibold">{{ row.name }}</span>
       <span class="block font-mono text-xs text-muted">{{ row.keyPrefix }}…</span>
+      <span class="block text-xs text-muted">{{
+        $t('admin.integrations.table.actsAsUser', { username: row.actsAs.username })
+      }}</span>
     </template>
     <template #cell-state="{ row }">
       <AdminChip :tone="STATE_TONES[stateOf(row)]">{{ stateText(row) }}</AdminChip>
@@ -105,15 +106,14 @@ const range = computed(() => {
         </AdminChip>
       </span>
     </template>
-    <template #cell-actsAs="{ row }">{{ row.actsAs.username }}</template>
     <template #cell-lastUsed="{ row }">
-      <span class="whitespace-nowrap text-muted">{{
+      <span class="block text-muted">{{
         row.lastUsedAt ? dateOf(row.lastUsedAt) : $t('admin.integrations.table.never')
       }}</span>
-    </template>
-    <template #cell-expires="{ row }">
-      <span class="whitespace-nowrap">{{
-        row.expiresAt ? dateOf(row.expiresAt) : $t('admin.integrations.table.noExpiry')
+      <span class="block text-xs">{{
+        $t('admin.integrations.table.expiresOn', {
+          date: row.expiresAt ? dateOf(row.expiresAt) : $t('admin.integrations.table.noExpiry'),
+        })
       }}</span>
     </template>
     <template #cell-cidrs="{ row }">
