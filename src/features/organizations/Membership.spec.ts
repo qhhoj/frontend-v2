@@ -24,15 +24,31 @@ describe('membership panel: requests', () => {
     const pending = hcmus({
       isMember: false,
       canAdminister: false,
+      canCreateProblem: false,
+      canCreateContest: false,
       pendingRequestId: joinRequest().id,
     });
     const calls = mockApi({
       ...signedInViewer(),
       ...organizationRoutes(
-        hcmus({ isMember: false, canAdminister: false, pendingRequestId: null }),
+        hcmus({
+          isMember: false,
+          canAdminister: false,
+          canCreateProblem: false,
+          canCreateContest: false,
+          pendingRequestId: null,
+        }),
       ),
       'GET /organizations/hcmus': sequence(
-        ok(hcmus({ isMember: false, canAdminister: false, pendingRequestId: null })),
+        ok(
+          hcmus({
+            isMember: false,
+            canAdminister: false,
+            canCreateProblem: false,
+            canCreateContest: false,
+            pendingRequestId: null,
+          }),
+        ),
         ok(pending),
       ),
       'POST /organizations/hcmus/requests': ok(joinRequest()),
@@ -59,7 +75,13 @@ describe('membership panel: official contest', () => {
 
   it('locks joining an open organization, says why and sends nothing', async () => {
     const lhp = organizationDetail({
-      viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
+      viewer: {
+        isMember: false,
+        canAdminister: false,
+        canCreateProblem: false,
+        canCreateContest: false,
+        pendingRequestId: null,
+      },
     });
     const calls = mockApi({ ...signedInViewer(), ...organizationRoutes(lhp), ...officialSite });
     const { wrapper } = await mountApp('/organizations/lhp');
@@ -75,7 +97,13 @@ describe('membership panel: official contest', () => {
 
   it('explains a lock the server reports while the site record still said off', async () => {
     const lhp = organizationDetail({
-      viewer: { isMember: false, canAdminister: false, pendingRequestId: null },
+      viewer: {
+        isMember: false,
+        canAdminister: false,
+        canCreateProblem: false,
+        canCreateContest: false,
+        pendingRequestId: null,
+      },
     });
     mockApi({
       ...signedInViewer(),

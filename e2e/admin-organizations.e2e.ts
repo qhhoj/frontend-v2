@@ -13,7 +13,13 @@ const PERMISSIONS = ['judge.edit_all_organization', 'judge.add_organization'];
 const DETAIL = organizationDetail({
   about: 'Câu lạc bộ Tin học.',
   slots: 200,
-  viewer: { isMember: false, canAdminister: true, pendingRequestId: null },
+  viewer: {
+    isMember: false,
+    canAdminister: true,
+    canCreateProblem: false,
+    canCreateContest: false,
+    pendingRequestId: null,
+  },
 });
 
 function organizationRoutes(api: FakeApi) {
