@@ -25,7 +25,7 @@
     "idRange": "Khoảng mã bài nộp (nâng cao)",
     "dateFrom": "Nộp từ",
     "dateTo": "Nộp trước",
-    "siteWide": "Không có bài hay kỳ thi: thao tác áp dụng cho cả trang và cần quyền judge.edit_all_problem.",
+    "siteWide": "Không có bài hay kỳ thi: thao tác áp dụng cho cả trang. {permission}.",
     "presets": "Chọn nhanh:",
     "rescore": "Tính lại điểm"
   },
@@ -67,7 +67,7 @@
       "matching": "bài nộp khớp bộ lọc.",
       "countedAt": "Đếm lúc {time}.",
       "needsLotChip": "Cần quyền riêng",
-      "needsLot": "bài nộp khớp, vượt giới hạn {limit}. Cần quyền judge.rejudge_submission_lot; thu hẹp bộ lọc hoặc nhờ người có quyền.",
+      "needsLot": "bài nộp khớp, vượt giới hạn {limit}. {permission}; thu hẹp bộ lọc hoặc nhờ người có quyền.",
       "noneChip": "Không khớp",
       "none": "Không có bài nộp nào khớp bộ lọc."
     },
@@ -98,6 +98,13 @@
     "title": "Các lần chạy gần đây",
     "empty": "Chưa có lần chạy nào.",
     "rejudge": "Chấm lại",
-    "rescore": "Tính lại điểm"
+    "rescore": "Tính lại điểm",
+    "columns": {
+      "action": "Thao tác",
+      "count": "Số bài",
+      "user": "Người chạy",
+      "filter": "Bộ lọc",
+      "createdAt": "Lúc chạy"
+    }
   }
 }

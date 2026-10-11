@@ -19,13 +19,13 @@ describe('rejudge filter', () => {
   it('refuses a date range that ends before it starts', () => {
     const filter = {
       ...emptyRejudgeFilter(),
-      dateFrom: '2026-10-02T00:00',
-      dateTo: '2026-10-01T00:00',
+      dateFrom: '2026-10-02T00:00:00.000Z',
+      dateTo: '2026-10-01T00:00:00.000Z',
     };
     expect(Object.keys(checkRejudgeFilter(filter))).toEqual(['dateTo']);
   });
 
-  it('sends only what was chosen, trimmed, with local dates as instants', () => {
+  it('sends only what was chosen, trimmed, with the dates as instants', () => {
     expect(toRejudgeBody({ ...emptyRejudgeFilter(), problem: ' hcmus41c ' })).toEqual({
       problem: 'hcmus41c',
     });
@@ -33,7 +33,7 @@ describe('rejudge filter', () => {
       ...emptyRejudgeFilter(),
       contest: 'voi26',
       idFrom: ID,
-      dateFrom: '2026-10-01T08:00',
+      dateFrom: '2026-10-01T01:00:00.000Z',
       languageIds: ['l1'],
       results: ['WA', 'TLE'],
       force: true,
@@ -41,7 +41,7 @@ describe('rejudge filter', () => {
     expect(body).toEqual({
       contest: 'voi26',
       idFrom: ID,
-      dateFrom: new Date('2026-10-01T08:00').toISOString(),
+      dateFrom: '2026-10-01T01:00:00.000Z',
       languages: ['l1'],
       results: ['WA', 'TLE'],
       force: true,

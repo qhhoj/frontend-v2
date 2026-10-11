@@ -1,22 +1,41 @@
 <script setup lang="ts">
-import EmptyState from '@/components/EmptyState.vue';
-import AdminBit from '../shell/AdminBit.vue';
-import { shortId } from '../ui/short-id';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { RunStatus, SimilarityRun, SimilarityScope } from '@/api/types/similarity';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import type { SimilarityRun, SimilarityScope } from '@/api/types/similarity';
-import { isActive, scopeQuery, totalPairs } from './similarity-runs';
+import AdminChip from '../ui/AdminChip.vue';
+import type { ChipTone } from '../ui/AdminChip.vue';
+import { buttonClass } from '../ui/controls';
+import { shortId } from '../ui/short-id';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../ui/table/table-columns';
 import { runDurationText, runStatusText } from './run-text';
+import { scopeQuery, totalPairs } from './similarity-runs';
 
+/** The scope's runs, newest first, each linking to its summary. Cards below 768 px. */
 const props = defineProps<{ runs: SimilarityRun[]; scope: SimilarityScope }>();
-
+const { t } = useI18n();
 const locale = useLocaleStore();
 
+const columns = computed<AdminColumn[]>(() => [
+  { key: 'id', label: t('admin.similarity.runs.columns.id'), priority: 'primary' },
+  { key: 'status', label: t('admin.similarity.runs.columns.status'), priority: 'badge' },
+  { key: 'createdAt', label: t('admin.similarity.runs.columns.createdAt') },
+  { key: 'duration', label: t('admin.similarity.runs.columns.duration') },
+  { key: 'groups', label: t('admin.similarity.runs.columns.groups'), align: 'end' },
+  { key: 'pairs', label: t('admin.similarity.runs.columns.pairs'), align: 'end' },
+]);
+const TONES: Record<RunStatus, ChipTone> = {
+  queued: 'neutral',
+  running: 'info',
+  done: 'positive',
+  failed: 'negative',
+};
 const pairsText = (run: SimilarityRun) => {
   const pairs = totalPairs(run);
   return pairs === null ? '—' : formatNumber(pairs, locale.locale);
 };
-
 const detailTo = (run: SimilarityRun) => ({
   name: 'admin-similarity',
   query: { ...scopeQuery(props.scope), run: run.id },
@@ -25,70 +44,39 @@ const detailTo = (run: SimilarityRun) => ({
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2 class="font-display text-base font-bold">
+    <h2 class="font-display text-base font-semibold">
       {{
         'problem' in scope
           ? $t('admin.similarity.runs.ofProblem', { code: scope.problem })
           : $t('admin.similarity.runs.ofContest', { key: scope.contest })
       }}
     </h2>
-    <p class="text-sm text-muted">{{ $t('admin.similarity.runs.note') }}</p>
-    <EmptyState v-if="runs.length === 0">{{ $t('admin.similarity.runs.empty') }}</EmptyState>
-    <div
-      v-else
-      class="overflow-x-auto"
-      role="region"
-      tabindex="0"
-      :aria-label="$t('admin.similarity.runs.label')"
+    <AdminDataTable
+      data-testid="runs"
+      :columns="columns"
+      :rows="runs"
+      :row-key="(run) => run.id"
+      :row-label="(run) => shortId(run.id)"
+      :label="$t('admin.similarity.runs.label')"
+      :empty-text="$t('admin.similarity.runs.empty')"
     >
-      <table data-testid="runs" class="w-full text-sm">
-        <thead class="text-left text-muted">
-          <tr>
-            <th scope="col" class="p-2">{{ $t('admin.similarity.runs.columns.id') }}</th>
-            <th scope="col" class="p-2">{{ $t('admin.similarity.runs.columns.status') }}</th>
-            <th scope="col" class="hidden p-2 md:table-cell">
-              {{ $t('admin.similarity.runs.columns.createdAt') }}
-            </th>
-            <th scope="col" class="hidden p-2 md:table-cell">
-              {{ $t('admin.similarity.runs.columns.duration') }}
-            </th>
-            <th scope="col" class="hidden p-2 md:table-cell">
-              {{ $t('admin.similarity.runs.columns.groups') }}
-            </th>
-            <th scope="col" class="hidden p-2 md:table-cell">
-              {{ $t('admin.similarity.runs.columns.pairs') }}
-            </th>
-            <th scope="col" class="p-2">
-              <span class="sr-only">{{ $t('admin.similarity.runs.columns.detail') }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="run in runs" :key="run.id" class="border-t border-line">
-            <td class="p-2 font-mono">{{ shortId(run.id) }}</td>
-            <td class="p-2">
-              <span class="inline-flex items-center gap-2">
-                {{ runStatusText(run) }}
-                <AdminBit v-if="isActive(run)" placement="queued" />
-              </span>
-            </td>
-            <td class="hidden p-2 md:table-cell">
-              {{ formatDateTime(run.createdAt, locale.locale) }}
-            </td>
-            <td class="hidden p-2 md:table-cell">{{ runDurationText(run) }}</td>
-            <td class="hidden p-2 md:table-cell">{{ run.groups.length }}</td>
-            <td class="hidden p-2 md:table-cell">{{ pairsText(run) }}</td>
-            <td class="p-2">
-              <RouterLink
-                :to="detailTo(run)"
-                class="inline-flex min-h-11 items-center font-semibold underline"
-              >
-                {{ $t('admin.similarity.runs.detail') }}
-              </RouterLink>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <template #cell-id="{ row }">
+        <span class="font-mono font-semibold">{{ shortId(row.id) }}</span>
+      </template>
+      <template #cell-status="{ row }">
+        <AdminChip :tone="TONES[row.status]">{{ runStatusText(row) }}</AdminChip>
+      </template>
+      <template #cell-createdAt="{ row }">
+        <span class="whitespace-nowrap">{{ formatDateTime(row.createdAt, locale.locale) }}</span>
+      </template>
+      <template #cell-duration="{ row }">{{ runDurationText(row) }}</template>
+      <template #cell-groups="{ row }">{{ row.groups.length }}</template>
+      <template #cell-pairs="{ row }">{{ pairsText(row) }}</template>
+      <template #actions="{ row }">
+        <RouterLink :to="detailTo(row)" :class="buttonClass('secondary', 'sm')">
+          {{ $t('admin.similarity.runs.detail') }}
+        </RouterLink>
+      </template>
+    </AdminDataTable>
   </section>
 </template>

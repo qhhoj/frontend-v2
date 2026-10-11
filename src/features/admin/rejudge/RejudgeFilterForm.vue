@@ -5,17 +5,16 @@ import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
 import VerdictChips from '../ui/VerdictChips.vue';
-import {
-  ADMIN_BUTTON_CLASS,
-  ADMIN_CHECK_CHIP_CLASS,
-  ADMIN_DANGER_CLASS,
-  ADMIN_INPUT_CLASS,
-} from '../ui/classes';
+import AdminCheckChips from '../ui/AdminCheckChips.vue';
+import { CARD, INPUT, buttonClass } from '../ui/controls';
+import AdminDateTimeField from '../ui/form/AdminDateTimeField.vue';
+import AdminNotice from '../ui/feedback/AdminNotice.vue';
+import { needsPermissionText } from '../ui/permission-text';
 import type { FieldErrors } from '../ui/admin-errors';
 import { RESULT_PRESETS, isSiteWide } from './rejudge-filter';
 import type { RejudgeFilter, ResultPreset } from './rejudge-filter';
 
-defineProps<{ languages: Language[]; errors: FieldErrors }>();
+const props = defineProps<{ languages: Language[]; errors: FieldErrors }>();
 const filter = defineModel<RejudgeFilter>('filter', { required: true });
 defineEmits<{ rejudge: []; rescore: []; reset: [] }>();
 
@@ -28,6 +27,9 @@ const TEXT_PAIRS: [TextField, TextField][] = [
 const DATE_FIELDS: DateField[] = ['dateFrom', 'dateTo'];
 const ID_FIELDS: TextField[] = ['idFrom', 'idTo'];
 const PRESETS = Object.keys(RESULT_PRESETS) as ResultPreset[];
+const languageOptions = computed(() =>
+  props.languages.map((language) => ({ value: language.id, label: language.name })),
+);
 const siteWide = computed(() => isSiteWide(filter.value));
 const applyPreset = (preset: ResultPreset) => {
   filter.value.results = [...RESULT_PRESETS[preset]];
@@ -35,18 +37,10 @@ const applyPreset = (preset: ResultPreset) => {
 </script>
 
 <template>
-  <section
-    class="glass flex flex-col gap-5 rounded-panel p-5 sm:p-6"
-    aria-labelledby="rejudge-filter-title"
-  >
-    <header class="flex flex-wrap items-center gap-3">
-      <h2 id="rejudge-filter-title" class="font-display text-xl font-semibold">
-        {{ $t('admin.rejudge.filter.title') }}
-      </h2>
-      <span class="rounded-pill border border-line px-2.5 py-0.5 font-mono text-xs">
-        judge.rejudge_submission
-      </span>
-    </header>
+  <section :class="[CARD, 'flex flex-col gap-5 p-5 sm:p-6']" aria-labelledby="rejudge-filter-title">
+    <h2 id="rejudge-filter-title" class="font-display text-xl font-semibold">
+      {{ $t('admin.rejudge.filter.title') }}
+    </h2>
 
     <div v-for="pair in TEXT_PAIRS" :key="pair[0]" class="grid gap-4 sm:grid-cols-2">
       <AdminField
@@ -62,35 +56,32 @@ const applyPreset = (preset: ResultPreset) => {
           :id="id"
           v-model="filter[field]"
           type="text"
-          :class="ADMIN_INPUT_CLASS"
+          :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="errors[field] ? 'true' : undefined"
           autocomplete="off"
         />
       </AdminField>
     </div>
-    <p v-if="siteWide" class="rounded-row border border-line bg-surface-hover p-3 text-sm">
-      {{ $t('admin.rejudge.filter.siteWide') }}
-    </p>
+    <AdminNotice
+      v-if="siteWide"
+      tone="caution"
+      :title="
+        $t('admin.rejudge.filter.siteWide', {
+          permission: needsPermissionText('judge.edit_all_problem'),
+        })
+      "
+    />
 
     <div class="grid gap-4 sm:grid-cols-2">
-      <AdminField
+      <AdminDateTimeField
         v-for="field in DATE_FIELDS"
         :key="field"
-        v-slot="{ id, describedBy }"
+        v-model="filter[field]"
         :label="$t(`admin.rejudge.filter.${field}`)"
         :error="errors[field]"
         :input-id="`rejudge-${field}`"
-      >
-        <input
-          :id="id"
-          v-model="filter[field]"
-          type="datetime-local"
-          :class="ADMIN_INPUT_CLASS"
-          :aria-describedby="describedBy"
-          :aria-invalid="errors[field] ? 'true' : undefined"
-        />
-      </AdminField>
+      />
     </div>
 
     <details class="rounded-row border border-line p-3" :open="!!(filter.idFrom || filter.idTo)">
@@ -111,7 +102,7 @@ const applyPreset = (preset: ResultPreset) => {
             :id="id"
             v-model="filter[field]"
             type="text"
-            :class="`${ADMIN_INPUT_CLASS} font-mono text-sm`"
+            :class="[INPUT, 'font-mono text-sm']"
             :aria-describedby="describedBy"
             :aria-invalid="errors[field] ? 'true' : undefined"
             autocomplete="off"
@@ -124,17 +115,11 @@ const applyPreset = (preset: ResultPreset) => {
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.languages') }}</legend>
       <p class="text-xs text-muted">{{ $t('admin.rejudge.filter.languagesHint') }}</p>
       <p v-if="errors.languages" class="text-sm text-negative">{{ errors.languages }}</p>
-      <div class="flex flex-wrap gap-2">
-        <label v-for="language in languages" :key="language.id" :class="ADMIN_CHECK_CHIP_CLASS">
-          <input
-            v-model="filter.languageIds"
-            type="checkbox"
-            name="rejudge-language"
-            :value="language.id"
-          />
-          {{ language.name }}
-        </label>
-      </div>
+      <AdminCheckChips
+        v-model="filter.languageIds"
+        :options="languageOptions"
+        name="rejudge-language"
+      />
     </fieldset>
 
     <fieldset class="flex flex-col gap-2">
@@ -146,7 +131,7 @@ const applyPreset = (preset: ResultPreset) => {
           v-for="preset in PRESETS"
           :key="preset"
           type="button"
-          class="min-h-11 rounded-pill border border-line-strong px-3 font-semibold hover:bg-surface-hover"
+          :class="buttonClass('secondary', 'sm')"
           @click="applyPreset(preset)"
         >
           {{ $t(`admin.rejudge.presets.${preset}`) }}
@@ -166,14 +151,14 @@ const applyPreset = (preset: ResultPreset) => {
     />
     <p class="text-sm text-muted">{{ $t('admin.rejudge.filter.lockedNote') }}</p>
 
-    <div class="flex flex-wrap gap-3">
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="$emit('reset')">
+    <div class="flex flex-wrap justify-end gap-3 border-t border-line pt-4">
+      <button type="button" :class="buttonClass('ghost')" @click="$emit('reset')">
         {{ $t('admin.rejudge.filter.reset') }}
       </button>
-      <button type="button" :class="ADMIN_BUTTON_CLASS" @click="$emit('rescore')">
+      <button type="button" :class="buttonClass('secondary')" @click="$emit('rescore')">
         {{ $t('admin.rejudge.filter.rescore') }}
       </button>
-      <button type="button" :class="ADMIN_DANGER_CLASS" @click="$emit('rejudge')">
+      <button type="button" :class="buttonClass('primary')" @click="$emit('rejudge')">
         {{ $t('admin.rejudge.filter.submit') }}
       </button>
     </div>

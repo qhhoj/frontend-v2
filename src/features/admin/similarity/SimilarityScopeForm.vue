@@ -2,7 +2,9 @@
 import { ref, useId, watch } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import type { SimilarityScope, SimilarityScopeKind } from '@/api/types/similarity';
-import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
+import AdminChip from '../ui/AdminChip.vue';
+import { INPUT, buttonClass } from '../ui/controls';
+import { needsPermissionText } from '../ui/permission-text';
 import { scopeKindOf, scopeValueOf } from './similarity-runs';
 
 const props = defineProps<{ scope: SimilarityScope | null; isPending: boolean }>();
@@ -34,9 +36,7 @@ const submitView = () => {
     :lead="$t('admin.similarity.scope.lead')"
   >
     <template #header-end>
-      <span class="rounded-pill bg-surface-solid px-3 py-1 font-mono text-xs text-muted">
-        {{ $t('admin.ui.needsPermission', { permission: 'judge.moss_contest' }) }}
-      </span>
+      <AdminChip>{{ needsPermissionText('judge.moss_contest') }}</AdminChip>
     </template>
     <form class="flex flex-col gap-4" @submit.prevent="submitView">
       <fieldset class="flex flex-wrap gap-4">
@@ -61,9 +61,9 @@ const submitView = () => {
                 : $t('admin.similarity.scope.contestKey')
             }}
           </label>
-          <input :id="valueInputId" v-model="typed" :class="ADMIN_INPUT_CLASS" autocomplete="off" />
+          <input :id="valueInputId" v-model="typed" :class="INPUT" autocomplete="off" />
         </div>
-        <button type="submit" :class="ADMIN_BUTTON_CLASS">
+        <button type="submit" :class="buttonClass()">
           {{ $t('admin.similarity.scope.view') }}
         </button>
       </div>
@@ -71,7 +71,7 @@ const submitView = () => {
     <div v-if="scope" class="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        :class="ADMIN_PRIMARY_CLASS"
+        :class="buttonClass('primary')"
         :aria-disabled="isPending || undefined"
         @click="emit('start')"
       >

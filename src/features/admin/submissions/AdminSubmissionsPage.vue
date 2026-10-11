@@ -6,44 +6,49 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { translate } from '@/i18n';
+import { formatNumber } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
+import { buttonClass } from '../ui/controls';
+import { rangeOf } from '../ui/table/table-columns';
 import BatchActionDialogs from '../rejudge/BatchActionDialogs.vue';
 import type { RejudgeOutcome } from '../rejudge/use-bulk-rejudge';
-import AdminSubmissionFilterForm from './AdminSubmissionFilterForm.vue';
+import AdminSubmissionFilterBar from './AdminSubmissionFilterBar.vue';
 import AdminSubmissionTable from './AdminSubmissionTable.vue';
-import SubmissionBulkBar from './SubmissionBulkBar.vue';
 import {
   batchBodyOf,
   filtersFromQuery,
   listQueryOf,
   queryOfFilters,
 } from './admin-submission-filters';
+import type { AdminSubmissionFilters } from './admin-submission-filters';
 import { useAdminSubmissionListQuery } from './admin-submissions.queries';
 
 const route = useRoute();
 const router = useRouter();
+const locale = useLocaleStore();
+/** The filter lives in the URL: every change in the filter bar is written there, and the list reads it back. */
 const applied = computed(() => filtersFromQuery(route.query));
-/** The form edits a draft; Apply puts it in the URL, which is what the list reads. */
-const draft = ref(filtersFromQuery(route.query));
 const { data, isPending, error, refetch } = useAdminSubmissionListQuery(() =>
   listQueryOf(applied.value),
 );
 const metaQuery = useProblemMetaQuery();
 const languages = computed(() => metaQuery.data.value?.languages ?? []);
 const items = computed(() => data.value?.items ?? []);
-const selected = ref<string[]>([]);
+const total = computed(() => data.value?.meta.total ?? 0);
+const selected = ref(new Set<string>());
 const allMatching = ref(false);
 const outcome = ref<RejudgeOutcome | null>(null);
 const dialogs = useTemplateRef('dialogs');
 
 /** A new filter or page starts a new selection: ids from another filter must not ride along. */
-watch(applied, (filters) => {
-  draft.value = { ...filters };
-  clearSelection();
+watch(applied, () => clearSelection());
+watch(selected, (ids) => {
+  if (ids.size === 0) allMatching.value = false;
 });
 function clearSelection() {
-  selected.value = [];
+  selected.value = new Set();
   allMatching.value = false;
 }
 /** A refusal keeps the selection, so staff can retry without ticking the rows again. */
@@ -51,16 +56,36 @@ function showOutcome(next: RejudgeOutcome) {
   outcome.value = next;
   if (next.kind === 'done') clearSelection();
 }
-const apply = () => router.push({ query: queryOfFilters({ ...draft.value, page: 1 }) });
-const reset = () => router.push({ query: {} });
+const applyFilters = (next: AdminSubmissionFilters) => router.push({ query: queryOfFilters(next) });
+
+/**
+ * "Every match" is offered once the whole page is ticked and more rows match than it shows. It is off while the list filters on
+ * the judging state, which a batch cannot, so "every match" would reach more rows than the list shows.
+ */
+const canSelectAll = computed(
+  () =>
+    applied.value.statuses.length === 0 &&
+    !allMatching.value &&
+    selected.value.size >= items.value.length &&
+    total.value > items.value.length,
+);
 const body = computed(() =>
-  batchBodyOf(applied.value, { ids: selected.value, allMatching: allMatching.value }),
+  batchBodyOf(applied.value, { ids: [...selected.value], allMatching: allMatching.value }),
 );
 const line = computed(() =>
   allMatching.value
     ? translate('admin.submissions.bulk.lineAll')
-    : translate('admin.submissions.bulk.lineSelected', { count: selected.value.length }),
+    : translate('admin.submissions.bulk.lineSelected', { count: selected.value.size }),
 );
+const resultText = computed(() =>
+  data.value
+    ? translate('admin.submissions.total', { count: formatNumber(total.value, locale.locale) })
+    : undefined,
+);
+const range = computed(() => {
+  const meta = data.value?.meta;
+  return meta ? rangeOf(meta.page, meta.pageSize, items.value.length, meta.total) : null;
+});
 </script>
 
 <template>
@@ -70,51 +95,76 @@ const line = computed(() =>
       :lead="$t('admin.submissions.lead')"
     >
       <template #actions>
-        <RouterLink
-          :to="{ name: 'admin-rejudge' }"
-          class="text-sm font-semibold text-accent-text underline"
-        >
+        <RouterLink :to="{ name: 'admin-rejudge' }" :class="buttonClass('secondary')">
           {{ $t('admin.submissions.toRejudge') }}
         </RouterLink>
       </template>
     </AdminPageHeader>
-    <AdminSubmissionFilterForm
-      v-model:filters="draft"
+    <AdminSubmissionFilterBar
+      :filters="applied"
       :languages="languages"
-      @apply="apply"
-      @reset="reset"
+      :result-text="resultText"
+      @change="applyFilters"
     />
     <AdminStatus v-if="outcome" :kind="outcome.kind" :text="outcome.text" />
-    <SubmissionBulkBar
-      v-model:all-matching="allMatching"
-      :selected-count="selected.length"
-      :total="data?.meta.total ?? 0"
-      :page-count="items.length"
-      :can-take-all="applied.statuses.length === 0"
-      @clear="clearSelection"
-      @rejudge="dialogs?.open('rejudge')"
-      @rescore="dialogs?.open('rescore')"
-    />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <SkeletonBlock v-for="index in 8" :key="index" class="h-10 w-full" />
+        <SkeletonBlock class="h-96 w-full" />
       </template>
-      <section class="glass flex flex-col gap-3 rounded-panel p-3 sm:p-4">
-        <p class="px-1 text-sm text-muted">
-          {{ $t('admin.submissions.total', { count: data?.meta.total ?? 0 }) }}
-        </p>
-        <p v-if="items.length === 0" class="p-4 text-center text-muted">
-          {{ $t('admin.submissions.empty') }}
-        </p>
-        <AdminSubmissionTable
-          v-else
-          v-model:selected="selected"
-          :items="items"
-          :label="$t('admin.shell.screens.submissions')"
-          selectable
-        />
-      </section>
-      <NumberedPager v-if="data" :meta="data.meta" :label="$t('admin.submissions.pager')" />
+      <AdminSubmissionTable
+        v-model:selected="selected"
+        :items="items"
+        :label="$t('admin.shell.screens.submissions')"
+        selectable
+      >
+        <template #bulk>
+          <span v-if="allMatching" class="text-sm font-semibold" role="status">
+            {{
+              $t('admin.submissions.bulk.allSelected', {
+                count: formatNumber(total, locale.locale),
+              })
+            }}
+          </span>
+          <button
+            v-else-if="canSelectAll"
+            type="button"
+            :class="buttonClass('ghost', 'sm')"
+            @click="allMatching = true"
+          >
+            {{
+              $t('admin.submissions.bulk.selectAll', { total: formatNumber(total, locale.locale) })
+            }}
+          </button>
+          <button
+            type="button"
+            :class="buttonClass('secondary', 'sm')"
+            @click="dialogs?.open('rescore')"
+          >
+            {{ $t('admin.rejudge.filter.rescore') }}
+          </button>
+          <button
+            type="button"
+            :class="buttonClass('secondary', 'sm')"
+            @click="dialogs?.open('rejudge')"
+          >
+            {{ $t('admin.submissions.bulk.rejudge') }}
+          </button>
+        </template>
+        <template #empty>
+          <p class="px-4 py-8 text-center text-muted">{{ $t('admin.submissions.empty') }}</p>
+        </template>
+        <template v-if="data" #footer>
+          <span v-if="range" class="font-mono tabular-nums">
+            {{ $t('admin.table.range', range) }}
+          </span>
+          <NumberedPager
+            class="ml-auto"
+            compact
+            :meta="data.meta"
+            :label="$t('admin.submissions.pager')"
+          />
+        </template>
+      </AdminSubmissionTable>
     </QueryState>
     <BatchActionDialogs ref="dialogs" :body="body" :line="line" @outcome="showOutcome" />
   </div>

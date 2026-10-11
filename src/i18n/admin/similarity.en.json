@@ -15,12 +15,12 @@
     "noScope": "Choose a problem or a contest to see its runs."
   },
   "start": {
-    "queued": "202 · Queued — The new run is in the queue. The list refreshes by itself; open the run to follow its progress.",
-    "conflict": "409 · A run is already going — This scope has a run that is not finished yet. Wait for it to end, then start again.",
+    "queued": "The new run is in the queue. The list refreshes by itself; open the run to follow its progress.",
+    "conflict": "This scope has a run that is not finished yet. Wait for it to end, then start again.",
     "openRunning": "Open the running run",
-    "rateLimited": "429 · Too many runs — Up to 10 runs an hour per account.",
+    "rateLimited": "Too many runs: up to 10 runs an hour per account.",
     "retryWithoutHeader": "Try again later.",
-    "retryAfter": "Try again in {count} {unit} (per Retry-After)."
+    "retryAfter": "Try again in {count} {unit}."
   },
   "units": {
     "seconds": "seconds",
@@ -30,7 +30,6 @@
   "runs": {
     "ofProblem": "Runs of problem {code}",
     "ofContest": "Runs of contest {key}",
-    "note": "The list is not paged.",
     "empty": "No runs for this scope yet.",
     "columns": {
       "id": "Run",
@@ -62,7 +61,7 @@
   },
   "notFound": {
     "title": "Not found",
-    "body": "This contest key or run does not exist, or you cannot edit it. The server answers 404 in both cases, so there is no more detail.",
+    "body": "This contest key or run does not exist, or you cannot edit it.",
     "back": "Back to the list"
   },
   "summary": {
@@ -104,22 +103,22 @@
       "language": "Language family",
       "allLanguages": "All",
       "minPercent": "Minimum similarity",
-      "minPercentHint": "The value sent is {fraction} (0 to 1). The run's threshold is {minPercent}%; no pair sits below it.",
+      "minPercentHint": "The run kept pairs from {minPercent}%; there are none below that.",
       "reset": "Reset",
       "hiddenNote": "Pairs of problems you cannot view are hidden, so the total here can be smaller than the run's total."
     },
     "count": "{count} pairs",
     "countAbove": "{count} pairs, similarity from {percent}%",
-    "sortNote": "Sorted by similarity, highest first",
     "columns": {
       "longest": "Longest",
       "overlap": "Overlap",
-      "fragments": "Fragments"
+      "fragments": "Fragments",
+      "similarity": "Similarity",
+      "authors": "Authors",
+      "problem": "Problem",
+      "language": "Language"
     },
     "open": "Compare",
-    "showing": "Showing {from} to {to} of {total} pairs",
-    "previous": "Previous",
-    "next": "Next",
     "emptyAbove": "No pairs at {percent}% or above",
     "emptyAny": "No pairs in this run yet.",
     "emptyHint": "Lower the similarity threshold or pick another problem to see more pairs.",

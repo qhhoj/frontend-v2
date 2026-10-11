@@ -25,7 +25,7 @@
     "idRange": "Submission id range (advanced)",
     "dateFrom": "Submitted from",
     "dateTo": "Submitted before",
-    "siteWide": "No problem or contest: the action covers the whole site and needs judge.edit_all_problem.",
+    "siteWide": "No problem or contest: the action covers the whole site. {permission}.",
     "presets": "Quick pick:",
     "rescore": "Recalculate points"
   },
@@ -67,7 +67,7 @@
       "matching": "submissions match the filter.",
       "countedAt": "Counted at {time}.",
       "needsLotChip": "Needs a separate permission",
-      "needsLot": "submissions match, over the limit of {limit}. Needs judge.rejudge_submission_lot; narrow the filter or ask someone who holds it.",
+      "needsLot": "submissions match, over the limit of {limit}. {permission}; narrow the filter or ask someone who holds it.",
       "noneChip": "No match",
       "none": "No submission matches the filter."
     },
@@ -98,6 +98,13 @@
     "title": "Recent runs",
     "empty": "No runs yet.",
     "rejudge": "Rejudge",
-    "rescore": "Rescore"
+    "rescore": "Rescore",
+    "columns": {
+      "action": "Action",
+      "count": "Submissions",
+      "user": "By",
+      "filter": "Filter",
+      "createdAt": "When"
+    }
   }
 }

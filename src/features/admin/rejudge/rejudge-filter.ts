@@ -4,7 +4,7 @@ import type { SubmissionResult } from '@/api/types/submissions';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
-import { fromLocalInput } from '../ui/datetime';
+import { formatInZone } from '../ui/form/site-time';
 import { shortId } from '../ui/short-id';
 
 export const UUID_V7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -15,9 +15,9 @@ export const LINKABLE_FIELDS = ['problem', 'contest', 'user', 'judgedOn'] as con
 type LinkableField = (typeof LINKABLE_FIELDS)[number];
 
 export interface RejudgeFilter extends Record<LinkableField, string> {
-  /** `datetime-local` values in the viewer's zone. */
-  dateFrom: string;
-  dateTo: string;
+  /** ISO instants (`AdminDateTimeField`, typed in the site's zone), or null for no bound. */
+  dateFrom: string | null;
+  dateTo: string | null;
   idFrom: string;
   idTo: string;
   languageIds: string[];
@@ -30,8 +30,8 @@ export const emptyRejudgeFilter = (): RejudgeFilter => ({
   contest: '',
   user: '',
   judgedOn: '',
-  dateFrom: '',
-  dateTo: '',
+  dateFrom: null,
+  dateTo: null,
   idFrom: '',
   idTo: '',
   languageIds: [],
@@ -47,7 +47,7 @@ export const RESULT_PRESETS = {
 } as const satisfies Record<string, readonly SubmissionResult[]>;
 export type ResultPreset = keyof typeof RESULT_PRESETS;
 
-/** Neither a problem nor a contest: the batch reaches every problem (needs `judge.edit_all_problem`). */
+/** Neither a problem nor a contest: the batch reaches every problem (needs the "edit every problem" permission). */
 export const isSiteWide = (filter: RejudgeFilter) =>
   !filter.problem.trim() && !filter.contest.trim();
 
@@ -56,9 +56,9 @@ export function checkRejudgeFilter(filter: RejudgeFilter): FieldErrors {
   for (const field of ['idFrom', 'idTo'] as const)
     if (filter[field].trim() && !UUID_V7.test(filter[field].trim()))
       errors[field] = translate('admin.rejudge.errors.id');
-  const from = fromLocalInput(filter.dateFrom);
-  const to = fromLocalInput(filter.dateTo);
-  if (from && to && from >= to) errors.dateTo = translate('admin.rejudge.errors.dateOrder');
+  const { dateFrom: from, dateTo: to } = filter;
+  if (from && to && Date.parse(from) >= Date.parse(to))
+    errors.dateTo = translate('admin.rejudge.errors.dateOrder');
   if (filter.languageIds.length > MAX_REJUDGE_LANGUAGES)
     errors.languages = translate('admin.rejudge.errors.languages');
   return errors;
@@ -71,10 +71,8 @@ export function toRejudgeBody(filter: RejudgeFilter): RejudgeBody {
     const value = filter[field].trim();
     if (value) body[field] = value;
   }
-  const dateFrom = fromLocalInput(filter.dateFrom);
-  const dateTo = fromLocalInput(filter.dateTo);
-  if (dateFrom) body.dateFrom = dateFrom;
-  if (dateTo) body.dateTo = dateTo;
+  if (filter.dateFrom) body.dateFrom = filter.dateFrom;
+  if (filter.dateTo) body.dateTo = filter.dateTo;
   if (filter.languageIds.length > 0) body.languages = filter.languageIds;
   if (filter.results.length > 0) body.results = filter.results;
   if (filter.force) body.force = true;
@@ -121,8 +119,8 @@ function scopeText(filter: RejudgeFilter): string {
 }
 
 /** The lower or upper bound: the date and the id when both are set (the server applies both), else whichever is. */
-function boundText(date: string, id: string): string {
-  const parts = [date.replace('T', ' '), id.trim() && shortId(id.trim())].filter(Boolean);
+function boundText(date: string | null, id: string): string {
+  const parts = [date && formatInZone(date), id.trim() && shortId(id.trim())].filter(Boolean);
   return parts.join(' · ') || translate('admin.rejudge.summary.noLimit');
 }
 
