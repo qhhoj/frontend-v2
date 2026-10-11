@@ -1,6 +1,7 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
 import type { QueryOf } from './typed';
 import type { JoinRequestState, OrganizationListItem } from './types/organizations';
+import type { SubmissionListQuery } from './types/submissions';
 
 /** The backend's largest page (`OrganizationListQueryDto`). */
 const ORGANIZATION_PAGE_SIZE = 100;
@@ -23,6 +24,9 @@ export const fetchMembers = (slug: string, query: MemberQuery) =>
   apiGetPage('/organizations/{slug}/members', { path: { slug }, query });
 export const fetchOrganizationPosts = (slug: string, page: number) =>
   apiGetPage('/organizations/{slug}/posts', { path: { slug }, query: { page } });
+/** The listed members' submissions: members, administrators and `judge.view_all_submission` only. */
+export const fetchOrganizationSubmissions = (slug: string, query: SubmissionListQuery) =>
+  apiGetPage('/organizations/{slug}/submissions', { path: { slug }, query });
 export const joinOrganization = (slug: string) =>
   apiSend('post', '/organizations/{slug}/join', { path: { slug } });
 export const leaveOrganization = (slug: string) =>

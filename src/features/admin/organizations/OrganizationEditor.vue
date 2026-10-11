@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import AdminField from '../ui/AdminField.vue';
@@ -11,8 +11,9 @@ import { failureTextOf } from '../ui/admin-errors';
 import { ADMIN_BUTTON_CLASS, ADMIN_INPUT_CLASS, ADMIN_PRIMARY_CLASS } from '../ui/classes';
 import OrganizationContext from './OrganizationContext.vue';
 import OrganizationLogoField from './OrganizationLogoField.vue';
-import { MAX_ORGANIZATION_ADMINS, slugFromName } from './organization-form';
+import { MAX_ORGANIZATION_ADMINS } from './organization-form';
 import { useOrganizationEditor } from './use-organization-editor';
+import { useSlugFromName } from './use-slug-from-name';
 
 const props = defineProps<{ slug: string | null }>();
 /** The page decides where a saved organization lives (a new slug moves the URL). */
@@ -22,18 +23,10 @@ const editor = useOrganizationEditor(
   (saved) => emit('saved', saved),
 );
 const { form, detail, errors, isCreate, canEditAll, isReadOnly, mutation } = editor;
-/** A create fills the address from the name until the address is typed by hand (clearing it hands it back). */
-const isSlugTyped = ref(false);
-if (isCreate)
-  watch(
-    () => form.name,
-    (name) => {
-      if (!isSlugTyped.value) form.slug = slugFromName(name);
-    },
-  );
-const onSlugInput = () => (isSlugTyped.value = form.slug !== '');
+const slugFill = isCreate ? useSlugFromName(form) : null;
+const onSlugInput = () => slugFill?.onSlugInput();
 function reset() {
-  isSlugTyped.value = false;
+  slugFill?.release();
   editor.reset();
 }
 const isSaved = ref(false);

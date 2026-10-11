@@ -1,16 +1,37 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { EllipsisVertical } from 'lucide-vue-next';
+import Menu from 'primevue/menu';
+import type { MenuItem } from 'primevue/menuitem';
+import { computed, ref } from 'vue';
+import { translate } from '@/i18n';
 import type { OrganizationMember } from '@/api/types/organizations';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { ADMIN_DANGER_CLASS } from '../ui/classes';
 
-/** One member in the administrators' list: rank, name, points, and the remove button (admins get a chip instead). */
-defineProps<{ member: OrganizationMember; isAdmin: boolean }>();
-const emit = defineEmits<{ kick: [] }>();
+/**
+ * One member in the administrators' list: rank, name, points, and a ⋮ menu of role and remove actions. An admin cannot be removed
+ * (backend `admin_not_kickable`); the last admin cannot step down either (`canDemote` false).
+ */
+const props = defineProps<{ member: OrganizationMember; isAdmin: boolean; canDemote: boolean }>();
+const emit = defineEmits<{ kick: []; promote: []; demote: [] }>();
 const { can } = usePermissions();
 /** The user admin page needs `judge.ban_user`; others get no link to a screen they cannot open. */
 const canOpenUser = computed(() => can('judge.ban_user'));
+const menu = ref<InstanceType<typeof Menu>>();
+const isMenuOpen = ref(false);
+/** The mock-up's ⋮ menu: an admin may step down; a member may be promoted or removed. */
+const menuModel = computed<MenuItem[]>(() =>
+  props.isAdmin
+    ? [{ label: translate('orgAdmin.members.demote'), command: () => emit('demote') }]
+    : [
+        { label: translate('orgAdmin.members.promote'), command: () => emit('promote') },
+        {
+          label: translate('admin.organizations.members.kick'),
+          class: 'text-negative',
+          command: () => emit('kick'),
+        },
+      ],
+);
 </script>
 
 <template>
@@ -35,18 +56,34 @@ const canOpenUser = computed(() => can('judge.ban_user'));
       >
         {{ $t('admin.organizations.members.openUser') }}
       </RouterLink>
-      <span v-if="isAdmin" class="max-w-48 text-xs text-muted">
-        {{ $t('admin.organizations.members.adminHint') }}
+      <span v-if="isAdmin && !canDemote" class="max-w-48 text-xs text-muted">
+        {{ $t('orgAdmin.members.lastAdmin') }}
       </span>
-      <button
-        v-else
-        type="button"
-        :class="ADMIN_DANGER_CLASS"
-        :aria-label="$t('admin.organizations.members.kickNamed', { username: member.username })"
-        @click="emit('kick')"
-      >
-        {{ $t('admin.organizations.members.kick') }}
-      </button>
+      <template v-else>
+        <button
+          type="button"
+          data-testid="member-actions"
+          class="inline-flex size-11 items-center justify-center rounded-pill text-muted hover:bg-surface-hover hover:text-content"
+          :aria-label="$t('orgAdmin.members.actionsNamed', { username: member.username })"
+          aria-haspopup="menu"
+          :aria-expanded="isMenuOpen"
+          @click="menu?.toggle($event)"
+        >
+          <EllipsisVertical aria-hidden="true" class="size-4" />
+        </button>
+        <Menu
+          ref="menu"
+          :model="menuModel"
+          popup
+          :pt="{
+            root: {
+              'aria-label': $t('orgAdmin.members.actionsNamed', { username: member.username }),
+            },
+          }"
+          @show="isMenuOpen = true"
+          @hide="isMenuOpen = false"
+        />
+      </template>
     </span>
   </li>
 </template>

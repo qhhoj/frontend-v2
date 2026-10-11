@@ -140,18 +140,21 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         <template #dropdownicon><ChevronDown class="size-4" aria-hidden="true" /></template>
       </Select>
     </div>
-    <label class="flex flex-col gap-1 text-[13px] text-muted">
-      {{ $t('submissions.rail.problemLabel') }}
-      <input
-        v-model="problemText"
-        name="problem"
-        type="text"
-        :maxlength="MAX_PROBLEM_CODE_LENGTH"
-        autocomplete="off"
-        :placeholder="$t('submissions.rail.problem')"
-        :class="TEXT_INPUT_CLASSES"
-      />
-    </label>
+    <!-- A list scoped to a set of problems (an organization's) swaps the code box for a picker. -->
+    <slot name="problem">
+      <label class="flex flex-col gap-1 text-[13px] text-muted">
+        {{ $t('submissions.rail.problemLabel') }}
+        <input
+          v-model="problemText"
+          name="problem"
+          type="text"
+          :maxlength="MAX_PROBLEM_CODE_LENGTH"
+          autocomplete="off"
+          :placeholder="$t('submissions.rail.problem')"
+          :class="TEXT_INPUT_CLASSES"
+        />
+      </label>
+    </slot>
     <label v-if="showUser" class="flex flex-col gap-1 text-[13px] text-muted">
       {{ $t('submissions.rail.userLabel') }}
       <input

@@ -82,7 +82,10 @@ test('a signed-in visitor asks to join a private organization and sees the reque
   await expect(page.getByText('Đang chờ duyệt', { exact: true }).first()).toBeVisible();
 });
 
-test('an administrator approves a pending request and the queue empties', async ({ page, api }) => {
+test('an administrator approves a pending request on "Quản lý" and the queue empties', async ({
+  page,
+  api,
+}) => {
   api.signedIn = true;
   let decided = false;
   api.routes['GET /organizations/hcmus'] = ok(
@@ -94,9 +97,14 @@ test('an administrator approves a pending request and the queue empties', async 
     decided = true;
     return ok(joinRequest({ id: REQUEST_ID, organizationSlug: 'hcmus', state: 'A' }));
   };
+  api.routes['GET /organizations/hcmus/members'] = list([]);
+  api.routes['GET /organizations/hcmus/revisions'] = list([]);
+  api.routes['POST /organizations/render-preview'] = ok({ html: '' });
+  // The old requests address lands on "Quản lý".
   await page.goto('/organizations/hcmus/requests');
-  await page.getByRole('button', { name: 'Duyệt', exact: true }).click();
-  await expect(page.getByText('Không có yêu cầu nào đang chờ', { exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/\/organizations\/hcmus\/manage$/);
+  await page.getByRole('button', { name: 'Chấp nhận', exact: true }).click();
+  await expect(page.getByText('Không có yêu cầu nào.', { exact: true })).toBeVisible();
 });
 
 test('the members table does not scroll the page sideways at 375 px', async ({ page, api }) => {

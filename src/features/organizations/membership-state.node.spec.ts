@@ -46,15 +46,14 @@ describe('membershipState', () => {
 
 describe('membershipErrorCopy', () => {
   const conflict = new ApiError('conflict', 409, 'x');
-  it('uses the board’s two cards for a refused join and a full organization', () => {
+  it('uses the board’s card for a refused join', () => {
     expect(membershipErrorCopy('join', conflict).title).toBe('orgMembership.joinFailedTitle');
-    expect(membershipErrorCopy('approve', conflict).title).toBe('orgMembership.fullTitle');
   });
   it('says to retry for the busy lock, whichever action it hit', () => {
     const busy = new ApiError('conflict', 409, 'x', {
       issues: [{ field: 'lock', code: 'busy', message: 'x' }],
     });
-    for (const action of ['join', 'approve', 'reject'] as const) {
+    for (const action of ['join', 'leave', 'request'] as const) {
       expect(membershipErrorCopy(action, busy)).toEqual({
         title: 'orgMembership.failedTitle',
         body: 'admin.ui.issues.busy',

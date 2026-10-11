@@ -184,11 +184,17 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/features/organizations/OrganizationPosts.vue'),
         meta: { titleKey: 'pages.organization' },
       },
+      // Join requests moved into "Quản lý"; old links (notifications, bookmarks) land there.
       {
         path: 'requests',
         name: 'organization-requests',
-        component: () => import('@/features/organizations/JoinRequestsPage.vue'),
-        meta: { titleKey: 'pages.joinRequests', requiresAuth: true },
+        redirect: (to) => ({ name: 'organization-manage', params: to.params }),
+      },
+      {
+        path: 'submissions',
+        name: 'organization-submissions',
+        component: () => import('@/features/organizations/submissions/OrgSubmissionsPage.vue'),
+        meta: { titleKey: 'pages.organization', requiresAuth: true },
       },
       {
         path: 'problems',

@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { fetchContestSubmissions } from '@/api/contests.api';
+import { fetchOrganizationSubmissions } from '@/api/organizations.api';
 import {
   fetchBestSubmissions,
   fetchSubmission,
@@ -115,5 +116,27 @@ export const useContestSubmissionListQuery = (
     /** Only a list for the same user stays on screen while the next one loads: a switch to the own-only list must not show the all-users rows. */
     placeholderData: (previous, previousQuery) =>
       userOfQueryKey(previousQuery?.queryKey) === apiQuery.value.user ? previous : undefined,
+  });
+};
+
+/** One page of an organization's member submissions per viewer; `isEnabled` holds it until the viewer is known to be inside. */
+export const useOrganizationSubmissionListQuery = (
+  slug: Ref<string>,
+  filters: Ref<SubmissionFilters>,
+  isEnabled: Ref<boolean>,
+) => {
+  const viewerId = useViewerId();
+  const apiQuery = computed(() => submissionListApiQuery(filters.value));
+  return useQuery({
+    enabled: isEnabled,
+    queryKey: computed(() => [
+      'submissions',
+      'organization',
+      viewerId.value,
+      slug.value,
+      apiQuery.value,
+    ]),
+    queryFn: () => fetchOrganizationSubmissions(slug.value, apiQuery.value),
+    placeholderData: keepPreviousData,
   });
 };

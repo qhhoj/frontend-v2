@@ -9,6 +9,9 @@ import { pageFromQuery } from '@/lib/paging';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import { usePermissions } from '@/stores/use-permissions';
+import { BUTTON } from '@/features/account/settings/buttons';
+import CreateOrganizationDialog from './create/CreateOrganizationDialog.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import OrganizationCard from './OrganizationCard.vue';
 import OrganizationCardSkeleton from './OrganizationCardSkeleton.vue';
@@ -47,6 +50,10 @@ const filters = computed(() =>
   isSignedIn.value ? FILTERS : FILTERS.filter((name) => name !== 'mine'),
 );
 const isListEmpty = computed(() => ranked.value.length === 0);
+/** Legacy `CreateOrganization` is gated on `judge.add_organization` alone. */
+const { can } = usePermissions();
+const canCreate = computed(() => can('judge.add_organization'));
+const isCreateOpen = ref(false);
 </script>
 
 <template>
@@ -59,27 +66,41 @@ const isListEmpty = computed(() => ranked.value.length === 0);
           <p class="text-muted">{{ $t('orgs.lead') }}</p>
         </div>
       </header>
-      <div
-        v-if="!isListEmpty"
-        role="group"
-        :aria-label="$t('orgs.filtersLabel')"
-        class="flex gap-1.5 rounded-pill bg-surface-hover p-1"
-      >
-        <button
-          v-for="key in filters"
-          :key="key"
-          type="button"
-          :aria-pressed="filter === key"
-          class="min-h-9 rounded-pill px-4 text-sm"
-          :class="
-            filter === key ? 'bg-surface-solid font-bold text-content shadow-glow' : 'text-muted'
-          "
-          @click="filter = key"
+      <div class="flex flex-wrap items-center gap-3">
+        <div
+          v-if="!isListEmpty"
+          role="group"
+          :aria-label="$t('orgs.filtersLabel')"
+          class="flex gap-1.5 rounded-pill bg-surface-hover p-1"
         >
-          {{ $t(`orgs.filters.${key}`) }} · {{ count(key) }}
+          <button
+            v-for="key in filters"
+            :key="key"
+            type="button"
+            :aria-pressed="filter === key"
+            class="min-h-9 rounded-pill px-4 text-sm"
+            :class="
+              filter === key ? 'bg-surface-solid font-bold text-content shadow-glow' : 'text-muted'
+            "
+            @click="filter = key"
+          >
+            {{ $t(`orgs.filters.${key}`) }} · {{ count(key) }}
+          </button>
+        </div>
+        <button
+          v-if="canCreate"
+          type="button"
+          data-testid="create-organization"
+          :class="BUTTON.primary"
+          @click="isCreateOpen = true"
+        >
+          <span aria-hidden="true">+</span>
+          <span class="max-sm:hidden">{{ $t('orgAdmin.create.open') }}</span>
+          <span class="sm:hidden">{{ $t('orgAdmin.create.openShort') }}</span>
         </button>
       </div>
     </div>
+    <CreateOrganizationDialog v-if="canCreate" v-model:visible="isCreateOpen" />
 
     <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
       <template #skeleton>

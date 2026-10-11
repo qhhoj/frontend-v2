@@ -2,7 +2,7 @@ import { ApiError } from '@/api/client';
 import { hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { errorMessageKey } from '@/i18n/error-message';
 
-export type MembershipAction = 'join' | 'leave' | 'request' | 'approve' | 'reject';
+export type MembershipAction = 'join' | 'leave' | 'request';
 
 export interface MembershipErrorCopy {
   title: string;
@@ -12,8 +12,6 @@ export interface MembershipErrorCopy {
 /** Every membership refusal is a 409 `conflict` (E18), except the `busy` lock, which only asks to retry; the action that failed tells which board card it is. */
 const CONFLICT_COPY: Partial<Record<MembershipAction, MembershipErrorCopy>> = {
   join: { title: 'orgMembership.joinFailedTitle', body: 'orgMembership.joinFailedBody' },
-  approve: { title: 'orgMembership.fullTitle', body: 'orgMembership.fullBody' },
-  reject: { title: 'orgMembership.decidedTitle', body: 'orgMembership.decidedBody' },
 };
 
 /** Official contest: the `/site` record can lag up to a minute, so the server's refusal gets the same words as the lock. */
