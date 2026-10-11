@@ -98,5 +98,43 @@
     "organizationQuotas": "Organization quotas",
     "cannedReplies": "Ticket reply templates",
     "polygonImport": "Import from Polygon"
+  },
+  "waiting": "waiting",
+  "search": {
+    "open": "Search admin",
+    "title": "Search admin",
+    "label": "Search screens, problems, contests, users, organizations",
+    "placeholder": "Problem code, contest name, username…",
+    "searching": "Searching…",
+    "failed": "A source could not be searched; results may be incomplete.",
+    "empty": "No results.",
+    "emptyAdvice": "Nothing matches. Try a problem code, a contest key or the start of a username.",
+    "tooShort": "Type at least {count} characters to search problems, contests, users and organizations.",
+    "count": "{count} result | {count} results",
+    "keys": "↑ ↓ to choose · Enter to open · Esc to close",
+    "tip": "Tip: press Ctrl K or / anywhere to search.",
+    "groups": {
+      "screens": "Admin screens",
+      "problems": "Problems",
+      "contests": "Contests",
+      "users": "Users",
+      "organizations": "Organizations"
+    }
+  },
+  "overview": {
+    "title": "Right now",
+    "queue": "Judging queue",
+    "queueDetail": "Submissions waiting or being judged (public problems).",
+    "judges": "Judges online",
+    "judgesDetail": "Connected / all judges.",
+    "tickets": "Tickets awaiting staff",
+    "ticketsDetail": "Open tickets whose newest message is not from staff.",
+    "reports": "Reported comments",
+    "reportsDetail": "Comments with reports not yet settled.",
+    "requests": "Organization join requests",
+    "requestsDetail": "Requests waiting for a decision across organizations."
+  },
+  "recent": {
+    "title": "Recently opened"
   }
 }

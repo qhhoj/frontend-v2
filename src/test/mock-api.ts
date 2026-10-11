@@ -16,7 +16,7 @@ export interface ApiCall {
 export type MockHandler = MockResponse | ((call: ApiCall) => MockResponse);
 
 /**
- * The shell's own reads on every signed-in page (bell, high-priority banner, official mode, ticket alerts). A test that does
+ * The shell's own reads on every signed-in page (bell, high-priority banner, official mode, ticket alerts, admin badges). A test that does
  * not route them gets these answers, and the calls are not recorded, so `calls` stays the page's own; route one to test it.
  */
 export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
@@ -26,6 +26,11 @@ export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
   'GET /notifications/unread-count': { body: { data: { count: 0 } } },
   'GET /notifications': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
   'GET /tickets/summary': { body: { data: { assignedOpen: 0, awaitingStaff: 0 } } },
+  // The admin nav's count badges (a staff member holding the screen's permission).
+  'GET /comments/reports': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
+  'GET /admin/organization-requests': {
+    body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } },
+  },
 };
 
 const responseOf = ({ status = 200, body, headers }: MockResponse) =>
