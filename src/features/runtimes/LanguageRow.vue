@@ -2,7 +2,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
-import { commonVersion, mismatchedJudges } from './runtimes-model';
+import { commonCompiler, commonVersion, mismatchedJudges } from './runtimes-model';
 
 /** One language: a summary line that opens in place to the extension and the version on every judge. */
 const props = defineProps<{
@@ -11,9 +11,9 @@ const props = defineProps<{
   isOpen: boolean;
 }>();
 defineEmits<{ toggle: [] }>();
-const common = computed(() => commonVersion(props.language));
+const common = computed(() => commonVersion(props.language, props.judges));
 const odd = computed(() => new Set(mismatchedJudges(props.language, props.judges)));
-const compiler = computed(() => props.language.versions[0]?.compiler ?? null);
+const compiler = computed(() => commonCompiler(props.language, props.judges));
 const versionOf = (judge: string) =>
   props.language.versions.find((entry) => entry.judge === judge)?.version ?? null;
 const detailId = computed(() => `language-${props.language.key}`);

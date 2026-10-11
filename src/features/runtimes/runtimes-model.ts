@@ -4,19 +4,27 @@ const SECONDS_PER_MINUTE = 60;
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;
 
-/** The version most judges have; ties go to the one seen first. Null when no judge has the language. */
-export function commonVersion(language: RuntimeLanguage): string | null {
+/** The version most online judges run (an asleep judge's old compiler does not vote); ties go to the one seen first. Null when no online judge has the language. */
+export function commonVersion(language: RuntimeLanguage, judges: RuntimeJudge[]): string | null {
+  const online = new Set(judges.filter((judge) => judge.online).map((judge) => judge.name));
   const counts = new Map<string, number>();
-  for (const { version } of language.versions) counts.set(version, (counts.get(version) ?? 0) + 1);
+  for (const { judge, version } of language.versions)
+    if (online.has(judge)) counts.set(version, (counts.get(version) ?? 0) + 1);
   let best: string | null = null;
   for (const [version, count] of counts)
     if (best === null || count > (counts.get(best) ?? 0)) best = version;
   return best;
 }
 
+/** The compiler name of a judge that runs the common version. */
+export function commonCompiler(language: RuntimeLanguage, judges: RuntimeJudge[]): string | null {
+  const common = commonVersion(language, judges);
+  return language.versions.find((entry) => entry.version === common)?.compiler ?? null;
+}
+
 /** Names of the online judges whose version differs from the common one (an offline judge is asleep, not wrong). */
 export function mismatchedJudges(language: RuntimeLanguage, judges: RuntimeJudge[]): string[] {
-  const common = commonVersion(language);
+  const common = commonVersion(language, judges);
   const online = new Set(judges.filter((judge) => judge.online).map((judge) => judge.name));
   return language.versions
     .filter((entry) => online.has(entry.judge) && entry.version !== common)

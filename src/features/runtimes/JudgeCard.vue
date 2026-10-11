@@ -11,7 +11,9 @@ const uptime = computed(() =>
   props.judge.startedAt ? uptimeSince(props.judge.startedAt, props.now) : null,
 );
 const loadPercent = computed(() =>
-  props.judge.slots > 0 ? Math.round((props.judge.busy / props.judge.slots) * 100) : 0,
+  props.judge.slots > 0
+    ? Math.min(100, Math.round((props.judge.busy / props.judge.slots) * 100))
+    : 0,
 );
 </script>
 

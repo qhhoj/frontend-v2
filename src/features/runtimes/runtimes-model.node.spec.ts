@@ -29,7 +29,7 @@ describe('mismatchedJudges', () => {
 
   it('flags the online judges that differ from the version most judges run', () => {
     const cpp = language({ a: '13.2', b: '13.2', c: '12.3' });
-    expect(commonVersion(cpp)).toBe('13.2');
+    expect(commonVersion(cpp, judges)).toBe('13.2');
     expect(mismatchedJudges(cpp, judges)).toEqual(['c']);
   });
 
@@ -39,8 +39,15 @@ describe('mismatchedJudges', () => {
     expect(mismatchedJudges(cpp, asleep)).toEqual([]);
   });
 
+  it('lets only online judges vote, so an asleep judge cannot make the online ones the odd ones', () => {
+    const cpp = language({ a: '13.2', b: '12.3', c: '12.3' });
+    const asleep = [judge('a'), judge('b'), judge('c', { online: false })];
+    expect(commonVersion(cpp, asleep)).toBe('13.2');
+    expect(mismatchedJudges(cpp, asleep)).toEqual(['b']);
+  });
+
   it('has no common version and no mismatch when no judge has the language', () => {
-    expect(commonVersion(language({}))).toBeNull();
+    expect(commonVersion(language({}), judges)).toBeNull();
     expect(mismatchedJudges(language({}), judges)).toEqual([]);
   });
 });
