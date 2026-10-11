@@ -16,6 +16,12 @@ export interface ContestListFilters {
   tag: string | null;
 }
 
+/** Where a contest list lives: the public /contests, or an organization's tab. */
+export interface ContestListRoute {
+  name: string;
+  params?: Record<string, string>;
+}
+
 export const PHASE_ORDER: readonly ContestPhase[] = ['running', 'upcoming', 'ended'];
 /** List B: every running contest, the next three, the last five. */
 export const OVERVIEW_PAGE_SIZE: Record<ContestPhase, number> = {
@@ -64,13 +70,18 @@ export const toContestListLocation = (filters: ContestListFilters): LocationQuer
 });
 
 /** What one group asks: the overview shows the first page of each, a single group pages. */
-export function groupQuery(filters: ContestListFilters, phase: ContestPhase): ContestListQuery {
+export function groupQuery(
+  filters: ContestListFilters,
+  phase: ContestPhase,
+  organizationId?: string,
+): ContestListQuery {
   const isSingleGroup = filters.phase === phase;
   return {
     phase,
     search: filters.search.trim() || undefined,
     rated: filters.isRatedOnly ? true : undefined,
     tag: filters.tag ?? undefined,
+    organization: organizationId,
     page: isSingleGroup ? filters.page : 1,
     pageSize: isSingleGroup ? PHASE_PAGE_SIZE : OVERVIEW_PAGE_SIZE[phase],
   };

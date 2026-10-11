@@ -16,18 +16,23 @@ import EndedContestTable from './EndedContestTable.vue';
 import RunningContestCard from './RunningContestCard.vue';
 import UpcomingContestRow from './UpcomingContestRow.vue';
 import { PHASE_PAGE_SIZE, groupQuery, toContestListLocation } from './use-contest-list-filters';
-import type { ContestListFilters } from './use-contest-list-filters';
+import type { ContestListFilters, ContestListRoute } from './use-contest-list-filters';
 
 const props = defineProps<{
   phase: ContestPhase;
   filters: ContestListFilters;
   /** The filtering tag's display name, for the empty text. */
   tagName?: string | null;
+  /** Only this organization's contests (its id); unset on the public list. */
+  organizationId?: string;
+  /** The page the list lives on, for the links back into it. */
+  listRoute?: ContestListRoute;
 }>();
+const listPage = computed<ContestListRoute>(() => props.listRoute ?? { name: 'contests' });
 const emit = defineEmits<{ page: [page: number] }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
-const query = computed(() => groupQuery(props.filters, props.phase));
+const query = computed(() => groupQuery(props.filters, props.phase, props.organizationId));
 const { data: list, isPending, error, refetch } = useContestListQuery(query);
 const contests = computed(() => list.value?.items ?? []);
 const total = computed(() => list.value?.meta.total ?? 0);
@@ -65,7 +70,7 @@ const linkText = computed(() => {
 });
 /** "Only this group" from the overview, "all groups" back from it; the search and rated filter stay. */
 const toggleTarget = computed(() => ({
-  name: 'contests',
+  ...listPage.value,
   query: toContestListLocation({
     ...props.filters,
     phase: isSingleGroup.value ? null : props.phase,
@@ -79,11 +84,11 @@ const isPastLastPage = computed(
   () => isSingleGroup.value && props.filters.page > 1 && contests.value.length === 0,
 );
 const firstPageTarget = computed(() => ({
-  name: 'contests',
+  ...listPage.value,
   query: toContestListLocation({ ...props.filters, page: 1 }),
 }));
 const clearTagTarget = computed(() => ({
-  name: 'contests',
+  ...listPage.value,
   query: toContestListLocation({ ...props.filters, tag: null, page: 1 }),
 }));
 </script>
@@ -114,6 +119,7 @@ const clearTagTarget = computed(() => ({
         :is-filtered="isFiltered"
         :is-past-last-page="isPastLastPage"
         :first-page-target="firstPageTarget"
+        :list-route="listPage"
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
       />

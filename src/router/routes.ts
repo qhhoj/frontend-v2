@@ -182,6 +182,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { titleKey: 'pages.organization', requiresAuth: true },
       },
       {
+        path: 'contests',
+        name: 'organization-contests',
+        component: () => import('@/features/organizations/OrganizationContestsPage.vue'),
+        meta: { titleKey: 'pages.organization' },
+      },
+      {
         path: 'quota',
         name: 'organization-quota',
         component: () => import('@/features/organizations/quota/OrgQuotaPage.vue'),

@@ -23,11 +23,12 @@ const tabs = computed<OrganizationTab[]>(() => {
   // Only administrators see the join requests and the quota; members also see the problems (the API refuses the rest).
   const requests = { routeName: 'organization-requests', labelKey: 'orgs.tabs.requests' };
   const problems = { routeName: 'organization-problems', labelKey: 'orgs.tabs.problems' };
+  const contests = { routeName: 'organization-contests', labelKey: 'orgs.tabs.contests' };
   const quota = { routeName: 'organization-quota', labelKey: 'orgs.tabs.quota' };
   const viewer = props.organization.viewer;
-  if (viewer?.canAdminister) return [about, members, problems, posts, requests, quota];
-  if (viewer?.isMember) return [about, members, problems, posts];
-  return [about, members, posts];
+  if (viewer?.canAdminister) return [about, members, problems, contests, posts, requests, quota];
+  if (viewer?.isMember) return [about, members, problems, contests, posts];
+  return [about, members, contests, posts];
 });
 </script>
 
