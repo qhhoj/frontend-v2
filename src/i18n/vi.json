@@ -971,6 +971,11 @@
     "pdfRateLimited": "Quá nhiều yêu cầu PDF",
     "pdfRetry": "Thử lại",
     "pdfRetryIn": "Thử lại sau {seconds} giây",
+    "pdfStatement": {
+      "hint": "Đề bài này là tệp PDF.",
+      "open": "Mở trong thẻ mới",
+      "title": "Đề bài PDF"
+    },
     "noSubmissions": "Bạn chưa nộp bài này.",
     "rail": {
       "railLabel": "Thông tin bài",

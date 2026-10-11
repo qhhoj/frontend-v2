@@ -79,7 +79,7 @@ test('the PDF button turns into an Open PDF link, announces it once and the last
   let asked = 0;
   api.routes['GET /problems/duongdi'] = {
     body: {
-      data: problemDetail({ pdfStatementUrl: '/api/internal/problems/duongdi/pdf' }),
+      data: problemDetail(),
     },
   };
   api.routes['GET /problems/duongdi/pdf'] = () =>

@@ -49,7 +49,7 @@ const stateChangingRequests = (sent: Request[], pathEnd: string) =>
     (request) => request.method() === 'POST' && request.url().endsWith(`${API}${pathEnd}`),
   );
 
-/** The seeded problem has no `pdfStatementUrl`, so the page shows no PDF button: the endpoint is checked directly. */
+/** The PDF endpoint is checked directly; the button flow is covered by the mocked e2e. */
 async function checkPdfEndpoint(page: Page) {
   const answer = await page.request.get(`${API}/problems/${PROBLEM_CODE}/pdf`);
   // 202 while the worker renders (or none runs), 200 once the file exists.

@@ -9,6 +9,7 @@ import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArch
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
+import PdfStatement from './PdfStatement.vue';
 import ProblemFactsCard from './ProblemFactsCard.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import ProblemLinksCard from './ProblemLinksCard.vue';
@@ -90,6 +91,11 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
           <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
             {{ $t('problem.untranslated') }}
           </p>
+          <PdfStatement
+            v-if="problem.pdfStatementUrl"
+            :url="problem.pdfStatementUrl"
+            class="mb-6 last:mb-0"
+          />
           <StatementBody :html="problem.descriptionHtml" />
           <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
             {{ $t('problem.authors') }}
