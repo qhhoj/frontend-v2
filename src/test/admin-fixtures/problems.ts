@@ -23,6 +23,7 @@ const editingLanguage = (
   name,
   shortName: null,
   commonName: name,
+  isActive: true,
   ace: 'text',
   extension: 'txt',
   template: '',

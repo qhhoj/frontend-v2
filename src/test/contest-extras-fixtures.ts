@@ -14,6 +14,7 @@ export const contestTag = (overrides: Partial<ContestTag> = {}): ContestTag => (
   color: 'tag-5',
   description: '',
   order: 0,
+  contestCount: 0,
   ...overrides,
 });
 

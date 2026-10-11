@@ -8,7 +8,13 @@ const FINISHED = submissionDetail({
   id: 'sub-1',
   status: 'D',
   result: 'TLE',
-  viewer: { canAbort: false, canRejudge: true, canReject: true, canLock: false },
+  viewer: {
+    canAbort: false,
+    canRejudge: true,
+    canReject: true,
+    canLock: false,
+    canOverrideScore: false,
+  },
 });
 const STAFF_PERMISSIONS = [
   'judge.rejudge_submission',
@@ -63,7 +69,13 @@ test('the owner who is not staff has no staff panel, even when the server flags 
     id: 'sub-1',
     status: 'G',
     result: null,
-    viewer: { canAbort: true, canRejudge: false, canReject: false, canLock: false },
+    viewer: {
+      canAbort: true,
+      canRejudge: false,
+      canReject: false,
+      canLock: false,
+      canOverrideScore: false,
+    },
   });
   api.routes['GET /submissions/sub-1'] = adminOk(judging);
   await page.goto('/submissions/sub-1');

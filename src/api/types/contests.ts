@@ -11,8 +11,8 @@ export type LabelStyle = Schemas['ContestLabelStyle'];
 /** backend: libs/contests LIVE_STATUSES; the viewer's own live participation in the contest. */
 export type LiveStatus = NonNullable<ContestListViewer['liveStatus']>;
 
-/** backend: contest-list.response.ts ContestListItemResponse without the viewer: the fields of every contest view. */
-export type ContestSummary = Omit<ContestListItem, 'viewer'>;
+/** backend: contest-list.response.ts ContestListItemResponse without the viewer and the list-only editor block: the fields of every contest view. */
+export type ContestSummary = Omit<ContestListItem, 'viewer' | 'editor'>;
 
 /** backend: contest-list.response.ts ContestListViewerResponse: the signed-in viewer's own state in one contest. */
 export type ContestListViewer = Schemas['ContestListViewerResponse'];

@@ -10,6 +10,8 @@ export const languageAdmin = (overrides: Partial<LanguageAdmin> = {}): LanguageA
   pygments: 'cpp',
   template: '',
   info: '',
+  isActive: true,
+  order: 0,
   description: 'g++ -std=c++20',
   extension: 'cpp',
   fileOnly: false,
