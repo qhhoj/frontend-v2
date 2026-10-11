@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Nightly full unit suite; pull requests run only the tests affected by the diff.
+  schedule:
+    - cron: '23 3 * * *'
   # Playwright runs locally before every merge (.batch/gates_fe.sh); on GitHub only when started by hand.
   workflow_dispatch:
 
@@ -39,6 +42,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -47,7 +52,13 @@ jobs:
       - run: npm run api:check
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm test
+      # Pull requests: only specs whose import graph touches a file changed since the base. Pushes to main,
+      # the nightly run and manual runs: the full suite.
+      - name: unit tests
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -n "$BASE_SHA" ]; then npx vitest run --changed "$BASE_SHA" --passWithNoTests; else npm test; fi
 
   # Playwright in 4 shards, by hand only (Actions -> CI -> Run workflow); each builds and previews dist/ through the
   # config's webServer. Pushes and the deploy gate rely on the local run.
