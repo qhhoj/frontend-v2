@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed, ref, useId } from 'vue';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import {
@@ -17,6 +16,7 @@ import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import UploadButton from '../../ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { formatFileSize } from '@/lib/format';
+import OfficialRankingPreview from './OfficialRankingPreview.vue';
 import { OFFICIAL_CSV_MAX_BYTES } from './ranking-link';
 
 const props = defineProps<{ contestKey: string }>();
@@ -36,7 +36,6 @@ const pickedFile = ref<File | null>(null);
 const urlText = ref('');
 const isRemoveOpen = ref(false);
 const sourceName = useId();
-const topRows = computed(() => (ranking.value?.rows ?? []).slice(0, 3));
 
 const queryClient = useQueryClient();
 const storeRanking = (stored: OfficialRanking | null) =>
@@ -148,52 +147,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
           <p class="text-sm font-semibold">
             {{ $t('admin.contests.ranking.official.current', { count: ranking.problems.length }) }}
           </p>
-          <div
-            class="overflow-x-auto"
-            tabindex="0"
-            role="region"
-            :aria-label="
-              $t('admin.contests.ranking.official.current', { count: ranking.problems.length })
-            "
-          >
-            <table data-testid="official-table" class="w-full min-w-[480px] text-sm">
-              <thead class="text-left text-muted">
-                <tr>
-                  <th scope="col" class="w-14 px-2 py-2 text-right">
-                    <RankColumnHeader :label="$t('admin.contests.ranking.official.columns.rank')" />
-                  </th>
-                  <th scope="col" class="px-2 py-2">
-                    {{ $t('admin.contests.ranking.official.columns.username') }}
-                  </th>
-                  <th scope="col" class="px-2 py-2">
-                    {{ $t('admin.contests.ranking.official.columns.fullName') }}
-                  </th>
-                  <th
-                    v-for="problem in ranking.problems"
-                    :key="problem"
-                    scope="col"
-                    class="px-2 py-2"
-                  >
-                    {{ problem }}
-                  </th>
-                  <th scope="col" class="px-2 py-2">
-                    {{ $t('admin.contests.ranking.official.columns.total') }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="row in topRows" :key="row.username" class="border-t border-line">
-                  <td class="px-2 py-2 text-right">{{ row.rank }}</td>
-                  <td class="px-2 py-2 font-mono">{{ row.username }}</td>
-                  <td class="px-2 py-2">{{ row.fullName }}</td>
-                  <td v-for="(score, index) in row.scores" :key="index" class="px-2 py-2">
-                    {{ score }}
-                  </td>
-                  <td class="px-2 py-2 font-semibold">{{ row.totalScore }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <OfficialRankingPreview :ranking="ranking" />
           <button
             type="button"
             :class="[buttonClass('danger'), 'self-start']"

@@ -9,16 +9,13 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { BUTTON } from '../ui/controls';
 import ChangeLines from './ChangeLines.vue';
 import { canLoadOldValues, changeLinesOf, fieldLabelKey } from './flatpage-history';
+import AdminChip from '../ui/AdminChip.vue';
 
 const props = defineProps<{ revision: FlatpageRevision; isOpen: boolean; readonly?: boolean }>();
 const emit = defineEmits<{ toggle: []; load: [] }>();
 const { t } = useI18n();
 const localeStore = useLocaleStore();
-const ACTION_CLASS = {
-  create: 'bg-verdict-ac-bg text-verdict-ac',
-  edit: 'bg-accent-soft text-accent-soft-text',
-  delete: 'bg-verdict-wa-bg text-verdict-wa',
-} as const;
+const ACTION_TONES = { create: 'positive', edit: 'accent', delete: 'negative' } as const;
 const fields = computed(() => Object.keys(props.revision.changes));
 const lines = computed(() => changeLinesOf(props.revision.changes));
 </script>
@@ -30,11 +27,9 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
         {{ formatDateTime(revision.at, localeStore.locale) }}
       </td>
       <td class="px-3 py-2">
-        <span
-          class="rounded-pill px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap"
-          :class="ACTION_CLASS[revision.action]"
-          >{{ t(`admin.pages.history.actions.${revision.action}`) }}</span
-        >
+        <AdminChip :tone="ACTION_TONES[revision.action]">{{
+          t(`admin.pages.history.actions.${revision.action}`)
+        }}</AdminChip>
       </td>
       <td class="px-3 py-2">
         <AdminUserLabel
@@ -46,12 +41,8 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
       </td>
       <td class="px-3 py-2">
         <ul class="flex flex-wrap gap-1">
-          <li
-            v-for="field in fields"
-            :key="field"
-            class="rounded-pill border border-line px-2 text-xs"
-          >
-            {{ t(fieldLabelKey(field)) }}
+          <li v-for="field in fields" :key="field">
+            <AdminChip>{{ t(fieldLabelKey(field)) }}</AdminChip>
           </li>
         </ul>
       </td>

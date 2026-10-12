@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref, watch } from 'vue';
 import { updateTicket } from '@/api/tickets.api';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import type { TicketDetail, TicketPatch } from '@/api/types/tickets';
 import { TICKET_TITLE_MAX_LENGTH } from '@/api/types/tickets';
 import AdminField from '../ui/AdminField.vue';
@@ -44,7 +44,7 @@ function submit() {
 </script>
 
 <template>
-  <GlassCard as="section" class="flex flex-col gap-4 p-5">
+  <Card variant="flat" padding="md" class="flex flex-col gap-4">
     <h3 class="font-display text-base font-bold">{{ $t('admin.tickets.move.heading') }}</h3>
     <form class="flex flex-col gap-3" novalidate @submit.prevent="submit">
       <AdminField
@@ -92,5 +92,5 @@ function submit() {
         />
       </div>
     </form>
-  </GlassCard>
+  </Card>
 </template>

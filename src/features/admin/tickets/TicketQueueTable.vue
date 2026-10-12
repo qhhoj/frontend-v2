@@ -5,14 +5,12 @@ import { Star } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { queueLocation } from './ticket-queue';
 
@@ -44,12 +42,6 @@ const columns = computed<AdminColumn[]>(() => [
       ]),
   { key: 'updated', label: t('admin.tickets.table.updated'), cellClass: 'whitespace-nowrap' },
 ]);
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
-    : null;
-});
 const selectTicket = (id: string) => router.replace({ query: queueLocation(props.filters, id) });
 const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${ticket.link.title}`;
 const rowAttrs = (ticket: TicketListItem) => ({
@@ -60,6 +52,7 @@ const rowAttrs = (ticket: TicketListItem) => ({
 
 <template>
   <AdminDataTable
+    :pager="meta ? { meta, label: $t('admin.tickets.table.pager') } : undefined"
     :columns="columns"
     :rows="items"
     :row-key="(ticket) => ticket.id"
@@ -116,14 +109,5 @@ const rowAttrs = (ticket: TicketListItem) => ({
     <template #cell-updated="{ row }">{{
       formatDateTime(row.lastMessageAt, locale.locale)
     }}</template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager
-        class="ml-auto"
-        compact
-        :meta="meta"
-        :label="$t('admin.tickets.table.pager')"
-      />
-    </template>
   </AdminDataTable>
 </template>

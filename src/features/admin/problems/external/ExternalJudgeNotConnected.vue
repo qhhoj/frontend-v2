@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../../shell/AdminBit.vue';
 import { BUTTON } from '../../ui/controls';
@@ -9,7 +9,12 @@ const { can } = usePermissions();
 </script>
 
 <template>
-  <GlassCard class="flex flex-wrap items-center gap-4 p-5" data-testid="external-not-connected">
+  <Card
+    variant="flat"
+    padding="md"
+    class="flex flex-wrap items-center gap-4"
+    data-testid="external-not-connected"
+  >
     <AdminBit placement="security" />
     <div class="min-w-[min(100%,16rem)] flex-1">
       <h2 class="font-bold">{{ $t('admin.externalJudge.notConnected.title') }}</h2>
@@ -27,5 +32,5 @@ const { can } = usePermissions();
       :class="BUTTON.secondary"
       >{{ $t('admin.externalJudge.notConnected.openSettings') }}</RouterLink
     >
-  </GlassCard>
+  </Card>
 </template>

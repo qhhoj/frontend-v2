@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { UsageOverviewRow, UsageSort } from '@/api/types/organization-usage';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { formatMebibytes } from '@/lib/quota';
@@ -14,7 +13,6 @@ import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminTabs from '../../ui/AdminTabs.vue';
 import { buttonClass } from '../../ui/controls';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
-import { rangeOf } from '../../ui/table/table-columns';
 import type { AdminColumn } from '../../ui/table/table-columns';
 import { useOrganizationViewTabs } from '../use-organization-view-tabs';
 import QuotaEditDialog from './QuotaEditDialog.vue';
@@ -51,10 +49,6 @@ const columns = computed<AdminColumn[]>(() => [
 ]);
 const credits = (value: number) => formatNumber(value, locale.locale);
 const mib = (bytes: number) => formatMebibytes(bytes, locale.locale);
-const range = computed(() => {
-  const meta = data.value?.meta;
-  return meta ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total) : null;
-});
 const { tabs: viewTabs } = useOrganizationViewTabs();
 </script>
 
@@ -66,6 +60,7 @@ const { tabs: viewTabs } = useOrganizationViewTabs();
     />
     <AdminTabs :tabs="viewTabs" current="quotas" :label="$t('admin.organizations.views.label')" />
     <AdminDataTable
+      :pager="data?.meta ? { meta: data.meta, label: $t('admin.quota.pager') } : undefined"
       data-testid="quota-overview"
       :columns="columns"
       :rows="rows"
@@ -132,12 +127,6 @@ const { tabs: viewTabs } = useOrganizationViewTabs();
         >
           {{ $t('admin.quota.edit') }}
         </button>
-      </template>
-      <template v-if="data" #footer>
-        <span v-if="range" class="font-mono tabular-nums">{{
-          $t('admin.table.range', range)
-        }}</span>
-        <NumberedPager class="ml-auto" compact :meta="data.meta" :label="$t('admin.quota.pager')" />
       </template>
     </AdminDataTable>
     <QuotaEditDialog

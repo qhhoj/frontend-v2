@@ -6,7 +6,6 @@ import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import { decideJoinRequest } from '@/api/organizations.api';
 import type { JoinRequest, JoinRequestState } from '@/api/types/organizations';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
@@ -16,7 +15,6 @@ import { buttonClass } from '../ui/controls';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { useBulkDecisions } from './join-request-bulk';
 import {
@@ -100,12 +98,6 @@ const columns = computed<AdminColumn[]>(() => [
         },
       ]),
 ]);
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.rows.length, meta.total)
-    : null;
-});
 const timeOf = (value: string) => formatNumericDateTime(value, locale.locale);
 const menuItems = (request: JoinRequest) => [
   { label: t('admin.organizations.queue.reject'), icon: X, run: () => void decide(request, 'R') },
@@ -122,6 +114,7 @@ const bulkFailure = computed(() => {
     <AdminStatus v-if="bulkFailure" kind="refused" :text="bulkFailure" />
     <AdminDataTable
       v-model:selected="bulk.ticked.value"
+      :pager="meta ? { meta, label: pagerLabel, queryKey: pagerKey } : undefined"
       :columns="columns"
       :rows="rows"
       :row-key="(request: JoinRequest) => request.id"
@@ -207,18 +200,6 @@ const bulkFailure = computed(() => {
         <AdminRowMenu
           :label="$t('admin.table.rowMenu', { name: row.username })"
           :items="menuItems(row)"
-        />
-      </template>
-      <template v-if="meta" #footer>
-        <span v-if="range" class="font-mono tabular-nums">{{
-          $t('admin.table.range', range)
-        }}</span>
-        <NumberedPager
-          class="ml-auto"
-          compact
-          :meta="meta"
-          :label="pagerLabel"
-          :query-key="pagerKey"
         />
       </template>
     </AdminDataTable>

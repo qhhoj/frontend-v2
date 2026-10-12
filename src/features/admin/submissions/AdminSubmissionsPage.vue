@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
@@ -11,7 +10,6 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { buttonClass } from '../ui/controls';
-import { rangeOf } from '../ui/table/table-columns';
 import BatchActionDialogs from '../rejudge/BatchActionDialogs.vue';
 import type { RejudgeOutcome } from '../rejudge/use-bulk-rejudge';
 import AdminSubmissionFilterBar from './AdminSubmissionFilterBar.vue';
@@ -82,10 +80,6 @@ const resultText = computed(() =>
     ? translate('admin.submissions.total', { count: formatNumber(total.value, locale.locale) })
     : undefined,
 );
-const range = computed(() => {
-  const meta = data.value?.meta;
-  return meta ? rangeOf(meta.page, meta.pageSize, items.value.length, meta.total) : null;
-});
 </script>
 
 <template>
@@ -116,6 +110,7 @@ const range = computed(() => {
         :items="items"
         :label="$t('admin.shell.screens.submissions')"
         selectable
+        :pager="data ? { meta: data.meta, label: $t('admin.submissions.pager') } : undefined"
       >
         <template #bulk>
           <span v-if="allMatching" class="text-sm font-semibold" role="status">
@@ -152,17 +147,6 @@ const range = computed(() => {
         </template>
         <template #empty>
           <p class="px-4 py-8 text-center text-muted">{{ $t('admin.submissions.empty') }}</p>
-        </template>
-        <template v-if="data" #footer>
-          <span v-if="range" class="font-mono tabular-nums">
-            {{ $t('admin.table.range', range) }}
-          </span>
-          <NumberedPager
-            class="ml-auto"
-            compact
-            :meta="data.meta"
-            :label="$t('admin.submissions.pager')"
-          />
         </template>
       </AdminSubmissionTable>
     </QueryState>

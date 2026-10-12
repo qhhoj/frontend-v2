@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { Eye, EyeOff, Pencil } from 'lucide-vue-next';
 import type { NumberedPageMeta } from '@/api/client';
 import type { AdminCommentItem } from '@/api/types/comments';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
@@ -12,13 +11,12 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import CommentExcerpt from './CommentExcerpt.vue';
 import CommentPlace from './CommentPlace.vue';
 
 /** Every comment of the site: hide or show is the row's one visible action, edit sits in its "⋯" menu. */
-const props = defineProps<{
+defineProps<{
   items: AdminCommentItem[];
   meta: NumberedPageMeta | undefined;
   loading: boolean;
@@ -42,12 +40,6 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'page', label: t('admin.comments.columns.page') },
   { key: 'createdAt', label: t('admin.comments.columns.createdAt'), priority: 'meta' },
 ]);
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
-    : null;
-});
 const menuItems = (item: AdminCommentItem) => [
   {
     label: t('admin.comments.edit.action'),
@@ -60,6 +52,7 @@ const menuItems = (item: AdminCommentItem) => [
 <template>
   <AdminDataTable
     v-model:selected="selected"
+    :pager="meta ? { meta, label: $t('admin.comments.all.pager') } : undefined"
     :columns="columns"
     :rows="items"
     :row-key="(item) => item.comment.id"
@@ -121,10 +114,6 @@ const menuItems = (item: AdminCommentItem) => [
           :items="menuItems(row)"
         />
       </template>
-    </template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.comments.all.pager')" />
     </template>
   </AdminDataTable>
 </template>

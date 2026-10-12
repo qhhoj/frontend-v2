@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { SIMILARITY_PAIRS_PAGE_SIZE } from '@/api/similarity.api';
 import type { SimilarityPair } from '@/api/types/similarity';
 import { formatNumber } from '@/lib/format';
@@ -9,7 +8,6 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { percentText } from './similarity-pairs';
 import type { PairFilter } from './similarity-pairs';
@@ -48,9 +46,6 @@ const meta = computed(() => ({
   pageSize: SIMILARITY_PAIRS_PAGE_SIZE,
   total: props.total,
 }));
-const range = computed(() =>
-  rangeOf(props.filter.page, SIMILARITY_PAIRS_PAGE_SIZE, props.pairs.length, props.total),
-);
 const emptyTitle = computed(() =>
   props.filter.minPercent === null
     ? t('admin.similarity.pairs.emptyAny')
@@ -60,6 +55,7 @@ const emptyTitle = computed(() =>
 
 <template>
   <AdminDataTable
+    :pager="meta ? { meta, label: $t('admin.similarity.pairs.pager') } : undefined"
     :columns="columns"
     :rows="pairs"
     :row-key="(pair) => pair.id"
@@ -109,15 +105,6 @@ const emptyTitle = computed(() =>
           {{ $t('admin.similarity.pairs.resetFilters') }}
         </button>
       </div>
-    </template>
-    <template #footer>
-      <span class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager
-        class="ml-auto"
-        compact
-        :meta="meta"
-        :label="$t('admin.similarity.pairs.pager')"
-      />
     </template>
   </AdminDataTable>
 </template>

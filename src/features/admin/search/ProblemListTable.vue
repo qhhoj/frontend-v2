@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDate, formatProblemPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
@@ -14,7 +13,6 @@ import { iconButtonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import HighlightedText from './HighlightedText.vue';
 
@@ -22,7 +20,7 @@ import HighlightedText from './HighlightedText.vue';
  * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
  * headers bound to `?sort=`, a pencil to the editor and a "⋯" menu per row. `toolbar` and `bulk` pass through.
  */
-const props = defineProps<{
+defineProps<{
   items: ProblemListItem[];
   meta: NumberedPageMeta | undefined;
   search: string;
@@ -61,12 +59,6 @@ const columns = computed<AdminColumn[]>(() => [
     sort: { asc: 'date', desc: '-date', first: 'desc' },
   },
 ]);
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
-    : null;
-});
 const editorOf = (code: string) => ({ name: 'admin-problemGeneral', params: { code } });
 const menuItems = (code: string): RowMenuItem[] => [
   {
@@ -96,6 +88,7 @@ const menuItems = (code: string): RowMenuItem[] => [
   <AdminDataTable
     v-model:sort="sort"
     v-model:selected="selected"
+    :pager="meta ? { meta, label: $t('admin.search.pager') } : undefined"
     :columns="columns"
     :rows="items"
     :row-key="(problem) => problem.code"
@@ -168,10 +161,6 @@ const menuItems = (code: string): RowMenuItem[] => [
         :label="$t('admin.problemList.menu.label', { code: row.code })"
         :items="menuItems(row.code)"
       />
-    </template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.search.pager')" />
     </template>
   </AdminDataTable>
 </template>

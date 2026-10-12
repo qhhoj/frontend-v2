@@ -3,19 +3,17 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { IntegrationClient, IntegrationScope } from '@/api/types/integration-clients';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import type { ChipTone } from '../ui/AdminChip.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { SCOPE_KEYS } from './integration-form';
 
 /** The card takes focus after a revoke (`tabindex=-1`, id `integration-table`). On a phone each client is a card. */
-const props = defineProps<{
+defineProps<{
   clients: IntegrationClient[];
   meta?: NumberedPageMeta;
   isLocked: boolean;
@@ -63,18 +61,12 @@ const stateText = (client: IntegrationClient) => {
 };
 const scopeText = (scope: IntegrationScope) =>
   t(`admin.integrations.form.scope.${SCOPE_KEYS[scope]}`);
-/** "1–50 / 312" when the list says its total. */
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.clients.length, meta.total)
-    : null;
-});
 </script>
 
 <template>
   <AdminDataTable
     id="integration-table"
+    :pager="meta ? { meta, label: $t('admin.integrations.table.pager') } : undefined"
     data-testid="integration-table"
     tabindex="-1"
     class="focus-visible:-outline-offset-2"
@@ -132,16 +124,5 @@ const range = computed(() => {
       </button>
     </template>
     <template #empty><slot name="empty" /></template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">
-        {{ $t('admin.table.range', range) }}
-      </span>
-      <NumberedPager
-        class="ml-auto"
-        compact
-        :meta="meta"
-        :label="$t('admin.integrations.table.pager')"
-      />
-    </template>
   </AdminDataTable>
 </template>

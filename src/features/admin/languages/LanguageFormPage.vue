@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
+import Card from '@/components/ui/Card.vue';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import LanguageForm from './LanguageForm.vue';
@@ -29,13 +30,13 @@ const language = computed(() => data.value?.find((entry) => entry.key === routeK
     <LanguageForm v-if="isNew" :language="null" />
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <LanguageForm v-if="language" :key="language.id" :language="language" />
-      <section v-else class="glass flex flex-col items-center gap-3 rounded-panel p-6 text-center">
+      <Card v-else variant="flat" padding="lg" class="flex flex-col items-center gap-3 text-center">
         <AdminBit placement="empty" />
         <p>{{ $t('admin.languages.form.notFound', { key: routeKey }) }}</p>
         <RouterLink :to="{ name: 'admin-languages' }" class="font-semibold underline">
           {{ $t('admin.languages.form.back') }}
         </RouterLink>
-      </section>
+      </Card>
     </QueryState>
   </div>
 </template>

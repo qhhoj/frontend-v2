@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { Eye, EyeOff, Megaphone, Pencil, Pin, PinOff } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { PostListItem } from '@/api/types/blog';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { hasPermission } from '@/lib/permissions';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -16,7 +15,6 @@ import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { unhidePlanOf } from './post-visibility';
 import type { ModerationFeed, PostFlags, RowFailure } from './moderation';
@@ -101,16 +99,12 @@ const menuItems = (post: PostListItem): RowMenuItem[] => [
       ]
     : []),
 ];
-const range = computed(() =>
-  props.meta
-    ? rangeOf(props.meta.page, props.meta.pageSize, props.posts.length, props.meta.total)
-    : null,
-);
 </script>
 
 <template>
   <AdminDataTable
     v-model:selected="selected"
+    :pager="meta ? { meta, label: $t('admin.posts.pager') } : undefined"
     data-testid="posts-queue"
     :columns="columns"
     :rows="posts"
@@ -196,10 +190,6 @@ const range = computed(() =>
         :label="$t('admin.table.rowMenu', { name: row.title })"
         :items="menuItems(row)"
       />
-    </template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.posts.pager')" />
     </template>
   </AdminDataTable>
 </template>

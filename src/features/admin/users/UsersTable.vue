@@ -4,14 +4,12 @@ import { useI18n } from 'vue-i18n';
 import { Lock } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { StaffUser } from '@/api/types/users-admin';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatAgo, formatDate, formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import UserStatusChips from './UserStatusChips.vue';
 import { userStatusOf } from './users-list';
@@ -51,16 +49,12 @@ const rankText = (user: StaffUser) => {
   const key = `admin.users.ranks.${user.displayRank}`;
   return i18n.te(key) ? t(key) : user.displayRank;
 };
-const range = computed(() =>
-  props.meta
-    ? rangeOf(props.meta.page, props.meta.pageSize, props.users.length, props.meta.total)
-    : null,
-);
 </script>
 
 <template>
   <AdminDataTable
     v-model:sort="sort"
+    :pager="meta ? { meta, label: $t('admin.users.list.pager') } : undefined"
     :columns="columns"
     :rows="users"
     :row-key="(user) => user.id"
@@ -131,9 +125,5 @@ const range = computed(() =>
       </span>
     </template>
     <template #empty><slot name="empty" /></template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.users.list.pager')" />
-    </template>
   </AdminDataTable>
 </template>

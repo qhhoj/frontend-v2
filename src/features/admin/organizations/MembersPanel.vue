@@ -4,7 +4,6 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { kickMember } from '@/api/organizations-admin.api';
 import type { OrganizationMember } from '@/api/types/organizations';
 import { useMembersQuery } from '@/features/organizations/organizations.queries';
@@ -22,7 +21,6 @@ import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { organizationHistoryKey } from './organization-history.queries';
 import { memberSearchOf } from './organization-search';
@@ -94,10 +92,6 @@ const resultText = computed(() =>
     ? t('admin.organizations.members.countMatchShort', { count: count.value })
     : t('admin.organizations.members.count', { count: count.value }),
 );
-const range = computed(() => {
-  const meta = members.data.value?.meta;
-  return meta ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total) : null;
-});
 const columns = computed<AdminColumn[]>(() => [
   {
     key: 'rank',
@@ -208,6 +202,15 @@ async function confirmKick() {
       :result-text="resultText"
     />
     <AdminDataTable
+      :pager="
+        members.data.value?.meta
+          ? {
+              meta: members.data.value.meta,
+              label: $t('admin.organizations.members.pager'),
+              queryKey: 'members',
+            }
+          : undefined
+      "
       :columns="columns"
       :rows="rows"
       :row-key="(row: OrganizationMember) => row.id"
@@ -241,18 +244,6 @@ async function confirmKick() {
             :items="menuItems(row)"
           />
         </span>
-      </template>
-      <template v-if="members.data.value" #footer>
-        <span v-if="range" class="font-mono tabular-nums">{{
-          $t('admin.table.range', range)
-        }}</span>
-        <NumberedPager
-          class="ml-auto"
-          compact
-          :meta="members.data.value.meta"
-          :label="$t('admin.organizations.members.pager')"
-          query-key="members"
-        />
       </template>
     </AdminDataTable>
     <ConfirmDialog

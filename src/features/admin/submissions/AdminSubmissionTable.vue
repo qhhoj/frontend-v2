@@ -2,6 +2,7 @@
 import { Copy, ExternalLink } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { NumberedPageMeta } from '@/api/client';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import UserLink from '@/components/UserLink.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
@@ -24,9 +25,14 @@ import { formatShortSiteTime } from './submission-time';
  * and the ⋯ menu copies its id; the id itself is not a column. With `selectable`, the checkbox
  * column drives `selected` and the `bulk` slot replaces the toolbar while rows are picked.
  */
-defineProps<{ items: SubmissionListItem[]; label: string; selectable?: boolean }>();
+defineProps<{
+  items: SubmissionListItem[];
+  label: string;
+  selectable?: boolean;
+  pager?: { meta: NumberedPageMeta; label: string };
+}>();
 const selected = defineModel<Set<string>>('selected', { default: () => new Set<string>() });
-defineSlots<{ bulk?: () => unknown; footer?: () => unknown; empty?: () => unknown }>();
+defineSlots<{ bulk?: () => unknown; empty?: () => unknown }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
 const toast = useAdminToast();
@@ -109,6 +115,7 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
     :row-label="(item) => shortId(item.id)"
     :label="label"
     :selectable="selectable"
+    :pager="pager"
   >
     <template #bulk><slot name="bulk" /></template>
     <template #cell-verdict="{ row }">
@@ -155,6 +162,5 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
       />
     </template>
     <template v-if="$slots.empty" #empty><slot name="empty" /></template>
-    <template v-if="$slots.footer" #footer><slot name="footer" /></template>
   </AdminDataTable>
 </template>

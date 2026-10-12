@@ -1,41 +1,33 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { JudgeRuntime } from '@/api/types/judges-admin';
+import AdminDataTable from '../ui/table/AdminDataTable.vue';
+import type { AdminColumn } from '../ui/table/table-columns';
 
 defineProps<{ runtimes: JudgeRuntime[] }>();
+const { t } = useI18n();
+const columns = computed<AdminColumn[]>(() => [
+  {
+    key: 'language',
+    label: t('admin.judges.runtimes.language'),
+    priority: 'primary',
+    cellClass: 'font-mono',
+  },
+  { key: 'name', label: t('admin.judges.runtimes.compiler'), grow: true },
+  { key: 'version', label: t('admin.judges.runtimes.version'), cellClass: 'font-mono' },
+  { key: 'priority', label: t('admin.judges.runtimes.priority'), align: 'end' },
+]);
 </script>
 
 <template>
-  <div class="overflow-x-auto">
-    <table class="w-full min-w-max text-left text-sm">
-      <caption class="pb-2 text-left text-muted">
-        {{
-          $t('admin.judges.runtimes.caption')
-        }}
-      </caption>
-      <thead>
-        <tr class="border-b border-line text-muted">
-          <th scope="col" class="py-2 pr-4 font-semibold">
-            {{ $t('admin.judges.runtimes.language') }}
-          </th>
-          <th scope="col" class="py-2 pr-4 font-semibold">
-            {{ $t('admin.judges.runtimes.compiler') }}
-          </th>
-          <th scope="col" class="py-2 pr-4 font-semibold">
-            {{ $t('admin.judges.runtimes.version') }}
-          </th>
-          <th scope="col" class="py-2 pr-4 font-semibold">
-            {{ $t('admin.judges.runtimes.priority') }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="runtime in runtimes" :key="runtime.language" class="border-b border-line">
-          <td class="py-2 pr-4 font-mono">{{ runtime.language }}</td>
-          <td class="py-2 pr-4">{{ runtime.name }}</td>
-          <td class="py-2 pr-4 font-mono">{{ runtime.version }}</td>
-          <td class="py-2 pr-4">{{ runtime.priority }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <section class="flex flex-col gap-2">
+    <p class="text-sm text-muted">{{ $t('admin.judges.runtimes.caption') }}</p>
+    <AdminDataTable
+      :columns="columns"
+      :rows="runtimes"
+      :row-key="(runtime) => runtime.language"
+      :label="$t('admin.judges.runtimes.caption')"
+    />
+  </section>
 </template>

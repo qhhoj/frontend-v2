@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useSessionStore } from '@/stores/session.store';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import Card from '@/components/ui/Card.vue';
 import { canUseAdmin } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
 import AuditEntryRow from './AuditEntryRow.vue';
@@ -40,12 +41,17 @@ const entries = computed(() => recent.data.value?.items ?? []);
       @retry="recent.refetch()"
     >
       <template #skeleton><SkeletonBlock class="h-64 w-full" /></template>
-      <ol v-if="entries.length > 0" class="glass divide-y divide-line overflow-hidden rounded-card">
+      <Card
+        v-if="entries.length > 0"
+        as="ol"
+        variant="flat"
+        class="divide-y divide-line overflow-hidden"
+      >
         <AuditEntryRow v-for="entry in entries" :key="entry.id" :entry="entry" />
-      </ol>
-      <p v-else class="glass rounded-card px-4 py-6 text-center text-sm text-muted">
+      </Card>
+      <Card v-else as="p" variant="flat" class="px-4 py-6 text-center text-sm text-muted">
         {{ $t('admin.audit.recent.empty') }}
-      </p>
+      </Card>
     </QueryState>
   </section>
 </template>
