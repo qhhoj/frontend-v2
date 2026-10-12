@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { ExternalLink, FileText, Image, Package } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import { ExternalLink, FileText, Image, Package, Trash2 } from 'lucide-vue-next';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { CARD } from '../../ui/controls';
+import { CARD, iconButtonClass } from '../../ui/controls';
 import { needsPermissionText } from '../../ui/permission-text';
 import UploadButton from '../../ui/UploadButton.vue';
 import { failureReasonOf } from '../failure-reason';
@@ -11,8 +12,8 @@ import { useProblemUpload } from './use-problem-upload';
 import type { ProblemUploadKind } from './use-problem-upload';
 
 /**
- * One upload tile: what it holds now (file name, open link, copy address), then "Tải lên" or "Thay". An image tile holds
- * nothing (each upload only returns an address to paste into the statement). A locked tile names the permission instead.
+ * One upload tile: what it holds now (file name, open link, copy address, remove), then "Tải lên" or "Thay". An image tile
+ * holds nothing (each upload only returns an address to paste into the statement). A locked tile names the permission instead.
  */
 const props = defineProps<{
   kind: ProblemUploadKind;
@@ -32,6 +33,12 @@ const ICONS = { image: Image, pdf: FileText, material: Package } as const;
 const shownUrl = computed(() => upload.url.value || props.currentUrl || '');
 const fileName = computed(() => shownUrl.value.split('/').pop() ?? '');
 const keepsFile = computed(() => props.currentUrl !== undefined);
+const canRemove = computed(() => keepsFile.value && !!shownUrl.value && !props.lockedBy);
+const isConfirmShown = ref(false);
+async function removeFile() {
+  await upload.removal.run(undefined);
+  if (!upload.removal.failure.value) isConfirmShown.value = false;
+}
 const buttonKey = computed(() =>
   keepsFile.value && shownUrl.value
     ? 'admin.problems.files.replace'
@@ -70,6 +77,17 @@ const buttonKey = computed(() =>
           <ExternalLink aria-hidden="true" class="size-3.5" :stroke-width="1.75" />
         </a>
         <CopyButton :text="shownUrl" :label="$t('admin.problems.files.copy')" />
+        <button
+          v-if="canRemove"
+          type="button"
+          data-testid="remove-file"
+          :class="[iconButtonClass('ghost'), 'text-negative']"
+          :aria-label="$t('admin.problems.files.remove', { name: fileName })"
+          :title="$t('admin.problems.files.remove', { name: fileName })"
+          @click="isConfirmShown = true"
+        >
+          <Trash2 aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        </button>
       </template>
       <span v-else class="text-muted">{{ $t('admin.problems.files.none') }}</span>
     </div>
@@ -88,5 +106,23 @@ const buttonKey = computed(() =>
       kind="refused"
       :text="failureReasonOf(upload.mutation.failure.value)"
     />
+    <ConfirmDialog
+      v-if="keepsFile"
+      v-model:visible="isConfirmShown"
+      :title="$t('admin.problems.files.removeTitle', { name: fileName })"
+      :body="$t('admin.problems.files.removeBody')"
+      :confirm-label="$t('admin.problems.files.removeConfirm')"
+      tone="danger"
+      :busy="upload.removal.isPending.value"
+      @confirm="removeFile"
+    >
+      <template #error>
+        <AdminStatus
+          v-if="upload.removal.failure.value"
+          kind="refused"
+          :text="failureReasonOf(upload.removal.failure.value)"
+        />
+      </template>
+    </ConfirmDialog>
   </section>
 </template>

@@ -518,7 +518,11 @@
     "open": "Mở",
     "copy": "Sao chép địa chỉ",
     "upload": "Tải lên",
-    "replace": "Thay tệp"
+    "replace": "Thay tệp",
+    "remove": "Gỡ {name}",
+    "removeTitle": "Gỡ {name}?",
+    "removeBody": "Bài sẽ không còn tệp này; tải tệp mới lên khi cần.",
+    "removeConfirm": "Gỡ tệp"
   },
   "header": {
     "public": "Công khai",

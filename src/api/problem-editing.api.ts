@@ -45,3 +45,7 @@ export const uploadStatementPdf = async (code: string, file: File): Promise<stri
   (await apiSend('post', '/problems/{code}/statement', { path: { code }, ...fileBody(file) })).url;
 export const uploadMaterial = async (code: string, file: File): Promise<string> =>
   (await apiSend('post', '/problems/{code}/material', { path: { code }, ...fileBody(file) })).url;
+export const removeStatementPdf = (code: string) =>
+  apiSend('delete', '/problems/{code}/statement', { path: { code } });
+export const removeMaterial = (code: string) =>
+  apiSend('delete', '/problems/{code}/material', { path: { code } });

@@ -5147,14 +5147,22 @@ export interface paths {
         put?: never;
         /**
          * Upload the downloadable material of a problem
-         * @description Needs `judge.upload_problem_material` and edit rights on the problem. Send
-         *     one multipart `file` of up to 20 MiB with an allowed extension (archives,
-         *     documents, sources, plain images and data files; 400
-         *     `material_type_not_allowed` otherwise). It replaces the previous material
-         *     and returns its `url`. Shares the upload budget of 30 per hour per user.
+         * @description Needs edit rights on the problem and `judge.upload_problem_material`; an
+         *     administrator who may create problems for every organization of an
+         *     organization-private problem needs no permission. Send one multipart
+         *     `file` of up to 20 MiB with an extension listed in the meta's
+         *     `materialExtensions` (400 `material_type_not_allowed` otherwise). It
+         *     replaces the previous material and returns its `url`. On an organization
+         *     problem the file counts against the organization's storage (403
+         *     `quota_exceeded`). Shares the upload budget of 30 per hour per user.
          */
         post: operations["ProblemUploadsController_uploadMaterial"];
-        delete?: never;
+        /**
+         * Remove the downloadable material of a problem
+         * @description The rights of the upload. Does nothing when there is none; on an
+         *     organization problem its bytes leave the organization's storage.
+         */
+        delete: operations["ProblemUploadsController_removeMaterial"];
         options?: never;
         head?: never;
         patch?: never;
@@ -5373,14 +5381,23 @@ export interface paths {
         put?: never;
         /**
          * Upload the PDF statement of a problem
-         * @description Needs `judge.upload_file_statement` and edit rights on the problem. Send one
-         *     multipart `file`, a PDF of up to 5 MiB (400 `statement_not_pdf` otherwise).
-         *     It replaces the previous PDF statement and returns its `url`. Cached
-         *     packages of the problem are dropped. Shares the upload budget of 30 per hour
-         *     per user.
+         * @description Needs edit rights on the problem and `judge.upload_file_statement`; an
+         *     administrator who may create problems for every organization of an
+         *     organization-private problem needs no permission. Send one multipart
+         *     `file`, a PDF of up to 5 MiB (400 `statement_not_pdf` otherwise). It
+         *     replaces the previous PDF statement and returns its `url`. On an
+         *     organization problem the file counts against the organization's storage
+         *     (403 `quota_exceeded`; a replaced file's bytes are given back). Cached
+         *     packages of the problem are dropped. Shares the upload budget of 30 per
+         *     hour per user.
          */
         post: operations["ProblemUploadsController_uploadStatement"];
-        delete?: never;
+        /**
+         * Remove the PDF statement of a problem
+         * @description The rights of the upload. Does nothing when there is none; on an
+         *     organization problem its bytes leave the organization's storage.
+         */
+        delete: operations["ProblemUploadsController_removeStatement"];
         options?: never;
         head?: never;
         patch?: never;
@@ -10509,6 +10526,10 @@ export interface components {
             baseName: string;
             /** @description The viewer may set `isPublic` without `judge.change_public_visibility`: the problem is organization-private and they may create problems for every one of its organizations (it then only reaches members). */
             canPublishToMembers: boolean;
+            /** @description The viewer may upload or remove the material: `judge.upload_problem_material`, or `canPublishToMembers`. */
+            canUploadMaterial: boolean;
+            /** @description The viewer may upload or remove the PDF statement: `judge.upload_file_statement`, or `canPublishToMembers` (an administrator of the problem's organizations). */
+            canUploadPdfStatement: boolean;
             /** @description Users who can edit the problem. */
             curators: components["schemas"]["UserSummaryResponse"][];
             /** @description Base-language statement in markdown. */
@@ -10592,6 +10613,8 @@ export interface components {
             languages: components["schemas"]["LanguageResponse"][];
             /** @description Licenses a problem can use. */
             licenses: components["schemas"]["LicenseResponse"][];
+            /** @description Extensions (lowercase, without the dot) a problem material upload may have. */
+            materialExtensions: string[];
             /** @description Problem types. */
             types: components["schemas"]["CatalogItemResponse"][];
         };
@@ -22857,6 +22880,37 @@ export interface operations {
             };
         };
     };
+    ProblemUploadsController_removeMaterial: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ProblemPackageController_download: {
         parameters: {
             query?: never;
@@ -23285,6 +23339,37 @@ export interface operations {
                         data: components["schemas"]["UploadedFileResponse"];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ProblemUploadsController_removeStatement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {
