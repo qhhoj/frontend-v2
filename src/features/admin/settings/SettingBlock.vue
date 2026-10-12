@@ -193,7 +193,7 @@ const historySuffix = (key: SettingKey) => (props.block.keys.length > 1 ? ` · $
           class="size-2 shrink-0 rounded-full bg-accent"
         />
         <span v-if="dirtyCount > 0" class="font-semibold">{{
-          $t('admin.form.saveBar.unsaved', dirtyCount)
+          $t('form.saveBar.unsaved', dirtyCount)
         }}</span>
         <template v-else-if="notice?.tone === 'done'">
           <CircleCheck

@@ -2723,5 +2723,17 @@
   "create": {
     "problem": "Create problem",
     "contest": "Create contest"
+  },
+  "form": {
+    "required": "required",
+    "optional": "(optional)",
+    "saveBar": {
+      "unsaved": "{count} unsaved change | {count} unsaved changes",
+      "savedAt": "Saved at {time}",
+      "clean": "No changes to save.",
+      "discard": "Discard changes",
+      "save": "Save changes",
+      "saving": "Saving…"
+    }
   }
 }

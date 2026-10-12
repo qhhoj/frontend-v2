@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { defineComponent, h, ref } from 'vue';
 import { RouterView, createMemoryHistory, createRouter } from 'vue-router';
-import { useDirtyGuard } from './use-dirty-guard';
+import { useLeaveGuard } from './use-leave-guard';
 
 const isDirty = ref(false);
-let guard: ReturnType<typeof useDirtyGuard>;
+let guard: ReturnType<typeof useLeaveGuard>;
 const FormPage = defineComponent({
   setup() {
-    guard = useDirtyGuard(isDirty);
+    guard = useLeaveGuard(isDirty);
     return () => h('form');
   },
 });
@@ -27,7 +27,7 @@ async function mountAt(path: string) {
   return router;
 }
 
-describe('useDirtyGuard', () => {
+describe('useLeaveGuard', () => {
   it('lets a clean form leave at once', async () => {
     isDirty.value = false;
     const router = await mountAt('/form');
