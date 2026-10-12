@@ -47,6 +47,13 @@ const facts = computed(() => [
     tone: '',
   },
 ]);
+/** Standard I/O reads in words; file I/O shows the exact names, which the contestant must type into `freopen`/`assign`. */
+const io = computed(() => {
+  const { mode, inputFile, outputFile } = props.problem.io;
+  return mode === 'file'
+    ? { isFile: true, text: `${inputFile} / ${outputFile}` }
+    : { isFile: false, text: '' };
+});
 const STATUS = {
   solved: { key: 'problems.solved', tone: 'text-verdict-ac' },
   attempted: { key: 'problems.attempted', tone: 'text-verdict-tle' },
@@ -72,6 +79,15 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
         >
           {{ $t(status.key) }}
           <StateBit v-if="problem.viewerStatus === 'solved'" variant="rankUp" size="tiny" />
+        </dd>
+      </div>
+      <div class="col-span-2" data-testid="problem-io">
+        <dt class="text-[13px] text-muted">{{ $t('problem.rail.facts.io') }}</dt>
+        <dd
+          class="mt-0.5 text-[15px] font-bold"
+          :class="io.isFile ? 'break-all font-mono text-[14px]' : ''"
+        >
+          {{ io.isFile ? io.text : $t('problem.rail.facts.stdio') }}
         </dd>
       </div>
     </dl>

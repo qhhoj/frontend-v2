@@ -1042,6 +1042,8 @@
       },
       "facts": {
         "solvers": "Người giải",
+        "io": "Nhập/xuất",
+        "stdio": "Bàn phím / màn hình",
         "status": "Trạng thái",
         "untried": "Chưa thử",
         "hideTypes": "Ẩn dạng bài",

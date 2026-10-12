@@ -82,6 +82,7 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
   isFullMarkup: false,
   isOrganizationPrivate: false,
   authors: [{ id: '0192a000-0000-7000-8000-0000000000aa', username: 'thayhung', rating: null }],
+  io: { mode: 'stdio', inputFile: null, outputFile: null },
   languageLimits: [{ language: 'PY3', timeLimit: 4.5, memoryLimit: 262144 }],
   pdfStatementUrl: null,
   materialUrl: null,

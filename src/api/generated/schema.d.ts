@@ -10436,6 +10436,8 @@ export interface components {
             hasEditorial: boolean;
             /** @description Problem id. */
             id: string;
+            /** @description How a solution reads and writes: stdin/stdout, or the named files. */
+            io: components["schemas"]["ProblemIoResponse"];
             /** @description Whether the statement may contain unsanitized HTML. */
             isFullMarkup: boolean;
             /** @description Whether test data is managed outside the site (the data editor is off). */
@@ -10539,6 +10541,12 @@ export interface components {
             connected: boolean;
             /** @description The problem's link; null when none. */
             link: components["schemas"]["ExternalJudgeLinkResponse"] | null;
+        };
+        ProblemIoResponse: {
+            inputFile: string | null;
+            /** @enum {string} */
+            mode: "file" | "stdio";
+            outputFile: string | null;
         };
         ProblemListItemResponse: {
             /** @description Percentage of accepted submissions, 0 to 100. */

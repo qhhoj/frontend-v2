@@ -556,6 +556,7 @@ export const problemDetail = (overrides: Partial<ProblemDetail> = {}): ProblemDe
     }),
     scratchLanguage(),
   ],
+  io: { mode: 'stdio', inputFile: null, outputFile: null },
   languageLimits: [{ language: 'PY3', timeLimit: 3, memoryLimit: 262144 }],
   pdfStatementUrl: null,
   availableTranslations: ['vi', 'en'],
