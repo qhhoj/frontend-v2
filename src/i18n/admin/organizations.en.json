@@ -113,10 +113,7 @@
     },
     "reject": "Refuse",
     "accept": "Accept",
-    "decided": {
-      "A": "Accepted · decided at {time}",
-      "R": "Refused · decided at {time}"
-    },
+    "decidedAt": "Decided at",
     "count": {
       "P": "{total} requests awaiting review",
       "A": "{total} accepted requests",

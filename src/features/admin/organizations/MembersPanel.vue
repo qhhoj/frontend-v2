@@ -99,7 +99,12 @@ const range = computed(() => {
   return meta ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total) : null;
 });
 const columns = computed<AdminColumn[]>(() => [
-  { key: 'rank', label: t('admin.organizations.members.rank'), align: 'end', cellClass: 'w-12' },
+  {
+    key: 'rank',
+    label: t('admin.organizations.members.rank'),
+    align: 'end',
+    cellClass: 'w-12 whitespace-nowrap',
+  },
   {
     key: 'member',
     label: t('admin.organizations.members.title'),
@@ -107,7 +112,12 @@ const columns = computed<AdminColumn[]>(() => [
     cellClass: 'w-full max-w-0',
   },
   { key: 'role', label: t('admin.organizations.members.role'), priority: 'badge' },
-  { key: 'points', label: t('admin.organizations.members.points'), align: 'end' },
+  {
+    key: 'points',
+    label: t('admin.organizations.members.points'),
+    align: 'end',
+    cellClass: 'whitespace-nowrap',
+  },
 ]);
 
 /** A new search starts again from the first page of members. */

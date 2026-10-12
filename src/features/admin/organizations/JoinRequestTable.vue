@@ -9,6 +9,7 @@ import type { JoinRequest, JoinRequestState } from '@/api/types/organizations';
 import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
@@ -90,7 +91,14 @@ const columns = computed<AdminColumn[]>(() => [
     : []),
   ...(props.state === 'P'
     ? []
-    : [{ key: 'decided', label: t('admin.organizations.queue.columns.decided') }]),
+    : [
+        {
+          key: 'decided',
+          label: t('admin.organizations.queue.columns.decided'),
+          stacked: true,
+          cellClass: 'min-w-44',
+        },
+      ]),
 ]);
 const range = computed(() => {
   const meta = props.meta;
@@ -99,14 +107,6 @@ const range = computed(() => {
     : null;
 });
 const timeOf = (value: string) => formatNumericDateTime(value, locale.locale);
-function decidedText(request: JoinRequest): string {
-  const decided = t(`admin.organizations.queue.decided.${request.state}`, {
-    time: request.decidedAt ? timeOf(request.decidedAt) : '',
-  });
-  return request.decidedByUsername
-    ? `${decided} · ${t('admin.organizations.queue.decidedBy', { name: request.decidedByUsername })}`
-    : decided;
-}
 const menuItems = (request: JoinRequest) => [
   { label: t('admin.organizations.queue.reject'), icon: X, run: () => void decide(request, 'R') },
 ];
@@ -180,7 +180,20 @@ const bulkFailure = computed(() => {
         >
       </template>
       <template #cell-decided="{ row }">
-        <span class="text-sm text-muted">{{ decidedText(row) }}</span>
+        <div class="flex min-w-0 flex-col items-start gap-1">
+          <AdminChip :tone="row.state === 'A' ? 'positive' : 'negative'">{{
+            $t(`admin.organizations.queue.states.${row.state}`)
+          }}</AdminChip>
+          <p class="m-0 text-sm text-muted">
+            {{ $t('admin.organizations.queue.decidedAt') }}
+            <span class="whitespace-nowrap tabular-nums">{{
+              row.decidedAt ? timeOf(row.decidedAt) : '—'
+            }}</span>
+            <template v-if="row.decidedByUsername">
+              · {{ $t('admin.organizations.queue.decidedBy', { name: row.decidedByUsername }) }}
+            </template>
+          </p>
+        </div>
       </template>
       <template v-if="state === 'P'" #actions="{ row }">
         <button

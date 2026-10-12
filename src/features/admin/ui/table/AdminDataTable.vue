@@ -191,14 +191,20 @@ const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeigh
               </template>
             </div>
           </div>
-          <p v-if="secondary.length" class="m-0 flex flex-wrap gap-x-2 text-sm text-muted">
+          <p v-if="secondary.length" class="m-0 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
             <template v-for="(column, index) in secondary" :key="column.key">
-              <span v-if="index > 0" aria-hidden="true">·</span>
-              <span class="inline-flex max-w-full min-w-0 items-baseline gap-1">
-                <span>{{ column.label }}</span>
+              <span v-if="index > 0 && !column.stacked" aria-hidden="true">·</span>
+              <span
+                class="inline-flex max-w-full min-w-0 items-baseline gap-1"
+                :class="column.stacked && 'basis-full'"
+              >
+                <span v-if="!column.stacked" class="whitespace-nowrap">{{ column.label }}</span>
                 <span
-                  class="min-w-0 text-content [overflow-wrap:anywhere]"
-                  :class="column.align === 'end' && 'font-mono tabular-nums'"
+                  class="min-w-0 [overflow-wrap:anywhere]"
+                  :class="[
+                    column.stacked ? 'w-full' : 'text-content',
+                    column.align === 'end' && 'font-mono tabular-nums whitespace-nowrap',
+                  ]"
                 >
                   <slot :name="`cell-${column.key}`" :row="row">{{
                     cellText(row, column.key)
