@@ -271,6 +271,7 @@
     "name": "Name",
     "create": "Create role",
     "save": "Save role",
+    "nameRequired": "Enter a role name to save.",
     "edit": "Edit",
     "show": "Permissions",
     "counts": "{members} members · {permissions} permissions",

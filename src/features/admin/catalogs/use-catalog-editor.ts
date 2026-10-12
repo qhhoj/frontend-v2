@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { translate } from '@/i18n';
 import { isConflict } from '../ui/admin-errors';
+import { countChanges } from '../ui/form/dirty-form';
 import type { FieldErrors } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import type { AdminQueryKey } from '../ui/use-admin-mutation';
@@ -31,6 +32,12 @@ export function useCatalogEditor<Row, Form extends object>(
   const form = ref(formFor(options.row())) as Ref<Form>;
   const hasTried = ref(false);
   const isCreate = computed(() => options.row() === null);
+  /** Fields that differ from the row (or the empty form): the save bar's "2 thay đổi chưa lưu". */
+  const dirtyCount = computed(() => countChanges(form.value, formFor(options.row())));
+  function discard() {
+    form.value = formFor(options.row());
+    hasTried.value = false;
+  }
   watch(options.row, (row) => {
     form.value = formFor(row);
     hasTried.value = false;
@@ -68,5 +75,5 @@ export function useCatalogEditor<Row, Form extends object>(
     if (Object.keys(options.check(form.value)).length) return;
     await mutation.run({ ...form.value });
   }
-  return { form, isCreate, errors, mutation, isTaken, save };
+  return { form, isCreate, dirtyCount, errors, mutation, isTaken, save, discard };
 }

@@ -7,6 +7,7 @@ import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { BUTTON, INPUT } from '../ui/controls';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import PermissionChecklist from './PermissionChecklist.vue';
 import { setDelta } from './user-access';
 
@@ -20,9 +21,14 @@ const ORG_ADMIN_ROLE = 'Org Admin';
 const NO_INHERITED = new Map<string, string[]>();
 const delta = computed(() => setDelta(props.role?.permissions ?? [], permissions.value));
 const isNameChanged = computed(() => name.value.trim() !== (props.role?.name ?? '').trim());
-const hasChanges = computed(
-  () => isNameChanged.value || delta.value.add.length > 0 || delta.value.remove.length > 0,
+const isPermissionsChanged = computed(
+  () => delta.value.add.length > 0 || delta.value.remove.length > 0,
 );
+const dirtyCount = computed(() => Number(isNameChanged.value) + Number(isPermissionsChanged.value));
+function discard() {
+  name.value = props.role?.name ?? '';
+  permissions.value = [...(props.role?.permissions ?? [])];
+}
 
 const save = useAdminMutation({
   mutate: () =>
@@ -50,7 +56,7 @@ const refusal = computed(() => {
   <form
     class="flex flex-col gap-4"
     data-testid="role-editor"
-    @submit.prevent="hasChanges && name.trim() !== '' && save.run(undefined)"
+    @submit.prevent="dirtyCount > 0 && name.trim() !== '' && save.run(undefined)"
   >
     <AdminField
       v-slot="{ id, describedBy, invalid }"
@@ -74,19 +80,20 @@ const refusal = computed(() => {
     />
     <PermissionChecklist v-model="permissions" :catalog="catalog" :inherited="NO_INHERITED" />
     <p v-if="errors.permissions" class="text-sm text-negative">{{ errors.permissions }}</p>
-    <div class="flex flex-wrap gap-2">
-      <button
-        type="submit"
-        :class="BUTTON.primary"
-        :aria-disabled="!hasChanges || name.trim() === '' || save.isPending.value || undefined"
-        :aria-busy="save.isPending.value || undefined"
-      >
-        {{ role ? $t('admin.users.roles.save') : $t('admin.users.roles.create') }}
-      </button>
-      <button type="button" :class="BUTTON.secondary" @click="emit('cancel')">
-        {{ $t('common.cancel') }}
-      </button>
-    </div>
+    <AdminSaveBar
+      variant="footer"
+      :dirty-count="dirtyCount"
+      :pending="save.isPending.value"
+      :blocked-reason="name.trim() === '' ? $t('admin.users.roles.nameRequired') : undefined"
+      :save-label="role ? $t('admin.users.roles.save') : $t('admin.users.roles.create')"
+      @discard="discard"
+    >
+      <template #actions>
+        <button type="button" :class="BUTTON.secondary" @click="emit('cancel')">
+          {{ $t('common.cancel') }}
+        </button>
+      </template>
+    </AdminSaveBar>
     <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
   </form>
 </template>

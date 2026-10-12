@@ -22,7 +22,6 @@
   "edit": "Edit",
   "create": "Add",
   "save": "Save",
-  "cancel": "Cancel",
   "fields": {
     "name": "Name",
     "fullName": "Full name",

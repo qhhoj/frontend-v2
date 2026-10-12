@@ -8,6 +8,7 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import MarkdownField from '../ui/MarkdownField.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { INPUT, buttonClass } from '../ui/controls';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { checkLicenseForm, emptyLicenseForm, licenseFormOf } from './catalog-forms';
 import type { LicenseForm } from './catalog-forms';
 import { LICENSES_ADMIN_KEY, META_KEYS } from './catalogs.queries';
@@ -17,7 +18,7 @@ import { useCatalogEditor } from './use-catalog-editor';
 const props = defineProps<{ row: LicenseAdmin | null }>();
 const emit = defineEmits<{ done: []; cancel: [] }>();
 const { can } = usePermissions();
-const { form, isCreate, errors, mutation, isTaken, save } = useCatalogEditor({
+const { form, isCreate, dirtyCount, errors, mutation, isTaken, save, discard } = useCatalogEditor({
   row: () => props.row,
   empty: emptyLicenseForm,
   formOf: licenseFormOf,
@@ -72,17 +73,21 @@ const TEXT_FIELDS = [
           :error="errors.text"
         />
       </div>
-      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
-        <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
-          {{ $t('admin.catalogs.cancel') }}
-        </button>
-        <button
-          type="submit"
-          :class="buttonClass('primary')"
-          :aria-busy="mutation.isPending.value || undefined"
+      <div class="flex border-t border-line pt-4">
+        <AdminSaveBar
+          variant="footer"
+          :dirty-count="dirtyCount"
+          :pending="mutation.isPending.value"
+          :allow-clean="isCreate"
+          :save-label="isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save')"
+          @discard="discard"
         >
-          {{ isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save') }}
-        </button>
+          <template #actions>
+            <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
+              {{ $t('common.close') }}
+            </button>
+          </template>
+        </AdminSaveBar>
       </div>
     </form>
     <AdminStatus

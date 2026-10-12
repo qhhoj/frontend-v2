@@ -7,6 +7,7 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { INPUT, buttonClass } from '../ui/controls';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { checkTaxonForm, emptyTaxonForm, taxonFormOf } from './catalog-forms';
 import { META_KEYS, taxaKey } from './catalogs.queries';
 import { useCatalogEditor } from './use-catalog-editor';
@@ -19,7 +20,7 @@ const ADD_PERMISSION = {
   'problem-types': 'judge.add_problemtype',
   'problem-groups': 'judge.add_problemgroup',
 } as const;
-const { form, isCreate, errors, mutation, isTaken, save } = useCatalogEditor({
+const { form, isCreate, dirtyCount, errors, mutation, isTaken, save, discard } = useCatalogEditor({
   row: () => props.row,
   empty: emptyTaxonForm,
   formOf: taxonFormOf,
@@ -74,17 +75,21 @@ const idPrefix = computed(() => `catalog-${props.kind}`);
           />
         </template>
       </AdminField>
-      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4">
-        <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
-          {{ $t('admin.catalogs.cancel') }}
-        </button>
-        <button
-          type="submit"
-          :class="buttonClass('primary')"
-          :aria-busy="mutation.isPending.value || undefined"
+      <div class="flex border-t border-line pt-4">
+        <AdminSaveBar
+          variant="footer"
+          :dirty-count="dirtyCount"
+          :pending="mutation.isPending.value"
+          :allow-clean="isCreate"
+          :save-label="isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save')"
+          @discard="discard"
         >
-          {{ isCreate ? $t('admin.catalogs.create') : $t('admin.catalogs.save') }}
-        </button>
+          <template #actions>
+            <button type="button" :class="buttonClass('ghost')" @click="emit('cancel')">
+              {{ $t('common.close') }}
+            </button>
+          </template>
+        </AdminSaveBar>
       </div>
     </form>
     <AdminStatus

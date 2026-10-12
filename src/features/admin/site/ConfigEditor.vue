@@ -10,6 +10,8 @@ import AdminChip from '../ui/AdminChip.vue';
 import { BUTTON, INPUT } from '../ui/controls';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
+import AdminLeaveGuard from '../ui/form/AdminLeaveGuard.vue';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import HtmlPreview from './HtmlPreview.vue';
 import { CONFIG_KEY_PATTERN, checkConfigValue, configKindOf } from './config-kinds';
 import ConfigHistory from './ConfigHistory.vue';
@@ -30,6 +32,10 @@ const value = ref(props.initialValue);
 const isCreating = ref(props.isNew);
 const localErrors = ref<Record<string, string>>({});
 const isDeleteOpen = ref(false);
+/** The value as last saved: the save bar counts the edit against it and "Huỷ thay đổi" puts it back. */
+const savedValue = ref(props.initialValue);
+const savedAt = ref<Date | null>(null);
+const dirtyCount = computed(() => (isCreating.value || value.value === savedValue.value ? 0 : 1));
 const kind = computed(() => configKindOf(keyName.value, value.value));
 
 /** The key's own check, then the value's; a new key must be free. */
@@ -54,6 +60,8 @@ const save = useAdminMutation({
     writeConfig(queryClient, result.key, result.value);
     refreshAfterConfigWrite(queryClient);
     isCreating.value = false;
+    savedValue.value = result.value;
+    savedAt.value = new Date();
   },
 });
 
@@ -147,28 +155,31 @@ const errorOf = (field: string): string | undefined =>
         :text="failureTextOf(save.failure.value)"
       />
 
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="submit"
-          :class="BUTTON.primary"
-          :aria-busy="save.isPending.value || undefined"
-        >
-          {{ $t('admin.site.config.save') }}
-        </button>
-        <button type="button" :class="BUTTON.ghost" @click="emit('close')">
-          {{ $t('admin.site.config.close') }}
-        </button>
-        <button
-          v-if="!isCreating"
-          type="button"
-          class="ml-auto"
-          :class="BUTTON.danger"
-          @click="isDeleteOpen = true"
-        >
-          {{ $t('admin.site.config.delete') }}
-        </button>
-      </div>
+      <AdminSaveBar
+        variant="footer"
+        :dirty-count="dirtyCount"
+        :pending="save.isPending.value"
+        :saved-at="savedAt"
+        :allow-clean="isCreating"
+        :save-label="$t('admin.site.config.save')"
+        @discard="value = savedValue"
+      >
+        <template #actions>
+          <button
+            v-if="!isCreating"
+            type="button"
+            :class="BUTTON.danger"
+            @click="isDeleteOpen = true"
+          >
+            {{ $t('admin.site.config.delete') }}
+          </button>
+          <button type="button" :class="BUTTON.ghost" @click="emit('close')">
+            {{ $t('admin.site.config.close') }}
+          </button>
+        </template>
+      </AdminSaveBar>
     </form>
+    <AdminLeaveGuard :dirty-count="dirtyCount" />
 
     <ConfigHistory v-if="!isCreating" :config-key="keyName" />
 
