@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { computed, ref, useId } from 'vue';
 import { Plus, X } from 'lucide-vue-next';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
@@ -27,8 +28,10 @@ const licenseValue = computed({
 const unpickedTypes = computed(() =>
   props.meta.types.filter((type) => !form.value.typeIds.includes(type.id)),
 );
-const typeNameOf = (typeId: string) =>
-  props.meta.types.find((type) => type.id === typeId)?.fullName ?? typeId;
+const typeNameOf = (typeId: string) => {
+  const type = props.meta.types.find((item) => item.id === typeId);
+  return type ? problemTypeLabel(type) : typeId;
+};
 
 function addType() {
   if (!pickedTypeId.value) return;
@@ -128,7 +131,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
         >
           <option value="">{{ $t('admin.problems.general.classes.pickType') }}</option>
           <option v-for="type in unpickedTypes" :key="type.id" :value="type.id">
-            {{ type.fullName }}
+            {{ problemTypeLabel(type) }}
           </option>
         </select>
         <button type="button" :class="buttonClass('secondary')" @click="addType">

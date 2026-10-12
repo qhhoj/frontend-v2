@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from './problem-type-label';
 import { ChevronDown } from 'lucide-vue-next';
 import Popover from 'primevue/popover';
 import { computed, ref } from 'vue';
@@ -13,7 +14,7 @@ const open = ref(false);
 const query = ref('');
 const shown = computed(() => {
   const needle = query.value.trim().toLocaleLowerCase();
-  return props.types.filter((type) => type.fullName.toLocaleLowerCase().includes(needle));
+  return props.types.filter((type) => problemTypeLabel(type).toLocaleLowerCase().includes(needle));
 });
 const toggle = (id: string) =>
   emit(
@@ -64,7 +65,7 @@ const toggle = (id: string) =>
               :checked="selected.includes(type.id)"
               @change="toggle(type.id)"
             />
-            {{ type.fullName }}
+            {{ problemTypeLabel(type) }}
           </label>
         </li>
         <li v-if="!shown.length" class="px-1 py-2 text-sm text-muted">

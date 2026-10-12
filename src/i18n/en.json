@@ -1109,6 +1109,7 @@
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
+    "uncategorized": "Uncategorized",
     "attemptedLong": "Attempted, not solved",
     "notTried": "Not tried",
     "sortField": {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import {
@@ -202,7 +203,7 @@ watch(
           >
             <option value="">{{ $t('admin.creation.problem.pickType') }}</option>
             <option v-for="type in meta.types" :key="type.id" :value="type.id">
-              {{ type.fullName }}
+              {{ problemTypeLabel(type) }}
             </option>
           </select>
         </AdminField>

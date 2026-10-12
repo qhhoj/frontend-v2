@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
@@ -53,6 +54,10 @@ const selectValue = (event: Event) => (event.target as HTMLSelectElement).value;
 
 const nameOf = (items: { id: string; fullName: string }[] | undefined, id: string) =>
   items?.find((item) => item.id === id)?.fullName ?? id;
+const typeNameOf = (id: string) => {
+  const type = props.meta?.types.find((item) => item.id === id);
+  return type ? problemTypeLabel(type) : id;
+};
 const chips = computed<ActiveFilter[]>(() => {
   const { groupId, typeId, author } = props.filters;
   return [
@@ -62,7 +67,7 @@ const chips = computed<ActiveFilter[]>(() => {
     },
     typeId && {
       key: 'typeId',
-      label: t('admin.problemList.chips.type', { name: nameOf(props.meta?.types, typeId) }),
+      label: t('admin.problemList.chips.type', { name: typeNameOf(typeId) }),
     },
     author && { key: 'author', label: t('admin.problemList.chips.author', { name: author }) },
   ].filter((chip): chip is ActiveFilter => Boolean(chip));
@@ -121,7 +126,7 @@ const clearAll = () => emit('change', { groupId: '', typeId: '', author: '' });
         >
           <option value="">{{ $t('admin.problemList.anyType') }}</option>
           <option v-for="type in meta?.types ?? []" :key="type.id" :value="type.id">
-            {{ type.fullName }}
+            {{ problemTypeLabel(type) }}
           </option>
         </select>
       </AdminField>
