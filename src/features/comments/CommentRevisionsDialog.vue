@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
+import Modal from '@/components/ui/Modal.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import UserLink from '@/components/UserLink.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -31,7 +32,17 @@ const chosen = computed(
     versions.value[0] ??
     null,
 );
-const view = ref<'changes' | 'full'>('changes');
+type RevisionView = 'changes' | 'full';
+const view = ref<RevisionView>('changes');
+/** The original has nothing to compare with: only its full text, and the switch is locked. */
+const hasChanges = computed(() => chosen.value?.previous != null);
+const shownView = computed<RevisionView>(() => (hasChanges.value ? view.value : 'full'));
+const viewOptions = computed(() =>
+  (['changes', 'full'] as const).map((value) => ({
+    value,
+    label: t(`comments.revisions.${value}`),
+  })),
+);
 const lines = computed(() => {
   const version = chosen.value;
   return version && version.previous !== null ? unifiedDiff(version.previous, version.text) : [];
@@ -51,13 +62,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    :draggable="false"
-    :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-  >
+  <Modal v-model:visible="visible" size="lg">
     <template #header>
       <div class="flex flex-wrap items-baseline gap-2">
         <h2 class="font-display text-lg font-semibold">{{ $t('comments.revisions.title') }}</h2>
@@ -95,24 +100,15 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
           </ol>
         </nav>
         <section v-if="chosen" class="flex min-w-0 flex-col gap-2">
-          <div
-            role="group"
-            :aria-label="$t('comments.revisions.views')"
-            class="flex w-fit gap-1 rounded-pill border border-line p-0.5"
-          >
-            <button
-              v-for="option in ['changes', 'full'] as const"
-              :key="option"
-              type="button"
-              :aria-pressed="view === option"
-              :disabled="option === 'changes' && chosen.previous === null"
-              class="min-h-9 rounded-pill px-3 text-sm aria-pressed:bg-accent-soft aria-pressed:font-semibold aria-pressed:text-accent-soft-text disabled:text-muted"
-              @click="view = option"
-            >
-              {{ $t(`comments.revisions.${option}`) }}
-            </button>
-          </div>
-          <template v-if="view === 'changes' && chosen.previous !== null">
+          <SegmentedControl
+            :model-value="shownView"
+            :options="viewOptions"
+            :label="$t('comments.revisions.views')"
+            :disabled="!hasChanges"
+            size="sm"
+            @update:model-value="view = $event"
+          />
+          <template v-if="shownView === 'changes' && chosen.previous !== null">
             <h3 class="text-sm font-semibold">
               {{ $t('comments.revisions.compare', { version: nameOf(chosen) }) }}
             </h3>
@@ -147,5 +143,5 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
         </section>
       </div>
     </QueryState>
-  </Dialog>
+  </Modal>
 </template>

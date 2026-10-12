@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { SubmissionStats } from '@/api/types/submissions';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -61,7 +61,7 @@ const figures = computed(() => {
 
 <template>
   <div data-testid="stats-strip" class="flex flex-col gap-3">
-    <GlassCard
+    <Card
       as="div"
       class="flex flex-wrap items-center gap-x-5 gap-y-1 py-1 pr-1.5 pl-4 text-meta text-muted"
     >
@@ -88,7 +88,7 @@ const figures = computed(() => {
         </div>
       </dl>
       <LiveToggle :live="live" class="ml-auto" @update:live="emit('update:live', $event)" />
-    </GlassCard>
+    </Card>
     <VerdictDistributionBar v-if="verdicts.length" :verdicts="verdicts" />
   </div>
 </template>

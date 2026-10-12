@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 import { DIFF_INLINE_BITS } from './diff-bits';
 import { diffRoute, MAX_DIFF_PICKS } from './diff-picks';
@@ -21,7 +22,6 @@ const summary = computed(() =>
       })
     : translate('sourceDiff.select.pickedOne'),
 );
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-4 text-sm font-semibold';
 </script>
 
 <template>
@@ -31,28 +31,12 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-4 text-sm font
   >
     <InlineBit v-if="picked.length === MAX_DIFF_PICKS" :kind="DIFF_INLINE_BITS.pickedTwo" />
     <p aria-live="polite" class="min-w-0 flex-1 text-sm font-semibold">{{ summary }}</p>
-    <button
-      type="button"
-      data-testid="diff-clear"
-      :class="`${BUTTON} border border-line hover:bg-surface-hover`"
-      @click="$emit('clear')"
-    >
+    <AppButton data-testid="diff-clear" @click="$emit('clear')">
       {{ $t('sourceDiff.select.clear') }}
-    </button>
-    <RouterLink
-      v-if="pair"
-      data-testid="diff-compare"
-      :to="diffRoute(pair)"
-      :class="`${BUTTON} bg-gradient-accent text-on-accent`"
-      >{{ $t('sourceDiff.select.compare') }}</RouterLink
-    >
-    <button
-      v-else
-      type="button"
-      aria-disabled="true"
-      :class="`${BUTTON} cursor-not-allowed border border-line text-muted`"
-    >
-      {{ $t('sourceDiff.select.needTwo') }}
-    </button>
+    </AppButton>
+    <AppButton v-if="pair" data-testid="diff-compare" tone="primary" :to="diffRoute(pair)">
+      {{ $t('sourceDiff.select.compare') }}
+    </AppButton>
+    <AppButton v-else disabled>{{ $t('sourceDiff.select.needTwo') }}</AppButton>
   </div>
 </template>

@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import type { CommentPageType } from '@/api/types/comments';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -246,17 +247,19 @@ useCommentJump({
         }}
         · {{ $t('comments.timeOrder') }}
       </span>
-      <button
+      <AppButton
         v-if="data && moderates && !isContestHidden"
-        type="button"
-        class="ml-auto inline-flex min-h-10 items-center gap-1.5 self-center rounded-pill border border-line px-3.5 text-sm font-semibold text-accent-text hover:bg-surface-hover"
+        size="sm"
+        class="ml-auto self-center"
         :aria-pressed="data.pageLocked"
-        :aria-busy="writes.setLocked.isPending.value || undefined"
+        :loading="writes.setLocked.isPending.value"
         @click="toggleLock"
       >
-        <component :is="data.pageLocked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
+        <template #icon>
+          <component :is="data.pageLocked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
+        </template>
         {{ $t(data.pageLocked ? 'comments.action.unlock' : 'comments.action.lock') }}
-      </button>
+      </AppButton>
     </div>
     <p
       v-if="data && moderates && data.pageLocked && !isContestHidden"

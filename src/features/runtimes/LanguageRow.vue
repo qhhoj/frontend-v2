@@ -2,6 +2,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
+import Chip from '@/components/ui/Chip.vue';
 import { commonCompiler, commonVersion, mismatchedJudges } from './runtimes-model';
 
 /** One language: a summary line that opens in place to the extension and the version on every judge. */
@@ -17,7 +18,6 @@ const compiler = computed(() => commonCompiler(props.language, props.judges));
 const versionOf = (judge: string) =>
   props.language.versions.find((entry) => entry.judge === judge)?.version ?? null;
 const detailId = computed(() => `language-${props.language.key}`);
-const CHIP = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold';
 </script>
 
 <template>
@@ -37,11 +37,7 @@ const CHIP = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold';
           <span v-if="common" class="font-mono">{{ common }}</span></span
         >
       </span>
-      <span
-        v-if="odd.size"
-        class="rounded-pill bg-tag-4-bg px-2.5 py-0.5 text-xs font-semibold text-tag-4"
-        >{{ $t('runtimes.mismatch', { count: odd.size }) }}</span
-      >
+      <Chip v-if="odd.size" tone="tag-4">{{ $t('runtimes.mismatch', { count: odd.size }) }}</Chip>
       <span class="font-mono text-sm text-muted">.{{ language.extension }}</span>
       <component :is="isOpen ? ChevronDown : ChevronRight" aria-hidden="true" class="size-4" />
     </button>
@@ -52,9 +48,7 @@ const CHIP = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold';
     >
       <p class="text-sm text-muted">
         {{ $t('runtimes.extension') }}
-        <span :class="[CHIP, 'bg-accent-soft text-accent-soft-text']"
-          >.{{ language.extension }}</span
-        >
+        <Chip tone="accent" class="font-mono">.{{ language.extension }}</Chip>
         <span v-if="language.fileOnly" class="ml-2">{{ $t('submit.fileOnly') }}</span>
       </p>
       <h4 class="text-xs font-semibold text-muted uppercase">{{ $t('runtimes.perJudge') }}</h4>
@@ -66,13 +60,11 @@ const CHIP = 'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold';
             :class="judge.online ? 'bg-verdict-ac' : 'bg-line-strong'"
           />
           <span class="flex-1">{{ judge.name }}</span>
-          <span
+          <Chip
             v-if="versionOf(judge.name)"
-            :class="[
-              CHIP,
-              odd.has(judge.name) ? 'bg-tag-4-bg text-tag-4' : 'bg-surface text-muted',
-            ]"
-            >{{ versionOf(judge.name) }}</span
+            :tone="odd.has(judge.name) ? 'tag-4' : 'neutral'"
+            class="font-mono"
+            >{{ versionOf(judge.name) }}</Chip
           >
           <span v-else class="text-xs text-muted">{{ $t('runtimes.notInstalled') }}</span>
         </li>

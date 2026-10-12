@@ -3,6 +3,7 @@ import { Download, ExternalLink } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { API_BASE } from '@/api/client';
 import CopyButton from '@/components/CopyButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatFileSize } from '@/lib/format';
 import { sourceLineCount } from '@/lib/source';
 
@@ -19,8 +20,6 @@ const sizeText = computed(() =>
   bytes.value < 1024 ? `${bytes.value} B` : formatFileSize(bytes.value),
 );
 const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.id)}/source`);
-const ACTION =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-4 text-sm font-semibold text-content';
 </script>
 
 <template>
@@ -37,27 +36,25 @@ const ACTION =
       >
     </span>
     <template v-if="filename">
-      <a
+      <AppButton
         data-testid="source-raw"
         :href="`${base}/raw`"
         target="_blank"
         rel="noopener"
-        :class="ACTION"
         :aria-label="$t('submission.source.raw')"
       >
-        <ExternalLink aria-hidden="true" class="size-4" />
+        <template #icon><ExternalLink aria-hidden="true" class="size-4" /></template>
         <span class="max-sm:sr-only">{{ $t('submission.source.rawShort') }}</span>
-      </a>
-      <a
+      </AppButton>
+      <AppButton
         data-testid="source-download"
         :href="`${base}/download`"
         :download="filename"
-        :class="ACTION"
         :aria-label="$t('submission.source.download')"
       >
-        <Download aria-hidden="true" class="size-4" />
+        <template #icon><Download aria-hidden="true" class="size-4" /></template>
         <span class="max-sm:sr-only">{{ $t('submission.source.downloadShort') }}</span>
-      </a>
+      </AppButton>
     </template>
     <CopyButton :text="text" :label="$t('submission.source.copy')" icon-only-on-phone />
   </div>

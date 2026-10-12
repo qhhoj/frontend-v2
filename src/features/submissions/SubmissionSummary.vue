@@ -5,7 +5,7 @@ import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions
 import type { SubmissionDetail } from '@/api/types/submissions';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -84,10 +84,7 @@ const facts = computed(() => [
     data-testid="submission-summary"
     class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
   >
-    <GlassCard
-      as="div"
-      class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
-    >
+    <Card as="div" class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8">
       <VerdictRing
         :progress="isFinished ? null : ringProgress(submission)"
         :verdict="verdict"
@@ -131,8 +128,8 @@ const facts = computed(() => [
         :closed-eyes="bit.eyesShut"
         class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
       />
-    </GlassCard>
-    <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
+    </Card>
+    <Card as="div" class="rounded-panel p-6 sm:p-8">
       <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
         <dt data-fact="problem" class="text-meta text-muted">
           {{ $t('submission.facts.problem') }}
@@ -178,6 +175,6 @@ const facts = computed(() => [
       <p v-if="submission.isPretested" class="mt-4 text-meta text-muted">
         {{ $t('submission.pretest') }}
       </p>
-    </GlassCard>
+    </Card>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
@@ -79,7 +79,7 @@ const totalText = computed(() => {
 </script>
 
 <template>
-  <GlassCard
+  <Card
     v-if="rows.length"
     as="div"
     data-testid="test-overview"
@@ -158,5 +158,5 @@ const totalText = computed(() => {
         </tfoot>
       </table>
     </ScrollRegion>
-  </GlassCard>
+  </Card>
 </template>

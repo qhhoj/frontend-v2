@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { ExternalJudgeRun } from '@/api/types/external-judge';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 
 /** The run on the remote OJ; the backend sends it only to viewers who may rejudge. */
 const props = defineProps<{ run: ExternalJudgeRun }>();
@@ -20,7 +20,7 @@ const link = computed(() =>
 </script>
 
 <template>
-  <GlassCard class="rounded-panel p-4" data-testid="external-run">
+  <Card class="rounded-panel p-4" data-testid="external-run">
     <h2 class="font-bold">{{ $t('submission.externalRun.title') }}</h2>
     <dl class="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
       <div v-for="row in rows" :key="row.key">
@@ -36,5 +36,5 @@ const link = computed(() =>
         </dd>
       </div>
     </dl>
-  </GlassCard>
+  </Card>
 </template>

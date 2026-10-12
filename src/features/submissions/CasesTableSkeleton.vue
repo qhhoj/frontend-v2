@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
 /** Mirrors `CasesTable.vue`: keep its card, header cells and row classes in sync. */
@@ -9,7 +9,7 @@ const NUMBER_COLUMN_COUNT = 3;
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
+  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold"><SkeletonBlock text class="w-40" /></h2>
     </div>
@@ -49,5 +49,5 @@ const NUMBER_COLUMN_COUNT = 3;
         </tbody>
       </table>
     </div>
-  </GlassCard>
+  </Card>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 
 /** Above the list: the live feed dropped (with a reload button), or rows arrived above the page shown (the "N mới" pill). */
@@ -14,13 +15,9 @@ const emit = defineEmits<{ reconnect: []; showNew: [] }>();
   >
     <InlineBit kind="sweat" />
     {{ $t('submissions.livePaused') }}
-    <button
-      type="button"
-      class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
-      @click="emit('reconnect')"
-    >
+    <AppButton @click="emit('reconnect')">
       {{ $t('submissions.liveReload') }}
-    </button>
+    </AppButton>
   </p>
   <div v-if="newCount > 0" class="sticky top-20 z-10 w-fit rounded-pill bg-surface-solid">
     <button

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { AlertCircle } from 'lucide-vue-next';
 import { computed, nextTick, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { COMMENT_MAX_LENGTH } from '@/api/types/comments';
+import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
+import Tabs from '@/components/ui/Tabs.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import CommentPreview from './CommentPreview.vue';
@@ -36,20 +38,18 @@ const locale = useLocaleStore();
 const id = useId();
 const textarea = ref<HTMLTextAreaElement | null>(null);
 const isOpen = ref(!props.startCollapsed);
-type ComposerTab = 'write' | 'preview';
-const TABS: readonly ComposerTab[] = ['write', 'preview'];
-const tab = ref<ComposerTab>('write');
-const tabButtons = ref<HTMLButtonElement[]>([]);
+const tab = ref('write');
+const tabs = computed(() =>
+  ['write', 'preview'].map((name) => ({
+    key: name,
+    label: t(`comments.composer.tab.${name}`),
+    panelId: `${id}-panel-${name}`,
+  })),
+);
 // A sent (cleared) draft starts over in the text.
 watch(text, (value) => {
   if (value === '') tab.value = 'write';
 });
-function switchWithArrow(event: KeyboardEvent) {
-  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-  event.preventDefault();
-  tab.value = tab.value === 'write' ? 'preview' : 'write';
-  tabButtons.value[TABS.indexOf(tab.value)]?.focus();
-}
 const isExpanded = computed(() => isOpen.value || props.replyTo !== null || text.value !== '');
 const isBlank = computed(() => !/\S/.test(text.value));
 const isTooLong = computed(() => text.value.length > COMMENT_MAX_LENGTH);
@@ -81,8 +81,6 @@ defineExpose({ focus });
 function submit() {
   if (!cannotSend.value) emit('submit');
 }
-const SECONDARY =
-  'inline-flex min-h-10 items-center rounded-pill border border-line px-4 text-sm font-semibold hover:bg-surface-hover';
 </script>
 
 <template>
@@ -111,43 +109,23 @@ const SECONDARY =
           {{ replyTarget }}
         </a>
       </span>
-      <button
-        type="button"
-        class="inline-flex min-h-10 items-center rounded-row px-2.5 text-muted hover:bg-surface-hover hover:text-content"
-        @click="emit('cancelReply')"
-      >
+      <AppButton tone="ghost" size="sm" @click="emit('cancelReply')">
         {{ $t('comments.composer.cancelReply') }}
-      </button>
+      </AppButton>
     </div>
     <div :class="mode === 'new' ? 'px-4 pt-3.5' : 'pt-2'">
-      <div role="tablist" :aria-label="$t('comments.composer.views')" class="mb-2 flex gap-1">
-        <button
-          v-for="name in TABS"
-          :id="`${id}-tab-${name}`"
-          ref="tabButtons"
-          :key="name"
-          type="button"
-          role="tab"
-          :aria-selected="tab === name"
-          :aria-controls="`${id}-panel-${name}`"
-          :tabindex="tab === name ? 0 : -1"
-          class="min-h-10 rounded-pill px-3.5 text-sm"
-          :class="
-            tab === name
-              ? 'bg-accent-soft font-semibold text-accent-soft-text'
-              : 'text-muted hover:bg-surface-hover'
-          "
-          @click="tab = name"
-          @keydown="switchWithArrow"
-        >
-          {{ $t(`comments.composer.tab.${name}`) }}
-        </button>
-      </div>
+      <Tabs
+        v-model="tab"
+        :items="tabs"
+        :label="$t('comments.composer.views')"
+        overflow="scroll"
+        class="mb-2"
+      />
       <div
         v-show="tab === 'write'"
         :id="`${id}-panel-write`"
         role="tabpanel"
-        :aria-labelledby="`${id}-tab-write`"
+        :aria-labelledby="`${id}-panel-write-tab`"
       >
         <label :for="id" class="sr-only">{{ $t('comments.composer.bodyLabel') }}</label>
         <textarea
@@ -168,7 +146,7 @@ const SECONDARY =
         :id="`${id}-panel-preview`"
         role="tabpanel"
         tabindex="0"
-        :aria-labelledby="`${id}-tab-preview`"
+        :aria-labelledby="`${id}-panel-preview-tab`"
       >
         <CommentPreview :text="text" :is-active="tab === 'preview'" />
       </div>
@@ -176,25 +154,14 @@ const SECONDARY =
         {{ $t(mode === 'edit' ? 'comments.composer.editHint' : 'comments.composer.markdownHelp') }}
       </p>
     </div>
-    <div
-      v-if="failure"
-      role="alert"
-      class="mt-2.5 flex items-start gap-2 rounded-row border border-negative px-3 py-2 text-sm text-negative"
-      :class="mode === 'new' && 'mx-4'"
-    >
-      <AlertCircle aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-      <span>
-        {{ $t(failure.key, failure.params) }}
-        <button
-          v-if="failure.key === 'comments.failure.conflict'"
-          type="button"
-          class="font-semibold underline"
-          @click="emit('reload')"
-        >
-          {{ $t('comments.composer.reload') }}
-        </button>
-      </span>
-    </div>
+    <Notice v-if="failure" tone="danger" class="mt-2.5" :class="mode === 'new' && 'mx-4'">
+      {{ $t(failure.key, failure.params) }}
+      <template v-if="failure.key === 'comments.failure.conflict'" #action>
+        <AppButton size="sm" @click="emit('reload')">{{
+          $t('comments.composer.reload')
+        }}</AppButton>
+      </template>
+    </Notice>
     <div
       class="flex flex-wrap items-center justify-end gap-3 py-2.5"
       :class="mode === 'new' && 'px-4 pb-3.5'"
@@ -211,17 +178,12 @@ const SECONDARY =
           })
         }}
       </span>
-      <button v-if="mode === 'edit'" type="button" :class="SECONDARY" @click="emit('cancel')">
+      <AppButton v-if="mode === 'edit'" @click="emit('cancel')">
         {{ $t('comments.composer.cancel') }}
-      </button>
-      <button
-        type="submit"
-        :aria-disabled="cannotSend || undefined"
-        :aria-busy="busy || undefined"
-        class="inline-flex min-h-10 items-center rounded-pill bg-gradient-accent px-5 text-sm font-semibold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
-      >
+      </AppButton>
+      <AppButton tone="primary" type="submit" :disabled="cannotSend" :loading="busy">
         {{ $t(submitKey) }}
-      </button>
+      </AppButton>
     </div>
   </form>
 </template>

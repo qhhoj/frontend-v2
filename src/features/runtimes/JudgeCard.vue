@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { RuntimeJudge } from '@/api/types/runtimes';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { uptimeSince } from './runtimes-model';
 
@@ -10,15 +11,10 @@ const props = defineProps<{ judge: RuntimeJudge; now: number }>();
 const uptime = computed(() =>
   props.judge.startedAt ? uptimeSince(props.judge.startedAt, props.now) : null,
 );
-const loadPercent = computed(() =>
-  props.judge.slots > 0
-    ? Math.min(100, Math.round((props.judge.busy / props.judge.slots) * 100))
-    : 0,
-);
 </script>
 
 <template>
-  <GlassCard
+  <Card
     as="article"
     :data-testid="`judge-card-${judge.name}`"
     class="flex flex-col gap-3 p-5"
@@ -47,16 +43,7 @@ const loadPercent = computed(() =>
           />
         </span>
       </div>
-      <div
-        role="progressbar"
-        :aria-valuenow="loadPercent"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        :aria-label="$t('runtimes.loadLabel')"
-        class="h-1.5 overflow-hidden rounded-pill bg-surface-strong"
-      >
-        <div class="h-full bg-accent" :style="{ width: `${loadPercent}%` }" />
-      </div>
+      <ProgressBar :value="judge.busy" :max="judge.slots" :label="$t('runtimes.loadLabel')" />
       <dl class="flex flex-col gap-1 text-sm">
         <div class="flex justify-between gap-3">
           <dt class="text-muted">{{ $t('runtimes.ping') }}</dt>
@@ -73,5 +60,5 @@ const loadPercent = computed(() =>
     <p v-else class="flex items-center gap-3 text-sm text-muted">
       <InlineBit kind="asleep" />{{ $t('runtimes.asleep') }}
     </p>
-  </GlassCard>
+  </Card>
 </template>
