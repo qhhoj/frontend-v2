@@ -1282,6 +1282,8 @@
     "submitFile": "Submit file",
     "collapse": "Collapse",
     "expand": "Expand",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen",
     "language": "Language",
     "source": "Source code",
     "upload": "Upload file",

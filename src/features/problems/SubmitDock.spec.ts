@@ -7,6 +7,7 @@ import { mockApi } from '@/test/mock-api';
 import { commentPageRoute } from '@/test/community-routes';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountApp } from '@/test/mount';
+import { FULLSCREEN_STORAGE_KEY } from './use-submit-fullscreen';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
 vi.mock('@/components/code-editor-cm', () => {
@@ -120,5 +121,60 @@ describe('the sheet shell', () => {
     await flushPromises();
     await expandSheet(wrapper);
     expect(sheetOf(wrapper).get('textarea').element.value).toBe('typed on desktop');
+  });
+});
+
+describe('full screen', () => {
+  const fullscreenPanel = (wrapper: VueWrapper) =>
+    wrapper.get('[role="dialog"][aria-modal="true"]');
+  const enter = async (wrapper: VueWrapper) => {
+    await dockOf(wrapper).get('button[aria-label="Toàn màn hình"]').trigger('click');
+    await flushPromises();
+  };
+  beforeEach(() => localStorage.clear());
+
+  it('keeps the typed code across docked and full screen, and leaves on Esc and on the button', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await openProblem();
+    await dockOf(wrapper).get('textarea').setValue('typed docked');
+    await enter(wrapper);
+    expect(fullscreenPanel(wrapper).get('textarea').element.value).toBe('typed docked');
+    expect(document.documentElement.style.overflow).toBe('hidden');
+    expect(document.activeElement).toBe(fullscreenPanel(wrapper).element);
+
+    await fullscreenPanel(wrapper).get('textarea').setValue('typed full');
+    await fullscreenPanel(wrapper).trigger('keydown', { key: 'Escape' });
+    await flushPromises();
+    expect(wrapper.find('[aria-modal="true"]').exists()).toBe(false);
+    expect(document.documentElement.style.overflow).toBe('');
+    expect(dockOf(wrapper).get('textarea').element.value).toBe('typed full');
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Toàn màn hình');
+
+    await enter(wrapper);
+    await fullscreenPanel(wrapper).get('button[aria-label="Thu nhỏ"]').trigger('click');
+    await flushPromises();
+    expect(wrapper.find('[aria-modal="true"]').exists()).toBe(false);
+  });
+
+  it('remembers the choice in this browser, defaulting to docked', async () => {
+    mockApi(signedInRoutes());
+    const first = await openProblem();
+    expect(first.wrapper.find('[aria-modal="true"]').exists()).toBe(false);
+    await enter(first.wrapper);
+    expect(localStorage.getItem(FULLSCREEN_STORAGE_KEY)).toBe('1');
+    first.wrapper.unmount();
+    const second = await openProblem();
+    expect(second.wrapper.find('[aria-modal="true"]').exists()).toBe(true);
+    expect(document.documentElement.style.overflow).toBe('hidden');
+  });
+
+  it('ignores Esc that closes an open dropdown inside the panel', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await openProblem();
+    await enter(wrapper);
+    const select = fullscreenPanel(wrapper).get('[data-pc-name="select"]');
+    select.element.setAttribute('aria-expanded', 'true');
+    await select.trigger('keydown', { key: 'Escape' });
+    expect(wrapper.find('[aria-modal="true"]').exists()).toBe(true);
   });
 });

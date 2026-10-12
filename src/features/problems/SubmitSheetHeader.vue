@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { ChevronDown, ChevronUp, Maximize2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useSheetDrag } from './use-sheet-drag';
+import { FULLSCREEN_TOGGLE_ID } from './use-submit-fullscreen';
 
 defineProps<{ isExpanded: boolean; controlsId: string }>();
-const emit = defineEmits<{ toggle: []; collapse: [] }>();
+const emit = defineEmits<{ toggle: []; collapse: []; fullscreen: [] }>();
 const title = ref<HTMLElement | null>(null);
 const toggleButton = ref<HTMLElement | null>(null);
 const drag = useSheetDrag(() => emit('collapse'));
@@ -31,18 +32,30 @@ defineExpose({
       <h2 ref="title" tabindex="-1" class="font-display text-base font-bold outline-none">
         {{ $t('submit.title') }}
       </h2>
-      <button
-        ref="toggleButton"
-        type="button"
-        :aria-expanded="isExpanded"
-        :aria-controls="controlsId"
-        :aria-label="$t(isExpanded ? 'submit.collapse' : 'submit.expand')"
-        class="flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
-        @click="emit('toggle')"
-      >
-        <ChevronDown v-if="isExpanded" class="size-5" aria-hidden="true" />
-        <ChevronUp v-else class="size-5" aria-hidden="true" />
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="isExpanded"
+          :id="FULLSCREEN_TOGGLE_ID"
+          type="button"
+          :aria-label="$t('submit.fullscreen')"
+          class="flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
+          @click="emit('fullscreen')"
+        >
+          <Maximize2 class="size-5" aria-hidden="true" />
+        </button>
+        <button
+          ref="toggleButton"
+          type="button"
+          :aria-expanded="isExpanded"
+          :aria-controls="controlsId"
+          :aria-label="$t(isExpanded ? 'submit.collapse' : 'submit.expand')"
+          class="flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
+          @click="emit('toggle')"
+        >
+          <ChevronDown v-if="isExpanded" class="size-5" aria-hidden="true" />
+          <ChevronUp v-else class="size-5" aria-hidden="true" />
+        </button>
+      </div>
     </div>
   </header>
 </template>
