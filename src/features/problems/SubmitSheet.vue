@@ -18,6 +18,7 @@ const props = defineProps<{
   /** `?resubmit=` of a signed-in viewer: the prefilled code is the point of the visit, so the sheet opens for it. */
   resubmitId: string | null;
 }>();
+const emit = defineEmits<{ fullscreen: [] }>();
 /** Per page load: no storage. The page starts it closed so the statement is what the viewer sees first. */
 const isExpanded = defineModel<boolean>('open', { required: true });
 // Every time the id appears, not only on load: an anonymous viewer arrives with it after signing in.
@@ -72,6 +73,7 @@ watch(isExpanded, async (expanded) => {
       :controls-id="SHEET_ID"
       @toggle="isExpanded = false"
       @collapse="isExpanded = false"
+      @fullscreen="emit('fullscreen')"
     />
     <!-- Mounted per expand, so a standing alert is announced again on reopening: accepted, a reopen is a new look at the form. -->
     <div class="flex min-h-0 flex-1 flex-col px-4 pb-3">
