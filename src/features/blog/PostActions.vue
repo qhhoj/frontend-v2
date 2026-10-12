@@ -9,6 +9,8 @@ import { useRouter } from 'vue-router';
 import { deletePost, updatePost } from '@/api/blog.api';
 import type { PostDetail } from '@/api/types/blog';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
@@ -59,23 +61,20 @@ const menuModel = computed<MenuItem[]>(() => [
   ...(canPin.value ? [{ label: pinLabel.value, command: () => void pinner.run(undefined) }] : []),
   ...(props.post.canDelete ? [{ label: t('blogPost.delete.action'), command: openDelete }] : []),
 ]);
-const BUTTON =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 text-sm font-semibold hover:bg-surface-hover';
 </script>
 
 <template>
   <div v-if="menuModel.length" class="flex flex-wrap items-center gap-2">
     <template v-if="isPhone">
-      <button
-        type="button"
-        :class="[BUTTON, 'px-3']"
-        :aria-label="$t('blogPost.actions')"
+      <IconButton
+        tone="secondary"
+        :label="$t('blogPost.actions')"
         aria-haspopup="menu"
         :aria-expanded="isMenuOpen"
         @click="menu?.toggle($event)"
       >
         <EllipsisVertical aria-hidden="true" class="size-4" />
-      </button>
+      </IconButton>
       <Menu
         ref="menu"
         :model="menuModel"
@@ -86,33 +85,18 @@ const BUTTON =
       />
     </template>
     <template v-else>
-      <RouterLink
-        v-if="post.canEdit"
-        :to="{ name: 'post-edit', params: { id: post.id } }"
-        :class="BUTTON"
-      >
-        <Pencil aria-hidden="true" class="size-4" />
+      <AppButton v-if="post.canEdit" :to="{ name: 'post-edit', params: { id: post.id } }">
+        <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
         {{ $t('blogPost.edit') }}
-      </RouterLink>
-      <button
-        v-if="canPin"
-        type="button"
-        :class="BUTTON"
-        :aria-disabled="pinner.isPending.value || undefined"
-        @click="pinner.run(undefined)"
-      >
-        <Pin aria-hidden="true" class="size-4" />
+      </AppButton>
+      <AppButton v-if="canPin" :loading="pinner.isPending.value" @click="pinner.run(undefined)">
+        <template #icon><Pin aria-hidden="true" class="size-4" /></template>
         {{ pinLabel }}
-      </button>
-      <button
-        v-if="post.canDelete"
-        type="button"
-        :class="[BUTTON, 'border-negative text-negative']"
-        @click="openDelete"
-      >
-        <Trash2 aria-hidden="true" class="size-4" />
+      </AppButton>
+      <AppButton v-if="post.canDelete" tone="danger" @click="openDelete">
+        <template #icon><Trash2 aria-hidden="true" class="size-4" /></template>
         {{ $t('blogPost.delete.action') }}
-      </button>
+      </AppButton>
     </template>
     <AdminStatus
       v-if="pinner.failure.value"

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ArrowLeft, ChevronDown } from 'lucide-vue-next';
+import { ChevronDown } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
-import AdminField from '@/features/admin/ui/AdminField.vue';
+import FormField from '@/components/ui/FormField.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { hasPermission } from '@/lib/permissions';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { usePageTitle } from '@/router/page-title';
@@ -21,6 +23,7 @@ import { usePostEditor } from './use-post-editor';
 /** `/blog/new` (personal, or `?organization=<slug>` preselects that organization) and `/blog/:id/edit`: board variant A. */
 const route = useRoute();
 const session = useSessionStore();
+const { t } = useI18n();
 const isPhone = useMediaQuery(PHONE_QUERY);
 const postId = computed(() => (route.name === 'post-edit' ? String(route.params.id) : null));
 const options = useComposeOptionsQuery();
@@ -56,6 +59,17 @@ const isRefused = computed(
     !options.data.value.canWritePersonal &&
     options.data.value.organizations.length === 0,
 );
+const backTo = computed(() =>
+  postId.value
+    ? { to: { name: 'post', params: { id: postId.value } }, label: t('postEditor.backToPost') }
+    : { to: { name: 'blog' }, label: t('nav.blog') },
+);
+/** The bar's submit publishes (or updates a live post); the draft button saves on its own. */
+const publish = () => editor.save(editor.isPostLive.value ? 'keep' : 'publish');
+/** Enter in a one-line field would submit the form: only the bar's buttons save. */
+function blockImplicitSubmit(event: KeyboardEvent) {
+  if (event.target instanceof HTMLInputElement) event.preventDefault();
+}
 const fixedAuthor = computed(() =>
   editor.post.value ? (editor.post.value.organization?.name ?? '') : null,
 );
@@ -63,18 +77,14 @@ const fixedAuthor = computed(() =>
 
 <template>
   <div class="page-column pb-0">
-    <header class="flex flex-col gap-2">
-      <RouterLink
-        :to="postId ? { name: 'post', params: { id: postId } } : { name: 'blog' }"
-        class="inline-flex w-fit items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
-      >
-        <ArrowLeft aria-hidden="true" class="size-4" />
-        {{ postId ? $t('postEditor.backToPost') : $t('nav.blog') }}
-      </RouterLink>
-      <h1 class="page-title">
-        {{ postId ? $t('postEditor.editTitle') : $t('postEditor.newTitle') }}
-      </h1>
-    </header>
+    <PageHeader
+      :title="postId ? $t('postEditor.editTitle') : $t('postEditor.newTitle')"
+      :crumbs="[
+        { label: backTo.label, to: backTo.to },
+        { label: postId ? $t('postEditor.editTitle') : $t('postEditor.newTitle') },
+      ]"
+      :back="backTo"
+    />
 
     <StatePanel
       v-if="isRefused"
@@ -94,11 +104,16 @@ const fixedAuthor = computed(() =>
         kind="forbidden"
         :title="$t('admin.postEditor.cannotEdit')"
       />
-      <!-- No implicit submit: only the bar's buttons save, each with its intent. -->
-      <form v-else class="flex flex-col gap-6" novalidate @submit.prevent>
+      <form
+        v-else
+        class="flex flex-col gap-6"
+        novalidate
+        @submit.prevent="publish"
+        @keydown.enter="blockImplicitSubmit"
+      >
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div class="flex min-w-0 flex-col gap-5">
-            <AdminField
+            <FormField
               v-slot="{ id, describedBy, invalid }"
               :label="$t('admin.postEditor.fields.title')"
               :error="errors.title"
@@ -112,7 +127,7 @@ const fixedAuthor = computed(() =>
                 :aria-describedby="describedBy"
                 :aria-invalid="invalid ? 'true' : undefined"
               />
-            </AdminField>
+            </FormField>
             <PostBodyEditor
               v-model="form.content"
               :preview-style="previewStyle"
@@ -172,7 +187,7 @@ const fixedAuthor = computed(() =>
           :is-done="writer.isDone.value"
           :is-nothing-to-save="editor.isNothingToSave.value"
           :failure="writer.failure.value"
-          @save="editor.save"
+          @save-draft="editor.save('draft')"
         />
       </form>
     </QueryState>

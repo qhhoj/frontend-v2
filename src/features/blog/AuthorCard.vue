@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
@@ -42,12 +43,9 @@ const tierLabelKey = computed(() => `tiers.${tier.value ?? 'unrated'}`);
           <span class="text-sm text-muted">{{ $t(tierLabelKey) }}</span>
         </div>
       </div>
-      <RouterLink
-        :to="{ name: 'user', params: { username } }"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >
+      <AppButton :to="{ name: 'user', params: { username } }" block>
         {{ $t('blogPost.viewProfile') }}
-      </RouterLink>
+      </AppButton>
     </QueryState>
   </GlassCard>
 </template>

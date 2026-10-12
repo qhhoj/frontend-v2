@@ -2,6 +2,7 @@
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { ratingTextClass } from '@/lib/tier-classes';
 import { useRoute, useRouter } from 'vue-router';
 import { canEnterAdmin } from '@/features/admin/admin-access';
@@ -47,17 +48,9 @@ const items = computed<MenuItem[]>(() => [
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false" />
   </template>
   <div v-else class="flex items-center gap-2">
-    <RouterLink
-      :to="{ name: 'login', query: { redirect: route.fullPath } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-strong px-3 text-sm sm:px-4 font-semibold hover:bg-surface-hover"
-    >
+    <AppButton :to="{ name: 'login', query: { redirect: route.fullPath } }">
       {{ $t('account.login') }}
-    </RouterLink>
-    <RouterLink
-      :to="{ name: 'register' }"
-      class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-3 text-sm font-bold text-on-accent sm:px-4"
-    >
-      {{ $t('account.register') }}
-    </RouterLink>
+    </AppButton>
+    <AppButton tone="primary" :to="{ name: 'register' }">{{ $t('account.register') }}</AppButton>
   </div>
 </template>

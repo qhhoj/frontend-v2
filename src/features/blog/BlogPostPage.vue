@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import { usePageTitle } from '@/router/page-title';
 import AuthorCard from './AuthorCard.vue';
@@ -31,12 +32,7 @@ usePageTitle(() => post.value?.title);
       :title="$t('blogPost.notFoundTitle')"
       :body="$t('blogPost.notFoundBody')"
     >
-      <RouterLink
-        :to="{ name: 'blog' }"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >
-        {{ $t('blogPost.backToBlog') }}
-      </RouterLink>
+      <AppButton :to="{ name: 'blog' }">{{ $t('blogPost.backToBlog') }}</AppButton>
     </StatePanel>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><PostArticleSkeleton /></template>
