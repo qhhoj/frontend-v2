@@ -15,6 +15,7 @@ describe('arbitraryUtilities', () => {
     [`class="rounded-t-[1.125rem]"`, ['rounded-t-[1.125rem]']],
     [`class="fixed z-[1200]"`, ['z-[1200]']],
     [`\`x \${y} !text-[11px]\``, ['!text-[11px]']],
+    [`class="text-[13px]/5 z-[5]!"`, ['text-[13px]/5', 'z-[5]!']],
   ])('flags %s', (line, expected) => {
     expect(found(line)).toEqual(expected);
   });

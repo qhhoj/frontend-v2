@@ -1,7 +1,7 @@
 // Arbitrary values that bypass the named tokens (docs/design-language.md): `text-[13px]`, `rounded-[3px]`, `z-[1200]`.
 // Use the steps instead: text-tiny|caption|meta|sm|base|title|page|stat|hero, rounded-cell|row|card|pill|control, z-sticky|savebar|header|bit|overlay|toast.
 const ARBITRARY =
-  /^(?:text-\[[\d.]+(?:px|r?em)\]|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\])$/;
+  /^(?:text-\[[\d.]+(?:px|r?em)\](?:\/\S+)?|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\])$/;
 const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 const QUOTED = /(['"`])((?:(?!\1).)*)\1/g;
 
@@ -37,4 +37,6 @@ export const arbitraryUtilities = (line) =>
     ? []
     : [...line.matchAll(QUOTED)]
         .flatMap(([, , text]) => text.split(/\s+/))
-        .filter((token) => ARBITRARY.test(token.replace(/^.*:/, '').replace(/^[!-]/, '')));
+        .filter((token) =>
+          ARBITRARY.test(token.replace(/^.*:/, '').replace(/^[!-]/, '').replace(/!$/, '')),
+        );
