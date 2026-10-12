@@ -8,6 +8,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import QueryState from '@/components/QueryState.vue';
 import UserContent from '@/components/UserContent.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -39,12 +40,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
     :title="$t('flatpage.signInTitle')"
     :body="$t('flatpage.signInBody')"
   >
-    <RouterLink
-      :to="loginTarget"
-      class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-5 font-semibold text-on-accent"
-    >
-      {{ $t('flatpage.signIn') }}
-    </RouterLink>
+    <AppButton tone="primary" :to="loginTarget">{{ $t('flatpage.signIn') }}</AppButton>
   </StatePanel>
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton>

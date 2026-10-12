@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PostComposeOptions } from '@/api/types/blog';
-import AdminField from '@/features/admin/ui/AdminField.vue';
+import FormField from '@/components/ui/FormField.vue';
+import SelectField from '@/components/ui/SelectField.vue';
+import TextArea from '@/components/ui/TextArea.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import AdminSwitch from '@/features/admin/ui/AdminSwitch.vue';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
-import { INPUT } from '@/features/admin/ui/controls';
 import type { PostFieldRights, PublishMode } from './post-form';
 
 /**
@@ -32,6 +34,11 @@ const postAs = computed({
   set: (value: 'self' | 'organization') => {
     organization.value = value === 'self' ? null : (organizations.value[0]?.slug ?? null);
   },
+});
+/** The organization select, shown only while one is chosen. */
+const chosenOrganization = computed({
+  get: () => organization.value ?? '',
+  set: (slug: string | number) => (organization.value = String(slug)),
 });
 const MODES: PublishMode[] = ['draft', 'public', 'scheduled'];
 const SEGMENT =
@@ -64,19 +71,18 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
           </label>
         </div>
       </fieldset>
-      <AdminField
+      <FormField
         v-if="organization !== null"
-        v-slot="{ id, describedBy }"
         :label="$t('postEditor.settings.organization')"
         :hint="$t('postEditor.settings.organizationHint')"
         input-id="post-organization"
       >
-        <select :id="id" v-model="organization" :class="INPUT" :aria-describedby="describedBy">
+        <SelectField v-model="chosenOrganization">
           <option v-for="item in organizations" :key="item.slug" :value="item.slug">
             {{ item.name }}
           </option>
-        </select>
-      </AdminField>
+        </SelectField>
+      </FormField>
     </template>
 
     <fieldset class="flex flex-col gap-2">
@@ -94,25 +100,16 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
       </label>
     </fieldset>
 
-    <AdminField
+    <FormField
       v-if="mode === 'scheduled'"
-      v-slot="{ id, describedBy, invalid }"
       :label="$t('postEditor.settings.publishOn')"
       :error="errors.publishOn"
       input-id="post-publish-on"
     >
-      <input
-        :id="id"
-        v-model="publishOn"
-        type="datetime-local"
-        :class="INPUT"
-        :aria-describedby="describedBy"
-        :aria-invalid="invalid ? 'true' : undefined"
-      />
-    </AdminField>
+      <TextInput v-model="publishOn" type="datetime-local" />
+    </FormField>
 
-    <AdminField
-      v-slot="{ id, describedBy }"
+    <FormField
       :label="$t('postEditor.settings.summary')"
       :hint="
         $t(rights.staff ? 'postEditor.settings.summaryHint' : 'postEditor.settings.summaryLocked')
@@ -120,15 +117,8 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
       :error="errors.summary"
       input-id="post-summary"
     >
-      <textarea
-        :id="id"
-        v-model="summary"
-        rows="3"
-        :disabled="!rights.staff"
-        :class="[INPUT, 'py-2 text-sm disabled:text-muted']"
-        :aria-describedby="describedBy"
-      />
-    </AdminField>
+      <TextArea v-model="summary" rows="3" :disabled="!rights.staff" />
+    </FormField>
 
     <AdminSwitch
       v-if="rights.pin"

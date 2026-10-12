@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronRight, FilePen, Pencil, Rss } from 'lucide-vue-next';
-import type { RouteLocationRaw } from 'vue-router';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -11,17 +11,21 @@ import type { PostFeed } from '@/api/types/blog';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
 import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import { useSessionStore } from '@/stores/session.store';
 import PostCard from './PostCard.vue';
 import PostCardSkeleton from './PostCardSkeleton.vue';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
 import { useMyDraftsQuery, usePostsQuery } from './blog.queries';
-import { WRITE_BUTTON_CLASS } from './post-state';
 import { useBlogRoute } from './use-blog-route';
 
 const { feed, page } = useBlogRoute();
 const session = useSessionStore();
+const { t } = useI18n();
 const { data, isPending, error, refetch } = usePostsQuery(feed, page);
 const items = computed(() => data.value?.items ?? []);
 /** Pinned posts lead as cards; the rest of the page is the compact list. */
@@ -33,14 +37,14 @@ const meta = computed(() => data.value?.meta);
 /** The signed-in viewer's unpublished posts: a link to them while there are any. */
 const drafts = useMyDraftsQuery(1);
 const draftCount = computed(() => (session.user ? (drafts.data.value?.meta.total ?? 0) : 0));
-const FEED_TABS: { feed: PostFeed; to: RouteLocationRaw }[] = [
-  { feed: 'global', to: { name: 'blog' } },
-  { feed: 'all', to: { name: 'blog', query: { feed: 'all' } } },
-];
-const TAB =
-  'inline-flex min-h-11 items-center rounded-pill px-4 font-semibold hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
-const TOOL =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover';
+const FEEDS: PostFeed[] = ['global', 'all'];
+const feedTabs = computed<TabItem[]>(() =>
+  FEEDS.map((key) => ({
+    key,
+    label: t(`blog.feeds.${key}`),
+    to: { name: 'blog', query: key === 'global' ? {} : { feed: key } },
+  })),
+);
 
 /** Another page or feed is a new list: bring its top (not the rail's) into view, below the shell's header. */
 const listTop = ref<HTMLElement | null>(null);
@@ -59,29 +63,21 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
       <StateBit variant="writing" size="inline" class="shrink-0" />
     </header>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <nav :aria-label="$t('blog.feedsLabel')" class="glass flex flex-wrap gap-1 rounded-pill p-1">
-        <template v-for="tab in FEED_TABS" :key="tab.feed">
-          <RouterLink v-slot="{ href, navigate }" custom :to="tab.to">
-            <a
-              :href="href"
-              :class="TAB"
-              :aria-current="feed === tab.feed ? 'page' : undefined"
-              @click="navigate"
-            >
-              {{ $t(`blog.feeds.${tab.feed}`) }}
-            </a>
-          </RouterLink>
-        </template>
-      </nav>
+      <Tabs
+        :model-value="feed"
+        :items="feedTabs"
+        :label="$t('blog.feedsLabel')"
+        overflow="scroll"
+      />
       <div class="flex flex-wrap items-center gap-2.5">
-        <RouterLink v-if="session.user" :to="{ name: 'post-new' }" :class="WRITE_BUTTON_CLASS">
-          <Pencil aria-hidden="true" class="size-4" />
+        <AppButton v-if="session.user" tone="primary" :to="{ name: 'post-new' }">
+          <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
           {{ $t('blog.write') }}
-        </RouterLink>
-        <a href="/api/internal/feeds/blog/rss" :aria-label="$t('blog.rss')" :class="TOOL">
-          <Rss aria-hidden="true" class="size-4" />
+        </AppButton>
+        <AppButton href="/api/internal/feeds/blog/rss" :aria-label="$t('blog.rss')">
+          <template #icon><Rss aria-hidden="true" class="size-4" /></template>
           RSS
-        </a>
+        </AppButton>
       </div>
     </div>
     <section
@@ -102,9 +98,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
     >
       <FilePen aria-hidden="true" class="size-5 text-accent-text" />
       <span class="flex-1">{{ $t('blog.myDrafts') }}</span>
-      <span class="rounded-pill bg-surface-hover px-2.5 py-0.5 text-sm text-muted">
-        {{ draftCount }}
-      </span>
+      <Chip size="md">{{ draftCount }}</Chip>
       <ChevronRight aria-hidden="true" class="size-4 text-muted" />
     </RouterLink>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">

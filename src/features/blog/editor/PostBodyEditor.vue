@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { Bold, Code, Italic, Link, List, ListOrdered, Sigma } from 'lucide-vue-next';
-import { nextTick, ref, useId } from 'vue';
+import { computed, nextTick, ref, useId } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { PreviewSource } from '@/api/types/admin-common';
 import UserContent from '@/components/UserContent.vue';
+import IconButton from '@/components/ui/IconButton.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useRenderPreview } from '@/features/admin/ui/use-render-preview';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
@@ -14,7 +18,11 @@ const content = defineModel<string>({ required: true });
 const props = defineProps<{ previewStyle: PreviewSource; error?: string }>();
 const id = useId();
 const isPhone = useMediaQuery(PHONE_QUERY);
-const tab = ref<'write' | 'preview'>('write');
+const { t } = useI18n();
+const tab = ref<string>('write');
+const bodyTabs = computed<TabItem[]>(() =>
+  (['write', 'preview'] as const).map((key) => ({ key, label: t(`postEditor.body.${key}`) })),
+);
 const source = ref<HTMLTextAreaElement | null>(null);
 const preview = useRenderPreview(
   () => content.value,
@@ -42,31 +50,17 @@ async function apply(action: MarkdownAction) {
   box.focus();
   box.setSelectionRange(next.start, next.end);
 }
-
-const TAB =
-  'inline-flex min-h-10 items-center rounded-pill px-4 text-sm font-semibold text-muted aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
 </script>
 
 <template>
   <div class="flex flex-col gap-2.5">
-    <div
+    <Tabs
       v-if="isPhone"
-      role="tablist"
-      :aria-label="$t('postEditor.body.label')"
-      class="inline-flex w-fit gap-0.5 rounded-pill border border-line-strong bg-surface-solid p-1"
-    >
-      <button
-        v-for="name in ['write', 'preview'] as const"
-        :key="name"
-        type="button"
-        role="tab"
-        :class="TAB"
-        :aria-selected="tab === name"
-        @click="tab = name"
-      >
-        {{ $t(`postEditor.body.${name}`) }}
-      </button>
-    </div>
+      v-model="tab"
+      :items="bodyTabs"
+      :label="$t('postEditor.body.label')"
+      overflow="scroll"
+    />
     <div class="overflow-hidden rounded-tile border border-line-strong bg-surface-solid">
       <div
         v-show="!isPhone || tab === 'write'"
@@ -75,17 +69,15 @@ const TAB =
         :aria-controls="id"
         class="flex flex-wrap items-center gap-0.5 border-b border-line bg-surface-strong p-1.5"
       >
-        <button
+        <IconButton
           v-for="tool in TOOLS"
           :key="tool.action"
-          type="button"
-          class="inline-flex size-10 items-center justify-center rounded-row text-muted hover:bg-surface-hover hover:text-content"
-          :aria-label="$t(`postEditor.body.tools.${tool.action}`)"
-          :title="$t(`postEditor.body.tools.${tool.action}`)"
+          size="sm"
+          :label="$t(`postEditor.body.tools.${tool.action}`)"
           @click="apply(tool.action)"
         >
           <component :is="tool.icon" aria-hidden="true" class="size-4" />
-        </button>
+        </IconButton>
         <span class="ml-auto hidden pr-2 text-xs text-muted sm:inline">Markdown · LaTeX</span>
       </div>
       <div class="grid md:grid-cols-2 md:divide-x md:divide-line">

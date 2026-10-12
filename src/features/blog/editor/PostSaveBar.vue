@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import SaveBar from '@/components/ui/SaveBar.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { BUTTON } from '@/features/admin/ui/controls';
+import { buttonClass } from '@/features/admin/ui/controls';
 import type { PublishMode } from './post-form';
-import type { SaveIntent } from './use-post-editor';
 
-/** The sticky bar under the editor: the save state, "save draft" and "publish" until the post is public, then "update" (saves the chosen visibility as it is). */
+/**
+ * The editor's save bar: the save state, "save draft" and "publish" until the post is public, then "update" (saves the chosen
+ * visibility as it is). The submit button publishes through the form's submit; saving is never gated on a change.
+ */
 const props = defineProps<{
   mode: PublishMode;
   /** The post as saved is public (an edit of a live post). */
@@ -17,7 +20,7 @@ const props = defineProps<{
   isNothingToSave: boolean;
   failure: unknown;
 }>();
-const emit = defineEmits<{ save: [intent: SaveIntent] }>();
+const emit = defineEmits<{ saveDraft: [] }>();
 const publishLabel = computed(() => {
   if (props.isLive) return 'postEditor.bar.update';
   return props.mode === 'scheduled' ? 'postEditor.bar.schedule' : 'postEditor.bar.publish';
@@ -25,10 +28,13 @@ const publishLabel = computed(() => {
 </script>
 
 <template>
-  <div
-    class="sticky bottom-0 z-10 -mx-4 flex flex-wrap items-center gap-3 border-t border-line bg-surface-solid px-4 py-3 sm:-mx-8 sm:px-8"
+  <SaveBar
+    :dirty-count="isDirty ? 1 : 0"
+    :pending="isPending"
+    :save-label="$t(publishLabel)"
+    allow-clean
   >
-    <div class="min-w-0 flex-1 text-sm" aria-live="polite">
+    <template #status>
       <AdminStatus v-if="failure" kind="refused" :text="failureTextOf(failure)" />
       <AdminStatus v-else-if="isDone" kind="done" :text="$t('admin.postEditor.saved')" />
       <AdminStatus
@@ -36,28 +42,21 @@ const publishLabel = computed(() => {
         kind="queued"
         :text="$t('admin.postEditor.nothingToSave')"
       />
-      <span v-else class="text-muted">
+      <span v-else :class="isDirty ? 'font-semibold' : 'text-muted'">
         {{ $t(isDirty ? 'postEditor.bar.unsaved' : 'postEditor.bar.clean') }}
       </span>
-    </div>
-    <div class="flex w-full gap-2.5 sm:w-auto">
+    </template>
+    <template #actions>
+      <!-- SaveBar's own buttons are the admin shape; the draft button matches them. -->
       <button
         v-if="!isLive"
         type="button"
-        :class="[BUTTON.secondary, 'flex-1 sm:flex-none']"
+        :class="buttonClass('secondary')"
         :aria-disabled="isPending || undefined"
-        @click="isPending || emit('save', 'draft')"
+        @click="isPending || emit('saveDraft')"
       >
         {{ $t('postEditor.bar.saveDraft') }}
       </button>
-      <button
-        type="button"
-        :class="[BUTTON.primary, 'flex-1 sm:flex-none']"
-        :aria-disabled="isPending || undefined"
-        @click="isPending || emit('save', isLive ? 'keep' : 'publish')"
-      >
-        {{ isPending ? $t('admin.postEditor.saving') : $t(publishLabel) }}
-      </button>
-    </div>
-  </div>
+    </template>
+  </SaveBar>
 </template>

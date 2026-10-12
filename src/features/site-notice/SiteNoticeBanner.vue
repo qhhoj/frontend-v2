@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { fetchSite } from '@/api/site.api';
+import IconButton from '@/components/ui/IconButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { SITE_STALE_MS, siteKey } from '@/features/official-mode/official-mode.queries';
 import { SITE_NOTICE_KEY, noticeFingerprint, readDismissed, writeDismissed } from './site-notice';
@@ -32,14 +33,9 @@ function dismiss() {
     <SettingsNotice tone="info">
       <span class="block whitespace-pre-line">{{ text }}</span>
       <template #action>
-        <button
-          type="button"
-          class="inline-flex size-11 items-center justify-center rounded-pill hover:bg-surface-hover"
-          :aria-label="$t('siteNotice.dismiss')"
-          @click="dismiss"
-        >
+        <IconButton :label="$t('siteNotice.dismiss')" @click="dismiss">
           <X aria-hidden="true" class="size-5" />
-        </button>
+        </IconButton>
       </template>
     </SettingsNotice>
   </section>

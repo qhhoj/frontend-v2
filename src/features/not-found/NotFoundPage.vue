@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router';
 import CryingBit from '@/components/CryingBit.vue';
 import ShortLinkNotFoundHint from '@/components/ShortLinkNotFoundHint.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 
 const route = useRoute();
 /** Pixel font for the giant 404; X is a filled block. */
@@ -46,18 +47,8 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
     <p class="max-w-md text-base leading-relaxed text-muted">{{ $t('notFound.body') }}</p>
     <ShortLinkNotFoundHint />
     <div class="flex flex-wrap justify-center gap-2.5">
-      <RouterLink
-        to="/"
-        class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-5 font-semibold text-on-accent"
-      >
-        {{ $t('notFound.home') }}
-      </RouterLink>
-      <RouterLink
-        to="/problems"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-solid px-5 font-semibold text-content hover:bg-surface-hover"
-      >
-        {{ $t('notFound.problems') }}
-      </RouterLink>
+      <AppButton tone="primary" to="/">{{ $t('notFound.home') }}</AppButton>
+      <AppButton to="/problems">{{ $t('notFound.problems') }}</AppButton>
     </div>
     <p data-testid="requested-path" class="max-w-full font-mono text-meta break-all text-muted">
       {{ route.path }}

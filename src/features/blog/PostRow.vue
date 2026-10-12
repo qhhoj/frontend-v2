@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
+import Chip from '@/components/ui/Chip.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
@@ -38,18 +39,12 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
   >
     <div class="flex min-w-0 flex-col gap-2">
       <h2 class="line-clamp-2 text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
-        <span
-          v-if="post.sticky"
-          class="mr-2 inline-flex rounded-pill bg-accent-soft px-2.5 py-0.5 align-middle text-xs font-semibold text-accent-soft-text"
-        >
-          {{ $t('blog.pinned') }}
-        </span>
-        <span
-          v-if="unpublished"
-          class="mr-2 inline-flex rounded-pill bg-surface-hover px-2.5 py-0.5 align-middle text-xs font-semibold text-muted"
-        >
-          {{ $t(`blog.drafts.state.${unpublished}`) }}
-        </span>
+        <Chip v-if="post.sticky" tone="accent" class="mr-2 align-middle">{{
+          $t('blog.pinned')
+        }}</Chip>
+        <Chip v-if="unpublished" class="mr-2 align-middle">{{
+          $t(`blog.drafts.state.${unpublished}`)
+        }}</Chip>
         <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
           {{ post.title }}
         </RouterLink>

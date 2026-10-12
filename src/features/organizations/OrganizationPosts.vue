@@ -6,9 +6,9 @@ import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import PostRow from '@/features/blog/PostRow.vue';
 import { useComposeOptionsQuery } from '@/features/blog/blog.queries';
-import { WRITE_BUTTON_CLASS } from '@/features/blog/post-state';
 import { pageFromQuery } from '@/lib/paging';
 import { useOrganizationPostsQuery } from './organizations.queries';
 import { useOrganization } from './use-organization';
@@ -30,10 +30,10 @@ const writeTo = computed(() => ({ name: 'post-new', query: { organization: slug.
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h2 class="text-lg font-semibold">{{ $t('orgMembership.postsTitle') }}</h2>
-      <RouterLink v-if="canWrite" :to="writeTo" :class="WRITE_BUTTON_CLASS">
-        <Pencil aria-hidden="true" class="size-4" />
+      <AppButton v-if="canWrite" tone="primary" :to="writeTo">
+        <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
         {{ $t('orgMembership.writePost') }}
-      </RouterLink>
+      </AppButton>
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SkeletonBlock class="h-40 w-full" /></template>
@@ -43,10 +43,10 @@ const writeTo = computed(() => ({ name: 'post-new', query: { organization: slug.
           :title="$t('orgMembership.noPosts')"
           :body="$t('orgMembership.noPostsBody')"
         >
-          <RouterLink v-if="canWrite" :to="writeTo" :class="WRITE_BUTTON_CLASS">
-            <Pencil aria-hidden="true" class="size-4" />
+          <AppButton v-if="canWrite" tone="primary" :to="writeTo">
+            <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
             {{ $t('orgMembership.writeFirstPost') }}
-          </RouterLink>
+          </AppButton>
         </StatePanel>
       </div>
       <div

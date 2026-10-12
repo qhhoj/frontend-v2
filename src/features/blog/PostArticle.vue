@@ -2,6 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserContent from '@/components/UserContent.vue';
+import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
@@ -25,7 +26,6 @@ const canVote = computed(() => session.user !== null && !isAuthor.value);
 const publishedOn = computed(() => formatNumericDate(props.post.publishOn, locale.locale));
 const send = (score: VoteScore) => votePost(props.post.id, score);
 const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] });
-const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
 </script>
 
 <template>
@@ -35,13 +35,11 @@ const CHIP = 'inline-flex rounded-pill px-2.5 py-0.5 text-xs font-semibold';
         <RouterLink
           v-if="post.organization"
           :to="{ name: 'organization', params: { slug: post.organization.slug } }"
-          :class="`${CHIP} border border-line text-content hover:bg-surface-hover`"
+          class="rounded-pill hover:underline"
         >
-          {{ post.organization.shortName }}
+          <Chip>{{ post.organization.shortName }}</Chip>
         </RouterLink>
-        <span v-if="post.sticky" :class="`${CHIP} bg-accent-soft text-accent-soft-text`">
-          {{ $t('blogPost.pinned') }}
-        </span>
+        <Chip v-if="post.sticky" tone="accent">{{ $t('blogPost.pinned') }}</Chip>
       </div>
       <h1 class="page-title [overflow-wrap:anywhere]">
         {{ post.title }}
