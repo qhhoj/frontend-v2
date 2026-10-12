@@ -1014,7 +1014,7 @@
       "body": "Bài này chưa có đề. Nếu bạn là người ra đề, hãy tải PDF hoặc viết đề trong trang quản trị.",
       "edit": "Viết đề bài"
     },
-    "untranslated": "Chưa có bản dịch cho ngôn ngữ này; đang hiện bản gốc.",
+    "untranslated": "Đang hiện bản gốc; chưa có bản dịch cho ngôn ngữ này.",
     "authors": "Tác giả:",
     "pdfPreparing": "Đang chuẩn bị PDF…",
     "pdfOpen": "Mở PDF",
@@ -1025,7 +1025,6 @@
     "pdfRetry": "Thử lại",
     "pdfRetryIn": "Thử lại sau {seconds} giây",
     "pdfStatement": {
-      "hint": "Đề bài này là tệp PDF.",
       "open": "Mở trong thẻ mới",
       "title": "Đề bài PDF"
     },

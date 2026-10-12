@@ -9,7 +9,6 @@ import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemContent from './ProblemContent.vue';
-import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
 import ProblemRailSkeleton from './ProblemRailSkeleton.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
 import { PROBLEM_LAYOUT } from './problem-layout';
@@ -91,9 +90,8 @@ watch(
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div :class="layout.grid">
-            <ProblemHeaderSkeleton :class="layout.left" />
+            <StatementSkeleton header :class="layout.left" />
             <ProblemRailSkeleton data-testid="problem-rail" :class="layout.rail" />
-            <StatementSkeleton :class="layout.left" />
           </div>
         </template>
         <ProblemContent

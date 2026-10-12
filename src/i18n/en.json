@@ -1014,7 +1014,7 @@
       "body": "This problem has no statement yet. If you are the author, upload a PDF or write one in the admin area.",
       "edit": "Write the statement"
     },
-    "untranslated": "This statement has no translation in this language yet; showing the original.",
+    "untranslated": "Showing the original; no translation in this language yet.",
     "authors": "Authors:",
     "pdfPreparing": "Preparing PDF…",
     "pdfOpen": "Open PDF",
@@ -1025,7 +1025,6 @@
     "pdfRetry": "Try again",
     "pdfRetryIn": "Try again in {seconds} s",
     "pdfStatement": {
-      "hint": "This statement is a PDF file.",
       "open": "Open in a new tab",
       "title": "PDF statement"
     },

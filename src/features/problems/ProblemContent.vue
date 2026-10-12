@@ -18,6 +18,7 @@ import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import ProblemSubmitCard from './ProblemSubmitCard.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
+import StatementNote from './StatementNote.vue';
 import SubmitDock from './SubmitDock.vue';
 import { hasNoStatement } from './statement-presence';
 import type { PROBLEM_LAYOUT } from './problem-layout';
@@ -55,14 +56,52 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="layout.grid">
-    <ProblemHeader :problem="problem" :class="layout.left">
-      <ProblemTabs
-        v-if="tabs.length > 1"
-        v-model="tab"
-        :tabs="tabs"
-        :label="$t('problem.tabsLabel')"
-      />
-    </ProblemHeader>
+    <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
+    <GlassCard
+      as="div"
+      data-testid="statement-card"
+      :class="['min-w-0 rounded-panel p-6 sm:p-8', layout.left]"
+    >
+      <ProblemHeader :problem="problem">
+        <ProblemTabs
+          v-if="tabs.length > 1"
+          v-model="tab"
+          :tabs="tabs"
+          :label="$t('problem.tabsLabel')"
+        />
+      </ProblemHeader>
+      <div
+        id="problem-panel-statement"
+        :role="tabs.length > 1 ? 'tabpanel' : undefined"
+        :aria-labelledby="tabs.length > 1 ? 'problem-tab-statement' : undefined"
+        :hidden="tab !== DEFAULT_TAB"
+        :tabindex="tab === DEFAULT_TAB ? 0 : undefined"
+      >
+        <template v-if="tab === DEFAULT_TAB">
+          <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
+          <PdfStatement
+            v-if="problem.pdfStatementUrl"
+            :url="problem.pdfStatementUrl"
+            :untranslated="!problem.translated"
+            class="mt-4 mb-6 last:mb-0"
+          />
+          <NoStatement
+            v-if="hasNoStatement(problem)"
+            :code="problem.code"
+            :can-edit="problem.canEdit"
+            class="mt-4"
+          />
+          <StatementBody v-else :html="problem.descriptionHtml" class="mt-4" />
+          <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
+            {{ $t('problem.authors') }}
+            <template v-for="(author, index) in problem.authors" :key="author.id"
+              ><template v-if="index">, </template
+              ><UserName :username="author.username" :rating="author.rating"
+            /></template>
+          </p>
+        </template>
+      </div>
+    </GlassCard>
     <aside
       data-testid="problem-rail"
       :aria-label="$t('problem.rail.railLabel')"
@@ -79,57 +118,24 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
       <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" />
     </aside>
     <div :class="['min-w-0', layout.left]">
+      <CommentsSection
+        v-if="tab === DEFAULT_TAB"
+        type="problem"
+        :page-key="problem.code"
+        :contest-key="problem.contest?.contestKey ?? null"
+        placeholder-key="comments.composer.problemPlaceholder"
+        class="mt-3"
+      />
       <div
-        v-for="panel in tabs"
-        :id="`problem-panel-${panel.id}`"
-        :key="panel.id"
-        :role="tabs.length > 1 ? 'tabpanel' : undefined"
-        :aria-labelledby="tabs.length > 1 ? `problem-tab-${panel.id}` : undefined"
-        :hidden="panel.id !== tab"
-        :tabindex="panel.id === tab ? 0 : undefined"
+        v-if="hasEditorial"
+        id="problem-panel-editorial"
+        role="tabpanel"
+        aria-labelledby="problem-tab-editorial"
+        :hidden="tab !== 'editorial'"
+        :tabindex="tab === 'editorial' ? 0 : undefined"
       >
-        <GlassCard
-          v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
-          as="div"
-          data-testid="statement-card"
-          class="rounded-panel p-6 sm:p-8"
-        >
-          <p v-if="!problem.translated" class="mb-4 text-sm text-muted">
-            {{ $t('problem.untranslated') }}
-          </p>
-          <PdfStatement
-            v-if="problem.pdfStatementUrl"
-            :url="problem.pdfStatementUrl"
-            class="mb-6 last:mb-0"
-          />
-          <NoStatement
-            v-if="hasNoStatement(problem)"
-            :code="problem.code"
-            :can-edit="problem.canEdit"
-          />
-          <StatementBody v-else :html="problem.descriptionHtml" />
-          <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
-            {{ $t('problem.authors') }}
-            <template v-for="(author, index) in problem.authors" :key="author.id"
-              ><template v-if="index">, </template
-              ><UserName :username="author.username" :rating="author.rating"
-            /></template>
-          </p>
-        </GlassCard>
-        <CommentsSection
-          v-if="panel.id === DEFAULT_TAB && tab === DEFAULT_TAB"
-          type="problem"
-          :page-key="problem.code"
-          :contest-key="problem.contest?.contestKey ?? null"
-          placeholder-key="comments.composer.problemPlaceholder"
-          class="mt-8"
-        />
         <!-- Mounted only while selected, so the editorial request is lazy. -->
-        <EditorialTab
-          v-if="panel.id === 'editorial' && tab === 'editorial'"
-          :code="problem.code"
-          @gone="$emit('gone')"
-        />
+        <EditorialTab v-if="tab === 'editorial'" :code="problem.code" @gone="$emit('gone')" />
       </div>
     </div>
   </div>
