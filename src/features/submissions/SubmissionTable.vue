@@ -15,7 +15,6 @@ import SubmissionVerdictBlock from './SubmissionVerdictBlock.vue';
 import {
   BODY_CELL_CLASSES,
   COLUMN_TIER_CLASS,
-  DENSE_BODY_CELL_CLASSES,
   HEADER_ROW_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
@@ -45,8 +44,6 @@ const props = withDefaults(
     rankStart?: number;
     /** The viewer's username: their rows are tinted (the best-submissions ranking). */
     ownUsername?: string;
-    /** One-line 42px rows (the list's "Gọn" density); the phone's stacked rows are the same either way. */
-    dense?: boolean;
     /** The problem code after its name, in muted mono. */
     showProblemCode?: boolean;
   }>(),
@@ -58,11 +55,10 @@ const props = withDefaults(
     pickedIds: undefined,
     rankStart: undefined,
     ownUsername: undefined,
-    dense: false,
     showProblemCode: false,
   },
 );
-const bodyCell = computed(() => (props.dense ? DENSE_BODY_CELL_CLASSES : BODY_CELL_CLASSES));
+const bodyCell = BODY_CELL_CLASSES;
 const locale = useLocaleStore();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const { openRow, openRowInTab } = useRowOpen();
@@ -157,10 +153,8 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             @auxclick="openRowInTab($event, row.id)"
           >
             <td v-if="isPicking" :class="bodyCell">
-              <!-- A dense row keeps the 44px target, overlapping the cell's padding instead of growing the row. -->
               <SubmissionPickBox
                 :id="row.id"
-                :class="{ '-my-1': dense }"
                 :order="pickOrder(row.id)"
                 :picked-count="pickedIds?.length ?? 0"
                 @toggle="emit('togglePick', $event)"
@@ -172,7 +166,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             >
               {{ rankStart + index }}
             </td>
-            <td :class="bodyCell"><SubmissionVerdictBlock :row="row" :dense="dense" /></td>
+            <td :class="bodyCell"><SubmissionVerdictBlock :row="row" /></td>
             <td v-if="isShown('problem')" :class="[bodyCell, 'w-full max-w-0']">
               <SubmissionProblemName
                 :problem="row.problem"

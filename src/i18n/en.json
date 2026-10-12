@@ -1198,11 +1198,6 @@
       "grading": "Judging",
       "advanced": "Advanced filters"
     },
-    "density": {
-      "label": "Row density",
-      "compact": "Compact",
-      "comfortable": "Roomy"
-    },
     "strip": {
       "passed": "{passed}/{outOf} tests passed",
       "passedBatch": "{passed}/{outOf} subtasks passed",
