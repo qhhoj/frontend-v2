@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { ApiError } from '@/api/client';
@@ -162,9 +163,7 @@ async function confirmAction() {
     aria-labelledby="staff-panel-title"
   >
     <header class="flex flex-wrap items-center gap-3">
-      <span class="rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold">
-        {{ $t('admin.staff.chip') }}
-      </span>
+      <Chip>{{ $t('admin.staff.chip') }}</Chip>
       <AdminBit placement="header" />
       <h2 id="staff-panel-title" class="font-display text-base font-bold">
         {{ $t('admin.staff.title') }}

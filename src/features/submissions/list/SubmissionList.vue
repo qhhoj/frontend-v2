@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -131,9 +131,9 @@ watch(
       />
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SubmissionCardListSkeleton /></template>
-        <GlassCard v-if="!rows.length" as="div">
+        <Card v-if="!rows.length" as="div">
           <EmptyState>{{ emptyText }}</EmptyState>
-        </GlassCard>
+        </Card>
         <SubmissionCardList
           v-else
           :submissions="rows"

@@ -2,7 +2,7 @@
 import { Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import LanguageRow from './LanguageRow.vue';
 
 const props = defineProps<{ languages: RuntimeLanguage[]; judges: RuntimeJudge[] }>();
@@ -21,7 +21,7 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
 </script>
 
 <template>
-  <GlassCard class="overflow-hidden rounded-panel">
+  <Card class="overflow-hidden rounded-panel">
     <header
       class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6"
     >
@@ -51,5 +51,5 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
       />
     </ul>
     <p v-else class="px-6 py-6 text-muted">{{ $t('runtimes.noMatch') }}</p>
-  </GlassCard>
+  </Card>
 </template>

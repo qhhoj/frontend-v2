@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import UserLink from '@/components/UserLink.vue';
 import { formatDateTime, formatAgoCompact } from '@/lib/format';
@@ -95,7 +95,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
 </script>
 
 <template>
-  <GlassCard ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+  <Card ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
     <SubmissionCompactList
       v-if="isCompact"
       :submissions="submissions"
@@ -208,5 +208,5 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
         </tbody>
       </table>
     </ScrollRegion>
-  </GlassCard>
+  </Card>
 </template>

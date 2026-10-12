@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed, ref, useId } from 'vue';
 import { useRouter } from 'vue-router';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { DIFF_INLINE_BITS } from './diff-bits';
 import { diffRoute, parseSubmissionRef } from './diff-picks';
@@ -26,7 +27,7 @@ function submit() {
 </script>
 
 <template>
-  <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
+  <Card as="div" class="rounded-panel p-6 sm:p-8">
     <form
       data-testid="compare-form"
       class="flex flex-col gap-3"
@@ -50,17 +51,14 @@ function submit() {
           :aria-describedby="errorKey ? errorId : undefined"
           class="min-h-11 min-w-0 flex-1 rounded-row border border-line-strong bg-surface-solid px-3 font-mono text-content"
         />
-        <button
-          type="submit"
-          class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-        >
+        <AppButton tone="primary" type="submit">
           {{ $t('sourceDiff.compare.submit') }}
-        </button>
+        </AppButton>
       </div>
       <p v-if="errorKey" :id="errorId" role="alert" class="text-sm text-negative">
         {{ $t(errorKey) }}
       </p>
       <p class="text-sm text-muted">{{ $t('sourceDiff.compare.hint') }}</p>
     </form>
-  </GlassCard>
+  </Card>
 </template>

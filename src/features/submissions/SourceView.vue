@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed, onMounted, ref, toRef, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import InlineBit from '@/components/InlineBit.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import { aceForSubmissionKey } from '@/components/code-language-keys';
 import { showCode } from '@/components/code-highlight';
@@ -52,20 +53,18 @@ const isExpanded = ref(route.hash === '#source');
 </script>
 
 <template>
-  <GlassCard id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-panel">
+  <Card id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
-        <button
+        <AppButton
           v-if="data && isExpanded"
-          type="button"
           aria-controls="source-code"
           :aria-expanded="true"
-          class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 text-sm font-semibold hover:bg-surface-hover"
           @click="isExpanded = false"
         >
           {{ $t('submission.source.collapse') }}
-        </button>
+        </AppButton>
         <RouterLink
           v-if="isOwn && problemCode && !forbiddenText"
           :to="{ name: 'problem', params: { code: problemCode }, query: { resubmit: id } }"
@@ -112,5 +111,5 @@ const isExpanded = ref(route.hash === '#source');
         :text="source"
       />
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

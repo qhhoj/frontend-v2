@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
@@ -86,7 +86,7 @@ const isHidden = computed(
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
+  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
@@ -162,5 +162,5 @@ const isHidden = computed(
     <p v-else-if="!compileError" class="px-6 pb-6 text-muted sm:px-8">
       {{ $t('submission.cases.none') }}
     </p>
-  </GlassCard>
+  </Card>
 </template>

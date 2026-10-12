@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -53,7 +53,7 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
 </script>
 
 <template>
-  <GlassCard ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+  <Card ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
     <ul v-if="isCompact" aria-hidden="true" class="m-0 list-none p-0">
       <li
         v-for="row in ROW_COUNT"
@@ -121,5 +121,5 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
         </tbody>
       </table>
     </ScrollRegion>
-  </GlassCard>
+  </Card>
 </template>

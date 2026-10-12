@@ -2,7 +2,8 @@
 import { computed, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import GlassCard from '@/components/GlassCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
@@ -77,12 +78,12 @@ const verdict = computed(() => {
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
     </p>
-    <GlassCard v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
+    <Card v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
       <div class="flex flex-wrap items-center gap-3">
         <InlineBit kind="sweat" />
         <p role="alert">{{ $t(forbiddenKey) }}</p>
       </div>
-    </GlassCard>
+    </Card>
     <QueryState
       v-else
       :loading="query.isPending.value"
@@ -102,13 +103,9 @@ const verdict = computed(() => {
         >
           <InlineBit kind="sweat" />
           {{ $t('submission.staleReload') }}
-          <button
-            type="button"
-            class="min-h-11 rounded-pill border border-line px-4 font-semibold text-content hover:bg-surface-hover"
-            @click="refollow()"
-          >
+          <AppButton @click="refollow()">
             {{ $t('submission.reload') }}
-          </button>
+          </AppButton>
         </p>
         <SubmissionSummary
           :submission="row"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { AUTHOR_FACT_KEY, SUMMARY_FACT_KEYS } from './summary-facts';
 
@@ -16,7 +16,7 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
     data-testid="submission-summary"
     class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
   >
-    <GlassCard
+    <Card
       as="div"
       class="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
     >
@@ -30,8 +30,8 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
         </p>
       </div>
       <SkeletonBlock data-skeleton-region="bit" :class="BIT_SLOT_CLASS" class="ml-auto shrink-0" />
-    </GlassCard>
-    <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
+    </Card>
+    <Card as="div" class="rounded-panel p-6 sm:p-8">
       <dl data-skeleton-region="facts" class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
         <template v-for="key in SUMMARY_FACT_KEYS" :key="key">
           <dt data-skeleton-region="fact" class="text-meta">
@@ -46,6 +46,6 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
           </dd>
         </template>
       </dl>
-    </GlassCard>
+    </Card>
   </div>
 </template>

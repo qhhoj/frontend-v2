@@ -27,7 +27,3 @@ export function composerStateOf(
 /** Legacy reply window: a comment older than a year takes replies only from moderators (`judge.change_comment`). */
 export const canReplyTo = (createdAt: string, now: number, moderates: boolean): boolean =>
   moderates || now - Date.parse(createdAt) < COMMENT_REPLY_WINDOW_MS;
-
-/** "Solved 3 / 5" as a share of the bar, clamped to 0..100. */
-export const solvedPercent = (solved: number, required: number): number =>
-  required <= 0 ? 100 : Math.min(100, Math.max(0, Math.round((solved / required) * 100)));

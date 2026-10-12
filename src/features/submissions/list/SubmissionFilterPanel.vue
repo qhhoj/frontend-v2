@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SubmissionResult } from '@/api/types/submissions';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from '../use-submission-filters';
@@ -41,7 +41,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
 </script>
 
 <template>
-  <GlassCard
+  <Card
     as="section"
     :aria-label="$t('submissions.quick.advanced')"
     class="grid gap-x-6 gap-y-4 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]"
@@ -136,5 +136,5 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         :class="TEXT_INPUT_CLASSES"
       />
     </label>
-  </GlassCard>
+  </Card>
 </template>

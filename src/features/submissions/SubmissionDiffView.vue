@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -87,11 +88,9 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
     :title="forbiddenTitle(problemSide)"
     :body="forbiddenBody(problemSide)"
   >
-    <RouterLink
-      :to="{ name: 'submission', params: { id: pair[otherSide(problemSide)] } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >{{ $t('sourceDiff.pickOther', { side: sideWord(problemSide) }) }}</RouterLink
-    >
+    <AppButton :to="{ name: 'submission', params: { id: pair[otherSide(problemSide)] } }">{{
+      $t('sourceDiff.pickOther', { side: sideWord(problemSide) })
+    }}</AppButton>
   </StatePanel>
   <StatePanel
     v-else-if="state.kind === 'notFound' && problemSide"
@@ -99,11 +98,7 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
     :title="$t('sourceDiff.notFoundTitle', { id: submissionShortId(pair[problemSide]) })"
     :body="$t('sourceDiff.notFoundBody', { side: sideWord(problemSide) })"
   >
-    <RouterLink
-      :to="{ name: 'submissions' }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >{{ $t('sourceDiff.toList') }}</RouterLink
-    >
+    <AppButton :to="{ name: 'submissions' }">{{ $t('sourceDiff.toList') }}</AppButton>
   </StatePanel>
   <StatePanel
     v-else-if="state.kind === 'error' && problemSide"
@@ -111,13 +106,9 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
     :title="$t('sourceDiff.errorTitle')"
     :body="$t('sourceDiff.errorBody', { id: submissionShortId(pair[problemSide]) })"
   >
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      @click="sides[problemSide].refetch()"
-    >
+    <AppButton @click="sides[problemSide].refetch()">
       {{ $t('common.retry') }}
-    </button>
+    </AppButton>
   </StatePanel>
   <StatePanel
     v-else-if="state.kind === 'tooLong'"
@@ -130,12 +121,11 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
       })
     "
   >
-    <RouterLink
+    <AppButton
       v-for="side in SIDES"
       :key="side"
       :to="{ name: 'submission', params: { id: pair[side] } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</RouterLink
+      >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</AppButton
     >
   </StatePanel>
   <StatePanel
@@ -144,12 +134,11 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
     :title="$t('sourceDiff.tooDifferentTitle')"
     :body="$t('sourceDiff.tooDifferentBody', { limit: format(MAX_EDIT_LINES) })"
   >
-    <RouterLink
+    <AppButton
       v-for="side in SIDES"
       :key="side"
       :to="{ name: 'submission', params: { id: pair[side] } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</RouterLink
+      >{{ $t(side === 'left' ? 'sourceDiff.viewLeft' : 'sourceDiff.viewRight') }}</AppButton
     >
   </StatePanel>
   <QueryState v-else :loading="state.kind === 'loading'" :error="null">

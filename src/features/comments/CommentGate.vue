@@ -4,8 +4,9 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { INTERACT_MIN_PROBLEM_COUNT } from '@/api/types/comments';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { safeRedirect } from '@/router/safe-redirect';
-import { solvedPercent } from './composer-state';
 
 /**
  * Why there is no composer, in the composer's place: sign in, too few solved problems (with the progress), a muted account,
@@ -60,13 +61,10 @@ const titleKey = computed(
       {{ $t(titleKey, { count: requiredCount }) }}
     </p>
     <template v-if="reason === 'signedOut'">
-      <RouterLink
-        :to="signIn"
-        class="mt-1 inline-flex min-h-11 items-center gap-2 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-      >
-        <LogIn aria-hidden="true" class="size-4" />
+      <AppButton tone="primary" :to="signIn" class="mt-1">
+        <template #icon><LogIn aria-hidden="true" class="size-4" /></template>
         {{ $t('comments.gate.signIn') }}
-      </RouterLink>
+      </AppButton>
       <p class="text-sm text-muted">
         {{ $t('comments.gate.noAccount') }}
         <RouterLink :to="register" class="font-semibold text-accent-text hover:underline">
@@ -83,19 +81,12 @@ const titleKey = computed(
             >{{ solvedCount }} / {{ requiredCount }}</span
           >
         </div>
-        <div
-          role="progressbar"
-          :aria-label="$t('comments.gate.solvedLabel')"
-          aria-valuemin="0"
-          :aria-valuemax="requiredCount"
-          :aria-valuenow="Math.min(solvedCount, requiredCount)"
-          class="h-2 overflow-hidden rounded-pill bg-surface-strong"
-        >
-          <div
-            class="h-full rounded-pill bg-positive"
-            :style="{ width: `${solvedPercent(solvedCount, requiredCount)}%` }"
-          />
-        </div>
+        <ProgressBar
+          :value="solvedCount"
+          :max="requiredCount"
+          tone="positive"
+          :label="$t('comments.gate.solvedLabel')"
+        />
       </div>
       <RouterLink
         :to="EASY_PROBLEMS"

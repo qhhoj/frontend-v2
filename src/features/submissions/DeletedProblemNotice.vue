@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { DELETED_PROBLEM_BIT } from './deleted-problem';
 
@@ -8,7 +8,7 @@ defineProps<{ name: string }>();
 </script>
 
 <template>
-  <GlassCard
+  <Card
     as="section"
     data-testid="deleted-problem-notice"
     aria-labelledby="deleted-problem-title"
@@ -21,5 +21,5 @@ defineProps<{ name: string }>();
       </h2>
       <p class="text-muted">{{ $t('deletedProblem.noticeBody', { name }) }}</p>
     </div>
-  </GlassCard>
+  </Card>
 </template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
+
 /** The "Đã xóa" tag beside a deleted problem's name in submission rows. */
 </script>
 
 <template>
-  <span class="ml-2 rounded-pill bg-surface-hover px-2 py-0.5 text-xs font-semibold text-content">{{
-    $t('deletedProblem.chip')
-  }}</span>
+  <Chip class="ml-2">{{ $t('deletedProblem.chip') }}</Chip>
 </template>
