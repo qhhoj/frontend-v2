@@ -5,9 +5,7 @@ import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
 import { formatInZone } from '../ui/form/site-time';
-import { shortId } from '../ui/short-id';
 
-export const UUID_V7 = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const MAX_REJUDGE_LANGUAGES = 50;
 
 /** Text fields the URL may prefill (`/admin/rejudge?contest=…&problem=…`). */
@@ -18,8 +16,6 @@ export interface RejudgeFilter extends Record<LinkableField, string> {
   /** ISO instants (`AdminDateTimeField`, typed in the site's zone), or null for no bound. */
   dateFrom: string | null;
   dateTo: string | null;
-  idFrom: string;
-  idTo: string;
   languageIds: string[];
   results: SubmissionResult[];
   force: boolean;
@@ -32,8 +28,6 @@ export const emptyRejudgeFilter = (): RejudgeFilter => ({
   judgedOn: '',
   dateFrom: null,
   dateTo: null,
-  idFrom: '',
-  idTo: '',
   languageIds: [],
   results: [],
   force: false,
@@ -53,9 +47,6 @@ export const isSiteWide = (filter: RejudgeFilter) =>
 
 export function checkRejudgeFilter(filter: RejudgeFilter): FieldErrors {
   const errors: FieldErrors = {};
-  for (const field of ['idFrom', 'idTo'] as const)
-    if (filter[field].trim() && !UUID_V7.test(filter[field].trim()))
-      errors[field] = translate('admin.rejudge.errors.id');
   const { dateFrom: from, dateTo: to } = filter;
   if (from && to && Date.parse(from) >= Date.parse(to))
     errors.dateTo = translate('admin.rejudge.errors.dateOrder');
@@ -67,7 +58,7 @@ export function checkRejudgeFilter(filter: RejudgeFilter): FieldErrors {
 /** The request body for the filter: empty parts are left out, `force` only when it is on. */
 export function toRejudgeBody(filter: RejudgeFilter): RejudgeBody {
   const body: RejudgeBody = {};
-  for (const field of [...LINKABLE_FIELDS, 'idFrom', 'idTo'] as const) {
+  for (const field of LINKABLE_FIELDS) {
     const value = filter[field].trim();
     if (value) body[field] = value;
   }
@@ -118,11 +109,9 @@ function scopeText(filter: RejudgeFilter): string {
   return problem || translate('admin.rejudge.summary.siteWide');
 }
 
-/** The lower or upper bound: the date and the id when both are set (the server applies both), else whichever is. */
-function boundText(date: string | null, id: string): string {
-  const parts = [date && formatInZone(date), id.trim() && shortId(id.trim())].filter(Boolean);
-  return parts.join(' · ') || translate('admin.rejudge.summary.noLimit');
-}
+/** The lower or upper date bound, or "no limit". */
+const boundText = (date: string | null): string =>
+  date ? formatInZone(date) : translate('admin.rejudge.summary.noLimit');
 
 /** The filter as the words the summary and the confirm show: empty parts say what they mean (all, no limit). */
 export function describeRejudgeFilter(
@@ -136,8 +125,8 @@ export function describeRejudgeFilter(
     scope: scopeText(filter),
     user: orAll(filter.user.trim(), 'allUsers'),
     judge: orAll(filter.judgedOn.trim(), 'allJudges'),
-    from: boundText(filter.dateFrom, filter.idFrom),
-    to: boundText(filter.dateTo, filter.idTo),
+    from: boundText(filter.dateFrom),
+    to: boundText(filter.dateTo),
     languages: orAll(languageNames.join(', '), 'allLanguages'),
     results: orAll(filter.results.join(', '), 'allResults'),
     locked: translate(

@@ -4,9 +4,6 @@
     "title": "Submission filter",
     "problem": "Problem code",
     "problemHint": "Leave empty for every problem.",
-    "idFrom": "From submission (id)",
-    "idTo": "To submission (id)",
-    "idHint": "Submission ids follow the submission time. The date range above is usually enough.",
     "languages": "Languages",
     "languagesHint": "Leave empty for every language.",
     "results": "Current result",
@@ -22,7 +19,6 @@
     "userHint": "Only this user's submissions.",
     "judgedOn": "Judge",
     "judgedOnHint": "Only submissions this judge graded last.",
-    "idRange": "Submission id range (advanced)",
     "dateFrom": "Submitted from",
     "dateTo": "Submitted before",
     "siteWide": "No problem or contest: the action covers the whole site. {permission}.",
@@ -74,7 +70,6 @@
     "sample": "Newest matching submissions"
   },
   "errors": {
-    "id": "Not a submission id.",
     "languages": "At most 50 languages.",
     "dateOrder": "The end must be after the start."
   },

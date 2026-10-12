@@ -18,14 +18,13 @@ const props = defineProps<{ languages: Language[]; errors: FieldErrors }>();
 const filter = defineModel<RejudgeFilter>('filter', { required: true });
 defineEmits<{ rejudge: []; rescore: []; reset: [] }>();
 
-type TextField = 'problem' | 'contest' | 'user' | 'judgedOn' | 'idFrom' | 'idTo';
+type TextField = 'problem' | 'contest' | 'user' | 'judgedOn';
 type DateField = 'dateFrom' | 'dateTo';
 const TEXT_PAIRS: [TextField, TextField][] = [
   ['problem', 'contest'],
   ['user', 'judgedOn'],
 ];
 const DATE_FIELDS: DateField[] = ['dateFrom', 'dateTo'];
-const ID_FIELDS: TextField[] = ['idFrom', 'idTo'];
 const PRESETS = Object.keys(RESULT_PRESETS) as ResultPreset[];
 const languageOptions = computed(() =>
   props.languages.map((language) => ({ value: language.id, label: language.name })),
@@ -83,33 +82,6 @@ const applyPreset = (preset: ResultPreset) => {
         :input-id="`rejudge-${field}`"
       />
     </div>
-
-    <details class="rounded-row border border-line p-3" :open="!!(filter.idFrom || filter.idTo)">
-      <summary class="cursor-pointer text-sm font-semibold">
-        {{ $t('admin.rejudge.filter.idRange') }}
-      </summary>
-      <p class="mt-2 text-xs text-muted">{{ $t('admin.rejudge.filter.idHint') }}</p>
-      <div class="mt-3 grid gap-4 sm:grid-cols-2">
-        <AdminField
-          v-for="field in ID_FIELDS"
-          :key="field"
-          v-slot="{ id, describedBy }"
-          :label="$t(`admin.rejudge.filter.${field}`)"
-          :error="errors[field]"
-          :input-id="`rejudge-${field}`"
-        >
-          <input
-            :id="id"
-            v-model="filter[field]"
-            type="text"
-            :class="[INPUT, 'font-mono text-sm']"
-            :aria-describedby="describedBy"
-            :aria-invalid="errors[field] ? 'true' : undefined"
-            autocomplete="off"
-          />
-        </AdminField>
-      </div>
-    </details>
 
     <fieldset class="flex flex-col gap-2">
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.languages') }}</legend>

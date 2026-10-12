@@ -4,9 +4,6 @@
     "title": "Bộ lọc bài nộp",
     "problem": "Mã bài",
     "problemHint": "Bỏ trống là mọi bài.",
-    "idFrom": "Từ bài nộp (mã)",
-    "idTo": "Đến bài nộp (mã)",
-    "idHint": "Mã bài nộp xếp theo thời gian nộp. Thường dùng khoảng thời gian ở trên là đủ.",
     "languages": "Ngôn ngữ",
     "languagesHint": "Bỏ trống là mọi ngôn ngữ.",
     "results": "Kết quả hiện tại",
@@ -22,7 +19,6 @@
     "userHint": "Chỉ bài nộp của người này.",
     "judgedOn": "Máy chấm",
     "judgedOnHint": "Chỉ bài nộp do máy chấm này chấm lần cuối.",
-    "idRange": "Khoảng mã bài nộp (nâng cao)",
     "dateFrom": "Nộp từ",
     "dateTo": "Nộp trước",
     "siteWide": "Không có bài hay kỳ thi: thao tác áp dụng cho cả trang. {permission}.",
@@ -74,7 +70,6 @@
     "sample": "Vài bài nộp khớp mới nhất"
   },
   "errors": {
-    "id": "Không phải mã bài nộp.",
     "languages": "Tối đa 50 ngôn ngữ.",
     "dateOrder": "Thời điểm kết thúc phải sau thời điểm bắt đầu."
   },
