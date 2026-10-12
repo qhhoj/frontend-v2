@@ -120,5 +120,11 @@
     "write": "Soạn",
     "preview": "Xem trước"
   },
-  "markdownPanes": "Soạn hoặc xem trước"
+  "markdownPanes": "Soạn hoặc xem trước",
+  "markdownTab": {
+    "write": "Viết",
+    "preview": "Xem trước"
+  },
+  "markdownSupported": "Hỗ trợ Markdown",
+  "charCount": "{count} ký tự"
 }

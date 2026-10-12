@@ -13,9 +13,12 @@ const props = defineProps<{
   accept?: string;
   maxBytes?: number;
   isPending?: boolean;
+  /** A fixed id, so another element (an avatar tile) can be a `<label for>` of the same file input. */
+  inputId?: string;
 }>();
 const emit = defineEmits<{ picked: [file: File] }>();
-const id = useId();
+const generatedId = useId();
+const id = props.inputId ?? generatedId;
 const refusal = ref('');
 const isBusyNoticeShown = ref(false);
 

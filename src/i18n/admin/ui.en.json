@@ -120,5 +120,11 @@
     "write": "Write",
     "preview": "Preview"
   },
-  "markdownPanes": "Write or preview"
+  "markdownPanes": "Write or preview",
+  "markdownTab": {
+    "write": "Write",
+    "preview": "Preview"
+  },
+  "markdownSupported": "Markdown supported",
+  "charCount": "{count} chars"
 }

@@ -1,39 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { uploadProblemImage } from '@/api/problem-editing.api';
-import { usePermissions } from '@/stores/use-permissions';
-import { useSessionStore } from '@/stores/session.store';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../problems/limits';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import UploadButton from '../ui/UploadButton.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { INPUT } from '../ui/controls';
-import { useAdminMutation } from '../ui/use-admin-mutation';
+import { useLogoUpload } from './use-logo-upload';
 
 /**
- * The logo path or URL with a live thumbnail, so admins see whether it loads before saving. Who may upload images (staff or
- * `judge.can_upload_image`, the statement image endpoint's rule) can also pick a file: its URL fills the box, saved with the form.
+ * The logo path or URL with a live thumbnail, so admins see whether it loads before saving. Who may upload images can also pick a file: its URL fills the box, saved with the form.
  */
 const logo = defineModel<string>({ required: true });
 /** True while an upload runs: the editor holds its save, so it never saves the old logo under a "Saved". */
 const isUploading = defineModel<boolean>('uploading', { default: false });
 defineProps<{ error?: string }>();
-const hasFailed = ref(false);
-
-const session = useSessionStore();
-const { can } = usePermissions();
-const canUpload = computed(() => session.isStaff || can('judge.can_upload_image'));
-const upload = useAdminMutation({
-  mutate: uploadProblemImage,
-  onDone: (url: string) => (logo.value = url),
-});
-watch(upload.isPending, (pending) => (isUploading.value = pending));
-/** A new value (typed or uploaded) clears the broken-image hint and an earlier upload refusal. */
-watch(logo, () => {
-  hasFailed.value = false;
-  upload.reset();
-});
+const { canUpload, hasFailed, upload } = useLogoUpload(logo, isUploading);
 </script>
 
 <template>

@@ -2666,11 +2666,22 @@
     "pendingBadge": "{count} pending requests",
     "info": {
       "title": "Organization details",
+      "avatar": "Avatar",
+      "avatarLead": "Shown next to the organization name everywhere.",
+      "avatarChange": "Change image",
+      "avatarUseUrl": "Use a URL",
+      "avatarUrl": "Image URL",
+      "avatarHint": "JPG, PNG, GIF, SVG · up to 5 MB",
+      "avatarUrlHint": "An http(s) URL or a site path.",
+      "identity": "Name and address",
+      "identityLead": "The display name and the address of the organization page.",
       "name": "Name",
       "slug": "Address",
-      "slugHint": "Changing the address breaks old links.",
+      "slugWarning": "Changing the address breaks old links.",
+      "aboutTitle": "About",
+      "aboutLead": "Shown on the organization page.",
       "about": "About (Markdown)",
-      "aboutPreview": "About preview",
+      "joinLead": "How new members join the organization.",
       "save": "Save changes",
       "reset": "Cancel",
       "staffLink": "Open in the admin pages (quota, places, visibility)"
@@ -2679,7 +2690,8 @@
       "label": "Joining",
       "open": "Open",
       "approval": "Approval",
-      "hint": "Open: join at once · Approval: an administrator approves each request"
+      "openHint": "Anyone can join at once.",
+      "approvalHint": "An administrator approves each request."
     },
     "members": {
       "promote": "Make administrator",

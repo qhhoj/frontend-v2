@@ -1,42 +1,30 @@
 <script setup lang="ts">
-import { useId } from 'vue';
+import { computed } from 'vue';
+import { translate } from '@/i18n';
+import SegmentedChoice from '@/features/appearance/SegmentedChoice.vue';
 
-/** Legacy `is_open` as the mock-up's segmented choice: open (join at once) or approval (join requests). */
+type Mode = 'open' | 'approval';
+
+/** Legacy `is_open` as a segmented choice (open: join at once; approval: join requests) with a hint that follows the choice. */
 const isOpen = defineModel<boolean>({ required: true });
-const labelId = useId();
-const hintId = useId();
-const MODES = [
-  { isOpen: true, labelKey: 'orgAdmin.joinMode.open' },
-  { isOpen: false, labelKey: 'orgAdmin.joinMode.approval' },
-] as const;
+const mode = computed<Mode>(() => (isOpen.value ? 'open' : 'approval'));
+const options = computed(() =>
+  (['open', 'approval'] as const).map((value) => ({
+    value,
+    label: translate(`orgAdmin.joinMode.${value}`),
+  })),
+);
 </script>
 
 <template>
-  <div class="flex flex-col gap-1.5">
-    <span :id="labelId" class="text-sm font-semibold">{{ $t('orgAdmin.joinMode.label') }}</span>
-    <div
-      role="radiogroup"
-      :aria-labelledby="labelId"
-      :aria-describedby="hintId"
-      class="flex w-fit gap-1 rounded-pill bg-surface-hover p-1"
-    >
-      <button
-        v-for="mode in MODES"
-        :key="mode.labelKey"
-        type="button"
-        role="radio"
-        :aria-checked="isOpen === mode.isOpen"
-        class="min-h-9 rounded-pill px-4 text-sm"
-        :class="
-          isOpen === mode.isOpen
-            ? 'bg-surface-solid font-bold text-content shadow-glow'
-            : 'text-muted hover:text-content'
-        "
-        @click="isOpen = mode.isOpen"
-      >
-        {{ $t(mode.labelKey) }}
-      </button>
-    </div>
-    <p :id="hintId" class="text-xs text-muted">{{ $t('orgAdmin.joinMode.hint') }}</p>
+  <div class="flex flex-col gap-2">
+    <SegmentedChoice
+      class="max-w-xs"
+      :label="$t('orgAdmin.joinMode.label')"
+      :options="options"
+      :selected="mode"
+      @pick="(picked) => (isOpen = picked === 'open')"
+    />
+    <p class="text-xs text-muted" aria-live="polite">{{ $t(`orgAdmin.joinMode.${mode}Hint`) }}</p>
   </div>
 </template>
