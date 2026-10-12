@@ -1043,7 +1043,9 @@
       "facts": {
         "solvers": "Solvers",
         "io": "Input/Output",
-        "stdio": "Standard input / output",
+        "input": "Input",
+        "output": "Output",
+        "stdio": "Standard I/O",
         "status": "Status",
         "untried": "Not tried",
         "hideTypes": "Hide problem types",

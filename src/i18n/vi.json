@@ -1043,6 +1043,8 @@
       "facts": {
         "solvers": "Người giải",
         "io": "Nhập/xuất",
+        "input": "Nhập",
+        "output": "Xuất",
         "stdio": "Bàn phím / màn hình",
         "status": "Trạng thái",
         "untried": "Chưa thử",
