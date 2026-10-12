@@ -34,7 +34,9 @@ describe('StatGrid', () => {
     });
     const toned = grid.findAll('dd')[0]!;
     const plain = grid.findAll('dd')[1]!;
-    expect(toned.classes()).toEqual(expect.arrayContaining(['font-mono', 'tabular-nums', 'text-positive']));
+    expect(toned.classes()).toEqual(
+      expect.arrayContaining(['font-mono', 'tabular-nums', 'text-positive']),
+    );
     expect(plain.classes()).not.toContain('text-positive');
   });
 });
