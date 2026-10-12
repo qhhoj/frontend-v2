@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Setting } from '@/api/types/settings-admin';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
@@ -107,8 +107,8 @@ const timeZones = computed(() =>
     <p v-if="canReset" class="text-xs text-muted">
       {{ $t('admin.settings.reset.hint') }} <span class="font-mono">{{ defaultText }}</span>
     </p>
-    <SettingsNotice v-if="isFilled" tone="info">
+    <Notice v-if="isFilled" tone="info">
       {{ $t('admin.settings.reset.filled', { stored: storedText }) }}
-    </SettingsNotice>
+    </Notice>
   </div>
 </template>

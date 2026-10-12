@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { PostListItem } from '@/api/types/blog';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { unhidePlanOf } from './post-visibility';
@@ -39,12 +39,12 @@ const authors = computed(() => props.post.authors.map((author) => author.usernam
         }}
       </p>
     </div>
-    <SettingsNotice v-if="plan.scheduled" tone="warning">
+    <Notice v-if="plan.scheduled" tone="warning">
       {{ $t('admin.posts.unhide.ahead', { time: publishTime }) }}
-    </SettingsNotice>
+    </Notice>
     <p v-else class="text-muted">{{ $t('admin.posts.unhide.now') }}</p>
     <template #error>
-      <SettingsNotice v-if="failure" tone="error">{{ failure }}</SettingsNotice>
+      <Notice v-if="failure" tone="danger">{{ failure }}</Notice>
     </template>
   </ConfirmDialog>
 </template>
