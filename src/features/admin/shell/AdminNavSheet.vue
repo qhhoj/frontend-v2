@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X } from 'lucide-vue-next';
+import { House, X } from 'lucide-vue-next';
 import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import AdminNav from './AdminNav.vue';
@@ -72,6 +72,13 @@ onBeforeUnmount(() => {
         data-testid="admin-nav-phone"
         class="flex-1 overflow-y-auto overscroll-contain px-3 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
       />
+      <RouterLink
+        to="/"
+        data-testid="admin-back-to-site"
+        class="flex min-h-11 items-center gap-2 border-t border-line px-4 text-sm font-semibold text-accent-text"
+      >
+        <House aria-hidden="true" class="size-4" />{{ $t('admin.shell.backToSite') }}
+      </RouterLink>
     </div>
   </dialog>
 </template>
