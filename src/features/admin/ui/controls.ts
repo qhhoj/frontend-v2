@@ -1,3 +1,5 @@
+import { CARD_VARIANTS } from '@/components/ui/Card.variants';
+
 /**
  * Admin control classes (design-system/qhhoj/pages/admin.md). Heights follow the admin density tokens from `admin-density.css`
  * (36 px on a fine pointer, 44 px on a coarse one); the fallback is the fine-pointer value. Controls are `rounded-cell`; pills
@@ -52,4 +54,4 @@ export const CHECK_CHIP = `inline-flex ${CONTROL_HEIGHT} items-center gap-2 roun
 export const TOGGLE = `${buttonClass('secondary')} aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text`;
 
 /** A form or table card: sections inside are split by hairlines, not by more cards. */
-export const CARD = 'rounded-row border border-line bg-surface';
+export const CARD = CARD_VARIANTS.flat;
