@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
 import { hasPermission } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
 
 const props = defineProps<{ username: string }>();
 const session = useSessionStore();
+const { t } = useI18n();
 
 const BASE_TABS = [
   { route: 'user', key: 'overview' },
@@ -14,26 +17,18 @@ const BASE_TABS = [
 ] as const;
 const COMMENTS_TAB = { route: 'user-comments', key: 'comments' } as const;
 
-const tabs = computed(() =>
-  hasPermission(session.user, 'judge.view_all_user_comment')
+const tabs = computed<PillTab[]>(() =>
+  (hasPermission(session.user, 'judge.view_all_user_comment')
     ? [...BASE_TABS, COMMENTS_TAB]
-    : BASE_TABS,
+    : BASE_TABS
+  ).map((tab) => ({
+    key: tab.route,
+    label: t(`profile.tabs.${tab.key}`),
+    to: { name: tab.route, params: { username: props.username } },
+  })),
 );
 </script>
 
 <template>
-  <nav
-    :aria-label="$t('profileTabs.title')"
-    class="flex gap-1 overflow-x-auto border-b border-line"
-  >
-    <RouterLink
-      v-for="tab in tabs"
-      :key="tab.route"
-      :to="{ name: tab.route, params: { username: props.username } }"
-      exact-active-class="border-accent font-bold text-accent-text"
-      class="-mb-px flex min-h-11 items-center border-b-2 border-transparent px-4 text-muted first:pl-0 hover:text-content"
-    >
-      {{ $t(`profile.tabs.${tab.key}`) }}
-    </RouterLink>
-  </nav>
+  <PillTabs :tabs="tabs" :label="t('profileTabs.title')" />
 </template>

@@ -35,7 +35,7 @@ const joinPolicyKey = computed(() =>
 <template>
   <section
     data-testid="organization-header"
-    class="flex flex-col gap-3 md:flex-row md:items-center md:gap-4"
+    class="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:gap-4"
   >
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <OrganizationLogo :organization="organization" />
@@ -50,7 +50,7 @@ const joinPolicyKey = computed(() =>
             :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
           />
         </div>
-        <p class="flex flex-wrap gap-x-3 gap-y-0.5 text-sm tabular-nums text-muted">
+        <p class="flex min-w-0 flex-wrap gap-x-3 gap-y-0.5 text-sm tabular-nums text-muted">
           <span class="font-mono">{{ organization.shortName }}</span>
           <span v-if="rank !== null">
             {{ $t('orgs.rankLabel') }} <b :class="medalClass(rank)">#{{ rank }}</b>
