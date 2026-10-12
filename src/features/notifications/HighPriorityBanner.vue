@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useSessionStore } from '@/stores/session.store';
 import { computed } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { NOTIFICATION_BITS } from './notification-bits';
 import { isTicketKind } from './notification-kinds';
@@ -17,7 +18,6 @@ const openLabelKey = computed(() =>
     ? 'notifications.banner.openTicket'
     : 'notifications.banner.open',
 );
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-4 font-semibold';
 const session = useSessionStore();
 </script>
 
@@ -39,21 +39,12 @@ const session = useSessionStore();
         <span class="block">{{ item.body }}</span>
         <template #action>
           <span class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              :class="`${BUTTON} bg-accent text-on-accent`"
-              @click="opener.open(item)"
-            >
+            <AppButton tone="primary" @click="opener.open(item)">
               {{ $t(openLabelKey) }}
-            </button>
-            <button
-              v-if="opener.canMarkRead.value"
-              type="button"
-              :class="`${BUTTON} border border-current`"
-              @click="opener.markRead(item)"
-            >
+            </AppButton>
+            <AppButton v-if="opener.canMarkRead.value" @click="opener.markRead(item)">
               {{ $t('notifications.banner.markRead') }}
-            </button>
+            </AppButton>
           </span>
         </template>
       </SettingsNotice>

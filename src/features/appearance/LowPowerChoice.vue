@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { LOW_POWER_PREFERENCES } from '@/theme/low-power';
 import type { LowPowerPreference } from '@/theme/low-power';
@@ -20,11 +20,7 @@ function choose(preference: LowPowerPreference) {
 </script>
 
 <template>
-  <GlassCard
-    id="low-power"
-    data-testid="low-power-section"
-    class="flex scroll-mt-24 flex-col gap-5 p-6"
-  >
+  <Card id="low-power" data-testid="low-power-section" class="flex scroll-mt-24 flex-col gap-5 p-6">
     <div>
       <h2 class="font-display text-xl font-semibold">{{ $t('lowPower.title') }}</h2>
       <p class="mt-1 text-meta text-muted">{{ $t('lowPower.lead') }}</p>
@@ -73,5 +69,5 @@ function choose(preference: LowPowerPreference) {
       <strong v-if="isSaved" class="text-content">{{ $t('lowPower.saved') }}. </strong
       >{{ $t('lowPower.savedNote') }}
     </p>
-  </GlassCard>
+  </Card>
 </template>

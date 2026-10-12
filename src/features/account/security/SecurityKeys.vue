@@ -5,7 +5,7 @@ import type { SecurityKey } from '@/api/types/account';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { BUTTON } from '../settings/buttons';
+import AppButton from '@/components/ui/AppButton.vue';
 import RemoveSecurityKeyDialog from './RemoveSecurityKeyDialog.vue';
 import { canRegisterSecurityKey } from './security-key';
 import { useSecurityKeysQuery } from './security.queries';
@@ -37,15 +37,9 @@ function askToRemove(key: SecurityKey) {
         <strong class="font-semibold">{{ $t('settings.keys.title') }}</strong>
         <span class="text-meta text-muted">{{ $t('settings.keys.description') }}</span>
       </span>
-      <button
-        v-if="supported"
-        type="button"
-        :class="BUTTON.secondary"
-        :aria-disabled="busy"
-        @click="busy || emit('add')"
-      >
+      <AppButton v-if="supported" :disabled="busy" @click="emit('add')">
         {{ $t('settings.keys.add') }}
-      </button>
+      </AppButton>
     </div>
     <p v-if="!supported" class="text-meta text-muted">{{ $t('settings.keys.unsupported') }}</p>
     <!-- Beside buttons the viewer can already press: no page-wide loading Bit for the key list. -->
@@ -70,14 +64,13 @@ function askToRemove(key: SecurityKey) {
             <strong class="font-semibold break-words">{{ key.name }}</strong>
             <span class="text-meta text-muted">{{ $t('settings.keys.kind') }}</span>
           </span>
-          <button
-            type="button"
-            :class="BUTTON.danger"
+          <AppButton
+            tone="danger"
             :aria-label="$t('settings.keys.removeLabel', { name: key.name })"
             @click="askToRemove(key)"
           >
             {{ $t('settings.keys.remove') }}
-          </button>
+          </AppButton>
         </li>
       </ul>
     </QueryState>

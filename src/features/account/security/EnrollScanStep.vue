@@ -4,6 +4,7 @@ import { confirmTotp } from '@/api/account.api';
 import { ApiError } from '@/api/client';
 import type { TotpEnrollment } from '@/api/types/account';
 import CopyButton from '@/components/CopyButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import OtpInput from '@/features/auth/OtpInput.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
@@ -11,7 +12,6 @@ import { translate } from '@/i18n';
 import { OTP_LENGTH } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 import QrCode from './QrCode.vue';
 import { groupSecret } from './totp-setup';
 
@@ -65,9 +65,9 @@ async function submit() {
           </li>
         </ol>
         <p class="text-sm md:hidden">{{ $t('settings.totp.phoneLead') }}</p>
-        <a :href="props.enrollment.otpauthUrl" :class="[BUTTON.primary, 'md:hidden']">{{
+        <AppButton :href="props.enrollment.otpauthUrl" tone="primary" class="md:hidden">{{
           $t('settings.totp.openAppShort')
-        }}</a>
+        }}</AppButton>
         <div class="flex flex-col gap-1.5">
           <span class="text-sm font-semibold">{{ $t('settings.totp.secretLabel') }}</span>
           <div class="flex flex-wrap items-center gap-2.5">
@@ -99,12 +99,12 @@ async function submit() {
       />
       <AuthError :id="ERROR_ID" :text="errorText" />
       <div class="flex flex-wrap gap-2.5">
-        <button type="submit" :class="BUTTON.primary" :aria-disabled="pending">
+        <AppButton type="submit" tone="primary" :disabled="pending">
           {{ $t('settings.totp.confirm') }}
-        </button>
-        <button type="button" :class="BUTTON.secondary" @click="emit('cancel')">
+        </AppButton>
+        <AppButton @click="emit('cancel')">
           {{ $t('common.cancel') }}
-        </button>
+        </AppButton>
       </div>
     </form>
   </div>

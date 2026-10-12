@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
 import AuthLayout from './AuthLayout.vue';
@@ -35,13 +36,10 @@ async function signOut() {
 <template>
   <AuthLayout :title="$t('auth.changePassword.titleForced')" width="medium">
     <template #header-end>
-      <button
-        type="button"
-        class="flex h-11 items-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-4 font-semibold hover:bg-surface-hover"
-        @click="signOut"
-      >
-        <LogOut aria-hidden="true" class="size-4" />{{ $t('account.logout') }}
-      </button>
+      <AppButton @click="signOut">
+        <template #icon><LogOut aria-hidden="true" class="size-4" /></template>
+        {{ $t('account.logout') }}
+      </AppButton>
     </template>
     <div v-if="!passwordChanged" class="flex items-center gap-3">
       <InlineBit kind="sweat" class="shrink-0" />

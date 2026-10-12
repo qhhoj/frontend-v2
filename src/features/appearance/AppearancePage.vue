@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import SettingsLayout from '@/features/account/settings/SettingsLayout.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useMediaQuery } from '@/lib/use-media-query';
@@ -50,7 +51,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
       />
     </div>
     <div class="flex flex-wrap items-start gap-5">
-      <GlassCard class="flex min-w-0 flex-[1_1_420px] flex-col gap-6 p-6">
+      <Card class="flex min-w-0 flex-[1_1_420px] flex-col gap-6 p-6">
         <div class="flex items-center justify-between gap-4">
           <div>
             <p id="own-look-label" class="font-semibold">{{ $t('appearance.customLook') }}</p>
@@ -116,15 +117,9 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         </LevelSlider>
 
         <div>
-          <button
-            type="button"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line-strong px-4.5 text-sm font-medium hover:bg-surface-hover"
-            @click="reset"
-          >
-            {{ $t('appearance.reset') }}
-          </button>
+          <AppButton @click="reset">{{ $t('appearance.reset') }}</AppButton>
         </div>
-      </GlassCard>
+      </Card>
 
       <section class="flex min-w-0 flex-[1_1_420px] flex-col gap-3.5">
         <h2 class="text-meta font-semibold tracking-wider text-muted uppercase">

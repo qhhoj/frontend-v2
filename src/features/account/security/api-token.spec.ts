@@ -97,7 +97,9 @@ describe('Settings › Security › sign out everywhere', () => {
       'POST /auth/logout-all': noContent(),
     });
     const { wrapper } = await mountApp('/settings/security');
-    expect(pageButton(wrapper, 'Đăng xuất mọi nơi').attributes('disabled')).toBeDefined();
+    const button = pageButton(wrapper, 'Đăng xuất mọi nơi');
+    expect(button.attributes('aria-disabled')).toBe('true');
+    await button.trigger('click');
     expect(calls.some((call) => call.path === '/auth/logout-all')).toBe(false);
   });
 });

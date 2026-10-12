@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 import { NOTIFICATION_BITS } from './notification-bits';
 
@@ -16,12 +17,6 @@ defineEmits<{ retry: [] }>();
     <InlineBit :kind="NOTIFICATION_BITS.loadFailed" />
     <strong>{{ $t('notifications.loadFailed') }}</strong>
     <span class="text-muted">{{ $t(errorMessageKey(error)) }}</span>
-    <button
-      type="button"
-      class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-      @click="$emit('retry')"
-    >
-      {{ $t('common.retry') }}
-    </button>
+    <AppButton @click="$emit('retry')">{{ $t('common.retry') }}</AppButton>
   </div>
 </template>

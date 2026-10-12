@@ -1,27 +1,35 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue';
 import UserContent from '@/components/UserContent.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import AuthFieldError from '@/features/auth/AuthFieldError.vue';
+import { translate } from '@/i18n';
 import LengthCounter from './LengthCounter.vue';
 import { profileFieldId } from './profile-field-ids';
 import { ABOUT_MAX_LENGTH, storedLength } from './profile-draft';
 
-type AboutTab = 'write' | 'saved';
-const TABS: readonly AboutTab[] = ['write', 'saved'];
+const TABS = ['write', 'saved'] as const;
 const props = withDefaults(defineProps<{ savedHtml: string; error?: string }>(), {
   error: undefined,
 });
 const about = defineModel<string>({ required: true });
-const tab = ref<AboutTab>('write');
+const tab = ref<string>('write');
 /** The error summary's link to this field: the text must be on screen before it can take the focus. */
 function showWriteTab() {
   tab.value = 'write';
 }
 defineExpose({ showWriteTab });
-const tabButtons = ref<HTMLButtonElement[]>([]);
 const baseId = useId();
 const TEXT_ID = profileFieldId('about');
 const idOf = (part: string) => `${baseId}-${part}`;
+const tabItems = computed<TabItem[]>(() =>
+  TABS.map((name) => ({
+    key: name,
+    label: translate(`settings.profile.aboutTab.${name}`),
+    panelId: idOf(`panel-${name}`),
+  })),
+);
 const describedBy = computed(() =>
   [props.error && idOf('error'), idOf('help')].filter(Boolean).join(' '),
 );
@@ -33,13 +41,6 @@ watch(
     if (error) tab.value = 'write';
   },
 );
-
-function switchWithArrow(event: KeyboardEvent) {
-  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-  event.preventDefault();
-  tab.value = tab.value === 'write' ? 'saved' : 'write';
-  tabButtons.value[TABS.indexOf(tab.value)]?.focus();
-}
 </script>
 
 <template>
@@ -48,35 +49,18 @@ function switchWithArrow(event: KeyboardEvent) {
       <label :for="TEXT_ID" class="text-sm font-semibold text-content">{{
         $t('settings.profile.fieldName.about')
       }}</label>
-      <div role="tablist" :aria-label="$t('settings.profile.aboutViews')" class="flex gap-1">
-        <button
-          v-for="name in TABS"
-          :id="idOf(`tab-${name}`)"
-          ref="tabButtons"
-          :key="name"
-          type="button"
-          role="tab"
-          :aria-selected="tab === name"
-          :aria-controls="idOf(`panel-${name}`)"
-          :tabindex="tab === name ? 0 : -1"
-          class="min-h-11 rounded-pill px-3.5 text-sm"
-          :class="
-            tab === name
-              ? 'bg-accent-soft font-semibold text-accent-soft-text'
-              : 'text-muted hover:bg-surface-hover'
-          "
-          @click="tab = name"
-          @keydown="switchWithArrow"
-        >
-          {{ $t(`settings.profile.aboutTab.${name}`) }}
-        </button>
-      </div>
+      <Tabs
+        v-model="tab"
+        :items="tabItems"
+        :label="$t('settings.profile.aboutViews')"
+        overflow="scroll"
+      />
     </div>
     <div
       v-show="tab === 'write'"
       :id="idOf('panel-write')"
       role="tabpanel"
-      :aria-labelledby="idOf('tab-write')"
+      :aria-labelledby="`${idOf('panel-write')}-tab`"
     >
       <textarea
         :id="TEXT_ID"
@@ -94,7 +78,7 @@ function switchWithArrow(event: KeyboardEvent) {
       :id="idOf('panel-saved')"
       role="tabpanel"
       tabindex="0"
-      :aria-labelledby="idOf('tab-saved')"
+      :aria-labelledby="`${idOf('panel-saved')}-tab`"
       class="min-h-[150px] rounded-row border border-line bg-surface-strong px-4 py-3"
     >
       <UserContent v-if="savedHtml" :html="savedHtml" />

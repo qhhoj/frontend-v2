@@ -2,11 +2,11 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
-import { BUTTON } from '../settings/buttons';
 
 /** Never rendered while viewing as another user: the page leaves it out then (Decision 16). */
 const session = useSessionStore();
@@ -28,9 +28,9 @@ async function logoutEverywhere() {
 <template>
   <SettingsCard :title="$t('settings.logoutAll.title')" :lead="$t('settings.logoutAll.lead')">
     <template #header-end>
-      <button type="button" :class="BUTTON.danger" @click="open">
+      <AppButton tone="danger" @click="open">
         {{ $t('settings.logoutAll.action') }}
-      </button>
+      </AppButton>
     </template>
     <ConfirmDialog
       v-model:visible="confirming"

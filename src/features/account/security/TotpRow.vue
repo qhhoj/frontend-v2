@@ -2,9 +2,9 @@
 import { Smartphone } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
-import { BUTTON } from '../settings/buttons';
 import DisableTotpDialog from './DisableTotpDialog.vue';
 import { useScratchCodesRemainingQuery } from './security.queries';
 
@@ -67,32 +67,16 @@ function regenerate() {
       >{{ $t('settings.twoFactor.on') }}</span
     >
     <span class="flex flex-wrap gap-2">
-      <button
-        v-if="!enabled"
-        type="button"
-        :class="BUTTON.primary"
-        :aria-disabled="busy"
-        @click="busy || emit('enable')"
-      >
+      <AppButton v-if="!enabled" tone="primary" :disabled="busy" @click="emit('enable')">
         {{ $t('settings.totp.enable') }}
-      </button>
+      </AppButton>
       <template v-else>
-        <button
-          type="button"
-          :class="BUTTON.secondary"
-          :aria-disabled="busy"
-          @click="busy || (confirmingRegenerate = true)"
-        >
+        <AppButton :disabled="busy" @click="confirmingRegenerate = true">
           {{ $t('settings.totp.regenerate') }}
-        </button>
-        <button
-          type="button"
-          :class="BUTTON.danger"
-          :aria-disabled="busy"
-          @click="busy || (disabling = true)"
-        >
+        </AppButton>
+        <AppButton tone="danger" :disabled="busy" @click="disabling = true">
           {{ $t('settings.totp.disable') }}
-        </button>
+        </AppButton>
       </template>
     </span>
     <ConfirmDialog

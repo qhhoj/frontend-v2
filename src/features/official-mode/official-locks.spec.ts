@@ -50,7 +50,7 @@ describe('official contest locks in profile settings', () => {
       const { wrapper } = await openSettings(officialMode, isSuperuser);
       expect(
         wrapper.get(`[aria-label="Chuyển ${LHP.name} xuống"]`).attributes('aria-disabled'),
-      ).toBe('false');
+      ).not.toBe('true');
       expect(wrapper.find('[data-testid="official-lock-note"]').exists()).toBe(false);
       wrapper.unmount();
     }

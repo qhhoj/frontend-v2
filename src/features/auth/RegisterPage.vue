@@ -3,6 +3,7 @@ import { nextTick, reactive, ref, watch } from 'vue';
 import { register, resendActivation } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { maskEmail } from '@/lib/mask-email';
 import { usernameProblem } from '@/lib/username';
 import { focusMain } from '@/router/focus-main';
@@ -112,11 +113,7 @@ async function submit() {
     <template #badge>
       <InlineBit kind="sweat" class="self-center" />
     </template>
-    <RouterLink
-      :to="{ name: 'login' }"
-      class="flex h-12 items-center justify-center rounded-pill border border-line-strong bg-surface-solid font-display font-semibold"
-      >{{ $t('auth.toLogin') }}</RouterLink
-    >
+    <AppButton block :to="{ name: 'login' }">{{ $t('auth.toLogin') }}</AppButton>
   </AuthLayout>
   <AuthLayout
     v-else

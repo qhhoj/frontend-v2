@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import AuthBrand from './AuthBrand.vue';
 
@@ -37,10 +38,7 @@ const WIDTHS = {
       </div>
     </header>
     <div class="flex flex-1 flex-col items-center justify-center gap-5 px-4 py-8 sm:p-8">
-      <section
-        class="glass flex w-full flex-col gap-[18px] rounded-panel p-6 sm:p-8"
-        :class="WIDTHS[width]"
-      >
+      <Card class="flex w-full flex-col gap-[18px] p-6 sm:p-8" :class="WIDTHS[width]">
         <slot name="badge" />
         <div :class="centered && 'text-center'">
           <h1 class="page-title">{{ title }}</h1>
@@ -49,7 +47,7 @@ const WIDTHS = {
           </p>
         </div>
         <slot />
-      </section>
+      </Card>
       <slot name="after" />
     </div>
   </div>

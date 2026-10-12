@@ -2,6 +2,9 @@
 import { Download, Palette, ShieldCheck, UserRound } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import PageHeader from '@/components/ui/PageHeader.vue';
+import type { PageCrumb } from '@/components/ui/PageHeader.vue';
+import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 
 /** The four sections; only Appearance is open to anonymous visitors. */
@@ -36,28 +39,19 @@ const sections = computed(() =>
   SECTIONS.filter((section) => signedIn.value || !section.signedInOnly),
 );
 const current = computed(() => SECTIONS.find((section) => section.route === route.name));
+/** Settings (a link once signed in), then the open section. */
+const crumbs = computed<PageCrumb[]>(() => [
+  {
+    label: translate('pages.settings'),
+    to: signedIn.value ? { name: 'settings' } : undefined,
+  },
+  ...(current.value ? [{ label: translate(current.value.labelKey) }] : []),
+]);
 </script>
 
 <template>
   <div class="mx-auto flex w-full max-w-[1216px] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
-    <nav
-      :aria-label="$t('common.breadcrumb')"
-      class="hidden items-center gap-1.5 text-meta sm:flex"
-    >
-      <RouterLink
-        v-if="signedIn"
-        :to="{ name: 'settings' }"
-        class="inline-flex min-h-11 items-center text-accent-text"
-      >
-        {{ $t('pages.settings') }}
-      </RouterLink>
-      <span v-else>{{ $t('pages.settings') }}</span>
-      <span aria-hidden="true" class="text-muted">/</span>
-      <span v-if="current" aria-current="page" class="text-muted">{{ $t(current.labelKey) }}</span>
-    </nav>
-    <h1 class="-mt-3 font-display text-[28px] leading-tight font-bold sm:text-[34px]">
-      {{ $t('pages.settings') }}
-    </h1>
+    <PageHeader :title="$t('pages.settings')" :crumbs="crumbs" />
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <nav
         v-if="sections.length > 1"

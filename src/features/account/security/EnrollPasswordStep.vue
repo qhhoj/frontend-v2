@@ -2,10 +2,10 @@
 import { ref } from 'vue';
 import { enrollTotp } from '@/api/account.api';
 import type { TotpEnrollment } from '@/api/types/account';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
-import { BUTTON } from '../settings/buttons';
 
 /** Step 1: the backend wants the current password before it issues a secret. */
 const emit = defineEmits<{ enrolled: [enrollment: TotpEnrollment]; cancel: [] }>();
@@ -36,12 +36,12 @@ async function submit() {
     />
     <AuthError :text="summary" />
     <div class="flex flex-wrap gap-2.5">
-      <button type="submit" :class="BUTTON.primary" :aria-disabled="pending">
+      <AppButton type="submit" tone="primary" :disabled="pending">
         {{ $t('settings.totp.continue') }}
-      </button>
-      <button type="button" :class="BUTTON.secondary" @click="emit('cancel')">
+      </AppButton>
+      <AppButton @click="emit('cancel')">
         {{ $t('common.cancel') }}
-      </button>
+      </AppButton>
     </div>
   </form>
 </template>

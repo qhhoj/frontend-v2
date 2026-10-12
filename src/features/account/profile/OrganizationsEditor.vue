@@ -2,6 +2,7 @@
 import { ArrowDown, ArrowUp, Building2, X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ProfileOrganization } from '@/api/types/profile';
+import IconButton from '@/components/ui/IconButton.vue';
 import { translate } from '@/i18n';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
@@ -28,8 +29,6 @@ const describedBy = computed(() => (lock.isLocked.value ? lock.noteId : undefine
 const rows = computed(() =>
   ids.value.flatMap((id) => props.organizations.filter((organization) => organization.id === id)),
 );
-const ICON_BUTTON =
-  'scroll-mb-28 flex size-11 items-center justify-center rounded-full border border-line-strong bg-surface-solid hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:border-line aria-disabled:text-muted';
 
 /** Acts on the id, not the row index, so a row the list does not show can never be moved by mistake. */
 function move(organization: ProfileOrganization, offset: -1 | 1) {
@@ -98,36 +97,37 @@ function leave(organization: ProfileOrganization) {
           </span>
         </span>
         <span class="flex gap-1.5">
-          <button
-            type="button"
-            :class="ICON_BUTTON"
-            :aria-label="$t('settings.organizations.up', { name: organization.name })"
-            :aria-disabled="lock.isLocked.value || index === 0"
+          <IconButton
+            tone="secondary"
+            class="scroll-mb-28"
+            :label="$t('settings.organizations.up', { name: organization.name })"
+            :disabled="lock.isLocked.value || index === 0"
             :aria-describedby="describedBy"
             @click="move(organization, -1)"
           >
             <ArrowUp aria-hidden="true" class="size-[18px]" />
-          </button>
-          <button
-            type="button"
-            :class="ICON_BUTTON"
-            :aria-label="$t('settings.organizations.down', { name: organization.name })"
-            :aria-disabled="lock.isLocked.value || index === rows.length - 1"
+          </IconButton>
+          <IconButton
+            tone="secondary"
+            class="scroll-mb-28"
+            :label="$t('settings.organizations.down', { name: organization.name })"
+            :disabled="lock.isLocked.value || index === rows.length - 1"
             :aria-describedby="describedBy"
             @click="move(organization, 1)"
           >
             <ArrowDown aria-hidden="true" class="size-[18px]" />
-          </button>
-          <button
+          </IconButton>
+          <IconButton
             v-if="!organization.isAdmin"
-            type="button"
-            :class="[ICON_BUTTON, 'text-negative']"
-            :aria-label="$t('settings.organizations.leave', { name: organization.name })"
-            v-bind="lock.lockAttrs.value"
+            tone="danger"
+            class="scroll-mb-28"
+            :label="$t('settings.organizations.leave', { name: organization.name })"
+            :disabled="lock.isLocked.value"
+            :aria-describedby="describedBy"
             @click="leave(organization)"
           >
             <X aria-hidden="true" class="size-[18px]" />
-          </button>
+          </IconButton>
         </span>
         <p v-if="organization.isAdmin" class="w-full text-meta text-muted">
           {{ $t('settings.organizations.adminNote') }}

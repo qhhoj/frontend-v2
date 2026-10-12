@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 
 /**
  * Board SetImpersonation: what the owner could do, each with the reason it is locked. The backend refuses all four while
@@ -47,7 +47,7 @@ const LOCKED_ACTIONS = [
           <strong class="font-semibold">{{ $t(action.titleKey) }}</strong>
           <span class="text-meta text-muted">{{ $t(action.reasonKey) }}</span>
         </span>
-        <button type="button" :class="BUTTON.secondary" disabled>{{ $t(action.actionKey) }}</button>
+        <AppButton disabled>{{ $t(action.actionKey) }}</AppButton>
       </li>
     </ul>
   </SettingsCard>

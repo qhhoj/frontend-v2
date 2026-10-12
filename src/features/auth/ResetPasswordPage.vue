@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { confirmPasswordReset } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { focusMain } from '@/router/focus-main';
 import { useSessionStore } from '@/stores/session.store';
 import AuthError from './AuthError.vue';
@@ -69,12 +70,9 @@ async function submit() {
     <template v-if="linkDead" #badge>
       <InlineBit kind="sweat" class="self-center" />
     </template>
-    <RouterLink
-      v-if="linkDead"
-      :to="{ name: 'forgot-password' }"
-      class="bg-gradient-accent flex h-12 items-center justify-center rounded-pill font-display font-semibold text-on-accent"
-      >{{ $t('auth.resetPassword.requestNew') }}</RouterLink
-    >
+    <AppButton v-if="linkDead" tone="primary" block :to="{ name: 'forgot-password' }">{{
+      $t('auth.resetPassword.requestNew')
+    }}</AppButton>
     <form v-else ref="formElement" class="flex flex-col gap-[18px]" @submit.prevent="submit">
       <NewPasswordPair
         v-model:password="form.newPassword"
