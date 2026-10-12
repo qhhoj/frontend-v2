@@ -6,7 +6,6 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
   COLUMN_TIER_CLASS,
-  DENSE_BODY_CELL_CLASSES,
   HEADER_ROW_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
@@ -25,12 +24,10 @@ const props = withDefaults(
     columnKeys?: readonly ColumnKey[];
     /** The signed-in list page's "Chọn" column (a 44 px cell, so rows are taller). */
     hasPickColumn?: boolean;
-    /** The list's one-line 42px rows. */
-    dense?: boolean;
   }>(),
-  { showProblem: true, columnKeys: undefined, hasPickColumn: false, dense: false },
+  { showProblem: true, columnKeys: undefined, hasPickColumn: false },
 );
-const bodyCell = computed(() => (props.dense ? DENSE_BODY_CELL_CLASSES : BODY_CELL_CLASSES));
+const bodyCell = BODY_CELL_CLASSES;
 /** Header cell width, then the cell's own width, per column in the table's order. */
 const COLUMNS = [
   { key: 'verdict', header: 'w-12', cell: 'w-[7.875rem]', isNumber: false },
@@ -109,17 +106,14 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
             class="border-t border-line"
           >
             <td v-if="hasPickColumn" :class="bodyCell">
-              <SkeletonBlock round class="size-11" :class="{ '-my-1': dense }" />
+              <SkeletonBlock round class="size-11" />
             </td>
             <td
               v-for="column in columns"
               :key="column.key"
               :class="[bodyCell, tierOf(column.key), { 'text-right font-mono': column.isNumber }]"
             >
-              <SkeletonBlock
-                v-if="column.key === 'verdict'"
-                :class="[column.cell, dense ? 'h-9' : 'h-12']"
-              />
+              <SkeletonBlock v-if="column.key === 'verdict'" :class="[column.cell, 'h-12']" />
               <SkeletonBlock v-else text :class="column.cell" />
             </td>
             <td :class="bodyCell"><SkeletonBlock class="size-7" /></td>

@@ -1198,11 +1198,6 @@
       "grading": "Đang chấm",
       "advanced": "Bộ lọc nâng cao"
     },
-    "density": {
-      "label": "Mật độ hàng",
-      "compact": "Gọn",
-      "comfortable": "Rộng"
-    },
     "strip": {
       "passed": "{passed}/{outOf} test đúng",
       "passedBatch": "{passed}/{outOf} subtask đúng",

@@ -5,18 +5,14 @@ import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSessionStore } from '@/stores/session.store';
-import DensitySwitch from '../DensitySwitch.vue';
 import DiffSelectionBar from '../DiffSelectionBar.vue';
 import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
 import SubmissionStatsStrip from '../SubmissionStatsStrip.vue';
-import SubmissionTable from '../SubmissionTable.vue';
-import SubmissionTableSkeleton from '../SubmissionTableSkeleton.vue';
 import { advancedFilterCount } from '../quick-filters';
 import { ALL_COLUMN_KEYS } from '../submission-table-cells';
 import type { ColumnKey } from '../submission-table-cells';
 import { useSubmissionStatsQuery } from '../submissions.queries';
 import { useDiffPicks } from '../use-diff-picks';
-import { useListDensity } from '../use-list-density';
 import LiveListNotices from './LiveListNotices.vue';
 import SubmissionCardList from './SubmissionCardList.vue';
 import SubmissionCardListSkeleton from './SubmissionCardListSkeleton.vue';
@@ -70,7 +66,6 @@ const chipUsername = computed(() =>
   isSignedIn.value && !hasFixedUser.value ? (session.user?.username ?? null) : null,
 );
 const picks = useDiffPicks();
-const density = useListDensity();
 const advancedCount = computed(() => advancedFilterCount(filters.value, chipUsername.value));
 /** A link that carries a filter only the panel shows opens with the panel open, so the filter is visible. */
 const isAdvancedOpen = ref(advancedCount.value > 0);
@@ -105,8 +100,6 @@ watch(
           @update="update"
           @toggle-advanced="isAdvancedOpen = !isAdvancedOpen"
         />
-        <!-- The phone's stacked rows have one density: the switch would change nothing there. -->
-        <DensitySwitch v-model="density" class="max-md:hidden" />
       </div>
       <SubmissionFilterPanel
         v-if="isAdvancedOpen"
@@ -137,36 +130,17 @@ watch(
         align="end"
       />
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton>
-          <SubmissionCardListSkeleton v-if="density === 'comfortable'" />
-          <SubmissionTableSkeleton
-            v-else
-            :has-pick-column="isSignedIn"
-            dense
-            :column-keys="columnKeys"
-          />
-        </template>
+        <template #skeleton><SubmissionCardListSkeleton /></template>
         <GlassCard v-if="!rows.length" as="div">
           <EmptyState>{{ emptyText }}</EmptyState>
         </GlassCard>
         <SubmissionCardList
-          v-else-if="density === 'comfortable'"
+          v-else
           :submissions="rows"
           :columns="columnKeys ?? ALL_COLUMN_KEYS"
           :highlight-ids="live.addedIds.value"
           :problem-labels="problemLabels ?? {}"
           :picked-ids="isSignedIn ? picks.picked.value : undefined"
-          @toggle-pick="picks.toggle"
-        />
-        <SubmissionTable
-          v-else
-          dense
-          :submissions="rows"
-          :highlight-ids="live.addedIds.value"
-          :picked-ids="isSignedIn ? picks.picked.value : undefined"
-          :column-keys="columnKeys"
-          :problem-labels="problemLabels"
-          show-problem-code
           @toggle-pick="picks.toggle"
         />
         <DiffSelectionBar
