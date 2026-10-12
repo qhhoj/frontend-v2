@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue';
 import type { ProblemTag } from '@/api/types/organization-problems';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { ORGANIZATION_TAG_COLORS } from './org-tag-classes';
 import { emptyTagForm, tagFormErrors, tagFormOf } from './org-tag-form';
 import type { TagForm } from './org-tag-form';
@@ -19,11 +21,10 @@ watch(visible, (isOpen) => {
   errors.value = {};
 });
 function submit() {
+  form.value.slug = form.value.slug.trim();
   errors.value = tagFormErrors(form.value, props.tag === null);
   if (Object.keys(errors.value).length === 0) emit('save', { ...form.value });
 }
-const INPUT =
-  'min-h-11 w-full rounded-row border border-line-strong bg-surface-solid px-3 text-content';
 </script>
 
 <template>
@@ -38,45 +39,25 @@ const INPUT =
     :busy="busy"
     @confirm="submit"
   >
-    <div v-if="!tag" class="flex flex-col gap-1.5">
-      <label for="org-tag-slug" class="text-sm font-semibold">{{
-        $t('orgProblems.tags.slug')
-      }}</label>
-      <input
-        id="org-tag-slug"
-        v-model.trim="form.slug"
-        :class="INPUT"
-        class="font-mono"
-        maxlength="20"
-        autocomplete="off"
-        :aria-invalid="errors.slug ? 'true' : undefined"
-        aria-describedby="org-tag-slug-hint org-tag-slug-error"
-      />
-      <p id="org-tag-slug-hint" class="text-xs text-muted">{{ $t('orgProblems.tags.slugHint') }}</p>
-      <p id="org-tag-slug-error" class="text-sm text-negative">
-        {{ errors.slug ? $t(errors.slug) : '' }}
-      </p>
-    </div>
+    <FormField
+      v-if="!tag"
+      input-id="org-tag-slug"
+      :label="$t('orgProblems.tags.slug')"
+      :hint="$t('orgProblems.tags.slugHint')"
+      :error="errors.slug ? $t(errors.slug) : undefined"
+    >
+      <TextInput v-model="form.slug" class="font-mono" maxlength="20" autocomplete="off" />
+    </FormField>
     <p v-else class="text-sm text-muted">
       {{ $t('orgProblems.tags.slugFixed', { slug: tag.slug }) }}
     </p>
-    <div class="flex flex-col gap-1.5">
-      <label for="org-tag-name" class="text-sm font-semibold">{{
-        $t('orgProblems.tags.name')
-      }}</label>
-      <input
-        id="org-tag-name"
-        v-model="form.name"
-        :class="INPUT"
-        maxlength="40"
-        autocomplete="off"
-        :aria-invalid="errors.name ? 'true' : undefined"
-        aria-describedby="org-tag-name-error"
-      />
-      <p id="org-tag-name-error" class="text-sm text-negative">
-        {{ errors.name ? $t(errors.name) : '' }}
-      </p>
-    </div>
+    <FormField
+      input-id="org-tag-name"
+      :label="$t('orgProblems.tags.name')"
+      :error="errors.name ? $t(errors.name) : undefined"
+    >
+      <TextInput v-model="form.name" maxlength="40" autocomplete="off" />
+    </FormField>
     <fieldset class="flex flex-col gap-2">
       <legend class="mb-1 text-sm font-semibold">{{ $t('orgProblems.tags.color') }}</legend>
       <div class="flex flex-wrap gap-2">

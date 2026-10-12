@@ -7,6 +7,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { ORG_BITS } from '../org-bits';
@@ -130,14 +131,12 @@ function saveTags(tagIds: string[]) {
             :title="$t('orgProblems.emptyTitle')"
             :body="$t('orgProblems.emptyBody')"
           >
-            <button
+            <AppButton
               v-if="filters.archived === 'false'"
-              type="button"
-              class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
               @click="applyFilters({ archived: 'true' })"
             >
               {{ $t('orgProblems.showArchived') }}
-            </button>
+            </AppButton>
           </StatePanel>
           <EmptyState
             v-else-if="listState === 'filteredEmpty'"

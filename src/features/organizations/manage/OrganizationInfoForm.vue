@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { TriangleAlert } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { OrganizationDetail } from '@/api/types/organizations';
+import FormField from '@/components/ui/FormField.vue';
+import SaveBar from '@/components/ui/SaveBar.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
-import AdminField from '@/features/admin/ui/AdminField.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import MarkdownField from '@/features/admin/ui/MarkdownField.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { BUTTON, INPUT } from '@/features/admin/ui/controls';
 import JoinModeField from './JoinModeField.vue';
 import OrganizationAvatarField from './OrganizationAvatarField.vue';
 import OrganizationSettingsSection from './OrganizationSettingsSection.vue';
 
 /**
  * Legacy `OrganizationForm` for the organization's own administrators: logo, name, address, about and join mode, in a two-column
- * settings card (section title left, controls right). Save stays aria-disabled until something changed. The staff
+ * settings card (section title left, controls right), then the save bar: save stays aria-disabled until something changed. The staff
  * fields (short name, places, unlisted) stay on the admin editor, linked for `judge.edit_all_organization` holders.
  */
 const props = defineProps<{ slug: string }>();
@@ -25,9 +27,13 @@ const editor = useOrganizationEditor(
   (saved) => emit('saved', saved),
 );
 const { form, errors, canEditAll, mutation } = editor;
-const isSaved = ref(false);
+const { t } = useI18n();
+const savedAt = ref<Date | null>(null);
 const isLogoUploading = ref(false);
 const isDirty = computed(() => editor.dirtyCount.value > 0);
+const blockedReason = computed(() =>
+  isLogoUploading.value ? t('orgAdmin.info.logoUploading') : undefined,
+);
 /** The address prefix is the site's own: the page's host and the organization route. */
 const SLUG_PREFIX = `${window.location.host}/organizations/`;
 /** The warning shows only for an address that differs from the saved one. */
@@ -36,13 +42,14 @@ const isSaveBlocked = computed(() => !isDirty.value || isLogoUploading.value);
 
 async function submit() {
   if (isSaveBlocked.value) return;
-  isSaved.value = false;
+  savedAt.value = null;
   const isSent = await editor.save();
   // An unchanged form sends nothing; it is as saved as it gets.
-  isSaved.value = isSent || (!mutation.failure.value && Object.keys(errors.value).length === 0);
+  const isSaved = isSent || (!mutation.failure.value && Object.keys(errors.value).length === 0);
+  savedAt.value = isSaved ? new Date() : null;
 }
 function reset() {
-  isSaved.value = false;
+  savedAt.value = null;
   editor.reset();
 }
 </script>
@@ -67,23 +74,14 @@ function reset() {
           :title="$t('orgAdmin.info.identity')"
           :description="$t('orgAdmin.info.identityLead')"
         >
-          <AdminField
+          <FormField
             input-id="org-info-name"
             :label="$t('orgAdmin.info.name')"
             :error="errors.name"
           >
-            <template #default="{ id, describedBy, invalid }">
-              <input
-                :id="id"
-                v-model="form.name"
-                :class="INPUT"
-                maxlength="128"
-                :aria-describedby="describedBy"
-                :aria-invalid="invalid ? 'true' : undefined"
-              />
-            </template>
-          </AdminField>
-          <AdminField
+            <TextInput v-model="form.name" maxlength="128" />
+          </FormField>
+          <FormField
             input-id="org-info-slug"
             :label="$t('orgAdmin.info.slug')"
             :error="errors.slug"
@@ -116,7 +114,7 @@ function reset() {
                 <span>{{ $t('orgAdmin.info.slugWarning') }}</span>
               </p>
             </template>
-          </AdminField>
+          </FormField>
         </OrganizationSettingsSection>
         <OrganizationSettingsSection
           :title="$t('orgAdmin.info.aboutTitle')"
@@ -136,32 +134,26 @@ function reset() {
           <JoinModeField v-model="form.isOpen" />
         </OrganizationSettingsSection>
       </div>
-      <div class="flex flex-wrap items-center justify-end gap-3">
-        <RouterLink
-          v-if="canEditAll"
-          :to="{ name: 'admin-organizations', query: { org: slug } }"
-          class="mr-auto text-sm font-semibold text-accent-text hover:underline"
-        >
-          {{ $t('orgAdmin.info.staffLink') }}
-        </RouterLink>
-        <button type="button" :class="BUTTON.secondary" @click="reset">
-          {{ $t('orgAdmin.info.reset') }}
-        </button>
-        <button
-          type="submit"
-          :class="BUTTON.primary"
-          :aria-disabled="isSaveBlocked || undefined"
-          :aria-busy="mutation.isPending.value || undefined"
-        >
-          {{ $t('orgAdmin.info.save') }}
-        </button>
-      </div>
+      <RouterLink
+        v-if="canEditAll"
+        :to="{ name: 'admin-organizations', query: { org: slug } }"
+        class="w-fit text-sm font-semibold text-accent-text hover:underline"
+      >
+        {{ $t('orgAdmin.info.staffLink') }}
+      </RouterLink>
       <AdminStatus
         v-if="mutation.failure.value"
         kind="refused"
         :text="failureTextOf(mutation.failure.value)"
       />
-      <AdminStatus v-else-if="isSaved" kind="done" :text="$t('admin.ui.saved')" />
+      <SaveBar
+        :dirty-count="editor.dirtyCount.value"
+        :pending="mutation.isPending.value"
+        :saved-at="savedAt"
+        :blocked-reason="blockedReason"
+        :save-label="$t('orgAdmin.info.save')"
+        @discard="reset"
+      />
     </form>
   </SettingsCard>
 </template>

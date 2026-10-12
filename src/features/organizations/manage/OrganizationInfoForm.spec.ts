@@ -27,14 +27,14 @@ async function openManage() {
 }
 
 describe('organization settings form', () => {
-  it('keeps Lưu thay đổi aria-disabled until the form is dirty, and Hủy puts it back', async () => {
+  it('keeps Lưu thay đổi aria-disabled until the form is dirty, and Huỷ thay đổi puts it back', async () => {
     const wrapper = await openManage();
     const form = wrapper.get('form');
     const save = () => form.get('button[type="submit"]');
     expect(save().attributes('aria-disabled')).toBe('true');
     await form.get('#org-info-name').setValue('Tên mới');
     expect(save().attributes('aria-disabled')).toBeUndefined();
-    const cancel = form.findAll('button').find((button) => button.text() === 'Hủy')!;
+    const cancel = form.findAll('button').find((button) => button.text() === 'Huỷ thay đổi')!;
     await cancel.trigger('click');
     expect((form.get('#org-info-name').element as HTMLInputElement).value).not.toBe('Tên mới');
     expect(save().attributes('aria-disabled')).toBe('true');

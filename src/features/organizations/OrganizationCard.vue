@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { OrganizationListItem } from '@/api/types/organizations';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { formatNumber } from '@/lib/format';
 import { medalClass } from '@/lib/medal';
 import { safeRedirect } from '@/router/safe-redirect';
@@ -36,10 +38,9 @@ const actionKey = computed(() => {
   if (!props.isSignedIn) return 'orgs.act.signIn';
   return props.organization.isOpen ? 'orgs.act.join' : 'orgs.act.request';
 });
-const actionClass = computed(() =>
-  !props.isMember && props.isSignedIn && props.organization.isOpen
-    ? 'bg-accent text-on-accent'
-    : 'bg-accent-soft text-accent-soft-text',
+/** Only "join" (an open organization) is the primary action; the rest are secondary. */
+const actionTone = computed(() =>
+  !props.isMember && props.isSignedIn && props.organization.isOpen ? 'primary' : 'secondary',
 );
 </script>
 
@@ -78,20 +79,9 @@ const actionClass = computed(() =>
     >
       <div class="flex flex-wrap items-center gap-2">
         <OrganizationJoinChip :is-open="organization.isOpen" />
-        <span
-          v-if="organization.isUnlisted"
-          class="rounded-pill border border-line px-3 py-1 text-sm text-muted"
-        >
-          {{ $t('orgs.unlisted') }}
-        </span>
+        <Chip v-if="organization.isUnlisted" size="md">{{ $t('orgs.unlisted') }}</Chip>
       </div>
-      <RouterLink
-        :to="actionRoute"
-        class="inline-flex min-h-9 items-center rounded-pill px-3.5 text-sm font-bold"
-        :class="actionClass"
-      >
-        {{ $t(actionKey) }}
-      </RouterLink>
+      <AppButton :to="actionRoute" :tone="actionTone" size="sm">{{ $t(actionKey) }}</AppButton>
     </div>
   </article>
 </template>

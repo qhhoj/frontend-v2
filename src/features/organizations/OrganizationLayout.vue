@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { usePageTitle } from '@/router/page-title';
 import OrganizationHeader from './OrganizationHeader.vue';
 import OrganizationHeaderSkeleton from './OrganizationHeaderSkeleton.vue';
@@ -23,12 +24,7 @@ usePageTitle(() => organization.value?.name);
       :body="$t('orgs.notFoundBody')"
       is-page-heading
     >
-      <RouterLink
-        :to="{ name: 'organizations' }"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >
-        {{ $t('orgs.backToList') }}
-      </RouterLink>
+      <AppButton :to="{ name: 'organizations' }">{{ $t('orgs.backToList') }}</AppButton>
     </StatePanel>
   </div>
   <div v-else class="flex flex-col">

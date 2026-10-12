@@ -3,7 +3,8 @@ import { computed } from 'vue';
 import { ChevronRight, Plus } from 'lucide-vue-next';
 import InlineBit from '@/components/InlineBit.vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
-import { BUTTON } from '@/features/account/settings/buttons';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useJoinRequestsQuery } from './organizations.queries';
@@ -41,22 +42,23 @@ const ROW =
       </div>
     </div>
     <div v-if="viewer?.canCreateProblem || viewer?.canCreateContest" class="flex flex-col gap-2.5">
-      <RouterLink
+      <AppButton
         v-if="viewer?.canCreateProblem"
         data-testid="org-create-problem"
+        tone="primary"
         :to="{ name: 'admin-problemNew', query: createQuery }"
-        :class="BUTTON.primary"
       >
-        <Plus class="size-4" aria-hidden="true" />{{ $t('create.problem') }}
-      </RouterLink>
-      <RouterLink
+        <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+        {{ $t('create.problem') }}
+      </AppButton>
+      <AppButton
         v-if="viewer?.canCreateContest"
         data-testid="org-create-contest"
         :to="{ name: 'admin-contestNew', query: createQuery }"
-        :class="BUTTON.secondary"
       >
-        <Plus class="size-4" aria-hidden="true" />{{ $t('create.contest') }}
-      </RouterLink>
+        <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+        {{ $t('create.contest') }}
+      </AppButton>
     </div>
     <nav
       :aria-label="$t('orgs.manageCard.shortcuts')"
@@ -72,12 +74,9 @@ const ROW =
       </RouterLink>
       <RouterLink v-if="canAdminister" :to="{ name: 'organization-manage', params }" :class="ROW">
         <span class="flex-1">{{ $t('orgs.manageCard.requests') }}</span>
-        <span
-          v-if="pendingTotal"
-          class="rounded-pill bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-soft-text"
-        >
+        <Chip v-if="pendingTotal" tone="accent">
           {{ $t('orgs.manageCard.pending', { count: formatNumber(pendingTotal, locale.locale) }) }}
-        </span>
+        </Chip>
         <ChevronRight class="size-4 text-accent-text" aria-hidden="true" />
       </RouterLink>
     </nav>
