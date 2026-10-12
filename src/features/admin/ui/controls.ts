@@ -1,3 +1,5 @@
+import { buttonClasses } from '@/components/ui/button-classes';
+import type { ButtonTone } from '@/components/ui/button-classes';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 
 /**
@@ -8,30 +10,12 @@ import { CARD_VARIANTS } from '@/components/ui/Card.variants';
  */
 const CONTROL_HEIGHT = 'min-h-[var(--qa-control,2.25rem)]';
 
-const BUTTON_BASE = `inline-flex ${CONTROL_HEIGHT} items-center justify-center gap-2 whitespace-nowrap rounded-cell border px-3.5 text-sm font-semibold transition-colors aria-disabled:cursor-not-allowed disabled:cursor-not-allowed`;
-/** Small: toolbar and row actions. A coarse pointer still gets the full control height. */
-const BUTTON_SMALL = `inline-flex min-h-8 pointer-coarse:min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-cell border px-2.5 text-sm font-semibold transition-colors aria-disabled:cursor-not-allowed disabled:cursor-not-allowed`;
-const DISABLED_LOOK =
-  'aria-disabled:border-line aria-disabled:bg-surface-strong aria-disabled:text-muted disabled:border-line disabled:bg-surface-strong disabled:text-muted';
-
-const TONES = {
-  /** One per page: the action the page exists for. */
-  primary: `border-accent bg-accent text-on-accent hover:border-accent-2 hover:bg-accent-2 ${DISABLED_LOOK}`,
-  /** Outline: every other action. */
-  secondary: `border-line-strong bg-surface-solid text-content hover:bg-surface-hover ${DISABLED_LOOK}`,
-  /** No frame: discard, cancel, icon actions inside rows. */
-  ghost:
-    'border-transparent bg-transparent text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
-  /** Destructive only (delete, ban, disable); outlined, never filled. */
-  danger: `border-negative bg-surface-solid text-negative hover:bg-surface-hover ${DISABLED_LOOK}`,
-} as const;
-
-export type ButtonTone = keyof typeof TONES;
+export type { ButtonTone };
 export type ControlSize = 'sm' | 'md';
 
-/** The class list of an admin button or button-styled link. */
+/** The class list of an admin button or button-styled link. Primary: one per page; danger: destructive only, outlined. */
 export const buttonClass = (tone: ButtonTone = 'secondary', size: ControlSize = 'md') =>
-  `${size === 'sm' ? BUTTON_SMALL : BUTTON_BASE} ${TONES[tone]}`;
+  buttonClasses({ tone, size, shape: 'admin' });
 
 /** A square icon-only button; give it an `aria-label` and a `title`. */
 export const iconButtonClass = (tone: ButtonTone = 'ghost', size: ControlSize = 'md') =>

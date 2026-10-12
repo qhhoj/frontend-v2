@@ -3,6 +3,7 @@ import { errorMessageKey } from '@/i18n/error-message';
 import { useWaitingWhile } from '@/stores/use-waiting-while';
 import InlineBit from './InlineBit.vue';
 import SkeletonBlock from './SkeletonBlock.vue';
+import AppButton from './ui/AppButton.vue';
 
 const props = withDefaults(
   defineProps<{ loading: boolean; error: unknown; registersWait?: boolean }>(),
@@ -29,13 +30,7 @@ useWaitingWhile(() => props.loading && props.registersWait);
     <!-- The message beside it says what happened, so the sweating Bit is decoration. -->
     <InlineBit kind="sweat" data-testid="bit" />
     <span>{{ $t(errorMessageKey(error)) }}</span>
-    <button
-      type="button"
-      class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-      @click="$emit('retry')"
-    >
-      {{ $t('common.retry') }}
-    </button>
+    <AppButton @click="$emit('retry')">{{ $t('common.retry') }}</AppButton>
   </div>
   <slot v-else />
 </template>
