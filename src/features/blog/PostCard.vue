@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
@@ -28,7 +29,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 </script>
 
 <template>
-  <article data-testid="post-card" class="glass flex min-w-0 flex-col overflow-hidden rounded-card">
+  <Card as="article" data-testid="post-card" class="flex min-w-0 flex-col overflow-hidden">
     <RouterLink
       :to="{ name: 'post', params: { id: post.id } }"
       tabindex="-1"
@@ -79,5 +80,5 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         />
       </footer>
     </div>
-  </article>
+  </Card>
 </template>

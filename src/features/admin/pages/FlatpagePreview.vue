@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserContent from '@/components/UserContent.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { INTL_LOCALES } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../ui/admin-errors';
@@ -70,17 +71,13 @@ const CHIP_TONES = {
     >
       <UserContent :html="html" />
     </div>
-    <p
-      v-if="status === 'paused'"
-      role="status"
-      class="rounded-row bg-verdict-tle-bg p-3 text-sm text-verdict-tle"
-    >
+    <Notice v-if="status === 'paused'" tone="warning" compact role="status">
       {{
         preview.retryAfterSeconds.value
           ? $t('admin.pages.preview.pausedWait', { seconds: preview.retryAfterSeconds.value })
           : $t('admin.pages.preview.paused')
       }}
-    </p>
+    </Notice>
     <p v-if="preview.failure.value" role="alert" class="text-sm text-negative">
       {{ failureTextOf(preview.failure.value) }}
     </p>

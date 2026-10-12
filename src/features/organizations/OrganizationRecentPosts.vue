@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -17,7 +18,7 @@ const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POS
 </script>
 
 <template>
-  <section class="glass flex flex-col gap-3 rounded-card p-5">
+  <Card padding="md" class="flex flex-col gap-3">
     <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.posts') }}</h2>
     <QueryState
       :loading="query.isPending.value"
@@ -61,5 +62,5 @@ const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POS
     >
       {{ $t('common.viewAll') }}
     </RouterLink>
-  </section>
+  </Card>
 </template>

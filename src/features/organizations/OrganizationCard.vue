@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { OrganizationListItem } from '@/api/types/organizations';
@@ -45,7 +46,7 @@ const actionTone = computed(() =>
 </script>
 
 <template>
-  <article data-testid="organization-card" class="glass flex flex-col gap-3.5 rounded-card p-5">
+  <Card as="article" data-testid="organization-card" padding="md" class="flex flex-col gap-3.5">
     <div class="flex min-w-0 items-center gap-3">
       <OrganizationLogo :organization="organization" />
       <div class="min-w-0 flex-1">
@@ -83,5 +84,5 @@ const actionTone = computed(() =>
       </div>
       <AppButton :to="actionRoute" :tone="actionTone" size="sm">{{ $t(actionKey) }}</AppButton>
     </div>
-  </article>
+  </Card>
 </template>

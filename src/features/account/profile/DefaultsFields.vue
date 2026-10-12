@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -90,10 +91,7 @@ const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
       </AuthSelect>
     </div>
     <p class="text-meta leading-normal text-muted">
-      <span
-        class="rounded-pill bg-verdict-pending-bg px-2.5 py-0.5 text-xs font-semibold text-verdict-pending"
-        >{{ $t('settings.defaults.deviceOnly') }}</span
-      >
+      <Chip>{{ $t('settings.defaults.deviceOnly') }}</Chip>
       {{ $t('settings.defaults.deviceOnlyNote') }}
     </p>
   </SettingsCard>

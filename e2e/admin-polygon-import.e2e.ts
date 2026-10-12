@@ -1,5 +1,6 @@
 import { expect, test } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
+import { sessionResponse, sessionUser } from '../src/test/fixtures';
 import { adminOk, signInAsStaff } from './fixtures/admin';
 
 const PERMISSION = 'judge.import_polygon_package';
@@ -32,6 +33,21 @@ for (const viewport of AUDIT_VIEWPORTS)
   }) => {
     await page.setViewportSize(viewport);
     signInAsStaff(api, [PERMISSION, 'judge.add_problem']);
+    // The backend reports where the viewer may create (`adminCapabilities`); a site-wide creator here.
+    api.routes['GET /auth/me'] = adminOk(
+      sessionResponse({
+        user: sessionUser({
+          username: 'minhthu',
+          isStaff: true,
+          permissions: [PERMISSION, 'judge.add_problem'],
+          adminCapabilities: {
+            organizations: false,
+            problemCreation: { site: true, organizations: false },
+            contestCreation: { site: false, organizations: false },
+          },
+        }),
+      }),
+    );
     api.routes['GET /problems/meta'] = adminOk(META);
     api.routes['POST /problems/imports'] = { status: 202, body: { data: { jobId: 'job-1' } } };
     let polls = 0;

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
@@ -28,22 +29,22 @@ const showsManageCard = computed(
       class="lg:col-start-3 lg:row-start-1"
     />
     <div class="flex min-w-0 flex-col gap-5 lg:col-span-2 lg:row-span-2 lg:row-start-1">
-      <section class="glass flex flex-col gap-3 rounded-card p-5 sm:p-6">
+      <Card class="flex flex-col gap-3 p-5 sm:p-6">
         <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.about') }}</h2>
         <UserContent v-if="organization.aboutHtml" :html="organization.aboutHtml" />
         <EmptyState v-else>{{ $t('orgs.noAbout') }}</EmptyState>
-      </section>
+      </Card>
       <OrganizationRecentPosts />
     </div>
     <aside class="flex min-w-0 flex-col gap-5 lg:col-start-3">
-      <section data-testid="organization-admins" class="glass flex flex-col gap-3 rounded-card p-5">
+      <Card data-testid="organization-admins" padding="md" class="flex flex-col gap-3">
         <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.admins') }}</h2>
         <ul class="flex flex-col gap-2">
           <li v-for="admin in organization.admins" :key="admin.id" class="flex items-center gap-2">
             <UserLink :username="admin.username" :rating="admin.rating" size="sm" />
           </li>
         </ul>
-      </section>
+      </Card>
       <OrganizationTopMembers />
     </aside>
   </div>

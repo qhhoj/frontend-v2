@@ -83,7 +83,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 ## Components
 
-- **Card**: `GlassCard` (`glass rounded-card`; callers add padding): a white hairline card in Clay, frosted in Glass.
+- **Card**: `ui/Card.vue` (variant `glass` = `glass rounded-card`; `padding` or caller padding): a white hairline card in Clay, frosted in Glass. `GlassCard` is its old-name wrapper.
 - **Pill nav / tabs**: `glass` pill container; active item `bg-accent-soft` + `text-accent-soft-text` + accent border (one active style for every tab set), others `text-muted` with a `bg-surface-hover` hover.
 - **Primary button**: `bg-gradient-accent` + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
 - **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.
