@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { RATING_BOX_CLASSES } from './profile-geometry';
 
@@ -13,7 +13,7 @@ const TAB_COUNT = 5;
 
 <template>
   <SkeletonBlock class="h-5 w-40" />
-  <GlassCard
+  <Card
     data-testid="profile-header"
     class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
   >
@@ -34,7 +34,7 @@ const TAB_COUNT = 5;
         <SkeletonBlock class="h-10 w-56" />
       </div>
     </div>
-  </GlassCard>
+  </Card>
   <div data-skeleton-region="tabs" class="flex gap-2 overflow-hidden">
     <SkeletonBlock v-for="index in TAB_COUNT" :key="index" class="min-h-11 w-28 shrink-0" pill />
   </div>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
@@ -17,7 +18,7 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
 </script>
 
 <template>
-  <GlassCard
+  <Card
     data-testid="anonymous-hero"
     class="flex flex-wrap items-center gap-6 p-6 sm:flex-nowrap sm:gap-8 sm:p-8"
   >
@@ -27,16 +28,8 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
       </h1>
       <p class="max-w-2xl text-muted">{{ $t('home.anon.body') }}</p>
       <div class="flex flex-wrap gap-2.5">
-        <RouterLink
-          to="/register"
-          class="bg-gradient-accent inline-flex min-h-11 items-center rounded-pill px-5 font-semibold text-on-accent"
-          >{{ $t('home.anon.register') }}</RouterLink
-        >
-        <RouterLink
-          to="/login"
-          class="inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-solid px-5 font-semibold text-content hover:bg-surface-hover"
-          >{{ $t('home.anon.signIn') }}</RouterLink
-        >
+        <AppButton tone="primary" to="/register">{{ $t('home.anon.register') }}</AppButton>
+        <AppButton to="/login">{{ $t('home.anon.signIn') }}</AppButton>
         <RouterLink
           to="/problems"
           class="inline-flex min-h-11 items-center px-3 font-semibold text-accent-text hover:underline"
@@ -65,5 +58,5 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
       :label="$t('home.anon.bit')"
       class="shrink-0 [--bit-px:6px] sm:[--bit-px:9px]"
     />
-  </GlassCard>
+  </Card>
 </template>

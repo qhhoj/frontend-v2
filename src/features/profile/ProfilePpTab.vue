@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SubmissionResult } from '@/api/types/submissions';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -53,21 +54,15 @@ const verdictFor = (result: string | null): Verdict =>
       :title="$t('profileTabs.ppErrorTitle')"
       :body="$t('profileTabs.ppErrorBody')"
     >
-      <button
-        type="button"
-        class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-        @click="refetch()"
-      >
-        {{ $t('common.retry') }}
-      </button>
+      <AppButton @click="refetch()">{{ $t('common.retry') }}</AppButton>
     </StatePanel>
     <QueryState v-else :loading="isPending" :error="null">
       <template #skeleton><ProfileTabSkeleton :rows="PP_PAGE_SIZE" kind="table" /></template>
-      <GlassCard v-if="!entries.length" as="div">
+      <Card v-if="!entries.length" as="div">
         <EmptyState>{{ $t('profileTabs.noPp') }}</EmptyState>
-      </GlassCard>
+      </Card>
       <template v-else>
-        <GlassCard as="div" class="overflow-hidden">
+        <Card as="div" class="overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full border-collapse text-sm">
               <thead>
@@ -148,7 +143,7 @@ const verdictFor = (result: string | null): Verdict =>
               </tbody>
             </table>
           </div>
-        </GlassCard>
+        </Card>
         <p class="text-center text-sm text-muted">
           {{ $t('profileTabs.ppFooter', { first: ranks.first, last: ranks.last }) }}
         </p>

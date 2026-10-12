@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
 /**
@@ -28,7 +28,7 @@ const CONTEST_ROWS = 5;
       <SkeletonBlock class="aspect-[739/115] w-full min-w-[46rem]" />
     </div>
   </div>
-  <GlassCard v-else class="p-5">
+  <Card v-else class="p-5">
     <SkeletonBlock class="h-7 w-40" />
     <div class="mt-3 hidden flex-col md:flex">
       <SkeletonBlock class="h-9" />
@@ -37,5 +37,5 @@ const CONTEST_ROWS = 5;
     <div class="mt-3 flex flex-col gap-3 md:hidden">
       <SkeletonBlock v-for="row in CONTEST_ROWS" :key="row" class="h-[61px]" />
     </div>
-  </GlassCard>
+  </Card>
 </template>

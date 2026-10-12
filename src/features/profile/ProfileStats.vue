@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -54,7 +54,7 @@ const tiles = computed<StatTile[]>(() => [
 </script>
 
 <template>
-  <GlassCard data-testid="profile-stats" class="p-5">
+  <Card data-testid="profile-stats" class="p-5">
     <h2 class="font-display text-base font-bold">{{ $t('profile.stats') }}</h2>
     <dl class="mt-3 grid grid-cols-2 gap-3">
       <div
@@ -68,5 +68,5 @@ const tiles = computed<StatTile[]>(() => [
         <dd v-if="tile.hint" class="text-xs text-muted">{{ tile.hint }}</dd>
       </div>
     </dl>
-  </GlassCard>
+  </Card>
 </template>

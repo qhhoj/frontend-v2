@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
@@ -28,7 +28,7 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
 </script>
 
 <template>
-  <GlassCard data-testid="recent-submissions" class="p-6">
+  <Card data-testid="recent-submissions" class="p-6">
     <div class="flex items-center justify-between">
       <h2 class="font-display text-base leading-7 font-bold">{{ $t('home.recentSubmissions') }}</h2>
       <RouterLink
@@ -83,5 +83,5 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
         </li>
       </ul>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

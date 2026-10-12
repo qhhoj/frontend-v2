@@ -3,7 +3,9 @@ import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { userEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
-import GlassCard from '@/components/GlassCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumericDate } from '@/lib/format';
 import { hasPermission } from '@/lib/permissions';
@@ -39,7 +41,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
 </script>
 
 <template>
-  <GlassCard
+  <Card
     data-testid="profile-header"
     class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
   >
@@ -57,12 +59,7 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
             >
               {{ $t(tierLabelKey) }}
             </span>
-            <span
-              v-if="isOwn"
-              class="rounded-pill bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-soft-text"
-            >
-              {{ $t('profile.own') }}
-            </span>
+            <Chip v-if="isOwn" tone="accent">{{ $t('profile.own') }}</Chip>
           </div>
           <p class="text-muted">
             {{ $t('profile.joined', { name: user.displayName, date: joinedDate }) }}
@@ -82,18 +79,8 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
       </div>
       <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap items-center gap-2.5">
         <template v-if="isOwn">
-          <RouterLink
-            to="/settings"
-            class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-          >
-            {{ $t('profile.edit') }}
-          </RouterLink>
-          <RouterLink
-            to="/blog/new"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-          >
-            {{ $t('profile.write') }}
-          </RouterLink>
+          <AppButton tone="primary" to="/settings">{{ $t('profile.edit') }}</AppButton>
+          <AppButton to="/blog/new">{{ $t('profile.write') }}</AppButton>
         </template>
         <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
         <AdminEditLink :to="editTarget" />
@@ -116,5 +103,5 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
         }}
       </p>
     </div>
-  </GlassCard>
+  </Card>
 </template>

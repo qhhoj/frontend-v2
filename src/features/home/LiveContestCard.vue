@@ -2,7 +2,7 @@
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import BitLoop from '@/components/BitLoop.vue';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRunningContestQuery } from './home.queries';
@@ -11,7 +11,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
 </script>
 
 <template>
-  <GlassCard data-testid="live-contest" class="border-line-accent! p-6">
+  <Card data-testid="live-contest" class="border-line-accent! p-6">
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex items-start gap-4">
@@ -65,5 +65,5 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
         >
       </template>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

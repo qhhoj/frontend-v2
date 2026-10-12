@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
 import StatePanel from '@/components/StatePanel.vue';
 import UserName from '@/components/UserName.vue';
@@ -32,14 +33,10 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
     <ul v-else class="flex flex-col gap-4">
       <li v-for="post in posts" :key="post.id" class="flex flex-col gap-1">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="rounded-pill bg-surface-strong px-2 font-mono text-xs tabular-nums">
-            {{ $t('home.anon.score', { score: formatNumber(post.score, locale.locale) }) }}
-          </span>
-          <span
-            v-if="post.sticky"
-            class="rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
-            >{{ $t('blog.pinned') }}</span
-          >
+          <Chip class="font-mono tabular-nums">{{
+            $t('home.anon.score', { score: formatNumber(post.score, locale.locale) })
+          }}</Chip>
+          <Chip v-if="post.sticky" tone="accent">{{ $t('blog.pinned') }}</Chip>
         </div>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id } }"

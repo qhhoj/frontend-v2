@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import SubmitSignInLink from '@/features/problems/SubmitSignInLink.vue';
@@ -43,24 +44,22 @@ const now = Date.now();
   />
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton><ProfileTabSkeleton :rows="3" kind="list" /></template>
-    <GlassCard v-if="!comments.length" as="div">
+    <Card v-if="!comments.length" as="div">
       <EmptyState>{{ $t('profileTabs.noComments') }}</EmptyState>
-    </GlassCard>
+    </Card>
     <ul v-else class="flex flex-col gap-4">
       <li v-for="comment in comments" :key="comment.id">
         <RecentCommentRow :comment="comment" :now="now" />
       </li>
     </ul>
     <div v-if="hasNextPage" class="mt-4 flex justify-center">
-      <button
-        type="button"
+      <AppButton
         data-testid="older-comments"
-        class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
         :aria-busy="isFetchingNextPage"
         @click="fetchNextPage()"
       >
         {{ $t('profileTabs.olderComments') }}
-      </button>
+      </AppButton>
     </div>
   </QueryState>
 </template>

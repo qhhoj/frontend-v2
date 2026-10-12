@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
@@ -20,7 +20,7 @@ const TABLE_COLUMNS = [
 </script>
 
 <template>
-  <GlassCard v-if="kind === 'table'" as="div" class="overflow-hidden">
+  <Card v-if="kind === 'table'" as="div" class="overflow-hidden">
     <div class="overflow-x-auto">
       <table aria-hidden="true" class="w-full border-collapse text-sm">
         <thead>
@@ -63,14 +63,14 @@ const TABLE_COLUMNS = [
         </tbody>
       </table>
     </div>
-  </GlassCard>
+  </Card>
   <ul v-else aria-hidden="true" class="flex flex-col gap-3">
     <li v-for="row in rows" :key="row">
-      <GlassCard as="div" class="flex flex-col gap-2 p-4">
+      <Card as="div" class="flex flex-col gap-2 p-4">
         <SkeletonBlock v-if="kind === 'groups'" text class="w-1/3" />
         <SkeletonBlock text class="w-2/3" />
         <SkeletonBlock text class="w-1/2" />
-      </GlassCard>
+      </Card>
     </li>
   </ul>
 </template>

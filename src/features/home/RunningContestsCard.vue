@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
@@ -27,13 +30,11 @@ const timeLeftOf = (contest: ContestListItem) =>
 </script>
 
 <template>
-  <GlassCard data-testid="running-contests" class="flex flex-col gap-4 p-5 sm:p-6">
+  <Card data-testid="running-contests" class="flex flex-col gap-4 p-5 sm:p-6">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <h2 class="flex items-center gap-2 font-display text-base font-bold">
         {{ $t('home.anon.running') }}
-        <span class="rounded-pill bg-surface-strong px-2 font-mono text-sm tabular-nums">{{
-          contests.length
-        }}</span>
+        <Chip size="md" class="font-mono tabular-nums">{{ contests.length }}</Chip>
       </h2>
       <RouterLink :to="{ name: 'contests' }" class="font-semibold text-accent-text hover:underline">
         {{ $t('home.anon.allContests') }}
@@ -71,24 +72,16 @@ const timeLeftOf = (contest: ContestListItem) =>
               })
             }}
           </p>
-          <div
-            role="img"
-            :aria-label="$t('home.anon.elapsed', { percent: percentOf(contest) })"
-            class="h-2 overflow-hidden rounded-pill bg-surface-hover"
-          >
-            <div
-              class="h-full rounded-pill bg-gradient-accent"
-              :style="{ width: `${percentOf(contest)}%` }"
-            />
-          </div>
+          <ProgressBar
+            :value="percentOf(contest)"
+            :label="$t('home.anon.elapsed', { percent: percentOf(contest) })"
+          />
           <p class="text-sm font-semibold">
             {{ $t('contests.list.timeLeft', { span: timeLeftOf(contest) }) }}
           </p>
-          <RouterLink
-            :to="{ name: 'contest', params: { key: contest.key } }"
-            class="inline-flex min-h-11 items-center self-start rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-            >{{ $t('home.anon.viewContest') }}</RouterLink
-          >
+          <AppButton :to="{ name: 'contest', params: { key: contest.key } }" class="self-start">{{
+            $t('home.anon.viewContest')
+          }}</AppButton>
         </article>
       </div>
       <div v-else class="flex flex-wrap items-center gap-3 py-2">
@@ -102,5 +95,5 @@ const timeLeftOf = (contest: ContestListItem) =>
         </RouterLink>
       </div>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

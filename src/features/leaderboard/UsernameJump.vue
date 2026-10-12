@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -26,11 +27,6 @@ const openProfile = () => {
       :placeholder="$t('leaderboard.jumpPlaceholder')"
       :class="[TOOLBAR_INPUT_CLASS, 'min-w-0 flex-1 sm:w-64 sm:flex-none']"
     />
-    <button
-      type="submit"
-      class="min-h-11 rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-    >
-      {{ $t('leaderboard.jumpSubmit') }}
-    </button>
+    <AppButton type="submit">{{ $t('leaderboard.jumpSubmit') }}</AppButton>
   </form>
 </template>
