@@ -2,6 +2,7 @@
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { problemEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import type { ProblemDetail } from '@/api/types/problems';
+import Chip from '@/components/ui/Chip.vue';
 import { useSessionStore } from '@/stores/session.store';
 import { problemTypeLabel } from './problem-type-label';
 
@@ -19,18 +20,12 @@ const session = useSessionStore();
       <div class="min-w-0 flex-1">
         <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
           <span class="font-mono text-muted [overflow-wrap:anywhere]">{{ problem.code }}</span>
-          <span
-            v-if="problem.group"
-            data-testid="problem-group-chip"
-            class="rounded-pill bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-soft-text"
-            >{{ problemTypeLabel(problem.group) }}</span
-          >
-          <span
-            v-if="problem.externalJudge"
-            data-testid="external-judge-badge"
-            class="rounded-pill bg-surface-strong px-2.5 py-0.5 text-xs font-semibold text-muted"
-            >{{ $t('problem.externalJudge', { oj: problem.externalJudge.oj }) }}</span
-          >
+          <Chip v-if="problem.group" data-testid="problem-group-chip" tone="accent">{{
+            problemTypeLabel(problem.group)
+          }}</Chip>
+          <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
+            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
+          }}</Chip>
         </p>
         <h1 class="mt-1 page-title [overflow-wrap:anywhere] max-sm:min-h-[65px]">
           {{ problem.name }}

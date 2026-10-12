@@ -2,7 +2,8 @@
 import { problemTypeLabel } from './problem-type-label';
 import { computed, ref } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import StateBit from '@/components/StateBit.vue';
 import {
   formatMemoryLimit,
@@ -67,7 +68,7 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
 </script>
 
 <template>
-  <GlassCard class="rounded-panel p-4" data-testid="problem-facts">
+  <Card class="rounded-panel p-4" data-testid="problem-facts">
     <dl data-testid="limits" class="grid grid-cols-2 gap-x-3 gap-y-3.5">
       <div v-for="fact in facts" :key="fact.key">
         <dt class="text-meta text-muted">{{ $t(fact.label) }}</dt>
@@ -99,20 +100,16 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
         type="button"
         :aria-expanded="typesShown"
         aria-controls="problem-types"
-        class="min-h-8 self-start text-sm font-semibold text-accent-text hover:underline"
+        class="min-h-8 self-start text-sm font-semibold text-accent-text hover:underline pointer-coarse:min-h-11"
         @click="typesShown = !typesShown"
       >
         {{ $t(typesShown ? 'problem.rail.facts.hideTypes' : 'problem.rail.facts.showTypes') }}
       </button>
       <ul v-show="typesShown" id="problem-types" class="flex flex-wrap gap-1.5">
-        <li
-          v-for="type in problem.types"
-          :key="type.id"
-          class="rounded-pill bg-surface-strong px-2.5 py-1 text-meta text-muted"
-        >
-          {{ problemTypeLabel(type) }}
+        <li v-for="type in problem.types" :key="type.id">
+          <Chip size="md">{{ problemTypeLabel(type) }}</Chip>
         </li>
       </ul>
     </div>
-  </GlassCard>
+  </Card>
 </template>

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { Upload } from 'lucide-vue-next';
-import { useId } from 'vue';
+import { computed, useId } from 'vue';
+import { buttonClasses } from '@/components/ui/button-classes';
 
-defineProps<{ iconOnly: boolean }>();
+const props = defineProps<{ iconOnly: boolean }>();
 const emit = defineEmits<{ pick: [file: File] }>();
 const inputId = useId();
+/** A label styled as a button: the file input stays native and only the label is seen. */
+const labelClass = computed(() => buttonClasses({ iconOnly: props.iconOnly }));
 
 function onPicked(event: Event) {
   const input = event.target as HTMLInputElement;
@@ -19,8 +22,8 @@ function onPicked(event: Event) {
     <input :id="inputId" type="file" class="peer sr-only" @change="onPicked" />
     <label
       :for="inputId"
-      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-pill border border-line bg-surface text-sm hover:bg-surface-hover peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
-      :class="iconOnly ? 'size-12' : 'h-11 px-4'"
+      class="cursor-pointer peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
+      :class="labelClass"
     >
       <Upload class="size-4" aria-hidden="true" />
       <span :class="{ 'sr-only': iconOnly }">{{ $t('submit.upload') }}</span>

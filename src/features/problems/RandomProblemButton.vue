@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toRef } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import type { ProblemFilters } from './use-problem-filters';
 import { useRandomProblem } from './use-random-problem';
 
@@ -13,13 +14,8 @@ const { open, pending, missing, failed } = useRandomProblem(toRef(props, 'filter
       <template v-if="missing">{{ $t('problems.randomNone') }}</template>
       <template v-else-if="failed">{{ $t('problems.randomFailed') }}</template>
     </span>
-    <button
-      type="button"
-      :disabled="pending"
-      class="h-10 rounded-row bg-accent px-4 text-sm font-semibold text-on-accent hover:bg-accent-2 disabled:opacity-60"
-      @click="open()"
-    >
+    <AppButton tone="primary" size="sm" :loading="pending" @click="open()">
       {{ $t('problems.random') }}
-    </button>
+    </AppButton>
   </div>
 </template>

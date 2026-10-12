@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, toRef, watch } from 'vue';
 import { ApiError } from '@/api/client';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import UserName from '@/components/UserName.vue';
 import { formatDate } from '@/lib/format';
@@ -35,7 +36,7 @@ watch(
 <template>
   <QueryState :loading="isPending" :error="isGone ? null : error" @retry="refetch()">
     <template #skeleton><StatementSkeleton /></template>
-    <GlassCard v-if="editorial" as="div" class="rounded-panel p-6 text-base sm:p-8">
+    <Card v-if="editorial" as="div" class="rounded-panel p-6 text-base sm:p-8">
       <p
         data-testid="editorial-meta"
         class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"
@@ -48,13 +49,11 @@ watch(
           /></template>
         </span>
         <span>{{ formatDate(editorial.publishOn, locale.locale) }}</span>
-        <span
-          v-if="!editorial.isPublic"
-          class="rounded-pill bg-accent-soft px-3 py-1 text-accent-soft-text"
-          >{{ $t('problem.editorial.editorsOnly') }}</span
-        >
+        <Chip v-if="!editorial.isPublic" tone="accent" size="md">{{
+          $t('problem.editorial.editorsOnly')
+        }}</Chip>
       </p>
       <StatementBody :html="editorial.contentHtml" />
-    </GlassCard>
+    </Card>
   </QueryState>
 </template>

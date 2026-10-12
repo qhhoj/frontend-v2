@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-vue-next';
 import Select from 'primevue/select';
 import type { Language } from '@/api/types/problems';
 import TokenCoin from '@/components/TokenCoin.vue';
+import Chip from '@/components/ui/Chip.vue';
 
 defineProps<{
   languages: Language[];
@@ -29,11 +30,7 @@ defineEmits<{ pick: [languageId: string] }>();
       <span v-if="selected" class="flex items-center gap-2">
         <TokenCoin :seed="selected.key" size="sm" />
         {{ selected.name }}
-        <span
-          v-if="selected.fileOnly"
-          class="rounded-pill bg-surface-strong px-2 text-xs text-muted"
-          >{{ $t('submit.fileOnly') }}</span
-        >
+        <Chip v-if="selected.fileOnly">{{ $t('submit.fileOnly') }}</Chip>
       </span>
     </template>
     <template #dropdownicon>
@@ -41,11 +38,7 @@ defineEmits<{ pick: [languageId: string] }>();
     </template>
     <template #option="{ option }">
       {{ option.name }}
-      <span
-        v-if="option.fileOnly"
-        class="ml-2 rounded-pill bg-surface-strong px-2 text-xs text-muted"
-        >{{ $t('submit.fileOnly') }}</span
-      >
+      <Chip v-if="option.fileOnly" class="ml-2">{{ $t('submit.fileOnly') }}</Chip>
     </template>
   </Select>
 </template>

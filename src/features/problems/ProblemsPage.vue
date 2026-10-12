@@ -3,7 +3,8 @@ import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
@@ -68,11 +69,9 @@ const summary = computed(() => {
 
 <template>
   <div class="page-column">
-    <header class="flex flex-wrap items-baseline gap-x-3">
-      <h1 class="page-title">{{ $t('problems.title') }}</h1>
-      <p class="min-h-6 text-sm text-muted">{{ summary }}</p>
-      <CreateShortcut kind="problem" class="ml-auto self-center" />
-    </header>
+    <PageHeader :title="$t('problems.title')" :meta="summary ? [summary] : []">
+      <template #actions><CreateShortcut kind="problem" /></template>
+    </PageHeader>
     <ProblemFilters
       :filters="filters"
       :types="meta?.types ?? []"
@@ -82,7 +81,7 @@ const summary = computed(() => {
     />
     <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />
     <div ref="listTop" class="scroll-mt-20" :aria-busy="isPlaceholderData">
-      <GlassCard as="div" class="overflow-hidden">
+      <Card as="div" class="overflow-hidden">
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
           <template #skeleton><ProblemTableSkeleton /></template>
           <EmptyState v-if="!problems.length">{{ $t('problems.empty') }}</EmptyState>
@@ -95,7 +94,7 @@ const summary = computed(() => {
           />
           <NumberedPager v-if="data" class="p-4" :meta="data.meta" :label="$t('problems.pager')" />
         </QueryState>
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import ProblemHeaderSkeleton from './ProblemHeaderSkeleton.vue';
 
@@ -11,7 +11,7 @@ defineProps<{ header?: boolean }>();
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="statement-card" class="rounded-panel p-6 sm:p-8">
+  <Card as="div" data-testid="statement-card" class="rounded-panel p-6 sm:p-8">
     <ProblemHeaderSkeleton v-if="header" class="mb-4" />
     <div data-skeleton-region="statement" class="flex flex-col gap-4 text-sm leading-[1.75]">
       <p v-for="paragraph in PARAGRAPHS" :key="paragraph">
@@ -20,5 +20,5 @@ defineProps<{ header?: boolean }>();
         </template>
       </p>
     </div>
-  </GlassCard>
+  </Card>
 </template>

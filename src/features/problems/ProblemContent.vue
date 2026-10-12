@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, toRef, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import Tabs from '@/components/ui/Tabs.vue';
 import UserName from '@/components/UserName.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
@@ -16,7 +18,6 @@ import ProblemHeader from './ProblemHeader.vue';
 import ProblemLinksCard from './ProblemLinksCard.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import ProblemSubmitCard from './ProblemSubmitCard.vue';
-import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
 import StatementNote from './StatementNote.vue';
 import SubmitDock from './SubmitDock.vue';
@@ -51,29 +52,37 @@ const resubmitId = computed(() =>
 );
 const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
+const { t } = useI18n();
+const tabItems = computed(() =>
+  props.tabs.map(({ id, labelKey }) => ({ key: id, label: t(labelKey), panelId: panelIdOf(id) })),
+);
+function panelIdOf(tabId: string) {
+  return `problem-panel-${tabId}`;
+}
 </script>
 
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="layout.grid">
     <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
-    <GlassCard
+    <Card
       as="div"
       data-testid="statement-card"
       :class="['min-w-0 rounded-panel p-6 sm:p-8', layout.left]"
     >
       <ProblemHeader :problem="problem">
-        <ProblemTabs
+        <Tabs
           v-if="tabs.length > 1"
           v-model="tab"
-          :tabs="tabs"
+          :items="tabItems"
           :label="$t('problem.tabsLabel')"
+          overflow="scroll"
         />
       </ProblemHeader>
       <div
-        id="problem-panel-statement"
+        :id="panelIdOf(DEFAULT_TAB)"
         :role="tabs.length > 1 ? 'tabpanel' : undefined"
-        :aria-labelledby="tabs.length > 1 ? 'problem-tab-statement' : undefined"
+        :aria-labelledby="tabs.length > 1 ? `${panelIdOf(DEFAULT_TAB)}-tab` : undefined"
         :hidden="tab !== DEFAULT_TAB"
         :tabindex="tab === DEFAULT_TAB ? 0 : undefined"
       >
@@ -101,7 +110,7 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
           </p>
         </template>
       </div>
-    </GlassCard>
+    </Card>
     <aside
       data-testid="problem-rail"
       :aria-label="$t('problem.rail.railLabel')"
@@ -128,9 +137,9 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
       />
       <div
         v-if="hasEditorial"
-        id="problem-panel-editorial"
+        :id="panelIdOf('editorial')"
         role="tabpanel"
-        aria-labelledby="problem-tab-editorial"
+        :aria-labelledby="`${panelIdOf('editorial')}-tab`"
         :hidden="tab !== 'editorial'"
         :tabindex="tab === 'editorial' ? 0 : undefined"
       >

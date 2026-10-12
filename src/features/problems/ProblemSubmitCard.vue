@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { nextTick, reactive } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SubmitSignInLink from './SubmitSignInLink.vue';
@@ -28,7 +29,7 @@ async function openPanel() {
 </script>
 
 <template>
-  <GlassCard class="flex flex-col gap-3 rounded-panel p-4" data-testid="rail-submit">
+  <Card class="flex flex-col gap-3 rounded-panel p-4" data-testid="rail-submit">
     <div class="flex items-center justify-between gap-2">
       <h2 class="font-display text-title font-bold">{{ $t('problem.rail.submit.title') }}</h2>
       <InlineBit kind="writing" />
@@ -46,14 +47,10 @@ async function openPanel() {
           @pick="state.setLanguage"
         />
       </label>
-      <button
-        type="button"
-        class="bg-gradient-accent h-11 rounded-pill font-display font-bold text-on-accent"
-        @click="openPanel"
-      >
+      <AppButton tone="primary" block @click="openPanel">
         {{ $t(open ? 'problem.rail.submit.goTo' : 'problem.rail.submit.open') }}
-      </button>
+      </AppButton>
       <p class="text-meta text-muted">{{ $t('problem.rail.submit.hint') }}</p>
     </template>
-  </GlassCard>
+  </Card>
 </template>
