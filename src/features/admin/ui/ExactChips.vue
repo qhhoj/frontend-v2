@@ -134,7 +134,7 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
         :id="listboxId"
         role="listbox"
         :aria-label="label"
-        class="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-row border border-line bg-surface-solid p-1 shadow-lg"
+        class="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-row border border-line bg-surface-solid p-1"
       >
         <li
           v-for="(chip, index) in suggestions.options.value"

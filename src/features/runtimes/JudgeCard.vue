@@ -42,7 +42,7 @@ const loadPercent = computed(() =>
           <i
             v-for="slot in judge.slots"
             :key="slot"
-            class="size-2.5 rounded-xs"
+            class="size-2.5 rounded-[2px]"
             :class="slot <= judge.busy ? 'bg-accent' : 'bg-line-strong'"
           />
         </span>

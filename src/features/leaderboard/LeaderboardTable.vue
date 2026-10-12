@@ -86,7 +86,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
               type="button"
               :class="[
                 VALUE_HEAD_INNER_CLASS,
-                'cursor-pointer rounded-sm uppercase hover:text-content',
+                'cursor-pointer rounded-skeleton uppercase hover:text-content',
               ]"
               @click="router.push(sortLocation(column.key))"
             >

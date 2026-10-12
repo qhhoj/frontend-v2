@@ -72,7 +72,7 @@ async function insertCanned(filled: string, title: string) {
           name="reply"
           rows="4"
           :placeholder="$t('ticket.replyPlaceholder')"
-          class="min-h-28 rounded-lg border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
+          class="min-h-28 rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
         />
       </label>
       <p v-if="failureKey" role="alert" class="text-[13px] text-negative">

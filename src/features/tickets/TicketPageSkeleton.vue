@@ -36,7 +36,7 @@ const MESSAGE_ROWS = [0, 1, 2];
           v-for="row in MESSAGE_ROWS"
           :key="row"
           data-skeleton-region="message"
-          class="flex gap-3 rounded-xl border border-line bg-surface p-4"
+          class="flex gap-3 rounded-card border border-line bg-surface p-4"
         >
           <SkeletonBlock round class="size-8" />
           <div class="flex min-w-0 flex-1 flex-col gap-2">

@@ -12,7 +12,7 @@ const KIND_OPTIONS = [
   { value: 'general', titleKey: 'tickets.new.generalKind', bodyKey: 'tickets.new.generalKindBody' },
 ] as const;
 const INPUT =
-  'min-h-11 w-full rounded-lg border bg-surface px-3.5 text-base text-content placeholder:text-muted';
+  'min-h-11 w-full rounded-cell border bg-surface px-3.5 text-base text-content placeholder:text-muted';
 const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
 const ERROR = 'text-[13px] text-negative';
 
@@ -68,7 +68,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
               <label
                 v-for="option in KIND_OPTIONS"
                 :key="option.value"
-                class="flex cursor-pointer flex-col gap-1 rounded-xl border p-4"
+                class="flex cursor-pointer flex-col gap-1 rounded-row border p-4"
                 :class="
                   draft.kind === option.value ? 'border-accent bg-accent-soft' : 'border-line'
                 "
