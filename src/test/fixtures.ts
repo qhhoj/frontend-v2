@@ -577,6 +577,7 @@ export const problemDetail = (overrides: Partial<ProblemDetail> = {}): ProblemDe
   testcaseVisibility: 'O',
   testcaseResultVisibility: 'A',
   allowViewFeedback: true,
+  io: { mode: 'stdio', inputFile: null, outputFile: null },
   editor: null,
   ...overrides,
 });
