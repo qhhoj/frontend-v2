@@ -518,7 +518,11 @@
     "open": "Open",
     "copy": "Copy address",
     "upload": "Upload",
-    "replace": "Replace"
+    "replace": "Replace",
+    "remove": "Remove {name}",
+    "removeTitle": "Remove {name}?",
+    "removeBody": "The problem will no longer have this file; upload a new one when needed.",
+    "removeConfirm": "Remove file"
   },
   "header": {
     "public": "Public",

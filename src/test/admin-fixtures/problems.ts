@@ -40,6 +40,7 @@ export const problemEditingMeta = (): ProblemEditingMeta => ({
     editingLanguage(LANG_CPP20, 'CPP20', 'C++20'),
     editingLanguage(LANG_PY3, 'PY3', 'Python 3'),
   ],
+  materialExtensions: ['zip', 'pdf', 'docx'],
 });
 
 export const problemEditor = (): ProblemEditor => ({
@@ -64,6 +65,8 @@ export const problemEditor = (): ProblemEditor => ({
   organizations: [],
   ogImage: '',
   canPublishToMembers: false,
+  canUploadPdfStatement: false,
+  canUploadMaterial: false,
 });
 
 export const editableProblem = (overrides: Partial<EditableProblem> = {}): EditableProblem => ({

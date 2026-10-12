@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
-import { usePermissions } from '@/stores/use-permissions';
-import { permissionLock } from '../general/field-lock';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
-import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
+import { acceptOfExtensions, IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
 import ProblemUploadCard from './ProblemUploadCard.vue';
 
-/** Three tiles: images for the statement (address only), the PDF statement, the material for contestants. */
-defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
-const { can } = usePermissions();
-const pdfLock = computed(() => permissionLock(can, 'judge.upload_file_statement'));
-const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_material'));
+/**
+ * Three tiles: images for the statement (address only), the PDF statement, the material for contestants.
+ * The server decides who may upload the PDF and material (the global permission, or administering the problem's
+ * organizations); a tile it refuses names the global permission.
+ */
+const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
+const pdfLock = computed(() =>
+  props.problem.editor?.canUploadPdfStatement ? undefined : 'judge.upload_file_statement',
+);
+const materialLock = computed(() =>
+  props.problem.editor?.canUploadMaterial ? undefined : 'judge.upload_problem_material',
+);
+const materialAccept = computed(() => acceptOfExtensions(props.meta.materialExtensions));
 </script>
 
 <template>
@@ -42,7 +48,7 @@ const materialLock = computed(() => permissionLock(can, 'judge.upload_problem_ma
       :code="problem.code"
       :title="$t('admin.problems.files.material.title')"
       :lead="$t('admin.problems.files.material.lead')"
-      accept=".zip,.pdf,.txt,.md"
+      :accept="materialAccept"
       :max-bytes="UPLOAD_LIMITS.material"
       :locked-by="materialLock"
       :current-url="problem.materialUrl"

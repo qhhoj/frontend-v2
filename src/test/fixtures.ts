@@ -153,6 +153,7 @@ export const problemMeta = (): ProblemMeta => ({
       fileOnly: true,
     }),
   ],
+  materialExtensions: ['zip', 'pdf'],
 });
 
 export const userPage = (overrides: Partial<UserPage> = {}): UserPage => ({
