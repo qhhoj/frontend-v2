@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -41,12 +42,7 @@ watch(user, (shown) => {
       :title="$t('profile.notFoundTitle')"
       :body="$t('profile.notFoundBody', { username })"
     >
-      <RouterLink
-        to="/users"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-      >
-        {{ $t('profile.toLeaderboard') }}
-      </RouterLink>
+      <AppButton to="/users">{{ $t('profile.toLeaderboard') }}</AppButton>
     </StatePanel>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ProfileHeaderSkeleton /></template>

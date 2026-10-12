@@ -3,7 +3,7 @@ import { TrendingDown, TrendingUp } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRatingHistoryQuery, useUserPageQuery } from '@/features/users/users.queries';
@@ -50,7 +50,7 @@ const tiles = computed(() =>
 </script>
 
 <template>
-  <GlassCard data-testid="rating-hero" class="p-6 sm:p-8">
+  <Card data-testid="rating-hero" class="p-6 sm:p-8">
     <QueryState
       :loading="isPending"
       :error="error || historyError"
@@ -179,5 +179,5 @@ const tiles = computed(() =>
         </dl>
       </template>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

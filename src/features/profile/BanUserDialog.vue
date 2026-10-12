@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, ref, useId } from 'vue';
 import { banUser } from '@/api/users.api';
@@ -39,15 +40,9 @@ function confirm() {
 </script>
 
 <template>
-  <button
-    v-if="!isBanned"
-    type="button"
-    data-testid="ban-open"
-    class="min-h-11 rounded-pill border border-negative px-5 font-semibold text-negative hover:bg-surface-hover"
-    @click="open"
-  >
+  <AppButton v-if="!isBanned" tone="danger" data-testid="ban-open" @click="open">
     {{ $t('profile.ban.open') }}
-  </button>
+  </AppButton>
   <StatePanel
     v-else
     kind="success"

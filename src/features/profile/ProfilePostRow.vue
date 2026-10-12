@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PostListItem } from '@/api/types/blog';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import UserContent from '@/components/UserContent.vue';
 import { formatDate, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -11,7 +11,7 @@ const locale = useLocaleStore();
 </script>
 
 <template>
-  <GlassCard as="article" class="flex flex-col gap-2 p-4 sm:p-5">
+  <Card as="article" class="flex flex-col gap-2 p-4 sm:p-5">
     <h2 class="font-display text-base font-bold">
       <RouterLink
         :to="{ name: 'post', params: { id: post.id } }"
@@ -30,5 +30,5 @@ const locale = useLocaleStore();
         })
       }}
     </p>
-  </GlassCard>
+  </Card>
 </template>

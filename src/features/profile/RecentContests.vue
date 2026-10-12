@@ -2,7 +2,7 @@
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { signedScore } from '@/lib/format';
 import { recentContests } from './recent-contests';
 import type { RecentContestRow } from './recent-contests';
@@ -21,7 +21,7 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
 </script>
 
 <template>
-  <GlassCard v-if="rows.length" data-testid="recent-contests" class="p-5">
+  <Card v-if="rows.length" data-testid="recent-contests" class="p-5">
     <h2 class="font-display text-base font-bold">{{ $t('profile.recent') }}</h2>
     <table class="mt-3 hidden w-full text-left text-sm md:table">
       <thead class="text-muted">
@@ -78,5 +78,5 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
         </span>
       </li>
     </ul>
-  </GlassCard>
+  </Card>
 </template>

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useUserPostsQuery } from '@/features/users/users.queries';
@@ -21,9 +21,9 @@ const posts = computed(() => data.value?.items ?? []);
 <template>
   <QueryState :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton><ProfileTabSkeleton :rows="3" kind="list" /></template>
-    <GlassCard v-if="!posts.length" as="div">
+    <Card v-if="!posts.length" as="div">
       <EmptyState>{{ $t('profileTabs.noPosts') }}</EmptyState>
-    </GlassCard>
+    </Card>
     <ul v-else class="flex flex-col gap-3">
       <li v-for="post in posts" :key="post.id">
         <ProfilePostRow :post="post" />

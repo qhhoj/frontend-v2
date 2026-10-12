@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -36,7 +36,7 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
       <UsernameJump />
     </header>
     <div ref="listTop" class="min-w-0">
-      <GlassCard class="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
+      <Card class="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
         <QueryState :loading="isPending" :error="error" @retry="refetch()">
           <template #skeleton><LeaderboardTableSkeleton :sort="sort" /></template>
           <StatePanel
@@ -53,7 +53,7 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
             <NumberedPager :meta="data.meta" :label="$t('leaderboard.pagerLabel')" />
           </template>
         </QueryState>
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>

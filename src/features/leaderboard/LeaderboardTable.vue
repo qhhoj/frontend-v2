@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ArrowDown } from 'lucide-vue-next';
@@ -126,12 +127,9 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
                     :title="entry.username"
                     class="min-w-0 truncate"
                   />
-                  <span
-                    v-if="entry.username === viewerName"
-                    class="shrink-0 rounded-pill bg-accent-soft px-2 text-xs font-semibold text-accent-soft-text"
-                  >
-                    {{ $t('common.you') }}
-                  </span>
+                  <Chip v-if="entry.username === viewerName" tone="accent">{{
+                    $t('common.you')
+                  }}</Chip>
                 </span>
                 <span
                   v-if="entry.displayName !== entry.username"

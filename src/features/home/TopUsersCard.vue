@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UserLink from '@/components/UserLink.vue';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useTopUsersQuery } from '@/features/users/users.queries';
@@ -15,7 +15,7 @@ const LIST_MIN_HEIGHT = 'min-h-[6.4rem]';
 </script>
 
 <template>
-  <GlassCard data-testid="top-users" class="p-6">
+  <Card data-testid="top-users" class="p-6">
     <h2 class="mb-3 font-display text-base font-bold">{{ $t('home.topRating') }}</h2>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
@@ -38,5 +38,5 @@ const LIST_MIN_HEIGHT = 'min-h-[6.4rem]';
         </li>
       </ol>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

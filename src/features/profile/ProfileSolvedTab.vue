@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SolvedGroup } from '@/api/types/users';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSolvedQuery } from '@/features/users/users.queries';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -22,16 +22,16 @@ const isFullScore = (points: number, total: number) => points >= total;
 <template>
   <QueryState :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton><ProfileTabSkeleton :rows="3" kind="groups" /></template>
-    <GlassCard v-if="!groups.length" as="div">
+    <Card v-if="!groups.length" as="div">
       <EmptyState>{{ $t('profileTabs.noSolved') }}</EmptyState>
-    </GlassCard>
+    </Card>
     <div v-else class="flex flex-col gap-4">
       <section
         v-for="(group, index) in groups"
         :key="group.name"
         :aria-labelledby="`solved-group-${index}`"
       >
-        <GlassCard as="div" class="flex flex-col gap-3 p-4 sm:p-5">
+        <Card as="div" class="flex flex-col gap-3 p-4 sm:p-5">
           <h2 :id="`solved-group-${index}`" class="font-display text-base font-bold">
             {{ group.name }}
             <span class="ml-2 text-sm font-normal text-muted">
@@ -72,7 +72,7 @@ const isFullScore = (points: number, total: number) => points >= total;
               </span>
             </li>
           </ul>
-        </GlassCard>
+        </Card>
       </section>
     </div>
   </QueryState>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import OrganizationLogo from '@/features/organizations/OrganizationLogo.vue';
 import { computed } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import UserContent from '@/components/UserContent.vue';
@@ -42,7 +43,7 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
     <ProfileStats :user="user" class="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-span-2 lg:row-start-1">
-      <GlassCard data-testid="rating-card" class="p-5">
+      <Card data-testid="rating-card" class="p-5">
         <h2 class="font-display text-base font-bold">{{ $t('ratingChart.title') }}</h2>
         <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
           <template #skeleton><ProfileOverviewSkeleton part="chart" /></template>
@@ -58,23 +59,20 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
             :title="$t('profile.unratedTitle')"
             :body="$t('profile.unratedBody')"
           >
-            <RouterLink
-              :to="{ path: '/contests', query: { phase: 'upcoming' } }"
-              class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-            >
+            <AppButton :to="{ path: '/contests', query: { phase: 'upcoming' } }">
               {{ $t('profile.upcoming') }}
-            </RouterLink>
+            </AppButton>
           </StatePanel>
         </QueryState>
-      </GlassCard>
+      </Card>
 
-      <GlassCard class="p-5">
+      <Card class="p-5">
         <h2 class="font-display text-base font-bold">{{ $t('profile.activityTitle') }}</h2>
         <QueryState :loading="activityPending" :error="activityError" @retry="refetchActivity()">
           <template #skeleton><ProfileOverviewSkeleton part="heatmap" /></template>
           <ActivityHeatmap v-if="activity" :activity="activity" class="mt-3" />
         </QueryState>
-      </GlassCard>
+      </Card>
 
       <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
         <template #skeleton><ProfileOverviewSkeleton part="contests" /></template>
@@ -83,11 +81,11 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
     </div>
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2">
-      <GlassCard v-if="user.aboutHtml" class="p-5">
+      <Card v-if="user.aboutHtml" class="p-5">
         <h2 class="font-display text-base font-bold">{{ $t('profile.about') }}</h2>
         <UserContent :html="user.aboutHtml" class="mt-3" />
-      </GlassCard>
-      <GlassCard v-if="user.organizations.length" class="p-5">
+      </Card>
+      <Card v-if="user.organizations.length" class="p-5">
         <h2 class="font-display text-base font-bold">{{ $t('profile.organizations') }}</h2>
         <ul class="mt-3 flex flex-col gap-1">
           <li v-for="organization in user.organizations" :key="organization.id">
@@ -103,7 +101,7 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
             </RouterLink>
           </li>
         </ul>
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>
