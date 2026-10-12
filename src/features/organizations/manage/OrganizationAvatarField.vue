@@ -5,7 +5,8 @@ import { useLogoUpload } from '@/features/admin/organizations/use-logo-upload';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import UploadButton from '@/features/admin/ui/UploadButton.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { INPUT } from '@/features/admin/ui/controls';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { initialsOf, tileClass } from '../org-visuals';
 
 /**
@@ -80,22 +81,21 @@ const hint = computed(() =>
         <p class="text-xs text-muted">{{ $t(hint) }}</p>
       </div>
     </div>
-    <div v-show="isUrlShown" :id="urlBoxId" class="flex flex-col gap-1.5">
-      <label :for="urlInputId" class="text-sm font-semibold">{{
-        $t('orgAdmin.info.avatarUrl')
-      }}</label>
-      <input
-        :id="urlInputId"
+    <FormField
+      v-show="isUrlShown"
+      :id="urlBoxId"
+      :input-id="urlInputId"
+      :label="$t('orgAdmin.info.avatarUrl')"
+      :error="error"
+    >
+      <TextInput
         v-model="logo"
-        :class="`${INPUT} font-mono text-sm`"
+        class="font-mono text-sm"
         maxlength="150"
         inputmode="url"
         placeholder="https://…"
-        :aria-invalid="error ? 'true' : undefined"
-        :aria-describedby="error ? `${urlInputId}-error` : undefined"
       />
-      <p v-if="error" :id="`${urlInputId}-error`" class="text-sm text-negative">{{ error }}</p>
-    </div>
+    </FormField>
     <AdminStatus
       v-if="upload.failure.value"
       kind="refused"

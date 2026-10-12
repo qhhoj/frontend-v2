@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
+
 /** The sticky bar of board M7A while rows are ticked; the count is announced politely when it changes. */
 defineProps<{ count: number; isPending: boolean }>();
 const emit = defineEmits<{ archive: []; unarchive: []; tag: []; clear: [] }>();
-const BUTTON =
-  'inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover aria-disabled:cursor-progress aria-disabled:text-muted';
 </script>
 
 <template>
@@ -16,32 +16,15 @@ const BUTTON =
     <p role="status" class="mr-auto font-semibold">
       {{ $t('orgProblems.bulk.selected', { count }, count) }}
     </p>
-    <button
-      type="button"
-      :class="BUTTON"
-      :aria-disabled="isPending || undefined"
-      @click="emit('tag')"
-    >
+    <AppButton :disabled="isPending" @click="emit('tag')">
       {{ $t('orgProblems.bulk.tag') }}
-    </button>
-    <button
-      type="button"
-      :class="BUTTON"
-      :aria-disabled="isPending || undefined"
-      @click="emit('archive')"
-    >
+    </AppButton>
+    <AppButton :disabled="isPending" @click="emit('archive')">
       {{ $t('orgProblems.bulk.archive') }}
-    </button>
-    <button
-      type="button"
-      :class="BUTTON"
-      :aria-disabled="isPending || undefined"
-      @click="emit('unarchive')"
-    >
+    </AppButton>
+    <AppButton :disabled="isPending" @click="emit('unarchive')">
       {{ $t('orgProblems.bulk.unarchive') }}
-    </button>
-    <button type="button" :class="BUTTON" @click="emit('clear')">
-      {{ $t('orgProblems.bulk.clear') }}
-    </button>
+    </AppButton>
+    <AppButton tone="ghost" @click="emit('clear')">{{ $t('orgProblems.bulk.clear') }}</AppButton>
   </div>
 </template>

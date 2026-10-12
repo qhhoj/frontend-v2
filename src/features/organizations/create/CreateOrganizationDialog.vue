@@ -2,13 +2,14 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextArea from '@/components/ui/TextArea.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
 import { useSlugFromName } from '@/features/admin/organizations/use-slug-from-name';
-import AdminField from '@/features/admin/ui/AdminField.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { INPUT } from '@/features/admin/ui/controls';
 import JoinModeField from '../manage/JoinModeField.vue';
 
 /**
@@ -43,48 +44,32 @@ async function create() {
   >
     <div class="flex flex-col gap-4">
       <p class="text-muted">{{ $t('orgAdmin.create.lead') }}</p>
-      <AdminField
+      <FormField
         input-id="org-create-name"
         :label="$t('orgAdmin.create.name')"
         :error="errors.name"
       >
-        <template #default="{ id, describedBy, invalid }">
-          <input
-            :id="id"
-            v-model="form.name"
-            :class="INPUT"
-            maxlength="128"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-          />
-        </template>
-      </AdminField>
+        <TextInput v-model="form.name" maxlength="128" />
+      </FormField>
       <div class="grid gap-4 sm:grid-cols-2">
-        <AdminField
+        <FormField
           input-id="org-create-slug"
           :label="$t('orgAdmin.create.slug')"
           :hint="$t('orgAdmin.create.slugHint', { slug: form.slug || '…' })"
           :error="errors.slug"
         >
-          <template #default="{ id, describedBy, invalid }">
-            <input
-              :id="id"
-              v-model="form.slug"
-              :class="`${INPUT} font-mono`"
-              maxlength="128"
-              :aria-describedby="describedBy"
-              :aria-invalid="invalid ? 'true' : undefined"
-              @input="slugFill.onSlugInput"
-            />
-          </template>
-        </AdminField>
+          <TextInput
+            v-model="form.slug"
+            class="font-mono"
+            maxlength="128"
+            @input="slugFill.onSlugInput"
+          />
+        </FormField>
         <JoinModeField v-model="form.isOpen" />
       </div>
-      <AdminField input-id="org-create-about" :label="$t('orgAdmin.create.about')">
-        <template #default="{ id }">
-          <textarea :id="id" v-model="form.about" rows="3" :class="`${INPUT} py-2`" />
-        </template>
-      </AdminField>
+      <FormField input-id="org-create-about" :label="$t('orgAdmin.create.about')">
+        <TextArea v-model="form.about" rows="3" />
+      </FormField>
       <p class="text-xs text-muted">{{ $t('orgAdmin.create.unlistedNote') }}</p>
     </div>
     <template #error>

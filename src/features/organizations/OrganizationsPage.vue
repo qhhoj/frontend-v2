@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { Plus } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -10,7 +12,9 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { usePermissions } from '@/stores/use-permissions';
-import { BUTTON } from '@/features/account/settings/buttons';
+import AppButton from '@/components/ui/AppButton.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+import type { SegmentOption } from '@/components/ui/SegmentedControl.vue';
 import CreateOrganizationDialog from './create/CreateOrganizationDialog.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import OrganizationCard from './OrganizationCard.vue';
@@ -22,6 +26,7 @@ type Filter = 'all' | 'mine' | 'open';
 const FILTERS: Filter[] = ['all', 'mine', 'open'];
 
 const route = useRoute();
+const { t } = useI18n();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const page = computed(() => pageFromQuery(route.query.page));
@@ -46,8 +51,11 @@ const predicates: Record<Filter, (entry: (typeof ranked.value)[number]) => boole
 const visible = computed(() => ranked.value.filter(predicates[filter.value]));
 const count = (key: Filter) =>
   formatNumber(ranked.value.filter(predicates[key]).length, locale.locale);
-const filters = computed(() =>
-  isSignedIn.value ? FILTERS : FILTERS.filter((name) => name !== 'mine'),
+const filters = computed<SegmentOption<Filter>[]>(() =>
+  (isSignedIn.value ? FILTERS : FILTERS.filter((name) => name !== 'mine')).map((key) => ({
+    value: key,
+    label: `${t(`orgs.filters.${key}`)} · ${count(key)}`,
+  })),
 );
 const isListEmpty = computed(() => ranked.value.length === 0);
 /** Legacy `CreateOrganization` is gated on `judge.add_organization` alone. */
@@ -67,37 +75,23 @@ const isCreateOpen = ref(false);
         </div>
       </header>
       <div class="flex flex-wrap items-center gap-3">
-        <div
+        <SegmentedControl
           v-if="!isListEmpty"
-          role="group"
-          :aria-label="$t('orgs.filtersLabel')"
-          class="flex gap-1.5 rounded-pill bg-surface-hover p-1"
-        >
-          <button
-            v-for="key in filters"
-            :key="key"
-            type="button"
-            :aria-pressed="filter === key"
-            class="min-h-9 rounded-pill px-4 text-sm"
-            :class="
-              filter === key ? 'bg-surface-solid font-bold text-content shadow-glow' : 'text-muted'
-            "
-            @click="filter = key"
-          >
-            {{ $t(`orgs.filters.${key}`) }} · {{ count(key) }}
-          </button>
-        </div>
-        <button
+          v-model="filter"
+          :options="filters"
+          :label="$t('orgs.filtersLabel')"
+          size="sm"
+        />
+        <AppButton
           v-if="canCreate"
-          type="button"
           data-testid="create-organization"
-          :class="BUTTON.primary"
+          tone="primary"
           @click="isCreateOpen = true"
         >
-          <span aria-hidden="true">+</span>
+          <template #icon><Plus class="size-4" aria-hidden="true" /></template>
           <span class="max-sm:hidden">{{ $t('orgAdmin.create.open') }}</span>
           <span class="sm:hidden">{{ $t('orgAdmin.create.openShort') }}</span>
-        </button>
+        </AppButton>
       </div>
     </div>
     <CreateOrganizationDialog v-if="canCreate" v-model:visible="isCreateOpen" />

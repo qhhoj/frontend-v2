@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import type { ProblemTag } from '@/api/types/organization-problems';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ARCHIVE_FILTERS } from './org-problem-filters';
@@ -90,12 +91,7 @@ const CHIP =
           :placeholder="$t('orgProblems.searchPlaceholder')"
           class="min-h-11 min-w-0 flex-1 rounded-row border border-line-strong bg-surface-solid px-3 text-content"
         />
-        <button
-          type="submit"
-          class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-        >
-          {{ $t('orgProblems.searchSubmit') }}
-        </button>
+        <AppButton type="submit">{{ $t('orgProblems.searchSubmit') }}</AppButton>
       </form>
     </div>
   </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import Chip from '@/components/ui/Chip.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePendingRequestQuery } from './organizations.queries';
@@ -18,11 +19,7 @@ const sentAt = computed(() =>
 
 <template>
   <div class="flex flex-col gap-2">
-    <span
-      class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
-    >
-      {{ $t('orgMembership.pending') }}
-    </span>
+    <Chip tone="accent" size="md" class="w-fit">{{ $t('orgMembership.pending') }}</Chip>
     <p v-if="request" class="text-sm text-muted">
       {{ $t('orgMembership.sentAt', { date: sentAt }) }}
     </p>

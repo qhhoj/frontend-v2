@@ -7,6 +7,8 @@ import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import { ORG_BITS } from '../org-bits';
 import type { TagForm } from './org-tag-form';
 import OrgTagChip from './OrgTagChip.vue';
@@ -59,8 +61,6 @@ function confirmDelete() {
   if (!deleting.value) return;
   remove.mutate(deleting.value.slug, { onSuccess: () => void (deleting.value = null) });
 }
-const ICON_BUTTON =
-  'inline-flex size-11 shrink-0 items-center justify-center rounded-pill hover:bg-surface-hover';
 </script>
 
 <template>
@@ -93,34 +93,27 @@ const ICON_BUTTON =
         <li v-for="tag in tags" :key="tag.id" class="flex items-center gap-2">
           <OrgTagChip :tag="tag" />
           <span class="min-w-0 truncate font-mono text-xs text-muted">{{ tag.slug }}</span>
-          <button
-            type="button"
-            class="ml-auto"
-            :class="ICON_BUTTON"
-            :aria-label="$t('orgProblems.tags.editLabel', { name: tag.name })"
+          <IconButton
+            class="ml-auto shrink-0"
+            :label="$t('orgProblems.tags.editLabel', { name: tag.name })"
             @click="openForm(tag)"
           >
             <Pencil aria-hidden="true" class="size-4" />
-          </button>
-          <button
-            type="button"
-            :class="ICON_BUTTON"
-            :aria-label="$t('orgProblems.tags.deleteLabel', { name: tag.name })"
+          </IconButton>
+          <IconButton
+            class="shrink-0"
+            :label="$t('orgProblems.tags.deleteLabel', { name: tag.name })"
             @click="openDelete(tag)"
           >
             <Trash2 aria-hidden="true" class="size-4" />
-          </button>
+          </IconButton>
         </li>
       </ul>
     </QueryState>
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:text-muted"
-      :aria-disabled="isFull ? 'true' : undefined"
-      @click="openForm(null)"
-    >
-      <Plus aria-hidden="true" class="size-4" />{{ $t('orgProblems.tags.add') }}
-    </button>
+    <AppButton :disabled="isFull" @click="openForm(null)">
+      <template #icon><Plus aria-hidden="true" class="size-4" /></template>
+      {{ $t('orgProblems.tags.add') }}
+    </AppButton>
     <OrgTagDialog
       v-model:visible="isFormOpen"
       :tag="editing"

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { MemberSort } from '@/api/types/organizations';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import { formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -30,6 +33,18 @@ const sort = computed<Exclude<MemberSort, 'rating'>>(() => {
   return SORT_OPTIONS.find((option) => option === value) ?? SORT_OPTIONS[0]!;
 });
 const page = computed(() => pageFromQuery(route.query.page));
+const { t } = useI18n();
+const sortTabs = computed<TabItem[]>(() =>
+  SORT_OPTIONS.map((option) => ({
+    key: option,
+    label: t(`orgs.columns.${option}`),
+    to: {
+      name: 'organization-members',
+      params: { slug: slug.value },
+      query: option === SORT_OPTIONS[0] ? {} : { sort: option },
+    },
+  })),
+);
 const { data, error, isPending, refetch } = useMembersQuery(slug, () => ({
   sort: sort.value,
   page: page.value,
@@ -54,21 +69,12 @@ const footer = computed(() => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <nav :aria-label="$t('orgMembership.sortLabel')" class="flex flex-wrap gap-1">
-      <RouterLink
-        v-for="option in SORT_OPTIONS"
-        :key="option"
-        :to="{
-          name: 'organization-members',
-          params: { slug },
-          query: option === SORT_OPTIONS[0] ? {} : { sort: option },
-        }"
-        class="inline-flex min-h-11 items-center rounded-pill px-4 font-semibold text-muted hover:text-content"
-        exact-active-class="bg-accent-soft text-accent-soft-text"
-      >
-        {{ $t(`orgs.columns.${option}`) }}
-      </RouterLink>
-    </nav>
+    <Tabs
+      :model-value="sort"
+      :items="sortTabs"
+      :label="$t('orgMembership.sortLabel')"
+      overflow="scroll"
+    />
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SkeletonBlock class="h-64 w-full" /></template>
       <StatePanel

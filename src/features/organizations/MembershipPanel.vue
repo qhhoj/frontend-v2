@@ -5,6 +5,8 @@ import { useRoute } from 'vue-router';
 import { MAX_OPEN_ORGANIZATIONS } from '@/api/types/organizations';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import { safeRedirect } from '@/router/safe-redirect';
@@ -69,36 +71,27 @@ const retry = () => {
       :title="$t(errorCopy.title)"
       :body="$t(errorCopy.body)"
     >
-      <button
-        type="button"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-        @click="retry"
-      >
-        {{ $t('orgMembership.retry') }}
-      </button>
+      <AppButton @click="retry">{{ $t('orgMembership.retry') }}</AppButton>
     </StatePanel>
 
-    <RouterLink
-      v-if="state === 'signedOut'"
-      :to="signInTo"
-      class="inline-flex min-h-11 w-full items-center justify-center rounded-pill bg-accent px-5 font-semibold text-on-accent"
-    >
+    <AppButton v-if="state === 'signedOut'" tone="primary" :to="signInTo" block>
       {{ $t('orgMembership.signIn') }}
-    </RouterLink>
+    </AppButton>
 
     <template v-else-if="state === 'canJoin'">
       <p class="text-sm text-muted">
         {{ $t('orgMembership.openLine', { max: MAX_OPEN_ORGANIZATIONS }) }}
       </p>
-      <button
-        type="button"
+      <AppButton
         v-bind="lock.lockAttrs.value"
-        :aria-busy="membership.isPending.value"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill bg-accent px-5 font-semibold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
-        @click="lock.isLocked.value || membership.join()"
+        tone="primary"
+        block
+        :disabled="lock.isLocked.value"
+        :loading="membership.isPending.value"
+        @click="membership.join()"
       >
         {{ $t('orgMembership.join') }}
-      </button>
+      </AppButton>
       <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
     </template>
 
@@ -127,25 +120,21 @@ const retry = () => {
       <p v-if="!organization.isOpen" class="text-sm text-muted">
         {{ $t('orgMembership.privateLeave') }}
       </p>
-      <button
-        type="button"
+      <AppButton
         v-bind="lock.lockAttrs.value"
-        :aria-busy="membership.isPending.value"
-        class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent"
-        @click="lock.isLocked.value || membership.leave()"
+        block
+        :disabled="lock.isLocked.value"
+        :loading="membership.isPending.value"
+        @click="membership.leave()"
       >
         {{ $t('orgMembership.leave') }}
-      </button>
+      </AppButton>
       <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
     </template>
 
     <template v-else-if="state === 'administrator'">
       <!-- Managing lives on the Quản lý tab and the overview card; the header only names the role. -->
-      <span
-        class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
-      >
-        {{ $t('orgMembership.administrator') }}
-      </span>
+      <Chip tone="accent" size="md" class="w-fit">{{ $t('orgMembership.administrator') }}</Chip>
     </template>
   </section>
 </template>
