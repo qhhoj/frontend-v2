@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, toRaw, watch } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import {
   changedOrganizationFields,
@@ -7,7 +7,8 @@ import {
 } from './organization-form';
 import type { OrganizationForm } from './organization-form';
 
-const copyOf = (form: OrganizationForm): OrganizationForm => structuredClone(form);
+/** A reactive proxy (the baseline on a reset) cannot be structured-cloned, so the copy is of the raw object. */
+const copyOf = (form: OrganizationForm): OrganizationForm => structuredClone(toRaw(form));
 
 /**
  * The form and the last saved state it is compared with. A loaded organization seeds both; a refetch seeds them again only

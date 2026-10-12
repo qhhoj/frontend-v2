@@ -2666,11 +2666,22 @@
     "pendingBadge": "{count} yêu cầu đang chờ",
     "info": {
       "title": "Thông tin tổ chức",
+      "avatar": "Ảnh đại diện",
+      "avatarLead": "Hiện cạnh tên tổ chức ở mọi nơi.",
+      "avatarChange": "Đổi ảnh",
+      "avatarUseUrl": "Dùng URL",
+      "avatarUrl": "URL ảnh",
+      "avatarHint": "JPG, PNG, GIF, SVG · tối đa 5 MB",
+      "avatarUrlHint": "URL http(s) hoặc đường dẫn trên trang.",
+      "identity": "Tên và đường dẫn",
+      "identityLead": "Tên hiển thị và địa chỉ trang tổ chức.",
       "name": "Tên tổ chức",
       "slug": "Đường dẫn",
-      "slugHint": "Đổi đường dẫn sẽ làm các liên kết cũ không mở được.",
+      "slugWarning": "Đổi đường dẫn sẽ làm liên kết cũ không mở được.",
+      "aboutTitle": "Giới thiệu",
+      "aboutLead": "Hiện trên trang tổ chức.",
       "about": "Giới thiệu (Markdown)",
-      "aboutPreview": "Xem trước phần giới thiệu",
+      "joinLead": "Cách thành viên mới vào tổ chức.",
       "save": "Lưu thay đổi",
       "reset": "Hủy",
       "staffLink": "Mở trong trang quản trị (hạn mức, chỗ, ẩn hiện)"
@@ -2679,7 +2690,8 @@
       "label": "Tham gia",
       "open": "Mở",
       "approval": "Cần duyệt",
-      "hint": "Mở: vào ngay · Cần duyệt: quản trị viên duyệt từng yêu cầu"
+      "openHint": "Ai cũng vào được ngay.",
+      "approvalHint": "Quản trị viên duyệt từng yêu cầu."
     },
     "members": {
       "promote": "Đặt làm quản trị viên",
