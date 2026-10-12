@@ -1,14 +1,5 @@
 {
-  "required": "required",
   "needsPermission": "Needs the “{permission}” permission",
-  "saveBar": {
-    "unsaved": "{count} unsaved change | {count} unsaved changes",
-    "savedAt": "Saved at {time}",
-    "clean": "No changes to save.",
-    "discard": "Discard changes",
-    "save": "Save changes",
-    "saving": "Saving…"
-  },
   "leave": {
     "title": "Leave this page?",
     "body": "{count} unsaved change will be lost. | {count} unsaved changes will be lost.",

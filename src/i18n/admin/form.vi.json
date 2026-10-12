@@ -1,14 +1,5 @@
 {
-  "required": "bắt buộc",
   "needsPermission": "Cần quyền “{permission}”",
-  "saveBar": {
-    "unsaved": "{count} thay đổi chưa lưu | {count} thay đổi chưa lưu",
-    "savedAt": "Đã lưu lúc {time}",
-    "clean": "Chưa có thay đổi nào để lưu.",
-    "discard": "Huỷ thay đổi",
-    "save": "Lưu thay đổi",
-    "saving": "Đang lưu…"
-  },
   "leave": {
     "title": "Rời trang?",
     "body": "{count} thay đổi chưa lưu sẽ mất. | {count} thay đổi chưa lưu sẽ mất.",

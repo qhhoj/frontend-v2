@@ -2723,5 +2723,17 @@
   "create": {
     "problem": "Tạo bài tập",
     "contest": "Tạo kỳ thi"
+  },
+  "form": {
+    "required": "bắt buộc",
+    "optional": "(tuỳ chọn)",
+    "saveBar": {
+      "unsaved": "{count} thay đổi chưa lưu | {count} thay đổi chưa lưu",
+      "savedAt": "Đã lưu lúc {time}",
+      "clean": "Chưa có thay đổi nào để lưu.",
+      "discard": "Huỷ thay đổi",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…"
+    }
   }
 }
