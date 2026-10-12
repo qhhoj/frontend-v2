@@ -9,6 +9,9 @@ export const IMAGE_MAX_BYTES = 5 * MIB;
 export const SOURCE_MAX_BYTES = MIB;
 export const MAX_CASE_ARGS_BYTES = MIB;
 export const IMAGE_ACCEPT = 'image/png,image/jpeg,image/gif,image/svg+xml';
+/** A file input's `accept` for the extensions the backend lists (without the dot), e.g. `.zip,.docx`. */
+export const acceptOfExtensions = (extensions: readonly string[]): string =>
+  extensions.map((extension) => `.${extension}`).join(',');
 
 export const FILE_NAME_MAX_LENGTH = 100;
 export const GENERATOR_ARGS_MAX_LENGTH = 1000;

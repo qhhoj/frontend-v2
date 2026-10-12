@@ -1,10 +1,27 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
-import { staffViewer } from '@/test/admin-routes';
-import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
+import { confirmDialog, staffViewer } from '@/test/admin-routes';
+import {
+  editableProblem,
+  problemEditor,
+  problemEditorRoutes,
+} from '@/test/admin-fixtures/problems';
+
+/** The server's upload rights for the viewer (`editor.canUpload*`): the permissions, or administering the problem's organizations. */
+const withUploadRights = (rights: { pdf: boolean; material: boolean }, overrides = {}) =>
+  editableProblem({
+    editor: {
+      ...problemEditor(),
+      canUploadPdfStatement: rights.pdf,
+      canUploadMaterial: rights.material,
+    },
+    ...overrides,
+  });
+/** An organization administrator: no upload permission of their own. */
+const ORG_ADMIN = ['judge.edit_own_problem', 'judge.create_organization_problem'];
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
 
@@ -30,10 +47,10 @@ const pick = async (wrapper: Mounted['wrapper'], testId: string, file: File) => 
 };
 
 describe('ProblemFilesTab', () => {
-  it('refuses a PDF over 5 MiB without sending it, and hides PDF upload without its permission', async () => {
+  it('refuses a PDF over 5 MiB without sending it, and locks the tile the server does not allow', async () => {
     const calls = mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.upload_file_statement']),
-      ...problemEditorRoutes(),
+      ...problemEditorRoutes(withUploadRights({ pdf: true, material: false })),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
     const big = new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'big.pdf');
@@ -50,7 +67,7 @@ describe('ProblemFilesTab', () => {
   it('replaces the PDF, marks public problem pages stale, and reads the problem again so the stored address is the new one', async () => {
     const calls = mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.upload_file_statement']),
-      ...problemEditorRoutes(),
+      ...problemEditorRoutes(withUploadRights({ pdf: true, material: false })),
       'POST /problems/hcmus41c/statement': ok({ url: '/media/pdf/hcmus41c-v2.pdf' }),
     });
     const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/files');
@@ -63,5 +80,41 @@ describe('ProblemFilesTab', () => {
     expect(
       calls.filter((call) => call.method === 'GET' && call.path === '/problems/hcmus41c'),
     ).toHaveLength(2);
+  });
+
+  it('offers both uploads to an organization administrator the server allows, picking any material type it accepts', async () => {
+    mockApi({
+      ...staffViewer(ORG_ADMIN),
+      ...problemEditorRoutes(withUploadRights({ pdf: true, material: true })),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
+    for (const testId of ['upload-pdf', 'upload-material'])
+      expect(wrapper.get(`[data-testid="${testId}"]`).text()).not.toContain('Cần quyền');
+    expect(
+      wrapper.get('[data-testid="upload-material"] input[type="file"]').attributes('accept'),
+    ).toBe('.zip,.pdf,.docx');
+  });
+
+  it('removes the material only after confirming, and reads the problem again', async () => {
+    const stored = { material: true, pdf: true };
+    const calls = mockApi({
+      ...staffViewer(ORG_ADMIN),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c': sequence(
+        ok(withUploadRights(stored, { materialUrl: '/media/materials/p/de.docx' })),
+        ok(withUploadRights(stored, { materialUrl: null })),
+      ),
+      'DELETE /problems/hcmus41c/material': noContent(),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/files');
+    const tile = () => wrapper.get('[data-testid="upload-material"]');
+    await tile().get('button[aria-label="Gỡ de.docx"]').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
+    await confirmDialog('Gỡ tệp');
+    expect(calls.filter((call) => call.method === 'DELETE').map((call) => call.path)).toEqual([
+      '/problems/hcmus41c/material',
+    ]);
+    expect(tile().text()).toContain('Chưa có tệp');
   });
 });
