@@ -1110,6 +1110,7 @@
     "clearAll": "Xóa tất cả",
     "removeFilter": "Bỏ lọc: {name}",
     "pointsChip": "{min}–{max} điểm",
+    "uncategorized": "Chưa phân loại",
     "attemptedLong": "Đã thử, chưa đúng",
     "notTried": "Chưa thử",
     "sortField": {

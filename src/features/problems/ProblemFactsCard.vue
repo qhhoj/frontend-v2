@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from './problem-type-label';
 import { computed, ref } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import GlassCard from '@/components/GlassCard.vue';
@@ -112,7 +113,7 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
           :key="type.id"
           class="rounded-pill bg-surface-strong px-2.5 py-1 text-[13px] text-muted"
         >
-          {{ type.fullName }}
+          {{ problemTypeLabel(type) }}
         </li>
       </ul>
     </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from './problem-type-label';
 import type { ProblemListItem, ProblemSort } from '@/api/types/problems';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
@@ -53,7 +54,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
             <span class="font-mono text-xs text-muted">{{ problem.code }}</span>
           </td>
           <td class="truncate px-3 py-2 text-[12.5px] text-muted">
-            {{ problem.types.map((type) => type.fullName).join(', ') }}
+            {{ problem.types.map((type) => problemTypeLabel(type)).join(', ') }}
           </td>
           <td class="px-3 py-2">
             <span class="inline-flex items-center gap-[7px] font-medium tabular-nums">

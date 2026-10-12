@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { FileArchive } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ImportOptions } from '@/api/types/problem-imports';
@@ -53,7 +54,7 @@ const localErrors = ref<FieldErrors>({});
 const { data: meta } = useProblemEditingMetaQuery();
 const groups = computed(() => meta.value?.groups ?? []);
 const typeOptions = computed(() =>
-  (meta.value?.types ?? []).map((type) => ({ value: type.id, label: type.fullName })),
+  (meta.value?.types ?? []).map((type) => ({ value: type.id, label: problemTypeLabel(type) })),
 );
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isOwnerReady = ref(false);

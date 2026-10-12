@@ -1,3 +1,4 @@
+import { problemTypeLabel } from './problem-type-label';
 import type { CatalogItem } from '@/api/types/problems';
 import { translate } from '@/i18n';
 import type { ProblemFilters } from './use-problem-filters';
@@ -26,7 +27,7 @@ const typeChips = (filters: ProblemFilters, catalog: Catalog): FilterChip[] =>
       ? [
           {
             key: `type:${id}`,
-            label: type.fullName,
+            label: problemTypeLabel(type),
             clear: { typeIds: filters.typeIds.filter((picked) => picked !== id) },
           },
         ]
