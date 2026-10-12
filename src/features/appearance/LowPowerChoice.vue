@@ -27,7 +27,7 @@ function choose(preference: LowPowerPreference) {
   >
     <div>
       <h2 class="font-display text-xl font-semibold">{{ $t('lowPower.title') }}</h2>
-      <p class="mt-1 text-[13px] text-muted">{{ $t('lowPower.lead') }}</p>
+      <p class="mt-1 text-meta text-muted">{{ $t('lowPower.lead') }}</p>
     </div>
     <fieldset class="grid gap-3 md:grid-cols-3">
       <legend class="sr-only">{{ $t('lowPower.title') }}</legend>
@@ -69,7 +69,7 @@ function choose(preference: LowPowerPreference) {
         <li v-for="key in EFFECT_KEYS" :key="key">{{ $t(`lowPower.effects.${key}`) }}</li>
       </ul>
     </div>
-    <p role="status" class="text-[13px] text-muted">
+    <p role="status" class="text-meta text-muted">
       <strong v-if="isSaved" class="text-content">{{ $t('lowPower.saved') }}. </strong
       >{{ $t('lowPower.savedNote') }}
     </p>

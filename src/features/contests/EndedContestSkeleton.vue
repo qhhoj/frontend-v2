@@ -38,7 +38,7 @@ const ROW_COUNT = 5;
           >
             <td :class="ENDED_CELL.name">
               <SkeletonBlock text class="w-48" />
-              <span class="block font-mono text-[12.5px]"><SkeletonBlock text class="w-16" /></span>
+              <span class="block font-mono text-caption"><SkeletonBlock text class="w-16" /></span>
             </td>
             <td :class="ENDED_CELL.when"><SkeletonBlock text class="w-28" /></td>
             <td :class="ENDED_CELL.format"><SkeletonBlock pill class="h-6 w-24" /></td>

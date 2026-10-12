@@ -114,7 +114,7 @@ const facts = computed(() => [
             ></template
           >
         </p>
-        <p v-if="isProvisional" data-testid="provisional" class="text-[13px] text-muted">
+        <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
           {{ $t('submission.provisional') }}
         </p>
       </div>
@@ -133,8 +133,8 @@ const facts = computed(() => [
       />
     </GlassCard>
     <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
-      <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]">
-        <dt data-fact="problem" class="text-[13px] text-muted">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
+        <dt data-fact="problem" class="text-meta text-muted">
           {{ $t('submission.facts.problem') }}
         </dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
@@ -148,7 +148,7 @@ const facts = computed(() => [
             >{{ problemName ?? submission.problem.name }}</RouterLink
           ><template v-else>{{ NO_VALUE }}</template>
         </dd>
-        <dt data-fact="user" class="text-[13px] text-muted">{{ $t('submission.facts.user') }}</dt>
+        <dt data-fact="user" class="text-meta text-muted">{{ $t('submission.facts.user') }}</dt>
         <dd class="min-w-0 [overflow-wrap:anywhere]">
           <UserLink
             v-if="submission.user"
@@ -158,7 +158,7 @@ const facts = computed(() => [
           />
           <template v-else>{{ NO_VALUE }}</template>
         </dd>
-        <dt data-fact="submitted" class="text-[13px] text-muted">
+        <dt data-fact="submitted" class="text-meta text-muted">
           {{ $t('submission.facts.submitted') }}
         </dt>
         <dd class="min-w-0">
@@ -169,13 +169,13 @@ const facts = computed(() => [
           >
         </dd>
         <template v-for="fact in facts" :key="fact.key">
-          <dt :data-fact="fact.key" class="text-[13px] text-muted">
+          <dt :data-fact="fact.key" class="text-meta text-muted">
             {{ $t(`submission.facts.${fact.key}`) }}
           </dt>
           <dd class="min-w-0 font-mono [overflow-wrap:anywhere]">{{ fact.value }}</dd>
         </template>
       </dl>
-      <p v-if="submission.isPretested" class="mt-4 text-[13px] text-muted">
+      <p v-if="submission.isPretested" class="mt-4 text-meta text-muted">
         {{ $t('submission.pretest') }}
       </p>
     </GlassCard>

@@ -54,7 +54,7 @@ const cellY = (row: number) => LABEL_ROW + row * STEP;
           :x="cellX(mark.column) > 700 ? 739 : cellX(mark.column) + 2"
           y="10"
           :text-anchor="cellX(mark.column) > 700 ? 'end' : 'start'"
-          class="fill-muted text-[10px]"
+          class="fill-muted text-tiny"
         >
           {{ $t(`ratingChart.months.${mark.month}`) }}
         </text>

@@ -32,7 +32,7 @@ async function switchMode() {
     <template v-if="!backupMode">
       <span aria-hidden="true" class="text-sm font-semibold">{{ label }}</span>
       <OtpInput v-model="code" :label="label" />
-      <p v-if="error" class="text-[13px] text-negative">{{ error }}</p>
+      <p v-if="error" class="text-meta text-negative">{{ error }}</p>
     </template>
     <AuthField
       v-else

@@ -13,7 +13,7 @@ const locale = useLocaleStore();
     data-testid="announcement"
     class="flex flex-col gap-1.5 border-t border-line py-3.5 first:border-t-0"
   >
-    <p class="flex items-center gap-2 text-[12.5px] text-muted">
+    <p class="flex items-center gap-2 text-caption text-muted">
       <time :datetime="announcement.createdAt">{{
         formatDateTime(announcement.createdAt, locale.locale)
       }}</time>

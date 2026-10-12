@@ -43,7 +43,7 @@ const WIDTHS = {
       >
         <slot name="badge" />
         <div :class="centered && 'text-center'">
-          <h1 class="font-display text-[26px] leading-tight font-bold">{{ title }}</h1>
+          <h1 class="page-title">{{ title }}</h1>
           <p v-if="lead" :role="leadRole" class="mt-1.5 text-sm leading-relaxed text-muted">
             {{ lead }}
           </p>

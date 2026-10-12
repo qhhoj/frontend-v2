@@ -14,7 +14,7 @@ const props = defineProps<{
   hideOrganizations?: boolean;
 }>();
 const CHIP =
-  'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-[12.5px] font-medium whitespace-nowrap';
+  'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-caption font-medium whitespace-nowrap';
 /** Read from the cache only: the list and the contest header fetch the catalogue; elsewhere tags stay neutral. */
 const { data: catalogue } = useContestTagsCache();
 const tagChips = computed(() => {

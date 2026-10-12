@@ -24,7 +24,7 @@ const linkLabel = computed(() =>
     : translate('tickets.general'),
 );
 const toggleLabel = computed(() => (props.ticket.isOpen ? 'ticket.close' : 'ticket.reopen'));
-const DT = 'text-[13px] font-semibold text-muted';
+const DT = 'text-meta font-semibold text-muted';
 const DD = 'text-sm';
 const BUSY_BUTTON = 'cursor-progress bg-accent-soft text-accent-soft-text';
 const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
@@ -54,7 +54,7 @@ const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
     </dl>
     <section class="flex flex-col gap-2 border-t border-line pt-4">
       <h2 class="text-sm font-semibold">{{ $t('ticket.status') }}</h2>
-      <p class="text-[13px] text-muted">{{ $t('ticket.statusHint') }}</p>
+      <p class="text-meta text-muted">{{ $t('ticket.statusHint') }}</p>
       <button
         v-if="canToggle"
         type="button"
@@ -65,7 +65,7 @@ const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
       >
         {{ $t(toggleLabel) }}
       </button>
-      <p v-if="failureKey" role="alert" class="text-[13px] text-negative">
+      <p v-if="failureKey" role="alert" class="text-meta text-negative">
         {{ $t(failureKey) }}
       </p>
     </section>

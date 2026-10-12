@@ -31,7 +31,7 @@ const INPUT = 'min-h-11 rounded-cell border border-line bg-surface px-3 text-bas
 
 <template>
   <form v-if="canFilterByPeople" class="grid gap-3 sm:grid-cols-2" @submit.prevent="apply">
-    <p class="text-[13px] text-muted sm:col-span-2">{{ $t('tickets.staffFilters') }}</p>
+    <p class="text-meta text-muted sm:col-span-2">{{ $t('tickets.staffFilters') }}</p>
     <label :class="FIELD">
       {{ $t('tickets.creator') }}
       <input v-model="creatorText" name="user" type="text" :class="INPUT" @blur="apply" />

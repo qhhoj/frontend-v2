@@ -102,7 +102,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
           <template v-else>
             <TicketTable :tickets="tickets" />
             <footer
-              class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-[13px] text-muted md:px-6"
+              class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-meta text-muted md:px-6"
             >
               <span>
                 {{ $t('tickets.footer', { total: formatNumber(total, locale.locale) })

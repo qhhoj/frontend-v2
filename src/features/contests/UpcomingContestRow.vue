@@ -43,7 +43,7 @@ const startsInText = computed(() =>
       class="flex size-16 shrink-0 flex-col items-center justify-center rounded-tile bg-accent-soft text-accent-soft-text"
     >
       <span class="font-display text-2xl leading-none font-bold">{{ dayChip.day }}</span>
-      <span class="text-[12px] font-semibold">{{ dayChip.month }}</span>
+      <span class="text-caption font-semibold">{{ dayChip.month }}</span>
     </span>
     <div class="min-w-0 flex-1">
       <h3 class="font-display text-lg font-semibold">
@@ -57,7 +57,7 @@ const startsInText = computed(() =>
       <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
         <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
-        <span class="font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
+        <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
       </div>
     </div>
     <div class="text-sm">

@@ -26,7 +26,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
 
 <template>
   <ScrollRegion :label="$t('problems.scrollRegion')">
-    <table class="w-full min-w-[900px] table-fixed border-collapse text-[14.5px]">
+    <table class="w-full min-w-[900px] table-fixed border-collapse text-sm">
       <caption class="sr-only">
         {{
           $t('problems.listName')
@@ -53,7 +53,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
             >
             <span class="font-mono text-xs text-muted">{{ problem.code }}</span>
           </td>
-          <td class="truncate px-3 py-2 text-[12.5px] text-muted">
+          <td class="truncate px-3 py-2 text-caption text-muted">
             {{ problem.types.map((type) => problemTypeLabel(type)).join(', ') }}
           </td>
           <td class="px-3 py-2">

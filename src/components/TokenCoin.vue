@@ -14,7 +14,7 @@ const coinClass = computed(() => COINS[coinIndex(props.seed)]);
   <span
     aria-hidden="true"
     class="inline-flex shrink-0 items-center justify-center rounded-full font-display font-bold text-on-coin"
-    :class="[coinClass, size === 'md' ? 'size-10 text-[13px]' : 'size-7 text-[11px]']"
+    :class="[coinClass, size === 'md' ? 'size-10 text-meta' : 'size-7 text-tiny']"
   >
     {{ label }}
   </span>

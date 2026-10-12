@@ -51,12 +51,12 @@ function regenerate() {
     </span>
     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
       <strong class="font-semibold">{{ $t('settings.totp.title') }}</strong>
-      <span class="text-[13px] text-muted">{{
+      <span class="text-meta text-muted">{{
         enabled ? $t('settings.totp.descriptionOn') : $t('settings.totp.descriptionOff')
       }}</span>
       <span
         v-if="remainingText"
-        class="text-[13px]"
+        class="text-meta"
         :class="lowOnCodes ? 'font-semibold text-negative' : 'text-muted'"
         >{{ remainingText }}</span
       >

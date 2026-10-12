@@ -23,7 +23,7 @@ const freezeClock = computed(() => {
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <div class="relative hidden h-5 font-mono text-[12.5px] text-muted tabular-nums md:block">
+    <div class="relative hidden h-5 font-mono text-caption text-muted tabular-nums md:block">
       <span class="absolute left-0">{{ formatClock(contest.startTime, locale.locale) }}</span>
       <span
         v-if="freezePercent !== null"

@@ -6,7 +6,7 @@ defineProps<{ id: string; message: string }>();
 </script>
 
 <template>
-  <p :id="id" class="flex items-center gap-1.5 text-[13px] text-negative">
+  <p :id="id" class="flex items-center gap-1.5 text-meta text-negative">
     <CircleAlert aria-hidden="true" class="size-3.5 shrink-0" />
     {{ message }}
   </p>

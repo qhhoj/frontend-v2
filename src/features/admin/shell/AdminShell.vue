@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../admin-access';
@@ -24,6 +24,10 @@ const isAllowed = computed(() =>
     capability: route.meta.capability,
   }),
 );
+
+/** On <html>, so dialogs teleported to <body> get the admin control tokens too (admin-density.css). */
+onMounted(() => document.documentElement.classList.add('qh-admin'));
+onBeforeUnmount(() => document.documentElement.classList.remove('qh-admin'));
 
 const navCounts = useNavCounts();
 const isPhoneNavOpen = ref(false);

@@ -94,7 +94,7 @@ function move(event: KeyboardEvent) {
         aria-hidden="true"
         :title="cellLabel(cell)"
         :style="cellStyle(cell)"
-        class="flex min-w-0 flex-1 items-center justify-center font-mono text-[10px] leading-none font-bold text-on-verdict-solid"
+        class="flex min-w-0 flex-1 items-center justify-center font-mono text-tiny leading-none font-bold text-on-verdict-solid"
         :class="[
           isLettered && 'rounded-[2px]',
           cell.status === null && 'border border-line-strong',

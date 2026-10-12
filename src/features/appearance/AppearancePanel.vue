@@ -80,10 +80,10 @@ const lowPowerOptions = computed(() =>
           :disabled="reducedTransparency || !isGlassTheme"
           @pick="(stop) => void update({ glass: stop })"
         />
-        <p v-if="!isGlassTheme" class="mt-2 text-[13px] text-muted">
+        <p v-if="!isGlassTheme" class="mt-2 text-meta text-muted">
           {{ $t('appearance.glassOnly') }}
         </p>
-        <p v-else-if="reducedTransparency" class="mt-2 text-[13px] text-muted">
+        <p v-else-if="reducedTransparency" class="mt-2 text-meta text-muted">
           {{ $t('appearance.solidByDevice') }}
         </p>
       </div>
@@ -101,14 +101,14 @@ const lowPowerOptions = computed(() =>
       <div class="flex items-center justify-between gap-3 border-t border-line pt-3">
         <button
           type="button"
-          class="inline-flex min-h-11 items-center px-1 text-[13px] text-muted underline hover:text-content"
+          class="inline-flex min-h-11 items-center px-1 text-meta text-muted underline hover:text-content"
           @click="reset"
         >
           {{ $t('appearance.useSite') }}
         </button>
         <RouterLink
           :to="{ name: 'settings-appearance' }"
-          class="inline-flex min-h-11 items-center text-[13px] text-accent-text underline"
+          class="inline-flex min-h-11 items-center text-meta text-accent-text underline"
           @click="popover?.hide()"
         >
           {{ $t('appearance.moreSettings') }}

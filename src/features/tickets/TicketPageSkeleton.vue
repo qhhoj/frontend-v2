@@ -14,7 +14,7 @@ const MESSAGE_ROWS = [0, 1, 2];
         data-skeleton-region="ticket-header"
         class="flex flex-col gap-3 p-5 sm:p-6"
       >
-        <p class="text-[13px]"><SkeletonBlock text class="w-32" /></p>
+        <p class="text-meta"><SkeletonBlock text class="w-32" /></p>
         <div class="flex flex-wrap items-center gap-2">
           <SkeletonBlock pill class="h-6 w-24" />
         </div>
@@ -23,13 +23,13 @@ const MESSAGE_ROWS = [0, 1, 2];
         </p>
         <p class="text-sm"><SkeletonBlock text class="w-40" /></p>
         <!-- The meta line runs to a second line on a phone and stays on one from sm up, as the loaded line does. -->
-        <div class="text-[13px]">
+        <div class="text-meta">
           <SkeletonBlock text class="w-full" />
           <span class="sm:hidden"> <SkeletonBlock text class="w-1/2" /></span>
         </div>
       </GlassCard>
       <section class="flex flex-col gap-4">
-        <p data-skeleton-region="thread-counts" class="text-[13px]">
+        <p data-skeleton-region="thread-counts" class="text-meta">
           <SkeletonBlock text class="w-40" />
         </p>
         <div

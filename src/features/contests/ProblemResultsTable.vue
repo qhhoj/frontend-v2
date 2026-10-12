@@ -43,7 +43,7 @@ const chipClasses = (code: ResultCode, value: number) =>
     >
       <table data-testid="problem-results" class="w-full min-w-[720px] border-collapse">
         <thead>
-          <tr class="text-left text-[13px] text-muted">
+          <tr class="text-left text-meta text-muted">
             <th scope="col" class="px-4 py-3 font-medium">
               {{ $t('contests.stats.columns.label') }}
             </th>

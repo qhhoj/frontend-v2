@@ -26,7 +26,7 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
 
 <template>
   <section :aria-label="$t('ticket.messages')" class="flex flex-col gap-4">
-    <p data-testid="thread-counts" class="text-[13px] text-muted">
+    <p data-testid="thread-counts" class="text-meta text-muted">
       {{
         $t('ticketTimeline.counts', {
           messages: formatNumber(ticket.messageCount, locale.locale),
@@ -53,7 +53,7 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
             >
               {{ $t('ticket.assigneeChip') }}
             </span>
-            <time :datetime="row.message.createdAt" class="text-[13px] text-muted">
+            <time :datetime="row.message.createdAt" class="text-meta text-muted">
               {{ when(row.message.createdAt) }}
             </time>
           </div>
@@ -67,7 +67,7 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
         class="rounded-row border border-line bg-surface-strong"
       >
         <summary
-          class="flex min-h-11 cursor-pointer flex-wrap items-center gap-2 px-4 py-2 text-[13px] text-muted"
+          class="flex min-h-11 cursor-pointer flex-wrap items-center gap-2 px-4 py-2 text-meta text-muted"
         >
           <span class="font-semibold text-content">
             {{ $t('ticketTimeline.group', { count: row.events.length }) }}
@@ -86,10 +86,10 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
         </div>
       </details>
     </template>
-    <p v-if="endsClosed(rows)" data-testid="thread-closed-note" class="text-[13px] text-muted">
+    <p v-if="endsClosed(rows)" data-testid="thread-closed-note" class="text-meta text-muted">
       {{ $t('ticketTimeline.noMessagesAfterClose') }}
     </p>
-    <p class="flex items-center gap-2 text-[13px] text-muted">
+    <p class="flex items-center gap-2 text-meta text-muted">
       <template v-if="isLive">
         <span aria-hidden="true" class="inline-block size-2 rounded-full bg-accent"></span>
         <span>{{ $t('ticket.liveOn') }}</span>

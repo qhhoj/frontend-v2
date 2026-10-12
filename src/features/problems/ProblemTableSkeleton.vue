@@ -10,10 +10,7 @@ const ROW_COUNT = 8;
 
 <template>
   <ScrollRegion placeholder label="">
-    <table
-      aria-hidden="true"
-      class="w-full min-w-[900px] table-fixed border-collapse text-[14.5px]"
-    >
+    <table aria-hidden="true" class="w-full min-w-[900px] table-fixed border-collapse text-sm">
       <ProblemTableColumns />
       <ProblemTableHead :sort="null" :interactive="false" />
       <tbody>
@@ -23,7 +20,7 @@ const ROW_COUNT = 8;
             <div class="font-medium"><SkeletonBlock text class="w-56" /></div>
             <span class="font-mono text-xs"><SkeletonBlock text class="w-16" /></span>
           </td>
-          <td class="px-3 py-2 text-[12.5px]"><SkeletonBlock text class="w-32" /></td>
+          <td class="px-3 py-2 text-caption"><SkeletonBlock text class="w-32" /></td>
           <td class="px-3 py-2"><SkeletonBlock text class="w-14" /></td>
           <td class="px-3 py-2 text-right"><SkeletonBlock text class="ml-auto w-10" /></td>
           <td class="py-2 pr-[22px] pl-3 text-right"><SkeletonBlock text class="ml-auto w-8" /></td>

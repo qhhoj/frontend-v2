@@ -8,7 +8,7 @@ const emit = defineEmits<{ remove: [patch: Partial<ProblemFilters>]; clearAll: [
 </script>
 
 <template>
-  <ul v-if="chips.length" class="flex flex-wrap items-center gap-2 text-[13px]">
+  <ul v-if="chips.length" class="flex flex-wrap items-center gap-2 text-meta">
     <li class="text-muted">{{ $t('problems.filtering') }}</li>
     <li v-for="chip in chips" :key="chip.key">
       <button

@@ -29,7 +29,7 @@ const cellLabel = computed(() => {
     >
       <span aria-hidden="true"
         >{{ view.cell.text
-        }}<small v-if="view.cell.time" class="block text-[11px] leading-tight font-medium">{{
+        }}<small v-if="view.cell.time" class="block text-tiny leading-tight font-medium">{{
           view.cell.time
         }}</small></span
       >
@@ -37,7 +37,7 @@ const cellLabel = computed(() => {
     </span>
     <span
       aria-hidden="true"
-      class="mt-1 block text-[12px] leading-snug text-muted xl:whitespace-nowrap"
+      class="mt-1 block text-caption leading-snug text-muted xl:whitespace-nowrap"
     >
       {{ cellLabel }}
     </span>
@@ -50,10 +50,8 @@ const cellLabel = computed(() => {
     <BitLoop data-testid="judging-bit" kind="judging" class="[--bit-px:2px]" />
     {{ $t('contests.problems.pending') }}
   </span>
-  <span v-else-if="view.kind === 'attempted'" class="text-[13px] whitespace-nowrap text-muted">
+  <span v-else-if="view.kind === 'attempted'" class="text-meta whitespace-nowrap text-muted">
     {{ $t('contests.problems.attempted', { count: view.attempts }, view.attempts) }}
   </span>
-  <span v-else class="text-[13px] whitespace-nowrap text-muted">{{
-    $t('ranking.cell.empty')
-  }}</span>
+  <span v-else class="text-meta whitespace-nowrap text-muted">{{ $t('ranking.cell.empty') }}</span>
 </template>

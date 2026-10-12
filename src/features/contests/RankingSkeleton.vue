@@ -14,12 +14,12 @@ const columns = computed(
 
 <template>
   <div class="glass overflow-hidden rounded-card">
-    <p aria-hidden="true" class="px-5 pt-3 text-[13px] md:hidden">
+    <p aria-hidden="true" class="px-5 pt-3 text-meta md:hidden">
       <SkeletonBlock text class="w-48" />
     </p>
     <div
       data-skeleton-region="table-header"
-      class="grid items-center py-4 text-[13px]"
+      class="grid items-center py-4 text-meta"
       :style="columns"
     >
       <span class="block px-5"><SkeletonBlock text class="w-8" /></span>

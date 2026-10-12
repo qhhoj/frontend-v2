@@ -22,7 +22,7 @@ const SECTIONS = [
   { route: 'settings-data', labelKey: 'settings.nav.data', icon: Download, signedInOnly: true },
 ] as const;
 const LINK =
-  'flex min-h-11 shrink-0 items-center gap-3 rounded-pill border px-4 text-sm whitespace-nowrap no-underline lg:text-[14.5px]';
+  'flex min-h-11 shrink-0 items-center gap-3 rounded-pill border px-4 text-sm whitespace-nowrap no-underline lg:text-sm';
 const LINK_STATE = {
   current: 'border-line-accent bg-accent-soft font-semibold text-accent-soft-text',
   other:
@@ -42,7 +42,7 @@ const current = computed(() => SECTIONS.find((section) => section.route === rout
   <div class="mx-auto flex w-full max-w-[1216px] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
     <nav
       :aria-label="$t('common.breadcrumb')"
-      class="hidden items-center gap-1.5 text-[13px] sm:flex"
+      class="hidden items-center gap-1.5 text-meta sm:flex"
     >
       <RouterLink
         v-if="signedIn"

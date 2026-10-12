@@ -21,7 +21,7 @@ const until = computed(() =>
   <p
     :id="id"
     data-testid="official-lock-note"
-    class="m-0 flex items-center gap-2 text-[13px] text-content"
+    class="m-0 flex items-center gap-2 text-meta text-content"
   >
     <InlineBit :kind="NOTIFICATION_BITS.locked" />
     <span>{{ until ? $t('officialMode.lockedUntil', { until }) : $t('officialMode.locked') }}</span>

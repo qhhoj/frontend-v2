@@ -1,4 +1,6 @@
-# QHHOJ Design System (Master)
+# Clay — QHHOJ Design System (Master)
+
+Clay is the QHHOJ design language (tokens, primitives, rules, rollout: `docs/design-language.md`). Clay & ivory is its default theme, Glass an optional theme family.
 
 Default direction: **Clay & ivory** (user pick, 2026-10-08, mock-up "Palette", third option): light-first, calm, ivory paper, white opaque surfaces, hairline borders, solid clay buttons, no blur, no blobs; the dark twin is warm charcoal. **Glass** (the earlier approved "I · Glass") stays as two optional themes, `glass-dark` and `glass-light`. Typography and the checklist come from ui-ux-pro-max (`"crypto defi glassmorphism" --design-system --density 6`). Page overrides go in `pages/<page>.md`; they win over this file.
 
@@ -54,12 +56,14 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 ## Typography
 
 - Display/headings: **Space Grotesk** 500-700. Body/UI: `--qh-font-body` (Verdana, then DejaVu Sans and the system sans). Numbers and code: **JetBrains Mono** (400, 600) with `tabular-nums`.
-- Base 16 px (browser default). Hero rating number 60 px (`text-6xl`), card numbers 26 px.
+- Type scale (font size only; leading comes from the primitives): `text-tiny` 11, `text-caption` 12, `text-meta` 13, `text-sm` 14 (UI, tables), `text-base` 16 (prose, every input), `text-title` 17, `text-page` 26 (the `page-title` h1 utility), `text-stat` 26 with `font-mono`, `text-hero` 40. No arbitrary `text-[Npx]` (`lint:tokens`). Hero rating number 60 px (`text-6xl`).
 - Self-hosted via `@fontsource` (no Google Fonts request).
 
 ## Shape, depth, motion
 
-- Radii (tokens): `rounded-cell` 12 px, `rounded-row` 16 px, `rounded-tile` 20 px (inner tiles, submit), `rounded-card` 24 px, `rounded-panel` 28 px (swap card), `rounded-pill` 999 px.
+- Radius by role: controls `rounded-control` (`--qh-radius-control`: pill, 12 px in the admin scope `.qh-admin`), inputs and code `rounded-cell` 12, inset tiles and notices `rounded-row` 16, cards and dialogs `rounded-card` 24, chips/tabs/segmented `rounded-pill`. `rounded-tile` 20 and `rounded-panel` 28 are legacy: no new uses. No `rounded-[…]` outside the lint allowlist.
+- Control heights: `--qh-control` 44 px (md), `--qh-control-sm` 36 px (44 px on coarse pointers; the admin scope's default), `--qh-control-lg` 56 px (swap card submit).
+- Z scale: `z-sticky` 10, `z-savebar` 20, `z-header` 30, `z-bit` 40, `z-overlay` 50, `z-toast` 1200 (above PrimeVue's 1000/1100 layers). No `z-[…]`.
 - Depth is hairlines and tone steps in Clay. Glass blurs 24 px at Glass 0 (Clear), scaled down to 0 at Glass 100 (Solid, opaque `--qh-surface-solid`); the personal Glass level moves `--qh-surface-live` and `--qh-blur-live` only. No drop shadows (the live-dot glow exists in Glass only).
 - Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover.
 - `prefers-reduced-motion`: durations 0, no transitions or animations. `prefers-reduced-transparency`: the card surface is opaque (`--qh-surface-solid`) and blur is 0. No `backdrop-filter` support: the card surface is opaque; inner tiles and hover rows keep their Glass tint. Clay is already opaque.
@@ -80,7 +84,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 ## Components
 
 - **Card**: `GlassCard` (`glass rounded-card`; callers add padding): a white hairline card in Clay, frosted in Glass.
-- **Pill nav**: `glass` pill container, active item `bg-surface-hover` + `text-content`, others `text-muted`.
+- **Pill nav / tabs**: `glass` pill container; active item `bg-accent-soft` + `text-accent-soft-text` + accent border (one active style for every tab set), others `text-muted` with a `bg-surface-hover` hover.
 - **Primary button**: `bg-gradient-accent` + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
 - **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.
 - **Verdict badge**: 40 px circle (`size-10`), verdict tint, abbreviation + accessible full label.
@@ -92,7 +96,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 ## Rules
 
-- No raw colour values outside `src/theme/themes/*.css` (`npm run lint:tokens`).
+- No raw colour values outside `src/theme/themes/*.css` (`npm run lint:tokens`). Status colours: `text-warning`/`bg-warning-bg` (the TLE pair) and `text-info`/`bg-info-bg` (the tag-5 pair); verdict colours only for verdicts.
 - Text >= 4.5:1 on the worst ground, large text >= 3:1; accent fills and the accent border >= 3:1; focus ring 2 px `--qh-focus-ring`, offset 2 px, never removed.
 - Meaning never by colour alone: verdicts carry text, frozen cells carry `?`, first solve carries a legend.
 - Touch targets >= 44 px; real `<button>`/`<a>`; icon-only buttons have `aria-label`.

@@ -76,7 +76,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
               "
             />
             <span class="w-9 font-mono text-sm font-bold">{{ code }}</span>
-            <span class="text-[15px]">{{ $t(`verdicts.${code}`) }}</span>
+            <span class="text-sm">{{ $t(`verdicts.${code}`) }}</span>
           </label>
         </div>
       </fieldset>
@@ -101,7 +101,7 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
                 })
               "
             />
-            <span class="text-[15px]">{{ $t(`contests.submissions.status.${group}`) }}</span>
+            <span class="text-sm">{{ $t(`contests.submissions.status.${group}`) }}</span>
           </label>
         </div>
       </fieldset>

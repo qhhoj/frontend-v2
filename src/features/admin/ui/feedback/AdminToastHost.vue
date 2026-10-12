@@ -28,7 +28,7 @@ function undo(toast: Toast) {
     role="status"
     aria-live="polite"
     :aria-label="translate('admin.feedback.toast.region')"
-    class="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[1200] flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
+    class="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-toast flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
   >
     <TransitionGroup
       tag="ol"

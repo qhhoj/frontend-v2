@@ -130,7 +130,7 @@ const totalText = computed(() => {
                   :class="VERDICT_TONE_CLASSES[statusVerdict(row.verdict).tone]"
                   >{{ row.verdict }}</span
                 >
-                <span class="text-[13px] text-muted">{{ rowReason(row) }}</span>
+                <span class="text-meta text-muted">{{ rowReason(row) }}</span>
               </div>
             </td>
             <td

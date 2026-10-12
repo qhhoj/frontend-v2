@@ -31,7 +31,7 @@ const text = computed(() =>
   <p
     data-testid="ticket-event"
     :data-type="event.type"
-    class="m-0 flex flex-wrap items-center gap-2 border-y border-dashed border-line py-2 text-[13px] text-muted"
+    class="m-0 flex flex-wrap items-center gap-2 border-y border-dashed border-line py-2 text-meta text-muted"
   >
     <component :is="ICONS[event.type]" aria-hidden="true" class="size-4 shrink-0" />
     <span class="text-content">{{ text }}</span>

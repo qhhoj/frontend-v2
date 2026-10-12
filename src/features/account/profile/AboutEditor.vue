@@ -85,7 +85,7 @@ function switchWithArrow(event: KeyboardEvent) {
         rows="8"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="scroll-mb-28 block min-h-[150px] w-full resize-y rounded-row border bg-surface-solid px-3.5 py-3 font-mono text-[13.5px] leading-relaxed text-content"
+        class="scroll-mb-28 block min-h-[150px] w-full resize-y rounded-row border bg-surface-solid px-3.5 py-3 font-mono text-meta leading-relaxed text-content"
         :class="error ? 'border-negative' : 'border-line-strong'"
       />
     </div>
@@ -101,7 +101,7 @@ function switchWithArrow(event: KeyboardEvent) {
       <p v-else class="text-sm text-muted">{{ $t('settings.profile.aboutEmpty') }}</p>
     </div>
     <div class="flex items-start justify-between gap-3">
-      <p :id="idOf('help')" class="text-[13px] leading-normal text-muted">
+      <p :id="idOf('help')" class="text-meta leading-normal text-muted">
         {{ $t('settings.profile.aboutHelp') }}
       </p>
       <LengthCounter :used="storedLength(about)" :max="ABOUT_MAX_LENGTH" />

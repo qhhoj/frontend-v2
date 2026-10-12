@@ -120,7 +120,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
             <div
               role="table"
               :aria-label="$t('comments.revisions.diffLabel')"
-              class="max-h-96 overflow-auto rounded-row border border-line font-mono text-[13px] leading-relaxed"
+              class="max-h-96 overflow-auto rounded-row border border-line font-mono text-meta leading-relaxed"
             >
               <div
                 v-for="(line, index) in lines"
@@ -142,7 +142,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
           </template>
           <pre
             v-else
-            class="max-h-96 overflow-auto rounded-row border border-line p-3 font-mono text-[13px] leading-relaxed break-words whitespace-pre-wrap"
+            class="max-h-96 overflow-auto rounded-row border border-line p-3 font-mono text-meta leading-relaxed break-words whitespace-pre-wrap"
             >{{ chosen.text }}</pre>
         </section>
       </div>

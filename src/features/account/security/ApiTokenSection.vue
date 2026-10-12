@@ -52,7 +52,7 @@ async function regenerate() {
         <CopyButton :text="token" :label="$t('settings.token.copy')" />
       </div>
     </template>
-    <p class="text-[13px] leading-normal text-muted">{{ $t('settings.token.risk') }}</p>
+    <p class="text-meta leading-normal text-muted">{{ $t('settings.token.risk') }}</p>
     <ConfirmDialog
       v-model:visible="confirming"
       :title="$t('settings.token.confirmTitle')"

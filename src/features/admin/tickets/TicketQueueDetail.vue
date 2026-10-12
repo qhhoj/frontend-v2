@@ -46,7 +46,7 @@ const toggleOpen = () => {
             <TicketLinkChip :link="ticket.link" />
           </div>
           <h2 class="font-display text-xl font-semibold">{{ ticket.title }}</h2>
-          <p class="text-[13px] text-muted">
+          <p class="text-meta text-muted">
             {{
               $t('admin.tickets.detail.byline', {
                 creator: ticket.creator.username,
@@ -68,7 +68,7 @@ const toggleOpen = () => {
             </button>
           </div>
         </header>
-        <p v-if="failureKey" role="alert" class="text-[13px] text-negative">
+        <p v-if="failureKey" role="alert" class="text-meta text-negative">
           {{ $t(failureKey) }}
         </p>
         <TicketMessages :ticket="ticket" :is-live="isLive" />

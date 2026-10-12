@@ -63,7 +63,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
           @input="isEdited = true"
         />
       </label>
-      <p v-if="isOverLimit" role="alert" class="text-[13px] text-negative">
+      <p v-if="isOverLimit" role="alert" class="text-meta text-negative">
         {{ $t('ticket.assigneesMax') }}
       </p>
       <div class="flex justify-end">
@@ -82,7 +82,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
         </button>
       </div>
     </form>
-    <p v-if="failureKey" role="alert" class="text-[13px] text-negative">
+    <p v-if="failureKey" role="alert" class="text-meta text-negative">
       {{ $t(failureKey) }}
     </p>
   </GlassCard>

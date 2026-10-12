@@ -47,7 +47,7 @@ onBeforeUnmount(() => observer?.disconnect());
       v-if="hasMoreRight && !noHint"
       data-testid="scroll-hint"
       aria-hidden="true"
-      class="px-5 pt-3 text-[13px] text-muted lg:hidden"
+      class="px-5 pt-3 text-meta text-muted lg:hidden"
     >
       <SkeletonBlock v-if="placeholder" text class="w-48" />
       <template v-else>{{ hint ?? $t('common.scrollHint') }}</template>

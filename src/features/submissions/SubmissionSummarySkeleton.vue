@@ -32,12 +32,9 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
       <SkeletonBlock data-skeleton-region="bit" :class="BIT_SLOT_CLASS" class="ml-auto shrink-0" />
     </GlassCard>
     <GlassCard as="div" class="rounded-panel p-6 sm:p-8">
-      <dl
-        data-skeleton-region="facts"
-        class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-[15px]"
-      >
+      <dl data-skeleton-region="facts" class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
         <template v-for="key in SUMMARY_FACT_KEYS" :key="key">
-          <dt data-skeleton-region="fact" class="text-[13px]">
+          <dt data-skeleton-region="fact" class="text-meta">
             <SkeletonBlock text class="w-16" />
           </dt>
           <dd>

@@ -72,7 +72,7 @@ const whenText = (contest: ContestListItem) => {
               class="font-semibold hover:text-accent-text"
               >{{ contest.name }}</RouterLink
             >
-            <span class="block font-mono text-[12.5px] text-muted">{{ contest.key }}</span>
+            <span class="block font-mono text-caption text-muted">{{ contest.key }}</span>
             <span
               v-if="!isOrganizationScoped && contest.organizations.length"
               class="mt-1 flex max-w-full flex-wrap gap-1.5"
@@ -88,7 +88,7 @@ const whenText = (contest: ContestListItem) => {
           </td>
           <td class="font-mono tabular-nums" :class="ENDED_CELL.participants">
             {{ formatNumber(contest.userCount, locale.locale) }}
-            <span v-if="contest.virtualCount" class="block text-[12.5px] text-muted">{{
+            <span v-if="contest.virtualCount" class="block text-caption text-muted">{{
               $t('contests.virtualExtra', {
                 count: formatNumber(contest.virtualCount, locale.locale),
               })

@@ -40,7 +40,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
 
 <template>
   <GlassCard as="header" data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
-    <nav :aria-label="$t('ticket.breadcrumb')" class="text-[13px] text-muted">
+    <nav :aria-label="$t('ticket.breadcrumb')" class="text-meta text-muted">
       <RouterLink :to="{ name: 'tickets' }" class="hover:underline">{{
         $t('ticket.list')
       }}</RouterLink>
@@ -80,6 +80,6 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
       <StateBit variant="staff" size="inline" />
       <span>{{ $t('ticket.staffView') }}</span>
     </p>
-    <p class="text-[13px] text-muted">{{ $t('ticket.meta', meta) }}</p>
+    <p class="text-meta text-muted">{{ $t('ticket.meta', meta) }}</p>
   </GlassCard>
 </template>

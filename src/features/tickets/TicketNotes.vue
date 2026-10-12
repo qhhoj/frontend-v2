@@ -52,8 +52,8 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
       </div>
     </form>
     <p v-else class="whitespace-pre-wrap text-sm">{{ ticket.notes || $t('ticket.noNotes') }}</p>
-    <p class="text-[13px] text-muted">{{ $t('ticket.notesHint') }}</p>
-    <p v-if="failureKey" role="alert" class="text-[13px] text-negative">
+    <p class="text-meta text-muted">{{ $t('ticket.notesHint') }}</p>
+    <p v-if="failureKey" role="alert" class="text-meta text-negative">
       {{ $t(failureKey) }}
     </p>
   </GlassCard>

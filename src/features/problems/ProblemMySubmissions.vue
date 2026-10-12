@@ -50,13 +50,13 @@ const score = (points: number | null) =>
 <template>
   <GlassCard class="flex flex-col gap-2 rounded-panel p-4" data-testid="rail-my-submissions">
     <div class="flex items-center justify-between gap-2">
-      <h2 class="flex items-center gap-2 font-display text-[17px] font-bold">
+      <h2 class="flex items-center gap-2 font-display text-title font-bold">
         {{ $t('problem.rail.mine.title') }}
         <StateBit v-if="isJudging" variant="judging" size="tiny" />
       </h2>
       <RouterLink
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-        class="inline-flex min-h-8 items-center text-[13px] font-bold text-accent-text hover:underline"
+        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline"
         >{{ $t('common.viewAll') }}</RouterLink
       >
     </div>
@@ -77,7 +77,7 @@ const score = (points: number | null) =>
             <VerdictBadge :verdict="verdictOf(submission)" size="sm" />
           </RouterLink>
           <span class="font-mono font-bold tabular-nums">{{ score(submission.points) }}</span>
-          <time :datetime="submission.date" class="ml-auto text-[13px] text-muted">{{
+          <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{
             formatAgoCompact(submission.date, now, locale.locale)
           }}</time>
         </li>

@@ -64,7 +64,7 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
         <SkeletonBlock class="h-12 w-24 shrink-0 self-start" />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <div v-if="isShown('problem')"><SkeletonBlock text class="w-32" /></div>
-          <div class="text-[13px]"><SkeletonBlock text class="w-28" /></div>
+          <div class="text-meta"><SkeletonBlock text class="w-28" /></div>
           <div v-if="isShown('when') || isShown('language')" class="text-xs">
             <SkeletonBlock text class="w-24" />
           </div>
@@ -79,7 +79,7 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
     <ScrollRegion v-else placeholder label="">
       <table
         aria-hidden="true"
-        class="w-full border-collapse text-[15px]"
+        class="w-full border-collapse text-sm"
         :class="columnKeys ? '' : FULL_TABLE_CLASS"
       >
         <thead>

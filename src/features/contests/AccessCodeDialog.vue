@@ -35,7 +35,7 @@ function submit() {
     @confirm="submit"
   >
     <!-- PrimeVue focuses the first [autofocus] field after the open transition; without it the close button gets focus. -->
-    <label :for="INPUT_ID" class="text-[12px] font-semibold tracking-wider text-muted uppercase">
+    <label :for="INPUT_ID" class="text-caption font-semibold tracking-wider text-muted uppercase">
       {{ $t('contests.actions.codeLabel') }}
     </label>
     <input

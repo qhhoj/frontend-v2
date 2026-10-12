@@ -54,7 +54,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         <div class="flex items-center justify-between gap-4">
           <div>
             <p id="own-look-label" class="font-semibold">{{ $t('appearance.customLook') }}</p>
-            <p class="mt-1 text-[13px] text-muted">{{ $t('appearance.customLookHelp') }}</p>
+            <p class="mt-1 text-meta text-muted">{{ $t('appearance.customLookHelp') }}</p>
           </div>
           <button
             type="button"
@@ -76,7 +76,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
 
         <div>
           <p class="font-semibold">{{ $t('appearance.accentTitle') }}</p>
-          <p class="mt-1 text-[13px] text-muted">{{ $t('appearance.accentHelp') }}</p>
+          <p class="mt-1 text-meta text-muted">{{ $t('appearance.accentHelp') }}</p>
           <div class="mt-3"><AccentChoice :disabled="!isOn" /></div>
         </div>
 
@@ -95,7 +95,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
           <div class="flex justify-between text-xs text-muted" aria-hidden="true">
             <span v-for="stop in GLASS_STOPS" :key="stop.value">{{ $t(stop.labelKey) }}</span>
           </div>
-          <p v-if="reducedTransparency" class="mt-2 text-[13px] text-muted">
+          <p v-if="reducedTransparency" class="mt-2 text-meta text-muted">
             {{ $t('appearance.solidByDevice') }}
           </p>
         </LevelSlider>
@@ -110,7 +110,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
           @input="(glow) => apply({ glow })"
           @commit="save()"
         >
-          <p v-if="!isGlassTheme" class="mt-2 text-[13px] text-muted">
+          <p v-if="!isGlassTheme" class="mt-2 text-meta text-muted">
             {{ $t('appearance.glassOnly') }}
           </p>
         </LevelSlider>
@@ -127,11 +127,11 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
       </GlassCard>
 
       <section class="flex min-w-0 flex-[1_1_420px] flex-col gap-3.5">
-        <h2 class="text-[13px] font-semibold tracking-wider text-muted uppercase">
+        <h2 class="text-meta font-semibold tracking-wider text-muted uppercase">
           {{ $t('appearance.preview') }}
         </h2>
         <AppearancePreview />
-        <p role="status" class="text-[13px] text-muted">{{ $t(saveNoteKey) }}</p>
+        <p role="status" class="text-meta text-muted">{{ $t(saveNoteKey) }}</p>
       </section>
     </div>
     <LowPowerChoice />

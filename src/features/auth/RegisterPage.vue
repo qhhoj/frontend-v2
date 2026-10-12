@@ -180,7 +180,7 @@ async function submit() {
           />
           {{ $t('auth.rules') }}
         </label>
-        <p v-if="rulesMissing" id="register-rules-error" class="text-[13px] text-negative">
+        <p v-if="rulesMissing" id="register-rules-error" class="text-meta text-negative">
           {{ $t('auth.rulesRequired') }}
         </p>
       </div>

@@ -64,7 +64,7 @@ const costOf = (row: SubmissionListItem) =>
           :problem="row.problem"
           :label="row.problem ? problemLabels[row.problem.code] : undefined"
         />
-        <div v-if="isShown('user') && row.user" class="flex min-w-0 text-[13px]">
+        <div v-if="isShown('user') && row.user" class="flex min-w-0 text-meta">
           <UserLink :username="row.user.username" :rating="row.user.rating" />
         </div>
         <div

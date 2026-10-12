@@ -22,9 +22,9 @@ const TABLE_COLUMNS = [
 <template>
   <GlassCard v-if="kind === 'table'" as="div" class="overflow-hidden">
     <div class="overflow-x-auto">
-      <table aria-hidden="true" class="w-full border-collapse text-[15px]">
+      <table aria-hidden="true" class="w-full border-collapse text-sm">
         <thead>
-          <tr class="text-[13px] text-muted">
+          <tr class="text-meta text-muted">
             <th
               v-for="column in TABLE_COLUMNS"
               :key="column.key"

@@ -17,8 +17,8 @@ const session = useSessionStore();
     <GlassCard class="rounded-panel p-4">
       <div data-skeleton-region="limits" class="grid grid-cols-2 gap-x-3 gap-y-3.5">
         <div v-for="fact in FACT_COUNT" :key="fact" data-skeleton-region="limit">
-          <SkeletonBlock text class="w-16 text-[13px]" />
-          <SkeletonBlock text class="mt-0.5 w-12 text-[17px]" />
+          <SkeletonBlock text class="w-16 text-meta" />
+          <SkeletonBlock text class="mt-0.5 w-12 text-title" />
         </div>
       </div>
     </GlassCard>

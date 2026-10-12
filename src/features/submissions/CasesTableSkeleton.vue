@@ -14,9 +14,9 @@ const NUMBER_COLUMN_COUNT = 3;
       <h2 class="font-display text-base font-bold"><SkeletonBlock text class="w-40" /></h2>
     </div>
     <div class="overflow-x-auto">
-      <table aria-hidden="true" class="w-full min-w-[560px] border-collapse text-[15px]">
+      <table aria-hidden="true" class="w-full min-w-[560px] border-collapse text-sm">
         <thead>
-          <tr class="text-left text-[13px] text-muted">
+          <tr class="text-left text-meta text-muted">
             <th
               v-for="column in COLUMN_COUNT"
               :key="column"

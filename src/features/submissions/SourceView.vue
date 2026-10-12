@@ -85,7 +85,7 @@ const isExpanded = ref(route.hash === '#source');
         tabindex="0"
         role="region"
         :aria-label="$t('submission.source.title')"
-        class="flex overflow-x-auto bg-surface-strong py-4 font-mono text-[13px] leading-relaxed focus-visible:-outline-offset-2"
+        class="flex overflow-x-auto bg-surface-strong py-4 font-mono text-meta leading-relaxed focus-visible:-outline-offset-2"
       >
         <pre aria-hidden="true" class="shrink-0 pr-4 pl-6 text-right text-muted select-none">{{
           lineNumbers

@@ -30,7 +30,7 @@ async function openPanel() {
 <template>
   <GlassCard class="flex flex-col gap-3 rounded-panel p-4" data-testid="rail-submit">
     <div class="flex items-center justify-between gap-2">
-      <h2 class="font-display text-[17px] font-bold">{{ $t('problem.rail.submit.title') }}</h2>
+      <h2 class="font-display text-title font-bold">{{ $t('problem.rail.submit.title') }}</h2>
       <InlineBit kind="writing" />
     </div>
     <SubmitSignInLink v-if="!isSignedIn" />
@@ -53,7 +53,7 @@ async function openPanel() {
       >
         {{ $t(open ? 'problem.rail.submit.goTo' : 'problem.rail.submit.open') }}
       </button>
-      <p class="text-[13px] text-muted">{{ $t('problem.rail.submit.hint') }}</p>
+      <p class="text-meta text-muted">{{ $t('problem.rail.submit.hint') }}</p>
     </template>
   </GlassCard>
 </template>

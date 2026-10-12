@@ -48,9 +48,9 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
             <SkeletonBlock round class="size-10 shrink-0" />
             <span class="min-w-32 flex-1">
               <span class="block font-semibold"><SkeletonBlock text class="w-2/3" /></span>
-              <span class="block text-[13px]"><SkeletonBlock text class="w-1/3" /></span>
+              <span class="block text-meta"><SkeletonBlock text class="w-1/3" /></span>
             </span>
-            <span class="ml-auto font-mono text-[13px]"><SkeletonBlock text class="w-24" /></span>
+            <span class="ml-auto font-mono text-meta"><SkeletonBlock text class="w-24" /></span>
           </li>
         </ul>
       </template>
@@ -71,11 +71,11 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
             <VerdictBadge :verdict="verdictOf(item)" />
             <span class="min-w-32 flex-1">
               <span class="block truncate font-semibold">{{ item.problem?.name ?? '—' }}</span>
-              <span class="block text-[13px] text-muted"
+              <span class="block text-meta text-muted"
                 >{{ $t(verdictOf(item).labelKey) }} · {{ item.language?.name ?? '—' }}</span
               >
             </span>
-            <span class="ml-auto text-right font-mono text-[13px] text-muted">
+            <span class="ml-auto text-right font-mono text-meta text-muted">
               {{ item.time !== null ? `${item.time.toFixed(2)}s · ` : ''
               }}{{ formatRelative(item.date, now, locale.locale) }}
             </span>

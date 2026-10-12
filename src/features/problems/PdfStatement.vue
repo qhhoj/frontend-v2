@@ -17,7 +17,7 @@ const isSitePath = computed(() => /^\/(?![/\\])/.test(props.url));
   <section data-testid="pdf-statement" class="flex flex-col gap-3">
     <div class="flex flex-wrap items-center gap-x-3.5 gap-y-2.5">
       <span
-        class="inline-flex items-center gap-1.5 rounded-row bg-accent-soft px-2 py-0.5 font-mono text-[11px] font-bold tracking-wide text-accent-soft-text"
+        class="inline-flex items-center gap-1.5 rounded-row bg-accent-soft px-2 py-0.5 font-mono text-tiny font-bold tracking-wide text-accent-soft-text"
         ><FileText aria-hidden="true" class="size-3.5" />PDF</span
       >
       <StatementNote v-if="untranslated" class="min-w-0 flex-1 basis-60" />

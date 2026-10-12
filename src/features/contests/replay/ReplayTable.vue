@@ -74,7 +74,7 @@ defineExpose({ focusRow });
         }}
       </caption>
       <thead>
-        <tr class="text-center text-[13px] text-muted">
+        <tr class="text-center text-meta text-muted">
           <th scope="col" class="w-14 px-3 py-3.5 text-right font-medium">
             <RankColumnHeader :label="$t('ranking.columns.rank')" />
           </th>
@@ -119,7 +119,7 @@ defineExpose({ focusRow });
               <Ghost class="size-4 shrink-0" aria-hidden="true" />
               <span>{{ row.name }}</span>
               <small v-if="row.caption" class="text-xs">{{ row.caption }}</small>
-              <span class="rounded-pill bg-surface-strong px-2 py-0.5 text-[11px]">{{
+              <span class="rounded-pill bg-surface-strong px-2 py-0.5 text-tiny">{{
                 row.isUnranked ? $t('replay.table.unranked') : $t('replay.table.ghost')
               }}</span>
             </span>
@@ -131,7 +131,7 @@ defineExpose({ focusRow });
               }}</span>
               <span
                 v-if="isViewerRow(row)"
-                class="rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"
+                class="rounded-pill bg-accent-soft px-2 py-0.5 text-tiny text-accent-soft-text"
                 >{{ $t('common.you') }}</span
               >
             </span>
@@ -140,7 +140,7 @@ defineExpose({ focusRow });
             {{ row.isUnranked ? '—' : rowCells.get(row.id)!.score }}
             <small
               v-if="hasCombinedScore && !row.isUnranked"
-              class="block text-[11px] font-medium text-muted"
+              class="block text-tiny font-medium text-muted"
               >{{ rowCells.get(row.id)!.cumtime }}</small
             >
           </td>

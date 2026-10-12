@@ -35,7 +35,7 @@ function askToRemove(key: SecurityKey) {
       </span>
       <span class="flex min-w-0 flex-1 flex-col gap-0.5">
         <strong class="font-semibold">{{ $t('settings.keys.title') }}</strong>
-        <span class="text-[13px] text-muted">{{ $t('settings.keys.description') }}</span>
+        <span class="text-meta text-muted">{{ $t('settings.keys.description') }}</span>
       </span>
       <button
         v-if="supported"
@@ -47,7 +47,7 @@ function askToRemove(key: SecurityKey) {
         {{ $t('settings.keys.add') }}
       </button>
     </div>
-    <p v-if="!supported" class="text-[13px] text-muted">{{ $t('settings.keys.unsupported') }}</p>
+    <p v-if="!supported" class="text-meta text-muted">{{ $t('settings.keys.unsupported') }}</p>
     <!-- Beside buttons the viewer can already press: no page-wide loading Bit for the key list. -->
     <QueryState
       :loading="keys.isPending.value"
@@ -68,7 +68,7 @@ function askToRemove(key: SecurityKey) {
         >
           <span class="flex min-w-0 flex-1 flex-col">
             <strong class="font-semibold break-words">{{ key.name }}</strong>
-            <span class="text-[13px] text-muted">{{ $t('settings.keys.kind') }}</span>
+            <span class="text-meta text-muted">{{ $t('settings.keys.kind') }}</span>
           </span>
           <button
             type="button"

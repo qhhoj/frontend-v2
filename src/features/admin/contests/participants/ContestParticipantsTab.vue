@@ -235,7 +235,7 @@ const showUser = (username: string) => change({ user: username, search: '', kind
       </template>
       <template #cell-penalty="{ row }">{{ formatPenalty(row.cumtime, locale.locale) }}</template>
       <template #cell-start="{ row }">
-        <span class="font-mono text-[13px] tabular-nums">{{ formatInZone(row.realStart) }}</span>
+        <span class="font-mono text-meta tabular-nums">{{ formatInZone(row.realStart) }}</span>
       </template>
       <template #cell-rules="{ row }">{{ rulesAcceptanceText(row, locale.locale) }}</template>
       <template #actions="{ row }">

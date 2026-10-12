@@ -45,7 +45,7 @@ const LOCKED_ACTIONS = [
       >
         <span class="flex min-w-0 flex-1 flex-col gap-0.5">
           <strong class="font-semibold">{{ $t(action.titleKey) }}</strong>
-          <span class="text-[13px] text-muted">{{ $t(action.reasonKey) }}</span>
+          <span class="text-meta text-muted">{{ $t(action.reasonKey) }}</span>
         </span>
         <button type="button" :class="BUTTON.secondary" disabled>{{ $t(action.actionKey) }}</button>
       </li>

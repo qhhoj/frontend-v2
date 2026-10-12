@@ -36,7 +36,7 @@ const LINK =
             <span class="max-w-40 truncate font-semibold lg:max-w-none lg:whitespace-normal">{{
               entry.name
             }}</span>
-            <span :class="['text-[12px]', STATUS_CLASSES[entry.status]]">{{
+            <span :class="['text-caption', STATUS_CLASSES[entry.status]]">{{
               $t(`problemSwitcher.status.${entry.status}`)
             }}</span>
           </span>

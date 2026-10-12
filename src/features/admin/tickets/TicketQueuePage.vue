@@ -47,7 +47,7 @@ const resultText = computed(() => {
       </template>
     </AdminPageHeader>
     <TicketAlertsStrip />
-    <p v-if="isLive" class="m-0 flex items-center gap-2 text-[13px] text-muted">
+    <p v-if="isLive" class="m-0 flex items-center gap-2 text-meta text-muted">
       <span aria-hidden="true" class="inline-block size-2 rounded-full bg-accent"></span>
       {{ $t('admin.tickets.live') }}
     </p>

@@ -6,7 +6,7 @@ defineProps<{ isOpen: boolean; isContributive: boolean }>();
 <template>
   <span class="inline-flex flex-wrap items-center gap-1.5">
     <span
-      class="inline-flex items-center rounded-pill px-2.5 py-0.5 text-[13px] font-semibold"
+      class="inline-flex items-center rounded-pill px-2.5 py-0.5 text-meta font-semibold"
       :class="
         isOpen ? 'bg-verdict-ac-bg text-verdict-ac' : 'bg-verdict-pending-bg text-verdict-pending'
       "
@@ -15,7 +15,7 @@ defineProps<{ isOpen: boolean; isContributive: boolean }>();
     </span>
     <span
       v-if="isContributive"
-      class="inline-flex items-center rounded-pill bg-accent-soft px-2.5 py-0.5 text-[13px] font-semibold text-accent-soft-text"
+      class="inline-flex items-center rounded-pill bg-accent-soft px-2.5 py-0.5 text-meta font-semibold text-accent-soft-text"
     >
       {{ $t('tickets.contributive') }}
     </span>

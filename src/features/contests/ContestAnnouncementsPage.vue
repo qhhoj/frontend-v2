@@ -73,7 +73,7 @@ const goTo = (next: number) =>
               data-skeleton-region="announcement"
               class="flex flex-col gap-1.5 border-t border-line py-3.5 first:border-t-0"
             >
-              <p class="text-[12.5px]"><SkeletonBlock text class="w-32" /></p>
+              <p class="text-caption"><SkeletonBlock text class="w-32" /></p>
               <p class="font-semibold"><SkeletonBlock text class="w-2/3" /></p>
               <SkeletonBlock text class="w-full" />
             </div>

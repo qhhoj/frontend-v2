@@ -28,7 +28,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
     >
       <table data-testid="language-stats" class="w-full min-w-[480px] border-collapse">
         <thead>
-          <tr class="text-left text-[13px] text-muted">
+          <tr class="text-left text-meta text-muted">
             <th scope="col" class="px-4 py-3 font-medium">
               {{ $t('contests.stats.columns.language') }}
             </th>

@@ -28,7 +28,7 @@ const ACTION =
     data-testid="source-file-bar"
     class="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line bg-surface px-4 py-2 sm:px-6"
   >
-    <span class="min-w-36 flex-1 font-mono text-[12.5px]">
+    <span class="min-w-36 flex-1 font-mono text-caption">
       <b v-if="filename">{{ filename }}</b>
       <span class="text-muted">
         <template v-if="filename"> · </template

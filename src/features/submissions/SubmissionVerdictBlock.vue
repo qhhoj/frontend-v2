@@ -46,13 +46,11 @@ const rowLabel = computed(() =>
     class="relative flex min-h-12 flex-col justify-center gap-0.5 overflow-hidden rounded-cell px-2.5 py-1.5 hover:brightness-110"
     :class="[BLOCK_TONE_CLASSES[blockToneOf(verdict)], compact ? 'w-24' : 'w-[7.875rem]']"
   >
-    <span class="font-display text-[15px] leading-[1.1] font-bold whitespace-nowrap">{{
-      label
-    }}</span>
+    <span class="font-display text-sm leading-[1.1] font-bold whitespace-nowrap">{{ label }}</span>
     <span
       v-if="detail"
       class="truncate font-mono leading-tight"
-      :class="compact ? 'text-[11px]' : 'text-xs'"
+      :class="compact ? 'text-tiny' : 'text-xs'"
       >{{ detail }}</span
     >
     <BitLoop
