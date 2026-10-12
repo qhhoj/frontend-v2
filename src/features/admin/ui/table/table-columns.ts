@@ -23,6 +23,8 @@ export interface AdminColumn {
   hideLabel?: boolean;
   /** Takes the width the other columns leave (content wraps, or clips with `truncate`); one per table. Default: the primary column. */
   grow?: boolean;
+  /** Phone card only: the cell fills its own line, without the "Label value" prefix (a cell that is a sentence by itself). */
+  stacked?: boolean;
   /** Extra classes on this column's cells (a width, `max-w-48 truncate`). */
   cellClass?: string;
 }

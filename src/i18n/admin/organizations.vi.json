@@ -113,10 +113,7 @@
     },
     "reject": "Từ chối",
     "accept": "Chấp nhận",
-    "decided": {
-      "A": "Đã chấp nhận · duyệt lúc {time}",
-      "R": "Đã từ chối · duyệt lúc {time}"
-    },
+    "decidedAt": "Duyệt lúc",
     "count": {
       "P": "{total} yêu cầu chờ duyệt",
       "A": "{total} yêu cầu đã chấp nhận",
