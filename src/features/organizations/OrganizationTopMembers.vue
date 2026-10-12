@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -13,7 +14,7 @@ const members = computed(() => query.data.value?.items ?? []);
 </script>
 
 <template>
-  <section data-testid="top-members" class="glass flex flex-col gap-3 rounded-card p-5">
+  <Card data-testid="top-members" padding="md" class="flex flex-col gap-3">
     <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.topMembers') }}</h2>
     <QueryState
       :loading="query.isPending.value"
@@ -33,5 +34,5 @@ const members = computed(() => query.data.value?.items ?? []);
     >
       {{ $t('orgs.allMembers') }}
     </RouterLink>
-  </section>
+  </Card>
 </template>

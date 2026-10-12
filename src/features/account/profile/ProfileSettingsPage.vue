@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
@@ -77,11 +78,11 @@ async function submit() {
   <SettingsLayout>
     <QueryState :loading="isPending" :error="loadError" @retry="refetch()">
       <template #skeleton>
-        <div class="glass flex flex-col gap-5 rounded-card p-5 md:p-7">
+        <Card as="div" class="flex flex-col gap-5 p-5 md:p-7">
           <SkeletonBlock class="h-6 w-32" />
           <SkeletonBlock class="h-[76px] w-full" />
           <SkeletonBlock class="h-[230px] w-full" />
-        </div>
+        </Card>
       </template>
       <form v-if="draft && profile" class="flex flex-col gap-5" novalidate @submit.prevent="submit">
         <SaveErrorSummary

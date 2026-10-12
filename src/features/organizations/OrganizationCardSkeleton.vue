@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 </script>
 
 <template>
   <!-- Mirrors OrganizationCard row for row: logo/name row, counts, footer with the chip and the action. -->
-  <div
+  <Card
+    as="div"
     data-skeleton-region="organization-card"
-    class="glass flex flex-col gap-3.5 rounded-card p-5"
+    padding="md"
+    class="flex flex-col gap-3.5"
   >
     <div class="flex items-center gap-3">
       <SkeletonBlock class="size-12 shrink-0" />
@@ -23,5 +26,5 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
       <SkeletonBlock pill class="h-[30px] w-24" />
       <SkeletonBlock pill class="h-9 w-24" />
     </div>
-  </div>
+  </Card>
 </template>

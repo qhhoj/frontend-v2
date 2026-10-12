@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { Check } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
@@ -56,12 +57,9 @@ const hasChips = computed(() => !props.isStale);
         >
           {{ $t('notifications.merged', { count: item.count }) }}
         </span>
-        <span
-          v-if="hasChips && item.priority === 'high'"
-          class="rounded-pill bg-verdict-tle-bg px-2 text-xs font-semibold text-verdict-tle"
-        >
+        <Chip v-if="hasChips && item.priority === 'high'" tone="warning">
           {{ $t('notifications.important') }}
-        </span>
+        </Chip>
       </span>
       <span class="line-clamp-2 text-sm text-muted">{{ body }}</span>
       <time :datetime="item.lastActivityAt" class="text-xs text-muted">{{ when }}</time>

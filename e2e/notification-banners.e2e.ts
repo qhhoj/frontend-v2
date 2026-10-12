@@ -52,7 +52,7 @@ test('official mode shows the pill beside the logo and the warning banner with t
   await expect(officialBanner(page).locator('[data-testid="inline-bit"]')).toBeVisible();
 });
 
-test('an anonymous visitor sees no official banner and sends no /site request', async ({
+test('an anonymous visitor sees no official banner even while official mode is on', async ({
   page,
   api,
 }) => {
@@ -60,7 +60,7 @@ test('an anonymous visitor sees no official banner and sends no /site request', 
   await page.goto('/blog');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(officialBanner(page)).toHaveCount(0);
-  expect(api.requestsTo('GET /site')).toHaveLength(0);
+  await expect(page.getByTestId('official-pill')).toHaveCount(0);
 });
 
 for (const viewport of AUDIT_VIEWPORTS)

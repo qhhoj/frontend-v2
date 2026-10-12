@@ -43,19 +43,37 @@ Other tokens:
 
 ## 3. Primitives
 
-Use these today:
+The kit lives in `src/components/ui/`; new code imports from there. Key props only; read the file for the rest.
 
-- Cards and states: `GlassCard`, `QueryState` (+ a `#skeleton` slot), `SkeletonBlock`, `StatePanel`, `EmptyState`, `ConfirmDialog` (`src/components/`).
-- Navigation: `PillTabs`, `NumberedPager`, `ToolbarSearch`, `ToolbarSelect`.
-- Admin (`src/features/admin/ui/`): `controls.ts` classes, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminRowMenu`, `AdminSaveBar` + `AdminLeaveGuard`, `AdminNotice`/`AdminStatus`, toasts via `use-admin-toast`.
-- Settings/auth: `SettingsCard`, `SettingsNotice`, `settings/buttons.ts`, `AuthField`.
+| Need                                 | Use                                                | Key props / notes                                                                                                                                                                             |
+| ------------------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button, link button                  | `AppButton`                                        | `tone` primary/secondary/ghost/danger, `size` sm/md/lg, `to` or `href`, `loading` (spinner, label kept), `disabled` (aria-disabled), `block`; slot `#icon`. Admin look comes from `.qh-admin` |
+| Icon-only button                     | `IconButton`                                       | `label` (required: aria-label + title), `tone` (default ghost), `size`                                                                                                                        |
+| Class string for a non-button (rare) | `buttonClasses()` in `button-classes.ts`           | same tones and sizes                                                                                                                                                                          |
+| Status pill, tag, count              | `Chip`                                             | `tone` neutral/accent/success/danger/warning/info/`tag-1..8`/verdict code, `size` sm 22 / md 28, `icon`, `dot`, `interactive`                                                                 |
+| Card                                 | `Card`                                             | `variant` glass (page card) / inset (tile) / flat (admin), `padding` sm/md/lg, `as`, `title` + `lead` + `#actions` header                                                                     |
+| Inline feedback                      | `Notice`                                           | `tone` info/success/warning/danger, `title`, `compact` (admin), `bit`, `role`; slots `details`, `action`                                                                                      |
+| Form field                           | `FormField` + `TextInput`/`TextArea`/`SelectField` | `label`, `hint`, `error`, `required`/`optional`; inputs read id and aria from the field                                                                                                       |
+| Save a form                          | `SaveBar` + `useLeaveGuard`                        | `dirtyCount`, `pending`, `savedAt`, `blockedReason`, `variant` page/footer                                                                                                                    |
+| Tabs                                 | `Tabs`                                             | `items` (`to` = links, else a tablist with `panelId`), `variant` pill/underline, `overflow` scroll/menu, v-model                                                                              |
+| One of a few choices                 | `SegmentedControl`                                 | `options`, v-model, `size` md/sm                                                                                                                                                              |
+| Page title block                     | `PageHeader`                                       | `title`, `lead`, `crumbs`, `back`, `meta`, `size` page/compact; slots `#actions`, `#tabs`                                                                                                     |
+| Table / list                         | `DataTable` (+ `DataTableColumns.ts`)              | `columns`, `rows`, `rowKey`, `density`, `stack` card/scroll, `stackBelow`, `stickyColumns`, `pager`, sort/selected models                                                                     |
+| Search + filters                     | `FilterBar`                                        | `searchLabel`, `chips`, v-model search                                                                                                                                                        |
+| Dialog                               | `Modal` (`ConfirmDialog` for confirms)             | `title`, `size` sm/md/lg (full screen < 640)                                                                                                                                                  |
+| Facts or stats                       | `StatGrid`                                         | `items` {label, value (string), tone, hint}, `cols`, `mode` fact/stat                                                                                                                         |
+| Meter                                | `ProgressBar`                                      | `value`, `max`, `tone`, `label`                                                                                                                                                               |
 
-Planned kit in `src/components/ui/` — use each once it exists; until then reuse the closest existing primitive above, never hand-roll a new recipe: `AppButton`/`IconButton`, `Chip`, `Card`, `Notice`, `FormField` + inputs, `Tabs`/`SegmentedControl`, `PageHeader`, `DataTable`, `SaveBar`, `StatGrid`, `Modal`.
+Also in `src/components/`: `QueryState` (+ `#skeleton`), `SkeletonBlock`, `StatePanel`, `EmptyState`, `NumberedPager`, `ToolbarSearch`, `ToolbarSelect`. Admin-only (`src/features/admin/ui/`): `AdminRowMenu`, `AdminLeaveGuard`, toasts via `use-admin-toast`.
+
+Thin wrappers kept for old call sites: `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `SettingsNotice`, `SettingsCard`, `AuthField`, `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
+
+Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values are plain strings, there is no toggle button (single `aria-pressed`) primitive. Not built: `MarkdownEditor`, `ListRow`, `SidebarLayout`. Until a part exists, reuse the closest one and never hand-roll a new recipe.
 
 ## 4. Rules
 
 - One primary action per view.
-- Disabled = `aria-disabled` + muted token pair, never `opacity`. A busy button shows a spinner and changes its label.
+- Disabled = `aria-disabled` + muted token pair, never `opacity`. A busy button shows a spinner (`AppButton loading`); pass a different label yourself if the action needs one.
 - Inputs use 16 px text (`text-base`), at least on touch; touch targets ≥ 44 px on coarse pointers (padding or `::after` hit area).
 - Helper text is one line (~60 chars); longer help goes behind a "?" button. An error replaces the hint.
 - Feedback: standing state or refusal → inline notice next to its cause; form save result → save bar text; row, bulk and background actions → toast. A failure is never toast-only.

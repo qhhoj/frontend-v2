@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
@@ -32,11 +33,11 @@ const unavailable = computed(
       </SettingsCard>
       <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <div class="glass flex flex-col gap-5 rounded-card p-5 md:p-7">
+          <Card as="div" class="flex flex-col gap-5 p-5 md:p-7">
             <SkeletonBlock class="h-6 w-56" />
             <SkeletonBlock class="h-[92px] w-full" />
             <SkeletonBlock class="h-11 w-44" pill />
-          </div>
+          </Card>
         </template>
         <DataExportCard v-if="status" :status="status" :username="session.user?.username ?? ''" />
       </QueryState>

@@ -1,12 +1,14 @@
 import { flushPromises } from '@vue/test-utils';
+import { useQuery } from '@tanstack/vue-query';
 import { defineComponent, h } from 'vue';
+import { fetchSite } from '@/api/site.api';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sessionUser, signedIn } from '@/test/fixtures';
 import { mockApi, ok, sequence } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
-import { useOfficialMode, useRefetchWhenOfficialModeEnds } from './official-mode.queries';
+import { siteKey, useOfficialMode, useRefetchWhenOfficialModeEnds } from './official-mode.queries';
 
 const Probe = defineComponent({
   setup() {
@@ -36,6 +38,19 @@ describe('useOfficialMode', () => {
     const result = await probe(anonymousViewer, true);
     expect(result.text).toBe('false/false/false');
     expect(result.siteCalls).toHaveLength(0);
+  });
+
+  it('stays off for an anonymous viewer when the site notice has read /site with the mode on', async () => {
+    mockApi({ ...anonymousViewer, ...site(true) });
+    const NoticeAndProbe = defineComponent({
+      setup() {
+        useQuery({ queryKey: siteKey, queryFn: fetchSite });
+        return () => h(Probe);
+      },
+    });
+    const wrapper = mountComponent(NoticeAndProbe);
+    await flushPromises();
+    expect(wrapper.text()).toBe('false/false/false');
   });
 });
 

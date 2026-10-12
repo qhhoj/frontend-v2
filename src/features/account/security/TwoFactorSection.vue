@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, nextTick, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
 import { translate } from '@/i18n';
@@ -53,15 +54,9 @@ function enrolled() {
     :lead="$t('settings.twoFactor.lead')"
   >
     <template #header-end>
-      <span
-        class="rounded-pill px-2.5 py-0.5 text-xs font-semibold"
-        :class="
-          enabled
-            ? 'bg-verdict-ac-bg text-verdict-ac'
-            : 'bg-verdict-pending-bg text-verdict-pending'
-        "
-        >{{ enabled ? $t('settings.twoFactor.on') : $t('settings.twoFactor.off') }}</span
-      >
+      <Chip :tone="enabled ? 'success' : 'neutral'">{{
+        enabled ? $t('settings.twoFactor.on') : $t('settings.twoFactor.off')
+      }}</Chip>
     </template>
     <SettingsNotice v-if="notice" tone="success">{{ notice }}</SettingsNotice>
     <ul :aria-label="$t('settings.twoFactor.methods')" class="m-0 flex list-none flex-col p-0">

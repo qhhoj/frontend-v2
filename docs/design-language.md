@@ -9,7 +9,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 | Group | Names |
 |---|---|
 | Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 |
-| Leading (proposed, confirm in the first primitive PR) | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · page 1.25 · stat/hero 1 |
+| Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · page 1.25 · stat/hero 1 |
 | Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on coarse pointers · `--qh-control-lg` 56 (swap card submit) |
 | Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `tile` 20 and `panel` 28: no new uses |
 | Z | `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200 (above PrimeVue's 1000/1100) |
@@ -23,13 +23,15 @@ Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported 
 
 Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
 
-## Primitives (phase 1, `src/components/ui/`)
+## Primitives (`src/components/ui/`)
 
-AppButton/IconButton, Chip, Card, PageHeader, FormField + inputs, Notice, Tabs/SegmentedControl, DataTable, SaveBar, StatGrid, MarkdownEditor, Modal, FilterBar, ProgressBar, ListRow, SidebarLayout. Each first emits today's classes; `Admin*` parts become re-exports. Until one exists, reuse the closest existing part; never hand-roll a new recipe.
+Built: AppButton/IconButton (+ `buttonClasses`), Chip, Card (+ `CARD_VARIANTS`), Notice, FormField + TextInput/TextArea/SelectField, SaveBar + `useLeaveGuard`, Tabs, SegmentedControl, PageHeader, DataTable, FilterBar, Modal, StatGrid, ProgressBar. Props and when to use each: `.claude/skills/qhhoj-web-style/SKILL.md` §3. `Admin*`, `GlassCard`, `PillTabs`, `Settings*` and `Auth*` parts are thin wrappers over them; new code imports `ui/` directly.
+
+Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, Chip `to`, StatGrid slot values, a single toggle button.
 
 ## Rules
 
-- One primary action per view. Disabled = `aria-disabled` + token pair, never opacity. Busy = spinner + changed label.
+- One primary action per view. Disabled = `aria-disabled` + token pair, never opacity. Busy = spinner (`AppButton loading`, label kept unless the caller changes it).
 - Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on coarse pointers.
 - Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tuỳ chọn)".
 - Feedback: standing state or refusal → inline Notice by its cause; form save → SaveBar text; row/bulk/background → toast. A failure is never toast-only.
@@ -47,6 +49,6 @@ AppButton/IconButton, Chip, Card, PageHeader, FormField + inputs, Notice, Tabs/S
 ## Phases
 
 0. Tokens, exact-value codemod, half-pixel and 15 px merges, lint at error (done).
-1. Primitives, one PR each, identical output.
-2. Migrate by area: admin → account/auth → problems/submissions → contests/profile/home → orgs/tickets.
+1. Primitives, one PR each, identical output (done, #175-#180).
+2. Migrate by area: admin → account/auth → problems/submissions → contests/profile/home → orgs/tickets (done, #181-#190; leftovers listed in the review PR).
 3. Visual unification after mock-up picks (PageHeader sizes, problem cards, ranking, stats).
