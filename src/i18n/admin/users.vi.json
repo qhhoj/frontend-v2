@@ -271,6 +271,7 @@
     "name": "Tên",
     "create": "Tạo vai trò",
     "save": "Lưu vai trò",
+    "nameRequired": "Nhập tên vai trò để lưu.",
     "edit": "Sửa",
     "show": "Quyền",
     "counts": "{members} thành viên · {permissions} quyền",

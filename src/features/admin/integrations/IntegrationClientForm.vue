@@ -10,6 +10,7 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { BUTTON, INPUT } from '../ui/controls';
 import AdminDateTimeField from '../ui/form/AdminDateTimeField.vue';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { SCOPE_KEYS, cidrLines } from './integration-form';
 import { integrationClientsKey } from './integration-clients.queries';
@@ -154,17 +155,21 @@ function submit() {
       :error="refusedText('expiresAt', 'admin.integrations.form.expiresRefused')"
     />
     <AdminStatus v-if="pageFailure" kind="refused" :text="pageFailure" />
-    <div class="flex flex-wrap gap-2 border-t border-line pt-4">
-      <button
-        type="submit"
-        :class="BUTTON.primary"
-        :aria-disabled="isLocked || create.isPending.value || undefined"
+    <div class="flex border-t border-line pt-4">
+      <AdminSaveBar
+        variant="footer"
+        allow-clean
+        :dirty-count="0"
+        :pending="create.isPending.value"
+        :blocked-reason="isLocked ? $t('admin.integrations.impersonating') : undefined"
+        :save-label="$t('admin.integrations.form.submit')"
       >
-        {{ $t('admin.integrations.form.submit') }}
-      </button>
-      <button type="button" :class="BUTTON.ghost" @click="emit('cancel')">
-        {{ $t('admin.integrations.form.cancel') }}
-      </button>
+        <template #actions>
+          <button type="button" :class="BUTTON.ghost" @click="emit('cancel')">
+            {{ $t('admin.integrations.form.cancel') }}
+          </button>
+        </template>
+      </AdminSaveBar>
     </div>
   </form>
 </template>

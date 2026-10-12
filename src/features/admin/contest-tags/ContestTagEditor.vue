@@ -10,6 +10,8 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf, isConflict } from '../ui/admin-errors';
 import type { FieldErrors } from '../ui/admin-errors';
 import { INPUT, buttonClass } from '../ui/controls';
+import { countChanges } from '../ui/form/dirty-form';
+import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import ColorTokenPicker from './ColorTokenPicker.vue';
 import { checkTagForm, emptyTagForm, tagFormOf, toTagBody, toTagPatch } from './contest-tag-form';
@@ -25,11 +27,16 @@ const isCreate = computed(() => props.tag === null);
 const localErrors = computed(() =>
   hasTried.value ? checkTagForm(form.value, isCreate.value) : {},
 );
+const savedForm = () => (props.tag ? tagFormOf(props.tag) : emptyTagForm());
+const dirtyCount = computed(() => countChanges(form.value, savedForm()));
+function discard() {
+  form.value = savedForm();
+  hasTried.value = false;
+}
 /** Every opening starts from the tag (or an empty form) and a clean slate. */
 watch(visible, (isOpen) => {
   if (!isOpen) return;
-  form.value = props.tag ? tagFormOf(props.tag) : emptyTagForm();
-  hasTried.value = false;
+  discard();
   mutation.reset();
 });
 
@@ -166,17 +173,21 @@ async function save() {
       />
     </div>
     <template #footer>
-      <button type="button" :class="[buttonClass('ghost'), 'ml-auto']" @click="visible = false">
-        {{ $t('admin.contestTags.cancel') }}
-      </button>
-      <button
-        type="submit"
+      <AdminSaveBar
+        variant="footer"
         :form="formId"
-        :class="buttonClass('primary')"
-        :aria-busy="mutation.isPending.value || undefined"
+        :dirty-count="dirtyCount"
+        :pending="mutation.isPending.value"
+        :allow-clean="isCreate"
+        :save-label="isCreate ? $t('admin.contestTags.create') : $t('admin.contestTags.save')"
+        @discard="discard"
       >
-        {{ isCreate ? $t('admin.contestTags.create') : $t('admin.contestTags.save') }}
-      </button>
+        <template #actions>
+          <button type="button" :class="buttonClass('ghost')" @click="visible = false">
+            {{ $t('common.close') }}
+          </button>
+        </template>
+      </AdminSaveBar>
     </template>
   </AdminDrawer>
 </template>

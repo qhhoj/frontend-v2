@@ -27,7 +27,6 @@
   },
   "create": "Add tag",
   "save": "Save tag",
-  "cancel": "Cancel",
   "created": "Tag added.",
   "saved": "Tag saved.",
   "empty": "No tags yet. Press “Add tag” to create the first one.",
