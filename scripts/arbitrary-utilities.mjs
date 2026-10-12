@@ -14,7 +14,6 @@ export const ALLOWED = {
   'features/submissions/SubmissionSummary.vue': ['text-[56px]'],
   'features/submissions/SubmissionSummarySkeleton.vue': ['text-[56px]'],
   'features/home/LiveContestCard.vue': ['text-[32px]'],
-  'features/contests/ContestRankingPage.vue': ['sm:text-[40px]'],
   'features/contests/replay/ContestReplayPage.vue': ['sm:text-[40px]'],
   'features/contests/RankingPodium.vue': ['text-[22px]'],
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],

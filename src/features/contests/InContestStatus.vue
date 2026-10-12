@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ContestDetail, CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatClock } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -47,15 +48,10 @@ const participation = computed(() => {
         </span>
       </template>
     </p>
-    <button
-      type="button"
-      :aria-disabled="isPending || undefined"
-      :aria-busy="isPending || undefined"
-      class="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-line px-5 font-semibold text-negative hover:bg-surface-hover aria-disabled:cursor-progress aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
-      @click="!isPending && emit('leave')"
-    >
-      <LogOut class="size-4" aria-hidden="true" />{{ $t('contests.actions.leave') }}
-    </button>
+    <AppButton tone="danger" :loading="isPending" @click="emit('leave')">
+      <template #icon><LogOut class="size-4" aria-hidden="true" /></template>
+      {{ $t('contests.actions.leave') }}
+    </AppButton>
     <p class="text-sm text-muted">{{ $t('contests.actions.leaveNote') }}</p>
   </div>
 </template>

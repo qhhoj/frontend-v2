@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { ContestPhase } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
 import type { ContestListRoute } from './use-contest-list-filters';
 
@@ -49,19 +50,16 @@ const action = computed(() => {
 </script>
 
 <template>
-  <GlassCard as="div">
+  <Card as="div">
     <EmptyState>
       <span class="block font-semibold text-content">{{ messageText }}</span>
       <span v-if="showsUpcomingHint" class="block">{{
         $t('contests.list.empty.upcomingHint')
       }}</span>
       <span v-if="isTagEmpty" class="block">{{ $t('contestTags.emptyHint') }}</span>
-      <RouterLink
-        v-if="action"
-        :to="action.to"
-        class="mt-3 inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-        >{{ $t(action.labelKey) }}</RouterLink
-      >
+      <AppButton v-if="action" tone="primary" :to="action.to" class="mt-3">{{
+        $t(action.labelKey)
+      }}</AppButton>
     </EmptyState>
-  </GlassCard>
+  </Card>
 </template>

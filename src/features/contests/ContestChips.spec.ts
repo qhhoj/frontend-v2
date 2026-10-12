@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import type { ContestSummary } from '@/api/types/contests';
 import { contestItem } from '@/test/fixtures';
 import { mountComponent } from '@/test/mount';
+import Chip from '@/components/ui/Chip.vue';
 import ContestChips from './ContestChips.vue';
 
 const chipsOf = (contest: ContestSummary, withTags = false, withCodeNeeded = false) =>
   mountComponent(ContestChips, { props: { contest, withTags, withCodeNeeded } })
-    .findAll('span')
+    .findAllComponents(Chip)
     .map((chip) => chip.text());
 
 const PLAIN = { isRated: false, isPrivate: false, isOrganizationPrivate: false, tags: [] };

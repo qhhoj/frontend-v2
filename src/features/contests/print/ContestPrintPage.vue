@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { useIsFetching } from '@tanstack/vue-query';
 import { ArrowLeft, Check, Printer } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -69,24 +70,19 @@ const CHIP =
             )
           "
         >
-          <RouterLink
-            :to="{ name: 'contest', params: { key } }"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold"
-            >{{ $t('contests.print.back') }}</RouterLink
-          >
+          <AppButton :to="{ name: 'contest', params: { key } }">{{
+            $t('contests.print.back')
+          }}</AppButton>
         </StatePanel>
         <template v-else>
           <div
             :aria-label="$t('contests.print.toolbar')"
             class="glass sticky top-2 z-10 flex flex-wrap items-center gap-3 rounded-panel px-3.5 py-2.5 print:hidden"
           >
-            <RouterLink
-              :to="{ name: 'contest', params: { key } }"
-              class="inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line px-3.5 text-sm font-semibold hover:bg-surface-hover"
-              ><ArrowLeft class="size-4" aria-hidden="true" />{{
-                $t('contests.print.back')
-              }}</RouterLink
-            >
+            <AppButton :to="{ name: 'contest', params: { key } }">
+              <template #icon><ArrowLeft class="size-4" aria-hidden="true" /></template>
+              {{ $t('contests.print.back') }}
+            </AppButton>
             <div class="flex flex-1 flex-wrap gap-2">
               <button
                 type="button"
@@ -119,16 +115,11 @@ const CHIP =
                 }}
               </button>
             </div>
-            <button
-              type="button"
-              :disabled="loadingStatements > 0"
-              class="inline-flex min-h-11 items-center gap-2 rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent disabled:opacity-60"
-              @click="printSheet"
-            >
-              <Printer class="size-4" aria-hidden="true" />
+            <AppButton tone="primary" :disabled="loadingStatements > 0" @click="printSheet">
+              <template #icon><Printer class="size-4" aria-hidden="true" /></template>
               <span class="hidden sm:inline">{{ $t('contests.print.print') }}</span>
               <span class="sm:hidden">{{ $t('contests.print.printShort') }}</span>
-            </button>
+            </AppButton>
           </div>
           <article
             class="print-doc mx-auto w-full max-w-[900px] rounded-panel border border-line bg-surface p-5 md:px-14 md:py-9"

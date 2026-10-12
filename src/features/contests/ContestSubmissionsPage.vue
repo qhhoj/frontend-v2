@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Notice from '@/components/ui/Notice.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -55,16 +56,16 @@ usePageTitle(() => contest.value?.name);
     <template v-else>
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
       <ContestCompactHeader v-if="contest" :contest="contest" />
-      <p
+      <Notice
         v-if="isOwnOnly"
         data-testid="own-only"
-        role="note"
-        class="glass flex flex-wrap items-center gap-3 rounded-tile px-5 py-3.5"
+        :title="$t('contests.submissions.ownOnlyTitle')"
       >
-        <strong>{{ $t('contests.submissions.ownOnlyTitle') }}</strong>
-        <span class="text-muted">{{ $t('contests.submissions.ownOnlyBody') }}</span>
-        <SubmitSignInLink v-if="!session.user" label-key="contests.submissions.signIn" />
-      </p>
+        {{ $t('contests.submissions.ownOnlyBody') }}
+        <template v-if="!session.user" #action>
+          <SubmitSignInLink label-key="contests.submissions.signIn" />
+        </template>
+      </Notice>
       <SubmissionList
         v-if="canAsk"
         :scope="scope"

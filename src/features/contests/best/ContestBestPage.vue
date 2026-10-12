@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { ArrowLeft, Info, TriangleAlert } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -15,6 +17,7 @@ import { SUBMISSION_PAGE_SIZE } from '@/features/submissions/list/submission-sco
 import { useContestBestSubmissionsQuery } from '@/features/submissions/submissions.queries';
 import { formatDateTime } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -54,6 +57,8 @@ const statusOf = (failure: unknown) => (failure instanceof ApiError ? failure.st
 const isMissing = computed(
   () => statusOf(contestError.value) === 404 || statusOf(error.value) === 404,
 );
+/** The back button sits in the header from `md`; a phone reaches the contest through the tabs. */
+const isPhone = useMediaQuery(PHONE_QUERY);
 const isRefused = computed(() => statusOf(error.value) === 403);
 const CHIP =
   'inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-line-strong px-4 font-display font-bold text-muted hover:bg-surface-hover aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text';
@@ -63,27 +68,20 @@ const CHIP =
   <div class="page-column">
     <ContestNotFound v-if="statusOf(contestError) === 404" />
     <StatePanel v-else-if="contestError" kind="error" :title="$t('contests.best.loadFailed')"
-      ><button
-        type="button"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold"
-        @click="refetchContest()"
-      >
+      ><AppButton @click="refetchContest()">
         {{ $t('contests.best.retry') }}
-      </button></StatePanel
+      </AppButton></StatePanel
     >
     <template v-else>
       <ContestTabs :contest-key="key" :phase="contest?.phase" current="contest" />
-      <header class="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 class="page-title">{{ heading }}</h1>
-          <p class="text-muted">{{ contest?.name }}</p>
-        </div>
-        <RouterLink
-          :to="{ name: 'contest', params: { key } }"
-          class="hidden min-h-11 items-center gap-1.5 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover md:inline-flex"
-          ><ArrowLeft class="size-4" aria-hidden="true" />{{ $t('contests.best.back') }}</RouterLink
-        >
-      </header>
+      <PageHeader :title="heading" :lead="contest?.name">
+        <template v-if="!isPhone" #actions>
+          <AppButton :to="{ name: 'contest', params: { key } }">
+            <template #icon><ArrowLeft class="size-4" aria-hidden="true" /></template>
+            {{ $t('contests.best.back') }}
+          </AppButton>
+        </template>
+      </PageHeader>
       <nav :aria-label="$t('contests.best.problems')" class="flex flex-wrap gap-2">
         <RouterLink
           v-for="problem in problems"
@@ -104,7 +102,7 @@ const CHIP =
       <StatePanel v-else-if="isMissing" kind="notFound" :title="$t('contests.best.missingTitle')" />
       <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SubmissionTableSkeleton :show-problem="false" /></template>
-        <GlassCard as="div" class="overflow-hidden">
+        <Card as="div" class="overflow-hidden">
           <p
             v-if="frozenAt"
             data-testid="best-frozen"
@@ -129,7 +127,7 @@ const CHIP =
           >
             <Info class="size-4 shrink-0" aria-hidden="true" />{{ $t('contests.best.rule') }}
           </p>
-        </GlassCard>
+        </Card>
       </QueryState>
     </template>
   </div>

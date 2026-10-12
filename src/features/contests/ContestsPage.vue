@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import ToolbarSearch from '@/components/ToolbarSearch.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
@@ -41,14 +42,8 @@ const tagName = computed(() => {
 
 <template>
   <div class="page-column">
-    <header class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 class="page-title">
-          {{ $t('contests.title') }}
-        </h1>
-        <p class="mt-1 text-muted">{{ $t('contests.list.lead') }}</p>
-      </div>
-      <div class="flex flex-wrap items-center gap-2.5">
+    <PageHeader :title="$t('contests.title')" :lead="$t('contests.list.lead')">
+      <template #actions>
         <ToolbarSearch
           v-model="search"
           :label="$t('contests.list.search')"
@@ -63,8 +58,8 @@ const tagName = computed(() => {
           :active="ratedChoice !== 'any'"
         />
         <CreateShortcut kind="contest" />
-      </div>
-    </header>
+      </template>
+    </PageHeader>
     <ContestTagFilter
       :tags="tags ?? []"
       :selected="filters.tag"

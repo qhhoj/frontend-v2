@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
 import { formatClock, formatNumber, formatShortDate, formatWeekdayDate } from '@/lib/format';
@@ -35,7 +35,7 @@ const phoneLine = computed(
 </script>
 
 <template>
-  <GlassCard
+  <Card
     data-testid="contest-header"
     class="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
   >
@@ -95,5 +95,5 @@ const phoneLine = computed(
       <ContestCountdown :contest="contest" @elapsed="emit('elapsed')" />
       <slot name="actions" />
     </div>
-  </GlassCard>
+  </Card>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { PRINT_BATCH_SIZE } from '@/api/balloons.api';
@@ -50,18 +51,12 @@ const printSheet = () => window.print();
           {{ $t('balloons.printTitle', { contest: contest?.name ?? key }) }}
         </h1>
         <div class="flex gap-2 print:hidden">
-          <RouterLink
-            :to="{ name: 'contest-balloons', params: { key } }"
-            class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold"
-            >{{ $t('balloons.back') }}</RouterLink
-          >
-          <button
-            type="button"
-            class="inline-flex min-h-11 items-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-            @click="printSheet"
-          >
+          <AppButton :to="{ name: 'contest-balloons', params: { key } }">{{
+            $t('balloons.back')
+          }}</AppButton>
+          <AppButton tone="primary" @click="printSheet">
             {{ $t('balloons.print') }}
-          </button>
+          </AppButton>
         </div>
       </header>
       <QueryState :loading="isPending" :error="error" @retry="refetch()">

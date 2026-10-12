@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { Star } from 'lucide-vue-next';
 import type { Balloon } from '@/api/types/contest-ops';
 import { ratingTextClass } from '@/lib/tier-classes';
@@ -50,15 +51,10 @@ const locale = useLocaleStore();
       <Star class="size-4" aria-hidden="true" />{{ $t('balloons.first') }}
     </span>
     <span v-else class="hidden sm:block" />
-    <button
-      type="button"
-      :aria-busy="isBusy || undefined"
-      :class="[
-        'col-span-2 inline-flex min-h-11 items-center justify-center rounded-pill px-5 font-semibold sm:col-span-1',
-        isDelivered(balloon)
-          ? 'border border-line hover:bg-surface-hover'
-          : 'bg-gradient-accent text-on-accent',
-      ]"
+    <AppButton
+      :tone="isDelivered(balloon) ? 'secondary' : 'primary'"
+      :loading="isBusy"
+      class="col-span-2 sm:col-span-1"
       @click="emit('toggle')"
     >
       {{ isDelivered(balloon) ? $t('balloons.undo') : $t('balloons.deliver')
@@ -67,6 +63,6 @@ const locale = useLocaleStore();
           $t('balloons.rowName', { label: balloon.problemLabel, team: balloon.team.username })
         }}</span
       >
-    </button>
+    </AppButton>
   </li>
 </template>

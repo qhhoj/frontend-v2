@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
+
 defineProps<{ badgeKey: string | null }>();
-const TONE =
-  'inline-flex min-h-6.5 items-center rounded-pill bg-accent-soft px-2.5 text-caption font-semibold whitespace-nowrap text-accent-soft-text';
 </script>
 
 <template>
-  <span v-if="badgeKey" data-testid="viewer-badge" :class="TONE">{{ $t(badgeKey) }}</span>
+  <Chip v-if="badgeKey" data-testid="viewer-badge" tone="accent">{{ $t(badgeKey) }}</Chip>
 </template>

@@ -1,6 +1,5 @@
 import type { ContestTag } from '@/api/types/contest-tags';
 import type { TagColor } from '@/api/types/tag-color';
-import { NEUTRAL_TAG_CLASS, TAG_COLOR_CLASSES } from './tag-colors';
 
 /** backend `CONTEST_TAG_PATTERN` (contest.schema.ts): a malformed `?tag=` would be a 400, so it is never sent. */
 export const CONTEST_TAG_PATTERN = /^[a-z0-9-]{1,20}$/;
@@ -11,7 +10,6 @@ export interface TagChipView {
   label: string;
   /** Null for a slug the catalogue does not hold. */
   color: TagColor | null;
-  colorClass: string;
 }
 
 export const catalogueBySlug = (tags: readonly ContestTag[]): ReadonlyMap<string, ContestTag> =>
@@ -19,8 +17,8 @@ export const catalogueBySlug = (tags: readonly ContestTag[]): ReadonlyMap<string
 
 export function tagChipOf(slug: string, catalogue: ReadonlyMap<string, ContestTag>): TagChipView {
   const tag = catalogue.get(slug);
-  if (!tag) return { slug, label: slug, color: null, colorClass: NEUTRAL_TAG_CLASS };
-  return { slug, label: tag.name, color: tag.color, colorClass: TAG_COLOR_CLASSES[tag.color] };
+  if (!tag) return { slug, label: slug, color: null };
+  return { slug, label: tag.name, color: tag.color };
 }
 
 export type TagFilterState = 'none' | 'applied' | 'unknown';

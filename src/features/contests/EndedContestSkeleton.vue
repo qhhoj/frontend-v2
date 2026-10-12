@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -13,7 +14,7 @@ const ROW_COUNT = 5;
 </script>
 
 <template>
-  <div class="glass overflow-hidden rounded-card">
+  <Card as="div" class="overflow-hidden">
     <ScrollRegion placeholder label="">
       <table aria-hidden="true" :class="ENDED_TABLE_CLASS">
         <thead>
@@ -50,5 +51,5 @@ const ROW_COUNT = 5;
         </tbody>
       </table>
     </ScrollRegion>
-  </div>
+  </Card>
 </template>

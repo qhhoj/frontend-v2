@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { Star } from 'lucide-vue-next';
@@ -121,16 +122,8 @@ const scoreHeaderKey = computed(() => {
           <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
             <span class="flex items-center gap-2">
               <UserLink :username="row.user.username" :rating="row.user.rating" />
-              <span
-                v-if="row.user.id === viewerId"
-                class="shrink-0 rounded-pill bg-accent-soft px-2 py-0.5 text-tiny text-accent-soft-text"
-                >{{ $t('common.you') }}</span
-              >
-              <span
-                v-if="row.isDisqualified"
-                class="shrink-0 rounded-pill bg-verdict-wa-bg px-2 py-0.5 text-tiny text-verdict-wa"
-                >{{ $t('ranking.disqualified') }}</span
-              >
+              <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
+              <Chip v-if="row.isDisqualified" tone="danger">{{ $t('ranking.disqualified') }}</Chip>
             </span>
           </th>
           <td class="font-bold">

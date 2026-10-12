@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { Ghost } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -39,7 +40,7 @@ const lines = computed(() =>
 </script>
 
 <template>
-  <section :aria-labelledby="headingId" class="glass flex flex-col gap-3 rounded-card p-5">
+  <Card :aria-labelledby="headingId" class="flex flex-col gap-3 p-5">
     <h2 :id="headingId" class="font-display text-base font-bold">
       {{ $t('replay.feed.title') }}
     </h2>
@@ -59,5 +60,5 @@ const lines = computed(() =>
         </span>
       </li>
     </ol>
-  </section>
+  </Card>
 </template>

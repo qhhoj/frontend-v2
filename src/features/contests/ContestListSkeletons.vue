@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import type { ContestPhase } from '@/api/types/contests';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import EndedContestSkeleton from './EndedContestSkeleton.vue';
@@ -8,11 +9,12 @@ defineProps<{ kind: ContestPhase }>();
 
 <template>
   <div v-if="kind === 'running'" class="grid gap-4 lg:grid-cols-2">
-    <div
+    <Card
       v-for="card in 2"
       :key="card"
+      as="div"
       data-skeleton-region="running-card"
-      class="glass flex flex-col gap-3 rounded-card p-5"
+      class="flex flex-col gap-3 p-5"
     >
       <SkeletonBlock pill class="h-7 w-40" />
       <div class="font-display text-xl font-semibold"><SkeletonBlock text class="w-3/4" /></div>
@@ -23,9 +25,9 @@ defineProps<{ kind: ContestPhase }>();
         <p class="text-sm"><SkeletonBlock text class="w-28" /></p>
         <SkeletonBlock pill class="h-11 w-28" />
       </div>
-    </div>
+    </Card>
   </div>
-  <div v-else-if="kind === 'upcoming'" class="glass rounded-card">
+  <Card v-else-if="kind === 'upcoming'" as="div">
     <div
       v-for="row in 3"
       :key="row"
@@ -47,6 +49,6 @@ defineProps<{ kind: ContestPhase }>();
       </div>
       <SkeletonBlock pill class="h-11 w-36" />
     </div>
-  </div>
+  </Card>
   <EndedContestSkeleton v-else />
 </template>
