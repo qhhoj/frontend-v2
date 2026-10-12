@@ -997,8 +997,7 @@
     "copySample": "Copy sample",
     "tabs": {
       "statement": "Statement",
-      "editorial": "Editorial",
-      "submissions": "Submissions"
+      "editorial": "Editorial"
     },
     "tabsLabel": "Problem sections",
     "editorial": {

@@ -18,7 +18,7 @@ import { useSessionStore } from '@/stores/session.store';
 
 const SHOWN = 3;
 const CLOCK_TICK_MS = 60_000;
-/** The signed-in viewer's last three submissions to this problem (same query as the "Bài nộp" tab, so it is fetched once). */
+/** The signed-in viewer's last three submissions to this problem. */
 const props = defineProps<{ code: string; points: number }>();
 const session = useSessionStore();
 const locale = useLocaleStore();

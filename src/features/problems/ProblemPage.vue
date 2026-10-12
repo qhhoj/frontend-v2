@@ -49,7 +49,6 @@ const tabs = computed(() => [
   ...(problem.value?.hasEditorial && !editorialGone.value
     ? [{ id: 'editorial', labelKey: 'problem.tabs.editorial' }]
     : []),
-  { id: 'submissions', labelKey: 'problem.tabs.submissions' },
 ]);
 const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route.query.tab : null));
 const tab = computed({
