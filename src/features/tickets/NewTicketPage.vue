@@ -3,6 +3,10 @@ import { computed, ref } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextArea from '@/components/ui/TextArea.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { translate } from '@/i18n';
 import { useNewTicket } from './use-new-ticket';
 import type { TicketDraft } from './ticket-draft';
@@ -11,37 +15,16 @@ const KIND_OPTIONS = [
   { value: 'problem', titleKey: 'tickets.new.problemKind', bodyKey: 'tickets.new.problemKindBody' },
   { value: 'general', titleKey: 'tickets.new.generalKind', bodyKey: 'tickets.new.generalKindBody' },
 ] as const;
-const INPUT =
-  'min-h-11 w-full rounded-cell border bg-surface px-3.5 text-base text-content placeholder:text-muted';
-const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
-const ERROR = 'text-meta text-negative';
 
 const form = ref<HTMLFormElement | null>(null);
 const { draft, problemName, problemMissing, panelFailure, isPending, issueKeyOf, submit } =
   useNewTicket(form);
 
-/** The one field whose target the kind picks: a problem code, or a page link. */
-const targetField = computed<keyof TicketDraft>(() =>
-  draft.kind === 'problem' ? 'problemCode' : 'issueUrl',
-);
-const hasError = (field: keyof TicketDraft) => issueKeyOf(field) !== undefined;
-const invalid = (field: keyof TicketDraft) => (hasError(field) ? 'true' : undefined);
-const errorId = (field: keyof TicketDraft) => (hasError(field) ? `${field}-error` : undefined);
-const borderFor = (field: keyof TicketDraft) =>
-  hasError(field) ? 'border-negative' : 'border-line';
 const errorText = (field: keyof TicketDraft) => {
   const key = issueKeyOf(field);
   return key ? translate(key, { code: draft.problemCode.trim() }) : undefined;
 };
 const trimmedCode = computed(() => draft.problemCode.trim());
-/** The lookup line describes the code field; the field error (when any) joins it. */
-const problemCodeDescribedBy = computed(() =>
-  ['problem-lookup', errorId('problemCode')].filter(Boolean).join(' '),
-);
-const SUBMIT = 'inline-flex min-h-11 items-center rounded-pill px-6 font-semibold';
-/** A busy submit keeps its shape and changes colour only (token colours, no opacity). */
-const IDLE = 'bg-accent text-on-accent';
-const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
 </script>
 
 <template>
@@ -83,18 +66,15 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
           </fieldset>
 
           <template v-if="draft.kind === 'problem'">
-            <label :class="FIELD">
-              {{ $t('tickets.new.problemCode') }}
-              <input
-                v-model="draft.problemCode"
-                name="problemCode"
-                type="text"
-                autocomplete="off"
-                :class="[INPUT, borderFor('problemCode')]"
-                :aria-invalid="invalid('problemCode')"
-                :aria-describedby="problemCodeDescribedBy"
-              />
-            </label>
+            <!-- The lookup line also describes the code field. -->
+            <FormField
+              input-id="problemCode"
+              :label="$t('tickets.new.problemCode')"
+              :error="errorText('problemCode')"
+              described-by="problem-lookup"
+            >
+              <TextInput v-model="draft.problemCode" name="problemCode" autocomplete="off" />
+            </FormField>
             <p id="problem-lookup" aria-live="polite" class="min-h-6 text-meta text-muted">
               <template v-if="problemName">{{
                 $t('tickets.new.problemName', { name: problemName })
@@ -104,52 +84,23 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
               }}</template>
             </p>
           </template>
-          <label v-else :class="FIELD">
-            {{ $t('tickets.new.url') }}
-            <input
-              v-model="draft.issueUrl"
-              name="issueUrl"
-              type="url"
-              autocomplete="off"
-              :class="[INPUT, borderFor('issueUrl')]"
-              :aria-invalid="invalid('issueUrl')"
-              :aria-describedby="errorId('issueUrl')"
-            />
-            <span class="text-meta font-normal text-muted">{{ $t('tickets.new.urlHint') }}</span>
-          </label>
-          <p v-if="errorText(targetField)" :id="errorId(targetField)" :class="ERROR">
-            {{ errorText(targetField) }}
-          </p>
+          <FormField
+            v-else
+            input-id="issueUrl"
+            :label="$t('tickets.new.url')"
+            :hint="$t('tickets.new.urlHint')"
+            :error="errorText('issueUrl')"
+          >
+            <TextInput v-model="draft.issueUrl" name="issueUrl" type="url" autocomplete="off" />
+          </FormField>
 
-          <label :class="FIELD">
-            {{ $t('tickets.new.title') }}
-            <input
-              v-model="draft.title"
-              name="title"
-              type="text"
-              :class="[INPUT, borderFor('title')]"
-              :aria-invalid="invalid('title')"
-              :aria-describedby="errorId('title')"
-            />
-          </label>
-          <p v-if="errorText('title')" :id="errorId('title')" :class="ERROR">
-            {{ errorText('title') }}
-          </p>
+          <FormField input-id="title" :label="$t('tickets.new.title')" :error="errorText('title')">
+            <TextInput v-model="draft.title" name="title" />
+          </FormField>
 
-          <label :class="FIELD">
-            {{ $t('tickets.new.body') }}
-            <textarea
-              v-model="draft.body"
-              name="body"
-              rows="8"
-              :class="[INPUT, 'min-h-40 py-2.5', borderFor('body')]"
-              :aria-invalid="invalid('body')"
-              :aria-describedby="errorId('body')"
-            />
-          </label>
-          <p v-if="errorText('body')" :id="errorId('body')" :class="ERROR">
-            {{ errorText('body') }}
-          </p>
+          <FormField input-id="body" :label="$t('tickets.new.body')" :error="errorText('body')">
+            <TextArea v-model="draft.body" name="body" rows="8" class="min-h-40" />
+          </FormField>
 
           <StatePanel
             v-if="panelFailure"
@@ -158,19 +109,10 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
             :body="$t(panelFailure.bodyKey, panelFailure.bodyParams ?? {})"
           />
           <div class="flex flex-wrap items-center justify-end gap-3">
-            <RouterLink
-              :to="{ name: 'tickets' }"
-              class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-            >
-              {{ $t('tickets.new.cancel') }}
-            </RouterLink>
-            <button
-              type="submit"
-              :aria-busy="isPending ? 'true' : undefined"
-              :class="[SUBMIT, isPending ? BUSY : IDLE]"
-            >
+            <AppButton :to="{ name: 'tickets' }">{{ $t('tickets.new.cancel') }}</AppButton>
+            <AppButton type="submit" tone="primary" :loading="isPending">
               {{ $t('tickets.new.submit') }}
-            </button>
+            </AppButton>
           </div>
         </form>
       </GlassCard>

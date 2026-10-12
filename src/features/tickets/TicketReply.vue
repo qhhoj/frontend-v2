@@ -4,6 +4,7 @@ import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { postTicketMessage } from '@/api/tickets.api';
 import GlassCard from '@/components/GlassCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import CannedReplyPicker from './canned/CannedReplyPicker.vue';
@@ -36,7 +37,6 @@ const { isPending, error, mutate } = useMutation({
   },
 });
 const failureKey = computed(() => (error.value ? replyFailureKey(error.value) : null));
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 
 /** `conflict` is the message cap and `forbidden` a muted account (the backend's one `forbidden` here); anything else (429 included) shows its own message. */
 const REPLY_FAILURE_KEYS: Readonly<Record<string, string>> = {
@@ -81,22 +81,15 @@ async function insertCanned(filled: string, title: string) {
       <p class="sr-only" aria-live="polite" data-testid="canned-inserted">{{ insertedText }}</p>
       <div class="flex flex-wrap items-center gap-2">
         <CannedReplyPicker v-if="cannedContext" :context="cannedContext" @pick="insertCanned" />
-        <button
+        <AppButton
           type="submit"
-          :aria-disabled="canSend ? undefined : 'true'"
-          :aria-busy="isPending ? 'true' : undefined"
-          :class="[
-            BUTTON,
-            'ml-auto',
-            isPending
-              ? 'cursor-progress bg-accent-soft text-accent-soft-text'
-              : canSend
-                ? 'bg-accent text-on-accent'
-                : 'bg-accent-soft text-accent-soft-text',
-          ]"
+          tone="primary"
+          class="ml-auto"
+          :disabled="!canSend"
+          :loading="isPending"
         >
           {{ $t('ticket.send') }}
-        </button>
+        </AppButton>
       </div>
     </form>
   </GlassCard>

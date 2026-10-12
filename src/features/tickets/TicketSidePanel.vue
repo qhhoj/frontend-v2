@@ -4,6 +4,7 @@ import type { TicketDetail } from '@/api/types/tickets';
 import { translate } from '@/i18n';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatAgo } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -26,8 +27,6 @@ const linkLabel = computed(() =>
 const toggleLabel = computed(() => (props.ticket.isOpen ? 'ticket.close' : 'ticket.reopen'));
 const DT = 'text-meta font-semibold text-muted';
 const DD = 'text-sm';
-const BUSY_BUTTON = 'cursor-progress bg-accent-soft text-accent-soft-text';
-const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
 </script>
 
 <template>
@@ -55,16 +54,15 @@ const BUTTON = 'min-h-11 w-full rounded-pill px-5 font-semibold';
     <section class="flex flex-col gap-2 border-t border-line pt-4">
       <h2 class="text-sm font-semibold">{{ $t('ticket.status') }}</h2>
       <p class="text-meta text-muted">{{ $t('ticket.statusHint') }}</p>
-      <button
+      <AppButton
         v-if="canToggle"
-        type="button"
         data-testid="toggle-open"
-        :aria-busy="isPending ? 'true' : undefined"
-        :class="[BUTTON, isPending ? BUSY_BUTTON : 'border border-line hover:bg-surface-hover']"
+        block
+        :loading="isPending"
         @click="patch({ isOpen: !ticket.isOpen })"
       >
         {{ $t(toggleLabel) }}
-      </button>
+      </AppButton>
       <p v-if="failureKey" role="alert" class="text-meta text-negative">
         {{ $t(failureKey) }}
       </p>

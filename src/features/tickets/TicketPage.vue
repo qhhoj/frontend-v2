@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { usePageTitle } from '@/router/page-title';
 import TicketHeader from './TicketHeader.vue';
 import TicketMessages from './TicketMessages.vue';
@@ -17,7 +18,6 @@ import TicketStaffActions from './TicketStaffActions.vue';
 import { useTicketQuery } from './tickets.queries';
 import { useTicketStream } from './use-ticket-stream';
 
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 const route = useRoute();
 const router = useRouter();
 /** Follows the route: a jump to another ticket reloads the page's data and moves the live feed. */
@@ -55,12 +55,7 @@ function takeSentFlag(current: Router): boolean {
       :body="$t('ticket.forbiddenBody')"
       is-page-heading
     >
-      <RouterLink
-        :to="{ name: 'tickets' }"
-        :class="`${BUTTON} border border-line hover:bg-surface-hover`"
-      >
-        {{ $t('ticket.backToList') }}
-      </RouterLink>
+      <AppButton :to="{ name: 'tickets' }">{{ $t('ticket.backToList') }}</AppButton>
     </StatePanel>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><TicketPageSkeleton /></template>
