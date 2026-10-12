@@ -9,9 +9,11 @@ const parts = computed(() => highlightParts(props.text, props.query));
 <template>
   <span>
     <template v-for="(part, index) in parts" :key="index">
-      <mark v-if="part.isHit" class="rounded-sm bg-accent-soft px-0.5 text-accent-soft-text">{{
-        part.text
-      }}</mark>
+      <mark
+        v-if="part.isHit"
+        class="rounded-skeleton bg-accent-soft px-0.5 text-accent-soft-text"
+        >{{ part.text }}</mark
+      >
       <template v-else>{{ part.text }}</template>
     </template>
   </span>

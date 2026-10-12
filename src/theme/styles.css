@@ -334,6 +334,25 @@
   }
 }
 
+/* iOS Safari zooms the page on focusing a text field under 16px. Unlayered, so it beats text-sm and friends; the code editor's textarea mirrors CodeMirror's font and is exempt. */
+@media (pointer: coarse) {
+  textarea:not(.code-editor-textarea),
+  select,
+  input:not(
+    [type='checkbox'],
+    [type='radio'],
+    [type='range'],
+    [type='file'],
+    [type='color'],
+    [type='submit'],
+    [type='button'],
+    [type='reset'],
+    [type='image']
+  ) {
+    font-size: 16px;
+  }
+}
+
 /* Same specificity as the theme selectors and later in the cascade: these win. */
 @supports not (backdrop-filter: blur(1px)) {
   :root,

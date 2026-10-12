@@ -26,7 +26,7 @@ const apply = () =>
     }),
   });
 const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
-const INPUT = 'min-h-11 rounded-lg border border-line bg-surface px-3 text-base text-content';
+const INPUT = 'min-h-11 rounded-cell border border-line bg-surface px-3 text-base text-content';
 </script>
 
 <template>

@@ -1,9 +1,11 @@
 // `src/api/generated/` is machine-written from the backend contract and skipped.
 // Colours live only in src/theme/themes/*.css; everything else uses semantic tokens. Specs are skipped (contrast tests use literal colours).
+// Stock radius/shadow class names are rejected too: `@theme` resets them, so they render nothing (scripts/stock-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { stockUtilities } from './stock-utilities.mjs';
 
 const root = new URL('../src/', import.meta.url).pathname;
 const themesDir = join(root, 'theme', 'themes');
@@ -32,6 +34,23 @@ const offences = files(root).flatMap((path) =>
       colourLiteral.test(line) ? [`src/${relative(root, path)}:${index + 1}: ${line.trim()}`] : [],
     ),
 );
+
+const stockOffences = files(root).flatMap((path) =>
+  readFileSync(path, 'utf8')
+    .split('\n')
+    .flatMap((line, index) =>
+      stockUtilities(line).length
+        ? [`src/${relative(root, path)}:${index + 1}: ${stockUtilities(line).join(' ')}`]
+        : [],
+    ),
+);
+
+if (stockOffences.length) {
+  console.error(
+    `Stock radius/shadow classes the theme resets (use rounded-cell|row|tile|card|panel|pill|skeleton or shadow-glow):\n${stockOffences.join('\n')}`,
+  );
+  process.exit(1);
+}
 
 if (offences.length) {
   console.error(

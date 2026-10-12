@@ -118,7 +118,7 @@ const totalText = computed(() => {
                   :href="`#case-${testCase.position}`"
                   :title="squareTitle(testCase)"
                   :aria-label="squareTitle(testCase)"
-                  class="size-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2"
+                  class="size-4 rounded-skeleton focus-visible:outline-2 focus-visible:outline-offset-2"
                   :class="squareClass(testCase.status)"
                 />
               </div>
