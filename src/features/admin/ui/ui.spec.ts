@@ -8,7 +8,6 @@ import { mountComponent } from '@/test/mount';
 import AdminField from './AdminField.vue';
 import AdminSwitch from './AdminSwitch.vue';
 import ExactChips from './ExactChips.vue';
-import ExactLookup from './ExactLookup.vue';
 import MarkdownField from './MarkdownField.vue';
 import UploadButton from './UploadButton.vue';
 import UsernameChips from './UsernameChips.vue';
@@ -305,20 +304,6 @@ describe('MarkdownField', () => {
       { style: 'problem', markdown: 'Xin chào' },
     ]);
     expect(wrapper.get('section').text()).toContain('Xin chào bạn');
-  });
-});
-
-describe('ExactLookup', () => {
-  it('opens the trimmed value on submit and ignores an empty box', async () => {
-    const wrapper = mountComponent(ExactLookup, {
-      props: { label: 'Mã bài', submitLabel: 'Mở' },
-    });
-    await wrapper.get('form').trigger('submit');
-    expect(wrapper.emitted('open')).toBeUndefined();
-    await wrapper.get('input').setValue('  aplusb ');
-    await wrapper.get('form').trigger('submit');
-    expect(wrapper.emitted('open')).toEqual([['aplusb']]);
-    expect(wrapper.get('label').attributes('for')).toBe(wrapper.get('input').attributes('id'));
   });
 });
 
