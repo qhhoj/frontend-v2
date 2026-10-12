@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { CheckCheck, Eye, EyeOff, X } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { CommentReportOutcome, CommentReportQueueItem } from '@/api/types/comments';
-import NumberedPager from '@/components/NumberedPager.vue';
 import UserName from '@/components/UserName.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -13,7 +12,6 @@ import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import CommentExcerpt from './CommentExcerpt.vue';
 import CommentPlace from './CommentPlace.vue';
@@ -50,11 +48,6 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'reports', label: t('admin.comments.columns.reports') },
   { key: 'page', label: t('admin.comments.columns.page') },
 ]);
-const range = computed(() =>
-  props.meta
-    ? rangeOf(props.meta.page, props.meta.pageSize, props.items.length, props.meta.total)
-    : null,
-);
 const when = (item: CommentReportQueueItem) =>
   formatDateTime(item.lastSettledAt ?? item.lastReportedAt, locale.locale);
 const canHideAndResolve = (item: CommentReportQueueItem) =>
@@ -95,6 +88,7 @@ const rowName = (item: CommentReportQueueItem) =>
 <template>
   <AdminDataTable
     v-model:selected="selected"
+    :pager="meta ? { meta, label: $t('admin.comments.pager') } : undefined"
     :columns="columns"
     :rows="items"
     :row-key="(item) => item.comment.id"
@@ -174,10 +168,6 @@ const rowName = (item: CommentReportQueueItem) =>
         :label="$t('admin.table.rowMenu', { name: rowName(row) })"
         :items="menuItems(row)"
       />
-    </template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">{{ $t('admin.table.range', range) }}</span>
-      <NumberedPager class="ml-auto" compact :meta="meta" :label="$t('admin.comments.pager')" />
     </template>
   </AdminDataTable>
 </template>

@@ -38,7 +38,6 @@
   "list": {
     "searchLabel": "Tìm theo khóa hoặc tên kỳ thi",
     "count": "{total} kỳ thi",
-    "range": "{from}–{to} / {total}",
     "open": "Mở {key}",
     "tableLabel": "Kỳ thi quản trị được",
     "phaseLabel": "Giai đoạn",
@@ -512,7 +511,6 @@
       "reinstateBody": "Các thí sinh được đưa trở lại bảng và bỏ cấm; bảng xếp hạng được tính lại một lần."
     },
     "tableLabel": "Các lượt tham gia",
-    "range": "{from}–{to} / {total}",
     "pagerLabel": "Trang lượt tham gia"
   },
   "bulk": {

@@ -4,13 +4,12 @@ import { UserPlus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { PARTICIPATIONS_PAGE_SIZE, fetchParticipations } from '@/api/contest-editing.api';
+import { fetchParticipations } from '@/api/contest-editing.api';
 import type {
   BulkDisqualifyResult,
   EditableContest,
   Participation,
 } from '@/api/types/contest-editing';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumber } from '@/lib/format';
 import { formatInZone } from '../../ui/form/site-time';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -23,7 +22,6 @@ import { buttonClass } from '../../ui/controls';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
 import AdminFilterBar from '../../ui/table/AdminFilterBar.vue';
 import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../../ui/table/table-columns';
 import type { AdminColumn } from '../../ui/table/table-columns';
 import ContestBulkResult from '../ContestBulkResult.vue';
 import AddParticipationDialog from './AddParticipationDialog.vue';
@@ -82,10 +80,6 @@ const chips = computed(() =>
 );
 const isFiltered = computed(() => query.value.search !== '' || activeFilters.value.length > 0);
 const clearAll = () => change({ search: '', kind: '', status: '', sort: '', user: '' });
-const range = computed(() => {
-  const meta = data.value?.meta;
-  return meta ? rangeOf(meta.page, PARTICIPATIONS_PAGE_SIZE, rows.value.length, meta.total) : null;
-});
 
 const kindText = (row: Participation) => {
   const kind = participationKindKey(row.virtual);
@@ -185,6 +179,11 @@ const showUser = (username: string) => change({ user: username, search: '', kind
     <AdminStatus v-if="directFailure" kind="refused" :text="failureTextOf(directFailure)" />
     <AdminDataTable
       v-model:selected="selected"
+      :pager="
+        data?.meta
+          ? { meta: data.meta, label: $t('admin.contests.participants.pagerLabel') }
+          : undefined
+      "
       :columns="columns"
       :rows="rows"
       :row-key="(row: Participation) => row.id"
@@ -242,17 +241,6 @@ const showUser = (username: string) => change({ user: username, search: '', kind
         <AdminRowMenu
           :items="actions.menuOf(row)"
           :label="$t('admin.contestOps.participants.more', { username: row.user.username })"
-        />
-      </template>
-      <template v-if="data" #footer>
-        <span v-if="range" class="font-mono tabular-nums">
-          {{ $t('admin.contests.participants.range', range) }}
-        </span>
-        <NumberedPager
-          class="ml-auto"
-          :meta="data.meta"
-          :label="$t('admin.contests.participants.pagerLabel')"
-          compact
         />
       </template>
     </AdminDataTable>

@@ -9,6 +9,7 @@ import { CARD, buttonClass } from '../../ui/controls';
 import type { ImportPhase, PollStop } from './import-job';
 import { downloadProgressOf, failedRowOf, importStepsOf, isRunningStep } from './import-steps';
 import type { ImportSource, RunningStep, StepStatus } from './import-steps';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 
 /** The job's steps from its `step` (a zip import has no download), the download bytes, and the end: link or reason. */
 const props = withDefaults(
@@ -103,20 +104,12 @@ const labelKey = (key: string, status: StepStatus) =>
           </span>
           <template v-if="step.key === 'downloading' && step.status === 'current' && download">
             <span class="text-sm text-muted">{{ downloadText }}</span>
-            <span
+            <ProgressBar
               v-if="download.share !== null"
-              role="progressbar"
-              :aria-label="$t('admin.polygon.progress.steps.downloading')"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              :aria-valuenow="Math.round(download.share * 100)"
-              class="h-1.5 w-full max-w-80 overflow-hidden rounded-pill bg-surface-strong"
-            >
-              <span
-                class="block h-full rounded-pill bg-accent"
-                :style="{ width: `${download.share * 100}%` }"
-              />
-            </span>
+              :value="Math.round(download.share * 100)"
+              :label="$t('admin.polygon.progress.steps.downloading')"
+              class="w-full max-w-80"
+            />
           </template>
         </span>
       </li>

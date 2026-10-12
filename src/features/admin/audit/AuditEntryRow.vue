@@ -10,6 +10,7 @@ import { canUseAdmin } from '../admin-access';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
 import { auditObjectLink } from './audit';
+import AdminChip from '../ui/AdminChip.vue';
 
 /** One change: when, who, what was done to which object, and the fields it touched (names only). */
 const props = defineProps<{ entry: AuditEntry }>();
@@ -57,9 +58,7 @@ const objectName = computed(() => props.entry.object.label ?? shortId(props.entr
     </span>
     <div class="flex min-w-0 flex-col gap-1">
       <p class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-        <span class="rounded-pill bg-surface-hover px-2 py-0.5 text-xs font-semibold">{{
-          actionLabel
-        }}</span>
+        <AdminChip>{{ actionLabel }}</AdminChip>
         <span class="text-muted">{{ typeLabel }}</span>
         <RouterLink
           v-if="link"

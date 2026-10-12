@@ -5,7 +5,6 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { ContestListItem } from '@/api/types/contests';
 import type { BulkContestResult } from '@/api/types/contest-editing';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { useContestTagsQuery } from '@/features/contests/contest-extras.queries';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -15,10 +14,9 @@ import { buttonClass } from '../../ui/controls';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
 import AdminFilterBar from '../../ui/table/AdminFilterBar.vue';
 import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../../ui/table/table-columns';
 import type { AdminColumn } from '../../ui/table/table-columns';
 import HighlightedText from '../../search/HighlightedText.vue';
-import { CONTEST_PHASE_FILTERS, INDEX_PAGE_SIZE } from '../../search/index-search';
+import { CONTEST_PHASE_FILTERS } from '../../search/index-search';
 import { useAdminContestSearchQuery } from '../../search/index-search.queries';
 import ContestBulkResult from '../ContestBulkResult.vue';
 import ContestBulkVisibilityDialog from './ContestBulkVisibilityDialog.vue';
@@ -101,10 +99,6 @@ const resultText = computed(() =>
       })
     : undefined,
 );
-const range = computed(() => {
-  const meta = data.value?.meta;
-  return meta ? rangeOf(meta.page, INDEX_PAGE_SIZE, rows.value.length, meta.total) : null;
-});
 
 const columns = computed<AdminColumn[]>(() => [
   {
@@ -192,6 +186,7 @@ const resultRows = computed(() =>
     <AdminDataTable
       v-model:sort="sort"
       v-model:selected="selected"
+      :pager="data?.meta ? { meta: data.meta, label: $t('admin.contests.list.pager') } : undefined"
       :columns="columns"
       :rows="rows"
       :row-key="(contest: ContestListItem) => contest.key"
@@ -241,17 +236,6 @@ const resultRows = computed(() =>
         <AdminRowMenu
           :items="menuOf(row)"
           :label="$t('admin.contests.list.more', { name: row.name })"
-        />
-      </template>
-      <template v-if="data" #footer>
-        <span v-if="range" class="font-mono tabular-nums">
-          {{ $t('admin.contests.list.range', range) }}
-        </span>
-        <NumberedPager
-          class="ml-auto"
-          :meta="data.meta"
-          :label="$t('admin.contests.list.pager')"
-          compact
         />
       </template>
     </AdminDataTable>

@@ -4,17 +4,15 @@ import { useI18n } from 'vue-i18n';
 import { ExternalLink, Trash2 } from 'lucide-vue-next';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ShortLink } from '@/api/types/short-links';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 
 /** The card takes focus after a delete (`tabindex=-1`, id `short-links-table`). On a phone each link is a card. */
-const props = defineProps<{
+defineProps<{
   links: ShortLink[];
   meta?: NumberedPageMeta;
   loading: boolean;
@@ -35,13 +33,6 @@ const columns = computed<AdminColumn[]>(() => [
 const isExpired = (link: ShortLink) =>
   link.expiresAt !== null && new Date(link.expiresAt).getTime() < Date.now();
 const dateOrDash = (value: string | null) => (value ? formatDateTime(value, locale.locale) : '—');
-/** "1–50 / 312" when the list says its total. */
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.links.length, meta.total)
-    : null;
-});
 const menuItems = (link: ShortLink) => [
   { label: t('admin.shortlinks.table.open'), icon: ExternalLink, to: link.path },
   {
@@ -56,6 +47,7 @@ const menuItems = (link: ShortLink) => [
 <template>
   <AdminDataTable
     id="short-links-table"
+    :pager="meta ? { meta, label: $t('admin.shortlinks.table.pager') } : undefined"
     data-testid="short-links-table"
     tabindex="-1"
     class="focus-visible:-outline-offset-2"
@@ -101,16 +93,5 @@ const menuItems = (link: ShortLink) => [
       />
     </template>
     <template #empty><slot name="empty" /></template>
-    <template v-if="meta" #footer>
-      <span v-if="range" class="font-mono tabular-nums">
-        {{ $t('admin.table.range', range) }}
-      </span>
-      <NumberedPager
-        class="ml-auto"
-        compact
-        :meta="meta"
-        :label="$t('admin.shortlinks.table.pager')"
-      />
-    </template>
   </AdminDataTable>
 </template>

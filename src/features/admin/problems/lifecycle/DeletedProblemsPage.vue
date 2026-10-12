@@ -4,7 +4,6 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { DeletedProblem } from '@/api/types/problem-lifecycle';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { actorName } from '@/lib/actor';
 import { formatNumericDateTime } from '@/lib/format';
@@ -18,7 +17,6 @@ import { failureTextOf } from '../../ui/admin-errors';
 import { buttonClass } from '../../ui/controls';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../../ui/table/AdminRowMenu.vue';
-import { rangeOf } from '../../ui/table/table-columns';
 import type { AdminColumn } from '../../ui/table/table-columns';
 import { graceTextOf, graceToneOf } from './days-left';
 import { useDeletedProblemsQuery } from './lifecycle.queries';
@@ -41,12 +39,6 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'deletedAt', label: t('admin.lifecycle.columns.deletedAt') },
   { key: 'deletedBy', label: t('admin.lifecycle.columns.deletedBy') },
 ]);
-const range = computed(() => {
-  const meta = data.value?.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, rows.value.length, meta.total)
-    : null;
-});
 const graceText = (row: DeletedProblem) => {
   const grace = graceTextOf(row);
   return t(grace.key, { count: grace.count }, grace.count);
@@ -103,6 +95,7 @@ useFocusFallback(
       class="focus-visible:outline-offset-2"
     >
       <AdminDataTable
+        :pager="data?.meta ? { meta: data.meta, label: $t('admin.lifecycle.pager') } : undefined"
         :columns="columns"
         :rows="rows"
         :row-key="(row) => row.code"
@@ -145,17 +138,6 @@ useFocusFallback(
               :items="menuItems(row)"
             />
           </template>
-        </template>
-        <template v-if="data" #footer>
-          <span v-if="range" class="font-mono tabular-nums">{{
-            $t('admin.table.range', range)
-          }}</span>
-          <NumberedPager
-            class="ml-auto"
-            compact
-            :meta="data.meta"
-            :label="$t('admin.lifecycle.pager')"
-          />
         </template>
       </AdminDataTable>
     </section>

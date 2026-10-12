@@ -6,7 +6,6 @@ import { useRoute, useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { OrganizationListFilters } from '@/api/organizations-admin.api';
 import type { OrganizationListItem } from '@/api/types/organizations';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import HighlightedText from '../search/HighlightedText.vue';
@@ -16,7 +15,6 @@ import { INPUT } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import type { ActiveFilter } from '../ui/table/AdminFilterBar.vue';
-import { rangeOf } from '../ui/table/table-columns';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { seatsText } from './org-seats';
 import { PER_ORGANIZATION_RESET } from './organization-search';
@@ -51,12 +49,6 @@ const resultText = computed(() =>
     ? t('admin.organizations.list.countMatchShort', { total: total.value })
     : t('admin.organizations.list.count', { total: total.value }),
 );
-const range = computed(() => {
-  const meta = props.meta;
-  return meta && 'total' in meta
-    ? rangeOf(meta.page, meta.pageSize, props.items.length, meta.total)
-    : null;
-});
 const columns = computed<AdminColumn[]>(() => [
   { key: 'name', label: t('admin.organizations.list.name'), priority: 'primary' },
   { key: 'state', label: t('admin.organizations.list.state'), priority: 'badge' },
@@ -148,6 +140,7 @@ const number = (value: number) => formatNumber(value, locale.locale);
       </template>
     </AdminFilterBar>
     <AdminDataTable
+      :pager="meta ? { meta, label: $t('admin.organizations.list.pager') } : undefined"
       data-testid="org-list"
       :columns="columns"
       :rows="items"
@@ -190,18 +183,6 @@ const number = (value: number) => formatNumber(value, locale.locale);
       </template>
       <template #cell-seats="{ row }">{{ seatsText(row, number) }}</template>
       <template #cell-points="{ row }">{{ number(row.performancePoints) }}</template>
-      <template #footer>
-        <span v-if="range" class="font-mono tabular-nums">{{
-          $t('admin.table.range', range)
-        }}</span>
-        <NumberedPager
-          v-if="meta"
-          class="ml-auto"
-          compact
-          :meta="meta"
-          :label="$t('admin.organizations.list.pager')"
-        />
-      </template>
     </AdminDataTable>
   </section>
 </template>

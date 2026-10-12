@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { BadgeCheck, Trash2 } from 'lucide-vue-next';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
@@ -42,7 +42,7 @@ async function confirmRemove() {
       <SkeletonBlock class="h-72 w-full rounded-panel" />
     </template>
     <ExternalJudgeNotConnected v-if="query.data.value && !query.data.value.connected" />
-    <GlassCard v-else-if="query.data.value" class="flex flex-col gap-5 rounded-panel p-5">
+    <Card v-else-if="query.data.value" variant="flat" padding="md" class="flex flex-col gap-5">
       <form class="flex flex-col gap-5" novalidate @submit.prevent="save.run(undefined)">
         <AdminSwitch
           v-model="form.isActive"
@@ -127,7 +127,7 @@ async function confirmRemove() {
           </button>
         </div>
       </form>
-    </GlassCard>
+    </Card>
   </QueryState>
   <ConfirmDialog
     v-model:visible="isRemoveOpen"

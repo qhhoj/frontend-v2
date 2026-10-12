@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="Row">
+import type { NumberedPageMeta } from '@/api/client';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { AdminColumn } from './table-columns';
 
@@ -24,6 +25,8 @@ const props = withDefaults(
     emptyText?: string;
     /** Caps the card's height so the header sticks while the rows scroll (a CSS length). */
     maxHeight?: string;
+    /** A numbered page: the footer shows its "1–50 / 312" range and the page links. */
+    pager?: { meta: NumberedPageMeta; label: string; queryKey?: string };
   }>(),
   {
     rowLabel: undefined,
@@ -35,6 +38,7 @@ const props = withDefaults(
     filtered: false,
     emptyText: undefined,
     maxHeight: undefined,
+    pager: undefined,
   },
 );
 const sort = defineModel<string | undefined>('sort');
@@ -72,6 +76,7 @@ const STACK_BELOW_PX = 768;
     :filtered="filtered"
     :empty-text="emptyText"
     :max-height="maxHeight"
+    :pager="pager"
     density="compact"
     :stack-below="STACK_BELOW_PX"
     @retry="$emit('retry')"

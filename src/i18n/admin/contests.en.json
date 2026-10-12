@@ -38,7 +38,6 @@
   "list": {
     "searchLabel": "Search by contest key or name",
     "count": "{total} contests",
-    "range": "{from}–{to} / {total}",
     "open": "Open {key}",
     "tableLabel": "Contests you can manage",
     "phaseLabel": "Phase",
@@ -512,7 +511,6 @@
       "reinstateBody": "The contestants return to the board and their contest ban is lifted; the ranking is recomputed once."
     },
     "tableLabel": "Participations",
-    "range": "{from}–{to} of {total}",
     "pagerLabel": "Participation pages"
   },
   "bulk": {

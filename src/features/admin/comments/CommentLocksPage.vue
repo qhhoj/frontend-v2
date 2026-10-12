@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { LockOpen } from 'lucide-vue-next';
 import type { CommentPageLink } from '@/api/types/comments';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { commentPageRoute } from '@/lib/comment-links';
 import { pageFromQuery } from '@/lib/paging';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
@@ -51,6 +50,7 @@ async function unlockPage(link: CommentPageLink) {
       :title="failureTextOf(unlock.failure.value)"
     />
     <AdminDataTable
+      :pager="data?.meta ? { meta: data.meta, label: $t('admin.comments.locks.pager') } : undefined"
       :columns="columns"
       :rows="items"
       :row-key="keyOf"
@@ -83,14 +83,6 @@ async function unlockPage(link: CommentPageLink) {
           <LockOpen aria-hidden="true" class="size-4" :stroke-width="1.75" />
           {{ $t('admin.comments.locks.unlock') }}
         </button>
-      </template>
-      <template v-if="data" #footer>
-        <NumberedPager
-          class="ml-auto"
-          compact
-          :meta="data.meta"
-          :label="$t('admin.comments.locks.pager')"
-        />
       </template>
     </AdminDataTable>
   </div>

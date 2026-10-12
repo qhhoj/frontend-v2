@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import TicketLinkChip from '@/features/tickets/TicketLinkChip.vue';
@@ -36,7 +36,7 @@ const toggleOpen = () => {
 </script>
 
 <template>
-  <GlassCard as="section" data-testid="queue-detail" class="flex min-w-0 flex-col gap-5 p-5">
+  <Card variant="flat" padding="md" data-testid="queue-detail" class="flex min-w-0 flex-col gap-5">
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SkeletonBlock class="h-96 w-full" /></template>
       <template v-if="ticket">
@@ -87,5 +87,5 @@ const toggleOpen = () => {
         <p class="sr-only" aria-live="polite">{{ announcement }}</p>
       </template>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

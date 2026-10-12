@@ -5,6 +5,7 @@ import AdminField from '../ui/AdminField.vue';
 import type { FieldErrors } from '../ui/admin-errors';
 import { INPUT } from '../ui/controls';
 import type { LanguageForm } from './language-form';
+import AdminChip from '../ui/AdminChip.vue';
 
 defineProps<{ mode: 'create' | 'edit'; errors: FieldErrors }>();
 const form = defineModel<LanguageForm>('form', { required: true });
@@ -38,9 +39,7 @@ const form = defineModel<LanguageForm>('form', { required: true });
         <div class="flex min-h-11 flex-wrap items-center gap-2">
           <Lock aria-hidden="true" class="size-4 text-muted" />
           <span class="font-mono">{{ form.key }}</span>
-          <span class="rounded-pill border border-line px-2 text-xs text-muted">
-            {{ $t('admin.languages.form.sealed') }}
-          </span>
+          <AdminChip>{{ $t('admin.languages.form.sealed') }}</AdminChip>
         </div>
         <p class="text-xs text-muted">{{ $t('admin.languages.form.hints.sealed') }}</p>
       </div>

@@ -7,6 +7,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../ui/admin-errors';
 import { useRenderPreview } from '../ui/use-render-preview';
 import { previewStatusOf } from './preview-status';
+import AdminChip from '../ui/AdminChip.vue';
 
 /** `savedContent` is null for a page not saved yet: then no text is "the saved text". */
 const props = defineProps<{ content: string; savedContent: string | null; savedHtml: string }>();
@@ -47,11 +48,11 @@ const chipText = computed(() =>
     { time: clock.value },
   ),
 );
-const CHIP_CLASS = {
-  saved: 'border border-line text-muted',
-  updating: 'bg-accent-soft text-accent-soft-text',
-  paused: 'bg-verdict-tle-bg text-verdict-tle',
-  done: 'bg-verdict-ac-bg text-verdict-ac',
+const CHIP_TONES = {
+  saved: 'neutral',
+  updating: 'accent',
+  paused: 'caution',
+  done: 'positive',
 } as const;
 </script>
 
@@ -59,13 +60,9 @@ const CHIP_CLASS = {
   <section :aria-label="$t('admin.pages.preview.title')" class="flex min-w-0 flex-col gap-1.5">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <p class="text-sm font-semibold">{{ $t('admin.pages.preview.title') }}</p>
-      <span
-        data-testid="preview-status"
-        class="rounded-pill px-2.5 py-0.5 text-xs font-semibold"
-        :class="CHIP_CLASS[status]"
-      >
+      <AdminChip data-testid="preview-status" :tone="CHIP_TONES[status]">
         {{ chipText }}
-      </span>
+      </AdminChip>
     </div>
     <div
       data-testid="preview"
