@@ -62,7 +62,7 @@ const submit = () =>
         class="flex w-full max-w-[440px] flex-col gap-4 px-6 py-6 lg:glass lg:gap-[18px] lg:rounded-panel lg:p-8"
         @submit.prevent="submit"
       >
-        <h1 class="font-display text-[26px] leading-tight font-bold">{{ $t('pages.login') }}</h1>
+        <h1 class="page-title">{{ $t('pages.login') }}</h1>
         <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
           notice
         }}</AuthNotice>

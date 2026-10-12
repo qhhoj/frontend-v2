@@ -8,7 +8,7 @@ defineProps<{ pending?: boolean }>();
     type="submit"
     :aria-busy="pending ? 'true' : undefined"
     :aria-disabled="pending ? 'true' : undefined"
-    class="bg-gradient-accent h-12 w-full rounded-pill font-display text-[15px] font-semibold text-on-accent aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
+    class="bg-gradient-accent h-12 w-full rounded-pill font-display text-sm font-semibold text-on-accent aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text"
   >
     <slot />
   </button>

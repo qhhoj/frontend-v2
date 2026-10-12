@@ -60,7 +60,7 @@ function onConfirmed(value: string[]) {
         :aria-current="name === step ? 'step' : undefined"
       >
         <span
-          class="flex size-7 items-center justify-center rounded-full border text-[13px] font-bold"
+          class="flex size-7 items-center justify-center rounded-full border text-meta font-bold"
           :class="markerOf(index)"
         >
           <Check v-if="index < stepIndex" aria-hidden="true" class="size-4" />

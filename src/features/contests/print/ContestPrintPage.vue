@@ -139,8 +139,8 @@ const CHIP =
               <p class="text-xs tracking-widest text-muted uppercase">
                 {{ $t('contests.print.kicker', { count: problems.length }, problems.length) }}
               </p>
-              <h1 class="mt-1 font-display text-xl font-bold md:text-[26px]">{{ contest.name }}</h1>
-              <p class="mt-1 text-[13px] text-muted">{{ whenText }}</p>
+              <h1 class="mt-1 font-display text-xl font-bold md:text-page">{{ contest.name }}</h1>
+              <p class="mt-1 text-meta text-muted">{{ whenText }}</p>
             </header>
             <template v-for="(problem, index) in problems" :key="problem.problemId">
               <p v-if="onePerPage && index > 0" aria-hidden="true" class="break-hint">

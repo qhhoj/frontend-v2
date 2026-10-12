@@ -56,4 +56,4 @@ export const fullColumnClass = (key: ColumnSlot, isFull: boolean) =>
 export const HEADER_CELL_CLASSES = 'px-2 py-3.5 font-medium whitespace-nowrap first:pl-6 last:pr-4';
 export const BODY_CELL_CLASSES = 'px-2 py-2 align-middle first:pl-6 last:pr-4';
 /** The header row: a tinted band above the first row. */
-export const HEADER_ROW_CLASSES = 'bg-surface-strong text-left text-[13px] text-muted';
+export const HEADER_ROW_CLASSES = 'bg-surface-strong text-left text-meta text-muted';

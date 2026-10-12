@@ -129,7 +129,7 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
     >
       <table
         data-testid="diff-table-wide"
-        class="hidden w-full min-w-[720px] table-fixed border-collapse font-mono text-[13px] leading-relaxed sm:table"
+        class="hidden w-full min-w-[720px] table-fixed border-collapse font-mono text-meta leading-relaxed sm:table"
       >
         <caption class="sr-only">
           {{
@@ -215,7 +215,7 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
       </table>
       <table
         data-testid="diff-table-narrow"
-        class="w-full table-fixed border-collapse font-mono text-[13px] leading-relaxed sm:hidden"
+        class="w-full table-fixed border-collapse font-mono text-meta leading-relaxed sm:hidden"
       >
         <caption class="sr-only">
           {{

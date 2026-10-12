@@ -44,7 +44,7 @@ const BUTTON_CLASSES =
     >
       {{ $t('submissions.pager.previous') }}
     </button>
-    <span class="font-mono text-[15px] tabular-nums">{{
+    <span class="font-mono text-sm tabular-nums">{{
       pageCount === undefined
         ? $t('submissions.pager.positionOpen', { page })
         : $t('submissions.pager.position', { page, total: pageCount })

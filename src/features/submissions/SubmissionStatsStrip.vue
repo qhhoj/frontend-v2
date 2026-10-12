@@ -63,13 +63,13 @@ const figures = computed(() => {
   <div data-testid="stats-strip" class="flex flex-col gap-3">
     <GlassCard
       as="div"
-      class="flex flex-wrap items-center gap-x-5 gap-y-1 py-1 pr-1.5 pl-4 text-[13px] text-muted"
+      class="flex flex-wrap items-center gap-x-5 gap-y-1 py-1 pr-1.5 pl-4 text-meta text-muted"
     >
       <p v-if="!stats && !pending" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
       <dl class="m-0 flex flex-wrap items-center gap-x-5 gap-y-1 py-1.5">
         <div v-for="figure in figures" :key="figure.id" class="flex items-baseline gap-1.5">
           <dt class="order-2">{{ $t(figure.labelKey) }}</dt>
-          <dd class="order-1 m-0 font-mono text-[15px] font-bold text-content tabular-nums">
+          <dd class="order-1 m-0 font-mono text-sm font-bold text-content tabular-nums">
             <SkeletonBlock
               v-if="pending && !stats"
               data-skeleton-region="value"

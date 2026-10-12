@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'update:live': [live: boolean] }>();
     data-testid="live-toggle"
     :aria-pressed="live"
     :title="$t('submissions.rail.live')"
-    class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill px-3 text-[13px] font-semibold whitespace-nowrap hover:bg-surface-hover"
+    class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill px-3 text-meta font-semibold whitespace-nowrap hover:bg-surface-hover"
     :class="live ? 'text-positive' : 'text-muted'"
     @click="emit('update:live', !live)"
   >

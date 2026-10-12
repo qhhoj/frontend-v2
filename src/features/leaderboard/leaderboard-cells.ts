@@ -27,7 +27,7 @@ export const SKELETON_ROW_COUNT = 12;
 
 /** The header row and its cells, shared by the board and its skeleton. */
 export const BOARD_HEAD_CLASS =
-  'text-left text-[12px] font-semibold tracking-wide text-muted uppercase';
+  'text-left text-caption font-semibold tracking-wide text-muted uppercase';
 export const RANK_HEAD_CLASS = 'w-12 px-2 py-2 text-right align-middle';
 export const USER_HEAD_CLASS = 'px-2 py-2 align-middle';
 export const ORGANIZATION_HEAD_CLASS =

@@ -11,7 +11,7 @@ const PHASE_CLASSES: Record<ContestPhase, string> = {
 
 <template>
   <span
-    class="inline-flex min-h-7 items-center gap-1.5 rounded-pill px-3 text-[13px] font-semibold whitespace-nowrap"
+    class="inline-flex min-h-7 items-center gap-1.5 rounded-pill px-3 text-meta font-semibold whitespace-nowrap"
     :class="PHASE_CLASSES[phase]"
   >
     <span v-if="phase === 'running'" aria-hidden="true" class="size-2 rounded-full bg-current" />{{

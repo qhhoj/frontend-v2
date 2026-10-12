@@ -15,7 +15,7 @@ const spanText = computed(() => {
 </script>
 
 <template>
-  <span class="font-mono text-[13px] tabular-nums">
+  <span class="font-mono text-meta tabular-nums">
     <span class="whitespace-nowrap">{{
       $t('admin.contests.list.window', { start: window.start, end: window.end })
     }}</span>

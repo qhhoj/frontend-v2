@@ -13,7 +13,7 @@ defineProps<{ header?: boolean }>();
 <template>
   <GlassCard as="div" data-testid="statement-card" class="rounded-panel p-6 sm:p-8">
     <ProblemHeaderSkeleton v-if="header" class="mb-4" />
-    <div data-skeleton-region="statement" class="flex flex-col gap-4 text-[15px] leading-[1.75]">
+    <div data-skeleton-region="statement" class="flex flex-col gap-4 text-sm leading-[1.75]">
       <p v-for="paragraph in PARAGRAPHS" :key="paragraph">
         <template v-for="line in LINES" :key="line">
           <SkeletonBlock text class="w-full" /><br />

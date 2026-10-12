@@ -89,7 +89,7 @@ const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
         </option>
       </AuthSelect>
     </div>
-    <p class="text-[13px] leading-normal text-muted">
+    <p class="text-meta leading-normal text-muted">
       <span
         class="rounded-pill bg-verdict-pending-bg px-2.5 py-0.5 text-xs font-semibold text-verdict-pending"
         >{{ $t('settings.defaults.deviceOnly') }}</span

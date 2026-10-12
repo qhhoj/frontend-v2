@@ -226,7 +226,7 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         :x="plotRight + 8"
         :y="item.y"
         :class="item.colorClass"
-        class="text-[12px] font-semibold"
+        class="text-caption font-semibold"
       >
         {{ item.text }}
       </text>
@@ -236,7 +236,7 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         :x="box.left - 8"
         :y="tick.y + 4"
         text-anchor="end"
-        class="fill-muted text-[12px] tabular-nums"
+        class="fill-muted text-caption tabular-nums"
       >
         {{ tick.rating }}
       </text>
@@ -266,7 +266,7 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         stroke-opacity="0.35"
         stroke-dasharray="2 2"
       />
-      <g v-for="mark in xLabels" :key="mark.key" class="fill-muted text-[12px]">
+      <g v-for="mark in xLabels" :key="mark.key" class="fill-muted text-caption">
         <text v-if="mark.name" :x="mark.x" :y="box.height - 28" text-anchor="middle">
           {{ mark.name }}
         </text>
@@ -316,21 +316,21 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         <text
           :x="tooltip.x + 10"
           :y="tooltip.y + 19"
-          class="fill-content text-[12px] font-semibold"
+          class="fill-content text-caption font-semibold"
         >
           {{ tooltip.name }}
         </text>
-        <text :x="tooltip.x + 10" :y="tooltip.y + 37" class="fill-muted text-[12px] tabular-nums">
+        <text :x="tooltip.x + 10" :y="tooltip.y + 37" class="fill-muted text-caption tabular-nums">
           {{ tooltip.place }}
         </text>
         <text
           :x="tooltip.x + 10"
           :y="tooltip.y + 57"
-          class="fill-content text-[13px] font-semibold tabular-nums"
+          class="fill-content text-meta font-semibold tabular-nums"
         >
           {{ tooltip.rating }}
           <tspan :class="tooltip.deltaClass">{{ tooltip.delta }}</tspan>
-          <tspan :class="tooltip.tierClass" class="text-[12px] font-normal" dx="6">
+          <tspan :class="tooltip.tierClass" class="text-caption font-normal" dx="6">
             {{ tooltip.tier }}
           </tspan>
         </text>

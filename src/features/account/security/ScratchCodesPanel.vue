@@ -120,7 +120,7 @@ onBeforeRouteLeave((to) => {
       <input ref="checkbox" v-model="acknowledged" type="checkbox" class="size-5 accent-accent" />
       {{ $t('settings.codes.acknowledge') }}
     </label>
-    <p v-if="reminded && !acknowledged" class="text-[13px] text-negative">
+    <p v-if="reminded && !acknowledged" class="text-meta text-negative">
       {{ $t('settings.codes.acknowledgeFirst') }}
     </p>
     <button

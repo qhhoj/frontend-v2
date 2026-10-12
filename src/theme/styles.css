@@ -17,6 +17,23 @@
   --radius-*: initial;
   --shadow-*: initial;
   --blur-*: initial;
+  /* Named type scale (docs/design-language.md); sm 14 and base 16 are Tailwind's own. Font size only: the
+     recommended leading lives with the primitives, so swapping an exact arbitrary size for its step changes nothing. */
+  --text-tiny: 11px;
+  --text-caption: 12px;
+  --text-meta: 13px;
+  --text-title: 17px;
+  --text-page: 26px;
+  --text-stat: 26px;
+  --text-hero: 40px;
+  /* Z scale: z-sticky, z-savebar, z-header, z-bit, z-overlay, z-toast. PrimeVue stacks its own overlays at
+     1000 and modals at 1100, so a toast sits above them. */
+  --z-index-sticky: 10;
+  --z-index-savebar: 20;
+  --z-index-header: 30;
+  --z-index-bit: 40;
+  --z-index-overlay: 50;
+  --z-index-toast: 1200;
 }
 
 @theme inline {
@@ -108,6 +125,10 @@
   --color-limit-memory-bg: var(--qh-limit-memory-bg);
   --color-limit-points: var(--qh-limit-points);
   --color-limit-points-bg: var(--qh-limit-points-bg);
+  --color-warning: var(--qh-warning);
+  --color-warning-bg: var(--qh-warning-bg);
+  --color-info: var(--qh-info);
+  --color-info-bg: var(--qh-info-bg);
   --font-display: var(--qh-font-display);
   --font-body: var(--qh-font-body);
   --font-mono: var(--qh-font-mono);
@@ -118,6 +139,7 @@
   --radius-panel: var(--qh-radius-panel);
   --radius-pill: var(--qh-radius-pill);
   --radius-skeleton: var(--qh-radius-skeleton);
+  --radius-control: var(--qh-radius-control);
   --shadow-glow: var(--qh-glow);
   --blur-glass: var(--qh-blur-live);
   --ease-standard: var(--qh-ease);
@@ -152,7 +174,7 @@
 /* Page title, Codeforces-sized: one rule for every h1 (pages put it on the h1 instead of size classes). */
 @utility page-title {
   font-family: var(--qh-font-display);
-  font-size: 26px;
+  font-size: var(--text-page);
   font-weight: 700;
   line-height: 1.25;
 }

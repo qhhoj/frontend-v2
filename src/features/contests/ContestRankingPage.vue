@@ -239,7 +239,7 @@ const VIEW_MODES = [
               <SkeletonBlock class="size-6 shrink-0" />
               <div class="min-w-0 flex-1">
                 <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
-                <p class="font-mono text-[13px]"><SkeletonBlock text class="w-1/2" /></p>
+                <p class="font-mono text-meta"><SkeletonBlock text class="w-1/2" /></p>
               </div>
             </div>
           </div>

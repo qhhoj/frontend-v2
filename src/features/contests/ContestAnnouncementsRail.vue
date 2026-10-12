@@ -35,7 +35,7 @@ const isLive = computed(
       <h2 class="font-display text-base font-bold">{{ $t('contests.tabs.announcements') }}</h2>
       <span
         v-if="isLive"
-        class="rounded-pill bg-verdict-ac-bg px-2.5 text-[12px] font-semibold text-verdict-ac"
+        class="rounded-pill bg-verdict-ac-bg px-2.5 text-caption font-semibold text-verdict-ac"
         >{{ $t('contests.announcements.live') }}</span
       >
     </div>

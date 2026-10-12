@@ -129,14 +129,14 @@ function leave(organization: ProfileOrganization) {
             <X aria-hidden="true" class="size-[18px]" />
           </button>
         </span>
-        <p v-if="organization.isAdmin" class="w-full text-[13px] text-muted">
+        <p v-if="organization.isAdmin" class="w-full text-meta text-muted">
           {{ $t('settings.organizations.adminNote') }}
         </p>
       </li>
     </ul>
     <p v-else class="text-sm text-muted">{{ $t('settings.organizations.empty') }}</p>
     <OfficialLockNote v-if="lock.isLocked.value && rows.length" :id="lock.noteId" />
-    <p v-if="error" class="text-[13px] text-negative" role="alert">{{ error }}</p>
+    <p v-if="error" class="text-meta text-negative" role="alert">{{ error }}</p>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     <!-- With no row the anchor sits on this link, so the error summary's link to the organizations always has a target. -->
     <RouterLink

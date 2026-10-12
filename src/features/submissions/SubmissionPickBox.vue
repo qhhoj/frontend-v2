@@ -26,7 +26,7 @@ function onClick(event: MouseEvent) {
       v-if="order > 0"
       data-testid="pick-order"
       aria-hidden="true"
-      class="absolute -top-0.5 -right-0.5 flex size-5 items-center justify-center rounded-pill bg-gradient-accent text-[11px] font-bold text-on-accent"
+      class="absolute -top-0.5 -right-0.5 flex size-5 items-center justify-center rounded-pill bg-gradient-accent text-tiny font-bold text-on-accent"
       >{{ order }}</span
     >
   </label>

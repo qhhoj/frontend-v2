@@ -75,7 +75,7 @@ async function insertCanned(filled: string, title: string) {
           class="min-h-28 rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
         />
       </label>
-      <p v-if="failureKey" role="alert" class="text-[13px] text-negative">
+      <p v-if="failureKey" role="alert" class="text-meta text-negative">
         {{ $t(failureKey) }}
       </p>
       <p class="sr-only" aria-live="polite" data-testid="canned-inserted">{{ insertedText }}</p>

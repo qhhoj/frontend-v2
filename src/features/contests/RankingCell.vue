@@ -24,7 +24,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
         }}<small
           v-if="view.time"
           data-testid="cell-time"
-          class="block text-[11px] leading-tight font-medium"
+          class="block text-tiny leading-tight font-medium"
           >{{ view.time }}</small
         ></span
       >

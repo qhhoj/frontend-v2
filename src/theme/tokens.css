@@ -13,6 +13,11 @@
   --qh-limit-memory-bg: var(--qh-tag-6-bg);
   --qh-limit-points: var(--qh-tag-8);
   --qh-limit-points-bg: var(--qh-tag-8-bg);
+  /* Status roles (docs/design-language.md): warning reuses the TLE pair, info the tag-5 pair, so every theme has them. */
+  --qh-warning: var(--qh-verdict-tle);
+  --qh-warning-bg: var(--qh-verdict-tle-bg);
+  --qh-info: var(--qh-tag-5);
+  --qh-info-bg: var(--qh-tag-5-bg);
   --qh-page-max: 80rem;
   --qh-sidebar-width: 20rem;
   --qh-radius-cell: 12px;
@@ -22,6 +27,12 @@
   --qh-radius-panel: 28px;
   --qh-radius-pill: 999px;
   --qh-radius-skeleton: 8px;
+  /* Radius by role: controls (buttons, tabs, segmented) are pills on public pages; the admin scope (.qh-admin) sets 12 px. */
+  --qh-radius-control: var(--qh-radius-pill);
+  /* Control heights: md is the default, sm for toolbars and row actions (44 px on touch), lg for the submit card only. */
+  --qh-control: 2.75rem;
+  --qh-control-sm: 2.25rem;
+  --qh-control-lg: 3.5rem;
   /* Personal look (appearance.ts): --qh-glass-level 0 is the theme's own glass, 100 is opaque with no blur; blob strength is the opacity of the blobs. Unset, they equal the site look. */
   --qh-glass-level: 0;
   --qh-blob-strength: 1;
@@ -35,6 +46,12 @@
   --qh-duration-fast: 150ms;
   --qh-duration: 200ms;
   --qh-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --qh-control-sm: 2.75rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

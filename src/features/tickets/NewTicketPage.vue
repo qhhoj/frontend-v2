@@ -14,7 +14,7 @@ const KIND_OPTIONS = [
 const INPUT =
   'min-h-11 w-full rounded-cell border bg-surface px-3.5 text-base text-content placeholder:text-muted';
 const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
-const ERROR = 'text-[13px] text-negative';
+const ERROR = 'text-meta text-negative';
 
 const form = ref<HTMLFormElement | null>(null);
 const { draft, problemName, problemMissing, panelFailure, isPending, issueKeyOf, submit } =
@@ -46,7 +46,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
 
 <template>
   <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 sm:px-8">
-    <p class="text-[13px] text-muted">
+    <p class="text-meta text-muted">
       <RouterLink :to="{ name: 'tickets' }" class="hover:underline">{{
         $t('tickets.title')
       }}</RouterLink>
@@ -77,7 +77,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
                   <input v-model="draft.kind" type="radio" name="kind" :value="option.value" />
                   {{ $t(option.titleKey) }}
                 </span>
-                <span class="text-[13px] text-muted">{{ $t(option.bodyKey) }}</span>
+                <span class="text-meta text-muted">{{ $t(option.bodyKey) }}</span>
               </label>
             </div>
           </fieldset>
@@ -95,7 +95,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
                 :aria-describedby="problemCodeDescribedBy"
               />
             </label>
-            <p id="problem-lookup" aria-live="polite" class="min-h-6 text-[13px] text-muted">
+            <p id="problem-lookup" aria-live="polite" class="min-h-6 text-meta text-muted">
               <template v-if="problemName">{{
                 $t('tickets.new.problemName', { name: problemName })
               }}</template>
@@ -115,7 +115,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
               :aria-invalid="invalid('issueUrl')"
               :aria-describedby="errorId('issueUrl')"
             />
-            <span class="text-[13px] font-normal text-muted">{{ $t('tickets.new.urlHint') }}</span>
+            <span class="text-meta font-normal text-muted">{{ $t('tickets.new.urlHint') }}</span>
           </label>
           <p v-if="errorText(targetField)" :id="errorId(targetField)" :class="ERROR">
             {{ errorText(targetField) }}
@@ -177,7 +177,7 @@ const BUSY = 'cursor-progress bg-accent-soft text-accent-soft-text';
 
       <GlassCard as="aside" class="h-fit p-6">
         <h2 class="font-display text-base font-bold">{{ $t('tickets.new.before') }}</h2>
-        <ul class="mt-3 list-disc space-y-2 pl-5 text-[15px] text-muted">
+        <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
           <li>
             <RouterLink
               :to="{ name: 'tickets', query: { scope: 'all', open: '1' } }"

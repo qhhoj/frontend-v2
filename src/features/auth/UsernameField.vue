@@ -62,7 +62,7 @@ const availabilityId = useId();
     <p
       :id="availabilityId"
       aria-live="polite"
-      class="flex min-h-5 items-center gap-1.5 text-[13px]"
+      class="flex min-h-5 items-center gap-1.5 text-meta"
       :class="line.colour"
     >
       <template v-if="line.key">{{ $t(line.key) }}</template>

@@ -131,7 +131,7 @@ const menuOf = (tag: ContestTag): RowMenuItem[] => [
         >
       </template>
       <template #cell-slug="{ row }">
-        <span class="font-mono text-[13px]">{{ row.slug }}</span>
+        <span class="font-mono text-meta">{{ row.slug }}</span>
       </template>
       <template #cell-description="{ row }">{{ row.description || '—' }}</template>
       <template #actions="{ row }">

@@ -97,7 +97,7 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
           }}
         </caption>
         <thead>
-          <tr class="text-left text-[12px] tracking-wider text-muted uppercase">
+          <tr class="text-left text-caption tracking-wider text-muted uppercase">
             <th scope="col" class="px-5 py-3 font-semibold">
               {{ $t('contests.problems.columns.label') }}
             </th>
@@ -141,11 +141,11 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
                 class="block truncate font-semibold hover:text-accent-text"
                 >{{ problem.name }}</RouterLink
               >
-              <span :title="problem.code" class="block truncate font-mono text-[12.5px] text-muted">
+              <span :title="problem.code" class="block truncate font-mono text-caption text-muted">
                 {{ problem.code }}
               </span>
             </td>
-            <td class="px-3 py-3 font-mono text-[13px] whitespace-nowrap tabular-nums">
+            <td class="px-3 py-3 font-mono text-meta whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
@@ -188,7 +188,7 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
               ><span class="sr-only">{{ problem.label }}. </span
               ><span class="truncate">{{ problem.name }}</span></RouterLink
             >
-            <p class="text-[12px] text-muted">
+            <p class="text-caption text-muted">
               {{ problem.code
               }}<template v-if="problem.maxSubmissions">
                 · {{ capText(problem.maxSubmissions) }}</template

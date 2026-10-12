@@ -45,7 +45,7 @@ const closeOverflow = () => overflowMenu.value?.hide();
       <nav
         v-if="crumbs.length > 0"
         :aria-label="$t('common.breadcrumb')"
-        class="hidden flex-wrap items-center gap-1.5 text-[13px] text-muted md:flex"
+        class="hidden flex-wrap items-center gap-1.5 text-meta text-muted md:flex"
       >
         <template v-for="(crumb, index) in crumbs" :key="index">
           <span v-if="index > 0" aria-hidden="true">/</span>
@@ -68,7 +68,7 @@ const closeOverflow = () => overflowMenu.value?.hide();
         <ChevronLeft aria-hidden="true" class="size-4" />{{ backLink.label }}
       </RouterLink>
       <h1 class="font-display text-xl leading-tight font-semibold md:text-2xl">{{ title }}</h1>
-      <div v-if="slots.meta" class="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-muted">
+      <div v-if="slots.meta" class="mt-1 flex flex-wrap items-center gap-2 text-meta text-muted">
         <slot name="meta" />
       </div>
       <p v-if="lead" class="mt-0.5 text-sm text-muted">{{ lead }}</p>

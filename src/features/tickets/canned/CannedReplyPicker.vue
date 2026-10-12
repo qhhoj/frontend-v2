@@ -53,7 +53,7 @@ function choose(reply: CannedReply) {
       class="flex w-[min(24rem,calc(100vw-4rem))] flex-col gap-3"
     >
       <p :id="titleId" class="font-display text-lg font-bold">{{ $t('cannedPicker.title') }}</p>
-      <p class="text-[13px] text-muted">{{ $t('cannedPicker.hint') }}</p>
+      <p class="text-meta text-muted">{{ $t('cannedPicker.hint') }}</p>
       <QueryState
         :loading="query.isLoading.value"
         :error="query.error.value"

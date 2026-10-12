@@ -82,7 +82,7 @@ const scoreHeaderKey = computed(() => {
         }}
       </caption>
       <thead>
-        <tr class="text-center text-[13px] text-muted">
+        <tr class="text-center text-meta text-muted">
           <th scope="col" class="w-14 px-3 py-4 text-right font-medium">
             <RankColumnHeader :label="$t('ranking.columns.rank')" />
           </th>
@@ -123,12 +123,12 @@ const scoreHeaderKey = computed(() => {
               <UserLink :username="row.user.username" :rating="row.user.rating" />
               <span
                 v-if="row.user.id === viewerId"
-                class="shrink-0 rounded-pill bg-accent-soft px-2 py-0.5 text-[11px] text-accent-soft-text"
+                class="shrink-0 rounded-pill bg-accent-soft px-2 py-0.5 text-tiny text-accent-soft-text"
                 >{{ $t('common.you') }}</span
               >
               <span
                 v-if="row.isDisqualified"
-                class="shrink-0 rounded-pill bg-verdict-wa-bg px-2 py-0.5 text-[11px] text-verdict-wa"
+                class="shrink-0 rounded-pill bg-verdict-wa-bg px-2 py-0.5 text-tiny text-verdict-wa"
                 >{{ $t('ranking.disqualified') }}</span
               >
             </span>
@@ -142,7 +142,7 @@ const scoreHeaderKey = computed(() => {
             }}</template>
             <small
               v-if="hasCombinedScore && !row.isDisqualified"
-              class="block text-[11px] font-medium text-muted"
+              class="block text-tiny font-medium text-muted"
               >{{ formatCumtime(context.formatName, row.cumtime) }}</small
             >
           </td>
@@ -156,7 +156,7 @@ const scoreHeaderKey = computed(() => {
   </ScrollRegion>
   <ul
     v-if="penalty"
-    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-[13px] text-muted"
+    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
   >
     <li class="flex items-center gap-1.5">
       <span
@@ -170,7 +170,7 @@ const scoreHeaderKey = computed(() => {
   </ul>
   <ul
     v-else
-    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-[13px] text-muted"
+    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
   >
     <li v-if="context.showsTime" class="flex items-center gap-1.5">
       <span

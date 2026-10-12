@@ -108,7 +108,7 @@ const CHIP =
           <p
             v-if="frozenAt"
             data-testid="best-frozen"
-            class="flex items-center gap-2.5 bg-tag-4-bg px-5 py-3 text-[13px] font-semibold text-tag-4"
+            class="flex items-center gap-2.5 bg-tag-4-bg px-5 py-3 text-meta font-semibold text-tag-4"
           >
             <TriangleAlert class="size-4 shrink-0" aria-hidden="true" />{{
               $t('contests.best.frozen', { time: formatDateTime(frozenAt, locale.locale) })
@@ -125,7 +125,7 @@ const CHIP =
             <NumberedPager :meta="list.meta" :label="$t('submissions.best.pager')" />
           </template>
           <p
-            class="flex items-center gap-2.5 border-t border-line px-5 py-2.5 text-[12.5px] text-muted"
+            class="flex items-center gap-2.5 border-t border-line px-5 py-2.5 text-caption text-muted"
           >
             <Info class="size-4 shrink-0" aria-hidden="true" />{{ $t('contests.best.rule') }}
           </p>

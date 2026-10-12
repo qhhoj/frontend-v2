@@ -44,13 +44,13 @@ const freezeClock = computed(() => {
     />
     <InlineBit v-else-if="target?.kind === 'end'" kind="contest" />
     <div v-if="target" class="flex-1">
-      <p class="text-[12px] font-semibold tracking-wider text-muted uppercase">
+      <p class="text-caption font-semibold tracking-wider text-muted uppercase">
         {{ $t(LABELS[target.kind]) }}
       </p>
       <p class="font-mono text-3xl leading-tight font-semibold md:text-5xl">
         <CountdownTimer :key="target.at" :until="target.at" />
       </p>
-      <p class="text-[13px] text-muted">
+      <p class="text-meta text-muted">
         {{ $t(CAPTIONS[target.kind], { time: instantLabel(target.at) }) }}
       </p>
     </div>
@@ -59,7 +59,7 @@ const freezeClock = computed(() => {
     </p>
     <p
       v-if="target?.kind === 'end' && freezeClock"
-      class="text-right text-[12px] text-muted md:hidden"
+      class="text-right text-caption text-muted md:hidden"
     >
       {{ $t('contests.detail.freeze')
       }}<b class="block font-mono text-verdict-tle">{{ freezeClock }}</b>

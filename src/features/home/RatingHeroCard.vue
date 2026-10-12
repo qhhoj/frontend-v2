@@ -89,8 +89,8 @@ const tiles = computed(() =>
             data-skeleton-region="tile"
             class="min-w-0 rounded-tile bg-surface-strong p-4"
           >
-            <p class="text-[13px]"><SkeletonBlock text class="w-14" /></p>
-            <p class="font-mono text-[26px]"><SkeletonBlock text class="w-20" /></p>
+            <p class="text-meta"><SkeletonBlock text class="w-14" /></p>
+            <p class="font-mono text-stat"><SkeletonBlock text class="w-20" /></p>
           </div>
         </div>
       </template>
@@ -173,8 +173,8 @@ const tiles = computed(() =>
             :key="tile.labelKey"
             class="min-w-0 rounded-tile bg-surface-strong p-4"
           >
-            <dt class="text-[13px] text-muted">{{ $t(tile.labelKey) }}</dt>
-            <dd class="m-0 font-mono text-[26px] font-semibold tabular-nums">{{ tile.value }}</dd>
+            <dt class="text-meta text-muted">{{ $t(tile.labelKey) }}</dt>
+            <dd class="m-0 font-mono text-stat font-semibold tabular-nums">{{ tile.value }}</dd>
           </div>
         </dl>
       </template>

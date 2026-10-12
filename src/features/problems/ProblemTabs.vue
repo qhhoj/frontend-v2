@@ -44,7 +44,7 @@ async function onKeydown(event: KeyboardEvent, index: number) {
       :aria-selected="tab.id === modelValue"
       :aria-controls="`problem-panel-${tab.id}`"
       :tabindex="tab.id === modelValue ? 0 : -1"
-      class="min-h-11 rounded-pill px-5 text-[15px] font-semibold"
+      class="min-h-11 rounded-pill px-5 text-sm font-semibold"
       :class="
         tab.id === modelValue
           ? 'bg-accent-soft text-accent-soft-text'
@@ -54,7 +54,7 @@ async function onKeydown(event: KeyboardEvent, index: number) {
       @keydown="onKeydown($event, index)"
     >
       {{ $t(tab.labelKey)
-      }}<span v-if="tab.count !== undefined" class="ml-2 font-mono text-[13px] tabular-nums">{{
+      }}<span v-if="tab.count !== undefined" class="ml-2 font-mono text-meta tabular-nums">{{
         formatNumber(tab.count, locale.locale)
       }}</span>
     </button>

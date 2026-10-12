@@ -19,7 +19,7 @@ const NUMBER_COLUMNS = [
 
 <template>
   <thead>
-    <tr class="bg-surface-strong text-left text-[13px] text-muted">
+    <tr class="bg-surface-strong text-left text-meta text-muted">
       <th scope="col" :class="`${CELL} pl-[22px]`">
         <span v-if="interactive" class="sr-only">{{ $t('problems.columns.status') }}</span>
       </th>

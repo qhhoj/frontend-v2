@@ -63,7 +63,7 @@ const timeLeftOf = (contest: ContestListItem) =>
               >{{ contest.name }}</RouterLink
             >
           </h3>
-          <p class="font-mono text-[13px] text-muted">
+          <p class="font-mono text-meta text-muted">
             {{
               $t('home.anon.contestants', {
                 key: contest.key,

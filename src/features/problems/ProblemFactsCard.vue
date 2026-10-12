@@ -70,17 +70,14 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
   <GlassCard class="rounded-panel p-4" data-testid="problem-facts">
     <dl data-testid="limits" class="grid grid-cols-2 gap-x-3 gap-y-3.5">
       <div v-for="fact in facts" :key="fact.key">
-        <dt class="text-[13px] text-muted">{{ $t(fact.label) }}</dt>
-        <dd class="mt-0.5 text-[17px] font-bold tabular-nums" :class="fact.tone">
+        <dt class="text-meta text-muted">{{ $t(fact.label) }}</dt>
+        <dd class="mt-0.5 text-title font-bold tabular-nums" :class="fact.tone">
           {{ fact.value }}
         </dd>
       </div>
       <div v-if="isSignedIn" data-testid="viewer-status">
-        <dt class="text-[13px] text-muted">{{ $t('problem.rail.facts.status') }}</dt>
-        <dd
-          class="mt-0.5 flex min-h-6 items-center gap-1.5 text-[15px] font-bold"
-          :class="status.tone"
-        >
+        <dt class="text-meta text-muted">{{ $t('problem.rail.facts.status') }}</dt>
+        <dd class="mt-0.5 flex min-h-6 items-center gap-1.5 text-sm font-bold" :class="status.tone">
           {{ $t(status.key) }}
           <StateBit v-if="problem.viewerStatus === 'solved'" variant="rankUp" size="tiny" />
         </dd>
@@ -91,8 +88,8 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
         :class="{ 'col-span-2': item.span }"
         :data-testid="`problem-io-${item.key}`"
       >
-        <dt class="text-[13px] text-muted">{{ $t(item.label) }}</dt>
-        <dd class="mt-0.5 break-all text-[17px] font-bold">
+        <dt class="text-meta text-muted">{{ $t(item.label) }}</dt>
+        <dd class="mt-0.5 break-all text-title font-bold">
           {{ item.text ?? $t('problem.rail.facts.stdio') }}
         </dd>
       </div>
@@ -111,7 +108,7 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
         <li
           v-for="type in problem.types"
           :key="type.id"
-          class="rounded-pill bg-surface-strong px-2.5 py-1 text-[13px] text-muted"
+          class="rounded-pill bg-surface-strong px-2.5 py-1 text-meta text-muted"
         >
           {{ problemTypeLabel(type) }}
         </li>

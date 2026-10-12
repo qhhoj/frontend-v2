@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ badgeKey: string | null }>();
 const TONE =
-  'inline-flex min-h-6.5 items-center rounded-pill bg-accent-soft px-2.5 text-[12.5px] font-semibold whitespace-nowrap text-accent-soft-text';
+  'inline-flex min-h-6.5 items-center rounded-pill bg-accent-soft px-2.5 text-caption font-semibold whitespace-nowrap text-accent-soft-text';
 </script>
 
 <template>

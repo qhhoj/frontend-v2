@@ -22,7 +22,7 @@ defineProps<{ tabs: PillTab[]; label: string }>();
 const LINK =
   'inline-flex min-h-11 items-center gap-2 rounded-pill border border-transparent px-4 text-sm font-medium whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
 const BADGE =
-  'inline-flex min-w-5 items-center justify-center rounded-pill px-1.5 text-[11px] font-semibold tabular-nums';
+  'inline-flex min-w-5 items-center justify-center rounded-pill px-1.5 text-tiny font-semibold tabular-nums';
 const BADGE_TONE = {
   neutral: 'bg-surface-hover text-content',
   accent: 'bg-accent text-on-accent',

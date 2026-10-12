@@ -8,7 +8,7 @@ const LINE_WIDTHS = ['w-1/3', 'w-1/2', 'w-2/5', 'w-3/5', 'w-1/4'] as const;
 </script>
 
 <template>
-  <div class="bg-surface-strong py-4 font-mono text-[13px] leading-relaxed">
+  <div class="bg-surface-strong py-4 font-mono text-meta leading-relaxed">
     <div v-for="line in LINE_COUNT" :key="line" data-skeleton-region="source-line" class="px-4">
       <SkeletonBlock text :class="LINE_WIDTHS[line % LINE_WIDTHS.length]" />
     </div>

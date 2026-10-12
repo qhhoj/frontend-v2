@@ -58,7 +58,7 @@ const percent = (fraction: number) => `${(fraction * 100).toFixed(2)}%`;
         :style="{ left: percent(point.position) }"
       />
     </div>
-    <ol class="m-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 text-[13px]">
+    <ol class="m-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 text-meta">
       <li v-for="point in timeline.points" :key="point.key" class="flex items-center gap-1.5">
         <span aria-hidden="true" class="size-2 shrink-0 rounded-full" :class="DOT[point.key]" />
         <span class="text-muted">{{ $t(`admin.contests.general.timeline.${point.key}`) }}</span>

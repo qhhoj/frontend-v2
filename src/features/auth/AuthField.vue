@@ -71,7 +71,7 @@ const border = computed(() =>
         :placeholder="placeholder"
         :aria-invalid="invalid ? 'true' : undefined"
         :aria-describedby="describedIds"
-        class="h-12 w-full min-w-0 rounded-row border bg-surface-solid px-3.5 text-[15px] text-content placeholder:text-muted"
+        class="h-12 w-full min-w-0 rounded-row border bg-surface-solid px-3.5 text-base text-content placeholder:text-muted"
         :class="[border, (isPassword || $slots.trailing) && 'pr-12']"
       />
       <button
@@ -93,7 +93,7 @@ const border = computed(() =>
       </span>
     </div>
     <slot />
-    <p v-if="hint" :id="hintId" class="text-[13px] text-muted">{{ hint }}</p>
+    <p v-if="hint" :id="hintId" class="text-meta text-muted">{{ hint }}</p>
     <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

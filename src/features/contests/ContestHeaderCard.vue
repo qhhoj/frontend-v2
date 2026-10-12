@@ -56,7 +56,7 @@ const phoneLine = computed(
           />
           {{ contest.name }}
         </h1>
-        <p class="font-mono text-[12px] text-muted md:hidden">{{ phoneLine }}</p>
+        <p class="font-mono text-caption text-muted md:hidden">{{ phoneLine }}</p>
         <p v-if="contest.summary" class="mt-1 hidden text-muted md:block">
           {{ contest.summary }}
         </p>

@@ -31,7 +31,7 @@ const name = useId();
           :stroke-width="2"
         />
         <span>{{ sample || $t('admin.contestTags.sample') }}</span>
-        <span class="font-mono text-[11px] font-normal">{{ key }}</span>
+        <span class="font-mono text-tiny font-normal">{{ key }}</span>
       </label>
     </div>
   </fieldset>

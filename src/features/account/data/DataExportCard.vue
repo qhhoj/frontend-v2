@@ -80,7 +80,7 @@ async function request() {
       <InlineBit kind="crown" />
       <div class="min-w-0 flex-1">
         <strong class="font-mono break-all">{{ username }}-data.zip</strong>
-        <p class="text-[13px] text-muted">
+        <p class="text-meta text-muted">
           {{
             $t('settings.data.fileFacts', {
               size: formatFileSize(file.size),
@@ -92,7 +92,7 @@ async function request() {
       <a :href="DATA_EXPORT_DOWNLOAD_URL" download :class="BUTTON.primary">
         {{ $t('settings.data.download') }}
       </a>
-      <p class="w-full text-[13px] text-muted">
+      <p class="w-full text-meta text-muted">
         {{
           $t('settings.data.expires', {
             time: when(file.expiresAt),
@@ -127,7 +127,7 @@ async function request() {
       >
         {{ buttonText }}
       </button>
-      <p v-if="ruleText" :id="ruleId" class="text-[13px] text-muted">{{ ruleText }}</p>
+      <p v-if="ruleText" :id="ruleId" class="text-meta text-muted">{{ ruleText }}</p>
     </div>
   </SettingsCard>
 </template>

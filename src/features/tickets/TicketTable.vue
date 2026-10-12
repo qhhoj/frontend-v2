@@ -18,14 +18,14 @@ const now = useNow(60_000);
 
 <template>
   <div class="overflow-x-auto">
-    <table class="w-full border-collapse text-[15px]">
+    <table class="w-full border-collapse text-sm">
       <caption class="sr-only">
         {{
           $t('tickets.title')
         }}
       </caption>
       <thead>
-        <tr class="text-left text-[13px] text-muted">
+        <tr class="text-left text-meta text-muted">
           <th scope="col" :class="TICKET_COLUMNS.title.header">
             {{ $t('tickets.columns.title') }}
           </th>

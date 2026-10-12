@@ -108,7 +108,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
-      <table class="w-full border-collapse text-[15px]" :class="columnKeys ? '' : FULL_TABLE_CLASS">
+      <table class="w-full border-collapse text-sm" :class="columnKeys ? '' : FULL_TABLE_CLASS">
         <caption class="sr-only">
           {{
             $t('submissions.listName')
@@ -183,7 +183,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               :class="[
                 bodyCell,
                 tierOf('cost'),
-                'text-right font-mono text-[13px] whitespace-nowrap text-muted tabular-nums',
+                'text-right font-mono text-meta whitespace-nowrap text-muted tabular-nums',
               ]"
             >
               {{ costText(row) }}

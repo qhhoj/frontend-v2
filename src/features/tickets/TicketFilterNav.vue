@@ -33,7 +33,7 @@ const linkTo = (patch: Partial<TicketListQuery>) => ({
         {{ $t('tickets.scope.own') }}
         <span
           v-if="filters.own && total !== undefined"
-          class="inline-flex min-w-5 items-center justify-center rounded-pill bg-accent px-1.5 text-[11px] text-on-accent"
+          class="inline-flex min-w-5 items-center justify-center rounded-pill bg-accent px-1.5 text-tiny text-on-accent"
           >{{ total }}</span
         >
       </RouterLink>

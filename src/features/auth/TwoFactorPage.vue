@@ -52,7 +52,7 @@ const failed = computed(
     Boolean(summary.value) || view.value === 'keyUnsupported' || view.value === 'sessionChanged',
 );
 const SECONDARY =
-  'flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-[15px] font-semibold hover:bg-surface-hover';
+  'flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-sm font-semibold hover:bg-surface-hover';
 const LINK = 'font-semibold text-accent-text underline';
 
 /** Any accepted factor flips the server session to authenticated; reload it, then leave like a password sign-in. */

@@ -84,7 +84,7 @@ const rowAttrs = (ticket: TicketListItem) => ({
         @click="selectTicket(row.id)"
       >
         <span class="font-semibold break-words">{{ row.title }}</span>
-        <span class="flex items-center gap-1 text-[13px] text-muted">
+        <span class="flex items-center gap-1 text-meta text-muted">
           {{ byline(row) }}
           <template v-if="row.isContributive">
             <Star aria-hidden="true" class="size-3.5 text-accent-text" :stroke-width="1.75" />

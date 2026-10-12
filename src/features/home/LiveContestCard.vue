@@ -16,7 +16,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
       <template #skeleton>
         <div class="flex items-start gap-4">
           <div class="min-w-0 flex-1">
-            <p data-skeleton-region="label" class="text-[13px] font-semibold">
+            <p data-skeleton-region="label" class="text-meta font-semibold">
               <SkeletonBlock text class="w-28" />
             </p>
             <h2 data-skeleton-region="name" class="mt-2 font-display text-xl font-semibold">
@@ -35,7 +35,7 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
       <template v-if="contest">
         <div class="flex items-start gap-4">
           <div class="min-w-0 flex-1">
-            <p class="flex items-center gap-2 text-[13px] font-semibold text-accent-text">
+            <p class="flex items-center gap-2 text-meta font-semibold text-accent-text">
               <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
               {{ $t('home.liveContest') }}
             </p>

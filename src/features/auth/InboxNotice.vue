@@ -31,7 +31,7 @@ async function resendMail() {
     <button
       type="button"
       :aria-disabled="coolingDown || pending ? 'true' : undefined"
-      class="flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-[15px] font-semibold text-content hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted"
+      class="flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-sm font-semibold text-content hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted"
       @click="resendMail"
     >
       <RotateCw aria-hidden="true" class="size-[18px]" />

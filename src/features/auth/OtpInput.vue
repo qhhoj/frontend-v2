@@ -89,7 +89,7 @@ defineExpose({ focus: () => boxes[firstEmptyBox()]?.focus() });
       :readonly="props.readonly"
       :aria-invalid="props.invalid ? 'true' : undefined"
       :aria-describedby="props.describedBy"
-      class="mx-auto h-[60px] w-full max-w-[52px] min-w-0 rounded-row border border-line-strong bg-surface-solid aria-[invalid=true]:border-negative text-center font-mono text-[26px] font-semibold text-content tabular-nums"
+      class="mx-auto h-[60px] w-full max-w-[52px] min-w-0 rounded-row border border-line-strong bg-surface-solid aria-[invalid=true]:border-negative text-center font-mono text-stat font-semibold text-content tabular-nums"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
       @paste.prevent="onPaste(index, $event)"

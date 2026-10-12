@@ -59,7 +59,7 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
         {{ $t('notFound.problems') }}
       </RouterLink>
     </div>
-    <p data-testid="requested-path" class="max-w-full font-mono text-[13px] break-all text-muted">
+    <p data-testid="requested-path" class="max-w-full font-mono text-meta break-all text-muted">
       {{ route.path }}
     </p>
   </section>

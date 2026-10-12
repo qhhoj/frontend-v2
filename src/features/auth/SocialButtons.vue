@@ -18,13 +18,13 @@ const ROW = 'grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-2';
     data-testid="social-skeleton"
     class="flex flex-col gap-4"
   >
-    <div class="text-center text-[13px]"><SkeletonBlock text class="w-32" /></div>
+    <div class="text-center text-meta"><SkeletonBlock text class="w-32" /></div>
     <div :class="ROW">
       <SkeletonBlock v-for="placeholder in 2" :key="placeholder" pill class="h-11" />
     </div>
   </div>
   <div v-else-if="providers?.length" data-testid="social-buttons" class="flex flex-col gap-4">
-    <div class="flex items-center gap-3 text-[13px] text-muted">
+    <div class="flex items-center gap-3 text-meta text-muted">
       <span aria-hidden="true" class="h-px flex-1 bg-line" />
       {{ $t('auth.social.or') }}
       <span aria-hidden="true" class="h-px flex-1 bg-line" />

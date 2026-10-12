@@ -89,12 +89,12 @@ const isHidden = computed(
   <GlassCard as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold">{{ $t('submission.cases.title') }}</h2>
-      <span v-if="running" class="text-[13px] text-muted">{{ $t('submission.liveUpdates') }}</span>
+      <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
-      <p class="text-[13px] text-muted">{{ $t('submission.cases.compileLog') }}</p>
+      <p class="text-meta text-muted">{{ $t('submission.cases.compileLog') }}</p>
       <pre
-        class="mt-1.5 max-h-96 overflow-auto rounded-tile bg-surface-strong p-4 font-mono text-[13px] leading-relaxed whitespace-pre"
+        class="mt-1.5 max-h-96 overflow-auto rounded-tile bg-surface-strong p-4 font-mono text-meta leading-relaxed whitespace-pre"
         >{{ compileError }}</pre>
     </div>
     <p v-if="isHidden" class="px-6 pb-6 text-muted sm:px-8">{{ $t('submission.casesHidden') }}</p>
@@ -105,14 +105,14 @@ const isHidden = computed(
       :aria-label="$t('submission.cases.scrollRegion')"
       class="overflow-x-auto focus-visible:-outline-offset-2"
     >
-      <table class="w-full min-w-[560px] border-collapse text-[15px]">
+      <table class="w-full min-w-[560px] border-collapse text-sm">
         <caption class="sr-only">
           {{
             $t('submission.cases.title')
           }}
         </caption>
         <thead>
-          <tr class="text-left text-[13px] text-muted">
+          <tr class="text-left text-meta text-muted">
             <th
               v-for="column in COLUMN_KEYS"
               :key="column"
@@ -136,9 +136,9 @@ const isHidden = computed(
             <tr v-if="row.details.length">
               <td colspan="5" class="px-6 pb-3">
                 <div v-for="detail in row.details" :key="detail.field" class="mt-1.5">
-                  <p class="text-[13px] text-muted">{{ detail.label }}</p>
+                  <p class="text-meta text-muted">{{ detail.label }}</p>
                   <pre
-                    class="mt-1 max-h-48 overflow-auto rounded-tile bg-surface-strong p-3 font-mono text-[13px] whitespace-pre-wrap [overflow-wrap:anywhere]"
+                    class="mt-1 max-h-48 overflow-auto rounded-tile bg-surface-strong p-3 font-mono text-meta whitespace-pre-wrap [overflow-wrap:anywhere]"
                     >{{ detail.text }}</pre>
                 </div>
               </td>

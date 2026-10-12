@@ -13,7 +13,7 @@ import UserMenu from './UserMenu.vue';
   >
     <RouterLink
       to="/"
-      class="flex min-h-11 shrink-0 items-center gap-2.5 font-display text-[17px] font-bold text-accent-text"
+      class="flex min-h-11 shrink-0 items-center gap-2.5 font-display text-title font-bold text-accent-text"
     >
       <span aria-hidden="true" class="bg-gradient-accent inline-block size-[28px] rounded-full" />
       {{ $t('app.name') }}

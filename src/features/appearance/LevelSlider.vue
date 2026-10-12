@@ -18,9 +18,9 @@ const emit = defineEmits<{ input: [value: number]; commit: [] }>();
   <div>
     <div class="flex items-baseline justify-between">
       <label :for="id" class="font-semibold">{{ label }}</label>
-      <span class="font-mono text-[13px] text-muted">{{ readout }}</span>
+      <span class="font-mono text-meta text-muted">{{ readout }}</span>
     </div>
-    <p v-if="help" class="mt-1 text-[13px] text-muted">{{ help }}</p>
+    <p v-if="help" class="mt-1 text-meta text-muted">{{ help }}</p>
     <input
       :id="id"
       type="range"

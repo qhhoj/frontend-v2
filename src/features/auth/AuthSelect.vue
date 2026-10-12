@@ -43,7 +43,7 @@ const describedIds = computed(
         :name="name"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedIds"
-        class="h-12 w-full min-w-0 appearance-none rounded-row border bg-surface-solid pr-10 pl-3.5 text-[15px] text-content"
+        class="h-12 w-full min-w-0 appearance-none rounded-row border bg-surface-solid pr-10 pl-3.5 text-base text-content"
         :class="error ? 'border-negative' : 'border-line-strong'"
       >
         <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
@@ -54,7 +54,7 @@ const describedIds = computed(
         class="pointer-events-none absolute top-1/2 right-3.5 size-[18px] -translate-y-1/2 text-muted"
       />
     </span>
-    <p v-if="hint" :id="hintId" class="text-[13px] leading-normal text-muted">{{ hint }}</p>
+    <p v-if="hint" :id="hintId" class="text-meta leading-normal text-muted">{{ hint }}</p>
     <AuthFieldError v-if="error" :id="errorId" :message="error" />
   </div>
 </template>

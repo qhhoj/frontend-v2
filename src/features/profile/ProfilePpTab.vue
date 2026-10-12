@@ -69,9 +69,9 @@ const verdictFor = (result: string | null): Verdict =>
       <template v-else>
         <GlassCard as="div" class="overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full border-collapse text-[15px]">
+            <table class="w-full border-collapse text-sm">
               <thead>
-                <tr class="text-[13px] text-muted">
+                <tr class="text-meta text-muted">
                   <th scope="col" :class="HEADER_RIGHT">
                     <RankColumnHeader :label="$t('profileTabs.columns.rank')" />
                   </th>
@@ -134,7 +134,7 @@ const verdictFor = (result: string | null): Verdict =>
                     >
                       <span class="flex items-center gap-2">
                         <VerdictLabel :verdict="verdictFor(entry.submission.result)" short />
-                        <span class="font-mono text-[13px] tabular-nums">
+                        <span class="font-mono text-meta tabular-nums">
                           {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
                         </span>
                       </span>

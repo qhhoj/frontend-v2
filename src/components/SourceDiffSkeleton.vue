@@ -14,7 +14,7 @@ const LINE_WIDTHS = ['w-1/3', 'w-1/2', 'w-2/5', 'w-3/5', 'w-1/4'] as const;
       <SkeletonBlock pill class="h-7 w-12 sm:w-20" />
       <SkeletonBlock pill class="h-7 w-28 sm:w-36" />
     </div>
-    <div class="bg-surface-strong font-mono text-[13px] leading-relaxed">
+    <div class="bg-surface-strong font-mono text-meta leading-relaxed">
       <div
         v-for="line in LINE_COUNT"
         :key="line"

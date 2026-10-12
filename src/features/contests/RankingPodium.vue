@@ -59,7 +59,7 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
           :title="row.user.username"
           class="block truncate text-lg"
         />
-        <p class="truncate font-mono text-[13px] text-muted">
+        <p class="truncate font-mono text-meta text-muted">
           {{
             isPenaltyFormat(context.formatName)
               ? `${$t('ranking.solvedCount', { count: solved(row) }, solved(row))} · ${formatCumtime(context.formatName, row.cumtime)}`
