@@ -6,14 +6,9 @@ import {
   toRejudgeBody,
 } from './rejudge-filter';
 
-const ID = '0198c3a1-0000-7000-8000-000000000001';
-
 describe('rejudge filter', () => {
-  it('accepts an empty filter (site-wide) and refuses ids that are not submission ids', () => {
+  it('accepts an empty filter (site-wide)', () => {
     expect(checkRejudgeFilter(emptyRejudgeFilter())).toEqual({});
-    expect(Object.keys(checkRejudgeFilter({ ...emptyRejudgeFilter(), idFrom: '128' }))).toEqual([
-      'idFrom',
-    ]);
   });
 
   it('refuses a date range that ends before it starts', () => {
@@ -32,7 +27,6 @@ describe('rejudge filter', () => {
     const body = toRejudgeBody({
       ...emptyRejudgeFilter(),
       contest: 'voi26',
-      idFrom: ID,
       dateFrom: '2026-10-01T01:00:00.000Z',
       languageIds: ['l1'],
       results: ['WA', 'TLE'],
@@ -40,7 +34,6 @@ describe('rejudge filter', () => {
     });
     expect(body).toEqual({
       contest: 'voi26',
-      idFrom: ID,
       dateFrom: '2026-10-01T01:00:00.000Z',
       languages: ['l1'],
       results: ['WA', 'TLE'],
@@ -49,7 +42,14 @@ describe('rejudge filter', () => {
   });
 
   it('prefills only the linkable text fields from the URL', () => {
-    const filter = filterFromQuery({ contest: 'voi26', problem: 'a', force: 'true', user: ['x'] });
+    const filter = filterFromQuery({
+      contest: 'voi26',
+      problem: 'a',
+      force: 'true',
+      user: ['x'],
+      idFrom: 'old-link',
+    });
     expect(filter).toMatchObject({ contest: 'voi26', problem: 'a', user: '', force: false });
+    expect(filter).not.toHaveProperty('idFrom');
   });
 });
