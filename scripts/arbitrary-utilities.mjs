@@ -28,7 +28,8 @@ export const ALLOWED = {
   'features/problems/ProblemTable.vue': ['rounded-[3px]'],
   'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
   'features/not-found/NotFoundPage.vue': ['rounded-[4px]'],
-  'features/admin/ui/AdminFilterTabs.vue': ['rounded-[1.125rem]'],
+  // The admin filter strip's frame: it wraps to two rows on a phone, where a pill radius would read as a blob.
+  'components/ui/SegmentedControl.vue': ['rounded-[1.125rem]'],
 };
 
 /** The arbitrary size, radius and z-index classes in the string literals of one source line; comment lines are ignored. */

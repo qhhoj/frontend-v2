@@ -1,4 +1,6 @@
 <script setup lang="ts" generic="Value extends string | number">
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+
 defineProps<{
   label: string;
   options: ReadonlyArray<{ value: Value; label: string }>;
@@ -9,22 +11,11 @@ defineEmits<{ pick: [value: Value] }>();
 </script>
 
 <template>
-  <div role="group" :aria-label="label" class="flex gap-1 rounded-pill bg-surface-strong p-1">
-    <button
-      v-for="option in options"
-      :key="option.value"
-      type="button"
-      :disabled="disabled"
-      :aria-pressed="option.value === selected"
-      class="min-h-11 flex-1 rounded-pill border px-2 text-sm leading-tight disabled:cursor-not-allowed"
-      :class="
-        option.value === selected
-          ? 'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content'
-          : 'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong'
-      "
-      @click="$emit('pick', option.value)"
-    >
-      {{ option.label }}
-    </button>
-  </div>
+  <SegmentedControl
+    :label="label"
+    :options="options"
+    :model-value="selected"
+    :disabled="disabled"
+    @update:model-value="(value) => $emit('pick', value as Value)"
+  />
 </template>

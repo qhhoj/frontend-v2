@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ChevronLeft, Ellipsis } from 'lucide-vue-next';
+import { Ellipsis } from 'lucide-vue-next';
 import Popover from 'primevue/popover';
 import { computed, ref, useSlots } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { navCrumbsOf } from '../shell/admin-nav';
 import type { AdminCrumb } from '../shell/admin-nav';
 
 /**
- * Every admin page's header: breadcrumb (from `md`), H1, an optional one-line lead and the actions. One primary action per
- * page goes in `#actions` with the secondary ones; a third action or more goes in `#overflow`, behind a "⋯ Thêm" button.
- * Below `md` the breadcrumb becomes one back link: `back`, else the nearest crumb that links somewhere.
+ * Every admin page's header: `PageHeader` at the compact title size, its breadcrumb led by the nav's crumbs. One primary
+ * action per page goes in `#actions` with the secondary ones; a third action or more goes in `#overflow`, behind a
+ * "⋯ Thêm" button. Below `md` the breadcrumb becomes one back link: `back`, else the nearest crumb that links somewhere.
  * `#meta` sits under the title (chips, a code, a status line).
  */
 const props = defineProps<{
@@ -29,10 +30,13 @@ const route = useRoute();
 const { t } = useI18n();
 const crumbs = computed(() => [...navCrumbsOf(route.path, t), ...(props.trail ?? [])]);
 const backLink = computed(() => {
-  if (props.back) return props.back;
-  const linked = crumbs.value.filter((crumb) => crumb.to);
-  const last = linked.at(-1);
-  return last?.to ? { to: last.to, label: last.label } : null;
+  const target = props.back ?? crumbs.value.filter((crumb) => crumb.to).at(-1);
+  if (!target?.to) return null;
+  return {
+    to: target.to,
+    label: target.label,
+    ariaLabel: t('admin.shell.backTo', { label: target.label }),
+  };
 });
 
 const overflowMenu = ref<InstanceType<typeof Popover> | null>(null);
@@ -40,44 +44,9 @@ const closeOverflow = () => overflowMenu.value?.hide();
 </script>
 
 <template>
-  <header class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end md:gap-4">
-    <div class="min-w-0 md:min-w-[min(100%,16rem)] md:flex-1">
-      <nav
-        v-if="crumbs.length > 0"
-        :aria-label="$t('common.breadcrumb')"
-        class="hidden flex-wrap items-center gap-1.5 text-meta text-muted md:flex"
-      >
-        <template v-for="(crumb, index) in crumbs" :key="index">
-          <span v-if="index > 0" aria-hidden="true">/</span>
-          <RouterLink
-            v-if="crumb.to"
-            :to="crumb.to"
-            class="hover:text-content hover:underline"
-            :class="{ 'font-mono': crumb.mono }"
-            >{{ crumb.label }}</RouterLink
-          >
-          <span v-else :class="{ 'font-mono': crumb.mono }">{{ crumb.label }}</span>
-        </template>
-      </nav>
-      <RouterLink
-        v-if="backLink"
-        :to="backLink.to!"
-        :aria-label="$t('admin.shell.backTo', { label: backLink.label })"
-        class="-ml-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-text md:hidden"
-      >
-        <ChevronLeft aria-hidden="true" class="size-4" />{{ backLink.label }}
-      </RouterLink>
-      <h1 class="font-display text-xl leading-tight font-semibold md:text-2xl">{{ title }}</h1>
-      <div v-if="slots.meta" class="mt-1 flex flex-wrap items-center gap-2 text-meta text-muted">
-        <slot name="meta" />
-      </div>
-      <p v-if="lead" class="mt-0.5 text-sm text-muted">{{ lead }}</p>
-    </div>
-    <div
-      v-if="slots.actions || slots.overflow"
-      data-testid="admin-page-actions"
-      class="flex flex-wrap items-center gap-2"
-    >
+  <PageHeader :title="title" :lead="lead" :crumbs="crumbs" :back="backLink" size="compact">
+    <template v-if="slots.meta" #meta><slot name="meta" /></template>
+    <template v-if="slots.actions || slots.overflow" #actions>
       <slot name="actions" />
       <template v-if="slots.overflow">
         <button
@@ -94,6 +63,6 @@ const closeOverflow = () => overflowMenu.value?.hide();
           </div>
         </Popover>
       </template>
-    </div>
-  </header>
+    </template>
+  </PageHeader>
 </template>
