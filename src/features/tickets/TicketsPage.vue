@@ -7,6 +7,8 @@ import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import StaffTicketFilters from './StaffTicketFilters.vue';
@@ -35,22 +37,17 @@ const isDefaultList = computed(
     !filters.value.user.length &&
     !filters.value.assignee.length,
 );
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 </script>
 
 <template>
   <div class="page-column">
-    <header class="flex flex-wrap items-end justify-between gap-4 pt-3 pb-1">
-      <div>
-        <h1 class="font-display text-4xl font-bold tracking-tight sm:text-[44px]">
-          {{ $t('tickets.title') }}
-        </h1>
-        <p class="mt-2 text-muted">{{ $t('tickets.lead') }}</p>
-      </div>
-      <RouterLink :to="{ name: 'ticket-new' }" :class="`${BUTTON} bg-accent text-on-accent`">
-        {{ $t('tickets.newTicket') }}
-      </RouterLink>
-    </header>
+    <PageHeader :title="$t('tickets.title')" :lead="$t('tickets.lead')">
+      <template #actions>
+        <AppButton tone="primary" :to="{ name: 'ticket-new' }">
+          {{ $t('tickets.newTicket') }}
+        </AppButton>
+      </template>
+    </PageHeader>
     <TicketAlertsStrip />
     <TicketFilterNav :filters="filters" :total="data?.meta.total" />
     <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
@@ -65,12 +62,9 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
           :title="$t('tickets.signInTitle')"
           :body="$t('tickets.signInBody')"
         >
-          <RouterLink
-            :to="{ name: 'login', query: { redirect: route.fullPath } }"
-            :class="`${BUTTON} bg-accent text-on-accent`"
-          >
+          <AppButton tone="primary" :to="{ name: 'login', query: { redirect: route.fullPath } }">
             {{ $t('tickets.signIn') }}
-          </RouterLink>
+          </AppButton>
         </StatePanel>
         <!-- A failed refresh keeps the rows already shown: the panel sits above them. -->
         <StatePanel
@@ -79,13 +73,7 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
           :title="$t('tickets.errorTitle')"
           :body="$t('tickets.errorBody')"
         >
-          <button
-            type="button"
-            :class="`${BUTTON} border border-line hover:bg-surface-hover`"
-            @click="refetch()"
-          >
-            {{ $t('tickets.retry') }}
-          </button>
+          <AppButton @click="refetch()">{{ $t('tickets.retry') }}</AppButton>
         </StatePanel>
         <template v-if="data && !isSignedOut">
           <StatePanel
@@ -94,9 +82,9 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
             :title="$t('tickets.emptyTitle')"
             :body="$t('tickets.emptyBody')"
           >
-            <RouterLink :to="{ name: 'ticket-new' }" :class="`${BUTTON} bg-accent text-on-accent`">
+            <AppButton tone="primary" :to="{ name: 'ticket-new' }">
               {{ $t('tickets.newTicket') }}
-            </RouterLink>
+            </AppButton>
           </StatePanel>
           <EmptyState v-else-if="!tickets.length">{{ $t('tickets.noMatch') }}</EmptyState>
           <template v-else>

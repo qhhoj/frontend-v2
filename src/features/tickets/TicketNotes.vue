@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
 import GlassCard from '@/components/GlassCard.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { useTicketPatch } from './use-ticket-patch';
 
 /** Notes: everyone who reads the ticket sees them; assignees and staff (`can.editNotes`) edit them. */
@@ -17,7 +18,6 @@ watch(
 );
 const { isPending, failureKey, patch } = useTicketPatch(props.ticket.id);
 const save = () => patch({ notes: draft.value }, () => (isEdited.value = false));
-const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibold';
 </script>
 
 <template>
@@ -37,18 +37,9 @@ const BUTTON = 'inline-flex min-h-11 items-center rounded-pill px-5 font-semibol
         />
       </label>
       <div class="flex justify-end">
-        <button
-          type="submit"
-          :aria-busy="isPending ? 'true' : undefined"
-          :class="[
-            BUTTON,
-            isPending
-              ? 'cursor-progress bg-accent-soft text-accent-soft-text'
-              : 'bg-accent text-on-accent',
-          ]"
-        >
+        <AppButton type="submit" tone="primary" :loading="isPending">
           {{ $t('ticket.saveNotes') }}
-        </button>
+        </AppButton>
       </div>
     </form>
     <p v-else class="whitespace-pre-wrap text-sm">{{ ticket.notes || $t('ticket.noNotes') }}</p>

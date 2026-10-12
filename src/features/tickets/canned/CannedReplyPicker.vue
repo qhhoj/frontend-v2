@@ -7,6 +7,7 @@ import type { CannedReply } from '@/api/types/tickets';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { adminRouteName } from '@/features/admin/admin-screens';
 import { TICKET_BITS } from '../ticket-bits';
 import { useCannedRepliesQuery } from '../tickets.queries';
@@ -31,17 +32,15 @@ function choose(reply: CannedReply) {
 </script>
 
 <template>
-  <button
-    type="button"
+  <AppButton
     data-testid="canned-picker"
-    class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
     @click="popover?.toggle($event)"
   >
-    <MessageSquareText aria-hidden="true" class="size-[18px]" />
+    <template #icon><MessageSquareText aria-hidden="true" class="size-[18px]" /></template>
     {{ $t('cannedPicker.open') }}
-  </button>
+  </AppButton>
   <Popover
     ref="popover"
     :pt="{ root: { role: 'dialog', 'aria-labelledby': titleId } }"

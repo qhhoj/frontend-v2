@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { TicketListQuery } from '@/api/types/tickets';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { hasPermission } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session.store';
 import { parseUsernames, routeQueryFromFilters } from './ticket-filters';
@@ -25,20 +27,16 @@ const apply = () =>
       page: 1,
     }),
   });
-const FIELD = 'flex flex-col gap-1.5 text-sm font-medium';
-const INPUT = 'min-h-11 rounded-cell border border-line bg-surface px-3 text-base text-content';
 </script>
 
 <template>
   <form v-if="canFilterByPeople" class="grid gap-3 sm:grid-cols-2" @submit.prevent="apply">
     <p class="text-meta text-muted sm:col-span-2">{{ $t('tickets.staffFilters') }}</p>
-    <label :class="FIELD">
-      {{ $t('tickets.creator') }}
-      <input v-model="creatorText" name="user" type="text" :class="INPUT" @blur="apply" />
-    </label>
-    <label :class="FIELD">
-      {{ $t('tickets.assignee') }}
-      <input v-model="assigneeText" name="assignee" type="text" :class="INPUT" @blur="apply" />
-    </label>
+    <FormField :label="$t('tickets.creator')">
+      <TextInput v-model="creatorText" name="user" type="text" @blur="apply" />
+    </FormField>
+    <FormField :label="$t('tickets.assignee')">
+      <TextInput v-model="assigneeText" name="assignee" type="text" @blur="apply" />
+    </FormField>
   </form>
 </template>

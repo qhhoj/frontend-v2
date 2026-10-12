@@ -4,6 +4,7 @@ import type { TicketDetail } from '@/api/types/tickets';
 import { TICKET_TIMELINE_CAP } from '@/api/types/tickets';
 import UserContent from '@/components/UserContent.vue';
 import UserName from '@/components/UserName.vue';
+import Chip from '@/components/ui/Chip.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { formatNumber, formatNumericDateTime } from '@/lib/format';
@@ -47,12 +48,9 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
         <div class="flex min-w-0 flex-1 flex-col gap-2">
           <div class="flex flex-wrap items-center gap-2 text-sm">
             <UserName :username="row.message.author.username" :rating="row.message.author.rating" />
-            <span
-              v-if="isAssignee(row.message.author.username)"
-              class="rounded-pill bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-soft-text"
-            >
+            <Chip v-if="isAssignee(row.message.author.username)" tone="accent">
               {{ $t('ticket.assigneeChip') }}
-            </span>
+            </Chip>
             <time :datetime="row.message.createdAt" class="text-meta text-muted">
               {{ when(row.message.createdAt) }}
             </time>
