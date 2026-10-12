@@ -3,8 +3,8 @@ import GlassCard from '@/components/GlassCard.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useSessionStore } from '@/stores/session.store';
 
-/** Mirrors the rail's cards (submit, facts, links; "my submissions" for a signed-in viewer): keep their box sizes in sync. */
-const FACT_COUNT = 5;
+/** Mirrors the rail's cards (submit, facts: 5 limits + 2 file I/O cells, links; "my submissions" for a signed-in viewer): keep their box sizes in sync. */
+const FACT_COUNT = 7;
 const session = useSessionStore();
 </script>
 
@@ -19,10 +19,6 @@ const session = useSessionStore();
         <div v-for="fact in FACT_COUNT" :key="fact" data-skeleton-region="limit">
           <SkeletonBlock text class="w-16 text-[13px]" />
           <SkeletonBlock text class="mt-0.5 w-12 text-[17px]" />
-        </div>
-        <div class="col-span-2" data-skeleton-region="limit">
-          <SkeletonBlock text class="w-16 text-[13px]" />
-          <SkeletonBlock text class="mt-0.5 w-32 text-[15px]" />
         </div>
       </div>
     </GlassCard>
