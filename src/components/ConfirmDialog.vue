@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
 import { computed, nextTick, onBeforeUnmount, useId, watch } from 'vue';
+import Modal from '@/components/ui/Modal.vue';
 
 /**
- * One confirm step for the destructive or irreversible choices, on the shared Dialog preset.
+ * One confirm step for the destructive or irreversible choices, in a `Modal` (the shared Dialog preset).
  * `confirm` only says the user chose it: the consumer closes the dialog (set `visible` false) once its request is done.
  * Busy blocks Cancel, Escape and the close button, and a second confirm, until the consumer clears it.
  * `canConfirm` is false while a required input in the body (a code, a password) is still empty: the confirm button turns
@@ -74,15 +74,11 @@ onBeforeUnmount(returnFocus);
 </script>
 
 <template>
-  <Dialog
+  <Modal
     :visible="visible"
-    modal
-    :header="title"
-    :draggable="false"
+    :title="title"
     :style="dialogStyle"
     :closable="!busy"
-    :close-on-escape="!busy"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
     :aria-describedby="bodyId"
     @update:visible="dismiss"
   >
@@ -114,5 +110,5 @@ onBeforeUnmount(returnFocus);
         {{ confirmLabel }}
       </button>
     </template>
-  </Dialog>
+  </Modal>
 </template>
