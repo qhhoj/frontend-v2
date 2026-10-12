@@ -22,10 +22,7 @@ const session = useSessionStore();
         </div>
       </div>
     </Card>
-    <Card
-      v-if="session.status === 'authenticated'"
-      class="flex flex-col gap-2 rounded-panel p-4"
-    >
+    <Card v-if="session.status === 'authenticated'" class="flex flex-col gap-2 rounded-panel p-4">
       <SkeletonBlock v-for="row in 3" :key="row" class="h-11" />
     </Card>
     <Card class="rounded-panel p-2"><SkeletonBlock class="h-11 w-full" /></Card>
