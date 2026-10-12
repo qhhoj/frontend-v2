@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref, watch } from 'vue';
 import { deleteConfig, putConfig } from '@/api/site-admin.api';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { SITE_NOTICE_KEY } from '@/features/site-notice/site-notice';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -70,9 +70,9 @@ function takeDown() {
       </AdminField>
       <div v-if="preview" class="flex flex-col gap-1.5">
         <span class="text-xs font-semibold text-muted">{{ $t('admin.site.notice.preview') }}</span>
-        <SettingsNotice tone="info">
+        <Notice tone="info">
           <span class="block whitespace-pre-line">{{ preview }}</span>
-        </SettingsNotice>
+        </Notice>
       </div>
       <div class="flex flex-wrap items-center gap-2 lg:col-span-2">
         <button

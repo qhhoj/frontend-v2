@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -52,7 +52,7 @@ const instantOrNotYet = (instant: string | null) =>
           </dd>
         </div>
       </dl>
-      <SettingsNotice
+      <Notice
         v-for="group in truncatedGroups(run)"
         :key="group.problemId + group.language"
         tone="warning"
@@ -65,10 +65,10 @@ const instantOrNotYet = (instant: string | null) =>
             compared: count(group.comparedCount),
           })
         }}
-      </SettingsNotice>
-      <SettingsNotice v-if="hasFailedGroup" tone="warning">
+      </Notice>
+      <Notice v-if="hasFailedGroup" tone="warning">
         {{ $t('admin.similarity.summary.someFailed') }}
-      </SettingsNotice>
+      </Notice>
       <SimilarityGroupsTable :groups="run.groups" />
       <div v-if="run.unsupported.length" class="flex flex-col gap-2">
         <h3 class="text-sm font-semibold">{{ $t('admin.similarity.summary.unsupported') }}</h3>
