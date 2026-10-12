@@ -20,6 +20,10 @@ const session = useSessionStore();
           <SkeletonBlock text class="w-16 text-[13px]" />
           <SkeletonBlock text class="mt-0.5 w-12 text-[17px]" />
         </div>
+        <div class="col-span-2" data-skeleton-region="limit">
+          <SkeletonBlock text class="w-16 text-[13px]" />
+          <SkeletonBlock text class="mt-0.5 w-32 text-[15px]" />
+        </div>
       </div>
     </GlassCard>
     <GlassCard
