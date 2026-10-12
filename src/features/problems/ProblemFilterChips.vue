@@ -14,7 +14,7 @@ const emit = defineEmits<{ remove: [patch: Partial<ProblemFilters>]; clearAll: [
       <button
         type="button"
         :aria-label="$t('problems.removeFilter', { name: chip.label })"
-        class="inline-flex min-h-8 items-center gap-1.5 rounded-pill bg-surface-strong py-1 pr-2 pl-3 hover:bg-surface-hover"
+        class="inline-flex min-h-8 items-center gap-1.5 rounded-pill bg-surface-strong py-1 pr-2 pl-3 hover:bg-surface-hover pointer-coarse:min-h-11"
         @click="emit('remove', chip.clear)"
       >
         {{ chip.label }}<X class="size-3.5" aria-hidden="true" />
@@ -23,7 +23,7 @@ const emit = defineEmits<{ remove: [patch: Partial<ProblemFilters>]; clearAll: [
     <li>
       <button
         type="button"
-        class="min-h-8 px-1 font-medium text-accent-text hover:underline"
+        class="min-h-8 px-1 font-medium text-accent-text hover:underline pointer-coarse:min-h-11"
         @click="emit('clearAll')"
       >
         {{ $t('problems.clearAll') }}

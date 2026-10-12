@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FileText, FileUp, X } from 'lucide-vue-next';
 import { ref, useId } from 'vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import type { Language } from '@/api/types/problems';
 import { formatFileSize } from '@/lib/format';
 import { acceptedExtension, uploadCapBytes } from '@/lib/source';
@@ -78,14 +79,9 @@ function removeFile() {
       <FileText class="size-5 shrink-0 text-muted" aria-hidden="true" />
       <span class="min-w-0 flex-1 truncate" :title="file.name">{{ file.name }}</span>
       <span class="shrink-0 font-mono text-xs text-muted">{{ formatFileSize(file.size) }}</span>
-      <button
-        type="button"
-        :aria-label="$t('submit.file.remove')"
-        class="flex size-11 shrink-0 items-center justify-center rounded-pill text-muted hover:bg-surface-hover"
-        @click="removeFile"
-      >
+      <IconButton :label="$t('submit.file.remove')" class="shrink-0" @click="removeFile">
         <X class="size-4" aria-hidden="true" />
-      </button>
+      </IconButton>
     </div>
   </div>
 </template>

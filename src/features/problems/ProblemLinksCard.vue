@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import type { ProblemDetail } from '@/api/types/problems';
 import BitMascot from '@/components/BitMascot.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -85,7 +85,7 @@ const ROW =
 </script>
 
 <template>
-  <GlassCard
+  <Card
     as="nav"
     :aria-label="$t('problem.rail.links.label')"
     data-testid="header-actions"
@@ -131,5 +131,5 @@ const ROW =
         </a>
       </li>
     </ul>
-  </GlassCard>
+  </Card>
 </template>

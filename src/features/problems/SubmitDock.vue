@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
@@ -60,14 +61,13 @@ function onPanelEscape(event: KeyboardEvent) {
     <div class="min-h-0 flex-1 px-4 py-3">
       <SubmitForm :problem="problem" :form="form" layout="full">
         <template #actions>
-          <button
-            type="button"
-            :aria-label="$t('submit.exitFullscreen')"
-            class="flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
+          <IconButton
+            :label="$t('submit.exitFullscreen')"
+            tone="secondary"
             @click="wantsFullscreen = false"
           >
             <Minimize2 class="size-5" aria-hidden="true" />
-          </button>
+          </IconButton>
         </template>
       </SubmitForm>
     </div>
@@ -99,26 +99,25 @@ function onPanelEscape(event: KeyboardEvent) {
       >
         <template #actions>
           <div class="flex items-center gap-2">
-            <button
+            <IconButton
               :id="FULLSCREEN_TOGGLE_ID"
-              type="button"
-              :aria-label="$t('submit.fullscreen')"
-              class="mr-2 flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
+              :label="$t('submit.fullscreen')"
+              tone="secondary"
+              class="mr-2"
               @click="wantsFullscreen = true"
             >
               <Maximize2 class="size-5" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
+            </IconButton>
+            <IconButton
               :aria-expanded="!isCollapsed"
               :aria-controls="BODY_ID"
-              :aria-label="$t(isCollapsed ? 'submit.expand' : 'submit.collapse')"
-              class="flex size-11 items-center justify-center rounded-pill border border-line bg-surface hover:bg-surface-hover"
+              :label="$t(isCollapsed ? 'submit.expand' : 'submit.collapse')"
+              tone="secondary"
               @click="isCollapsed = !isCollapsed"
             >
               <ChevronUp v-if="isCollapsed" class="size-5" aria-hidden="true" />
               <ChevronDown v-else class="size-5" aria-hidden="true" />
-            </button>
+            </IconButton>
           </div>
         </template>
       </SubmitForm>

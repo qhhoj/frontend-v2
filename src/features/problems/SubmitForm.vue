@@ -2,12 +2,12 @@
 import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
 import FileDropzone from './FileDropzone.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
-import SubmitButton from './SubmitButton.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { useSubmitForm } from './use-submit-form';
 
@@ -64,7 +64,7 @@ const LAYOUTS = {
     editorMinLines: 4,
     editorFill: '',
     counterRow: 'flex-1',
-    submit: 'h-11 px-6',
+    submit: { size: 'md', block: false },
     header: 'contents',
   },
   sheet: {
@@ -75,7 +75,7 @@ const LAYOUTS = {
     editorMinLines: 6,
     editorFill: '',
     counterRow: 'justify-between',
-    submit: 'h-14 w-full',
+    submit: { size: 'lg', block: true },
     header: 'contents',
   },
   full: {
@@ -87,7 +87,7 @@ const LAYOUTS = {
     editorFill:
       'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
     counterRow: '',
-    submit: 'h-11 px-6',
+    submit: { size: 'md', block: false },
     header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
   },
 } as const;
@@ -167,12 +167,17 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         <slot name="actions" />
       </div>
 
-      <SubmitButton
+      <AppButton
         v-if="isTopRow"
-        :label="$t(submitLabelKey)"
-        :can-submit="state.canSubmit"
-        :class="[classes.submit, isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitCollapsed]"
-      />
+        type="submit"
+        tone="primary"
+        v-bind="classes.submit"
+        :disabled="!state.canSubmit"
+        :loading="state.submitting"
+        class="shrink-0"
+        :class="isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitCollapsed"
+        >{{ $t(submitLabelKey) }}</AppButton
+      >
     </div>
 
     <div v-show="!collapsed" class="min-w-0" :class="[REGION_ORDER.body, classes.body]">
@@ -245,11 +250,16 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         }}</span>
       </template>
     </div>
-    <SubmitButton
+    <AppButton
       v-if="!isTopRow"
-      :label="$t(submitLabelKey)"
-      :can-submit="state.canSubmit"
-      :class="[classes.submit, REGION_ORDER.submit]"
-    />
+      type="submit"
+      tone="primary"
+      v-bind="classes.submit"
+      :disabled="!state.canSubmit"
+      :loading="state.submitting"
+      class="shrink-0"
+      :class="REGION_ORDER.submit"
+      >{{ $t(submitLabelKey) }}</AppButton
+    >
   </form>
 </template>

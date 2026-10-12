@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import InlineBit from '@/components/InlineBit.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
@@ -48,7 +48,7 @@ const score = (points: number | null) =>
 </script>
 
 <template>
-  <GlassCard class="flex flex-col gap-2 rounded-panel p-4" data-testid="rail-my-submissions">
+  <Card class="flex flex-col gap-2 rounded-panel p-4" data-testid="rail-my-submissions">
     <div class="flex items-center justify-between gap-2">
       <h2 class="flex items-center gap-2 font-display text-title font-bold">
         {{ $t('problem.rail.mine.title') }}
@@ -56,7 +56,7 @@ const score = (points: number | null) =>
       </h2>
       <RouterLink
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline"
+        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline pointer-coarse:min-h-11"
         >{{ $t('common.viewAll') }}</RouterLink
       >
     </div>
@@ -83,5 +83,5 @@ const score = (points: number | null) =>
         </li>
       </ol>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>
