@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -12,19 +14,19 @@ const canAdminister = computed(() => props.organization.viewer?.canAdminister ==
 const pending = useJoinRequestsQuery(() => props.organization.slug, 'P', 1, canAdminister);
 const pendingTotal = computed(() => pending.data.value?.meta.total ?? 0);
 
+const { t } = useI18n();
+
 interface OrganizationTab {
   routeName: string;
   labelKey: string;
-  count?: string;
-  /** An accent badge: something waits for the viewer. */
-  alert?: { count: string; label: string };
+  badge?: PillTab['badge'];
 }
-const tabs = computed<OrganizationTab[]>(() => {
+const visibleTabs = computed<OrganizationTab[]>(() => {
   const about = { routeName: 'organization', labelKey: 'orgs.tabs.about' };
-  const members = {
+  const members: OrganizationTab = {
     routeName: 'organization-members',
     labelKey: 'orgs.tabs.members',
-    count: formatNumber(props.organization.memberCount, locale.locale),
+    badge: { text: formatNumber(props.organization.memberCount, locale.locale), tone: 'neutral' },
   };
   const posts = { routeName: 'organization-posts', labelKey: 'orgs.tabs.posts' };
   // Members also see the problems and submissions, administrators the quota and "Quản lý" (the API refuses the rest).
@@ -35,8 +37,14 @@ const tabs = computed<OrganizationTab[]>(() => {
   const manage: OrganizationTab = {
     routeName: 'organization-manage',
     labelKey: 'orgs.tabs.manage',
-    alert: pendingTotal.value
-      ? { count: formatNumber(pendingTotal.value, locale.locale), label: 'orgAdmin.pendingBadge' }
+    badge: pendingTotal.value
+      ? {
+          text: formatNumber(pendingTotal.value, locale.locale),
+          tone: 'accent',
+          srLabel: t('orgAdmin.pendingBadge', {
+            count: formatNumber(pendingTotal.value, locale.locale),
+          }),
+        }
       : undefined,
   };
   const viewer = props.organization.viewer;
@@ -45,30 +53,16 @@ const tabs = computed<OrganizationTab[]>(() => {
   if (viewer?.isMember) return [about, members, problems, contests, posts, submissions];
   return [about, members, contests, posts];
 });
+const tabs = computed<PillTab[]>(() =>
+  visibleTabs.value.map((tab) => ({
+    key: tab.routeName,
+    label: t(tab.labelKey),
+    to: { name: tab.routeName, params: { slug: props.organization.slug } },
+    badge: tab.badge,
+  })),
+);
 </script>
 
 <template>
-  <nav :aria-label="$t('orgs.tabsLabel')" class="flex gap-1 overflow-x-auto">
-    <RouterLink
-      v-for="tab in tabs"
-      :key="tab.routeName"
-      :to="{ name: tab.routeName, params: { slug: organization.slug } }"
-      class="inline-flex min-h-11 items-center whitespace-nowrap border-b-2 border-transparent px-4 font-semibold text-muted hover:text-content"
-      exact-active-class="border-accent text-accent-text"
-    >
-      {{ $t(tab.labelKey) }}
-      <span v-if="tab.count" class="ml-1.5 rounded-pill bg-surface-hover px-2 text-sm">{{
-        tab.count
-      }}</span>
-      <template v-if="tab.alert">
-        <span
-          data-testid="pending-badge"
-          aria-hidden="true"
-          class="ml-1.5 rounded-pill bg-accent px-2 text-sm text-on-accent"
-          >{{ tab.alert.count }}</span
-        >
-        <span class="sr-only">{{ $t(tab.alert.label, { count: tab.alert.count }) }}</span>
-      </template>
-    </RouterLink>
-  </nav>
+  <PillTabs :tabs="tabs" :label="t('orgs.tabsLabel')" />
 </template>

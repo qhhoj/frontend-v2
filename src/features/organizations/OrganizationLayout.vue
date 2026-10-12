@@ -32,8 +32,8 @@ usePageTitle(() => organization.value?.name);
     </StatePanel>
   </div>
   <div v-else class="flex flex-col">
-    <div class="border-b border-line bg-surface-solid">
-      <div class="page-gutter flex flex-col gap-2 pt-4">
+    <div class="min-w-0 border-b border-line bg-surface-solid">
+      <div class="page-gutter flex min-w-0 flex-col gap-2 py-3">
         <RouterLink
           :to="{ name: 'organizations' }"
           class="w-fit text-xs text-accent-text hover:underline"

@@ -90,6 +90,7 @@ export const editableProblem = (overrides: Partial<EditableProblem> = {}): Edita
   testcaseVisibility: 'C',
   testcaseResultVisibility: 'B',
   allowViewFeedback: true,
+  io: { mode: 'stdio', inputFile: null, outputFile: null },
   canEdit: true,
   acRate: 0,
   userCount: 0,

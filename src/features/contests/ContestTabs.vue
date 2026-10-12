@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed, toRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { ContestPhase } from '@/api/types/contests';
+import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
 import AnnouncementLiveRegion from './AnnouncementLiveRegion.vue';
 import { useUnreadAnnouncementCount } from './announcement-seen';
 import { useContestQuery } from './contests.queries';
 
 /** `current` names the tab to light up on a page that is not a tab's own route (a problem's best submissions lights `contest`). */
+const { t } = useI18n();
 const props = defineProps<{ contestKey: string; phase?: ContestPhase; current?: string }>();
 interface ContestTab {
   name: string;
@@ -24,43 +27,38 @@ const TABS: ContestTab[] = [
 const visibleTabs = computed(() =>
   TABS.filter((tab) => !tab.isEndedOnly || props.phase === 'ended'),
 );
-/** The open tab is the one RouterLink marks `aria-current="page"` (exact match), so no route comparison is needed. */
-const LINK =
-  'inline-flex min-h-11 items-center gap-2 rounded-pill border border-transparent px-4 text-sm font-medium whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
 const unread = useUnreadAnnouncementCount(toRef(props, 'contestKey'));
 /** Balloon volunteers and editors of a contest with balloons on get the queue's tab; read from the cached contest answer. */
 const { data: contest } = useContestQuery(() => props.contestKey);
 const canViewBalloons = computed(() => contest.value?.viewer.canViewBalloons ?? false);
 /** The announcements stream runs while the contest can still get announcements; it waits until the phase is known. */
 const isStreaming = computed(() => props.phase !== undefined && props.phase !== 'ended');
+const tabs = computed<PillTab[]>(() => {
+  const own = visibleTabs.value.map((tab) => ({
+    key: tab.name,
+    label: t(tab.labelKey),
+    to: { name: tab.name, params: { key: props.contestKey } },
+    isCurrent: tab.name === props.current,
+    badge:
+      tab.name === 'contest-announcements' && unread.value > 0
+        ? {
+            text: String(unread.value),
+            tone: 'accent' as const,
+            srLabel: t('contests.announcements.unread', { count: unread.value }, unread.value),
+          }
+        : undefined,
+  }));
+  if (!canViewBalloons.value) return own;
+  const balloons = {
+    key: 'contest-balloons',
+    label: t('balloons.tab'),
+    to: { name: 'contest-balloons', params: { key: props.contestKey } },
+  };
+  return [...own, balloons];
+});
 </script>
 
 <template>
-  <nav :aria-label="$t('contests.tabs.label')" class="flex flex-wrap gap-1">
-    <RouterLink
-      v-for="tab in visibleTabs"
-      :key="tab.name"
-      :to="{ name: tab.name, params: { key: contestKey } }"
-      v-bind="tab.name === current ? { 'aria-current': 'page' } : {}"
-      :class="LINK"
-    >
-      {{ $t(tab.labelKey) }}
-      <span
-        v-if="tab.name === 'contest-announcements' && unread > 0"
-        class="inline-flex min-w-5 items-center justify-center rounded-pill bg-accent px-1.5 text-[11px] font-semibold text-on-accent"
-      >
-        <span aria-hidden="true">{{ unread }}</span>
-        <span class="sr-only">{{
-          $t('contests.announcements.unread', { count: unread }, unread)
-        }}</span>
-      </span>
-    </RouterLink>
-    <RouterLink
-      v-if="canViewBalloons"
-      :to="{ name: 'contest-balloons', params: { key: contestKey } }"
-      :class="LINK"
-      >{{ $t('balloons.tab') }}</RouterLink
-    >
-  </nav>
+  <PillTabs :tabs="tabs" :label="t('contests.tabs.label')" />
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>
