@@ -10,6 +10,7 @@ const props = defineProps<{ ranking: OfficialRanking }>();
 const { t } = useI18n();
 const PREVIEW_ROWS = 3;
 const scoreKey = (index: number) => `score${index}`;
+const NO_WRAP = 'whitespace-nowrap';
 const rows = computed(() =>
   props.ranking.rows.slice(0, PREVIEW_ROWS).map((row) => ({
     ...row,
@@ -17,23 +18,34 @@ const rows = computed(() =>
   })),
 );
 const columns = computed<DataTableColumn[]>(() => [
-  { key: 'rank', label: t('admin.contests.ranking.official.columns.rank'), align: 'end' },
+  {
+    key: 'rank',
+    label: t('admin.contests.ranking.official.columns.rank'),
+    align: 'end',
+    cellClass: NO_WRAP,
+  },
   {
     key: 'username',
     label: t('admin.contests.ranking.official.columns.username'),
-    cellClass: 'font-mono',
+    cellClass: `${NO_WRAP} font-mono`,
   },
-  { key: 'fullName', label: t('admin.contests.ranking.official.columns.fullName'), grow: true },
+  {
+    key: 'fullName',
+    label: t('admin.contests.ranking.official.columns.fullName'),
+    grow: true,
+    cellClass: NO_WRAP,
+  },
   ...props.ranking.problems.map((problem, index) => ({
     key: scoreKey(index),
     label: problem,
     align: 'end' as const,
+    cellClass: NO_WRAP,
   })),
   {
     key: 'totalScore',
     label: t('admin.contests.ranking.official.columns.total'),
     align: 'end',
-    cellClass: 'font-semibold',
+    cellClass: `${NO_WRAP} font-semibold`,
   },
 ]);
 </script>
