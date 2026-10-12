@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import type { ContestPhase } from '@/api/types/contests';
+import Chip from '@/components/ui/Chip.vue';
+import type { ChipTone } from '@/components/ui/Chip.vue';
 
 defineProps<{ phase: ContestPhase }>();
-const PHASE_CLASSES: Record<ContestPhase, string> = {
-  running: 'bg-verdict-ac-bg text-verdict-ac',
-  upcoming: 'bg-accent-soft text-accent-soft-text',
-  ended: 'bg-verdict-pending-bg text-verdict-pending',
+/** An ended contest wears the pending verdict's grey pair. */
+const PHASE_TONES: Record<ContestPhase, ChipTone> = {
+  running: 'success',
+  upcoming: 'accent',
+  ended: 'P',
 };
 </script>
 
 <template>
-  <span
-    class="inline-flex min-h-7 items-center gap-1.5 rounded-pill px-3 text-meta font-semibold whitespace-nowrap"
-    :class="PHASE_CLASSES[phase]"
-  >
-    <span v-if="phase === 'running'" aria-hidden="true" class="size-2 rounded-full bg-current" />{{
-      $t(`contests.phase.${phase}`)
-    }}
-  </span>
+  <Chip size="md" :tone="PHASE_TONES[phase]" :dot="phase === 'running'">{{
+    $t(`contests.phase.${phase}`)
+  }}</Chip>
 </template>

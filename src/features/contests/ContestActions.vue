@@ -5,6 +5,8 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import type { ContestDetail } from '@/api/types/contests';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { spanMessage } from '@/lib/contest-time';
@@ -50,10 +52,6 @@ const NOTICE_KEYS: Partial<Record<ContestActionKind, string>> = {
 };
 /** Kinds whose button shows the opening time and cannot be pressed. */
 const LOCKED_KINDS: readonly ContestActionKind[] = ['opensLater', 'registered'];
-const ACTIVE_BUTTON =
-  'inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent aria-disabled:cursor-progress aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text';
-const LOCKED_BUTTON =
-  'inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-pill border border-line bg-surface-hover px-5 font-semibold text-content';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const route = useRoute();
@@ -188,13 +186,9 @@ watch(isRulesOpen, (isOpen) => {
       <p data-testid="participation-status" role="status" aria-live="polite" class="sr-only">
         {{ participationStatus }}
       </p>
-      <RouterLink
-        v-if="chosen.kind === 'signIn'"
-        :to="signInTarget"
-        class="inline-flex min-h-11 items-center justify-center rounded-pill bg-gradient-accent px-5 font-semibold text-on-accent"
-      >
+      <AppButton v-if="chosen.kind === 'signIn'" tone="primary" :to="signInTarget">
         {{ $t('contests.actions.signIn') }}
-      </RouterLink>
+      </AppButton>
       <InContestStatus
         v-else-if="chosen.kind === 'leave'"
         :contest="contest"
@@ -203,25 +197,21 @@ watch(isRulesOpen, (isOpen) => {
         @leave="perform().catch(() => undefined)"
       />
       <template v-else>
-        <span
-          v-if="chosen.kind === 'registered'"
-          class="w-fit rounded-pill bg-accent-soft px-3 py-1 text-sm font-semibold text-accent-soft-text"
-        >
+        <Chip v-if="chosen.kind === 'registered'" tone="accent" size="md" class="w-fit">
           {{ $t('contests.actions.registeredBadge') }}
-        </span>
+        </Chip>
         <p v-if="NOTICE_KEYS[chosen.kind]" class="text-muted">
           {{ $t(NOTICE_KEYS[chosen.kind]!) }}
         </p>
-        <button
+        <AppButton
           v-if="hasButton"
-          type="button"
-          :aria-disabled="isLocked || isPending || undefined"
-          :aria-busy="isPending || undefined"
-          :class="isLocked ? LOCKED_BUTTON : ACTIVE_BUTTON"
+          tone="primary"
+          :disabled="isLocked"
+          :loading="isPending"
           @click="start"
         >
           {{ actionLabel }}
-        </button>
+        </AppButton>
         <p v-else class="text-muted">{{ actionLabel }}</p>
         <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted">
           {{

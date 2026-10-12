@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, watch } from 'vue';
 import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import type { ContestDetail } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AnnouncementItem from './AnnouncementItem.vue';
@@ -30,14 +31,10 @@ const isLive = computed(
 </script>
 
 <template>
-  <GlassCard class="p-5">
+  <Card class="p-5">
     <div class="mb-1 flex items-center justify-between gap-3">
       <h2 class="font-display text-base font-bold">{{ $t('contests.tabs.announcements') }}</h2>
-      <span
-        v-if="isLive"
-        class="rounded-pill bg-verdict-ac-bg px-2.5 text-caption font-semibold text-verdict-ac"
-        >{{ $t('contests.announcements.live') }}</span
-      >
+      <Chip v-if="isLive" tone="success">{{ $t('contests.announcements.live') }}</Chip>
     </div>
     <div v-if="isPending" data-skeleton-region="announcement-rail" class="flex flex-col gap-2 py-3">
       <SkeletonBlock text class="w-2/3" />
@@ -58,5 +55,5 @@ const isLive = computed(
       class="inline-flex min-h-11 items-center text-accent-text underline"
       >{{ $t('common.viewAll') }}</RouterLink
     >
-  </GlassCard>
+  </Card>
 </template>

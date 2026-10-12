@@ -2,6 +2,7 @@
 import { Lock, TrendingUp } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ContestSummary } from '@/api/types/contests';
+import Chip from '@/components/ui/Chip.vue';
 import ContestOrganizationChips from './ContestOrganizationChips.vue';
 import { useContestTagsCache } from './contest-extras.queries';
 import { catalogueBySlug, tagChipOf } from './tag-chips';
@@ -13,8 +14,6 @@ const props = defineProps<{
   /** Leave the restricting-organization links out: the caller shows them elsewhere. */
   hideOrganizations?: boolean;
 }>();
-const CHIP =
-  'inline-flex min-h-6.5 items-center gap-1 rounded-pill border border-line px-2.5 text-caption font-medium whitespace-nowrap';
 /** Read from the cache only: the list and the contest header fetch the catalogue; elsewhere tags stay neutral. */
 const { data: catalogue } = useContestTagsCache();
 const tagChips = computed(() => {
@@ -26,32 +25,23 @@ const showOrganizations = computed(() => props.withTags && props.contest.organiz
 </script>
 
 <template>
-  <span :class="[CHIP, 'bg-surface-strong font-semibold text-content']">{{
-    $t(`formats.${contest.formatName}`)
-  }}</span>
-  <span
-    v-if="contest.isRated"
-    :class="[CHIP, 'border-transparent bg-accent-soft text-accent-soft-text']"
-  >
-    <TrendingUp class="size-3" aria-hidden="true" />{{ $t('contests.rated') }}
-  </span>
-  <span v-if="withCodeNeeded && contest.requiresAccessCode" :class="[CHIP, 'text-muted']"
-    ><Lock class="size-3" aria-hidden="true" />{{ $t('contests.list.codeNeeded') }}</span
-  >
-  <span v-if="contest.isPrivate" :class="[CHIP, 'text-muted']">{{ $t('contests.private') }}</span>
-  <span
-    v-else-if="contest.isOrganizationPrivate && !showOrganizations"
-    :class="[CHIP, 'text-muted']"
-    >{{ $t('contests.organizationPrivate') }}</span
-  >
+  <Chip>{{ $t(`formats.${contest.formatName}`) }}</Chip>
+  <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
+  <Chip v-if="withCodeNeeded && contest.requiresAccessCode" :icon="Lock">{{
+    $t('contests.list.codeNeeded')
+  }}</Chip>
+  <Chip v-if="contest.isPrivate">{{ $t('contests.private') }}</Chip>
+  <Chip v-else-if="contest.isOrganizationPrivate && !showOrganizations">{{
+    $t('contests.organizationPrivate')
+  }}</Chip>
   <template v-if="withTags">
     <ContestOrganizationChips v-if="showOrganizations && !hideOrganizations" :contest="contest" />
-    <span
+    <Chip
       v-for="chip in tagChips"
       :key="chip.slug"
       :data-tag-color="chip.color ?? 'neutral'"
-      :class="[CHIP, chip.colorClass]"
-      >{{ chip.label }}</span
+      :tone="chip.color ?? 'neutral'"
+      >{{ chip.label }}</Chip
     >
   </template>
 </template>

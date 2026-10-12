@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, watch } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
 import { phaseAt } from '@/lib/contest-time';
@@ -100,9 +101,7 @@ const clearTagTarget = computed(() => ({
         <h2 :id="headingId" class="font-display text-2xl font-semibold">
           {{ $t(`contests.phase.${phase}`) }}
         </h2>
-        <span :id="countId" class="rounded-pill bg-surface-hover px-2.5 text-sm font-semibold">{{
-          countText
-        }}</span>
+        <Chip :id="countId" size="md">{{ countText }}</Chip>
       </div>
       <RouterLink
         :to="toggleTarget"
@@ -130,7 +129,7 @@ const clearTagTarget = computed(() => ({
           :contest="contest"
         />
       </div>
-      <GlassCard v-else-if="phase === 'upcoming'" as="div">
+      <Card v-else-if="phase === 'upcoming'" as="div">
         <ul class="m-0 list-none p-0">
           <UpcomingContestRow
             v-for="contest in shownContests"
@@ -138,7 +137,7 @@ const clearTagTarget = computed(() => ({
             :contest="contest"
           />
         </ul>
-      </GlassCard>
+      </Card>
       <EndedContestTable
         v-else
         :contests="shownContests"

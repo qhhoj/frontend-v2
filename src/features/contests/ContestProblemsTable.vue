@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { ExternalLink, Printer } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber } from '@/lib/format';
 import { showsCellTime } from '@/lib/ranking-cells';
@@ -59,7 +60,7 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
 </script>
 
 <template>
-  <GlassCard data-testid="contest-problems" class="overflow-hidden">
+  <Card data-testid="contest-problems" class="overflow-hidden">
     <p
       v-if="isCrowned"
       data-testid="solved-summary"
@@ -82,13 +83,10 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
           {{ $t('contests.problems.heading') }}
           <span class="text-sm font-normal text-muted">({{ problems.length }})</span>
         </h2>
-        <RouterLink
-          :to="{ name: 'contest-all', params: { key: contest.key } }"
-          class="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-pill border border-accent bg-accent-soft px-3.5 text-sm font-semibold whitespace-nowrap text-accent-soft-text hover:bg-surface-hover"
-          ><Printer class="size-4" aria-hidden="true" />{{
-            $t('contests.problems.printAll')
-          }}</RouterLink
-        >
+        <AppButton :to="{ name: 'contest-all', params: { key: contest.key } }" class="shrink-0">
+          <template #icon><Printer class="size-4" aria-hidden="true" /></template>
+          {{ $t('contests.problems.printAll') }}
+        </AppButton>
       </div>
       <table class="hidden w-full border-collapse md:table">
         <caption class="sr-only">
@@ -159,15 +157,11 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
               <OwnResultChip :problem="problem" :context="context" />
             </td>
             <td class="px-3 py-3 text-right">
-              <RouterLink
-                :to="problemLink(problem)"
-                class="inline-flex size-11 items-center justify-center rounded-pill border border-line hover:bg-surface-hover"
-                :title="$t('contests.problems.open')"
-              >
+              <AppButton :to="problemLink(problem)" icon-only :title="$t('contests.problems.open')">
                 <span class="sr-only"
                   >{{ $t('contests.problems.open') }} {{ problem.label }}. {{ problem.name }}</span
                 ><ExternalLink class="size-4" aria-hidden="true" />
-              </RouterLink>
+              </AppButton>
             </td>
           </tr>
         </tbody>
@@ -202,5 +196,5 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
         </li>
       </ul>
     </template>
-  </GlassCard>
+  </Card>
 </template>

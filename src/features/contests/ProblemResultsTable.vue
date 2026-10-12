@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import type { ContestProblemStats } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
 import { VERDICT_TONE_CLASSES } from '@/lib/verdicts';
@@ -35,11 +36,12 @@ const chipClasses = (code: ResultCode, value: number) =>
 <template>
   <section class="flex flex-col gap-2">
     <h2 class="font-display text-xl font-bold">{{ $t('contests.stats.problemTitle') }}</h2>
-    <div
+    <Card
+      as="div"
       tabindex="0"
       role="region"
       :aria-label="$t('contests.stats.region')"
-      class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
+      class="overflow-x-auto focus-visible:-outline-offset-2"
     >
       <table data-testid="problem-results" class="w-full min-w-[720px] border-collapse">
         <thead>
@@ -106,7 +108,7 @@ const chipClasses = (code: ResultCode, value: number) =>
           </tr>
         </tbody>
       </table>
-    </div>
+    </Card>
     <p class="px-1 text-xs text-muted">{{ $t('contests.stats.errNote') }}</p>
   </section>
 </template>

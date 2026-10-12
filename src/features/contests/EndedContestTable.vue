@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 import type { ContestListItem } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { spanMessage } from '@/lib/contest-time';
@@ -37,7 +38,7 @@ const whenText = (contest: ContestListItem) => {
   <ScrollRegion
     data-testid="ended-contests"
     :label="$t('contests.list.endedRegion')"
-    class="glass overflow-hidden rounded-card"
+    :class="[CARD_VARIANTS.glass, 'overflow-hidden']"
   >
     <table :class="ENDED_TABLE_CLASS">
       <caption class="sr-only">

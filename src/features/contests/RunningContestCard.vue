@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { contestProgress, spanMessage } from '@/lib/contest-time';
 import { formatClock, formatNumber } from '@/lib/format';
@@ -32,7 +33,7 @@ const perParticipation = computed(() =>
 </script>
 
 <template>
-  <GlassCard as="article" data-testid="running-contest" class="flex flex-col gap-3 p-5">
+  <Card as="article" data-testid="running-contest" class="flex flex-col gap-3 p-5">
     <div class="flex flex-wrap items-center gap-1.5">
       <PhasePill phase="running" />
       <ContestChips :contest="contest" with-tags with-code-needed />
@@ -51,12 +52,11 @@ const perParticipation = computed(() =>
     </div>
     <div class="flex items-center gap-3 font-mono text-meta tabular-nums">
       <span>{{ formatClock(contest.startTime, locale.locale) }}</span>
-      <span aria-hidden="true" class="h-2 flex-1 overflow-hidden rounded-pill bg-surface-hover">
-        <span
-          class="block h-full rounded-pill bg-accent"
-          :style="{ width: `${progressPercent}%` }"
-        />
-      </span>
+      <ProgressBar
+        :value="progressPercent"
+        :label="$t('home.anon.elapsed', { percent: progressPercent })"
+        class="flex-1"
+      />
       <span>{{ endLabel }}</span>
     </div>
     <div class="flex items-center gap-2 font-semibold">
@@ -91,5 +91,5 @@ const perParticipation = computed(() =>
         :is-primary="call.isPrimary"
       />
     </div>
-  </GlassCard>
+  </Card>
 </template>

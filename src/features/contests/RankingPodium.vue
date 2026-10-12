@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import type { RankingProblem, RankingRow } from '@/api/types/contests';
 import BitLoop from '@/components/BitLoop.vue';
@@ -37,10 +38,11 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
 
 <template>
   <section :aria-label="$t('ranking.podium')" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-    <div
+    <Card
       v-for="row in rows"
       :key="row.participationId"
-      class="glass flex items-center gap-3.5 rounded-card p-5"
+      as="div"
+      class="flex items-center gap-3.5 p-5"
       :class="placeOf(row)"
     >
       <span
@@ -74,6 +76,6 @@ const placeOf = (row: RankingRow) => (isPlainPodium.value ? PLACES[row.rank ?? 3
         kind="rankUp"
         class="shrink-0 [--bit-px:3px]"
       />
-    </div>
+    </Card>
   </section>
 </template>

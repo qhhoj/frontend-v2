@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { RANK_COLUMN_REM, statsWidthRem, tableMinWidthRem } from './ranking-columns';
@@ -13,7 +14,7 @@ const columns = computed(
 </script>
 
 <template>
-  <div class="glass overflow-hidden rounded-card">
+  <Card as="div" class="overflow-hidden">
     <p aria-hidden="true" class="px-5 pt-3 text-meta md:hidden">
       <SkeletonBlock text class="w-48" />
     </p>
@@ -40,5 +41,5 @@ const columns = computed(
       </span>
       <span class="block px-2.5"><SkeletonBlock text class="w-full" /></span>
     </div>
-  </div>
+  </Card>
 </template>

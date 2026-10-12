@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import StateBit from '@/components/StateBit.vue';
 import { REPLAY_BITS } from './replay-bits';
@@ -29,11 +31,11 @@ const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state))
 </script>
 
 <template>
-  <section
+  <Card
     data-testid="replay-state"
     :data-state="state"
     :role="role"
-    class="glass flex flex-col items-center gap-3 rounded-card px-6 text-center"
+    class="flex flex-col items-center gap-3 px-6 text-center"
     :class="isCompact ? 'py-6' : 'py-10'"
   >
     <StateBit
@@ -45,20 +47,14 @@ const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state))
       {{ $t(`replay.states.${state}.title`) }}
     </h2>
     <p class="max-w-md text-muted">{{ $t(`replay.states.${state}.body`) }}</p>
-    <button
-      v-if="hasRetry"
-      type="button"
-      class="min-h-11 rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
-      @click="$emit('retry')"
-    >
+    <AppButton v-if="hasRetry" @click="$emit('retry')">
       {{ $t('replay.states.retry') }}
-    </button>
-    <RouterLink
+    </AppButton>
+    <AppButton
       v-else-if="hasRankingLink"
       :to="{ name: 'contest-ranking', params: { key: contestKey } }"
-      class="inline-flex min-h-11 items-center rounded-pill border border-line px-4 font-semibold hover:bg-surface-hover"
     >
       {{ $t('replay.states.backToRanking') }}
-    </RouterLink>
-  </section>
+    </AppButton>
+  </Card>
 </template>

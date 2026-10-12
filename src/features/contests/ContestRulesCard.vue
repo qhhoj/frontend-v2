@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import { contestRules } from './contest-rules';
 import type { RuleRow } from './contest-rules';
@@ -24,7 +24,7 @@ function valueText(rule: RuleRow): string {
 </script>
 
 <template>
-  <GlassCard class="p-5">
+  <Card class="p-5">
     <h2 class="mb-3 font-display text-base font-bold">{{ $t('contests.rules.title') }}</h2>
     <dl class="flex flex-col gap-2.5 text-sm">
       <div
@@ -38,5 +38,5 @@ function valueText(rule: RuleRow): string {
         </dd>
       </div>
     </dl>
-  </GlassCard>
+  </Card>
 </template>

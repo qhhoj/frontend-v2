@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import BitLoop from '@/components/BitLoop.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import StatGrid from '@/components/ui/StatGrid.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { usePageTitle } from '@/router/page-title';
@@ -16,6 +18,7 @@ import LanguageStatsTable from './LanguageStatsTable.vue';
 import ProblemResultsTable from './ProblemResultsTable.vue';
 import { statTiles } from './stats-summary';
 
+const { t } = useI18n();
 const route = useRoute();
 const locale = useLocaleStore();
 const key = computed(() => String(route.params.key));
@@ -33,7 +36,12 @@ const solverCounts = computed(
     ),
 );
 const tiles = computed(() =>
-  stats.value ? statTiles(stats.value, contest.value?.userCount ?? 0, locale.locale) : [],
+  stats.value
+    ? statTiles(stats.value, contest.value?.userCount ?? 0, locale.locale).map((tile) => ({
+        label: t(tile.labelKey),
+        value: tile.value,
+      }))
+    : [],
 );
 </script>
 
@@ -43,11 +51,7 @@ const tiles = computed(() =>
     <template v-else>
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
       <ContestCompactHeader v-if="contest" :contest="contest" />
-      <GlassCard
-        v-if="isClosed"
-        as="div"
-        class="flex flex-col items-center gap-2 px-6 py-8 text-center"
-      >
+      <Card v-if="isClosed" as="div" class="flex flex-col items-center gap-2 px-6 py-8 text-center">
         <BitLoop kind="security" :label="$t('contests.stats.closedTitle')" class="[--bit-px:4px]" />
         <strong class="block text-content">{{ $t('contests.stats.closedTitle') }}</strong>
         <p class="text-muted">{{ $t('contests.stats.closedBody') }}</p>
@@ -57,33 +61,26 @@ const tiles = computed(() =>
         >
           {{ $t('contests.stats.toRanking') }}
         </RouterLink>
-      </GlassCard>
+      </Card>
       <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <dl class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Card
               v-for="tile in 4"
               :key="tile"
+              as="div"
+              variant="inset"
+              padding="sm"
               data-skeleton-region="stats-tile"
-              class="glass rounded-card p-5"
             >
-              <dd class="font-display text-3xl font-bold"><SkeletonBlock text class="w-20" /></dd>
-              <dt class="text-sm"><SkeletonBlock text class="w-28" /></dt>
-            </div>
-          </dl>
+              <p class="text-meta leading-4.5"><SkeletonBlock text class="w-28" /></p>
+              <p class="mt-1 text-stat leading-none"><SkeletonBlock text class="w-20" /></p>
+            </Card>
+          </div>
           <SkeletonBlock data-skeleton-region="problem-results" class="h-72 w-full rounded-card" />
         </template>
         <template v-if="stats">
-          <dl data-testid="stats-tiles" class="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div
-              v-for="tile in tiles"
-              :key="tile.id"
-              class="glass flex flex-col-reverse rounded-card p-5"
-            >
-              <dt class="text-sm text-muted">{{ $t(tile.labelKey) }}</dt>
-              <dd class="font-display text-3xl font-bold">{{ tile.value }}</dd>
-            </div>
-          </dl>
+          <StatGrid data-testid="stats-tiles" :items="tiles" :cols="4" mode="stat" />
           <ProblemResultsTable :problems="stats.problems" :solver-counts="solverCounts" />
           <LanguageStatsTable :languages="stats.languages" />
         </template>

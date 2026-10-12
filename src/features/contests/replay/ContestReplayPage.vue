@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { LocateFixed } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -112,10 +113,10 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
       <QueryState v-else :loading="state === 'loading'" :error="null">
         <template #skeleton>
           <div class="flex flex-col gap-5">
-            <section
+            <Card
               data-skeleton-region="player"
               data-replay-part="player"
-              class="glass flex flex-col gap-3 rounded-card p-4 sm:p-5"
+              class="flex flex-col gap-3 p-4 sm:p-5"
             >
               <div class="flex flex-wrap items-center gap-3">
                 <SkeletonBlock pill class="h-11 w-28" />
@@ -130,9 +131,9 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
               </div>
               <p class="font-mono text-xs"><SkeletonBlock text class="w-full" /></p>
               <p class="text-xs"><SkeletonBlock text class="w-56" /></p>
-            </section>
+            </Card>
             <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-              <div data-replay-part="board" class="glass overflow-hidden rounded-card">
+              <Card as="div" data-replay-part="board" class="overflow-hidden">
                 <div
                   v-for="row in BOARD_SKELETON_ROWS"
                   :key="row"
@@ -146,16 +147,17 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
                   </span>
                   <SkeletonBlock text class="hidden w-48 sm:inline-block" />
                 </div>
-              </div>
-              <div
+              </Card>
+              <Card
+                as="div"
                 data-skeleton-region="feed"
                 data-replay-part="feed"
-                class="glass flex flex-col gap-3 rounded-card p-5"
+                class="flex flex-col gap-3 p-5"
               >
                 <div class="font-display text-lg"><SkeletonBlock text class="w-28" /></div>
                 <SkeletonBlock text class="w-full" />
                 <SkeletonBlock text class="w-3/4" />
-              </div>
+              </Card>
             </div>
           </div>
         </template>
@@ -176,16 +178,12 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
             {{ $t('replay.player.finished') }}
           </p>
           <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <GlassCard as="div" data-replay-part="board" class="overflow-hidden">
+            <Card as="div" data-replay-part="board" class="overflow-hidden">
               <div v-if="myRowId" class="flex justify-end px-5 pt-4">
-                <button
-                  type="button"
-                  class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line px-4 text-sm font-semibold hover:bg-surface-hover"
-                  @click="goToMyRow"
-                >
-                  <LocateFixed class="size-4" aria-hidden="true" />
+                <AppButton @click="goToMyRow">
+                  <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
                   {{ $t('replay.player.myRow') }}
-                </button>
+                </AppButton>
               </div>
               <ReplayTable
                 ref="table"
@@ -194,7 +192,7 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
                 :viewer-id="viewerId"
                 :label="$t('replay.table.caption')"
               />
-            </GlassCard>
+            </Card>
             <ReplayEventFeed
               data-replay-part="feed"
               :entries="feed"

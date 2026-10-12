@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import { Pause, Play } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { formatDuration } from '@/lib/format';
@@ -45,21 +47,19 @@ function onScrub(event: Event) {
 </script>
 
 <template>
-  <section
+  <Card
     :aria-label="$t('replay.player.label')"
     data-replay-part="player"
-    class="glass flex flex-col gap-3 rounded-card p-4 sm:p-5"
+    class="flex flex-col gap-3 p-4 sm:p-5"
   >
     <div class="flex flex-wrap items-center gap-3">
-      <button
-        type="button"
-        class="inline-flex min-h-11 items-center gap-2 rounded-pill bg-gradient-accent px-4.5 font-bold text-on-accent"
-        @click="togglePlay"
-      >
-        <Pause v-if="isPlaying" class="size-4" aria-hidden="true" />
-        <Play v-else class="size-4" aria-hidden="true" />
+      <AppButton tone="primary" @click="togglePlay">
+        <template #icon>
+          <Pause v-if="isPlaying" class="size-4" aria-hidden="true" />
+          <Play v-else class="size-4" aria-hidden="true" />
+        </template>
         {{ isPlaying ? $t('replay.player.pause') : $t('replay.player.play') }}
-      </button>
+      </AppButton>
       <p class="font-mono tabular-nums">
         {{ clock }} <span class="text-muted">/ {{ total }}</span>
       </p>
@@ -115,5 +115,5 @@ function onScrub(event: Event) {
       <span>{{ total }}</span>
     </div>
     <p class="text-xs text-muted">{{ $t('replay.player.marksLegend') }}</p>
-  </section>
+  </Card>
 </template>

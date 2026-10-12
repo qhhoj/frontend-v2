@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ProgressBar from '@/components/ui/ProgressBar.vue';
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import type { ContestLanguageStats } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
@@ -20,11 +22,12 @@ const count = (value: number) => formatNumber(value, locale.locale);
 <template>
   <section class="flex flex-col gap-2">
     <h2 class="font-display text-xl font-bold">{{ $t('contests.stats.languageTitle') }}</h2>
-    <div
+    <Card
+      as="div"
       tabindex="0"
       role="region"
       :aria-label="$t('contests.stats.region')"
-      class="glass overflow-x-auto rounded-card focus-visible:-outline-offset-2"
+      class="overflow-x-auto focus-visible:-outline-offset-2"
     >
       <table data-testid="language-stats" class="w-full min-w-[480px] border-collapse">
         <thead>
@@ -52,15 +55,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
             <th scope="row" class="px-4 py-3 text-left font-semibold">{{ language.name }}</th>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <div
-                  aria-hidden="true"
-                  class="h-2.5 flex-1 overflow-hidden rounded-pill bg-surface-hover"
-                >
-                  <div
-                    class="h-full rounded-pill bg-accent"
-                    :style="{ width: `${share * 100}%` }"
-                  />
-                </div>
+                <ProgressBar :value="share" :max="1" :label="language.name" class="flex-1" />
                 <span class="w-16 text-right font-mono text-sm">
                   {{ formatPercent(share * 100, locale.locale) }}
                 </span>
@@ -73,6 +68,6 @@ const count = (value: number) => formatNumber(value, locale.locale);
           </tr>
         </tbody>
       </table>
-    </div>
+    </Card>
   </section>
 </template>

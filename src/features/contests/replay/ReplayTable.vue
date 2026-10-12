@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import RankingProblemHeader from '../RankingProblemHeader.vue';
 import { Ghost } from 'lucide-vue-next';
@@ -119,9 +120,9 @@ defineExpose({ focusRow });
               <Ghost class="size-4 shrink-0" aria-hidden="true" />
               <span>{{ row.name }}</span>
               <small v-if="row.caption" class="text-xs">{{ row.caption }}</small>
-              <span class="rounded-pill bg-surface-strong px-2 py-0.5 text-tiny">{{
+              <Chip>{{
                 row.isUnranked ? $t('replay.table.unranked') : $t('replay.table.ghost')
-              }}</span>
+              }}</Chip>
             </span>
             <span v-else class="inline-flex flex-wrap items-center gap-2 align-middle">
               <UserAvatar :username="row.name" :size="24" />
@@ -129,11 +130,7 @@ defineExpose({ focusRow });
               <span v-if="row.kind === 'virtual'" class="text-muted">{{
                 $t('replay.table.virtual')
               }}</span>
-              <span
-                v-if="isViewerRow(row)"
-                class="rounded-pill bg-accent-soft px-2 py-0.5 text-tiny text-accent-soft-text"
-                >{{ $t('common.you') }}</span
-              >
+              <Chip v-if="isViewerRow(row)" tone="accent">{{ $t('common.you') }}</Chip>
             </span>
           </th>
           <td class="font-bold">

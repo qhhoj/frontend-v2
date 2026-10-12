@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import { ApiError } from '@/api/client';
 import { showsCellTime } from '@/lib/ranking-cells';
@@ -30,10 +30,12 @@ const context = computed<RankingContext | null>(() => {
 
 <template>
   <div class="page-column">
-    <EmptyState v-if="isMissing" class="glass rounded-card" data-testid="public-ranking-missing">
-      <strong class="block text-content">{{ $t('ranking.public.notFoundTitle') }}</strong>
-      {{ $t('ranking.public.notFoundBody') }}
-    </EmptyState>
+    <Card v-if="isMissing" as="div">
+      <EmptyState data-testid="public-ranking-missing">
+        <strong class="block text-content">{{ $t('ranking.public.notFoundTitle') }}</strong>
+        {{ $t('ranking.public.notFoundBody') }}
+      </EmptyState>
+    </Card>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><RankingSkeleton :problem-count="4" :has-time-column="false" /></template>
       <template v-if="data && context">
@@ -41,17 +43,17 @@ const context = computed<RankingContext | null>(() => {
           <p class="text-muted">{{ $t('ranking.public.subtitle') }}</p>
           <h1 class="mt-1 page-title">{{ data.contest.name }}</h1>
         </div>
-        <EmptyState v-if="!data.ranking.rows.length" class="glass rounded-card">{{
-          $t('ranking.empty')
-        }}</EmptyState>
-        <GlassCard v-else as="div" class="overflow-hidden">
+        <Card v-if="!data.ranking.rows.length" as="div">
+          <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
+        </Card>
+        <Card v-else as="div" class="overflow-hidden">
           <RankingTable
             :ranking="data.ranking"
             :rows="data.ranking.rows"
             :context="context"
             :viewer-id="null"
           />
-        </GlassCard>
+        </Card>
       </template>
     </QueryState>
   </div>

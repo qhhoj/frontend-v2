@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -90,7 +90,7 @@ const summaryBit = computed(() =>
           <span v-else>{{ $t('replay.overlay.noRow') }}</span>
         </p>
         <div data-overlay-part="panels" class="grid items-start gap-5 lg:grid-cols-2">
-          <GlassCard as="div" class="overflow-hidden">
+          <Card as="div" class="overflow-hidden">
             <h2 class="px-5 pt-4 font-display text-base font-bold">
               {{ $t('replay.overlay.realBoard', { time: clock }) }}
             </h2>
@@ -100,8 +100,8 @@ const summaryBit = computed(() =>
               :viewer-id="session.user?.id ?? null"
               :label="$t('replay.overlay.realBoard', { time: clock })"
             />
-          </GlassCard>
-          <GlassCard as="div" class="overflow-hidden">
+          </Card>
+          <Card as="div" class="overflow-hidden">
             <h2 class="px-5 pt-4 font-display text-base font-bold">
               {{ $t('replay.overlay.yourBoard', { time: clock }) }}
             </h2>
@@ -111,7 +111,7 @@ const summaryBit = computed(() =>
               :viewer-id="session.user?.id ?? null"
               :label="$t('replay.overlay.yourBoard', { time: clock })"
             />
-          </GlassCard>
+          </Card>
         </div>
       </template>
     </QueryState>

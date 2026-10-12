@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -10,9 +11,10 @@ const hasActionRow = computed(() => session.status === 'authenticated');
 
 <template>
   <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
-  <div
+  <Card
+    as="div"
     data-skeleton-region="contest-header"
-    class="glass grid gap-5 rounded-card p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
+    class="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
   >
     <!-- Line boxes mirror ContestHeaderCard: the phone line and the authors line each show at one width only. -->
     <div class="flex flex-col gap-3">
@@ -53,22 +55,22 @@ const hasActionRow = computed(() => session.status === 'authenticated');
       <SkeletonBlock pill class="hidden h-11 w-full md:block" />
       <SkeletonBlock v-if="hasActionRow" pill class="h-11 w-full" />
     </div>
-  </div>
+  </Card>
   <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
-    <div data-skeleton-region="problems" class="glass flex flex-col rounded-card px-5">
+    <Card as="div" data-skeleton-region="problems" class="flex flex-col px-5">
       <div v-for="row in 3" :key="row" class="py-3">
         <SkeletonBlock text class="w-full" />
       </div>
-    </div>
+    </Card>
     <aside class="flex flex-col gap-5">
-      <div data-skeleton-region="rules" class="glass rounded-card p-5">
+      <Card as="div" data-skeleton-region="rules" class="p-5">
         <dl class="flex flex-col gap-2.5 text-sm">
           <div v-for="row in 6" :key="row" class="grid grid-cols-[8rem_minmax(0,1fr)] gap-3">
             <dt><SkeletonBlock text class="w-20" /></dt>
             <dd><SkeletonBlock text class="w-full" /></dd>
           </div>
         </dl>
-      </div>
+      </Card>
     </aside>
   </div>
 </template>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Search, Snowflake } from 'lucide-vue-next';
+import { Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import EmptyState from '@/components/EmptyState.vue';
-import InlineBit from '@/components/InlineBit.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { rankingSummary } from './ranking-summary';
@@ -22,6 +24,7 @@ import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from '
 import VirtualOverlay from './replay/VirtualOverlay.vue';
 import { virtualRunOf } from './replay/virtual-run';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
@@ -106,10 +109,11 @@ const summary = computed(() =>
 );
 const setVirtual = (value: boolean) =>
   void router.replace({ query: { ...route.query, virtual: value ? '1' : undefined } });
-const VIEW_MODES = [
-  { virtual: false, labelKey: 'ranking.official' },
-  { virtual: true, labelKey: 'ranking.withVirtual' },
-] as const;
+const viewModes = computed(() => [
+  { value: 'official', label: t('ranking.official') },
+  { value: 'virtual', label: t('ranking.withVirtual') },
+]);
+const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
 </script>
 
 <template>
@@ -120,13 +124,13 @@ const VIEW_MODES = [
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div data-skeleton-region="title">
             <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
-            <div class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
+            <div class="mt-1 page-title">
               <SkeletonBlock text class="w-80 max-w-full" />
             </div>
           </div>
           <div data-skeleton-region="controls" class="flex flex-wrap items-center gap-2.5">
-            <SkeletonBlock pill class="h-[52px] w-44" />
-            <SkeletonBlock pill class="h-12 w-48" />
+            <SkeletonBlock pill class="h-(--qh-control) w-44" />
+            <SkeletonBlock pill class="h-(--qh-control) w-48" />
           </div>
         </div>
       </template>
@@ -140,7 +144,10 @@ const VIEW_MODES = [
             </h1>
           </div>
           <div class="flex flex-wrap items-center gap-2.5">
-            <p v-if="running" class="glass flex h-11 items-center gap-2.5 rounded-pill px-4.5">
+            <p
+              v-if="running"
+              class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"
+            >
               <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
               <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
               <CountdownTimer
@@ -149,32 +156,18 @@ const VIEW_MODES = [
                 @elapsed="refetchContest()"
               />
             </p>
-            <div
-              role="group"
-              :aria-label="$t('ranking.viewMode')"
-              class="glass flex rounded-pill p-1"
-            >
-              <button
-                v-for="mode in VIEW_MODES"
-                :key="mode.labelKey"
-                type="button"
-                :aria-pressed="withVirtual === mode.virtual"
-                class="min-h-11 rounded-pill px-4 text-sm"
-                :class="
-                  withVirtual === mode.virtual
-                    ? 'bg-gradient-accent font-bold text-on-accent'
-                    : 'text-content hover:bg-surface-hover'
-                "
-                @click="setVirtual(mode.virtual)"
-              >
-                {{ $t(mode.labelKey) }}
-              </button>
-            </div>
+            <SegmentedControl
+              :label="$t('ranking.viewMode')"
+              :options="viewModes"
+              :model-value="viewMode"
+              class="whitespace-nowrap"
+              @update:model-value="setVirtual($event === 'virtual')"
+            />
             <button
               v-if="virtualRun"
               type="button"
               :aria-pressed="isComparing"
-              class="glass min-h-11 rounded-pill px-4 text-sm"
+              class="glass min-h-(--qh-control) rounded-pill px-4 text-sm"
               :class="
                 isComparing
                   ? 'bg-gradient-accent font-bold text-on-accent'
@@ -184,40 +177,29 @@ const VIEW_MODES = [
             >
               {{ $t('replay.overlay.toggle') }}
             </button>
-            <label class="glass flex h-12 items-center gap-2 rounded-pill px-4 text-muted">
+            <label
+              class="glass flex h-(--qh-control) items-center gap-2 rounded-pill px-4 text-muted"
+            >
               <span class="sr-only">{{ $t('ranking.searchLabel') }}</span>
               <Search class="size-4 shrink-0" aria-hidden="true" />
               <input
                 v-model="search"
                 type="search"
                 :placeholder="$t('ranking.searchLabel')"
-                class="min-h-11 w-36 bg-transparent text-content"
+                class="h-full w-36 bg-transparent text-content"
               />
             </label>
           </div>
         </div>
-        <p
-          v-if="ranking?.frozen"
-          role="status"
-          class="glass flex items-center gap-3 rounded-tile px-5 py-3.5"
-        >
-          <span
-            aria-hidden="true"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-verdict-pending-bg text-verdict-pending"
-          >
-            <Snowflake class="size-4" />
-          </span>
-          <span
-            ><strong class="text-content">{{ $t('ranking.frozenTitle') }}</strong> —
-            {{
-              $t(
-                'ranking.frozenBody',
-                { minutes: contest.frozenLastMinutes },
-                contest.frozenLastMinutes,
-              )
-            }}</span
-          >
-        </p>
+        <Notice v-if="ranking?.frozen" role="status" :title="$t('ranking.frozenTitle')">
+          {{
+            $t(
+              'ranking.frozenBody',
+              { minutes: contest.frozenLastMinutes },
+              contest.frozenLastMinutes,
+            )
+          }}
+        </Notice>
       </template>
     </QueryState>
     <QueryState
@@ -229,11 +211,13 @@ const VIEW_MODES = [
       <template #skeleton>
         <div class="flex flex-col gap-5">
           <div data-skeleton-region="podium" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div
+            <Card
               v-for="place in PODIUM_SKELETON_CARDS"
               :key="place"
+              as="div"
+              padding="md"
               data-skeleton-region="podium-card"
-              class="glass flex items-center gap-3.5 rounded-card p-5"
+              class="flex items-center gap-3.5"
             >
               <SkeletonBlock round class="shrink-0" :class="place === 1 ? 'size-15' : 'size-13'" />
               <SkeletonBlock class="size-6 shrink-0" />
@@ -241,23 +225,18 @@ const VIEW_MODES = [
                 <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
                 <p class="font-mono text-meta"><SkeletonBlock text class="w-1/2" /></p>
               </div>
-            </div>
+            </Card>
           </div>
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
-      <EmptyState v-if="!ranking?.rows.length" class="glass rounded-card">{{
-        $t('ranking.empty')
-      }}</EmptyState>
+      <Card v-if="!ranking?.rows.length" as="div">
+        <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
+      </Card>
       <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">
-        <p
-          v-if="rankingRefreshFailed"
-          role="status"
-          class="glass flex items-center gap-3 rounded-pill px-4 py-2 text-sm text-muted"
-        >
-          <InlineBit kind="sweat" />
+        <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
           {{ $t('ranking.refreshFailed') }}
-        </p>
+        </Notice>
         <RankingPodium
           v-if="podium.length"
           :rows="podium"
@@ -265,14 +244,14 @@ const VIEW_MODES = [
           :context="rankingContext"
           :class="{ 'opacity-60': rankingStale }"
         />
-        <GlassCard as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
+        <Card as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
           <RankingTable
             :ranking="ranking"
             :rows="rows"
             :context="rankingContext"
             :viewer-id="session.user?.id ?? null"
           />
-        </GlassCard>
+        </Card>
       </div>
     </QueryState>
     <VirtualOverlay

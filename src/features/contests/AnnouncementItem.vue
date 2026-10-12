@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import UserContent from '@/components/UserContent.vue';
 import { formatDateTime } from '@/lib/format';
 import type { Announcement } from '@/api/types/contests';
@@ -17,12 +18,9 @@ const locale = useLocaleStore();
       <time :datetime="announcement.createdAt">{{
         formatDateTime(announcement.createdAt, locale.locale)
       }}</time>
-      <span
-        v-if="isUnread"
-        data-testid="unread-pill"
-        class="rounded-pill bg-accent-soft px-2 font-semibold text-accent-soft-text"
-        >{{ $t('contests.announcements.new') }}</span
-      >
+      <Chip v-if="isUnread" data-testid="unread-pill" tone="accent">{{
+        $t('contests.announcements.new')
+      }}</Chip>
     </p>
     <h3 class="font-semibold">{{ announcement.title }}</h3>
     <div :class="{ 'line-clamp-3': isCompact }">

@@ -10,7 +10,6 @@ describe('tag chips', () => {
       slug: 'tin-hoc-tre-2019',
       label: 'tin-hoc-tre-2019',
       color: null,
-      colorClass: 'border-line text-muted',
     });
   });
 
