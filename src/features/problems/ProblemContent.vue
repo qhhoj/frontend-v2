@@ -15,7 +15,6 @@ import ProblemFactsCard from './ProblemFactsCard.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import ProblemLinksCard from './ProblemLinksCard.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
-import ProblemSubmissionsTab from './ProblemSubmissionsTab.vue';
 import ProblemSubmitCard from './ProblemSubmitCard.vue';
 import ProblemTabs from './ProblemTabs.vue';
 import StatementBody from './StatementBody.vue';
@@ -57,7 +56,12 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="layout.grid">
     <ProblemHeader :problem="problem" :class="layout.left">
-      <ProblemTabs v-model="tab" :tabs="tabs" :label="$t('problem.tabsLabel')" />
+      <ProblemTabs
+        v-if="tabs.length > 1"
+        v-model="tab"
+        :tabs="tabs"
+        :label="$t('problem.tabsLabel')"
+      />
     </ProblemHeader>
     <aside
       data-testid="problem-rail"
@@ -79,8 +83,8 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
         v-for="panel in tabs"
         :id="`problem-panel-${panel.id}`"
         :key="panel.id"
-        role="tabpanel"
-        :aria-labelledby="`problem-tab-${panel.id}`"
+        :role="tabs.length > 1 ? 'tabpanel' : undefined"
+        :aria-labelledby="tabs.length > 1 ? `problem-tab-${panel.id}` : undefined"
         :hidden="panel.id !== tab"
         :tabindex="panel.id === tab ? 0 : undefined"
       >
@@ -125,10 +129,6 @@ const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id 
           v-if="panel.id === 'editorial' && tab === 'editorial'"
           :code="problem.code"
           @gone="$emit('gone')"
-        />
-        <ProblemSubmissionsTab
-          v-if="panel.id === 'submissions' && tab === 'submissions'"
-          :code="problem.code"
         />
       </div>
     </div>
