@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import { verifyTotp } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { OTP_LENGTH, normalizeBackupCode } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
 import AuthBadge from './AuthBadge.vue';
@@ -35,7 +36,8 @@ const digits = ref('');
 const backupCode = ref('');
 const keyAttempted = ref(false);
 const otp = ref<{ focus: () => void } | null>(null);
-const keyButton = ref<HTMLButtonElement | null>(null);
+/** An `AppButton`; its root element takes the focus. */
+const keyButton = ref<{ $el: HTMLElement } | null>(null);
 /** The wrong-code text's id: the six boxes point at it while the code is refused. */
 const CODE_ERROR_ID = 'two-factor-code-error';
 const formElement = ref<HTMLFormElement | null>(null);
@@ -51,8 +53,6 @@ const failed = computed(
   () =>
     Boolean(summary.value) || view.value === 'keyUnsupported' || view.value === 'sessionChanged',
 );
-const SECONDARY =
-  'flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-sm font-semibold hover:bg-surface-hover';
 const LINK = 'font-semibold text-accent-text underline';
 
 /** Any accepted factor flips the server session to authenticated; reload it, then leave like a password sign-in. */
@@ -96,7 +96,7 @@ async function signInWithKey() {
   keyAttempted.value = true;
   // The browser's prompt takes focus; focusing the button first returns focus there when the prompt closes.
   await nextTick();
-  keyButton.value?.focus();
+  keyButton.value?.$el.focus();
   await run(() =>
     refreshIfFactorGone(async () => {
       if ((await signInWithPasskey()) !== 'cancelled') await finish();
@@ -124,13 +124,10 @@ async function signOut() {
     centered
   >
     <template #header-end>
-      <button
-        type="button"
-        class="flex h-11 items-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-4 font-semibold hover:bg-surface-hover"
-        @click="signOut"
-      >
-        <LogOut aria-hidden="true" class="size-4" />{{ $t('account.logout') }}
-      </button>
+      <AppButton @click="signOut">
+        <template #icon><LogOut aria-hidden="true" class="size-4" /></template>
+        {{ $t('account.logout') }}
+      </AppButton>
     </template>
     <template #badge>
       <InlineBit v-if="failed" kind="sweat" class="self-center" />
@@ -166,14 +163,10 @@ async function signOut() {
       />
       <AuthError :id="CODE_ERROR_ID" :text="summary" />
       <AuthSubmit :pending="pending">{{ $t('auth.twoFactor.submit') }}</AuthSubmit>
-      <button
-        v-if="view === 'app' && keyUsable"
-        type="button"
-        :class="SECONDARY"
-        @click="signInWithKey"
-      >
-        <Fingerprint aria-hidden="true" class="size-[18px]" />{{ $t('auth.twoFactor.useKey') }}
-      </button>
+      <AppButton v-if="view === 'app' && keyUsable" block @click="signInWithKey">
+        <template #icon><Fingerprint aria-hidden="true" class="size-[18px]" /></template>
+        {{ $t('auth.twoFactor.useKey') }}
+      </AppButton>
     </form>
     <template v-else-if="view === 'key'">
       <!-- Always mounted: a live region inserted already holding its text is often not announced. -->
@@ -185,24 +178,13 @@ async function signOut() {
         </template>
       </p>
       <AuthError :text="summary" />
-      <button
-        ref="keyButton"
-        type="button"
-        :aria-disabled="pending ? 'true' : undefined"
-        :class="SECONDARY"
-        @click="signInWithKey"
-      >
+      <AppButton ref="keyButton" block :disabled="pending" @click="signInWithKey">
         {{ keyAttempted ? $t('auth.twoFactor.retryKey') : $t('auth.twoFactor.useKey') }}
-      </button>
+      </AppButton>
     </template>
-    <button
-      v-else-if="view === 'sessionChanged'"
-      type="button"
-      class="bg-gradient-accent h-12 w-full rounded-pill font-display font-semibold text-on-accent"
-      @click="signOut"
-    >
+    <AppButton v-else-if="view === 'sessionChanged'" tone="primary" block @click="signOut">
       {{ $t('auth.twoFactor.signInAgain') }}
-    </button>
+    </AppButton>
     <p v-if="hasCode" class="text-center text-sm">
       <button type="button" :class="LINK" @click="switchTo(view === 'backup' ? 'app' : 'backup')">
         {{ view === 'backup' ? $t('auth.twoFactor.useApp') : $t('auth.twoFactor.useBackup') }}

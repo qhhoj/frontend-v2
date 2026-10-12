@@ -4,9 +4,13 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import { buttonClasses } from '@/components/ui/button-classes';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 import { formatScratchCode, scratchCodesText } from './totp-setup';
+
+/** Not an AppButton: while the box is unticked a click still reminds and moves focus to it. */
+const DONE_BUTTON = buttonClasses({ tone: 'primary' });
 
 /** The backup codes, shown once (enrolment and regeneration). Leaving before ticking the box asks first, in the shared dialog. */
 const props = defineProps<{ codes: string[]; username: string; notice: string }>();
@@ -109,12 +113,12 @@ onBeforeRouteLeave((to) => {
     </ul>
     <div class="flex flex-wrap gap-2.5">
       <CopyButton :text="text" :label="$t('settings.codes.copy')" />
-      <button type="button" :class="BUTTON.secondary" @click="download">
+      <AppButton @click="download">
         {{ $t('settings.codes.download') }}
-      </button>
-      <button type="button" :class="BUTTON.secondary" @click="print">
+      </AppButton>
+      <AppButton @click="print">
         {{ $t('settings.codes.print') }}
-      </button>
+      </AppButton>
     </div>
     <label class="flex min-h-11 items-center gap-3 text-sm font-semibold">
       <input ref="checkbox" v-model="acknowledged" type="checkbox" class="size-5 accent-accent" />
@@ -125,7 +129,7 @@ onBeforeRouteLeave((to) => {
     </p>
     <button
       type="button"
-      :class="[BUTTON.primary, 'self-start']"
+      :class="[DONE_BUTTON, 'self-start']"
       :aria-disabled="!acknowledged"
       @click="finish"
     >

@@ -21,7 +21,6 @@ export const ALLOWED = {
   'features/auth/AuthBrand.vue': ['text-[22px]', 'lg:text-[28px]'],
   'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
-  'features/account/settings/SettingsLayout.vue': ['text-[28px]', 'sm:text-[34px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],

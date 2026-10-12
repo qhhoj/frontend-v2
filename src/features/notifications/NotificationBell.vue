@@ -5,6 +5,7 @@ import { computed, onScopeDispose, ref, watch } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
@@ -192,13 +193,9 @@ const drawerPt = computed(() => ({
         />
       </QueryState>
       <template #footer>
-        <RouterLink
-          :to="{ name: 'notifications' }"
-          class="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-line font-semibold hover:bg-surface-hover"
-          @click="isOpen = false"
-        >
+        <AppButton block :to="{ name: 'notifications' }" @click="isOpen = false">
           {{ $t('notifications.seeAll') }}
-        </RouterLink>
+        </AppButton>
       </template>
     </Drawer>
   </template>

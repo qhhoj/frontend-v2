@@ -2,12 +2,12 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { regenerateScratchCodes } from '@/api/account.api';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { OTP_LENGTH } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
-import { BUTTON } from '../settings/buttons';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
 import SecondFactorCodeField from './SecondFactorCodeField.vue';
 import { SCRATCH_CODES_REMAINING_KEY } from './security.queries';
@@ -57,21 +57,12 @@ async function regenerate() {
       <SecondFactorCodeField v-model="code" :label="$t('settings.totp.regenerateCode')" />
       <AuthError :text="summary" />
       <div class="flex flex-wrap gap-2.5">
-        <button
-          type="submit"
-          :class="BUTTON.primary"
-          :aria-disabled="pending || code.length < OTP_LENGTH"
-        >
+        <AppButton type="submit" tone="primary" :disabled="pending || code.length < OTP_LENGTH">
           {{ $t('settings.totp.regenerateSubmit') }}
-        </button>
-        <button
-          type="button"
-          :class="BUTTON.secondary"
-          :aria-disabled="pending"
-          @click="pending || emit('close')"
-        >
+        </AppButton>
+        <AppButton :disabled="pending" @click="emit('close')">
           {{ $t('common.cancel') }}
-        </button>
+        </AppButton>
       </div>
     </form>
   </SettingsCard>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 </script>
 
 <template>
   <!-- Decorative: it shows the page's own tokens at work, so assistive technology skips it. Nothing in here is focusable. -->
   <div aria-hidden="true" class="flex flex-col gap-3.5">
-    <GlassCard class="flex flex-col gap-3.5 p-6">
+    <Card class="flex flex-col gap-3.5 p-6">
       <div class="flex items-center justify-between gap-3">
         <h3 class="font-display text-[22px] font-bold">{{ $t('appearance.previewTitle') }}</h3>
         <span
@@ -23,7 +23,7 @@ import GlassCard from '@/components/GlassCard.vue';
       >
         {{ $t('appearance.previewSubmit') }}
       </span>
-    </GlassCard>
+    </Card>
     <span
       class="inline-flex h-10 w-fit items-center gap-2 rounded-pill border border-accent bg-accent-soft px-3.5 text-sm text-accent-soft-text"
     >

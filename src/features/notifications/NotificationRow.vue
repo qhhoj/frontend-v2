@@ -2,6 +2,7 @@
 import { Check } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
+import IconButton from '@/components/ui/IconButton.vue';
 import { translate } from '@/i18n';
 import { formatAgo } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -65,14 +66,14 @@ const hasChips = computed(() => !props.isStale);
       <span class="line-clamp-2 text-sm text-muted">{{ body }}</span>
       <time :datetime="item.lastActivityAt" class="text-xs text-muted">{{ when }}</time>
     </button>
-    <button
+    <IconButton
       v-if="canMarkRead && item.unread"
-      type="button"
-      class="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-line hover:bg-surface-hover"
-      :aria-label="$t('notifications.markRead', { title })"
+      tone="secondary"
+      class="shrink-0"
+      :label="$t('notifications.markRead', { title })"
       @click="emit('markRead', item)"
     >
       <Check aria-hidden="true" class="size-[18px]" />
-    </button>
+    </IconButton>
   </li>
 </template>

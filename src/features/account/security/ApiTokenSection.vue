@@ -3,12 +3,12 @@ import { ref } from 'vue';
 import { regenerateApiToken } from '@/api/account.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 
 /** The new token lives in this component only: leaving the page drops it for good (board SetSecurityA). */
 const token = ref<string | null>(null);
@@ -38,9 +38,9 @@ async function regenerate() {
 <template>
   <SettingsCard :title="$t('settings.token.title')" :lead="$t('settings.token.lead')">
     <template #header-end>
-      <button type="button" :class="BUTTON.secondary" @click="open">
+      <AppButton @click="open">
         {{ $t('settings.token.create') }}
-      </button>
+      </AppButton>
     </template>
     <template v-if="token">
       <SettingsNotice tone="warning">{{ $t('settings.token.copyNow') }}</SettingsNotice>

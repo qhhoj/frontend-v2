@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 
 /** Sticky at the bottom of the form (board SetProfile, SetPhone); Save is the form's submit button. */
@@ -12,10 +13,6 @@ const status = computed(() => {
     return translate('settings.profile.fixToSave', { count: props.invalidCount });
   return translate(props.dirty ? 'settings.profile.unsaved' : 'settings.profile.noChanges');
 });
-
-function requestUndo() {
-  if (!idle.value) emit('undo');
-}
 </script>
 
 <template>
@@ -24,21 +21,12 @@ function requestUndo() {
   >
     <p class="text-sm text-muted">{{ status }}</p>
     <div class="flex gap-2.5">
-      <button
-        type="button"
-        class="min-h-11 rounded-pill border border-line-strong bg-surface-solid px-5 text-sm font-semibold hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:text-muted"
-        :aria-disabled="idle"
-        @click="requestUndo"
-      >
+      <AppButton :disabled="idle" @click="emit('undo')">
         {{ $t('settings.profile.undo') }}
-      </button>
-      <button
-        type="submit"
-        class="min-h-11 rounded-pill bg-gradient-accent px-5 text-sm font-bold text-on-accent aria-disabled:cursor-not-allowed aria-disabled:bg-none aria-disabled:bg-surface-hover aria-disabled:text-muted"
-        :aria-disabled="idle"
-      >
+      </AppButton>
+      <AppButton type="submit" tone="primary" :disabled="!dirty" :loading="pending">
         {{ pending ? $t('settings.profile.saving') : $t('settings.profile.save') }}
-      </button>
+      </AppButton>
     </div>
   </div>
 </template>

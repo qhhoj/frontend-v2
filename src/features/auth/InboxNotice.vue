@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RotateCw } from 'lucide-vue-next';
 import { ref } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from './AuthError.vue';
 import { useAuthAction } from './use-auth-action';
 import { useCooldown } from './use-cooldown';
@@ -28,17 +29,12 @@ async function resendMail() {
       <p v-if="resent" class="font-semibold text-content">{{ $t('auth.inbox.resent') }}</p>
     </div>
     <AuthError :text="summary" />
-    <button
-      type="button"
-      :aria-disabled="coolingDown || pending ? 'true' : undefined"
-      class="flex h-12 w-full items-center justify-center gap-2 rounded-pill border border-line-strong bg-surface-solid font-display text-sm font-semibold text-content hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted"
-      @click="resendMail"
-    >
-      <RotateCw aria-hidden="true" class="size-[18px]" />
+    <AppButton block :disabled="coolingDown || pending" @click="resendMail">
+      <template #icon><RotateCw aria-hidden="true" class="size-[18px]" /></template>
       <template v-if="coolingDown">{{
         $t('auth.inbox.resendIn', { time: remainingText })
       }}</template>
       <template v-else>{{ $t('auth.inbox.resend') }}</template>
-    </button>
+    </AppButton>
   </div>
 </template>

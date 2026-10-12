@@ -2,13 +2,13 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 import { addSecurityKey } from './security-key';
 import { SECURITY_KEYS_KEY } from './security.queries';
 
@@ -73,17 +73,12 @@ async function submit() {
       <SettingsNotice v-if="pending" tone="info">{{ $t('settings.keys.waiting') }}</SettingsNotice>
       <AuthError :text="summary" />
       <div class="flex flex-wrap gap-2.5">
-        <button type="submit" :class="BUTTON.primary" :aria-disabled="!canSubmit">
+        <AppButton type="submit" tone="primary" :disabled="!canSubmit" :loading="pending">
           {{ pending ? $t('settings.keys.registering') : $t('settings.keys.register') }}
-        </button>
-        <button
-          type="button"
-          :class="BUTTON.secondary"
-          :aria-disabled="pending"
-          @click="pending || emit('close')"
-        >
+        </AppButton>
+        <AppButton :disabled="pending" @click="emit('close')">
           {{ $t('common.cancel') }}
-        </button>
+        </AppButton>
       </div>
     </form>
   </SettingsCard>

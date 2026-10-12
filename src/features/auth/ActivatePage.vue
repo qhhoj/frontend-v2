@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { activate, resendActivation } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { useWaitingWhile } from '@/stores/use-waiting-while';
 import type { BitKind } from '@/mascot/bit-frames';
 import type { BitMood } from '@/mascot/bit-moods';
@@ -97,12 +98,9 @@ onMounted(() => {
     <template v-if="card.bit" #badge>
       <InlineBit :kind="card.bit" class="self-center" />
     </template>
-    <RouterLink
-      v-if="state === 'activated'"
-      :to="{ name: 'login' }"
-      class="bg-gradient-accent flex h-12 items-center justify-center rounded-pill font-display font-semibold text-on-accent"
-      >{{ $t('auth.submitLogin') }}</RouterLink
-    >
+    <AppButton v-if="state === 'activated'" tone="primary" block :to="{ name: 'login' }">{{
+      $t('auth.submitLogin')
+    }}</AppButton>
     <EmailLinkRequest
       v-else-if="asksForEmail"
       :send="resendActivation"
@@ -115,14 +113,9 @@ onMounted(() => {
     </EmailLinkRequest>
     <template v-else>
       <AuthError :text="errorText" />
-      <button
-        v-if="state === 'failed'"
-        type="button"
-        class="flex h-12 items-center justify-center rounded-pill border border-line-strong bg-surface-solid font-display font-semibold text-content"
-        @click="retryActivation"
-      >
+      <AppButton v-if="state === 'failed'" block @click="retryActivation">
         {{ $t('auth.activation.retry') }}
-      </button>
+      </AppButton>
     </template>
   </AuthLayout>
 </template>

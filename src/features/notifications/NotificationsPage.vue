@@ -3,10 +3,11 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
@@ -79,15 +80,9 @@ const FILTER_CLASS =
           <p class="mt-2 text-muted">{{ $t('notifications.lead') }}</p>
         </div>
       </div>
-      <button
-        v-if="canReadAll"
-        type="button"
-        class="inline-flex min-h-11 items-center rounded-pill border border-line px-5 font-semibold hover:bg-surface-hover"
-        :aria-busy="markAll.isPending.value ? 'true' : undefined"
-        @click="readAll"
-      >
+      <AppButton v-if="canReadAll" :loading="markAll.isPending.value" @click="readAll">
         {{ $t('notifications.readAllLong') }}
-      </button>
+      </AppButton>
     </header>
     <SettingsNotice
       v-if="!opener.canMarkRead.value"
@@ -156,7 +151,7 @@ const FILTER_CLASS =
           {{ $t(`notifications.kinds.${option}`) }}
         </RouterLink>
       </nav>
-      <GlassCard
+      <Card
         as="section"
         data-testid="notifications-card"
         class="p-4 sm:p-6"
@@ -214,7 +209,7 @@ const FILTER_CLASS =
             </footer>
           </template>
         </QueryState>
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>

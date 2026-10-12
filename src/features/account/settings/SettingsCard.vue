@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 
 /** One titled settings card on the shared glass surface. */
 defineProps<{ title: string; lead?: string }>();
@@ -12,7 +12,7 @@ defineExpose({ focusHeading });
 </script>
 
 <template>
-  <GlassCard :aria-labelledby="headingId" class="flex flex-col gap-5 p-5 md:p-7">
+  <Card :aria-labelledby="headingId" class="flex flex-col gap-5 p-5 md:p-7">
     <header class="flex flex-wrap items-start justify-between gap-4">
       <div class="max-w-[620px]">
         <h2
@@ -28,5 +28,5 @@ defineExpose({ focusHeading });
       <slot name="header-end" />
     </header>
     <slot />
-  </GlassCard>
+  </Card>
 </template>

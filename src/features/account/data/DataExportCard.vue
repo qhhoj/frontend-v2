@@ -5,6 +5,7 @@ import { DATA_EXPORT_DOWNLOAD_URL, requestDataExport } from '@/api/account.api';
 import { ApiError } from '@/api/client';
 import type { DataExportStatus } from '@/api/types/account';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { translate } from '@/i18n';
 import { formatDateTime, formatFileSize } from '@/lib/format';
@@ -12,7 +13,6 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsNotice from '../settings/SettingsNotice.vue';
-import { BUTTON } from '../settings/buttons';
 import { daysLeft, exportFileOf, requestRuleOf, timeLeft } from './data-export';
 import { DATA_EXPORT_KEY } from './data.queries';
 
@@ -89,9 +89,9 @@ async function request() {
           }}
         </p>
       </div>
-      <a :href="DATA_EXPORT_DOWNLOAD_URL" download :class="BUTTON.primary">
+      <AppButton :href="DATA_EXPORT_DOWNLOAD_URL" download tone="primary">
         {{ $t('settings.data.download') }}
-      </a>
+      </AppButton>
       <p class="w-full text-meta text-muted">
         {{
           $t('settings.data.expires', {
@@ -117,16 +117,15 @@ async function request() {
     </dl>
     <SettingsNotice v-if="failureText" tone="error" bit="sweat">{{ failureText }}</SettingsNotice>
     <div class="flex flex-col items-start gap-1.5">
-      <button
-        type="button"
+      <AppButton
         data-request-export
-        :class="BUTTON.primary"
-        :aria-disabled="!canRequest"
+        tone="primary"
+        :disabled="!canRequest"
         :aria-describedby="ruleText ? ruleId : undefined"
         @click="request"
       >
         {{ buttonText }}
-      </button>
+      </AppButton>
       <p v-if="ruleText" :id="ruleId" class="text-meta text-muted">{{ ruleText }}</p>
     </div>
   </SettingsCard>
