@@ -1,22 +1,20 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import BitSprite from '@/components/BitSprite.vue';
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import SwarmBit from '@/components/SwarmBit.vue';
 import { useMotionOff } from '@/lib/use-motion-off';
 import { BIT_LOOKS } from '@/mascot/bit-sprite';
 import {
   LOADING_BIT_SIZE,
-  LOADING_PIXEL,
   bitCount,
-  hopOffset,
   isGone,
   leaveHeading,
-  legStep,
   spawnWalker,
   stepLeaver,
   stepWalker,
   walkBounds,
 } from '@/mascot/bit-walk';
 import type { Walker } from '@/mascot/bit-walk';
+import { useBitPlacement, useFrameLoop, viewportSize } from '@/mascot/use-bit-swarm';
 import { LOADING_TIMING } from './use-loading-phase';
 import type { LoadingPhase } from './use-loading-phase';
 
@@ -33,78 +31,43 @@ const props = defineProps<{ phase: LoadingPhase }>();
 const emit = defineEmits<{ gone: [] }>();
 
 const reducedMotion = useMotionOff();
-// Measured without the scrollbar, which the fixed layer does not cover.
-const viewport = () => ({
-  width: document.documentElement.clientWidth,
-  height: document.documentElement.clientHeight,
-});
 const looks = computed(() =>
   props.phase === 'hidden'
     ? []
-    : BIT_LOOKS.slice(0, reducedMotion.value ? 1 : bitCount(viewport().width)),
+    : BIT_LOOKS.slice(0, reducedMotion.value ? 1 : bitCount(viewportSize().width)),
 );
-const legSteps = ref<boolean[]>([]);
-const bitElements: Array<HTMLElement | null> = [];
+const { legSteps, bind, place, clear: clearPlacement } = useBitPlacement();
 let walkers: Walker[] = [];
-let frameId = 0;
-let lastTimestamp: number | null = null;
 
 const isExiting = () => props.phase === 'leaving' || props.phase === 'fading';
 const isAnimated = () => props.phase !== 'hidden' && !reducedMotion.value;
 
-function place(index: number) {
-  const element = bitElements[index];
-  const walker = walkers[index];
-  if (!element || !walker) return;
-  element.style.transform = `translate(${walker.x}px, ${walker.y + hopOffset(walker.hopMsLeft)}px)`;
-  const flipper = element.firstElementChild as HTMLElement | null;
-  if (flipper) flipper.style.transform = walker.facing < 0 ? 'scaleX(-1)' : 'none';
-  const stepping = legStep(walker.travelled);
-  if (legSteps.value[index] !== stepping) legSteps.value[index] = stepping;
-}
-
-/** Back to the CSS position (the corner under reduced motion). */
-function clearPlacement() {
-  bitElements.forEach((element) => {
-    if (!element) return;
-    element.style.transform = '';
-    if (element.firstElementChild) (element.firstElementChild as HTMLElement).style.transform = '';
-  });
-}
-
-function tick(timestamp: number) {
-  const frameMs = lastTimestamp === null ? 0 : timestamp - lastTimestamp;
-  lastTimestamp = timestamp;
-  const area = viewport();
+function tick(frameMs: number) {
+  const area = viewportSize();
   if (isExiting()) walkers = walkers.map((walker) => stepLeaver(walker, frameMs));
   else {
     const bounds = walkBounds(area, LOADING_BIT_SIZE);
     walkers = walkers.map((walker) => stepWalker(walker, bounds, frameMs, Math.random));
   }
-  walkers.forEach((_walker, index) => place(index));
-  frameId = requestAnimationFrame(tick);
+  walkers.forEach((walker, index) => place(index, walker));
   if (isExiting() && walkers.every((walker) => isGone(walker, area, LOADING_BIT_SIZE)))
     emit('gone');
 }
+const loop = useFrameLoop(tick);
 
 function startLoop() {
   if (!walkers.length) {
-    const bounds = walkBounds(viewport(), LOADING_BIT_SIZE);
+    const bounds = walkBounds(viewportSize(), LOADING_BIT_SIZE);
     walkers = looks.value.map(() => spawnWalker(bounds, Math.random));
-    walkers.forEach((_walker, index) => place(index));
+    walkers.forEach((walker, index) => place(index, walker));
   }
-  if (!frameId && !document.hidden) frameId = requestAnimationFrame(tick);
+  loop.start();
 }
-
-function stopLoop() {
-  if (frameId) cancelAnimationFrame(frameId);
-  frameId = 0;
-  lastTimestamp = null;
-}
+const stopLoop = loop.stop;
 
 /** The exit heading of every Bit, chosen once as leaving starts. */
 function headForNearestEdge() {
-  const area = viewport();
+  const area = viewportSize();
   walkers = walkers.map((walker) => ({
     ...walker,
     heading: leaveHeading(walker, area, LOADING_BIT_SIZE),
@@ -156,23 +119,15 @@ onBeforeUnmount(() => {
     :class="phase === 'fading' ? 'opacity-0' : 'opacity-100'"
     :style="{ transitionDuration: `${LOADING_TIMING.fadeMs}ms` }"
   >
-    <div
+    <SwarmBit
       v-for="(look, index) in looks"
       :key="look.headgear"
-      :ref="(element) => (bitElements[index] = element as HTMLElement | null)"
+      :ref="bind(index)"
       data-testid="loading-bit"
-      :data-headgear="look.headgear"
-      class="pointer-events-none absolute will-change-transform"
+      :look="look"
+      :step="legSteps[index]"
+      class="pointer-events-none"
       :class="reducedMotion ? 'bottom-4 left-4' : 'top-0 left-0'"
-      :style="{
-        '--bit-px': `${LOADING_PIXEL}px`,
-        width: `${LOADING_BIT_SIZE}px`,
-        height: `${LOADING_BIT_SIZE}px`,
-      }"
-    >
-      <div>
-        <BitSprite :look="look" :step="legSteps[index]" />
-      </div>
-    </div>
+    />
   </div>
 </template>

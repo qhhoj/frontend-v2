@@ -7,11 +7,14 @@ export interface ToastInput {
   tone?: ToastTone;
   /** Shows "Hoàn tác"; runs once and closes the toast. Only for reversible actions. */
   undo?: () => void;
+  /** The undo button's label when it is not "Hoàn tác" (e.g. "Gọi lại"). */
+  undoLabel?: string;
 }
 
-export interface Toast extends Required<Omit<ToastInput, 'undo'>> {
+export interface Toast extends Required<Omit<ToastInput, 'undo' | 'undoLabel'>> {
   id: number;
   undo?: () => void;
+  undoLabel?: string;
 }
 
 /** At most three toasts; a fourth pushes out the oldest. */
@@ -55,6 +58,7 @@ export function showToast(input: ToastInput): number {
     text: input.text,
     tone: input.tone ?? 'success',
     undo: input.undo,
+    undoLabel: input.undoLabel,
   };
   toasts.push(toast);
   while (toasts.length > MAX_TOASTS) dismissToast(toasts[0]!.id);

@@ -62,7 +62,7 @@ function undo(toast: Toast) {
           :class="buttonClass('ghost', 'sm')"
           @click="undo(toast)"
         >
-          {{ translate('admin.feedback.toast.undo') }}
+          {{ toast.undoLabel ?? translate('admin.feedback.toast.undo') }}
         </button>
         <button
           type="button"

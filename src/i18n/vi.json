@@ -640,6 +640,16 @@
     "savedBrowser": "Đã lưu trong trình duyệt này · đăng nhập để dùng trên mọi thiết bị",
     "solidByDevice": "Thiết bị của bạn yêu cầu giảm độ trong suốt, nên các thẻ luôn đặc."
   },
+  "bitRoam": {
+    "title": "Bit chạy quanh trang",
+    "help": "Bit của màn hình tải đi lại quanh trang.",
+    "new": "Mới",
+    "count": "Số Bit",
+    "countHint": "Tối đa 5; điện thoại tối đa 3.",
+    "stillNote": "Bit đứng yên khi bật Chế độ tiết kiệm hoặc giảm chuyển động.",
+    "resting": "Bit đi nghỉ đến hết phiên này",
+    "callBack": "Gọi lại"
+  },
   "theme": {
     "styleClay": "Clay",
     "styleGlass": "Glass",
