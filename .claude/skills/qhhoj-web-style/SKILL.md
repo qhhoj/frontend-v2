@@ -84,6 +84,7 @@ Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values
 - Empty states always offer one next step. Skeletons are shaped from the real component, never fixed pixel heights.
 - Active tab = `bg-accent-soft` + `text-accent-soft-text` + accent border.
 - Copy: Vietnamese first, through i18n (vi and en both), short and plain. Lucide icons only, no emoji.
+- Person names in mock-ups, placeholders, examples and fixtures shown on screen: only `thanhngan` / `ricelee` (Thanh Ngân / Rice Lee). Never invent other names.
 
 ## 5. Process
 
