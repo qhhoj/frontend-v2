@@ -9,6 +9,7 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import OrganizationChips from '../../ui/OrganizationChips.vue';
 import UsernameChips from '../../ui/UsernameChips.vue';
 import { EDIT_ALL_PROBLEM, permissionLock } from './field-lock';
+import ProblemOrganizationsField from './ProblemOrganizationsField.vue';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
@@ -20,8 +21,10 @@ defineProps<{
   sectionId?: string;
 }>();
 const { can } = usePermissions();
-/** Staff-only people and organizations: a viewer without `judge.edit_all_problem` sees them locked. */
+/** Staff-only people: a viewer without `judge.edit_all_problem` sees them locked. */
 const staffLock = computed(() => permissionLock(can, EDIT_ALL_PROBLEM));
+/** Staff set the organizations freely; other editors move the problem between the organizations they manage. */
+const editsAllProblems = computed(() => can(EDIT_ALL_PROBLEM));
 </script>
 
 <template>
@@ -68,20 +71,21 @@ const staffLock = computed(() => permissionLock(can, EDIT_ALL_PROBLEM));
       :locked-by="staffLock"
       :error="errors.bannedUsers"
     />
-    <OrganizationChips
-      v-model="form.organizations"
-      data-testid="people-organizations"
-      :label="$t('admin.problems.people.organizations')"
-      :locked-by="staffLock"
-      :error="errors.organizations"
-    />
-    <AdminCheckbox
-      v-model="form.isOrganizationPrivate"
-      class="lg:mt-7"
-      input-id="problem-isOrganizationPrivate"
-      :label="$t('admin.problems.people.orgPrivate')"
-      :description="$t('admin.problems.people.orgPrivateHint')"
-      :locked-by="staffLock"
-    />
+    <template v-if="editsAllProblems">
+      <OrganizationChips
+        v-model="form.organizations"
+        data-testid="people-organizations"
+        :label="$t('admin.problems.people.organizations')"
+        :error="errors.organizations"
+      />
+      <AdminCheckbox
+        v-model="form.isOrganizationPrivate"
+        class="lg:mt-7"
+        input-id="problem-isOrganizationPrivate"
+        :label="$t('admin.problems.people.orgPrivate')"
+        :description="$t('admin.problems.people.orgPrivateHint')"
+      />
+    </template>
+    <ProblemOrganizationsField v-else v-model="form" :error="errors.organizations" />
   </AdminFormSection>
 </template>

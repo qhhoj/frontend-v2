@@ -51,10 +51,11 @@ async function typeCloneCode(code: string) {
 }
 
 describe('problem people, status and clone', () => {
-  it('locks authors, curators, banned users and organizations without judge.edit_all_problem', async () => {
+  it('locks authors, curators and banned users without judge.edit_all_problem, and offers no organization to a viewer who manages none', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_problem']), ...problemEditorRoutes() });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general?view=advanced');
-    for (const list of ['authors', 'curators', 'bannedUsers', 'organizations'])
+    expect(wrapper.find('[data-testid="people-organizations"] select').exists()).toBe(false);
+    for (const list of ['authors', 'curators', 'bannedUsers'])
       expect(
         wrapper.get(`[data-testid="people-${list}"] input`).attributes('disabled'),
         list,

@@ -148,7 +148,12 @@
     "orgPrivate": "Riêng tư theo tổ chức",
     "orgPrivateHint": "Chỉ thành viên các tổ chức trên thấy bài.",
     "suggester": "Người đề xuất",
-    "suggesterPending": "đang chờ duyệt"
+    "suggesterPending": "đang chờ duyệt",
+    "orgSite": "Trang chính (không thuộc tổ chức nào)",
+    "orgAdd": "Thêm vào tổ chức…",
+    "orgMoveHint": "Bạn chỉ thêm hoặc bỏ được tổ chức mình quản trị.",
+    "orgNotManaged": "Bạn không quản trị {name} nên không bỏ được.",
+    "orgPrefix": "Mã bài phải bắt đầu bằng {prefix}. Hãy đổi mã bài trong cùng lần lưu."
   },
   "status": {
     "title": "Trạng thái",

@@ -111,7 +111,9 @@
     "group_name_taken": "Đã có vai trò trùng tên.",
     "added_and_removed": "Không thể vừa thêm vừa bỏ cùng một mục.",
     "problem_unknown": "Không có bài nào mang mã này.",
-    "organization_code_prefix": "Mã bài của tổ chức phải bắt đầu bằng tiền tố của tổ chức, kèm ít nhất một ký tự sau."
+    "organization_code_prefix": "Mã bài của tổ chức phải bắt đầu bằng tiền tố của tổ chức, kèm ít nhất một ký tự sau.",
+    "organization_rights": "Bạn chỉ thêm hoặc bỏ được tổ chức mà bạn có quyền tạo bài.",
+    "site_problem_rights": "Cần quyền “Tạo bài” để đưa bài ra khỏi mọi tổ chức về trang chính."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

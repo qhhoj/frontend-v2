@@ -4814,6 +4814,15 @@ export interface paths {
          *     code moves the test data directory (400 `data_directory_taken` if one
          *     exists) and changing points, partial scoring or organization privacy
          *     rescores the problem. Writes a revision and returns the updated problem.
+         *     Without `judge.edit_all_problem`, `organizations` and
+         *     `isOrganizationPrivate` (a move) need the organization problem creation
+         *     rights in every organization added or removed (403
+         *     `organization_rights`) and `judge.add_problem` to leave every organization
+         *     for the site (403 `site_problem_rights`). The code is never renamed: a move
+         *     of an organization-private problem needs a code with the new first
+         *     organization's prefix in the same request (400 `organization_code_prefix`,
+         *     superusers exempt). A move into an organization spends its problem
+         *     credits and must fit its storage (403 `quota_exceeded`).
          */
         patch: operations["ProblemEditingController_edit"];
         trace?: never;
@@ -8699,7 +8708,7 @@ export interface components {
             allowedLanguages?: string[];
             /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
-            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem`. */
+            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem` (the organization fields only on create, see `organizations`). */
             authors?: string[];
             /** @description User ids that may not submit to the problem. */
             bannedUsers?: string[];
@@ -8720,7 +8729,7 @@ export interface components {
             isFullMarkup?: boolean;
             /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
-            /** @description Whether only members of `organizations` can see the problem. */
+            /** @description Whether only members of `organizations` can see the problem. Gated like `organizations`. */
             isOrganizationPrivate?: boolean;
             /** @description Whether the problem is public. Changing it needs `judge.change_public_visibility`. */
             isPublic?: boolean;
@@ -8737,7 +8746,7 @@ export interface components {
             name: string;
             /** @description Image URL used for link previews, up to 150 characters. */
             ogImage?: string;
-            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). */
+            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). On create it needs `judge.edit_all_problem`; on update the organization rules of `PATCH /problems/{code}` apply instead. */
             organizations?: string[];
             /** @description Whether partial scores are given. */
             partial?: boolean;
@@ -12717,7 +12726,7 @@ export interface components {
             allowedLanguages?: string[];
             /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
-            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem`. */
+            /** @description Author user ids. This field and the ones below up to `date` need `judge.edit_all_problem` (the organization fields only on create, see `organizations`). */
             authors?: string[];
             /** @description User ids that may not submit to the problem. */
             bannedUsers?: string[];
@@ -12740,7 +12749,7 @@ export interface components {
             isFullMarkup?: boolean;
             /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
-            /** @description Whether only members of `organizations` can see the problem. */
+            /** @description Whether only members of `organizations` can see the problem. Gated like `organizations`. */
             isOrganizationPrivate?: boolean;
             /** @description Whether the problem is public. Changing it needs `judge.change_public_visibility`. */
             isPublic?: boolean;
@@ -12757,7 +12766,7 @@ export interface components {
             name?: string;
             /** @description Image URL used for link previews, up to 150 characters. */
             ogImage?: string;
-            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). */
+            /** @description Ids of the organizations the problem is private to (with `isOrganizationPrivate`). On create it needs `judge.edit_all_problem`; on update the organization rules of `PATCH /problems/{code}` apply instead. */
             organizations?: string[];
             /** @description Whether partial scores are given. */
             partial?: boolean;
