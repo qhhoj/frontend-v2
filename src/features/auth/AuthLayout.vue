@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Card from '@/components/ui/Card.vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
-import AuthBrand from './AuthBrand.vue';
+import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 
 withDefaults(
   defineProps<{
@@ -31,7 +31,7 @@ const WIDTHS = {
     <header
       class="flex items-center justify-between gap-3 border-b border-line bg-surface-solid px-4 py-2 sm:px-8 sm:py-3"
     >
-      <AuthBrand />
+      <BrandWordmark />
       <div class="flex items-center gap-3 text-sm">
         <slot name="header-end" />
         <LocaleToggle />

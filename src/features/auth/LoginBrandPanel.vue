@@ -4,7 +4,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSiteCountsQuery } from './auth.queries';
-import AuthBrand from './AuthBrand.vue';
+import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 
 /**
  * LoginB's panel (and LoginPhone's band below lg). Decoration next to a working form: no `QueryState`, no registered
@@ -20,7 +20,7 @@ const show = (value: number) => formatNumber(value, locale.locale);
     class="grid grid-cols-[auto_1fr] items-center gap-x-3.5 bg-accent-soft px-6 py-5 lg:flex lg:flex-col lg:items-start lg:justify-between lg:p-12"
   >
     <BitLoop data-testid="login-bit" kind="welcome" class="row-span-2 [--bit-px:5px] lg:hidden" />
-    <AuthBrand size="lg" />
+    <BrandWordmark size="lg" />
     <div class="hidden lg:flex lg:flex-col lg:gap-7">
       <BitLoop data-testid="login-bit" kind="welcome" class="[--bit-px:14px]" />
       <div>
