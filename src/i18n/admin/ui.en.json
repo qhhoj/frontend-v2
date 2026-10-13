@@ -111,7 +111,9 @@
     "group_name_taken": "Another role has this name.",
     "added_and_removed": "An item cannot be added and removed at once.",
     "problem_unknown": "No problem has this code.",
-    "organization_code_prefix": "An organization problem code must start with the organization prefix, followed by at least one character."
+    "organization_code_prefix": "An organization problem code must start with the organization prefix, followed by at least one character.",
+    "organization_rights": "You can add or remove only organizations you may create problems for.",
+    "site_problem_rights": "Moving a problem out of every organization onto the main site needs the “Create problems” permission."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

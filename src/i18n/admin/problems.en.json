@@ -148,7 +148,12 @@
     "orgPrivate": "Private to organizations",
     "orgPrivateHint": "Only members of the listed organizations see the problem.",
     "suggester": "Suggested by",
-    "suggesterPending": "awaiting review"
+    "suggesterPending": "awaiting review",
+    "orgSite": "Main site (no organization)",
+    "orgAdd": "Add to an organization…",
+    "orgMoveHint": "You can add or remove only organizations you manage.",
+    "orgNotManaged": "You do not manage {name}, so you cannot remove it.",
+    "orgPrefix": "The problem code must start with {prefix}. Change the code in the same save."
   },
   "status": {
     "title": "Status",
