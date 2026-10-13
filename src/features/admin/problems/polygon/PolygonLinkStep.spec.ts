@@ -10,7 +10,7 @@ const LINK = 'https://polygon.codeforces.com/p3n21nw/LamTerQH/qhh-evolution-ioi'
 /** The wizard with one answer to every link check; returns the page and the API calls. */
 async function pasteLink(text: string, answer: MockResponse) {
   const calls = mockApi({
-    ...staffViewer(['judge.import_polygon_package', 'judge.add_problem']),
+    ...staffViewer(['judge.add_problem']),
     'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
     'POST /polygon/resolve': answer,
   });

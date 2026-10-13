@@ -118,6 +118,11 @@ export const problemEditorRoutes = (problem: EditableProblem = editableProblem()
   'GET /problems/meta': ok(problemEditingMeta()),
   // The setup checklist of a private problem reads its test data.
   [`GET /problems/${problem.code}/data`]: ok(problemData()),
+  // The data tab's Polygon card asks for the link; most problems have none.
+  [`GET /problems/${problem.code}/polygon`]: {
+    status: 404,
+    body: { error: { code: 'polygon_not_linked', message: 'polygon_not_linked' } },
+  },
 });
 
 export const testCase = (overrides: Partial<TestCase>): TestCase => ({

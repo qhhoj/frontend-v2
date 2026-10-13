@@ -16,7 +16,7 @@ const navLinks = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
 
 describe('AdminShell', () => {
   it('greets the staff member and lists only the screens their permissions open', async () => {
-    mockApi(staffViewer(['judge.add_problem', 'judge.import_polygon_package']));
+    mockApi(staffViewer(['judge.add_problem']));
     const { wrapper } = await mountApp('/admin');
     await waitForAdminShell(wrapper);
     expect(wrapper.text()).toContain('Chào minhthu');

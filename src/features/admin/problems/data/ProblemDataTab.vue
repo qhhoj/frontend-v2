@@ -5,7 +5,6 @@ import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-ed
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD } from '../../ui/controls';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
@@ -36,7 +35,6 @@ import { useDataForm } from './use-data-form';
  * source files, the checker and grader details and the test list. One save bar saves the judging form of both views.
  */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
-const { can } = usePermissions();
 const {
   query,
   form,
@@ -122,7 +120,7 @@ async function submit() {
         </div>
       </div>
       <template v-else>
-        <PolygonLinkPanel v-if="can('judge.import_polygon_package')" :code="problem.code" />
+        <PolygonLinkPanel :code="problem.code" />
         <div class="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
           <div :class="CARD"><ProblemPackageCard :code="problem.code" /></div>
           <DataSourceFiles :code="problem.code" :data="query.data.value" />

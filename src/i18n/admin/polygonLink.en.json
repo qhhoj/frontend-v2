@@ -151,6 +151,10 @@
     "autoSyncOn": "A newer READY package re-imports the statements, tests and checker. On.",
     "autoSyncOff": "A newer READY package re-imports the statements, tests and checker. Off.",
     "unlink": "Unlink",
+    "readOnly": "{needs} to sync, switch auto-sync or unlink.",
+    "autoSyncState": "Auto-sync: {state}",
+    "on": "on",
+    "off": "off",
     "syncConfirm": {
       "title": "Sync {code} from Polygon?",
       "confirm": "Sync and overwrite",

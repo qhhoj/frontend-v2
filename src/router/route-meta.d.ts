@@ -1,4 +1,4 @@
-import type { AdminCapabilityRule } from '@/features/admin/admin-screens';
+import type { AdminCapability } from '@/features/admin/admin-screens';
 import type { PermissionRule } from '@/lib/permissions';
 import 'vue-router';
 
@@ -18,7 +18,7 @@ declare module 'vue-router' {
     /** Admin screens: the permission (or any-of list) the screen needs; viewers without it (and without `capability`) see AdminForbidden in place. */
     permission?: PermissionRule;
     /** Admin screens: an object right that also opens the screen. */
-    capability?: AdminCapabilityRule;
+    capability?: AdminCapability;
   }
 }
 

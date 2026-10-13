@@ -3,7 +3,6 @@ import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { sessionResponse, sessionUser } from '../src/test/fixtures';
 import { adminOk, signInAsStaff } from './fixtures/admin';
 
-const PERMISSION = 'judge.import_polygon_package';
 /** The Task 4 meta shape, inline: the e2e project has no `@` alias to import the unit fixture through. */
 const META = {
   types: [
@@ -32,14 +31,14 @@ for (const viewport of AUDIT_VIEWPORTS)
     api,
   }) => {
     await page.setViewportSize(viewport);
-    signInAsStaff(api, [PERMISSION, 'judge.add_problem']);
+    signInAsStaff(api, ['judge.add_problem']);
     // The backend reports where the viewer may create (`adminCapabilities`); a site-wide creator here.
     api.routes['GET /auth/me'] = adminOk(
       sessionResponse({
         user: sessionUser({
           username: 'minhthu',
           isStaff: true,
-          permissions: [PERMISSION, 'judge.add_problem'],
+          permissions: ['judge.add_problem'],
           adminCapabilities: {
             organizations: false,
             problemCreation: { site: true, organizations: false },

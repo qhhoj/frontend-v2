@@ -4,7 +4,7 @@ import type { ImportOptions } from '@/api/types/problem-imports';
 import { translate } from '@/i18n';
 import type { CreationOwner } from '../../creation/creation-owners';
 import type { CreationScope } from '../../creation/creation-scope';
-import { IMPORT_POLYGON } from '../../admin-screens';
+import { SYNC_POLYGON } from '../../admin-screens';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { parseLanguageMap } from './import-job';
 
@@ -15,7 +15,7 @@ export const LANGUAGE_NAME_MAX = 30;
 
 export const IMPORT_MODES = ['create', 'update'] as const;
 export type ImportMode = (typeof IMPORT_MODES)[number];
-/** Backend `ProblemImportsService.resolveJob`: a site create needs `judge.add_problem` (an organization create its creation rights, see `canCreateFor`); update needs the edit rule (`canEdit`, `edit_own_problem`). Both need `judge.import_polygon_package` too, except a create for an organization (`importRightsOf`). */
+/** Backend `ProblemImportsService.resolveJob`: a site create needs `judge.add_problem` (an organization create its creation rights, see `canCreateFor`); update needs the edit rule (`canEdit`, `edit_own_problem`), and a Polygon link import's update `judge.sync_polygon_problem` too. */
 export const IMPORT_MODE_PERMISSION: Record<ImportMode, string> = {
   create: 'judge.add_problem',
   update: 'judge.edit_own_problem',
@@ -138,27 +138,20 @@ export function importFormErrors(
 export const canCreateFor = (owner: CreationOwner | null, scope: CreationScope): boolean =>
   owner ? scope.organizations : scope.site;
 
-/** What an import viewer holds: the import permission, `edit_own_problem`, and the session's problem creation scope. */
+/** What an import viewer holds: `edit_own_problem`, whether an update may replace a Polygon link, and the session's problem creation scope. */
 export interface ImportRights {
-  canImport: boolean;
   canEditOwn: boolean;
+  /** Always true for a zip import (no link); a Polygon link import's update replaces the link and needs `judge.sync_polygon_problem`. */
+  canRelink: boolean;
   scope: CreationScope;
 }
 
-/** The creation scope of an import: site-wide also needs `judge.import_polygon_package` (an organization creator without it may only create for an organization). */
-export const importScopeOf = (rights: ImportRights): CreationScope => ({
-  site: rights.scope.site && rights.canImport,
-  organizations: rights.scope.organizations,
-});
-
-/** The permission a mode lacks for this viewer, or null: create needs a creation scope (site or organization), update the import permission and `edit_own_problem`. */
+/** The permission a mode lacks for this viewer, or null: create needs a creation scope (site or organization), update `edit_own_problem` (and the sync permission to relink). */
 export function missingForMode(mode: ImportMode, rights: ImportRights): string | null {
-  if (mode === 'create') {
-    const scope = importScopeOf(rights);
-    return scope.site || scope.organizations ? null : IMPORT_MODE_PERMISSION.create;
-  }
-  if (!rights.canImport) return IMPORT_POLYGON;
-  return rights.canEditOwn ? null : IMPORT_MODE_PERMISSION.update;
+  if (mode === 'create')
+    return rights.scope.site || rights.scope.organizations ? null : IMPORT_MODE_PERMISSION.create;
+  if (!rights.canEditOwn) return IMPORT_MODE_PERMISSION.update;
+  return rights.canRelink ? null : SYNC_POLYGON;
 }
 
 const optionalText = (text: string) => text.trim() || undefined;

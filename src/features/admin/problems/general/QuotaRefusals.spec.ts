@@ -60,7 +60,7 @@ describe('quota refusals show their numbers on every create, clone and upload fo
 
   it('the Polygon import: a storage refusal has no form field, so the page line carries it', async () => {
     mockApi({
-      ...staffViewer(['judge.import_polygon_package', 'judge.add_problem']),
+      ...staffViewer(['judge.add_problem']),
       'GET /problems/meta': ok(problemEditingMeta()),
       'POST /problems/imports': STORAGE,
     });
@@ -77,7 +77,7 @@ describe('quota refusals show their numbers on every create, clone and upload fo
 
   it('the Polygon import still shows a field issue under its field and no page line', async () => {
     mockApi({
-      ...staffViewer(['judge.import_polygon_package', 'judge.add_problem']),
+      ...staffViewer(['judge.add_problem']),
       'GET /problems/meta': ok(problemEditingMeta()),
       'POST /problems/imports': {
         status: 400,

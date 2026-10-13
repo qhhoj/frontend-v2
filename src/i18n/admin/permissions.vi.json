@@ -14,7 +14,7 @@
     "change_public_visibility": "Công khai hoặc ẩn bài",
     "change_manually_managed": "Đánh dấu dữ liệu bài quản lý thủ công",
     "see_organization_problem": "Xem bài của tổ chức",
-    "import_polygon_package": "Nhập gói Polygon",
+    "sync_polygon_problem": "Đồng bộ bài từ Polygon",
     "delete_problem": "Xoá bài",
     "add_tagproblem": "Gắn nhãn bài",
     "see_private_solution": "Xem lời giải riêng tư",
