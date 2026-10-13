@@ -137,7 +137,7 @@ describe('BitRoamLayer', () => {
     document.body.append(button);
     document.elementFromPoint = () => button;
     const { wrapper } = await mountApp('/settings/appearance');
-    expect(() => runUntilResting(wrapper, 60_000)).toThrow('no Bit rested');
+    expect(() => runUntilResting(wrapper, 20_000)).toThrow('no Bit rested');
   });
 
   it('a tap on a resting Bit sends up hearts', async () => {
