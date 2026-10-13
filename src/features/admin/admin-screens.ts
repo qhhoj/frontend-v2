@@ -3,22 +3,20 @@ import type { PermissionRule } from '@/lib/permissions';
 
 /** An object right the session reports beside the permission codenames (backend `UserResponse.adminCapabilities`). */
 export type AdminCapability = keyof Schemas['AdminCapabilitiesResponse'];
-/** A capability, or `organizationProblemCreation`: `problemCreation` counted for organizations only (the imports, where site-wide use needs `judge.import_polygon_package`). */
-export type AdminCapabilityRule = AdminCapability | 'organizationProblemCreation';
 
 export interface AdminScreen {
   path: string;
   /** `null`: anyone who may enter `/admin` (`canEnterAdmin`). */
   permission: PermissionRule | null;
   /** An object right that also opens the screen, for viewers without the permission. */
-  capability?: AdminCapabilityRule;
+  capability?: AdminCapability;
 }
 
 /** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
 const PROBLEM_EDIT = 'judge.edit_own_problem';
 const CONTEST_EDIT = ['judge.edit_own_contest', 'judge.edit_all_contest'] as const;
-/** The imports also open for organization problem creators, who may only create for their organizations. */
-export const IMPORT_POLYGON = 'judge.import_polygon_package';
+/** Syncing a Polygon-linked problem and changing its link (backend `POLYGON_SYNC_PERMISSION`); importing needs only the rights of the change (create, or edit for an update). */
+export const SYNC_POLYGON = 'judge.sync_polygon_problem';
 const problemTab = (tab: string): AdminScreen => ({
   path: `/admin/problems/:code/${tab}`,
   permission: PROBLEM_EDIT,
@@ -39,13 +37,13 @@ export const ADMIN_SCREENS = {
   },
   polygonImport: {
     path: '/admin/problems/polygon',
-    permission: IMPORT_POLYGON,
-    capability: 'organizationProblemCreation',
+    permission: ['judge.add_problem', SYNC_POLYGON],
+    capability: 'problemCreation',
   },
   problemImport: {
     path: '/admin/problems/import',
-    permission: IMPORT_POLYGON,
-    capability: 'organizationProblemCreation',
+    permission: ['judge.add_problem', PROBLEM_EDIT],
+    capability: 'problemCreation',
   },
   problemGeneral: problemTab('general'),
   problemStatements: problemTab('statements'),

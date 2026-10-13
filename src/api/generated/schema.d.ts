@@ -4451,10 +4451,10 @@ export interface paths {
         put?: never;
         /**
          * Import a Polygon problem and link it
-         * @description The rights of the zip import (`POST /problems/imports`): an organization
-         *     problem creator without `judge.import_polygon_package` may only create
-         *     for an organization, and may not turn on `autoSync` (403 `forbidden`; a
-         *     sync needs that permission). The body takes the
+         * @description The rights of the zip import (`POST /problems/imports`); `autoSync` on and
+         *     `mode` update (which replaces the problem's link) also need
+         *     `judge.sync_polygon_problem` (else 403 `forbidden`), so without it send
+         *     `autoSync` false to create a linked problem. The body takes the
          *     problem `link` (checked again as on `POST /polygon/resolve`, with the same
          *     errors), the zip import's options (`code`, `mode`, `organization`,
          *     authors, curators, group, types, points, statement languages, zero-point
@@ -4487,7 +4487,7 @@ export interface paths {
         put?: never;
         /**
          * Check a Polygon problem link and preview the problem
-         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). The body takes the problem page
+         * @description Needs the right to create a problem on the site (`judge.add_problem`) or for an organization (`judge.create_organization_problem` and an administered organization), or `judge.sync_polygon_problem`. The body takes the problem page
          *     address, `https://polygon.codeforces.com/p…/owner/name`; its `p…` part is
          *     the permission: the server finds `owner/name` among the problems shared
          *     with the QHHOJ account and compares the token with the `<problem url>` of
@@ -4518,7 +4518,7 @@ export interface paths {
         };
         /**
          * Get whether the Polygon account is connected
-         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). `connected` is true when both the API
+         * @description Needs the right to create a problem on the site (`judge.add_problem`) or for an organization (`judge.create_organization_problem` and an administered organization), or `judge.sync_polygon_problem`. `connected` is true when both the API
          *     key and secret are set in the admin settings; `accountName` is the Polygon
          *     login setters add as a READ co-author (empty when unset). No call to Polygon
          *     is made. The secret is never returned.
@@ -4541,8 +4541,7 @@ export interface paths {
         };
         /**
          * List the Polygon sync history of every problem
-         * @description Needs `judge.import_polygon_package` and `judge.edit_all_problem` (the
-         *     runs name every problem). Every finished Polygon import and sync job, newest
+         * @description Needs `judge.edit_all_problem` (the runs name every problem). Every finished Polygon import and sync job, newest
          *     first: problem code, Polygon problem, revision, package and its build time,
          *     first import or sync, manual or automatic, who started it, the result and,
          *     for a failure, the step it stopped at and the error shown to the requester.
@@ -5240,8 +5239,7 @@ export interface paths {
         };
         /**
          * Get a problem's Polygon link
-         * @description Needs `judge.import_polygon_package` and write access to the problem's test
-         *     data. Returns the link (Polygon id, synced revision and package, last sync
+         * @description Needs write access to the problem's test data. Returns the link (Polygon id, synced revision and package, last sync
          *     time, result and error, auto-sync switch) and Polygon's newest package,
          *     which is null when Polygon cannot be asked. Errors: 404 `not_found`, 404
          *     `polygon_not_linked`, 403 `forbidden`.
@@ -5251,7 +5249,7 @@ export interface paths {
         post?: never;
         /**
          * Unlink a problem from Polygon
-         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
          *     data. Removes the link only; statement, tests and every other field stay.
          *     Writes a problem revision. Answers 204. Errors: 404 `polygon_not_linked`,
          *     409 `conflict` when the link changed meanwhile.
@@ -5261,10 +5259,12 @@ export interface paths {
         head?: never;
         /**
          * Switch a problem's Polygon auto-sync
-         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
          *     data. With `autoSync` on, the worker checks Polygon every 10 minutes and
-         *     syncs a newer READY package, except while a contest using the problem is
-         *     running. Writes a problem revision. Errors: 404 `polygon_not_linked`, 409
+         *     syncs a newer READY package as the user who switched it on, except while a
+         *     contest using the problem is running; each run needs that user to still
+         *     hold the permission and the write access, else it fails and is recorded on
+         *     the link. Writes a problem revision. Errors: 404 `polygon_not_linked`, 409
          *     `conflict` when the link changed meanwhile.
          */
         patch: operations["ProblemPolygonLinkController_update"];
@@ -5281,13 +5281,16 @@ export interface paths {
         put?: never;
         /**
          * Sync a linked problem from Polygon
-         * @description Needs `judge.import_polygon_package` and write access to the problem's test
+         * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
          *     data. Queues the import job in sync mode on the newest READY package:
          *     statement, tutorial, tests, checker and limits are overwritten; code,
          *     points, group, types, authors, curators and allowed languages are kept.
          *     The result is recorded on the link. Answers 202 with a `jobId` to poll at
-         *     `GET /problems/imports/{jobId}`. Counts towards the 10 imports an hour per
-         *     user. Errors: 404 `polygon_not_linked`, 409 `polygon_package_not_ready`,
+         *     `GET /problems/imports/{jobId}`. The worker checks the package against the
+         *     storage of the organization an organization-private problem is charged to
+         *     (the package size minus the test data it replaces). Counts towards the 10 imports an hour per
+         *     user. Errors: 403 `forbidden`, 404 `polygon_not_linked`, 409
+         *     `polygon_package_not_ready`,
          *     409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
          */
         post: operations["ProblemPolygonLinkController_sync"];
@@ -5306,8 +5309,7 @@ export interface paths {
         };
         /**
          * List a problem's Polygon sync history
-         * @description Needs `judge.import_polygon_package` and write access to the problem's test
-         *     data. Every finished Polygon import and sync job of the problem, newest
+         * @description Needs write access to the problem's test data. Every finished Polygon import and sync job of the problem, newest
          *     first, also after an unlink: revision, package and its build time, first
          *     import or sync, manual or automatic, who started it, the result and, for a
          *     failure, the step it stopped at and the error shown to the requester. Paged,
@@ -5576,11 +5578,10 @@ export interface paths {
         put?: never;
         /**
          * Import a Polygon package as a new or existing problem
-         * @description Needs `judge.import_polygon_package`; creating a problem also needs
-         *     `judge.add_problem`, updating needs write access to the problem's test data.
-         *     Without `judge.import_polygon_package`, an organization problem creator
-         *     may only create for an organization (`organization` required, no
-         *     `update`; else 403 `forbidden`).
+         * @description Needs the rights of the change: creating a problem needs
+         *     `judge.add_problem` (or, with `organization`, that organization's creation
+         *     rights), updating needs write access to the problem's test data (else 403
+         *     `forbidden`). No Polygon-specific permission.
          *     Send the Polygon package as a multipart `file` (a zip with `problem.xml` at
          *     its root, up to 512 MiB) and the options in the query string: `code`, `mode`
          *     (`create` or `update`), `organization`, authors, curators, group, types,
@@ -5613,7 +5614,7 @@ export interface paths {
         };
         /**
          * Get the state of a Polygon import job
-         * @description Needs `judge.import_polygon_package`, or the right to create problems for an organization (`judge.create_organization_problem` and an administered organization). Returns the job state (`waiting`,
+         * @description Returns the job state (`waiting`,
          *     `active`, `completed`, `failed`, ...), the imported problem when completed,
          *     and the error written for the requester when it failed. Only the user who
          *     started the job, or a superuser, can read it; anyone else gets the same 404

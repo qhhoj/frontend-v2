@@ -9,13 +9,16 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { formatNumericDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
 import { failureTextOf } from '../../ui/admin-errors';
+import { SYNC_POLYGON } from '../../admin-screens';
 import AdminChip from '../../ui/AdminChip.vue';
 import type { ChipTone } from '../../ui/AdminChip.vue';
 import { buttonClass } from '../../ui/controls';
+import { needsPermissionText } from '../../ui/permission-text';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportProgress from '../import/ImportProgress.vue';
 import { isFinal } from '../import/import-job';
@@ -29,13 +32,16 @@ import type { LinkStatus } from './polygon-link';
 import { polygonLinkKey, usePolygonLinkQuery } from './polygon.queries';
 
 /**
- * The general tab's Polygon card, only for a linked problem (404 `polygon_not_linked` hides it): revision in use against
- * the newest package, the last sync, "Đồng bộ ngay" after an overwrite warning, the auto-sync switch, and unlink.
+ * The data tab's Polygon card, only for a linked problem (404 `polygon_not_linked` hides it): revision in use against
+ * the newest package, the last sync and the history for every editor of the test data; "Đồng bộ ngay" after an
+ * overwrite warning, the auto-sync switch and unlink only with `judge.sync_polygon_problem` (else one line says so).
  */
 const props = defineProps<{ code: string }>();
 const locale = useLocaleStore();
 const viewer = useViewerId();
 const queryClient = useQueryClient();
+const { canAny } = usePermissions();
+const canSync = computed(() => canAny(SYNC_POLYGON));
 const linkQuery = usePolygonLinkQuery(() => props.code);
 const state = computed(() => linkQuery.data.value ?? null);
 const status = computed(() => (state.value ? linkStatusOf(state.value) : null));
@@ -219,7 +225,20 @@ const onHistoryToggle = (event: Event) =>
       "
     />
 
-    <div class="flex flex-wrap items-center gap-4 border-t border-line pt-4">
+    <p
+      v-if="!canSync"
+      class="border-t border-line pt-4 text-meta text-muted"
+      data-testid="polygon-link-read-only"
+    >
+      {{
+        $t('admin.polygonLink.panel.autoSyncState', {
+          state: $t(`admin.polygonLink.panel.${state.link.autoSync ? 'on' : 'off'}`),
+        })
+      }}
+      ·
+      {{ $t('admin.polygonLink.panel.readOnly', { needs: needsPermissionText(SYNC_POLYGON) }) }}
+    </p>
+    <div v-else class="flex flex-wrap items-center gap-4 border-t border-line pt-4">
       <button
         type="button"
         :class="buttonClass('primary')"
@@ -251,7 +270,7 @@ const onHistoryToggle = (event: Event) =>
         {{ $t('admin.polygonLink.panel.unlink') }}
       </button>
     </div>
-    <p v-if="!canSyncNow(state)" id="polygon-sync-blocked" class="text-sm text-muted">
+    <p v-if="canSync && !canSyncNow(state)" id="polygon-sync-blocked" class="text-sm text-muted">
       {{ $t('admin.polygonLink.panel.syncBlocked') }}
     </p>
     <AdminStatus

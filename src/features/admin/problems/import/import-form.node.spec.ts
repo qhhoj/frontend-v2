@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   canCreateFor,
   codeFromPolygonName,
-  importScopeOf,
   missingForMode,
   emptyImportForm,
   importFormErrors,
@@ -103,26 +102,23 @@ describe('import owner', () => {
 });
 
 describe('import rights', () => {
-  const rights = (canImport: boolean, site: boolean, organizations: boolean) => ({
-    canImport,
+  const rights = (site: boolean, organizations: boolean, canRelink = true) => ({
     canEditOwn: true,
+    canRelink,
     scope: { site, organizations },
   });
 
-  it('lets an organization creator without the import permission create for organizations only, never update', () => {
-    const teacher = rights(false, true, true);
-    expect(importScopeOf(teacher)).toEqual({ site: false, organizations: true });
-    expect(missingForMode('create', teacher)).toBeNull();
-    expect(missingForMode('update', teacher)).toBe('judge.import_polygon_package');
+  it('needs a creation scope, site or organization, to create', () => {
+    expect(missingForMode('create', rights(false, false))).toBe('judge.add_problem');
+    expect(missingForMode('create', rights(true, false))).toBeNull();
+    expect(missingForMode('create', rights(false, true))).toBeNull();
   });
 
-  it('needs a creation scope to create, and the import permission plus edit_own_problem to update', () => {
-    expect(missingForMode('create', rights(true, false, false))).toBe('judge.add_problem');
-    expect(missingForMode('create', rights(false, true, false))).toBe('judge.add_problem');
-    expect(missingForMode('create', rights(true, true, false))).toBeNull();
-    expect(missingForMode('update', { ...rights(true, true, false), canEditOwn: false })).toBe(
+  it('needs edit_own_problem to update, and the sync permission to relink a Polygon problem', () => {
+    expect(missingForMode('update', { ...rights(false, false), canEditOwn: false })).toBe(
       'judge.edit_own_problem',
     );
-    expect(missingForMode('update', rights(true, false, false))).toBeNull();
+    expect(missingForMode('update', rights(false, false))).toBeNull();
+    expect(missingForMode('update', rights(true, true, false))).toBe('judge.sync_polygon_problem');
   });
 });

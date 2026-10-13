@@ -10,18 +10,14 @@ import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
 const LINK = 'https://polygon.codeforces.com/p3n21nw/LamTerQH/xau-doi-xung';
-/** An organization admin with the organization problem right and the site-wide create right, but no import permission. */
+/** An organization admin with the organization problem right, without `judge.add_problem` or the Polygon sync permission. */
 const teacher = () =>
   sessionUser({
     isStaff: true,
-    permissions: [
-      'judge.create_organization_problem',
-      'judge.edit_own_problem',
-      'judge.add_problem',
-    ],
+    permissions: ['judge.create_organization_problem', 'judge.edit_own_problem'],
     adminCapabilities: {
       organizations: true,
-      problemCreation: { site: true, organizations: true },
+      problemCreation: { site: false, organizations: true },
       contestCreation: { site: false, organizations: false },
     },
   });
@@ -34,8 +30,8 @@ const teacherRoutes = () => ({
 const buttonLabelled = (wrapper: Wrapper, label: string) =>
   wrapper.findAll('button').find((button) => button.text() === label)!;
 
-describe('imports by an organization problem creator without the import permission', () => {
-  it('opens the zip import with the organization as the only owner and update disabled', async () => {
+describe('imports by an organization problem creator', () => {
+  it('opens the zip import with the organization as the only owner, and update for its editor', async () => {
     mockApi(teacherRoutes());
     const { wrapper } = await mountApp('/admin/problems/import');
     await vi.waitFor(() =>
@@ -47,9 +43,8 @@ describe('imports by an organization problem creator without the import permissi
     const radios = wrapper.findAll('input[name="import-mode"]');
     expect(radios.map((radio) => (radio.element as HTMLInputElement).disabled)).toEqual([
       false,
-      true,
+      false,
     ]);
-    expect(wrapper.text()).toContain('Cần quyền “Nhập gói Polygon”');
   });
 
   it('imports from Polygon into the organization without the auto-sync switch', async () => {
@@ -93,8 +88,8 @@ describe('imports by an organization problem creator without the import permissi
     });
   });
 
-  it('keeps the imports closed to a site creator with neither the import permission nor an organization', async () => {
-    mockApi(staffViewer(['judge.add_problem']));
+  it('keeps the imports closed to a viewer who may neither create nor edit a problem', async () => {
+    mockApi(staffViewer(['judge.change_comment']));
     const { wrapper } = await mountApp('/admin/problems/import');
     await vi.waitFor(() =>
       expect(wrapper.find('[data-testid="admin-forbidden"]').exists()).toBe(true),

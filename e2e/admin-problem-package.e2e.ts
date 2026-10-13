@@ -13,6 +13,10 @@ function editorRoutes(api: FakeApi) {
   api.routes['GET /problems/hcmus41c'] = adminOk(editableProblem());
   api.routes['GET /problems/meta'] = adminOk(problemEditingMeta());
   api.routes['GET /problems/hcmus41c/data'] = adminOk(problemData());
+  api.routes['GET /problems/hcmus41c/polygon'] = {
+    status: 404,
+    body: { error: { code: 'polygon_not_linked', message: 'not linked' } },
+  };
 }
 
 test('builds the package, polls, and offers the zip link', async ({ page, api }) => {
