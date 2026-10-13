@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import NotificationBell from '@/features/notifications/NotificationBell.vue';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
@@ -11,13 +12,7 @@ import UserMenu from './UserMenu.vue';
   <header
     class="page-gutter relative flex flex-wrap items-center gap-x-5 gap-y-3 py-4 md:flex-nowrap"
   >
-    <RouterLink
-      to="/"
-      class="flex min-h-11 shrink-0 items-center gap-2.5 font-display text-title font-bold text-accent-text"
-    >
-      <span aria-hidden="true" class="bg-gradient-accent inline-block size-[28px] rounded-full" />
-      {{ $t('app.name') }}
-    </RouterLink>
+    <BrandWordmark />
     <OfficialModePill />
     <AppNav />
     <div class="ml-auto flex shrink-0 items-center gap-2">

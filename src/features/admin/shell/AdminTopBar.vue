@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Menu, Search, ShieldCheck } from 'lucide-vue-next';
+import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import UserMenu from '@/features/shell/UserMenu.vue';
 import { shortcutHint } from './search/use-palette-shortcut';
@@ -14,15 +15,12 @@ defineEmits<{ search: []; menu: [] }>();
     data-testid="admin-topbar"
     class="flex items-center gap-2 border-b border-line bg-surface-strong px-4 py-2 sm:gap-4 sm:px-6 sm:py-3"
   >
-    <RouterLink
-      :to="{ name: 'admin-dashboard' }"
-      class="flex min-h-11 shrink-0 items-center gap-2 font-display text-lg font-bold whitespace-nowrap"
-    >
-      {{ $t('app.name') }}
-      <span class="hidden font-body text-sm font-semibold text-muted sm:inline">{{
+    <div class="flex shrink-0 items-center gap-2">
+      <BrandWordmark :to="{ name: 'admin-dashboard' }" size="sm" />
+      <span class="hidden font-body text-sm font-semibold whitespace-nowrap text-muted sm:inline">{{
         $t('admin.shell.title')
       }}</span>
-    </RouterLink>
+    </div>
     <span
       data-testid="admin-staff-badge"
       class="hidden shrink-0 items-center gap-1.5 rounded-pill bg-content px-3 py-1 text-xs font-semibold whitespace-nowrap text-ground xl:inline-flex"

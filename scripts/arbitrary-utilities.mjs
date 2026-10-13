@@ -17,7 +17,6 @@ export const ALLOWED = {
   'features/contests/replay/ContestReplayPage.vue': ['sm:text-[40px]'],
   'features/contests/RankingPodium.vue': ['text-[22px]'],
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
-  'features/auth/AuthBrand.vue': ['text-[22px]', 'lg:text-[28px]'],
   'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
