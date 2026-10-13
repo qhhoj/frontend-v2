@@ -77,7 +77,7 @@ const submit = () =>
           :label="$t('auth.username')"
           autocomplete="username"
           :error="fieldErrors.username"
-          placeholder="minhthu"
+          placeholder="thanhngan"
           required
           spellcheck="false"
           autocapitalize="none"
