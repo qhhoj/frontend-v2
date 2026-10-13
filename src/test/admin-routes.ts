@@ -26,7 +26,7 @@ export const staffViewer = (
   'GET /auth/me': signedIn({
     user: sessionUser({
       id: STAFF_ID,
-      username: 'minhthu',
+      username: 'bitcoder',
       isStaff: true,
       permissions,
       adminCapabilities: siteCreation(permissions, overrides.isSuperuser ?? false),

@@ -135,7 +135,7 @@ describe('IntegrationClientsPage', () => {
       'GET /auth/me': signedIn({
         user: sessionUser({
           id: STAFF_ID,
-          username: 'minhthu',
+          username: 'bitcoder',
           isStaff: true,
           permissions: PERMISSIONS,
         }),

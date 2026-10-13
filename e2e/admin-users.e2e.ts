@@ -91,7 +91,7 @@ test('a superuser views as a user: the bar shows on the home page and its stop b
   const staff = sessionResponse({
     user: sessionUser({
       id: STAFF_ID,
-      username: 'minhthu',
+      username: 'bitcoder',
       isStaff: true,
       isSuperuser: true,
       permissions: ['judge.ban_user'],

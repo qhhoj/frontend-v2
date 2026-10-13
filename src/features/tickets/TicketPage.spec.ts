@@ -92,7 +92,7 @@ describe('ticket page: route and account changes', () => {
 
 describe('ticket page: staff controls follow the backend permission', () => {
   it('hides every staff control from a viewer whom the backend gives no staff rights', async () => {
-    const detail = ticketDetail({ creator: { id: 'x', username: 'minhthu', rating: null } });
+    const detail = ticketDetail({ creator: { id: 'x', username: 'bitcoder', rating: null } });
     mockApi({ ...signedInViewer(), [`GET /tickets/${id}`]: ok(detail) });
     const { wrapper } = await mountApp(`/tickets/${id}`);
     expect(wrapper.find('button[data-testid="mark-good"]').exists()).toBe(false);

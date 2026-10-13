@@ -4,8 +4,8 @@ import { appendToDraft, fillPlaceholders } from './canned-text';
 describe('canned reply text', () => {
   it('fills every {tên} and {bài} and leaves other braces alone', () => {
     const body = 'Chào {tên}! Bài {bài} đã sửa. {tên} xem lại {bài} nhé. {x} {Tên}';
-    expect(fillPlaceholders(body, { creator: 'minhthu', problem: 'Trò chơi trên cây' })).toBe(
-      'Chào minhthu! Bài Trò chơi trên cây đã sửa. minhthu xem lại Trò chơi trên cây nhé. {x} {Tên}',
+    expect(fillPlaceholders(body, { creator: 'bitcoder', problem: 'Trò chơi trên cây' })).toBe(
+      'Chào bitcoder! Bài Trò chơi trên cây đã sửa. bitcoder xem lại Trò chơi trên cây nhé. {x} {Tên}',
     );
   });
 

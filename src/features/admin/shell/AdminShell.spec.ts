@@ -19,7 +19,7 @@ describe('AdminShell', () => {
     mockApi(staffViewer(['judge.add_problem']));
     const { wrapper } = await mountApp('/admin');
     await waitForAdminShell(wrapper);
-    expect(wrapper.text()).toContain('Chào minhthu');
+    expect(wrapper.text()).toContain('Chào bitcoder');
     expect(navLinks(wrapper)).toEqual(['Tổng quan', 'Bài tập', 'Nhập từ Polygon', 'Nhập tệp .zip']);
     const dashboard = wrapper.find('[data-testid="admin-dashboard"]').text();
     expect(dashboard).toContain('Tạo bài tập');

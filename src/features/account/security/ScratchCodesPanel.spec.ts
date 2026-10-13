@@ -5,7 +5,7 @@ import { mountComponent } from '@/test/mount';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
 
 const CODES = ['K7QM2XRA9PTD4WLE', 'H3ZN8CVB5YJF1MSU'];
-const PROPS = { codes: CODES, username: 'minhthu', notice: 'Đã bật' };
+const PROPS = { codes: CODES, username: 'bitcoder', notice: 'Đã bật' };
 const button = (wrapper: VueWrapper, text: string) =>
   wrapper.findAll('button').find((candidate) => candidate.text() === text)!;
 const printScope = () => document.documentElement.dataset.printScope;

@@ -66,7 +66,7 @@ export const creditEntry = (overrides: Partial<CreditEntry> = {}): CreditEntry =
   amount: 10,
   ref: 'caitui2',
   createdAt: '2026-10-09T00:10:00Z',
-  actor: { id: f4Id(711), username: 'minhthu' },
+  actor: { id: f4Id(711), username: 'bitcoder' },
   ...overrides,
 });
 
@@ -115,7 +115,7 @@ export const deletedProblem = (overrides: Partial<DeletedProblem> = {}): Deleted
   code: 'cuvui',
   name: 'Cú vui',
   deletedAt: '2026-10-05T03:00:00Z',
-  deletedBy: { id: f4Id(721), username: 'minhthu', rating: null },
+  deletedBy: { id: f4Id(721), username: 'bitcoder', rating: null },
   daysLeft: 26,
   isPurged: false,
   ...overrides,
