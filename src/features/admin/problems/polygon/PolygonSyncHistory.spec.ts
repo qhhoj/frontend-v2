@@ -27,7 +27,7 @@ const run = (overrides: Partial<PolygonSyncRun> = {}): PolygonSyncRun => ({
   ...overrides,
 });
 const routes = (permissions: string[]) => ({
-  ...staffViewer(['judge.import_polygon_package', ...permissions]),
+  ...staffViewer(['judge.edit_own_problem', 'judge.sync_polygon_problem', ...permissions]),
   'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
   'GET /polygon/syncs': page([
     run({

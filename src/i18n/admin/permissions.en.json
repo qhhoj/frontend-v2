@@ -14,7 +14,7 @@
     "change_public_visibility": "Make problems public or private",
     "change_manually_managed": "Mark problem data as manually managed",
     "see_organization_problem": "See organization problems",
-    "import_polygon_package": "Import Polygon packages",
+    "sync_polygon_problem": "Sync problems from Polygon",
     "delete_problem": "Delete problems",
     "add_tagproblem": "Tag problems",
     "see_private_solution": "See private editorials",

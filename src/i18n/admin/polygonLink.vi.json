@@ -151,6 +151,10 @@
     "autoSyncOn": "Có gói READY mới hơn thì tự nhập lại đề, test và checker. Đang bật.",
     "autoSyncOff": "Có gói READY mới hơn thì tự nhập lại đề, test và checker. Đang tắt.",
     "unlink": "Huỷ liên kết",
+    "readOnly": "{needs} để đồng bộ, bật tự đồng bộ hoặc huỷ liên kết.",
+    "autoSyncState": "Tự đồng bộ: {state}",
+    "on": "bật",
+    "off": "tắt",
     "syncConfirm": {
       "title": "Đồng bộ {code} từ Polygon?",
       "confirm": "Đồng bộ và ghi đè",

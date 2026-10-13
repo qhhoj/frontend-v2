@@ -10,7 +10,7 @@ import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import ProblemCodeField from '../general/ProblemCodeField.vue';
 import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
 import { useCreationScope } from '../../creation/creation-scope';
-import { IMPORT_POLYGON } from '../../admin-screens';
+import { SYNC_POLYGON } from '../../admin-screens';
 import AdminField from '../../ui/AdminField.vue';
 import AdminCheckChips from '../../ui/AdminCheckChips.vue';
 import UploadButton from '../../ui/UploadButton.vue';
@@ -24,7 +24,6 @@ import {
   IMPORT_MODES,
   IMPORT_MODE_PERMISSION,
   canCreateFor,
-  importScopeOf,
   missingForMode,
   emptyImportForm,
   importFormErrors,
@@ -44,8 +43,10 @@ const props = withDefaults(
     withFile?: boolean;
     title?: string;
     initial?: Partial<ImportForm>;
+    /** An import from a Polygon link: its update replaces the problem's link. */
+    linksPolygon?: boolean;
   }>(),
-  { withFile: true, title: undefined, initial: undefined },
+  { withFile: true, title: undefined, initial: undefined, linksPolygon: false },
 );
 const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File | null }] }>();
 
@@ -62,17 +63,15 @@ const isCreate = computed(() => form.value.mode === 'create');
 const { scope } = useCreationScope('problem');
 const { canAny } = usePermissions();
 const rights = computed(() => ({
-  canImport: canAny(IMPORT_POLYGON),
   canEditOwn: canAny(IMPORT_MODE_PERMISSION.update),
+  canRelink: !props.linksPolygon || canAny(SYNC_POLYGON),
   scope: scope.value,
 }));
-/** Site-wide only with the import permission; an organization creator may create for their organizations. */
-const importScope = computed(() => importScopeOf(rights.value));
 const missingFor = (mode: ImportMode) => missingForMode(mode, rights.value);
 const canUseMode = (mode: ImportMode) => missingFor(mode) === null;
 /** The submit also checks the owner picked. */
 const missingOnSubmit = (mode: ImportMode) =>
-  mode === 'create' && !canCreateFor(form.value.owner, importScope.value)
+  mode === 'create' && !canCreateFor(form.value.owner, scope.value)
     ? IMPORT_MODE_PERMISSION.create
     : missingFor(mode);
 /** A create waits for the owner picker; without any create right the mode check refuses instead. */
@@ -153,7 +152,6 @@ function submit() {
         v-if="isCreate && canUseMode('create')"
         v-model="form.owner"
         v-model:ready="isOwnerReady"
-        :allow-site="rights.canImport"
         kind="problem"
       />
 

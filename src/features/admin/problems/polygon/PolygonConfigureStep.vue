@@ -4,7 +4,7 @@ import { startPolygonLinkImport } from '@/api/polygon.api';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import type { PolygonImportBody, PolygonProblem } from '@/api/types/polygon';
 import { usePermissions } from '@/stores/use-permissions';
-import { IMPORT_POLYGON } from '../../admin-screens';
+import { SYNC_POLYGON } from '../../admin-screens';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -18,8 +18,9 @@ import PolygonSourcePanel from './PolygonSourcePanel.vue';
 const props = defineProps<{ link: string; problem: PolygonProblem }>();
 const emit = defineEmits<{ back: []; started: [jobId: string, body: PolygonImportBody] }>();
 const autoSync = ref(false);
-/** Auto-sync runs with the importer's `judge.import_polygon_package`; an organization creator without it cannot turn it on. */
-const canAutoSync = usePermissions().canAny(IMPORT_POLYGON);
+/** Auto-sync runs with the importer's `judge.sync_polygon_problem`; an importer without it links with auto-sync off. */
+const { canAny } = usePermissions();
+const canAutoSync = computed(() => canAny(SYNC_POLYGON));
 const initial = { code: codeFromPolygonName(props.problem.name) };
 
 const { run, isPending, fieldErrors, failure } = useAdminMutation({
@@ -53,6 +54,7 @@ const refusal = computed(() =>
     <div class="flex min-w-0 flex-col gap-4">
       <ImportOptionsForm
         :with-file="false"
+        links-polygon
         :title="$t('admin.polygonLink.configure.board')"
         :initial="initial"
         :is-pending="isPending"

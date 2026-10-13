@@ -6,7 +6,7 @@ import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditingMeta } from '@/test/admin-fixtures/problems';
 
-const PERMS = ['judge.import_polygon_package', 'judge.add_problem'];
+const PERMS = ['judge.add_problem'];
 const STEP_OF: Record<string, string> = {
   active: 'statements',
   completed: 'done',
@@ -97,11 +97,10 @@ describe('ZipImportPage', () => {
     expect(calls.filter((call) => call.path === '/problems/imports/job-1')).toHaveLength(polls);
   });
 
-  it('disables a mode the viewer may not use, says which permission it needs, and sends nothing', async () => {
-    const calls = mockApi({
-      ...staffViewer(['judge.import_polygon_package']),
+  it('disables a mode the viewer may not use and says which permission it needs', async () => {
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
       'GET /problems/meta': ok(problemEditingMeta()),
-      'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
     });
     const { wrapper } = await mountApp('/admin/problems/import');
     await vi.waitFor(() =>
@@ -110,18 +109,16 @@ describe('ZipImportPage', () => {
     const radios = wrapper.findAll('input[name="import-mode"]');
     expect(radios.map((radio) => (radio.element as HTMLInputElement).disabled)).toEqual([
       true,
-      true,
+      false,
     ]);
     expect(wrapper.text()).toContain('Cần quyền “Tạo bài”');
-    expect(wrapper.text()).toContain('Cần quyền “Sửa bài của mình”');
-    await start(wrapper);
-    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
+    expect(wrapper.text()).not.toContain('Cần quyền “Sửa bài của mình”');
   });
 
   it('imports into the only administered organization for a teacher without judge.add_problem', async () => {
     const teacher = sessionUser({
       isStaff: true,
-      permissions: ['judge.import_polygon_package', 'judge.create_organization_problem'],
+      permissions: ['judge.create_organization_problem'],
       adminCapabilities: {
         organizations: true,
         problemCreation: { site: false, organizations: true },
