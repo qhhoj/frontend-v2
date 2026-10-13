@@ -586,14 +586,20 @@
   border: 1px solid var(--qh-line);
   border-radius: var(--qh-radius-cell);
 }
-/* Input and output samples are paired: side by side where each half has room for 18rem, stacked below that. */
+/* Input and output samples are paired: side by side (equal height) where each half has room for 18rem, stacked below that. */
 .user-content.statement .sample-pair {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   gap: 0 1rem;
   margin-block: 0.75em;
   & > .sample {
+    display: flex;
+    flex-direction: column;
     min-width: 0;
+  }
+  /* Grid cells stretch, so the box fills what is left under the title row: both halves end level. */
+  & > .sample > pre {
+    flex: 1;
   }
 }
 .user-content.statement .sample > pre {
