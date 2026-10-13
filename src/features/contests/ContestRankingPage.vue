@@ -17,6 +17,7 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ContestTabs from './ContestTabs.vue';
+import { ownSubmissionsOnly } from './own-submissions';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
@@ -250,6 +251,8 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
             :rows="rows"
             :context="rankingContext"
             :viewer-id="session.user?.id ?? null"
+            :contest-key="key"
+            :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
           />
         </Card>
       </div>

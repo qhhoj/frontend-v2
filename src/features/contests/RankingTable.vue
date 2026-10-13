@@ -5,7 +5,7 @@ import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { Star } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { medalClass } from '@/lib/medal';
-import type { Ranking, RankingRow } from '@/api/types/contests';
+import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber } from '@/lib/format';
 import {
@@ -31,13 +31,28 @@ const props = defineProps<{
   rows: RankingRow[];
   context: RankingContext;
   viewerId: string | null;
+  /** Cells link to the contest's submissions of that user and problem; absent on boards that cannot (replay). */
+  contestKey?: string;
+  /** The viewer may only see own submissions (backend narrows the list), so only their own row links. */
+  ownSubmissionsOnly?: boolean;
 }>();
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const cellsOf = (row: RankingRow) =>
   props.ranking.problems.map((problem) => ({
     problemId: problem.problemId,
+    to: submissionsLink(row, problem),
     view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.context),
   }));
+/** Contest submissions of one user (and problem); undefined where the viewer may not see them. */
+const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
+  if (!props.contestKey) return undefined;
+  if (props.ownSubmissionsOnly && row.user.id !== props.viewerId) return undefined;
+  return {
+    name: 'contest-submissions',
+    params: { key: props.contestKey },
+    query: { user: row.user.username, problem: problem?.code },
+  };
+};
 const LEGEND = [
   'ranking.legend.solved',
   'ranking.legend.failed',
@@ -121,7 +136,11 @@ const scoreHeaderKey = computed(() => {
           </td>
           <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
             <span class="flex items-center gap-2">
-              <UserLink :username="row.user.username" :rating="row.user.rating" />
+              <UserLink
+                :username="row.user.username"
+                :rating="row.user.rating"
+                :to="submissionsLink(row)"
+              />
               <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
               <Chip v-if="row.isDisqualified" tone="danger">{{ $t('ranking.disqualified') }}</Chip>
             </span>
@@ -142,7 +161,12 @@ const scoreHeaderKey = computed(() => {
           <td v-if="hasTimeColumn">
             {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
           </td>
-          <RankingCell v-for="cell in cellsOf(row)" :key="cell.problemId" :view="cell.view" />
+          <RankingCell
+            v-for="cell in cellsOf(row)"
+            :key="cell.problemId"
+            :view="cell.view"
+            :to="cell.to"
+          />
         </tr>
       </tbody>
     </table>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
@@ -11,6 +12,8 @@ withDefaults(
     /** Avatar edge: xs 24 px, sm 28 px, md 32 px. */
     size?: 'xs' | 'sm' | 'md';
     showAvatar?: boolean;
+    /** Where the name links instead of the profile. */
+    to?: RouteLocationRaw;
   }>(),
   { size: 'xs', showAvatar: true },
 );
@@ -24,6 +27,12 @@ const AVATAR_PX = { xs: 24, sm: 28, md: 32 } as const;
     :class="size === 'xs' ? 'gap-1.5' : 'gap-2'"
   >
     <UserAvatar v-if="showAvatar" :username="username" :size="AVATAR_PX[size]" />
-    <UserName :username="username" :rating="rating" :title="username" class="min-w-0 truncate" />
+    <UserName
+      :username="username"
+      :rating="rating"
+      :title="username"
+      :to="to"
+      class="min-w-0 truncate"
+    />
   </span>
 </template>
