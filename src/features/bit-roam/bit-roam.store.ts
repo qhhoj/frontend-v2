@@ -30,22 +30,6 @@ const readChoice = (): BitRoamChoice => {
   }
 };
 
-const readResting = () => {
-  try {
-    return sessionStorage.getItem(RESTING_KEY) === '1';
-  } catch {
-    return false;
-  }
-};
-const writeResting = (isResting: boolean) => {
-  try {
-    if (isResting) sessionStorage.setItem(RESTING_KEY, '1');
-    else sessionStorage.removeItem(RESTING_KEY);
-  } catch {
-    // Unavailable storage: the Bits rest for this page only.
-  }
-};
-
 /**
  * The roaming Bits preference. The signed-in account's choice outranks this browser's (same rule as the look, see
  * `appearance.store.ts`); a user action paints at once and becomes this browser's choice. `resting` is the shoo gesture: the
@@ -55,7 +39,7 @@ export const useBitRoamStore = defineStore('bitRoam', () => {
   const browser = ref<BitRoamChoice>(readChoice());
   /** `undefined`: not signed in, or the account has not answered yet. */
   const account = ref<BitRoamChoice | undefined>(undefined);
-  const resting = ref(readResting());
+  const resting = ref(readStorage(RESTING_KEY, 'session') === '1');
 
   const choice = computed(() => account.value ?? browser.value);
 
@@ -74,11 +58,11 @@ export const useBitRoamStore = defineStore('bitRoam', () => {
 
   function shoo() {
     resting.value = true;
-    writeResting(true);
+    writeStorage(RESTING_KEY, '1', 'session');
   }
   function callBack() {
     resting.value = false;
-    writeResting(false);
+    writeStorage(RESTING_KEY, '', 'session');
   }
 
   return { choice, resting, choose, adopt, shoo, callBack };

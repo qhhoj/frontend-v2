@@ -21,7 +21,8 @@ import { useInLiveContest } from './use-in-live-contest';
  * only. The layer is fixed, aria-hidden and takes no clicks; a resting Bit's own box does: a tap makes it hop with hearts, a
  * double click or a 0.5 s hold shoos every Bit for the browser session (a toast offers "Gọi lại").
  * Not on admin pages, inside a live contest, or while the loading swarm is out. Under reduced motion or low power one Bit
- * stands still in the bottom-left corner and takes no clicks. A hidden tab pauses the loop.
+ * stands still in the bottom-left corner and takes no clicks. A hidden tab pauses the loop. A Bit never rests on a link,
+ * button or field, so it never takes a click meant for one.
  */
 const HOLD_MS = 500;
 /** The shooed Bits that have not left by then are dropped (a pointer resting in their way can hold them up). */
@@ -59,6 +60,24 @@ let pointer: Pointer | null = null;
 let leaving = false;
 let exitTimer: ReturnType<typeof setTimeout> | undefined;
 
+/** What a resting Bit's box must not cover: it would take the click meant for the control (the layer sits above the header). */
+const CONTROLS =
+  'a, button, input, select, textarea, label, summary, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])';
+const INSET = LOADING_BIT_SIZE / 4;
+/** True when a control lies under the box (read once, when a Bit is about to rest; walking Bits take no pointer events). */
+function isOverControl(roamer: Roamer) {
+  const far = LOADING_BIT_SIZE - INSET;
+  return [
+    [LOADING_BIT_SIZE / 2, LOADING_BIT_SIZE / 2],
+    [INSET, INSET],
+    [far, INSET],
+    [INSET, far],
+    [far, far],
+  ].some(([dx, dy]) =>
+    document.elementFromPoint(roamer.x + dx!, roamer.y + dy!)?.closest(CONTROLS),
+  );
+}
+
 const areaNow = () => ({
   bounds: walkBounds(viewportSize(), LOADING_BIT_SIZE),
   pointer,
@@ -81,7 +100,14 @@ function tick(frameMs: number) {
     roamers = stepLeavers(roamers, viewport, pointer, frameMs);
     if (roamers.every((roamer) => isGone(roamer, viewport, LOADING_BIT_SIZE)))
       return finishLeaving();
-  } else roamers = stepRoamers(roamers, areaNow(), frameMs, Math.random);
+  } else {
+    const before = roamers;
+    roamers = stepRoamers(roamers, areaNow(), frameMs, Math.random).map((roamer, index) =>
+      isResting(roamer) && !isResting(before[index]!) && isOverControl(roamer)
+        ? { ...roamer, restMsLeft: 0 }
+        : roamer,
+    );
+  }
   placeAll();
 }
 const loop = useFrameLoop(tick);
@@ -89,22 +115,27 @@ const loop = useFrameLoop(tick);
 function removeAll() {
   loop.stop();
   roamers = [];
+  cheers.value = [];
   shownCount.value = 0;
 }
 
+/** Bumped by every sync, so one that resumes after a newer one started does nothing. */
+let syncGeneration = 0;
 async function sync() {
+  const generation = ++syncGeneration;
   if (leaving) return;
   if (!isWanted.value) return removeAll();
   if (motionOff.value) {
-    loop.stop();
-    roamers = [];
+    removeAll();
     clearPlacement();
+    elements.forEach((element) => element?.style.removeProperty('pointer-events'));
     shownCount.value = 1;
     return;
   }
   roamers = spawnRoamers(wantedCount.value, areaNow(), Math.random, roamers);
   shownCount.value = roamers.length;
   await nextTick();
+  if (generation !== syncGeneration) return;
   placeAll();
   loop.start();
 }
@@ -198,7 +229,7 @@ onBeforeUnmount(() => {
       :look="look"
       :step="legSteps[index]"
       class="pointer-events-none cursor-pointer select-none"
-      :class="motionOff ? 'bottom-[calc(env(safe-area-inset-bottom)+16px)] left-4' : 'top-0 left-0'"
+      :class="motionOff ? 'bottom-4 left-4' : 'top-0 left-0'"
       @click="cheerBit(index)"
       @dblclick="shoo"
       @pointerdown="startHold"

@@ -35,6 +35,8 @@ describe('BitRoamLayer', () => {
     frames = fakeAnimationFrames();
     vi.spyOn(Math, 'random').mockImplementation(seededRandom(3));
     setViewport(1280);
+    // jsdom has no layout: nothing lies under a Bit unless a test says so.
+    document.elementFromPoint = () => null;
   });
   afterEach(() => {
     sessionStorage.clear();
@@ -42,8 +44,8 @@ describe('BitRoamLayer', () => {
   });
 
   /** Plays frames until some Bit rests (takes clicks), and returns it. */
-  const runUntilResting = (wrapper: VueWrapper) => {
-    for (let time = 16; time < 120_000; time += 16) {
+  const runUntilResting = (wrapper: VueWrapper, forMs = 120_000) => {
+    for (let time = 16; time < forMs; time += 16) {
       frames.runFrame(time);
       const resting = bits(wrapper).find(
         (bit) => (bit.element as HTMLElement).style.pointerEvents === 'auto',
@@ -129,6 +131,15 @@ describe('BitRoamLayer', () => {
     expect((bits(wrapper)[0]!.element as HTMLElement).style.pointerEvents).not.toBe('auto');
   });
 
+  it('never rests on a link, button or field, so it never takes a click meant for one', async () => {
+    mockApi(withBits(3));
+    const button = document.createElement('button');
+    document.body.append(button);
+    document.elementFromPoint = () => button;
+    const { wrapper } = await mountApp('/settings/appearance');
+    expect(() => runUntilResting(wrapper, 60_000)).toThrow('no Bit rested');
+  });
+
   it('a tap on a resting Bit sends up hearts', async () => {
     mockApi(withBits(2));
     const { wrapper } = await mountApp('/settings/appearance');
@@ -155,7 +166,7 @@ describe('BitRoamLayer', () => {
     )!;
     callBack.click();
     await flushPromises();
-    expect(sessionStorage.getItem('qhhoj.bitRoamResting')).toBeNull();
+    expect(sessionStorage.getItem('qhhoj.bitRoamResting')).not.toBe('1');
     expect(bits(wrapper)).toHaveLength(3);
   });
 
@@ -166,7 +177,7 @@ describe('BitRoamLayer', () => {
     const resting = runUntilResting(wrapper);
     await resting.trigger('pointerdown');
     vi.advanceTimersByTime(499);
-    expect(sessionStorage.getItem('qhhoj.bitRoamResting')).toBeNull();
+    expect(sessionStorage.getItem('qhhoj.bitRoamResting')).not.toBe('1');
     vi.advanceTimersByTime(1);
     expect(sessionStorage.getItem('qhhoj.bitRoamResting')).toBe('1');
     vi.useRealTimers();
