@@ -2,6 +2,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountComponent } from '@/test/mount';
+import { fakeAnimationFrames } from '@/test/animation-frames';
 import { seededRandom } from '@/test/seeded-random';
 import LoadingBit from './LoadingBit.vue';
 import type { LoadingPhase } from './use-loading-phase';
@@ -24,28 +25,6 @@ const setTabHidden = (hidden: boolean) => {
   Object.defineProperty(document, 'hidden', { value: hidden, configurable: true });
   document.dispatchEvent(new Event('visibilitychange'));
 };
-
-/** requestAnimationFrame that queues callbacks; `runFrame(timestamp)` plays the queued one. */
-function fakeAnimationFrames() {
-  let queued: FrameRequestCallback | undefined;
-  const request = vi.fn((callback: FrameRequestCallback) => {
-    queued = callback;
-    return request.mock.calls.length;
-  });
-  const cancel = vi.fn(() => (queued = undefined));
-  vi.stubGlobal('requestAnimationFrame', request);
-  vi.stubGlobal('cancelAnimationFrame', cancel);
-  return {
-    request,
-    cancel,
-    isQueued: () => queued !== undefined,
-    runFrame(timestamp: number) {
-      const callback = queued;
-      queued = undefined;
-      callback?.(timestamp);
-    },
-  };
-}
 
 describe('LoadingBit', () => {
   let frames: ReturnType<typeof fakeAnimationFrames>;

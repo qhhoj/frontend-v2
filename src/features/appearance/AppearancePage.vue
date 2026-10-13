@@ -10,11 +10,13 @@ import { useSessionStore } from '@/stores/session.store';
 import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
 import { useThemeStore } from '@/theme/theme.store';
+import BitRoamCard from '@/features/bit-roam/BitRoamCard.vue';
 import AccentChoice from './AccentChoice.vue';
 import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
 import LowPowerChoice from './LowPowerChoice.vue';
 import ModeChoice from './ModeChoice.vue';
+import SettingSwitch from './SettingSwitch.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
 const appearance = useAppearanceStore();
@@ -57,17 +59,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
             <p id="own-look-label" class="font-semibold">{{ $t('appearance.customLook') }}</p>
             <p class="mt-1 text-meta text-muted">{{ $t('appearance.customLookHelp') }}</p>
           </div>
-          <button
-            type="button"
-            role="switch"
-            :aria-checked="isOn"
-            aria-labelledby="own-look-label"
-            class="flex h-11 w-14 shrink-0 items-center rounded-pill border border-line-accent p-1"
-            :class="isOn ? 'bg-gradient-accent justify-end' : 'justify-start bg-surface-strong'"
-            @click="toggle"
-          >
-            <span aria-hidden="true" class="size-8 rounded-full bg-content" />
-          </button>
+          <SettingSwitch :checked="isOn" labelledby="own-look-label" @toggle="toggle" />
         </div>
 
         <div>
@@ -129,6 +121,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
         <p role="status" class="text-meta text-muted">{{ $t(saveNoteKey) }}</p>
       </section>
     </div>
+    <BitRoamCard />
     <LowPowerChoice />
   </SettingsLayout>
 </template>

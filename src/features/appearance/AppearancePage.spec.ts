@@ -131,3 +131,51 @@ describe('Settings › Appearance', () => {
     expect((wrapper.get('#glow-level').element as HTMLInputElement).value).toBe('60');
   });
 });
+
+describe('Settings › Appearance › Bit chạy quanh trang', () => {
+  const card = (wrapper: VueWrapper) => wrapper.get('[data-testid="bit-roam-section"]');
+
+  it('is off with one Bit by default, the count greyed until it is on', async () => {
+    mockApi({ 'GET /auth/me': signedIn(), ...echoProfile });
+    const { wrapper } = await mountApp('/settings/appearance');
+    expect(card(wrapper).get('[role="switch"]').attributes('aria-checked')).toBe('false');
+    const count = card(wrapper).get<HTMLInputElement>('#bit-roam-count');
+    expect(count.element.value).toBe('1');
+    expect(count.attributes('disabled')).toBeDefined();
+    expect(count.attributes('aria-describedby')).toBe('bit-roam-count-hint');
+    expect(card(wrapper).text()).toContain('Tối đa 5; điện thoại tối đa 3.');
+  });
+
+  it('saves the switch at once and the count when the slider is released', async () => {
+    const calls = mockApi({
+      'GET /auth/me': signedIn(),
+      'GET /contests/current': ok(null),
+      ...echoProfile,
+    });
+    const { wrapper } = await mountApp('/settings/appearance');
+    await card(wrapper).get('[role="switch"]').trigger('click');
+    await flushPromises();
+    expect(patches(calls)).toEqual([{ bitRoam: { on: true, count: 1 } }]);
+    const count = card(wrapper).get<HTMLInputElement>('#bit-roam-count');
+    count.element.value = '4';
+    await count.trigger('input');
+    expect(patches(calls)).toHaveLength(1);
+    await count.trigger('change');
+    await flushPromises();
+    expect(patches(calls).at(-1)).toEqual({ bitRoam: { on: true, count: 4 } });
+    // Off keeps the count.
+    await card(wrapper).get('[role="switch"]').trigger('click');
+    await flushPromises();
+    expect(patches(calls).at(-1)).toEqual({ bitRoam: { on: false, count: 4 } });
+  });
+
+  it('keeps a visitor’s choice in this browser and sends nothing', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedOut });
+    const { wrapper } = await mountApp('/settings/appearance');
+    await card(wrapper).get('[role="switch"]').trigger('click');
+    expect(JSON.parse(localStorage.getItem('qhhoj.bitRoam')!)).toEqual({ on: true, count: 1 });
+    expect(card(wrapper).get('p[role="status"]').text()).toContain('trình duyệt này');
+    expect(patches(calls)).toEqual([]);
+    sessionStorage.clear();
+  });
+});

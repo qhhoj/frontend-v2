@@ -51,8 +51,9 @@ const PHONE_WIDTH = 768;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 /** Probability that an event with `rate` per second happens within `seconds`. */
-const chance = (rate: number, seconds: number) => 1 - Math.exp(-rate * seconds);
-const facingOf = (heading: number, current: 1 | -1): 1 | -1 => {
+export const chance = (rate: number, seconds: number) => 1 - Math.exp(-rate * seconds);
+/** The way the sprite faces for `heading`; near-vertical headings keep `current`. */
+export const facingOf = (heading: number, current: 1 | -1): 1 | -1 => {
   const horizontal = Math.cos(heading);
   return Math.abs(horizontal) > FACING_DEADZONE ? (horizontal < 0 ? -1 : 1) : current;
 };
@@ -68,8 +69,9 @@ const isOutside = (walker: Walker, bounds: Bounds) =>
   walker.x > bounds.maxX ||
   walker.y < bounds.minY ||
   walker.y > bounds.maxY;
-const normalise = (heading: number) => ((heading % FULL_TURN) + FULL_TURN) % FULL_TURN;
-const secondsOf = (frameMs: number) =>
+export const normalise = (heading: number) => ((heading % FULL_TURN) + FULL_TURN) % FULL_TURN;
+/** A frame in seconds, clamped to [0, MAX_FRAME_MS]. */
+export const secondsOf = (frameMs: number) =>
   // NaN counts as no time passed; negative frames are clamped too, so sqrt() never sees a negative.
   (Number.isNaN(frameMs) ? 0 : clamp(frameMs, 0, MAX_FRAME_MS)) / 1000;
 

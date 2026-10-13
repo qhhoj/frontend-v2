@@ -2,6 +2,8 @@
 import { defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
+import BitRoamLayer from '@/features/bit-roam/BitRoamLayer.vue';
+import { useAccountBitRoamSync } from '@/features/bit-roam/use-bit-roam-choice';
 import AppFooter from './AppFooter.vue';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
@@ -19,6 +21,7 @@ const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/Adm
 useAccountCacheSync();
 useAccountThemeSync();
 useAccountAppearanceSync();
+useAccountBitRoamSync();
 const route = useRoute();
 </script>
 
@@ -52,5 +55,6 @@ const route = useRoute();
       <AppFooter v-if="route.meta.layout !== 'auth'" class="print:hidden" />
     </template>
     <LoadingLayer />
+    <BitRoamLayer />
   </div>
 </template>

@@ -16,10 +16,16 @@ function ensureHost(appContext: AppContext | undefined) {
 }
 
 /**
- * Admin toasts: `show({ text, tone?, undo? })` and `dismiss(id)`. Call it in `setup`; the host (bottom right, bottom centre
- * on phones; polite region, errors as alerts) is mounted once, on first use, and outlives route changes.
+ * Admin toasts: `show({ text, tone?, undo?, undoLabel? })` and `dismiss(id)`. Call it in `setup`; the host (bottom right, bottom
+ * centre on phones; polite region, errors as alerts) is mounted once and outlives route changes: at this call, or with `lazy`
+ * at the first `show` (for a page outside admin that rarely toasts, so its status region is not on every page).
  */
-export function useAdminToast() {
-  ensureHost(getCurrentInstance()?.appContext);
-  return { show: showToast, dismiss: dismissToast };
+export function useAdminToast({ lazy = false } = {}) {
+  const appContext = getCurrentInstance()?.appContext;
+  if (!lazy) ensureHost(appContext);
+  const show: typeof showToast = (input) => {
+    ensureHost(appContext);
+    return showToast(input);
+  };
+  return { show, dismiss: dismissToast };
 }

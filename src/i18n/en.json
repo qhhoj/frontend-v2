@@ -640,6 +640,16 @@
     "savedBrowser": "Saved in this browser · sign in to keep it on every device",
     "solidByDevice": "Your device asks for less transparency, so cards stay solid."
   },
+  "bitRoam": {
+    "title": "Bits around the page",
+    "help": "The loading-screen Bits wander around the page.",
+    "new": "New",
+    "count": "Bits",
+    "countHint": "Up to 5; up to 3 on phones.",
+    "stillNote": "The Bits stand still in low-power mode or with reduced motion.",
+    "resting": "The Bits are resting until this session ends",
+    "callBack": "Call back"
+  },
   "theme": {
     "styleClay": "Clay",
     "styleGlass": "Glass",
