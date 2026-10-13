@@ -162,7 +162,7 @@ const SCREENS: Screen[] = [
       name: 'Bài đã xoá',
       daysLeft: 20,
       deletedAt: '2026-10-01T00:00:00Z',
-      deletedBy: { id: 'u', rating: null, username: 'minhthu' },
+      deletedBy: { id: 'u', rating: null, username: 'bitcoder' },
       isPurged: false,
     }),
   ),

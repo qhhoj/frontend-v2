@@ -57,7 +57,7 @@ export const feedKeyStatus = (overrides: Partial<FeedKeyStatus> = {}): FeedKeySt
   mode: 'frozen-until-release',
   expiresAt: '2026-10-22T08:00:00.000Z',
   releasedAt: null,
-  createdBy: 'minhthu',
+  createdBy: 'bitcoder',
   ...overrides,
 });
 

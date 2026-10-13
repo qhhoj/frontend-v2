@@ -36,7 +36,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['GET /auth/me'] = adminOk(
       sessionResponse({
         user: sessionUser({
-          username: 'minhthu',
+          username: 'bitcoder',
           isStaff: true,
           permissions: ['judge.add_problem'],
           adminCapabilities: {

@@ -12,7 +12,7 @@ export function signInAsStaff(api: FakeApi, permissions: string[], isSuperuser =
   api.signedIn = true;
   api.routes['GET /auth/me'] = adminOk(
     sessionResponse({
-      user: sessionUser({ username: 'minhthu', isStaff: true, isSuperuser, permissions }),
+      user: sessionUser({ username: 'bitcoder', isStaff: true, isSuperuser, permissions }),
     }),
   );
   api.routes['GET /profile'] = adminOk(profile());

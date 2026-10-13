@@ -17,7 +17,7 @@ const SIZES = [24, 28, 32, 96, 128] as const;
 
 /** Role grids (`.` transparent, `O` outline) of three looks, from the board's bitRows. */
 const GOLDEN_ROWS: Record<string, readonly string[]> = {
-  minhthu: [
+  bitcoder: [
     '................',
     '........O.......',
     '....OOOOAOO.....',
@@ -78,7 +78,7 @@ const countFilled = (grid: readonly (readonly (string | null)[])[]) =>
 
 describe('avatarHash and bitAvatarFor', () => {
   it('gives the same look for the same username, whatever its case', () => {
-    expect(bitAvatarFor('Minhthu')).toEqual(bitAvatarFor('minhthu'));
+    expect(bitAvatarFor('Bitcoder')).toEqual(bitAvatarFor('bitcoder'));
     expect(bitAvatarFor('HOANGNAM_10A')).toEqual(bitAvatarFor('hoangnam_10a'));
   });
 
@@ -113,7 +113,7 @@ describe('mixedRadixDigits', () => {
 describe('avatarLook for banned and deleted accounts', () => {
   it('gives every banned or deleted account the same fixed look, whoever the name is', () => {
     for (const status of ['banned', 'deleted'] as const) {
-      const look = avatarLook('minhthu', status);
+      const look = avatarLook('bitcoder', status);
       expect(avatarLook('someone_else', status)).toEqual(look);
       expect(look.hat.name).toBe('none');
       expect(look.eyes).toBe('closed');
@@ -126,7 +126,7 @@ describe('avatarLook for banned and deleted accounts', () => {
 describe('avatarRoleRows and avatarPixels', () => {
   it('shares the body, legs and outline with bit-sprite (open eyes, no hat, no pattern)', () => {
     const plain: AvatarLook = {
-      ...bitAvatarFor('minhthu'),
+      ...bitAvatarFor('bitcoder'),
       hat: NO_HAT,
       pattern: NO_PATTERN,
       eyes: 'open',

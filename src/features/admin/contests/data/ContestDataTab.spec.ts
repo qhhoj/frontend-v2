@@ -64,7 +64,7 @@ describe('contest data tab', () => {
     mockApi({
       ...routes(),
       'GET /auth/me': signedIn({
-        user: sessionUser({ id: STAFF_ID, username: 'minhthu', isStaff: true, permissions: EDIT }),
+        user: sessionUser({ id: STAFF_ID, username: 'bitcoder', isStaff: true, permissions: EDIT }),
         impersonatorId: 'admin-1',
       }),
       'GET /profile': ok(profile()),
