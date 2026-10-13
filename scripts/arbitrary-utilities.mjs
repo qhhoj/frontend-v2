@@ -10,7 +10,6 @@ const QUOTED = /(['"`])((?:(?!\1).)*)\1/g;
  * StatGrid redesigns (phase 3, P8/P11); the tiny radii are marks too small for a role radius.
  */
 export const ALLOWED = {
-  'features/tickets/TicketsPage.vue': ['sm:text-[44px]'],
   'features/submissions/SubmissionSummary.vue': ['text-[56px]'],
   'features/submissions/SubmissionSummarySkeleton.vue': ['text-[56px]'],
   'features/home/LiveContestCard.vue': ['text-[32px]'],
