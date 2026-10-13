@@ -24,4 +24,42 @@ describe('RankingTable', () => {
     expect(cells[1]!.text()).toBe('—');
     expect(wrapper.text()).not.toContain('9999');
   });
+
+  describe('cell links', () => {
+    const cell = { time: 100, points: 1, penalty: 0, tries: 1 } as never;
+    const rows = () => [
+      rankingRow(1, 'p1', 'bitcoder', 1, 0, { [ranking().problems[0]!.problemId]: cell }),
+    ];
+    const mountWith = (extra: Record<string, unknown>) =>
+      mount(RankingTable, {
+        props: { ranking: ranking(), rows: rows(), context, viewerId: null, ...extra },
+        global: {
+          plugins: [i18n],
+          stubs: {
+            RouterLink: { props: ['to'], template: '<a :href="JSON.stringify(to)"><slot /></a>' },
+          },
+        },
+      });
+
+    it('links an attempted cell to the contest submissions of that user and problem', () => {
+      const links = mountWith({ contestKey: 'c1' }).findAll('tbody td a');
+      expect(links).toHaveLength(1);
+      expect(JSON.parse(links[0]!.attributes('href')!)).toMatchObject({
+        params: { key: 'c1' },
+        query: { user: 'bitcoder', problem: 'r42a' },
+      });
+    });
+
+    it("links the user name to that user's contest submissions", () => {
+      const nameLink = (extra: Record<string, unknown>) =>
+        JSON.parse(mountWith(extra).find('tbody th a').attributes('href')!);
+      expect(nameLink({ contestKey: 'c1' })).toMatchObject({ query: { user: 'bitcoder' } });
+    });
+
+    it('does not link other users when the viewer sees only own submissions', () => {
+      expect(
+        mountWith({ contestKey: 'c1', ownSubmissionsOnly: true }).findAll('tbody td a'),
+      ).toHaveLength(0);
+    });
+  });
 });
