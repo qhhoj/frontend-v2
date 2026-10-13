@@ -7361,6 +7361,14 @@ export interface components {
             /** @description Why the user is banned; shown to the user at sign-in and to staff. Must not be blank. */
             reason: string;
         };
+        BitRoamDto: {
+            count: number;
+            on: boolean;
+        };
+        BitRoamResponse: {
+            count: number;
+            on: boolean;
+        };
         BulkContestResponse: {
             /** @description Number of contests changed. */
             done: number;
@@ -10666,6 +10674,8 @@ export interface components {
             aboutHtml: string;
             /** @description Custom accent and glass settings; null for the site look. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
+            /** @description Roaming Bits: off with one Bit until the user turns them on. */
+            bitRoam: components["schemas"]["BitRoamResponse"];
             /** @description Display first name. */
             firstName: string;
             /** @description Default programming language id; null when none. */
@@ -12779,6 +12789,8 @@ export interface components {
             about?: string;
             /** @description The whole look replaces the stored one; `null` clears it (the site's look). */
             appearance?: components["schemas"]["AppearanceDto"] | null;
+            /** @description Replaces the stored switch and count. */
+            bitRoam?: components["schemas"]["BitRoamDto"];
             /** @description Display first name, up to 30 characters. */
             firstName?: string;
             /**
