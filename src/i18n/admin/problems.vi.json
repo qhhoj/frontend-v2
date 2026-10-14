@@ -153,7 +153,9 @@
     "orgAdd": "Thêm vào tổ chức…",
     "orgMoveHint": "Bạn chỉ thêm hoặc bỏ được tổ chức mình quản trị.",
     "orgNotManaged": "Bạn không quản trị {name} nên không bỏ được.",
-    "orgPrefix": "Mã bài phải bắt đầu bằng {prefix}. Hãy đổi mã bài trong cùng lần lưu."
+    "orgPrefix": "Mã bài phải bắt đầu bằng {prefix}. Hãy đổi mã bài trong cùng lần lưu.",
+    "orgSiteNeeds": "Hãy thêm tổ chức mới trước khi lưu: đưa bài về trang chính cần quyền “Tạo bài”.",
+    "orgRename": "Đổi mã thành {code}"
   },
   "status": {
     "title": "Trạng thái",

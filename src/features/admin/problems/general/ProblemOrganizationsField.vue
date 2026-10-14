@@ -7,11 +7,13 @@ import { usePermissions } from '@/stores/use-permissions';
 import { useCreationOwnersQuery } from '../../creation/creation-owners';
 import type { CreationOwner } from '../../creation/creation-owners';
 import { useCreationScope } from '../../creation/creation-scope';
-import { INPUT } from '../../ui/controls';
-import { needsPermissionText } from '../../ui/permission-text';
+import { BUTTON, INPUT } from '../../ui/controls';
 import { shortId } from '../../ui/short-id';
 import { useOrganizationNames } from '../../ui/use-organization-names';
 import type { ProblemForm } from './problem-form';
+
+/** Backend `IsProblemCode`: 1 to 32 characters. */
+const MAX_CODE_LENGTH = 32;
 
 /**
  * Moving a problem between organizations, for an editor without `judge.edit_all_problem` (backend
@@ -37,20 +39,23 @@ const nameOf = (organizationId: string) =>
 const ids = computed(() => form.value.organizations.map((chip) => chip.id));
 const addable = computed(() => managed.value.filter((owner) => !ids.value.includes(owner.id)));
 const canLeaveForSite = computed(() => can('judge.add_problem'));
-const isLastOwned = computed(() => ids.value.length === 1 && form.value.isOrganizationPrivate);
+/** The editor removed the last organization: without `judge.add_problem` they must add another one before saving. */
+const hasRemovedAll = ref(false);
+const isSiteMoveRefused = computed(
+  () => hasRemovedAll.value && ids.value.length === 0 && !canLeaveForSite.value,
+);
 
-/** Why this chip has no remove button; null when it can be removed. */
+/** Why this chip has no remove button (an organization the viewer does not manage); null when it can be removed. */
 function lockReason(organizationId: string): string | null {
-  if (!ownerOf(organizationId))
-    return translate('admin.problems.people.orgNotManaged', { name: nameOf(organizationId) });
-  if (isLastOwned.value && !canLeaveForSite.value) return needsPermissionText('judge.add_problem');
-  return null;
+  if (ownerOf(organizationId)) return null;
+  return translate('admin.problems.people.orgNotManaged', { name: nameOf(organizationId) });
 }
 
 function setOrganizations(next: string[]) {
   const wasEmpty = ids.value.length === 0;
   // Chips carry only ids here, like the stored form, so re-adding an organization is no change.
   form.value.organizations = next.map((organizationId) => ({ id: organizationId, slug: null }));
+  hasRemovedAll.value = next.length === 0 && !wasEmpty;
   if (next.length === 0) form.value.isOrganizationPrivate = false;
   else if (wasEmpty) form.value.isOrganizationPrivate = true;
 }
@@ -69,6 +74,23 @@ const neededPrefix = computed(() => {
   const prefix = ownerOf(first)?.problemCodePrefix;
   return prefix && !form.value.code.startsWith(prefix) ? prefix : null;
 });
+
+/** The code with the needed prefix in place of a managed organization's prefix it carries (else in front); null past 32 characters. */
+const suggestedCode = computed(() => {
+  const prefix = neededPrefix.value;
+  if (!prefix) return null;
+  const { code } = form.value;
+  const carried = managed.value
+    .map((owner) => owner.problemCodePrefix)
+    .filter((other) => code.startsWith(other) && code.length > other.length)
+    .sort((left, right) => right.length - left.length)[0];
+  const suggestion = prefix + (carried ? code.slice(carried.length) : code);
+  return suggestion.length <= MAX_CODE_LENGTH ? suggestion : null;
+});
+/** An explicit rename by the editor; the server never renames a moved problem. */
+const renameCode = () => {
+  if (suggestedCode.value) form.value.code = suggestedCode.value;
+};
 </script>
 
 <template>
@@ -127,8 +149,16 @@ const neededPrefix = computed(() => {
     <p v-else :id="`${id}-hint`" class="text-xs text-muted">
       {{ $t('admin.problems.people.orgMoveHint') }}
     </p>
+    <Notice v-if="isSiteMoveRefused" tone="warning" compact data-testid="organization-site-notice">
+      {{ $t('admin.problems.people.orgSiteNeeds') }}
+    </Notice>
     <Notice v-if="neededPrefix" tone="warning" compact data-testid="organization-prefix-notice">
       {{ $t('admin.problems.people.orgPrefix', { prefix: neededPrefix }) }}
+      <template v-if="suggestedCode" #action>
+        <button type="button" :class="BUTTON.secondary" @click="renameCode">
+          {{ $t('admin.problems.people.orgRename', { code: suggestedCode }) }}
+        </button>
+      </template>
     </Notice>
   </div>
 </template>
