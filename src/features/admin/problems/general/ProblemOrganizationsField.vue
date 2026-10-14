@@ -7,19 +7,16 @@ import { usePermissions } from '@/stores/use-permissions';
 import { useCreationOwnersQuery } from '../../creation/creation-owners';
 import type { CreationOwner } from '../../creation/creation-owners';
 import { useCreationScope } from '../../creation/creation-scope';
-import { BUTTON, INPUT } from '../../ui/controls';
+import { INPUT } from '../../ui/controls';
 import { shortId } from '../../ui/short-id';
 import { useOrganizationNames } from '../../ui/use-organization-names';
 import type { ProblemForm } from './problem-form';
-
-/** Backend `IsProblemCode`: 1 to 32 characters. */
-const MAX_CODE_LENGTH = 32;
 
 /**
  * Moving a problem between organizations, for an editor without `judge.edit_all_problem` (backend
  * `OrganizationProblemRules`): they add and remove only organizations they may create problems for (the creation owners),
  * and leave every organization for the site only with `judge.add_problem`. Joining the first organization makes the problem
- * private to it, leaving the last one makes it a site problem. The code is never renamed: a notice names the prefix.
+ * private to it, leaving the last one makes it a site problem. A move keeps the problem code.
  */
 const form = defineModel<ProblemForm>({ required: true });
 defineProps<{ error?: string }>();
@@ -66,31 +63,6 @@ function add() {
   if (picked.value) setOrganizations([...ids.value, picked.value]);
   picked.value = '';
 }
-
-/** The prefix the code must carry after the save: the first organization's, when the problem stays organization-private. */
-const neededPrefix = computed(() => {
-  const first = ids.value[0];
-  if (!first || !form.value.isOrganizationPrivate) return null;
-  const prefix = ownerOf(first)?.problemCodePrefix;
-  return prefix && !form.value.code.startsWith(prefix) ? prefix : null;
-});
-
-/** The code with the needed prefix in place of a managed organization's prefix it carries (else in front); null past 32 characters. */
-const suggestedCode = computed(() => {
-  const prefix = neededPrefix.value;
-  if (!prefix) return null;
-  const { code } = form.value;
-  const carried = managed.value
-    .map((owner) => owner.problemCodePrefix)
-    .filter((other) => code.startsWith(other) && code.length > other.length)
-    .sort((left, right) => right.length - left.length)[0];
-  const suggestion = prefix + (carried ? code.slice(carried.length) : code);
-  return suggestion.length <= MAX_CODE_LENGTH ? suggestion : null;
-});
-/** An explicit rename by the editor; the server never renames a moved problem. */
-const renameCode = () => {
-  if (suggestedCode.value) form.value.code = suggestedCode.value;
-};
 </script>
 
 <template>
@@ -151,14 +123,6 @@ const renameCode = () => {
     </p>
     <Notice v-if="isSiteMoveRefused" tone="warning" compact data-testid="organization-site-notice">
       {{ $t('admin.problems.people.orgSiteNeeds') }}
-    </Notice>
-    <Notice v-if="neededPrefix" tone="warning" compact data-testid="organization-prefix-notice">
-      {{ $t('admin.problems.people.orgPrefix', { prefix: neededPrefix }) }}
-      <template v-if="suggestedCode" #action>
-        <button type="button" :class="BUTTON.secondary" @click="renameCode">
-          {{ $t('admin.problems.people.orgRename', { code: suggestedCode }) }}
-        </button>
-      </template>
     </Notice>
   </div>
 </template>
