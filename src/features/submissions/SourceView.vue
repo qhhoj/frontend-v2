@@ -8,7 +8,7 @@ import QueryState from '@/components/QueryState.vue';
 import { aceForSubmissionKey } from '@/components/code-language-keys';
 import { showCode } from '@/components/code-highlight';
 import { translate } from '@/i18n';
-import { sourceLineCount } from '@/lib/source';
+import { normalizeNewlines, sourceLineCount } from '@/lib/source';
 import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
 import SourceFileBar from './SourceFileBar.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
@@ -36,7 +36,8 @@ const forbiddenText = computed(() => {
     (isForbidden(error.value) ? 'submission.sourceHidden' : null);
   return key === null ? null : translate(key);
 });
-const source = computed(() => data.value?.source ?? '');
+/** A stored source may end its lines in CR alone (a file read before the editor normalized files), which a `<pre>` shows as one line. */
+const source = computed(() => normalizeNewlines(data.value?.source ?? ''));
 /** Plain text first, coloured once the language's parser has loaded; the text itself never changes. */
 const sourceBlock = ref<HTMLElement | null>(null);
 watchEffect(() => {

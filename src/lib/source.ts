@@ -15,12 +15,28 @@ export const codePointCount = (text: string) =>
 /** Lines to number in a source view: a source ending in a newline has no empty last line. */
 export const sourceLineCount = (text: string) => text.replace(/\n$/, '').split('\n').length;
 
+/** CRLF (Windows) and a lone CR (classic Mac) become LF; nothing else changes. A `<pre>` shows a lone CR as a space. */
+export const normalizeNewlines = (text: string) => text.replace(/\r\n?/g, '\n');
+
+/** The encoding a byte order mark names (UTF-16 either way round), else UTF-8. The decoder drops the mark itself. */
+function decodeText(bytes: Uint8Array) {
+  const [first, second] = bytes;
+  const encoding =
+    first === 0xff && second === 0xfe
+      ? 'utf-16le'
+      : first === 0xfe && second === 0xff
+        ? 'utf-16be'
+        : 'utf-8';
+  return new TextDecoder(encoding).decode(bytes);
+}
+
 export type SourceFileResult =
   { ok: true; text: string } | { ok: false; reason: 'tooLarge' | 'notText' | 'tooLong' };
 
+/** A source file as editor text: the one place a file's encoding and line endings are settled (always LF). */
 export async function readSourceFile(file: File): Promise<SourceFileResult> {
   if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: 'tooLarge' };
-  const text = await file.text();
+  const text = normalizeNewlines(decodeText(new Uint8Array(await file.arrayBuffer())));
   if (text.includes('\u0000')) return { ok: false, reason: 'notText' };
   if (codePointCount(text) > MAX_SOURCE_LENGTH) return { ok: false, reason: 'tooLong' };
   return { ok: true, text };
