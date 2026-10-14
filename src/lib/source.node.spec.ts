@@ -5,6 +5,7 @@ import {
   MAX_SOURCE_LENGTH,
   checkUploadFile,
   codePointCount,
+  normalizeNewlines,
   readSourceFile,
   sourceLineCount,
   submitErrorKey,
@@ -28,7 +29,53 @@ describe('codePointCount', () => {
   });
 });
 
+describe('normalizeNewlines', () => {
+  it('turns CRLF and a lone CR into LF and leaves everything else as it was', () => {
+    expect(normalizeNewlines('a\r\nb\rc\n\n  d\t\r')).toBe('a\nb\nc\n\n  d\t\n');
+    expect(normalizeNewlines('\r\r\n')).toBe('\n\n');
+    expect(normalizeNewlines('no newline ')).toBe('no newline ');
+  });
+});
+
 describe('readSourceFile', () => {
+  const lines = ['#include <cstdio>', 'int main() {', '  return 0;', '}', ''];
+  const bytesFile = (bytes: number[] | Uint8Array) => new File([new Uint8Array(bytes)], 'a.cpp');
+  const utf16 = (text: string, littleEndian: boolean) => {
+    const bytes = new Uint8Array(2 + text.length * 2);
+    const view = new DataView(bytes.buffer);
+    view.setUint16(0, 0xfeff, littleEndian);
+    for (let at = 0; at < text.length; at++)
+      view.setUint16(2 + at * 2, text.charCodeAt(at), littleEndian);
+    return bytes;
+  };
+  const expected = { ok: true, text: lines.join('\n') };
+
+  it.each([
+    ['CRLF', '\r\n'],
+    ['a lone CR (classic Mac)', '\r'],
+    ['LF', '\n'],
+  ])('reads %s line endings as one line per line, each ending in LF', async (_name, ending) => {
+    const result = await readSourceFile(new File([lines.join(ending)], 'a.cpp'));
+    expect(result).toEqual(expected);
+    expect(result.ok && sourceLineCount(result.text)).toBe(4);
+  });
+  it('drops a UTF-8 byte order mark and keeps non-ASCII text', async () => {
+    const body = [...new TextEncoder().encode('// xin chào\r\nint x;')];
+    expect(await readSourceFile(bytesFile([0xef, 0xbb, 0xbf, ...body]))).toEqual({
+      ok: true,
+      text: '// xin chào\nint x;',
+    });
+  });
+  it.each([
+    ['little', true],
+    ['big', false],
+  ])('decodes UTF-16 %s-endian with a byte order mark', async (_name, littleEndian) => {
+    const text = `// chào 😀\r\n${lines.join('\r')}`;
+    expect(await readSourceFile(bytesFile(utf16(text, littleEndian)))).toEqual({
+      ok: true,
+      text: `// chào 😀\n${lines.join('\n')}`,
+    });
+  });
   it('rejects a binary file', async () => {
     const result = await readSourceFile(new File([new Uint8Array([1, 0, 2])], 'a.bin'));
     expect(result).toEqual({ ok: false, reason: 'notText' });

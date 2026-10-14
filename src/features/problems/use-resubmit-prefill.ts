@@ -2,6 +2,7 @@ import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchSubmission, fetchSubmissionSource } from '@/api/submissions.api';
+import { normalizeNewlines } from '@/lib/source';
 
 export interface ResubmitPrefill {
   languageId: string | null;
@@ -26,7 +27,7 @@ export function useResubmitPrefill(
         fetchSubmission(id),
         fetchSubmissionSource(id),
       ]);
-      apply({ languageId: submission.language?.id ?? null, source });
+      apply({ languageId: submission.language?.id ?? null, source: normalizeNewlines(source) });
     } catch {
       // 401, 403 and 404 all mean the same to the viewer: this submission cannot be reused.
       resubmitUnavailable.value = true;
