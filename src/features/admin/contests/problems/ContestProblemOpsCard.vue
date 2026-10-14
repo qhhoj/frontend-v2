@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import { computed, ref, watch } from 'vue';
 import { rejudgeContestProblem, rescoreContestProblem } from '@/api/contest-admin.api';
 import type { EditableContest } from '@/api/types/contest-editing';
@@ -122,6 +123,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
         :class="buttonClass('secondary')"
         @click="openRejudge"
       >
+        <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />
         {{ $t('admin.contestOps.problemOps.rejudge') }}
       </button>
     </div>

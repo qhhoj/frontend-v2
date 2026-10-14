@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
@@ -90,6 +91,7 @@ const resultText = computed(() =>
     >
       <template #actions>
         <RouterLink :to="{ name: 'admin-rejudge' }" :class="buttonClass('secondary')">
+          <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />
           {{ $t('admin.submissions.toRejudge') }}
         </RouterLink>
       </template>
@@ -142,6 +144,7 @@ const resultText = computed(() =>
             :class="buttonClass('secondary', 'sm')"
             @click="dialogs?.open('rejudge')"
           >
+            <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />
             {{ $t('admin.submissions.bulk.rejudge') }}
           </button>
         </template>

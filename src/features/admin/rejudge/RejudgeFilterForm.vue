@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
@@ -131,6 +132,7 @@ const applyPreset = (preset: ResultPreset) => {
         {{ $t('admin.rejudge.filter.rescore') }}
       </button>
       <button type="button" :class="buttonClass('primary')" @click="$emit('rejudge')">
+        <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />
         {{ $t('admin.rejudge.filter.submit') }}
       </button>
     </div>
