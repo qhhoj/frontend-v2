@@ -116,6 +116,32 @@ describe('submission page', () => {
     expect(detailCalls(calls)).toHaveLength(3); // open, the stream's final read, the list invalidation
   });
 
+  it('explains an internal error in plain words, with the judge message only when the API sent it (staff)', async () => {
+    const internalError = (error: string | null) =>
+      submissionDetail({ status: 'IE', result: 'IE', points: null, error });
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(internalError(null)),
+      ...problemPageRoutes(),
+    });
+    const contestant = (await openSubmission('sub-1')).wrapper;
+    const notice = contestant.get('[data-testid="internal-error"]');
+    expect(notice.text()).toContain('Ban quản trị sẽ kiểm tra lại');
+    expect(notice.text()).not.toContain('IE');
+    expect(notice.find('[data-testid="internal-error-message"]').exists()).toBe(false);
+    contestant.unmount();
+
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(internalError('checker failed with exit code 3')),
+      ...problemPageRoutes(),
+    });
+    const staff = (await openSubmission('sub-1')).wrapper;
+    expect(staff.get('[data-testid="internal-error-message"]').text()).toBe(
+      'checker failed with exit code 3',
+    );
+  });
+
   it('shows the reload hint when the stream is gone and the row never confirmed an end', async () => {
     mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading()), ...problemPageRoutes() });
     const { wrapper } = await openSubmission('sub-1');

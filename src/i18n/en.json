@@ -1398,6 +1398,10 @@
       "contest_running": "The contest is running, other people's submissions are not visible yet",
       "hidden": "You are not allowed to see this submission"
     },
+    "internalError": {
+      "notice": "Something went wrong while judging this submission. The staff will look into it.",
+      "staffMessage": "Error message (visible to staff only)"
+    },
     "casesHidden": "Viewers cannot see the results of individual tests",
     "sourceHidden": "You cannot see the source code of this submission.",
     "externalRun": {

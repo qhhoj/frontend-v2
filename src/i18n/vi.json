@@ -1398,6 +1398,10 @@
       "contest_running": "Kỳ thi đang diễn ra, chưa thể xem bài nộp của người khác",
       "hidden": "Bạn không có quyền xem bài nộp này"
     },
+    "internalError": {
+      "notice": "Hệ thống gặp lỗi khi chấm bài này. Ban quản trị sẽ kiểm tra lại.",
+      "staffMessage": "Thông báo lỗi (chỉ ban quản trị thấy)"
+    },
     "casesHidden": "Người xem không được xem kết quả từng test",
     "sourceHidden": "Bạn không xem được mã nguồn của bài nộp này.",
     "externalRun": {

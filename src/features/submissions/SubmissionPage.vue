@@ -26,6 +26,7 @@ import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
 import DeletedProblemNotice from './DeletedProblemNotice.vue';
+import InternalErrorNotice from './InternalErrorNotice.vue';
 import { isProblemDeleted } from './deleted-problem';
 import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
@@ -123,6 +124,7 @@ const verdict = computed(() => {
           :problem-points="problemQuery.data.value?.points ?? null"
           :running="isLive"
         />
+        <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
         <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
         <SubmissionStaffPanel :submission="row" />
         <SourceView
