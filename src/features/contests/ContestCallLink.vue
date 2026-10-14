@@ -8,6 +8,7 @@ defineProps<{ contestKey: string; contestName: string; labelKey: string; isPrima
   <AppButton
     :to="{ name: 'contest', params: { key: contestKey } }"
     :tone="isPrimary ? 'primary' : 'secondary'"
+    class="min-w-52 justify-center whitespace-nowrap"
     >{{ $t(labelKey) }}<span class="sr-only">: {{ contestName }}</span></AppButton
   >
 </template>

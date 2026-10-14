@@ -46,7 +46,9 @@ const ROW_COUNT = 5;
             <td :class="ENDED_CELL.participants">
               <SkeletonBlock text class="ml-auto w-10" />
             </td>
-            <td :class="ENDED_CELL.action"><SkeletonBlock pill class="ml-auto h-11 w-24" /></td>
+            <td :class="ENDED_CELL.action">
+              <SkeletonBlock pill class="ml-auto h-11 w-52" />
+            </td>
           </tr>
         </tbody>
       </table>
