@@ -6288,7 +6288,8 @@ export interface paths {
          * Override a submission's verdict and score
          * @description Needs `judge.change_submission` and edit rights on the problem (403
          *     `forbidden`). Sets `result` (a graded verdict) and `points` on the
-         *     problem's scale; the case results stay as judged. User points, problem
+         *     problem's scale; the case results stay as judged. An internal error's
+         *     message moves from the submission to the revision log. User points, problem
          *     statistics and contest results are recomputed as after a judging (an
          *     `ioi16` contest still scores batches from the judged cases). Sending the
          *     stored score again changes nothing. 400
@@ -11768,7 +11769,7 @@ export interface components {
              * @description When the submission was made.
              */
             date: string;
-            /** @description Compile log or compiler warnings; the judge's internal error message only for editors. */
+            /** @description Compile log or compiler warnings; an internal error's message (it can quote jury data) only for the problem's editors, null for everyone else, the submitter included. */
             error: string | null;
             /** @description The run on the external judge; only for viewers who may rejudge, and only for the current judging generation. */
             externalRun: components["schemas"]["SubmissionExternalRunResponse"] | null;
