@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import Chip from '@/components/ui/Chip.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
@@ -192,6 +193,7 @@ async function confirmAction() {
           :aria-describedby="!isReady(action) ? reasonIdOf(action) : undefined"
           @click="openAction(action)"
         >
+          <component :is="STAFF_ICONS[action]" class="size-4 shrink-0" aria-hidden="true" />
           {{ $t(`admin.staff.buttons.${action}`) }}
         </button>
       </template>

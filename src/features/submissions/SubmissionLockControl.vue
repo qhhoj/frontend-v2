@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import { lockSubmission, unlockSubmission } from '@/api/submission-actions.api';
@@ -39,6 +40,11 @@ const label = computed(() =>
         :aria-busy="mutation.isPending.value || undefined"
         @click="mutation.run(!isLocked)"
       >
+        <component
+          :is="isLocked ? STAFF_ICONS.unlock : STAFF_ICONS.lock"
+          class="size-4 shrink-0"
+          aria-hidden="true"
+        />
         {{ $t(label) }}
       </button>
       <span class="text-sm text-muted">{{ $t('admin.staff.lockControl.hint') }}</span>
