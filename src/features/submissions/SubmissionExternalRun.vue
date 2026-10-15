@@ -20,7 +20,7 @@ const link = computed(() =>
 </script>
 
 <template>
-  <Card class="rounded-panel p-4" data-testid="external-run">
+  <Card class="rounded-card p-4" data-testid="external-run">
     <h2 class="font-bold">{{ $t('submission.externalRun.title') }}</h2>
     <dl class="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
       <div v-for="row in rows" :key="row.key">

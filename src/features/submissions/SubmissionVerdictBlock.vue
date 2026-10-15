@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import BitLoop from '@/components/BitLoop.vue';
 import { translate } from '@/i18n';
-import { BLOCK_TONE_CLASSES, blockToneOf, verdictOf } from '@/lib/verdicts';
+import { BLOCK_TONE_CLASSES, blockToneOf, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { NO_VALUE, gradingPercent, isFinished, scoreText } from './submission-row';
 
@@ -14,7 +14,7 @@ import { NO_VALUE, gradingPercent, isFinished, scoreText } from './submission-ro
  */
 const props = defineProps<{ row: SubmissionListItem; compact?: boolean }>();
 const locale = useLocaleStore();
-const verdict = computed(() => verdictOf(props.row));
+const verdict = computed(() => submissionVerdictOf(props.row));
 const label = computed(() =>
   verdict.value.code === 'G'
     ? translate(props.compact ? 'submissions.gradingShort' : verdict.value.labelKey)
@@ -50,7 +50,7 @@ const rowLabel = computed(() =>
     <span
       v-if="detail"
       class="truncate font-mono leading-tight"
-      :class="compact ? 'text-tiny' : 'text-xs'"
+      :class="compact ? 'text-tiny' : 'text-caption'"
       >{{ detail }}</span
     >
     <BitLoop

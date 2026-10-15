@@ -12,7 +12,7 @@ defineProps<{ name: string }>();
     as="section"
     data-testid="deleted-problem-notice"
     aria-labelledby="deleted-problem-title"
-    class="flex items-start gap-4 rounded-panel p-6 sm:p-8"
+    class="flex items-start gap-4 rounded-card p-6 sm:p-8"
   >
     <InlineBit :kind="DELETED_PROBLEM_BIT" />
     <div class="flex flex-col gap-1">

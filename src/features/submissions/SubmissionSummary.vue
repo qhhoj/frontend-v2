@@ -16,7 +16,7 @@ import {
   formatRelative,
 } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
-import type { Verdict } from '@/lib/verdicts';
+import { PARTIAL_CODE, type Verdict } from '@/lib/verdicts';
 import { useNow } from '@/lib/use-now';
 import { BIT_MOODS } from '@/mascot/bit-moods';
 import { verdictBitMood } from '@/mascot/verdict-bit';
@@ -67,6 +67,12 @@ const runtime = computed(() =>
     : `${formatCaseTime(props.submission.time)} · ${formatCaseMemory(props.submission.memory)}`,
 );
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
+/** A partially correct score fills the ring by its share of the problem's points. */
+const partialShare = computed(() => {
+  const max = props.submission.problem?.points;
+  if (props.verdict.code !== PARTIAL_CODE || !max || props.submission.points === null) return null;
+  return props.submission.points / max;
+});
 /** Only a finished submission has a final verdict worth a crown or a sweat drop; until then the hourglass Bit judges. */
 const bit = computed(() => {
   const mood = isFinished.value ? verdictBitMood(props.verdict) : null;
@@ -84,10 +90,11 @@ const facts = computed(() => [
     data-testid="submission-summary"
     class="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
   >
-    <Card as="div" class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8">
+    <Card as="div" class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-card p-6 sm:p-8">
       <VerdictRing
         :progress="isFinished ? null : ringProgress(submission)"
         :verdict="verdict"
+        :share="partialShare"
         :is-empty="submission.status === 'PD'"
       />
       <div class="min-w-0 flex-1 basis-40">
@@ -129,7 +136,7 @@ const facts = computed(() => [
         class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
       />
     </Card>
-    <Card as="div" class="rounded-panel p-6 sm:p-8">
+    <Card as="div" class="rounded-card p-6 sm:p-8">
       <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
         <dt data-fact="problem" class="text-meta text-muted">
           {{ $t('submission.facts.problem') }}

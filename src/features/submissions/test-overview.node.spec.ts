@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { submissionCase } from '@/test/fixtures';
-import { buildOverviewRows } from './test-overview';
+import { buildOverviewRows, reasonParts, scoreConversion } from './test-overview';
 
 const testCase = (position: number, status: 'AC' | 'WA' | 'TLE' | 'SC', batch: number | null) =>
   submissionCase({ position, status, batch, points: status === 'AC' ? 10 : 0, total: 10 });
@@ -46,5 +46,62 @@ describe('buildOverviewRows', () => {
     );
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ batch: null, earned: 20, max: 30, verdict: 'WA' });
+  });
+});
+
+const scored = (position: number, points: number, batch: number | null = null, total = 5) =>
+  submissionCase({ position, status: 'AC', batch, points, total });
+
+describe('partial tests in the overview', () => {
+  it('counts full and partial tests apart and reads "15 correct · 5 partially correct"', () => {
+    const cases = [
+      ...Array.from({ length: 15 }, (_unused, index) => scored(index + 1, 5)),
+      ...[3.86, 2.89, 2.54, 2.89, 2.73].map((points, index) => scored(16 + index, points)),
+    ];
+    const [row] = buildOverviewRows(cases, null);
+    expect(row).toMatchObject({ verdict: 'PC', rule: 'sum', passedCount: 15, partialCount: 5 });
+    expect(reasonParts(row!)).toEqual([
+      { key: 'passed', values: { count: 15 } },
+      { key: 'partial', values: { count: 5 } },
+    ]);
+  });
+
+  it('names the lowest test of a subtask that took part of its points', () => {
+    const cases = [scored(1, 30, 1, 30), scored(2, 17.3, 1, 30), scored(3, 23, 1, 30)];
+    const [row] = buildOverviewRows(cases, null);
+    expect(row).toMatchObject({ verdict: 'PC', rule: 'min', earned: 17.3, lowestPosition: 2 });
+    expect(reasonParts(row!).map((part) => part.key)).toEqual(['passed', 'partial', 'lowest']);
+  });
+
+  it('keeps the failing verdict first and still counts the partial tests', () => {
+    const cases = [
+      scored(1, 2.5),
+      submissionCase({ position: 2, status: 'WA', batch: null, points: 0, total: 5 }),
+    ];
+    const [row] = buildOverviewRows(cases, null);
+    expect(row).toMatchObject({ verdict: 'WA', passedCount: 0, partialCount: 1 });
+    expect(reasonParts(row!).map((part) => part.key)).toEqual(['failed', 'partial']);
+  });
+
+  it('says "n/n passed" only when every test has full points', () => {
+    const [row] = buildOverviewRows([scored(1, 5), scored(2, 5)], null);
+    expect(row).toMatchObject({ verdict: 'AC', partialCount: 0, lowestPosition: null });
+    expect(reasonParts(row!)).toEqual([{ key: 'allPassed', values: { passed: 2, total: 2 } }]);
+  });
+});
+
+describe('scoreConversion', () => {
+  it('explains a partial score from the test points', () => {
+    expect(scoreConversion(89.9, 100, 719.2, 800)?.share).toBeCloseTo(0.899);
+  });
+
+  it('has nothing to explain at full marks, while grading, or without tests', () => {
+    expect(scoreConversion(100, 100, 800, 800)).toBeNull();
+    expect(scoreConversion(50, 100, null, 800)).toBeNull();
+    expect(scoreConversion(0, 0, 0, 800)).toBeNull();
+  });
+
+  it('stays quiet when the formula does not give the stored points (no partial scoring)', () => {
+    expect(scoreConversion(50, 100, 0, 800)).toBeNull();
   });
 });

@@ -12,7 +12,7 @@ import { useScopedSubmissionListQuery } from '@/features/submissions/submissions
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
 import { formatAgoCompact, formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
-import { verdictOf } from '@/lib/verdicts';
+import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 
@@ -74,7 +74,7 @@ const score = (points: number | null) =>
           class="flex min-h-11 items-center gap-2.5 border-t border-line"
         >
           <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
-            <VerdictBadge :verdict="verdictOf(submission)" size="sm" />
+            <VerdictBadge :verdict="submissionVerdictOf(submission)" size="sm" />
           </RouterLink>
           <span class="font-mono font-bold tabular-nums">{{ score(submission.points) }}</span>
           <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{

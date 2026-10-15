@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
+import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
-import { verdictOf } from '@/lib/verdicts';
+import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. */
+/**
+ * Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
+ * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor.
+ */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
   batches: SubmissionBatch[] | null;
@@ -38,18 +41,17 @@ const DETAIL_FIELDS = [
 interface GradedRow {
   key: string;
   label: string;
-  status: CaseStatus;
+  verdict: Verdict;
   time: string;
   memory: string;
   points: string;
   details: { field: string; label: string; text: string }[];
 }
 
-const caseVerdict = (status: CaseStatus) => verdictOf({ status: 'D', result: status });
 const caseRow = (testCase: SubmissionCase): GradedRow => ({
   key: `case-${testCase.position}`,
   label: String(testCase.position),
-  status: testCase.status,
+  verdict: caseVerdictOf(testCase),
   time: formatCaseTime(testCase.time),
   memory: formatCaseMemory(testCase.memory),
   points: formatPoints(testCase.points, testCase.total),
@@ -60,7 +62,7 @@ const caseRow = (testCase: SubmissionCase): GradedRow => ({
 const batchRow = (batch: SubmissionBatch): GradedRow => ({
   key: `batch-${batch.batch}`,
   label: translate('submission.cases.batch', { number: batch.batch }),
-  status: batch.status,
+  verdict: caseVerdictOf(batch),
   time: NO_VALUE,
   memory: NO_VALUE,
   points: formatPoints(batch.points, batch.total),
@@ -79,6 +81,20 @@ const pendingNumbers = computed(() => {
     (_unused, offset) => firstPending + offset,
   );
 });
+/** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
+const ROW_CARD =
+  'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';
+const CELL = 'px-6 py-3 max-sm:p-0';
+const NUMBER_CELL = `${CELL} text-right font-mono tabular-nums`;
+const CELL_PLACES = {
+  test: 'max-sm:col-start-1 max-sm:row-start-1',
+  result: 'max-sm:col-start-2 max-sm:row-start-1',
+  time: 'max-sm:col-start-2 max-sm:row-start-2 max-sm:text-left max-sm:text-caption max-sm:text-muted',
+  memory: 'max-sm:col-start-3 max-sm:row-start-2 max-sm:text-caption max-sm:text-muted',
+  points: 'max-sm:col-start-3 max-sm:row-start-1',
+} as const;
+const pointsClass = (verdict: Verdict) =>
+  verdict.code === PARTIAL_CODE ? 'font-bold text-verdict-partial' : '';
 const hasRows = computed(() => gradedRows.value.length > 0 || pendingNumbers.value.length > 0);
 const isHidden = computed(
   () => props.cases === null && props.batches === null && !props.compileError,
@@ -86,15 +102,15 @@ const isHidden = computed(
 </script>
 
 <template>
-  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
-      <h2 class="font-display text-base font-bold">{{ $t('submission.cases.title') }}</h2>
+  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-card">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
+      <h2 class="font-display text-title font-bold">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
       <p class="text-meta text-muted">{{ $t('submission.cases.compileLog') }}</p>
       <pre
-        class="mt-1.5 max-h-96 overflow-auto rounded-tile bg-surface-strong p-4 font-mono text-meta leading-relaxed whitespace-pre"
+        class="mt-1.5 max-h-96 overflow-auto rounded-cell bg-surface-strong p-4 font-mono text-meta leading-relaxed whitespace-pre"
         >{{ compileError }}</pre>
     </div>
     <p v-if="isHidden" class="px-6 pb-6 text-muted sm:px-8">{{ $t('submission.casesHidden') }}</p>
@@ -105,13 +121,13 @@ const isHidden = computed(
       :aria-label="$t('submission.cases.scrollRegion')"
       class="overflow-x-auto focus-visible:-outline-offset-2"
     >
-      <table class="w-full min-w-[560px] border-collapse text-sm">
+      <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[560px]">
         <caption class="sr-only">
           {{
             $t('submission.cases.title')
           }}
         </caption>
-        <thead>
+        <thead class="max-sm:sr-only">
           <tr class="text-left text-meta text-muted">
             <th
               v-for="column in COLUMN_KEYS"
@@ -124,21 +140,34 @@ const isHidden = computed(
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="max-sm:block">
           <template v-for="row in gradedRows" :key="row.key">
-            <tr :id="row.key" data-testid="case-row" class="scroll-mt-20 border-t border-line">
-              <th scope="row" class="px-6 py-3 text-left font-mono font-normal">{{ row.label }}</th>
-              <td class="px-6 py-3"><VerdictLabel :verdict="caseVerdict(row.status)" /></td>
-              <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.time }}</td>
-              <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.memory }}</td>
-              <td class="px-6 py-3 text-right font-mono tabular-nums">{{ row.points }}</td>
+            <tr
+              :id="row.key"
+              data-testid="case-row"
+              class="scroll-mt-20 border-t border-line"
+              :class="ROW_CARD"
+            >
+              <th
+                scope="row"
+                class="text-left font-mono font-normal max-sm:text-meta max-sm:text-muted"
+                :class="[CELL, CELL_PLACES.test]"
+              >
+                {{ row.label }}
+              </th>
+              <td :class="[CELL, CELL_PLACES.result]"><VerdictLabel :verdict="row.verdict" /></td>
+              <td :class="[NUMBER_CELL, CELL_PLACES.time]">{{ row.time }}</td>
+              <td :class="[NUMBER_CELL, CELL_PLACES.memory]">{{ row.memory }}</td>
+              <td :class="[NUMBER_CELL, CELL_PLACES.points, pointsClass(row.verdict)]">
+                {{ row.points }}
+              </td>
             </tr>
-            <tr v-if="row.details.length">
-              <td colspan="5" class="px-6 pb-3">
+            <tr v-if="row.details.length" class="max-sm:block">
+              <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4">
                 <div v-for="detail in row.details" :key="detail.field" class="mt-1.5">
                   <p class="text-meta text-muted">{{ detail.label }}</p>
                   <pre
-                    class="mt-1 max-h-48 overflow-auto rounded-tile bg-surface-strong p-3 font-mono text-meta whitespace-pre-wrap [overflow-wrap:anywhere]"
+                    class="mt-1 max-h-48 overflow-auto rounded-cell bg-surface-strong p-3 font-mono text-meta whitespace-pre-wrap [overflow-wrap:anywhere]"
                     >{{ detail.text }}</pre>
                 </div>
               </td>
@@ -149,12 +178,19 @@ const isHidden = computed(
             :key="`pending-${number}`"
             data-testid="pending-row"
             class="border-t border-line text-muted"
+            :class="ROW_CARD"
           >
-            <th scope="row" class="px-6 py-3 text-left font-mono font-normal">{{ number }}</th>
-            <td class="px-6 py-3">{{ $t('submission.cases.pending') }}</td>
-            <td class="px-6 py-3 text-right font-mono">{{ NO_VALUE }}</td>
-            <td class="px-6 py-3 text-right font-mono">{{ NO_VALUE }}</td>
-            <td class="px-6 py-3 text-right font-mono">{{ NO_VALUE }}</td>
+            <th
+              scope="row"
+              class="text-left font-mono font-normal"
+              :class="[CELL, CELL_PLACES.test]"
+            >
+              {{ number }}
+            </th>
+            <td :class="[CELL, CELL_PLACES.result]">{{ $t('submission.cases.pending') }}</td>
+            <td :class="[NUMBER_CELL, CELL_PLACES.time]">{{ NO_VALUE }}</td>
+            <td :class="[NUMBER_CELL, CELL_PLACES.memory]">{{ NO_VALUE }}</td>
+            <td :class="[NUMBER_CELL, CELL_PLACES.points]">{{ NO_VALUE }}</td>
           </tr>
         </tbody>
       </table>

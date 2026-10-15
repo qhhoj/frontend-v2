@@ -20,6 +20,7 @@ const solversOf = (problem: ContestProblemStats) => {
 /** Solid verdict fills for the stacked bar (no text sits on them); the chips keep the tinted tone classes. */
 const SEGMENT_FILLS: Record<VerdictTone, string> = {
   ac: 'bg-verdict-ac',
+  pc: 'bg-verdict-partial',
   wa: 'bg-verdict-wa',
   tle: 'bg-verdict-tle',
   rte: 'bg-verdict-rte',

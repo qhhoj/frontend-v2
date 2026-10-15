@@ -10,7 +10,7 @@ const CARDS = 6;
     <li
       v-for="index in CARDS"
       :key="index"
-      class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-tile border border-line bg-surface-solid px-4 py-3.5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:px-5"
+      class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-row border border-line bg-surface-solid px-4 py-3.5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:px-5"
     >
       <SkeletonBlock round class="size-14" />
       <span class="flex min-w-0 flex-col gap-2">

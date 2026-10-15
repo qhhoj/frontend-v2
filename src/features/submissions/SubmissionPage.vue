@@ -9,7 +9,7 @@ import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useProblemQuery } from '@/features/problems/problems.queries';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
-import { verdictOf } from '@/lib/verdicts';
+import { submissionVerdictOf, verdictOf } from '@/lib/verdicts';
 import { usePageTitle } from '@/router/page-title';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -57,12 +57,14 @@ const isNotFound = computed(
 );
 const forbiddenKey = computed(() => forbiddenMessageKey(query.error.value));
 
-/** The stream's status leads only while the grading goes on; a final status shows the stored row, which carries the result. */
+/** The stream's status leads only while the grading goes on; a final status shows the stored row, which carries the result (PC when partial). */
 const verdict = computed(() => {
   if (!row.value) return null;
   const streamStatus = live.status;
   const isStreamLeading = streamStatus !== null && IN_PROGRESS_STATUSES.includes(streamStatus);
-  return verdictOf(isStreamLeading ? { status: streamStatus, result: null } : row.value);
+  return isStreamLeading
+    ? verdictOf({ status: streamStatus, result: null })
+    : submissionVerdictOf(row.value);
 });
 </script>
 
@@ -79,7 +81,7 @@ const verdict = computed(() => {
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
     </p>
-    <Card v-if="forbiddenKey" as="div" class="rounded-panel p-6 sm:p-8">
+    <Card v-if="forbiddenKey" as="div" class="rounded-card p-6 sm:p-8">
       <div class="flex flex-wrap items-center gap-3">
         <InlineBit kind="sweat" />
         <p role="alert">{{ $t(forbiddenKey) }}</p>
@@ -121,7 +123,9 @@ const verdict = computed(() => {
           :cases="row.cases"
           :batches="row.batches"
           :points="row.points"
-          :problem-points="problemQuery.data.value?.points ?? null"
+          :problem-points="row.problem?.points ?? null"
+          :case-points="row.casePoints"
+          :case-total="row.caseTotal"
           :running="isLive"
         />
         <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />

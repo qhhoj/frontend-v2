@@ -11,6 +11,7 @@ const shares = computed(() => verdictShares(props.verdicts));
 /** Fill only: the bar and the legend swatches carry no text. */
 const SEGMENT_CLASSES: Record<BlockTone, string> = {
   ac: 'bg-verdict-ac-solid',
+  pc: 'bg-verdict-partial',
   wa: 'bg-verdict-wa-solid',
   tle: 'bg-verdict-tle-solid',
   rte: 'bg-verdict-rte-solid',

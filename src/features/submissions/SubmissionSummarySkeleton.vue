@@ -18,7 +18,7 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
   >
     <Card
       as="div"
-      class="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-4 rounded-panel p-6 sm:p-8"
+      class="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-4 rounded-card p-6 sm:p-8"
     >
       <SkeletonBlock data-skeleton-region="ring" round class="size-32 shrink-0" />
       <div class="min-w-0 flex-1 basis-40">
@@ -31,7 +31,7 @@ const SCORE_BLOCK_CLASS = 'h-14 w-40';
       </div>
       <SkeletonBlock data-skeleton-region="bit" :class="BIT_SLOT_CLASS" class="ml-auto shrink-0" />
     </Card>
-    <Card as="div" class="rounded-panel p-6 sm:p-8">
+    <Card as="div" class="rounded-card p-6 sm:p-8">
       <dl data-skeleton-region="facts" class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
         <template v-for="key in SUMMARY_FACT_KEYS" :key="key">
           <dt data-skeleton-region="fact" class="text-meta">

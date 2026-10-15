@@ -926,6 +926,7 @@
   },
   "verdicts": {
     "AC": "Accepted",
+    "PC": "Partially correct",
     "WA": "Wrong answer",
     "TLE": "Time limit exceeded",
     "MLE": "Memory limit exceeded",
@@ -1358,12 +1359,19 @@
       "points": "Points",
       "subtask": "Subtask {number}",
       "allTests": "All tests",
-      "testTitle": "Test {number}: {verdict}",
+      "testTitle": "Test {number}: {verdict}, {points}",
       "allPassed": "{passed}/{total} tests passed",
       "failed": "Test {number} {verdict}",
       "skipped": "{count} skipped",
       "total": "Total",
-      "rule": "a subtask scores only when every test is AC"
+      "passed": "{count} correct",
+      "partial": "{count} partially correct",
+      "lowest": "lowest at test {number}",
+      "ruleSum": "sum of test points",
+      "ruleMin": "lowest test counts",
+      "explainSum": "Score = sum of {count} tests: {cases}, scaled {percent}% × {max} = {points} points.",
+      "explainMin": "Each subtask scores its lowest test. Sum {parts} = {cases}, scaled {percent}% × {max} = {points} points.",
+      "rounding": "Test points show 2 decimals; the total uses exact points rounded to 1 decimal."
     },
     "cases": {
       "title": "Results per test",

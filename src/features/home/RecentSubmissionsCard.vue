@@ -6,7 +6,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { formatRelative } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
-import { verdictOf } from '@/lib/verdicts';
+import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRecentSubmissionsQuery } from './home.queries';
 
@@ -68,11 +68,12 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
             :to="{ name: 'submission', params: { id: item.id } }"
             class="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-row bg-surface px-3.5 py-3 text-content hover:bg-surface-hover"
           >
-            <VerdictBadge :verdict="verdictOf(item)" />
+            <VerdictBadge :verdict="submissionVerdictOf(item)" />
             <span class="min-w-32 flex-1">
               <span class="block truncate font-semibold">{{ item.problem?.name ?? '—' }}</span>
               <span class="block text-meta text-muted"
-                >{{ $t(verdictOf(item).labelKey) }} · {{ item.language?.name ?? '—' }}</span
+                >{{ $t(submissionVerdictOf(item).labelKey) }} ·
+                {{ item.language?.name ?? '—' }}</span
               >
             </span>
             <span class="ml-auto text-right font-mono text-meta text-muted">
