@@ -27,7 +27,7 @@ function submit() {
 </script>
 
 <template>
-  <Card as="div" class="rounded-panel p-6 sm:p-8">
+  <Card as="div" class="rounded-card p-6 sm:p-8">
     <form
       data-testid="compare-form"
       class="flex flex-col gap-3"

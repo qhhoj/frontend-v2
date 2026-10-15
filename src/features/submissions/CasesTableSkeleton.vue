@@ -9,12 +9,12 @@ const NUMBER_COLUMN_COUNT = 3;
 </script>
 
 <template>
-  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-panel">
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-6 pt-5 pb-3">
-      <h2 class="font-display text-base font-bold"><SkeletonBlock text class="w-40" /></h2>
+  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-card">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
+      <h2 class="font-display text-title font-bold"><SkeletonBlock text class="w-40" /></h2>
     </div>
     <div class="overflow-x-auto">
-      <table aria-hidden="true" class="w-full min-w-[560px] border-collapse text-sm">
+      <table aria-hidden="true" class="w-full border-collapse sm:min-w-[560px] text-sm">
         <thead>
           <tr class="text-left text-meta text-muted">
             <th

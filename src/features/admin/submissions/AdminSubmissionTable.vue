@@ -9,7 +9,7 @@ import VerdictBadge from '@/components/VerdictBadge.vue';
 import SubmissionProblemName from '@/features/submissions/SubmissionProblemName.vue';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { copyText } from '@/lib/clipboard';
-import { verdictOf } from '@/lib/verdicts';
+import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { shortId } from '../ui/short-id';
@@ -123,7 +123,7 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
         :to="{ name: 'submission', params: { id: row.id } }"
         class="inline-flex rounded-full hover:brightness-110"
       >
-        <VerdictBadge :verdict="verdictOf(row)" size="sm" class="min-w-12" />
+        <VerdictBadge :verdict="submissionVerdictOf(row)" size="sm" class="min-w-12" />
       </RouterLink>
     </template>
     <template #cell-user="{ row }">

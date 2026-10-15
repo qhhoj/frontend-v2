@@ -54,7 +54,7 @@ const isExpanded = ref(route.hash === '#source');
 </script>
 
 <template>
-  <Card id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-panel">
+  <Card id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-card">
     <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3">
       <h2 class="font-display text-base font-bold">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">

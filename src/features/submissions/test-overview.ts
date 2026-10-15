@@ -1,4 +1,5 @@
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
+import { PARTIAL_CODE, isPartial } from '@/lib/verdicts';
 
 /** The case status of a test the judge did not run because an earlier test of its subtask failed. */
 export const SKIPPED_STATUS: CaseStatus = 'SC';
@@ -8,18 +9,29 @@ export interface OverviewRow {
   /** The subtask number; null for the single row of a problem without subtasks. */
   batch: number | null;
   cases: SubmissionCase[];
-  /** The first failing status, else AC (or SC when every test was skipped). */
-  verdict: CaseStatus;
+  /** The first failing status, else PC when a test earned part of its points, else AC (or SC when every test was skipped). */
+  verdict: CaseStatus | typeof PARTIAL_CODE;
+  /** How the row adds its tests up: a subtask takes its lowest test's points, a plain list sums them. */
+  rule: 'min' | 'sum';
+  /** Tests with full points. */
   passedCount: number;
+  /** Accepted tests that earned only part of their points. */
+  partialCount: number;
   skippedCount: number;
   /** The first failing test, when there is one. */
   failedPosition: number | null;
+  /** The test that set a subtask's points, when no test failed and the subtask is short of its maximum. */
+  lowestPosition: number | null;
   earned: number;
   max: number;
 }
 
 const isSkipped = (testCase: SubmissionCase) => testCase.status === SKIPPED_STATUS;
 const isFailed = (testCase: SubmissionCase) => testCase.status !== 'AC' && !isSkipped(testCase);
+const isPartialCase = (testCase: SubmissionCase) =>
+  isPartial(testCase.status, testCase.points, testCase.total);
+const isFullCase = (testCase: SubmissionCase) =>
+  testCase.status === 'AC' && !isPartialCase(testCase);
 const sumOf = (cases: SubmissionCase[], field: 'points' | 'total') =>
   cases.reduce((sum, testCase) => sum + testCase[field], 0);
 
@@ -37,6 +49,17 @@ function subtaskPoints(
   };
 }
 
+function rowVerdict(cases: SubmissionCase[]): OverviewRow['verdict'] {
+  const failed = cases.find(isFailed);
+  if (failed) return failed.status;
+  if (cases.every(isSkipped)) return SKIPPED_STATUS;
+  return cases.some(isPartialCase) ? PARTIAL_CODE : 'AC';
+}
+
+/** The test whose points a subtask took: its lowest, first by position on a tie. */
+const lowestCase = (cases: SubmissionCase[]) =>
+  cases.reduce((lowest, testCase) => (testCase.points < lowest.points ? testCase : lowest));
+
 function buildRow(
   key: string,
   batch: number | null,
@@ -44,18 +67,23 @@ function buildRow(
   batches: SubmissionBatch[] | null,
 ): OverviewRow {
   const failed = cases.find(isFailed);
+  const rule = batch === null ? 'sum' : 'min';
   const points =
     batch === null
       ? { earned: sumOf(cases, 'points'), max: sumOf(cases, 'total') }
       : subtaskPoints(batch, cases, batches);
+  const isShortSubtask = rule === 'min' && !failed && points.earned < points.max;
   return {
     key,
     batch,
     cases,
-    verdict: failed?.status ?? (cases.every(isSkipped) ? SKIPPED_STATUS : 'AC'),
-    passedCount: cases.filter((testCase) => testCase.status === 'AC').length,
+    verdict: rowVerdict(cases),
+    rule,
+    passedCount: cases.filter(isFullCase).length,
+    partialCount: cases.filter(isPartialCase).length,
     skippedCount: cases.filter(isSkipped).length,
     failedPosition: failed?.position ?? null,
+    lowestPosition: isShortSubtask ? lowestCase(cases).position : null,
     ...points,
   };
 }
@@ -81,4 +109,45 @@ export function buildOverviewRows(
 export function earnedTone(earned: number, max: number): 'full' | 'none' | 'partial' {
   if (earned === 0) return 'none';
   return earned >= max ? 'full' : 'partial';
+}
+
+/** One part of a row's reason line: an i18n key under `submission.overview` and its values. */
+export interface ReasonPart {
+  key: 'allPassed' | 'failed' | 'passed' | 'partial' | 'lowest' | 'skipped';
+  values: Record<string, number | string>;
+}
+
+/** Why the row scored what it did, e.g. "15 correct · 5 partially correct"; the failing test's verdict is the caller's to name. */
+export function reasonParts(row: OverviewRow): ReasonPart[] {
+  if (row.failedPosition === null && row.skippedCount === 0 && row.partialCount === 0)
+    return [{ key: 'allPassed', values: { passed: row.passedCount, total: row.cases.length } }];
+  const parts: ReasonPart[] = [];
+  if (row.failedPosition !== null)
+    parts.push({ key: 'failed', values: { number: row.failedPosition, verdict: row.verdict } });
+  else if (row.partialCount > 0) parts.push({ key: 'passed', values: { count: row.passedCount } });
+  if (row.partialCount > 0) parts.push({ key: 'partial', values: { count: row.partialCount } });
+  if (row.lowestPosition !== null)
+    parts.push({ key: 'lowest', values: { number: row.lowestPosition } });
+  if (row.skippedCount > 0) parts.push({ key: 'skipped', values: { count: row.skippedCount } });
+  return parts;
+}
+
+/** The judge's own rounding: Python's `round(value, 3)` is close enough here, the check only allows for float noise. */
+const SCORE_TOLERANCE = 1e-3;
+
+/**
+ * How test points became the score, for the explanation line: `casePoints / caseTotal × problemPoints`. Null when there is
+ * nothing to explain (full marks, no tests) or when that formula does not give the stored points, e.g. a problem without
+ * partial scoring, which gives 0 unless every test is full.
+ */
+export function scoreConversion(
+  casePoints: number,
+  caseTotal: number,
+  points: number | null,
+  problemPoints: number | null,
+): { share: number } | null {
+  if (points === null || problemPoints === null || caseTotal <= 0 || casePoints >= caseTotal)
+    return null;
+  const share = casePoints / caseTotal;
+  return Math.abs(share * problemPoints - points) < SCORE_TOLERANCE ? { share } : null;
 }

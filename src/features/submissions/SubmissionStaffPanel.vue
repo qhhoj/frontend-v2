@@ -160,7 +160,7 @@ async function confirmAction() {
   <section
     v-if="isVisible"
     data-testid="staff-panel"
-    class="glass flex flex-col gap-4 rounded-panel p-5"
+    class="glass flex flex-col gap-4 rounded-card p-5"
     aria-labelledby="staff-panel-title"
   >
     <header class="flex flex-wrap items-center gap-3">

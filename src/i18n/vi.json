@@ -926,6 +926,7 @@
   },
   "verdicts": {
     "AC": "Chấp nhận",
+    "PC": "Đúng một phần",
     "WA": "Sai kết quả",
     "TLE": "Quá thời gian",
     "MLE": "Quá bộ nhớ",
@@ -1358,12 +1359,19 @@
       "points": "Điểm",
       "subtask": "Subtask {number}",
       "allTests": "Các test",
-      "testTitle": "Test {number}: {verdict}",
+      "testTitle": "Test {number}: {verdict}, {points}",
       "allPassed": "{passed}/{total} test đúng",
       "failed": "Test {number} {verdict}",
       "skipped": "{count} bỏ qua",
       "total": "Tổng",
-      "rule": "subtask chỉ tính điểm khi mọi test đều AC"
+      "passed": "{count} đúng",
+      "partial": "{count} đúng một phần",
+      "lowest": "thấp nhất ở test {number}",
+      "ruleSum": "cộng điểm các test",
+      "ruleMin": "lấy điểm test thấp nhất",
+      "explainSum": "Điểm bài = cộng điểm {count} test: {cases}, quy đổi {percent}% × {max} = {points} điểm.",
+      "explainMin": "Mỗi subtask lấy điểm test thấp nhất của nó. Tổng {parts} = {cases}, quy đổi {percent}% × {max} = {points} điểm.",
+      "rounding": "Điểm từng test làm tròn 2 chữ số khi hiển thị; tổng dùng điểm gốc, làm tròn 1 chữ số."
     },
     "cases": {
       "title": "Kết quả từng test",

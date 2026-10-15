@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
-import { VERDICT_TONE_VARS, verdictOf } from '@/lib/verdicts';
+import { VERDICT_TONE_VARS, submissionVerdictOf } from '@/lib/verdicts';
 import { isFinished } from '../submission-row';
 
 /**
@@ -13,7 +13,7 @@ import { isFinished } from '../submission-row';
 const props = defineProps<{ row: SubmissionListItem }>();
 const PERCENT = 100;
 const FULL_TURN_DEGREES = 360;
-const verdict = computed(() => verdictOf(props.row));
+const verdict = computed(() => submissionVerdictOf(props.row));
 const isGrading = computed(() => props.row.status === 'G');
 const fraction = computed(() => {
   if (isGrading.value) return ringFraction(props.row);

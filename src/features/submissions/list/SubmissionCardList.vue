@@ -4,7 +4,7 @@ import UserLink from '@/components/UserLink.vue';
 import { translate } from '@/i18n';
 import { formatAgoCompact, formatCaseMemory, formatCaseTime, formatDateTime } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
-import { VERDICT_TONE_CLASSES, verdictOf } from '@/lib/verdicts';
+import { VERDICT_TONE_CLASSES, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionPickBox from '../SubmissionPickBox.vue';
 import SubmissionProblemName from '../SubmissionProblemName.vue';
@@ -42,7 +42,7 @@ const rowLabel = (row: SubmissionListItem) =>
     id: row.id,
     user: row.user?.username ?? NO_VALUE,
     problem: row.problem?.name ?? NO_VALUE,
-    verdict: translate(verdictOf(row).labelKey),
+    verdict: translate(submissionVerdictOf(row).labelKey),
   });
 /** On md+ each chip fills a fixed slot with right-aligned tabular figures, so time, memory and language line up across cards. */
 const PILL =
@@ -59,7 +59,7 @@ const PILL =
       v-for="row in submissions"
       :key="row.id"
       :data-id="row.id"
-      class="@container grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-tile border border-line bg-surface-solid px-4 py-3.5 hover:bg-surface-hover md:px-5"
+      class="@container grid cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-row border border-line bg-surface-solid px-4 py-3.5 hover:bg-surface-hover md:px-5"
       :class="[
         pickedIds
           ? 'md:grid-cols-[auto_auto_minmax(0,1fr)_15rem_auto]'
@@ -113,8 +113,9 @@ const PILL =
           :to="{ name: 'submission', params: { id: row.id } }"
           :aria-label="rowLabel(row)"
           class="inline-flex min-h-11 items-center rounded-pill px-3 font-mono text-xs font-bold whitespace-nowrap hover:brightness-95 md:min-h-8 md:justify-center"
-          :class="VERDICT_TONE_CLASSES[verdictOf(row).tone]"
-          >{{ verdictOf(row).code }} · {{ $t(verdictOf(row).labelKey) }}</RouterLink
+          :class="VERDICT_TONE_CLASSES[submissionVerdictOf(row).tone]"
+          >{{ submissionVerdictOf(row).code }} ·
+          {{ $t(submissionVerdictOf(row).labelKey) }}</RouterLink
         >
         <div class="flex flex-wrap gap-1.5 md:grid md:grid-cols-[3.75rem_4.75rem_minmax(0,1fr)]">
           <template v-if="hasCost(row)">
