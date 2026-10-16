@@ -25,7 +25,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       :is="to ? RouterLink : 'span'"
       v-else
       :to="to"
-      class="flex flex-col items-center justify-center rounded-cell px-1 text-center font-semibold whitespace-nowrap"
+      class="relative flex flex-col items-center justify-center rounded-cell px-1 text-center font-semibold whitespace-nowrap tabular-nums"
       :class="[
         CELL_BOX_CLASS,
         KIND_CLASSES[view.kind],
@@ -33,9 +33,14 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
         to && 'cursor-pointer transition hover:ring-2 hover:ring-line-strong',
       ]"
     >
+      <!-- The star is out of the flow so the text stays centred identically in every row. -->
+      <Star
+        v-if="view.kind === 'first-solve'"
+        aria-hidden="true"
+        class="absolute top-1 left-1 size-3"
+      />
       <span aria-hidden="true" class="block"
-        ><Star v-if="view.kind === 'first-solve'" class="mr-1 inline size-3 align-baseline" />{{
-          view.text
+        >{{ view.text
         }}<small
           v-if="view.time"
           data-testid="cell-time"

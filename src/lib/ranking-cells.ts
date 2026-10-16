@@ -12,7 +12,7 @@ export interface RankingCellView {
   kind: CellKind;
   /** What the cell shows; the label says the same in words for screen readers. */
   text: string;
-  /** Points formats with times: the small second line (`0:08:12`). */
+  /** The small second line (`0:08:12`): the solve time of a points or penalty cell. */
   time?: string;
   labelKey: string;
   labelParams: Record<string, string | number>;
@@ -94,7 +94,8 @@ function solvedPenaltyCell(cell: ProblemCell, wrong: number, isFirst: boolean): 
   const time = formatElapsed(Number(cell.time ?? 0));
   return {
     kind: isFirst ? 'first-solve' : 'solved',
-    text: `+${wrong || ''} ${time}`,
+    text: `+${wrong || ''}`,
+    time,
     labelKey: isFirst ? 'ranking.cell.firstSolve' : 'ranking.cell.solved',
     labelParams: { tries: wrong, time },
   };

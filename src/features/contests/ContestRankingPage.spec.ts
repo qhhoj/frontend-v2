@@ -113,7 +113,7 @@ describe('contest ranking', () => {
     );
     const { wrapper } = await mountApp('/contests/r42/ranking');
     const row = rowOf(wrapper, 'user_07');
-    expect(cellTexts(row)).toEqual(['+1 0:09', '?2']);
+    expect(cellTexts(row)).toEqual(['+10:09', '?2']);
     expect(
       row
         .findAll('td')
