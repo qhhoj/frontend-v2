@@ -29,9 +29,10 @@ const timedDefault = context('default');
 
 describe('ranking cells, icpc', () => {
   it('counts wrong tries before the solve', () => {
-    expect(rankingCell({ time: 1860, points: 1, tries: 2 }, problem(), 'me', icpc).text).toBe(
-      '+1 0:31',
-    );
+    expect(rankingCell({ time: 1860, points: 1, tries: 2 }, problem(), 'me', icpc)).toMatchObject({
+      text: '+1',
+      time: '0:31',
+    });
   });
 
   it('hides frozen results behind ?n', () => {
@@ -63,7 +64,8 @@ describe('ranking cells, vnoj', () => {
       ),
     ).toMatchObject({
       kind: 'solved',
-      text: '+1 0:09',
+      text: '+1',
+      time: '0:09',
       labelParams: { tries: 1, time: '0:09' },
     });
     expect(
@@ -72,8 +74,8 @@ describe('ranking cells, vnoj', () => {
         problem({ points: 1 }),
         'me',
         vnoj,
-      ).text,
-    ).toBe('+ 0:09');
+      ),
+    ).toMatchObject({ text: '+', time: '0:09' });
   });
 
   it('shows pending submissions by their count and failed tries by the penalty', () => {
