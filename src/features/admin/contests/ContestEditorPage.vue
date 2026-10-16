@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatLabel } from '@/lib/contest-format';
 import { ExternalLink, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
@@ -67,7 +68,7 @@ const LIST = { name: 'admin-contests' } as const;
       >
         <template #meta>
           <ContestPhaseChip :phase="contest.phase" />
-          <AdminChip>{{ $t(`admin.contests.formats.${contest.formatName}`) }}</AdminChip>
+          <AdminChip>{{ formatLabel(contest.formatName) }}</AdminChip>
           <ContestWindowText :start-time="contest.startTime" :end-time="contest.endTime" />
           <span class="inline-flex items-center gap-1 whitespace-nowrap">
             <Users aria-hidden="true" class="size-3.5" :stroke-width="1.75" />

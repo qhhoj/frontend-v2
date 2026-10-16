@@ -18,7 +18,7 @@ import { safeRedirect } from '@/router/safe-redirect';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import AccessCodeDialog from './AccessCodeDialog.vue';
-import { actionFactsOf, commandOf, contestAction } from './contest-action';
+import { actionFactsOf, commandOf, contestAction, signInLabelKey } from './contest-action';
 import type { ContestActionKind } from './contest-action';
 import { useCurrentParticipationQuery } from './contests.queries';
 import ContestRulesDialog from './ContestRulesDialog.vue';
@@ -60,9 +60,8 @@ const locale = useLocaleStore();
 const now = useNow();
 /** Below `md` the bar is teleported to the body: the header card's glass blur would otherwise pin it inside the card. */
 const isPhone = useMediaQuery(PHONE_QUERY);
-const chosen = computed(() =>
-  contestAction(actionFactsOf(props.contest, session.user !== null, now.value)),
-);
+const facts = computed(() => actionFactsOf(props.contest, session.user !== null, now.value));
+const chosen = computed(() => contestAction(facts.value));
 const { data: current } = useCurrentParticipationQuery(
   computed(() => chosen.value.kind === 'leave'),
 );
@@ -187,7 +186,7 @@ watch(isRulesOpen, (isOpen) => {
         {{ participationStatus }}
       </p>
       <AppButton v-if="chosen.kind === 'signIn'" tone="primary" :to="signInTarget">
-        {{ $t('contests.actions.signIn') }}
+        {{ $t(signInLabelKey(facts)) }}
       </AppButton>
       <InContestStatus
         v-else-if="chosen.kind === 'leave'"

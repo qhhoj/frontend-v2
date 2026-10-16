@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatLabel } from '@/lib/contest-format';
 import type { ContestFormatName, LabelStyle } from '@/api/types/contest-editing';
 import AdminField from '../../ui/AdminField.vue';
 import { INPUT } from '../../ui/controls';
@@ -55,7 +56,7 @@ const pickFormat = (event: Event) => chooseFormat(form.value, textOf(event) as C
             @change="pickFormat"
           >
             <option v-for="name in FORMAT_NAMES" :key="name" :value="name">
-              {{ $t(`admin.contests.formats.${name}`) }}
+              {{ formatLabel(name) }}
             </option>
           </select>
         </template>
@@ -100,7 +101,7 @@ const pickFormat = (event: Event) => chooseFormat(form.value, textOf(event) as C
       <legend class="mb-3 text-sm font-semibold">
         {{
           $t('admin.contests.general.fields.formatConfigTitle', {
-            format: $t(`admin.contests.formats.${form.formatName}`),
+            format: formatLabel(form.formatName),
           })
         }}
       </legend>

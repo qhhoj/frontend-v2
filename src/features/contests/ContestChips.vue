@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatLabel } from '@/lib/contest-format';
 import { Lock, TrendingUp } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ContestSummary } from '@/api/types/contests';
@@ -25,7 +26,7 @@ const showOrganizations = computed(() => props.withTags && props.contest.organiz
 </script>
 
 <template>
-  <Chip>{{ $t(`formats.${contest.formatName}`) }}</Chip>
+  <Chip>{{ formatLabel(contest.formatName) }}</Chip>
   <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
   <Chip v-if="withCodeNeeded && contest.requiresAccessCode" :icon="Lock">{{
     $t('contests.list.codeNeeded')

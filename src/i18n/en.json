@@ -215,6 +215,8 @@
     },
     "actions": {
       "signIn": "Sign in to take part",
+      "signInVirtual": "Sign in to join virtually",
+      "signInOnly": "Sign in",
       "join": "Enter",
       "rejoin": "Back to the contest",
       "register": "Register",
@@ -1279,7 +1281,7 @@
     "scrollHint": "Swipe sideways to see the problems →"
   },
   "formats": {
-    "default": "Default",
+    "default": "Points",
     "ioi": "IOI",
     "ioi16": "IOI 2016",
     "icpc": "ICPC",

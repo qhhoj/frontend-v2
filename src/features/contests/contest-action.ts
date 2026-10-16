@@ -71,6 +71,12 @@ function endedAction(facts: ActionFacts): ContestAction {
   return action('virtual', facts.requiresAccessCode && !facts.skipsAccessCode);
 }
 
+/** The visitor's button: the contest list calls an ended contest's action "Thi ảo", so the sign-in names it too. */
+export function signInLabelKey(facts: Pick<ActionFacts, 'phase' | 'disallowVirtual'>): string {
+  if (facts.phase !== 'ended') return 'contests.actions.signIn';
+  return facts.disallowVirtual ? 'contests.actions.signInOnly' : 'contests.actions.signInVirtual';
+}
+
 export function contestAction(facts: ActionFacts): ContestAction {
   if (!facts.isSignedIn) return action('signIn');
   if (facts.isCurrent) return action('leave');

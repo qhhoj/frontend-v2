@@ -1,5 +1,5 @@
 import type { ContestDetail, ContestFormatName } from '@/api/types/contests';
-import { translate } from '@/i18n';
+import { formatLabel } from '@/lib/contest-format';
 import type { Locale } from '@/i18n';
 import { freezeStart, spanMessage } from '@/lib/contest-time';
 import { formatDateTime } from '@/lib/format';
@@ -31,7 +31,7 @@ const row = (
 ): RuleRow => ({ termKey: `contests.rules.${term}`, valueKey, params, ...extras });
 
 function formatRule(contest: ContestDetail): RuleRow {
-  const format = translate(`formats.${contest.formatName}`);
+  const format = formatLabel(contest.formatName);
   const fallback = DEFAULT_PENALTY_MINUTES[contest.formatName];
   if (fallback === undefined) return row('format', 'contests.rules.formatOnly', { format });
   const stored = contest.formatConfig.penalty;
