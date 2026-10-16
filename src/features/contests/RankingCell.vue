@@ -19,14 +19,14 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       :is="to ? RouterLink : 'span'"
       v-else
       :to="to"
-      class="block rounded-cell px-1 py-1.5 font-semibold whitespace-nowrap"
+      class="flex h-12 flex-col items-center justify-center rounded-cell px-1 text-center font-semibold whitespace-nowrap"
       :class="[
         KIND_CLASSES[view.kind],
         view.partialStep && PARTIAL_CLASSES[view.partialStep],
         to && 'cursor-pointer transition hover:ring-2 hover:ring-line-strong',
       ]"
     >
-      <span aria-hidden="true"
+      <span aria-hidden="true" class="block"
         ><Star v-if="view.kind === 'first-solve'" class="mr-1 inline size-3 align-baseline" />{{
           view.text
         }}<small
