@@ -215,6 +215,8 @@
     },
     "actions": {
       "signIn": "Đăng nhập để tham gia",
+      "signInVirtual": "Đăng nhập để thi ảo",
+      "signInOnly": "Đăng nhập",
       "join": "Vào thi",
       "rejoin": "Quay lại kỳ thi",
       "register": "Đăng ký",
@@ -1279,7 +1281,7 @@
     "scrollHint": "Vuốt ngang để xem các bài →"
   },
   "formats": {
-    "default": "Mặc định",
+    "default": "Tính điểm",
     "ioi": "IOI",
     "ioi16": "IOI 2016",
     "icpc": "ICPC",

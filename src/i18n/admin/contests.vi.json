@@ -19,15 +19,6 @@
   },
   "view": "Xem kỳ thi",
   "tabsLabel": "Các phần của kỳ thi",
-  "formats": {
-    "default": "Mặc định",
-    "ioi": "IOI",
-    "ioi16": "IOI 2016",
-    "icpc": "ICPC",
-    "vnoj": "VNOJ",
-    "ultimate": "Ultimate",
-    "final_submission": "Lần nộp cuối"
-  },
   "notFound": "Không có kỳ thi {key}.",
   "cannotEdit": "Tài khoản này không sửa được kỳ thi {key}.",
   "index": {

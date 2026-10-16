@@ -6,7 +6,7 @@ import {
   listViewer,
   participationSummary,
 } from '@/test/fixtures';
-import { actionFactsOf, contestAction, listCallToAction } from './contest-action';
+import { actionFactsOf, contestAction, listCallToAction, signInLabelKey } from './contest-action';
 import type { ActionFacts } from './contest-action';
 
 const facts = (overrides: Partial<ActionFacts> = {}): ActionFacts => ({
@@ -224,4 +224,15 @@ describe('listCallToAction', () => {
   ] as const)('%s', (_case, item, labelKey, badgeKey, isPrimary) =>
     expect(listCallToAction(item, NOW)).toEqual({ labelKey, badgeKey, isPrimary }),
   );
+});
+
+describe('signInLabelKey', () => {
+  it.each([
+    ['upcoming', 'upcoming', false, 'contests.actions.signIn'],
+    ['running', 'running', false, 'contests.actions.signIn'],
+    ['ended', 'ended', false, 'contests.actions.signInVirtual'],
+    ['ended without virtual runs', 'ended', true, 'contests.actions.signInOnly'],
+  ] as const)('a visitor on a %s contest', (_name, phase, disallowVirtual, key) => {
+    expect(signInLabelKey({ phase, disallowVirtual })).toBe(key);
+  });
 });

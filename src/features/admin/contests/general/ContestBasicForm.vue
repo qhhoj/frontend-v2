@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatLabel } from '@/lib/contest-format';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Lock } from 'lucide-vue-next';
@@ -37,7 +38,7 @@ const SCOREBOARD_OPTIONS = ['V', 'H', 'C', 'P'] as const;
 const formatOptions = computed(() =>
   COMMON_FORMATS.map((value) => ({
     value,
-    label: t(`admin.contests.formats.${value}`),
+    label: formatLabel(value),
     description: t(`${KEY}.basic.formats.${value}`),
   })),
 );
@@ -110,7 +111,7 @@ const format = computed<ContestFormatName>({
         isCommonFormat
           ? t(`${KEY}.basic.moreFormats`)
           : t(`${KEY}.basic.otherFormat`, {
-              format: t(`admin.contests.formats.${form.formatName}`),
+              format: formatLabel(form.formatName),
             })
       }}
     </p>
