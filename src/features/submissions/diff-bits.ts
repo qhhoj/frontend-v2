@@ -16,6 +16,5 @@ export const DIFF_STATE_PANELS = {
 /** Decorative small Bits beside the diff notices and entry points (`InlineBit`). */
 export const DIFF_INLINE_BITS = {
   languages: 'sweat',
-  compareForm: 'writing',
   pickedTwo: 'crown',
 } as const satisfies Record<string, BitMood | BitKind>;

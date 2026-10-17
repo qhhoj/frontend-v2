@@ -23,6 +23,12 @@ describe('CasesTable', () => {
     expect(wrapper.findAll('[data-testid="pending-row"]')).toHaveLength(0);
   });
 
+  it('says a compile error keeps its log for source readers, never "no test results"', () => {
+    const wrapper = mountTable({ cases: [], compileLogHidden: true });
+    expect(wrapper.text()).toContain('Lỗi biên dịch. Thông báo biên dịch chỉ hiện');
+    expect(wrapper.text()).not.toContain('Chưa có kết quả từng test');
+  });
+
   it('shows only the hidden message when neither cases nor batches are visible', () => {
     const wrapper = mountTable({});
     expect(wrapper.text()).toContain('Người xem không được xem kết quả từng test');

@@ -27,10 +27,13 @@ export interface OverviewRow {
 }
 
 const isSkipped = (testCase: SubmissionCase) => testCase.status === SKIPPED_STATUS;
-const isFailed = (testCase: SubmissionCase) => testCase.status !== 'AC' && !isSkipped(testCase);
+/** A test that did not pass and was run (a skipped test is not a failure). */
+export const isFailed = (testCase: SubmissionCase) =>
+  testCase.status !== 'AC' && !isSkipped(testCase);
 const isPartialCase = (testCase: SubmissionCase) =>
   isPartial(testCase.status, testCase.points, testCase.total);
-const isFullCase = (testCase: SubmissionCase) =>
+/** An accepted test with all of its points. */
+export const isFullCase = (testCase: SubmissionCase) =>
   testCase.status === 'AC' && !isPartialCase(testCase);
 const sumOf = (cases: SubmissionCase[], field: 'points' | 'total') =>
   cases.reduce((sum, testCase) => sum + testCase[field], 0);

@@ -1378,14 +1378,13 @@
       "problem": "Bài",
       "user": "Người nộp",
       "language": "Ngôn ngữ",
-      "runtime": "Thời gian chạy",
       "judge": "Máy chấm",
       "submitted": "Nộp lúc"
     },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "overview": {
-      "title": "Tổng quan test",
-      "scrollRegion": "Tổng quan test, cuộn ngang",
+      "title": "Theo subtask",
+      "scrollRegion": "Theo subtask, cuộn ngang",
       "group": "Nhóm",
       "tests": "Test",
       "result": "Kết quả",
@@ -1407,8 +1406,8 @@
       "rounding": "Điểm từng test làm tròn 2 chữ số khi hiển thị; tổng dùng điểm gốc, làm tròn 1 chữ số."
     },
     "cases": {
-      "title": "Kết quả từng test",
-      "scrollRegion": "Kết quả từng test, cuộn ngang",
+      "title": "Kết quả chấm",
+      "scrollRegion": "Kết quả chấm, cuộn ngang",
       "none": "Chưa có kết quả từng test",
       "test": "Test",
       "result": "Kết quả",
@@ -1420,19 +1419,20 @@
       "compileLog": "Thông báo biên dịch",
       "feedback": "Phản hồi",
       "extendedFeedback": "Phản hồi chi tiết",
-      "output": "Đầu ra"
+      "output": "Đầu ra",
+      "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn."
     },
     "source": {
       "title": "Mã nguồn",
       "copy": "Sao chép mã nguồn",
-      "resubmit": "Nộp lại",
       "collapse": "Thu gọn",
       "expand": "Xem mã nguồn ({count} dòng)",
       "lines": "{count} dòng",
       "raw": "Xem mã nguồn thô",
       "rawShort": "Mã thô",
       "download": "Tải mã nguồn xuống",
-      "downloadShort": "Tải xuống"
+      "downloadShort": "Tải xuống",
+      "rawHint": "Mở mã nguồn dạng văn bản thuần trong thẻ mới"
     },
     "forbidden": {
       "solve_first": "Giải bài này trước để xem bài nộp",
@@ -1453,6 +1453,15 @@
       "score": "Điểm",
       "link": "Lượt chấm bên ngoài",
       "open": "Mở"
+    },
+    "actions": {
+      "problem": "Về đề bài",
+      "resubmit": "Nộp lại"
+    },
+    "sourceLocked": {
+      "signIn": "Đăng nhập để xem mã nguồn, nếu đề bài cho phép.",
+      "solveFirst": "Giải bài này để xem mã nguồn.",
+      "signInAction": "Đăng nhập"
     }
   },
   "states": {
@@ -2067,12 +2076,12 @@
   },
   "sourceDiff": {
     "compare": {
-      "title": "So sánh với bài khác",
       "label": "Mã bài nộp hoặc liên kết để so sánh",
       "submit": "So sánh",
       "hint": "Hoặc chọn hai bài trong danh sách bài nộp. Bạn chỉ so sánh được bài mình có quyền xem.",
       "invalid": "Nhập mã bài nộp hoặc dán liên kết của một bài nộp.",
-      "same": "Hãy chọn một bài nộp khác bài này."
+      "same": "Hãy chọn một bài nộp khác bài này.",
+      "open": "So sánh với bài khác…"
     },
     "select": {
       "column": "Chọn",

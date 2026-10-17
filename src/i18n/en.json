@@ -1378,14 +1378,13 @@
       "problem": "Problem",
       "user": "Author",
       "language": "Language",
-      "runtime": "Run time",
       "judge": "Judge",
       "submitted": "Submitted"
     },
     "pretest": "This submission was graded on the pretests only.",
     "overview": {
-      "title": "Test overview",
-      "scrollRegion": "Test overview, scrolls sideways",
+      "title": "By subtask",
+      "scrollRegion": "By subtask, scrolls sideways",
       "group": "Group",
       "tests": "Tests",
       "result": "Result",
@@ -1407,8 +1406,8 @@
       "rounding": "Test points show 2 decimals; the total uses exact points rounded to 1 decimal."
     },
     "cases": {
-      "title": "Results per test",
-      "scrollRegion": "Results per test, scrolls sideways",
+      "title": "Judging result",
+      "scrollRegion": "Judging result, scroll sideways",
       "none": "No test results yet",
       "test": "Test",
       "result": "Result",
@@ -1420,19 +1419,20 @@
       "compileLog": "Compiler message",
       "feedback": "Feedback",
       "extendedFeedback": "Detailed feedback",
-      "output": "Output"
+      "output": "Output",
+      "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source."
     },
     "source": {
       "title": "Source code",
       "copy": "Copy the source code",
-      "resubmit": "Resubmit",
       "collapse": "Collapse",
       "expand": "Show source ({count} lines)",
       "lines": "{count} lines",
       "raw": "View raw source",
       "rawShort": "Raw",
       "download": "Download the source",
-      "downloadShort": "Download"
+      "downloadShort": "Download",
+      "rawHint": "Open the source as plain text in a new tab"
     },
     "forbidden": {
       "solve_first": "Solve this problem first to see the submission",
@@ -1453,6 +1453,15 @@
       "score": "Score",
       "link": "Remote run",
       "open": "Open"
+    },
+    "actions": {
+      "problem": "Back to problem",
+      "resubmit": "Resubmit"
+    },
+    "sourceLocked": {
+      "signIn": "Sign in to see the source, if the problem allows it.",
+      "solveFirst": "Solve this problem to see the source.",
+      "signInAction": "Sign in"
     }
   },
   "states": {
@@ -2067,12 +2076,12 @@
   },
   "sourceDiff": {
     "compare": {
-      "title": "Compare with another",
       "label": "Submission id or link to compare with",
       "submit": "Compare",
       "hint": "Or tick two rows in the submission list. You can only compare submissions you may view.",
       "invalid": "Enter a submission id or paste a submission link.",
-      "same": "Pick a submission other than this one."
+      "same": "Pick a submission other than this one.",
+      "open": "Compare with another submission…"
     },
     "select": {
       "column": "Pick",

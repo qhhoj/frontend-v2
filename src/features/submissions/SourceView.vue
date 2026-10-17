@@ -2,23 +2,29 @@
 import AppButton from '@/components/ui/AppButton.vue';
 import { computed, onMounted, ref, toRef, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-import InlineBit from '@/components/InlineBit.vue';
+import { ApiError } from '@/api/client';
+import type { SourceAccess } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import QueryState from '@/components/QueryState.vue';
 import { aceForSubmissionKey } from '@/components/code-language-keys';
 import { showCode } from '@/components/code-highlight';
 import { translate } from '@/i18n';
 import { normalizeNewlines, sourceLineCount } from '@/lib/source';
 import { forbiddenReasonKey, isForbidden } from './forbidden-reason';
+import { safeRedirect } from '@/router/safe-redirect';
 import SourceFileBar from './SourceFileBar.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
-/** Keep `SourceViewSkeleton.vue` in step: same card, header and line classes. */
+/**
+ * The source card. The source is asked for only with `access` granted; otherwise (and on a 401 or 403 from the source
+ * endpoint) a notice says why, with "Đăng nhập" for a visitor. The default slot (the compare link) shows with the source.
+ * Keep `SourceViewSkeleton.vue` in step: same card, header and line classes.
+ */
 const props = defineProps<{
   id: string;
-  problemCode: string | null;
-  isOwn: boolean;
+  access: SourceAccess;
   languageKey: string | null;
   languageName: string | null;
 }>();
@@ -27,15 +33,30 @@ const route = useRoute();
 onMounted(() => {
   if (route.hash === '#source') document.getElementById('source')?.scrollIntoView();
 });
-const { data, isPending, error, refetch } = useSubmissionSourceQuery(toRef(props, 'id'));
-
-/** A 403 is a reason to show, not an error to retry: the B18 reason, else the plain "hidden" text. */
-const forbiddenText = computed(() => {
+const isGranted = computed(() => props.access === 'granted');
+const { data, isPending, error, refetch } = useSubmissionSourceQuery(toRef(props, 'id'), isGranted);
+const LOCKED_KEYS: Record<Exclude<SourceAccess, 'granted'>, string> = {
+  sign_in: 'submission.sourceLocked.signIn',
+  solve_first: 'submission.sourceLocked.solveFirst',
+  hidden: 'submission.sourceHidden',
+};
+const isSignedOut = computed(
+  () =>
+    props.access === 'sign_in' || (error.value instanceof ApiError && error.value.status === 401),
+);
+/** Why there is no source: the detail's answer first; a 401 or 403 is a reason to show, not an error to retry. */
+const lockedText = computed(() => {
+  if (props.access !== 'granted') return translate(LOCKED_KEYS[props.access]);
+  if (isSignedOut.value) return translate(LOCKED_KEYS.sign_in);
   const key =
     forbiddenReasonKey(error.value) ??
     (isForbidden(error.value) ? 'submission.sourceHidden' : null);
   return key === null ? null : translate(key);
 });
+const loginTo = computed(() => ({
+  name: 'login',
+  query: { redirect: safeRedirect(route.fullPath) },
+}));
 /** A stored source may end its lines in CR alone (a file read before the editor normalized files), which a `<pre>` shows as one line. */
 const source = computed(() => normalizeNewlines(data.value?.source ?? ''));
 /** Plain text first, coloured once the language's parser has loaded; the text itself never changes. */
@@ -66,17 +87,19 @@ const isExpanded = ref(route.hash === '#source');
         >
           {{ $t('submission.source.collapse') }}
         </AppButton>
-        <RouterLink
-          v-if="isOwn && problemCode && !forbiddenText"
-          :to="{ name: 'problem', params: { code: problemCode }, query: { resubmit: id } }"
-          class="inline-flex min-h-11 items-center rounded-pill bg-accent-soft px-4 text-sm font-semibold text-accent-soft-text"
-          >{{ $t('submission.source.resubmit') }}</RouterLink
-        >
       </div>
     </div>
-    <p v-if="forbiddenText" class="flex flex-wrap items-center gap-3 px-6 pb-6 text-muted">
-      <InlineBit kind="sweat" />{{ forbiddenText }}
-    </p>
+    <div v-if="lockedText" data-testid="source-locked" class="px-6 pb-6">
+      <!-- compact: the sign-in button goes under the text, which keeps its width on a phone. -->
+      <Notice compact>
+        {{ lockedText }}
+        <template v-if="isSignedOut" #action>
+          <AppButton size="sm" class="mt-2" :to="loginTo">{{
+            $t('submission.sourceLocked.signInAction')
+          }}</AppButton>
+        </template>
+      </Notice>
+    </div>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
       <div
@@ -111,6 +134,7 @@ const isExpanded = ref(route.hash === '#source');
         :language-name="languageName"
         :text="source"
       />
+      <slot v-if="data" />
     </QueryState>
   </Card>
 </template>

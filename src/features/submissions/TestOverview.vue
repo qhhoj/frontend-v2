@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import { ArrowDownWideNarrow, Info, Sigma } from 'lucide-vue-next';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
-import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
@@ -24,9 +23,9 @@ import {
 } from './test-overview';
 
 /**
- * The score explained: one row per subtask (or one for all tests), one square per test filled by its share of points, and
- * the total with how test points became the score. Squares link to the test's row in `CasesTable.vue` (`#case-<n>`). Below
- * `sm` the squares hide and each row stacks: name and points, then the verdict and its reason.
+ * The foot of the result card (`CasesTable.vue`'s `footer` slot): with subtasks, one row each, one square per test filled by its
+ * share of points; then the total with how test points became the score. Squares link to the test's row (`#case-<n>`). Below
+ * `sm` the squares hide and each subtask row stacks: name and points, then the verdict and its reason.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -133,16 +132,11 @@ const explanation = computed(() => {
 </script>
 
 <template>
-  <Card
-    v-if="rows.length"
-    as="div"
-    data-testid="test-overview"
-    class="overflow-hidden rounded-card"
-  >
-    <ScrollRegion :label="$t('submission.overview.scrollRegion')">
+  <div v-if="rows.length" data-testid="test-overview">
+    <ScrollRegion v-if="hasBatches" :label="$t('submission.overview.scrollRegion')">
       <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[640px]">
         <caption
-          class="px-4 max-sm:block pt-5 pb-3 text-left font-display text-title font-bold sm:px-6"
+          class="border-t border-line px-4 pt-4 pb-2 text-left text-sm font-bold max-sm:block sm:px-6"
         >
           {{
             $t('submission.overview.title')
@@ -244,5 +238,5 @@ const explanation = computed(() => {
         <span class="text-muted">{{ $t('submission.overview.rounding') }}</span></span
       >
     </p>
-  </Card>
+  </div>
 </template>
