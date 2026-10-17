@@ -6,12 +6,11 @@ import {
   sessionUser,
   signedIn,
   signedOut,
-  submissionDetail,
   userPage,
 } from '@/test/fixtures';
 import { loginRoutes } from '@/test/auth-routes';
 import { installFakeEventSource } from '@/test/fake-event-source';
-import { problemPageRoutes, signedInViewer, submissionPageRoutes } from '@/test/problem-routes';
+import { signedInViewer } from '@/test/problem-routes';
 import { stubMatchMedia } from '@/test/match-media';
 import { mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
@@ -75,37 +74,6 @@ describe('Bit placements', () => {
     expect(down.wrapper.get('[data-testid="rating-row"]').text()).toContain('-28');
     expect(down.wrapper.find('[data-testid="rank-up-bit"]').exists()).toBe(false);
     down.wrapper.unmount();
-  });
-
-  it('shows the judging Bit on a submission that is still being graded, and a verdict Bit once final', async () => {
-    const grading = submissionDetail({
-      status: 'G',
-      result: null,
-      points: null,
-      casePoints: 7,
-      caseTotal: 20,
-      currentTestcase: 3,
-    });
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(grading), ...problemPageRoutes() });
-    const pending = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() =>
-      expect(pending.wrapper.find('[data-testid="score"]').exists()).toBe(true),
-    );
-    const judging = pending.wrapper.get('[data-testid="judging-bit"]');
-    expect(judging.attributes('aria-hidden')).toBe('true');
-    expect(pixelsOf(judging.element)).toBe(pixelsOfKind('judging'));
-    expect(pending.wrapper.find('[role="img"][aria-label="Bit đội vương miện"]').exists()).toBe(
-      false,
-    );
-    pending.wrapper.unmount();
-
-    const accepted = submissionDetail({ status: 'D', result: 'AC', points: 1000 });
-    mockApi({ ...signedInViewer(), ...submissionPageRoutes(accepted), ...problemPageRoutes() });
-    const final = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() => expect(final.wrapper.find('[data-testid="score"]').exists()).toBe(true));
-    expect(final.wrapper.find('[data-testid="judging-bit"]').exists()).toBe(false);
-    expect(final.wrapper.find('[role="img"][aria-label="Bit đội vương miện"]').exists()).toBe(true);
-    final.wrapper.unmount();
   });
 
   it('greets a visitor on the login page with the welcome Bit in the brand panel, decorative', async () => {

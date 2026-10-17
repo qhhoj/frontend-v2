@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { i18n } from '@/i18n';
-import { verdictBitMood } from '@/mascot/verdict-bit';
 import {
   VERDICT_CODES,
   caseVerdictOf,
@@ -70,13 +69,5 @@ describe('caseVerdictOf', () => {
     expect(caseVerdictOf({ status: 'AC', points: 5, total: 5 }).code).toBe('AC');
     expect(caseVerdictOf({ status: 'AC', points: 0, total: 0 }).code).toBe('AC');
     expect(caseVerdictOf({ status: 'WA', points: 0, total: 5 }).code).toBe('WA');
-  });
-});
-
-describe('verdictBitMood', () => {
-  it('crowns a full AC only: a partial result gets no Bit', () => {
-    expect(verdictBitMood(submissionVerdictOf(finished('AC', 800, 800)))).toBe('crown');
-    expect(verdictBitMood(submissionVerdictOf(finished('AC', 719.2, 800)))).toBeNull();
-    expect(verdictBitMood(submissionVerdictOf(finished('WA', 0, 800)))).toBe('sweat');
   });
 });

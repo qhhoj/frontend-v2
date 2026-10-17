@@ -9,7 +9,8 @@ import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /**
- * Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
+ * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
+ * `TestOverview.vue`). Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
  * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor.
  */
 const props = defineProps<{
@@ -21,6 +22,8 @@ const props = defineProps<{
   running: boolean;
   /** The compile log of a compile error. Text only. */
   compileError?: string | null;
+  /** A compile error whose log this viewer may not read (it quotes the code): said instead of "no test results". */
+  compileLogHidden?: boolean;
 }>();
 
 const locale = useLocaleStore();
@@ -195,8 +198,12 @@ const isHidden = computed(
         </tbody>
       </table>
     </div>
+    <p v-else-if="compileLogHidden" class="px-6 pb-6 text-muted sm:px-8">
+      {{ $t('submission.cases.compileLogHidden') }}
+    </p>
     <p v-else-if="!compileError" class="px-6 pb-6 text-muted sm:px-8">
       {{ $t('submission.cases.none') }}
     </p>
+    <slot name="footer" />
   </Card>
 </template>

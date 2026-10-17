@@ -10,6 +10,8 @@ export const FINISHED_STATUSES: readonly SubmissionStatus[] = ['D', 'IE', 'CE', 
 
 export type SubmissionListItem = Schemas['SubmissionListItemResponse'];
 export type SubmissionDetail = Schemas['SubmissionDetailResponse'];
+/** Whether the source endpoint answers this viewer: `granted`, else why not. */
+export type SourceAccess = SubmissionDetail['sourceAccess'];
 /** The action flags for the signed-in viewer. */
 export type SubmissionViewer = Schemas['SubmissionViewerResponse'];
 

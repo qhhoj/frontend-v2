@@ -58,11 +58,11 @@ const centerText = computed(() => {
     role="img"
     :aria-label="label"
     :style="ringStyle"
-    class="flex size-32 shrink-0 items-center justify-center rounded-full"
+    class="flex size-18 shrink-0 items-center justify-center rounded-full"
   >
     <span
       aria-hidden="true"
-      class="flex size-24 items-center justify-center rounded-full bg-surface-solid font-mono text-title font-semibold tabular-nums"
+      class="flex size-14 items-center justify-center rounded-full bg-surface-solid font-mono text-sm font-semibold tabular-nums"
       :class="{ 'text-muted': isEmpty }"
       >{{ centerText }}</span
     >

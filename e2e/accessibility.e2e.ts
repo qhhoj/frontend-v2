@@ -31,7 +31,10 @@ const PAGES = [
     path: '/submissions',
     ready: { anonymous: 'Tổng hai số', 'signed-in': 'Tổng hai số' },
   },
-  { path: '/submissions/sub-1', ready: { 'signed-in': 'Kết quả từng test' } },
+  {
+    path: '/submissions/sub-1',
+    ready: { anonymous: 'Kết quả chấm', 'signed-in': 'Kết quả chấm' },
+  },
   { path: '/login', ready: { anonymous: 'Đăng nhập' } },
   { path: '/blog', ready: { anonymous: 'Blog', 'signed-in': 'Blog' } },
   {
