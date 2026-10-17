@@ -9,16 +9,21 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useOrganization } from './use-organization';
 import { useOrganizationPostsQuery } from './organizations.queries';
 
-/** The about tab shows the organization's two newest posts; the posts tab lists the rest. */
+/**
+ * The about tab shows the organization's two newest posts; the posts tab lists the rest. Without posts the card is left out
+ * (P-10), unless `keepsEmpty` (an administrator, who writes them from the posts tab it links to).
+ */
+const props = defineProps<{ keepsEmpty: boolean }>();
 const RECENT_POST_COUNT = 2;
 const { slug } = useOrganization();
 const locale = useLocaleStore();
 const query = useOrganizationPostsQuery(slug, 1);
 const posts = computed(() => (query.data.value?.items ?? []).slice(0, RECENT_POST_COUNT));
+const isEmpty = computed(() => query.isSuccess.value && posts.value.length === 0);
 </script>
 
 <template>
-  <Card padding="md" class="flex flex-col gap-3">
+  <Card v-if="!isEmpty || props.keepsEmpty" padding="md" class="flex flex-col gap-3">
     <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.posts') }}</h2>
     <QueryState
       :loading="query.isPending.value"
