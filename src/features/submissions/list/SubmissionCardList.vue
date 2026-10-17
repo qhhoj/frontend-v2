@@ -17,8 +17,7 @@ import TestStrip from './TestStrip.vue';
 
 /**
  * The list's roomy ("Rộng") rows as cards: score ring; problem, then submitter and age, then the per-test strip; verdict and
- * time, memory and language in a fixed-width right column (md+), so every card's strip has the same width. `columns` hides what the table would hide (the contest's own-only list keeps
- * verdict, problem and age). A row without `testSummary` (hidden from this viewer, or an older backend) has no strip.
+ * time, memory and language in a fixed-width right column (md+), so every card's strip has the same width. `columns` hides what the table would hide. A row without `testSummary` (hidden from this viewer, or an older backend) has no strip.
  */
 const props = defineProps<{
   submissions: SubmissionListItem[];

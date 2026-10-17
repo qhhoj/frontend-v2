@@ -6,6 +6,7 @@ import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSessionStore } from '@/stores/session.store';
 import DiffSelectionBar from '../DiffSelectionBar.vue';
+import LiveToggle from '../LiveToggle.vue';
 import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
 import SubmissionStatsStrip from '../SubmissionStatsStrip.vue';
 import { advancedFilterCount } from '../quick-filters';
@@ -17,6 +18,7 @@ import LiveListNotices from './LiveListNotices.vue';
 import SubmissionCardList from './SubmissionCardList.vue';
 import SubmissionCardListSkeleton from './SubmissionCardListSkeleton.vue';
 import SubmissionFilterPanel from './SubmissionFilterPanel.vue';
+import SubmissionLedgerList from './SubmissionLedgerList.vue';
 import type { ProblemPickerSource } from './problem-picker-options';
 import { fixedUserOf } from './submission-scope';
 import type { SubmissionScope } from './submission-scope';
@@ -25,7 +27,8 @@ import { useSubmissionList } from './use-submission-list';
 /**
  * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, pagers, table and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
- * judging-state boxes, the columns, the contest letters and the unfiltered empty text.
+ * judging-state boxes, the columns, the contest letters and the unfiltered empty text. The contest tab (P-21) also
+ * drops the site's stats (`showStats`), puts its own chips in the `filters` slot and lists ledger rows (`ledger`).
  */
 const props = withDefaults(
   defineProps<{
@@ -39,6 +42,12 @@ const props = withDefaults(
     /** Problem code to the contest letter, shown before the name. */
     problemLabels?: Record<string, string>;
     emptyKey?: string;
+    showStats?: boolean;
+    ledger?: boolean;
+    /** False drops "Bộ lọc nâng cao" (a list of the viewer's own rows, filtered by its chips only). */
+    advancedFilters?: boolean;
+    /** The page's chips pick the problem, so it does not count as an advanced filter. */
+    problemByChip?: boolean;
   }>(),
   {
     enabled: true,
@@ -47,6 +56,10 @@ const props = withDefaults(
     columnKeys: undefined,
     problemLabels: undefined,
     emptyKey: 'submissions.empty',
+    showStats: true,
+    ledger: false,
+    advancedFilters: true,
+    problemByChip: false,
   },
 );
 const ADVANCED_PANEL_ID = 'submission-advanced-filters';
@@ -57,7 +70,7 @@ const { filters, update, reset, listQuery, rows, live, languages, emptyText } = 
   emptyKey: () => props.emptyKey,
 });
 const { data: list, isPending, error, refetch, isPlaceholderData } = listQuery;
-const { data: stats, isPending: isStatsPending } = useSubmissionStatsQuery();
+const { data: stats, isPending: isStatsPending } = useSubmissionStatsQuery(() => props.showStats);
 /** The diff page needs a signed-in viewer, so only they pick rows. */
 const isSignedIn = computed(() => session.status === 'authenticated');
 const hasFixedUser = computed(() => fixedUserOf(props.scope) !== null);
@@ -66,9 +79,24 @@ const chipUsername = computed(() =>
   isSignedIn.value && !hasFixedUser.value ? (session.user?.username ?? null) : null,
 );
 const picks = useDiffPicks();
-const advancedCount = computed(() => advancedFilterCount(filters.value, chipUsername.value));
+const advancedCount = computed(() =>
+  advancedFilterCount(
+    props.problemByChip ? { ...filters.value, problem: '' } : filters.value,
+    chipUsername.value,
+  ),
+);
 /** A link that carries a filter only the panel shows opens with the panel open, so the filter is visible. */
-const isAdvancedOpen = ref(advancedCount.value > 0);
+const isAdvancedOpen = ref(props.advancedFilters && advancedCount.value > 0);
+const toggleAdvanced = () => (isAdvancedOpen.value = !isAdvancedOpen.value);
+/** What a page's own filter row needs (the `filters` slot): the filters, their setter and the advanced panel's button. */
+const filterSlot = computed(() => ({
+  filters: filters.value,
+  update,
+  advanced: props.advancedFilters
+    ? { open: isAdvancedOpen.value, count: advancedCount.value, panelId: ADVANCED_PANEL_ID }
+    : null,
+  toggleAdvanced,
+}));
 
 /** Another page is a new list: bring its top (not the filters') into view, below the shell's header. */
 const listTop = ref<HTMLElement | null>(null);
@@ -82,6 +110,7 @@ watch(
   <div class="flex min-w-0 flex-col gap-5">
     <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>
     <SubmissionStatsStrip
+      v-if="showStats"
       :stats="stats"
       :pending="isStatsPending"
       :live="filters.live"
@@ -89,20 +118,28 @@ watch(
     />
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <SubmissionQuickFilters
-          :filters="filters"
-          :languages="languages"
-          :username="chipUsername"
-          :grading-count="stats?.queueLength"
-          :advanced-open="isAdvancedOpen"
-          :advanced-count="advancedCount"
-          :panel-id="ADVANCED_PANEL_ID"
-          @update="update"
-          @toggle-advanced="isAdvancedOpen = !isAdvancedOpen"
+        <slot name="filters" v-bind="filterSlot">
+          <SubmissionQuickFilters
+            :filters="filters"
+            :languages="languages"
+            :username="chipUsername"
+            :grading-count="stats?.queueLength"
+            :advanced-open="isAdvancedOpen"
+            :advanced-count="advancedCount"
+            :panel-id="ADVANCED_PANEL_ID"
+            @update="update"
+            @toggle-advanced="toggleAdvanced"
+          />
+        </slot>
+        <!-- Without the stats strip its live pill moves here, so a list opened with live=0 can follow again. -->
+        <LiveToggle
+          v-if="!showStats"
+          :live="filters.live"
+          @update:live="update({ live: $event })"
         />
       </div>
       <SubmissionFilterPanel
-        v-if="isAdvancedOpen"
+        v-if="advancedFilters && isAdvancedOpen"
         :id="ADVANCED_PANEL_ID"
         :filters="filters"
         :problem-source="problemSource"
@@ -134,6 +171,13 @@ watch(
         <Card v-if="!rows.length" as="div">
           <EmptyState>{{ emptyText }}</EmptyState>
         </Card>
+        <SubmissionLedgerList
+          v-else-if="ledger"
+          :submissions="rows"
+          :highlight-ids="live.addedIds.value"
+          :problem-labels="problemLabels ?? {}"
+          :show-user="!hasFixedUser"
+        />
         <SubmissionCardList
           v-else
           :submissions="rows"

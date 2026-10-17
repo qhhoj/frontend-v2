@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { SlidersHorizontal } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
-import { toolbarControlClass } from '@/components/toolbar-classes';
 import FilterToggle from '@/features/problems/FilterToggle.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import AdvancedFiltersButton from './AdvancedFiltersButton.vue';
 import { isQuickFilterOn, quickFilterPatch } from './quick-filters';
 import type { QuickFilter } from './quick-filters';
 import type { SubmissionFilters } from './use-submission-filters';
@@ -76,17 +75,11 @@ const pickLanguage = (languageId: string) =>
       :active="filters.languageIds.length > 0"
       @update:model-value="pickLanguage"
     />
-    <button
-      type="button"
-      data-testid="advanced-filters"
-      :aria-expanded="advancedOpen"
-      :aria-controls="panelId"
-      :class="[toolbarControlClass(advancedCount > 0), 'border-dashed']"
-      @click="emit('toggleAdvanced')"
-    >
-      <SlidersHorizontal class="size-4" aria-hidden="true" />
-      {{ $t('submissions.quick.advanced') }}
-      <span v-if="advancedCount" class="font-mono text-xs tabular-nums">{{ advancedCount }}</span>
-    </button>
+    <AdvancedFiltersButton
+      :open="advancedOpen"
+      :count="advancedCount"
+      :panel-id="panelId"
+      @toggle="emit('toggleAdvanced')"
+    />
   </div>
 </template>
