@@ -162,6 +162,12 @@
         "notPushed": "Live push is off: contestants only see it on this tab.",
         "post": "Post announcement",
         "posted": "Announcement posted."
+      },
+      "alert": {
+        "label": "New contest announcement",
+        "title": "New announcement",
+        "view": "View",
+        "close": "Close"
       }
     },
     "rules": {
