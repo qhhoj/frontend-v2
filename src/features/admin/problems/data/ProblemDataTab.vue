@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { uploadDataArchive } from '@/api/problem-data.api';
+import type { ProblemData } from '@/api/types/problem-data';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -28,6 +29,7 @@ import CasesSummary from './CasesSummary.vue';
 import { DATA_BASIC_FIELDS, dataAdvancedCount } from './data-views';
 import { toDataForm } from './test-cases';
 import { useDataForm } from './use-data-form';
+import { pairArchiveFiles } from './zip-autofill';
 
 /**
  * The checker's complaints, the Basic/Advanced switch, then per view: Basic has the archive (upload, tests from the zip,
@@ -49,9 +51,17 @@ const {
   mutation,
 } = useDataForm(() => props.problem.code);
 const keepAnswer = useKeepDataAnswer(() => props.problem.code);
+const isAutofillOpen = ref(false);
+const isAutofillAfterUpload = ref(false);
+/** An upload only stores the zip: the tests are made from it next, so that dialog opens at once when the zip has pairs. */
 const archive = useAdminMutation({
   mutate: (file: File) => uploadDataArchive(props.problem.code, file),
-  onDone: keepAnswer,
+  onDone: (saved: ProblemData) => {
+    keepAnswer(saved);
+    if (pairArchiveFiles(saved.archiveFiles).pairs.length === 0) return;
+    isAutofillAfterUpload.value = true;
+    isAutofillOpen.value = true;
+  },
 });
 const blockedReason = computed(() =>
   badRowNumbers.value.length > 0
@@ -106,6 +116,8 @@ async function submit() {
             />
             <CasesAutofill
               v-model="form.cases"
+              v-model:open="isAutofillOpen"
+              v-model:after-upload="isAutofillAfterUpload"
               :archive-files="query.data.value.archiveFiles"
               :problem-points="problem.points"
               @invalid="markInvalid"

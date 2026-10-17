@@ -35,6 +35,8 @@ const mountAdmin = async (path: string) => {
   return mounted;
 };
 
+const buttonLabelledIn = (root: HTMLElement, label: string) =>
+  [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === label)!;
 const buttonLabelled = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], label: string) =>
   wrapper.findAll('button').find((button) => button.text() === label)!;
 
@@ -202,21 +204,29 @@ describe('ProblemGeneralTab', () => {
 
   describe('publishing a private problem', () => {
     const PUBLISH = [...EDIT, 'judge.change_public_visibility'];
-    const tickPublic = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
-      wrapper.get('#problem-isPublic').setValue(true);
+    const card = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+      wrapper.get('[data-testid="problem-visibility"]');
+    const openDialog = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
+      await card(wrapper).get('[data-testid="problem-visibility-open"]').trigger('click');
+      await flushPromises();
+    };
 
-    it('warns when the problem has no test cases, without blocking the save', async () => {
-      mockApi({
+    it('lists the missing steps and warns before publishing, without blocking it', async () => {
+      const calls = mockApi({
         ...staffViewer(PUBLISH),
         ...problemEditorRoutes(),
         'GET /problems/hcmus41c/data': ok(problemData({ cases: [] })),
+        'PATCH /problems/hcmus41c': ok(editableProblem({ isPublic: true })),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      await tickPublic(wrapper);
+      expect(card(wrapper).get('[data-step="tests"]').text()).toBe('Chưa có test');
+      expect(card(wrapper).get('[data-step="statement"]').text()).toBe('Có đề bài');
+      await openDialog(wrapper);
+      expect(document.body.textContent).toContain('Bài chưa xong các bước sau');
+      buttonLabelledIn(document.body, 'Vẫn công khai').click();
       await flushPromises();
-      const note = wrapper.get('[data-testid="publish-readiness"]');
-      expect(note.text()).toContain('chưa có test nào');
-      expect(buttonLabelled(wrapper, 'Lưu thay đổi').attributes('aria-disabled')).toBeUndefined();
+      expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
+      expect(card(wrapper).text()).toContain('Công khai');
     });
 
     it('lets an organization creator show an organization-private problem to members without the permission', async () => {
@@ -230,30 +240,32 @@ describe('ProblemGeneralTab', () => {
         'PATCH /problems/hcmus41c': ok(editableProblem({ isPublic: true })),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
-      expect(wrapper.text()).toContain('chỉ thành viên tổ chức thấy');
-      await tickPublic(wrapper);
-      await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+      expect(card(wrapper).text()).toContain('Hiện cho thành viên');
+      await openDialog(wrapper);
+      const confirm = [...document.body.querySelectorAll('[role="dialog"] button')].find((button) =>
+        /công khai$/i.test(button.textContent?.trim() ?? ''),
+      ) as HTMLButtonElement;
+      confirm.click();
       await flushPromises();
       expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ isPublic: true });
     });
 
-    it('keeps Public locked without the permission or the flag', async () => {
+    it('offers no publish button without the permission or the flag', async () => {
       mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes() });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeDefined();
+      expect(card(wrapper).find('[data-testid="problem-visibility-open"]').exists()).toBe(false);
+      expect(card(wrapper).text()).toContain('Cần quyền');
     });
 
-    it('says nothing when the cases carry points', async () => {
+    it('publishes without a warning when every step is done', async () => {
       mockApi({
         ...staffViewer(PUBLISH),
-        ...problemEditorRoutes(),
+        ...problemEditorRoutes(editableProblem({ viewerStatus: 'solved' })),
         'GET /problems/hcmus41c/data': ok(problemData()),
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-      await tickPublic(wrapper);
-      await flushPromises();
-      expect(wrapper.find('[data-testid="publish-readiness"]').exists()).toBe(false);
+      await openDialog(wrapper);
+      expect(document.body.querySelector('[data-testid="problem-visibility-warning"]')).toBeNull();
     });
   });
 

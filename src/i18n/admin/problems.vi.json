@@ -129,12 +129,10 @@
     "savedToast": "Đã lưu bài {code}.",
     "basic": {
       "sections": {
-        "info": "Mã, tên và giới hạn",
-        "publish": "Hiện cho thí sinh"
+        "info": "Mã, tên và giới hạn"
       },
       "leads": {
-        "info": "Mã và tên hiện ở danh sách bài. Giới hạn áp dụng cho mọi ngôn ngữ.",
-        "publish": "Tắt: chỉ người phụ trách bài thấy."
+        "info": "Mã và tên hiện ở danh sách bài. Giới hạn áp dụng cho mọi ngôn ngữ."
       }
     }
   },
@@ -160,16 +158,7 @@
     "public": "Công khai",
     "manual": "Quản lý thủ công",
     "fullMarkup": "Cho phép markup đầy đủ",
-    "fullMarkupHint": "HTML không được lọc.",
-    "dateOffer": "Đặt ngày đăng là bây giờ để bài hiện như bài mới?",
-    "dateNow": "Dùng ngày hôm nay",
-    "readiness": {
-      "title": "Bài này có thể chưa sẵn sàng để công khai:",
-      "noCases": "Bài chưa có test nào, nên mọi bài nộp đều không chấm được.",
-      "noCasePoints": "Các test có tổng 0 điểm, nên không ai ghi được điểm.",
-      "noProblemPoints": "Bài có 0 điểm.",
-      "openData": "Mở dữ liệu test"
-    }
+    "fullMarkupHint": "HTML không được lọc."
   },
   "clone": {
     "title": "Nhân bản bài {code}",
@@ -325,7 +314,8 @@
       "unpairedHint": "Các tệp này sẽ không thành test. Kiểm tra tên: input và output của một test phải cùng thư mục và cùng tên gốc.",
       "others": "{count} tệp khác (không phải input/output)",
       "apply": "Thêm {count} test",
-      "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu."
+      "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu.",
+      "skip": "Bỏ qua, tự thêm test"
     },
     "config": {
       "checkerTitle": "Trình chấm",
@@ -489,7 +479,7 @@
   },
   "uploads": {
     "archive": {
-      "upload": "Tải zip mới lên"
+      "upload": "Tải gói test (.zip)"
     },
     "sources": {
       "title": "Tệp nguồn kèm theo",
@@ -533,5 +523,57 @@
     "public": "Công khai",
     "private": "Riêng tư",
     "suggested": "Đề xuất"
+  },
+  "visibility": {
+    "title": {
+      "everyone": "Hiện cho thí sinh",
+      "members": "Hiện cho thành viên"
+    },
+    "lead": {
+      "private": "Đang tắt: chỉ người phụ trách bài thấy. Công khai khi bài đã sẵn sàng.",
+      "public": "Đang bật: thí sinh thấy bài trong danh sách và nộp được."
+    },
+    "missing": "Còn thiếu:",
+    "ready": "Đã đủ bước:",
+    "checks": {
+      "statement": {
+        "done": "Có đề bài",
+        "missing": "Chưa có đề bài"
+      },
+      "tests": {
+        "done": "Có test",
+        "missing": "Chưa có test"
+      },
+      "scoring": {
+        "done": "Test có điểm",
+        "missing": "Test chưa có điểm"
+      },
+      "trial": {
+        "done": "Đã nộp thử",
+        "missing": "Chưa nộp thử"
+      }
+    },
+    "publish": {
+      "everyone": "Công khai…",
+      "members": "Hiện cho thành viên…",
+      "title": "Công khai bài {code}?",
+      "body": {
+        "everyone": "Mọi người sẽ thấy bài trong danh sách và nộp được.",
+        "members": "Thành viên tổ chức sẽ thấy bài và nộp được."
+      },
+      "warning": "Bài chưa xong các bước sau:",
+      "dateNow": "Đặt ngày đăng là hôm nay (bài hiện như bài mới)",
+      "confirm": "Công khai",
+      "confirmAnyway": "Vẫn công khai"
+    },
+    "hide": {
+      "everyone": "Chuyển về riêng tư…",
+      "members": "Ẩn với thành viên…",
+      "title": "Chuyển bài {code} về riêng tư?",
+      "body": "Thí sinh sẽ không thấy bài nữa; bài nộp cũ vẫn giữ.",
+      "confirm": "Chuyển về riêng tư"
+    },
+    "publishedToast": "Đã công khai bài {code}.",
+    "hiddenToast": "Đã chuyển bài {code} về riêng tư."
   }
 }

@@ -129,12 +129,10 @@
     "savedToast": "Saved {code}.",
     "basic": {
       "sections": {
-        "info": "Code, name and limits",
-        "publish": "Show to contestants"
+        "info": "Code, name and limits"
       },
       "leads": {
-        "info": "The code and name show in the problem list. Limits apply to every language.",
-        "publish": "Off: only the problem's staff see it."
+        "info": "The code and name show in the problem list. Limits apply to every language."
       }
     }
   },
@@ -160,16 +158,7 @@
     "public": "Public",
     "manual": "Managed manually",
     "fullMarkup": "Allow full markup",
-    "fullMarkupHint": "HTML is not filtered.",
-    "dateOffer": "Set the publication date to now, so the problem lists as new?",
-    "dateNow": "Use today’s date",
-    "readiness": {
-      "title": "This problem may not be ready to publish:",
-      "noCases": "It has no test cases, so every submission fails to judge.",
-      "noCasePoints": "Its test cases are worth 0 points, so nobody can score.",
-      "noProblemPoints": "The problem is worth 0 points.",
-      "openData": "Open the test data"
-    }
+    "fullMarkupHint": "HTML is not filtered."
   },
   "clone": {
     "title": "Clone {code}",
@@ -325,7 +314,8 @@
       "unpairedHint": "These files will not become tests. Check their names: a test's input and output must share a folder and a base name.",
       "others": "{count} other files (not input/output)",
       "apply": "Add {count} tests",
-      "applied": "Added {count} tests. Press “Save configuration” to save."
+      "applied": "Added {count} tests. Press “Save configuration” to save.",
+      "skip": "Skip, add tests by hand"
     },
     "config": {
       "checkerTitle": "Checker",
@@ -489,7 +479,7 @@
   },
   "uploads": {
     "archive": {
-      "upload": "Upload a new zip"
+      "upload": "Upload tests (.zip)"
     },
     "sources": {
       "title": "Attached source files",
@@ -533,5 +523,57 @@
     "public": "Public",
     "private": "Private",
     "suggested": "Suggested"
+  },
+  "visibility": {
+    "title": {
+      "everyone": "Shown to contestants",
+      "members": "Shown to members"
+    },
+    "lead": {
+      "private": "Off: only the problem's staff see it. Publish once it is ready.",
+      "public": "On: contestants see the problem in the list and can submit."
+    },
+    "missing": "Missing:",
+    "ready": "All steps done:",
+    "checks": {
+      "statement": {
+        "done": "Statement written",
+        "missing": "No statement"
+      },
+      "tests": {
+        "done": "Tests uploaded",
+        "missing": "No tests"
+      },
+      "scoring": {
+        "done": "Tests score points",
+        "missing": "Tests score nothing"
+      },
+      "trial": {
+        "done": "Tried",
+        "missing": "Not tried yet"
+      }
+    },
+    "publish": {
+      "everyone": "Publish…",
+      "members": "Show to members…",
+      "title": "Publish {code}?",
+      "body": {
+        "everyone": "Everyone will see the problem in the list and can submit.",
+        "members": "The organization's members will see the problem and can submit."
+      },
+      "warning": "These steps are not done yet:",
+      "dateNow": "Set the publish date to today (listed as new)",
+      "confirm": "Publish",
+      "confirmAnyway": "Publish anyway"
+    },
+    "hide": {
+      "everyone": "Make private…",
+      "members": "Hide from members…",
+      "title": "Make {code} private?",
+      "body": "Contestants will no longer see it; past submissions stay.",
+      "confirm": "Make private"
+    },
+    "publishedToast": "Published {code}.",
+    "hiddenToast": "{code} is private now."
   }
 }

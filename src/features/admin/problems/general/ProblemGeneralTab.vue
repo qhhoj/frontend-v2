@@ -12,12 +12,13 @@ import EditorViewTabs from '../../ui/form/EditorViewTabs.vue';
 import { useEditorView } from '../../ui/form/use-editor-view';
 import ProblemDangerZone from '../lifecycle/ProblemDangerZone.vue';
 import ProblemGeneralForm from './ProblemGeneralForm.vue';
+import ProblemVisibilityCard from './ProblemVisibilityCard.vue';
 import { PROBLEM_SECTION_IDS, problemSections } from './problem-sections';
 import { problemAdvancedCount, PROBLEM_BASIC_FIELDS } from './problem-views';
 import { useProblemForm } from './use-problem-form';
 
 /**
- * The Basic/Advanced switch, one form card, and the save bar for both views. Advanced adds the danger zone under the card
+ * The Basic/Advanced switch, one form card, and the save bar for both views. Basic opens with the visibility card, which saves on its own. Advanced adds the danger zone under the card
  * and a section rail from 1280 px ("Đi tới mục" below). Attachments live on the Files tab, Polygon on the Data tab, clone
  * in the header's "Thêm" menu.
  */
@@ -61,6 +62,7 @@ const isAdvanced = computed(() => view.value === 'advanced');
       :class="isAdvanced ? 'xl:grid-cols-[minmax(0,55rem)_15rem] xl:items-start' : 'max-w-[55rem]'"
     >
       <div class="flex min-w-0 flex-col gap-6">
+        <ProblemVisibilityCard v-if="!isAdvanced" :problem="problem" />
         <form :id="FORM_ID" novalidate @submit.prevent="submit">
           <fieldset
             :disabled="mutation.isPending.value"
@@ -74,8 +76,6 @@ const isAdvanced = computed(() => view.value === 'advanced');
               :errors="errors"
               :suggester="problem.editor?.suggester ?? null"
               :is-suggestion-pending="!problem.isPublic"
-              :private-code="problem.isPublic ? undefined : problem.code"
-              :can-publish-to-members="problem.editor?.canPublishToMembers ?? false"
               has-change-message
             />
           </fieldset>
