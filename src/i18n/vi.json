@@ -1337,7 +1337,15 @@
     "virtual": "ảo",
     "virtualLegend": "Hàng có chip “ảo” là lượt thi ảo; hàng không có chip là kết quả thật.",
     "myRow": "Về hàng của tôi · #{rank}",
-    "moreTiedLabel": "{count} thí sinh đồng hạng nữa, xem bảng"
+    "moreTiedLabel": "{count} thí sinh đồng hạng nữa, xem bảng",
+    "awaitingPublish": {
+      "title": "Kết quả cuối đang chờ ban tổ chức công bố",
+      "body": "Ô “?n” là bài nộp trong {minutes} phút cuối. Bảng sẽ mở khi ban tổ chức bấm Công bố.",
+      "editorBody": "Bạn đang xem kết quả thật; thí sinh vẫn thấy ô “?n” cho {minutes} phút cuối đến khi bạn công bố.",
+      "button": "Công bố kết quả",
+      "confirmTitle": "Công bố kết quả cuối?",
+      "confirmBody": "Bảng mở băng cho mọi người và được tính lại; thí sinh thấy kết quả thật ngay."
+    }
   },
   "formats": {
     "default": "Tính điểm",
