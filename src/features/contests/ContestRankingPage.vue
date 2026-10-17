@@ -226,7 +226,7 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
               class="flex min-h-11.5 items-center gap-3 px-4 py-2 lg:px-5 lg:py-4"
             >
               <SkeletonBlock round class="size-7 shrink-0" />
-              <SkeletonBlock round class="size-5 shrink-0" />
+              <SkeletonBlock round class="size-6 shrink-0" />
               <SkeletonBlock text class="w-1/2" />
               <SkeletonBlock text class="ml-auto w-10" />
             </div>
