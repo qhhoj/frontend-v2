@@ -8,6 +8,7 @@ import {
   problemDetail,
   profile,
   languageItem,
+  submissionDetail,
 } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
@@ -26,6 +27,8 @@ vi.mock('@/features/account/profile.queries', () => ({
   useProfileQuery: () => ({ data: profileData }),
 }));
 /** The submit requests only: the router's own `/auth/me` is in `calls` too. */
+/** The result strip reads the new submission (Q-01 B). */
+const submittedRow = { 'GET /submissions/sub-9': ok(submissionDetail({ id: 'sub-9' })) };
 const submitCalls = (calls: ApiCall[]) => calls.filter((call) => call.path.includes('/submit'));
 
 function mountForm(problem: ProblemDetail = problemDetail(), resubmitId: string | null = null) {
@@ -111,6 +114,7 @@ describe('a problem change under the form', () => {
     const calls = mockApi({
       ...anonymousViewer,
       'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+      ...submittedRow,
     });
     const { form, problemRef } = mountForm();
     form.setLanguage(PY3_ID);
@@ -152,10 +156,11 @@ describe('loading a source file into the editor', () => {
 });
 
 describe('submitting text', () => {
-  it('posts the language id and the source, then opens the submission', async () => {
+  it('posts the language id and the source, then names the submission and stays on the problem', async () => {
     const calls = mockApi({
       ...anonymousViewer,
       'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+      ...submittedRow,
     });
     const { form, push } = mountForm();
     form.source.value = 'int main() { return 0; }';
@@ -164,12 +169,14 @@ describe('submitting text', () => {
       language: CPP17_ID,
       source: 'int main() { return 0; }',
     });
-    expect(push).toHaveBeenCalledWith({ name: 'submission', params: { id: 'sub-9' } });
+    expect(form.lastSubmissionId.value).toBe('sub-9');
+    expect(push).not.toHaveBeenCalled();
   });
   it('sends one request for a double click', async () => {
     const calls = mockApi({
       ...anonymousViewer,
       'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+      ...submittedRow,
     });
     const { form } = mountForm();
     form.source.value = 'x';
@@ -186,6 +193,7 @@ describe('submitting text', () => {
     banned.form.source.value = 'x';
     await banned.form.submitNow();
     expect(banned.form.errorText.value).toBe('Tài khoản bị cấm nộp bài này.');
+    expect(banned.form.lastSubmissionId.value).toBeNull();
     expect(banned.form.source.value).toBe('x');
     mockApi({
       ...anonymousViewer,
@@ -216,8 +224,9 @@ describe('file-only languages', () => {
     const calls = mockApi({
       ...anonymousViewer,
       'POST /problems/duongdi/submit/file': ok({ id: 'sub-9' }),
+      ...submittedRow,
     });
-    const { form, push } = scratch();
+    const { form } = scratch();
     form.setLanguage(SCRATCH_ID);
     expect(form.canSubmit.value).toBe(false);
     form.chooseFile(catFile());
@@ -226,7 +235,7 @@ describe('file-only languages', () => {
     const body = submitCalls(calls)[0]!.body as FormData;
     expect(body.get('language')).toBe(SCRATCH_ID);
     expect((body.get('file') as File).name).toBe('catmaze-final.sb3');
-    expect(push).toHaveBeenCalledWith({ name: 'submission', params: { id: 'sub-9' } });
+    expect(form.lastSubmissionId.value).toBe('sub-9');
   });
   it('offers no upload at all when the language has fileSizeLimit 0', () => {
     const closed = problemDetail({

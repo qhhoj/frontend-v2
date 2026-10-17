@@ -274,6 +274,8 @@ describe('problem page inside a contest', () => {
     const facts = wrapper.get('[data-testid="problem-facts"]').text();
     expect(facts).toContain('Điểm kỳ thi250');
     expect(facts).not.toContain('Tỉ lệ AC');
+    await wrapper.get('[data-testid="rail-submit"] button').trigger('click');
+    await flushPromises();
     expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
       `Kỳ thi: ${solved.name}`,
     );
