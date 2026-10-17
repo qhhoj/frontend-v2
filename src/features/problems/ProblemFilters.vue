@@ -30,6 +30,13 @@ const groupOptions = computed(() => [
   { value: '', label: translate('problems.groupAll') },
   ...props.groups.map((group) => ({ value: group.id, label: group.fullName })),
 ]);
+/** Orders the column headers can show: the name and the three number columns. */
+const HEADER_SORT_FIELDS: readonly string[] = ['name', 'points', 'acRate', 'userCount'];
+const hasNonHeaderSort = computed(
+  () =>
+    props.filters.sort !== null &&
+    !HEADER_SORT_FIELDS.includes(props.filters.sort.replace(/^-/, '')),
+);
 const setSort = (value: string) =>
   emit('update', { sort: value !== DEFAULT_SORT && isProblemSort(value) ? value : null });
 </script>
@@ -73,16 +80,16 @@ const setSort = (value: string) =>
     >
       {{ $t('problems.hasEditorial') }}
     </FilterToggle>
-    <!-- Sort and the random pick wrap together, so a narrow row never leaves one of them alone. -->
-    <div class="flex max-w-full min-w-0 flex-wrap items-center gap-2">
-      <ToolbarSelect
-        :label="$t('problems.sort')"
-        :model-value="filters.sort ?? DEFAULT_SORT"
-        :options="sortOptions()"
-        :active="filters.sort !== null"
-        @update:model-value="setSort"
-      />
-      <RandomProblemButton :filters="filters" />
-    </div>
+    <!-- Desktop sorts by the column headers. The select stays on phones (the table scrolls sideways there) and on
+         desktop while the list is in an order no header shows (newest is the default; oldest, code). -->
+    <ToolbarSelect
+      :class="{ 'sm:hidden': !hasNonHeaderSort }"
+      :label="$t('problems.sort')"
+      :model-value="filters.sort ?? DEFAULT_SORT"
+      :options="sortOptions()"
+      :active="filters.sort !== null"
+      @update:model-value="setSort"
+    />
+    <RandomProblemButton :filters="filters" class="ml-auto" />
   </div>
 </template>
