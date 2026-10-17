@@ -8,7 +8,8 @@ import { useSessionStore } from '@/stores/session.store';
 import { problemTypeLabel } from './problem-type-label';
 
 /**
- * The top of the statement card: code, group chip, title and edit link, a hairline, then the tabs in the slot.
+ * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the phone's limit strip), a
+ * hairline, then the tabs in the default slot.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
 /** `section`: the tab being read; the edit link opens its editor tab. */
@@ -29,12 +30,13 @@ const session = useSessionStore();
             $t('problem.externalJudge', { oj: problem.externalJudge.oj })
           }}</Chip>
         </p>
-        <h1 class="mt-1 page-title [overflow-wrap:anywhere] max-sm:min-h-[65px]">
+        <h1 class="mt-1 page-title [overflow-wrap:anywhere]">
           {{ problem.name }}
         </h1>
       </div>
       <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
     </div>
+    <slot name="strip" />
     <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div v-if="$slots.default" class="mt-4"><slot /></div>
   </div>
