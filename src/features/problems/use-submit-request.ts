@@ -1,7 +1,8 @@
+import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import type { Ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { submit, submitFile } from '@/api/submissions.api';
+import { newSubmissionListKeys } from '@/features/submissions/list/submission-scope';
 import { submitErrorKey } from '@/lib/source';
 import type { SubmitMessage } from './submit-message';
 
@@ -13,13 +14,19 @@ interface SubmitRequestInput {
   chosenFile: Ref<File | null>;
   /** Everything but `submitting` that must hold before a request may leave. */
   isReady: Ref<boolean>;
+  /** A contest problem: a submit spends one of its attempts, which the problem detail counts. */
+  isContest: Ref<boolean>;
   report: (message: SubmitMessage | null) => void;
 }
 
-/** The submit request (JSON for text, multipart for a file) and what follows: the submission page or the error. */
+/**
+ * The submit request (JSON for text, multipart for a file) and what follows (Q-01 B): the viewer stays on the problem
+ * and `lastSubmissionId` names the new submission for the live result strip, or the error shows.
+ */
 export function useSubmitRequest(input: SubmitRequestInput) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const submitting = ref(false);
+  const lastSubmissionId = ref<string | null>(null);
   const { problemCode, languageId, source, chosenFile } = input;
   const send = () =>
     input.fileMode.value
@@ -33,12 +40,17 @@ export function useSubmitRequest(input: SubmitRequestInput) {
     input.report(null);
     try {
       const { id } = await send();
-      await router.push({ name: 'submission', params: { id } });
+      lastSubmissionId.value = id;
+      // The new row joins the viewer's lists; in a contest, the attempts left drop.
+      for (const queryKey of newSubmissionListKeys())
+        void queryClient.invalidateQueries({ queryKey });
+      if (input.isContest.value)
+        void queryClient.invalidateQueries({ queryKey: ['problems', 'detail'] });
     } catch (error) {
       input.report(submitErrorKey(error));
     } finally {
       submitting.value = false;
     }
   }
-  return { submitting, submitNow };
+  return { submitting, lastSubmissionId, submitNow };
 }

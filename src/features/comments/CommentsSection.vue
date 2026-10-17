@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Lock, LockOpen } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { ChevronDown, Lock, LockOpen } from 'lucide-vue-next';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -41,8 +41,10 @@ const props = withDefaults(
     pageKey: string;
     contestKey?: string | null;
     placeholderKey?: string;
+    /** P-02: a page without comments shows one "Bình luận (0)" row that opens the section (the problem page). */
+    foldWhenEmpty?: boolean;
   }>(),
-  { contestKey: null, placeholderKey: undefined },
+  { contestKey: null, placeholderKey: undefined, foldWhenEmpty: false },
 );
 const PAGE_QUERY = 'commentPage';
 const MODERATE_PERMISSION = 'judge.change_comment';
@@ -73,6 +75,25 @@ const isContestHidden = computed(() => data.value?.postBlock?.reason === 'contes
 const composerState = computed(() => data.value && composerStateOf(isSignedIn.value, data.value));
 
 const entries = computed(() => flattenInTimeOrder(data.value?.comments ?? []));
+const isUnfolded = ref(false);
+const isFolded = computed(
+  () =>
+    props.foldWhenEmpty &&
+    !isUnfolded.value &&
+    data.value !== undefined &&
+    data.value.pagination.page === 1 &&
+    entries.value.length === 0 &&
+    // A gate or a lock is news in itself: it stays in sight.
+    !isContestHidden.value &&
+    !data.value.pageLocked,
+);
+const heading = ref<HTMLElement | null>(null);
+/** Opening the folded row puts focus on the section's heading, where the row was. */
+async function unfold() {
+  isUnfolded.value = true;
+  await nextTick();
+  heading.value?.focus();
+}
 const byId = computed(() => new Map(entries.value.map((entry) => [entry.comment.id, entry])));
 const quoteFor = (entry: NumberedComment) =>
   entry.comment.parentId ? quoteOf(entry.comment.parentId, byId.value) : null;
@@ -235,149 +256,169 @@ useCommentJump({
     aria-labelledby="comments-heading"
     class="flex scroll-mt-20 flex-col gap-4"
   >
-    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      <h2 id="comments-heading" class="font-display text-xl font-semibold sm:text-2xl">
-        {{ $t('comments.title') }}
-      </h2>
-      <span v-if="data && !isContestHidden && entries.length" class="text-sm text-muted">
-        {{
-          lastPage > 1
-            ? $t('comments.pageOf', { page: data.pagination.page, last: lastPage })
-            : $t('comments.count', { count: entries.length }, entries.length)
-        }}
-        · {{ $t('comments.timeOrder') }}
-      </span>
-      <AppButton
-        v-if="data && moderates && !isContestHidden"
-        size="sm"
-        class="ml-auto self-center"
-        :aria-pressed="data.pageLocked"
-        :loading="writes.setLocked.isPending.value"
-        @click="toggleLock"
+    <h2 v-if="isFolded" id="comments-heading">
+      <button
+        type="button"
+        data-testid="comments-fold"
+        aria-expanded="false"
+        class="flex min-h-11 w-full items-center gap-2 rounded-card border border-line bg-surface-solid px-5 py-3 text-left hover:bg-surface-hover"
+        @click="unfold"
       >
-        <template #icon>
-          <component :is="data.pageLocked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
-        </template>
-        {{ $t(data.pageLocked ? 'comments.action.unlock' : 'comments.action.lock') }}
-      </AppButton>
-    </div>
-    <p
-      v-if="data && moderates && data.pageLocked && !isContestHidden"
-      role="status"
-      class="flex items-center gap-2.5 rounded-card border border-line bg-surface-strong px-4 py-3 text-sm"
-    >
-      <Lock aria-hidden="true" class="size-5 shrink-0" />
-      <span>
-        <strong>{{ $t('comments.moderation.lockedTitle') }}</strong>
-        {{
-          $t(
-            data.canComment
-              ? 'comments.moderation.lockedOverride'
-              : 'comments.moderation.lockedBody',
-          )
-        }}
-      </span>
-    </p>
-    <p v-if="reportSent" role="status" class="text-sm text-muted">
-      {{ $t('comments.report.sent') }}
-    </p>
-    <p v-if="unhideFailedId" role="alert" class="text-sm text-negative">
-      {{ $t('comments.unhideFailed') }}
-    </p>
-    <p v-if="lockFailed" role="alert" class="text-sm text-negative">
-      {{ $t('comments.lockFailed') }}
-    </p>
+        <span class="font-display text-base font-semibold">{{ $t('comments.title') }}</span>
+        <span class="font-mono text-sm text-muted">(0)</span>
+        <ChevronDown aria-hidden="true" class="ml-auto size-5 text-muted" />
+      </button>
+    </h2>
+    <template v-else>
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h2
+          id="comments-heading"
+          ref="heading"
+          tabindex="-1"
+          class="font-display text-xl font-semibold outline-none sm:text-2xl"
+        >
+          {{ $t('comments.title') }}
+        </h2>
+        <span v-if="data && !isContestHidden && entries.length" class="text-sm text-muted">
+          {{
+            lastPage > 1
+              ? $t('comments.pageOf', { page: data.pagination.page, last: lastPage })
+              : $t('comments.count', { count: entries.length }, entries.length)
+          }}
+          · {{ $t('comments.timeOrder') }}
+        </span>
+        <AppButton
+          v-if="data && moderates && !isContestHidden"
+          size="sm"
+          class="ml-auto self-center"
+          :aria-pressed="data.pageLocked"
+          :loading="writes.setLocked.isPending.value"
+          @click="toggleLock"
+        >
+          <template #icon>
+            <component :is="data.pageLocked ? LockOpen : Lock" aria-hidden="true" class="size-4" />
+          </template>
+          {{ $t(data.pageLocked ? 'comments.action.unlock' : 'comments.action.lock') }}
+        </AppButton>
+      </div>
+      <p
+        v-if="data && moderates && data.pageLocked && !isContestHidden"
+        role="status"
+        class="flex items-center gap-2.5 rounded-card border border-line bg-surface-strong px-4 py-3 text-sm"
+      >
+        <Lock aria-hidden="true" class="size-5 shrink-0" />
+        <span>
+          <strong>{{ $t('comments.moderation.lockedTitle') }}</strong>
+          {{
+            $t(
+              data.canComment
+                ? 'comments.moderation.lockedOverride'
+                : 'comments.moderation.lockedBody',
+            )
+          }}
+        </span>
+      </p>
+      <p v-if="reportSent" role="status" class="text-sm text-muted">
+        {{ $t('comments.report.sent') }}
+      </p>
+      <p v-if="unhideFailedId" role="alert" class="text-sm text-negative">
+        {{ $t('comments.unhideFailed') }}
+      </p>
+      <p v-if="lockFailed" role="alert" class="text-sm text-negative">
+        {{ $t('comments.lockFailed') }}
+      </p>
 
-    <CommentGate v-if="isOfficialClosed" reason="official" />
-    <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton>
-        <div class="flex flex-col gap-3" aria-hidden="true">
-          <SkeletonBlock v-for="row in 3" :key="row" class="block h-24 w-full" />
-        </div>
-      </template>
-      <template v-if="data">
-        <CommentGate v-if="isContestHidden" reason="contest" :contest-key="contestKey" />
-        <template v-else>
-          <ol v-if="entries.length" class="flex flex-col gap-3">
-            <CommentItem
-              v-for="entry in entries"
-              :key="entry.comment.id"
-              :entry="entry"
-              :quote="quoteFor(entry)"
-              :now="now"
-              :can-vote="isSignedIn && entry.comment.author?.id !== session.user?.id"
-              :can-reply="composerState === 'ready' && canReplyToEntry(entry)"
-              :is-past-reply-window="composerState === 'ready' && !canReplyToEntry(entry)"
-              :moderates="moderates"
-              :can-report="isSignedIn && entry.comment.author?.id !== session.user?.id"
-              :is-editing="editingId === entry.comment.id"
-              :is-phone="isPhone"
-              @reply="startReply(entry)"
-              @edit="startEdit(entry)"
-              @history="showHistory(entry)"
-              @hide="askHide(entry)"
-              @unhide="unhide(entry)"
-              @delete="askDelete(entry)"
-              @report="askReport(entry)"
-            >
-              <CommentComposer
-                v-model="editDraft"
-                mode="edit"
-                :busy="writes.edit.isPending.value"
-                :failure="editFailure"
-                @submit="saveEdit"
-                @cancel="editingId = null"
-                @reload="reloadAfterConflict"
-              />
-            </CommentItem>
-          </ol>
-          <div
-            v-else
-            data-testid="comments-empty"
-            class="rounded-card border border-line bg-surface-solid"
-          >
-            <EmptyState>
-              <span class="block font-display font-semibold text-content">
-                {{ $t('comments.empty') }}
-              </span>
-              <span v-if="composerState === 'ready'" class="mt-1 block text-sm">
-                {{ $t('comments.emptyBody') }}
-              </span>
-            </EmptyState>
+      <CommentGate v-if="isOfficialClosed" reason="official" />
+      <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
+        <template #skeleton>
+          <div class="flex flex-col gap-3" aria-hidden="true">
+            <SkeletonBlock v-for="row in 3" :key="row" class="block h-24 w-full" />
           </div>
-          <p v-if="data.truncatedThreads.length" class="text-sm text-muted">
-            {{ $t('comments.truncatedReplies') }}
-          </p>
-          <NumberedPager
-            :meta="data.pagination"
-            :label="$t('comments.pager')"
-            :query-key="PAGE_QUERY"
-          />
-          <CommentComposer
-            v-if="composerState === 'ready'"
-            ref="composer"
-            v-model="draft"
-            mode="new"
-            class="mt-2"
-            :reply-to="replyQuote || null"
-            :busy="writes.post.isPending.value"
-            :failure="postFailure"
-            :placeholder-key="placeholderKey"
-            :start-collapsed="isPhone"
-            @submit="sendComment"
-            @cancel-reply="replyToId = null"
-          />
-          <CommentGate
-            v-else-if="composerState"
-            :reason="composerState"
-            :contest-key="contestKey"
-            :solved="data.postBlock?.solved"
-            :required="data.postBlock?.required"
-            class="mt-2"
-          />
         </template>
-      </template>
-    </QueryState>
+        <template v-if="data">
+          <CommentGate v-if="isContestHidden" reason="contest" :contest-key="contestKey" />
+          <template v-else>
+            <ol v-if="entries.length" class="flex flex-col gap-3">
+              <CommentItem
+                v-for="entry in entries"
+                :key="entry.comment.id"
+                :entry="entry"
+                :quote="quoteFor(entry)"
+                :now="now"
+                :can-vote="isSignedIn && entry.comment.author?.id !== session.user?.id"
+                :can-reply="composerState === 'ready' && canReplyToEntry(entry)"
+                :is-past-reply-window="composerState === 'ready' && !canReplyToEntry(entry)"
+                :moderates="moderates"
+                :can-report="isSignedIn && entry.comment.author?.id !== session.user?.id"
+                :is-editing="editingId === entry.comment.id"
+                :is-phone="isPhone"
+                @reply="startReply(entry)"
+                @edit="startEdit(entry)"
+                @history="showHistory(entry)"
+                @hide="askHide(entry)"
+                @unhide="unhide(entry)"
+                @delete="askDelete(entry)"
+                @report="askReport(entry)"
+              >
+                <CommentComposer
+                  v-model="editDraft"
+                  mode="edit"
+                  :busy="writes.edit.isPending.value"
+                  :failure="editFailure"
+                  @submit="saveEdit"
+                  @cancel="editingId = null"
+                  @reload="reloadAfterConflict"
+                />
+              </CommentItem>
+            </ol>
+            <div
+              v-else
+              data-testid="comments-empty"
+              class="rounded-card border border-line bg-surface-solid"
+            >
+              <EmptyState>
+                <span class="block font-display font-semibold text-content">
+                  {{ $t('comments.empty') }}
+                </span>
+                <span v-if="composerState === 'ready'" class="mt-1 block text-sm">
+                  {{ $t('comments.emptyBody') }}
+                </span>
+              </EmptyState>
+            </div>
+            <p v-if="data.truncatedThreads.length" class="text-sm text-muted">
+              {{ $t('comments.truncatedReplies') }}
+            </p>
+            <NumberedPager
+              :meta="data.pagination"
+              :label="$t('comments.pager')"
+              :query-key="PAGE_QUERY"
+            />
+            <CommentComposer
+              v-if="composerState === 'ready'"
+              ref="composer"
+              v-model="draft"
+              mode="new"
+              class="mt-2"
+              :reply-to="replyQuote || null"
+              :busy="writes.post.isPending.value"
+              :failure="postFailure"
+              :placeholder-key="placeholderKey"
+              :start-collapsed="isPhone"
+              @submit="sendComment"
+              @cancel-reply="replyToId = null"
+            />
+            <CommentGate
+              v-else-if="composerState"
+              :reason="composerState"
+              :contest-key="contestKey"
+              :solved="data.postBlock?.solved"
+              :required="data.postBlock?.required"
+              class="mt-2"
+            />
+          </template>
+        </template>
+      </QueryState>
+    </template>
 
     <ConfirmDialog
       v-model:visible="isHideOpen"

@@ -279,6 +279,8 @@ describe('problem page inside a contest', () => {
     expect(strip.find('[data-testid="strip-own-result"]').exists()).toBe(true);
     expect(strip.find('[data-testid="strip-status"]').exists()).toBe(false);
     expect(strip.text()).not.toContain('người giải');
+    await wrapper.get('[data-testid="rail-submit"] button').trigger('click');
+    await flushPromises();
     expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
       `Kỳ thi: ${solved.name}`,
     );

@@ -9,6 +9,7 @@ import { useContestQuery } from '@/features/contests/contests.queries';
 import FileDropzone from './FileDropzone.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
+import SubmitResultStrip from './SubmitResultStrip.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { useSubmitForm } from './use-submit-form';
 
@@ -20,8 +21,6 @@ const props = defineProps<{
    * full-screen panel: a header row (title, language, upload, actions, submit) over an editor that fills the rest.
    */
   layout: 'dock' | 'sheet' | 'full';
-  /** Dock only: the editor, counter and upload are hidden; the language, the contest line, the error and submit stay. */
-  collapsed?: boolean;
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
@@ -43,20 +42,19 @@ const submitLabelKey = computed(() => {
 
 /**
  * Where each region sits, top to bottom (dock: left to right, wrapping). The dock keeps the actions and the submit
- * button in its top row beside the language, expanded or not, so it stays short; the sheet puts them below the editor
- * until it is collapsed, so those two have a second place.
+ * button in its top row beside the language, so it stays short; the sheet puts them below the editor.
  */
 const REGION_ORDER = {
   languageRow: 'order-1',
   info: 'order-2',
   upload: 'order-3',
   actions: 'order-4 ml-auto',
-  actionsCollapsed: 'order-5',
+  actionsTopRow: 'order-5',
   body: 'order-6',
   message: 'order-7',
   counterRow: 'order-8',
   submit: 'order-9',
-  submitCollapsed: 'order-4 ml-auto',
+  submitTopRow: 'order-4 ml-auto',
   /** Full screen: the actions sit right-aligned and the submit button ends the row. */
   submitLast: 'order-5',
 } as const;
@@ -100,14 +98,20 @@ const LAYOUTS = {
 } as const;
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
-/** Where the actions and submit sit: the top row of the dock, or of a collapsed form. */
+/** Where the actions and submit sit: the top row of the dock and the full-screen panel, or under the sheet's editor. */
 const isFull = computed(() => props.layout === 'full');
-const isTopRow = computed(() => props.layout !== 'sheet' || props.collapsed);
-const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
+const isTopRow = computed(() => props.layout !== 'sheet');
+const hasSourceUpload = computed(() => !state.fileMode);
 </script>
 
 <template>
   <form :class="classes.form" @submit.prevent="state.submitNow()">
+    <SubmitResultStrip
+      v-if="state.lastSubmissionId"
+      :result="form.result"
+      :submission-id="state.lastSubmissionId"
+      class="order-first w-full shrink-0"
+    />
     <div :class="classes.header">
       <h2
         v-if="layout === 'full'"
@@ -171,7 +175,7 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
       />
       <div
         v-if="$slots.actions"
-        :class="isTopRow && !isFull ? REGION_ORDER.actionsCollapsed : REGION_ORDER.actions"
+        :class="isTopRow && !isFull ? REGION_ORDER.actionsTopRow : REGION_ORDER.actions"
       >
         <slot name="actions" />
       </div>
@@ -184,12 +188,12 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         :disabled="!state.canSubmit"
         :loading="state.submitting"
         class="shrink-0"
-        :class="isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitCollapsed"
+        :class="isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitTopRow"
         >{{ $t(submitLabelKey) }}</AppButton
       >
     </div>
 
-    <div v-show="!collapsed" class="min-w-0" :class="[REGION_ORDER.body, classes.body]">
+    <div class="min-w-0" :class="[REGION_ORDER.body, classes.body]">
       <div
         v-if="!state.fileMode"
         role="group"
@@ -240,7 +244,6 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
 
     <div
       v-if="!isSheet || !state.fileMode"
-      v-show="!collapsed"
       class="flex min-w-0 items-center gap-3 text-sm"
       :class="[REGION_ORDER.counterRow, classes.counterRow]"
     >

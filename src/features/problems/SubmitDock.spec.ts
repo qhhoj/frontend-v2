@@ -1,12 +1,12 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PHONE_QUERY } from '@/lib/use-media-query';
-import { problemDetail, sessionUser } from '@/test/fixtures';
-import { mockApi } from '@/test/mock-api';
+import { problemDetail, sessionUser, submissionDetail } from '@/test/fixtures';
+import { mockApi, ok } from '@/test/mock-api';
 import { commentPageRoute } from '@/test/community-routes';
 import { stubMatchMedia } from '@/test/match-media';
 import { mountApp } from '@/test/mount';
+import { PROBLEM_LAYOUT } from './problem-layout';
 import { FULLSCREEN_STORAGE_KEY } from './use-submit-fullscreen';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -15,6 +15,12 @@ vi.mock('@/components/code-editor-cm', () => {
 });
 
 const dockOf = (wrapper: VueWrapper) => wrapper.get('section[aria-label="Nộp bài"]');
+const railCard = (wrapper: VueWrapper) => wrapper.get('[data-testid="rail-submit"]');
+/** P-02 B: the rail's one button opens the dock. */
+async function openDock(wrapper: VueWrapper) {
+  await railCard(wrapper).get('button').trigger('click');
+  await flushPromises();
+}
 const openProblem = async (path = '/problems/duongdi') => {
   const mounted = await mountApp(path);
   await vi.waitFor(() => expect(mounted.wrapper.find('#main h1').exists()).toBe(true));
@@ -41,15 +47,61 @@ beforeEach(() => {
 });
 
 describe('anonymous viewer', () => {
-  it('sees one sign-in row that returns to this problem, and no editor', async () => {
+  it('sees one sign-in link that returns to this problem, and no dock or editor', async () => {
     mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper } = await openProblem();
-    const dock = dockOf(wrapper);
-    const link = dock.get('a');
+    const link = railCard(wrapper).get('a');
     expect(link.text()).toBe('Đăng nhập để nộp bài');
     expect(link.attributes('href')).toBe('/login?redirect=/problems/duongdi');
-    expect(dock.find('textarea').exists()).toBe(false);
-    expect(dock.find('button').exists()).toBe(false);
+    expect(railCard(wrapper).find('button').exists()).toBe(false);
+    expect(wrapper.find('section[aria-label="Nộp bài"]').exists()).toBe(false);
+    expect(wrapper.find('textarea').exists()).toBe(false);
+  });
+});
+
+describe('one way in (P-02 B)', () => {
+  it('shows no dock on load; the rail button opens it, the close button removes it', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await openProblem();
+    expect(wrapper.find('section[aria-label="Nộp bài"]').exists()).toBe(false);
+    expect(railCard(wrapper).find('[data-pc-name="select"]').exists()).toBe(false);
+    await openDock(wrapper);
+    expect(dockOf(wrapper).find('textarea').exists()).toBe(true);
+    await dockOf(wrapper).get('button[aria-label="Đóng khung nộp bài"]').trigger('click');
+    await flushPromises();
+    expect(wrapper.find('section[aria-label="Nộp bài"]').exists()).toBe(false);
+  });
+
+  it('opens the dock by itself for ?resubmit', async () => {
+    mockApi({
+      ...signedInRoutes(),
+      'GET /submissions/sub-1': ok(submissionDetail()),
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: 'print(42)\n' }),
+    });
+    const { wrapper } = await openProblem('/problems/duongdi?resubmit=sub-1');
+    await vi.waitFor(() =>
+      expect(dockOf(wrapper).get('textarea').element.value).toBe('print(42)\n'),
+    );
+  });
+});
+
+describe('after a submit (Q-01 B)', () => {
+  it('stays on the problem and shows the result with a link to the full page', async () => {
+    mockApi({
+      ...signedInRoutes(),
+      'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+      'GET /submissions/sub-9': ok(submissionDetail({ id: 'sub-9', points: 0 })),
+    });
+    const { wrapper, router } = await openProblem();
+    await openDock(wrapper);
+    await dockOf(wrapper).get('form').trigger('submit');
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/problems/duongdi');
+    const strip = dockOf(wrapper).get('[data-testid="submit-result"]');
+    await vi.waitFor(() => expect(strip.text()).toContain('0 / 1600 · WA test 3'));
+    expect(strip.get('[data-testid="submit-result-link"]').attributes('href')).toBe(
+      '/submissions/sub-9',
+    );
   });
 });
 
@@ -70,6 +122,7 @@ describe('another problem', () => {
       ['problems', 'detail', sessionUser().id, 'lis', 'vi'],
       problemDetail({ code: 'lis', name: 'Dãy con tăng dài nhất' }),
     );
+    await openDock(wrapper);
     await openLanguageList(wrapper);
     await pickLanguage('Python 3');
     await dockOf(wrapper).get('textarea').setValue('my python');
@@ -78,15 +131,17 @@ describe('another problem', () => {
     await router.push('/problems/duongdi');
     await vi.waitFor(() => expect(wrapper.get('#main h1').text()).toBe('Đường đi ngắn nhất'));
     await flushPromises();
+    await openDock(wrapper);
     expect(dockOf(wrapper).get('textarea').element.value).toContain('int main');
     expect(dockOf(wrapper).text()).toContain('C++17');
   });
 });
 
-/** The submit sheet replaces the dock on a phone. */
-async function openOnPhone({ isPhone = true, path = '/problems/duongdi' } = {}) {
+/** Where the rail stacks under the statement (phones, tablets: below `lg` outside a contest), the sheet replaces the dock. */
+const STACKED = PROBLEM_LAYOUT.plain.stacked;
+async function openStacked({ isStacked = true, path = '/problems/duongdi' } = {}) {
   const media = stubMatchMedia();
-  media.setQuery(PHONE_QUERY, isPhone);
+  media.setQuery(STACKED, isStacked);
   const mounted = await mountApp(path);
   await vi.waitFor(() => expect(mounted.wrapper.find('#main h1').exists()).toBe(true));
   await flushPromises();
@@ -102,7 +157,7 @@ async function expandSheet(wrapper: VueWrapper) {
 describe('the sheet shell', () => {
   it('collapses on Escape and on the button, returning focus to the expand button', async () => {
     mockApi(signedInRoutes());
-    const { wrapper } = await openOnPhone();
+    const { wrapper } = await openStacked();
     await expandSheet(wrapper);
     await sheetOf(wrapper).get('textarea').trigger('keydown', { key: 'Escape' });
     await flushPromises();
@@ -115,12 +170,18 @@ describe('the sheet shell', () => {
   });
   it('keeps the typed code when the screen is resized across the breakpoint', async () => {
     mockApi(signedInRoutes());
-    const { wrapper, media } = await openOnPhone({ isPhone: false });
-    await collapsedBar(wrapper).get('textarea').setValue('typed on desktop');
-    media.setQuery(PHONE_QUERY, true);
+    const { wrapper, media } = await openStacked({ isStacked: false });
+    await openDock(wrapper);
+    await dockOf(wrapper).get('textarea').setValue('typed on desktop');
+    media.setQuery(STACKED, true);
     await flushPromises();
-    await expandSheet(wrapper);
     expect(sheetOf(wrapper).get('textarea').element.value).toBe('typed on desktop');
+  });
+  it('has no rail card where the rail stacks under the statement: the bar is the only way in', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await openStacked();
+    expect(wrapper.find('[data-testid="rail-submit"]').exists()).toBe(false);
+    expect(collapsedBar(wrapper).find('button[aria-expanded]').exists()).toBe(true);
   });
 });
 
@@ -136,6 +197,7 @@ describe('full screen', () => {
   it('keeps the typed code across docked and full screen, and leaves on Esc and on the button', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
+    await openDock(wrapper);
     await dockOf(wrapper).get('textarea').setValue('typed docked');
     await enter(wrapper);
     expect(fullscreenPanel(wrapper).get('textarea').element.value).toBe('typed docked');
@@ -156,14 +218,17 @@ describe('full screen', () => {
     expect(wrapper.find('[aria-modal="true"]').exists()).toBe(false);
   });
 
-  it('remembers the choice in this browser, defaulting to docked', async () => {
+  it('remembers the choice in this browser for the next opening, defaulting to docked', async () => {
     mockApi(signedInRoutes());
     const first = await openProblem();
+    await openDock(first.wrapper);
     expect(first.wrapper.find('[aria-modal="true"]').exists()).toBe(false);
     await enter(first.wrapper);
     expect(localStorage.getItem(FULLSCREEN_STORAGE_KEY)).toBe('1');
     first.wrapper.unmount();
     const second = await openProblem();
+    expect(second.wrapper.find('[aria-modal="true"]').exists()).toBe(false);
+    await openDock(second.wrapper);
     expect(second.wrapper.find('[aria-modal="true"]').exists()).toBe(true);
     expect(document.documentElement.style.overflow).toBe('hidden');
   });
@@ -171,6 +236,7 @@ describe('full screen', () => {
   it('ignores Esc that closes an open dropdown inside the panel', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
+    await openDock(wrapper);
     await enter(wrapper);
     const select = fullscreenPanel(wrapper).get('[data-pc-name="select"]');
     select.element.setAttribute('aria-expanded', 'true');

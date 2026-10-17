@@ -28,6 +28,8 @@ export const useSubmissionQuery = (id: Ref<string>) => {
   return useQuery({
     queryKey: computed(() => ['submissions', 'detail', viewerId.value, id.value]),
     queryFn: () => fetchSubmission(id.value),
+    // An empty id is "no submission yet" (the problem page's result strip before the first submit).
+    enabled: computed(() => id.value !== ''),
   });
 };
 

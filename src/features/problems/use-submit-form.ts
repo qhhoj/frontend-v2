@@ -9,6 +9,7 @@ import { useSourceTemplate } from './use-source-template';
 import { useSubmitFile } from './use-submit-file';
 import { useSubmitLanguage } from './use-submit-language';
 import { useSubmitRequest } from './use-submit-request';
+import { useSubmitResult } from './use-submit-result';
 
 /**
  * State of the submit form, shared by the desktop dock and the phone sheet. Each concern lives in its own
@@ -37,15 +38,22 @@ export function useSubmitForm(problem: Ref<ProblemDetail>, resubmitId: Ref<strin
     () =>
       languageId.value !== null && !uploadsOff.value && attemptsLeft.value !== 0 && hasInput.value,
   );
-  const { submitting, submitNow } = useSubmitRequest({
+  const { submitting, lastSubmissionId, submitNow } = useSubmitRequest({
     problemCode: computed(() => problem.value.code),
     languageId,
     fileMode,
     source,
     chosenFile,
     isReady,
+    isContest: computed(
+      () => problem.value.contest !== null && problem.value.contest !== undefined,
+    ),
     report,
   });
+  const result = useSubmitResult(
+    lastSubmissionId,
+    computed(() => problem.value.points),
+  );
   const canSubmit = computed(() => isReady.value && !submitting.value);
 
   // The viewer's code decides the language: once they have typed, a profile arriving late must not relabel it.
@@ -73,6 +81,8 @@ export function useSubmitForm(problem: Ref<ProblemDetail>, resubmitId: Ref<strin
     tooLong,
     attemptsLeft,
     submitting,
+    lastSubmissionId,
+    result,
     errorText,
     resubmitUnavailable,
     submitNow,
