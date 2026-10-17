@@ -12,7 +12,9 @@
     "users": "Xếp hạng",
     "blog": "Blog",
     "organizations": "Tổ chức",
-    "more": "Thêm"
+    "more": "Thêm",
+    "menu": "Menu",
+    "openMenu": "Mở menu"
   },
   "pages": {
     "publicRanking": "Bảng xếp hạng công khai",
@@ -633,7 +635,7 @@
     "modeOption": {
       "light": "Sáng",
       "dark": "Tối",
-      "auto": "Tự động"
+      "auto": "Theo máy"
     },
     "accentTitle": "Màu nhấn",
     "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả nền sáng lẫn tối.",
@@ -689,7 +691,8 @@
   },
   "locale": {
     "switchTo": "Switch to English",
-    "short": "EN"
+    "short": "EN",
+    "title": "Ngôn ngữ"
   },
   "auth": {
     "username": "Tên đăng nhập",

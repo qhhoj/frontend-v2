@@ -24,7 +24,7 @@ test('Glass automatic follows the system colour scheme live, on Glass, and survi
   await expect(
     panel
       .getByRole('group', { name: 'Chế độ', exact: true })
-      .getByRole('button', { name: 'Tự động' }),
+      .getByRole('button', { name: 'Theo máy' }),
   ).toHaveAttribute('aria-pressed', 'true');
   await panel.getByRole('button', { name: 'Glass', exact: true }).click();
   await expect(html).toHaveAttribute('data-theme', 'glass-light');

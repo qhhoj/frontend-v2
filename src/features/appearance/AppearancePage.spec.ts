@@ -72,10 +72,10 @@ describe('Settings › Appearance', () => {
   });
 
   it.each([
-    ['auto', 'Clay', 'Tự động'],
+    ['auto', 'Clay', 'Theo máy'],
     ['clay-dark', 'Clay', 'Tối'],
     ['dark', 'Clay', 'Tối'], // legacy value: now Clay
-    ['glass-auto', 'Glass', 'Tự động'],
+    ['glass-auto', 'Glass', 'Theo máy'],
     ['glass-light', 'Glass', 'Sáng'],
   ])('shows the stored preference %s as %s, %s', async (stored, style, mode) => {
     localStorage.setItem('qhhoj.theme', stored);

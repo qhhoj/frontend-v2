@@ -9,7 +9,8 @@ import { NAV_ITEM_CLASS, scrollToClearFade, splitNavItems } from './nav-overflow
 
 /**
  * The main navigation. From `md` up the bar never wraps: the items that do not fit move into a
- * "More" menu. On a phone it is a strip that scrolls inside itself, with fades where items are clipped.
+ * "More" menu. On a phone it is a plain strip between the logo and the menu button that scrolls inside itself, with
+ * fades where items are clipped.
  */
 const route = useRoute();
 const NAV_ITEMS = [
@@ -28,10 +29,11 @@ const isCurrent = (path: string) => {
     ? route.path === '/'
     : route.path === path || route.path.startsWith(`${path}/`);
 };
+/** The current item: a tinted pill in the phone strip, an underline in the glass bar. */
 const itemClass = (path: string) => [
   NAV_ITEM_CLASS,
   isCurrent(path)
-    ? 'relative font-bold text-accent-text after:absolute after:inset-x-3 after:bottom-1.5 after:h-0.5 after:rounded-pill after:bg-accent sm:after:inset-x-4'
+    ? 'relative font-bold max-md:bg-accent-soft max-md:text-accent-soft-text md:text-accent-text md:after:absolute md:after:inset-x-4 md:after:bottom-1.5 md:after:h-0.5 md:after:rounded-pill md:after:bg-accent'
     : 'text-muted hover:text-content',
 ];
 
@@ -145,11 +147,11 @@ watch(isPhone, refresh, { flush: 'post' });
 </script>
 
 <template>
-  <div ref="wrapper" class="relative order-last w-full md:order-none md:min-w-0 md:flex-1">
+  <div ref="wrapper" class="relative min-w-0 flex-1">
     <nav
       ref="navElement"
       :aria-label="$t('nav.main')"
-      class="glass flex w-full gap-0.5 overflow-x-auto rounded-pill p-1 md:w-fit md:max-w-full md:overflow-hidden"
+      class="flex w-full gap-0.5 overflow-x-auto md:glass md:w-fit md:max-w-full md:overflow-hidden md:rounded-pill md:p-1"
       :style="{ maskImage: fadeMask, WebkitMaskImage: fadeMask }"
       @scroll="readClipping"
       @focusin="onFocusIn"
