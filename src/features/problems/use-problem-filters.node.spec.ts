@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   NO_FILTERS,
+  panelFilterCount,
   parseProblemFilters,
   toApiFilters,
   toProblemQuery,
@@ -48,5 +49,26 @@ describe('problem filters in the URL', () => {
     expect(toApiFilters(NO_FILTERS).solved).toBeUndefined();
     expect(toApiFilters({ ...NO_FILTERS, hideSolved: true }).solved).toBe(false);
     expect(toApiFilters({ ...NO_FILTERS, hasEditorial: true }).hasEditorial).toBe(true);
+  });
+});
+
+describe('panelFilterCount', () => {
+  it('ignores search and sort, which stay outside the phone filter panel', () => {
+    expect(panelFilterCount({ ...NO_FILTERS, search: 'sum', sort: 'points' })).toBe(0);
+  });
+
+  it('counts each narrowing filter once, a points range as one', () => {
+    expect(
+      panelFilterCount({
+        ...NO_FILTERS,
+        groupId: GROUP_ID,
+        typeIds: [TYPE_ID, V4_ID],
+        pointsMin: 100,
+        pointsMax: 800,
+        hideSolved: true,
+        hasEditorial: true,
+      }),
+    ).toBe(5);
+    expect(panelFilterCount({ ...NO_FILTERS, pointsMax: 800 })).toBe(1);
   });
 });
