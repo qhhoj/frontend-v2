@@ -51,17 +51,31 @@ describe('profile tabs', () => {
     expect(asked).toEqual([null, '0192a000-0000-7000-8000-00000000c0aa']);
     expect(wrapper.find('button[data-testid="older-comments"]').exists()).toBe(false);
   });
-  it('tells a viewer without the right that the comments tab is closed, with no comments request', async () => {
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...base,
-      'GET /users/user_01/comments': fail(403, 'forbidden'),
-    });
-    const { wrapper } = await mountApp('/users/user_01/comments');
-    expect(wrapper.get('[data-state="forbidden"]').text()).toContain(
-      'Bạn không có quyền xem bình luận của người dùng này',
-    );
+  it('shows no comments tab and the not-found page to a viewer without the right, with no comments request', async () => {
+    const calls = mockApi({ ...signedInViewer(), ...base });
+    const { wrapper, router } = await mountApp('/users/user_01/comments');
+    expect(router.currentRoute.value.name).toBe('not-found');
+    expect(router.currentRoute.value.path).toBe('/users/user_01/comments');
     expect(calls.some((call) => call.path.endsWith('/comments'))).toBe(false);
+    await router.push('/users/user_01');
+    await flushPromises();
+    expect(wrapper.find('a[href="/users/user_01/comments"]').exists()).toBe(false);
+  });
+  it('keeps the comments behind not-found when the session cannot be read', async () => {
+    const calls = mockApi({ ...base, 'GET /auth/me': fail(500, 'internal') });
+    const { router } = await mountApp('/users/user_01/comments');
+    expect(router.currentRoute.value.name).toBe('not-found');
+    expect(calls.some((call) => call.path.endsWith('/comments'))).toBe(false);
+  });
+  it('links "Bài nộp" to the site list filtered to the user, with their count', async () => {
+    const calls = mockApi({ ...anonymousViewer, ...base });
+    const { wrapper } = await mountApp('/users/user_01');
+    await flushPromises();
+    const tab = wrapper.get('a[href="/submissions?user=user_01"]');
+    expect(tab.text()).toContain('Bài nộp');
+    expect(tab.get('[data-testid="tab-badge"]').text()).toContain('38');
+    const counted = calls.find((call) => call.path === '/submissions')!;
+    expect([counted.query.get('user'), counted.query.get('pageSize')]).toEqual(['user_01', '1']);
   });
   it('gives a full-score chip the accepted tone and a partial one the neutral tone, with one decimal when fractional', async () => {
     mockApi({
@@ -93,25 +107,22 @@ describe('profile tabs', () => {
     expect(chipOf('Một phần').text()).toBe('70,5/100');
     expect(wrapper.text()).toContain('2 bài · 170,5 điểm');
   });
-  it('asks a signed-out visitor to sign in and sends no comments request', async () => {
+  it('shows a signed-out visitor the not-found page for the comments, with no comments request', async () => {
     const calls = mockApi({ ...anonymousViewer, ...base });
-    const { wrapper } = await mountApp('/users/user_01/comments');
-    expect(wrapper.get('[data-state="signIn"]').text()).toContain(
-      'Đăng nhập để xem bình luận của người dùng',
-    );
-    expect(wrapper.get('[data-state="signIn"] a').attributes('href')).toBe(
-      '/login?redirect=/users/user_01/comments',
-    );
+    const { router } = await mountApp('/users/user_01/comments');
+    expect(router.currentRoute.value.name).toBe('not-found');
     expect(calls.some((call) => call.path.endsWith('/comments'))).toBe(false);
   });
-  it('closes the comments tab when the server refuses a viewer who was allowed', async () => {
+  it('says so when the server refuses a staff viewer the comments', async () => {
     const viewer = signedInViewer({
       user: sessionUser({ permissions: ['judge.view_all_user_comment'] }),
     });
     mockApi({ ...viewer, ...base, 'GET /users/user_01/comments': fail(403, 'forbidden') });
     const { wrapper } = await mountApp('/users/user_01/comments');
+    await flushPromises();
     expect(wrapper.get('[data-state="forbidden"]').text()).toContain(
       'Bạn không có quyền xem bình luận của người dùng này',
     );
+    expect(wrapper.find('[data-state="forbidden"] button').exists()).toBe(false);
   });
 });

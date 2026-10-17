@@ -1534,10 +1534,13 @@
     "write": "Write a post",
     "joined": "{name} · Joined {date}",
     "rating": "Rating",
+    "solvedLead": "Solved",
     "ratingSummary": "Highest {max} · lowest {min} · {count} contests",
     "tabs": {
       "overview": "Overview",
       "solved": "Solved",
+      "submissions": "Submissions",
+      "submissionCount": "{count} submission | {count} submissions",
       "pp": "Performance points",
       "blog": "Posts",
       "comments": "Comments"
@@ -1603,9 +1606,7 @@
     "noPosts": "No posts yet.",
     "olderComments": "Load older comments",
     "noComments": "No comments yet.",
-    "commentsSignIn": "Sign in to see a user's comments",
     "commentsForbidden": "You may not list this user's comments",
-    "signIn": "Sign in",
     "title": "Profile sections"
   },
   "orgs": {
@@ -2185,8 +2186,7 @@
   },
   "shortLink": {
     "notFoundHint": "You may not have permission to view this page.",
-    "copy": "Copy",
-    "copyAriaLabel": "Copy link",
+    "copy": "Copy link",
     "creating": "Creating link…",
     "copied": "Copied",
     "copiedAnnounce": "Copied {url}",
