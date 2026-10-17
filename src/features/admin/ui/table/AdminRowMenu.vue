@@ -17,9 +17,14 @@ export interface RowMenuItem {
   /** Destructive: listed last, in red, after a separator. The consumer must confirm before acting. */
   danger?: boolean;
   disabled?: boolean;
+  /** A short line under the label, e.g. why a disabled item is disabled. */
+  hint?: string;
 }
 
-/** The "⋯" menu of a table row: secondary row actions, destructive ones last and separated. */
+/**
+ * The "⋯" menu of a table row: secondary row actions, destructive ones last and separated. Admin lists build the items
+ * with `standardRowMenu` (./standard-row-menu.ts), which keeps the order and the words the same on every list.
+ */
 const props = defineProps<{ items: RowMenuItem[]; label: string }>();
 const router = useRouter();
 const menu = ref<InstanceType<typeof Menu>>();
@@ -58,6 +63,7 @@ const toMenuItem = (item: RowMenuItem): MenuItem => ({
   disabled: item.disabled,
   rowIcon: item.icon,
   danger: item.danger,
+  hint: item.hint,
   command: () => runItem(item),
 });
 const model = computed<MenuItem[]>(() => {
@@ -104,7 +110,10 @@ const model = computed<MenuItem[]>(() => {
           :class="item.danger ? 'text-negative' : 'text-muted'"
           :stroke-width="1.75"
         />
-        <span>{{ item.label }}</span>
+        <span class="flex flex-col" :class="item.hint && 'py-1.5'">
+          <span>{{ item.label }}</span>
+          <span v-if="item.hint" class="text-xs text-muted">{{ item.hint }}</span>
+        </span>
       </a>
     </template>
   </Menu>

@@ -76,7 +76,8 @@
     "confirmTitle": "Xóa kỳ thi {key}?",
     "confirmBody": "Mọi thứ thuộc kỳ thi này sẽ bị xóa. Không thể hoàn tác.",
     "keyLabel": "Gõ {key} để xác nhận",
-    "confirm": "Xóa"
+    "confirm": "Xóa",
+    "done": "Đã xóa kỳ thi {key}."
   },
   "participants": {
     "add": "Thêm lượt tham gia",

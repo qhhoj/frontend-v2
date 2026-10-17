@@ -13,7 +13,7 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import ProblemSetupChecklist from './ProblemSetupChecklist.vue';
 import { routeTabs } from '../ui/admin-tabs';
-import { buttonClass } from '../ui/controls';
+import { OVERFLOW_ITEM, buttonClass } from '../ui/controls';
 import { isNotFound } from '../ui/admin-errors';
 import ProblemCloneDialog from './general/ProblemCloneDialog.vue';
 import { useEditableProblemQuery, useProblemEditingMetaQuery } from './problem-editing.queries';
@@ -122,11 +122,7 @@ function openClone(close: () => void) {
             </RouterLink>
           </template>
           <template v-if="canClone" #overflow="{ close }">
-            <button
-              type="button"
-              class="flex min-h-(--qa-control) items-center gap-2 rounded-cell px-3 text-left text-sm hover:bg-surface-hover"
-              @click="openClone(close)"
-            >
+            <button type="button" :class="OVERFLOW_ITEM" @click="openClone(close)">
               <Copy aria-hidden="true" class="size-4 text-muted" :stroke-width="1.75" />
               {{ $t('admin.problems.clone.open') }}
             </button>

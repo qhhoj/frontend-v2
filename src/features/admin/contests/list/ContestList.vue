@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Pencil } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -19,6 +18,8 @@ import HighlightedText from '../../search/HighlightedText.vue';
 import { CONTEST_PHASE_FILTERS } from '../../search/index-search';
 import { useAdminContestSearchQuery } from '../../search/index-search.queries';
 import ContestBulkResult from '../ContestBulkResult.vue';
+import ContestCloneDialog from '../lifecycle/ContestCloneDialog.vue';
+import ContestDeleteDialog from '../lifecycle/ContestDeleteDialog.vue';
 import ContestBulkVisibilityDialog from './ContestBulkVisibilityDialog.vue';
 import ContestFlagChips from './ContestFlagChips.vue';
 import ContestListFilters from './ContestListFilters.vue';
@@ -126,7 +127,24 @@ const editTo = (contest: ContestListItem) => ({
   name: 'admin-contestGeneral',
   params: { key: contest.key },
 });
-const menuOf = useContestRowMenu();
+/** The row whose clone or delete dialog is open; kept after closing so the dialog's text does not change while it fades. */
+const target = ref<ContestListItem | null>(null);
+const isCloneOpen = ref(false);
+const isDeleteOpen = ref(false);
+/** A deleted contest leaves the bulk selection too, so a later bulk run does not name it. */
+function forget(key: string) {
+  selected.value = new Set([...selected.value].filter((picked) => picked !== key));
+}
+const menuOf = useContestRowMenu({
+  clone: (contest) => {
+    target.value = contest;
+    isCloneOpen.value = true;
+  },
+  remove: (contest) => {
+    target.value = contest;
+    isDeleteOpen.value = true;
+  },
+});
 
 const selected = ref(new Set<string>());
 const lastResult = ref<BulkContestResult | null>(null);
@@ -225,14 +243,6 @@ const resultRows = computed(() =>
       <template #cell-users="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
       <template #cell-flags="{ row }"><ContestFlagChips :contest="row" /></template>
       <template #actions="{ row }">
-        <RouterLink
-          :to="editTo(row)"
-          :class="buttonClass('ghost', 'sm')"
-          :aria-label="$t('admin.contests.list.editLabel', { name: row.name })"
-        >
-          <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-          {{ $t('admin.contests.list.edit') }}
-        </RouterLink>
         <AdminRowMenu
           :items="menuOf(row)"
           :label="$t('admin.contests.list.more', { name: row.name })"
@@ -245,5 +255,13 @@ const resultRows = computed(() =>
       :is-visible="isBulkVisible"
       @done="onBulkDone"
     />
+    <template v-if="target">
+      <ContestCloneDialog v-model:visible="isCloneOpen" :source="target" />
+      <ContestDeleteDialog
+        v-model:visible="isDeleteOpen"
+        :contest-key="target.key"
+        @deleted="forget(target.key)"
+      />
+    </template>
   </div>
 </template>

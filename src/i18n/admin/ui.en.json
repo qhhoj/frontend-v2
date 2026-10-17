@@ -1,4 +1,9 @@
 {
+  "row": {
+    "view": "View public page",
+    "clone": "Clone…",
+    "remove": "Delete…"
+  },
   "save": "Save changes",
   "saved": "Saved.",
   "needsPermission": "Needs {permission}",

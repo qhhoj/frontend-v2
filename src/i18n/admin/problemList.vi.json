@@ -49,17 +49,17 @@
     "type": "Loại: {name}",
     "author": "Tác giả: {name}"
   },
-  "edit": "Sửa {code}",
   "menu": {
     "label": "Thao tác khác cho {code}",
-    "view": "Xem bài",
-    "data": "Dữ liệu chấm",
-    "delete": "Xóa bài…"
+    "data": "Dữ liệu chấm"
   },
+  "partial": "từng phần",
+  "partialHint": "Chấm từng phần: mỗi test đúng được một phần điểm.",
   "deleted": "Đã xóa {code}. Khôi phục được ở mục “Đã xóa”.",
   "import": {
     "button": "Nhập",
     "label": "Nhập bài tập"
   },
-  "count": "{total} bài"
+  "count": "{total} bài",
+  "countOwn": "{total} bài · chỉ hiện bài bạn phụ trách"
 }

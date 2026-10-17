@@ -49,17 +49,17 @@
     "type": "Type: {name}",
     "author": "Author: {name}"
   },
-  "edit": "Edit {code}",
   "menu": {
     "label": "More actions for {code}",
-    "view": "View problem",
-    "data": "Test data",
-    "delete": "Delete problem…"
+    "data": "Test data"
   },
+  "partial": "partial",
+  "partialHint": "Partial scoring: each passed test earns part of the points.",
   "deleted": "Deleted {code}. You can restore it under “Deleted”.",
   "import": {
     "button": "Import",
     "label": "Import problems"
   },
-  "count": "{total} problems"
+  "count": "{total} problems",
+  "countOwn": "{total} problems · only the ones you manage"
 }

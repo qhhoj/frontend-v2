@@ -81,11 +81,8 @@
       "rated": "Rated",
       "pending": "{count} pending"
     },
-    "edit": "Edit",
-    "editLabel": "Edit {name}",
     "more": "More actions for {name}",
     "ranking": "Ranking",
-    "view": "View contest",
     "rate": "Rate",
     "pager": "Contest list pages",
     "bulk": {
@@ -466,9 +463,10 @@
       "button": "Clone",
       "confirmTitle": "Clone the contest",
       "keyLabel": "New contest key",
+      "startLabel": "Start",
+      "endLine": "Ends {time}, as long as the original.",
       "confirm": "Clone",
-      "done": "Created {key}.",
-      "open": "Open the new contest"
+      "done": "Created {key}."
     },
     "queuedToast": "Queued: {action}.",
     "groups": {

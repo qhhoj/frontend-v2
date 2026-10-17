@@ -39,3 +39,7 @@ export const TOGGLE = `${buttonClass('secondary')} aria-pressed:border-accent ar
 
 /** A form or table card: sections inside are split by hairlines, not by more cards. */
 export const CARD = CARD_VARIANTS.flat;
+
+/** One item of a page header's "⋯ Thêm" menu (`AdminPageHeader` #overflow). */
+export const OVERFLOW_ITEM =
+  'flex min-h-(--qa-control) w-full items-center gap-2 rounded-cell px-3 text-left text-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60';

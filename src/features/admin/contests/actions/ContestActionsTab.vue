@@ -219,7 +219,7 @@ const runReplayRebuild = () => runAction(rebuildReplay);
       </h2>
       <div class="grid items-start gap-4 xl:grid-cols-2">
         <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
-        <ContestCloneCard :contest-key="contest.key" />
+        <ContestCloneCard :contest="contest" />
       </div>
     </section>
     <section class="flex flex-col gap-3" aria-labelledby="contest-actions-danger">
