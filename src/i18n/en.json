@@ -12,7 +12,9 @@
     "users": "Rankings",
     "blog": "Blog",
     "organizations": "Organizations",
-    "more": "More"
+    "more": "More",
+    "menu": "Menu",
+    "openMenu": "Open the menu"
   },
   "pages": {
     "publicRanking": "Public ranking",
@@ -630,7 +632,7 @@
     "modeOption": {
       "light": "Light",
       "dark": "Dark",
-      "auto": "Automatic"
+      "auto": "Device"
     },
     "accentTitle": "Accent",
     "accentHelp": "Every preset is checked for readable text in light and dark.",
@@ -686,7 +688,8 @@
   },
   "locale": {
     "switchTo": "Chuyển sang tiếng Việt",
-    "short": "VI"
+    "short": "VI",
+    "title": "Language"
   },
   "auth": {
     "username": "Username",
