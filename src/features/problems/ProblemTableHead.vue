@@ -5,7 +5,7 @@ import ProblemSortButton from './ProblemSortButton.vue';
 
 /** `interactive` false renders the same cells with placeholder blocks (the skeleton: no text to read), so nothing shifts when rows load. */
 const props = defineProps<{ sort: ProblemSort | null; interactive: boolean }>();
-const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
+const emit = defineEmits<{ sort: [sort: ProblemSort | null] }>();
 
 const ariaSort = (field: ProblemSortField) =>
   props.sort === field ? 'ascending' : props.sort === `-${field}` ? 'descending' : 'none';

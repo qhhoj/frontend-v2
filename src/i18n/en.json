@@ -1126,6 +1126,10 @@
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
+    "count": "{n} problem | {n} problems",
+    "legendPartial": "= partial scoring",
+    "legend": "Legend",
+    "pagerTop": "Problem pages, top of the list",
     "uncategorized": "Uncategorized",
     "attemptedLong": "Attempted, not solved",
     "notTried": "Not tried",
@@ -1433,7 +1437,8 @@
   },
   "pager": {
     "previous": "Previous page",
-    "next": "Next page"
+    "next": "Next page",
+    "position": "{page} / {last}"
   },
   "vote": {
     "up": "Vote up",
