@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   contestDetail,
+  contestViewer,
   participationSummary,
   ranking,
   rankingRow,
@@ -278,6 +279,53 @@ describe('contest ranking', () => {
       const calls = mockApi(virtualRoutes(ok(null)));
       await mountApp('/contests/r41/ranking');
       expect(lastVirtualFlag(calls)).toBe('false');
+    });
+  });
+  describe('a board still frozen after the end', () => {
+    const frozenEnded = (canEdit: boolean) =>
+      endedContest({ frozenLastMinutes: 30, viewer: contestViewer({ canEdit }) });
+    const endedRoutes = (canEdit: boolean, frozen: boolean) => ({
+      ...signedInViewer(),
+      ...contestPageRoutes(frozenEnded(canEdit)),
+      'GET /contests/r41/ranking': ok(ranking({ frozen })),
+      'GET /contests/current': ok(null),
+    });
+    const buttonsNamed = (name: string) =>
+      [...document.body.querySelectorAll('button')].filter(
+        (button) => button.textContent?.trim() === name,
+      );
+
+    it('tells contestants who they wait for and what "?n" means, without the publish button', async () => {
+      mockApi(endedRoutes(false, true));
+      const { wrapper } = await mountApp('/contests/r41/ranking');
+      const notice = wrapper.get('[data-testid="freeze-notice"]');
+      expect(notice.text()).toContain('Kết quả cuối đang chờ ban tổ chức công bố');
+      expect(notice.text()).toContain('30 phút cuối');
+      expect(wrapper.find('[data-testid="publish-results"]').exists()).toBe(false);
+    });
+
+    it('lets an editor, who sees the live board, publish it through the unfreeze', async () => {
+      const calls = mockApi({
+        ...endedRoutes(true, false),
+        'PATCH /contests/r41': ok(frozenEnded(true)),
+      });
+      const { wrapper } = await mountApp('/contests/r41/ranking');
+      await wrapper.get('[data-testid="publish-results"]').trigger('click');
+      await flushPromises();
+      const confirm = buttonsNamed('Công bố kết quả').at(-1)!;
+      confirm.click();
+      await flushPromises();
+      expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.body)).toEqual([
+        { frozenLastMinutes: 0 },
+      ]);
+    });
+
+    it('keeps the running copy while the contest still runs', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
+      mockApi(routes());
+      const { wrapper } = await mountApp('/contests/r42/ranking');
+      expect(wrapper.get('[data-testid="freeze-notice"]').text()).toContain('Bảng đang đóng băng');
     });
   });
 });

@@ -1283,7 +1283,15 @@
     "tiedAt": "Tied for {rank}",
     "virtual": "virtual",
     "virtualLegend": "Rows marked “virtual” are virtual runs; rows without it are real results.",
-    "myRow": "Go to my row · #{rank}"
+    "myRow": "Go to my row · #{rank}",
+    "awaitingPublish": {
+      "title": "Final results are waiting for the organisers",
+      "body": "A “?n” cell is a submission from the last {minutes} minute. The board opens when the organisers publish it. | A “?n” cell is a submission from the last {minutes} minutes. The board opens when the organisers publish it.",
+      "editorBody": "You see the real results; contestants still see “?n” for the last {minutes} minute until you publish. | You see the real results; contestants still see “?n” for the last {minutes} minutes until you publish.",
+      "button": "Publish results",
+      "confirmTitle": "Publish the final results?",
+      "confirmBody": "The board unfreezes for everyone and is rescored; contestants see the real results at once."
+    }
   },
   "formats": {
     "default": "Points",
