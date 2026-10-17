@@ -1236,7 +1236,9 @@
       "accepted": "AC",
       "errors": "Errors",
       "grading": "Judging",
-      "advanced": "Advanced filters"
+      "advanced": "Advanced filters",
+      "filters": "Filters",
+      "compare": "Compare"
     },
     "strip": {
       "passed": "{passed}/{outOf} tests passed",
@@ -1252,7 +1254,8 @@
     "ring": {
       "label": "Score {percent}%",
       "grading": "{percent}% of the points judged"
-    }
+    },
+    "mineSummary": "Your submissions · {count}"
   },
   "ranking": {
     "public": {

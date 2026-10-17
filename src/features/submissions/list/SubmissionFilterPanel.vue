@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { Language } from '@/api/types/problems';
 import type { SubmissionResult } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from '../use-submission-filters';
 import type { StatusGroup, SubmissionFilters } from '../use-submission-filters';
+import LanguageFilterSelect from '../LanguageFilterSelect.vue';
 import SubmissionProblemPicker from './SubmissionProblemPicker.vue';
 import type { ProblemPickerSource } from './problem-picker-options';
 
@@ -17,6 +19,8 @@ const props = defineProps<{
   problemSource: ProblemPickerSource;
   showUser: boolean;
   showStatusGroups: boolean;
+  /** The language choice, shown here only on a phone (the chip row holds it from sm). */
+  languages: Language[];
 }>();
 const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [] }>();
 
@@ -106,6 +110,12 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
         </div>
       </fieldset>
     </div>
+    <LanguageFilterSelect
+      class="w-fit sm:hidden"
+      :filters="filters"
+      :languages="languages"
+      @update="emit('update', $event)"
+    />
     <label v-if="problemSource.kind === 'code'" class="flex flex-col gap-1 text-sm text-muted">
       {{ $t('submissions.rail.problemLabel') }}
       <input

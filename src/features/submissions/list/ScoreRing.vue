@@ -7,7 +7,7 @@ import { VERDICT_TONE_VARS, submissionVerdictOf } from '@/lib/verdicts';
 import { isFinished } from '../submission-row';
 
 /**
- * A card's score: the share of the problem's points as a ring in the verdict's colour, the percent in the middle. A row still
+ * A card's score (40 px in a phone's ledger row, 56 px from md): the share of the problem's points as a ring in the verdict's colour, the percent in the middle. A row still
  * being graded fills with the points judged so far; one with no score (CE, IE, queued) shows its code on an empty ring.
  */
 const props = defineProps<{ row: SubmissionListItem }>();
@@ -41,11 +41,11 @@ const label = computed(() => {
     role="img"
     :aria-label="label"
     :style="ringStyle"
-    class="flex size-14 shrink-0 items-center justify-center rounded-full"
+    class="flex size-10 shrink-0 items-center justify-center rounded-full md:size-14"
   >
     <span
       aria-hidden="true"
-      class="flex size-11 items-center justify-center rounded-full bg-surface-solid font-mono text-xs font-bold tabular-nums"
+      class="flex size-8 items-center justify-center rounded-full bg-surface-solid font-mono text-tiny font-bold tabular-nums md:size-11 md:text-xs"
       :style="{ color: `var(${colour})` }"
       >{{ fraction === null ? verdict.code : `${percent}%` }}</span
     >
