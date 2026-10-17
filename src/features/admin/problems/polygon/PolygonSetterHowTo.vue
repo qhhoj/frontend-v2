@@ -12,7 +12,7 @@ const STEPS = ['access', 'package', 'paste'] as const;
 <template>
   <div class="flex flex-col gap-3" :class="!headless && 'rounded-row bg-surface-strong p-4'">
     <h3 v-if="!headless" class="font-semibold">{{ $t('admin.polygonLink.howTo.title') }}</h3>
-    <ol class="flex list-decimal flex-col gap-1.5 pl-5 text-sm">
+    <ol class="flex list-decimal flex-col gap-1.5 pl-5 text-sm [overflow-wrap:anywhere]">
       <li v-for="step in STEPS" :key="step">
         <i18n-t :keypath="`admin.polygonLink.howTo.steps.${step}`" tag="span">
           <template #account>

@@ -1,20 +1,12 @@
 {
   "title": "Cài đặt trang",
-  "lead": "Cài đặt có kiểu của trang; mỗi khối được kiểm tra và lưu riêng, bí mật không bao giờ hiện lại.",
-  "groupsLabel": "Nhóm cài đặt",
-  "groups": {
-    "site": "Trang web",
-    "contest": "Kỳ thi",
-    "mail": "Thư điện tử",
-    "auth": "Đăng nhập",
-    "notify": "Thông báo",
-    "pdf": "Xuất PDF",
-    "similarity": "Giống nhau",
-    "quota": "Hạn mức",
-    "problem": "Bài tập",
-    "polygon": "Polygon",
-    "externalJudge": "Máy chấm ngoài",
-    "organization": "Tổ chức"
+  "lead": "Cài đặt có kiểu của trang, chia theo chủ đề; một thanh lưu cho mọi thay đổi, bí mật không bao giờ hiện lại.",
+  "tabsLabel": "Nhóm cài đặt",
+  "tabs": {
+    "general": "Chung",
+    "accounts": "Tài khoản",
+    "integrations": "Kết nối",
+    "limits": "Giới hạn"
   },
   "blocks": {
     "site": {
@@ -240,10 +232,6 @@
     "httpsOrEmpty": "Để trống hoặc dùng https.",
     "httpOrHttpsOrEmpty": "Để trống hoặc dùng http:// hoặc https://."
   },
-  "save": "Lưu",
-  "discard": "Huỷ thay đổi",
-  "saved": "Đã lưu.",
-  "savedBlock": "Đã lưu {name}.",
   "badValue": {
     "officialModeEndsAt": "Thời điểm chưa hợp lệ. Dùng dạng ISO 8601 có múi giờ, ví dụ 2026-10-10T17:00:00+07:00."
   },
@@ -321,7 +309,6 @@
       "body": "Bản sửa của khoá có bí mật chỉ ghi “đã đặt / chưa đặt”, nên không khôi phục được giá trị bí mật."
     }
   },
-  "noChanges": "Không có thay đổi.",
   "options": {
     "quota": {
       "enforce": {

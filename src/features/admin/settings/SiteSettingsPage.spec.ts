@@ -32,6 +32,9 @@ const mountSettings = async () => {
 };
 const block = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], id: string) =>
   wrapper.get(`[data-block="${id}"]`);
+/** The page's one save bar. */
+const saveBar = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+  wrapper.get('[data-testid="settings-save-bar"]');
 const clickIn = async (scope: ReturnType<typeof block>, text: string) => {
   await scope
     .findAll('button')
@@ -55,7 +58,8 @@ describe('SiteSettingsPage', () => {
     await contest.get('[role="switch"]').trigger('click');
     // The number box is bound with `v-model.number`: setValue('3') must reach the draft as the number 3, not the string '3'.
     await contest.get('input[type="number"]').setValue('3');
-    await clickIn(contest, 'Lưu');
+    expect(saveBar(wrapper).text()).toContain('2 thay đổi chưa lưu');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
     expect(
       calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]),
     ).toEqual([
@@ -76,7 +80,7 @@ describe('SiteSettingsPage', () => {
     const contest = block(wrapper, 'contest');
     await contest.get('[role="switch"]').trigger('click');
     await contest.get('input[type="number"]').setValue('3');
-    await clickIn(contest, 'Lưu');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
     expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.path)).toEqual([
       '/admin/settings/contest.officialMode',
     ]);
@@ -94,7 +98,7 @@ describe('SiteSettingsPage', () => {
     const { wrapper } = await mountSettings();
     const site = block(wrapper, 'site');
     await site.get('input').setValue('Mars/Base');
-    await clickIn(site, 'Lưu');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
     expect(site.get('[role="alert"]').text()).toContain('Not an IANA time zone.');
     expect((site.get('input').element as HTMLInputElement).value).toBe('Mars/Base');
   });
@@ -144,7 +148,7 @@ describe('defaults', () => {
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'similarity.minPercent');
     await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
-    await clickIn(block(wrapper, 'similarity'), 'Huỷ thay đổi');
+    await clickIn(saveBar(wrapper), 'Huỷ thay đổi');
     expect((row.get('input').element as HTMLInputElement).value).toBe('65');
     expect(row.text()).not.toContain('Đã điền giá trị mặc định');
   });
@@ -238,18 +242,67 @@ describe('saving a replaced secret', () => {
     const mail = block(wrapper, 'mail');
     await clickIn(mail, 'Thay thế');
     await mail.get('input[type="password"]').setValue('smtps://u:p@h');
-    await clickIn(mail, 'Lưu');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
     expect(mail.find('input[type="password"]').exists()).toBe(false);
-    expect(mail.text()).toContain('Đã lưu.');
-    await clickIn(mail, 'Lưu');
+    expect(saveBar(wrapper).text()).toContain('Đã lưu lúc');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
     expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(1);
   });
+});
 
-  it('says so when "Lưu" has nothing to save', async () => {
+describe('one save bar for every tab', () => {
+  it('counts unsaved keys per tab, keeps them across a tab switch and saves every changed block', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/site.timeZone': ok(setting('site.timeZone', 'UTC')),
+        'PATCH /admin/settings/similarity.minPercent': ok(setting('similarity.minPercent', 70)),
+      }),
+    );
+    const { wrapper, router } = await mountSettings();
+    await block(wrapper, 'site').get('input').setValue('UTC');
+    await router.push('/admin/settings?tab=limits');
+    await flushPromises();
+    await keyRow(wrapper, 'similarity.minPercent').get('input').setValue('70');
+    expect(wrapper.get('[data-testid="settings-tab-general"]').text()).toContain('1');
+    expect(wrapper.get('[data-testid="settings-tab-limits"]').text()).toContain('1');
+    expect(saveBar(wrapper).text()).toContain('2 thay đổi chưa lưu');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.path)).toEqual([
+      '/admin/settings/site.timeZone',
+      '/admin/settings/similarity.minPercent',
+    ]);
+    expect(wrapper.get('[data-testid="settings-tab-general"]').text()).not.toContain('1');
+  });
+
+  it('saves the other blocks past a refused one and opens the refused block’s tab', async () => {
+    const calls = mockApi(
+      routes({
+        'PATCH /admin/settings/site.timeZone': invalid(issue('value', 'invalid', 'Bad zone.')),
+        'PATCH /admin/settings/similarity.minPercent': ok(setting('similarity.minPercent', 70)),
+      }),
+    );
+    const { wrapper, router } = await mountSettings();
+    await block(wrapper, 'site').get('input').setValue('Mars/Base');
+    await router.push('/admin/settings?tab=limits');
+    await flushPromises();
+    await keyRow(wrapper, 'similarity.minPercent').get('input').setValue('70');
+    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await flushPromises();
+    expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(2);
+    expect(router.currentRoute.value.query.tab).toBe('general');
+    expect(block(wrapper, 'site').get('[role="alert"]').text()).toContain('Bad zone.');
+    expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
+  });
+
+  it('keeps "Lưu thay đổi" disabled while nothing changed', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'site'), 'Lưu');
+    const save = saveBar(wrapper)
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu thay đổi')!;
+    expect(save.attributes('aria-disabled')).toBe('true');
+    await save.trigger('click');
+    await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
-    expect(block(wrapper, 'site').text()).toContain('Không có thay đổi.');
   });
 });
