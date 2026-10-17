@@ -122,7 +122,9 @@
       "notFoundTitle": "Không tìm thấy kỳ thi",
       "notFoundBody": "Kỳ thi không tồn tại hoặc bạn không được xem.",
       "backToList": "Về danh sách kỳ thi",
-      "aside": "Thông tin kỳ thi"
+      "aside": "Thông tin kỳ thi",
+      "ratingChange": "Rating của bạn {change}",
+      "firstRating": "Rating đầu tiên: {rating}"
     },
     "problems": {
       "caption": "Các bài của kỳ thi",
@@ -1303,7 +1305,8 @@
       "solved": "Giải",
       "penalty": "Phạt",
       "score": "Điểm",
-      "scoreTime": "Điểm · giờ"
+      "scoreTime": "Điểm · giờ",
+      "ratingChange": "Δ rating"
     },
     "legend": {
       "firstSolve": "giải đầu tiên",

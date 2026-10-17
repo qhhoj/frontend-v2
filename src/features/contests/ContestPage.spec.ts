@@ -40,6 +40,20 @@ describe('contest detail header', () => {
     expect(hatchStyle).toContain('width: 25%');
   });
 
+  it("shows the viewer's rating change once the contest's ratings are applied", async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    const chipOf = async (ratingChange: { rating: number; delta: number | null } | null) => {
+      const contest = contestDetail({ viewer: contestViewer({ ratingChange }) });
+      mockApi({ ...signedInViewer(), ...contestPageRoutes(contest) });
+      const { wrapper } = await mountApp('/contests/r42');
+      return wrapper.find('[data-testid="viewer-rating-change"]');
+    };
+    expect((await chipOf({ rating: 1843, delta: 42 })).text()).toBe('Rating của bạn +42 → 1843');
+    expect((await chipOf({ rating: 1189, delta: -7 })).text()).toBe('Rating của bạn -7 → 1189');
+    expect((await chipOf({ rating: 1500, delta: null })).text()).toBe('Rating đầu tiên: 1500');
+    expect((await chipOf(null)).exists()).toBe(false);
+  });
+
   it('counts to the start of an upcoming contest and says the problems come with it', async () => {
     vi.useFakeTimers({ now: Date.parse('2026-10-08T07:17:45Z'), toFake: ['Date'] });
     mockApi({ ...anonymousViewer, ...contestPageRoutes(UPCOMING) });
