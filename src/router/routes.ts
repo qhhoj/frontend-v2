@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { adminRoutes } from '@/features/admin/admin-routes';
+import { USER_COMMENTS_PERMISSION } from '@/features/profile/user-comments-access';
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -163,7 +164,7 @@ export const routes: RouteRecordRaw[] = [
         path: 'comments',
         name: 'user-comments',
         component: () => import('@/features/profile/ProfileCommentsTab.vue'),
-        meta: { titleKey: 'pages.user' },
+        meta: { titleKey: 'pages.user', notFoundWithout: USER_COMMENTS_PERMISSION },
       },
     ],
   },

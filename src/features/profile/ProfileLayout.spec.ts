@@ -216,3 +216,26 @@ it('moves the URL to the current name when an old, renamed username is opened', 
   const { router } = await mountApp('/users/ngoc_anh_old?tab=x');
   await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/users/ngoc_anh?tab=x'));
 });
+
+it('leads the rating box with the problems solved until the user has a rating (Q-03 B)', async () => {
+  mockApi({ ...anonymousViewer, ...profileRoutes(userPage({ problemCount: 1234 })) });
+  const rated = await mountApp('/users/user_01');
+  await flushPromises();
+  const ratedBox = rated.wrapper.get('[data-testid="rating-box"]');
+  expect([
+    ratedBox.text().startsWith('Rating'),
+    ratedBox.get('[data-testid="rating-figure"]').text(),
+  ]).toEqual([true, '2104']);
+  rated.wrapper.unmount();
+
+  mockApi({
+    ...anonymousViewer,
+    ...profileRoutes(userPage({ rating: null, problemCount: 1234 })),
+  });
+  const { wrapper } = await mountApp('/users/user_01');
+  await flushPromises();
+  const box = wrapper.get('[data-testid="rating-box"]');
+  expect(box.text()).toContain('Đã giải');
+  expect(box.get('[data-testid="rating-figure"]').text()).toBe('1.234');
+  expect(box.text()).not.toContain('Cao nhất');
+});

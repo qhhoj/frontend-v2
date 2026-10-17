@@ -24,6 +24,8 @@ export const profileRoutes = (user: UserPage = userPage()): Routes => ({
   [`GET /users/${user.username}`]: ok(user),
   [`GET /users/${user.username}/ratings`]: ok(ratingHistory()),
   [`GET /users/${user.username}/activity`]: ok(activity()),
+  // The "Bài nộp" tab's count (P-07): a one-row page of the user's submissions.
+  'GET /submissions': page([], { pageSize: 1, total: 38 }),
 });
 /** The profile tabs of one user. */
 export const profileTabRoutes = (username = 'user_01'): Routes => ({
