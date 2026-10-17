@@ -1,8 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSessionStore } from '@/stores/session.store';
-import { submissionItem } from '@/test/fixtures';
-import { invalid, issue, mockApi, page } from '@/test/mock-api';
+import { participationSummary, submissionItem } from '@/test/fixtures';
+import { fail, holdRequestsTo, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer, submissionListRoutes } from '@/test/problem-routes';
 
@@ -93,18 +93,72 @@ describe('the submission list page', () => {
     expect(linked.wrapper.get('button[data-testid="advanced-filters"]').text()).toContain('1');
   });
 
-  it('shows "Của tôi" only to a signed-in viewer and filters by their username', async () => {
+  it('shows "Của tôi" only to a signed-in viewer, chosen for them on the bare list, and off stays off', async () => {
     mockApi({ ...anonymousViewer, ...submissionListRoutes });
     const anonymous = await openList();
     expect(anonymous.wrapper.find('button[data-quick-filter="mine"]').exists()).toBe(false);
 
     const calls = mockApi({ ...signedInViewer(), ...submissionListRoutes });
-    const { wrapper } = await openList();
-    const mine = wrapper.get('button[data-quick-filter="mine"]');
-    await mine.trigger('click');
+    const { wrapper, router } = await openList();
     const username = useSessionStore().user!.username;
-    await vi.waitFor(() => expect(calls.at(-1)!.query.get('user')).toBe(username));
+    const listCalls = () => calls.filter((call) => call.path === '/submissions');
+    expect(listCalls().map((call) => call.query.get('user'))).toEqual([username]);
+    expect(router.currentRoute.value.query.user).toBe(username);
+    const mine = wrapper.get('button[data-quick-filter="mine"]');
     expect(mine.attributes('aria-pressed')).toBe('true');
+    await mine.trigger('click');
+    await vi.waitFor(() => expect(listCalls().at(-1)!.query.get('user')).toBeNull());
+    await flushPromises();
+    expect(router.currentRoute.value.query.user).toBeUndefined();
+    expect(mine.attributes('aria-pressed')).toBe('false');
+  });
+
+  it('keeps a filter the viewer picks while "Của tôi" is still being decided', async () => {
+    const calls = mockApi({ ...signedInViewer(), ...submissionListRoutes });
+    holdRequestsTo('/contests/current');
+    const { wrapper, router } = await mountApp('/submissions');
+    await vi.waitFor(() =>
+      expect(wrapper.find('button[data-quick-filter="accepted"]').exists()).toBe(true),
+    );
+    await wrapper.get('button[data-quick-filter="accepted"]').trigger('click');
+    await vi.waitFor(() => expect(wrapper.find('[data-id]').exists()).toBe(true));
+    const listed = calls.filter((call) => call.path === '/submissions');
+    expect(listed.map((call) => call.query.get('user'))).toEqual([null]);
+    expect(router.currentRoute.value.query).toEqual({ result: ['AC'] });
+  });
+
+  it('shows the site feed when the session cannot be read', async () => {
+    const calls = mockApi({ 'GET /auth/me': fail(500, 'internal'), ...submissionListRoutes });
+    await openList();
+    expect(calls.find((call) => call.path === '/submissions')!.query.get('user')).toBeNull();
+  });
+
+  it('keeps the site feed for a visitor, a filtered link and a viewer in a running contest', async () => {
+    const visitorCalls = mockApi({ ...anonymousViewer, ...submissionListRoutes });
+    await openList();
+    expect(visitorCalls.find((call) => call.path === '/submissions')!.query.get('user')).toBeNull();
+
+    const linkCalls = mockApi({ ...signedInViewer(), ...submissionListRoutes });
+    await openList('/submissions?result=AC');
+    const linked = linkCalls.find((call) => call.path === '/submissions')!;
+    expect([linked.query.get('user'), linked.query.getAll('result')]).toEqual([null, ['AC']]);
+
+    const contestCalls = mockApi({
+      ...signedInViewer(),
+      ...submissionListRoutes,
+      'GET /contests/current': ok({
+        contest: {
+          key: 'r42',
+          name: 'r42',
+          startTime: '2026-01-01T00:00:00Z',
+          endTime: '2999-01-01T00:00:00Z',
+        },
+        participation: participationSummary({ endTime: '2999-01-01T00:00:00Z' }),
+      }),
+      'GET /contests/r42/announcements': page([]),
+    });
+    await openList();
+    expect(contestCalls.find((call) => call.path === '/submissions')!.query.get('user')).toBeNull();
   });
 });
 
@@ -160,10 +214,17 @@ describe('picking two submissions to compare', () => {
   ]);
   const boxOf = (wrapper: Awaited<ReturnType<typeof openList>>['wrapper'], id: string) =>
     wrapper.get(`[data-id="${id}"] input[type="checkbox"]`);
+  /** Q-04 C: the boxes wait behind "So sánh". */
+  async function openComparing() {
+    const mounted = await openList();
+    expect(mounted.wrapper.find('[data-id] input[type="checkbox"]').exists()).toBe(false);
+    await mounted.wrapper.get('[data-testid="compare-mode"]').trigger('click');
+    return mounted;
+  }
 
   it('picks in order, left then right, and links to the diff', async () => {
     mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
-    const { wrapper } = await openList();
+    const { wrapper } = await openComparing();
     expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
     await boxOf(wrapper, 's-2').trigger('click');
     expect(wrapper.get('[data-testid="diff-selection"]').text()).toContain('Đã chọn 1 / 2 bài');
@@ -178,9 +239,18 @@ describe('picking two submissions to compare', () => {
     );
   });
 
+  it('drops the picks when "So sánh" is turned off', async () => {
+    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
+    const { wrapper } = await openComparing();
+    await boxOf(wrapper, 's-1').trigger('click');
+    await wrapper.get('[data-testid="compare-mode"]').trigger('click');
+    expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
+    expect(wrapper.find('[data-id] input[type="checkbox"]').exists()).toBe(false);
+  });
+
   it('drops the compare bar when the viewer signs out with picks made', async () => {
     mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': threeRows });
-    const { wrapper } = await openList();
+    const { wrapper } = await openComparing();
     await boxOf(wrapper, 's-1').trigger('click');
     expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(true);
     useSessionStore().status = 'anonymous';
@@ -188,9 +258,10 @@ describe('picking two submissions to compare', () => {
     expect(wrapper.find('[data-testid="diff-selection"]').exists()).toBe(false);
   });
 
-  it('shows no pick boxes to a signed-out viewer', async () => {
+  it('shows no pick boxes and no "So sánh" to a signed-out viewer', async () => {
     mockApi({ ...anonymousViewer, ...submissionListRoutes, 'GET /submissions': threeRows });
     const { wrapper } = await openList();
     expect(wrapper.find('[data-id] input[type="checkbox"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="compare-mode"]').exists()).toBe(false);
   });
 });

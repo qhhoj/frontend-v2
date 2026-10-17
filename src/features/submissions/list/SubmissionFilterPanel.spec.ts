@@ -19,6 +19,7 @@ const mountPanel = (showStatusGroups = false) =>
       filters: parseSubmissionFilters({}),
       problemSource: { kind: 'code' as const },
       showUser: true,
+      languages: [],
       showStatusGroups,
     },
   });

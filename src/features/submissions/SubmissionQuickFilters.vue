@@ -1,19 +1,20 @@
 <script setup lang="ts">
+import { GitCompareArrows } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import FilterToggle from '@/features/problems/FilterToggle.vue';
-import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdvancedFiltersButton from './AdvancedFiltersButton.vue';
+import LanguageFilterSelect from './LanguageFilterSelect.vue';
 import { isQuickFilterOn, quickFilterPatch } from './quick-filters';
 import type { QuickFilter } from './quick-filters';
 import type { SubmissionFilters } from './use-submission-filters';
 
 /**
- * The chips above the list: Của tôi (signed-in viewers), AC, Lỗi, Đang chấm, the language, and the button that opens
- * the advanced filters. Every chip only edits `filters`, so the URL stays the one source of truth.
+ * The chips above the list: Của tôi (signed-in viewers), AC, Lỗi, Đang chấm, the language (in the panel on a phone), the
+ * button that opens the filters ("Bộ lọc" on a phone), and "So sánh", which shows the rows' pick boxes. Every chip but
+ * "So sánh" only edits `filters`, so the URL stays the one source of truth. On a phone the row scrolls sideways.
  */
 const props = defineProps<{
   filters: SubmissionFilters;
@@ -26,9 +27,17 @@ const props = defineProps<{
   /** Filters set only in the advanced panel, counted on its button. */
   advancedCount: number;
   panelId: string;
+  /** Whether rows show their compare boxes; null hides "So sánh" (a viewer who cannot compare). */
+  comparing: boolean | null;
 }>();
-const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; toggleAdvanced: [] }>();
+const emit = defineEmits<{
+  update: [patch: Partial<SubmissionFilters>];
+  toggleAdvanced: [];
+  toggleCompare: [];
+}>();
 const locale = useLocaleStore();
+/** Below sm the language box lives in the panel too, so the button counts it there. */
+const phoneCount = computed(() => props.advancedCount + (props.filters.languageIds.length ? 1 : 0));
 
 const chips = computed(() =>
   (['mine', 'accepted', 'errors', 'grading'] as const satisfies readonly QuickFilter[]).filter(
@@ -38,25 +47,18 @@ const chips = computed(() =>
 const isOn = (chip: QuickFilter) => isQuickFilterOn(props.filters, chip, props.username);
 const toggle = (chip: QuickFilter) =>
   emit('update', quickFilterPatch(props.filters, chip, props.username));
-
-const ANY_LANGUAGE = '';
-const languageOptions = computed(() => [
-  { value: ANY_LANGUAGE, label: translate('submissions.rail.anyLanguage') },
-  ...props.languages.map((language) => ({ value: language.id, label: language.name })),
-]);
-const pickLanguage = (languageId: string) =>
-  emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
 </script>
 
 <template>
   <div
     role="search"
     :aria-label="$t('submissions.rail.title')"
-    class="flex flex-wrap items-center gap-2"
+    class="flex items-center gap-2 max-sm:-mx-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pb-1 sm:flex-wrap"
   >
     <FilterToggle
       v-for="chip in chips"
       :key="chip"
+      class="shrink-0 whitespace-nowrap"
       :data-quick-filter="chip"
       :pressed="isOn(chip)"
       @toggle="toggle(chip)"
@@ -68,18 +70,28 @@ const pickLanguage = (languageId: string) =>
         >{{ formatNumber(gradingCount, locale.locale) }}</span
       >
     </FilterToggle>
-    <ToolbarSelect
-      :label="$t('submissions.rail.language')"
-      :model-value="filters.languageIds[0] ?? ANY_LANGUAGE"
-      :options="languageOptions"
-      :active="filters.languageIds.length > 0"
-      @update:model-value="pickLanguage"
+    <LanguageFilterSelect
+      class="max-sm:hidden"
+      :filters="filters"
+      :languages="languages"
+      @update="emit('update', $event)"
     />
     <AdvancedFiltersButton
       :open="advancedOpen"
       :count="advancedCount"
+      :phone-count="phoneCount"
       :panel-id="panelId"
       @toggle="emit('toggleAdvanced')"
     />
+    <FilterToggle
+      v-if="comparing !== null"
+      data-testid="compare-mode"
+      class="shrink-0 whitespace-nowrap"
+      :pressed="comparing"
+      @toggle="emit('toggleCompare')"
+    >
+      <GitCompareArrows class="size-4" aria-hidden="true" />
+      {{ $t('submissions.quick.compare') }}
+    </FilterToggle>
   </div>
 </template>

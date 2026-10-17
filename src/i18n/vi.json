@@ -1236,7 +1236,9 @@
       "accepted": "AC",
       "errors": "Lỗi",
       "grading": "Đang chấm",
-      "advanced": "Bộ lọc nâng cao"
+      "advanced": "Bộ lọc nâng cao",
+      "filters": "Bộ lọc",
+      "compare": "So sánh"
     },
     "strip": {
       "passed": "{passed}/{outOf} test đúng",
@@ -1252,7 +1254,8 @@
     "ring": {
       "label": "Điểm {percent}%",
       "grading": "Đã chấm {percent}% số điểm"
-    }
+    },
+    "mineSummary": "Bài nộp của bạn · {count} bài"
   },
   "ranking": {
     "public": {
