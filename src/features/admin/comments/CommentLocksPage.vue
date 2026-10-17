@@ -6,7 +6,7 @@ import { LockOpen } from 'lucide-vue-next';
 import type { CommentPageLink } from '@/api/types/comments';
 import { commentPageRoute } from '@/lib/comment-links';
 import { pageFromQuery } from '@/lib/paging';
-import AdminPageHeader from '../ui/AdminPageHeader.vue';
+import CommentsSectionHeader from './CommentsSectionHeader.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { buttonClass } from '../ui/controls';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
@@ -40,10 +40,7 @@ async function unlockPage(link: CommentPageLink) {
 
 <template>
   <div class="flex w-full flex-col gap-4">
-    <AdminPageHeader
-      :title="$t('admin.comments.locks.title')"
-      :lead="$t('admin.comments.locks.lead')"
-    />
+    <CommentsSectionHeader :lead="$t('admin.comments.locks.lead')" />
     <AdminNotice
       v-if="unlock.failure.value"
       tone="danger"

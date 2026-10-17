@@ -3,12 +3,13 @@ import { ChevronDown, LayoutDashboard } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
-import { ADMIN_NAV, isCurrentNav, visibleNav } from './admin-nav';
-import type { AdminNavGroup, AdminNavId } from './admin-nav';
+import { ADMIN_NAV, isCurrentItem, visibleNav } from './admin-nav';
+import type { AdminNavGroup, AdminNavId, AdminNavItem } from './admin-nav';
 import { useNavCollapse } from './use-nav-collapse';
+import type { NavCount } from './overview/admin-overview.queries';
 
 /** Badge counts by item; the shell reads them once for both copies of the nav. */
-defineProps<{ counts: Partial<Record<AdminNavId, number | null>> }>();
+defineProps<{ counts: Partial<Record<AdminNavId, NavCount>> }>();
 
 const route = useRoute();
 const session = useSessionStore();
@@ -17,10 +18,9 @@ const { isOpen, toggle } = useNavCollapse();
 /** The shell renders two copies of this nav (side column and phone sheet): ids are per instance, never repeated in the DOM. */
 const idPrefix = useId();
 
-const isCurrent = (path: string) => isCurrentNav(path, route.path);
+const isCurrent = (item: AdminNavItem) => isCurrentItem(item, route.path);
 /** The group holding the current screen never folds, so the nav always shows where the viewer is. */
-const holdsCurrent = (navGroup: AdminNavGroup) =>
-  navGroup.items.some((item) => isCurrent(item.path));
+const holdsCurrent = (navGroup: AdminNavGroup) => navGroup.items.some((item) => isCurrent(item));
 
 const ITEM_CLASS =
   'flex min-h-(--qa-control) items-center gap-2.5 rounded-cell px-2.5 text-sm hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
@@ -72,18 +72,25 @@ const GROUP_CLASS =
         <li v-for="item in navGroup.items" :key="item.id">
           <RouterLink
             :to="{ name: item.routeName }"
-            :aria-current="isCurrent(item.path) ? 'page' : undefined"
+            :aria-current="isCurrent(item) ? 'page' : undefined"
             :class="ITEM_CLASS"
           >
             <component :is="item.icon" aria-hidden="true" class="size-4 shrink-0" />
             <span class="min-w-0 flex-1">{{ $t(item.labelKey) }}</span>
             <span
-              v-if="counts[item.id]"
+              v-if="counts[item.id]?.value"
               data-testid="admin-nav-count"
-              class="rounded-pill bg-verdict-tle-bg px-2 py-0.5 font-mono text-xs font-semibold text-verdict-tle tabular-nums"
+              class="rounded-pill px-2 py-0.5 font-mono text-xs font-semibold tabular-nums"
+              :class="
+                counts[item.id]?.needsAction
+                  ? 'bg-verdict-tle-bg text-verdict-tle'
+                  : 'bg-surface-strong text-muted'
+              "
             >
-              {{ counts[item.id] }}
-              <span class="sr-only">{{ $t('admin.shell.waiting') }}</span>
+              {{ counts[item.id]?.value }}
+              <span class="sr-only">{{
+                counts[item.id]?.needsAction ? $t('admin.shell.waiting') : $t('admin.shell.queued')
+              }}</span>
             </span>
           </RouterLink>
         </li>

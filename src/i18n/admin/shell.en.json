@@ -14,10 +14,10 @@
     "problems": "Problems",
     "contests": "Contests",
     "judging": "Judging",
-    "community": "Moderation",
+    "community": "Community",
     "users": "Users",
-    "site": "Site",
-    "content": "Content"
+    "system": "System",
+    "tools": "Tools"
   },
   "forbidden": {
     "title": "You do not have access to this section",
@@ -87,6 +87,7 @@
     "commentLocks": "Locked comment pages"
   },
   "waiting": "waiting",
+  "queued": "in the judge queue",
   "search": {
     "open": "Search admin",
     "title": "Search admin",
@@ -124,5 +125,12 @@
   },
   "recent": {
     "title": "Shortcuts"
+  },
+  "nav": {
+    "submissions": "Submissions · queue",
+    "comments": "Comments",
+    "settings": "Settings",
+    "log": "Change log",
+    "types": "Problem catalogs"
   }
 }

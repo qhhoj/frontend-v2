@@ -25,7 +25,6 @@
   "all": {
     "title": "All comments",
     "lead": "Every comment on the site, newest first. Search by text or author, then hide or show one or many.",
-    "reportsLink": "Reported comments",
     "filters": {
       "search": "Text",
       "searchPlaceholder": "Words in the comment",
@@ -121,5 +120,12 @@
     "createdAt": "Written",
     "reports": "Reports"
   },
-  "rowName": "comment on {page}"
+  "rowName": "comment on {page}",
+  "section": {
+    "title": "Comments",
+    "reports": "Reported",
+    "all": "All",
+    "locks": "Locked pages",
+    "tabsLabel": "Comment sections"
+  }
 }

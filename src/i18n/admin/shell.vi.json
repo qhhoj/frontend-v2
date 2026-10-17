@@ -13,11 +13,11 @@
   "groups": {
     "problems": "Bài tập",
     "contests": "Kỳ thi",
-    "judging": "Chấm bài",
-    "community": "Kiểm duyệt",
+    "judging": "Chấm",
+    "community": "Cộng đồng",
     "users": "Người dùng",
-    "site": "Trang web",
-    "content": "Nội dung"
+    "system": "Hệ thống",
+    "tools": "Công cụ"
   },
   "forbidden": {
     "title": "Bạn chưa có quyền mở mục này",
@@ -87,6 +87,7 @@
     "commentLocks": "Trang khoá bình luận"
   },
   "waiting": "đang chờ xử lý",
+  "queued": "bài trong hàng đợi chấm",
   "search": {
     "open": "Tìm trong quản trị",
     "title": "Tìm trong quản trị",
@@ -124,5 +125,12 @@
   },
   "recent": {
     "title": "Lối tắt"
+  },
+  "nav": {
+    "submissions": "Bài nộp · hàng đợi",
+    "comments": "Bình luận",
+    "settings": "Cài đặt",
+    "log": "Nhật ký",
+    "types": "Danh mục bài tập"
   }
 }

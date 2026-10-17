@@ -4,25 +4,23 @@ import {
   Activity,
   Braces,
   CloudDownload,
+  Download,
   Building2,
   Code,
-  Download,
   FileText,
   Files,
-  Flag,
-  Gauge,
   GitCompare,
   History,
   LifeBuoy,
   Link,
   ListChecks,
-  Lock,
   MessagesSquare,
   Newspaper,
   Plug,
   RotateCcw,
   Server,
   Settings,
+  Tag,
   Tags,
   Trophy,
   Users,
@@ -40,22 +38,37 @@ export interface AdminNavItem extends AdminAccess {
   labelKey: string;
   icon: Component;
   routeName: string;
+  /** The screen's path: the item is current on it and on every page below it. */
   path: string;
+  /** Further sections the item stands for (the comments item: every comment and the locked pages beside the reports). */
+  alsoPaths: readonly string[];
 }
+/** P-35 A: by object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. */
 export interface AdminNavGroup {
-  id: 'problems' | 'contests' | 'judging' | 'content' | 'community' | 'users' | 'site';
+  id: 'problems' | 'contests' | 'judging' | 'community' | 'users' | 'system' | 'tools';
   labelKey: string;
   items: AdminNavItem[];
 }
 
-const screenItem = (id: AdminScreenId, icon: Component): AdminNavItem => {
+interface ItemOptions {
+  /** A nav label other than the screen title. */
+  labelKey?: string;
+  alsoPaths?: readonly string[];
+}
+
+const screenItem = (
+  id: AdminScreenId,
+  icon: Component,
+  options: ItemOptions = {},
+): AdminNavItem => {
   const screen: AdminScreen = ADMIN_SCREENS[id];
   return {
     id,
-    labelKey: `admin.shell.screens.${id}`,
+    labelKey: options.labelKey ?? `admin.shell.screens.${id}`,
     icon,
     routeName: adminRouteName(id),
     path: screen.path,
+    alsoPaths: options.alsoPaths ?? [],
     permission: screen.permission,
     capability: screen.capability,
   };
@@ -72,43 +85,56 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('problems', FileText),
     screenItem('polygonImport', CloudDownload),
     screenItem('problemImport', Download),
-    screenItem('types', Tags),
   ]),
-  group('contests', [
-    screenItem('contests', Trophy),
-    screenItem('contestTags', Tags),
-    screenItem('similarity', GitCompare),
-  ]),
+  group('contests', [screenItem('contests', Trophy)]),
   group('judging', [
-    screenItem('submissions', ListChecks),
-    screenItem('rejudge', RotateCcw),
+    screenItem('submissions', ListChecks, { labelKey: 'admin.shell.nav.submissions' }),
     screenItem('judges', Server),
     screenItem('languages', Code),
   ]),
-  group('content', [
+  group('community', [
+    screenItem('tickets', LifeBuoy),
+    // One "Bình luận" item for the three tabs, opening on the reports queue.
+    screenItem('commentReports', MessagesSquare, {
+      labelKey: 'admin.shell.nav.comments',
+      alsoPaths: [ADMIN_SCREENS.comments.path, ADMIN_SCREENS.commentLocks.path],
+    }),
     screenItem('posts', Newspaper),
+  ]),
+  group('users', [screenItem('users', Users), screenItem('organizations', Building2)]),
+  group('system', [
+    screenItem('settings', Settings, { labelKey: 'admin.shell.nav.settings' }),
+    screenItem('log', History, { labelKey: 'admin.shell.nav.log' }),
+  ]),
+  group('tools', [
+    screenItem('types', Tags, { labelKey: 'admin.shell.nav.types' }),
+    screenItem('contestTags', Tag),
+    screenItem('similarity', GitCompare),
+    screenItem('rejudge', RotateCcw),
     screenItem('pages', Files),
     screenItem('config', Braces),
-  ]),
-  group('community', [
-    screenItem('commentReports', Flag),
-    screenItem('comments', MessagesSquare),
-    screenItem('commentLocks', Lock),
-    screenItem('tickets', LifeBuoy),
-  ]),
-  group('users', [
-    screenItem('users', Users),
-    screenItem('organizations', Building2),
-    screenItem('organizationQuotas', Gauge),
-    screenItem('activity', Activity),
-  ]),
-  group('site', [
-    screenItem('settings', Settings),
     screenItem('shortLinks', Link),
     screenItem('integrations', Plug),
-    screenItem('log', History),
+    screenItem('activity', Activity),
   ]),
 ];
+
+/** Screens without a nav item of their own (a tab or a section of one) that Ctrl+K still finds by name. */
+export const PALETTE_ONLY_SCREENS: readonly AdminNavItem[] = [
+  screenItem('comments', MessagesSquare),
+  screenItem('commentLocks', MessagesSquare),
+  screenItem('organizationQuotas', Building2),
+  screenItem('cannedReplies', LifeBuoy),
+];
+
+/** Every screen Ctrl+K lists, nav items first. */
+export const PALETTE_SCREENS: readonly AdminNavItem[] = [
+  ...ADMIN_NAV.flatMap((navGroup) => navGroup.items),
+  ...PALETTE_ONLY_SCREENS,
+];
+
+/** The groups folded until the viewer opens them: the rare tools. */
+export const FOLDED_BY_DEFAULT: readonly AdminNavGroup['id'][] = ['tools'];
 
 export function visibleNav(groups: AdminNavGroup[], user: AdminViewer | null): AdminNavGroup[] {
   return groups
@@ -121,10 +147,11 @@ export function visibleNav(groups: AdminNavGroup[], user: AdminViewer | null): A
 
 const isWithin = (basePath: string, routePath: string) =>
   routePath === basePath || routePath.startsWith(`${basePath}/`);
-const NAV_PATHS = ADMIN_NAV.flatMap((navGroup) => navGroup.items.map((item) => item.path));
+const pathsOf = (item: AdminNavItem) => [item.path, ...item.alsoPaths];
+const NAV_PATHS = ADMIN_NAV.flatMap((navGroup) => navGroup.items.flatMap(pathsOf));
 /**
  * An item is current when the route is its page or inside it, unless a longer item path also holds the route:
- * `/admin/organizations/quotas` is the quotas item's, not the organizations item's, and no list of exceptions is needed.
+ * `/admin/problems/polygon` is the Polygon import item's, not the problems item's, and no list of exceptions is needed.
  */
 export function isCurrentNav(
   itemPath: string,
@@ -135,10 +162,14 @@ export function isCurrentNav(
   return !navPaths.some((path) => path.length > itemPath.length && isWithin(path, routePath));
 }
 
+/** Whether the item stands for the route: its screen or one of its further sections, or a page below them. */
+export const isCurrentItem = (item: AdminNavItem, routePath: string): boolean =>
+  pathsOf(item).some((path) => isCurrentNav(path, routePath));
+
 /** The nav group and item that hold a route path; `null` outside the nav (the dashboard). */
 export function navPlaceOf(routePath: string): { group: AdminNavGroup; item: AdminNavItem } | null {
   for (const navGroup of ADMIN_NAV) {
-    const item = navGroup.items.find((entry) => isCurrentNav(entry.path, routePath));
+    const item = navGroup.items.find((entry) => isCurrentItem(entry, routePath));
     if (item) return { group: navGroup, item };
   }
   return null;
@@ -159,7 +190,7 @@ export function navCrumbsOf(routePath: string, translate: (key: string) => strin
   const place = navPlaceOf(routePath);
   if (!place) return [];
   const groupCrumb: AdminCrumb = { label: translate(place.group.labelKey) };
-  if (routePath === place.item.path) return [groupCrumb];
+  if (pathsOf(place.item).includes(routePath)) return [groupCrumb];
   const screenCrumb = { label: translate(place.item.labelKey), to: { name: place.item.routeName } };
   return groupCrumb.label === screenCrumb.label ? [screenCrumb] : [groupCrumb, screenCrumb];
 }
@@ -173,9 +204,6 @@ export function heldPermission(
   const permissions = typeof rule === 'string' ? [rule] : rule;
   return permissions.find((permission) => hasPermission(user, permission)) ?? null;
 }
-
-/** The dashboard's quick-link cards: the nav's six groups, each with the screens this viewer may open. */
-export const visibleDashboard = (user: AdminViewer | null) => visibleNav(ADMIN_NAV, user);
 
 /** The greeting card's three actions; each shows only with its screen's permission. */
 export const QUICK_ACTIONS: AdminScreenId[] = ['problemNew', 'polygonImport', 'contestNew'];
