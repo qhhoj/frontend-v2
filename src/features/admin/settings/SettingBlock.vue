@@ -11,18 +11,17 @@ import { isSameValue } from '../ui/form/dirty-form';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { failureTextOf, fieldErrorsOf, hasIssueCode } from '../ui/admin-errors';
 import SettingField from './SettingField.vue';
-import { SETTING_KINDS } from './setting-blocks';
 import type { ShownBlock } from './setting-blocks';
 import { checkBlock, sendKeysInOrder } from './setting-save';
+import type { BlockSaveOutcome } from './settings-page';
 import type { Drafts } from './setting-save';
 import { draftOf } from './setting-values';
 import { useStoreSettingAnswer } from './settings.queries';
 
 /**
- * One titled block of keys with one "Lưu". Each key keeps its own draft; a key's draft is rebuilt only when the stored
- * value of that key changes, so an unsaved edit of another key of the block is never lost.
- * The footer works like `AdminSaveBar` for this block alone (blocks validate and save as units): the number of changed keys,
- * "Huỷ thay đổi" and "Lưu", both `aria-disabled` while nothing changed. It reports that number (`dirty`) for the leave guard.
+ * One titled block of keys. Each key keeps its own draft; a key's draft is rebuilt only when the stored value of that key
+ * changes, so an unsaved edit of another key of the block is never lost. The block validates and saves as a unit, but the
+ * page's one save bar drives it: it reports its changed keys (`dirty`) and exposes `save` and `discard`.
  */
 const props = defineProps<{ block: ShownBlock }>();
 const emit = defineEmits<{ history: [key: SettingKey]; dirty: [count: number] }>();
@@ -54,10 +53,6 @@ const dirtyCount = computed(
       (setting) => drafts[setting.key] && !isSameValue(drafts[setting.key], draftOf(setting)),
     ).length,
 );
-/** The Discord block only lists webhook rows, each saved on its own: with nothing to draft the footer would sit disabled. */
-const hasDraftFields = computed(() =>
-  props.block.settings.some((setting) => SETTING_KINDS[setting.key].kind !== 'webhooks'),
-);
 watch(dirtyCount, (count) => emit('dirty', count), { immediate: true });
 watch(dirtyCount, (count) => {
   if (count > 0 && notice.value?.tone === 'done') notice.value = null;
@@ -80,10 +75,14 @@ function refusalMessage(key: SettingKey, error: unknown): string {
   return fieldErrorsOf(error).value ?? failureTextOf(error);
 }
 
-async function save() {
-  if (isSaving.value) return;
+/** Sends the block's changed keys; a refusal stays on the block as an alert. */
+async function save(): Promise<BlockSaveOutcome> {
+  if (isSaving.value) return 'unchanged';
   const problem = checkBlock(props.block.settings, drafts);
-  if (problem) return showRefusal(problem.key, problem.problem);
+  if (problem) {
+    showRefusal(problem.key, problem.problem);
+    return 'refused';
+  }
   isSaving.value = true;
   const answers = new Map<SettingKey, Setting>();
   const outcome = await sendKeysInOrder(props.block.settings, { ...drafts }, async (key, value) => {
@@ -94,16 +93,12 @@ async function save() {
   });
   isSaving.value = false;
   rebuildDraftsFrom(answers);
-  if ('failedKey' in outcome)
-    return showRefusal(outcome.failedKey, refusalMessage(outcome.failedKey, outcome.error));
-  if (outcome.saved.length > 0) {
-    notice.value = { tone: 'done', text: t('admin.settings.saved') };
-    toast.show({
-      text: t('admin.settings.savedBlock', {
-        name: t(`admin.settings.blocks.${props.block.id}.title`),
-      }),
-    });
-  } else notice.value = { tone: 'done', text: t('admin.settings.noChanges') };
+  if ('failedKey' in outcome) {
+    showRefusal(outcome.failedKey, refusalMessage(outcome.failedKey, outcome.error));
+    return 'refused';
+  }
+  notice.value = null;
+  return outcome.saved.length > 0 ? 'saved' : 'unchanged';
 }
 
 /**
@@ -127,10 +122,16 @@ function onCleared(answer: Setting) {
 
 /** A block of several keys names the key for screen readers ("Lịch sử · mail.from"); the key is shown beside the button. */
 const historySuffix = (key: SettingKey) => (props.block.keys.length > 1 ? ` · ${key}` : '');
+
+defineExpose({ save, discard: discardEdits });
 </script>
 
 <template>
-  <section :data-block="block.id" :aria-labelledby="headingId" :class="[CARD, 'flex flex-col']">
+  <section
+    :data-block="block.id"
+    :aria-labelledby="headingId"
+    :class="[CARD, 'flex min-w-0 flex-col']"
+  >
     <header class="px-4 pt-4 sm:px-5">
       <h2 :id="headingId" class="font-display text-base font-semibold">
         {{ $t(`admin.settings.blocks.${block.id}.title`) }}
@@ -182,47 +183,13 @@ const historySuffix = (key: SettingKey) => (props.block.keys.length > 1 ? ` · $
     <div v-if="notice?.tone === 'refused'" role="alert" class="px-4 pb-3 sm:px-5">
       <AdminNotice tone="danger" :title="notice.text" />
     </div>
-    <footer
-      v-if="hasDraftFields"
-      class="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line px-4 py-3 sm:px-5"
+    <p
+      v-if="notice?.tone === 'done'"
+      role="status"
+      class="flex items-center gap-2 px-4 pb-3 text-sm sm:px-5"
     >
-      <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
-        <span
-          v-if="dirtyCount > 0"
-          aria-hidden="true"
-          class="size-2 shrink-0 rounded-full bg-accent"
-        />
-        <span v-if="dirtyCount > 0" class="font-semibold">{{
-          $t('form.saveBar.unsaved', dirtyCount)
-        }}</span>
-        <template v-else-if="notice?.tone === 'done'">
-          <CircleCheck
-            aria-hidden="true"
-            class="size-4 shrink-0 text-positive"
-            :stroke-width="1.75"
-          />
-          <span>{{ notice.text }}</span>
-        </template>
-      </p>
-      <div class="ml-auto flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          :class="buttonClass('ghost')"
-          :aria-disabled="dirtyCount === 0 || isSaving || undefined"
-          @click="discardEdits"
-        >
-          {{ t('admin.settings.discard') }}
-        </button>
-        <button
-          type="button"
-          :class="buttonClass('primary')"
-          :aria-disabled="dirtyCount === 0 || undefined"
-          :aria-busy="isSaving || undefined"
-          @click="save"
-        >
-          {{ t('admin.settings.save') }}
-        </button>
-      </div>
-    </footer>
+      <CircleCheck aria-hidden="true" class="size-4 shrink-0 text-positive" :stroke-width="1.75" />
+      {{ notice.text }}
+    </p>
   </section>
 </template>

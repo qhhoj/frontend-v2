@@ -14,7 +14,7 @@ test('site settings: Enter on "Thay thế" reveals the password box with focus i
 }) => {
   signInAsStaff(api, ['judge.change_settings']);
   api.routes['GET /admin/settings'] = adminOk(ALL_SETTINGS);
-  await page.goto('/admin/settings');
+  await page.goto('/admin/settings?tab=accounts');
   const mailBlock = page.locator('[data-block="mail"]');
   await mailBlock.getByRole('button', { name: 'Thay thế', exact: true }).focus();
   await page.keyboard.press('Enter');
@@ -39,7 +39,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['PATCH /admin/settings/similarity.minPercent'] = adminOk(
       setting('similarity.minPercent', 50, { default: 50, isDefault: true }),
     );
-    await page.goto('/admin/settings');
+    await page.goto('/admin/settings?tab=limits');
     const row = page.locator('[data-key="similarity.minPercent"]');
     await row.getByRole('button', { name: 'Về mặc định 50' }).focus();
     await page.keyboard.press('Enter');
@@ -48,12 +48,11 @@ for (const viewport of AUDIT_VIEWPORTS)
     expect(api.requestsTo('PATCH /admin/settings/similarity.minPercent')).toHaveLength(0);
     expect(await axeViolationsIn(page)).toEqual([]);
 
-    await page
-      .locator('[data-block="similarity"]')
-      .getByRole('button', { name: 'Lưu', exact: true })
-      .focus();
+    const saveBar = page.getByTestId('settings-save-bar');
+    await expect(saveBar).toContainText('1 thay đổi chưa lưu');
+    await saveBar.getByRole('button', { name: 'Lưu thay đổi', exact: true }).focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('status').filter({ hasText: 'Đã lưu.' })).toBeVisible();
+    await expect(saveBar.getByRole('status')).toContainText('Đã lưu lúc');
     expect(api.requestsTo('PATCH /admin/settings/similarity.minPercent')).toHaveLength(1);
   });
 
@@ -68,7 +67,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     api.routes['PATCH /admin/settings/mail.smtpUrl'] = adminOk(
       setting('mail.smtpUrl', { set: false }),
     );
-    await page.goto('/admin/settings');
+    await page.goto('/admin/settings?tab=accounts');
     const mailBlock = page.locator('[data-block="mail"]');
     await mailBlock.getByRole('button', { name: 'Xoá bí mật', exact: true }).focus();
     await page.keyboard.press('Enter');

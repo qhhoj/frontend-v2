@@ -47,61 +47,42 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'externalJudge.maxWaitMinutes': { kind: 'integer', min: 1, max: 240 },
 };
 
-export type SettingGroup =
-  | 'site'
-  | 'contest'
-  | 'problem'
-  | 'organization'
-  | 'polygon'
-  | 'externalJudge'
-  | 'mail'
-  | 'auth'
-  | 'notify'
-  | 'pdf'
-  | 'similarity'
-  | 'quota';
-/** The page's group strip and sections, in this order. */
-export const SETTING_GROUPS: SettingGroup[] = [
-  'site',
-  'contest',
-  'problem',
-  'organization',
-  'polygon',
-  'externalJudge',
-  'mail',
-  'auth',
-  'notify',
-  'pdf',
-  'similarity',
-  'quota',
-];
+/** The page's tabs (`?tab=`), in this order: blocks grouped by topic so one view never holds every block. */
+export const SETTING_TABS = ['general', 'accounts', 'integrations', 'limits'] as const;
+export type SettingTab = (typeof SETTING_TABS)[number];
 
 export interface SettingBlockSpec {
   id: string;
-  group: SettingGroup;
+  tab: SettingTab;
   keys: SettingKey[];
 }
+/** Every block, tab by tab, in page order. */
 export const SETTING_BLOCKS: SettingBlockSpec[] = [
-  { id: 'site', group: 'site', keys: ['site.timeZone'] },
+  { id: 'site', tab: 'general', keys: ['site.timeZone'] },
   {
     id: 'contest',
-    group: 'contest',
+    tab: 'general',
     keys: [
       'contest.officialMode',
       'contest.officialModeEndsAt',
       'contest.banAfterDisqualifications',
     ],
   },
-  { id: 'problem', group: 'problem', keys: ['problem.deleteGraceDays'] },
-  { id: 'organization', group: 'organization', keys: ['organization.adminRoleId'] },
+  { id: 'problem', tab: 'general', keys: ['problem.deleteGraceDays'] },
+  { id: 'organization', tab: 'general', keys: ['organization.adminRoleId'] },
+  { id: 'mail', tab: 'accounts', keys: ['mail.from', 'mail.smtpUrl'] },
+  { id: 'google', tab: 'accounts', keys: ['auth.google'] },
+  { id: 'github', tab: 'accounts', keys: ['auth.github'] },
+  { id: 'facebook', tab: 'accounts', keys: ['auth.facebook'] },
+  { id: 'pwned', tab: 'accounts', keys: ['auth.pwnedApiUrl'] },
   {
     id: 'polygon',
-    group: 'polygon',
+    tab: 'integrations',
     keys: ['polygon.accountName', 'polygon.apiKey', 'polygon.apiSecret'],
   },
   {
     id: 'externalJudge',
-    group: 'externalJudge',
+    tab: 'integrations',
     keys: [
       'externalJudge.baseUrl',
       'externalJudge.apiToken',
@@ -109,21 +90,16 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
       'externalJudge.maxWaitMinutes',
     ],
   },
-  { id: 'mail', group: 'mail', keys: ['mail.from', 'mail.smtpUrl'] },
-  { id: 'google', group: 'auth', keys: ['auth.google'] },
-  { id: 'github', group: 'auth', keys: ['auth.github'] },
-  { id: 'facebook', group: 'auth', keys: ['auth.facebook'] },
-  { id: 'pwned', group: 'auth', keys: ['auth.pwnedApiUrl'] },
-  { id: 'discord', group: 'notify', keys: ['discord.webhooks'] },
-  { id: 'pdf', group: 'pdf', keys: ['pdf.renderTimeoutMs', 'pdf.maxBytes'] },
+  { id: 'discord', tab: 'integrations', keys: ['discord.webhooks'] },
+  { id: 'pdf', tab: 'limits', keys: ['pdf.renderTimeoutMs', 'pdf.maxBytes'] },
   {
     id: 'similarity',
-    group: 'similarity',
+    tab: 'limits',
     keys: ['similarity.minPercent', 'similarity.maxPairs', 'similarity.maxSubmissions'],
   },
   {
     id: 'quota',
-    group: 'quota',
+    tab: 'limits',
     keys: [
       'quota.enforce',
       'quota.defaultMonthlyCredits',

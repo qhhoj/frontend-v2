@@ -1,20 +1,12 @@
 {
   "title": "Site settings",
-  "lead": "The site's typed settings; each block is checked and saved on its own, and secrets are never shown again.",
-  "groupsLabel": "Setting groups",
-  "groups": {
-    "site": "Site",
-    "contest": "Contests",
-    "mail": "Email",
-    "auth": "Sign-in",
-    "notify": "Notifications",
-    "pdf": "PDF export",
-    "similarity": "Similarity",
-    "quota": "Quota",
-    "problem": "Problems",
-    "polygon": "Polygon",
-    "externalJudge": "External judge",
-    "organization": "Organizations"
+  "lead": "Typed site settings, grouped by topic; one save bar for every change, secrets are never shown again.",
+  "tabsLabel": "Setting groups",
+  "tabs": {
+    "general": "General",
+    "accounts": "Accounts",
+    "integrations": "Integrations",
+    "limits": "Limits"
   },
   "blocks": {
     "site": {
@@ -240,10 +232,6 @@
     "httpsOrEmpty": "Leave empty or use https.",
     "httpOrHttpsOrEmpty": "Leave empty or use http:// or https://."
   },
-  "save": "Save",
-  "discard": "Discard changes",
-  "saved": "Saved.",
-  "savedBlock": "Saved {name}.",
   "badValue": {
     "officialModeEndsAt": "Not a valid instant. Use ISO 8601 with an offset, for example 2026-10-10T17:00:00+07:00."
   },
@@ -321,7 +309,6 @@
       "body": "A revision of a key with a secret records only “set / not set”, so a secret value cannot be restored."
     }
   },
-  "noChanges": "Nothing to save.",
   "options": {
     "quota": {
       "enforce": {
