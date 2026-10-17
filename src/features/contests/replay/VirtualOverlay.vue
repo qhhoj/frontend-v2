@@ -43,8 +43,11 @@ const board = computed(() =>
     ? boardAt(index.value, elapsed.value, context.value, virtualRow.value ? [virtualRow.value] : [])
     : null,
 );
-const rowsOf = (isReal: boolean) =>
-  (board.value?.rows ?? []).filter((row) => (row.kind === 'real') === isReal);
+/** The real board is ranked on its own (1, 2, 3…), as the contest's own ranking; the run's board keeps the merged ranks. */
+const realRows = computed(() =>
+  rankRows((board.value?.rows ?? []).filter((row) => row.kind === 'real')),
+);
+const runRows = computed(() => (board.value?.rows ?? []).filter((row) => row.kind !== 'real'));
 const panelOf = (rows: BoardRow[]) => ({ problems: board.value?.problems ?? [], rows });
 const rank = computed(() => board.value?.rows.find((row) => row.kind === 'virtual')?.rank ?? null);
 /** Where the viewer would stand among the real rows alone (ghosts left out). */
@@ -95,10 +98,11 @@ const summaryBit = computed(() =>
               {{ $t('replay.overlay.realBoard', { time: clock }) }}
             </h2>
             <ReplayTable
-              :board="panelOf(rowsOf(true))"
+              :board="panelOf(realRows)"
               :context="context"
               :viewer-id="session.user?.id ?? null"
               :label="$t('replay.overlay.realBoard', { time: clock })"
+              :viewer-label="$t('replay.overlay.youReal')"
             />
           </Card>
           <Card as="div" class="overflow-hidden">
@@ -106,7 +110,7 @@ const summaryBit = computed(() =>
               {{ $t('replay.overlay.yourBoard', { time: clock }) }}
             </h2>
             <ReplayTable
-              :board="panelOf(rowsOf(false))"
+              :board="panelOf(runRows)"
               :context="context"
               :viewer-id="session.user?.id ?? null"
               :label="$t('replay.overlay.yourBoard', { time: clock })"

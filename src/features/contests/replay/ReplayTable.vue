@@ -8,6 +8,7 @@ import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
+import { focusTableRow } from '@/lib/focus-table-row';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import RankingCell from '../RankingCell.vue';
 import type { BoardRow, ReplayBoard } from './replay-board';
@@ -25,6 +26,8 @@ const props = defineProps<{
   context: RankingContext;
   viewerId: string | null;
   label: string;
+  /** The viewer's chip; "Bạn (thật)" on the real board next to a virtual run. */
+  viewerLabel?: string;
 }>();
 const isMotionAllowed = useMotionAllowed();
 const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-out';
@@ -49,14 +52,7 @@ const isViewerRow = (row: BoardRow) =>
   row.kind !== 'ghost' && row.userId !== null && row.userId === props.viewerId;
 
 /** Focuses a row's name cell ("Về hàng của tôi"); false when the row is not on this board. */
-function focusRow(rowId: string): boolean {
-  const rows = [...(root.value?.querySelectorAll<HTMLElement>('tr[data-row-id]') ?? [])];
-  const header = rows.find((row) => row.dataset.rowId === rowId)?.querySelector('th');
-  if (!header) return false;
-  header.focus();
-  header.scrollIntoView?.({ block: 'center', behavior: isMotionAllowed.value ? 'smooth' : 'auto' });
-  return true;
-}
+const focusRow = (rowId: string) => focusTableRow(root.value, rowId, isMotionAllowed.value);
 defineExpose({ focusRow });
 </script>
 
@@ -105,7 +101,7 @@ defineExpose({ focusRow });
         <tr
           v-for="row in board.rows"
           :key="row.id"
-          v-memo="[row.rank, rowCells.get(row.id), isViewerRow(row)]"
+          v-memo="[row.rank, rowCells.get(row.id), isViewerRow(row), viewerLabel]"
           :data-row-id="row.id"
           :data-kind="row.kind"
           class="border-t border-line text-center"
@@ -127,10 +123,10 @@ defineExpose({ focusRow });
             <span v-else class="inline-flex flex-wrap items-center gap-2 align-middle">
               <UserAvatar :username="row.name" :size="24" />
               <UserName :username="row.name" :rating="row.rating" />
-              <span v-if="row.kind === 'virtual'" class="text-muted">{{
-                $t('replay.table.virtual')
-              }}</span>
-              <Chip v-if="isViewerRow(row)" tone="accent">{{ $t('common.you') }}</Chip>
+              <Chip v-if="row.kind === 'virtual'">{{ $t('ranking.virtual') }}</Chip>
+              <Chip v-if="isViewerRow(row)" tone="accent">{{
+                viewerLabel ?? $t('common.you')
+              }}</Chip>
             </span>
           </th>
           <td class="font-bold">

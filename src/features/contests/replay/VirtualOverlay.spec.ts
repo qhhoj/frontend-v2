@@ -56,17 +56,27 @@ describe('virtual overlay on the ranking page', () => {
     expect(
       wrapper.get('[data-overlay-part="summary"] [data-bit-kind]').attributes('data-bit-kind'),
     ).toBe('rankUp');
+    // The real board is ranked on its own, so the virtual row and the ghost ahead of it leave no gaps.
     expect(panelRows(wrapper, 0)).toEqual([
-      ['2', 'part-07'],
-      ['3', 'part-01'],
-      ['5', 'part-12'],
-      ['6', 'part-03'],
+      ['1', 'part-07'],
+      ['2', 'part-01'],
+      ['3', 'part-12'],
+      ['4', 'part-03'],
     ]);
     expect(panelRows(wrapper, 1)).toEqual([
       ['1', 'ghost-0'],
       ['4', VIRTUAL_PARTICIPATION_ID],
       ['—', 'ghost-1'],
     ]);
+    const chipsOf = (index: number, rowId: string) =>
+      wrapper
+        .findAll('[data-overlay-part="panels"] tbody')
+        [index]!.get(`tr[data-row-id="${rowId}"]`)
+        .findAll('th span span')
+        .map((chip) => chip.text())
+        .filter(Boolean);
+    expect(chipsOf(0, 'part-01')).toContain('Bạn (thật)');
+    expect(chipsOf(1, VIRTUAL_PARTICIPATION_ID)).toEqual(expect.arrayContaining(['ảo', 'Bạn']));
     expect(wrapper.text()).toContain('Bảng thật · 00:25:00');
     expect(wrapper.text()).toContain('Lượt ảo của bạn · 00:25:00');
   });
