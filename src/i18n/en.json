@@ -236,9 +236,7 @@
       "inContest": "You are in this contest",
       "since": "since {time}",
       "spectating": "Spectating",
-      "virtualRunning": "Virtual run #{run} running",
       "leave": "Leave contest",
-      "leaveNote": "Leaving only exits contest mode. Your score stays and you can come back while the contest runs.",
       "codeTitle": "Enter the access code",
       "codeBody": "“{name}” needs a code from the organizers.",
       "codeLabel": "Access code",
@@ -324,6 +322,32 @@
       "missingTitle": "This problem is not in the contest",
       "loadFailed": "The contest could not be loaded",
       "retry": "Retry"
+    },
+    "leave": {
+      "live": {
+        "link": "Leave contest",
+        "title": "Leave the contest?",
+        "body": "Leaving only exits contest mode. Your score stays, and you can come back while the contest runs."
+      },
+      "virtual": {
+        "link": "Stop virtual run",
+        "title": "Stop the virtual run?",
+        "body": "The virtual run ends now and cannot resume. Your submissions stay on the “Include virtual” board."
+      },
+      "spectate": {
+        "link": "Stop spectating",
+        "title": "Stop spectating?",
+        "body": "You leave spectator mode and can spectate again at any time."
+      }
+    },
+    "virtualRun": {
+      "note": "Your result is on the “Include virtual” board (the button below opens it)."
+    },
+    "switchRun": {
+      "title": "Enter {name}?",
+      "body": "You are in a virtual run of {other} ({left} left). Entering this contest will {ends}; your submissions are kept.",
+      "ends": "end the virtual run",
+      "stay": "Stay in the virtual run"
     }
   },
   "placeholder": {

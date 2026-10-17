@@ -236,9 +236,7 @@
       "inContest": "Bạn đang thi",
       "since": "từ {time}",
       "spectating": "Đang theo dõi",
-      "virtualRunning": "Thi ảo #{run} đang chạy",
       "leave": "Rời kỳ thi",
-      "leaveNote": "Rời kỳ thi chỉ thoát khỏi chế độ thi. Điểm giữ nguyên, bạn có thể vào lại khi kỳ thi còn diễn ra.",
       "codeTitle": "Nhập mã tham gia",
       "codeBody": "“{name}” cần mã do ban tổ chức cung cấp.",
       "codeLabel": "Mã tham gia",
@@ -324,6 +322,32 @@
       "missingTitle": "Không tìm thấy bài này trong kỳ thi",
       "loadFailed": "Không tải được kỳ thi",
       "retry": "Thử lại"
+    },
+    "leave": {
+      "live": {
+        "link": "Rời kỳ thi",
+        "title": "Rời kỳ thi?",
+        "body": "Rời kỳ thi chỉ thoát khỏi chế độ thi. Điểm giữ nguyên, bạn có thể vào lại khi kỳ thi còn diễn ra."
+      },
+      "virtual": {
+        "link": "Dừng lượt ảo",
+        "title": "Dừng lượt thi ảo?",
+        "body": "Lượt thi ảo kết thúc ngay và không chạy tiếp được. Kết quả đã nộp vẫn ở bảng “Gồm thi ảo”."
+      },
+      "spectate": {
+        "link": "Thôi theo dõi",
+        "title": "Thôi theo dõi kỳ thi?",
+        "body": "Bạn thoát chế độ theo dõi và có thể vào theo dõi lại bất cứ lúc nào."
+      }
+    },
+    "virtualRun": {
+      "note": "Kết quả của bạn hiện ở bảng “Gồm thi ảo” (mở sẵn từ nút dưới đây)."
+    },
+    "switchRun": {
+      "title": "Vào {name}?",
+      "body": "Bạn đang thi ảo {other} (còn {left}). Vào kỳ thi này sẽ {ends}; kết quả đã nộp vẫn được giữ.",
+      "ends": "kết thúc lượt thi ảo",
+      "stay": "Ở lại lượt ảo"
     }
   },
   "placeholder": {

@@ -3,16 +3,14 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import type { ContestDetail } from '@/api/types/contests';
+import type { ContestDetail, CurrentParticipation } from '@/api/types/contests';
 import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { spanMessage } from '@/lib/contest-time';
-import { useDockHeight } from '@/features/problems/use-dock-height';
 import { formatClock } from '@/lib/format';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useNow } from '@/lib/use-now';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -20,8 +18,10 @@ import { useSessionStore } from '@/stores/session.store';
 import AccessCodeDialog from './AccessCodeDialog.vue';
 import { actionFactsOf, commandOf, contestAction, signInLabelKey } from './contest-action';
 import type { ContestActionKind } from './contest-action';
-import { useCurrentParticipationQuery } from './contests.queries';
+import { participationKind } from './bar/current-contest';
+import type { ParticipationKind } from './bar/current-contest';
 import ContestRulesDialog from './ContestRulesDialog.vue';
+import ContestSwitchDialog from './ContestSwitchDialog.vue';
 import InContestStatus from './InContestStatus.vue';
 import { acceptanceOf, hasRules, needsRulesAcceptance } from './join-rules';
 import type { ParticipationRefusal } from './participation-refusal';
@@ -53,26 +53,38 @@ const NOTICE_KEYS: Partial<Record<ContestActionKind, string>> = {
 /** Kinds whose button shows the opening time and cannot be pressed. */
 const LOCKED_KINDS: readonly ContestActionKind[] = ['opensLater', 'registered'];
 
-const props = defineProps<{ contest: ContestDetail }>();
+/** `current`: the viewer's running participation anywhere (`/contests/current`), read once by the page. */
+const props = defineProps<{ contest: ContestDetail; current: CurrentParticipation | null }>();
 const route = useRoute();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const now = useNow();
-/** Below `md` the bar is teleported to the body: the header card's glass blur would otherwise pin it inside the card. */
-const isPhone = useMediaQuery(PHONE_QUERY);
 const facts = computed(() => actionFactsOf(props.contest, session.user !== null, now.value));
 const chosen = computed(() => contestAction(facts.value));
-const { data: current } = useCurrentParticipationQuery(
-  computed(() => chosen.value.kind === 'leave'),
+const isSwitchOpen = ref(false);
+/** The viewer's running participation here, or null while `/contests/current` has not said so. */
+const ownRun = computed(() =>
+  props.current?.contest.key === props.contest.key ? props.current.participation : null,
 );
+/**
+ * How the viewer takes part here. Until `/contests/current` answers, the phase decides: only a virtual run is
+ * possible once the contest has ended, so the stronger "end the run" wording is never replaced by the live one.
+ */
+const ownKind = computed<ParticipationKind>(() => {
+  if (ownRun.value) return participationKind(ownRun.value.virtual);
+  return props.contest.phase === 'ended' ? 'virtual' : 'live';
+});
+/** A virtual run of another contest still going: joining here would end it, so the viewer is asked first (P-19). */
+const replacedRun = computed(() => {
+  const run = props.current;
+  return run && run.contest.key !== props.contest.key && run.participation.virtual > 0 ? run : null;
+});
+/** The other run ended while the question was open: the question goes with it. */
+watch(replacedRun, (run) => {
+  if (!run) isSwitchOpen.value = false;
+});
 const { run, isPending, error, reset } = useParticipation(computed(() => props.contest.key));
 const root = ref<HTMLElement | null>(null);
-/** The phone bar is fixed to the bottom: publish its height so the footer clears it. */
-const phoneBar = computed(() => (isPhone.value ? root.value : null));
-useDockHeight(phoneBar);
-watch(isPhone, (isNow) => {
-  if (!isNow) document.documentElement.style.removeProperty('--dock-height');
-});
 const isDialogOpen = ref(false);
 const participationStatus = ref('');
 const startClock = computed(() => formatClock(props.contest.startTime, locale.locale));
@@ -149,7 +161,14 @@ function askCodeOrPerform() {
   else void perform().catch(() => undefined);
 }
 function start() {
-  if (isPending.value || commandOf(chosen.value.kind) === null) return;
+  const command = commandOf(chosen.value.kind);
+  if (isPending.value || command === null) return;
+  if (command === 'join' && replacedRun.value) isSwitchOpen.value = true;
+  else proceed();
+}
+/** After the switch question, if any: the rules, then the code, then the request. */
+function proceed() {
+  isSwitchOpen.value = false;
   reset();
   hasAcceptedRules.value = false;
   if (needsRules.value) isRulesOpen.value = true;
@@ -175,83 +194,86 @@ watch(isRulesOpen, (isOpen) => {
 </script>
 
 <template>
-  <Teleport to="body" :disabled="!isPhone">
-    <div
-      ref="root"
-      data-testid="contest-actions"
-      tabindex="-1"
-      class="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-line bg-surface-solid p-3 md:static md:z-auto md:border-0 md:bg-transparent md:p-0"
-    >
-      <p data-testid="participation-status" role="status" aria-live="polite" class="sr-only">
-        {{ participationStatus }}
+  <div ref="root" data-testid="contest-actions" tabindex="-1" class="flex flex-col gap-2">
+    <p data-testid="participation-status" role="status" aria-live="polite" class="sr-only">
+      {{ participationStatus }}
+    </p>
+    <AppButton v-if="chosen.kind === 'signIn'" tone="primary" :to="signInTarget">
+      {{ $t(signInLabelKey(facts)) }}
+    </AppButton>
+    <InContestStatus
+      v-else-if="chosen.kind === 'leave'"
+      :contest="contest"
+      :kind="ownKind"
+      :since="ownRun?.realStart ?? contest.viewer.liveParticipation?.realStart ?? null"
+      :is-pending="isPending"
+      :return-focus-to="() => root"
+      @leave="perform().catch(() => undefined)"
+    />
+    <template v-else>
+      <Chip v-if="chosen.kind === 'registered'" tone="accent" size="md" class="w-fit">
+        {{ $t('contests.actions.registeredBadge') }}
+      </Chip>
+      <p v-if="NOTICE_KEYS[chosen.kind]" class="text-muted">
+        {{ $t(NOTICE_KEYS[chosen.kind]!) }}
       </p>
-      <AppButton v-if="chosen.kind === 'signIn'" tone="primary" :to="signInTarget">
-        {{ $t(signInLabelKey(facts)) }}
-      </AppButton>
-      <InContestStatus
-        v-else-if="chosen.kind === 'leave'"
-        :contest="contest"
-        :current="current"
-        :is-pending="isPending"
-        @leave="perform().catch(() => undefined)"
-      />
-      <template v-else>
-        <Chip v-if="chosen.kind === 'registered'" tone="accent" size="md" class="w-fit">
-          {{ $t('contests.actions.registeredBadge') }}
-        </Chip>
-        <p v-if="NOTICE_KEYS[chosen.kind]" class="text-muted">
-          {{ $t(NOTICE_KEYS[chosen.kind]!) }}
-        </p>
-        <AppButton
-          v-if="hasButton"
-          tone="primary"
-          :disabled="isLocked"
-          :loading="isPending"
-          @click="start"
-        >
-          {{ actionLabel }}
-        </AppButton>
-        <p v-else class="text-muted">{{ actionLabel }}</p>
-        <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted">
-          {{
-            $t('contests.actions.virtualNote', {
-              span: $t(virtualLength.key, virtualLength.params, virtualLength.count ?? 1),
-            })
-          }}
-        </p>
-        <p v-if="chosen.kind === 'spectate'" class="text-sm text-muted">
-          {{ $t('contests.actions.spectateNote') }}
-        </p>
-      </template>
-      <p
-        v-if="error && !isDialogOpen && !isRulesOpen"
-        role="alert"
-        class="flex items-center gap-2.5 text-verdict-wa"
+      <AppButton
+        v-if="hasButton"
+        tone="primary"
+        :disabled="isLocked"
+        :loading="isPending"
+        @click="start"
       >
-        <InlineBit kind="sweat" />
-        <span>{{ $t(errorMessageKey(error)) }}</span>
+        {{ actionLabel }}
+      </AppButton>
+      <p v-else class="text-muted">{{ actionLabel }}</p>
+      <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted">
+        {{
+          $t('contests.actions.virtualNote', {
+            span: $t(virtualLength.key, virtualLength.params, virtualLength.count ?? 1),
+          })
+        }}
       </p>
-      <AccessCodeDialog
-        v-model:visible="isDialogOpen"
-        :action-label="actionLabel"
-        :contest-name="contest.name"
-        :is-pending="isPending"
-        :error="error"
-        @submit="(code) => perform(code).catch(() => undefined)"
-      />
-      <ContestRulesDialog
-        v-model:visible="isRulesOpen"
-        :contest-name="contest.name"
-        :revision="contest.rulesRevision"
-        :rules-html="contest.rulesHtml"
-        :is-refreshing="isRulesRefreshing"
-        :action-label="actionLabel"
-        :is-virtual="chosen.kind === 'virtual'"
-        :is-pending="isPending"
-        :error="error"
-        :previous-acceptance="chosen.kind === 'virtual' ? previousAcceptance : null"
-        @accept="acceptRules"
-      />
-    </div>
-  </Teleport>
+      <p v-if="chosen.kind === 'spectate'" class="text-sm text-muted">
+        {{ $t('contests.actions.spectateNote') }}
+      </p>
+    </template>
+    <p
+      v-if="error && !isDialogOpen && !isRulesOpen"
+      role="alert"
+      class="flex items-center gap-2.5 text-verdict-wa"
+    >
+      <InlineBit kind="sweat" />
+      <span>{{ $t(errorMessageKey(error)) }}</span>
+    </p>
+    <ContestSwitchDialog
+      v-if="replacedRun"
+      v-model:visible="isSwitchOpen"
+      :contest-name="contest.name"
+      :replaced="replacedRun"
+      :confirm-label="actionLabel"
+      @confirm="proceed"
+    />
+    <AccessCodeDialog
+      v-model:visible="isDialogOpen"
+      :action-label="actionLabel"
+      :contest-name="contest.name"
+      :is-pending="isPending"
+      :error="error"
+      @submit="(code) => perform(code).catch(() => undefined)"
+    />
+    <ContestRulesDialog
+      v-model:visible="isRulesOpen"
+      :contest-name="contest.name"
+      :revision="contest.rulesRevision"
+      :rules-html="contest.rulesHtml"
+      :is-refreshing="isRulesRefreshing"
+      :action-label="actionLabel"
+      :is-virtual="chosen.kind === 'virtual'"
+      :is-pending="isPending"
+      :error="error"
+      :previous-acceptance="chosen.kind === 'virtual' ? previousAcceptance : null"
+      @accept="acceptRules"
+    />
+  </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { ContestDetail } from '@/api/types/contests';
+import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
@@ -13,7 +13,12 @@ import ContestCountdown from './ContestCountdown.vue';
 import ContestTimeBar from './ContestTimeBar.vue';
 import PhasePill from './PhasePill.vue';
 
-const props = defineProps<{ contest: ContestDetail }>();
+/**
+ * `run`: the viewer's running participation here. The contest bar then carries the clock, so a phone drops the big
+ * countdown (P-17 A); a virtual run's countdown counts the run's own time (P-19).
+ */
+const props = defineProps<{ contest: ContestDetail; run?: ParticipationSummary | null }>();
+const virtualRun = computed(() => (props.run && props.run.virtual > 0 ? props.run : null));
 /** The header colours its tags: read the catalogue only when the contest has tags. */
 useContestTagsQuery(() => props.contest.tags.length > 0);
 const emit = defineEmits<{ elapsed: [] }>();
@@ -91,8 +96,15 @@ const phoneLine = computed(
         </template>
       </p>
     </div>
-    <div class="flex flex-col gap-4">
-      <ContestCountdown :contest="contest" @elapsed="emit('elapsed')" />
+    <div
+      :class="['flex flex-col gap-4', virtualRun && 'rounded-row border border-line-accent p-4']"
+    >
+      <ContestCountdown
+        :contest="contest"
+        :virtual-run="virtualRun"
+        :class="run && 'max-md:hidden'"
+        @elapsed="emit('elapsed')"
+      />
       <slot name="actions" />
     </div>
   </Card>

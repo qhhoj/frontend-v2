@@ -12,6 +12,7 @@ import { phaseAt } from '@/lib/contest-time';
 import { useSessionStore } from '@/stores/session.store';
 import { usePageTitle } from '@/router/page-title';
 import ContestActions from './ContestActions.vue';
+import { useCurrentContest } from './bar/use-current-contest';
 import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
 import ContestHeaderCard from './ContestHeaderCard.vue';
@@ -32,6 +33,11 @@ const session = useSessionStore();
 const key = computed(() => String(route.params.key));
 const { data: contest, isPending, error, refetch } = useContestQuery(key);
 usePageTitle(() => contest.value?.name);
+const { current } = useCurrentContest();
+/** The viewer's running participation in this contest (live, virtual or spectating), or null. */
+const run = computed(() =>
+  current.value?.contest.key === key.value ? current.value.participation : null,
+);
 /** A contest that does not exist (or is hidden) is a dead end, not a failure to retry: the crying Bit says so. */
 const isMissing = computed(() => error.value instanceof ApiError && error.value.status === 404);
 
@@ -57,9 +63,9 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
       <template #skeleton><ContestDetailSkeleton /></template>
       <template v-if="contest">
         <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <ContestHeaderCard :contest="contest" @elapsed="onCountdownElapsed">
+        <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
           <template #actions>
-            <ContestActions :contest="contest" />
+            <ContestActions :contest="contest" :current="current" />
             <div class="flex items-start gap-2">
               <ShortLinkButton
                 class="flex-1"

@@ -3,7 +3,7 @@ import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 import { RULES_HTML, RULES_MARKDOWN } from '@/test/contest-extras-fixtures';
@@ -315,5 +315,107 @@ describe('contest actions with rules', () => {
     ).toBeGreaterThanOrEqual(2);
     await tickAndConfirm();
     expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
+  });
+});
+
+describe('contest actions: a virtual run of another contest', () => {
+  const otherRun = {
+    contest: {
+      key: 'trash_ended',
+      name: 'Trash Cup 2026',
+      startTime: '2026-09-26T04:40:00Z',
+      endTime: '2026-09-26T07:40:00Z',
+    },
+    participation: participationSummary({ virtual: 1, endTime: '2999-01-01T00:00:00Z' }),
+  };
+  const routes = () => ({
+    ...signedInViewer(),
+    ...contestPageRoutes(),
+    'GET /contests/current': ok(otherRun),
+    'GET /contests/trash_ended/announcements': page([]),
+    'POST /contests/r42/join': ok(participationSummary()),
+  });
+  afterEach(() => vi.useRealTimers());
+  const dialogButton = (name: string) =>
+    [...dialog()!.querySelectorAll('button')].find(
+      (button) => button.textContent?.trim() === name,
+    )!;
+
+  it('asks before joining ends it, and stays when the viewer keeps the run', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi(routes());
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()!.textContent).toContain('Trash Cup 2026');
+    dialogButton('Ở lại lượt ảo').click();
+    await flushPromises();
+    expect(joinCalls(calls)).toEqual([]);
+  });
+
+  it('joins once the viewer confirms', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi(routes());
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    dialogButton('Vào thi').click();
+    await flushPromises();
+    expect(joinCalls(calls)).toHaveLength(1);
+  });
+});
+
+describe('contest actions: leaving', () => {
+  const inContest = (overrides: Parameters<typeof contestDetail>[0] = {}) =>
+    contestDetail({
+      viewer: contestViewer({ isCurrent: true, inContest: true, liveStatus: 'participating' }),
+      ...overrides,
+    });
+  const leaveCalls = (calls: ReturnType<typeof mockApi>) =>
+    calls.filter((call) => call.path === '/contests/r42/leave');
+  const link = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], name: string) =>
+    actionsOf(wrapper)
+      .findAll('button')
+      .find((button) => button.text() === name);
+  afterEach(() => vi.useRealTimers());
+
+  it('asks before leaving a live contest, then leaves on confirm', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const detail = inContest();
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(detail),
+      'GET /contests/current': ok({ contest: detail, participation: participationSummary() }),
+      'POST /contests/r42/leave': ok(null),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() => expect(link(wrapper, 'Rời kỳ thi')).toBeDefined());
+    await link(wrapper, 'Rời kỳ thi')!.trigger('click');
+    await flushPromises();
+    expect(dialog()!.textContent).toContain('Rời kỳ thi?');
+    expect(leaveCalls(calls)).toEqual([]);
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(leaveCalls(calls)).toHaveLength(1);
+  });
+
+  it('words an ended contest as a virtual run even before the current participation answers', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(
+        inContest({
+          phase: 'ended',
+          startTime: '2026-10-01T08:00:00Z',
+          endTime: '2026-10-01T11:00:00Z',
+        }),
+      ),
+      'GET /contests/current': fail(500, 'internal'),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() => expect(link(wrapper, 'Dừng lượt ảo')).toBeDefined());
+    expect(link(wrapper, 'Rời kỳ thi')).toBeUndefined();
   });
 });
