@@ -10,6 +10,7 @@ import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber } from '@/lib/format';
+import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import {
   formatCumtime,
   isPenaltyFormat,
@@ -23,6 +24,7 @@ import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
   PROBLEM_COLUMN_REM,
   RANK_COLUMN_REM,
+  RATING_COLUMN_REM,
   SCORE_COLUMN_REM,
   TIME_COLUMN_REM,
   tableMinWidthRem,
@@ -78,8 +80,11 @@ const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
+/** Rated contests carry each row's rating change once the ratings are applied (P-22, Q-06 A). */
+const hasRatingColumn = computed(() => props.rows.some((row) => row.ratingChange));
 const minWidth = computed(
-  () => `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value)}rem`,
+  () =>
+    `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value) + (hasRatingColumn.value ? RATING_COLUMN_REM : 0)}rem`,
 );
 const scoreHeaderKey = computed(() => {
   if (penalty.value) return 'ranking.columns.solved';
@@ -96,6 +101,7 @@ const scoreHeaderKey = computed(() => {
           <col />
           <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
           <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
+          <col v-if="hasRatingColumn" :style="{ width: `${RATING_COLUMN_REM}rem` }" />
           <col
             v-for="problem in ranking.problems"
             :key="problem.problemId"
@@ -120,6 +126,9 @@ const scoreHeaderKey = computed(() => {
             </th>
             <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium">
               {{ $t('ranking.columns.penalty') }}
+            </th>
+            <th v-if="hasRatingColumn" scope="col" class="px-2.5 py-4 font-medium">
+              {{ $t('ranking.columns.ratingChange') }}
             </th>
             <th
               v-for="problem in ranking.problems"
@@ -174,6 +183,20 @@ const scoreHeaderKey = computed(() => {
             </td>
             <td v-if="hasTimeColumn">
               {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
+            </td>
+            <td
+              v-if="hasRatingColumn"
+              data-testid="rating-change"
+              class="px-2.5 whitespace-nowrap"
+              :class="deltaToneClass(row.ratingChange?.delta ?? null)"
+            >
+              <template v-if="!row.ratingChange">—</template>
+              <template v-else-if="row.ratingChange.delta === null">{{
+                row.ratingChange.rating
+              }}</template>
+              <template v-else
+                >{{ formatDelta(row.ratingChange.delta) }} → {{ row.ratingChange.rating }}</template
+              >
             </td>
             <RankingCell
               v-for="cell in cellsOf(row)"

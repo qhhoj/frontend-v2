@@ -2,8 +2,10 @@
 import { computed } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
+import { formatDelta } from '@/lib/rating-delta';
 import { formatClock, formatNumber, formatShortDate, formatWeekdayDate } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -28,6 +30,13 @@ const lengthSpan = computed(() =>
 const elapsedSpan = computed(() =>
   phase.value === 'running' ? spanMessage((now.value - startMs.value) / 1000) : null,
 );
+/** The viewer's own rating change once the contest's ratings are applied (P-22, Q-06 A). */
+const ratingChange = computed(() => props.contest.viewer.ratingChange);
+const ratingChangeTone = computed(() => {
+  const delta = ratingChange.value?.delta;
+  if (!delta) return 'neutral';
+  return delta > 0 ? 'success' : 'danger';
+});
 const phoneLine = computed(
   () =>
     `${props.contest.key} · ${formatClock(props.contest.startTime, locale.locale)}–${formatClock(props.contest.endTime, locale.locale)} · ${formatShortDate(props.contest.startTime, locale.locale)}`,
@@ -93,6 +102,21 @@ const phoneLine = computed(
     </div>
     <div class="flex flex-col gap-4">
       <ContestCountdown :contest="contest" @elapsed="emit('elapsed')" />
+      <Chip
+        v-if="ratingChange"
+        data-testid="viewer-rating-change"
+        size="md"
+        :tone="ratingChangeTone"
+        class="self-start font-mono tabular-nums"
+      >
+        {{
+          ratingChange.delta === null
+            ? $t('contests.detail.firstRating', { rating: ratingChange.rating })
+            : $t('contests.detail.ratingChange', {
+                change: `${formatDelta(ratingChange.delta)} → ${ratingChange.rating}`,
+              })
+        }}
+      </Chip>
       <slot name="actions" />
     </div>
   </Card>
