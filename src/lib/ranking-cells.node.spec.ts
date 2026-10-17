@@ -261,3 +261,29 @@ describe('ranking cells, zero-point problem', () => {
     expect(view.kind).not.toBe('first-solve');
   });
 });
+
+describe('ranking cells past 99 hours (P-18)', () => {
+  const LONG = 113 * 86_400 + 23 * 3600 + 36 * 60;
+  const vi = { ...timedDefault, locale: 'vi' as const };
+  const timeOf = (time: number, board: RankingContext = timedDefault) =>
+    rankingCell({ points: 100, time }, problem(), 'me', board).time;
+
+  it('shows a long solve time as short days and hours, and says it in full words', () => {
+    const cell = rankingCell({ points: 100, time: LONG }, problem(), 'me', vi);
+    expect(cell.time).toBe('113 ng 23 g');
+    expect(cell.labelParams.time).toBe('113 ngày 23 giờ');
+    expect(timeOf(LONG)).toBe('113d 23h');
+    expect(rankingCell({ time: LONG, points: 1, tries: 1 }, problem(), 'me', icpc).time).toBe(
+      '113d 23h',
+    );
+  });
+
+  it('switches at exactly 100 hours and drops zero hours', () => {
+    expect(timeOf(100 * 3600 - 1)).toBe('99:59:59');
+    expect(timeOf(100 * 3600, vi)).toBe('4 ng 4 g');
+    expect(timeOf(5 * 86_400, vi)).toBe('5 ng');
+    expect(
+      rankingCell({ time: 100 * 3600 - 60, points: 1, tries: 1 }, problem(), 'me', icpc).time,
+    ).toBe('99:59');
+  });
+});
