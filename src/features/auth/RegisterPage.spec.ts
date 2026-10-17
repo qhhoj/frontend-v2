@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CPP17_ID, PY3_ID, organizationItem, signedOut } from '@/test/fixtures';
+import { CPP17_ID, organizationItem, signedOut } from '@/test/fixtures';
 import { registerRoutes } from '@/test/auth-routes';
 import { fail, invalid, issue, mockApi, noContent, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
@@ -59,19 +59,19 @@ describe('register page', () => {
     expect(document.activeElement).toBe(document.getElementById('main'));
   });
 
-  it('sends the school and the language the viewer chose instead of the default', async () => {
+  it('sends the school the viewer chose, and asks for no language (P-13: C++17 is set without a field)', async () => {
     const calls = register();
     const { wrapper } = await mountApp('/register');
+    expect(wrapper.find('select[name="languageId"]').exists()).toBe(false);
     await openSelect(wrapper, '[data-testid="school-picker"]');
     await pickOption(organizationItem().name);
-    await wrapper.get('select[name="languageId"]').setValue(PY3_ID);
     await fill(wrapper);
     expect(registerBody(calls)).toEqual({
       username: 'new_user',
       email: 'new@example.com',
       password: PASSWORD,
       organizationId: organizationItem().id,
-      languageId: PY3_ID,
+      languageId: CPP17_ID,
     });
   });
 

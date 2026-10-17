@@ -48,18 +48,14 @@ const form = reactive({
   languageId: undefined as string | undefined,
 });
 const formElement = ref<HTMLFormElement | null>(null);
-// The email has no input: an `email_taken` issue (the provider's address is already registered) lands in the summary.
+// The email and the language have no input: their issues (`email_taken`, a language gone meanwhile) land in the summary.
 const { pending, error, fieldErrors, summary, run, dismiss, focusFirstInvalid } = useAuthAction(
   formElement,
-  ['username', 'password', 'organizationId', 'languageId'],
+  ['username', 'password', 'organizationId'],
 );
 watch(
   () => form.organizationId,
   () => dismiss('organizationId'),
-);
-watch(
-  () => form.languageId,
-  () => dismiss('languageId'),
 );
 
 const failedWith = (code: string) => error.value instanceof ApiError && error.value.code === code;
