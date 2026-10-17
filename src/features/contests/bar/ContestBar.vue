@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import { navSectionOverride } from '@/features/shell/nav-section';
+import { usePublishedHeight } from '@/features/problems/use-dock-height';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
+import { useSessionStore } from '@/stores/session.store';
 import { useUnreadAnnouncementCount } from '../announcement-seen';
 import { participationKind } from './current-contest';
 
@@ -25,6 +27,11 @@ const statusText = computed(() => {
   return t(kind.value === 'spectate' ? 'contestBar.spectate' : 'contestBar.live');
 });
 const unread = useUnreadAnnouncementCount(contestKey);
+const root = ref<HTMLElement | null>(null);
+/** Sticky things below it (the print toolbar) clear it through `--contest-bar-height`. */
+usePublishedHeight(root, '--contest-bar-height');
+/** The impersonation banner is the one sticky strip above: the bar then scrolls away rather than slide under it. */
+const session = useSessionStore();
 /** A phone's 44 px bar abbreviates a multi-day clock (`28 ng 14 g`). */
 const isPhone = useMediaQuery(PHONE_QUERY);
 
@@ -46,11 +53,8 @@ const LINKS = computed<BarLink[]>(() => [
   },
   { name: 'contest-announcements', label: t('contests.tabs.announcements') },
 ]);
-/** A page of this contest that is not a tab's own route: its problem lights "Đề bài", a submission "Bài nộp". */
-const CLAIMED_BY: Record<string, string> = {
-  problem: 'contest',
-  submission: 'contest-submissions',
-};
+/** A page of this contest that is not a tab's own route: its problem lights "Đề bài". */
+const CLAIMED_BY: Record<string, string> = { problem: 'contest' };
 const currentLink = computed(() => {
   const name = String(route.name ?? '');
   if (route.params.key === contestKey.value) return name;
@@ -62,8 +66,12 @@ const LINK =
 
 <template>
   <div
+    ref="root"
     data-testid="contest-bar"
-    class="sticky top-0 z-header border-b border-line bg-accent-soft print:hidden"
+    :class="[
+      'z-header border-b border-line bg-accent-soft print:hidden',
+      !session.impersonatorId && 'sticky top-0',
+    ]"
   >
     <div class="page-gutter flex h-11 items-center gap-2 md:h-12 md:gap-3">
       <RouterLink

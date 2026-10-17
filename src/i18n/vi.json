@@ -75,7 +75,8 @@
       "hours": "{count} giờ",
       "minutes": "{count} phút",
       "underMinute": "dưới 1 phút",
-      "daysHoursShort": "{days} ng {hours} g"
+      "daysHoursShort": "{days} ng {hours} g",
+      "daysShort": "{days} ng"
     },
     "participants": "{count} thí sinh",
     "virtualExtra": "+{count} ảo",

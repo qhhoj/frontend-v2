@@ -70,12 +70,13 @@
     },
     "span": {
       "days": "{count} day | {count} days",
-      "daysHours": "{days} d {hours} h",
+      "daysHours": "{days} days {hours} h",
       "hoursMinutes": "{hours} h {minutes} min",
       "hours": "{count} hour | {count} hours",
       "minutes": "{count} minute | {count} minutes",
       "underMinute": "under a minute",
-      "daysHoursShort": "{days}d {hours}h"
+      "daysHoursShort": "{days}d {hours}h",
+      "daysShort": "{days}d"
     },
     "participants": "{count} contestant | {count} contestants",
     "virtualExtra": "+{count} virtual",

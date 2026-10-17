@@ -3,7 +3,7 @@ import { useSessionStore } from '@/stores/session.store';
 import { useCurrentParticipationQuery } from '../contests.queries';
 import { activeParticipation } from './current-contest';
 
-/** `setTimeout` cannot wait longer than about 24.8 days; a longer run is re-read on the next refetch. */
+/** `setTimeout` cannot wait longer than about 24.8 days; a longer run is re-checked on each answer of the query. */
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
 
 /**
@@ -13,13 +13,14 @@ const MAX_TIMEOUT_MS = 2 ** 31 - 1;
 export function useCurrentContest(isAsked: () => boolean = () => true) {
   const session = useSessionStore();
   const isEnabled = computed(() => isAsked() && session.status === 'authenticated');
-  const { data, isPending } = useCurrentParticipationQuery(isEnabled);
+  const { data, isPending, dataUpdatedAt } = useCurrentParticipationQuery(isEnabled);
   /** Re-read when the answer changes and when its end passes; the computed below reads the clock only through it. */
   const checkedAt = ref(Date.now());
   let endTimer: ReturnType<typeof setTimeout> | undefined;
   watch(
-    () => data.value?.participation.endTime,
-    (endTime) => {
+    // Every answer re-reads the clock, even one equal to the last (an end past the timer's reach).
+    [() => data.value?.participation.endTime, dataUpdatedAt],
+    ([endTime]) => {
       clearTimeout(endTimer);
       checkedAt.value = Date.now();
       const msLeft = endTime ? Date.parse(endTime) - checkedAt.value : 0;

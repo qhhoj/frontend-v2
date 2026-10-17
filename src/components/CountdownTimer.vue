@@ -17,10 +17,14 @@ const text = computed(() => {
   const view = countdownView(remaining.value);
   if (view.kind === 'clock') return view.text;
   const { days, hours } = view;
-  if (props.short) return t('contests.span.daysHoursShort', { days, hours });
-  return hours === 0
-    ? t('contests.span.days', { count: days }, days)
-    : t('contests.span.daysHours', { days, hours });
+  if (hours === 0)
+    return props.short
+      ? t('contests.span.daysShort', { days })
+      : t('contests.span.days', { count: days }, days);
+  return t(props.short ? 'contests.span.daysHoursShort' : 'contests.span.daysHours', {
+    days,
+    hours,
+  });
 });
 watch(remaining, (seconds) => seconds === 0 && emit('elapsed'));
 </script>
