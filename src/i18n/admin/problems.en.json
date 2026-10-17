@@ -203,7 +203,18 @@
       "descriptionLength": "Content is at most {max} characters.",
       "character": "Do not use the character {character}; use a plain one instead."
     },
-    "savedToast": "Saved {slot}."
+    "savedToast": "Saved {slot}.",
+    "nameDefaultHint": "Defaults to the problem's name; type to change it for {language}.",
+    "written": {
+      "label": "Statements written",
+      "short": {
+        "vi": "VI",
+        "en": "EN",
+        "original": "Base"
+      },
+      "yes": "{slot}: written",
+      "no": "{slot}: missing"
+    }
   },
   "editorial": {
     "public": "Publish the editorial",

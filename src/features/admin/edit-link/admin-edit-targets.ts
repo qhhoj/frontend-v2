@@ -14,20 +14,38 @@ type Viewer = AdminViewer | null;
 const EDIT_ANY_ORGANIZATION = 'judge.edit_all_organization';
 const open = (user: Viewer, screen: AdminScreenId) => canUseAdmin(user, ADMIN_SCREENS[screen]);
 
-export const problemEditTarget = (
+/** The public problem page's tabs, each with the editor tab that edits what is on screen (Q-09 A). */
+const PROBLEM_SECTION_SCREENS = {
+  statement: 'problemStatements',
+  editorial: 'problemEditorial',
+} as const satisfies Record<string, AdminScreenId>;
+export type ProblemSection = keyof typeof PROBLEM_SECTION_SCREENS;
+
+/** The pencil opens the editor tab of the section being read: the statement's text, or the editorial. */
+export function problemEditTarget(
   user: Viewer,
   problem: { code: string; canEdit: boolean },
-): RouteLocationRaw | null =>
-  problem.canEdit && open(user, 'problemGeneral')
-    ? { name: adminRouteName('problemGeneral'), params: { code: problem.code } }
+  section: ProblemSection = 'statement',
+): RouteLocationRaw | null {
+  const screen = PROBLEM_SECTION_SCREENS[section];
+  return problem.canEdit && open(user, screen)
+    ? { name: adminRouteName(screen), params: { code: problem.code } }
     : null;
+}
+
+/** The contest editor tabs a public contest page can link to: the one matching what is on screen. */
+export type ContestEditScreen = Extract<
+  AdminScreenId,
+  'contestGeneral' | 'contestProblems' | 'contestRanking' | 'contestAnnouncements'
+>;
 
 export const contestEditTarget = (
   user: Viewer,
   contest: { key: string; viewer: { canEdit: boolean } },
+  screen: ContestEditScreen = 'contestGeneral',
 ): RouteLocationRaw | null =>
-  contest.viewer.canEdit && open(user, 'contestGeneral')
-    ? { name: adminRouteName('contestGeneral'), params: { key: contest.key } }
+  contest.viewer.canEdit && open(user, screen)
+    ? { name: adminRouteName(screen), params: { key: contest.key } }
     : null;
 
 /** Organization admins already have the public Manage tab; only site staff who edit any organization get the link. */

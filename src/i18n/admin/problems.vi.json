@@ -203,7 +203,18 @@
       "descriptionLength": "Nội dung tối đa {max} ký tự.",
       "character": "Không dùng ký tự {character}; hãy thay bằng ký tự thường."
     },
-    "savedToast": "Đã lưu {slot}."
+    "savedToast": "Đã lưu {slot}.",
+    "nameDefaultHint": "Mặc định theo tên bài; gõ để đổi riêng cho {language}.",
+    "written": {
+      "label": "Đề đã viết",
+      "short": {
+        "vi": "VI",
+        "en": "EN",
+        "original": "Gốc"
+      },
+      "yes": "{slot}: đã có",
+      "no": "{slot}: chưa có"
+    }
   },
   "editorial": {
     "public": "Công khai lời giải",

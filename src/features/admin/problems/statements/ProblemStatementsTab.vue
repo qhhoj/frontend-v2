@@ -77,7 +77,11 @@ const SEGMENT =
         class="max-w-xl"
         input-id="statement-name"
         :label="$t('admin.problems.statements.nameLabel', { language: $t(slotName) })"
-        :hint="$t('admin.problems.statements.nameHint')"
+        :hint="
+          current.exists
+            ? $t('admin.problems.statements.nameHint')
+            : $t('admin.problems.statements.nameDefaultHint', { language: $t(slotName) })
+        "
         :error="errors.name"
       >
         <input
