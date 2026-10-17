@@ -18,6 +18,7 @@ import { isNotFound } from '../ui/admin-errors';
 import ProblemCloneDialog from './general/ProblemCloneDialog.vue';
 import { useEditableProblemQuery, useProblemEditingMetaQuery } from './problem-editing.queries';
 import { PROBLEM_TABS, problemTabComponent, problemTabOf } from './problem-tabs';
+import { STATEMENT_SLOTS, writtenSlots } from './statements/statement-drafts';
 
 const route = useRoute();
 const { can } = usePermissions();
@@ -38,6 +39,12 @@ function statusOf(detail: EditableProblem): { key: string; tone: ChipTone; icon:
   return { key: 'private', tone: 'neutral', icon: Lock };
 }
 const status = computed(() => (problem.data.value ? statusOf(problem.data.value) : null));
+/** "VI ✓ · EN — · Gốc ✓": which statements exist, so a missing translation shows before contest day. */
+const written = computed(() =>
+  problem.data.value?.editor
+    ? STATEMENT_SLOTS.map((slot) => ({ slot, isWritten: writtenSlots(problem.data.value!)[slot] }))
+    : [],
+);
 
 /** The tabs stick to the top: a focused field or a section jumped to lands below them, never under them. */
 const root = document.documentElement;
@@ -85,6 +92,27 @@ function openClone(close: () => void) {
             >
             <AdminChip v-if="status" :tone="status.tone" :icon="status.icon">
               {{ $t(`admin.problems.header.${status.key}`) }}
+            </AdminChip>
+            <AdminChip
+              v-if="written.length"
+              data-testid="statement-slots"
+              :title="$t('admin.problems.statements.written.label')"
+            >
+              <span class="sr-only">{{ $t('admin.problems.statements.written.label') }}:</span>
+              <template v-for="(item, index) in written" :key="item.slot">
+                <span v-if="index > 0" aria-hidden="true">&nbsp;·&nbsp;</span>
+                <span :class="item.isWritten ? 'text-positive' : 'text-muted'">
+                  <span aria-hidden="true"
+                    >{{ $t(`admin.problems.statements.written.short.${item.slot}`) }}
+                    {{ item.isWritten ? '✓' : '—' }}</span
+                  >
+                  <span class="sr-only">{{
+                    $t(`admin.problems.statements.written.${item.isWritten ? 'yes' : 'no'}`, {
+                      slot: $t(`admin.problems.statements.slots.${item.slot}`),
+                    })
+                  }}</span>
+                </span>
+              </template>
             </AdminChip>
           </template>
           <template #actions>

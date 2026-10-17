@@ -23,6 +23,21 @@ describe('admin edit targets', () => {
     expect(problemEditTarget(null, { code: 'a', canEdit: true })).toBeNull();
   });
 
+  it('opens the editor tab of the section being read', () => {
+    const editor = viewer(['judge.edit_own_problem']);
+    const problem = { code: 'a', canEdit: true };
+    expect(problemEditTarget(editor, problem)).toMatchObject({ name: 'admin-problemStatements' });
+    expect(problemEditTarget(editor, problem, 'editorial')).toMatchObject({
+      name: 'admin-problemEditorial',
+    });
+    const contestEditor = viewer(['judge.edit_own_contest']);
+    const contest = { key: 'k', viewer: { canEdit: true } };
+    expect(contestEditTarget(contestEditor, contest, 'contestRanking')).toMatchObject({
+      name: 'admin-contestRanking',
+      params: { key: 'k' },
+    });
+  });
+
   it('hides the contest link from a viewer who cannot edit it', () => {
     const editor = viewer(['judge.edit_own_contest']);
     expect(contestEditTarget(editor, { key: 'k', viewer: { canEdit: true } })).not.toBeNull();

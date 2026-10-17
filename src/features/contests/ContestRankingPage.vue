@@ -16,6 +16,8 @@ import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import ContestTabs from './ContestTabs.vue';
 import { ownSubmissionsOnly } from './own-submissions';
 import RankingSkeleton from './RankingSkeleton.vue';
@@ -145,6 +147,7 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
             </h1>
           </div>
           <div class="flex flex-wrap items-center gap-2.5">
+            <AdminEditLink :to="contestEditTarget(session.user, contest, 'contestRanking')" />
             <p
               v-if="running"
               class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"

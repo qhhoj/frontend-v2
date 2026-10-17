@@ -18,14 +18,17 @@ export interface StatementDraft {
   exists: boolean;
 }
 
-/** A translation's draft, or the original description (`original`: always exists, its name is on the general tab). */
+/**
+ * A translation's draft, or the original description (`original`: always exists, its name is on the general tab). A missing
+ * translation starts with the problem's name, so writing it never means typing the title again.
+ */
 export function statementDraftOf(problem: EditableProblem, slot: StatementSlot): StatementDraft {
   const editor = problem.editor!;
   if (slot === 'original') {
     return { name: editor.baseName, description: editor.description, exists: true };
   }
   const translation = editor.translations.find((candidate) => candidate.language === slot);
-  if (!translation) return { name: '', description: '', exists: false };
+  if (!translation) return { name: editor.baseName, description: '', exists: false };
   return { name: translation.name, description: translation.description, exists: true };
 }
 
@@ -95,4 +98,11 @@ export function visibleStatementErrors(
   if (errors.description && draft.description !== saved.description)
     visible.description = errors.description;
   return visible;
+}
+
+/** Which statements a problem has: a slot counts once its description is written ("VI ✓ · EN — · Gốc ✓"). */
+export function writtenSlots(problem: EditableProblem): Record<StatementSlot, boolean> {
+  const isWritten = (slot: StatementSlot) =>
+    statementDraftOf(problem, slot).description.trim() !== '';
+  return { vi: isWritten('vi'), en: isWritten('en'), original: isWritten('original') };
 }

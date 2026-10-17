@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { problemEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
+import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targets';
 import type { ProblemDetail } from '@/api/types/problems';
 import Chip from '@/components/ui/Chip.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -10,7 +11,8 @@ import { problemTypeLabel } from './problem-type-label';
  * The top of the statement card: code, group chip, title and edit link, a hairline, then the tabs in the slot.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
-const props = defineProps<{ problem: ProblemDetail }>();
+/** `section`: the tab being read; the edit link opens its editor tab. */
+const props = defineProps<{ problem: ProblemDetail; section?: ProblemSection }>();
 const session = useSessionStore();
 </script>
 
@@ -31,7 +33,7 @@ const session = useSessionStore();
           {{ problem.name }}
         </h1>
       </div>
-      <AdminEditLink :to="problemEditTarget(session.user, props.problem)" />
+      <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
     </div>
     <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div v-if="$slots.default" class="mt-4"><slot /></div>

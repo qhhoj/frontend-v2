@@ -73,7 +73,7 @@ function panelIdOf(tabId: string) {
       data-testid="statement-card"
       :class="['min-w-0 rounded-panel p-6 sm:p-8', layout.left]"
     >
-      <ProblemHeader :problem="problem">
+      <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <Tabs
           v-if="tabs.length > 1"
           v-model="tab"
