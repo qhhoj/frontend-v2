@@ -6,6 +6,7 @@ import QueryState from '@/components/QueryState.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import { useNavSection } from '@/features/shell/nav-section';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemContent from './ProblemContent.vue';
@@ -25,6 +26,8 @@ const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef
 const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
 /** Two columns only once the rail has its rows; while the contest loads or fails the statement keeps the full width. */
 const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);
+/** A problem solved inside the viewer's contest belongs to "Kỳ thi" in the nav (P-15). */
+useNavSection(() => (contestKey.value ? '/contests' : null));
 
 usePageTitle(() => problem.value?.name);
 
@@ -101,6 +104,7 @@ watch(
           :problem="problem"
           :tabs="tabs"
           :layout="layout"
+          :contest="contest && railEntries ? contest : null"
           @gone="editorialGone = true"
         />
       </QueryState>

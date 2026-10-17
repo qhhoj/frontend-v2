@@ -2,6 +2,7 @@
 import { computed, ref, toRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import Card from '@/components/ui/Card.vue';
 import Tabs from '@/components/ui/Tabs.vue';
@@ -34,6 +35,8 @@ const props = defineProps<{
   problem: ProblemDetail;
   tabs: { id: string; labelKey: string }[];
   layout: (typeof PROBLEM_LAYOUT)[keyof typeof PROBLEM_LAYOUT];
+  /** The viewer's contest holding this problem (its points and the viewer's cell replace the site-wide facts). */
+  contest?: ContestDetail | null;
 }>();
 const tab = defineModel<string>('tab', { required: true });
 defineEmits<{ gone: [] }>();
@@ -122,7 +125,7 @@ function panelIdOf(tabId: string) {
         :form="submitForm"
         :is-signed-in="isSignedIn"
       />
-      <ProblemFactsCard :problem="problem" :is-signed-in="isSignedIn" />
+      <ProblemFactsCard :problem="problem" :is-signed-in="isSignedIn" :contest="contest" />
       <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :points="problem.points" />
       <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" />
     </aside>

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { SwitcherEntry, SwitcherStatus } from './problem-switcher';
 
-/** M5B: the contest's problems beside the statement, while the viewer's participation holds this one. The page decides when it is ready (`useProblemRail`). */
+/**
+ * M5B: the contest's problems beside the statement, while the viewer's participation holds this one. The page decides when
+ * it is ready (`useProblemRail`). Below `lg` the contest bar above already names the contest: the strip is the chips alone.
+ */
 defineProps<{ contestKey: string; contestName: string; entries: SwitcherEntry[] }>();
 const STATUS_CLASSES: Record<SwitcherStatus, string> = {
   solved: 'text-verdict-ac',
@@ -21,7 +24,7 @@ const LINK =
   >
     <RouterLink
       :to="{ name: 'contest', params: { key: contestKey } }"
-      class="flex min-h-11 items-center px-3 font-display text-sm font-semibold hover:text-accent-text"
+      class="hidden min-h-11 items-center px-3 font-display text-sm font-semibold hover:text-accent-text lg:flex"
       >{{ contestName }}</RouterLink
     >
     <ul class="m-0 flex list-none gap-1 overflow-x-auto p-0 lg:flex-col lg:overflow-visible">

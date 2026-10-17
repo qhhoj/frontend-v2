@@ -7,12 +7,10 @@ import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/co
 import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber } from '@/lib/format';
-import { showsCellTime } from '@/lib/ranking-cells';
-import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
 import { limitsText } from './contest-limits';
-import { attemptsLeftUnderCap, solvedSummary } from './own-result';
+import { attemptsLeftUnderCap, ownResultContext, solvedSummary } from './own-result';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
@@ -36,12 +34,7 @@ const problems = computed(() => props.contest.problems ?? []);
 const hasOwnResults = computed(() =>
   problems.value.some((problem) => problem.viewerResult !== null),
 );
-const context = computed<RankingContext>(() => ({
-  formatName: props.contest.formatName,
-  pointsPrecision: props.contest.pointsPrecision,
-  locale: locale.locale,
-  showsTime: showsCellTime(props.contest.formatName, props.contest.formatConfig),
-}));
+const context = computed(() => ownResultContext(props.contest, locale.locale));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
 /** The cap line, with the attempts the viewer has left once they have a result. */

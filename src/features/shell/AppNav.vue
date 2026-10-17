@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { translate } from '@/i18n';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import NavOverflowMenu from './NavOverflowMenu.vue';
+import { navSectionOverride } from './nav-section';
 import { NAV_ITEM_CLASS, scrollToClearFade, splitNavItems } from './nav-overflow';
 
 /**
@@ -20,9 +21,13 @@ const NAV_ITEMS = [
   { path: '/blog', labelKey: 'nav.blog' },
   { path: '/organizations', labelKey: 'nav.organizations' },
 ] as const;
-/** A section stays current on its sub-pages (`/problems/aplusb` is in Problems). */
-const isCurrent = (path: string) =>
-  path === '/' ? route.path === '/' : route.path === path || route.path.startsWith(`${path}/`);
+/** A section stays current on its sub-pages (`/problems/aplusb` is in Problems), unless the page claims another (`useNavSection`). */
+const isCurrent = (path: string) => {
+  if (navSectionOverride.value !== null) return path === navSectionOverride.value;
+  return path === '/'
+    ? route.path === '/'
+    : route.path === path || route.path.startsWith(`${path}/`);
+};
 const itemClass = (path: string) => [
   NAV_ITEM_CLASS,
   isCurrent(path)

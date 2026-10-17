@@ -1,5 +1,6 @@
-import type { ContestProblem, RankingProblem } from '@/api/types/contests';
-import { rankingCell } from '@/lib/ranking-cells';
+import type { ContestDetail, ContestProblem, RankingProblem } from '@/api/types/contests';
+import type { Locale } from '@/i18n';
+import { rankingCell, showsCellTime } from '@/lib/ranking-cells';
 import type { RankingCellView, RankingContext } from '@/lib/ranking-cells';
 
 export type OwnResultView =
@@ -38,4 +39,12 @@ export const attemptsLeftUnderCap = (maxSubmissions: number, attempts: number): 
 export const solvedSummary = (problems: ContestProblem[]) => ({
   solved: problems.filter((problem) => problem.viewerResult?.isSolved).length,
   total: problems.length,
+});
+
+/** How the contest prints the viewer's own cells (the problems table and the problem page's facts card). */
+export const ownResultContext = (contest: ContestDetail, locale: Locale): RankingContext => ({
+  formatName: contest.formatName,
+  pointsPrecision: contest.pointsPrecision,
+  locale,
+  showsTime: showsCellTime(contest.formatName, contest.formatConfig),
 });
