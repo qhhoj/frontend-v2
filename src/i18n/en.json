@@ -993,6 +993,7 @@
     "ratingTier": "Rating · {tier}",
     "ratingChart": "Rating over {count} contest, from {first} to {last} | Rating over {count} contests, from {first} to {last}",
     "solved": "Solved",
+    "solvedUnrated": "Problems solved · no rating yet",
     "points": "Points",
     "rank": "Rank",
     "recentSubmissions": "Recent submissions",
