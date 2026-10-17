@@ -66,6 +66,6 @@ describe('appearance panel', () => {
     expect(root.dataset.accent).toBeUndefined();
     expect(root.dataset.theme).toBe('clay-light');
     expect(buttonNamed('Clay').getAttribute('aria-pressed')).toBe('true');
-    expect(buttonNamed('Tự động').getAttribute('aria-pressed')).toBe('true');
+    expect(buttonNamed('Theo máy').getAttribute('aria-pressed')).toBe('true');
   });
 });

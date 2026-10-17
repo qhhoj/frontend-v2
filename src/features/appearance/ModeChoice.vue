@@ -10,6 +10,8 @@ import SegmentedChoice from './SegmentedChoice.vue';
 type Style = 'clay' | 'glass';
 type Mode = ColorScheme | 'auto';
 
+/** `modeOnly`: light, dark or the device's, without the style (the phone menu; the panel and settings show both). */
+defineProps<{ modeOnly?: boolean }>();
 const theme = useThemeStore();
 const chooseTheme = useThemeChoice();
 
@@ -47,6 +49,7 @@ const preferenceOf = (nextStyle: Style, nextMode: Mode): string => {
   <!-- Mode is the theme preference (siteTheme), not part of the personal look: picking it never turns the look on. -->
   <div class="flex flex-col gap-2">
     <SegmentedChoice
+      v-if="!modeOnly"
       :label="$t('appearance.style')"
       :options="styleOptions"
       :selected="style"
