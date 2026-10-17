@@ -123,8 +123,19 @@ const cellText = (row: Row, key: string) => {
   const value = (row as Record<string, unknown>)[key];
   return typeof value === 'string' || typeof value === 'number' ? String(value) || '—' : '—';
 };
-const alignClass = (column: DataTableColumn) =>
-  column.align === 'end' ? 'text-right font-mono tabular-nums' : 'text-left';
+/**
+ * Numbers and `mono` values stay on one line, so their column is as wide as the value. A text column may break anywhere
+ * (`overflow-wrap: anywhere`, so one long username cannot widen the table past its card), but that also lowers its
+ * min-content width to one letter and the growing column would squeeze it to a letter per line: it keeps 5rem at least
+ * (badges are chips that never break, icon columns are as wide as their icon, the growing one yields on purpose).
+ * `:where()` keeps the floor at zero specificity for a column's own `cellClass`.
+ */
+const alignClass = (column: DataTableColumn) => {
+  if (column.align === 'end') return 'text-right font-mono tabular-nums whitespace-nowrap';
+  if (column.mono) return 'text-left font-mono whitespace-nowrap';
+  const hasFloor = !column.hideLabel && column.priority !== 'badge' && !growsOf(column);
+  return hasFloor ? 'text-left [:where(&)]:min-w-20' : 'text-left';
+};
 /**
  * `max-w-0` + `w-full` is the auto-layout idiom for "all the leftover width, never more": the content wraps or truncates
  * inside it. The column marked `grow` gets it, else the primary one: the name is what yields when the others need room.
@@ -132,10 +143,6 @@ const alignClass = (column: DataTableColumn) =>
 const growsOf = (column: DataTableColumn) =>
   column.grow ?? (!props.columns.some((other) => other.grow) && column === primary.value);
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
-/**
- * A table cell never asks for more than 16rem and lets an unbroken value (a long username, an IPv6 address) wrap, so one
- * long value cannot widen the table past its card; `:where()` keeps the cap at zero specificity for a column's own `cellClass`.
- */
 const CELL_BASE =
   'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
 const CELL = computed(
@@ -336,6 +343,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   :class="[
                     column.stacked ? 'w-full' : 'text-content',
                     column.align === 'end' && 'font-mono tabular-nums whitespace-nowrap',
+                    column.mono && 'font-mono',
                   ]"
                 >
                   <slot :name="`cell-${column.key}`" :row="row">{{

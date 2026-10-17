@@ -25,7 +25,7 @@ const isOpen = computed({
 });
 const columns = computed<AdminColumn[]>(() => [
   { key: 'name', label: t('admin.catalogs.fields.name'), priority: 'primary' },
-  { key: 'key', label: t('admin.catalogs.fields.key'), cellClass: 'font-mono' },
+  { key: 'key', label: t('admin.catalogs.fields.key'), mono: true },
   {
     key: 'link',
     label: t('admin.catalogs.fields.link'),

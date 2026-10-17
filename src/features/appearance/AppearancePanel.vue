@@ -42,6 +42,7 @@ const lowPowerOptions = computed(() =>
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
     :aria-label="$t('appearance.title')"
+    :title="$t('appearance.title')"
     @click="popover?.toggle($event)"
   >
     <Palette class="size-5" aria-hidden="true" />

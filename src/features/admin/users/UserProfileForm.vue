@@ -14,6 +14,7 @@ import { INPUT } from '../ui/controls';
 import { useDirtyForm } from '../ui/form/dirty-form';
 import { needsPermissionText } from '../ui/permission-text';
 import { changedUserFields, STAFF_DISPLAY_RANKS, userEditFormOf } from './user-edit';
+import { displayRankLabel } from './display-rank';
 import { invalidateUserModeration } from './users.queries';
 
 /** The Hồ sơ tab. The drawer footer saves it (`form` id, exposed state); only changed fields are sent. */
@@ -184,9 +185,11 @@ defineExpose({
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
         >
-          <option v-if="user.displayRank === 'banned'" value="banned">banned</option>
+          <option v-if="user.displayRank === 'banned'" value="banned">
+            {{ displayRankLabel('banned') }}
+          </option>
           <option v-for="rank in STAFF_DISPLAY_RANKS" :key="rank" :value="rank">
-            {{ $t(`admin.users.edit.ranks.${rank}`) }}
+            {{ displayRankLabel(rank) }}
           </option>
         </select>
       </AdminField>

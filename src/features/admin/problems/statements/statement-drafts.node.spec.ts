@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { editableProblem } from '@/test/admin-fixtures/problems';
-import { insertImage, isOriginalLocked, previewStyleFor } from './statement-drafts';
+import {
+  checkStatementDraft,
+  initialSlotOf,
+  insertImage,
+  isOriginalLocked,
+  previewStyleFor,
+  visibleStatementErrors,
+} from './statement-drafts';
 
 describe('statement drafts', () => {
   it('asks for problem-full only for a full-markup problem and a viewer allowed to see it', () => {
@@ -17,5 +24,36 @@ describe('statement drafts', () => {
     expect(isOriginalLocked(editableProblem({ isFullMarkup: true }), false)).toBe(true);
     expect(isOriginalLocked(editableProblem({ isFullMarkup: true }), true)).toBe(false);
     expect(isOriginalLocked(editableProblem({ isFullMarkup: false }), false)).toBe(false);
+  });
+
+  it('opens on the Vietnamese translation when there is one, else on the base statement', () => {
+    expect(initialSlotOf(editableProblem())).toBe('vi');
+    const baseOnly = editableProblem();
+    baseOnly.editor!.translations = [{ language: 'en', name: 'Path', description: 'A graph.' }];
+    expect(initialSlotOf(baseOnly)).toBe('original');
+  });
+});
+
+describe('visible statement errors', () => {
+  const missing = { name: '', description: '', exists: false };
+  const errorsOf = (draft: typeof missing) => checkStatementDraft(draft, 'en');
+
+  it('shows nothing for a missing translation that was only opened', () => {
+    expect(errorsOf(missing).name).toBeDefined();
+    expect(visibleStatementErrors(errorsOf(missing), missing, missing, false)).toEqual({});
+  });
+
+  it('shows the empty name once a save was tried', () => {
+    const draft = { ...missing, description: 'A graph.' };
+    expect(Object.keys(visibleStatementErrors(errorsOf(draft), draft, missing, true))).toEqual([
+      'name',
+    ]);
+  });
+
+  it('shows a field’s own error as soon as the field changed, and not the untouched one', () => {
+    const draft = { ...missing, description: 'It’s a graph.' };
+    expect(Object.keys(visibleStatementErrors(errorsOf(draft), draft, missing, false))).toEqual([
+      'description',
+    ]);
   });
 });

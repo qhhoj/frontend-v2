@@ -18,6 +18,7 @@ function requestReset() {
     type="button"
     class="grid size-11 shrink-0 place-items-center rounded-pill border border-line-strong bg-surface-solid hover:bg-surface-hover aria-disabled:cursor-not-allowed aria-disabled:text-muted"
     :aria-label="t('admin.settings.reset.label', { value: defaultText })"
+    :title="t('admin.settings.reset.label', { value: defaultText })"
     :aria-disabled="isAtDefault || undefined"
     @click="requestReset"
   >

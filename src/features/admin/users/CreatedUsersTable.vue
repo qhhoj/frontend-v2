@@ -15,7 +15,7 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'username',
     label: t('admin.users.create.results.username'),
     priority: 'primary',
-    cellClass: 'font-mono',
+    mono: true,
   },
   { key: 'status', label: t('admin.users.create.results.status'), priority: 'badge' },
   { key: 'detail', label: t('admin.users.create.results.detail'), grow: true },

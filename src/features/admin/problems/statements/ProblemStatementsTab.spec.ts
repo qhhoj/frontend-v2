@@ -52,6 +52,26 @@ describe('ProblemStatementsTab', () => {
     expect(invalidatedKeys(queryClient, [['problems', 'detail', 'probe']])).toHaveLength(1);
   });
 
+  it('opens an imported problem (base statement + English) on the base statement with no error until a save is tried', async () => {
+    const imported = editableProblem();
+    imported.editor!.translations = [
+      { language: 'en', name: 'Constrained path', description: 'Given a graph.' },
+    ];
+    const calls = mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes(imported), ...PREVIEW });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    expect(wrapper.get('[data-slot="original"]').attributes('aria-checked')).toBe('true');
+    expect(wrapper.find('[aria-invalid="true"]').exists()).toBe(false);
+    await wrapper.get('[data-slot="vi"]').trigger('click');
+    expect(wrapper.text()).not.toContain('Tên từ 1 đến 100 ký tự.');
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    await wrapper.get('#statement-name').setValue('');
+    expect(wrapper.get('#statement-name').attributes('aria-invalid')).toBe('true');
+    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').trigger('click');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Tên từ 1 đến 100 ký tự.');
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
+  });
+
   it('never asks for problem-full without judge.problem_full_markup', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const calls = mockApi({

@@ -29,6 +29,12 @@ export function statementDraftOf(problem: EditableProblem, slot: StatementSlot):
   return { name: translation.name, description: translation.description, exists: true };
 }
 
+/** The slot the tab opens on: the Vietnamese translation when there is one, else the base statement (never an empty "chưa có"). */
+export const initialSlotOf = (problem: EditableProblem): StatementSlot =>
+  problem.editor!.translations.some((translation) => translation.language === 'vi')
+    ? 'vi'
+    : 'original';
+
 /** `problem-full` only for a full-markup problem and a viewer allowed to see it; the backend refuses it otherwise. */
 export const previewStyleFor = (problem: EditableProblem, canFullMarkup: boolean): PreviewStyle =>
   problem.isFullMarkup && canFullMarkup ? 'problem-full' : 'problem';
@@ -71,4 +77,22 @@ export function checkStatementDraft(draft: StatementDraft, slot: StatementSlot):
   const descriptionError = markdownError(draft.description);
   if (descriptionError) errors.description = descriptionError;
   return errors;
+}
+
+/**
+ * The errors on screen: a field's own once its text differs from the saved one, every field's once a save of the slot was
+ * tried. An opened but untouched slot (a missing translation's empty name) shows none.
+ */
+export function visibleStatementErrors(
+  errors: FieldErrors,
+  draft: StatementDraft,
+  saved: StatementDraft,
+  isSaveTried: boolean,
+): FieldErrors {
+  if (isSaveTried) return errors;
+  const visible: FieldErrors = {};
+  if (errors.name && draft.name !== saved.name) visible.name = errors.name;
+  if (errors.description && draft.description !== saved.description)
+    visible.description = errors.description;
+  return visible;
 }

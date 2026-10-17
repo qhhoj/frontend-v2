@@ -8,10 +8,12 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import {
   checkStatementDraft,
+  initialSlotOf,
   isOriginalLocked,
   previewStyleFor,
   STATEMENT_SLOTS,
   statementDraftOf,
+  visibleStatementErrors,
 } from './statement-drafts';
 import type { StatementDraft, StatementSlot } from './statement-drafts';
 
@@ -52,7 +54,7 @@ function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementS
 /** The statements tab: one draft per slot for the page's life, saved one slot at a time, with the last saved text as the baseline. */
 export function useStatementDrafts(problem: () => EditableProblem) {
   const { can } = usePermissions();
-  const slot = ref<StatementSlot>('vi');
+  const slot = ref<StatementSlot>(initialSlotOf(problem()));
   const drafts = ref<Drafts>(seedDrafts(problem()));
   const saved = ref<Drafts>(seedDrafts(problem()));
   const current = computed(() => drafts.value[slot.value]);
@@ -64,6 +66,16 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   );
   const previewStyle = computed(() => previewStyleFor(problem(), canFullMarkup.value));
   const errors = computed(() => checkStatementDraft(current.value, slot.value));
+  /** Slots whose save was tried since their last save or discard: their errors all show. */
+  const triedSlots = ref(new Set<StatementSlot>());
+  const visibleErrors = computed(() =>
+    visibleStatementErrors(
+      errors.value,
+      current.value,
+      saved.value[slot.value],
+      triedSlots.value.has(slot.value),
+    ),
+  );
   /** The save bar counts the slot on screen (one slot saves at a time); the leave guard counts every slot. */
   const dirtyCount = computed(() => changedFields(current.value, saved.value[slot.value]));
   const totalDirtyCount = computed(() =>
@@ -82,10 +94,14 @@ export function useStatementDrafts(problem: () => EditableProblem) {
         slot: translate(`admin.problems.statements.slots.${target}`),
       }),
     onSuccess: () => (savedAt.value = new Date()),
-    onDone: (_saved: unknown, target: StatementSlot) => recordSaved(drafts, saved, target),
+    onDone: (_saved: unknown, target: StatementSlot) => {
+      recordSaved(drafts, saved, target);
+      triedSlots.value.delete(target);
+    },
   });
 
   async function save() {
+    triedSlots.value.add(slot.value);
     if (isLocked.value || Object.keys(errors.value).length > 0) return;
     if (dirtyCount.value === 0) return;
     await saveMutation.run(slot.value);
@@ -94,6 +110,7 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   /** Puts the slot on screen back to its last saved text. */
   function discard() {
     drafts.value[slot.value] = { ...saved.value[slot.value] };
+    triedSlots.value.delete(slot.value);
   }
 
   return {
@@ -106,7 +123,7 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     savedAt,
     previewStyle,
     canFullMarkup,
-    errors,
+    errors: visibleErrors,
     save,
     discard,
     saveMutation,

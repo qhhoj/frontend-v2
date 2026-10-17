@@ -11,6 +11,7 @@ import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
+import { memberRoleLabel } from './display-rank';
 import UserStatusChips from './UserStatusChips.vue';
 import { userStatusOf } from './users-list';
 import type { UserLock } from './users-list';
@@ -27,8 +28,7 @@ const props = defineProps<{
 }>();
 const sort = defineModel<string | undefined>('sort');
 const emit = defineEmits<{ open: [username: string]; retry: [] }>();
-const i18n = useI18n();
-const { t } = i18n;
+const { t } = useI18n();
 const locale = useLocaleStore();
 const now = Date.now();
 
@@ -45,10 +45,6 @@ const columns = computed<AdminColumn[]>(() => [
     sort: { asc: 'lastAccess', desc: '-lastAccess', first: 'desc' },
   },
 ]);
-const rankText = (user: StaffUser) => {
-  const key = `admin.users.ranks.${user.displayRank}`;
-  return i18n.te(key) ? t(key) : user.displayRank;
-};
 </script>
 
 <template>
@@ -85,7 +81,7 @@ const rankText = (user: StaffUser) => {
       <AdminChip v-else-if="row.isStaff" tone="info">
         {{ $t('admin.users.list.status.staff') }}
       </AdminChip>
-      <span v-else class="text-muted">{{ rankText(row) }}</span>
+      <span v-else class="text-muted">{{ memberRoleLabel(row.displayRank) }}</span>
     </template>
     <template #cell-status="{ row }"><UserStatusChips :status="userStatusOf(row)" /></template>
     <template #cell-banReason="{ row }">

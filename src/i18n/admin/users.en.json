@@ -96,8 +96,10 @@
   "ranks": {
     "user": "Member",
     "setter": "Problem setter",
+    "daor": "Bedao team",
     "staff": "Staff",
     "admin": "Administrator",
+    "teacher": "Teacher",
     "banned": "Banned"
   },
   "edit": {
@@ -143,14 +145,6 @@
       "noEmail": "The account has no e-mail address.",
       "send": "Send reset link",
       "sent": "Reset link sent to {email}."
-    },
-    "ranks": {
-      "user": "User",
-      "setter": "Problem setter",
-      "daor": "Bedao team",
-      "staff": "Staff",
-      "admin": "Admin",
-      "teacher": "Teacher"
     },
     "account": {
       "active": "The account is active.",

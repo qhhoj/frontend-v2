@@ -96,8 +96,10 @@
   "ranks": {
     "user": "Thành viên",
     "setter": "Người ra đề",
-    "staff": "Nhân viên",
+    "daor": "Đội Bedao",
+    "staff": "Nhân sự",
     "admin": "Quản trị viên",
+    "teacher": "Giáo viên",
     "banned": "Bị cấm"
   },
   "edit": {
@@ -143,14 +145,6 @@
       "noEmail": "Tài khoản không có địa chỉ email.",
       "send": "Gửi liên kết đặt lại mật khẩu",
       "sent": "Đã gửi liên kết đặt lại tới {email}."
-    },
-    "ranks": {
-      "user": "Người dùng",
-      "setter": "Người ra đề",
-      "daor": "Đội Bedao",
-      "staff": "Nhân sự",
-      "admin": "Quản trị",
-      "teacher": "Giáo viên"
     },
     "account": {
       "active": "Tài khoản đang hoạt động.",

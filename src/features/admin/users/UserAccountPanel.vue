@@ -4,6 +4,7 @@ import type { UserPage } from '@/api/types/users';
 import type { UserEdit } from '@/api/types/users-admin';
 import CopyButton from '@/components/CopyButton.vue';
 import { BUTTON } from '../ui/controls';
+import { displayRankLabel } from './display-rank';
 import ImpersonateDialog from './ImpersonateDialog.vue';
 import UserActivationRow from './UserActivationRow.vue';
 import UserDangerRow from './UserDangerRow.vue';
@@ -38,7 +39,7 @@ const isImpersonateOpen = ref(false);
       </div>
       <div>
         <dt class="text-muted">{{ $t('admin.users.card.facts.rank') }}</dt>
-        <dd class="font-semibold">{{ page.displayRank }}</dd>
+        <dd class="font-semibold">{{ displayRankLabel(page.displayRank) }}</dd>
       </div>
       <div>
         <dt class="text-muted">{{ $t('admin.users.card.facts.rating') }}</dt>
