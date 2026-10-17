@@ -113,7 +113,9 @@
       "notFoundTitle": "Contest not found",
       "notFoundBody": "This contest does not exist or is hidden from you.",
       "backToList": "Back to contests",
-      "aside": "Contest details"
+      "aside": "Contest details",
+      "ratingChange": "Your rating {change}",
+      "firstRating": "First rating: {rating}"
     },
     "problems": {
       "caption": "Contest problems",
@@ -1251,7 +1253,8 @@
       "solved": "Solved",
       "penalty": "Penalty",
       "score": "Score",
-      "scoreTime": "Score · time"
+      "scoreTime": "Score · time",
+      "ratingChange": "Δ rating"
     },
     "legend": {
       "firstSolve": "first solve",
