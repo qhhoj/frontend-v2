@@ -57,7 +57,7 @@ const action = computed(() => {
         $t('contests.list.empty.upcomingHint')
       }}</span>
       <span v-if="isTagEmpty" class="block">{{ $t('contestTags.emptyHint') }}</span>
-      <AppButton v-if="action" tone="primary" :to="action.to" class="mt-3">{{
+      <AppButton v-if="action" tone="secondary" :to="action.to" class="mt-3">{{
         $t(action.labelKey)
       }}</AppButton>
     </EmptyState>

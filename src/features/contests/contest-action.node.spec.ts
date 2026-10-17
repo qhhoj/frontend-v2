@@ -167,7 +167,7 @@ describe('listCallToAction', () => {
       null,
       false,
     ],
-    ['a visitor on an ended contest', contestItem(ended), 'contests.list.virtual', null, false],
+    ['a visitor on an ended contest', contestItem(ended), 'contests.list.view', null, false],
     [
       'a visitor on an ended contest without virtual runs',
       contestItem({ ...ended, disallowVirtual: true }),
@@ -210,14 +210,14 @@ describe('listCallToAction', () => {
     [
       'an ended contest',
       contestItem({ ...ended, viewer: signedIn }),
-      'contests.list.virtual',
+      'contests.list.view',
       null,
       false,
     ],
     [
       'a running row whose end has passed reads as ended',
       contestItem({ endTime: '2026-10-08T08:30:00Z' }),
-      'contests.list.virtual',
+      'contests.list.view',
       null,
       false,
     ],

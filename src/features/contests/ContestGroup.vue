@@ -41,13 +41,16 @@ const isSingleGroup = computed(() => props.filters.phase === props.phase);
 const isFiltered = computed(() =>
   Boolean(props.filters.search.trim() || props.filters.isRatedOnly || props.filters.tag),
 );
-const now = useNow(15_000);
+/** A running contest's card counts the seconds: the group follows it to the second, so a card never sits at 00:00:00. */
+const now = useNow(props.phase === 'running' ? 1000 : 15_000);
 /** A running contest leaves the list the moment its end passes, before the server answers. */
 const shownContests = computed(() =>
   contests.value.filter(
     (contest) => props.phase !== 'running' || phaseAt(contest, now.value) === 'running',
   ),
 );
+/** One running contest spans the column; two columns only from two on (P-26). */
+const isSoleRunning = computed(() => shownContests.value.length === 1);
 const hasRunEnded = computed(() => shownContests.value.length < contests.value.length);
 /** Then the server is asked once for the list without it. */
 watch(hasRunEnded, (isNowEnded) => {
@@ -122,11 +125,15 @@ const clearTagTarget = computed(() => ({
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
       />
-      <div v-else-if="phase === 'running'" class="grid gap-4 lg:grid-cols-2">
+      <div
+        v-else-if="phase === 'running'"
+        :class="['grid gap-4', !isSoleRunning && 'lg:grid-cols-2']"
+      >
         <RunningContestCard
           v-for="contest in shownContests"
           :key="contest.key"
           :contest="contest"
+          :wide="isSoleRunning"
         />
       </div>
       <Card v-else-if="phase === 'upcoming'" as="div">
