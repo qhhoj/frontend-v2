@@ -92,7 +92,9 @@
       "submissions": "Bài nộp",
       "stats": "Thống kê",
       "ranking": "Bảng xếp hạng",
-      "replay": "Phát lại"
+      "replay": "Phát lại",
+      "manage": "Quản lý",
+      "manageContest": "Quản lý kỳ thi"
     },
     "submissions": {
       "statusTitle": "Trạng thái chấm",
@@ -151,7 +153,19 @@
       "empty": "Chưa có thông báo.",
       "emptyPage": "Chưa có thông báo nào.",
       "paused": "Cập nhật trực tiếp tạm dừng.",
-      "reconnect": "Kết nối lại"
+      "reconnect": "Kết nối lại",
+      "compose": {
+        "title": "Thông báo mới",
+        "onlyOrganisers": "Chỉ ban tổ chức thấy khung này",
+        "titleLabel": "Tiêu đề",
+        "titlePlaceholder": "vd. Bài C: sửa giới hạn",
+        "bodyLabel": "Nội dung",
+        "bodyHint": "Markdown.",
+        "recipients": "Gửi tới {count} thí sinh",
+        "notPushed": "Chưa bật gửi trực tiếp: thí sinh chỉ thấy ở tab này.",
+        "post": "Đăng thông báo",
+        "posted": "Đã đăng thông báo."
+      }
     },
     "rules": {
       "intro": "Giới thiệu",

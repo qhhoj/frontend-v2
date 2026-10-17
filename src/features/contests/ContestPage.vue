@@ -2,7 +2,8 @@
 import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
+import { Settings } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
 import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import QueryState from '@/components/QueryState.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
@@ -45,6 +46,9 @@ const run = computed(() =>
 const isUnderway = computed(
   () => contest.value?.phase === 'running' || (run.value?.virtual ?? 0) > 0,
 );
+const manageTarget = computed(
+  () => contest.value && contestEditTarget(session.user, contest.value),
+);
 /** A contest that does not exist (or is hidden) is a dead end, not a failure to retry: the crying Bit says so. */
 const isMissing = computed(() => error.value instanceof ApiError && error.value.status === 404);
 
@@ -73,12 +77,15 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
         <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
           <template #actions>
             <ContestActions :contest="contest" :current="current" />
-            <div class="flex items-start gap-2">
+            <div class="flex items-center gap-2">
+              <AppButton v-if="manageTarget" :to="manageTarget" size="sm">
+                <template #icon><Settings aria-hidden="true" class="size-4" /></template>
+                {{ $t('contests.tabs.manageContest') }}
+              </AppButton>
               <ShortLinkButton
-                class="flex-1"
+                compact
                 :path="shortLinkPath({ kind: 'contest', key: contest.key })"
               />
-              <AdminEditLink class="mt-1.5" :to="contestEditTarget(session.user, contest)" />
             </div>
           </template>
         </ContestHeaderCard>
