@@ -1,4 +1,9 @@
 {
+  "row": {
+    "view": "Xem trang công khai",
+    "clone": "Nhân bản…",
+    "remove": "Xoá…"
+  },
   "save": "Lưu thay đổi",
   "saved": "Đã lưu.",
   "needsPermission": "Cần quyền {permission}",

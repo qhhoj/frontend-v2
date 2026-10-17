@@ -76,7 +76,8 @@
     "confirmTitle": "Delete contest {key}?",
     "confirmBody": "Everything that belongs to this contest is deleted. This cannot be undone.",
     "keyLabel": "Type {key} to confirm",
-    "confirm": "Delete"
+    "confirm": "Delete",
+    "done": "Deleted contest {key}."
   },
   "participants": {
     "add": "Add participation",

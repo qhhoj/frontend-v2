@@ -81,11 +81,8 @@
       "rated": "Có rating",
       "pending": "{count} chờ chấm"
     },
-    "edit": "Sửa",
-    "editLabel": "Sửa {name}",
     "more": "Thao tác khác với {name}",
     "ranking": "Bảng xếp hạng",
-    "view": "Xem kỳ thi",
     "rate": "Tính rating",
     "pager": "Trang danh sách kỳ thi",
     "bulk": {
@@ -466,9 +463,10 @@
       "button": "Nhân bản",
       "confirmTitle": "Nhân bản kỳ thi",
       "keyLabel": "Khóa kỳ thi mới",
+      "startLabel": "Bắt đầu",
+      "endLine": "Kết thúc {time}, cùng độ dài với kỳ thi gốc.",
       "confirm": "Nhân bản",
-      "done": "Đã tạo {key}.",
-      "open": "Mở kỳ thi vừa tạo"
+      "done": "Đã tạo {key}."
     },
     "queuedToast": "Đã xếp hàng: {action}.",
     "groups": {

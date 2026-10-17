@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { formatLabel } from '@/lib/contest-format';
-import { ExternalLink, Users } from 'lucide-vue-next';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { Copy, ExternalLink, Trash2, Users } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
@@ -18,6 +19,9 @@ import { useEditableContestQuery } from './contest-editing.queries';
 import { CONTEST_TABS, contestTabComponent, contestTabCount, contestTabOf } from './contest-tabs';
 import ContestPhaseChip from './list/ContestPhaseChip.vue';
 import ContestWindowText from './list/ContestWindowText.vue';
+import ContestCloneDialog from './lifecycle/ContestCloneDialog.vue';
+import ContestDeleteDialog from './lifecycle/ContestDeleteDialog.vue';
+import { deleteBlockedBy } from './lifecycle/contest-delete';
 
 /** One contest's editor: a header with its phase, format, window and size, sticky section tabs, then the open tab. */
 const route = useRoute();
@@ -41,6 +45,23 @@ const tabs = computed(() => {
   }));
 });
 const LIST = { name: 'admin-contests' } as const;
+
+/** The header's "⋯ Thêm": Nhân bản… and Xoá…, the same dialogs as the list's row menu and the Actions tab. */
+const router = useRouter();
+const { can } = usePermissions();
+const isCloneOpen = ref(false);
+const isDeleteOpen = ref(false);
+const deleteBlock = computed(() => deleteBlockedBy(contest.value?.settings?.isVisible ?? true));
+function openClone(close: () => void) {
+  close();
+  isCloneOpen.value = true;
+}
+function openDelete(close: () => void) {
+  close();
+  isDeleteOpen.value = true;
+}
+const MENU_ITEM =
+  'flex min-h-(--qa-control) w-full items-center gap-2 rounded-cell px-3 text-left text-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60';
 </script>
 
 <template>
@@ -88,6 +109,31 @@ const LIST = { name: 'admin-contests' } as const;
             {{ $t('admin.contests.view') }}
           </RouterLink>
         </template>
+        <template v-if="isEditable" #overflow="{ close }">
+          <button
+            v-if="can('judge.clone_contest')"
+            type="button"
+            :class="MENU_ITEM"
+            @click="openClone(close)"
+          >
+            <Copy aria-hidden="true" class="size-4 text-muted" :stroke-width="1.75" />
+            {{ $t('admin.ui.row.clone') }}
+          </button>
+          <button
+            type="button"
+            :class="[MENU_ITEM, 'text-negative']"
+            :disabled="Boolean(deleteBlock)"
+            :title="deleteBlock"
+            data-testid="contest-header-delete"
+            @click="openDelete(close)"
+          >
+            <Trash2 aria-hidden="true" class="size-4" :stroke-width="1.75" />
+            <span class="flex flex-col">
+              {{ $t('admin.ui.row.remove') }}
+              <span v-if="deleteBlock" class="text-xs text-muted">{{ deleteBlock }}</span>
+            </span>
+          </button>
+        </template>
       </AdminPageHeader>
       <div v-if="!isEditable" :class="[CARD, 'flex flex-wrap items-center gap-3 p-5']">
         <AdminBit placement="forbidden" />
@@ -96,6 +142,12 @@ const LIST = { name: 'admin-contests' } as const;
       <template v-else>
         <AdminTabs :tabs="tabs" :label="$t('admin.contests.tabsLabel')" sticky />
         <component :is="tabComponent" v-if="tabComponent" :contest="contest" />
+        <ContestCloneDialog v-model:visible="isCloneOpen" :source="contest" />
+        <ContestDeleteDialog
+          v-model:visible="isDeleteOpen"
+          :contest-key="contest.key"
+          @deleted="router.push(LIST)"
+        />
       </template>
     </div>
   </QueryState>

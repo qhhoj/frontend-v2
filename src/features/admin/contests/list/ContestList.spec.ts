@@ -22,6 +22,16 @@ const mountIndex = async (path = '/admin/contests') => {
   return mounted;
 };
 
+/** The labels of a row's "⋯" menu, opened, with whether each is disabled. */
+async function rowMenu(wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], name: string) {
+  await wrapper.get(`button[aria-label="Thao tác khác với ${name}"]`).trigger('click');
+  await flushPromises();
+  return [...document.body.querySelectorAll('[role="menuitem"]')].map((item) => ({
+    text: item.textContent.replace(/\s+/g, ' ').trim(),
+    disabled: item.getAttribute('aria-disabled') === 'true',
+  }));
+}
+
 describe('ContestList', () => {
   it('switches the phase through the address and drops it for "Tất cả"', async () => {
     const calls = mockApi({
@@ -77,5 +87,29 @@ describe('ContestList', () => {
     await wrapper.get('button[aria-label="Bỏ lọc Thẻ: cup"]').trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.query).toEqual({ rated: 'yes', scope: 'mine' });
+  });
+  it('keeps one row contract: the title edits, "⋯" lists view, clone, ranking, delete, and a visible contest cannot be deleted', async () => {
+    const shown = adminContestItem({
+      editor: { isVisible: true, lockedAfter: null, pendingCount: null },
+    });
+    mockApi({
+      ...staffViewer([...PERMS, 'judge.clone_contest']),
+      ...NO_TAGS,
+      'GET /contests': page([shown]),
+    });
+    const { wrapper } = await mountIndex();
+    const row = wrapper.get('tbody tr');
+    expect(row.findAll('a').map((link) => link.attributes('href'))).toEqual([
+      '/admin/contests/hcmus-2026-r1/general',
+    ]);
+    const items = await rowMenu(wrapper, shown.name);
+    expect(items.map((item) => item.text)).toEqual([
+      'Xem trang công khai',
+      'Nhân bản…',
+      'Bảng xếp hạng',
+      expect.stringContaining('Xoá…'),
+    ]);
+    expect(items.at(-1)).toMatchObject({ disabled: true });
+    expect(items.at(-1)!.text).toContain('Hãy ẩn kỳ thi');
   });
 });

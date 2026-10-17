@@ -115,9 +115,13 @@ function askDelete(code: string) {
   isDeleteOpen.value = true;
 }
 
+/** The index lists only the problems the account may edit: an author without edit_all_problem is told so. */
+const countKey = computed(() =>
+  can('judge.edit_all_problem') ? 'admin.problemList.count' : 'admin.problemList.countOwn',
+);
 const resultText = computed(() =>
   data.value
-    ? t('admin.problemList.count', { total: formatNumber(data.value.meta.total, locale.locale) })
+    ? t(countKey.value, { total: formatNumber(data.value.meta.total, locale.locale) })
     : undefined,
 );
 </script>

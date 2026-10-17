@@ -192,7 +192,10 @@ describe('rating by format and freeze window', () => {
   it('marks the public contest pages and the admin index stale after a clone', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
-      ...routes({ 'POST /contests/hcmus-w41/clone': ok(editableContest({ key: 'w42' })) }),
+      ...routes({
+        'POST /contests/hcmus-w41/clone': ok(editableContest({ key: 'w42' })),
+        'GET /contests/w42': ok(editableContest({ key: 'w42' })),
+      }),
     });
     const { wrapper, queryClient } = await mountAndWaitFor(
       '/admin/contests/hcmus-w41/actions',
@@ -208,6 +211,30 @@ describe('rating by format and freeze window', () => {
     document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
     await confirmDialog('Nhân bản');
     expect(invalidatedKeys(queryClient, keys)).toEqual(keys);
+  });
+
+  it('clones a week later by default, says when the copy ends, and opens the copy', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
+      ...routes({
+        'POST /contests/hcmus-w41/clone': ok(editableContest({ key: 'w42' })),
+        'GET /contests/w42': ok(editableContest({ key: 'w42' })),
+      }),
+    });
+    const { wrapper, router } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/actions',
+      TAB_TEXT,
+    );
+    await click(wrapper, 'Nhân bản');
+    expect(openDialog().textContent).toContain('Kết thúc 15/10/2026 17:00');
+    (document.body.querySelector('#clone-key') as HTMLInputElement).value = 'w42';
+    document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
+    await confirmDialog('Nhân bản');
+    expect(calls.find((call) => call.method === 'POST')!.body).toEqual({
+      key: 'w42',
+      startTime: '2026-10-15T06:00:00.000Z',
+    });
+    expect(router.currentRoute.value.fullPath).toBe('/admin/contests/w42/general');
   });
 });
 

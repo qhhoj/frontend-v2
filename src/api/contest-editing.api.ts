@@ -14,8 +14,12 @@ export const createOrganizationContest = (slug: string, body: ContestBody) =>
   apiSend('post', '/organizations/{slug}/contests', { path: { slug }, body });
 export const updateContest = (key: string, patch: ContestPatch) =>
   apiSend('patch', '/contests/{key}', { path: { key }, body: patch });
-export const cloneContest = (key: string, newKey: string) =>
-  apiSend('post', '/contests/{key}/clone', { path: { key }, body: { key: newKey } });
+/** A copy under `newKey`; with `startTime` its window (and registration) moves by the same shift. */
+export const cloneContest = (key: string, newKey: string, startTime?: string) =>
+  apiSend('post', '/contests/{key}/clone', {
+    path: { key },
+    body: { key: newKey, ...(startTime && { startTime }) },
+  });
 
 export const ANNOUNCEMENTS_PAGE_SIZE = 20;
 export const fetchAnnouncements = (key: string, page: number) =>

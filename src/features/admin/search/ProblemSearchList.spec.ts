@@ -83,4 +83,30 @@ describe('ProblemSearchList', () => {
     expect(problemCalls(calls).at(-1)!.query.get('q')).toBe('cây');
     expect(problemCalls(calls).at(-1)!.query.has('search')).toBe(false);
   });
+  it('keeps one row contract: the title edits, "⋯" lists view, clone and delete, and points read as a number', async () => {
+    mockApi({
+      ...staffViewer([...PERMS, 'judge.clone_problem', 'judge.delete_problem']),
+      ...META,
+      'GET /problems': page([adminProblemItem({ points: 800, partial: true })]),
+    });
+    const { wrapper } = await mountIndex();
+    const row = wrapper.get('tr[data-code="hcmus41c"]');
+    expect(row.findAll('a').map((link) => link.attributes('href'))).toEqual([
+      '/admin/problems/hcmus41c/general',
+    ]);
+    expect(row.text()).toContain('từng phần');
+    expect(row.text()).toContain('800');
+    expect(row.text()).not.toContain('800p');
+    await row.get('button[aria-label="Thao tác khác cho hcmus41c"]').trigger('click');
+    await flushPromises();
+    const items = [...document.body.querySelectorAll('[role="menuitem"]')];
+    expect(items.map((item) => item.textContent.trim())).toEqual([
+      'Xem trang công khai',
+      'Nhân bản…',
+      'Xoá…',
+    ]);
+    (items[1]!.querySelector('a') as HTMLElement).click();
+    await flushPromises();
+    expect(document.body.querySelector('[role="dialog"]')?.textContent).toContain('hcmus41c');
+  });
 });

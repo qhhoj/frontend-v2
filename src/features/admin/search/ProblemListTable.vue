@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { Building2, Database, ExternalLink, Globe, Lock, Pencil, Trash2 } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { Building2, Globe, Lock } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
-import { formatDate, formatProblemPoints } from '@/lib/format';
+import { formatDate, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { iconButtonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
-import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
+import { standardRowMenu } from '../ui/table/standard-row-menu';
+import ProblemCloneDialog from '../problems/general/ProblemCloneDialog.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
 import HighlightedText from './HighlightedText.vue';
 
 /**
  * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
- * headers bound to `?sort=`, a pencil to the editor and a "⋯" menu per row. `toolbar` and `bulk` pass through.
+ * headers bound to `?sort=`; the title opens the editor and "⋯" holds Xem · Nhân bản… · Xoá… (the admin row contract).
+ * Points read as a plain number, with a "từng phần" chip when partial. `toolbar` and `bulk` pass through.
  */
 defineProps<{
   items: ProblemListItem[];
@@ -60,28 +61,18 @@ const columns = computed<AdminColumn[]>(() => [
   },
 ]);
 const editorOf = (code: string) => ({ name: 'admin-problemGeneral', params: { code } });
-const menuItems = (code: string): RowMenuItem[] => [
-  {
-    label: t('admin.problemList.menu.view'),
-    icon: ExternalLink,
-    to: { name: 'problem', params: { code } },
-  },
-  {
-    label: t('admin.problemList.menu.data'),
-    icon: Database,
-    to: { name: 'admin-problemData', params: { code } },
-  },
-  ...(can('judge.delete_problem')
-    ? [
-        {
-          label: t('admin.problemList.menu.delete'),
-          icon: Trash2,
-          danger: true,
-          run: () => emit('delete', code),
-        },
-      ]
-    : []),
-];
+const cloning = ref('');
+const isCloneOpen = ref(false);
+function askClone(code: string) {
+  cloning.value = code;
+  isCloneOpen.value = true;
+}
+const menuItems = (code: string) =>
+  standardRowMenu({
+    view: { name: 'problem', params: { code } },
+    clone: can('judge.clone_problem') ? () => askClone(code) : undefined,
+    remove: can('judge.delete_problem') ? { run: () => emit('delete', code) } : undefined,
+  });
 </script>
 
 <template>
@@ -143,24 +134,22 @@ const menuItems = (code: string): RowMenuItem[] => [
       </span>
     </template>
     <template #cell-points="{ row }">
-      {{ formatProblemPoints(row.points, row.partial, locale.locale) }}
+      <span class="inline-flex items-center gap-1.5">
+        <AdminChip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
+          {{ $t('admin.problemList.partial') }}
+        </AdminChip>
+        <span class="tabular-nums">{{ formatNumber(row.points, locale.locale) }}</span>
+      </span>
     </template>
     <template #cell-date="{ row }">
       {{ row.date ? formatDate(row.date, locale.locale) : '—' }}
     </template>
     <template #actions="{ row }">
-      <RouterLink
-        :to="editorOf(row.code)"
-        :class="iconButtonClass('ghost', 'sm')"
-        :aria-label="$t('admin.problemList.edit', { code: row.code })"
-        :title="$t('admin.problemList.edit', { code: row.code })"
-      >
-        <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-      </RouterLink>
       <AdminRowMenu
         :label="$t('admin.problemList.menu.label', { code: row.code })"
         :items="menuItems(row.code)"
       />
     </template>
   </AdminDataTable>
+  <ProblemCloneDialog v-model:visible="isCloneOpen" :code="cloning" />
 </template>
