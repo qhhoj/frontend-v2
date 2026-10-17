@@ -227,19 +227,26 @@
       "phase": "Trạng thái",
       "participants": "Thí sinh",
       "virtual": "thêm {count} lượt thi ảo",
-      "problems": "Bài"
+      "problems": "Bài",
+      "visibility": {
+        "label": "Hiển thị",
+        "offState": "Ẩn — thí sinh chưa thấy",
+        "onState": "Đang hiện — thí sinh thấy kỳ thi",
+        "shown": "Đã hiện kỳ thi {key}.",
+        "hidden": "Đã ẩn kỳ thi {key}."
+      }
     },
     "basic": {
       "sections": {
         "info": "Kỳ thi",
         "time": "Thời gian",
         "format": "Cách tính điểm",
-        "access": "Ai thấy"
+        "access": "Bảng xếp hạng"
       },
       "leads": {
         "info": "Khóa dùng trong địa chỉ trang kỳ thi.",
         "time": "Giờ Việt Nam (UTC+7).",
-        "access": "Ai thấy kỳ thi và bảng xếp hạng."
+        "access": "Ai xem được bảng xếp hạng. Hiện hoặc ẩn kỳ thi bằng ô Hiển thị trong phần tóm tắt."
       },
       "quickLegend": "Kéo dài",
       "quick": "+{n} phút",
@@ -268,10 +275,10 @@
   "create": {
     "title": "Tạo kỳ thi",
     "submit": "Tạo kỳ thi",
-    "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau.",
+    "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau. Sau khi tạo: thêm bài.",
     "required": "Trường có dấu * là bắt buộc.",
     "cancel": "Huỷ",
-    "done": "Đã tạo kỳ thi {key}."
+    "done": "Đã tạo kỳ thi {key}. Tiếp theo: thêm bài."
   },
   "problems": {
     "columns": {
@@ -285,12 +292,15 @@
       "order": "Thứ tự"
     },
     "addLabel": "Thêm bài",
-    "addPlaceholder": "Mã hoặc tên bài…",
+    "addPlaceholder": "Thêm bài: gõ mã hoặc tên, Enter để thêm đúng mã",
     "full": "Tối đa 100 bài.",
     "notFound": "Không có bài {code}.",
     "alreadyListed": "Bài {code} đã có trong kỳ thi.",
     "orderLine": "Thứ tự trong bảng là thứ tự trong kỳ thi (tối đa 100 bài). Gõ vị trí mới hoặc dùng nút lên, xuống để đổi.",
     "prefixLine": "Cắt output: để trống là dùng mặc định của máy chấm.",
+    "limitsLine": "Cắt output và số lần nộp tối đa chưa đặt cho bài nào.",
+    "showLimits": "Hiện hai cột này",
+    "hideLimits": "Ẩn hai cột này",
     "rescoreWarning": "Đổi điểm hoặc cách tính khi kỳ thi đã có bài nộp không tự tính lại.",
     "rescoreLink": "Dùng Tính lại điểm ở tab Thao tác.",
     "save": "Lưu bài trong kỳ thi",
@@ -320,8 +330,10 @@
     "positionFor": "Vị trí của {code}",
     "saved": "Đã lưu danh sách bài.",
     "tableLabel": "Các bài trong kỳ thi",
-    "empty": "Chưa có bài nào. Thêm bài ở bên cạnh.",
-    "tools": "Thêm và chấm lại bài"
+    "empty": "Chưa có bài nào. Thêm bài ở ô phía trên.",
+    "tools": "Thêm bài",
+    "rejudgeLine": "Chấm lại hoặc tính lại điểm một bài:",
+    "rejudgeLink": "tab Thao tác."
   },
   "announcements": {
     "composeTitle": "Đăng thông báo",
@@ -476,6 +488,7 @@
     },
     "penalty": "{hours} giờ {minutes} phút",
     "countLine": "{total} lượt tham gia · 50 mỗi trang",
+    "countSplit": "{total} lượt tham gia: {live} thí sinh, {virtual} lượt thi ảo · 50 mỗi trang",
     "userLabel": "Tìm theo tên đăng nhập",
     "columns": {
       "user": "Người dùng",

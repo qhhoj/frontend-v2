@@ -6,7 +6,8 @@
     "fixed": "Cố định",
     "site": "Không thuộc tổ chức",
     "privateHint": "Chỉ thành viên tổ chức thấy, cho đến khi bạn công khai.",
-    "siteHint": "Bài của trang, ẩn cho đến khi bạn công khai."
+    "siteHint": "Bài của trang, ẩn cho đến khi bạn công khai.",
+    "chooseHint": "Chọn tổ chức nếu chỉ dành cho thành viên của họ."
   },
   "problem": {
     "timeHint": "Giây, ví dụ 1.",

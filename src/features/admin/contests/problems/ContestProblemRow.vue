@@ -6,8 +6,8 @@ import { nullableNumber, textOf } from '../general/input-values';
 import type { ProblemRow } from './contest-problems';
 
 /**
- * One problem of the contest order: its label, points, flags, output prefix and cap, with select, move and
- * remove. Below `md` the row turns into a card: every cell shows its own caption.
+ * One problem of the contest order: its label, points, flags, and with `showLimits` its output prefix and cap, with
+ * select, move and remove. Below `md` the row turns into a card: every cell shows its own caption.
  */
 const row = defineModel<ProblemRow>({ required: true });
 const props = defineProps<{
@@ -16,6 +16,7 @@ const props = defineProps<{
   position: number;
   count: number;
   isSelected: boolean;
+  showLimits: boolean;
 }>();
 const emit = defineEmits<{
   move: [delta: -1 | 1];
@@ -95,7 +96,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.pretest') }}</span>
       </label>
     </td>
-    <td :class="CELL">
+    <td v-if="showLimits" :class="CELL">
       <span :class="CAPTION">{{ $t('admin.contests.problems.columns.prefix') }}</span>
       <input
         :value="row.outputPrefix ?? ''"
@@ -108,7 +109,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         @input="row.outputPrefix = nullableNumber(textOf($event))"
       />
     </td>
-    <td :class="CELL">
+    <td v-if="showLimits" :class="CELL">
       <span :class="CAPTION">{{ $t('admin.contests.problems.columns.maxSubmissions') }}</span>
       <input
         :value="row.maxSubmissions ?? ''"

@@ -6,7 +6,8 @@
     "fixed": "Fixed",
     "site": "No organization",
     "privateHint": "Only the organization's members see it, until you publish it.",
-    "siteHint": "A site problem, hidden until you publish it."
+    "siteHint": "A site problem, hidden until you publish it.",
+    "chooseHint": "Pick an organization if only its members should take part."
   },
   "problem": {
     "timeHint": "Seconds, e.g. 1.",

@@ -9,16 +9,18 @@ import type { CreationOwner } from '../../creation/creation-owners';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { buttonClass } from '../../ui/controls';
+import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
-import { useEditorView } from '../../ui/form/use-editor-view';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import { canSetVisible, checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
-import ContestGeneralForm from './ContestGeneralForm.vue';
-import { CONTEST_BASIC_FIELDS } from './contest-views';
+import ContestBasicForm from './ContestBasicForm.vue';
 
+/**
+ * Creating a contest asks only what it cannot start without: key, name, time and owner. Everything else is edited
+ * afterwards, starting on the problems tab.
+ */
 const router = useRouter();
 const { can } = usePermissions();
 const form = ref(emptyContestForm());
@@ -39,7 +41,7 @@ const mutation = useAdminMutation({
   successText: (created: EditableContest) =>
     translate('admin.contests.create.done', { key: created.key }),
   onDone: (created: EditableContest) => {
-    void router.push({ name: 'admin-contestGeneral', params: { key: created.key } });
+    void router.push({ name: 'admin-contestProblems', params: { key: created.key } });
   },
 });
 const shownErrors = computed(() => ({
@@ -47,21 +49,11 @@ const shownErrors = computed(() => ({
   ...mutation.fieldErrors.value,
 }));
 
-const EMPTY_FORM = emptyContestForm();
-const { view, errorViews, revealErrors } = useEditorView(
-  () => shownErrors.value,
-  CONTEST_BASIC_FIELDS,
-);
-
-/**
- * Nothing is sent while a local check fails; the create body keeps out every group the account may not set. A refusal in
- * the view out of sight brings that view up.
- */
+/** Nothing is sent while a local check fails; the create body keeps out every group the account may not set. */
 async function create() {
   hasTried.value = true;
   if (Object.keys(localErrors.value).length === 0 && isOwnerReady.value)
     await mutation.run(toContestBody(form.value, can, Boolean(owner.value)));
-  await revealErrors();
 }
 </script>
 
@@ -72,20 +64,18 @@ async function create() {
       :lead="$t('admin.contests.create.lead')"
       :back="{ to: { name: 'admin-contests' }, label: $t('admin.contests.index.title') }"
     />
-    <form class="flex flex-col gap-6" novalidate @submit.prevent="create">
-      <div class="rounded-row border border-line bg-surface px-4 py-2.5">
-        <CreationOwnerPicker v-model="owner" v-model:ready="isOwnerReady" kind="contest" />
+    <form class="flex max-w-4xl flex-col gap-6" novalidate @submit.prevent="create">
+      <div :class="[CARD, 'flex min-w-0 flex-col']">
+        <ContestBasicForm v-model="form" :errors="shownErrors" :is-create="true" :owner="owner" />
+        <div class="border-t border-line px-4 py-5 sm:px-5">
+          <CreationOwnerPicker
+            v-model="owner"
+            v-model:ready="isOwnerReady"
+            kind="contest"
+            layout="field"
+          />
+        </div>
       </div>
-      <ContestGeneralForm
-        v-model="form"
-        :errors="shownErrors"
-        :is-create="true"
-        :has-codes="{ access: false, ranking: false }"
-        :view="view"
-        :error-views="errorViews"
-        :saved="EMPTY_FORM"
-        :owner="owner"
-      />
       <AdminStatus
         v-if="mutation.failure.value"
         kind="refused"

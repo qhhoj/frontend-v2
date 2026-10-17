@@ -22,6 +22,7 @@ import ContestCloneCard from './ContestCloneCard.vue';
 import ContestDataCard from './ContestDataCard.vue';
 import ContestDeleteCard from './ContestDeleteCard.vue';
 import ContestFreezeLockCard from './ContestFreezeLockCard.vue';
+import ContestProblemOpsCard from './ContestProblemOpsCard.vue';
 import ContestPublishCard from './ContestPublishCard.vue';
 import { isBoardFrozen, isBusy } from './contest-actions';
 
@@ -192,6 +193,7 @@ const runReplayRebuild = () => runAction(rebuildReplay);
           </ContestActionCard>
         </div>
       </QueryState>
+      <ContestProblemOpsCard :contest="contest" />
     </section>
     <section class="flex flex-col gap-3" aria-labelledby="contest-actions-board">
       <h2 id="contest-actions-board" :class="GROUP">

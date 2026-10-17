@@ -7,31 +7,24 @@ import type { ContestFormatName } from '@/api/types/contest-editing';
 import type { CreationOwner } from '../../creation/creation-owners';
 import AdminField from '../../ui/AdminField.vue';
 import { INPUT } from '../../ui/controls';
-import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import ChoiceCards from '../../ui/form/ChoiceCards.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { canSetVisible } from '../contest-form';
 import type { ContestForm } from '../contest-form';
-import { usePermissions } from '@/stores/use-permissions';
 import { chooseFormat, COMMON_FORMATS } from '../format-config';
 import ContestBasicTime from './ContestBasicTime.vue';
 
-/** The Basic view ("Cơ bản"): key and name, start and end, the scoring format, and who sees the contest. */
+/**
+ * The Basic view ("Cơ bản"): key and name, start and end, the scoring format and the ranking's visibility. Creating shows
+ * only key, name and time; "Hiển thị" is the summary's switch, not a field.
+ */
 const form = defineModel<ContestForm>({ required: true });
-const props = defineProps<{
+defineProps<{
   errors: FieldErrors;
   isCreate: boolean;
   owner?: CreationOwner | null;
 }>();
 const { t } = useI18n();
-const { can } = usePermissions();
-/** Visibility unlocks for `judge.change_contest_visibility`, or `judge.create_private_contest` on a private contest. */
-const visibleLock = computed(() =>
-  canSetVisible(form.value, can, Boolean(props.owner))
-    ? undefined
-    : 'judge.change_contest_visibility',
-);
 const KEY = 'admin.contests.general';
 const SCOREBOARD_OPTIONS = ['V', 'H', 'C', 'P'] as const;
 
@@ -99,7 +92,7 @@ const format = computed<ContestFormatName>({
     </AdminField>
   </AdminFormSection>
   <ContestBasicTime v-model="form" :errors="errors" />
-  <AdminFormSection :title="t(`${KEY}.basic.sections.format`)" :columns="1">
+  <AdminFormSection v-if="!isCreate" :title="t(`${KEY}.basic.sections.format`)" :columns="1">
     <ChoiceCards
       v-model="format"
       :legend="t(`${KEY}.basic.formatLegend`)"
@@ -117,17 +110,10 @@ const format = computed<ContestFormatName>({
     </p>
   </AdminFormSection>
   <AdminFormSection
+    v-if="!isCreate"
     :title="t(`${KEY}.basic.sections.access`)"
     :description="t(`${KEY}.basic.leads.access`)"
   >
-    <AdminCheckbox
-      v-model="form.isVisible"
-      class="lg:col-span-2"
-      input-id="contest-isVisible"
-      :label="t(`${KEY}.fields.isVisible`)"
-      :description="t(`${KEY}.fields.isVisibleHint`)"
-      :locked-by="visibleLock"
-    />
     <AdminField
       v-slot="{ id, describedBy }"
       input-id="contest-scoreboardVisibility"

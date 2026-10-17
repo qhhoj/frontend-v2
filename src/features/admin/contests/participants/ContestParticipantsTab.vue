@@ -79,6 +79,20 @@ const chips = computed(() =>
   })),
 );
 const isFiltered = computed(() => query.value.search !== '' || activeFilters.value.length > 0);
+/**
+ * The result line. Unfiltered it also splits the total into the contest's own counts (live and virtual), the numbers the
+ * header, the tab chip and the summary show, so the four places read as one.
+ */
+const resultText = computed(() => {
+  const number = (value: number) => formatNumber(value, locale.locale);
+  if (isFiltered.value)
+    return t('admin.contests.participants.countLine', { total: number(total.value) });
+  return t('admin.contests.participants.countSplit', {
+    total: number(total.value),
+    live: number(props.contest.userCount),
+    virtual: number(props.contest.virtualCount),
+  });
+});
 const clearAll = () => change({ search: '', kind: '', status: '', sort: '', user: '' });
 
 const kindText = (row: Participation) => {
@@ -161,9 +175,7 @@ const showUser = (username: string) => change({ user: username, search: '', kind
     <AdminFilterBar
       v-model:search="search"
       :search-label="$t('admin.contests.participants.userLabel')"
-      :result-text="
-        $t('admin.contests.participants.countLine', { total: formatNumber(total, locale.locale) })
-      "
+      :result-text="resultText"
       :chips="chips"
       :filter-count="activeFilters.filter((key) => key !== 'user').length"
       @remove="(key: string) => change({ [key]: '' })"

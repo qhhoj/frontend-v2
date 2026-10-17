@@ -13,7 +13,7 @@ import ContestSummaryRail from './ContestSummaryRail.vue';
 import { CONTEST_BASIC_FIELDS } from './contest-views';
 import { useContestForm } from './use-contest-form';
 
-/** The general tab: the form card, a summary rail from 1280 px, and the save bar with its leave guard. */
+/** The general tab: the form card, the summary (a strip above it, a rail from 1280 px), and the save bar with its leave guard. */
 const props = defineProps<{ contest: EditableContest }>();
 const { form, seed, errors, dirtyCount, savedAt, pendingPatch, save, discard, mutation } =
   useContestForm(() => props.contest);
@@ -63,7 +63,7 @@ const pageFailure = computed(() =>
       <ContestSummaryRail
         :contest="contest"
         :has-sections="view === 'advanced'"
-        class="hidden xl:flex"
+        class="max-xl:order-first"
       />
     </div>
     <AdminNotice

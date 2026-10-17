@@ -10,10 +10,13 @@ import { useCreationScope } from './creation-scope';
 import type { CreationKind } from './creation-scope';
 
 /**
- * The owner strip of a create form: one wrapping row, who owns the new problem or contest. Radio chips for a few
- * organizations, a select for many, a fixed line when there is one choice. "Không thuộc tổ chức" only for site-wide creators.
+ * Who owns the new problem or contest. Radio chips for a few organizations, a select for many, a fixed line when there is
+ * one choice. "Không thuộc tổ chức" only for site-wide creators. `layout`: `strip` is one wrapping row above the form;
+ * `field` is a labelled field inside the form card, where a site-wide creator always gets the select.
  */
-const props = defineProps<{ kind: CreationKind }>();
+const props = withDefaults(defineProps<{ kind: CreationKind; layout?: 'strip' | 'field' }>(), {
+  layout: 'strip',
+});
 const owner = defineModel<CreationOwner | null>({ required: true });
 /** False until the owners are known, so the form waits instead of posting to the wrong place. */
 const isReady = defineModel<boolean>('ready', { default: false });
@@ -48,9 +51,15 @@ const selectedSlug = computed({
     owner.value = options.value.find((option) => option.slug === slug) ?? null;
   },
 });
-const ownerHint = computed(() =>
-  owner.value ? 'admin.creation.owner.privateHint' : 'admin.creation.owner.siteHint',
+const isSelect = computed(
+  () => options.value.length > MAX_CARDS || (props.layout === 'field' && scope.value.site),
 );
+const ownerHint = computed(() => {
+  if (owner.value) return 'admin.creation.owner.privateHint';
+  return props.layout === 'field'
+    ? 'admin.creation.owner.chooseHint'
+    : 'admin.creation.owner.siteHint';
+});
 </script>
 
 <template>
@@ -59,9 +68,12 @@ const ownerHint = computed(() =>
     data-testid="creation-owner"
   >
     <legend class="sr-only">{{ $t('admin.creation.owner.label') }}</legend>
-    <span aria-hidden="true" class="text-sm font-semibold">{{
-      $t('admin.creation.owner.label')
-    }}</span>
+    <span
+      aria-hidden="true"
+      class="text-sm font-semibold"
+      :class="layout === 'field' && 'w-full'"
+      >{{ $t('admin.creation.owner.label') }}</span
+    >
     <span v-if="!isReady" class="text-sm text-muted">{{ $t('admin.creation.owner.loading') }}</span>
     <template v-else-if="choiceCount === 1 && owner">
       <span class="flex min-w-0 items-center gap-2">
@@ -74,10 +86,9 @@ const ownerHint = computed(() =>
       </span>
     </template>
     <select
-      v-else-if="options.length > MAX_CARDS"
+      v-else-if="isSelect"
       v-model="selectedSlug"
-      :class="INPUT"
-      class="w-auto max-w-full"
+      :class="[INPUT, layout === 'field' ? 'w-full lg:w-1/2' : 'w-auto max-w-full']"
       :aria-label="$t('admin.creation.owner.label')"
     >
       <option v-if="scope.site" :value="SITE">{{ $t('admin.creation.owner.site') }}</option>
@@ -109,6 +120,11 @@ const ownerHint = computed(() =>
         <b>{{ $t('admin.creation.owner.site') }}</b>
       </label>
     </template>
-    <span v-if="isReady" class="min-w-0 text-xs text-muted">{{ $t(ownerHint) }}</span>
+    <span
+      v-if="isReady"
+      class="min-w-0 text-xs text-muted"
+      :class="layout === 'field' && 'w-full'"
+      >{{ $t(ownerHint) }}</span
+    >
   </fieldset>
 </template>
