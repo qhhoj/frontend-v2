@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onScopeDispose, ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { useNow } from '@/lib/use-now';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { loadSeenAnnouncement, seenAnnouncementId } from '../announcement-seen';
 import { useContestAnnouncementsQuery } from '../contests.queries';
 import { useAnnouncementFeed } from '../use-announcement-feed';
-import { alertedAnnouncement, dismissAnnouncementAlert } from './announcement-alert';
+import AnnouncementsPausedNotice from '../AnnouncementsPausedNotice.vue';
+import {
+  alertedAnnouncement,
+  dismissAnnouncementAlert,
+  isAlertDismissed,
+} from './announcement-alert';
+import { shellStreamKey } from './shell-stream';
 import { useLiveContest } from './use-live-contest';
 
 /**
@@ -21,27 +26,35 @@ import { useLiveContest } from './use-live-contest';
 const live = useLiveContest();
 const route = useRoute();
 const viewerId = useViewerId();
-const now = useNow(15_000);
 const key = computed(() => live.contest.value?.key ?? '');
 /** Announcements are pushed only until the contest's own end (a virtual run after it gets none). */
-const isStreaming = computed(
-  () => !!live.contest.value && Date.parse(live.contest.value.endTime) > now.value,
-);
+const isStreaming = live.isContestRunning;
+watchEffect(() => (shellStreamKey.value = isStreaming.value ? key.value : null));
+onScopeDispose(() => (shellStreamKey.value = null));
 const { message } = useAnnouncementFeed(key, isStreaming);
-const { data } = useContestAnnouncementsQuery(key, ref(ANNOUNCEMENT_FIRST_PAGE), isStreaming);
+const { data, isPlaceholderData } = useContestAnnouncementsQuery(
+  key,
+  ref(ANNOUNCEMENT_FIRST_PAGE),
+  isStreaming,
+);
 watch(
   [viewerId, key],
   ([viewer, contestKey]) => contestKey && loadSeenAnnouncement(viewer, contestKey),
-  {
-    immediate: true,
-  },
+  { immediate: true },
 );
+/** Contest pages of this contest show the paused notice and their own badge; other pages get the alert's copy. */
+const isOnThisContest = computed(() => route.params.key === key.value);
 const isOnAnnouncementsTab = computed(
-  () => route.name === 'contest-announcements' && route.params.key === key.value,
+  () => isOnThisContest.value && route.name === 'contest-announcements',
 );
+/** A page kept from another contest (the key just changed) is never alerted under this one's name. */
 const shown = computed(() =>
-  isStreaming.value && !isOnAnnouncementsTab.value
-    ? alertedAnnouncement(data.value?.items ?? [], seenAnnouncementId(viewerId.value, key.value))
+  isStreaming.value && !isOnAnnouncementsTab.value && !isPlaceholderData.value
+    ? alertedAnnouncement(
+        data.value?.items ?? [],
+        seenAnnouncementId(viewerId.value, key.value),
+        (id) => isAlertDismissed(viewerId.value, id),
+      )
     : null,
 );
 const announcementsTab = computed(() => ({
@@ -55,6 +68,11 @@ const announcementsTab = computed(() => ({
     <div data-testid="contest-announcement-live" role="status" aria-live="polite" class="sr-only">
       {{ message }}
     </div>
+    <AnnouncementsPausedNotice
+      v-if="isStreaming && !isOnThisContest"
+      :contest-key="key"
+      class="page-gutter mt-3 md:fixed md:right-6 md:bottom-[calc(var(--dock-height,0px)+1.5rem)] md:z-toast md:rounded-row md:border md:border-line md:bg-surface-solid md:p-3"
+    />
     <aside
       v-if="shown && live.contest.value"
       data-testid="announcement-alert"
@@ -73,7 +91,7 @@ const announcementsTab = computed(() => ({
             <AppButton size="sm" tone="primary" :to="announcementsTab">
               {{ $t('contests.announcements.alert.view') }}
             </AppButton>
-            <AppButton size="sm" tone="ghost" @click="dismissAnnouncementAlert(shown.id)">
+            <AppButton size="sm" tone="ghost" @click="dismissAnnouncementAlert(viewerId, shown.id)">
               {{ $t('contests.announcements.alert.close') }}
             </AppButton>
           </div>
