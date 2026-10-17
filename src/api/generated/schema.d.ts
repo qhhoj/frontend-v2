@@ -2293,8 +2293,9 @@ export interface paths {
          * @description Requires `judge.clone_contest` and edit rights on the source. Copies
          *     settings and problems to a new, hidden contest under the new key, with the
          *     caller as its only author; participations, announcements and similar per-
-         *     contest data stay with the source. Reserved keys fail with 400
-         *     `key_reserved`.
+         *     contest data stay with the source. With `startTime` the copy starts then,
+         *     its end and registration window moved by the same amount. Reserved keys
+         *     fail with 400 `key_reserved`.
          */
         post: operations["ContestEditingController_clone"];
         delete?: never;
@@ -7656,6 +7657,11 @@ export interface components {
              *     32.
              */
             key: string;
+            /**
+             * @description Start of the copy, ISO 8601. The end and the registration window move by
+             *     the same amount; omitted: the source's times are kept.
+             */
+            startTime?: string;
         };
         CloneProblemDto: {
             /** @description Code of the new problem. */

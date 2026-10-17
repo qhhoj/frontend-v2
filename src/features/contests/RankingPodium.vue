@@ -71,7 +71,7 @@ const scoreOf = (row: RankingRow) => {
                 group.rank
               }}</span>
               <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ group.rank }}:</span>
-              <UserAvatar :username="row.user.username" :size="20" />
+              <UserAvatar :username="row.user.username" :size="24" />
               <UserName
                 :username="row.user.username"
                 :rating="row.user.rating"
