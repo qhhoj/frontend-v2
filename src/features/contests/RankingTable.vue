@@ -3,8 +3,10 @@ import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { Star } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { focusTableRow } from '@/lib/focus-table-row';
 import { medalClass } from '@/lib/medal';
+import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber } from '@/lib/format';
@@ -37,6 +39,13 @@ const props = defineProps<{
   ownSubmissionsOnly?: boolean;
 }>();
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
+const root = ref<HTMLElement | null>(null);
+const isMotionAllowed = useMotionAllowed();
+/** Focuses a participation's name cell ("Về hàng của tôi"); false when the row is not shown. */
+const focusRow = (participationId: string) =>
+  focusTableRow(root.value, participationId, isMotionAllowed.value);
+defineExpose({ focusRow });
+const hasVirtualRows = computed(() => props.rows.some((row) => row.virtual > 0));
 const cellsOf = (row: RankingRow) =>
   props.ranking.problems.map((problem) => ({
     problemId: problem.problemId,
@@ -79,123 +88,131 @@ const scoreHeaderKey = computed(() => {
 </script>
 
 <template>
-  <ScrollRegion :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-    <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
-      <colgroup>
-        <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
-        <col />
-        <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
-        <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
-        <col
-          v-for="problem in ranking.problems"
-          :key="problem.problemId"
-          :style="{ width: `${PROBLEM_COLUMN_REM}rem` }"
-        />
-      </colgroup>
-      <caption class="sr-only">
-        {{
-          $t('pages.ranking')
-        }}
-      </caption>
-      <thead>
-        <tr class="text-center text-meta text-muted">
-          <th scope="col" class="w-14 px-3 py-4 text-right font-medium">
-            <RankColumnHeader :label="$t('ranking.columns.rank')" />
-          </th>
-          <th scope="col" class="px-2.5 py-4 text-left font-medium">
-            {{ $t('ranking.columns.user') }}
-          </th>
-          <th scope="col" class="px-2.5 py-4 font-medium">
-            {{ $t(scoreHeaderKey) }}
-          </th>
-          <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium">
-            {{ $t('ranking.columns.penalty') }}
-          </th>
-          <th
+  <div ref="root" class="contents">
+    <ScrollRegion :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
+      <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
+        <colgroup>
+          <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
+          <col />
+          <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
+          <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
+          <col
             v-for="problem in ranking.problems"
             :key="problem.problemId"
-            scope="col"
-            class="px-1.5 py-4 font-bold text-content"
-          >
-            <RankingProblemHeader :problem="problem" />
-          </th>
-        </tr>
-      </thead>
-      <tbody class="font-mono text-sm tabular-nums">
-        <tr
-          v-for="row in rows"
-          :key="row.participationId"
-          class="border-t border-line text-center"
-          :class="{ 'bg-surface-hover': row.user.id === viewerId }"
-        >
-          <td
-            class="w-14 px-3 py-2.5 text-right"
-            :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
-          >
-            {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
-          </td>
-          <th scope="row" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
-            <span class="flex items-center gap-2">
-              <UserLink
-                :username="row.user.username"
-                :rating="row.user.rating"
-                :to="submissionsLink(row)"
-              />
-              <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
-              <Chip v-if="row.isDisqualified" tone="danger">{{ $t('ranking.disqualified') }}</Chip>
-            </span>
-          </th>
-          <td class="font-bold">
-            <template v-if="row.isDisqualified">—</template>
-            <template v-else>{{
-              penalty
-                ? solvedCount(row, ranking.problems, context)
-                : formatNumber(row.score, context.locale, context.pointsPrecision)
-            }}</template>
-            <small
-              v-if="hasCombinedScore && !row.isDisqualified"
-              class="block text-tiny font-medium text-muted"
-              >{{ formatCumtime(context.formatName, row.cumtime) }}</small
-            >
-          </td>
-          <td v-if="hasTimeColumn">
-            {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
-          </td>
-          <RankingCell
-            v-for="cell in cellsOf(row)"
-            :key="cell.problemId"
-            :view="cell.view"
-            :to="cell.to"
+            :style="{ width: `${PROBLEM_COLUMN_REM}rem` }"
           />
-        </tr>
-      </tbody>
-    </table>
-  </ScrollRegion>
-  <ul
-    v-if="penalty"
-    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
-  >
-    <li class="flex items-center gap-1.5">
-      <span
-        data-testid="first-solve-swatch"
-        class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
-        ><Star class="size-3"
-      /></span>
-      {{ $t('ranking.legend.firstSolve') }}
-    </li>
-    <li v-for="key in LEGEND" :key="key">{{ $t(key) }}</li>
-  </ul>
-  <ul
-    v-else
-    class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
-  >
-    <li v-if="context.showsTime" class="flex items-center gap-1.5">
-      <span
-        class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
-        ><Star class="size-3" aria-hidden="true"
-      /></span>
-      {{ $t('ranking.legend.firstPoints') }}
-    </li>
-    <li v-for="key in POINTS_LEGEND" :key="key">{{ $t(key) }}</li>
-  </ul>
+        </colgroup>
+        <caption class="sr-only">
+          {{
+            $t('pages.ranking')
+          }}
+        </caption>
+        <thead>
+          <tr class="text-center text-meta text-muted">
+            <th scope="col" class="w-14 px-3 py-4 text-right font-medium">
+              <RankColumnHeader :label="$t('ranking.columns.rank')" />
+            </th>
+            <th scope="col" class="px-2.5 py-4 text-left font-medium">
+              {{ $t('ranking.columns.user') }}
+            </th>
+            <th scope="col" class="px-2.5 py-4 font-medium">
+              {{ $t(scoreHeaderKey) }}
+            </th>
+            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium">
+              {{ $t('ranking.columns.penalty') }}
+            </th>
+            <th
+              v-for="problem in ranking.problems"
+              :key="problem.problemId"
+              scope="col"
+              class="px-1.5 py-4 font-bold text-content"
+            >
+              <RankingProblemHeader :problem="problem" />
+            </th>
+          </tr>
+        </thead>
+        <tbody class="font-mono text-sm tabular-nums">
+          <tr
+            v-for="row in rows"
+            :key="row.participationId"
+            :data-row-id="row.participationId"
+            class="border-t border-line text-center"
+            :class="{ 'bg-surface-hover': row.user.id === viewerId }"
+          >
+            <td
+              class="w-14 px-3 py-2.5 text-right"
+              :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
+            >
+              {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
+            </td>
+            <th scope="row" tabindex="-1" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
+              <span class="flex items-center gap-2">
+                <UserLink
+                  :username="row.user.username"
+                  :rating="row.user.rating"
+                  :to="submissionsLink(row)"
+                />
+                <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
+                <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
+                <Chip v-if="row.isDisqualified" tone="danger">{{
+                  $t('ranking.disqualified')
+                }}</Chip>
+              </span>
+            </th>
+            <td class="font-bold">
+              <template v-if="row.isDisqualified">—</template>
+              <template v-else>{{
+                penalty
+                  ? solvedCount(row, ranking.problems, context)
+                  : formatNumber(row.score, context.locale, context.pointsPrecision)
+              }}</template>
+              <small
+                v-if="hasCombinedScore && !row.isDisqualified"
+                class="block text-tiny font-medium text-muted"
+                >{{ formatCumtime(context.formatName, row.cumtime) }}</small
+              >
+            </td>
+            <td v-if="hasTimeColumn">
+              {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
+            </td>
+            <RankingCell
+              v-for="cell in cellsOf(row)"
+              :key="cell.problemId"
+              :view="cell.view"
+              :to="cell.to"
+            />
+          </tr>
+        </tbody>
+      </table>
+    </ScrollRegion>
+    <ul
+      v-if="penalty"
+      class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
+    >
+      <li class="flex items-center gap-1.5">
+        <span
+          data-testid="first-solve-swatch"
+          class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
+          ><Star class="size-3"
+        /></span>
+        {{ $t('ranking.legend.firstSolve') }}
+      </li>
+      <li v-for="key in LEGEND" :key="key">{{ $t(key) }}</li>
+      <li v-if="hasVirtualRows">{{ $t('ranking.virtualLegend') }}</li>
+    </ul>
+    <ul
+      v-else
+      class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
+    >
+      <li v-if="context.showsTime" class="flex items-center gap-1.5">
+        <span
+          class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
+          ><Star class="size-3" aria-hidden="true"
+        /></span>
+        {{ $t('ranking.legend.firstPoints') }}
+      </li>
+      <li v-for="key in POINTS_LEGEND" :key="key">{{ $t(key) }}</li>
+      <li v-if="hasVirtualRows">{{ $t('ranking.virtualLegend') }}</li>
+    </ul>
+  </div>
 </template>

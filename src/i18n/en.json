@@ -1280,7 +1280,10 @@
     "refreshFailed": "Could not refresh the board, retrying.",
     "scrollHint": "Swipe sideways to see the problems →",
     "tied": "tied",
-    "tiedAt": "Tied for {rank}"
+    "tiedAt": "Tied for {rank}",
+    "virtual": "virtual",
+    "virtualLegend": "Rows marked “virtual” are virtual runs; rows without it are real results.",
+    "myRow": "Go to my row · #{rank}"
   },
   "formats": {
     "default": "Points",
@@ -2348,8 +2351,7 @@
     "table": {
       "caption": "Replay ranking",
       "ghost": "Ghost",
-      "unranked": "Not enough data",
-      "virtual": "(virtual)"
+      "unranked": "Not enough data"
     },
     "overlay": {
       "label": "Your virtual run against the real board",
@@ -2357,7 +2359,8 @@
       "summary": "You are #{rank} · #{realRank} on the real board",
       "noRow": "Your virtual row is not on the board yet.",
       "realBoard": "Real board · {time}",
-      "yourBoard": "Your virtual run · {time}"
+      "yourBoard": "Your virtual run · {time}",
+      "youReal": "You (real)"
     }
   },
   "contestTags": {
