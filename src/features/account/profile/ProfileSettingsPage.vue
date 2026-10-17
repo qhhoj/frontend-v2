@@ -15,7 +15,8 @@ import SettingsNotice from '../settings/SettingsNotice.vue';
 import DefaultsFields from './DefaultsFields.vue';
 import IdentityFields from './IdentityFields.vue';
 import OrganizationsEditor from './OrganizationsEditor.vue';
-import SaveBar from './SaveBar.vue';
+import SaveBar from '@/components/ui/SaveBar.vue';
+import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
 import SaveErrorSummary from './SaveErrorSummary.vue';
 import {
   PROFILE_FIELD_ORDER,
@@ -30,9 +31,22 @@ import { useProfileDraft } from './use-profile-draft';
 const locale = useLocaleStore();
 const session = useSessionStore();
 const officialMode = useOfficialMode();
-const { query, draft, dirty, problems, pending, error, attempted, justSaved, save, undo } =
-  useProfileDraft();
+const {
+  query,
+  draft,
+  changedCount,
+  problems,
+  pending,
+  error,
+  attempted,
+  saved,
+  savedAt,
+  save,
+  undo,
+} = useProfileDraft();
 const { data: profile, isPending, error: loadError, refetch } = query;
+/** "Đã lưu lúc …" in the zone the viewer keeps on their profile, not the site's. */
+const savedTimeZone = computed(() => saved.value?.timezone || undefined);
 /** The summary exposes only `focus()`. */
 const summaryNotice = ref<{ focus: () => void } | null>(null);
 const identityFields = ref<{ showAboutWriteTab: () => void } | null>(null);
@@ -61,6 +75,12 @@ const fieldSummary = computed(() => {
 /** A failed save that no field explains (locked, offline, the organizations conflict). */
 const saveErrorSentence = computed(() =>
   error.value && !invalidFields.value.length ? saveErrorText(error.value) : null,
+);
+/** After a failed save that named fields, the bar says what to fix (saving stays possible: a server error clears only on the next save). */
+const fixText = computed(() =>
+  attempted.value && invalidFields.value.length
+    ? translate('settings.profile.fixToSave', { count: invalidFields.value.length })
+    : null,
 );
 const offline = computed(
   () => error.value instanceof ApiError && error.value.code === 'network_error',
@@ -92,10 +112,7 @@ async function submit() {
           :items="fieldSummary.items"
         />
         <SettingsCard :title="$t('settings.nav.profile')" :lead="$t('settings.profile.lead')">
-          <SettingsNotice v-if="justSaved" tone="success" bit="crown">
-            {{ $t('settings.profile.saved') }}
-          </SettingsNotice>
-          <SettingsNotice v-else-if="saveErrorSentence" tone="error" bit="sweat">
+          <SettingsNotice v-if="saveErrorSentence" tone="error" bit="sweat">
             {{ saveErrorSentence }}
             <template v-if="offline" #action>
               <button
@@ -121,25 +138,35 @@ async function submit() {
             :username="session.user?.username ?? ''"
             :saved-about-html="profile.aboutHtml"
             :errors="fieldErrors"
-          />
+          >
+            <DefaultsFields
+              v-model:language-id="draft.languageId"
+              v-model:timezone="draft.timezone"
+              :errors="fieldErrors"
+            />
+          </IdentityFields>
         </SettingsCard>
         <OrganizationsEditor
           v-model="draft.organizationIds"
           :organizations="profile.organizations"
           :error="fieldErrors.organizations"
         />
-        <DefaultsFields
-          v-model:language-id="draft.languageId"
-          v-model:timezone="draft.timezone"
-          :errors="fieldErrors"
-        />
+        <!-- The save result lives here and only here. The bar's edges follow the layout's gutters (the nav sits beside it from lg). -->
         <SaveBar
-          :dirty="dirty"
+          class="[--qa-gutter:1rem] md:[--qa-gutter:2rem] lg:rounded-t-card lg:[--qa-gutter:0px] lg:px-5"
+          :dirty-count="changedCount"
           :pending="pending"
-          :invalid-count="attempted ? invalidFields.length : 0"
-          @undo="undo"
-        />
+          :saved-at="savedAt"
+          :time-zone="savedTimeZone"
+          hide-idle-on-phone
+          @discard="undo"
+        >
+          <template v-if="fixText" #status>
+            <span class="font-semibold text-negative">{{ fixText }}</span>
+          </template>
+        </SaveBar>
       </form>
     </QueryState>
+    <AdminLeaveGuard :dirty-count="changedCount" />
   </SettingsLayout>
 </template>

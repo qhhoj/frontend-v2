@@ -46,10 +46,12 @@ describe('Settings › Profile defaults', () => {
 
   it('switches the interface language at once, on this device only: no request, nothing to save', async () => {
     const { wrapper, calls } = await openProfile();
-    await select(wrapper, 'locale').setValue('en');
+    await wrapper
+      .get<HTMLSelectElement>('[data-testid="interface-language"] select')
+      .setValue('en');
     expect(document.documentElement.lang).toBe('en');
     expect(patches(calls)).toEqual([]);
-    expect(wrapper.text()).toContain('No unsaved changes.');
+    expect(wrapper.text()).toContain('No changes to save.');
     expect(localStorage.getItem('qhhoj.locale')).toBe('en');
   });
 });

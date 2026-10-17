@@ -19,7 +19,7 @@ test('profile: an over-long name is caught before sending, a fixed one is saved 
   await expect(name).toBeFocused();
   await name.fill('Trần Minh Thư');
   await page.getByRole('button', { name: 'Lưu thay đổi' }).click();
-  await expect(page.locator('#main').getByRole('status')).toHaveText('Đã lưu hồ sơ.');
+  await expect(page.locator('#main').getByRole('status')).toHaveText(/^Đã lưu lúc \d\d:\d\d$/);
   await page.reload();
   await expect(page.getByLabel('Tên hiển thị')).toHaveValue('Trần Minh Thư');
 });
