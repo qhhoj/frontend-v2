@@ -1147,6 +1147,10 @@
     "clearAll": "Xóa tất cả",
     "removeFilter": "Bỏ lọc: {name}",
     "pointsChip": "{min}–{max} điểm",
+    "count": "{n} bài",
+    "legendPartial": "= chấm từng phần",
+    "legend": "Chú giải",
+    "pagerTop": "Các trang bài tập, đầu danh sách",
     "uncategorized": "Chưa phân loại",
     "attemptedLong": "Đã thử, chưa đúng",
     "notTried": "Chưa thử",
@@ -1454,7 +1458,8 @@
   },
   "pager": {
     "previous": "Trang trước",
-    "next": "Trang sau"
+    "next": "Trang sau",
+    "position": "{page} / {last}"
   },
   "vote": {
     "up": "Bình chọn lên",

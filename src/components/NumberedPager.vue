@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import { lastPageOf, pageWindow } from '@/lib/paging';
 
-/** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. `align="end"` puts them at the right (a pager above a list). */
+/** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. `align="end"` puts them at the right (a pager above a list); `stepper` shows only the arrows around "page / last", the short pager above a list whose numbered one sits below it. */
 const props = withDefaults(
   defineProps<{
     meta: NumberedPageMeta;
@@ -14,11 +14,13 @@ const props = withDefaults(
     align?: 'center' | 'end';
     /** Admin density: 32 px cells on a fine pointer (44 px on a coarse one), 12 px radius. */
     compact?: boolean;
+    stepper?: boolean;
   }>(),
   {
     queryKey: 'page',
     align: 'center',
     compact: false,
+    stepper: false,
   },
 );
 const route = useRoute();
@@ -59,7 +61,10 @@ const ARROW = computed(
     <span v-else role="link" :aria-label="$t('pager.previous')" aria-disabled="true" :class="ARROW">
       <ChevronLeft aria-hidden="true" class="size-4" />
     </span>
-    <template v-for="(slot, index) in slots" :key="index">
+    <span v-if="stepper" data-testid="pager-position" class="px-1 font-mono text-sm tabular-nums">{{
+      $t('pager.position', { page: meta.page, last })
+    }}</span>
+    <template v-for="(slot, index) in slots" v-else :key="index">
       <span v-if="slot === 'gap'" aria-hidden="true" class="px-1 text-muted">…</span>
       <RouterLink v-else v-slot="{ href, navigate }" custom :to="linkTo(slot)">
         <a

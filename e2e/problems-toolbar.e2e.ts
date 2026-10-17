@@ -31,7 +31,7 @@ test('the toolbar filters the list through the URL, with chips and clear all', a
   await expect(page).toHaveURL(/min=800&max=2400/);
   await page.keyboard.press('Escape');
 
-  await page.getByRole('combobox', { name: 'Sắp xếp' }).selectOption('-points');
+  await page.getByRole('columnheader', { name: 'Điểm' }).getByRole('button').click();
   await expect(page).toHaveURL(/sort=-points/);
   await expect(page.getByRole('columnheader', { name: 'Điểm' })).toHaveAttribute(
     'aria-sort',

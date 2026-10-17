@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { problemTypeLabel } from './problem-type-label';
+import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 import type { ProblemListItem, ProblemSort } from '@/api/types/problems';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
@@ -16,10 +16,16 @@ defineProps<{
   /** Without a viewer there is no status to show, not even "not tried". */
   signedIn: boolean;
 }>();
-const emit = defineEmits<{ sort: [sort: ProblemSort] }>();
+const emit = defineEmits<{ sort: [sort: ProblemSort | null] }>();
 const locale = useLocaleStore();
 const { open, openInTab } = useRowLink();
 const target = (code: string) => ({ name: 'problem', params: { code } });
+
+/** The catch-all type says nothing in a list: a problem with no other type shows a dash. */
+const typesText = (problem: ProblemListItem) => {
+  const named = problem.types.filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME);
+  return named.length ? named.map((type) => problemTypeLabel(type)).join(', ') : '—';
+};
 
 const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff-4' } as const;
 </script>
@@ -54,7 +60,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
             <span class="font-mono text-xs text-muted">{{ problem.code }}</span>
           </td>
           <td class="truncate px-3 py-2 text-caption text-muted">
-            {{ problem.types.map((type) => problemTypeLabel(type)).join(', ') }}
+            {{ typesText(problem) }}
           </td>
           <td class="px-3 py-2">
             <span class="inline-flex items-center gap-[7px] font-medium tabular-nums">
