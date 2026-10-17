@@ -987,6 +987,7 @@
     "ratingTier": "Rating · {tier}",
     "ratingChart": "Rating qua {count} kỳ thi, từ {first} đến {last}",
     "solved": "Đã giải",
+    "solvedUnrated": "Bài đã giải · chưa có rating",
     "points": "Điểm",
     "rank": "Hạng",
     "recentSubmissions": "Bài nộp gần đây",

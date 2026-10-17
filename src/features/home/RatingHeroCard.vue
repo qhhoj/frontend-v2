@@ -35,10 +35,24 @@ const delta = computed(() =>
 const tier = computed(() => ratingTier(user.value?.rating ?? null));
 const greeting = greetingKey(new Date().getHours());
 const path = computed(() => sparklinePath(ratings.value, 640, 110));
+/** Q-03 B: an unrated student leads with the problems solved, a number that can grow every day; the rating once there is one. */
+const isRated = computed(() => tier.value !== null);
+const headline = computed(() =>
+  isRated.value
+    ? String(user.value!.rating)
+    : formatNumber(user.value!.problemCount, locale.locale),
+);
 const tiles = computed(() =>
   user.value
     ? [
-        { labelKey: 'home.solved', value: formatNumber(user.value.problemCount, locale.locale) },
+        ...(isRated.value
+          ? [
+              {
+                labelKey: 'home.solved',
+                value: formatNumber(user.value.problemCount, locale.locale),
+              },
+            ]
+          : []),
         {
           labelKey: 'home.points',
           value: formatNumber(user.value.performancePoints, locale.locale, 1),
@@ -99,11 +113,16 @@ const tiles = computed(() =>
           <div class="min-w-0">
             <p class="text-muted">{{ $t(greeting, { username }) }}</p>
             <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
-              <span class="font-mono text-6xl font-semibold tracking-tight tabular-nums">{{
-                user.rating ?? '—'
-              }}</span>
+              <span
+                data-testid="hero-figure"
+                class="font-mono text-6xl font-semibold tracking-tight tabular-nums"
+                >{{ headline }}</span
+              >
               <!-- The delta pill and the rank-up Bit wrap as one group, so the Bit always sits beside its delta. -->
-              <span v-if="delta !== null" class="mb-3 flex flex-nowrap items-center gap-2">
+              <span
+                v-if="isRated && delta !== null"
+                class="mb-3 flex flex-nowrap items-center gap-2"
+              >
                 <span
                   class="inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
                   :class="
@@ -127,8 +146,12 @@ const tiles = computed(() =>
                 />
               </span>
             </div>
-            <p class="text-muted">
-              {{ $t('home.ratingTier', { tier: $t(tier ? `tiers.${tier}` : 'tiers.unrated') }) }}
+            <p data-testid="hero-caption" class="text-muted">
+              {{
+                isRated
+                  ? $t('home.ratingTier', { tier: $t(`tiers.${tier}`) })
+                  : $t('home.solvedUnrated')
+              }}
             </p>
           </div>
           <BitMascot
@@ -139,7 +162,7 @@ const tiles = computed(() =>
           />
         </div>
         <svg
-          v-if="ratings.length >= 2"
+          v-if="isRated && ratings.length >= 2"
           viewBox="0 0 640 110"
           width="100%"
           height="110"
