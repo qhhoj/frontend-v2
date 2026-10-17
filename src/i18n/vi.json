@@ -718,12 +718,10 @@
     },
     "signup": {
       "school": "Trường",
-      "language": "Ngôn ngữ mặc định",
       "optional": "(tuỳ chọn)",
       "schoolSearch": "Gõ để tìm trường",
       "schoolNone": "Không tìm thấy trường",
-      "schoolFilter": "Tìm trường",
-      "none": "Chưa chọn"
+      "schoolFilter": "Tìm trường"
     },
     "twoFactor": {
       "title": "Xác thực hai bước",

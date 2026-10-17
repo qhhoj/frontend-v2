@@ -21,7 +21,7 @@ import { useAuthAction } from './use-auth-action';
 /** RegisterA, then CheckEmail after a send, or Activation's "registration unavailable" card when the mailer is down. */
 type Phase = 'form' | 'sent' | 'mailUnavailable';
 
-/** `languageId` stays unset until the picker's C++17 default lands; `chosenIds` drops an empty school. */
+/** `languageId` stays unset until `SignupChoices` sets C++17 (no field, P-13); `chosenIds` drops an empty school. A language issue lands in the summary. */
 const form = reactive({
   username: '',
   email: '',
@@ -37,16 +37,12 @@ const rulesMissing = ref(false);
 const formElement = ref<HTMLFormElement | null>(null);
 const { pending, fieldErrors, summary, run, dismiss, focusFirstInvalid, error } = useAuthAction(
   formElement,
-  ['username', 'email', 'password', 'organizationId', 'languageId'],
+  ['username', 'email', 'password', 'organizationId'],
 );
 // The pickers are components with models, not inputs that bubble `input`: editing one drops its old server message.
 watch(
   () => form.organizationId,
   () => dismiss('organizationId'),
-);
-watch(
-  () => form.languageId,
-  () => dismiss('languageId'),
 );
 const LINK = 'font-semibold text-accent-text underline';
 
@@ -87,7 +83,7 @@ async function submit() {
 </script>
 
 <template>
-  <AuthLayout v-if="phase === 'sent'" :title="$t('auth.inbox.title')" centered>
+  <AuthLayout v-if="phase === 'sent'" :title="$t('auth.inbox.title')" centered brand>
     <template #badge>
       <InlineBit kind="envelope" class="self-center" />
     </template>
@@ -109,6 +105,7 @@ async function submit() {
     :lead="$t('auth.mailUnavailable.lead')"
     lead-role="alert"
     centered
+    brand
   >
     <template #badge>
       <InlineBit kind="sweat" class="self-center" />
@@ -120,10 +117,11 @@ async function submit() {
     :title="$t('auth.registerTitle')"
     :lead="$t('auth.registerLead')"
     width="double"
+    brand
   >
     <template #header-end>
-      <span class="hidden text-muted sm:inline"
-        >{{ $t('auth.haveAccountPrompt') }}
+      <span class="flex items-center gap-1"
+        ><span class="text-muted max-sm:hidden">{{ $t('auth.haveAccountPrompt') }}</span>
         <RouterLink :to="{ name: 'login' }" :class="LINK">{{
           $t('auth.submitLogin')
         }}</RouterLink></span

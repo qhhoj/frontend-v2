@@ -292,7 +292,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/features/auth/LoginPage.vue'),
-    meta: { titleKey: 'pages.login', guestOnly: true },
+    meta: { titleKey: 'pages.login', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/login/2fa',

@@ -17,14 +17,13 @@ import { chosenIds, defaultLanguageId } from './signup-choices';
 import SignupChoices from './SignupChoices.vue';
 
 const SCHOOL = '[data-testid="school-picker"]';
-const LANGUAGE = 'select[name="languageId"]';
 
 /** `mountComponent` installs the router, whose first navigation asks `/auth/me`. */
 const mockRegisterApi = (overrides: Record<string, MockHandler> = {}) =>
   mockApi({ 'GET /auth/me': signedOut, ...registerRoutes, ...overrides });
 
-/** Mounts the pickers and feeds their `update:` events back as props, the way a parent page does. */
-function mountChoices(props: Record<string, unknown> = {}) {
+/** Mounts the pickers and feeds their `update:` events back as props, the way a parent page does; waits for both lists. */
+async function mountLoaded(props: Record<string, unknown> = {}) {
   // `mountComponent` types its props loosely; a variable of this type passes where an object literal would not.
   const setProps = (changed: Record<string, unknown>) => wrapper.setProps(changed);
   const wrapper = mountComponent(SignupChoices, {
@@ -35,22 +34,12 @@ function mountChoices(props: Record<string, unknown> = {}) {
       ...props,
     },
   });
-  return wrapper;
-}
-/** Mounts and waits until both lists have loaded. */
-const mountLoaded = async (props: Record<string, unknown> = {}) => {
-  const wrapper = mountChoices(props);
   await flushPromises();
   return wrapper;
-};
-type Choices = Awaited<ReturnType<typeof mountLoaded>>;
-const languageOptions = (wrapper: Choices) =>
-  wrapper.findAll(`${LANGUAGE} option`).map((option) => option.text());
-const languageValue = (wrapper: Choices) =>
-  (wrapper.get(LANGUAGE).element as HTMLSelectElement).value;
+}
 
 describe('SignupChoices', () => {
-  it('offers the open schools in a searchable list and the languages a viewer can submit in', async () => {
+  it('offers the open schools in a searchable list, and no language picker (P-13)', async () => {
     mockRegisterApi({
       'GET /organizations': page([
         organizationItem({ id: 'org-a', name: 'THPT A' }),
@@ -63,33 +52,22 @@ describe('SignupChoices', () => {
     expect(optionTexts()).toEqual(['THPT A', 'THPT B']);
     await typeFilter('B');
     expect(optionTexts()).toEqual(['THPT B']);
-    // problemMeta(): C++17, Python 3, and an output-only language that cannot be a default
-    expect(languageOptions(wrapper)).toEqual(['Chưa chọn', 'C++17', 'Python 3']);
+    expect(wrapper.find('select[name="languageId"]').exists()).toBe(false);
   });
 
-  it('starts the language at C++17 when the list has it', async () => {
+  it('sets the language to C++17 once the list has loaded', async () => {
     mockRegisterApi();
     const wrapper = await mountLoaded();
-    expect(languageValue(wrapper)).toBe(CPP17_ID);
     expect(wrapper.emitted('update:languageId')).toEqual([[CPP17_ID]]);
   });
 
-  it('does not apply C++17 again after the viewer chose "Chưa chọn" and the picker remounts', async () => {
-    mockRegisterApi();
-    // The parent keeps '' once the viewer chose "Chưa chọn"; a fresh mount must not start over at C++17.
-    const remounted = await mountLoaded({ languageId: '' });
-    expect(languageValue(remounted)).toBe('');
-    expect(remounted.emitted('update:languageId')).toBeUndefined();
-  });
-
-  it('keeps a language the viewer already chose instead of the C++17 default', async () => {
+  it('leaves a language the parent already holds', async () => {
     mockRegisterApi();
     const wrapper = await mountLoaded({ languageId: PY3_ID });
-    expect(languageValue(wrapper)).toBe(PY3_ID);
     expect(wrapper.emitted('update:languageId')).toBeUndefined();
   });
 
-  it('offers a retry when the school list fails and keeps the language select usable', async () => {
+  it('offers a retry when the school list fails', async () => {
     let attempts = 0;
     mockRegisterApi({
       'GET /organizations': () => {
@@ -100,7 +78,6 @@ describe('SignupChoices', () => {
     });
     const wrapper = await mountLoaded();
     expect(wrapper.find(SCHOOL).exists()).toBe(false);
-    expect(wrapper.find(LANGUAGE).exists()).toBe(true);
     await wrapper.get('[role="alert"] button').trigger('click');
     await flushPromises();
     expect(wrapper.find(SCHOOL).exists()).toBe(true);

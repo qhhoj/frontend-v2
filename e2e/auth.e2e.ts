@@ -142,13 +142,15 @@ test.describe('second factor', () => {
 });
 
 test.describe('registration, activation and resend', () => {
-  test('marks a taken username, never blocks, and registers with school and language', async ({
+  test('marks a taken username, never blocks, and registers with the school and the C++17 default', async ({
     page,
     api,
   }) => {
     const auth = installAuth(api);
+    // P-13: no language field; once the languages load the account starts at C++17 all the same.
+    const languagesLoaded = page.waitForResponse(/\/problems\/meta/);
     await page.goto('/register');
-    await expect(page.getByLabel('Ngôn ngữ mặc định (tuỳ chọn)')).toHaveValue(CPP17_ID);
+    await languagesLoaded;
     const terms = page.locator('label:has(input[name="rules"])');
     await expect(terms).toContainText(
       'Tôi đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư.',
@@ -163,7 +165,6 @@ test.describe('registration, activation and resend', () => {
     await page.getByRole('combobox', { name: 'Trường (tuỳ chọn)' }).click();
     await page.getByPlaceholder('Gõ để tìm trường').fill('THPT A');
     await page.getByRole('option', { name: organizationItem().name }).click();
-    await page.getByLabel('Ngôn ngữ mặc định (tuỳ chọn)').selectOption({ label: 'C++17' });
     await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
     await expect(page.getByText('Tên đăng nhập đã được dùng.')).toBeVisible();
     await expect(page.getByLabel('Tên đăng nhập')).toBeFocused();
@@ -178,7 +179,7 @@ test.describe('registration, activation and resend', () => {
       email: 'new@example.com',
       password: 'correct horse battery',
       organizationId: organizationItem().id,
-      languageId: expect.any(String),
+      languageId: CPP17_ID,
     });
   });
 
@@ -238,20 +239,13 @@ test.describe('registration, activation and resend', () => {
     api,
   }) => {
     const auth = installAuth(api);
+    const languagesLoaded = page.waitForResponse(/\/problems\/meta/);
     await page.goto('/register/social?token=pending-1');
+    await languagesLoaded;
     await page.getByLabel('Tên đăng nhập').fill('social_user');
     await page.getByLabel('Mật khẩu', PASSWORD).fill('correct horse battery');
     await page.getByRole('combobox', { name: 'Trường (tuỳ chọn)' }).click();
     await page.getByRole('option', { name: organizationItem().name }).click();
-    // The language picker starts at C++17 (the signup default), so the completion carries it too.
-    const language = page.getByLabel('Ngôn ngữ mặc định (tuỳ chọn)');
-    await expect
-      .poll(() =>
-        language.evaluate((select: HTMLSelectElement) =>
-          select.selectedOptions[0]?.textContent?.trim(),
-        ),
-      )
-      .toBe('C++17');
     await page.getByRole('button', { name: 'Tạo tài khoản' }).click();
     await expect(page).toHaveURL(/\/$/);
     expect(requestsOf(auth, 'social-complete')).toEqual([
@@ -260,7 +254,7 @@ test.describe('registration, activation and resend', () => {
         username: 'social_user',
         password: 'correct horse battery',
         organizationId: organizationItem().id,
-        languageId: expect.any(String),
+        languageId: CPP17_ID,
       },
     ]);
   });

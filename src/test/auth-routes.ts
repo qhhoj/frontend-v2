@@ -6,8 +6,12 @@ export const socialRoutes = {
   'GET /auth/social/providers': ok({ providers: ['google', 'github'] }),
 };
 
-/** What the signup pages load: the open schools and the languages. Each such page's spec spreads this too. */
+/** The auth shell's brand panel (login, register, forgotten password): the site counts. */
+export const brandRoutes = { 'GET /home': ok({ counts: HOME_COUNTS }) };
+
+/** What the signup pages load: the open schools and the languages (for the C++17 default), and the brand panel. */
 export const registerRoutes = {
+  ...brandRoutes,
   'GET /organizations': page([organizationItem()]),
   'GET /problems/meta': ok(problemMeta()),
 };
@@ -15,5 +19,5 @@ export const registerRoutes = {
 /** What the login screen loads: the social buttons and the brand panel's counts. */
 export const loginRoutes = {
   ...socialRoutes,
-  'GET /home': ok({ counts: HOME_COUNTS }),
+  ...brandRoutes,
 };
