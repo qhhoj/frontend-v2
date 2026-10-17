@@ -155,7 +155,7 @@ describe('contest ranking', () => {
     ).toBeGreaterThanOrEqual(2);
   });
 
-  it('shares medals between tied ranks and keeps a tied first place', async () => {
+  it('groups tied ranks into one podium cell and keeps rank order', async () => {
     const [problemA] = RANKING_PROBLEM_IDS;
     const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
     mockApi(
@@ -179,8 +179,12 @@ describe('contest ranking', () => {
       'user_12',
       'user_03',
     ]);
-    const [first, tiedFirst, third] = podium.findAll('span[aria-hidden="true"]');
-    expect(first!.classes()).toEqual(tiedFirst!.classes());
-    expect(third!.classes()).not.toEqual(first!.classes());
+    // One cell per rank in rank order: the tie at 1 shares a cell, and no rank 2 cell is invented.
+    const cells = podium.findAll('[data-podium-rank]');
+    expect(cells.map((cell) => cell.findAll('a').map((link) => link.text()))).toEqual([
+      ['user_07', 'user_12'],
+      ['user_03'],
+    ]);
+    expect(cells.map((cell) => cell.find('span[aria-hidden="true"]').text())).toEqual(['1', '3']);
   });
 });

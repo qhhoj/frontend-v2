@@ -1278,7 +1278,9 @@
     "empty": "No contestants yet.",
     "disqualified": "Disqualified",
     "refreshFailed": "Could not refresh the board, retrying.",
-    "scrollHint": "Swipe sideways to see the problems →"
+    "scrollHint": "Swipe sideways to see the problems →",
+    "tied": "tied",
+    "tiedAt": "Tied for {rank}"
   },
   "formats": {
     "default": "Points",
