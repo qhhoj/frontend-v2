@@ -10,6 +10,7 @@ import AppFooter from './AppFooter.vue';
 import AppHeader from './AppHeader.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue';
+import LiveAnnouncementAlert from '@/features/contests/live/LiveAnnouncementAlert.vue';
 import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import BackgroundBlobs from './BackgroundBlobs.vue';
@@ -55,6 +56,7 @@ const { current: currentContest } = useCurrentContest(
         <SiteNoticeBanner class="print:hidden" />
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
+        <LiveAnnouncementAlert class="print:hidden" />
       </template>
       <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
         <slot />

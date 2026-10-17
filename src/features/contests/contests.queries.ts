@@ -59,9 +59,14 @@ export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   });
 };
 
-export const useContestAnnouncementsQuery = (key: Ref<string>, page: Ref<number>) => {
+export const useContestAnnouncementsQuery = (
+  key: Ref<string>,
+  page: Ref<number>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewerId = useViewerId();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => ['contests', 'announcements', viewerId.value, key.value, page.value]),
     queryFn: () => fetchContestAnnouncements(key.value, page.value),
     placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),
