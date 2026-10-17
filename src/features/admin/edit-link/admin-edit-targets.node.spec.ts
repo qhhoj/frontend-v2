@@ -29,6 +29,22 @@ describe('admin edit targets', () => {
     expect(contestEditTarget(editor, { key: 'k', viewer: { canEdit: false } })).toBeNull();
   });
 
+  it('opens the editor tab matching the public contest page', () => {
+    const editor = viewer(['judge.edit_own_contest']);
+    const contest = { key: 'k', viewer: { canEdit: true } };
+    expect(contestEditTarget(editor, contest, 'contest-announcements')).toMatchObject({
+      name: 'admin-contestAnnouncements',
+      params: { key: 'k' },
+    });
+    expect(contestEditTarget(editor, contest, 'contest-ranking')).toMatchObject({
+      name: 'admin-contestRanking',
+    });
+    expect(contestEditTarget(editor, contest, 'contest-stats')).toMatchObject({
+      name: 'admin-contestGeneral',
+    });
+    expect(contestEditTarget(editor, contest)).toMatchObject({ name: 'admin-contestGeneral' });
+  });
+
   it('links an organization only for site staff, not for its own admins', () => {
     const org = { slug: 's', viewer: { canAdminister: true } };
     expect(organizationEditTarget(viewer(['judge.edit_all_organization']), org)).toMatchObject({

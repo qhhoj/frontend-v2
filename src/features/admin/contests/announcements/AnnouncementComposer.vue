@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { postAnnouncement } from '@/api/contest-editing.api';
+import { toRef } from 'vue';
 import type { Announcement } from '@/api/types/contest-editing';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminField from '../../ui/AdminField.vue';
@@ -10,30 +9,14 @@ import { translate } from '@/i18n';
 import { failureTextOf } from '../../ui/admin-errors';
 import AnnouncementPreview from './AnnouncementPreview.vue';
 import { COMPOSE_HEADING_ID } from './composer-heading';
-import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { useAnnouncementComposer } from './use-announcement-composer';
 
 const props = defineProps<{ contestKey: string; isPushedLive: boolean }>();
 const emit = defineEmits<{ posted: [announcement: Announcement] }>();
-const title = ref('');
-const description = ref('');
-
-const post = useAdminMutation({
-  mutate: (draft: { title: string; description: string }) =>
-    postAnnouncement(props.contestKey, draft),
-  invalidates: () => [
-    ['admin', 'contest-announcements', props.contestKey],
-    ['contests', 'announcements'],
-  ],
+const { title, description, post, submit } = useAnnouncementComposer(toRef(props, 'contestKey'), {
   successText: () => translate('admin.contests.announcements.posted'),
-  onDone: (created: Announcement) => {
-    title.value = '';
-    description.value = '';
-    emit('posted', created);
-  },
+  onPosted: (created) => emit('posted', created),
 });
-
-/** The draft is kept when the backend refuses it, so the writer can fix the title and send again. */
-const submit = () => post.run({ title: title.value, description: description.value });
 </script>
 
 <template>
