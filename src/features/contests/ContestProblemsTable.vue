@@ -163,9 +163,9 @@ const capLines = computed(
               :to="problemLink(problem)"
               class="flex min-h-11 min-w-0 items-center font-semibold"
               ><span class="sr-only">{{ problem.label }}. </span
-              ><span class="truncate">{{ problem.name }}</span></RouterLink
+              ><span class="line-clamp-2">{{ problem.name }}</span></RouterLink
             >
-            <p class="text-caption text-muted">
+            <p class="font-mono text-caption text-muted">
               {{ problem.code
               }}<template v-if="capLines.get(problem.problemId)">
                 · {{ capLines.get(problem.problemId) }}</template
