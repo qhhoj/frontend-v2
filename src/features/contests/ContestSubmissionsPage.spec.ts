@@ -43,7 +43,7 @@ describe('contest submissions tab', () => {
       ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions?user=other');
-    expect(wrapper.get('[data-testid="own-only"]').text()).toContain('Chỉ hiện bài nộp của bạn');
+    expect(wrapper.get('[data-testid="own-only"]').text()).toContain('chỉ bạn thấy');
     expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
     expect(wrapper.find('input[placeholder="tên đăng nhập"]').exists()).toBe(false);
   });
@@ -95,5 +95,46 @@ describe('contest submissions tab', () => {
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
     expect(wrapper.find('[data-testid="own-only"]').exists()).toBe(false);
+  });
+
+  it('filters by problem letter and lists ledger rows, without the site-wide stats (P-21)', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });
+    const row = submissionItem({
+      id: 'sub-b',
+      problem: { code: 'r42b', name: 'Bài B', isDeleted: false, points: 100 },
+      result: 'WA',
+    });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(twoProblems),
+      'GET /contests/r42/submissions': page([row]),
+      ...submissionListRoutes,
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions');
+    expect(calls.some((call) => call.path === '/submissions/stats')).toBe(false);
+    const ledgerRow = wrapper.get('[data-testid="submission-ledger"] [data-id="sub-b"]');
+    expect(ledgerRow.text()).toContain('B');
+    expect(ledgerRow.text()).toContain('WA');
+    const chipB = wrapper.findAll('[role="search"] button').find((chip) => chip.text() === 'B')!;
+    await chipB.trigger('click');
+    await vi.waitFor(() => expect(listCalls(calls).at(-1)!.query.get('problem')).toBe('r42b'));
+  });
+
+  it('keeps the live switch and lights the letter, not an advanced panel, for a problem link', async () => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(twoProblems),
+      'GET /contests/r42/submissions': page([]),
+      ...submissionListRoutes,
+    });
+    const { wrapper } = await mountApp('/contests/r42/submissions?problem=r42b&live=0');
+    expect(wrapper.get('[data-testid="live-toggle"]').attributes('aria-pressed')).toBe('false');
+    expect(wrapper.find('[data-testid="advanced-filters"]').exists()).toBe(false);
+    expect(wrapper.find('#submission-advanced-filters').exists()).toBe(false);
+    const chipB = wrapper.findAll('[role="search"] button').find((chip) => chip.text() === 'B')!;
+    expect(chipB.attributes('aria-pressed')).toBe('true');
   });
 });

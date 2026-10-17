@@ -105,9 +105,13 @@ export const useContestBestSubmissionsQuery = (
   });
 };
 
-/** Today's numbers for the list's strip: public, polled in the background (a failed poll keeps the last numbers). */
-export const useSubmissionStatsQuery = () =>
+/**
+ * Today's numbers for the list's strip: public, polled in the background (a failed poll keeps the last numbers).
+ * `isEnabled` false (a list that shows no stats) never asks.
+ */
+export const useSubmissionStatsQuery = (isEnabled: MaybeRefOrGetter<boolean> = true) =>
   useQuery({
+    enabled: computed(() => toValue(isEnabled)),
     queryKey: ['submissions', 'stats'],
     queryFn: fetchSubmissionStats,
     refetchInterval: STATS_REFRESH_MS,

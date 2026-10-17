@@ -101,7 +101,10 @@
       "ownOnlyTitle": "Chỉ hiện bài nộp của bạn",
       "ownOnlyBody": "Bài nộp của thí sinh khác chưa công khai trong lúc kỳ thi đang diễn ra hoặc bảng đóng băng.",
       "signIn": "Đăng nhập để xem bài nộp của bạn",
-      "empty": "Chưa có bài nộp nào trong kỳ thi."
+      "empty": "Chưa có bài nộp nào trong kỳ thi.",
+      "all": "Tất cả",
+      "ownHeading": "Bài nộp của bạn",
+      "onlyYou": "chỉ bạn thấy"
     },
     "detail": {
       "authors": "Ra đề:",
