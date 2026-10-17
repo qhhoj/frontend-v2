@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CPP17_ID,
   PY3_ID,
+  contestDetail,
+  contestProblem,
   SCRATCH_ID,
   problemDetail,
   profile,
@@ -14,6 +16,7 @@ import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
+import type { ContestDetail } from '@/api/types/contests';
 import type { Profile } from '@/api/types/profile';
 import type { ProblemDetail } from '@/api/types/problems';
 import { MAX_SOURCE_LENGTH } from '@/lib/source';
@@ -31,13 +34,17 @@ vi.mock('@/features/account/profile.queries', () => ({
 const submittedRow = { 'GET /submissions/sub-9': ok(submissionDetail({ id: 'sub-9' })) };
 const submitCalls = (calls: ApiCall[]) => calls.filter((call) => call.path.includes('/submit'));
 
-function mountForm(problem: ProblemDetail = problemDetail(), resubmitId: string | null = null) {
+function mountForm(
+  problem: ProblemDetail = problemDetail(),
+  resubmitId: string | null = null,
+  contest: ContestDetail | null = null,
+) {
   let form!: ReturnType<typeof useSubmitForm>;
   const problemRef = ref(problem);
   const wrapper = mountComponent(
     defineComponent({
       setup() {
-        form = useSubmitForm(problemRef, ref(resubmitId));
+        form = useSubmitForm(problemRef, ref(resubmitId), () => contest);
         return () => null;
       },
     }),
@@ -171,6 +178,20 @@ describe('submitting text', () => {
     });
     expect(form.lastSubmissionId.value).toBe('sub-9');
     expect(push).not.toHaveBeenCalled();
+  });
+  it("scores the result on the contest's points inside the viewer's contest (Q-10 A)", async () => {
+    mockApi({
+      ...anonymousViewer,
+      'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
+      'GET /submissions/sub-9': ok(submissionDetail({ id: 'sub-9', points: 400 })),
+    });
+    const contest = contestDetail({
+      problems: [contestProblem(0, { code: 'duongdi', points: 100, partial: true })],
+    });
+    const { form } = mountForm(problemDetail({ points: 1600 }), null, contest);
+    form.source.value = 'int main() { return 0; }';
+    await form.submitNow();
+    await vi.waitFor(() => expect(form.result.text.value).toMatch(/^25 \/ 100 · /));
   });
   it('sends one request for a double click', async () => {
     const calls = mockApi({

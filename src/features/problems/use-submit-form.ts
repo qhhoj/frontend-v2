@@ -1,10 +1,12 @@
 import { computed, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import { MAX_SOURCE_LENGTH, codePointCount } from '@/lib/source';
 import { useSubmitMessage } from './submit-message';
 import { useResubmitPrefill } from './use-resubmit-prefill';
 import type { ResubmitPrefill } from './use-resubmit-prefill';
+import { useContestProblem } from './use-contest-problem';
 import { useSourceTemplate } from './use-source-template';
 import { useSubmitFile } from './use-submit-file';
 import { useSubmitLanguage } from './use-submit-language';
@@ -14,8 +16,13 @@ import { useSubmitResult } from './use-submit-result';
 /**
  * State of the submit form, shared by the desktop dock and the phone sheet. Each concern lives in its own
  * composable (language, template, file, request, resubmit); this one only wires them together and gates submit.
+ * `contest` is the viewer's contest holding the problem: the result strip then scores on the contest's points.
  */
-export function useSubmitForm(problem: Ref<ProblemDetail>, resubmitId: Ref<string | null>) {
+export function useSubmitForm(
+  problem: Ref<ProblemDetail>,
+  resubmitId: Ref<string | null>,
+  contest: () => ContestDetail | null | undefined = () => null,
+) {
   const source = ref('');
   const { errorText, report } = useSubmitMessage();
   const switchLanguage = () => {
@@ -50,9 +57,19 @@ export function useSubmitForm(problem: Ref<ProblemDetail>, resubmitId: Ref<strin
     ),
     report,
   });
+  const { contestProblem } = useContestProblem(() => problem.value, contest);
   const result = useSubmitResult(
     lastSubmissionId,
-    computed(() => problem.value.points),
+    computed(() => {
+      const inContest = contestProblem.value;
+      const precision = contest()?.pointsPrecision ?? 0;
+      return {
+        problemPoints: problem.value.points,
+        contest: inContest
+          ? { points: inContest.points, partial: inContest.partial, precision }
+          : null,
+      };
+    }),
   );
   const canSubmit = computed(() => isReady.value && !submitting.value);
 

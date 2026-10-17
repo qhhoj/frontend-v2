@@ -62,7 +62,7 @@ watch(
   },
   { immediate: true },
 );
-const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId);
+const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, () => props.contest);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();
 const tabItems = computed(() =>
