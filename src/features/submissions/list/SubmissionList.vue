@@ -4,6 +4,8 @@ import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import { formatNumber } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import DiffSelectionBar from '../DiffSelectionBar.vue';
 import LiveToggle from '../LiveToggle.vue';
@@ -25,7 +27,7 @@ import type { SubmissionScope } from './submission-scope';
 import { useSubmissionList } from './use-submission-list';
 
 /**
- * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, pagers, table and its loading,
+ * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, the list, its pager at the foot, and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
  * judging-state boxes, the columns, the contest letters and the unfiltered empty text. The contest tab (P-21) also
  * drops the site's stats (`showStats`), puts its own chips in the `filters` slot and lists ledger rows (`ledger`).
@@ -64,6 +66,7 @@ const props = withDefaults(
 );
 const ADVANCED_PANEL_ID = 'submission-advanced-filters';
 const session = useSessionStore();
+const locale = useLocaleStore();
 const { filters, update, reset, listQuery, rows, live, languages, emptyText } = useSubmissionList({
   scope: () => props.scope,
   enabled: () => props.enabled,
@@ -79,6 +82,25 @@ const chipUsername = computed(() =>
   isSignedIn.value && !hasFixedUser.value ? (session.user?.username ?? null) : null,
 );
 const picks = useDiffPicks();
+/** Q-04 C: the rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
+const isComparing = ref(false);
+const toggleCompare = () => {
+  isComparing.value = !isComparing.value;
+  if (!isComparing.value) picks.clear();
+};
+/** "Bài nộp của bạn · 12 bài" over the viewer's whole own list (no other filter), once its own page has loaded. */
+const mineTotal = computed(() => {
+  const { problem, user, results, languageIds, statusGroups } = filters.value;
+  const isAllMine =
+    chipUsername.value !== null &&
+    user === chipUsername.value &&
+    !problem &&
+    !results.length &&
+    !languageIds.length &&
+    !statusGroups.length;
+  const meta = isPlaceholderData.value ? undefined : list.value?.meta;
+  return isAllMine && meta && 'total' in meta ? meta.total : null;
+});
 const advancedCount = computed(() =>
   advancedFilterCount(
     props.problemByChip ? { ...filters.value, problem: '' } : filters.value,
@@ -127,8 +149,10 @@ watch(
             :advanced-open="isAdvancedOpen"
             :advanced-count="advancedCount"
             :panel-id="ADVANCED_PANEL_ID"
+            :comparing="isSignedIn ? isComparing : null"
             @update="update"
             @toggle-advanced="toggleAdvanced"
+            @toggle-compare="toggleCompare"
           />
         </slot>
         <!-- Without the stats strip its live pill moves here, so a list opened with live=0 can follow again. -->
@@ -145,6 +169,7 @@ watch(
         :problem-source="problemSource"
         :show-user="!hasFixedUser"
         :show-status-groups="showStatusGroups"
+        :languages="languages"
         @update="update"
         @reset="reset"
       />
@@ -162,10 +187,14 @@ watch(
       />
       <NumberedPager
         v-if="list && rows.length"
+        class="max-md:hidden"
         :meta="list.meta"
         :label="$t('submissions.pager.top')"
         align="end"
       />
+      <p v-if="mineTotal !== null" data-testid="mine-summary" class="text-meta text-muted">
+        {{ $t('submissions.mineSummary', { count: formatNumber(mineTotal, locale.locale) }) }}
+      </p>
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SubmissionCardListSkeleton /></template>
         <Card v-if="!rows.length" as="div">
@@ -184,7 +213,7 @@ watch(
           :columns="columnKeys ?? ALL_COLUMN_KEYS"
           :highlight-ids="live.addedIds.value"
           :problem-labels="problemLabels ?? {}"
-          :picked-ids="isSignedIn ? picks.picked.value : undefined"
+          :picked-ids="isSignedIn && isComparing ? picks.picked.value : undefined"
           @toggle-pick="picks.toggle"
         />
         <DiffSelectionBar

@@ -10,7 +10,8 @@ import VerdictDistributionBar from './VerdictDistributionBar.vue';
 
 /**
  * Today's numbers in one slim line ("1.284 đã chấm hôm nay · 61% chấp nhận · 2 chờ · 1/1 máy chấm"), the live pill, and
- * the bar of today's verdicts. `pending` shows placeholders while the first answer loads; the live pill never waits for it.
+ * the bar of today's verdicts. A phone keeps the queue and the judges only, without the bar (P-08). `pending` shows
+ * placeholders while the first answer loads; the live pill never waits for it.
  */
 const props = defineProps<{
   stats: SubmissionStats | undefined;
@@ -35,6 +36,8 @@ const verdicts = computed(
   () => (props.stats as Partial<SubmissionStats> | undefined)?.verdictsToday ?? [],
 );
 
+/** The figures a phone keeps: is my submission waiting, and is a judge up. */
+const PHONE_FIGURES: ReadonlySet<string> = new Set(['queue', 'judges']);
 const figures = computed(() => {
   const { stats } = props;
   const number = (value: number) => formatNumber(value, locale.locale);
@@ -67,7 +70,12 @@ const figures = computed(() => {
     >
       <p v-if="!stats && !pending" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
       <dl class="m-0 flex flex-wrap items-center gap-x-5 gap-y-1 py-1.5">
-        <div v-for="figure in figures" :key="figure.id" class="flex items-baseline gap-1.5">
+        <div
+          v-for="figure in figures"
+          :key="figure.id"
+          class="flex items-baseline gap-1.5"
+          :class="{ 'max-sm:hidden': !PHONE_FIGURES.has(figure.id) }"
+        >
           <dt class="order-2">{{ $t(figure.labelKey) }}</dt>
           <dd class="order-1 m-0 font-mono text-sm font-bold text-content tabular-nums">
             <SkeletonBlock
@@ -89,6 +97,6 @@ const figures = computed(() => {
       </dl>
       <LiveToggle :live="live" class="ml-auto" @update:live="emit('update:live', $event)" />
     </Card>
-    <VerdictDistributionBar v-if="verdicts.length" :verdicts="verdicts" />
+    <VerdictDistributionBar v-if="verdicts.length" class="max-sm:hidden" :verdicts="verdicts" />
   </div>
 </template>
