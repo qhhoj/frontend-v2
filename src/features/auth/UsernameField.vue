@@ -33,6 +33,7 @@ const LINE = {
 } as const;
 const line = computed(() => LINE[status.value]);
 const availabilityId = useId();
+const hintId = useId();
 </script>
 
 <template>
@@ -42,10 +43,9 @@ const availabilityId = useId();
     :label="$t('auth.username')"
     autocomplete="username"
     placeholder="bitcoder"
-    :hint="$t('auth.usernameHint')"
     :error="problem ?? error"
     :tone="TONES[status]"
-    :described-by="availabilityId"
+    :described-by="line.key ? availabilityId : `${availabilityId} ${hintId}`"
     required
     spellcheck="false"
     autocapitalize="none"
@@ -58,14 +58,20 @@ const availabilityId = useId();
         :class="[line.colour, status === 'checking' && 'motion-safe:animate-spin']"
       />
     </template>
-    <!-- Always rendered, so the line's height is reserved and the answer never moves the form. -->
-    <p
-      :id="availabilityId"
-      aria-live="polite"
-      class="flex min-h-5 items-center gap-1.5 text-meta"
-      :class="line.colour"
-    >
-      <template v-if="line.key">{{ $t(line.key) }}</template>
-    </p>
+    <!-- One line under the field (P-13), so it is as tall as its neighbour in the two-column form: the format hint
+         until there is an answer, then the answer. The live region is always rendered, so only answers are announced. -->
+    <div class="grid min-h-5 text-meta">
+      <p
+        :id="availabilityId"
+        aria-live="polite"
+        class="col-start-1 row-start-1 flex items-center gap-1.5"
+        :class="line.colour"
+      >
+        <template v-if="line.key">{{ $t(line.key) }}</template>
+      </p>
+      <p v-if="!line.key" :id="hintId" class="col-start-1 row-start-1 text-muted">
+        {{ $t('auth.usernameHint') }}
+      </p>
+    </div>
   </AuthField>
 </template>

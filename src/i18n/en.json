@@ -735,12 +735,10 @@
     },
     "signup": {
       "school": "School",
-      "language": "Default language",
       "optional": "(optional)",
       "schoolSearch": "Type to find a school",
       "schoolNone": "No school found",
-      "schoolFilter": "Find a school",
-      "none": "Not chosen"
+      "schoolFilter": "Find a school"
     },
     "twoFactor": {
       "title": "Two-step verification",
