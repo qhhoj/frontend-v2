@@ -7,7 +7,6 @@ import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import StateBit from '@/components/StateBit.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
-import { ownResultContext } from '@/features/contests/own-result';
 import {
   formatMemoryLimit,
   formatNumber,
@@ -15,24 +14,27 @@ import {
   formatTimeLimit,
 } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useContestProblem } from './use-contest-problem';
+import { viewerStatusOf } from './viewer-status';
 
 /**
  * Limits, solve counts, the viewer's status and the problem types (hideable). Keep `ProblemRailSkeleton.vue` in step.
  * Inside the viewer's contest (`contest` lists the problem) the site-wide numbers make no sense: the card shows the
  * contest's points and the viewer's own cell ("Của bạn") instead (P-15).
+ * `narrow` hides what the limit strip under the title already says when the rail is not beside the statement: the facts
+ * grid, and the whole card when the problem has no types.
  */
 const props = defineProps<{
   problem: ProblemDetail;
   isSignedIn: boolean;
   contest?: ContestDetail | null;
+  narrow?: { limits: string; typesDivider: string };
 }>();
 const locale = useLocaleStore();
 const typesShown = ref(true);
-const contestProblem = computed(
-  () => props.contest?.problems?.find((problem) => problem.code === props.problem.code) ?? null,
-);
-const ownContext = computed(() =>
-  props.contest ? ownResultContext(props.contest, locale.locale) : null,
+const { contestProblem, ownContext, contestPoints } = useContestProblem(
+  () => props.problem,
+  () => props.contest,
 );
 const limitFacts = computed(() => [
   {
@@ -49,9 +51,8 @@ const limitFacts = computed(() => [
   },
 ]);
 const contestFacts = computed(() => {
-  const inContest = contestProblem.value;
-  if (!inContest || !props.contest) return null;
-  const points = formatNumber(inContest.points, locale.locale, props.contest.pointsPrecision);
+  const points = contestPoints.value;
+  if (points === null) return null;
   return [
     ...limitFacts.value,
     {
@@ -94,17 +95,15 @@ const ioFacts = computed(() => {
       ]
     : [{ key: 'stdio', label: 'problem.rail.facts.io', text: null, span: true }];
 });
-const STATUS = {
-  solved: { key: 'problems.solved', tone: 'text-verdict-ac' },
-  attempted: { key: 'problems.attempted', tone: 'text-verdict-tle' },
-  untried: { key: 'problem.rail.facts.untried', tone: 'text-muted' },
-} as const;
-const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
+const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
 </script>
 
 <template>
-  <Card class="rounded-panel p-4" data-testid="problem-facts">
-    <dl data-testid="limits" class="grid grid-cols-2 gap-x-3 gap-y-3.5">
+  <Card
+    :class="['rounded-panel p-4', !problem.types.length && narrow?.limits]"
+    data-testid="problem-facts"
+  >
+    <dl data-testid="limits" :class="['grid grid-cols-2 gap-x-3 gap-y-3.5', narrow?.limits]">
       <div v-for="fact in facts" :key="fact.key">
         <dt class="text-meta text-muted">{{ $t(fact.label) }}</dt>
         <dd class="mt-0.5 text-title font-bold tabular-nums" :class="fact.tone">
@@ -119,7 +118,7 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
       </div>
       <div v-else-if="isSignedIn" data-testid="viewer-status">
         <dt class="text-meta text-muted">{{ $t('problem.rail.facts.status') }}</dt>
-        <dd class="mt-0.5 flex min-h-6 items-center gap-1.5 text-sm font-bold" :class="status.tone">
+        <dd class="mt-0.5 flex min-h-6 items-center gap-1.5 text-sm font-bold" :class="status.text">
           {{ $t(status.key) }}
           <StateBit v-if="problem.viewerStatus === 'solved'" variant="rankUp" size="tiny" />
         </dd>
@@ -136,7 +135,10 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
         </dd>
       </div>
     </dl>
-    <div v-if="problem.types.length" class="mt-3.5 flex flex-col gap-2 border-t border-line pt-3">
+    <div
+      v-if="problem.types.length"
+      :class="['flex flex-col gap-2', narrow?.typesDivider ?? 'mt-3.5 border-t border-line pt-3']"
+    >
       <button
         type="button"
         :aria-expanded="typesShown"

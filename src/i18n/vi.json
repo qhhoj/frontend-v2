@@ -1080,7 +1080,11 @@
       }
     },
     "pdfRender": "Tải đề dạng PDF",
-    "externalJudge": "Chấm trên {oj}"
+    "externalJudge": "Chấm trên {oj}",
+    "strip": {
+      "partial": "từng phần",
+      "solves": "AC {rate}% · {count} người giải"
+    }
   },
   "problems": {
     "title": "Bài tập",
