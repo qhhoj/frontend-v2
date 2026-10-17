@@ -1677,8 +1677,6 @@
     "emptyFilterBody": "Thử chọn mục khác ở bộ lọc.",
     "back": "← Tổ chức",
     "about": "Giới thiệu",
-    "joinPolicyOpen": "Mở tự do khi tham gia",
-    "joinPolicyApproval": "Cần duyệt khi tham gia",
     "ppMeta": "{pp} điểm thành tích",
     "membersMeta": "{count} thành viên",
     "manageCard": {
@@ -1694,18 +1692,15 @@
   "orgMembership": {
     "signIn": "Đăng nhập để tham gia",
     "join": "Tham gia tổ chức",
-    "openLine": "Mỗi người tham gia tối đa {max} tổ chức mở. Tham gia ngay, không cần duyệt.",
     "requestTitle": "Gửi yêu cầu tham gia",
     "reason": "Lý do (bắt buộc, tối đa 4096 ký tự)",
     "send": "Gửi yêu cầu",
     "pending": "Đang chờ duyệt",
     "sentAt": "gửi {date}",
     "pendingLine": "Quản trị viên sẽ xem yêu cầu của bạn. Bạn chỉ có thể có một yêu cầu đang chờ cho mỗi tổ chức.",
-    "isMember": "Bạn là thành viên",
     "leave": "Rời tổ chức",
     "privateLeave": "Tổ chức riêng tư: nếu rời, muốn vào lại phải gửi yêu cầu mới.",
     "administrator": "Quản trị viên",
-    "joined": "Đã tham gia {name}",
     "joinFailedTitle": "Không tham gia được",
     "joinFailedBody": "Bạn đã ở 3 tổ chức mở, đó là mức tối đa. Hãy rời một tổ chức mở trước khi tham gia.",
     "failedTitle": "Không thực hiện được",
@@ -1720,7 +1715,14 @@
     "postsTitle": "Bài viết của tổ chức",
     "writePost": "Viết bài cho tổ chức",
     "writeFirstPost": "Viết bài đầu tiên",
-    "noPostsBody": "Quản trị viên đăng bài cho tổ chức tại đây; thành viên đọc được."
+    "noPostsBody": "Quản trị viên đăng bài cho tổ chức tại đây; thành viên đọc được.",
+    "member": "Thành viên",
+    "menu": "Thao tác với tổ chức",
+    "leaveTitle": "Rời {name}?",
+    "leaveOpenBody": "Tổ chức mở: bạn có thể tham gia lại bất cứ lúc nào.",
+    "left": "Đã rời {name}",
+    "joinedToast": "Đã tham gia {name}. Muốn rời, mở menu ⋯ ở đầu trang tổ chức.",
+    "openLine": "Mỗi người tham gia tối đa {max} tổ chức mở."
   },
   "blog": {
     "lead": "Thông báo, hướng dẫn và chia sẻ từ cộng đồng. Bài ghim luôn nằm đầu bảng tin.",

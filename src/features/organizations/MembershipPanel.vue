@@ -1,33 +1,48 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, useId, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { MAX_OPEN_ORGANIZATIONS } from '@/api/types/organizations';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import Chip from '@/components/ui/Chip.vue';
+import Modal from '@/components/ui/Modal.vue';
+import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import { safeRedirect } from '@/router/safe-redirect';
-import { useSessionStore } from '@/stores/session.store';
 import JoinRequestForm from './JoinRequestForm.vue';
 import PendingRequestBlock from './PendingRequestBlock.vue';
 import { membershipErrorCopy } from './membership-errors';
-import { membershipState } from './membership-state';
+import type { MembershipState } from './membership-state';
 import { useMembership } from './use-membership';
 
-/** The viewer's one membership panel in the organization header: join, request, pending, member or administrator. */
-const props = defineProps<{ organization: OrganizationDetail }>();
+/**
+ * The header's one way in (P-10): sign in, join, or ask to join (the reason in a dialog), and the pending request. A member or
+ * an administrator has nothing here: their chip sits by the name and leaving is in the ⋯ menu. Joining says so in a toast; a
+ * failure stays here, next to the button.
+ */
+const props = defineProps<{ organization: OrganizationDetail; state: MembershipState }>();
+const { t } = useI18n();
 const route = useRoute();
-const session = useSessionStore();
-const membership = useMembership(() => props.organization.slug);
-/** Official contest: join, request and leave answer `locked_in_official_contest`, so they are locked here with the reason. */
-const lock = useOfficialLock();
+const toast = useAdminToast({ lazy: true });
 const reason = ref('');
+const isRequestOpen = ref(false);
+const membership = useMembership(
+  () => props.organization.slug,
+  (kind) => {
+    isRequestOpen.value = false;
+    if (kind === 'join')
+      toast.show({
+        tone: 'success',
+        text: t('orgMembership.joinedToast', { name: props.organization.name }),
+      });
+  },
+);
+/** Official contest: join and request answer `locked_in_official_contest`, so they are locked here with the reason. */
+const lock = useOfficialLock();
 const panel = ref<HTMLElement>();
-const state = computed(() => membershipState(props.organization, session.user !== null));
-const joined = computed(() => membership.succeeded.value && membership.action.value === 'join');
+const openLineId = useId();
 const errorCopy = computed(() =>
   membership.error.value && membership.action.value
     ? membershipErrorCopy(membership.action.value, membership.error.value)
@@ -42,31 +57,29 @@ const signInTo = computed(() => ({
 watch(
   () => membership.error.value,
   (error) => {
-    if (error) void nextTick(() => panel.value?.focus());
+    if (error && !isRequestOpen.value) void nextTick(() => panel.value?.focus());
   },
 );
+function openRequest() {
+  membership.reset();
+  isRequestOpen.value = true;
+}
 const retry = () => {
-  const kind = membership.action.value;
-  if (kind === 'join') membership.join();
-  else if (kind === 'leave') membership.leave();
-  else if (kind === 'request') membership.request(reason.value);
+  if (membership.action.value === 'join') membership.join();
+  else if (membership.action.value === 'request') membership.request(reason.value);
 };
 </script>
 
 <template>
   <section
+    v-if="state !== 'member' && state !== 'administrator'"
     ref="panel"
     data-testid="membership-panel"
     tabindex="-1"
-    :class="['flex flex-col gap-3', state === 'administrator' ? 'w-fit' : 'w-full md:w-72']"
+    class="flex w-full flex-col gap-2 md:w-auto md:max-w-72 md:items-end"
   >
     <StatePanel
-      v-if="joined"
-      kind="success"
-      :title="$t('orgMembership.joined', { name: organization.shortName })"
-    />
-    <StatePanel
-      v-if="errorCopy"
+      v-if="errorCopy && !isRequestOpen"
       kind="error"
       :title="$t(errorCopy.title)"
       :body="$t(errorCopy.body)"
@@ -74,36 +87,28 @@ const retry = () => {
       <AppButton @click="retry">{{ $t('orgMembership.retry') }}</AppButton>
     </StatePanel>
 
-    <AppButton v-if="state === 'signedOut'" tone="primary" :to="signInTo" block>
+    <AppButton v-if="state === 'signedOut'" tone="primary" :to="signInTo" class="max-md:w-full">
       {{ $t('orgMembership.signIn') }}
     </AppButton>
 
-    <template v-else-if="state === 'canJoin'">
-      <p class="text-sm text-muted">
-        {{ $t('orgMembership.openLine', { max: MAX_OPEN_ORGANIZATIONS }) }}
-      </p>
+    <template v-else-if="state === 'canJoin' || state === 'canRequest'">
       <AppButton
         v-bind="lock.lockAttrs.value"
         tone="primary"
-        block
+        class="max-md:w-full"
         :disabled="lock.isLocked.value"
-        :loading="membership.isPending.value"
-        @click="membership.join()"
+        :loading="state === 'canJoin' && membership.isPending.value"
+        :aria-describedby="
+          lock.isLocked.value ? lock.noteId : state === 'canJoin' ? openLineId : undefined
+        "
+        @click="state === 'canJoin' ? membership.join() : openRequest()"
       >
-        {{ $t('orgMembership.join') }}
+        {{ $t(state === 'canJoin' ? 'orgMembership.join' : 'orgMembership.requestTitle') }}
       </AppButton>
       <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
-    </template>
-
-    <template v-else-if="state === 'canRequest'">
-      <h2 class="font-display text-base font-bold">{{ $t('orgMembership.requestTitle') }}</h2>
-      <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
-      <JoinRequestForm
-        v-else
-        v-model="reason"
-        :busy="membership.isPending.value"
-        @submit="membership.request(reason)"
-      />
+      <p v-else-if="state === 'canJoin'" :id="openLineId" class="text-meta text-muted">
+        {{ $t('orgMembership.openLine', { max: MAX_OPEN_ORGANIZATIONS }) }}
+      </p>
     </template>
 
     <PendingRequestBlock
@@ -112,29 +117,20 @@ const retry = () => {
       :request-id="organization.viewer!.pendingRequestId!"
     />
 
-    <template v-else-if="state === 'member'">
-      <p class="inline-flex items-center gap-2 font-semibold">
-        <Check aria-hidden="true" class="size-5 text-accent-text" />
-        {{ $t('orgMembership.isMember') }}
+    <Modal
+      v-model:visible="isRequestOpen"
+      :title="$t('orgMembership.requestTitle')"
+      size="md"
+      :closable="!membership.isPending.value"
+    >
+      <JoinRequestForm
+        v-model="reason"
+        :busy="membership.isPending.value"
+        @submit="membership.request(reason)"
+      />
+      <p v-if="errorCopy" role="alert" class="mt-3 text-sm text-negative">
+        <strong>{{ $t(errorCopy.title) }}</strong> {{ $t(errorCopy.body) }}
       </p>
-      <p v-if="!organization.isOpen" class="text-sm text-muted">
-        {{ $t('orgMembership.privateLeave') }}
-      </p>
-      <AppButton
-        v-bind="lock.lockAttrs.value"
-        block
-        :disabled="lock.isLocked.value"
-        :loading="membership.isPending.value"
-        @click="membership.leave()"
-      >
-        {{ $t('orgMembership.leave') }}
-      </AppButton>
-      <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
-    </template>
-
-    <template v-else-if="state === 'administrator'">
-      <!-- Managing lives on the Quản lý tab and the overview card; the header only names the role. -->
-      <Chip tone="accent" size="md" class="w-fit">{{ $t('orgMembership.administrator') }}</Chip>
-    </template>
+    </Modal>
   </section>
 </template>

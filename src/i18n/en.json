@@ -1677,8 +1677,6 @@
     "emptyFilterBody": "Try another filter.",
     "back": "← Organizations",
     "about": "About",
-    "joinPolicyOpen": "Anyone can join",
-    "joinPolicyApproval": "Joining needs approval",
     "ppMeta": "{pp} performance points",
     "membersMeta": "{count} members",
     "manageCard": {
@@ -1694,18 +1692,15 @@
   "orgMembership": {
     "signIn": "Sign in to join",
     "join": "Join",
-    "openLine": "You may be in up to {max} open organizations. Join now, no approval needed.",
     "requestTitle": "Ask to join",
     "reason": "Reason (required, up to 4096 characters)",
     "send": "Send request",
     "pending": "Waiting for approval",
     "sentAt": "sent {date}",
     "pendingLine": "An administrator will review it. You can have one pending request per organization.",
-    "isMember": "You are a member",
     "leave": "Leave",
     "privateLeave": "Private organization: to come back after leaving you need a new request.",
     "administrator": "Administrator",
-    "joined": "You joined {name}",
     "joinFailedTitle": "Could not join",
     "joinFailedBody": "You are in 3 open organizations, the maximum. Leave one before joining.",
     "failedTitle": "That did not work",
@@ -1720,7 +1715,14 @@
     "postsTitle": "Organization posts",
     "writePost": "Write for the organization",
     "writeFirstPost": "Write the first post",
-    "noPostsBody": "Admins post for the organization here; members can read them."
+    "noPostsBody": "Admins post for the organization here; members can read them.",
+    "member": "Member",
+    "menu": "Organization actions",
+    "leaveTitle": "Leave {name}?",
+    "leaveOpenBody": "An open organization: you can join again at any time.",
+    "left": "Left {name}",
+    "joinedToast": "Joined {name}. To leave, open the ⋯ menu at the top of the organization page.",
+    "openLine": "You can be in at most {max} open organizations."
   },
   "blog": {
     "lead": "News, guides and stories from the community. Pinned posts stay on top.",
