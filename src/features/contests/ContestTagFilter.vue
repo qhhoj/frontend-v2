@@ -22,7 +22,12 @@ const SKELETON_CHIPS = 5;
 </script>
 
 <template>
-  <div data-testid="tag-filter" class="flex min-w-0 flex-col gap-2">
+  <!-- A site without tags shows no chip row at all (P-26): no empty box under the title. -->
+  <div
+    v-if="hasFailed || isLoading || tags.length || state === 'unknown'"
+    data-testid="tag-filter"
+    class="flex min-w-0 flex-col gap-2"
+  >
     <p
       v-if="hasFailed"
       data-testid="tag-failed"
@@ -81,8 +86,6 @@ const SKELETON_CHIPS = 5;
         </li>
       </ul>
     </nav>
-    <!-- An empty catalogue keeps the loading row's box, so the groups below do not jump up when the chips fail to come. -->
-    <div v-else-if="!hasFailed" aria-hidden="true" class="h-13" />
     <p
       v-if="state === 'unknown'"
       data-testid="tag-unknown"

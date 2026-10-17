@@ -1,13 +1,38 @@
 import type { Locale } from '@/i18n';
 import { localDayOffset } from '@/lib/contest-time';
-import { formatClock } from '@/lib/format';
+import { formatClock, formatNumericDate, formatShortDate } from '@/lib/format';
+
+interface ContestTimes {
+  startTime: string;
+  endTime: string;
+}
 
 /** The end clock in the viewer's zone, with `(+N)` when it falls N days after the start's day (`01:00 (+1)`). */
-export function endClockLabel(
-  times: { startTime: string; endTime: string },
-  locale: Locale,
-): string {
+export function endClockLabel(times: ContestTimes, locale: Locale): string {
   const clock = formatClock(times.endTime, locale);
   const dayOffset = localDayOffset(times.startTime, times.endTime);
   return dayOffset > 0 ? `${clock} (+${dayOffset})` : clock;
+}
+
+/** The contest starts and ends on the same day in the viewer's zone. */
+export const isOneDay = (times: ContestTimes): boolean =>
+  localDayOffset(times.startTime, times.endTime) === 0;
+
+/**
+ * The two ends of a timeline: clocks when the contest starts and ends on one day, else the date before each clock
+ * (`15/10 11:27` ─── `15/11 11:27`), with the year when the years differ, so two equal clocks on different days never
+ * read as one instant (P-18).
+ */
+export function timelineLabels(
+  times: ContestTimes,
+  locale: Locale,
+): { start: string; end: string } {
+  const isSameYear =
+    new Date(times.startTime).getFullYear() === new Date(times.endTime).getFullYear();
+  const dateOf = isSameYear ? formatShortDate : formatNumericDate;
+  const label = (instant: string) =>
+    isOneDay(times)
+      ? formatClock(instant, locale)
+      : `${dateOf(instant, locale)} ${formatClock(instant, locale)}`;
+  return { start: label(times.startTime), end: label(times.endTime) };
 }

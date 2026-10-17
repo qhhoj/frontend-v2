@@ -101,6 +101,7 @@ const whenText = (contest: ContestListItem) => {
               :contest-name="contest.name"
               :label-key="callOf(contest).labelKey"
               :is-primary="callOf(contest).isPrimary"
+              compact
             />
           </td>
         </tr>

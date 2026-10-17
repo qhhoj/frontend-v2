@@ -31,13 +31,18 @@ describe('contest list', () => {
     ]);
   });
 
-  it('moves the time left with the clock, every 15 seconds', async () => {
+  it("counts the time left down with the hero's clock", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date', 'setInterval', 'clearInterval'] });
     mockApi({ ...anonymousViewer, ...contestListRoutes({ running: [running] }) });
     const { wrapper } = await mountApp('/contests');
     vi.advanceTimersByTime(45_000);
     await flushPromises();
-    expect(wrapper.get('[data-testid="running-contest"]').text()).toContain('còn 1 giờ 46 phút');
+    const timer = () => wrapper.get('[data-testid="running-contest"] [role="timer"]').text();
+    const before = timer();
+    expect(before).toMatch(/^01:4\d:\d\d$/);
+    vi.advanceTimersByTime(1_000);
+    await flushPromises();
+    expect(timer()).not.toBe(before);
   });
 
   it('starts again at page 1 when a filter changes, keeping the phase', async () => {
