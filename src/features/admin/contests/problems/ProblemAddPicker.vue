@@ -11,8 +11,8 @@ const MIN_SEARCH = 2;
 const RESULTS = 8;
 
 /**
- * Adds a problem: typing searches codes and names among the problems this account may see and lists the
- * matches to pick; Enter still adds the exact code typed.
+ * Adds a problem from the box above the table: typing searches codes and names among the problems this account may see
+ * and lists the matches to pick; Enter still adds the exact code typed. The placeholder says so; the label is for readers.
  */
 const props = defineProps<{
   listedIds: string[];
@@ -56,7 +56,7 @@ async function submit() {
 
 <template>
   <div class="flex flex-col gap-2">
-    <label for="contest-add-problem" class="text-sm font-semibold">{{
+    <label for="contest-add-problem" class="sr-only">{{
       $t('admin.contests.problems.addLabel')
     }}</label>
     <input
@@ -74,7 +74,7 @@ async function submit() {
       spellcheck="false"
       @keydown.enter.prevent="submit"
     />
-    <p id="contest-add-problem-hint" class="text-xs text-muted">
+    <p id="contest-add-problem-hint" class="sr-only">
       {{ $t('admin.contests.problems.addHint') }}
     </p>
     <p v-if="error" id="contest-add-problem-error" class="text-sm text-negative">{{ error }}</p>

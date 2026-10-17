@@ -161,7 +161,6 @@
       "removeAccessCode": "Remove code",
       "rankingAccessCode": "Ranking access code",
       "removeRankingAccessCode": "Remove ranking code",
-      "isVisible": "Contest visible",
       "isPrivate": "Private",
       "isPrivateHint": "Only the contestants listed.",
       "privateContestants": "Listed contestants",
@@ -180,7 +179,6 @@
       "optionsTitle": "Display and judging options",
       "runPretestsOnlyHint": "Only pretests run during the contest; full tests at final judging.",
       "hideProblemTagsHint": "Contestants do not see the problem tags.",
-      "isVisibleHint": "Off: only the contest staff see it.",
       "isOrganizationPrivateHint": "Only members of the chosen organizations may enter."
     },
     "hints": {
@@ -227,19 +225,26 @@
       "phase": "Status",
       "participants": "Participants",
       "virtual": "plus {count} virtual",
-      "problems": "Problems"
+      "problems": "Problems",
+      "visibility": {
+        "label": "Visible",
+        "offState": "Hidden — participants cannot see it yet",
+        "onState": "Shown — participants see the contest",
+        "shown": "Contest {key} is now shown.",
+        "hidden": "Contest {key} is now hidden."
+      }
     },
     "basic": {
       "sections": {
         "info": "Contest",
         "time": "Time",
         "format": "Scoring",
-        "access": "Who sees it"
+        "access": "Scoreboard"
       },
       "leads": {
         "info": "The key is used in the contest page address.",
         "time": "Vietnam time (UTC+7).",
-        "access": "Who sees the contest and its scoreboard."
+        "access": "Who sees the scoreboard. Show or hide the contest with the Visible switch in the summary."
       },
       "quickLegend": "Lasts",
       "quick": "+{n} min",
@@ -268,10 +273,10 @@
   "create": {
     "title": "Create contest",
     "submit": "Create contest",
-    "lead": "Fill in the details and the times; everything else can be changed later.",
+    "lead": "Fill in the details and the times; everything else can be changed later. Next: add problems.",
     "required": "Fields marked * are required.",
     "cancel": "Cancel",
-    "done": "Created contest {key}."
+    "done": "Created contest {key}. Next: add problems."
   },
   "problems": {
     "columns": {
@@ -285,12 +290,15 @@
       "order": "Order"
     },
     "addLabel": "Add a problem",
-    "addPlaceholder": "Problem code or name…",
+    "addPlaceholder": "Add a problem: type a code or name, Enter adds the exact code",
     "full": "At most 100 problems.",
     "notFound": "There is no problem {code}.",
     "alreadyListed": "Problem {code} is already in the contest.",
     "orderLine": "The table order is the contest order (at most 100 problems). Type a new position or use the up and down buttons to change it.",
     "prefixLine": "Output cut: leave empty for the judge's default.",
+    "limitsLine": "No problem has an output cut or a submission cap.",
+    "showLimits": "Show these columns",
+    "hideLimits": "Hide these columns",
     "rescoreWarning": "Changing points or scoring after submissions exist does not rescore them automatically.",
     "rescoreLink": "Use Rescore on the Actions tab.",
     "save": "Save contest problems",
@@ -320,8 +328,10 @@
     "positionFor": "Position of {code}",
     "saved": "Problem list saved.",
     "tableLabel": "Contest problems",
-    "empty": "No problems yet. Add one alongside.",
-    "tools": "Add and rejudge problems"
+    "empty": "No problems yet. Add one in the box above.",
+    "tools": "Add problems",
+    "rejudgeLine": "Rejudge or rescore one problem:",
+    "rejudgeLink": "Actions tab."
   },
   "announcements": {
     "composeTitle": "Post an announcement",
@@ -463,6 +473,7 @@
     "queuedToast": "Queued: {action}.",
     "groups": {
       "jobs": "Judging and scoring",
+      "problem": "One problem",
       "board": "Scoreboard and publishing",
       "copy": "Data and copies",
       "danger": "Danger zone"
@@ -476,6 +487,7 @@
     },
     "penalty": "{hours} h {minutes} min",
     "countLine": "{total} participations · 50 per page",
+    "countSplit": "{total} participations, of which {live} participants and {virtual} virtual · 50 per page",
     "userLabel": "Search usernames",
     "columns": {
       "user": "User",

@@ -10,6 +10,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
+import { needsPermissionText } from '../../ui/permission-text';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
 /**
@@ -128,7 +129,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
       </button>
     </div>
     <p v-if="problems.length && !canRejudge" class="text-sm text-muted">
-      {{ $t('admin.ui.needsPermission', { permission: 'judge.rejudge_submission' }) }}
+      {{ needsPermissionText('judge.rejudge_submission') }}
     </p>
     <AdminStatus
       v-if="rescore.isDone.value"
@@ -174,7 +175,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
         </template>
       </p>
       <p v-if="lastPreview && !lastPreview.allowed" class="text-sm text-negative">
-        {{ $t('admin.ui.needsPermission', { permission: 'judge.rejudge_submission_lot' }) }}
+        {{ needsPermissionText('judge.rejudge_submission_lot') }}
       </p>
       <label class="flex min-h-11 items-center gap-2 text-sm">
         <input v-model="includeLocked" type="checkbox" class="size-5" />

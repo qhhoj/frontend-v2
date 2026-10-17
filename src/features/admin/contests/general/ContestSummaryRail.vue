@@ -5,11 +5,14 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { CARD } from '../../ui/controls';
 import ContestPhaseChip from '../list/ContestPhaseChip.vue';
+import ContestVisibilitySwitch from './ContestVisibilitySwitch.vue';
 import { CONTEST_SECTION_KEYS, contestSectionLabel, jumpToSection } from './contest-sections';
 
-/** The general tab's right rail from 1280 px: the contest at a glance, then the form's sections as jump links. */
-/** `hasSections`: the Advanced view, whose sections the rail links to. */
-const props = defineProps<{ contest: EditableContest; hasSections: boolean }>();
+/**
+ * The contest at a glance on the general and problems tabs: phase, the "Hiển thị" switch and the counts. A strip above the
+ * tab below 1280 px, a sticky right rail from there; on the Advanced view the rail also links to the form's sections.
+ */
+const props = defineProps<{ contest: EditableContest; hasSections?: boolean }>();
 const locale = useLocaleStore();
 const stats = computed(() => [
   {
@@ -31,14 +34,26 @@ const LINK =
 
 <template>
   <aside
-    class="sticky top-16 flex flex-col gap-3"
+    class="flex flex-col gap-3 xl:sticky xl:top-16"
     :aria-label="$t('admin.contests.general.rail.label')"
+    data-testid="contest-summary"
   >
-    <div :class="[CARD, 'flex flex-col divide-y divide-line']">
-      <div class="flex items-center justify-between gap-2 px-4 py-3">
+    <div
+      :class="[
+        CARD,
+        'grid grid-cols-2 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto] xl:flex xl:flex-col xl:divide-y xl:divide-line',
+      ]"
+    >
+      <div
+        class="flex flex-col items-start justify-center gap-1 px-4 py-3 xl:flex-row xl:items-center xl:justify-between"
+      >
         <span class="text-xs text-muted">{{ $t('admin.contests.general.rail.phase') }}</span>
         <ContestPhaseChip :phase="contest.phase" />
       </div>
+      <ContestVisibilitySwitch
+        :contest="contest"
+        class="px-4 py-3 max-sm:order-last max-sm:col-span-2"
+      />
       <div v-for="stat in stats" :key="stat.key" class="flex flex-col px-4 py-3">
         <span class="text-xs text-muted">{{ $t(`admin.contests.general.rail.${stat.key}`) }}</span>
         <span class="font-display text-xl font-semibold tabular-nums">{{ stat.value }}</span>
@@ -49,7 +64,7 @@ const LINK =
     </div>
     <nav
       v-if="hasSections"
-      :class="[CARD, 'flex flex-col p-2']"
+      :class="[CARD, 'hidden flex-col p-2 xl:flex']"
       :aria-label="$t('admin.form.section.jumpTo')"
     >
       <p class="m-0 px-2 pt-1 pb-1.5 text-xs font-semibold tracking-wide text-muted uppercase">

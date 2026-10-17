@@ -68,6 +68,25 @@ describe('ContestProblemsTab', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(3);
   });
 
+  it('shows the output-cut and cap columns on request, and on their own once a problem has a cap', async () => {
+    const uncapped = editableContest();
+    uncapped.problems = uncapped.problems!.map((problem) => ({ ...problem, maxSubmissions: null }));
+    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes(uncapped) });
+    const plain = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
+    const capBoxes = () => plain.wrapper.findAll('input[aria-label^="Số lần nộp tối đa cho"]');
+    expect(capBoxes()).toHaveLength(0);
+    await plain.wrapper.get('[data-testid="contest-limits-toggle"]').trigger('click');
+    expect(capBoxes()).toHaveLength(3);
+    plain.wrapper.unmount();
+
+    mockApi({ ...staffViewer(EDIT), ...contestEditorRoutes() });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/problems', WARNING);
+    const cap = wrapper.get('input[aria-label="Số lần nộp tối đa cho hcmus41c"]');
+    expect((cap.element as HTMLInputElement).value).toBe('20');
+    await cap.setValue('');
+    expect(wrapper.find('input[aria-label="Số lần nộp tối đa cho hcmus41c"]').exists()).toBe(true);
+  });
+
   it('refuses a cleared points box beside its row, and sends nothing', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
@@ -112,6 +131,8 @@ describe('ContestProblemsTab', () => {
     const position = wrapper.get('input[aria-label="Vị trí của hcmus41c"]');
     await position.setValue('1');
     await position.trigger('change');
+    expect(wrapper.get('#contest-copy-problems').isVisible()).toBe(false);
+    await wrapper.get('[data-testid="contest-copy-toggle"]').trigger('click');
     await wrapper.get('#contest-copy-problems').setValue('hcmus-w40');
     await wrapper
       .findAll('form')

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
+import { Copy } from 'lucide-vue-next';
 import type { EditableContest } from '@/api/types/contest-editing';
 import BulkSelectionBar from '../../ui/BulkSelectionBar.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -8,16 +9,17 @@ import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { checked, useRowSelection } from '../../ui/use-row-selection';
-import ContestProblemOpsCard from './ContestProblemOpsCard.vue';
 import ContestProblemRow from './ContestProblemRow.vue';
 import ProblemAddPicker from './ProblemAddPicker.vue';
 import ProblemCopyFrom from './ProblemCopyFrom.vue';
+import ContestSummaryRail from '../general/ContestSummaryRail.vue';
 import { isPointsValid, labelFor } from './contest-problems';
 import { useContestProblemRows } from './use-contest-problem-rows';
 
 /**
- * The contest's problem list as one draft: edit rows in place, add by code or copy from another contest, then save the
- * whole list. From 1536 px the add and copy tools and the per-problem operations sit in a rail beside the table.
+ * The contest's problem list as one draft: edit rows in place, add by code or copy from another contest (the box and the
+ * button above the table), then save the whole list. The contest summary sits beside it from 1280 px, above it below.
+ * Rejudging one problem is on the Actions tab.
  */
 const props = defineProps<{ contest: EditableContest }>();
 const {
@@ -52,6 +54,23 @@ function removeAt(index: number) {
   selection.toggle(rows.value[index]!.problemId, false);
   remove(index);
 }
+const isCopyOpen = ref(false);
+/**
+ * Output prefix and submission cap are rarely set: their columns show on request, or once a row has one (and then stay,
+ * so clearing the last value does not pull the box away mid-edit).
+ */
+const showLimits = ref(false);
+const hasLimits = computed(() =>
+  rows.value.some((row) => row.outputPrefix !== null || row.maxSubmissions !== null),
+);
+watch(
+  hasLimits,
+  (has) => {
+    if (has) showLimits.value = true;
+  },
+  { immediate: true },
+);
+const copyPanelId = useId();
 const formId = useId();
 const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
 </script>
@@ -60,8 +79,36 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
   <div class="flex flex-col gap-4">
     <!-- The save bar submits this empty form: the add and copy tools are forms of their own. -->
     <form :id="formId" class="hidden" novalidate @submit.prevent="save" />
-    <div class="grid items-start gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
+    <div class="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_15rem]">
+      <ContestSummaryRail :contest="contest" class="xl:order-last" />
       <div class="flex min-w-0 flex-col gap-3">
+        <section class="flex flex-col gap-3" :aria-label="$t('admin.contests.problems.tools')">
+          <div class="flex flex-wrap items-start gap-2">
+            <ProblemAddPicker
+              class="min-w-0 flex-1 basis-72"
+              :listed-ids="listedIds"
+              :is-full="isFull"
+              :is-adding="isAdding"
+              :error="addError"
+              :add-by-code="addByCode"
+              @pick="addFound"
+            />
+            <button
+              type="button"
+              :class="buttonClass('secondary')"
+              :aria-expanded="isCopyOpen"
+              :aria-controls="copyPanelId"
+              data-testid="contest-copy-toggle"
+              @click="isCopyOpen = !isCopyOpen"
+            >
+              <Copy class="size-4" aria-hidden="true" />
+              {{ $t('admin.contests.problems.copyLabel') }}
+            </button>
+          </div>
+          <div v-show="isCopyOpen" :id="copyPanelId" :class="[CARD, 'px-4 py-3']">
+            <ProblemCopyFrom :current-key="contest.key" :copy="copyRows" />
+          </div>
+        </section>
         <BulkSelectionBar :count="selection.selected.value.length" @clear="selection.clear">
           <label class="flex items-center gap-2 text-sm font-semibold">
             {{ $t('admin.contests.problems.bulkPoints') }}
@@ -119,10 +166,10 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
                 <th scope="col" :class="HEAD">
                   {{ $t('admin.contests.problems.columns.pretest') }}
                 </th>
-                <th scope="col" :class="HEAD">
+                <th v-if="showLimits" scope="col" :class="HEAD">
                   {{ $t('admin.contests.problems.columns.prefix') }}
                 </th>
-                <th scope="col" :class="HEAD">
+                <th v-if="showLimits" scope="col" :class="HEAD">
                   {{ $t('admin.contests.problems.columns.maxSubmissions') }}
                 </th>
                 <th scope="col" :class="HEAD">
@@ -140,6 +187,7 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
                 :position="index + 1"
                 :count="rows.length"
                 :is-selected="selection.isSelected(row.problemId)"
+                :show-limits="showLimits"
                 @move="(delta) => move(index, delta)"
                 @move-to="(position) => moveTo(index, position - 1)"
                 @remove="removeAt(index)"
@@ -153,7 +201,25 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
         </div>
         <ul class="m-0 flex list-none flex-col gap-1 p-0 text-xs text-muted">
           <li>{{ $t('admin.contests.problems.orderLine') }}</li>
-          <li>{{ $t('admin.contests.problems.prefixLine') }}</li>
+          <li v-if="showLimits">{{ $t('admin.contests.problems.prefixLine') }}</li>
+          <li v-if="!hasLimits">
+            {{ $t('admin.contests.problems.limitsLine') }}
+            <button
+              type="button"
+              class="font-semibold text-accent-text underline"
+              :aria-pressed="showLimits"
+              data-testid="contest-limits-toggle"
+              @click="showLimits = !showLimits"
+            >
+              {{
+                $t(
+                  showLimits
+                    ? 'admin.contests.problems.hideLimits'
+                    : 'admin.contests.problems.showLimits',
+                )
+              }}
+            </button>
+          </li>
           <li>
             {{ $t('admin.contests.problems.rescoreWarning') }}
             <RouterLink
@@ -162,24 +228,21 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
               >{{ $t('admin.contests.problems.rescoreLink') }}</RouterLink
             >
           </li>
+          <li>
+            {{ $t('admin.contests.problems.rejudgeLine') }}
+            <RouterLink
+              :to="{
+                name: 'admin-contestActions',
+                params: { key: contest.key },
+                hash: '#contest-actions-problem',
+              }"
+              class="font-semibold text-accent-text underline"
+              data-testid="contest-rejudge-link"
+              >{{ $t('admin.contests.problems.rejudgeLink') }}</RouterLink
+            >
+          </li>
         </ul>
       </div>
-
-      <aside
-        class="grid min-w-0 items-start gap-4 lg:grid-cols-3 2xl:flex 2xl:flex-col"
-        :aria-label="$t('admin.contests.problems.tools')"
-      >
-        <ProblemAddPicker
-          :listed-ids="listedIds"
-          :is-full="isFull"
-          :is-adding="isAdding"
-          :error="addError"
-          :add-by-code="addByCode"
-          @pick="addFound"
-        />
-        <ProblemCopyFrom :current-key="contest.key" :copy="copyRows" />
-        <ContestProblemOpsCard :contest="contest" />
-      </aside>
     </div>
 
     <AdminStatus

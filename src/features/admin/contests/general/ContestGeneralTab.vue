@@ -13,7 +13,7 @@ import ContestSummaryRail from './ContestSummaryRail.vue';
 import { CONTEST_BASIC_FIELDS } from './contest-views';
 import { useContestForm } from './use-contest-form';
 
-/** The general tab: the form card, a summary rail from 1280 px, and the save bar with its leave guard. */
+/** The general tab: the form card, the summary (a strip above it, a rail from 1280 px), and the save bar with its leave guard. */
 const props = defineProps<{ contest: EditableContest }>();
 const { form, seed, errors, dirtyCount, savedAt, pendingPatch, save, discard, mutation } =
   useContestForm(() => props.contest);
@@ -38,6 +38,11 @@ const pageFailure = computed(() =>
 <template>
   <form class="flex flex-col gap-4" novalidate @submit.prevent="submit">
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_15rem] xl:items-start">
+      <ContestSummaryRail
+        :contest="contest"
+        :has-sections="view === 'advanced'"
+        class="xl:order-last"
+      />
       <fieldset :disabled="mutation.isPending.value" class="m-0 min-w-0 border-0 p-0">
         <ContestGeneralForm
           v-model="form"
@@ -60,11 +65,6 @@ const pageFailure = computed(() =>
           >
         </p>
       </fieldset>
-      <ContestSummaryRail
-        :contest="contest"
-        :has-sections="view === 'advanced'"
-        class="hidden xl:flex"
-      />
     </div>
     <AdminNotice
       v-if="willRescore"

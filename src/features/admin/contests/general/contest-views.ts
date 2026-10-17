@@ -10,12 +10,15 @@ export const CONTEST_BASIC_FIELDS = [
   'startTime',
   'endTime',
   'formatName',
-  'isVisible',
   'scoreboardVisibility',
 ] as const satisfies readonly (keyof ContestForm)[];
 
-/** Set by the server, not by the editor: the creator as author, an organization contest's members-only access. */
+/**
+ * Not the form's to count: set by the server (the creator as author, an organization contest's members-only access), or
+ * by the summary's "Hiển thị" switch, which saves at once.
+ */
 const UNCOUNTED: readonly (keyof ContestForm)[] = [
+  'isVisible',
   'authors',
   'organizations',
   'isOrganizationPrivate',

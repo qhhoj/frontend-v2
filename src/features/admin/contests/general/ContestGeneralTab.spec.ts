@@ -20,6 +20,7 @@ const STALE_AFTER_WRITE = [
   ['contests', 'list', 'probe'],
   ['admin', 'index', 'contests', 'probe'],
 ];
+const SWITCH = '[data-testid="contest-visibility"] [role="switch"]';
 const save = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
   await wrapper
     .findAll('button')
@@ -95,7 +96,7 @@ describe('ContestGeneralTab', () => {
       .trigger('click');
     await flushPromises();
     expect(invalidatedKeys(created.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
-    expect(created.router.currentRoute.value.fullPath).toBe('/admin/contests/w42/general');
+    expect(created.router.currentRoute.value.fullPath).toBe('/admin/contests/w42/problems');
   });
 
   it('shows the refusal for a tag that is not in the catalogue', async () => {
@@ -130,24 +131,24 @@ describe('ContestGeneralTab', () => {
     const openVisibility = async (contest: ReturnType<typeof editableContest>) => {
       mockApi({ ...orgAdmin(), ...contestEditorRoutes(contest) });
       const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
-      return wrapper.get('#contest-isVisible');
+      return wrapper.get(SWITCH);
     };
 
     it('can toggle it on an organization-private contest', async () => {
-      const checkbox = await openVisibility(
+      const toggle = await openVisibility(
         editableContest({
           isOrganizationPrivate: true,
           settings: contestSettings({ isVisible: false, isOrganizationPrivate: true }),
         }),
       );
-      expect(checkbox.attributes('disabled')).toBeUndefined();
+      expect(toggle.attributes('aria-disabled')).toBeUndefined();
     });
 
     it('cannot toggle it on a public contest', async () => {
-      const checkbox = await openVisibility(
+      const toggle = await openVisibility(
         editableContest({ settings: contestSettings({ isVisible: false }) }),
       );
-      expect(checkbox.attributes('disabled')).toBeDefined();
+      expect(toggle.attributes('aria-disabled')).toBe('true');
     });
   });
 
@@ -157,7 +158,25 @@ describe('ContestGeneralTab', () => {
       ...contestEditorRoutes(editableContest({ settings: contestSettings({ isVisible: false }) })),
     });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
-    expect(wrapper.get('#contest-isVisible').attributes('disabled')).toBeUndefined();
+    expect(wrapper.get(SWITCH).attributes('aria-disabled')).toBeUndefined();
+  });
+
+  it('shows a hidden contest at once from the summary switch, with the state in words', async () => {
+    const hidden = editableContest({ settings: contestSettings({ isVisible: false }) });
+    const calls = mockApi({
+      ...staffViewer([...EDIT, 'judge.change_contest_visibility']),
+      ...contestEditorRoutes(hidden),
+      'PATCH /contests/hcmus-w41': ok(editableContest()),
+    });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/general', BASIC_MARK);
+    const summary = () => wrapper.get('[data-testid="contest-visibility"]');
+    expect(summary().text()).toContain('Ẩn — thí sinh chưa thấy');
+    await wrapper.get(SWITCH).trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({ isVisible: true });
+    expect(wrapper.get(SWITCH).attributes('aria-checked')).toBe('true');
+    expect(summary().text()).toContain('Đang hiện');
+    expect(wrapper.text()).not.toContain('thay đổi chưa lưu');
   });
 
   it('names an organization chip instead of showing its id', async () => {
@@ -241,20 +260,20 @@ describe('ContestGeneralTab', () => {
     expect(wrapper.find('[data-testid="editor-view-advanced-alert"]').exists()).toBe(true);
   });
 
-  it('brings the Basic view up on create when the start and end are missing', async () => {
-    mockApi({ ...staffViewer(['judge.add_contest']) });
-    const { wrapper, router } = await mountAndWaitFor(
-      '/admin/contests/new?view=advanced',
-      'Tạo kỳ thi',
-    );
+  it('creates from key, name and time only, and sends nothing while the start and end are missing', async () => {
+    const calls = mockApi({ ...staffViewer(['judge.add_contest']) });
+    const { wrapper } = await mountAndWaitFor('/admin/contests/new', 'Tạo kỳ thi');
+    expect(wrapper.find('[data-testid="editor-view-advanced"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain(BASIC_MARK);
+    await wrapper.get('#contest-key').setValue('w42');
+    await wrapper.get('#contest-name').setValue('W42');
     await wrapper
       .findAll('button')
       .find((button) => button.text() === 'Tạo kỳ thi')!
       .trigger('click');
     await flushPromises();
-    expect(router.currentRoute.value.query.view).toBeUndefined();
     expect(wrapper.get('#contest-startTime').attributes('aria-invalid')).toBe('true');
-    expect(wrapper.find('[data-testid="editor-view-basic-alert"]').exists()).toBe(true);
+    expect(calls.some((call) => call.method === 'POST')).toBe(false);
   });
 
   it('counts an unsaved Advanced edit on the Advanced tab', async () => {

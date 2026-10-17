@@ -43,9 +43,11 @@ describe('ContestParticipantsTab', () => {
     });
     const { wrapper } = await mountAndWaitFor(
       '/admin/contests/hcmus-w41/participants',
-      '214 lượt tham gia · 50 mỗi trang',
+      '214 lượt tham gia, trong đó 214 thí sinh và 0 lượt thi ảo · 50 mỗi trang',
     );
-    expect(wrapper.text()).toContain('214 lượt tham gia · 50 mỗi trang');
+    expect(wrapper.text()).toContain(
+      '214 lượt tham gia, trong đó 214 thí sinh và 0 lượt thi ảo · 50 mỗi trang',
+    );
     expect(wrapper.get('tbody tr').text()).toContain('Trực tiếp');
     expect(wrapper.get('tbody tr').text()).toContain('Hợp lệ');
     await pickRowAction(wrapper, 'Loại khỏi bảng');
@@ -72,7 +74,7 @@ describe('ContestParticipantsTab', () => {
       endTime: '2026-10-08T10:00:00.000Z',
     }),
   });
-  const COUNT_LINE = '214 lượt tham gia · 50 mỗi trang';
+  const COUNT_LINE = '214 lượt tham gia, trong đó 214 thí sinh và 0 lượt thi ảo · 50 mỗi trang';
   it('refetches the contest settings and marks the ranking stale after a disqualify, so a later General save cannot un-ban the user', async () => {
     const calls = mockApi(disqualifyRoutes());
     const { wrapper, queryClient } = await mountAndWaitFor(
